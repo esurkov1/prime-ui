@@ -1,9 +1,8 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { autoScrollStep } from "@/internal/edgeAutoScroll";
 import { RollingNumber } from "@/internal/RollingNumber";
-import { Dnd } from "./Dnd";
+import { DND_CARRYING_ATTRIBUTE, Dnd, DndLock } from "./Dnd";
 import { insertionBefore } from "./geometry";
 import { moveBefore } from "./useSortableList";
 
@@ -1020,29 +1019,6 @@ describe("connected lists", () => {
   });
 });
 
-describe("auto-scroll", () => {
-  it("scrolls only along the axes the box scrolls", () => {
-    render(<div data-testid="column" style={{ overflowX: "hidden", overflowY: "auto" }} />);
-    const column = screen.getByTestId("column");
-    vi.spyOn(column, "getBoundingClientRect").mockReturnValue({
-      left: 0,
-      top: 0,
-      right: 100,
-      bottom: 100,
-      width: 100,
-      height: 100,
-      x: 0,
-      y: 0,
-      toJSON: () => ({}),
-    });
-    // Near the right edge, mid-height: only a sideways scroll would be asked for.
-    autoScrollStep([column], { x: 98, y: 50 }, 16);
-    expect(column.scrollLeft).toBe(0);
-    autoScrollStep([column], { x: 50, y: 98 }, 16);
-    expect(column.scrollTop).toBeGreaterThan(0);
-  });
-});
-
 describe("helpers", () => {
   it("moveBefore moves an item in front of another, or last", () => {
     const ids = ["a", "b", "c"];
@@ -1601,5 +1577,221 @@ describe('table rows (`as="tbody"`)', () => {
       reject(new Error("refused"));
     });
     expect(order()).toEqual(["a", "b", "c"]);
+  });
+});
+
+describe("one session", () => {
+  it("a Dnd.Root inside another is its children: one live region, one overlay", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Root>
+          <Dnd.Draggable kind="card" id="c1" aria-label="Счёт 1042">
+            Счёт 1042
+          </Dnd.Draggable>
+        </Dnd.Root>
+      </Dnd.Root>,
+    );
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+  });
+});
+
+describe("keyboard target", () => {
+  it("with `handle` the grip carries the shortcuts and the role description, not the item", () => {
+    render(<Sortable initial={rows("a", "b")} handle />);
+    const row = screen.getByTestId("row-a");
+    expect(row).not.toHaveAttribute("aria-keyshortcuts");
+    expect(row).not.toHaveAttribute("aria-roledescription");
+    expect(row).not.toHaveAttribute("tabindex");
+    const grip = screen.getByTestId("grip-a");
+    expect(grip).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
+    expect(grip).toHaveAttribute("aria-roledescription", "перетаскиваемый элемент");
+  });
+
+  it("a named div item is a button with a role description; an unnamed one stays generic", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Sortable
+          aria-label="list"
+          items={rows("a", "b")}
+          getId={(row) => row.id}
+          onReorder={() => {}}
+          renderItem={(row) => (
+            <Dnd.SortableItem
+              id={row.id}
+              data-testid={`row-${row.id}`}
+              aria-labelledby={row.id === "a" ? "title-a" : undefined}
+            >
+              <span id={`title-${row.id}`}>Задача {row.id}</span>
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>,
+    );
+    const named = screen.getByRole("button", { name: "Задача a" });
+    expect(named).toBe(screen.getByTestId("row-a"));
+    expect(named).toHaveAttribute("aria-roledescription", "перетаскиваемый элемент");
+    const unnamed = screen.getByTestId("row-b");
+    expect(unnamed).not.toHaveAttribute("role");
+    expect(unnamed).not.toHaveAttribute("aria-roledescription");
+    expect(unnamed).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
+  });
+
+  it("a named Dnd.Draggable is a button; an unnamed one has no role description", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Draggable kind="card" id="c1" aria-label="Счёт 1042">
+          Счёт 1042
+        </Dnd.Draggable>
+        <Dnd.Draggable kind="card" id="c2" data-testid="plain">
+          Счёт 1043
+        </Dnd.Draggable>
+      </Dnd.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Счёт 1042" })).toHaveAttribute(
+      "aria-roledescription",
+    );
+    expect(screen.getByTestId("plain")).not.toHaveAttribute("aria-roledescription");
+  });
+});
+
+describe("the lock", () => {
+  it("is a named image; the grip of a locked item turns into it with its ref and attributes", () => {
+    const ref = React.createRef<HTMLElement>();
+    render(
+      <Dnd.Root>
+        <DndLock aria-label="Системная колонка" data-testid="lock" />
+        <Dnd.Sortable
+          aria-label="list"
+          handle
+          items={rows("a")}
+          getId={(row) => row.id}
+          onReorder={() => {}}
+          renderItem={(row) => (
+            <Dnd.SortableItem id={row.id} locked>
+              <Dnd.Handle ref={ref} data-testid="grip" className="grip" />
+              {row.id}
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>,
+    );
+    expect(screen.getByTestId("lock")).toHaveAccessibleName("Системная колонка");
+    const grip = screen.getByTestId("grip");
+    expect(grip).toBe(ref.current);
+    expect(grip.tagName).toBe("SPAN");
+    expect(grip).toHaveClass("grip");
+    expect(grip).toHaveAccessibleName("Закреплено");
+  });
+});
+
+describe("a move being saved", () => {
+  it("the item is busy and still, its grip is busy, until the promise settles", async () => {
+    let resolve: () => void = () => {};
+    const onReorder = vi.fn(
+      () =>
+        new Promise<void>((done) => {
+          resolve = done;
+        }),
+    );
+    render(
+      <Dnd.Root>
+        <Dnd.Sortable
+          aria-label="list"
+          handle
+          items={rows("a", "b", "c")}
+          getId={(row) => row.id}
+          onReorder={onReorder}
+          renderItem={(row) => (
+            <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+              <Dnd.Handle data-testid={`grip-${row.id}`} />
+              {row.id}
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>,
+    );
+    await act(async () => {
+      fireEvent.keyDown(screen.getByTestId("grip-a"), { key: "ArrowDown", altKey: true });
+    });
+    expect(screen.getByTestId("row-a")).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByTestId("grip-a")).toHaveAttribute("aria-busy", "true");
+    // Still while saved: another move of the same item waits.
+    fireEvent.keyDown(screen.getByTestId("grip-a"), { key: "ArrowDown", altKey: true });
+    expect(onReorder).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      resolve();
+    });
+    expect(screen.getByTestId("row-a")).not.toHaveAttribute("aria-busy");
+  });
+});
+
+describe("drag state on the list", () => {
+  it("every list that may take the item is marked while it is carried", () => {
+    render(<Sortable initial={rows("a", "b")} />);
+    const list = screen.getByLabelText("list");
+    expect(list).not.toHaveAttribute(DND_CARRYING_ATTRIBUTE);
+    pressOn(screen.getByTestId("row-a"), 10, 5);
+    moveTo(10, 25);
+    expect(list).toHaveAttribute(DND_CARRYING_ATTRIBUTE);
+    releaseAt(10, 25);
+    expect(list).not.toHaveAttribute(DND_CARRYING_ATTRIBUTE);
+  });
+
+  it("the click after a drop into another list is no press on the item drawn there", () => {
+    const onClick = vi.fn();
+    function Two() {
+      const [cols, setCols] = React.useState<Record<string, Row[]>>({
+        left: rows("a"),
+        right: rows("x"),
+      });
+      return (
+        <Dnd.Root>
+          {(["left", "right"] as const).map((name) => (
+            <Dnd.Sortable
+              key={name}
+              kind="card"
+              aria-label={name}
+              items={cols[name] ?? []}
+              getId={(row) => row.id}
+              onReorder={(id) =>
+                setCols({ left: name === "left" ? rows("a", "x") : [], right: rows("x", id) })
+              }
+              renderItem={(row) => (
+                <Dnd.SortableItem id={row.id} data-testid={`${name}-${row.id}`} onClick={onClick}>
+                  {row.id}
+                </Dnd.SortableItem>
+              )}
+            />
+          ))}
+        </Dnd.Root>
+      );
+    }
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const left = this.closest('[aria-label="right"]') ? 200 : 0;
+      const item = this.hasAttribute("data-dnd-item");
+      const width = this.hasAttribute("data-lifted") ? 0 : 100;
+      const height = item ? ROW_HEIGHT : 300;
+      return {
+        left,
+        top: 0,
+        right: left + width,
+        bottom: height,
+        width,
+        height,
+        x: left,
+        y: 0,
+        toJSON: () => ({}),
+      };
+    });
+    render(<Two />);
+    pressOn(screen.getByTestId("left-a"), 10, 5);
+    moveTo(250, 250);
+    releaseAt(250, 250);
+    fireEvent.click(screen.getByTestId("right-a"));
+    expect(onClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("right-a"));
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });

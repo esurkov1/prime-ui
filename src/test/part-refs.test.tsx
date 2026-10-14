@@ -483,6 +483,46 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "Dnd.Handle",
+    "BUTTON",
+    (ref) => (
+      <Dnd.Root>
+        <Dnd.Sortable
+          as="ul"
+          handle
+          items={["a"]}
+          getId={(id) => id}
+          onReorder={() => undefined}
+          renderItem={(id) => (
+            <Dnd.SortableItem id={id}>
+              <Dnd.Handle ref={ref} data-testid="part" />
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>
+    ),
+  ],
+  [
+    "Dnd.Handle (lock of a locked item)",
+    "SPAN",
+    (ref) => (
+      <Dnd.Root>
+        <Dnd.Sortable
+          as="ul"
+          handle
+          items={["a"]}
+          getId={(id) => id}
+          onReorder={() => undefined}
+          renderItem={(id) => (
+            <Dnd.SortableItem id={id} locked>
+              <Dnd.Handle ref={ref} data-testid="part" />
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>
+    ),
+  ],
+  [
     "Dnd.Draggable",
     "DIV",
     (ref) => (

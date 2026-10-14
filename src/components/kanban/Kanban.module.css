@@ -236,15 +236,10 @@
   list-style: none;
 }
 
-/* An empty column: Dnd's empty state, a dashed drop slot at the top of the drop area with the text
-   and a hint; Dnd steps it out of the flow and fades it once a card's gap opens in the column. */
+/* An empty column: Dnd's empty state, the text and a hint inside the dashed drop slot Dnd draws at
+   the top of the drop area; Dnd steps it out of the flow and fades it once a card's gap opens. */
 .empty {
-  box-sizing: border-box;
   padding-block: var(--prime-space-6);
-  border-radius: var(--prime-radius-m);
-  /* A drop slot, not a card: the dashed «put it here» line Dnd draws for its gap, no fill. The
-     line is a translucent fill, so it reads the same on a well and on a bare surface. */
-  border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
   pointer-events: none;
 }
 

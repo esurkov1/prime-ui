@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { RollingNumber } from "./RollingNumber";
+import { carryRolling, RollingNumber } from "./RollingNumber";
 
 describe("RollingNumber", () => {
   it("keeps the real value as text and gives every digit its column", () => {
@@ -44,5 +44,22 @@ describe("RollingNumber", () => {
     // React writes 4, the replay puts 3 back for one style read, then 4 again.
     expect(seen.slice(-2)).toEqual(["3", "4"]);
     expect(digit?.style.getPropertyValue("--rolling-n")).toBe("4");
+  });
+
+  it("a carried copy takes the destination's digits from the right", () => {
+    const copy = render(<RollingNumber>{12}</RollingNumber>).container;
+    const destination = render(<RollingNumber>{15}</RollingNumber>).container;
+    expect(carryRolling(copy, destination)).toBe(true);
+    expect(copy).toHaveTextContent("15");
+    const ones = copy.querySelectorAll<HTMLElement>("[data-rolling-digit]")[1];
+    expect(ones?.style.getPropertyValue("--rolling-n")).toBe("5");
+  });
+
+  it("a number that grew a column rolls the shared columns and asks for a copy", () => {
+    const copy = render(<RollingNumber>{9}</RollingNumber>).container;
+    const destination = render(<RollingNumber>{10}</RollingNumber>).container;
+    expect(carryRolling(copy, destination)).toBe(false);
+    expect(copy).toHaveTextContent("0");
+    expect(carryRolling(document.createElement("span"), destination)).toBe(false);
   });
 });

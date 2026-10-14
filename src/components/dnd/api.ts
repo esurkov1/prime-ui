@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Dnd.Root",
-      en: "No ref, no DOM of its own besides the portalled overlay and a visually hidden live region. Owns the one drag session the app shares — mount it once above every screen that drags. Without a root the parts render but do not drag.",
-      ru: "Без собственной разметки, кроме оверлея в портале и скрытой live-области. Владеет единственной сессией перетаскивания — монтируйте один раз над всеми экранами. Без корня части рендерятся, но не перетаскиваются.",
+      en: "No ref, no DOM of its own besides the portalled overlay and a visually hidden live region. Owns the one drag session the app shares: mount it once above every screen that drags; a root inside another renders only its children. Without a root nothing drags.",
+      ru: "Без своей разметки, кроме оверлея в портале и скрытой live-области. Владеет единственной сессией перетаскивания: монтируйте один раз над всеми экранами; корень внутри другого рендерит только детей. Без корня ничего не перетаскивается.",
       props: [
         {
           name: "labels",
@@ -24,8 +24,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Sortable",
-      en: "Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target: renders the items through `renderItem` and draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.",
-      ru: "Список и его цель сброса: рендерит элементы через `renderItem`, рисует зазор и оптимистичный порядок. Ставит `data-axis` и `data-dragging`.",
+      en: "Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target: renders the items through `renderItem`, draws the gap and the optimistic order. Sets `data-axis`, `data-disabled`, `data-dragging`, `data-dnd-carrying`.",
+      ru: "Список и его цель сброса: рендерит элементы через `renderItem`, рисует зазор и оптимистичный порядок. Ставит `data-axis`, `data-disabled`, `data-dragging`, `data-dnd-carrying`.",
       props: [
         {
           name: "items",
@@ -52,8 +52,8 @@ export const api: ComponentApi = {
           name: "onReorder",
           type: "(id: string, beforeId: string | null) => void | Promise<void>",
           required: true,
-          en: "Item `id` lands in front of `beforeId` (`null` = last); in linked lists `id` may come from another list. Apply it with `moveBefore`; return a promise to save on a server (a rejection moves the item back).",
-          ru: "Элемент `id` встаёт перед `beforeId` (`null` — в конец); в связанных списках `id` может прийти из другого списка. Применяйте через `moveBefore`; верните промис для сохранения на сервере (reject возвращает элемент).",
+          en: "Item `id` lands in front of `beforeId` (`null` = last), maybe from a linked list. Apply it with `moveBefore`; a returned promise keeps the item still and busy until it settles, a rejection moves it back.",
+          ru: "Элемент `id` встаёт перед `beforeId` (`null` — в конец), возможно из связанного списка. Применяйте через `moveBefore`; промис держит элемент неподвижным и занятым, reject возвращает его.",
         },
         {
           name: "renderItem",
@@ -105,8 +105,8 @@ export const api: ComponentApi = {
         {
           name: "empty",
           type: "ReactNode",
-          en: "Shown while the list has no items; fades out when a gap opens in the list, so the gap takes its place.",
-          ru: "Показывается, пока в списке нет элементов; гаснет, когда в списке открывается зазор, и зазор встаёт на его место.",
+          en: "Shown while the list has no items, inside a dashed drop slot while the list takes drops; fades out when a gap opens in the list, so the gap takes its place.",
+          ru: "Показывается, пока в списке нет элементов, — в пунктирном слоте для сброса, пока список принимает элементы; гаснет, когда в списке открывается зазор, и зазор встаёт на его место.",
         },
         {
           name: "as",
@@ -137,8 +137,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.SortableItem",
-      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item of the list; presses on buttons, fields and links inside never start a drag.",
-      ru: "`<li>` в `ul` / `ol`, `<tr>` в `tbody`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Один элемент списка; нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
+      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item; presses on controls inside never drag. Without `handle` it takes the keys, and a named `<div>` item is a `button`.",
+      ru: "`<li>` в `ul` / `ol`, `<tr>` в `tbody`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Один элемент; нажатия на элементы управления внутри не тянут его. Без `handle` клавиши работают на нём, а названный `<div>` — это `button`.",
       props: [
         {
           name: "id",
@@ -183,8 +183,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Handle",
-      en: "`ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button; a press always starts the drag, Alt + arrows on it move its item. In a `locked` item it is a lock instead.",
-      ru: "Ручка: ghost-кнопка `xs` с одной иконкой; нажатие всегда начинает перетаскивание, Alt + стрелки двигают её элемент. В элементе с `locked` вместо неё замок.",
+      en: "`ref` → `HTMLButtonElement` (`HTMLSpanElement` in a `locked` item). The grip: a ghost icon-only `xs` Button that starts the drag and takes the item's keys; busy while the item's move is saved. In a `locked` item it is a lock.",
+      ru: "Ручка: ghost-кнопка `xs` с одной иконкой, начинает перетаскивание и принимает клавиши элемента; занята, пока перенос сохраняется. В элементе с `locked` — замок.",
       props: [
         {
           name: "aria-label",
@@ -203,8 +203,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Draggable",
-      en: "Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a `Dnd.DropZone`; stays in place, faded, while carried. Has no keyboard path: offer a button or a menu for the same move.",
-      ru: "Элемент, который переносят на `Dnd.DropZone`; на время переноса остаётся на месте полупрозрачным. Клавиатурного пути нет — дайте кнопку или меню для того же действия.",
+      en: "Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a `Dnd.DropZone`; stays in place, faded, while carried; a named one is a `button`. No keyboard path: offer a button or a menu for the same move.",
+      ru: "Элемент, который переносят на `Dnd.DropZone`; на время переноса остаётся на месте полупрозрачным; названный — это `button`. Клавиатурного пути нет — дайте кнопку или меню для того же действия.",
       props: [
         {
           name: "kind",
@@ -374,8 +374,8 @@ export const api: ComponentApi = {
       ru: "Имя замка, который показывает `Dnd.Handle` в элементе с `locked`.",
     },
     roleDescription: {
-      en: "`aria-roledescription` of every draggable item.",
-      ru: "`aria-roledescription` каждого перетаскиваемого элемента.",
+      en: "`aria-roledescription` of every draggable item (its grip with `handle`).",
+      ru: "`aria-roledescription` каждого перетаскиваемого элемента (с `handle` — его ручки).",
     },
     grabbed: { en: "Live region: picked up.", ru: "Live-область: взят." },
     dropped: { en: "Live region: dropped on a target.", ru: "Live-область: брошен на цель." },
@@ -433,8 +433,12 @@ export const api: ComponentApi = {
         ru: 'Live-область (`role="status"`, `aria-live="polite"`) объявляет: взят, перемещён, возвращён, отменён, позиция N из M, перенос в другой список и причину отказа (`labels`).',
       },
       {
-        en: "Every draggable item has `aria-roledescription` and `aria-keyshortcuts` (with the across keys in linked lists) and is in the tab order (`tabIndex={0}`); with `handle` the grip takes focus instead. The clone is `aria-hidden`.",
-        ru: "У каждого перетаскиваемого элемента `aria-roledescription` и `aria-keyshortcuts` (в связанных списках — с клавишами переноса), он в порядке Tab (`tabIndex={0}`); с `handle` фокус берёт ручка. Клон — `aria-hidden`.",
+        en: "The keyboard target of a sortable item has `aria-keyshortcuts` (with the across keys in linked lists) and `aria-roledescription` and is in the tab order: the item itself (`tabIndex={0}`; a named `<div>` item is a `button`, an `li` or a `tr` keeps its role), or with `handle` its grip. A role description stands only on an element with a role. The clone is `aria-hidden`.",
+        ru: "Клавиатурная цель элемента списка несёт `aria-keyshortcuts` (в связанных списках — с клавишами переноса) и `aria-roledescription` и стоит в порядке Tab: сам элемент (`tabIndex={0}`; названный `<div>` — это `button`, `li` и `tr` сохраняют свою роль) или с `handle` его ручка. Описание роли ставится только на элемент с ролью. Клон — `aria-hidden`.",
+      },
+      {
+        en: "While `onReorder`'s promise is pending, the item has `aria-busy` and holds still, and its `Dnd.Handle` is busy.",
+        ru: "Пока промис `onReorder` не завершён, у элемента `aria-busy`, он неподвижен, а его `Dnd.Handle` занята.",
       },
       {
         en: "In lists sharing a `kind`, Alt + the across arrows move the item to the same row of the neighbouring list in document order; focus follows the item.",
@@ -445,8 +449,8 @@ export const api: ComponentApi = {
         ru: "Имя элемента — его видимый текст: `aria-labelledby` / `aria-describedby` на заголовок и описание, а не `aria-label`, который заглушает содержимое. Список называет `aria-label` или `aria-labelledby` — это имя звучит при переносе в него.",
       },
       {
-        en: 'A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role="img">` named `labels.locked` with the `status.locked` icon at the grip\'s size (no ref).',
-        ru: 'У элемента с `locked` нет описания роли и сочетаний; его `Dnd.Handle` — замок: `<span role="img">` с именем `labels.locked` и иконкой `status.locked` размера ручки (без ref).',
+        en: "A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role=\"img\">` named `labels.locked` with the `status.locked` icon at the grip's size, taking the grip's `ref` and attributes.",
+        ru: 'У элемента с `locked` нет описания роли и сочетаний; его `Dnd.Handle` — замок: `<span role="img">` с именем `labels.locked` и иконкой `status.locked` размера ручки, с `ref` и атрибутами ручки.',
       },
       {
         en: "Touch: a drag starts after a hold; a finger that moves first scrolls the page.",

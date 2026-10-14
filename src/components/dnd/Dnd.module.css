@@ -43,32 +43,16 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-/* Why the spot refuses the item (`canDrop` answered a string): the tooltip's inverse chip under
-   the carried copy, start-aligned with it, so it moves with the copy and never covers the target. */
+/* Why the spot refuses the item (`canDrop` answered a string): the tooltip's chip
+   (`tooltipSurface`) under the carried copy, start-aligned with it, so it moves with the copy and
+   never covers the target. It drops in from above (`enterMotion`). */
 .reason {
+  --enter-shift: calc(var(--prime-space-1) * -1);
+
   position: absolute;
   inset-block-start: calc(100% + var(--prime-tooltip-offset));
   inset-inline-start: 0;
-  box-sizing: border-box;
   inline-size: max-content;
-  max-inline-size: var(--prime-tooltip-max-width);
-  padding-block: var(--prime-tooltip-m-padding-y);
-  padding-inline: var(--prime-tooltip-m-padding-x);
-  border-radius: var(--prime-tooltip-m-radius);
-  background: var(--prime-color-tooltip-bg);
-  color: var(--prime-color-tooltip-text);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--prime-tooltip-m-text-size);
-  line-height: var(--prime-tooltip-m-line-height);
-  overflow-wrap: anywhere;
-  animation: reasonIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
-}
-
-@keyframes reasonIn {
-  from {
-    opacity: 0;
-    transform: translateY(calc(var(--prime-space-1) * -1));
-  }
 }
 
 /* The carried clone keeps its colours but never its interactivity. */
@@ -82,7 +66,9 @@
   visibility: hidden;
 }
 
-/* Page-wide while a drag is in flight: "holding" cursor everywhere, no text selection behind the pointer. */
+/* Page-wide while a drag is in flight: "holding" cursor everywhere, no text selection behind the
+   pointer. The one page-wide rule: a host scopes its own drag-time look to the list that may take
+   the item (`data-dnd-carrying`). */
 :global(html[data-dnd-active]) * {
   cursor: grabbing;
   user-select: none;
@@ -97,6 +83,7 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .draggable[data-disabled] {
@@ -127,6 +114,12 @@
   outline-offset: var(--prime-focus-offset);
 }
 
+/* A table body that sorts its rows stays a row group (the table lays it out); its cells fade into
+   a refusal. Zero specificity on the body: a table's own cell transition wins. */
+:where(.sortableRows) > tr > td {
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
 /* The hole the lifted item leaves, standing where it will land. It fades in on the spot and then
    glides from place to place with the items (FLIP in `useFlipList`). */
 .placeholder {
@@ -155,27 +148,27 @@ li.placeholder {
   pointer-events: none;
 }
 
-/* A table body that sorts its rows stays a row group (the table lays it out); a refusing one tints
-   its cells. */
+/* A refusing table body tints its cells. */
 .sortableRows[data-dnd-reject] > tr > td {
   background-color: var(--prime-color-danger-soft);
 }
 
-/* The sortable container. */
+/* The sortable container. The host sets the distance between items with `--dnd-sortable-gap`. */
 .sortable {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-2);
+  gap: var(--dnd-sortable-gap, var(--prime-space-2));
   min-width: 0;
   margin: 0;
   padding: 0;
+  border-radius: var(--prime-radius-m);
   list-style: none;
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* A list that refuses the item in flight says so before the release. */
 .sortable[data-dnd-reject] {
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-danger-soft);
+  background-color: var(--prime-color-danger-soft);
 }
 
 .sortable[data-axis="x"] {
@@ -263,10 +256,24 @@ li.placeholder {
   position: relative;
 }
 
+/* An empty list that takes drops is a drop slot: the dashed «put it here» line the gap draws, no
+   fill. The line is a translucent fill, so it reads the same on a well and on a bare surface. */
 .empty {
   min-width: 0;
   list-style: none;
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+/* A table's empty row is the table's own; a list draws the slot. */
+.empty:not(tr) {
+  box-sizing: border-box;
+  border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
+  border-radius: var(--prime-radius-m);
+}
+
+/* A list that takes no drops shows only its text. */
+.sortable[data-disabled] > .empty {
+  border-color: transparent;
 }
 
 .sortable > [data-dnd-gap] ~ .empty {
@@ -275,18 +282,6 @@ li.placeholder {
   inset-inline: 0;
   opacity: 0;
   pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .overlay .lift,
-  .dropZone[data-dnd-flash],
-  .reason {
-    animation: none;
-  }
-
-  .empty {
-    transition: none;
-  }
 }
 
 /* A table has no room for the empty row beside the gap: the gap takes its place. */

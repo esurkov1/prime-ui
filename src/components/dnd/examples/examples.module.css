@@ -85,9 +85,10 @@
 }
 
 /* grid.tsx: the host sets the tracks of a wrapping grid; the gap takes a cell. */
-.gallery[data-axis] {
+.gallery {
+  --dnd-sortable-gap: var(--prime-space-3);
+
   grid-template-columns: repeat(auto-fill, minmax(calc(var(--prime-space-24) * 1.25), 1fr));
-  gap: var(--prime-space-3);
   width: 100%;
   max-width: calc(var(--prime-space-24) * 6);
 }
@@ -98,12 +99,10 @@
   border-radius: var(--prime-thumbnail-m-radius);
 }
 
-/* An empty column's line: a dashed «put it here» slot, like the gap that replaces it. */
+/* An empty column's line, inside the drop slot Dnd draws around it. */
 .empty {
   margin: 0;
   padding: var(--prime-space-4);
-  border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
-  border-radius: var(--prime-radius-m);
   text-align: center;
 }
 
@@ -151,7 +150,6 @@
 }
 
 .chips {
-  gap: var(--prime-space-2);
   width: max-content;
 }
 
