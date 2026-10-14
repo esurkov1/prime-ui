@@ -46,7 +46,7 @@ export default function DndStatesExample() {
                     {step.person}
                   </Typography>
                 </span>
-                {step.signed ? <Badge.Root color="green">Подписано</Badge.Root> : null}
+                {step.signed ? <Badge.Root tone="success">Подписано</Badge.Root> : null}
               </Dnd.SortableItem>
             )}
           />

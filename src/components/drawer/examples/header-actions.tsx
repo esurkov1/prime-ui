@@ -21,7 +21,7 @@ export default function DrawerHeaderActionsExample() {
           <Drawer.Title>{DEAL.title}</Drawer.Title>
           <Drawer.Description>{DEAL.client}</Drawer.Description>
           <Drawer.Actions>
-            <Badge.Root color="green">Выиграна</Badge.Root>
+            <Badge.Root tone="success">Выиграна</Badge.Root>
             <Dropdown.Root>
               <Dropdown.Trigger>
                 <Button.Root variant="ghost" tone="neutral" aria-label="Действия со сделкой">

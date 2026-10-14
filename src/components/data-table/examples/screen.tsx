@@ -12,7 +12,6 @@ import {
   matchesSmartFilter,
   PageContent,
   PageToolbar,
-  type PaletteColor,
   SmartFilter,
   type SmartFilterField,
   type SmartFilterValue,
@@ -34,13 +33,13 @@ type Invoice = {
   status: Status;
 };
 
-/** One hue per status across the product: the text carries the meaning, the color repeats it. */
-const STATUS: Record<Status, { label: string; color: PaletteColor }> = {
-  draft: { label: "Черновик", color: "gray" },
-  sent: { label: "Отправлен", color: "blue" },
-  paid: { label: "Оплачен", color: "green" },
-  overdue: { label: "Просрочен", color: "red" },
-};
+/** One tone per status across the product: the text carries the meaning, the tone repeats it. */
+const STATUS = {
+  draft: { label: "Черновик", tone: "neutral" },
+  sent: { label: "Отправлен", tone: "info" },
+  paid: { label: "Оплачен", tone: "success" },
+  overdue: { label: "Просрочен", tone: "danger" },
+} as const satisfies Record<Status, { label: string; tone: string }>;
 
 const INVOICES: Invoice[] = [
   {
@@ -208,7 +207,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
     header: "Статус",
     accessor: "status",
     cell: (row) => (
-      <Badge.Root color={STATUS[row.status].color}>{STATUS[row.status].label}</Badge.Root>
+      <Badge.Root tone={STATUS[row.status].tone}>{STATUS[row.status].label}</Badge.Root>
     ),
   },
   {

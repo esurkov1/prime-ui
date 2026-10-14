@@ -51,7 +51,7 @@ export default function KanbanLimitsExample() {
           </Kanban.ItemDescription>
           {ticket.blocked ? (
             <Kanban.ItemBadges>
-              <Badge.Root color="orange">Ждёт клиента</Badge.Root>
+              <Badge.Root tone="warning">Ждёт клиента</Badge.Root>
             </Kanban.ItemBadges>
           ) : null}
         </Kanban.Item>

@@ -8,7 +8,7 @@ export default function TooltipNonInteractiveTriggerExample() {
     <div className={styles.row}>
       <Tooltip.Root>
         <Tooltip.Trigger>
-          <Badge.Root color="orange">Просрочен</Badge.Root>
+          <Badge.Root tone="danger">Просрочен</Badge.Root>
         </Tooltip.Trigger>
         <Tooltip.Content>Счёт не оплачен 12 дней, срок был 1 октября</Tooltip.Content>
       </Tooltip.Root>

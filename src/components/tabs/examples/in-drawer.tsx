@@ -41,7 +41,7 @@ export default function TabsInDrawerExample() {
               <DescriptionList.Root>
                 <DescriptionList.Item label="Клиент">Анна Смирнова</DescriptionList.Item>
                 <DescriptionList.Item label="Статус">
-                  <Badge.Root color="orange">Собирается на складе</Badge.Root>
+                  <Badge.Root tone="info">Собирается на складе</Badge.Root>
                 </DescriptionList.Item>
                 <DescriptionList.Item label="Оплата">Картой, 3 октября</DescriptionList.Item>
                 <DescriptionList.Item label="Менеджер">Илья Соколов</DescriptionList.Item>

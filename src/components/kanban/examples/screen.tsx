@@ -520,9 +520,9 @@ export default function KanbanScreenExample() {
                     <DescriptionList.Item label="Источник">{deal.source}</DescriptionList.Item>
                     <DescriptionList.Item label="Договор">
                       {deal.contract ? (
-                        <Badge.Root color="green">Подписан</Badge.Root>
+                        <Badge.Root tone="success">Подписан</Badge.Root>
                       ) : (
-                        <Badge.Root color="gray">Не подписан</Badge.Root>
+                        <Badge.Root tone="neutral">Не подписан</Badge.Root>
                       )}
                     </DescriptionList.Item>
                   </DescriptionList.Root>

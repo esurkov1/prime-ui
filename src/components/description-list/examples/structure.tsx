@@ -8,7 +8,7 @@ export default function DescriptionListStructureExample() {
     <div className={styles.column}>
       <DescriptionList.Root labels={{ empty: "Нет", emptyText: "Нет данных" }}>
         <DescriptionList.Item label="Статус">
-          <Badge.Root color="green">Оплачен</Badge.Root>
+          <Badge.Root tone="success">Оплачен</Badge.Root>
         </DescriptionList.Item>
         <DescriptionList.Item label="Договор">
           <LinkButton href="#contract-118">Договор № 118 от 12 марта</LinkButton>

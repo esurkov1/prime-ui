@@ -140,7 +140,7 @@ const COLUMNS: DataTableColumn<Payment>[] = [
     cell: (row) => (
       <span className={styles.client}>
         {row.client}
-        {row.late ? <Badge.Root color="orange">С опозданием</Badge.Root> : null}
+        {row.late ? <Badge.Root tone="warning">С опозданием</Badge.Root> : null}
       </span>
     ),
   },

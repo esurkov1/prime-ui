@@ -22,9 +22,9 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
     header: "Статус",
     cell: (row) =>
       row.paid ? (
-        <Badge.Root color="green">Оплачен</Badge.Root>
+        <Badge.Root tone="success">Оплачен</Badge.Root>
       ) : (
-        <Badge.Root color="orange">Ожидает</Badge.Root>
+        <Badge.Root tone="warning">Ожидает</Badge.Root>
       ),
   },
   { id: "amount", header: "Сумма", numeric: true, cell: (row) => RUB.format(row.amount) },

@@ -27,7 +27,7 @@ export default function VisuallyHiddenAssertiveExample() {
         Сохранить счёт
       </Button.Root>
       {failed ? (
-        <Badge.Root color="red" aria-hidden="true">
+        <Badge.Root tone="danger" aria-hidden="true">
           Не сохранено
         </Badge.Root>
       ) : null}

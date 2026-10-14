@@ -18,7 +18,7 @@ export default function VisuallyHiddenOverviewExample() {
     <>
       <Typography as="span" variant="body-m">
         Счета к оплате{" "}
-        <Badge.Root color="orange" aria-hidden="true">
+        <Badge.Root tone="warning" aria-hidden="true">
           {unpaid}
         </Badge.Root>
         <VisuallyHidden>, ждут оплаты: {unpaid}</VisuallyHidden>

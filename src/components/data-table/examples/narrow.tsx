@@ -21,7 +21,11 @@ const COLUMNS: DataTableColumn<Ticket>[] = [
     id: "priority",
     header: "Приоритет",
     cell: (row) =>
-      row.urgent ? <Badge.Root color="red">Высокий</Badge.Root> : <Badge.Root>Обычный</Badge.Root>,
+      row.urgent ? (
+        <Badge.Root tone="danger">Высокий</Badge.Root>
+      ) : (
+        <Badge.Root tone="neutral">Обычный</Badge.Root>
+      ),
   },
   { id: "waiting", header: "Ждёт, ч", accessor: "waiting", numeric: true },
 ];

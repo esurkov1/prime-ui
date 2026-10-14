@@ -66,7 +66,7 @@ export default function DndDropZonesExample() {
                   {doc.title}
                 </Typography>
                 {doc.signing ? (
-                  <Badge.Root color="orange" className={styles.badge}>
+                  <Badge.Root tone="warning" className={styles.badge}>
                     На подписи
                   </Badge.Root>
                 ) : null}

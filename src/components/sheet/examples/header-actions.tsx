@@ -26,7 +26,7 @@ export default function SheetHeaderActionsExample() {
           <Sheet.Title>Курьер у двери</Sheet.Title>
           <Sheet.Description>Заказ № 1042 · 3 коробки</Sheet.Description>
           <Sheet.Actions>
-            <Badge.Root color="green">Оплачен</Badge.Root>
+            <Badge.Root tone="success">Оплачен</Badge.Root>
             <Dropdown.Root>
               <Dropdown.Trigger>
                 <Button.Root variant="ghost" tone="neutral" aria-label="Действия с заказом">
