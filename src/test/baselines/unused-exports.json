@@ -1,6 +1,5 @@
 [
   "src/hooks/breakpoints.ts: HOVER_QUERY is unused",
-  "src/hooks/useDraft.ts: useDraft is test-only",
   "src/hooks/useEdgeOverflow.ts: EdgeOverflow is unused",
   "src/hooks/useEdgeOverflow.ts: EdgeOverflowAxis is unused",
   "src/hooks/useEnterConfirm.ts: UseEnterConfirmOptions is unused",
@@ -26,9 +25,6 @@
   "src/internal/iconLayout.ts: IconLayout is unused",
   "src/internal/interactiveElement.tsx: InteractiveElementProps is test-only",
   "src/internal/listbox.ts: ListboxKeyContext is unused",
-  "src/internal/messageList.tsx: MessageRowDescription is unused",
-  "src/internal/messageList.tsx: RowKind is unused",
-  "src/internal/messageList.tsx: SelectionStore is unused",
   "src/internal/overlay/FloatingPanel.tsx: FloatingPanelProps is unused",
   "src/internal/overlay/FloatingPanel.tsx: FloatingTriggerProps is unused",
   "src/internal/overlay/layerStack.ts: OutsideDismiss is unused",

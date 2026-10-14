@@ -20,7 +20,8 @@ export const page: ComponentPageConfig = {
   examples: [
     {
       slot: "overview",
-      description: "Объявление о работах: иконка, заголовок и описание на мягкой заливке info.",
+      description:
+        "Объявление о работах: иконка, заголовок и описание на мягкой заливке info — `Banner.Icon`, `Banner.Title`, `Banner.Description`.",
     },
     {
       slot: "variants",
@@ -41,7 +42,7 @@ export const page: ComponentPageConfig = {
       scenario: "dismissible",
       title: "Закрытие",
       description:
-        "Видимостью владеет родитель: кнопка закрытия вызывает колбэк, баннер схлопывается, фокус переходит на кнопку возврата; имя кнопки из labels — `onDismiss`, `labels`.",
+        "Видимостью владеет родитель: кнопка закрытия вызывает колбэк, баннер сменяется кнопкой возврата, и фокус переходит на неё; имя кнопки из labels — `onDismiss`, `labels`.",
     },
     {
       scenario: "page-strip",

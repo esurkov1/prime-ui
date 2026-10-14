@@ -3,12 +3,17 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { HOVER_QUERY } from "@/hooks/breakpoints";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { useScrollRegion } from "@/hooks/useScrollRegion";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
+import { useLongPress } from "@/internal/longPress";
 import mediaPill from "@/internal/mediaPill.module.css";
 import {
   defineRowKind,
@@ -23,11 +28,13 @@ import {
   messagePartOf,
 } from "@/internal/messagePart";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { flattenChildren } from "@/internal/parts";
 import {
   type SurfaceDepth,
   SurfaceDepthProvider,
   useNestedSurfaceDepth,
 } from "@/internal/surfaceDepth";
+import { type AsyncHandler, isPromiseLike, usePendingAction } from "@/internal/usePendingChanges";
 
 import { BubbleHug } from "./bubbleHug";
 import { createBubbleMorph, MorphSnapshot } from "./bubbleMorph";
@@ -95,9 +102,6 @@ export type MessageStatus = "sending" | "sent" | "read" | "failed";
  */
 export type MessageShell = "bubble" | "media" | "round";
 
-// biome-ignore lint/suspicious/noConfusingVoidType: a handler that returns nothing must fit.
-type AsyncEvent<T> = (value: T) => void | Promise<unknown>;
-
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const STATUS_ICONS = [
@@ -155,7 +159,7 @@ const NO_OPTIMISTIC: ReadonlyMap<string, boolean> = new Map();
  */
 function useOptimisticReactions(
   reactions: readonly MessageReaction[],
-  onReactionToggle: AsyncEvent<string> | undefined,
+  onReactionToggle: AsyncHandler<[emoji: string], unknown> | undefined,
 ) {
   const [optimistic, setOptimistic] = React.useState(NO_OPTIMISTIC);
   const shown = applyOptimistic(reactions, optimistic);
@@ -166,7 +170,7 @@ function useOptimisticReactions(
     if (!onReactionToggle || optimistic.has(emoji)) return;
     const next = !shown.some((reaction) => reaction.emoji === emoji && reaction.selected);
     const result = onReactionToggle(emoji);
-    if (!(result instanceof Promise)) return;
+    if (!isPromiseLike(result)) return;
     setOptimistic((current) => new Map(current).set(emoji, next));
     try {
       await result;
@@ -181,25 +185,6 @@ function useOptimisticReactions(
     }
   }, []);
   return { optimistic, shown, toggleReaction: onReactionToggle ? toggle : null };
-}
-
-/** `onRetry` with its pending state: a returned promise shows `sending` until it settles. */
-function useRetry(onRetry: MessageRootProps["onRetry"]) {
-  const [retrying, setRetrying] = React.useState(false);
-  const retry = async () => {
-    if (!onRetry || retrying) return;
-    const result = onRetry();
-    if (!(result instanceof Promise)) return;
-    setRetrying(true);
-    try {
-      await result;
-    } catch {
-      // Rejected: the message stays failed.
-    } finally {
-      setRetrying(false);
-    }
-  };
-  return { retrying, retry };
 }
 
 /**
@@ -323,30 +308,13 @@ function useReactionBarState(rootRef: React.RefObject<HTMLElement | null>) {
 const isElement = (child: React.ReactElement, type: unknown): boolean => child.type === type;
 
 /**
- * The children of a message as a flat list of elements: fragments opened (their keys kept unique),
- * `null`, `false` and strings dropped — what decides the shell is what renders.
- */
-function flatten(nodes: React.ReactNode, prefix = ""): React.ReactElement[] {
-  const out: React.ReactElement[] = [];
-  for (const node of React.Children.toArray(nodes)) {
-    if (!React.isValidElement(node)) continue;
-    const key = `${prefix}${node.key ?? ""}`;
-    if (node.type === React.Fragment) {
-      out.push(...flatten((node.props as { children?: React.ReactNode }).children, `${key}/`));
-    } else {
-      out.push(prefix ? React.cloneElement(node, { key }) : node);
-    }
-  }
-  return out;
-}
-
-/**
  * The parts of a message and the shell they ask for: a `round` part makes a circle message, a
  * lone `media` part a picture message, anything else a bubble (`MessagePartSpec.shell`). The
  * author's header, the avatar, the menu and the reactions have places of their own.
  */
 function partsOf(children: React.ReactNode) {
-  const items = flatten(children);
+  // Fragments opened; strings dropped — what decides the shell is what renders.
+  const items = flattenChildren(children).filter(React.isValidElement);
   const avatar = items.find((child) => isElement(child, MessageAvatar));
   const author = items.find((child) => isElement(child, MessageAuthor));
   const menu = items.find((child) => isElement(child, MessageMenu));
@@ -428,13 +396,8 @@ const ACTIONS_ESTIMATE = 40;
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-/** How long a finger rests on a message before its menu opens. */
-const LONG_PRESS_MS = 500;
-/** A finger that moves further than this (px) scrolls instead of pressing. */
-const LONG_PRESS_SLOP = 8;
-
 export type MessageRootProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> & {
-  /** The id of the message: selection, `onNewMessage`, `onRead`, `current`, `Message.Reply target`. */
+  /** The id of the message: selection, `onNewMessage`, `onRead`, `jumpTo`, `Message.Reply target`. */
   value?: string;
   /** `incoming` on the start side on a surface fill, `outgoing` on the end side in the accent hue. */
   direction?: MessageDirection;
@@ -455,13 +418,13 @@ export type MessageRootProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> &
    * Sends a failed message again (the retry button beside it). A returned promise shows `sending`
    * until it settles; a rejection leaves it failed.
    */
-  onRetry?: () => void | Promise<void>;
+  onRetry?: AsyncHandler;
   /**
    * The reader puts or takes back a reaction: a chip of `Message.Reactions`, a double tap (the
    * chat's quick reaction), `L`, or the reaction bar. A returned promise keeps the chip pending until it
    * settles; update the reactions when it resolves. Without it reactions are read-only.
    */
-  onReactionToggle?: AsyncEvent<string>;
+  onReactionToggle?: AsyncHandler<[emoji: string], unknown>;
   labels?: Partial<MessageLabels>;
   ref?: React.Ref<HTMLElement>;
 };
@@ -516,6 +479,9 @@ function MessageRoot({
   // the conversation, the conversation's own anchoring holds (`hold`).
   const holdRef = React.useRef(list.hold);
   holdRef.current = list.hold;
+  const region = useScrollRegion();
+  const regionRef = React.useRef(region);
+  regionRef.current = region;
   const [morph] = React.useState(() =>
     createBubbleMorph(() => {
       const article = rootRef.current;
@@ -524,6 +490,7 @@ function MessageRoot({
         bubble: bubbleRef.current,
         fill: fillRef.current,
         row: article?.closest<HTMLElement>("[data-message-row]") ?? article,
+        scroller: regionRef.current?.element() ?? null,
         hold: holdRef.current,
       };
     }),
@@ -579,6 +546,7 @@ function MessageRoot({
   const bleedEnd = shell === "bubble" && specs[body.length - 1]?.bleed === true;
 
   // ── reactions ──
+  const reactionsProps = reactions?.props as MessageReactionsProps | undefined;
   const {
     optimistic,
     shown: ownReactions,
@@ -606,7 +574,8 @@ function MessageRoot({
   );
 
   // ── meta ──
-  const { retrying, retry } = useRetry(onRetry);
+  // A returned promise shows `sending` until it settles; a rejection leaves the message failed.
+  const { pending: retrying, run: retry } = usePendingAction(onRetry);
   const shownStatus: MessageStatus | undefined = retrying ? "sending" : status;
   const time = timeProp instanceof Date ? formatTime(timeProp) : (timeProp ?? null);
   const dateTime = timeProp instanceof Date ? timeProp.toISOString() : undefined;
@@ -692,13 +661,12 @@ function MessageRoot({
     [neutralDepth, memory, holdPosition, pressMessage],
   );
 
-  // ── menu ──
+  // ── menu: opens against the message (`Dropdown.Anchor`) at the point pressed ──
   const [menuOpen, setMenuOpen] = React.useState(false);
   // The menu mounts on its first open and stays for its exit and focus return: a chat of many
   // messages keeps no closed menu per row (its floating layer, media query and listeners).
   const [menuMounted, setMenuMounted] = React.useState(false);
   const [anchor, setAnchor] = React.useState({ x: 0, y: 0 });
-  const press = React.useRef<{ timer: number; x: number; y: number } | null>(null);
   const hasMenu = menu !== undefined && !selecting;
 
   const openMenuAt = (clientX: number, clientY: number) => {
@@ -712,22 +680,24 @@ function MessageRoot({
     const bubble = bubbleRef.current?.getBoundingClientRect();
     if (bubble) openMenuAt(bubble.left, bubble.bottom);
   };
-  const cancelPress = () => {
-    if (press.current) window.clearTimeout(press.current.timer);
-    press.current = null;
-  };
-  React.useEffect(
-    () => () => {
-      if (press.current) window.clearTimeout(press.current.timer);
-    },
-    [],
-  );
 
   // ── reaction bar ──
   const reactionBar = useReactionBarState(rootRef);
   const { bar, setBar } = reactionBar;
+  // A long hover shows the bar only where the pointer can hover.
+  const hoverable = useMediaQuery(HOVER_QUERY);
   const reactionOptions = list.reactionOptions ?? DEFAULT_REACTION_OPTIONS;
   const canReact = toggleReaction !== null && reactionOptions.length > 0 && !selecting;
+  // A long press of a finger: the reaction bar above the message and the menu below.
+  const longPress = useLongPress({
+    enabled: hasMenu || canReact,
+    onLongPress: ({ x, y }) => {
+      // The long press is ours, not the native text selection it may have started.
+      window.getSelection()?.removeAllRanges();
+      if (hasMenu) openMenuAt(x, y);
+      if (canReact) setBar("touch");
+    },
+  });
   const pickReaction = (emoji: string) => {
     toggleReaction?.(emoji);
     setMenuOpen(false);
@@ -776,10 +746,10 @@ function MessageRoot({
     <div
       ref={columnRef}
       className={styles.column}
+      data-message-column=""
       data-actions={hasActions || undefined}
       onPointerEnter={(event) => {
-        if (event.pointerType !== "mouse" || !canReact || bar !== null) return;
-        if (!window.matchMedia?.("(hover: hover)").matches) return;
+        if (event.pointerType !== "mouse" || !canReact || bar !== null || !hoverable) return;
         reactionBar.hoverStart();
       }}
       onPointerLeave={reactionBar.leaveSoon}
@@ -832,213 +802,185 @@ function MessageRoot({
     </div>
   );
 
+  const article = (
+    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: an article becomes an option in selection mode
+    <article
+      ref={mergedRef}
+      tabIndex={-1}
+      {...rest}
+      style={style}
+      role={selecting ? "option" : undefined}
+      aria-selected={selecting ? selected : undefined}
+      aria-label={name}
+      aria-posinset={row?.position}
+      aria-setsize={row?.size}
+      data-message-article=""
+      data-message-value={value}
+      className={cx(styles.root, className)}
+      {...toDataAttributes({
+        direction,
+        position,
+        shell,
+        avatars: gutter || undefined,
+        selecting: selecting || undefined,
+        selected: selected || undefined,
+        failed: shownStatus === "failed" || undefined,
+      })}
+      onContextMenu={(event) => {
+        onContextMenu?.(event);
+        // A link keeps the browser's own menu (open in a new tab, copy the address).
+        if (
+          event.defaultPrevented ||
+          !hasMenu ||
+          !inMessage(event.target) ||
+          (event.target as Element).closest("a")
+        )
+          return;
+        event.preventDefault();
+        longPress.cancel();
+        openMenuAt(event.clientX, event.clientY);
+      }}
+      onPointerDown={(event) => {
+        onPointerDown?.(event);
+        if (selecting) {
+          // Press and drag (or slide a finger from the check) paints the messages passed over.
+          list.range.onPointerDown(list.indexOf(event.currentTarget), event);
+          return;
+        }
+        if (!inMessage(event.target) || isInteractive(event.target)) return;
+        longPress.handlers.onPointerDown(event);
+      }}
+      onPointerMove={longPress.handlers.onPointerMove}
+      onPointerUp={longPress.handlers.onPointerUp}
+      onPointerCancel={longPress.handlers.onPointerCancel}
+      onMouseDown={(event) => {
+        onMouseDown?.(event);
+        // A double click reacts: the press that makes it double selects no word on the way. A
+        // single press still starts a drag selection of the text.
+        if (
+          event.detail >= 2 &&
+          canQuickReact &&
+          !selecting &&
+          !event.defaultPrevented &&
+          inMessage(event.target) &&
+          !isInteractive(event.target)
+        )
+          event.preventDefault();
+      }}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented || event.target !== event.currentTarget) return;
+        if (selecting) {
+          if (event.key === " " || event.key === "Enter") {
+            event.preventDefault();
+            toggleSelected({ shiftKey: event.shiftKey, detail: 0 });
+          }
+          return;
+        }
+        const plainKey = !event.metaKey && !event.ctrlKey && !event.altKey;
+        if (event.code === "KeyL" && plainKey) {
+          event.preventDefault();
+          quickReact();
+          return;
+        }
+        if (event.code === "KeyR" && plainKey && canReact) {
+          event.preventDefault();
+          setBar("keyboard");
+          return;
+        }
+        if (
+          hasMenu &&
+          (event.key === "Enter" ||
+            event.key === "ContextMenu" ||
+            (event.shiftKey && event.key === "F10"))
+        ) {
+          event.preventDefault();
+          openMenuAtBubble();
+        }
+      }}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented || !selecting) return;
+        // In selection mode a press anywhere on the row toggles it, links and players included.
+        event.preventDefault();
+        toggleSelected(event);
+      }}
+      onDoubleClick={(event) => {
+        onDoubleClick?.(event);
+        if (
+          event.defaultPrevented ||
+          selecting ||
+          !inMessage(event.target) ||
+          isInteractive(event.target)
+        )
+          return;
+        // A double click that selected a word is about the text, not a reaction.
+        const selection = window.getSelection();
+        if (selection && !selection.isCollapsed) return;
+        quickReact();
+      }}
+    >
+      {selecting ? (
+        <span className={cx(styles.select, enterMotion.enter)} aria-hidden="true">
+          <Checkbox.Indicator shape="circle" checked={selected} />
+        </span>
+      ) : null}
+      {gutter ? <div className={styles.gutter}>{showAvatar ? avatar : null}</div> : null}
+      {status === "failed" && onRetry ? (
+        <span className={styles.retry} data-morph-item="">
+          <Button.Root
+            variant="ghost"
+            tone="danger"
+            size="s"
+            loading={retrying}
+            aria-label={labels.retry}
+            onClick={() => retry?.()}
+          >
+            <Button.Icon>
+              <Icon name="action.refresh" />
+            </Button.Icon>
+          </Button.Root>
+        </span>
+      ) : null}
+      {column}
+      {canReact && reactionBar.mounted ? (
+        <ReactionBar
+          open={bar !== null}
+          onOpenChange={(open) => {
+            if (!open) reactionBar.close();
+          }}
+          anchorRef={bubbleRef}
+          align={direction === "outgoing" ? "end" : "start"}
+          options={reactionOptions}
+          selected={ownSelected}
+          onPick={pickReaction}
+          focusOnOpen={bar === "keyboard"}
+          closeOnOutsideClick={reactionsProps?.closeOnOutsideClick ?? true}
+          closeOnEscape={reactionsProps?.closeOnEscape ?? true}
+          labels={{ bar: labels.reactionBar, more: labels.moreReactions }}
+          onPointerEnter={reactionBar.stay}
+          onPointerLeave={reactionBar.leaveSoon}
+        />
+      ) : null}
+    </article>
+  );
+
   return (
     <MessageRootProvider value={rootContext}>
-      {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: an article becomes an option in selection mode */}
-      <article
-        ref={mergedRef}
-        tabIndex={-1}
-        {...rest}
-        style={style}
-        role={selecting ? "option" : undefined}
-        aria-selected={selecting ? selected : undefined}
-        aria-label={name}
-        aria-posinset={row?.position}
-        aria-setsize={row?.size}
-        data-message-article=""
-        data-message-value={value}
-        className={cx(styles.root, className)}
-        {...toDataAttributes({
-          direction,
-          position,
-          shell,
-          avatars: gutter || undefined,
-          selecting: selecting || undefined,
-          selected: selected || undefined,
-          failed: shownStatus === "failed" || undefined,
-        })}
-        onContextMenu={(event) => {
-          onContextMenu?.(event);
-          // A link keeps the browser's own menu (open in a new tab, copy the address).
-          if (
-            event.defaultPrevented ||
-            !hasMenu ||
-            !inMessage(event.target) ||
-            (event.target as Element).closest("a")
-          )
-            return;
-          event.preventDefault();
-          openMenuAt(event.clientX, event.clientY);
-        }}
-        onPointerDown={(event) => {
-          onPointerDown?.(event);
-          if (selecting) {
-            // Press and drag (or slide a finger from the check) paints the messages passed over.
-            list.range.onPointerDown(list.indexOf(event.currentTarget), event);
-            return;
-          }
-          if (
-            !(hasMenu || canReact) ||
-            event.pointerType !== "touch" ||
-            !inMessage(event.target) ||
-            isInteractive(event.target)
-          )
-            return;
-          const { clientX: x, clientY: y } = event;
-          cancelPress();
-          press.current = {
-            x,
-            y,
-            timer: window.setTimeout(() => {
-              press.current = null;
-              // The long press is ours, not the native text selection it may have started.
-              window.getSelection()?.removeAllRanges();
-              // The reaction bar above the message and the menu below.
-              if (hasMenu) openMenuAt(x, y);
-              if (canReact) setBar("touch");
-            }, LONG_PRESS_MS),
-          };
-        }}
-        onPointerMove={(event) => {
-          const start = press.current;
-          if (
-            start &&
-            Math.hypot(event.clientX - start.x, event.clientY - start.y) > LONG_PRESS_SLOP
-          )
-            cancelPress();
-        }}
-        onPointerUp={cancelPress}
-        onPointerCancel={cancelPress}
-        onMouseDown={(event) => {
-          onMouseDown?.(event);
-          // A double click reacts: the press that makes it double selects no word on the way. A
-          // single press still starts a drag selection of the text.
-          if (
-            event.detail >= 2 &&
-            canQuickReact &&
-            !selecting &&
-            !event.defaultPrevented &&
-            inMessage(event.target) &&
-            !isInteractive(event.target)
-          )
-            event.preventDefault();
-        }}
-        onKeyDown={(event) => {
-          onKeyDown?.(event);
-          if (event.defaultPrevented || event.target !== event.currentTarget) return;
-          if (selecting) {
-            if (event.key === " " || event.key === "Enter") {
-              event.preventDefault();
-              toggleSelected({ shiftKey: event.shiftKey, detail: 0 });
-            }
-            return;
-          }
-          const plainKey = !event.metaKey && !event.ctrlKey && !event.altKey;
-          if (event.code === "KeyL" && plainKey) {
-            event.preventDefault();
-            quickReact();
-            return;
-          }
-          if (event.code === "KeyR" && plainKey && canReact) {
-            event.preventDefault();
-            setBar("keyboard");
-            return;
-          }
-          if (
-            hasMenu &&
-            (event.key === "Enter" ||
-              event.key === "ContextMenu" ||
-              (event.shiftKey && event.key === "F10"))
-          ) {
-            event.preventDefault();
-            openMenuAtBubble();
-          }
-        }}
-        onClick={(event) => {
-          onClick?.(event);
-          if (event.defaultPrevented || !selecting) return;
-          // In selection mode a press anywhere on the row toggles it, links and players included.
-          event.preventDefault();
-          toggleSelected(event);
-        }}
-        onDoubleClick={(event) => {
-          onDoubleClick?.(event);
-          if (
-            event.defaultPrevented ||
-            selecting ||
-            !inMessage(event.target) ||
-            isInteractive(event.target)
-          )
-            return;
-          // A double click that selected a word is about the text, not a reaction.
-          const selection = window.getSelection();
-          if (selection && !selection.isCollapsed) return;
-          quickReact();
-        }}
-      >
-        {selecting ? (
-          <span className={styles.select} aria-hidden="true">
-            <Checkbox.Indicator shape="circle" checked={selected} />
-          </span>
-        ) : null}
-        {gutter ? <div className={styles.gutter}>{showAvatar ? avatar : null}</div> : null}
-        {status === "failed" && onRetry ? (
-          <span className={styles.retry} data-morph-item="">
-            <Button.Root
-              variant="ghost"
-              tone="danger"
-              size="s"
-              loading={retrying}
-              aria-label={labels.retry}
-              onClick={retry}
-            >
-              <Button.Icon>
-                <Icon name="action.refresh" />
-              </Button.Icon>
-            </Button.Root>
-          </span>
-        ) : null}
-        {column}
-        {hasMenu && menuMounted ? (
-          <Dropdown.Root open={menuOpen} onOpenChange={setMenuOpen}>
-            <Dropdown.Trigger>
-              {/* The menu opens where the pointer is: a point inside the row anchors it, out of
-                the tab order. Focus that returns here after Escape goes on to the message. */}
-              <button
-                type="button"
-                className={styles.anchor}
-                style={
-                  {
-                    "--anchor-x": `${anchor.x}px`,
-                    "--anchor-y": `${anchor.y}px`,
-                  } as React.CSSProperties
-                }
-                tabIndex={-1}
-                aria-label={labels.menu}
-                onFocus={() => rootRef.current?.focus({ preventScroll: true })}
-              />
-            </Dropdown.Trigger>
-            {menu}
-          </Dropdown.Root>
-        ) : null}
-        {canReact && reactionBar.mounted ? (
-          <ReactionBar
-            open={bar !== null}
-            onOpenChange={(open) => {
-              if (!open) reactionBar.close();
-            }}
-            anchorRef={bubbleRef}
-            align={direction === "outgoing" ? "end" : "start"}
-            options={reactionOptions}
-            selected={ownSelected}
-            onPick={pickReaction}
-            focusOnOpen={bar === "keyboard"}
-            labels={{ bar: labels.reactionBar, more: labels.moreReactions }}
-            onPointerEnter={reactionBar.stay}
-            onPointerLeave={reactionBar.leaveSoon}
-          />
-        ) : null}
-      </article>
+      {menu !== undefined ? (
+        // The menu opens against the message at the point pressed; focus returns to the message.
+        // Wrapped whenever the message has a menu, so selection mode never remounts the message.
+        <Dropdown.Root
+          open={menuOpen && hasMenu}
+          onOpenChange={setMenuOpen}
+          anchorPoint={menuOpen && hasMenu ? anchor : null}
+        >
+          <Dropdown.Anchor>{article}</Dropdown.Anchor>
+          {menuMounted ? menu : null}
+        </Dropdown.Root>
+      ) : (
+        article
+      )}
     </MessageRootProvider>
   );
 }

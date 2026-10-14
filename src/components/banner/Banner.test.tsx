@@ -1,8 +1,10 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import enterMotion from "@/internal/enterMotion.module.css";
+import { withMotion } from "@/test/motion";
 
 import { Banner } from "./Banner";
 import styles from "./Banner.module.css";
@@ -108,6 +110,52 @@ describe("Banner", () => {
     );
     expect(ref.current).toBe(container.firstElementChild);
     expect(ref.current).toHaveClass(enterMotion.enter);
+  });
+
+  it("hands focus to the next tab stop when it is dismissed", async () => {
+    const user = userEvent.setup();
+    function Page() {
+      const [shown, setShown] = React.useState(true);
+      return (
+        <>
+          {shown ? (
+            <Banner.Root onDismiss={() => setShown(false)}>
+              <Banner.Content>
+                <Banner.Title>Тёмная тема</Banner.Title>
+              </Banner.Content>
+            </Banner.Root>
+          ) : null}
+          <button type="button">Открыть заказы</button>
+        </>
+      );
+    }
+    render(<Page />);
+    await user.tab();
+    await user.keyboard("{Enter}");
+    expect(screen.queryByText("Тёмная тема")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Открыть заказы" })).toHaveFocus();
+  });
+
+  it("closes up in place when its parent unmounts it", async () => {
+    const motion = withMotion();
+    const { container, rerender } = render(
+      <div>
+        <Banner.Root>
+          <Banner.Content>Квартал закрыт</Banner.Content>
+        </Banner.Root>
+      </div>,
+    );
+    const host = container.firstElementChild as HTMLElement;
+    rerender(<div />);
+    await Promise.resolve();
+    const ghost = host.firstElementChild as HTMLElement;
+    expect(ghost).toHaveAttribute("data-leaving");
+    expect(ghost).toHaveAttribute("aria-hidden", "true");
+    expect(ghost).toHaveTextContent("Квартал закрыт");
+    const [glide] = motion.on(ghost);
+    expect((glide.keyframes as Keyframe[])[1]).toMatchObject({ opacity: 0, height: "0px" });
+    glide.finish();
+    expect(host.children).toHaveLength(0);
   });
 
   it("takes the close button name from labels", () => {

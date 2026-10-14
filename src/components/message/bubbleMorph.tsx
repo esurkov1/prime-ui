@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { motionToken, readElementDurationMs } from "@/internal/motionTiming";
 
 /**
  * The bubble morph: every size change of an existing message (a reaction row that opens or closes,
@@ -77,13 +78,6 @@ const progressOf = (animation: Animation) => {
   return animation.playState === "finished" || progress == null ? 1 : progress;
 };
 
-function parseDuration(raw: string): number {
-  const value = raw.trim();
-  const n = Number.parseFloat(value);
-  if (Number.isNaN(n)) return 0;
-  return value.endsWith("ms") ? n : value.endsWith("s") ? n * 1000 : n;
-}
-
 export type BubbleMorphElements = {
   /** The message: the bubble, the tail and the reactions under a picture or a circle. */
   column: HTMLElement | null;
@@ -92,6 +86,8 @@ export type BubbleMorphElements = {
   fill: HTMLElement | null;
   /** The row of the list the message stands in (its windowed box, or the message itself). */
   row: HTMLElement | null;
+  /** The scroller of the conversation (`ScrollRegion.element()`); `null` outside one. */
+  scroller: HTMLElement | null;
   /** Holds the conversation's own anchoring while the message gives way itself (`Chat.Messages`). */
   hold?: (() => void) | undefined;
 };
@@ -199,23 +195,8 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
   const bubbleVisible = (layout: Box): Box =>
     clip ? boxAt(layout, clip.from, progressOf(clip.animation)) : layout;
 
-  /** The scroller the row stands in (found once, again only when the row moved to another). */
-  let scroller: HTMLElement | null = null;
-  const scrollerOf = (row: HTMLElement) => {
-    if (scroller?.contains(row)) return scroller;
-    scroller = null;
-    for (let node = row.parentElement; node; node = node.parentElement) {
-      const overflow = getComputedStyle(node).overflowY;
-      if (overflow === "auto" || overflow === "scroll") {
-        scroller = node;
-        break;
-      }
-    }
-    return scroller;
-  };
-
   const capture: BubbleMorph["capture"] = (options) => {
-    const { column, bubble, row } = elements();
+    const { column, bubble, row, scroller } = elements();
     if (!column || !bubble || !column.isConnected) return;
     // A capture that is still waiting for its play keeps the look from before the first change.
     if (snapshot) return;
@@ -231,7 +212,7 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
       row: row ? boxOf(row) : null,
       items,
       anchor: options?.anchor ?? "end",
-      scrollTop: row ? (scrollerOf(row)?.scrollTop ?? null) : null,
+      scrollTop: row ? (scroller?.scrollTop ?? null) : null,
     };
   };
 
@@ -251,7 +232,7 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
    */
   const giveWay = (before: Snapshot, row: HTMLElement, delta: number) => {
     const glides: { element: HTMLElement; dy: number }[] = [];
-    const host = scrollerOf(row);
+    const host = elements().scroller;
     if (!host || !before.row) return glides;
     /** Where the walk over what gives way starts: the message (its article), inside its row. */
     const origin = elements().column?.parentElement ?? row;
@@ -318,13 +299,16 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
     const { column, bubble, fill, row } = elements();
     if (!before || !column || !bubble || !column.isConnected) return;
 
-    const style = getComputedStyle(column);
-    // The token is global (a theme or reduced motion retunes it on the root).
-    const duration = parseDuration(
-      getComputedStyle(document.documentElement).getPropertyValue("--prime-message-morph-duration"),
+    // The clock is global (a theme or reduced motion retunes it on the root); the curve is the
+    // message's own, the standard one unless a host retunes it.
+    const duration = readElementDurationMs(
+      document.documentElement,
+      "--prime-message-morph-duration",
     );
-    const easing = style.getPropertyValue("--message-morph-ease").trim() || "ease";
-    const timing: KeyframeAnimationOptions = { duration, easing };
+    const easing =
+      getComputedStyle(column).getPropertyValue("--message-morph-ease").trim() ||
+      motionToken("--prime-motion-easing-standard");
+    const timing: KeyframeAnimationOptions = easing ? { duration, easing } : { duration };
 
     // ── the row's change of height, given way to before anything is read (reduced motion too) ──
     const rowDelta = row && before.row ? boxOf(row).height - before.row.height : 0;

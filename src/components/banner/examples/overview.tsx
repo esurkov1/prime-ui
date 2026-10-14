@@ -1,4 +1,4 @@
-/** A maintenance notice: icon, title and description on a soft info fill. */
+/** A maintenance notice: icon, title and description on a soft info fill — `Banner.Icon`, `Banner.Title`, `Banner.Description`. */
 import { Banner, Icon } from "prime-ui-kit";
 
 export default function BannerOverviewExample() {

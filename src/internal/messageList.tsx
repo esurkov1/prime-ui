@@ -31,7 +31,7 @@ export type Selection = readonly string[] | null;
  * The selection of a list, outside React state: each message subscribes to its own state in it
  * (`useMessageSelection`), so a toggle re-renders the messages whose state changed, not the list.
  */
-export type SelectionStore = {
+type SelectionStore = {
   get: () => Selection;
   /** `0` — not selecting, `1` — selecting, not selected, `2` — selected. */
   stateOf: (value: string) => 0 | 1 | 2;
@@ -154,7 +154,7 @@ export function useListSelection(): Selection {
 // ─── Rows ─────────────────────────────────────────────────────────────────────
 
 /** What a message row says about itself from its props alone, before it renders. */
-export type MessageRowDescription = {
+type MessageRowDescription = {
   value: string | undefined;
   direction: MessageDirection;
   /** The row's height before it is measured (px). */
@@ -169,7 +169,7 @@ export type MessageRowDescription = {
  * typing, the selection bar). A `message` row describes itself; a `sticky` row is a date that
  * sticks while its day scrolls.
  */
-export type RowKind = {
+type RowKind = {
   tail?: boolean;
   sticky?: boolean;
   message?: (props: Record<string, unknown>) => MessageRowDescription;

@@ -1,13 +1,7 @@
 [
-  "src/components/chat-list/ChatList.virtual.test.tsx: queries [class*=",
-  "src/components/composer/Composer.test.tsx: queries [class*=",
-  "src/components/composer/Composer.test.tsx: reads a .module.css as text",
   "src/components/data-table/DataTable.test.tsx: reads a .module.css as text",
   "src/components/gantt/Gantt.test.tsx: queries [class*=",
   "src/components/list/List.test.tsx: reads a .module.css as text",
-  "src/components/message/Message.test.tsx: reads a .module.css as text",
-  "src/components/message/MessageContent.test.tsx: reads a .module.css as text",
-  "src/components/notification/Notification.test.tsx: queries [class*=",
   "src/components/page-content/PageContent.test.tsx: reads a .module.css as text",
   "src/components/switch/Switch.test.tsx: getComputedStyle",
   "src/components/timeline/Timeline.test.tsx: reads a .module.css as text",

@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
@@ -10,6 +7,8 @@ import { ChatSeparator, ChatService, ChatUnread } from "@/components/chat/ChatRo
 import { ChatSelectionBar, MessageList } from "@/components/chat/MessageList";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { VideoNote } from "@/components/video-note/VideoNote";
+import { cssRule, cssRules, cssValue } from "@/test/css";
+import { withMotion } from "@/test/motion";
 
 import { Message } from "./Message";
 
@@ -269,14 +268,9 @@ describe("Message", () => {
       const plus = screen.getByRole("button", { name: /^\+1 2/ });
       const bang = screen.getByRole("button", { name: "!: 4" });
       // The entrance is the message's morph (`bubbleMorph`): a recorded `animate`.
-      const entered = new Set<Element>();
-      const animate = vi.fn(function (this: Element) {
-        entered.add(this);
-        return { cancel() {}, finished: Promise.resolve(), effect: null } as unknown as Animation;
-      });
-      Element.prototype.animate = animate as unknown as Element["animate"];
+      const motion = withMotion();
+      const entered = () => new Set(motion.animations.map((animation) => animation.element));
       document.documentElement.style.setProperty("--prime-message-morph-duration", "300ms");
-      vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
       try {
         // Toggling one chip changes it in place: no chip remounts, none takes the entrance.
         act(() => {
@@ -284,24 +278,22 @@ describe("Message", () => {
         });
         expect(screen.getByRole("button", { name: /^\+1 3/ })).toBe(plus);
         expect(screen.getByRole("button", { name: "!: 4" })).toBe(bang);
-        expect(entered.size).toBe(0);
+        expect(entered().size).toBe(0);
 
         // A reaction new on the message enters, once; the others stay as they were.
         fireEvent.doubleClick(screen.getByText("Релиз в четверг"));
         const party = screen.getByRole("button", { name: "🎉 1: Вы" });
-        expect(entered.has(party.parentElement as Element)).toBe(true);
-        expect(entered.has(plus.parentElement as Element)).toBe(false);
+        expect(entered().has(party.parentElement as Element)).toBe(true);
+        expect(entered().has(plus.parentElement as Element)).toBe(false);
         expect(screen.getByRole("button", { name: "!: 4" })).toBe(bang);
       } finally {
-        delete (Element.prototype as Partial<Element>).animate;
         document.documentElement.style.removeProperty("--prime-message-morph-duration");
-        vi.unstubAllGlobals();
       }
     });
 
     it("opens the held row with the first reaction and closes it with the last, at once", async () => {
-      vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
-      try {
+      withMotion();
+      {
         let resolve: () => void = () => {};
         const onReactionToggle = vi.fn(
           () =>
@@ -333,8 +325,6 @@ describe("Message", () => {
         expect(slot).toHaveAttribute("data-state", "closed");
         expect(bubble).not.toHaveAttribute("data-reactions");
         expect(document.querySelector("[data-message-reactions]")).toBe(slot);
-      } finally {
-        vi.unstubAllGlobals();
       }
     });
   });
@@ -417,6 +407,29 @@ describe("Message", () => {
     expect(onReactionToggle).toHaveBeenCalledWith("fire");
     await vi.waitFor(() => expect(screen.queryByRole("toolbar")).toBeNull());
     expect(screen.getByRole("article")).toHaveFocus();
+  });
+
+  it("closes the bar on Escape and on a press outside unless Message.Reactions keeps it", async () => {
+    function Thread({ dismiss }: { dismiss: boolean }) {
+      return (
+        <MessageList aria-label="Чат">
+          <Message.Root time="10:00" onReactionToggle={() => {}}>
+            <Message.Text>Счёт отправлен</Message.Text>
+            <Message.Reactions items={[]} closeOnEscape={dismiss} closeOnOutsideClick={dismiss} />
+          </Message.Root>
+        </MessageList>
+      );
+    }
+    const { rerender } = render(<Thread dismiss={false} />);
+    screen.getByRole("article").focus();
+    await userEvent.keyboard("r");
+    await screen.findByRole("toolbar", { name: "Реакции" });
+    await userEvent.keyboard("{Escape}");
+    fireEvent.pointerDown(document.body);
+    expect(screen.getByRole("toolbar", { name: "Реакции" })).toBeInTheDocument();
+    rerender(<Thread dismiss />);
+    await userEvent.keyboard("{Escape}");
+    await vi.waitFor(() => expect(screen.queryByRole("toolbar")).toBeNull());
   });
 
   it("closes the bar at once, without its exit, when the chat scrolls", async () => {
@@ -682,17 +695,15 @@ describe("Message", () => {
     }
     const { rerender, container } = render(<Chat selected={null} />);
     const group = container.querySelector<HTMLElement>("[aria-label='Чат']");
-    expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("");
+    expect(group?.style.getPropertyValue("--message-bottom-lift")).toBe("");
     rerender(<Chat selected={["a"]} />);
     // The bar's height goes to the group in the commit it appears in: the button rises over it.
-    expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("56px");
+    expect(group?.style.getPropertyValue("--message-bottom-lift")).toBe("-56px");
     rerender(<Chat selected={null} />);
-    expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("");
-    const flat = readFileSync(join(__dirname, "../chat/Chat.module.css"), "utf8").replace(
-      /\s+/g,
-      " ",
+    expect(group?.style.getPropertyValue("--message-bottom-lift")).toBe("");
+    expect(cssValue(cssRule("src/components/chat/Chat.module.css", ".jumpBox"), "translate")).toBe(
+      "0 var(--message-bottom-lift, 0)",
     );
-    expect(flat).toContain("translate: 0 calc(-1 * var(--message-bottom-bar, 0px));");
     vi.restoreAllMocks();
   });
 
@@ -973,7 +984,18 @@ describe("Message", () => {
 });
 
 describe("Message shells and layout contract", () => {
-  const css = readFileSync(join(__dirname, "Message.module.css"), "utf8");
+  const SHEET = "src/components/message/Message.module.css";
+  const rule = (selector: string) => cssRule(SHEET, selector);
+  /** Some rule of the sheet declares `prop` (with `value`, when given). */
+  const declares = (prop: string, value?: string) =>
+    cssRules(SHEET).some((item) =>
+      item.decls.some(
+        (decl) => decl.prop === prop && (value === undefined || decl.value === value),
+      ),
+    );
+  const transitions = (selector: string) =>
+    rule(selector).decls.some((decl) => decl.prop.startsWith("transition"));
+  const selectors = () => cssRules(SHEET).map((item) => item.selector);
   const shellOf = (index: number) =>
     screen.getAllByRole("article")[index]?.querySelector("[data-message-bubble]");
 
@@ -1026,8 +1048,9 @@ describe("Message shells and layout contract", () => {
     const row = screen.getByRole("group", { name: "Реакции" });
     expect(row.lastElementChild).toHaveAttribute("aria-hidden", "true");
     expect(row.lastElementChild).toHaveTextContent("14:26");
-    const flat = css.replace(/\s+/g, " ");
-    expect(flat).toContain(".bubble[data-reactions]:not([data-sized]) .spacer { display: none; }");
+    expect(cssValue(rule(".bubble[data-reactions]:not([data-sized]) .spacer"), "display")).toBe(
+      "none",
+    );
   });
 
   it("keeps a card's content still when the reactions row comes: its spacer stays", () => {
@@ -1043,47 +1066,59 @@ describe("Message shells and layout contract", () => {
   });
 
   it("lays a size change out at once; the morph alone moves it (no layout transitions)", () => {
-    const flat = css.replace(/\s+/g, " ");
-    const spacer = flat.match(/ \.spacer \{([^}]*)\}/)?.[1] ?? "";
-    expect(spacer).not.toContain("transition");
+    expect(transitions(".spacer")).toBe(false);
     // One line of where it stands: dropping it never changes a row's height.
-    expect(spacer).toContain("block-size: 1lh;");
-    expect(flat).toMatch(/\.reactionsSlot \{ --disclosure-duration: 0s;/);
-    const slot = flat.match(/ \.chipSlot \{([^}]*)\}/)?.[1] ?? "";
-    expect(slot).not.toContain("transition");
-    expect(flat).not.toContain("@starting-style { .chipSlot");
+    expect(cssValue(rule(".spacer"), "block-size")).toBe("1lh");
+    expect(cssValue(rule(".reactionsSlot"), "--disclosure-duration")).toBe(
+      "var(--prime-motion-instant)",
+    );
+    expect(transitions(".chipSlot")).toBe(false);
+    expect(
+      cssRules(SHEET).some(
+        (item) =>
+          item.selector === ".chipSlot" &&
+          item.parents.some((parent) => parent.startsWith("@starting-style")),
+      ),
+    ).toBe(false);
   });
 
   it("keeps the run's rhythm (no room held for reactions) and grows on the standard clock", () => {
-    const flat = css.replace(/\s+/g, " ");
     // Half a run's gap on each side of a row, nothing else: 8 inside a run, 16 between runs.
-    expect(flat).toContain("padding-block: calc(var(--prime-message-group-gap) / 2);");
-    expect(flat).not.toContain("--message-reserve");
-    expect(flat).toContain("--message-morph-ease: var(--prime-motion-easing-standard);");
+    expect(declares("padding-block", "calc(var(--prime-message-group-gap) / 2)")).toBe(true);
+    expect(declares("--message-reserve")).toBe(false);
+    expect(declares("--message-morph-ease", "var(--prime-motion-easing-standard)")).toBe(true);
     // The meta stands on the chips' line bottom, where it stands without them: never moved.
-    expect(flat).not.toMatch(/\[data-reactions\] > \.meta \{ translate/);
+    expect(
+      cssRules(SHEET).some(
+        (item) =>
+          item.selector.endsWith("[data-reactions] > .meta") &&
+          item.decls.some((decl) => decl.prop === "translate"),
+      ),
+    ).toBe(false);
   });
 
   it("paints a still bubble's fill on the bubble; the fill layer exists only while it morphs", () => {
-    const flat = css.replace(/\s+/g, " ");
-    expect(flat).toContain('.bubble[data-shell="bubble"] { background: var(--message-fill); }');
-    expect(flat).toMatch(/\.fill \{[^}]*display: none;/);
-    expect(flat).toContain("[data-morphing] .fill { display: block; }");
+    expect(cssValue(rule('.bubble[data-shell="bubble"]'), "background")).toBe(
+      "var(--message-fill)",
+    );
+    expect(cssValue(rule(".fill"), "display")).toBe("none");
+    const morphing = cssRules(SHEET).find((item) =>
+      item.selector.endsWith("[data-morphing] .fill"),
+    );
+    expect(morphing && cssValue(morphing, "display")).toBe("block");
   });
 
   it("marks selection and pointing by the others stepping back, from one list attribute", () => {
-    const flat = css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ");
+    const all = selectors().join("\n");
     const back = ".root:not([data-selected]) > :is(.gutter, .column, .retry)";
-    expect(flat).toContain(`[data-message-list][data-selecting] ${back}`);
-    expect(flat).toContain(
-      '[data-message-list][data-pointing="current"] .root:not([data-pointed])',
-    );
-    expect(flat).toContain("opacity: var(--prime-message-dim-opacity);");
-    expect(flat).toContain("filter: saturate(var(--prime-message-dim-saturation));");
+    expect(all).toContain(`[data-message-list][data-selecting] ${back}`);
+    expect(all).toContain('[data-message-list][data-pointing="current"] .root:not([data-pointed])');
+    expect(declares("opacity", "var(--prime-message-dim-opacity)")).toBe(true);
+    expect(declares("filter", "saturate(var(--prime-message-dim-saturation))")).toBe(true);
     // Nothing drawn on the message: no outline, wash or ring of a selected or pointed bubble.
-    expect(flat).not.toMatch(/data-(flash|current)/);
-    expect(flat).not.toMatch(/\[data-selected\][^{]*::(before|after)/);
-    expect(flat).not.toContain(":has(");
+    expect(all).not.toMatch(/data-(flash|current)/);
+    expect(all).not.toMatch(/\[data-selected\][^\n]*::(before|after)/);
+    expect(all).not.toContain(":has(");
   });
 
   it("gives a picture message no backing, and an album neutral gaps in both directions", () => {
@@ -1107,7 +1142,8 @@ describe("Message shells and layout contract", () => {
     // The outgoing album's gaps stand on an incoming surface, never the tinted outgoing fill.
     expect(gapsOf(outgoing)).toBe(gapsOf(incoming));
     expect(gapsOf(outgoing)).not.toBe("tinted");
-    expect(css).toMatch(/\.bubble\[data-shell="media"\] \{\s*padding: 0;\s*background: none;/);
+    expect(cssValue(rule('.bubble[data-shell="media"]'), "padding")).toBe("0");
+    expect(cssValue(rule('.bubble[data-shell="media"]'), "background")).toBe("none");
   });
 
   it("marks only real text as selectable", () => {
@@ -1124,6 +1160,6 @@ describe("Message shells and layout contract", () => {
     // The meta (the visible one; its spacer copies are hidden and never selectable in CSS).
     const meta = article.querySelector("[data-message-meta]");
     expect(meta?.closest("[data-message-selectable]")).toBeNull();
-    expect(css).toMatch(/\.meta \{[^}]*user-select: none;/);
+    expect(cssValue(rule(".meta"), "user-select")).toBe("none");
   });
 });

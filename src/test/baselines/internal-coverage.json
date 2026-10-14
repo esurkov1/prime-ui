@@ -13,8 +13,6 @@
   "src/internal/fileFormat.ts: no fileFormat.test",
   "src/internal/iconLayout.ts: no iconLayout.test",
   "src/internal/mergeRefs.ts: no mergeRefs.test",
-  "src/internal/messageList.tsx: no messageList.test",
-  "src/internal/messagePart.tsx: no messagePart.test",
   "src/internal/overlay/layerStack.ts: no layerStack.test",
   "src/internal/progressSegments.ts: no progressSegments.test",
   "src/internal/surfaceDepth.tsx: no surfaceDepth.test",

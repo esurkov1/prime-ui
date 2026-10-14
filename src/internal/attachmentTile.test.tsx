@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Dnd } from "@/components/dnd/Dnd";
 import type { UploadItem } from "@/hooks/useUploadQueue";
+import { cssRule, cssValue } from "@/test/css";
 
 import { AttachmentTile } from "./attachmentTile";
 import pill from "./mediaPill.module.css";
@@ -229,5 +230,11 @@ describe("AttachmentTile", () => {
     expect(onRemove).toHaveBeenCalledTimes(2);
     rerender(<Tile kind="file" name="Акт.pdf" />);
     expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("a strip is one row of fixed tiles: a tile never shrinks however many there are", () => {
+    expect(cssValue(cssRule("src/internal/attachmentTile.module.css", ".strip > *"), "flex")).toBe(
+      "none",
+    );
   });
 });

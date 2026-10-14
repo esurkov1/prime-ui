@@ -113,37 +113,19 @@
 
 /* ── Send / record button ── */
 .action {
-  position: relative;
-  z-index: var(--prime-z-raised);
   /* A held record button is dragged: no page scroll, no text selection under the finger. */
   touch-action: none;
 }
 
-/* The glyphs of every action stand in one cell; the current one turns and scales in. */
-.morph {
-  display: grid;
-  place-items: center;
-}
-
-.glyph {
-  grid-area: 1 / 1;
-  display: flex;
-  transition:
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
-}
-
-.glyph[data-state="inactive"] {
-  opacity: 0;
-  transform: scale(var(--prime-motion-scale-mark)) rotate(-30deg);
-}
-
 /*
- * Slide up to lock: a pill above the held button. Its arrow follows the finger up to the lock
- * threshold (`--prime-space-12`); at the threshold the recording locks and the pill leaves with a
- * short scale-and-fade (the lock "snaps").
+ * Slide up to lock: a pill above the held button, a floating surface of the ladder
+ * (`data-depth="floating"`). Its arrow follows the finger up to the lock threshold
+ * (`--prime-space-12`); at the threshold the recording locks and the pill leaves with a short
+ * scale-and-fade (the lock "snaps", `enterMotion.exit` from the popping scale).
  */
 .lock {
+  --enter-shift: var(--prime-space-2);
+
   position: absolute;
   inset-block-end: calc(100% + var(--prime-space-3));
   inset-inline-start: 50%;
@@ -153,20 +135,18 @@
   gap: var(--prime-space-1);
   padding: var(--prime-space-2) var(--prime-space-1);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-muted);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-secondary);
   box-shadow: var(--prime-shadow-overlay);
   translate: -50% calc(-1 * min(var(--composer-lift, 0px), var(--prime-space-12)) / 2);
   pointer-events: none;
 }
 
-.lock[data-state="open"] {
-  animation: composerLockIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
-}
-
 .lock[data-state="closed"] {
+  --enter-shift: 0;
+  --enter-scale: var(--prime-motion-scale-pop);
+
   color: var(--prime-color-accent-text);
-  animation: composerLockOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
 }
 
 .lockArrow {
@@ -174,25 +154,11 @@
   translate: 0 calc(-1 * min(var(--composer-lift, 0px), var(--prime-space-12)) / 2);
 }
 
-@keyframes composerLockIn {
-  from {
-    opacity: 0;
-    transform: translateY(var(--prime-space-2));
-  }
-}
-
-@keyframes composerLockOut {
-  to {
-    opacity: 0;
-    transform: scale(var(--prime-motion-scale-pop));
-  }
-}
-
 /*
  * ── Recording bar ──
  * Covers the paperclip and the field (the first two cells of the row), so its height never changes:
- * delete · dot · timer · waveform (locked), or dot · timer · «slide to cancel» (held).
- * Cross-fades with the field (`swapMotion`).
+ * delete · dot · timer · waveform (locked), or dot · timer · «slide to cancel» (held). It rises in
+ * over the field and closes up in place when the recording ends (`partPresence`).
  */
 .recording {
   position: relative;
@@ -213,10 +179,6 @@
   padding-inline-start: 0;
 }
 
-.recording[data-state="closed"] {
-  pointer-events: none;
-}
-
 .cancel {
   flex: none;
 }
@@ -232,9 +194,8 @@
     infinite alternate;
 }
 
-/* A paused recording: the dot becomes a still pause glyph in the same hue. */
-.pausedGlyph {
-  display: inline-flex;
+/* The dot, or — paused — a still pause glyph in the same hue, swapped in place (`GlyphSwap`). */
+.status {
   flex: none;
   color: var(--prime-color-danger-default);
 }
@@ -288,6 +249,9 @@
 
 /* ── Round video message preview, above the composer (VideoNote geometry) ── */
 .preview {
+  --enter-shift: var(--prime-space-4);
+  --enter-scale: var(--prime-motion-scale-mark);
+
   position: absolute;
   z-index: var(--prime-z-overlay);
   inset-block-end: calc(100% + var(--prime-space-4));
@@ -300,28 +264,10 @@
   pointer-events: none;
 }
 
-.preview[data-state="open"] {
-  animation: composerPreviewIn var(--prime-motion-duration-base)
-    var(--prime-motion-easing-emphasized) both;
-}
-
+/* It leaves on the spot, popping smaller (`enterMotion.exit`). */
 .preview[data-state="closed"] {
-  animation: composerPreviewOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit)
-    both;
-}
-
-@keyframes composerPreviewIn {
-  from {
-    opacity: 0;
-    transform: translateY(var(--prime-space-4)) scale(var(--prime-motion-scale-mark));
-  }
-}
-
-@keyframes composerPreviewOut {
-  to {
-    opacity: 0;
-    transform: scale(var(--prime-motion-scale-pop));
-  }
+  --enter-shift: 0;
+  --enter-scale: var(--prime-motion-scale-pop);
 }
 
 .previewSkeleton {
@@ -349,15 +295,14 @@
   opacity: 1;
 }
 
-/* The recording's ring toward the length limit (`internal/ring`, `live`), over the circle's edge in
-   the accent, a band of one spacing step — the playback ring of VideoNote. */
+/* The recording's ring toward the length limit (`internal/ring`, `live`, `weight="band"`), over the
+   circle's edge in the accent — the playback ring of VideoNote. */
 .previewRing {
   position: absolute;
   inset: 0;
 }
 
 .preview > .previewRing {
-  --ring-stroke: var(--prime-space-1);
   --ring-fill: var(--prime-color-accent-default);
 }
 

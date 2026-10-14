@@ -28,6 +28,9 @@ import { useNearView } from "@/internal/useNearView";
 import styles from "./Gallery.module.css";
 import { type GalleryLayout, itemRatio, layoutGallery } from "./layout";
 
+/** The most items one album lays out: a longer set goes as several albums. */
+export { GALLERY_MAX } from "./layout";
+
 export type GalleryItem = {
   /** Default `image`. */
   type?: "image" | "video";

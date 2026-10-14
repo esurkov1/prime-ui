@@ -6,6 +6,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 
@@ -78,7 +79,7 @@ export function ChatPinned({
   className,
   ...rest
 }: ChatPinnedProps) {
-  const labels = { ...CHAT_PINNED_LABELS, ...labelsProp };
+  const labels = useLabels(CHAT_PINNED_LABELS, labelsProp);
   const { jump } = useChat();
   const depth = useNestedSurfaceDepth();
   const [value, setValue] = useControllableState<string | undefined>({

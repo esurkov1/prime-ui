@@ -212,23 +212,6 @@
   inline-size: var(--prime-space-8);
 }
 
-/* --- Row menu ---------------------------------------------------------------------- */
-
-/* The point the menu opens from: where the pointer was, or under the row from the keyboard. */
-.anchor {
-  position: absolute;
-  inset-inline-start: var(--anchor-x);
-  inset-block-start: var(--anchor-y);
-  inline-size: 0;
-  block-size: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  outline: none;
-  pointer-events: none;
-}
-
 /* --- Narrow container -------------------------------------------------------------- */
 
 /* A squeezed pane keeps the names and the counts: the preview line and the time step out. */

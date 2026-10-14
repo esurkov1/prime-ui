@@ -244,17 +244,17 @@ describe("The message list: jump, search, read receipts", () => {
     search.focus();
     const { rerender } = render(<Conversation rows={HISTORY} region={region} highlight="рек" />);
     expect(document.querySelector("mark")).toHaveTextContent("рек");
-    rerender(<Conversation rows={HISTORY} region={region} highlight="рек" current="m2" />);
+    rerender(<Conversation rows={HISTORY} region={region} highlight="рек" jumpTo="m2" />);
     expect(region.scrollToElement).toHaveBeenCalledWith(article("m2"), "smooth");
     // While a search match is current the others stay stepped back, with no blink.
     expect(group()).toHaveAttribute("data-pointing", "current");
     expect(article("m2")).toHaveAttribute("data-pointed");
     expect(search).toHaveFocus();
-    rerender(<Conversation rows={HISTORY} region={region} highlight="рек" current="m1" />);
+    rerender(<Conversation rows={HISTORY} region={region} highlight="рек" jumpTo="m1" />);
     expect(article("m2")).not.toHaveAttribute("data-pointed");
     expect(article("m1")).toHaveAttribute("data-pointed");
     expect(group()).toHaveAttribute("data-pointing", "current");
-    rerender(<Conversation rows={HISTORY} region={region} highlight="рек" current={null} />);
+    rerender(<Conversation rows={HISTORY} region={region} highlight="рек" jumpTo={null} />);
     expect(group()).not.toHaveAttribute("data-pointing");
     expect(article("m1")).not.toHaveAttribute("data-pointed");
     search.remove();
@@ -263,14 +263,14 @@ describe("The message list: jump, search, read receipts", () => {
   it("a jump outside a search blinks the target, again on a repeated jump", () => {
     const region = fakeRegion();
     const { rerender } = render(<Conversation rows={HISTORY} region={region} />);
-    rerender(<Conversation rows={HISTORY} region={region} current="m1" />);
+    rerender(<Conversation rows={HISTORY} region={region} jumpTo="m1" />);
     expect(group()).toHaveAttribute("data-pointing", "a");
     expect(article("m1")).toHaveAttribute("data-pointed");
     // Nothing is drawn on the message itself.
     expect(bubble("m1")).not.toHaveAttribute("data-flash");
     // A jump to the same message restarts the blink (the value flips, so CSS replays it).
-    rerender(<Conversation rows={HISTORY} region={region} current={null} />);
-    rerender(<Conversation rows={HISTORY} region={region} current="m1" />);
+    rerender(<Conversation rows={HISTORY} region={region} jumpTo={null} />);
+    rerender(<Conversation rows={HISTORY} region={region} jumpTo="m1" />);
     expect(group()).toHaveAttribute("data-pointing", "b");
     // Another animation ending (a message entering) leaves the blink running.
     animationEnd(bubble("m2"), "_messageEnter_x1");
@@ -327,7 +327,7 @@ describe("Message.Typing", () => {
             <Message.Text>{row.text}</Message.Text>
           </Message.Root>
         ))}
-        <Message.Typing active={typing} />
+        <Message.Typing open={typing} />
       </MessageList>
     );
     const { rerender } = render(<Thread typing rows={HISTORY} />);
@@ -347,7 +347,7 @@ describe("Message.Typing", () => {
     expect(status).toHaveAttribute("data-state", "open");
     rerender(
       <MessageList aria-label="Переписка">
-        <Message.Typing active={false} />
+        <Message.Typing open={false} />
       </MessageList>,
     );
     expect(screen.queryByText("Собеседник печатает")).toBeNull();

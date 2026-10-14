@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { MediaViewer } from "@/components/media-viewer/MediaViewer";
 import { Modal } from "@/components/modal/Modal";
 
-import { captureOpener, focusBack, handoffFocus } from "./focus";
+import { captureOpener, focusBack, handoffFocus, tabStopBeside } from "./focus";
 
 /**
  * Safari does not focus a button on a click: focus stays on the `tabindex="-1"` region around it
@@ -169,5 +169,23 @@ describe("handoffFocus", () => {
       handoffFocus(screen.getByTestId("old"), screen.getByRole("button", { name: "Далее" })),
     ).toBe(false);
     expect(search).toHaveFocus();
+  });
+});
+
+describe("tabStopBeside", () => {
+  it("is the first tab stop after the part, else the last one before it", () => {
+    render(
+      <>
+        <button type="button">Назад</button>
+        <div data-testid="banner">
+          <button type="button">Скрыть</button>
+        </div>
+        <a href="#orders">Заказы</a>
+      </>,
+    );
+    const banner = screen.getByTestId("banner");
+    expect(tabStopBeside(banner)).toBe(screen.getByRole("link", { name: "Заказы" }));
+    screen.getByRole("link").removeAttribute("href");
+    expect(tabStopBeside(banner)).toBe(screen.getByRole("button", { name: "Назад" }));
   });
 });

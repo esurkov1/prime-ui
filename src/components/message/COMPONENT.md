@@ -43,7 +43,7 @@ Message.Root                      role="article" row «{author}, {time}» (an op
 │                                 over a picture or a circle)
 ├─ Message.Actions                a row of a bot's inline keyboard under the bubble (Button.Root children);
 │                                 several make several rows
-├─ Message.Menu                   Dropdown.Content opened at the pointer (+ «Выбрать» in a chat with a selection)
+├─ Message.Menu                   Dropdown.Content anchored to the message (Dropdown.Anchor) at the pointer (+ «Выбрать» in a chat with a selection)
 └─ [reaction bar]                 floating toolbar above the bubble: long press, long hover, `R`
 
 Message.Typing                    «печатает…»: an incoming bubble of three dots, the last row of a list
@@ -212,6 +212,8 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `items` | `MessageReaction[]` | — (required) | `{ emoji, count, selected?, users? }` — `count` is the total, `selected` the reader's own reaction, `users` (`{ id, name, src?, color? }[]`, in the order they put it) who put it; without `users` the chip shows the count. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press outside closes the message's reaction bar. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the message's reaction bar. |
 | `labels` | `Partial<MessageReactionsLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
@@ -231,11 +233,11 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `…rest` | `Omit<DropdownContentProps, "side" \| "align" \| "matchTriggerWidth">` | — | `children` (the items), `className`. |
 
 ### Message.Typing
-`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots at the end of the list while the other side types (`Chat.Root typing` puts it there). Keep it mounted and switch `active`.
+`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots at the end of the list while the other side types (`Chat.Root typing` puts it there). Keep it mounted and switch `open`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `active` | `boolean` | `true` | The other side is typing. Keep the part mounted and switch this, so it can leave smoothly. |
+| `open` | `boolean` | `true` | The bubble is open: the other side is typing. Keep the part mounted and switch this, so it folds open and closed. |
 | `children` | `ReactNode` | — | `Message.Avatar` of who types, in a group chat (`Chat.Messages type="group"`). |
 | `labels` | `Partial<MessageTypingLabels>` | — | `typing` — the text read for assistive tech. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
@@ -294,7 +296,7 @@ The fill moves between the two in a color transition (`fast`, both ways); the av
 | `edited` | «изменено» before the time |
 | `Message.Location live` | a breathing pin and a «Трансляция» badge |
 | `Message.Text plain` | a string without Markdown |
-| `Message.Typing active` | the typing bubble shows; off, it leaves closing its height |
+| `Message.Typing open` | the typing bubble shows; off, it leaves closing its height |
 
 The list-level settings a message reads — the group chat's author header and avatar gutter (`type`), the quick reaction, the reaction bar's options, the reader — are props of `Chat.Messages`.
 
@@ -306,7 +308,7 @@ The list-level settings a message reads — the group chat's author header and a
 | new at the end | the chat's list decided it (`data-enter="incoming"` / `"outgoing"`) | the message column floats up `--prime-space-3` from below and fades in (`fast`, enter easing, `transform` + `opacity` only; the row box clips it); never on a first render, history or a status change. See Chat |
 | pointed at / stepping back | the chat's jump, search or selection (`data-pointed`, `data-selected` on the message; `data-pointing`, `data-selecting` on the list) | nothing is drawn on the message: it stays at full strength while the others — the bubble, picture or circle with its tail and reactions, the avatar, the retry — step back to `--prime-message-dim-opacity` with a slight desaturation (selection: `fast`, both ways; the current search match: while it is current); a jump instead blinks the message itself three times, `base` each, the others stay still. Reduced motion: no blink |
 | search match | the chat's search query | every case-insensitive match in `Message.Text` and the transcripts under a soft accent wash (`<mark>`) |
-| typing | `Message.Typing active` | an incoming bubble of three dots rising and fading in turn on the loading loop (reduced motion slows it); enters floating up while its height opens (`fast`), leaves closing its height (`fast`) — or at once when a reply arrives at the end of the list in the same update; its block axis clips, so a closed row leaves nothing under the list |
+| typing | `Message.Typing open` | an incoming bubble of three dots rising and fading in turn on the loading loop (reduced motion slows it); enters floating up while its height opens (`fast`), leaves closing its height (`fast`) — or at once when a reply arrives at the end of the list in the same update; its block axis clips, so a closed row leaves nothing under the list |
 | status change | `status` | the ticks cross-fade and scale (`base`, `emphasized`), interruptible |
 | retrying | `onRetry` returns a promise | `sending` ticks and a `loading` retry button until it settles |
 | inline keyboard | `Message.Actions` children | `data-actions` on the message column: the rows under the bubble, the bubble at least as wide as them, no tail |
@@ -322,7 +324,7 @@ The list-level settings a message reads — the group chat's author header and a
 | transferring media / file, sent or received (one look both ways) | `transfer`, `transferProgress`, `transferDirection` (of an item for media) | media: the picture dims under the shared transfer disk in the middle — a 40px disk on the media shade (backdrop blur) with a white ×, the progress drawn as a ring along its inner edge (the disk is a Button `shape="circle"` `variant="shade"`; the ring is its `progress` ring — the kit ring at the line weight, 2px, a 32% white track, a white arc from 12 o'clock gliding `base`, always turning; the button is `aria-busy` and described by «Отправка {percent}%» / «Загрузка {percent}%» by the direction), the play mark of a video gives way; pressing the disk cancels; done — the ring fills, then the disk fades and shrinks to 0.9 (`fast`), the picture returns to full; failed — the disk turns danger with a retry arrow («Повторить отправку» / «Повторить загрузку», described by «Не отправилось» / «Не загрузилось»); `remote` — the download arrow on the same disk, no ring (`onDownload`). A file: the same disk at the tile's size (`xl`, 48px) covers its round tile, always shown — the ring along its edge, the × on the media shade; failed — the danger retry and the reason under the name; done — it fades away and the face (or the download link) is back. Voice and video messages draw the same transfer on their own play disk (VoicePlayer, VideoNote). Every one is the same disk (`internal/transferDisk`): one ring proportion, track, start, motion and cancel / retry / download. The size line shows «{done} из {total}». The name and the size line never move |
 | transfer pending | `onCancel` / `onRetry` returned a promise | a `Spinner` in the disk's glyph place, `aria-busy`, no second press; a rejection leaves the transfer as it was and announces `cancelFailed` / `retryFailed` |
 | selection mode | the chat's `selected` (not `null`) | an `option` with `aria-selected`; a check (`Checkbox.Indicator`, circle) at the row start; a press anywhere on the row toggles it — the parts inside take no presses meanwhile; `data-selecting`, `data-selected` on the article |
-| menu open | right click, long press, Enter / Shift+F10 / the menu key | the menu at the pointer (below the bubble from the keyboard); a bottom sheet on a phone |
+| menu open | right click, long press, Enter / Shift+F10 / the menu key | the menu against the message at the pointer (`anchorPoint`; below the bubble from the keyboard), focus returns to the message on close; a bottom sheet on a phone |
 | focused | keyboard | the focus ring around the bubble |
 
 ## Layout & spacing
@@ -355,7 +357,7 @@ The list-level settings a message reads — the group chat's author header and a
 | `R` | Opens the reaction bar (with `onReactionToggle`); arrows move between reactions, `Home` / `End` to the ends, `Enter` / `Space` pick, `Tab` closes it |
 | `L` | Puts or takes back the quick reaction (as a double tap) |
 | `Tab` | Moves to the buttons and links of a message: the reply quote, a file, the `Message.Actions` buttons in row order |
-| `Escape` | Closes the menu or the reaction bar |
+| `Escape` | Closes the menu, or the reaction bar unless `Message.Reactions closeOnEscape={false}` |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -388,7 +390,6 @@ The list-level settings a message reads — the group chat's author header and a
 | `read` | `"Прочитано"` | Name of the two-check status. |
 | `failed` | `"Не отправлено"` | Name of the failed status. |
 | `retry` | `"Повторить отправку"` | The retry button beside a failed message. |
-| `menu` | `"Действия с сообщением"` | The name of the context menu. |
 | `select` | `"Выбрать"` | The menu item that starts selection mode with the message. |
 | `reactionAdded` | `"Реакция {emoji} поставлена"` | Announced when the quick reaction (a double tap, `L`) is put. |
 | `reactionRemoved` | `"Реакция {emoji} снята"` | Announced when the quick reaction is taken back. |
@@ -474,7 +475,7 @@ The list-level settings a message reads — the group chat's author header and a
 | [structure.tsx](examples/structure.tsx) | Optional parts of a bubble in their order: the author, a forwarded header, a reply quote, the text and reactions — `Message.Author`, `Message.Forwarded`, `Message.Reply`, `Message.Reactions`. |
 | [kinds.tsx](examples/kinds.tsx) | Every kind of message in its shell, both directions, single and in runs: text bubbles, pictures and circles as blocks, a caption bubble, voice, file, contact, place and link cards, reactions inside a bubble and under a picture — `Message.Media`, `VideoNote`, `Message.File`, `Message.Contact`, `Message.Location`, `Message.LinkPreview`, `VoicePlayer`. |
 | [author.tsx](examples/author.tsx) | A group chat's run of one author: the first message opens with the name in the author's hue, a crown and the member's tag, the last one shows the avatar in the gutter; another author with initials only, a long name that ellipsizes before its tag, a header on a pill over a photo, and your own reply — `Message.Author`, `tag`, `Message.AuthorIcon`, `Message.Avatar`, `position`, `hueOf`. |
-| [typing.tsx](examples/typing.tsx) | The typing signal: an incoming bubble of three dots that enters like a message and leaves closing its height; switch it, keep it mounted — `Message.Typing`, `active`. |
+| [typing.tsx](examples/typing.tsx) | The typing signal: an incoming bubble of three dots that enters like a message and leaves closing its height; switch it, keep it mounted — `Message.Typing`, `open`. |
 | [status.tsx](examples/status.tsx) | Delivery of outgoing messages: a clock while sending, one check when sent, two when read, and a failed one with a retry that resolves after a second; the time comes as a date and reads to the second — `status`, `onRetry`, `formatTime`. |
 | [text-formatting.tsx](examples/text-formatting.tsx) | The Markdown the Composer writes, rendered safely: bold, italic, strike, code, a code block, links and a quote; long words and URLs wrap; a pasted error log stays as typed, its stars and underscores kept — `Message.Text`, `edited`, `plain`. |
 | [reactions.tsx](examples/reactions.tsx) | Reactions under a message: each chip shows who reacted — up to three avatars, from four on two and «+N» — and a press on a chip, or a double tap on the message, puts or takes back your own at once while the request runs behind it — `Message.Reactions`, `users`, `onReactionToggle`. |
@@ -505,7 +506,7 @@ The list-level settings a message reads — the group chat's author header and a
 - A rounded wrapper or a backing of your own around `Message.Media` → the message shell rounds and clips it.
 - Measuring a bubble or animating its height yourself → the bubble fits its content in CSS and the kit owns every size change of a message.
 - A context menu on a hover-only «…» button → `Message.Menu`: right click, long press and the keyboard open it.
-- «печатает…» as a text row you add and remove → `<Message.Typing active={typing} />` kept mounted, or `Chat.Root typing`.
+- «печатает…» as a text row you add and remove → `<Message.Typing open={typing} />` kept mounted, or `Chat.Root typing`.
 - Pausing other players by hand → one sound at a time is built into `VoicePlayer`, `VideoNote` and chat videos.
 - A transcript as a separate `Message.Text`, or a height animation of your own around it → `transcript` / `onTranscribe` on `VoicePlayer` and `VideoNote`: the text opens inside the same message, in one stroke with its height.
 - A list, dates, search or selection built around messages → [Chat](../chat/COMPONENT.md).

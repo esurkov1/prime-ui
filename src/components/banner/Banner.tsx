@@ -3,11 +3,13 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { iconSlotClass } from "@/internal/iconBox";
 import { leaveInPlace } from "@/internal/leaveInPlace";
+import { handoffFocus, tabStopBeside } from "@/internal/overlay/focus";
 import { type ControlSize, compactTier, type Tone, type Variant } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
@@ -48,7 +50,7 @@ export type BannerRootProps = React.HTMLAttributes<HTMLDivElement> & {
   placement?: "inset" | "page";
   /**
    * Renders a close button and calls this on its click. The parent unmounts the banner; it closes
-   * up in place, and the parent moves focus somewhere sensible.
+   * up in place, and focus inside it moves to the next tab stop of the page.
    */
   onDismiss?: () => void;
   labels?: Partial<BannerLabels>;
@@ -58,7 +60,7 @@ export type BannerRootProps = React.HTMLAttributes<HTMLDivElement> & {
 function BannerRoot({
   variant = "soft",
   tone = "info",
-  size = "m",
+  size: sizeProp,
   placement = "inset",
   onDismiss,
   labels,
@@ -69,12 +71,17 @@ function BannerRoot({
 }: BannerRootProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(rootRef, ref);
-  // Unmounted by its parent (dismissed, condition gone): a copy closes up in place, so the content
-  // below glides up instead of jumping.
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
+  // Unmounted by its parent (dismissed, condition gone): focus inside moves to the tab stop that
+  // takes its place, and a copy closes up in place, so the content below glides up instead of
+  // jumping.
   React.useLayoutEffect(() => {
     const node = rootRef.current;
     return () => {
-      if (node) leaveInPlace(node, "block");
+      if (!node) return;
+      handoffFocus(node, tabStopBeside(node));
+      leaveInPlace(node, "block");
     };
   }, []);
   const dismissLabel = labels?.dismiss ?? BANNER_LABELS.dismiss;
@@ -96,24 +103,26 @@ function BannerRoot({
     >
       <SurfaceDepthProvider value={depth}>
         <BannerContext.Provider value={context}>
-          <ControlSizeProvider value={size}>
-            {children}
-            {onDismiss ? (
-              <span className={styles.close}>
-                <Button.Root
-                  variant="ghost"
-                  tone="inherit"
-                  size={compactTier(size)}
-                  aria-label={dismissLabel}
-                  onClick={onDismiss}
-                >
-                  <Button.Icon>
-                    <Icon name="action.close" />
-                  </Button.Icon>
-                </Button.Root>
-              </span>
-            ) : null}
-          </ControlSizeProvider>
+          {tier.provide(
+            <>
+              {children}
+              {onDismiss ? (
+                <span className={styles.close}>
+                  <Button.Root
+                    variant="ghost"
+                    tone="inherit"
+                    size={compactTier(size)}
+                    aria-label={dismissLabel}
+                    onClick={onDismiss}
+                  >
+                    <Button.Icon>
+                      <Icon name="action.close" />
+                    </Button.Icon>
+                  </Button.Root>
+                </span>
+              ) : null}
+            </>,
+          )}
         </BannerContext.Provider>
       </SurfaceDepthProvider>
     </div>
@@ -137,7 +146,9 @@ export type BannerIconProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 /** Holds one `Icon` on the first text line, in the tone color. */
 function BannerIcon({ className, ...rest }: BannerIconProps) {
-  return <span className={cx(styles.icon, className)} aria-hidden="true" {...rest} />;
+  return (
+    <span className={cx(styles.icon, iconSlotClass, className)} aria-hidden="true" {...rest} />
+  );
 }
 BannerIcon.displayName = "Banner.Icon";
 

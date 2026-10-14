@@ -5,9 +5,9 @@ import {
   Card,
   Chat,
   ChatList,
+  type ChatMessageEntry,
   Composer,
   type ComposerActivity,
-  type ComposerMediaItem,
   type ComposerMessage,
   type ComposerRecording,
   Dropdown,
@@ -232,12 +232,8 @@ const excerpt = (message: ChatMessage) => {
   }
 };
 
-/** An album holds up to ten photos and videos: more go as the next album. */
-const ALBUM_MAX = 10;
-const albumsOf = (media: readonly ComposerMediaItem[]) =>
-  Array.from({ length: Math.ceil(media.length / ALBUM_MAX) }, (_, index) =>
-    media.slice(index * ALBUM_MAX, (index + 1) * ALBUM_MAX),
-  );
+/** A dialog's history as the server returns it: its own message objects for every load. */
+const historyOf = () => HISTORY.map((message) => ({ ...message }));
 
 /** The local object URLs a message plays from (photos, videos and recordings sent here). */
 const localSourcesOf = (message: Content): string[] =>
@@ -282,7 +278,7 @@ type ChatComposerProps = {
 };
 
 /** The Composer with its upload queue: an upload tick re-renders the composer, not the thread. */
-const ChatComposer = React.memo(function ChatComposer({
+function ChatComposer({
   replyTo,
   replyAuthor,
   editing,
@@ -304,15 +300,15 @@ const ChatComposer = React.memo(function ChatComposer({
   if (!editing && editedId !== null) setEditedId(null);
 
   // Optimistic: every message is in the list at once with `sending`, so the send returns at once
-  // and the field is free for the next one. The bar's `value` says what it answers or edits.
-  // Photos and videos go as albums with the text as their caption, other files as file messages.
-  // The tray's previews are revoked after the send, so an album plays from its own URLs.
-  const send = ({ text, media, files, replyTo: reply, editOf }: ComposerMessage) => {
+  // and the field is free for the next one. The bar's `messageId` says what it answers or edits.
+  // Photos and videos go as albums, the text as the first one's caption, other files as file
+  // messages. The tray's previews are revoked after the send, so an album plays from its own URLs.
+  const send = ({ text, albums, files, replyTo: reply, editOf }: ComposerMessage) => {
     if (editOf) {
       onSave(editOf, text);
       return;
     }
-    albumsOf(media).forEach((album, index) => {
+    albums.forEach((album, index) => {
       onPost(
         {
           kind: "media",
@@ -329,7 +325,7 @@ const ChatComposer = React.memo(function ChatComposer({
     for (const item of files) {
       onPost({ kind: "file", name: item.file.name, size: item.file.size, href: "#" }, reply);
     }
-    if (text && media.length === 0) onPost({ kind: "text", text }, reply);
+    if (text && albums.length === 0) onPost({ kind: "text", text }, reply);
   };
 
   const sendVoice = ({ blob, durationMs, waveform }: ComposerRecording) =>
@@ -355,7 +351,7 @@ const ChatComposer = React.memo(function ChatComposer({
     >
       <Composer.Attach />
       {replyTo ? (
-        <Composer.Context value={replyTo.id} onDismiss={onReplyDismiss}>
+        <Composer.Context messageId={replyTo.id} onDismiss={onReplyDismiss}>
           <Composer.Title>Ответ {replyTo.from === "me" ? "себе" : replyAuthor}</Composer.Title>
           <Composer.Description>{excerpt(replyTo)}</Composer.Description>
         </Composer.Context>
@@ -363,7 +359,7 @@ const ChatComposer = React.memo(function ChatComposer({
       {editing ? (
         <Composer.Context
           mode="edit"
-          value={editing.id}
+          messageId={editing.id}
           onDismiss={() => {
             onEditDismiss();
             setDraft("");
@@ -375,11 +371,11 @@ const ChatComposer = React.memo(function ChatComposer({
       ) : null}
     </Composer.Root>
   );
-});
+}
 
 export default function ChatScreenExample() {
   const [dialogId, setDialogId] = React.useState<string | null>("vector");
-  const [messages, setMessages] = React.useState<ChatMessage[]>(HISTORY);
+  const [messages, setMessages] = React.useState<ChatMessage[]>(historyOf);
   const [hasOlder, setHasOlder] = React.useState(true);
   const [replyTo, setReplyTo] = React.useState<ChatMessage | null>(null);
   const [editing, setEditing] = React.useState<ChatMessage | null>(null);
@@ -430,7 +426,11 @@ export default function ChatScreenExample() {
   const [loadedId, setLoadedId] = React.useState<string | null>(null);
   React.useEffect(() => {
     if (!dialogId) return;
-    const timer = window.setTimeout(() => setLoadedId(dialogId), DIALOG_MS);
+    const timer = window.setTimeout(() => {
+      setMessages(historyOf());
+      setHasOlder(true);
+      setLoadedId(dialogId);
+    }, DIALOG_MS);
     return () => window.clearTimeout(timer);
   }, [dialogId]);
 
@@ -444,19 +444,16 @@ export default function ChatScreenExample() {
     setHasOlder(false);
   };
 
-  // Every update touches one message: the rest keep their objects, so their rows stay memoized.
-  const patch = React.useCallback(
-    (id: string, next: (message: ChatMessage) => Partial<ChatMessage>) =>
-      setMessages((current) =>
-        current.map((message) =>
-          message.id === id ? ({ ...message, ...next(message) } as ChatMessage) : message,
-        ),
+  // Every update touches one message: the rest keep their objects, so their rows stay as they are.
+  const patch = (id: string, next: (message: ChatMessage) => Partial<ChatMessage>) =>
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === id ? ({ ...message, ...next(message) } as ChatMessage) : message,
       ),
-    [],
-  );
+    );
 
   /** The client reads, waits while you are still typing, types for a moment and answers. */
-  const clientAnswers = React.useCallback(async () => {
+  const clientAnswers = async () => {
     await wait(MESSAGE_SEND_MS + MESSAGE_READ_MS);
     while (myActivity.current !== null) await wait(500);
     setClientTyping(true);
@@ -468,132 +465,112 @@ export default function ChatScreenExample() {
       ...current,
       { id: `client-${Date.now()}`, from: "client", sentAt: new Date(), kind: "text", text },
     ]);
-  }, []);
+  };
 
   /**
    * Adds an outgoing message at once (it rises from the composer into the list), sends it, then
    * marks it read when the client opens it. The id stays: the row is never re-keyed.
    */
-  const post = React.useCallback(
-    (content: Content, replyToId?: string) => {
-      for (const url of localSourcesOf(content)) localUrls.current.add(url);
-      const id = `own-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-      const message = {
-        ...content,
-        id,
-        from: "me",
-        sentAt: new Date(),
-        status: "sending",
-        replyTo: replyToId,
-      } as ChatMessage;
-      setMessages((current) => [...current, message]);
-      window.setTimeout(() => patch(id, () => ({ status: "sent" })), MESSAGE_SEND_MS);
-      window.setTimeout(
-        () => patch(id, () => ({ status: "read" })),
-        MESSAGE_SEND_MS + MESSAGE_READ_MS,
-      );
-      void clientAnswers();
-    },
-    [patch, clientAnswers],
-  );
+  const post = (content: Content, replyToId?: string) => {
+    for (const url of localSourcesOf(content)) localUrls.current.add(url);
+    const id = `own-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const message = {
+      ...content,
+      id,
+      from: "me",
+      sentAt: new Date(),
+      status: "sending",
+      replyTo: replyToId,
+    } as ChatMessage;
+    setMessages((current) => [...current, message]);
+    window.setTimeout(() => patch(id, () => ({ status: "sent" })), MESSAGE_SEND_MS);
+    window.setTimeout(
+      () => patch(id, () => ({ status: "read" })),
+      MESSAGE_SEND_MS + MESSAGE_READ_MS,
+    );
+    void clientAnswers();
+  };
 
-  const save = React.useCallback(
-    (id: string, text: string) => patch(id, () => ({ text, edited: true })),
-    [patch],
-  );
+  const save = (id: string, text: string) => patch(id, () => ({ text, edited: true }));
 
-  const editLast = React.useCallback(() => {
+  const editLast = () => {
     const last = [...messages].reverse().find((item) => item.from === "me" && item.kind === "text");
     if (!last) return;
     setReplyTo(null);
     setEditing(last);
-  }, [messages]);
+  };
 
-  const startEdit = React.useCallback((message: ChatMessage) => {
+  const startEdit = (message: ChatMessage) => {
     setReplyTo(null);
     setEditing(message);
-  }, []);
+  };
 
-  const startReply = React.useCallback((message: ChatMessage) => {
+  const startReply = (message: ChatMessage) => {
     setEditing(null);
     setReplyTo(message);
-  }, []);
+  };
 
-  const reportActivity = React.useCallback((activity: ComposerActivity | null) => {
+  const reportActivity = (activity: ComposerActivity | null) => {
     // A real chat sends it over its socket; here the simulated client reads it.
     myActivity.current = activity;
-  }, []);
+  };
 
-  const remove = React.useCallback(
-    (id: string) => setMessages((current) => current.filter((item) => item.id !== id)),
-    [],
-  );
+  const remove = (id: string) => setMessages((current) => current.filter((item) => item.id !== id));
 
-  const dismissReply = React.useCallback(() => setReplyTo(null), []);
-  const dismissEdit = React.useCallback(() => setEditing(null), []);
-
-  // The newest messages for what a row looks up (a reply's original), without making every row
-  // render again when one message changes.
-  const messagesRef = React.useRef(messages);
-  messagesRef.current = messages;
   const contact = dialog.contact;
 
-  // A message renders again only when its data, its place or this function change: a status or an
-  // upload tick re-renders the one message it touches.
-  const renderMessage = React.useCallback(
-    (message: ChatMessage) => {
-      const own = message.from === "me";
-      const original = message.replyTo
-        ? messagesRef.current.find((item) => item.id === message.replyTo)
-        : undefined;
-      return (
-        <Message.Root
-          direction={own ? "outgoing" : "incoming"}
-          time={message.sentAt}
-          status={message.status}
-          edited={message.edited}
-        >
-          {original ? (
-            <Message.Reply author={original.from === "me" ? "Вы" : contact} target={original.id}>
-              {excerpt(original)}
-            </Message.Reply>
+  // A message renders again only when its data or its place change: a status or an upload tick
+  // re-renders the one message it touches. A dialog loads its own messages, so a row never
+  // outlives the contact it names; a reply's original comes from the list (`entry.find`).
+  const renderMessage = (message: ChatMessage, entry: ChatMessageEntry<ChatMessage>) => {
+    const own = message.from === "me";
+    const original = message.replyTo ? entry.find(message.replyTo) : undefined;
+    return (
+      <Message.Root
+        direction={own ? "outgoing" : "incoming"}
+        time={message.sentAt}
+        status={message.status}
+        edited={message.edited}
+      >
+        {original ? (
+          <Message.Reply author={original.from === "me" ? "Вы" : contact} target={original.id}>
+            {excerpt(original)}
+          </Message.Reply>
+        ) : null}
+        {renderContent(message)}
+        <Message.Menu>
+          <Dropdown.Item onSelect={() => startReply(message)}>
+            <Dropdown.ItemIcon>
+              <Icon name="action.reply" />
+            </Dropdown.ItemIcon>
+            Ответить
+          </Dropdown.Item>
+          {own && message.kind === "text" ? (
+            <Dropdown.Item onSelect={() => startEdit(message)}>
+              <Dropdown.ItemIcon>
+                <Icon name="action.edit" />
+              </Dropdown.ItemIcon>
+              Изменить
+            </Dropdown.Item>
           ) : null}
-          {renderContent(message)}
-          <Message.Menu>
-            <Dropdown.Item onSelect={() => startReply(message)}>
+          <Dropdown.Item onSelect={() => navigator.clipboard?.writeText(excerpt(message))}>
+            <Dropdown.ItemIcon>
+              <Icon name="action.copy" />
+            </Dropdown.ItemIcon>
+            Скопировать
+          </Dropdown.Item>
+          {own ? (
+            <Dropdown.Item tone="danger" onSelect={() => remove(message.id)}>
               <Dropdown.ItemIcon>
-                <Icon name="action.reply" />
+                <Icon name="action.delete" />
               </Dropdown.ItemIcon>
-              Ответить
+              Удалить
             </Dropdown.Item>
-            {own && message.kind === "text" ? (
-              <Dropdown.Item onSelect={() => startEdit(message)}>
-                <Dropdown.ItemIcon>
-                  <Icon name="action.edit" />
-                </Dropdown.ItemIcon>
-                Изменить
-              </Dropdown.Item>
-            ) : null}
-            <Dropdown.Item onSelect={() => navigator.clipboard?.writeText(excerpt(message))}>
-              <Dropdown.ItemIcon>
-                <Icon name="action.copy" />
-              </Dropdown.ItemIcon>
-              Скопировать
-            </Dropdown.Item>
-            {own ? (
-              <Dropdown.Item tone="danger" onSelect={() => remove(message.id)}>
-                <Dropdown.ItemIcon>
-                  <Icon name="action.delete" />
-                </Dropdown.ItemIcon>
-                Удалить
-              </Dropdown.Item>
-            ) : null}
-          </Message.Menu>
-        </Message.Root>
-      );
-    },
-    [contact, startReply, startEdit, remove],
-  );
+          ) : null}
+        </Message.Menu>
+      </Message.Root>
+    );
+  };
 
   return (
     <>
@@ -699,8 +676,8 @@ export default function ChatScreenExample() {
                       replyTo={replyTo}
                       replyAuthor={dialog.contactTo}
                       editing={editing}
-                      onReplyDismiss={dismissReply}
-                      onEditDismiss={dismissEdit}
+                      onReplyDismiss={() => setReplyTo(null)}
+                      onEditDismiss={() => setEditing(null)}
                       onEditLast={editLast}
                       onPost={post}
                       onSave={save}

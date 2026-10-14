@@ -1,10 +1,13 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { withMotion } from "@/test/motion";
 
-import { NotificationCard } from "./Notification";
+import { NotificationCard, type NotificationDismissReason } from "./Notification";
+import styles from "./Notification.module.css";
 import { NotificationProvider, useNotifications } from "./NotificationStore";
 
 function NotificationHarness() {
@@ -96,7 +99,7 @@ describe("Notification", () => {
     expect(await screen.findByText("Persistent title")).toBeInTheDocument();
     const card = screen.getByText("Persistent title").closest("article");
     expect(card).toHaveAttribute("data-persistent", "true");
-    expect(card?.querySelector("[class*=progressTrack]")).toBeNull();
+    expect(card?.querySelector(`.${styles.progressTrack}`)).toBeNull();
   });
 
   it("limits visible notifications per position by max", async () => {
@@ -199,19 +202,6 @@ describe("Notification", () => {
 
     function stackItems(name = "Уведомления сверху справа") {
       return Array.from(screen.getByRole("list", { name }).children) as HTMLElement[];
-    }
-
-    function stubMotion() {
-      vi.stubGlobal("matchMedia", (query: string) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        addListener: () => {},
-        removeListener: () => {},
-        dispatchEvent: () => false,
-      }));
     }
 
     it("puts the newest card on top and peeks older ones behind it", () => {
@@ -319,7 +309,7 @@ describe("Notification", () => {
     });
 
     it("keeps a dismissed card until its exit transition ends, out of the offsets", () => {
-      stubMotion();
+      withMotion();
       render(
         <NotificationProvider>
           <CountingHarness />
@@ -342,7 +332,7 @@ describe("Notification", () => {
     });
 
     it("removes a dismissed card by the token timeout when no animationend arrives", () => {
-      stubMotion();
+      withMotion();
       vi.useFakeTimers();
       render(
         <NotificationProvider>
@@ -422,7 +412,7 @@ describe("Notification", () => {
 
     /** The countdown line: a CSS animation of the toast's duration. */
     function countdownLine() {
-      const line = document.querySelector<HTMLElement>("[class*=progressValue]");
+      const line = document.querySelector<HTMLElement>(`.${styles.progressValue}`);
       if (!line) throw new Error("no countdown line");
       return line;
     }
@@ -556,7 +546,7 @@ describe("NotificationCard", () => {
     expect(card).toHaveAttribute("data-tone", "success");
     expect(card).toHaveAttribute("data-persistent", "true");
     expect(screen.queryByRole("button")).toBeNull();
-    expect(container.querySelector("[class*=progressTrack]")).toBeNull();
+    expect(container.querySelector(`.${styles.progressTrack}`)).toBeNull();
 
     rerender(<NotificationCard tone="danger" title="Ошибка" badge={3} onDismiss={onDismiss} />);
     expect(screen.getByRole("alert")).toBeInTheDocument();
@@ -567,7 +557,9 @@ describe("NotificationCard", () => {
 });
 
 describe("Notification — onDismiss", () => {
-  function Undo({ onDismiss, max }: { onDismiss: (title: string) => void; max?: number }) {
+  type Leave = (title: string, reason: NotificationDismissReason) => void;
+
+  function Undo({ onDismiss, max }: { onDismiss: Leave; max?: number }) {
     return (
       <NotificationProvider max={max}>
         <Push onDismiss={onDismiss} />
@@ -575,7 +567,7 @@ describe("Notification — onDismiss", () => {
     );
   }
 
-  function Push({ onDismiss }: { onDismiss: (title: string) => void }) {
+  function Push({ onDismiss }: { onDismiss: Leave }) {
     const { notify, dismissAll } = useNotifications();
     const count = React.useRef(0);
     return (
@@ -585,7 +577,12 @@ describe("Notification — onDismiss", () => {
           onClick={() => {
             count.current += 1;
             const title = `Удалено ${count.current}`;
-            notify({ title, persistent: true, onDismiss: () => onDismiss(title) });
+            notify({
+              title,
+              persistent: true,
+              action: { label: "Отменить", onClick: () => undefined },
+              onDismiss: (reason) => onDismiss(title, reason),
+            });
           }}
         >
           push
@@ -597,7 +594,7 @@ describe("Notification — onDismiss", () => {
     );
   }
 
-  it("fires once when the toast is closed", async () => {
+  it("fires once when the toast is closed, with the reason", async () => {
     const onDismiss = vi.fn();
     render(<Undo onDismiss={onDismiss} />);
     fireEvent.click(screen.getByRole("button", { name: "push" }));
@@ -606,7 +603,32 @@ describe("Notification — onDismiss", () => {
     fireEvent.click(screen.getByRole("button", { name: "dismiss all" }));
     await waitFor(() => expect(screen.queryByText("Удалено 1")).not.toBeInTheDocument());
     expect(onDismiss).toHaveBeenCalledTimes(1);
-    expect(onDismiss).toHaveBeenCalledWith("Удалено 1");
+    expect(onDismiss).toHaveBeenCalledWith("Удалено 1", "dismiss");
+  });
+
+  it("is announced once when two ways close it in the same event", () => {
+    withMotion();
+    const onDismiss = vi.fn();
+    render(<Undo onDismiss={onDismiss} />);
+    fireEvent.click(screen.getByRole("button", { name: "push" }));
+    const close = screen.getByRole("button", { name: "Закрыть уведомление" });
+    // The close button and a `dismissAll()` before React renders the first exit.
+    act(() => {
+      close.click();
+      screen.getByRole("button", { name: "dismiss all" }).click();
+    });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(onDismiss).toHaveBeenCalledWith("Удалено 1", "close");
+  });
+
+  it("closes the toast after its action runs", async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn();
+    render(<Undo onDismiss={onDismiss} />);
+    await user.click(screen.getByRole("button", { name: "push" }));
+    await user.click(screen.getByRole("button", { name: "Отменить" }));
+    expect(screen.queryByText("Удалено 1")).not.toBeInTheDocument();
+    expect(onDismiss).toHaveBeenCalledWith("Удалено 1", "action");
   });
 
   it("fires for a toast a newer one pushes out of a full stack", async () => {
@@ -616,7 +638,50 @@ describe("Notification — onDismiss", () => {
     await screen.findByText("Удалено 1");
     fireEvent.click(screen.getByRole("button", { name: "push" }));
     await screen.findByText("Удалено 2");
-    expect(onDismiss).toHaveBeenCalledWith("Удалено 1");
+    expect(onDismiss).toHaveBeenCalledWith("Удалено 1", "overflow");
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("lets a pushed-out toast leave through its exit", () => {
+    vi.useFakeTimers();
+    withMotion();
+    render(<Undo onDismiss={() => undefined} max={1} />);
+    const push = screen.getByRole("button", { name: "push" });
+    fireEvent.click(push);
+    fireEvent.click(push);
+    const oldest = screen.getByText("Удалено 1").closest("li");
+    expect(oldest).toHaveAttribute("data-state", "closed");
+    expect(screen.getByText("Удалено 2").closest("li")).toHaveAttribute("data-state", "open");
+    act(() => {
+      vi.advanceTimersByTime(exitTimeoutMs("fast"));
+    });
+    expect(screen.queryByText("Удалено 1")).not.toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it("hands focus to the next open card when a focused one leaves", async () => {
+    const user = userEvent.setup();
+    render(<Undo onDismiss={() => undefined} />);
+    const push = screen.getByRole("button", { name: "push" });
+    await user.click(push);
+    await user.click(push);
+    const [newest] = screen.getAllByRole("button", { name: "Закрыть уведомление" });
+    newest.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getAllByRole("button", { name: "Закрыть уведомление" })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Отменить" })).toHaveFocus();
+  });
+
+  it("returns focus to where it came from when the last card leaves", async () => {
+    const user = userEvent.setup();
+    render(<Undo onDismiss={() => undefined} />);
+    await user.click(screen.getByRole("button", { name: "push" }));
+    const all = screen.getByRole("button", { name: "dismiss all" });
+    all.focus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Отменить" })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(screen.queryByText("Удалено 1")).not.toBeInTheDocument();
+    expect(all).toHaveFocus();
   });
 });

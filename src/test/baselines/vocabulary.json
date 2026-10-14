@@ -1,7 +1,4 @@
 [
   "src/components/chat/api.ts: Chat.Messages.type → `multiple` for one vs many (a `type` prop names no selection mode)",
-  "src/components/composer/api.ts: Composer.Context.value → `messageId`",
-  "src/components/message/api.ts: Message.Typing.active → `current` (a navigation location) or `selected` (a choice)",
-  "src/components/notification/api.ts: NotificationCard.icon → an `X.Icon` part",
-  "src/components/notification/api.ts: notify(options).icon → an `X.Icon` part"
+  "src/components/notification/api.ts: NotificationCard.icon → an `X.Icon` part"
 ]

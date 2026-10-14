@@ -5,11 +5,13 @@ import { Button } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Crossfade } from "@/components/crossfade/Crossfade";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { FileUpload } from "@/components/file-upload/FileUpload";
+import { FileUpload, type FileUploadPicker } from "@/components/file-upload/FileUpload";
+import { GALLERY_MAX } from "@/components/gallery/Gallery";
 import { Hint } from "@/components/hint/Hint";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Textarea } from "@/components/textarea/Textarea";
-import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
+import { TOUCH_QUERY } from "@/hooks/breakpoints";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -17,20 +19,22 @@ import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
 import type { UploadItem, UploadQueue } from "@/hooks/useUploadQueue";
 import { Icon, type IconName } from "@/icons";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
 import { type MediaKind, mediaKind } from "@/internal/mediaKind";
+import { usePartPresence } from "@/internal/partPresence";
 import { Ring } from "@/internal/ring";
 import { type ControlSize, stepDown } from "@/internal/states";
-import swapMotion from "@/internal/swapMotion.module.css";
 import { TEXT_FORMATTING_LABELS, type TextFormattingLabels } from "@/internal/textFormatting";
 import { useTextFormatting } from "@/internal/textFormattingToolbar";
+import { type AsyncHandler, isPromiseLike } from "@/internal/usePendingChanges";
 import styles from "./Composer.module.css";
 import { drawLiveWave, type LiveWaveSize, type LiveWaveStyle } from "./liveWave";
 import {
@@ -146,13 +150,14 @@ export const COMPOSER_LABELS: ComposerLabels = {
 export type ComposerMediaItem = UploadItem & { type: MediaKind };
 
 /**
- * What `onSend` receives: the text (trimmed); the uploaded `media` (photos and videos, in the order
- * of the tray — one album) and `files` (everything else, or every file with «как файлы»); and the
- * `value` of the shown `Composer.Context` — `replyTo` for a reply, `editOf` for an edit.
+ * What `onSend` receives: the text (trimmed); the uploaded photos and videos as `albums` (in the
+ * order of the tray, a new album every `GALLERY_MAX` items — one message each) and `files`
+ * (everything else, or every file with «как файлы»); and the `messageId` of the shown
+ * `Composer.Context` — `replyTo` for a reply, `editOf` for an edit.
  */
 export type ComposerMessage = {
   text: string;
-  media: readonly ComposerMediaItem[];
+  albums: readonly (readonly ComposerMediaItem[])[];
   files: readonly UploadItem[];
   replyTo?: string;
   editOf?: string;
@@ -170,18 +175,14 @@ export type ComposerQueue = Pick<
   "items" | "add" | "retry" | "remove" | "clear" | "move"
 >;
 
-/** A slow event: return a Promise to show it pending (resolve = done, reject = nothing changes). */
-// biome-ignore lint/suspicious/noConfusingVoidType: a handler that returns nothing must fit.
-type AsyncEvent<T> = (value: T) => void | Promise<unknown>;
-
 /** Reply to a message, or edit one of yours. */
 export type ComposerContextMode = "reply" | "edit";
 
 type Bar = {
   id: string;
   mode: ComposerContextMode;
-  /** The message the bar is about (`Composer.Context value`). */
-  value: string | undefined;
+  /** The message the bar is about (`Composer.Context messageId`). */
+  messageId: string | undefined;
   dismiss: (() => void) | undefined;
 };
 
@@ -205,15 +206,11 @@ const HOLD_MS = 200;
  * reaction of touch screens, short enough that the delayed reveal of a recording reads as instant.
  */
 const DOUBLE_MS = 300;
-const TOUCH_QUERY = "(hover: none) and (pointer: coarse)";
 const EMPTY_UPLOADS: readonly UploadItem[] = [];
 /** The field grows from one line to this many, then scrolls inside. */
 const MAX_ROWS = 8;
 /** `typing` ends this long after the last keystroke. */
 const TYPING_IDLE_MS = 3000;
-
-const isPromise = (value: unknown): value is PromiseLike<unknown> =>
-  typeof (value as PromiseLike<unknown> | undefined)?.then === "function";
 
 /** `0:07,4`: minutes, seconds and tenths of a recording. */
 function formatElapsed(ms: number): string {
@@ -264,7 +261,7 @@ export type ComposerRootProps = Omit<
    * while it runs (the send button is busy, the field read-only): resolve clears the field and the
    * attachments and closes the reply / edit bar (its `onDismiss`), reject leaves everything as it was.
    */
-  onSend?: AsyncEvent<ComposerMessage>;
+  onSend?: AsyncHandler<[message: ComposerMessage], unknown>;
   /**
    * What the person is doing changed: `typing` from the first keystroke until the text is sent,
    * cleared or rests for 3 s; `voice` / `video` while a recording shows; `null` — nothing. Fires on
@@ -272,12 +269,12 @@ export type ComposerRootProps = Omit<
    */
   onActivityChange?: (activity: ComposerActivity | null) => void;
   /** A voice message was recorded. With it (or `onSendVideoNote`) an empty field shows the record button. */
-  onSendVoice?: AsyncEvent<ComposerRecording>;
+  onSendVoice?: AsyncHandler<[recording: ComposerRecording], unknown>;
   /**
    * A round video message was recorded. With it a double click / double tap (or ↑ ↓) on the record
    * button switches voice and video.
    */
-  onSendVideoNote?: AsyncEvent<ComposerRecording>;
+  onSendVideoNote?: AsyncHandler<[recording: ComposerRecording], unknown>;
   /** ↑ in an empty field: open your last message for editing. */
   onEditLast?: () => void;
   /** What the record button records (controlled); `video` needs `onSendVideoNote`. */
@@ -329,7 +326,8 @@ function ComposerRoot({
   onDrop,
   ...rest
 }: ComposerRootProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const disabled = useInheritedDisabled(disabledProp);
   const labels = useLabels(COMPOSER_LABELS, labelsProp);
   const [value, setValue] = useControllableState({
@@ -391,6 +389,10 @@ function ComposerRoot({
         const type = mediaKind(item.file);
         return type === null ? [] : [{ ...item, type }];
       });
+  // An album lays out at most `GALLERY_MAX` items: a longer set goes as several.
+  const albums = Array.from({ length: Math.ceil(sentMedia.length / GALLERY_MAX) }, (_, index) =>
+    sentMedia.slice(index * GALLERY_MAX, (index + 1) * GALLERY_MAX),
+  );
   const doneFiles = asFiles ? done : done.filter((item) => mediaKind(item.file) === null);
   const addFiles = React.useCallback(
     (files: File[]) => {
@@ -406,7 +408,7 @@ function ComposerRoot({
   const canSend = hasContent && !uploading && !pending && !disabled;
 
   const finishSend = (result: unknown, onDone: () => void) => {
-    if (!isPromise(result)) {
+    if (!isPromiseLike(result)) {
       onDone();
       return;
     }
@@ -423,10 +425,10 @@ function ComposerRoot({
   const send = () => {
     if (!canSend) return;
     const sentBar = bar;
-    const message: ComposerMessage = { text, media: sentMedia, files: doneFiles };
-    if (sentBar?.value !== undefined) {
-      if (sentBar.mode === "edit") message.editOf = sentBar.value;
-      else message.replyTo = sentBar.value;
+    const message: ComposerMessage = { text, albums, files: doneFiles };
+    if (sentBar?.messageId !== undefined) {
+      if (sentBar.mode === "edit") message.editOf = sentBar.messageId;
+      else message.replyTo = sentBar.messageId;
     }
     const result = onSend?.(message);
     finishSend(result, () => {
@@ -862,7 +864,9 @@ function ComposerRoot({
     [],
   );
 
-  const recordBar = usePresence(recording, { exitDuration: "fast" });
+  // The recording bar rises in over the field and closes up in place when the recording ends.
+  const recordBar = usePartPresence<HTMLDivElement>({ present: recording, axis: "inline" });
+  const setBarRef = useMergedRefs(barRef, recordBar.ref);
   const lockPill = usePresence(holding, { exitDuration: "fast" });
   const preview = usePresence(recording && recorder.mode === "video", { exitDuration: "fast" });
 
@@ -924,6 +928,7 @@ function ComposerRoot({
   );
 
   const actionKind = recording ? "send" : editing ? "save" : showRecord ? recordMode : "send";
+  const pauseIcon: IconName = recorder.paused ? "action.play" : "action.pause";
   const actionLabel =
     actionKind === "save"
       ? labels.save
@@ -947,7 +952,7 @@ function ComposerRoot({
 
   return (
     <ComposerProvider value={contextValue}>
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <form
           aria-label={labels.region}
           {...rest}
@@ -1106,18 +1111,12 @@ function ComposerRoot({
               />
               {format.toolbar}
             </div>
-            {recordBar.mounted ? (
+            {recording ? (
               <div
-                ref={barRef}
-                className={cx(
-                  styles.recording,
-                  recordBar.state === "open" ? swapMotion.swapIn : swapMotion.swapOut,
-                )}
-                data-state={recordBar.state}
+                ref={setBarRef}
+                className={cx(styles.recording, recordBar.className)}
                 data-locked={locked || undefined}
                 data-paused={recorder.paused || undefined}
-                inert={!recording}
-                onAnimationEnd={recordBar.onExitEnd}
               >
                 {locked ? (
                   <Button.Root
@@ -1143,17 +1142,18 @@ function ComposerRoot({
                     disabled={recorder.status !== "recording"}
                   >
                     <Button.Icon>
-                      <Icon name={recorder.paused ? "action.play" : "action.pause"} />
+                      <Icon name={pauseIcon} />
                     </Button.Icon>
                   </Button.Root>
                 ) : null}
-                {recorder.paused ? (
-                  <span className={cx(styles.pausedGlyph, enterMotion.enter)} aria-hidden="true">
+                {/* The breathing dot; paused, a still pause glyph in its place. */}
+                <GlyphSwap className={styles.status}>
+                  {recorder.paused ? (
                     <Icon name="action.pause" size={stepDown(size)} animated={false} />
-                  </span>
-                ) : (
-                  <span className={styles.dot} aria-hidden="true" />
-                )}
+                  ) : (
+                    <span key="dot" className={styles.dot} aria-hidden="true" />
+                  )}
+                </GlyphSwap>
                 <span ref={timerRef} className={styles.timer} aria-hidden="true" />
                 {locked ? (
                   // A canvas without fallback content is not exposed: the timer and the live
@@ -1170,8 +1170,12 @@ function ComposerRoot({
             <div className={styles.end}>
               {lockPill.mounted ? (
                 <span
-                  className={styles.lock}
+                  className={cx(
+                    styles.lock,
+                    lockPill.state === "open" ? enterMotion.enter : enterMotion.exit,
+                  )}
                   data-state={lockPill.state}
+                  data-depth="floating"
                   aria-hidden="true"
                   onAnimationEnd={lockPill.onExitEnd}
                 >
@@ -1196,17 +1200,7 @@ function ComposerRoot({
                 data-action={actionKind}
               >
                 <Button.Icon>
-                  <span className={styles.morph}>
-                    {(Object.keys(actionIcon) as (typeof actionKind)[]).map((kind) => (
-                      <span
-                        key={kind}
-                        className={styles.glyph}
-                        data-state={kind === actionKind ? "active" : "inactive"}
-                      >
-                        <Icon name={actionIcon[kind]} />
-                      </span>
-                    ))}
-                  </span>
+                  <Icon name={actionIcon[actionKind]} />
                 </Button.Icon>
               </Button.Root>
               <VisuallyHidden id={hintId}>
@@ -1215,8 +1209,8 @@ function ComposerRoot({
             </div>
           </div>
           <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
-        </form>
-      </ControlSizeProvider>
+        </form>,
+      )}
     </ComposerProvider>
   );
 }
@@ -1250,7 +1244,7 @@ function VideoPreview({
   return (
     <div
       ref={ref}
-      className={styles.preview}
+      className={cx(styles.preview, state === "open" ? enterMotion.enterBase : enterMotion.exit)}
       data-state={state}
       data-ready={(ready && stream !== null) || undefined}
       aria-hidden="true"
@@ -1267,7 +1261,7 @@ function VideoPreview({
           onLoadedData={() => setReady(true)}
         />
       ) : null}
-      <Ring value={0} live track={false} className={styles.previewRing} />
+      <Ring value={0} live weight="band" track={false} className={styles.previewRing} />
     </div>
   );
 }
@@ -1277,8 +1271,7 @@ function VideoPreview({
 export type ComposerContextProps = React.HTMLAttributes<HTMLDivElement> & {
   /** `reply` — a reply to a message; `edit` — your message is being edited (send saves). */
   mode?: ComposerContextMode;
-  /** The id of the message answered or edited: `onSend` gets it as `replyTo` / `editOf`. */
-  value?: string;
+  messageId?: string;
   /**
    * Stop replying or editing: the close button, Escape in the field, and a send that went through.
    * Without it no close button.
@@ -1289,10 +1282,15 @@ export type ComposerContextProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
+const CONTEXT_ICON: Record<ComposerContextMode, IconName> = {
+  reply: "action.reply",
+  edit: "action.edit",
+};
+
 /** The bar above the field: «Ответ Анне» with the quoted text, or «Редактирование». */
 function ComposerContext({
   mode = "reply",
-  value,
+  messageId,
   onDismiss,
   id: idProp,
   className,
@@ -1311,14 +1309,19 @@ function ComposerContext({
       registerBar({
         id,
         mode,
-        value,
+        messageId,
         dismiss: dismissable ? () => dismissRef.current?.() : undefined,
       }),
-    [registerBar, id, mode, value, dismissable],
+    [registerBar, id, mode, messageId, dismissable],
   );
-  // A bar that appears (a reply picked in the chat) brings the caret to the field.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on mount and on a new mode only
-  React.useEffect(() => focusFieldIfLive(), [mode]);
+  // A bar that appears (a reply picked in the chat), or turns from a reply into an edit, brings
+  // the caret to the field.
+  const focusedMode = React.useRef<ComposerContextMode | null>(null);
+  React.useEffect(() => {
+    if (focusedMode.current === mode) return;
+    focusedMode.current = mode;
+    focusFieldIfLive();
+  });
 
   return (
     <div
@@ -1328,7 +1331,9 @@ function ComposerContext({
       data-mode={mode}
     >
       <span className={styles.contextIcon} aria-hidden="true">
-        <Icon name={mode === "edit" ? "action.edit" : "action.reply"} />
+        <GlyphSwap>
+          <Icon name={CONTEXT_ICON[mode]} />
+        </GlyphSwap>
       </span>
       <div className={styles.contextText}>{children}</div>
       {dismissable ? (
@@ -1397,19 +1402,14 @@ function ComposerAttach({
   ...rest
 }: ComposerAttachProps) {
   const { size, labels, disabled, addFiles, attachSlot } = useComposerContext();
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const picker = React.useRef<FileUploadPicker>(null);
   const name = ariaLabel ?? labels.attach;
   const icon = (
     <Button.Icon>
       <Icon name="action.attach" />
     </Button.Icon>
   );
-  const pick = React.useCallback((types: string) => {
-    const input = inputRef.current;
-    if (!input) return;
-    input.accept = types;
-    input.click();
-  }, []);
+  const pick = React.useCallback((types: string) => picker.current?.open({ accept: types }), []);
 
   // Rendered into the row's start cell, wherever it stands among the root's children; nothing
   // until the cell exists (the first commit), so the server render and hydration agree.
@@ -1436,19 +1436,13 @@ function ComposerAttach({
 
   return createPortal(
     <div {...rest} className={cx(styles.attach, className)}>
-      {/* Own input: one picker serves every item, each with its own `accept`; FileUpload has one. */}
-      <input
-        ref={inputRef}
-        type="file"
+      {/* One picker serves every item: each opens it with its own `accept`. */}
+      <FileUpload.Root
+        trigger="none"
+        picker={picker}
         multiple
-        tabIndex={-1}
-        aria-hidden="true"
-        className={visuallyHiddenClass}
         disabled={disabled}
-        onChange={(event) => {
-          addFiles(Array.from(event.target.files ?? []));
-          event.target.value = "";
-        }}
+        onFilesChange={addFiles}
       />
       <Dropdown.Root>
         <Dropdown.Trigger>

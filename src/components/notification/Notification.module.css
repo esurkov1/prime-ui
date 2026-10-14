@@ -274,12 +274,7 @@
   justify-content: center;
   height: var(--ntf-title-line-height);
   color: var(--ntf-accent);
-}
-
-.iconWrap svg {
-  display: block;
-  width: var(--ntf-icon);
-  height: var(--ntf-icon);
+  --prime-icon-size: var(--ntf-icon);
 }
 
 /* The close button is taller than the title line: centered on it, it overhangs into the padding

@@ -47,6 +47,7 @@ FileUpload.Root                 field frame: label → trigger → files → hin
 │     ├─ FileUpload.Title       zone title (`<LinkButton asChild><button>` inside for an inline link)
 │     └─ FileUpload.Description secondary line (the kit Hint)
 ├─ Button                       trigger="button": kit Button that opens the picker; children are its content
+├─ (nothing)                    trigger="none": only the hidden <input type="file"> that picker.open clicks
 └─ files                        `value` then the uploads of `queue` (nothing while empty, unless an add tile)
    ├─ layout="list"             <ul> of rows drawn from the FileUpload.Item parts; the add tile as the last row
    └─ layout="grid" | "strip"   Dnd.Sortable <ul> of square tiles, the same slots on every kind:
@@ -105,7 +106,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `trigger` | `"dropzone" \| "button" \| "tile"` | `"dropzone"` | `dropzone`: the drop area. `button`: a compact picker button, no zone and no drop (a composer paperclip). `tile`: an add tile as the last cell of the files. |
+| `trigger` | `"dropzone" \| "button" \| "tile" \| "none"` | `"dropzone"` | `dropzone`: the drop area. `button`: a compact picker button, no drop. `tile`: an add tile after the files. `none`: no trigger, the picker opens from code (`picker`). |
 | `variant` | `"dashed" \| "solid"` | `"dashed"` | The look of the drop zone: `dashed` shows the drop line; `solid` keeps only the fill (cards, modals). |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size. |
 | `value` | `readonly FileUploadFile[]` | — | Files in their order (controlled): `{ id, name, size?, type?, src?, alt?, href? }` — on the server or uploads of `queue` by id. `src`: picture or video; `alt` spoken for the name; `href` links name or tile to the file. |
@@ -249,6 +250,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | `dropzone` | the drop area with an icon, a title, a description and a decorative browse button, the files under it | a standalone upload field of a form; documents | yes |
 | `button` | a kit Button of the tier, no zone and no drop: soft with the paperclip and text, ghost when its content is a `Button.Icon` alone | a composer's paperclip, an «attach» action in a toolbar or a dense form; pair it with `FileUpload.Queue` when the files live elsewhere | |
 | `tile` | a dashed add tile — «+», «Добавить», `count из max` — as the last cell of the files; the whole row while empty; files drop anywhere on the set | file cards and the image gallery: files are added where they will lie | |
+| `none` | nothing of its own: a hidden file input that `picker.open({ accept })` clicks, no drop | a menu of attachment kinds whose items each open the picker with their own types (`Composer.Attach` with `Composer.Item`) | |
 
 ### variant (FileUpload.Root)
 | Value | Looks like | Use when | Default |

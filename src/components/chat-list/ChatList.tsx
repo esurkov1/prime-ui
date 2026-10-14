@@ -15,15 +15,21 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
-import { leaveInPlace } from "@/internal/leaveInPlace";
+import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
+import { useLongPress } from "@/internal/longPress";
+import { usePartPresence } from "@/internal/partPresence";
+import { flattenChildren, isPart } from "@/internal/parts";
+import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { useFlipList } from "@/internal/useFlipList";
 
@@ -86,8 +92,6 @@ export type ChatListLabels = {
   file: string;
   location: string;
   contact: string;
-  /** `aria-label` of the point the row menu opens from. */
-  menu: string;
 };
 
 export const CHAT_LIST_LABELS: ChatListLabels = {
@@ -116,7 +120,6 @@ export const CHAT_LIST_LABELS: ChatListLabels = {
   file: "Файл",
   location: "Геопозиция",
   contact: "Контакт",
-  menu: "Действия с диалогом",
 };
 
 // ─── Contexts ─────────────────────────────────────────────────────────────────
@@ -136,15 +139,18 @@ type ChatListContextValue = {
   /** Arrows, Home / End and the menu keys of a row. */
   keyDown: (event: React.KeyboardEvent<HTMLElement>, key: string) => void;
   focused: (key: string) => void;
-  openMenu: (key: string, point: Point | null) => void;
+  /** The row whose menu is open and the point it opens at (px from the row's top-left). */
+  menu: { key: string; point: Point } | null;
+  /** Opens a row's menu at a point in client coordinates, or under the row from the keyboard. */
+  openMenu: (key: string, client: Point | null) => void;
+  closeMenu: () => void;
   register: (key: string, node: HTMLElement | null) => void;
-  /** Rows new in the data since the last render: they rise in once. */
-  entering: Set<string>;
-  /** Rows taken out of the data: they close up in place as they unmount. */
-  leaving: Set<string>;
+  /** Rows new in the data rise in once; rows taken out close up in place. */
+  presence: Pick<ListPresence, "entering" | "leaving">;
 };
 
-const ChatListContext = React.createContext<ChatListContextValue | null>(null);
+const [ChatListProvider, useChatListContext] =
+  createComponentContext<ChatListContextValue>("ChatList");
 
 type RowContextValue = {
   key: string;
@@ -152,13 +158,12 @@ type RowContextValue = {
   measure?: (node: HTMLElement | null) => void;
 };
 
-const RowContext = React.createContext<RowContextValue | null>(null);
+const [RowProvider, useRowContext] = createComponentContext<RowContextValue>("ChatList.Item", {
+  parent: "ChatList.Root renderItem",
+});
 
 function useChatList(part: string): [ChatListContextValue, RowContextValue] {
-  const list = React.useContext(ChatListContext);
-  const row = React.useContext(RowContext);
-  if (!list || !row) throw new Error(`${part} is rendered by ChatList.Root renderItem`);
-  return [list, row];
+  return [useChatListContext(part), useRowContext(part)];
 }
 
 // ─── Parts of an item ─────────────────────────────────────────────────────────
@@ -222,20 +227,6 @@ function ChatListItemMenu({ children, ...rest }: ChatListItemMenuProps) {
 }
 ChatListItemMenu.displayName = "ChatList.ItemMenu";
 
-const isPart = <P,>(
-  node: React.ReactNode,
-  type: React.ElementType,
-): node is React.ReactElement<P> => React.isValidElement(node) && node.type === type;
-
-/** The children as a flat list: fragments opened. */
-function flatten(nodes: React.ReactNode): React.ReactNode[] {
-  return React.Children.toArray(nodes).flatMap((node) =>
-    React.isValidElement<{ children?: React.ReactNode }>(node) && node.type === React.Fragment
-      ? flatten(node.props.children)
-      : [node],
-  );
-}
-
 type ItemParts = {
   avatar: React.ReactElement<ChatListItemIconProps> | null;
   text: React.ReactElement<ChatListItemTextProps> | null;
@@ -247,7 +238,7 @@ type ItemParts = {
 /** The parts of an item by type: an icon before the name is the avatar, after it a glyph. */
 function partsOf(children: React.ReactNode): ItemParts {
   const parts: ItemParts = { avatar: null, text: null, glyphs: [], description: null, menu: null };
-  for (const node of flatten(children)) {
+  for (const node of flattenChildren(children)) {
     if (isPart<ChatListItemIconProps>(node, ChatListItemIcon)) {
       if (parts.text === null && parts.avatar === null) parts.avatar = node;
       else parts.glyphs.push(node);
@@ -257,35 +248,6 @@ function partsOf(children: React.ReactNode): ItemParts {
     else if (isPart<ChatListItemMenuProps>(node, ChatListItemMenu)) parts.menu = node;
   }
   return parts;
-}
-
-/**
- * A small part of a row that may come and go while the row stays (a count, a glyph): it rises in
- * when it appears in a mounted row and closes up in place when it goes.
- */
-function Pop({
-  live,
-  className,
-  children,
-}: {
-  live: boolean;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const ref = React.useRef<HTMLSpanElement>(null);
-  const [enter] = React.useState(live);
-  React.useLayoutEffect(() => {
-    const node = ref.current;
-    return () => {
-      // A row that leaves takes its parts with it: the copy is placed only when the row stays.
-      if (node) leaveInPlace(node, "inline");
-    };
-  }, []);
-  return (
-    <span ref={ref} className={cx(styles.pop, enter && enterMotion.enter, className)}>
-      {children}
-    </span>
-  );
 }
 
 const STATUS_ICONS = [
@@ -301,11 +263,6 @@ const STATUS_ICONS = [
 const flipRows = (list: HTMLElement) =>
   list.querySelectorAll<HTMLElement>("li:not([data-leaving]) > [data-dnd-item]");
 const flipRowKey = (row: HTMLElement) => row.dataset.dndItem;
-
-/** How long a finger rests on a row before its menu opens. */
-const LONG_PRESS_MS = 500;
-/** A finger that moves further than this (px) scrolls instead of pressing. */
-const LONG_PRESS_SLOP = 8;
 
 type ChatListItemOwnProps = {
   /** When the last message was sent: a `Date` (shown with the root's `formatTime`) or the text to show. */
@@ -370,12 +327,13 @@ function ChatListItem({
   const parts = partsOf(children);
   const hasMenu = parts.menu !== null;
 
-  const nodeRef = React.useRef<HTMLElement | null>(null);
+  /** The row's `<li>`: what the window measures and what closes up when the row leaves. */
+  const itemRef = React.useRef<HTMLElement | null>(null);
   const { register } = list;
   const { measure } = row;
   const own = React.useCallback(
     (node: HTMLElement | null) => {
-      nodeRef.current = node;
+      itemRef.current = node?.parentElement ?? null;
       register(key, node);
       // The window measures the row's `<li>`: its height is the row's place in the list.
       measure?.(node?.parentElement ?? null);
@@ -385,45 +343,23 @@ function ChatListItem({
   const mergedRef = useMergedRefs<HTMLElement>(own, ref);
 
   // A row new in the data rises in once; one the owner took out closes up in place.
-  const [enter] = React.useState(() => list.entering.has(key));
-  const { entering, leaving } = list;
-  React.useEffect(() => {
-    entering.delete(key);
-  }, [entering, key]);
-  React.useLayoutEffect(() => {
-    const node = nodeRef.current;
-    const item = node?.parentElement;
-    return () => {
-      if (item && leaving.has(key)) {
-        leaving.delete(key);
-        leaveInPlace(item, "block");
-      }
-    };
-  }, [leaving, key]);
+  const enter = useListItemPresence(list.presence, key, itemRef);
 
-  // Parts that come and go while the row stays rise in; on the first render they are just there.
-  const mounted = React.useRef(false);
-  React.useEffect(() => {
-    mounted.current = true;
-  }, []);
-  const live = mounted.current;
-
-  // ── long press ──
-  const press = React.useRef<{ timer: number; x: number; y: number } | null>(null);
-  const pressed = React.useRef(false);
-  const cancelPress = () => {
-    if (press.current) window.clearTimeout(press.current.timer);
-    press.current = null;
-  };
-  React.useEffect(
-    () => () => {
-      if (press.current) window.clearTimeout(press.current.timer);
-    },
-    [],
-  );
+  // A long press of a finger opens the menu (a mouse has its right click).
+  const longPress = useLongPress({
+    enabled: hasMenu,
+    onLongPress: (point) => list.openMenu(key, point),
+  });
 
   // ── first line ──
   const glyphSize = compactTier(list.size);
+  // Parts that come and go while the row stays rise in and close up in place.
+  const count = unread > 0;
+  const pin = pinned && !count && !mention;
+  const mutedPart = usePartPresence<HTMLSpanElement>({ present: muted, axis: "inline" });
+  const mentionPart = usePartPresence<HTMLSpanElement>({ present: mention, axis: "inline" });
+  const countPart = usePartPresence<HTMLSpanElement>({ present: count, axis: "inline" });
+  const pinPart = usePartPresence<HTMLSpanElement>({ present: pin, axis: "inline" });
   const textProps = parts.text?.props;
   const title = (
     <List.ItemText {...textProps} className={cx(styles.title, textProps?.className)}>
@@ -442,9 +378,9 @@ function ChatListItem({
       })}
       {muted ? " " : null}
       {muted ? (
-        <Pop live={live} className={styles.glyph}>
+        <span ref={mutedPart.ref} className={cx(styles.pop, styles.glyph, mutedPart.className)}>
           <Icon name="status.muted" size={glyphSize} label={labels.muted} animated={false} />
-        </Pop>
+        </span>
       ) : null}
     </List.ItemText>
   );
@@ -496,7 +432,7 @@ function ChatListItem({
       ref: _ref,
       ...descRest
     } = descProps;
-    const hasText = descChildren !== undefined && descChildren !== null && descChildren !== "";
+    const hasText = hasContent(descChildren);
     preview = (
       <span
         {...descRest}
@@ -544,23 +480,21 @@ function ChatListItem({
   ) : null;
 
   // ── counts ──
-  const count = unread > 0;
-  const pin = pinned && !count && !mention;
   // Beside two lines the cell stays even when empty: a count that goes closes up in place.
   const badges =
     count || mention || pin || hasSecondLine ? (
       <List.ItemMeta className={styles.badges}>
         {mention ? (
-          <Pop live={live}>
+          <span ref={mentionPart.ref} className={cx(styles.pop, mentionPart.className)}>
             <Badge.Root color="blue" variant="solid" className={styles.mention} aria-hidden="true">
               @
             </Badge.Root>
             <VisuallyHidden>{labels.mention}</VisuallyHidden>
-          </Pop>
+          </span>
         ) : null}
         {mention && count ? " " : null}
         {count ? (
-          <Pop live={live}>
+          <span ref={countPart.ref} className={cx(styles.pop, countPart.className)}>
             <Badge.Root
               color={muted ? "gray" : "blue"}
               variant={muted ? "soft" : "solid"}
@@ -570,19 +504,20 @@ function ChatListItem({
               {unread}
             </Badge.Root>
             <VisuallyHidden>{formatLabel(labels.unread, { count: unread })}</VisuallyHidden>
-          </Pop>
+          </span>
         ) : null}
         {pin ? (
-          <Pop live={live} className={styles.glyph}>
+          <span ref={pinPart.ref} className={cx(styles.pop, styles.glyph, pinPart.className)}>
             <Icon name="action.pin" size={glyphSize} label={labels.pinned} animated={false} />
-          </Pop>
+          </span>
         ) : null}
       </List.ItemMeta>
     ) : null;
 
   const avatarProps = parts.avatar?.props;
+  const menuAt = list.menu?.key === key ? list.menu.point : null;
 
-  return (
+  const item = (
     <List.Item
       {...rest}
       ref={mergedRef}
@@ -598,8 +533,7 @@ function ChatListItem({
       })}
       onClick={(event) => {
         // The long press that opened the menu is not a click on the row.
-        if (pressed.current) {
-          pressed.current = false;
+        if (longPress.takeFired()) {
           event.preventDefault();
           return;
         }
@@ -624,38 +558,24 @@ function ChatListItem({
         onContextMenu?.(event);
         if (event.defaultPrevented || !hasMenu) return;
         event.preventDefault();
-        cancelPress();
+        longPress.cancel();
         list.openMenu(key, { x: event.clientX, y: event.clientY });
       }}
       onPointerDown={(event) => {
         onPointerDown?.(event);
-        pressed.current = false;
-        if (!hasMenu || event.pointerType !== "touch") return;
-        const { clientX: x, clientY: y } = event;
-        cancelPress();
-        press.current = {
-          x,
-          y,
-          timer: window.setTimeout(() => {
-            press.current = null;
-            pressed.current = true;
-            list.openMenu(key, { x, y });
-          }, LONG_PRESS_MS),
-        };
+        longPress.handlers.onPointerDown(event);
       }}
       onPointerMove={(event) => {
         onPointerMove?.(event);
-        const start = press.current;
-        if (start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > LONG_PRESS_SLOP)
-          cancelPress();
+        longPress.handlers.onPointerMove(event);
       }}
       onPointerUp={(event) => {
         onPointerUp?.(event);
-        cancelPress();
+        longPress.handlers.onPointerUp();
       }}
       onPointerCancel={(event) => {
         onPointerCancel?.(event);
-        cancelPress();
+        longPress.handlers.onPointerCancel();
       }}
     >
       {avatarProps ? <List.ItemIcon {...avatarProps} /> : null}
@@ -665,6 +585,20 @@ function ChatListItem({
       {badges}
     </List.Item>
   );
+  if (!parts.menu) return item;
+  // The menu opens against the row, at the point it was asked for; focus returns to the row.
+  return (
+    <Dropdown.Root
+      open={menuAt !== null}
+      onOpenChange={(open) => {
+        if (!open) list.closeMenu();
+      }}
+      anchorPoint={menuAt}
+    >
+      <Dropdown.Anchor>{item}</Dropdown.Anchor>
+      {parts.menu}
+    </Dropdown.Root>
+  );
 }
 ChatListItem.displayName = "ChatList.Item";
 
@@ -672,8 +606,6 @@ ChatListItem.displayName = "ChatList.Item";
 
 /** From this many dialogs only the rows around the view render. */
 const VIRTUAL_FROM = 100;
-/** Rows ghosts close up for at most; a larger change glides the rest into place instead. */
-const LEAVE_MAX = 20;
 /** Placeholder rows while the list loads. */
 const SKELETON_ROWS = 6;
 /** Rows share one measured height until each is measured itself. */
@@ -709,7 +641,7 @@ export type ChatListRootProps<T = unknown> = Omit<
   onLoadMore?: () => void | Promise<void>;
   /** The empty state without a search. Default: «Нет диалогов». */
   empty?: React.ReactNode;
-  /** Row tier: height, text, avatar, the search field. Default `m`. */
+  /** Row tier: height, text, avatar, the search field. Default: the host's tier, else `m`. */
   size?: ControlSize;
   /** «Now» for the times. Default: the moment of the render. */
   now?: Date;
@@ -718,39 +650,6 @@ export type ChatListRootProps<T = unknown> = Omit<
   labels?: Partial<ChatListLabels>;
   ref?: React.Ref<HTMLDivElement>;
 };
-
-type MotionState = {
-  order: string;
-  keys: readonly string[];
-  settle: number;
-  entering: Set<string>;
-  leaving: Set<string>;
-};
-
-/** What changed in the order of the dialogs: new rows rise in, a removal closes up, a move glides. */
-function nextMotion(prev: MotionState | null, keys: readonly string[], order: string): MotionState {
-  if (prev === null) {
-    return { order, keys, settle: 0, entering: new Set(), leaving: new Set() };
-  }
-  if (prev.order === order) return prev;
-  const before = new Set(prev.keys);
-  const after = new Set(keys);
-  const added = keys.filter((key) => !before.has(key));
-  const removed = prev.keys.filter((key) => !after.has(key));
-  const keptBefore = prev.keys.filter((key) => after.has(key));
-  const keptAfter = keys.filter((key) => before.has(key));
-  const moved = keptBefore.some((key, index) => keptAfter[index] !== key);
-  // Only removed: the rows close up in place (the ones below follow the closing). Anything else
-  // glides every row from where it stood.
-  const closing = !moved && added.length === 0 && removed.length <= LEAVE_MAX;
-  return {
-    order,
-    keys,
-    settle: closing ? prev.settle : prev.settle + 1,
-    entering: prev.keys.length > 0 && added.length <= LEAVE_MAX ? new Set(added) : new Set(),
-    leaving: closing ? new Set(removed) : new Set(),
-  };
-}
 
 /**
  * The conversation list of a messenger: the dialogs as data, each drawn by `renderItem` as a
@@ -772,7 +671,7 @@ function ChatListRoot<T>({
   hasMore = false,
   onLoadMore,
   empty,
-  size = "m",
+  size: sizeProp,
   now: nowProp,
   formatTime = formatChatTime,
   labels: labelsProp,
@@ -781,6 +680,8 @@ function ChatListRoot<T>({
   ...rest
 }: ChatListRootProps<T>) {
   const labels = useLabels(CHAT_LIST_LABELS, labelsProp);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const [value, setValue] = useControllableState<string | null>({
     value: valueProp,
     defaultValue,
@@ -801,17 +702,15 @@ function ChatListRoot<T>({
   const order = keys.join("\u0000");
   const keyIndex = new Map(keys.map((key, index) => [key, index] as const));
 
-  // ── motion of the order ──
-  const motionRef = React.useRef<MotionState | null>(null);
-  const motion = nextMotion(motionRef.current, keys, order);
-  motionRef.current = motion;
+  // ── motion of the order: new rows rise in, a removal closes up, a move glides ──
+  const presence = useListPresence(keys);
   const [listEl, setListEl] = React.useState<HTMLUListElement | null>(null);
   useFlipList({
     container: listEl,
     nodes: flipRows,
     keyOf: flipRowKey,
     layoutKey: order,
-    settle: motion.settle,
+    settle: presence.settle,
   });
 
   // ── focus ──
@@ -870,19 +769,15 @@ function ChatListRoot<T>({
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     const { keys, focusRow, reveal } = latest.current;
     const index = keys.indexOf(key);
-    const last = keys.length - 1;
-    let next: number | null = null;
-    if (event.key === "ArrowDown") next = Math.min(index + 1, last);
-    else if (event.key === "ArrowUp") {
-      if (index === 0 && searchRef.current) {
-        event.preventDefault();
-        searchRef.current.focus();
-        return;
-      }
-      next = Math.max(index - 1, 0);
-    } else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = last;
-    if (next === null || index < 0) return;
+    if (index < 0) return;
+    // Up from the first row goes to the search field above the list.
+    if (event.key === "ArrowUp" && index === 0 && searchRef.current) {
+      event.preventDefault();
+      searchRef.current.focus();
+      return;
+    }
+    const next = rovingIndex(event.key, index, keys.length, "vertical", { wrap: false });
+    if (next === null) return;
     event.preventDefault();
     const target = keys[next];
     if (target === undefined) return;
@@ -899,30 +794,19 @@ function ChatListRoot<T>({
     [setValue],
   );
 
-  // ── row menu ──
-  const [menu, setMenu] = React.useState<({ key: string } & Point) | null>(null);
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const openMenu = React.useCallback((key: string, point: Point | null) => {
-    const root = rootRef.current?.getBoundingClientRect();
-    const node = rowsRef.current.get(key);
-    if (!root) return;
-    let at = point;
-    if (!at) {
-      // From the keyboard: under the row, at its start.
-      const rect = node?.getBoundingClientRect();
-      if (!rect) return;
-      at = { x: rect.left, y: rect.bottom };
-    }
+  // ── row menu: open against its row; the row stays rendered while it is open ──
+  const [menu, setMenu] = React.useState<{ key: string; point: Point } | null>(null);
+  const openMenu = React.useCallback((key: string, client: Point | null) => {
+    const rect = rowsRef.current.get(key)?.getBoundingClientRect();
+    if (!rect) return;
+    // From the keyboard: under the row, at its start.
+    const point = client
+      ? { x: client.x - rect.left, y: client.y - rect.top }
+      : { x: 0, y: rect.height };
     setFocusKey(key);
-    setMenu({ key, x: at.x - root.left, y: at.y - root.top });
-    setMenuOpen(true);
+    setMenu({ key, point });
   }, []);
-  const menuItem = menu ? items[keyIndex.get(menu.key) ?? -1] : undefined;
-  const lastMenu = React.useRef<React.ReactElement | null>(null);
-  if (menuItem !== undefined) {
-    const element = renderItem(menuItem) as React.ReactElement<{ children?: React.ReactNode }>;
-    lastMenu.current = partsOf(element.props.children).menu ?? lastMenu.current;
-  }
+  const closeMenu = React.useCallback(() => setMenu(null), []);
 
   // ── virtual window ──
   const virtualized = !loading && items.length > VIRTUAL_FROM;
@@ -978,19 +862,20 @@ function ChatListRoot<T>({
     select,
     keyDown,
     focused: setFocusKey,
+    menu,
     openMenu,
+    closeMenu,
     register,
-    entering: motion.entering,
-    leaving: motion.leaving,
+    presence,
   };
 
   const row = (index: number, measure?: (node: HTMLElement | null) => void) => {
     const item = items[index] as T;
     const key = keys[index] as string;
     return (
-      <RowContext key={key} value={{ key, measure }}>
+      <RowProvider key={key} value={{ key, measure }}>
         {renderItem(item)}
-      </RowContext>
+      </RowProvider>
     );
   };
 
@@ -1077,79 +962,55 @@ function ChatListRoot<T>({
         : labels.noResults
       : "";
 
-  return (
-    <ControlSizeProvider value={size}>
-      <ChatListContext value={context}>
-        <div
-          {...rest}
-          ref={mergedRootRef}
-          className={cx(styles.root, className)}
-          {...toDataAttributes({ size })}
-        >
-          {searchable ? (
-            <div className={styles.search}>
-              <Input.Root>
-                <Input.Wrapper>
-                  <Input.Icon side="start">
-                    <Icon name="action.search" tone="secondary" />
-                  </Input.Icon>
-                  <Input.Field
-                    ref={searchRef}
-                    type="search"
-                    aria-label={labels.search}
-                    placeholder={labels.searchPlaceholder}
-                    value={query}
-                    onValueChange={setQuery}
-                    onKeyDown={(event) => {
-                      if (event.key === "Escape" && query !== "") {
-                        event.preventDefault();
-                        setQuery("");
-                      }
-                      if (event.key === "ArrowDown" && tabKey !== null && state === "ready") {
-                        event.preventDefault();
-                        focusRow(tabKey);
-                      }
-                    }}
-                  />
-                  {query !== "" ? <Input.ClearButton onClick={() => setQuery("")} /> : null}
-                </Input.Wrapper>
-              </Input.Root>
-            </div>
-          ) : null}
-          <ScrollContainer
-            ref={scrollRef}
-            className={styles.scroller}
-            aria-busy={loading || undefined}
-            onReachEnd={hasMore && onLoadMore && !loading ? onLoadMore : undefined}
-          >
-            <Crossfade state={state}>{body}</Crossfade>
-          </ScrollContainer>
-          <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
-          {menu ? (
-            <Dropdown.Root open={menuOpen} onOpenChange={setMenuOpen}>
-              <Dropdown.Trigger>
-                {/* The menu opens where the pointer is: a point inside the list anchors it, out of
-                  the tab order. Focus that returns here after Escape goes on to the row. */}
-                <button
-                  type="button"
-                  className={styles.anchor}
-                  style={
-                    {
-                      "--anchor-x": `${menu.x}px`,
-                      "--anchor-y": `${menu.y}px`,
-                    } as React.CSSProperties
-                  }
-                  tabIndex={-1}
-                  aria-label={labels.menu}
-                  onFocus={() => rowsRef.current.get(menu.key)?.focus({ preventScroll: true })}
+  return tier.provide(
+    <ChatListProvider value={context}>
+      <div
+        {...rest}
+        ref={mergedRootRef}
+        className={cx(styles.root, className)}
+        {...toDataAttributes({ size })}
+      >
+        {searchable ? (
+          <div className={styles.search}>
+            <Input.Root>
+              <Input.Wrapper>
+                <Input.Icon side="start">
+                  <Icon name="action.search" tone="secondary" />
+                </Input.Icon>
+                <Input.Field
+                  ref={searchRef}
+                  type="search"
+                  aria-label={labels.search}
+                  placeholder={labels.searchPlaceholder}
+                  value={query}
+                  onValueChange={setQuery}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape" && query !== "") {
+                      event.preventDefault();
+                      setQuery("");
+                    }
+                    if (event.key === "ArrowDown" && tabKey !== null && state === "ready") {
+                      event.preventDefault();
+                      focusRow(tabKey);
+                    }
+                  }}
                 />
-              </Dropdown.Trigger>
-              {lastMenu.current}
-            </Dropdown.Root>
-          ) : null}
-        </div>
-      </ChatListContext>
-    </ControlSizeProvider>
+                {query !== "" ? <Input.ClearButton onClick={() => setQuery("")} /> : null}
+              </Input.Wrapper>
+            </Input.Root>
+          </div>
+        ) : null}
+        <ScrollContainer
+          ref={scrollRef}
+          className={styles.scroller}
+          aria-busy={loading || undefined}
+          onReachEnd={hasMore && onLoadMore && !loading ? onLoadMore : undefined}
+        >
+          <Crossfade state={state}>{body}</Crossfade>
+        </ScrollContainer>
+        <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
+      </div>
+    </ChatListProvider>,
   );
 }
 ChatListRoot.displayName = "ChatList.Root";

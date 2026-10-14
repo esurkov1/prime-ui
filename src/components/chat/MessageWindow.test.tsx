@@ -16,7 +16,7 @@ const ROWS: Row[] = Array.from({ length: 500 }, (_, index) => ({
 
 function fakeRegion(): ScrollRegion {
   return {
-    element: () => null,
+    element: () => document.querySelector<HTMLElement>("[data-testid=scroller]"),
     atEnd: () => false,
     subscribe: () => () => {},
     scrollToEnd: vi.fn(),
@@ -180,7 +180,7 @@ describe("The message list in a scroller: a window of rows", () => {
     const region = fakeRegion();
     const { rerender } = render(<Conversation rows={ROWS} region={region} />);
     expect(article("m3")).toBeNull();
-    rerender(<Conversation rows={ROWS} region={region} current="m3" />);
+    rerender(<Conversation rows={ROWS} region={region} jumpTo="m3" />);
     // The browser reports the jump's scroll: the window moves there.
     await act(async () => {
       fireEvent.scroll(screen.getByTestId("scroller"));

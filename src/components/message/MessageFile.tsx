@@ -9,8 +9,10 @@ import { extensionOf, formatColor } from "@/internal/fileFormat";
 import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import palette from "@/internal/palette.module.css";
+import textRole from "@/internal/textRole.module.css";
 import {
   inFlight,
   TRANSFER_LABELS,
@@ -77,7 +79,7 @@ export function MessageFile({
   ref,
   ...rest
 }: MessageFileProps) {
-  const labels = { ...MESSAGE_FILE_LABELS, ...labelsProp };
+  const labels = useLabels(MESSAGE_FILE_LABELS, labelsProp);
   const { spacer } = useMessagePart();
   const transferring = inFlight(transfer);
   const failed = transfer === "failed";
@@ -104,7 +106,7 @@ export function MessageFile({
       </Thumbnail.Fallback>
     </Thumbnail.Root>
   ) : format ? (
-    <span className={styles.format} aria-hidden="true">
+    <span className={cx(textRole.caption, styles.format)} aria-hidden="true">
       {format.slice(0, 4).toUpperCase()}
     </span>
   ) : (

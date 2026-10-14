@@ -118,10 +118,13 @@
  * the others step back (see «Stepping back» below). No outline, no wash.
  */
 .select {
+  /* It pops in where it stands (`enterMotion.enter`). */
+  --enter-shift: 0;
+  --enter-scale: var(--prime-motion-scale-enter);
+
   order: -1;
   /* A finger slid from a check paints the messages it passes (no scroll from here). */
   touch-action: none;
-  animation: messageSelectIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
 }
 
 .root[data-direction="outgoing"] .select {
@@ -139,41 +142,13 @@
 /*
  * A message new at the end (`data-enter`, set by the list for one play — never on the first render,
  * a history load or a status change). Mine and theirs alike float up into their place from
- * `space-3` below and fade in: one keyframe on the column, `transform` + `opacity`, `fast` with the
- * enter easing. Nothing else moves — the list is pushed by layout and a region pinned to the end
- * stays pinned. The row's box clips the rising column (paint containment), so it never adds
- * scrollable overflow under the end. Reduced motion makes it instant (the global duration tokens).
+ * `space-3` below and fade in: the list joins `enterMotion.enter` on the column for that play.
+ * Nothing else moves — the list is pushed by layout and a region pinned to the end stays pinned.
+ * The row's box clips the rising column (paint containment), so it never adds scrollable overflow
+ * under the end. Reduced motion keeps the fade only.
  */
-.root[data-enter] .column {
-  animation: messageEnter var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
-}
-
-@keyframes messageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(var(--prime-space-3));
-  }
-}
-
-@keyframes messageSelectIn {
-  from {
-    opacity: 0;
-    transform: scale(var(--prime-motion-scale-enter));
-  }
-}
-
-.anchor {
-  position: absolute;
-  left: var(--anchor-x);
-  top: var(--anchor-y);
-  width: 0;
-  height: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  outline: none;
-  pointer-events: none;
+.column {
+  --enter-shift: var(--prime-space-3);
 }
 
 /* ─── Bubble ────────────────────────────────────────────────────────────── */
@@ -367,7 +342,6 @@
  * Reduced motion: no blink — the others stand back for a moment (the list lets go).
  */
 .gutter,
-.column,
 .retry {
   transition:
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
@@ -739,13 +713,13 @@ button.reply:focus-visible {
 
 /*
  * Every message holds the row's place: a disclosure (`internal/Disclosure`) closed until the first
- * reaction and closed again after the last one — laid out at once (`--disclosure-duration: 0s`);
+ * reaction and closed again after the last one — laid out at once (`--prime-motion-instant`);
  * the message's morph plays the change. Inside a bubble it ends the bubble and takes back its gap;
  * under a picture or a circle it stands on the message's side. The disclosure's clip keeps the
  * focus space past its edge, so a chip's ring is never cut.
  */
 .reactionsSlot {
-  --disclosure-duration: 0s;
+  --disclosure-duration: var(--prime-motion-instant);
 
   order: 1;
 }

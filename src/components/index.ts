@@ -471,6 +471,7 @@ export { NativeSelect } from "./native-select/NativeSelect";
 export type {
   NotificationAction,
   NotificationCardProps,
+  NotificationDismissReason,
   NotificationLabels,
   NotificationOptions,
   NotificationPosition,

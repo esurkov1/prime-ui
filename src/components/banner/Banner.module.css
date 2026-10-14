@@ -207,12 +207,7 @@
   height: var(--bn-title-line-height);
   padding-inline-end: var(--bn-gap);
   color: var(--bn-icon-color);
-}
-
-.icon svg {
-  display: block;
-  width: var(--bn-icon);
-  height: var(--bn-icon);
+  --prime-icon-size: var(--bn-icon);
 }
 
 .title {

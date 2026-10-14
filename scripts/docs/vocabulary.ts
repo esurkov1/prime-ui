@@ -10,8 +10,6 @@ export const RENAMED = {
   parts: {} as Record<string, string>,
   /** `Part.prop` (or `*.prop` for every part) → the canonical name. */
   props: {
-    "Chat.Messages.current": "`jumpTo`",
-    "Composer.Context.value": "`messageId`",
     "*.type": "`multiple` for one vs many (a `type` prop names no selection mode)",
     "*.fillWidth": "`fullWidth`",
     "*.leadingIcon": "an `X.Icon` part",

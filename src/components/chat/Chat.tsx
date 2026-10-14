@@ -15,6 +15,8 @@ import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import type { Selection } from "@/internal/messageList";
+import { flattenChildren } from "@/internal/parts";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Chat.module.css";
 import { ChatPinned } from "./ChatPinned";
@@ -70,11 +72,7 @@ export type ChatRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultV
   defaultSearch?: string | null;
   /** The search opened, changed its query or closed (`null`). */
   onSearchChange?: (search: string | null) => void;
-  /**
-   * A message to bring into view and point at (a link, a notification): it
-   * blinks. A search's current match takes its place while the search is open.
-   */
-  current?: string | null;
+  jumpTo?: string | null;
   /** The other side is typing: the header's status turns into «печатает…» and the list ends with the typing bubble. */
   typing?: boolean;
   labels?: Partial<ChatLabels>;
@@ -95,7 +93,7 @@ function ChatRoot({
   search: searchProp,
   defaultSearch = null,
   onSearchChange,
-  current: currentProp = null,
+  jumpTo: jumpToProp = null,
   typing = false,
   labels: labelsProp,
   className,
@@ -134,7 +132,7 @@ function ChatRoot({
 
   const searching = search !== null;
   const match = matches[matches.length - 1 - Math.min(matchIndex, matches.length - 1)];
-  const current = searching ? (match ?? null) : currentProp;
+  const jumpTo = searching ? (match ?? null) : jumpToProp;
   const selected = selectable ? selectedState : undefined;
 
   const value = React.useMemo<ChatContextValue>(
@@ -147,7 +145,7 @@ function ChatRoot({
       setMatches,
       matchIndex,
       setMatchIndex,
-      current,
+      jumpTo,
       typing,
       jump,
       revealRef,
@@ -164,7 +162,7 @@ function ChatRoot({
       setSearch,
       matches,
       matchIndex,
-      current,
+      jumpTo,
       typing,
       jump,
       titleId,
@@ -188,18 +186,6 @@ ChatRoot.displayName = "Chat.Root";
 export type ChatHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
-
-/** The children as a flat list: fragments opened, `null`, booleans and empty strings dropped. */
-function flattenChildren(nodes: React.ReactNode, prefix = ""): React.ReactNode[] {
-  return React.Children.toArray(nodes).flatMap((node) => {
-    if (!React.isValidElement(node)) return [node];
-    const key = `${prefix}${node.key ?? ""}`;
-    if (node.type === React.Fragment) {
-      return flattenChildren((node.props as { children?: React.ReactNode }).children, `${key}/`);
-    }
-    return [prefix ? React.cloneElement(node, { key }) : node];
-  });
-}
 
 /**
  * The top of the chat: who it is with. A row of the leading elements (a back button, an `Avatar`),
@@ -238,7 +224,9 @@ function ChatTitle({ as: Tag = "h2", className, id, ...rest }: ChatTitleProps) {
     setHasTitle(true);
     return () => setHasTitle(false);
   }, [setHasTitle]);
-  return <Tag id={id ?? titleId} className={cx(styles.title, className)} {...rest} />;
+  return (
+    <Tag id={id ?? titleId} className={cx(textRole.titleS, styles.title, className)} {...rest} />
+  );
 }
 ChatTitle.displayName = "Chat.Title";
 
@@ -404,13 +392,15 @@ ChatSearch.displayName = "Chat.Search";
 // ─── Messages ─────────────────────────────────────────────────────────────────
 
 /** Where a message of `Chat.Messages items` stands, handed to `renderMessage`. */
-export type ChatMessageEntry = {
+export type ChatMessageEntry<T = unknown> = {
   /** The place in its author's run; set on the rendered `Message.Root` for you. */
   position: MessagePosition;
   /** The first of a run: the author's header shows here in a group chat. */
   showAuthor: boolean;
   /** The last of a run: the avatar shows here in a group chat. */
   showAvatar: boolean;
+  /** Another item of the list by its key (a reply's original), as the list holds it now. */
+  find: (key: string) => T | undefined;
 };
 
 export type ChatMessagesProps<T = unknown> = Omit<
@@ -419,7 +409,7 @@ export type ChatMessagesProps<T = unknown> = Omit<
   | "selected"
   | "defaultSelected"
   | "onSelectedChange"
-  | "current"
+  | "jumpTo"
   | "highlight"
   | "onMatchesChange"
   | "revealRef"
@@ -452,10 +442,11 @@ export type ChatMessagesProps<T = unknown> = Omit<
   isService?: (item: T) => boolean;
   /**
    * Renders an item (with `items`): a `Message.Root` (its `value` and `position` are set for you)
-   * or a `Chat.Service`. Called again only for items whose data or place changed, or when this
-   * function changes — keep it stable (`useCallback`) for a long history.
+   * or a `Chat.Service`. Called again only for items whose data or place changed — whatever a row
+   * shows comes from its item; another message (a reply's original) comes from `entry.find`. An
+   * inline function is fine: the latest one renders.
    */
-  renderMessage?: (item: T, entry: ChatMessageEntry) => React.ReactElement;
+  renderMessage?: (item: T, entry: ChatMessageEntry<T>) => React.ReactElement;
   /** The key of the first unread item: the «Непрочитанные» band stands above it. */
   unread?: string;
   /** Messages of one author further apart than this many minutes start a new run. Default 5. */
@@ -471,7 +462,6 @@ type Built = {
   position: MessagePosition;
   /** The text of the band above it, `false` without one. */
   unread: string | false;
-  render: unknown;
   element: React.ReactElement;
 };
 
@@ -495,8 +485,12 @@ function useItemRows<T>(
 ): React.ReactElement[] | null {
   const built = React.useRef(new Map<string, Built>());
   const dates = React.useRef(new Map<string, React.ReactElement>());
+  /** The items by key as of this render: what `entry.find` reads. */
+  const byKey = React.useRef(new Map<string, T>());
+  const [find] = React.useState(() => (key: string) => byKey.current.get(key));
   const { items, getKey, getAuthor, getDate, renderMessage, unread } = props;
   if (!items || !getKey || !getAuthor || !getDate || !renderMessage) return null;
+  byKey.current = new Map(items.map((item) => [getKey(item), item]));
   const entries: MessageListEntry<T>[] = groupMessages(items, {
     getAuthor,
     getDate,
@@ -523,8 +517,7 @@ function useItemRows<T>(
       cached &&
       cached.item === entry.item &&
       cached.position === entry.position &&
-      cached.unread === isUnread &&
-      cached.render === renderMessage
+      cached.unread === isUnread
     ) {
       next.set(entry.key, cached);
       return cached.element;
@@ -533,6 +526,7 @@ function useItemRows<T>(
       position: entry.position,
       showAuthor: entry.showAuthor,
       showAvatar: entry.showAvatar,
+      find,
     });
     const props = rendered.props as { value?: string; position?: MessagePosition };
     const message =
@@ -554,7 +548,6 @@ function useItemRows<T>(
       item: entry.item,
       position: entry.position,
       unread: isUnread,
-      render: renderMessage,
       element,
     });
     return element;
@@ -563,14 +556,6 @@ function useItemRows<T>(
   return rows;
 }
 
-/**
- * The conversation: the one message list of the kit, in its own scroller. A `role="log"` of rows
- * (new messages are announced politely) with one tab stop — arrows, Home and End move between
- * messages. Rows come from `items` (dates, runs and the unread band added for you) or from
- * children (`Message.Root`, `Chat.Separator`, `Chat.Service`, `Chat.Unread`; `Chat.SelectionBar`
- * and `Message.Typing` close the list). Only the rows around the view render; the list opens at
- * the end and keeps the reader's place.
- */
 /** The placeholders of a first load, oldest first: the side and the lines of each bubble. */
 const LOADING_ROWS = [
   { direction: "incoming", lines: 1 },
@@ -604,6 +589,14 @@ function ChatLoading({ group }: { group: boolean }) {
   );
 }
 
+/**
+ * The conversation: the one message list of the kit, in its own scroller. A `role="log"` of rows
+ * (new messages are announced politely) with one tab stop — arrows, Home and End move between
+ * messages. Rows come from `items` (dates, runs and the unread band added for you) or from
+ * children (`Message.Root`, `Chat.Separator`, `Chat.Service`, `Chat.Unread`; `Chat.SelectionBar`
+ * and `Message.Typing` close the list). Only the rows around the view render; the list opens at
+ * the end and keeps the reader's place.
+ */
 function ChatMessages<T>({
   type = "direct",
   loading = false,
@@ -682,7 +675,7 @@ function ChatMessages<T>({
                 ariaLabelledBy ?? (ariaLabel || !chat.hasTitle ? undefined : chat.titleId)
               }
               group={type === "group"}
-              current={chat.current}
+              jumpTo={chat.jumpTo}
               highlight={chat.search ?? ""}
               onMatchesChange={chat.setMatches}
               revealRef={chat.revealRef}
@@ -690,7 +683,7 @@ function ChatMessages<T>({
             >
               {rows}
               {children}
-              {ownTyping ? null : <Message.Typing active={chat.typing} />}
+              {ownTyping ? null : <Message.Typing open={chat.typing} />}
             </MessageList>
           </ScrollContainer>
         )}

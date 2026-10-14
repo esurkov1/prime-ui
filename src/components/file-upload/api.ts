@@ -66,10 +66,10 @@ export const api: ComponentApi = {
       props: [
         {
           name: "trigger",
-          type: '"dropzone" | "button" | "tile"',
+          type: '"dropzone" | "button" | "tile" | "none"',
           default: '"dropzone"',
-          en: "`dropzone`: the drop area. `button`: a compact picker button, no zone and no drop (a composer paperclip). `tile`: an add tile as the last cell of the files.",
-          ru: "`dropzone`: зона перетаскивания. `button`: компактная кнопка выбора без зоны и сброса (скрепка в поле сообщения). `tile`: плитка добавления последней ячейкой файлов.",
+          en: "`dropzone`: the drop area. `button`: a compact picker button, no drop. `tile`: an add tile after the files. `none`: no trigger, the picker opens from code (`picker`).",
+          ru: "`dropzone`: зона перетаскивания. `button`: компактная кнопка выбора без сброса. `tile`: плитка добавления после файлов. `none`: без триггера, выбор открывается из кода (`picker`).",
         },
         {
           name: "variant",

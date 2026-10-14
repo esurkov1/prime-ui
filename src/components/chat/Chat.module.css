@@ -26,10 +26,6 @@
   margin: 0;
   overflow: hidden;
   color: var(--prime-color-text-primary);
-  font-size: var(--prime-text-title-s-size);
-  font-weight: var(--prime-text-title-s-weight);
-  line-height: var(--prime-text-title-s-line-height);
-  letter-spacing: var(--prime-text-title-s-tracking);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -264,6 +260,9 @@
  * floats over the last messages and takes no room.
  */
 .jump {
+  --enter-shift: var(--prime-space-2);
+  --enter-scale: var(--prime-motion-scale-enter);
+
   position: sticky;
   z-index: var(--prime-z-above);
   inset-block-end: var(--prime-space-3);
@@ -272,22 +271,15 @@
   margin-inline-end: var(--prime-space-2);
 }
 
-.jump[data-state="open"] {
-  animation: chatJumpIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
-}
-
-.jump[data-state="closed"] {
-  animation: chatJumpOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
-}
-
 /* Above a bar stuck to the bottom (the selection bar): lifted by its height, gliding as it comes
-   and goes (`--message-bottom-bar`, written by the bar), so the two never overlap. */
+   and goes (`--message-bottom-lift`, the bar's height upward, written by the bar), so the two never
+   overlap. */
 .jumpBox {
   position: absolute;
   inset-block-end: 0;
   inset-inline-end: 0;
   display: flex;
-  translate: 0 calc(-1 * var(--message-bottom-bar, 0px));
+  translate: 0 var(--message-bottom-lift, 0);
   transition: translate var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -304,20 +296,6 @@
   pointer-events: none;
 }
 
-@keyframes chatJumpIn {
-  from {
-    opacity: 0;
-    transform: translateY(var(--prime-space-2)) scale(var(--prime-motion-scale-enter));
-  }
-}
-
-@keyframes chatJumpOut {
-  to {
-    opacity: 0;
-    transform: translateY(var(--prime-space-2)) scale(var(--prime-motion-scale-enter));
-  }
-}
-
 .selectionBar {
   position: sticky;
   z-index: var(--prime-z-above);
@@ -330,7 +308,8 @@
   margin-block-start: var(--prime-space-3);
   padding: var(--prime-space-2) var(--prime-space-3);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-fill-muted);
+  /* A floating surface of the ladder (`data-depth="floating"`): it floats over the messages. */
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
 }
 

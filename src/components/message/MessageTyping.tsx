@@ -2,7 +2,9 @@ import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
+import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useLabels } from "@/internal/labels";
 import { defineRowKind, useMessageList } from "@/internal/messageList";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
@@ -17,12 +19,7 @@ export type MessageTypingLabels = {
 export const MESSAGE_TYPING_LABELS: MessageTypingLabels = { typing: "Собеседник печатает" };
 
 export type MessageTypingProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /**
-   * The other side is typing. Keep the part mounted and switch this: it enters like an incoming
-   * message and leaves closing its height — or at once, when the reply arrives in the same update.
-   * Default `true`.
-   */
-  active?: boolean;
+  open?: boolean;
   /** `Message.Avatar` of who types, for a group chat (`Chat.Messages type="group"`). */
   children?: React.ReactNode;
   labels?: Partial<MessageTypingLabels>;
@@ -34,47 +31,53 @@ export type MessageTypingProps = Omit<React.HTMLAttributes<HTMLDivElement>, "chi
  * conversation while the other side types. A polite status for assistive tech.
  */
 export function MessageTyping({
-  active = true,
+  open = true,
   labels: labelsProp,
   className,
   children,
   ...rest
 }: MessageTypingProps) {
-  const labels = { ...MESSAGE_TYPING_LABELS, ...labelsProp };
+  const labels = useLabels(MESSAGE_TYPING_LABELS, labelsProp);
   const list = useMessageList();
   const depth = useNestedSurfaceDepth();
-  const presence = usePresence(active, { exitDuration: "fast" });
+  const presence = usePresence(open, { exitDuration: "fast" });
+  // It opens its height as it arrives and closes it as it goes (`Disclosure`, `fast`).
+  const fold = useDisclosure({ open: presence.state === "open", appear: true });
   // The reply that ends the typing takes its place: when a message arrives in the same commit the
   // typing stops, the typing goes at once instead of closing its height under the new message.
   const [replaced, setReplaced] = React.useState(false);
-  if (active && replaced) setReplaced(false);
+  if (open && replaced) setReplaced(false);
   const { arrivedNow } = list;
   React.useLayoutEffect(() => {
-    if (!active && arrivedNow()) setReplaced(true);
-  }, [active, arrivedNow]);
-  if (!presence.mounted || (replaced && !active)) return null;
+    if (!open && arrivedNow()) setReplaced(true);
+  }, [open, arrivedNow]);
+  if (!presence.mounted || (replaced && !open)) return null;
   return (
     <div
       role="status"
       {...rest}
-      className={cx(typing.root, className)}
-      data-state={presence.state}
+      ref={fold.root.ref}
+      className={cx(fold.root.className, typing.root, className)}
+      data-state={fold.root["data-state"]}
+      data-mounted={fold.root["data-mounted"]}
       onTransitionEnd={(event) => {
         if (event.target === event.currentTarget && event.propertyName === "grid-template-rows") {
           presence.onExitEnd(event);
         }
       }}
     >
-      <div className={typing.row} {...toDataAttributes({ avatars: list.group || undefined })}>
-        {list.group ? <div className={styles.gutter}>{children}</div> : null}
-        <SurfaceDepthProvider value={depth}>
-          <div className={typing.bubble} data-depth={depth} aria-hidden="true">
-            <span className={typing.dot} />
-            <span className={typing.dot} />
-            <span className={typing.dot} />
-          </div>
-        </SurfaceDepthProvider>
-        <VisuallyHidden>{active ? labels.typing : ""}</VisuallyHidden>
+      <div className={fold.clip.className}>
+        <div className={typing.row} {...toDataAttributes({ avatars: list.group || undefined })}>
+          {list.group ? <div className={styles.gutter}>{children}</div> : null}
+          <SurfaceDepthProvider value={depth}>
+            <div className={typing.bubble} data-depth={depth} aria-hidden="true">
+              <span className={typing.dot} />
+              <span className={typing.dot} />
+              <span className={typing.dot} />
+            </div>
+          </SurfaceDepthProvider>
+          <VisuallyHidden>{open ? labels.typing : ""}</VisuallyHidden>
+        </div>
       </div>
     </div>
   );

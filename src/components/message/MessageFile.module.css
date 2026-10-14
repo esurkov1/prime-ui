@@ -53,20 +53,9 @@
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* No format: the document glyph on the muted fill. */
-.tile:is(:not([data-color]), [data-color="gray"]) {
-  color: var(--prime-color-text-muted);
-}
-
-.tile:is(:not([data-color]), [data-color="gray"]) > .face {
-  background: var(--prime-color-fill-muted);
-}
-
+/* The caption role (`textRole.caption`, joined in TSX) in the semibold weight. */
 .format {
-  font-size: var(--prime-text-caption-size);
   font-weight: var(--prime-font-weight-semibold);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 /* The picture fills the circle. */

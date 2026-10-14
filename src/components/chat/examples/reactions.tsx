@@ -73,31 +73,26 @@ const toggleOwn = (reactions: MessageReaction[], emoji: string): MessageReaction
 export default function ChatReactionsExample() {
   const [requests, setRequests] = React.useState(REQUESTS);
 
-  const toggle = React.useCallback(
-    (id: string, emoji: string) =>
-      setRequests((current) =>
-        current.map((request) =>
-          request.id === id
-            ? { ...request, reactions: toggleOwn(request.reactions, emoji) }
-            : request,
-        ),
+  const toggle = (id: string, emoji: string) =>
+    setRequests((current) =>
+      current.map((request) =>
+        request.id === id
+          ? { ...request, reactions: toggleOwn(request.reactions, emoji) }
+          : request,
       ),
-    [],
-  );
+    );
 
-  const renderMessage = React.useCallback(
-    (request: Request) => (
-      <Message.Root
-        direction={request.author === "me" ? "outgoing" : "incoming"}
-        time={request.sentAt}
-        status={request.author === "me" ? "read" : undefined}
-        onReactionToggle={(emoji) => toggle(request.id, emoji)}
-      >
-        <Message.Text>{request.text}</Message.Text>
-        {request.reactions.length ? <Message.Reactions items={request.reactions} /> : null}
-      </Message.Root>
-    ),
-    [toggle],
+  // A reaction renders again only the request it changed.
+  const renderMessage = (request: Request) => (
+    <Message.Root
+      direction={request.author === "me" ? "outgoing" : "incoming"}
+      time={request.sentAt}
+      status={request.author === "me" ? "read" : undefined}
+      onReactionToggle={(emoji) => toggle(request.id, emoji)}
+    >
+      <Message.Text>{request.text}</Message.Text>
+      {request.reactions.length ? <Message.Reactions items={request.reactions} /> : null}
+    </Message.Root>
   );
 
   return (
