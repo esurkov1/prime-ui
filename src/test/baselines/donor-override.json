@@ -1,6 +1,5 @@
 [
   "src/components/drawer/Drawer.module.css: sets --dialog-padding, private to src/components/modal/DialogParts.module.css",
-  "src/components/list/List.module.css: sets --avatar-slot-size, private to src/components/avatar/Avatar.module.css",
   "src/components/message/Message.module.css: sets --avatar-ring, private to src/components/avatar/Avatar.module.css",
   "src/components/modal/DialogParts.module.css: sets --avatar-slot-size, private to src/components/avatar/Avatar.module.css",
   "src/components/progress-circle/ProgressCircle.module.css: sets --ring-track, private to src/internal/ring.module.css",

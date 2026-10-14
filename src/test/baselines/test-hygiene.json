@@ -1,9 +1,6 @@
 [
   "src/components/data-table/DataTable.test.tsx: reads a .module.css as text",
-  "src/components/gantt/Gantt.test.tsx: queries [class*=",
-  "src/components/list/List.test.tsx: reads a .module.css as text",
   "src/components/page-content/PageContent.test.tsx: reads a .module.css as text",
   "src/components/switch/Switch.test.tsx: getComputedStyle",
-  "src/components/timeline/Timeline.test.tsx: reads a .module.css as text",
   "src/internal/palette.test.ts: reads a .module.css as text"
 ]

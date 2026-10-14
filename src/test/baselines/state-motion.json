@@ -6,7 +6,6 @@
   "src/components/file-upload/FileUpload.module.css: .item flips background",
   "src/components/file-upload/FileUpload.module.css: .item flips box-shadow",
   "src/components/file-upload/FileUpload.module.css: .root flips outline-color",
-  "src/components/gantt/Gantt.module.css: .rowHeader flips opacity",
   "src/components/message/MessageReactionBar.module.css: .bar flips opacity",
   "src/components/message/MessageReactionBar.module.css: .bar flips opacity #2",
   "src/components/message/MessageReactionBar.module.css: .bar flips transform",
