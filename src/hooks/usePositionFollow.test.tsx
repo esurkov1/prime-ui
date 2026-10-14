@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
 
@@ -115,5 +115,58 @@ describe("usePosition", () => {
     expect(seen[0]).toBe(screen.getByRole("button", { name: "anchor" }));
     expect(layer.style.left).toBe("8px");
     expect(layer.style.getPropertyValue("--float-min-w")).toBe("40px");
+  });
+});
+
+/*
+ * A Select panel: narrow by its content until `--float-min-w` makes it as wide as its anchor. With
+ * `align="auto"` near the end of the screen the panel lines its end edge up — from its width. The
+ * first placement must use the width the panel has once its limits are written, or the first frame
+ * shows it out of place (to the right) until the next one corrects it.
+ */
+function AutoAligned() {
+  const anchorRef = React.useRef<HTMLButtonElement>(null);
+  const layerRef = React.useRef<HTMLDivElement>(null);
+  const { attachLayer } = usePosition(true, anchorRef, layerRef, {
+    align: "auto",
+    matchAnchorWidth: true,
+  });
+  return (
+    <>
+      <button ref={anchorRef} type="button">
+        anchor
+      </button>
+      <div ref={attachLayer} data-testid="layer" />
+    </>
+  );
+}
+
+describe("usePosition — the first placement uses the settled size", () => {
+  it("writes the size limits first and places the layer by its final width", () => {
+    const anchorRect = rect({ top: 100, bottom: 136, left: 700, right: 1000, width: 300 });
+    const restore = [
+      vi.spyOn(HTMLButtonElement.prototype, "getBoundingClientRect").mockReturnValue(anchorRect),
+      // The layer is 120 wide by its content, or as wide as `--float-min-w` once it is written.
+      vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        const min = Number.parseFloat(this.style.getPropertyValue("--float-min-w"));
+        return Number.isFinite(min) ? Math.max(120, min) : 120;
+      }),
+      vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(200),
+    ];
+    const { innerWidth } = window;
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
+    try {
+      render(<AutoAligned />);
+      const layer = screen.getByTestId("layer");
+      // End edge lined up with a 300-wide panel: 1000 − 300. A 120-wide guess would give 880.
+      expect(layer.style.left).toBe("700px");
+      expect(layer.style.getPropertyValue("--float-min-w")).toBe("300px");
+      expect(layer).not.toHaveAttribute("data-float-pending");
+    } finally {
+      for (const spy of restore) spy.mockRestore();
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: innerWidth });
+    }
   });
 });

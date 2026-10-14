@@ -33,6 +33,11 @@
   z-index: var(--prime-z-overlay);
 }
 
+/* An anchored layer before its first placement (`usePosition`): never painted out of place. */
+.layer[data-float-pending] {
+  visibility: hidden;
+}
+
 /* ─── Sheet: the same layer at the bottom edge of a narrow viewport ───────────
  * `FloatingPanel` with `sheet`: a scrim, then a full-width raised sheet holding the grab handle
  * and the panel itself. The panel keeps its own classes (menu, popover content) but takes the

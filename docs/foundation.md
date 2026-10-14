@@ -361,6 +361,10 @@ holds across the kit.
   screen lines up its end edge and the panel grows toward the start. It flips to the top only when it
   does not fit. Explicit `align` is for a panel that must line up with one edge of a block.
   Tooltip centres on its trigger.
+  The first frame already shows the final place: size limits (`--float-min-w` and the rest) are
+  written before the panel is measured, the panel is measured again until its size settles, a late
+  size change is placed in the ResizeObserver callback (before paint, never a frame later), and an
+  anchored panel stays invisible until it has its first place (`data-float-pending`).
 - **Gestures.** Only a sheet swipes: Sheet, and a Modal or a floating layer shown as a bottom sheet below
   640, close with a swipe down from the grab handle or the header (`useSwipeDismiss`), as an extra way out
   next to Escape and the scrim, following `closeOnOutsideClick`. A Drawer has no touch gestures: it closes

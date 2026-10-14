@@ -268,15 +268,11 @@ export function usePosition(
         };
       }
       const { offset, pad, arrow } = metricsRef.current;
-      const rect = anchor.getBoundingClientRect();
-
-      const pos = computeFloatingPosition(
-        resolveAnchorRect ? resolveAnchorRect(anchor, rect) : rect,
-        layer.offsetWidth,
-        layer.offsetHeight,
-        window.innerWidth,
-        window.innerHeight,
-        {
+      const rawRect = anchor.getBoundingClientRect();
+      const rect = resolveAnchorRect ? resolveAnchorRect(anchor, rawRect) : rawRect;
+      const boundary = resolveBoundary?.(anchor) ?? undefined;
+      const compute = (width: number, height: number) =>
+        computeFloatingPosition(rect, width, height, window.innerWidth, window.innerHeight, {
           side: preferredSide,
           align,
           offset,
@@ -284,10 +280,8 @@ export function usePosition(
           flip: true,
           matchAnchorWidth,
           arrowInset: arrow,
-          boundary: resolveBoundary?.(anchor) ?? undefined,
-        },
-      );
-      setResolvedSide(pos.side);
+          boundary,
+        });
 
       // Only real changes are written: repeated updates with the same numbers cause no layout work.
       const set = (name: string, value: string) => {
@@ -295,12 +289,35 @@ export function usePosition(
       };
       const px = (n: number | undefined) => (n === undefined ? "" : `${n}px`);
       set("position", "fixed");
+
+      /*
+       * The size limits change the layer's own size (a Select panel takes its anchor's width), and
+       * the place depends on that size (`align="auto"` lines the end edge up from the width). So the
+       * limits are written first and the layer is measured again until its size settles — all in this
+       * one call, before paint: the first frame already shows the final place, never a narrower
+       * panel that jumps on the next frame.
+       */
+      let width = layer.offsetWidth;
+      let height = layer.offsetHeight;
+      let pos = compute(width, height);
+      for (let pass = 0; pass < 3; pass++) {
+        set(FLOAT_MIN_WIDTH_VAR, px(pos.minWidth));
+        set(FLOAT_MAX_WIDTH_VAR, px(pos.maxWidth));
+        set(FLOAT_MAX_HEIGHT_VAR, px(pos.maxHeight));
+        const nextWidth = layer.offsetWidth;
+        const nextHeight = layer.offsetHeight;
+        if (nextWidth === width && nextHeight === height) break;
+        width = nextWidth;
+        height = nextHeight;
+        pos = compute(width, height);
+      }
+      setResolvedSide(pos.side);
+
       set("top", px(pos.top));
       set("left", px(pos.left));
-      set(FLOAT_MIN_WIDTH_VAR, px(pos.minWidth));
-      set(FLOAT_MAX_WIDTH_VAR, px(pos.maxWidth));
-      set(FLOAT_MAX_HEIGHT_VAR, px(pos.maxHeight));
       set(FLOAT_ARROW_VAR, px(pos.arrow));
+      // Placed: the layer may be seen (see `attachLayer`).
+      delete layer.dataset.floatPending;
     },
     [
       anchorRef,
@@ -319,9 +336,14 @@ export function usePosition(
   const updateRef = React.useRef(update);
   updateRef.current = update;
 
+  const enabledRef = React.useRef(enabled);
+  enabledRef.current = enabled;
   const attachLayer = React.useCallback(
     (node: HTMLElement | null) => {
       layerRef.current = node;
+      // Not seen until it has a place: a layer is never painted where it does not belong, even for
+      // a frame (`[data-float-pending]` hides it; the first update clears it).
+      if (node && enabledRef.current) node.dataset.floatPending = "";
       setAttached(node !== null);
     },
     [layerRef],
@@ -355,8 +377,18 @@ export function usePosition(
       target.addEventListener("scroll", follow, { passive: true });
     }
     window.visualViewport?.addEventListener("resize", resize);
-    // Also catches the layer's late size changes (web fonts, content loading in).
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(follow);
+    /*
+     * The layer's late size changes (web fonts, content loading in, a filtered list) are placed in
+     * the observer's own callback: it runs after layout and before paint, so the new place shows in
+     * the same frame. A frame later (`requestAnimationFrame`) would paint the old place once.
+     */
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(() => {
+            cancelAnimationFrame(frame);
+            updateRef.current(false);
+          });
     if (layerRef.current) observer?.observe(layerRef.current);
     if (anchorRef.current) observer?.observe(anchorRef.current);
 
