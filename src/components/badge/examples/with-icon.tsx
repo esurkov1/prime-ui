@@ -1,4 +1,4 @@
-/** A leading dot, a leading or trailing icon and an icon-only square with a name — `Badge.Dot`, `Badge.Icon`, `aria-label`. */
+/** A leading dot in the text color or its own hue, a leading or trailing icon and an icon-only square with a name — `Badge.Dot`, `color`, `Badge.Icon`, `aria-label`. */
 import { Badge, Icon, Typography } from "prime-ui-kit";
 
 export default function BadgeWithIconExample() {
@@ -11,6 +11,15 @@ export default function BadgeWithIconExample() {
         </Badge.Root>
         <Typography as="span" variant="caption" tone="muted">
           Badge.Dot
+        </Typography>
+      </div>
+      <div>
+        <Badge.Root>
+          <Badge.Dot color="purple" />
+          Проект «Север»
+        </Badge.Root>
+        <Typography as="span" variant="caption" tone="muted">
+          Badge.Dot · color
         </Typography>
       </div>
       <div>

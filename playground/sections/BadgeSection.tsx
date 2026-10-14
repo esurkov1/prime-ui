@@ -18,7 +18,8 @@ export const page: ComponentPageConfig = {
       "tag",
       "фильтр",
       "onRemove",
-      "onPress",
+      "pressed",
+      "tone",
       "color",
       "variant",
     ],
@@ -29,11 +30,11 @@ export const page: ComponentPageConfig = {
   title: "Badge",
   kind: "primitive",
   description:
-    "Единственный чип кита: статус, категория или счётчик, снимаемое значение и нажимаемый переключатель с действием при наведении — в цвете палитры.",
+    "Единственный чип кита: статус в цвете роли, категория в цвете палитры, счётчик, снимаемое значение и переключатель с действием при наведении.",
   examples: [
     {
       slot: "overview",
-      description: "Статусы публикации: смысл несёт текст, оттенок его повторяет — `color`.",
+      description: "Статусы счёта: смысл несёт текст, тон его повторяет — `tone`.",
     },
     {
       slot: "variants",
@@ -44,17 +45,17 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Неактивный бейдж, переключатель выключен и включён, снимаемый и ждущий запроса — `disabled`, `onPress`, `pressed`, `onRemove`, `loading`.",
+        "Неактивный бейдж, чип-переключатель выключен и включён, снимаемый и ждущий запроса — `disabled`, `pressed`, `onRemove`, `loading`.",
     },
     {
       slot: "with-icon",
       description:
-        "Точка в начале, иконка в начале или в конце и квадрат-иконка с именем — `Badge.Dot`, `Badge.Icon`, `aria-label`.",
+        "Точка в начале цвета текста или своего оттенка, иконка в начале или в конце и квадрат-иконка с именем — `Badge.Dot`, `color`, `Badge.Icon`, `aria-label`.",
     },
     {
       scenario: "in-controls",
       title: "Внутри контрола",
-      description: "В кнопке и поле бейдж без `size` берёт ярус на ступень ниже.",
+      description: "В кнопке и поле бейдж сам берёт ярус на ступень ниже — `Badge.Root`.",
     },
     {
       scenario: "applied-filters",
@@ -72,7 +73,18 @@ export const page: ComponentPageConfig = {
       scenario: "filter-values",
       title: "Значения фильтра",
       description:
-        "Значения как переключатели с действием «скрыть», которое выезжает без изменения ширины — `onPress`, `pressed`, `Badge.Action`, `persistent`.",
+        "Значения как переключатели с действием «скрыть», которое выезжает без изменения ширины — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`.",
+    },
+    {
+      scenario: "square",
+      title: "Квадратная плитка",
+      description:
+        "Форматы файлов квадратными плитками текста, достаточно крупными для трёх букв; оттенок разделяет их по виду — `shape`, `size`, `color`.",
+    },
+    {
+      slot: "controlled",
+      description:
+        "Города доставки как чипы-переключатели, состоянием которых владеет экран: сводка считает выбранные — `pressed`, `onPressedChange`.",
     },
   ],
   api,

@@ -1,4 +1,4 @@
-/** Filter values as toggles with a hide action that slides in without changing the width — `onPress`, `pressed`, `Badge.Action`, `persistent`. */
+/** Filter values as toggles with a hide action that slides in without changing the width — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`. */
 import { Badge } from "prime-ui-kit";
 import * as React from "react";
 
@@ -10,8 +10,7 @@ const VALUES = ["Москва", "Казань", "Новосибирск", "Со�
 
 export default function BadgeFilterValuesExample() {
   const [modes, setModes] = React.useState<Record<string, Mode>>({ Казань: "show", Сочи: "hide" });
-  const set = (value: string, mode: Exclude<Mode, undefined>) =>
-    setModes((prev) => ({ ...prev, [value]: prev[value] === mode ? undefined : mode }));
+  const set = (value: string, mode: Mode) => setModes((prev) => ({ ...prev, [value]: mode }));
 
   return (
     <div className={styles.badges}>
@@ -20,16 +19,15 @@ export default function BadgeFilterValuesExample() {
         return (
           <Badge.Root
             key={value}
-            color={mode === "show" ? "blue" : mode === "hide" ? "red" : "gray"}
             pressed={mode === "show"}
-            onPress={() => set(value, "show")}
+            onPressedChange={(pressed) => set(value, pressed ? "show" : undefined)}
           >
             {mode === "hide" ? `НЕ ${value}` : value}
             <Badge.Action
               label={mode === "hide" ? `Не скрывать ${value}` : `Скрыть ${value}`}
               pressed={mode === "hide"}
               persistent={mode === "hide"}
-              onClick={() => set(value, "hide")}
+              onClick={() => set(value, mode === "hide" ? undefined : "hide")}
             />
           </Badge.Root>
         );

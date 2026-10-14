@@ -6,11 +6,12 @@
 > The kit's one chip: a static label for a status, category or count, a removable value or applied filter, and a pressable toggle with a hover action — in a palette color.
 
 ## When to use
-- Status or category of a row in a table or list («Оплачен», «Черновик», «Бета»).
+- Status of a row in a table or list («Оплачен», «Просрочен») — `tone`; a category («Бета», a team, a tag) — `color`.
 - Counters inside buttons and fields («Входящие 12», «−25%»).
 - A workflow state with a leading dot (`Badge.Dot`).
 - A selected value, keyword or applied filter the user can remove (`onRemove`).
-- Values in a filter panel that toggle on press and hide with a hover action (`onPress`, `Badge.Action`).
+- Values in a filter panel that toggle on press and hide with a hover action (the `pressed` triad, `Badge.Action`).
+- A short code as a square tile (a file format «PDF») — `shape="square"`.
 
 ## When not to use
 - A multi-select field with chips → use [TagSelect](../tag-select/COMPONENT.md) (it renders badges itself).
@@ -29,7 +30,7 @@ import { Badge } from "prime-ui-kit";
 Badge.Root          <span>: fill, tier dimensions
 ├─ [start segment]  Badge.Icon or Badge.Dot at the start edge: full height, mark centred
 ├─ body             text, Badge.Dot, inline Badge.Icon
-│                   (a <button> with onPress; a <span> with a trailing segment; none when read-only)
+│                   (a toggle <button> with the pressed triad; a <span> with a trailing segment; none when read-only)
 ├─ Badge.Action     optional end segment revealed on hover / focus (always shown on touch screens)
 └─ remove segment   with onRemove: full height, the whole end is the hit area (Icon action.close)
 ```
@@ -39,22 +40,25 @@ Badge.Root          <span>: fill, tier dimensions
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Badge.Root
-`ref` → `HTMLSpanElement`. The chip: fill, tier dimensions; a read-only badge is one `<span>`, `onPress` makes the body a `<button>`, `onRemove` adds a remove segment.
+`ref` → `HTMLSpanElement`. The chip: fill, tier dimensions; a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue. Categorizes; the text carries the meaning. |
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` without `tone` | Palette hue: a category (a team, a tag); the text carries the meaning. Not together with `tone`. |
+| `tone` | `"neutral" \| "success" \| "warning" \| "danger" \| "info"` | — | A status in the role colors (paid, overdue, failed); `neutral` is the gray hue. Not together with `color`. |
 | `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | Treatment. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down; outside a control it is `m`. |
+| `shape` | `"chip" \| "square"` | `"chip"` | `square` — a tile as wide as it is tall, the text centred: a file format («PDF»), a short code. |
 | `onRemove` | `() => void \| Promise<void>` | — | Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays. |
 | `loading` | `boolean` | `false` | The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, which takes no press. A promise from `onRemove` does the same on its own. |
-| `onPress` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | Makes the body a `<button>` covering the whole badge (a toggle chip, a filter value); gets the event, so Alt / Shift clicks can mean more. |
-| `pressed` | `boolean` | — | Toggle state of a pressable badge: `aria-pressed` on the body, `data-pressed` on the root. |
+| `pressed` | `boolean` | — | A toggle chip (a filter value): the body becomes a `<button>` over the whole badge with `aria-pressed`; on takes the selected look (accent soft). |
+| `defaultPressed` | `boolean` | — | The initial state of an uncontrolled toggle chip; a press flips it. |
+| `onPressedChange` | `(pressed: boolean) => void` | — | Fires with the new state when the toggle chip is pressed. |
 | `disabled` | `boolean` | — | Muted look for every variant, `aria-disabled`; the body button, remove and action get native `disabled`. |
 | `className` | `string` | — | Class on the badge. |
 | `labels` | `Partial<BadgeLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge. |
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `aria-label` (icon-only) and the other span attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "onClick" \| "color">` | — | `aria-label` (an icon-only badge named by it is an image) and the other span attributes; no `onClick` — a pressable chip is the toggle. |
 
 ### Badge.Icon
 `ref` → `HTMLSpanElement`. A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.
@@ -66,12 +70,13 @@ Badge.Root          <span>: fill, tier dimensions
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
 ### Badge.Dot
-`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier and the color set on it.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | A dot of its own hue (the solid step) instead of the text color: a project color, an attention mark. |
 | `className` | `string` | — | Class on the dot. |
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | The other span attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "color">` | — | The other span attributes. |
 
 ### Badge.Action
 `ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus (always shown on touch); the width never changes. One per badge, not together with `onRemove`.
@@ -95,17 +100,30 @@ Badge.Root          <span>: fill, tier dimensions
 | `solid` | saturated hue fill, contrasting text | one label per area that must stand out | |
 | `outline` | transparent, 1px inset line in the hue text at 32% | a quiet secondary label next to soft badges | |
 
+### tone
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `neutral` | the gray hue | draft, archived, cancelled | |
+| `success` | the success role colors | paid, published, done | |
+| `warning` | the warning role colors | waiting, needs attention | |
+| `danger` | the danger role colors | failed, overdue, rejected | |
+| `info` | the info role colors | issued, in progress | |
+
+A status takes `tone`; a category takes `color`. The two never go together (the type refuses it).
+
 ### color
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `gray` | neutral wash | draft, archived, cancelled | yes |
-| `blue` | blue | in progress, counters | |
-| `green` | green | success, paid, published | |
-| `orange` | orange | waiting, needs attention | |
-| `red` | red | failed, rejected, urgent | |
-| `yellow` | yellow | paused, under review | |
+| `gray` | neutral wash | a category without a hue of its own | yes (without `tone`) |
+| `blue` · `green` · `orange` · `red` · `yellow` | palette hues | teams, projects, tags, file kinds | |
 | `purple` | purple | roles, private categories | |
 | `sky` · `pink` · `teal` | extra hues | more categories | |
+
+### shape
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `chip` | as wide as its content | every badge | yes |
+| `square` | a tile as wide as it is tall, the text centred and clipped | a file format, a short code | |
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -126,22 +144,24 @@ Badge.Root          <span>: fill, tier dimensions
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| hue / treatment | `color`, `variant` | `data-color`, `data-variant` (always set) |
+| hue / treatment | `color` or `tone`, `variant` | `data-color` (a hue, or gray for `neutral`), `data-tone`, `data-variant` (always set); `data-shape="square"` for a tile |
 | size | `size`, else the control, else `m` | `data-size`, `data-tier` (visual tier) |
 | icon segments | edge `Badge.Icon` / `Badge.Dot`, icon-only | `data-icon-start`, `data-icon-end`, `data-icon-only` |
 | plain text | read-only, text children only | `data-text-only`: the root is one block box that ellipsizes; otherwise each text run sits in its own block span |
 | removable | `onRemove` | `data-removable`; the remove segment takes a `fill-subtle-active` wash on hover |
 | removing | `onRemove` returned a pending promise, or `loading` | `data-pending`, `aria-busy`; the content quiets to 0.6 (`fast`, both ways), a `Spinner` stands in for the ×, the segment gets `aria-disabled` and takes no second press; rejected — the badge stays and `labels.removeFailed` is announced |
-| leaving | the owner took the badge out after its remove segment | a copy stays in place and closes up — fades, settles to 0.96 and shrinks to nothing with its gap (`fast`, `exit`) — so the badges after it glide in; off under reduced motion |
-| pressable / pressed | `onPress`, `pressed` | `data-pressable`, `data-pressed`, `aria-pressed` on the body; `fill-subtle` wash on hover |
+| leaving | the owner took the badge out (after its remove segment, or any change of the list) | a copy stays in place and closes up — fades, settles and shrinks to nothing with its gap (`fast`, `exit`, `internal/partPresence`) — so the badges after it glide in; off under reduced motion |
+| toggle / pressed | the `pressed` / `defaultPressed` / `onPressedChange` triad | `data-pressable`, `aria-pressed` on the body; on adds `data-pressed` and the selected look (accent soft), gliding in and out (`fast`); hover washes a step of the badge's text color over its fill |
 | action | `Badge.Action` | `data-action="reveal" \| "persistent"`; the text slides and the segment fades in over `fast` |
-| disabled | `disabled` | `data-disabled`, `aria-disabled`; inner buttons disabled |
+| disabled | `disabled` | `data-disabled`, `aria-disabled`; inner buttons disabled, no hover wash |
+| icon-only, named | only `Badge.Icon` children and `aria-label` | `role="img"` with that name |
 | count | a number as the only child | the digits roll to the new value when the number changes |
 
 ## Layout & spacing
 - Inline-flex, `width: fit-content`, `max-width: 100%`; text never wraps and ends in an ellipsis.
 - Segments are `mark + padding + gap` wide and full height; the mark sits with equal space to the edge and to the text.
-- `Badge.Dot` is 6px, 8px from `l`; alone it takes the tier of the surrounding control.
+- `Badge.Dot` is 6px, 8px from `l`; alone it takes the tier of the surrounding control; `color` paints it in the solid step of that hue.
+- The root never clips: the text ellipsizes in its own box, so the segments' touch areas reach past the chip.
 - `Badge.Action` room is reserved, so revealing it never changes the badge width.
 - Several badges in a row: `gap: var(--prime-space-2)`.
 - In a list row the badge is the trailing column; the title column gets `min-width: 0` and an ellipsis.
@@ -153,17 +173,17 @@ Badge.Root          <span>: fill, tier dimensions
 
 | Key | Action |
 |---|---|
-| `Tab` | Focuses the body of a pressable badge, then its action or remove segment. |
-| `Enter` · `Space` | Presses the focused body, remove or action button. |
+| `Tab` | Focuses the body of a toggle chip, then its action or remove segment. |
+| `Enter` · `Space` | Presses the focused body (the toggle flips), remove or action button. |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - A read-only badge is plain text in a `<span>`, no role.
-- `onPress` makes the body a `<button>` with `aria-pressed` when `pressed` is set; remove and `Badge.Action` are separate buttons with their own names.
+- The `pressed` triad makes the body a `<button>` with `aria-pressed`; remove and `Badge.Action` are separate buttons with their own names.
 - Give every remove button a unique name with `labels.remove`; after removing, move focus to a neighbouring badge or the source field.
 - While a removal is saved the badge has `aria-busy` and the segment `aria-disabled`; once a removal waits, the badge mounts a polite live region that speaks `labels.removeFailed` if the promise rejects.
-- `Badge.Dot` is `aria-hidden`; icon-only badges need `aria-label`. Color never carries meaning alone.
+- `Badge.Dot` is `aria-hidden`; an icon-only badge needs `aria-label` and then is `role="img"`. Color never carries meaning alone, a `tone` neither.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -176,18 +196,23 @@ Badge.Root          <span>: fill, tier dimensions
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Publication statuses: soft badges where the text carries the meaning and the hue repeats it — `color`. |
+| [overview.tsx](examples/overview.tsx) | Invoice statuses: soft badges where the text carries the meaning and the tone repeats it — `tone`. |
 | [variants.tsx](examples/variants.tsx) | Every palette hue in every treatment; the text must read without the color — `variant`, `color`. |
 | [sizes.tsx](examples/sizes.tsx) | Every badge tier, 16 to 32 px high — `size`. |
-| [states.tsx](examples/states.tsx) | An inactive badge, a pressable toggle off and on, a removable one and one that waits on a request — `disabled`, `onPress`, `pressed`, `onRemove`, `loading`. |
-| [with-icon.tsx](examples/with-icon.tsx) | A leading dot, a leading or trailing icon and an icon-only square with a name — `Badge.Dot`, `Badge.Icon`, `aria-label`. |
-| [in-controls.tsx](examples/in-controls.tsx) | Inside a button or a field the badge takes the tier one step down without `size`. |
+| [states.tsx](examples/states.tsx) | An inactive badge, a toggle chip off and on, a removable one and one that waits on a request — `disabled`, `pressed`, `onRemove`, `loading`. |
+| [with-icon.tsx](examples/with-icon.tsx) | A leading dot in the text color or its own hue, a leading or trailing icon and an icon-only square with a name — `Badge.Dot`, `color`, `Badge.Icon`, `aria-label`. |
+| [in-controls.tsx](examples/in-controls.tsx) | Inside a button or a field the badge takes the tier one step down by itself — `Badge.Root`. |
 | [applied-filters.tsx](examples/applied-filters.tsx) | Applied filters: each badge drops its filter and names it for screen readers — `onRemove`, `labels`. |
 | [server-tags.tsx](examples/server-tags.tsx) | Order tags removed on the server: a badge waits dimmed with a spinner, leaves once the server agrees and stays with an announcement when it refuses — `onRemove`, `labels`. |
-| [filter-values.tsx](examples/filter-values.tsx) | Filter values as toggles with a hide action that slides in without changing the width — `onPress`, `pressed`, `Badge.Action`, `persistent`. |
+| [filter-values.tsx](examples/filter-values.tsx) | Filter values as toggles with a hide action that slides in without changing the width — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`. |
+| [square.tsx](examples/square.tsx) | File formats as square tiles of text, large enough for three letters; the hue sorts them by kind — `shape`, `size`, `color`. |
+| [controlled.tsx](examples/controlled.tsx) | Delivery cities as toggle chips whose state the screen owns: the summary counts the chosen ones — `pressed`, `onPressedChange`. |
 
 ## Mistakes
-- `<Badge.Root onClick={…}>` → use `onPress` for a toggle, or a `Button` for a command.
+- `<Badge.Root onClick={…}>` → the type refuses it: a toggle chip is the `pressed` triad, a command is a `Button`.
+- A status in a palette hue (`color="red"` for «Просрочен») → `tone="danger"`; `color` is for categories.
+- A toggle drawn by switching `color` → the `pressed` triad: the selected look comes with `aria-pressed`.
+- A square format tile styled by a host class → `shape="square"`.
 - A custom × or hover button next to a badge → use `onRemove` or `Badge.Action`.
 - Several removable badges with the default «Удалить» → pass `labels.remove` with the badge text.
 - A colored badge with no text → keep a word; color alone is not a signal.
@@ -196,5 +221,5 @@ Badge.Root          <span>: fill, tier dimensions
 - Removing the badge from your list first and putting it back when the request fails → return the request's promise and remove it after it succeeds; the badge waits meanwhile.
 
 ## Related
-- **Built from:** `Icon` (remove ×, `Badge.Action` −), [Spinner](../spinner/COMPONENT.md) (removing)
+- **Built from:** `Icon` (remove ×, `Badge.Action` −), [Spinner](../spinner/COMPONENT.md) (removing), `internal/chipTier` (tiers), `internal/glyphSwap` (× ⇄ spinner), `internal/partPresence` (leaving)
 - **See also:** [TagSelect](../tag-select/COMPONENT.md), [Select](../select/COMPONENT.md) (row badges), [SegmentedControl](../segmented-control/COMPONENT.md) (`Count`, color dots), [SmartFilter](../smart-filter/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

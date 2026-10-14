@@ -183,6 +183,22 @@
   flex-shrink: 0;
 }
 
+/* The «+N» chip is pressed through the button around it. */
+.chipMoreButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.chipMoreButton:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.chipMoreButton:disabled {
+  cursor: not-allowed;
+}
+
 /* Chip focused with the arrow keys (outer ring; the row is padded by the focus space). */
 .chip:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);

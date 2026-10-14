@@ -1,4 +1,4 @@
-/** An inactive badge, a pressable toggle off and on, a removable one and one that waits on a request — `disabled`, `onPress`, `pressed`, `onRemove`, `loading`. */
+/** An inactive badge, a toggle chip off and on, a removable one and one that waits on a request — `disabled`, `pressed`, `onRemove`, `loading`. */
 import { Badge, Typography } from "prime-ui-kit";
 
 const noop = () => undefined;
@@ -15,15 +15,15 @@ export default function BadgeStatesExample() {
         </Typography>
       </div>
       <div>
-        <Badge.Root color="blue" onPress={noop} pressed={false}>
+        <Badge.Root pressed={false} onPressedChange={noop}>
           Москва
         </Badge.Root>
         <Typography as="span" variant="caption" tone="muted">
-          onPress
+          pressed: false
         </Typography>
       </div>
       <div>
-        <Badge.Root color="blue" onPress={noop} pressed>
+        <Badge.Root pressed onPressedChange={noop}>
           Москва
         </Badge.Root>
         <Typography as="span" variant="caption" tone="muted">

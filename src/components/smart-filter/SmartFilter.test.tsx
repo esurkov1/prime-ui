@@ -261,7 +261,7 @@ describe("SmartFilter", () => {
     expect(onValue).toHaveBeenLastCalledWith({ other: { include: ["x"], exclude: [] } });
   });
 
-  it("tag row: tags and «add» share the tag tier (never below s); «add» opens the panel", () => {
+  it("tag row: tags take the tag tier (never below s), «add» is a text action of their type and opens the panel", () => {
     const value = { method: { include: ["GET"], exclude: [] } };
     const { rerender } = render(
       <SmartFilter.Root fields={FIELDS} size="xs" defaultValue={value}>
@@ -272,7 +272,8 @@ describe("SmartFilter", () => {
     const row = () => chips() as HTMLElement;
     const add = () => screen.getByRole("button", { name: "Добавить фильтр" });
     expect(row().firstElementChild).toHaveAttribute("data-size", "s");
-    expect(add().closest("[data-size]")).toHaveAttribute("data-size", "s");
+    // LinkButton runs one tier larger than Badge: an xs link has the 12px text of an s tag.
+    expect(add()).toHaveAttribute("data-size", "xs");
 
     rerender(
       <SmartFilter.Root fields={FIELDS} size="l" defaultValue={value}>
@@ -281,7 +282,7 @@ describe("SmartFilter", () => {
       </SmartFilter.Root>,
     );
     expect(row().firstElementChild).toHaveAttribute("data-size", "l");
-    expect(add().closest("[data-size]")).toHaveAttribute("data-size", "l");
+    expect(add()).toHaveAttribute("data-size", "s");
 
     fireEvent.click(add());
     expect(screen.getByRole("dialog")).toBeInTheDocument();

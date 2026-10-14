@@ -516,17 +516,14 @@ function Panel({ searchable }: { searchable: boolean }) {
         }
       />
     );
+    // A text action in the row of values, its type matching the tags (as «Сбросить все»).
     const more = collapsible ? (
-      <Badge.Root
-        size={size}
-        variant="outline"
-        onPress={() => setExpanded((prev) => new Set(prev).add(field.key))}
-      >
-        {formatLabel(labels.more, { count: matched.length - collapsedLimit })}
-        <Badge.Icon>
+      <LinkButton asChild tone="neutral" size={TIER_BELOW[tagSizeOf(size)]}>
+        <button type="button" onClick={() => setExpanded((prev) => new Set(prev).add(field.key))}>
+          {formatLabel(labels.more, { count: matched.length - collapsedLimit })}
           <Icon name="nav.chevronDown" />
-        </Badge.Icon>
-      </Badge.Root>
+        </button>
+      </LinkButton>
     ) : null;
 
     sections.push({
@@ -722,6 +719,8 @@ const TIER_BELOW: Record<ControlSize, ControlSize> = {
  */
 function ValueToggle({ option, size, mode, single, canHide, query, onMode }: ValueToggleProps) {
   const { labels } = useSmartFilter();
+  // Alt held on the press that toggles the value: it hides the value instead.
+  const altPress = React.useRef(false);
   return (
     <Badge.Root
       size={tagSizeOf(size)}
@@ -729,7 +728,10 @@ function ValueToggle({ option, size, mode, single, canHide, query, onMode }: Val
       pressed={mode === "include"}
       title={formatLabel(labels.showValue, { value: option.label })}
       data-mode={mode ?? undefined}
-      onPress={(event) => onMode(event.altKey && canHide ? "exclude" : "include")}
+      onClickCapture={(event) => {
+        altPress.current = event.altKey;
+      }}
+      onPressedChange={() => onMode(altPress.current && canHide ? "exclude" : "include")}
       onKeyDown={(event) => {
         if (event.key === "Enter" && event.shiftKey && canHide) {
           event.preventDefault();
@@ -821,20 +823,20 @@ function SmartFilterChips({ className, ...rest }: SmartFilterChipsProps) {
           ...selection.exclude.map((v) => tag(v, true)),
         ];
       })}
-      {/* Actions in the tag row are tag-sized: a pressable gray Badge and a text action whose
-          type matches the tags (LinkButton runs one tier larger than Badge). */}
-      <Badge.Root
-        size={tagSize}
-        onPress={() => {
-          setSearch("");
-          setOpen(true);
-        }}
-      >
-        <Badge.Icon>
+      {/* Actions in the tag row are text actions whose type matches the tags (LinkButton runs one
+          tier larger than Badge). */}
+      <LinkButton asChild tone="neutral" size={TIER_BELOW[tagSize]}>
+        <button
+          type="button"
+          onClick={() => {
+            setSearch("");
+            setOpen(true);
+          }}
+        >
           <Icon name="action.add" />
-        </Badge.Icon>
-        {labels.add}
-      </Badge.Root>
+          {labels.add}
+        </button>
+      </LinkButton>
       <LinkButton asChild tone="neutral" size={TIER_BELOW[tagSize]} className={styles.clearAll}>
         <button type="button" onClick={clearAll}>
           {labels.clearAll}

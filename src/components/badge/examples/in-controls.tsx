@@ -1,4 +1,4 @@
-/** Inside a button or a field the badge takes the tier one step down without `size`. */
+/** Inside a button or a field the badge takes the tier one step down by itself — `Badge.Root`. */
 import { Badge, Button, Input } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
