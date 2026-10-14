@@ -8,8 +8,6 @@
   "src/components/chat-list/examples/sizes.tsx: imports CSS",
   "src/components/chat-list/examples/states.tsx: imports CSS",
   "src/components/chat/examples/states.tsx: imports CSS",
-  "src/components/color-picker/examples/sizes.tsx: imports CSS",
-  "src/components/color-picker/examples/states.tsx: imports CSS",
   "src/components/composer/examples/sizes.tsx: imports CSS",
   "src/components/composer/examples/states.tsx: imports CSS",
   "src/components/data-table/examples/sizes.tsx: imports CSS",

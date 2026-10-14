@@ -3,6 +3,5 @@
   "src/components/checkbox/examples/states.tsx: `checked`",
   "src/components/progress-circle/examples/inner-content.tsx: `children`",
   "src/components/progress-circle/examples/under-way.tsx: `children`",
-  "src/components/switch/examples/states.tsx: `checked`",
   "src/layout/sidebar/examples/router.tsx: `aria-current`"
 ]

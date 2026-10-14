@@ -4,9 +4,7 @@
   "src/components/checkbox/examples/overview.tsx: JSDoc tail",
   "src/components/checkbox/examples/without-label.tsx: JSDoc tail",
   "src/components/code-block/examples/narrow.tsx: JSDoc tail",
-  "src/components/color-swatches/examples/wrapping.tsx: JSDoc tail",
   "src/components/description-list/examples/screen.tsx: raw <dl>",
   "src/components/file-upload/examples/narrow.tsx: JSDoc tail",
-  "src/components/scroll-container/examples/overview.tsx: JSDoc tail",
   "src/layout/app-shell/examples/template.tsx: JSDoc tail"
 ]

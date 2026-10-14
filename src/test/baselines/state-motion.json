@@ -12,7 +12,6 @@
   "src/components/message/MessageReactionBar.module.css: .bar flips transform",
   "src/components/message/MessageReactionBar.module.css: .bar flips transform #2",
   "src/components/native-select/NativeSelect.module.css: .placeholder flips color",
-  "src/components/scroll-container/ScrollContainer.module.css: .root flips background-color",
   "src/components/segmented-control/SegmentedControl.module.css: .root flips box-shadow",
   "src/components/select/Select.module.css: .item flips background",
   "src/components/select/Select.module.css: .item flips background #2",

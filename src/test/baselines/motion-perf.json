@@ -1,7 +1,6 @@
 [
   "src/components/composer/Composer.module.css: local @keyframes composerPulse",
   "src/components/composer/Composer.module.css: reduced-motion block globals.css already covers (.dot)",
-  "src/components/digit-input/DigitInput.module.css: local @keyframes primeDigitIn",
   "src/components/dnd/Dnd.module.css: animates background",
   "src/components/dnd/Dnd.module.css: animates background #2",
   "src/components/dnd/Dnd.module.css: local @keyframes dropFlash",
