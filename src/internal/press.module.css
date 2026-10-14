@@ -1,0 +1,75 @@
+/*
+ * Press feedback (foundation §7 rule 6): a pressable gives under the pointer — `scale` to
+ * `--prime-motion-press-scale` (`-compact` for icon-only and small targets) over `fast`, and back
+ * by the same transition on release. Reduced motion sets both scales to 1. Disabled, read-only,
+ * loading and busy never scale, nor anything inside a disabled or read-only host.
+ *
+ *   .press / .pressCompact          on the element that is pressed and gives
+ *   .pressHost + .pressPart /
+ *   .pressHost + .pressPartCompact  the host is pressed, a part inside it gives (the box of a
+ *                                   checkbox row, the glyph of a nav item)
+ *
+ * The individual `scale` property composes with any `transform` of the host. A host that declares
+ * its own `transition` lists `scale var(--prime-motion-duration-fast)
+ * var(--prime-motion-easing-standard)` in it too (one `transition` wins the cascade).
+ */
+.press,
+.pressCompact,
+.pressPart,
+.pressPartCompact {
+  transition: scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.press:active:not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled="true"],
+    [data-readonly="true"],
+    [aria-readonly="true"],
+    [data-loading="true"],
+    [aria-busy="true"],
+    :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
+  ) {
+  scale: var(--prime-motion-press-scale);
+}
+
+.pressCompact:active:not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled="true"],
+    [data-readonly="true"],
+    [aria-readonly="true"],
+    [data-loading="true"],
+    [aria-busy="true"],
+    :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
+  ) {
+  scale: var(--prime-motion-press-scale-compact);
+}
+
+.pressHost:active:not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled="true"],
+    [data-readonly="true"],
+    [aria-readonly="true"],
+    [data-loading="true"],
+    [aria-busy="true"],
+    :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
+  )
+  .pressPart {
+  scale: var(--prime-motion-press-scale);
+}
+
+.pressHost:active:not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled="true"],
+    [data-readonly="true"],
+    [aria-readonly="true"],
+    [data-loading="true"],
+    [aria-busy="true"],
+    :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
+  )
+  .pressPartCompact {
+  scale: var(--prime-motion-press-scale-compact);
+}

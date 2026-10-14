@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown, type DropdownContentProps } from "@/components/dropdown/Dropdown";
-import { exitTimeoutMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { Disclosure } from "@/internal/Disclosure";
@@ -11,6 +11,7 @@ import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch } from "@/internal/HighlightMatch";
 import { useMessageList } from "@/internal/messageList";
 import { defineMessagePart, useMessageHighlight, useMessagePart } from "@/internal/messagePart";
+import { exitTimeoutMs } from "@/internal/motionTiming";
 import { hueOf } from "@/internal/palette";
 import palette from "@/internal/palette.module.css";
 import { RollingNumber } from "@/internal/RollingNumber";
@@ -702,7 +703,6 @@ export function MessageReactions({
     <Disclosure
       open={shown.length > 0}
       className={styles.reactionsSlot}
-      clipClassName={styles.reactionsClip}
       data-message-reactions=""
       data-morph-skip=""
     >

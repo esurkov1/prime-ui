@@ -5,7 +5,6 @@
   "src/components/command-menu/CommandMenu.test.tsx: reads a .module.css as text",
   "src/components/composer/Composer.test.tsx: queries [class*=",
   "src/components/composer/Composer.test.tsx: reads a .module.css as text",
-  "src/components/crossfade/Crossfade.test.tsx: reads a .module.css as text",
   "src/components/data-table/DataTable.test.tsx: reads a .module.css as text",
   "src/components/example-frame/ExampleFrame.test.tsx: reads a .module.css as text",
   "src/components/gantt/Gantt.test.tsx: queries [class*=",

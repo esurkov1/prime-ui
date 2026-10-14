@@ -187,6 +187,7 @@ const JS_DEFAULTS = [
   "motion.duration.slow",
   "motion.duration.xfast",
   "motion.holdConfirm",
+  "motion.stagger",
   "panel.offset",
   "space.2",
   "space.6",

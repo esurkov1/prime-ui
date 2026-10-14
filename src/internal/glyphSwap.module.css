@@ -1,7 +1,9 @@
 /*
  * The glyph cross-fade (`glyphSwap.tsx`): every layer in one grid cell, centred, so the box is the
- * glyph's size; the outgoing layer shrinks to 0.6 and fades, the incoming one grows from 0.6
- * (`fast` · standard). Reduced motion: the swap is instant (the leaving layer never mounts).
+ * glyph's size; the outgoing layer shrinks to `--prime-motion-scale-mark` and fades, the incoming
+ * one grows from it (`fast` · standard). The scale runs on the movement clock and the fade on the
+ * fade clock, so reduced motion keeps only the fade in (foundation §7 rule 12); the leaving layer
+ * never mounts then.
  *
  *   .swap   the cell
  *   .layer  one glyph (`data-entering` — the incoming one, `data-leaving` — the outgoing one)
@@ -26,7 +28,9 @@
 }
 
 .layer[data-entering] {
-  animation: glyphIn var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  animation:
+    glyphInScale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    glyphInFade var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .layer[data-leaving] {
@@ -35,19 +39,14 @@
   pointer-events: none;
 }
 
-@keyframes glyphIn {
+@keyframes glyphInScale {
   from {
-    opacity: 0;
     transform: scale(var(--prime-motion-scale-mark));
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .layer {
-    transition: none;
-  }
-
-  .layer[data-entering] {
-    animation: none;
+@keyframes glyphInFade {
+  from {
+    opacity: 0;
   }
 }

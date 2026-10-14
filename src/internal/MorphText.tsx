@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
+import { afterMotionMs, readCssDurationMs } from "@/internal/motionTiming";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./MorphText.module.css";
@@ -53,13 +54,12 @@ function letters(text: string, kind: "in" | "out") {
   ));
 }
 
-/** Longest letter stagger of a word: the per-letter step is a sixth of `--prime-motion-stagger`. */
-function settleMs(text: string, root: Element): number {
-  const css = getComputedStyle(root);
-  const read = (name: string) => Number.parseFloat(css.getPropertyValue(name)) || 0;
-  const base = read("--prime-motion-duration-base");
-  const step = read("--prime-motion-stagger") / 6;
-  return base + step * text.length + 50;
+/** When the morph of `text` has settled: the letters' clock plus the longest stagger. */
+function settleMs(text: string): number {
+  const base = readCssDurationMs("--prime-motion-duration-base");
+  // The per-letter step is a sixth of `--prime-motion-stagger` (MorphText.module.css).
+  const step = readCssDurationMs("--prime-motion-stagger") / 6;
+  return afterMotionMs(base + step * text.length);
 }
 
 /**
@@ -75,7 +75,8 @@ export function MorphText({ children: text, className }: MorphTextProps) {
   const segmentRef = React.useRef<HTMLSpanElement>(null);
   const sizerRef = React.useRef<HTMLSpanElement>(null);
   const prevText = React.useRef<string | null>(null);
-  const restWidth = React.useRef(0);
+  /** The width the settled text takes: where the next change starts. */
+  const restWidth = React.useRef<{ text: string; className?: string; width: number } | null>(null);
   const nextId = React.useRef(0);
   const [morph, setMorph] = React.useState<Morph | null>(null);
   const morphRef = React.useRef(morph);
@@ -92,7 +93,7 @@ export function MorphText({ children: text, className }: MorphTextProps) {
       return;
     }
     const running = morphRef.current;
-    const width = running ? root.getBoundingClientRect().width : restWidth.current;
+    const width = running ? root.getBoundingClientRect().width : (restWidth.current?.width ?? 0);
     nextId.current += 1;
     setMorph({ id: nextId.current, from: running ? running.to : prev, to: text, width });
   }, [text]);
@@ -117,16 +118,15 @@ export function MorphText({ children: text, className }: MorphTextProps) {
     }
     const changed = splitChange(morph.from, morph.to);
     const longest = changed.in.length > changed.out.length ? changed.in : changed.out;
-    const timer = window.setTimeout(() => setMorph(null), settleMs(longest, root));
+    const timer = window.setTimeout(() => setMorph(null), settleMs(longest));
     return () => window.clearTimeout(timer);
   }, [morph]);
 
   // At rest: remember the width the text takes, the starting point of the next change. Measured
-  // once per settled text, not on every render (a read here forces a synchronous layout).
-  // biome-ignore lint/correctness/useExhaustiveDependencies: text and className change the width
+  // once per settled text and class, not on every render (a read here forces a synchronous layout).
   React.useLayoutEffect(() => {
     if (morph || !rootRef.current) return;
-    restWidth.current = rootRef.current.getBoundingClientRect().width;
+    restWidth.current = { text, className, width: rootRef.current.getBoundingClientRect().width };
   }, [morph, text, className]);
 
   if (!morph || !change) {

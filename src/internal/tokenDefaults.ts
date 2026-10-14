@@ -13,6 +13,7 @@ export const TOKEN_DEFAULTS = {
   "--prime-motion-duration-slow": 570,
   "--prime-motion-duration-xfast": 150,
   "--prime-motion-hold-confirm": 1200,
+  "--prime-motion-stagger": 80,
   "--prime-panel-offset": 4,
   "--prime-space-2": 8,
   "--prime-space-6": 24,

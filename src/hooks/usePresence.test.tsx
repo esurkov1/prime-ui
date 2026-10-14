@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import { exitTimeoutMs, usePresence } from "./usePresence";
+import { exitTimeoutMs } from "@/internal/motionTiming";
+import { usePresence } from "./usePresence";
 
 function stubReducedMotion(reduce: boolean) {
   vi.stubGlobal(

@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { exitTimeoutMs } from "@/hooks/usePresence";
+import { exitTimeoutMs } from "@/internal/motionTiming";
 
 import { NotificationCard } from "./Notification";
 import { NotificationProvider, useNotifications } from "./NotificationStore";

@@ -1,52 +1,80 @@
 /*
- * A part that opens and closes in place (foundation §7 height exception; the model is Sidebar's
- * group disclosure): a grid row `0fr ↔ 1fr` with the content's fade and short slide on the same
- * clock, so opening and closing are one stroke, mirror images, never two steps. The content stays
- * mounted; a closed one keeps its last state and turns `visibility: hidden` only once the close has
- * played (out of the tab order and the accessibility tree, nothing to paint). The clip contains its
- * layout and paint, so a frame of the glide lays out only the clip's own box and the flow after it.
+ * A part that opens and closes in place — the "row fold" exception of foundation §7 rule 5, the
+ * one engine of a `grid-template-rows` fold (`src/styles/motion-perf.test.ts`): a grid row
+ * `0fr ↔ 1fr` with the content's fade and short slide on the same clock, so opening and closing are
+ * one stroke, mirror images, never two steps. The content stays mounted; a closed one keeps its
+ * last state and turns `visibility: hidden` only once the close has played (out of the tab order
+ * and the accessibility tree, nothing to paint). The clip contains its layout and paint, so a frame
+ * of the fold lays out only the clip's own box and the flow after it; it keeps the focus space
+ * past its edge, so a focus ring of the content is never cut.
  *
- * The host sets the clock: `--disclosure-duration` (default `base`) and `--disclosure-ease`
- * (default `standard`). Reduced motion zeroes the duration tokens: it opens and closes at once.
+ * The host sets the clocks:
+ *   --disclosure-duration        opening (default `base`)
+ *   --disclosure-ease            opening (default `standard`)
+ *   --disclosure-close-duration  closing (default: the opening's)
+ *   --disclosure-close-ease      closing (default: the opening's)
+ * Reduced motion zeroes the duration tokens: it opens and closes at once. Nothing moves before
+ * `data-mounted` (one frame after mount, `useDisclosure`).
  */
 .root {
+  --disclosure-open-clock: var(--disclosure-duration, var(--prime-motion-duration-base))
+    var(--disclosure-ease, var(--prime-motion-easing-standard));
+  --disclosure-close-clock: var(
+      --disclosure-close-duration,
+      var(--disclosure-duration, var(--prime-motion-duration-base))
+    )
+    var(--disclosure-close-ease, var(--disclosure-ease, var(--prime-motion-easing-standard)));
+
   display: grid;
   grid-template-rows: 0fr;
   min-width: 0;
   visibility: hidden;
-  transition:
-    grid-template-rows var(--disclosure-duration, var(--prime-motion-duration-base))
-    var(--disclosure-ease, var(--prime-motion-easing-standard)),
-    visibility 0s linear var(--disclosure-duration, var(--prime-motion-duration-base));
 }
 
 .root[data-state="open"] {
   grid-template-rows: 1fr;
   visibility: visible;
+}
+
+.root[data-mounted] {
   transition:
-    grid-template-rows var(--disclosure-duration, var(--prime-motion-duration-base))
-    var(--disclosure-ease, var(--prime-motion-easing-standard)),
-    visibility 0s;
+    grid-template-rows var(--disclosure-close-clock),
+    visibility var(--prime-motion-instant) linear
+    var(--disclosure-close-duration, var(--disclosure-duration, var(--prime-motion-duration-base)));
+}
+
+.root[data-mounted][data-state="open"] {
+  transition:
+    grid-template-rows var(--disclosure-open-clock),
+    visibility var(--prime-motion-instant);
 }
 
 .clip {
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: var(--prime-focus-space);
   contain: layout paint;
 }
 
 .clip > * {
   opacity: 0;
-  translate: 0 calc(-1 * var(--prime-space-1));
-  transition:
-    opacity var(--disclosure-duration, var(--prime-motion-duration-base))
-    var(--disclosure-ease, var(--prime-motion-easing-standard)),
-    translate var(--disclosure-duration, var(--prime-motion-duration-base))
-    var(--disclosure-ease, var(--prime-motion-easing-standard));
+  translate: 0 calc(var(--prime-space-1) * -1);
 }
 
 .root[data-state="open"] > .clip > * {
   opacity: 1;
   translate: 0 0;
+}
+
+.root[data-mounted] > .clip > * {
+  transition:
+    opacity var(--disclosure-close-clock),
+    translate var(--disclosure-close-clock);
+}
+
+.root[data-mounted][data-state="open"] > .clip > * {
+  transition:
+    opacity var(--disclosure-open-clock),
+    translate var(--disclosure-open-clock);
 }

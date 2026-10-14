@@ -1,5 +1,5 @@
 /** A detail panel keyed by the record id: picking another client cross-fades the details of a different height — `state`. */
-import { Card, Crossfade, SegmentedControl, Typography } from "prime-ui-kit";
+import { Card, Crossfade, DescriptionList, SegmentedControl } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -47,18 +47,13 @@ export default function CrossfadeRecordSwitchExample() {
       <Card.Root variant="panel">
         <Card.Body>
           <Crossfade state={client.id}>
-            <ul className={styles.facts} aria-label={client.name}>
+            <DescriptionList.Root aria-label={client.name}>
               {client.facts.map(([term, value]) => (
-                <li key={term} className={styles.fact}>
-                  <Typography as="span" variant="body-s" tone="secondary">
-                    {term}
-                  </Typography>
-                  <Typography as="span" variant="body-m">
-                    {value}
-                  </Typography>
-                </li>
+                <DescriptionList.Item key={term} label={term}>
+                  {value}
+                </DescriptionList.Item>
               ))}
-            </ul>
+            </DescriptionList.Root>
           </Crossfade>
         </Card.Body>
       </Card.Root>

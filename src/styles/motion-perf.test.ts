@@ -120,7 +120,7 @@ const LAYOUT_TRANSITIONS: Record<string, string[]> = {
   "src/components/message/MessageTyping.module.css": ["grid-template-rows"],
   "src/components/message/MessageReactionBar.module.css": ["grid-template-rows"],
   // Content-driven heights with no transform stand-in.
-  "src/components/crossfade/Crossfade.module.css": ["height"],
+  "src/internal/RegionSwap.module.css": ["height"],
   "src/components/notification/Notification.module.css": ["height"],
   "src/components/tag-select/TagSelect.module.css": ["height"],
   // The rail width and its edge cut; the nested group disclosure.
@@ -274,6 +274,7 @@ const KEYFRAME_HOMES = new Set([
   "src/internal/swapMotion.module.css",
   "src/internal/disclosure.module.css",
   "src/internal/glyphSwap.module.css",
+  "src/internal/MorphText.module.css",
   "src/internal/ring.module.css",
   "src/icons/glyphMotion.module.css",
   "src/components/skeleton/Skeleton.module.css",

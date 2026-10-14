@@ -4,7 +4,6 @@ import { Button } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { exitTimeoutMs } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -23,6 +22,7 @@ import {
   type MessagePartSpec,
   messagePartOf,
 } from "@/internal/messagePart";
+import { exitTimeoutMs } from "@/internal/motionTiming";
 import {
   type SurfaceDepth,
   SurfaceDepthProvider,

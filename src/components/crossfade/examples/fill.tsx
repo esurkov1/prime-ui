@@ -1,13 +1,5 @@
 /** A deal board that fills its panel's height while it swaps between loading and data, and a notice slot above it that takes no room while empty — `fill`, `state`. */
-import {
-  Banner,
-  Button,
-  Card,
-  Crossfade,
-  ScrollContainer,
-  Skeleton,
-  Typography,
-} from "prime-ui-kit";
+import { Banner, Button, Card, Crossfade, List, ScrollContainer, Skeleton } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -21,6 +13,7 @@ const STAGES = [
 export default function CrossfadeFillExample() {
   const [status, setStatus] = React.useState<"loading" | "ready">("ready");
   const [notice, setNotice] = React.useState<string | null>(null);
+  const [dealId, setDealId] = React.useState<string | null>(null);
 
   const refresh = () => {
     setNotice(null);
@@ -55,19 +48,23 @@ export default function CrossfadeFillExample() {
           <ScrollContainer className={styles.board}>
             {STAGES.map((stage) => (
               <Card.Root key={stage.id} className={styles.column}>
-                <Card.Body>
-                  <Typography as="h3" variant="title-s">
+                <Card.Header>
+                  <Card.Title as="h3">
                     {stage.title} · {stage.deals.length}
-                  </Typography>
-                  <ul className={styles.facts}>
+                  </Card.Title>
+                </Card.Header>
+                <Card.Body>
+                  <List.Root aria-label={stage.title}>
                     {stage.deals.map((deal) => (
-                      <li key={deal}>
-                        <Typography as="span" variant="body-m">
-                          {deal}
-                        </Typography>
-                      </li>
+                      <List.Item
+                        key={deal}
+                        current={deal === dealId}
+                        onClick={() => setDealId(deal)}
+                      >
+                        <List.ItemText>{deal}</List.ItemText>
+                      </List.Item>
                     ))}
-                  </ul>
+                  </List.Root>
                 </Card.Body>
               </Card.Root>
             ))}

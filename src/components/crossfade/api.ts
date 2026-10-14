@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Crossfade",
-      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and glides to the new height; still on the first render, instant under reduced motion.",
-      ru: "Область, которая плавно сменяет содержимое при смене `state` и мягко подстраивает высоту; на первом рендере неподвижна, при reduced motion меняется сразу.",
+      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and glides to the new height; still on the first render. Under reduced motion the old content goes at once and the height jumps; the new content still fades in.",
+      ru: "Область, которая плавно сменяет содержимое при смене `state` и мягко подстраивает высоту; на первом рендере неподвижна. При reduced motion старое содержимое уходит сразу и высота меняется скачком; новое всё равно проявляется.",
       props: [
         {
           name: "state",
@@ -49,8 +49,8 @@ export const api: ComponentApi = {
         ru: "Уходящий слой — `aria-hidden` и `inert`: скринридер и Tab не попадают в исчезающее содержимое.",
       },
       {
-        en: "Move focus yourself when the focused control was in the old state (e.g. the retry button of an error).",
-        ru: "Если фокус был в старом состоянии (кнопка «Повторить» у ошибки), переведите его сами.",
+        en: "Focus in the old state (the retry button of an error) moves into the new one: its first tab stop, or the new content itself; focus elsewhere on the page stays where it is.",
+        ru: "Фокус из старого состояния (кнопка «Повторить» у ошибки) переходит в новое: на первый элемент с табуляцией или на само новое содержимое; фокус в другом месте страницы не трогается.",
       },
     ],
   },

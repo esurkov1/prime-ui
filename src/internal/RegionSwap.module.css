@@ -1,9 +1,9 @@
 /*
- * Crossfade — a region that swaps its content between states (foundation §7 rule 8).
- * The current state is in flow and fades in (`swapMotion.swapIn`, base · enter); the previous one
- * is laid over it, click-through, and fades out (`swapMotion.swapOut`, fast · exit). The root
- * glides from the old height to the new one (base · standard) and returns to `auto`. Nothing
- * moves on the first render; under reduced motion the swap is instant (no layer, no glide).
+ * RegionSwap — a region that swaps its content between states (foundation §7 rule 8). The current
+ * state is in flow and fades in (`swapMotion.swapIn`); the previous one is laid over it from the
+ * top edge, click-through, and fades out (`swapMotion.swapOut`). The root glides from the old
+ * height to the new one (base · standard, the "height glide" exception of foundation §7 rule 5)
+ * through `--swap-height`, which the component sets only while it glides, and returns to `auto`.
  */
 .root {
   position: relative;
@@ -20,20 +20,22 @@
 /* While the height glides the content may be taller than the root: clip it, but keep room for
    focus rings (foundation §7). */
 .root[data-resizing="true"] {
+  height: var(--swap-height);
   overflow: clip;
   overflow-clip-margin: var(--prime-focus-space);
 }
 
+/* A block formatting context: a state measures the same in flow and laid over as it leaves. */
 .layer {
+  display: flow-root;
   min-width: 0;
 }
 
 /* The leaving state lies over the new one from the top edge and takes no pointer events. */
 .leaving {
   position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
+  inset-block-start: 0;
+  inset-inline: 0;
   pointer-events: none;
 }
 
