@@ -50,7 +50,7 @@ export default function AppHeaderNarrowExample() {
           </AppHeader.Actions>
         </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Page>
+          <PageContent.Root as="section">
             <PageContent.Body>
               {ORDERS.map((order) => (
                 <Typography key={order} variant="body-m">
@@ -58,7 +58,7 @@ export default function AppHeaderNarrowExample() {
                 </Typography>
               ))}
             </PageContent.Body>
-          </PageContent.Page>
+          </PageContent.Root>
         </AppShell.Main>
       </AppShell.Root>
     </div>

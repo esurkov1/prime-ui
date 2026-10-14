@@ -11,10 +11,10 @@ const WIDTHS = [
 
 export default function PageContentVariantsExample() {
   return (
-    <div className={styles.main}>
-      <div className={styles.stack}>
-        {WIDTHS.map(({ value, text }) => (
-          <PageContent.Root key={value} maxWidth={value}>
+    <>
+      {WIDTHS.map(({ value, text }) => (
+        <div key={value} className={styles.main}>
+          <PageContent.Root maxWidth={value}>
             <PageContent.Body>
               <Card.Root>
                 <Card.Body>
@@ -25,8 +25,8 @@ export default function PageContentVariantsExample() {
               </Card.Root>
             </PageContent.Body>
           </PageContent.Root>
-        ))}
-      </div>
-    </div>
+        </div>
+      ))}
+    </>
   );
 }

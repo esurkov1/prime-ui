@@ -7,6 +7,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import type { TagRef } from "@/internal/polymorphic";
 import textRole from "@/internal/textRole.module.css";
 
 import styles from "./PageContent.module.css";
@@ -14,25 +15,32 @@ import styles from "./PageContent.module.css";
 /** Cap of the page column inside `main`. */
 export type PageContentMaxWidth = "full" | "readable" | "wide";
 
-export type PageContentRootProps = React.HTMLAttributes<HTMLDivElement> & {
+/** The element of the page column: a plain column, or a `<section>` that a heading names. */
+export type PageContentRootAs = "div" | "section";
+
+export type PageContentRootProps = React.HTMLAttributes<HTMLElement> & {
+  as?: PageContentRootAs;
   maxWidth?: PageContentMaxWidth;
   /**
    * The page takes the height of the panel (`AppShell.Root fillViewport`): the body gets what the
    * header leaves, for a full-height table, board, chat or `PageContent.Split`.
    */
   fill?: boolean;
-  ref?: React.Ref<HTMLDivElement>;
+  ref?: React.Ref<HTMLElement>;
 };
 
 function PageContentRoot({
+  as: Tag = "div",
   maxWidth = "full",
   fill = false,
   className,
+  ref,
   ...rest
 }: PageContentRootProps) {
   return (
-    <div
+    <Tag
       className={cx(styles.root, className)}
+      ref={ref as TagRef<PageContentRootAs>}
       {...rest}
       {...toDataAttributes({
         "max-width": maxWidth === "full" ? undefined : maxWidth,
@@ -42,16 +50,6 @@ function PageContentRoot({
   );
 }
 PageContentRoot.displayName = "PageContent.Root";
-
-export type PageContentPageProps = React.HTMLAttributes<HTMLElement> & {
-  ref?: React.Ref<HTMLElement>;
-};
-
-/** The whole page as a `<section>` (full panel width): `Header` with the one h1, then `Body`. */
-function PageContentPage({ className, ...rest }: PageContentPageProps) {
-  return <section className={cx(styles.page, className)} {...rest} />;
-}
-PageContentPage.displayName = "PageContent.Page";
 
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
@@ -352,33 +350,46 @@ function PageContentSplit({
 }
 PageContentSplit.displayName = "PageContent.Split";
 
-export type PageContentListProps = DivProps;
+/** Which pane of the split a panel is. */
+export type PageContentPanelKind = "list" | "detail";
 
-/** The list pane: a fixed column on a wide split, the whole split while the detail is closed. */
-function PageContentList({
+export type PageContentPanelProps = DivProps & {
+  kind: PageContentPanelKind;
+};
+
+/**
+ * A pane of the split. `list` — a fixed column on a wide split, the whole split while the detail
+ * is closed; it remembers the control that had focus, so going back returns there. `detail` — the
+ * rest of a wide split; on a narrow one it replaces the list while open.
+ */
+function PageContentPanel({
+  kind,
   className,
   ref,
   onFocus,
   onAnimationEnd,
   ...rest
-}: PageContentListProps) {
-  const split = useSplit("PageContent.List");
-  const mergedRef = useMergedRefs(split.listRef, ref);
+}: PageContentPanelProps) {
+  const split = useSplit("PageContent.Panel");
+  const mergedRef = useMergedRefs(kind === "list" ? split.listRef : split.detailRef, ref);
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: the pane only records which list control had focus (focus bubbles from it), so going back can return there; it handles no input.
+    // biome-ignore lint/a11y/noStaticElementInteractions: the list pane only records which control had focus (focus bubbles from it), so going back can return there; it handles no input.
     <div
       tabIndex={-1}
       {...rest}
       ref={mergedRef}
       className={cx(
         styles.pane,
-        styles.list,
-        split.entering === "list" && enterMotion.enterBase,
+        kind === "list" ? styles.list : styles.detail,
+        split.entering === kind && enterMotion.enterBase,
         className,
       )}
+      data-kind={kind}
       onFocus={(event) => {
         onFocus?.(event);
-        if (event.target !== event.currentTarget) split.lastListFocus.current = event.target;
+        if (kind === "list" && event.target !== event.currentTarget) {
+          split.lastListFocus.current = event.target;
+        }
       }}
       onAnimationEnd={(event) => {
         onAnimationEnd?.(event);
@@ -387,33 +398,7 @@ function PageContentList({
     />
   );
 }
-PageContentList.displayName = "PageContent.List";
-
-export type PageContentDetailProps = DivProps;
-
-/** The detail pane: the rest of a wide split; on a narrow one it replaces the list while open. */
-function PageContentDetail({ className, ref, onAnimationEnd, ...rest }: PageContentDetailProps) {
-  const split = useSplit("PageContent.Detail");
-  const mergedRef = useMergedRefs(split.detailRef, ref);
-  return (
-    <div
-      tabIndex={-1}
-      {...rest}
-      ref={mergedRef}
-      className={cx(
-        styles.pane,
-        styles.detail,
-        split.entering === "detail" && enterMotion.enterBase,
-        className,
-      )}
-      onAnimationEnd={(event) => {
-        onAnimationEnd?.(event);
-        if (event.target === event.currentTarget) split.endEnter();
-      }}
-    />
-  );
-}
-PageContentDetail.displayName = "PageContent.Detail";
+PageContentPanel.displayName = "PageContent.Panel";
 
 export type PageContentBackButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -450,7 +435,6 @@ PageContentBackButton.displayName = "PageContent.BackButton";
 
 export const PageContent = {
   Root: PageContentRoot,
-  Page: PageContentPage,
   Header: PageContentHeader,
   Actions: PageContentActions,
   Title: PageContentTitle,
@@ -460,7 +444,6 @@ export const PageContent = {
   Grid: PageContentGrid,
   Cell: PageContentCell,
   Split: PageContentSplit,
-  List: PageContentList,
-  Detail: PageContentDetail,
+  Panel: PageContentPanel,
   BackButton: PageContentBackButton,
 };

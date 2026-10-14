@@ -204,7 +204,7 @@ export default function AppShellScreenExample() {
     >
       {/* Another section is another page: it cross-fades instead of flipping. */}
       <Crossfade state={current}>
-        <PageContent.Page>
+        <PageContent.Root as="section">
           <PageContent.Body>
             {current === "today" ? (
               <>
@@ -261,7 +261,7 @@ export default function AppShellScreenExample() {
               </Card.Root>
             )}
           </PageContent.Body>
-        </PageContent.Page>
+        </PageContent.Root>
       </Crossfade>
     </AppShell.Template>
   );

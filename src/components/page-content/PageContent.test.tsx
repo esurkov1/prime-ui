@@ -56,13 +56,13 @@ describe("PageContent", () => {
     expect(container.firstChild).not.toHaveAttribute("data-max-width");
   });
 
-  it("renders Page as a semantic region", () => {
+  it('renders Root as="section" as a semantic region', () => {
     render(
-      <PageContent.Page aria-label="Doc">
+      <PageContent.Root as="section" aria-label="Doc">
         <PageContent.Header>
           <PageContent.Title>Doc</PageContent.Title>
         </PageContent.Header>
-      </PageContent.Page>,
+      </PageContent.Root>,
     );
 
     expect(document.querySelector("section")).toHaveAttribute("aria-label", "Doc");
@@ -202,15 +202,15 @@ describe("PageContent.Split", () => {
           if (!open) setChat(null);
         }}
       >
-        <PageContent.List data-pane="list" aria-label="Диалоги">
+        <PageContent.Panel kind="list" data-pane="list" aria-label="Диалоги">
           <button type="button" onClick={() => setChat("granit")}>
             ООО «Гранит»
           </button>
-        </PageContent.List>
-        <PageContent.Detail data-pane="detail" aria-label="Переписка">
+        </PageContent.Panel>
+        <PageContent.Panel kind="detail" data-pane="detail" aria-label="Переписка">
           <PageContent.BackButton />
           <p>{chat ?? "Выберите диалог"}</p>
-        </PageContent.Detail>
+        </PageContent.Panel>
       </PageContent.Split>
     );
   }

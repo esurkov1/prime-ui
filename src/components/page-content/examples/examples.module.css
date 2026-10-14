@@ -9,13 +9,6 @@
   container-type: inline-size;
 }
 
-/* Several page columns stacked with the section rhythm. */
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-10);
-}
-
 /* list-detail: main of a viewport-high shell — a column of a fixed height the page fills. */
 .fillMain {
   box-sizing: border-box;
@@ -46,11 +39,11 @@
   min-height: 0;
 }
 
-.dialogs {
+.tickets {
   padding: var(--prime-space-2);
 }
 
-.messages {
+.notes {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-3);

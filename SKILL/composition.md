@@ -56,7 +56,7 @@ AppShell.Root                      once per app (layouts.md#app-frame-once-per-a
 │  └─ AppHeader.Tools              second row → PageToolbar.Root: search and filter, sections,
 │                                  view, the primary action; Chips under them
 └─ AppShell.Main                   gutters + top air (24, 32 from 1024px); the page renders here
-   └─ PageContent.Page | Root      the page you deliver
+   └─ PageContent.Root             the page you deliver
       └─ PageContent.Body          blocks 24 apart, starting at main's top air
          ├─ PageContent.Grid       every tile of the screen, 16 on both axes
          │  └─ PageContent.Cell    span (of 12), rows; the tile fills it
@@ -70,7 +70,7 @@ Document page: the header without a title, and in main
 
 - A screen component renders its page: its `AppHeader.Root` (through the shell's `header`) and its
   body. Styles, `applyTheme`, `NotificationProvider` and `AppShell` live at the app root.
-- `PageContent.Page` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
+- `PageContent.Root as="section"` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
   settings, `maxWidth="readable"` for one narrow column of text or fields.
 - No outer padding, no margins: `AppShell.Main` has the gutters and the top air under the header,
   `PageContent` has block → block 24, section → section 40, tile → tile 16 (and header → body 24 on

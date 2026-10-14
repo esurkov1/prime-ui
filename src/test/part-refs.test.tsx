@@ -250,22 +250,12 @@ const CASES: Case[] = [
     ),
   ],
   [
-    "PageContent.List",
+    "PageContent.Panel",
     "DIV",
     (ref) => (
       <PageContent.Split>
-        <PageContent.List ref={ref} data-testid="part" aria-label="Диалоги" />
-        <PageContent.Detail aria-label="Переписка" />
-      </PageContent.Split>
-    ),
-  ],
-  [
-    "PageContent.Detail",
-    "DIV",
-    (ref) => (
-      <PageContent.Split>
-        <PageContent.List aria-label="Диалоги" />
-        <PageContent.Detail ref={ref} data-testid="part" aria-label="Переписка" />
+        <PageContent.Panel kind="list" ref={ref} data-testid="part" aria-label="Обращения" />
+        <PageContent.Panel kind="detail" aria-label="Обращение" />
       </PageContent.Split>
     ),
   ],

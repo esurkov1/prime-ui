@@ -99,7 +99,7 @@ export default function CompositionPage() {
           </li>
           <li>
             {renderInlineCode(
-              "Один заголовок — в шапке: `AppHeader.Title` и `AppHeader.Description` со строкой данных («128 в работе · 6 ждут оплаты»), путь `Breadcrumb` перед ним у вложенной записи, инструменты страницы — `PageToolbar` в `AppHeader.Tools`. В основной области — `PageContent.Page` с `Body`, без `PageContent.Header`.",
+              'Один заголовок — в шапке: `AppHeader.Title` и `AppHeader.Description` со строкой данных («128 в работе · 6 ждут оплаты»), путь `Breadcrumb` перед ним у вложенной записи, инструменты страницы — `PageToolbar` в `AppHeader.Tools`. В основной области — `PageContent.Root as="section"` с `Body`, без `PageContent.Header`.',
             )}
           </li>
           <li>

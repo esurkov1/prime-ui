@@ -22,13 +22,13 @@ export function DocPage({
   children: React.ReactNode;
 }) {
   return (
-    <PageContent.Page>
+    <PageContent.Root as="section">
       <PageContent.Header>
         <PageContent.Title>{title}</PageContent.Title>
         <PageContent.Description measure={measure}>{description}</PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>{children}</PageContent.Body>
-    </PageContent.Page>
+    </PageContent.Root>
   );
 }
 

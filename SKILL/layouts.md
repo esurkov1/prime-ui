@@ -212,7 +212,7 @@ from what people do, not from how the backend is split. The full guide with the 
 
 ## Page wrapper
 
-- App pages (dashboard, list, detail, a board): `PageContent.Page` — the full width of the panel; the
+- App pages (dashboard, list, detail, a board): `PageContent.Root as="section"` — the full width of the panel; the
   page's title and tools are in its `AppHeader`, the body starts with its first block.
 - Document pages — settings and long forms: `PageContent.Root maxWidth="wide"` with `PageContent.Header`
   (the page's h1) and a `PageContent.Section layout="aside"`
@@ -222,8 +222,8 @@ from what people do, not from how the backend is split. The full guide with the 
 - A page as high as the panel (a log, a board, a chat): `AppShell.Root fillViewport` +
   `PageContent.Root fill`; the body passes its free height to a filling child — DataTable
   `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`. Never compute heights from `100vh`.
-- List + detail (mail, a messenger, a ticket queue): `PageContent.Split` with `PageContent.List` and
-  `PageContent.Detail` in a filling page. Side by side from 48rem of the split's own width, one pane
+- List + detail (mail, a messenger, a ticket queue): `PageContent.Split` with `PageContent.Panel kind="list"` and
+  `PageContent.Panel kind="detail"` in a filling page. Side by side from 48rem of the split's own width, one pane
   at a time below it with `PageContent.BackButton` first in the detail's header; `open` is «a record
   is chosen». Each pane gives its last child the free height: a Card with its own `ScrollContainer`
   (`anchor="end"` for a thread). The records in the list pane are a `List` (`current` on the open

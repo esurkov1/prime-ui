@@ -138,7 +138,7 @@ export function App() {
         </AppHeader.Root>
       }
     >
-      <PageContent.Page>
+      <PageContent.Root as="section">
         <PageContent.Body>
           <Input.Root label="Email" required hint="We will send an invitation">
             <Input.Wrapper>
@@ -147,7 +147,7 @@ export function App() {
           </Input.Root>
           <Button.Root>Invite</Button.Root>
         </PageContent.Body>
-      </PageContent.Page>
+      </PageContent.Root>
     </AppShell.Template>
   );
 }

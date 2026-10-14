@@ -4,17 +4,13 @@
  * its neighbours, tile → tile 16 on both axes of the grid.
  */
 
-.root,
-.page {
+.root {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-6);
   width: 100%;
   min-width: 0;
-}
-
-.root {
   margin-inline: auto;
 }
 
