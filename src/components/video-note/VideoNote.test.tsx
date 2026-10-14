@@ -6,7 +6,9 @@ import { Fieldset } from "@/components/fieldset/Fieldset";
 import { Message } from "@/components/message/Message";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { VoicePlayer } from "@/components/voice-player/VoicePlayer";
+import mediaPill from "@/internal/mediaPill.module.css";
 import { MessagePartProvider, messagePartOf } from "@/internal/messagePart";
+import textRole from "@/internal/textRole.module.css";
 import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { VideoNote } from "./VideoNote";
@@ -444,8 +446,14 @@ describe("VideoNote geometry", () => {
         .flatMap((rule) => rule.decls.map((decl) => [decl.prop, decl.value] as const)),
     );
     expect(pill.get("color")).toBe("var(--prime-color-media-pill-fg)");
-    expect(pill.get("font-weight")).toBe("var(--prime-font-weight-regular)");
-    expect(pill.get("font-size")).toBe("var(--prime-text-caption-size)");
+    // The text is the caption role (regular weight), joined next to the pill.
+    expect(cssValue(cssRule("src/internal/textRole.module.css", ".caption"), "font-weight")).toBe(
+      "var(--prime-text-caption-weight)",
+    );
+    const { container } = render(<VideoNote src={SRC} duration={4} />);
+    const duration = container.querySelector('[data-badge="duration"]');
+    expect(duration?.className).toContain(textRole.caption);
+    expect(duration?.className).toContain(mediaPill.pill);
   });
 
   it("is a round part: the message's outline hook and meta overlay sit on the circle", () => {

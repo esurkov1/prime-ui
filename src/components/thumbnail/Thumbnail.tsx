@@ -22,6 +22,7 @@ import palette from "@/internal/palette.module.css";
 import press from "@/internal/press.module.css";
 import { Slot } from "@/internal/slot";
 import { type ControlSize, compactTier, type PaletteColor } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Thumbnail.module.css";
 
@@ -236,7 +237,9 @@ function ThumbnailVideoInner({
           themselves. The mark fades out while the video plays and back on a pause. */}
       {!controls && !loops ? <MediaPlayMark shown={!playing} className={styles.play} /> : null}
       {!controls && duration !== null ? (
-        <span className={cx(pill.pill, styles.duration)}>{formatDuration(duration)}</span>
+        <span className={cx(textRole.caption, pill.pill, styles.duration)}>
+          {formatDuration(duration)}
+        </span>
       ) : null}
     </>
   );

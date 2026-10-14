@@ -203,7 +203,7 @@ export function AttachmentTile({
       {badge !== undefined ? (
         // `data-dnd-mirror`: the carried copy shows the pill too, as it changes in flight.
         <span
-          className={cx(onMedia && pill.tag, styles.badge)}
+          className={cx(onMedia && cx(textRole.caption, pill.tag), styles.badge)}
           aria-hidden="true"
           data-dnd-mirror=""
         >

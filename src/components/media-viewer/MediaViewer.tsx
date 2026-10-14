@@ -533,7 +533,10 @@ function ViewerDialog({
 
         <div className={styles.top} data-viewer-chrome="">
           {count > 1 ? (
-            <span className={cx(pill.pill, fieldTierClass, styles.counter)} data-size="s">
+            <span
+              className={cx(textRole.caption, pill.pill, fieldTierClass, styles.counter)}
+              data-size="s"
+            >
               {formatLabel(labels.counter, { current: index + 1, total: count })}
             </span>
           ) : null}

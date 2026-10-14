@@ -25,6 +25,7 @@ import { defineMessagePart, useInMessage, useMessagePart } from "@/internal/mess
 import press from "@/internal/press.module.css";
 import { Ring } from "@/internal/ring";
 import { nextSurfaceDepth, useSurfaceDepth } from "@/internal/surfaceDepth";
+import textRole from "@/internal/textRole.module.css";
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
 import styles from "./VideoNote.module.css";
@@ -160,7 +161,11 @@ function VideoNoteInner(props: VideoNoteProps) {
         {description ? <VisuallyHidden id={descriptionId}>{description}</VisuallyHidden> : null}
         {/* The duration on the bottom-start corner; the message's meta pill takes the bottom end. */}
         {shown !== null ? (
-          <span className={cx(pill.pill, styles.duration)} data-badge="duration" aria-hidden="true">
+          <span
+            className={cx(textRole.caption, pill.pill, styles.duration)}
+            data-badge="duration"
+            aria-hidden="true"
+          >
             {formatClock(shown)}
             <UnplayedDot shown={unplayed} />
           </span>

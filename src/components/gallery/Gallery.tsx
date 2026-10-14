@@ -14,6 +14,7 @@ import { MediaPlayMark } from "@/internal/mediaDisk";
 import pill from "@/internal/mediaPill.module.css";
 import { useMessagePart } from "@/internal/messagePart";
 import press from "@/internal/press.module.css";
+import textRole from "@/internal/textRole.module.css";
 import {
   TRANSFER_LABELS,
   type TransferDirection,
@@ -168,7 +169,7 @@ function GalleryTileView({
           {/* A transfer takes the middle: the mark gives it up and comes back once it is done. */}
           <MediaPlayMark shown={!covered} className={styles.play} />
           {length !== null ? (
-            <span className={cx(pill.pill, styles.length)} aria-hidden="true">
+            <span className={cx(textRole.caption, pill.pill, styles.length)} aria-hidden="true">
               {formatClock(length)}
             </span>
           ) : null}

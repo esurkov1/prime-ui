@@ -1,4 +1,1 @@
-[
-  "src/internal/mediaPill.module.css: reads --prime-text-caption-tracking",
-  "src/internal/menu.module.css: local [data-tone] color (.item[data-tone=\"danger\"]:not([data-disabled=\"true\"]), .item[data-tone=\"danger\"]:not([data-disabled=\"true\"]) .itemIcon)"
-]
+[]

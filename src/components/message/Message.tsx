@@ -34,6 +34,7 @@ import {
   SurfaceDepthProvider,
   useNestedSurfaceDepth,
 } from "@/internal/surfaceDepth";
+import textRole from "@/internal/textRole.module.css";
 import { type AsyncHandler, isPromiseLike, usePendingAction } from "@/internal/usePendingChanges";
 
 import { BubbleHug } from "./bubbleHug";
@@ -599,7 +600,11 @@ function MessageRoot({
         <Meta
           {...{ time, dateTime, edited, labels }}
           status={shownStatus}
-          className={metaMode === "overlay" ? cx(mediaPill.pill, styles.metaOverlay) : undefined}
+          className={
+            metaMode === "overlay"
+              ? cx(textRole.caption, mediaPill.pill, styles.metaOverlay)
+              : undefined
+          }
         />
       ) : null,
     [hasMeta, time, dateTime, edited, labels, shownStatus, metaMode],
@@ -755,7 +760,7 @@ function MessageRoot({
           {showAuthor && shell === "bubble" ? author : null}
           {showAuthor && shell !== "bubble" ? (
             // Over a picture or a circle the header stands on a pill at its top-start corner.
-            <div className={cx(mediaPill.pill, styles.authorPill)}>{author}</div>
+            <div className={cx(textRole.caption, mediaPill.pill, styles.authorPill)}>{author}</div>
           ) : null}
           {body.map((child, index) => (
             <MessagePartProvider
