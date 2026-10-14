@@ -65,8 +65,8 @@ Skeleton           <span aria-hidden="true">; data-shape, data-size
 
 ## Layout & spacing
 - Put skeletons in the real layout of the content: the same grid, gaps and paddings, so the swap to data moves nothing.
-- Width: a text line and a control fill their container; narrow them with a `className` (a label is shorter than its field, an amount shorter than a name). Shape defaults have zero specificity, so a `className` always wins.
-- Height: text and control come from the tier; a `block` fills its container or takes a height from `className`.
+- Width: a text line and a control fill their container; narrow them with a `className` (a label is shorter than its field, an amount shorter than a name). Every size default — the `max-width: 100%` cap too — has zero specificity, so a `className` always wins.
+- Height: text and control come from the tier (the shared tier table, `internal/fieldTier`); a `block` fills its container — an absolutely placed media box too — or takes a height from `className`.
 - Inside a sized host (a DataTable, a Popover, a field tier) `size` follows the host tier.
 
 ## Accessibility
@@ -104,5 +104,5 @@ No `labels`.
 - Returning to a skeleton on every refresh of data already shown → keep the data, set `aria-busy`.
 
 ## Related
-- **Built from:** —
+- **Built from:** `internal/fieldClasses` (the tier table)
 - **See also:** [Crossfade](../crossfade/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)
