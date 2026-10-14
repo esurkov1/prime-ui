@@ -129,12 +129,16 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus to the checkbox. |
 | `Space` | Toggles it. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A native `<input type="checkbox">` (visually hidden over the box, so validation bubbles point at it), wrapped by the `<label>` row.
 - `aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.
 - Without visible text, pass `aria-label` on `Checkbox.Root` (it lands on the input).

@@ -278,6 +278,8 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the toolbar (`DataTable.ColumnsMenu`), sort buttons, row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination. |
@@ -288,6 +290,8 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | `Escape` | Cancels a row drag; the row goes back to its place. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Native `<table>` semantics; head cells are `scope="col"` (the empty handle-column cell is a `<td>`); sortable heads hold a `<button>` and expose `aria-sort`; the whole head cell shows the inset focus ring.
 - A link row has one link for assistive tech: the `<a>` in the key cell, named by its text. Its copies over the other cells are `aria-hidden` and `tabindex="-1"`, so the pointer can use the whole row. An in-place row is focusable itself (`tabindex="0"`) and reads as its cells. Either way the focused row shows a ring around all its cells.
 - A row never opens from a control inside it (links, buttons, fields, `label`, `summary`, ARIA widgets, `data-row-click-ignore`), from a text selection, or from a React event that bubbled out of a portal (a ⋯ menu item).

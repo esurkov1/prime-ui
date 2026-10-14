@@ -1,0 +1,7 @@
+[
+  "src/components/accordion/Accordion.test.tsx: keyboard Enter opens item",
+  "src/components/accordion/Accordion.test.tsx: keyboard Space opens item",
+  "src/components/composer/Composer.test.tsx: Enter and Space start at once from the keyboard; the button then sends",
+  "src/components/gantt/Gantt.test.tsx: makes the row header a link with getRowHref: the grid stop, plain clicks to onRowClick",
+  "src/components/tabs/Tabs.test.tsx: glides the indicator on arrow keys, never under reduced motion"
+]

@@ -29,4 +29,21 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "Renders a native `<kbd>`; its text is read as is.",
+        ru: "Нативный `<kbd>`: текст клавиши читается как есть.",
+      },
+      {
+        en: "Symbol keys (⌘ ⌥ ⇧ ↵) need `aria-label` and `title` («Command», «Shift»).",
+        ru: "Символьным клавишам (⌘ ⌥ ⇧ ↵) нужны `aria-label` и `title` («Command», «Shift»).",
+      },
+      {
+        en: 'A visual «+» between keys gets `aria-hidden="true"`.',
+        ru: 'Визуальный «+» между клавишами — `aria-hidden="true"`.',
+      },
+    ],
+  },
 };

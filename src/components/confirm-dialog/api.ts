@@ -115,4 +115,41 @@ export const api: ComponentApi = {
       ru: "Сообщение после ошибки `onConfirm`, если `error` не задан.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab · Shift+Tab",
+        en: "Cycles focus inside the dialog; Cancel is focused first.",
+        ru: "Переводит фокус по кругу внутри окна; первой в фокусе «Отмена».",
+      },
+      {
+        keys: "Enter",
+        en: "On a button presses it; from the dialog itself presses the confirm.",
+        ru: "На кнопке нажимает её; из самого окна — кнопку действия.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the dialog unless the action runs; focus returns to the trigger.",
+        ru: "Закрывает окно, пока не идёт запрос; фокус возвращается на триггер.",
+      },
+    ],
+    aria: [
+      {
+        en: '`role="alertdialog"`, `aria-modal="true"`, named by `title`, described by `description`.',
+        ru: '`role="alertdialog"` и `aria-modal="true"`; имя — `title`, описание — `description`.',
+      },
+      {
+        en: "Cancel takes focus first — the least destructive choice.",
+        ru: "Первой фокус получает «Отмена» — наименее опасный выбор.",
+      },
+      {
+        en: 'While the action runs the confirm has `aria-busy="true"`; Cancel and the close button are disabled.',
+        ru: 'Пока идёт запрос, у кнопки действия `aria-busy="true"`, «Отмена» и крестик выключены.',
+      },
+      {
+        en: 'The failure message is `role="alert"`, read at once.',
+        ru: 'Сообщение об ошибке — `role="alert"`, его зачитывают сразу.',
+      },
+    ],
+  },
 };

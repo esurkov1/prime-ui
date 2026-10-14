@@ -153,12 +153,16 @@ Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`,
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | Presses the button (native `<button>`); with `holdToConfirm` the key is held until the fill completes. |
 | `Tab` | Moves focus; a disabled button is skipped, with `asChild` it stays focusable with `aria-disabled`. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Native `<button>`, `type="button"` by default, so it never submits a form by accident.
 - Icon-only buttons need `aria-label`; `Button.Icon` is `aria-hidden`.
 - `progress` is visual only: put the share in the label or in `aria-describedby` («Скачивание 42%»).

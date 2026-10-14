@@ -91,12 +91,16 @@ Motion: the color and the underline fade in over `fast` (the underline is always
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` | Follows the link (native `<a>`). |
 | `Tab` | Moves focus; a disabled link is skipped. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A native `<a>`: announced as a link, named by its text.
 - The disabled state is a non-focusable `<a role="link" aria-disabled="true">` without `href`; it keeps `id` and `aria-*`.
 - With `asChild` the child gives the role and name: a router link, or a `<button>` for an action.

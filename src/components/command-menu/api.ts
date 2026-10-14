@@ -290,4 +290,63 @@ export const api: ComponentApi = {
       ru: "Кнопка повтора под `loadError` (`onRetry`).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "ArrowDown · ArrowUp",
+        en: "Move the active item, wrapping; focus stays in the search field.",
+        ru: "Переводят активный пункт по кругу; фокус остаётся в поле поиска.",
+      },
+      {
+        keys: "Home · End",
+        en: "First / last matching item.",
+        ru: "Первый / последний найденный пункт.",
+      },
+      {
+        keys: "Enter",
+        en: "Runs the active item; with a load error, retries (`onRetry`).",
+        ru: "Выполняет активный пункт; при ошибке загрузки повторяет её (`onRetry`).",
+      },
+      {
+        keys: "Tab",
+        en: "With a load error, moves focus to the retry button.",
+        ru: "При ошибке загрузки переводит фокус на кнопку «Повторить».",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the palette (`closeOnEscape`); focus returns to the opener.",
+        ru: "Закрывает палитру (`closeOnEscape`); фокус возвращается на открывший элемент.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The palette is `role="dialog"` with `aria-modal`, named by `CommandMenu.Title` or `aria-label`.',
+        ru: 'Палитра — `role="dialog"` с `aria-modal`; имя — `CommandMenu.Title` или `aria-label`.',
+      },
+      {
+        en: "The search field takes focus on open and has no focus ring: the caret is the indicator. Its `onChange`, `onKeyDown`, `onFocus` and `onBlur` reach the input.",
+        ru: "Поле поиска получает фокус при открытии и не рисует кольцо фокуса: индикатор — каретка. Его `onChange`, `onKeyDown`, `onFocus` и `onBlur` доходят до поля.",
+      },
+      {
+        en: 'The field is `role="combobox"` with `aria-controls` on the list and `aria-activedescendant` on the active item; items are `role="option"`, the active one `aria-selected`.',
+        ru: 'Поле — `role="combobox"` с `aria-controls` на список и `aria-activedescendant` на активный пункт; пункты — `role="option"`, активный — `aria-selected`.',
+      },
+      {
+        en: '`CommandMenu.Group` is `role="group"` named by its `label`; the empty result is `role="status"`.',
+        ru: '`CommandMenu.Group` — `role="group"` с именем из `label`; пустой результат — `role="status"`.',
+      },
+      {
+        en: 'While loading the list and the field are `aria-busy` and `labels.loading` is announced politely; skeleton rows are hidden from screen readers; a load error is `role="alert"`.',
+        ru: 'При загрузке список и поле — `aria-busy`, а `labels.loading` объявляется вежливо; строки-скелеты скрыты от скринридеров; ошибка загрузки — `role="alert"`.',
+      },
+      {
+        en: "The arrows reaching the last item ask for the next batch the same way scrolling does.",
+        ru: "Стрелки, дошедшие до последнего пункта, запрашивают следующую порцию так же, как прокрутка.",
+      },
+      {
+        en: "The page behind is inert; after closing, focus returns to the opener.",
+        ru: "Страница за палитрой неактивна; после закрытия фокус возвращается на открывший элемент.",
+      },
+    ],
+  },
 };

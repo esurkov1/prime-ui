@@ -124,12 +124,16 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focus on the trigger opens the tooltip after the delay. |
 | `Escape` | Hides the tooltip; focus stays on the trigger. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The chip is `role="tooltip"`; while open the trigger points at it with `aria-describedby` (appended to the child's own).
 - `Tooltip.Trigger` composes the child's `ref`, sets `data-state` and chains the child's `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus` and `onBlur`.
 - The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.

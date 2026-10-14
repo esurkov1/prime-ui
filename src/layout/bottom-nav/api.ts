@@ -171,4 +171,40 @@ export const api: ComponentApi = {
       ru: "`aria-label` ориентира `<nav>`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab · Shift+Tab",
+        en: "Moves focus through the sections and the action; a disabled one is skipped.",
+        ru: "Переводит фокус по разделам и действию; недоступный пропускается.",
+      },
+      {
+        keys: "Enter",
+        en: "Opens the section (a link or a button) or runs the action.",
+        ru: "Открывает раздел (ссылка или кнопка) или выполняет действие.",
+      },
+    ],
+    aria: [
+      {
+        en: "A `<nav>` landmark named by `labels.nav` («Основные разделы») or its own `aria-label`.",
+        ru: "Ориентир `<nav>` с именем `labels.nav` («Основные разделы») или своим `aria-label`.",
+      },
+      {
+        en: 'The current section has `aria-current="page"`; visually it is the primary-color item among muted ones (a contrast step, not a hue); floating, it also sits on the selection capsule, so the accent is never the only cue.',
+        ru: 'Текущий раздел — `aria-current="page"`: иконка и подпись основного цвета, остальные приглушены; в капсуле — акцентного цвета на капсуле выбора, так что цвет не единственный признак.',
+      },
+      {
+        en: "The icon is hidden from assistive tech; the item is named by its label, the count is read after it («Заказы 12»).",
+        ru: "Иконка скрыта от скринридеров; имя пункта — подпись, счётчик читается после неё («Заказы 12»).",
+      },
+      {
+        en: "`BottomNav.Action` is a button without text, named by its required `aria-label`; it sits inside the landmark, before or after the items (where it is placed).",
+        ru: "`BottomNav.Action` — кнопка без текста, её имя — обязательный `aria-label`; она внутри ориентира после пунктов.",
+      },
+      {
+        en: "A disabled item is a `disabled` button, an `aria-disabled` link without `href`, or an `aria-disabled` `asChild` child out of the Tab order (`tabIndex={-1}`).",
+        ru: "Недоступный пункт — `disabled` у кнопки или `aria-disabled` у ссылки без `href`.",
+      },
+    ],
+  },
 };

@@ -267,4 +267,83 @@ export const api: ComponentApi = {
       ru: "Значение ползунка перемотки: `{current}` и `{duration}` в формате m:ss.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "ArrowLeft · ArrowRight",
+        en: "Turn the page (mirrored in RTL); at an end without `loop` the track nudges back.",
+        ru: "Листают страницы (в RTL — зеркально); на краю без `loop` лента пружинит.",
+      },
+      {
+        keys: "Home · End",
+        en: "Slide to the first and the last item.",
+        ru: "Приводят свайпом к первому и последнему элементу.",
+      },
+      {
+        keys: "+ · -",
+        en: "Zoom the picture in (`=` too) and out a step; `0` brings it back to the fit.",
+        ru: "Приближают и отдаляют картинку на шаг; `0` возвращает к вписанному размеру.",
+      },
+      {
+        keys: "Space · K",
+        en: "Video: play and pause.",
+        ru: "Видео: воспроизводит и ставит на паузу.",
+      },
+      {
+        keys: "Shift+ArrowLeft · Shift+ArrowRight",
+        en: "Video: seek 5 seconds back and forward.",
+        ru: "Видео: перематывает на 5 секунд назад и вперёд.",
+      },
+      {
+        keys: "ArrowUp · ArrowDown",
+        en: "Video: raise and lower the sound.",
+        ru: "Видео: прибавляет и убавляет громкость.",
+      },
+      { keys: "M", en: "Video: mute and unmute.", ru: "Видео: выключает и включает звук." },
+      {
+        keys: "Escape",
+        en: "Closes the viewer (`closeOnEscape`); focus returns to the element that opened it.",
+        ru: "Закрывает просмотр (`closeOnEscape`); фокус возвращается на элемент, открывший его.",
+      },
+      {
+        keys: "Tab · Shift+Tab",
+        en: "Cycle focus inside the viewer and bring the bars back.",
+        ru: "Переводят фокус по кругу внутри просмотра и показывают панели.",
+      },
+    ],
+    aria: [
+      {
+        en: '`role="dialog"`, `aria-modal="true"`, named by `aria-label` or `labels.viewer`.',
+        ru: '`role="dialog"` и `aria-modal="true"`; имя — `aria-label` или `labels.viewer`.',
+      },
+      {
+        en: 'Every page is a `role="group"` with `aria-roledescription="слайд"` and a name like «3 из 12»; the neighbours are `aria-hidden` and `inert`.',
+        ru: 'Каждая страница — `role="group"` с `aria-roledescription="слайд"` и именем «3 из 12»; соседние страницы скрыты (`aria-hidden`, `inert`).',
+      },
+      {
+        en: "A page change is read out by a polite live region: «{alt}, 3 из 12».",
+        ru: "Смена страницы зачитывается вежливым живым регионом: «{alt}, 3 из 12».",
+      },
+      {
+        en: "Every gesture has a single-pointer alternative: arrows and keys turn pages, the zoom button and keys zoom, the close button closes (WCAG 2.5.1, 2.5.7).",
+        ru: "Каждому жесту есть замена одним указателем: стрелки и клавиши листают, кнопка и клавиши масштабируют, кнопка закрывает (WCAG 2.5.1, 2.5.7).",
+      },
+      {
+        en: "With `autoPlay` a video starts once its page settles; pause, sound and its level are always on the bar (WCAG 1.4.2), and `autoPlay={false}` leaves the start to the person. The seek slider names the time in `aria-valuetext`, the level slider the percent.",
+        ru: "С `autoPlay` видео стартует, когда его страница встала на место; пауза, звук и громкость всегда под рукой на панели (WCAG 1.4.2), `autoPlay={false}` оставляет запуск человеку. Ползунок перемотки называет время в `aria-valuetext`, ползунок громкости — проценты.",
+      },
+      {
+        en: "A video's bar stays while it stands still; while it plays it steps aside after 2.5 s without the pointer moving and comes back on any move, key or touch — never while the pointer rests on it, focus is in it or the level is open.",
+        ru: "Панель видео на паузе видна всегда; во время воспроизведения уходит через 2,5 с без движения указателя и возвращается от любого движения, клавиши или касания — но не пока указатель над ней, фокус внутри или открыта громкость.",
+      },
+      {
+        en: "The level is an upright Slider in a panel over the sound button: it opens on hover, on focus (Tab) and on a tap; Escape closes the panel, not the viewer. A mouse click on the button mutes; a click on the video plays and pauses it.",
+        ru: "Громкость — вертикальный Slider во всплывающей панели над кнопкой звука: открывается наведением, фокусом (Tab) или касанием; Escape закрывает панель, а не просмотр.",
+      },
+      {
+        en: "The page under the viewer is `inert`, scroll is locked; on close focus returns to the opener.",
+        ru: "Страница под просмотром неактивна (`inert`), прокрутка заблокирована; при закрытии фокус возвращается на элемент, открывший просмотр.",
+      },
+    ],
+  },
 };

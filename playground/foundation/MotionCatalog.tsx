@@ -6,13 +6,13 @@
 import { useNavigate } from "react-router-dom";
 
 import { LinkButton } from "@/components/link-button/LinkButton";
-import type { ComponentPageConfig } from "../components/ComponentPage";
+import { type ComponentPageConfig, exampleLayout } from "../components/ComponentPage";
 import { DocBlock } from "../components/Doc";
 import { renderInlineCode } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoDescription } from "../components/PlaygroundDemoTypography";
 import { PlaygroundSourceFrame } from "../components/PlaygroundExampleFrame";
 import { getExample } from "../exampleRegistry";
-import { slotLayout } from "../pageStandard";
+
 import s from "./foundation.module.css";
 
 const SECTIONS = Object.values(
@@ -146,7 +146,7 @@ function MotionExample({ item }: { item: MotionItem }) {
       <DemoDescription>{renderInlineCode(item.text)}</DemoDescription>
       <PlaygroundSourceFrame
         entry={getExample(page.base ?? "components", page.dir, item.file)}
-        previewLayout={slotLayout(page.kind, "slot" in example ? example.slot : null)}
+        previewLayout={exampleLayout(page.kind, example)}
       />
       <LinkButton
         href={href}

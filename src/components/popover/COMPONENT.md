@@ -138,6 +138,8 @@ Motion (`overlayMotion`): the panel grows out of the side that faces its trigger
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | On the trigger: opens the panel (focus moves into it) and closes it. |
@@ -145,6 +147,8 @@ Motion (`overlayMotion`): the panel grows out of the side that faces its trigger
 | `Tab` | Moves through the panel content; with `trapFocus` it cycles inside the panel, without it Tab past the last stop closes the panel and goes on from the trigger. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The panel is `role="dialog"` without `aria-modal`, named by `Popover.Title` (else by the trigger) and described by `Popover.Description`.
 - The trigger gets `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` and `data-state`; the child's own `id` wins. Other props given to `Popover.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
 - Opened from a Trigger, focus moves into the panel: `[data-autofocus]`, else the first tab stop, else the panel. Opened at a `Popover.Anchor`, focus stays in the anchor (`initialFocus` moves it in), and presses on the anchor do not dismiss the panel.

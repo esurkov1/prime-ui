@@ -221,6 +221,8 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `ArrowLeft` · `ArrowRight` | Select the neighbouring tab, wrapping and skipping disabled ones; also work in a vertical list. |
@@ -230,6 +232,8 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 | `Tab` | Enters the active tab (roving tabindex), then moves to the panel. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - WAI-ARIA tabs pattern: `tablist` / `tab` / `tabpanel` with `aria-controls` / `aria-labelledby` wired automatically; give `Tabs.List` an `aria-label`.
 - Selection follows focus; the panel is focusable (`tabIndex=0`).
 - In a two-line tab the accessible name is label (+ count); `Tabs.Description` becomes `aria-describedby`.

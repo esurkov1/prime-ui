@@ -336,6 +336,8 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus through the items; a disabled or folded one is skipped. |
@@ -345,6 +347,8 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 | `Escape` | Closes the flyout (focus returns to the parent) and the off-canvas panel on a narrow screen. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The panel is a `<nav>` named by `labels.navigation`; groups are `role="group"` named by their label.
 - The current item has `aria-current="page"`; in compact mode the label shows as a tooltip, so icon-only items keep a visible name.
 - A collapsible group heading and a SubTrigger are buttons with `aria-expanded` and `aria-controls`; folded content is `inert`.

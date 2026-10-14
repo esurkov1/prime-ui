@@ -129,6 +129,8 @@ Motion: it opens out of the thumbnail it was opened from — the picture grows f
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `ArrowLeft` · `ArrowRight` | Turn the page (mirrored in RTL); at an end without `loop` the track nudges back. |
@@ -142,6 +144,8 @@ Motion: it opens out of the thumbnail it was opened from — the picture grows f
 | `Tab` · `Shift+Tab` | Cycle focus inside the viewer and bring the bars back. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="dialog"`, `aria-modal="true"`, named by `aria-label` or `labels.viewer`.
 - Every page is a `role="group"` with `aria-roledescription="слайд"` and a name like «3 из 12»; the neighbours are `aria-hidden` and `inert`.
 - A page change is read out by a polite live region: «{alt}, 3 из 12».

@@ -273,4 +273,35 @@ export const api: ComponentApi = {
       ru: "Имя `PageContent.BackButton` (у `PageContent.Split`).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        en: "On `PageContent.BackButton`: back from the detail to the list; focus returns to the list control that opened it.",
+        ru: "На `PageContent.BackButton` возвращает из деталей к списку; фокус встаёт на элемент списка, с которого их открыли.",
+      },
+    ],
+    aria: [
+      {
+        en: "Title is an `<h1>`; use one per page.",
+        ru: "`PageContent.Title` — `<h1>`; один на страницу.",
+      },
+      {
+        en: "Give `PageContent.Page` an `aria-labelledby` that points at the Title `id` to name the region.",
+        ru: "Назовите `PageContent.Page` через `aria-labelledby` на `id` заголовка.",
+      },
+      {
+        en: "`PageContent.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`, so it is a region landmark with the heading's name; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).",
+        ru: "`PageContent.Section` — `<section>`, названный своим `<h2>` (`label`) через `aria-labelledby`.",
+      },
+      {
+        en: 'Name `PageContent.List` and `PageContent.Detail` with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).',
+        ru: "Назовите панели `PageContent.List` и `PageContent.Detail` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера.",
+      },
+      {
+        en: "`PageContent.BackButton` is named by `labels.back` and is shown only while the split shows one pane.",
+        ru: "`PageContent.BackButton` названа `labels.back` и видна, только пока сплит показывает одну панель.",
+      },
+    ],
+  },
 };

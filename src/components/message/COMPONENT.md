@@ -345,6 +345,8 @@ The list-level settings a message reads — the group chat's author header and a
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Shift+F10` · `ContextMenu` | Opens the menu of the focused message (`ContextMenu` is the menu key); in a chat's selection mode `Enter` / `Space` toggle it and Shift extends the range from the anchor |
@@ -354,6 +356,8 @@ The list-level settings a message reads — the group chat's author header and a
 | `Escape` | Closes the menu or the reaction bar |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Every message is a `role="article"` named «{author}, {time}» (`labels.message`); an outgoing one is «Вы»; the author names every message of a run, its header shown or not. In a list it carries `aria-posinset` / `aria-setsize`; in a chat's selection mode it is an `option` with `aria-selected`.
 - The delivery status is an image named «Отправляется», «Отправлено», «Прочитано» or «Не отправлено».
 - A reply with `target` or `onClick` is a button; the hidden «Ответ на сообщение» explains it. Pressing it moves the focus to the original.

@@ -78,32 +78,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "ArrowLeft · ArrowRight · ArrowUp · ArrowDown",
-        action: "Двигают ползунок области или канала; в сетке ColorPresets — между образцами.",
-      },
-      { keys: "PageUp · PageDown", action: "Крупный шаг области и ползунков." },
-      {
-        keys: "Home · End",
-        action: "Края ползунка; первый / последний образец в сетке ColorPresets.",
-      },
-      {
-        keys: "Enter · Space",
-        action: "Применяет поле; выбирает образец пресета и закрывает панель.",
-      },
-      {
-        keys: "Tab",
-        action: "Ходит по частям; из сетки ColorPresets возвращает на триггер и закрывает.",
-      },
-      { keys: "Escape", action: "Закрывает панель ColorPresets." },
-    ],
-    aria: [
-      'Область и ползунки — примитивы React Aria со своими именами `role="slider"`.',
-      "`TriggerSwatch` и `ColorPresets.Swatch` скрыты (`aria-hidden`) — дайте кнопке-триггеру `aria-label`; `ColorPresets.Trigger` называет свой элемент «`labels.trigger`: <цвет>», если у него нет своего `aria-label`.",
-      '`ColorPicker.Swatches` — `role="radiogroup"` (ColorSwatches): назовите через `label` или `aria-label`.',
-      'Сетка ColorPresets — `role="listbox"` с образцами `role="option"`, имя из `label` у Content или `labels.list`.',
-    ],
-  },
 };

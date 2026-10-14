@@ -31,11 +31,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      "Текст остаётся в дереве доступности и входит в имя элемента вокруг.",
-      'С `live="polite"` — вежливая живая область (`role="status"`), с `live="assertive"` — срочное объявление (`role="alert"`): держите её смонтированной и меняйте текст.',
-    ],
-  },
 };

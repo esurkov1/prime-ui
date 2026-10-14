@@ -1,5 +1,4 @@
 import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 const spanRest: ApiProp = {
   name: "…rest",
@@ -221,7 +220,12 @@ export const api: ComponentApi = {
           en: "Trigger and Content.",
           ru: "Trigger и Content.",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
     {
@@ -441,4 +445,86 @@ export const api: ComponentApi = {
       ru: "Объявляется, когда обещание из `onValueChange` отклонено и значение вернулось.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space · ArrowDown · ArrowUp",
+        en: "On the trigger open the list; focus moves into the search or the list.",
+        ru: "На триггере открывают список; фокус уходит в поиск или список.",
+      },
+      {
+        keys: "ArrowDown · ArrowUp · Home · End",
+        en: "In the list move the highlight over the enabled options, wrapping; a `Select.Action` is the last stop after the options.",
+        ru: "В списке двигают подсветку по доступным пунктам по кругу; `Select.Action` — последняя остановка после пунктов.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Pick the highlighted option; a single pick closes the list and returns focus to the trigger. On a `Select.Action`, run it and close the list.",
+        ru: "Выбирают подсвеченный пункт; одиночный выбор закрывает список и возвращает фокус на триггер. На `Select.Action` запускают действие и закрывают список.",
+      },
+      {
+        keys: "A–Я",
+        en: "Typeahead: the highlight jumps to the option starting with the letter or the typed prefix.",
+        ru: "Набор с клавиатуры: подсветка уходит на пункт с этой буквы или префикса.",
+      },
+      {
+        keys: "Delete · Backspace",
+        en: "On the trigger with `clearable` clear the value.",
+        ru: "На триггере с `clearable` очищают значение.",
+      },
+      {
+        keys: "Enter",
+        en: "With a load error in the open list, retries (`onRetry`).",
+        ru: "При ошибке загрузки в открытом списке повторяет загрузку (`onRetry`).",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the list; focus returns to the trigger.",
+        ru: "Закрывает список; фокус возвращается на триггер.",
+      },
+      {
+        keys: "Tab",
+        en: "Returns focus to the trigger, closes the list and moves on from the trigger.",
+        ru: "Возвращает фокус на триггер, закрывает список и переходит дальше от триггера.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The trigger is `role="combobox"` with `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`; `label` names it.',
+        ru: 'Триггер — `role="combobox"` с `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`; имя — `label`.',
+      },
+      {
+        en: 'The list is `role="listbox"` (`aria-multiselectable` with `multiple`); options are `role="option"` with `aria-selected`; the highlight goes through `aria-activedescendant`.',
+        ru: 'Список — `role="listbox"` (`aria-multiselectable` при `multiple`); пункты — `role="option"` с `aria-selected`; подсветка — через `aria-activedescendant`.',
+      },
+      {
+        en: "The hint and the error are linked by `aria-describedby`; the error sets `aria-invalid`; loading sets `aria-busy`.",
+        ru: "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`; при загрузке — `aria-busy`.",
+      },
+      {
+        en: 'While loading the list is `aria-busy` and `labels.loading` is announced politely; skeleton rows are hidden from screen readers; a load error is `role="alert"`.',
+        ru: 'При загрузке список — `aria-busy`, а `labels.loading` объявляется вежливо; строки-скелеты скрыты от скринридеров; ошибка загрузки — `role="alert"`.',
+      },
+      {
+        en: "The highlight reaching the last option asks for the next batch the same way scrolling does.",
+        ru: "Подсветка, дошедшая до последнего пункта, запрашивает следующую порцию так же, как прокрутка.",
+      },
+      {
+        en: '`Select.Action` rows are `role="option"` in a `role="group"` under the scroller; the listbox owns the group through `aria-owns`, and the highlight reaches them through `aria-activedescendant`.',
+        ru: '`Select.Action` — `role="option"` в группе под прокруткой; список владеет группой через `aria-owns`, подсветка доходит до действия через `aria-activedescendant`.',
+      },
+      {
+        en: 'While an `onValueChange` promise is pending the trigger is `aria-busy`; a rejection announces `labels.changeFailed` in a polite `role="status"` region.',
+        ru: "Пока сохраняется обещание из `onValueChange`, триггер — `aria-busy`, а отказ объявляет `labels.changeFailed` вежливо.",
+      },
+      {
+        en: "With `name`, hidden inputs carry the value into a native form submit; native trigger events (`onFocus`, `onBlur`, `onKeyDown`) reach the button.",
+        ru: "С `name` скрытые поля несут значение в нативную отправку формы; нативные события триггера (`onFocus`, `onBlur`, `onKeyDown`) доходят до кнопки.",
+      },
+      {
+        en: "An outside press closes the list without moving focus back: focus follows the pointer (foundation §8).",
+        ru: "Клик снаружи закрывает список без возврата фокуса: фокус остаётся там, куда нажали.",
+      },
+    ],
+  },
 };

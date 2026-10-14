@@ -45,12 +45,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      "Дайте подсказке `id` и добавьте его в `aria-describedby` контрола — скринридер прочтёт её вместе с полем.",
-      'Ошибке, которая появляется после действия пользователя, добавьте `role="alert"`.',
-      "`Hint.Icon` декоративна: смысл несёт текст.",
-    ],
-  },
 };

@@ -142,4 +142,50 @@ export const api: ComponentApi = {
       ru: "Описание графика с линией `reference` (`aria-describedby`); `{value}` подставляется.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "← · → · ↓ · ↑",
+        en: "Previous or next point: `←` / `↓` back, `→` / `↑` forward, as on a slider.",
+        ru: "Предыдущая или следующая точка: `←` / `↓` назад, `→` / `↑` вперёд, как у слайдера.",
+      },
+      { keys: "Home · End", en: "First or last point.", ru: "Первая или последняя точка." },
+      {
+        keys: "Tab",
+        en: "Focuses the chart; leaving focus returns the headline to rest (`summary`, `highlight`).",
+        ru: "Фокус на график; уход фокуса возвращает заголовок в покой (`summary`, `highlight`).",
+      },
+      {
+        keys: "Escape",
+        en: "Hides the tooltip and returns the headline to rest.",
+        ru: "Прячет подсказку и возвращает заголовок в покой.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.',
+        ru: 'График — `role="slider"` с именем из `label`; `aria-valuetext` озвучивает точку: «8 окт: 312 400 ₽»; в покое с `summary="sum"` — период: «9 сен – 8 окт: 8 914 000 ₽».',
+      },
+      {
+        en: "The headline with the value and change reads as plain text.",
+        ru: "Заголовок с последним значением и изменением читается как обычный текст.",
+      },
+      {
+        en: "The change carries a sign and an arrow, never color alone; a negative bar goes down, not only red.",
+        ru: "Изменение показано знаком и стрелкой, а не только цветом; отрицательный столбик уходит вниз, а не только краснеет.",
+      },
+      {
+        en: "While `loading` the root is `aria-busy` and the chart is not in the tab order yet.",
+        ru: "Во время `loading` корень помечен `aria-busy`, графика в порядке фокуса ещё нет.",
+      },
+      {
+        en: '`layout="compact"`: no visible title; `label` is only the slider\'s name, the point still goes to `aria-valuetext`.',
+        ru: '`layout="compact"`: видимого заголовка нет, `label` — только имя слайдера, значение точки — в `aria-valuetext`. Указатель и клавиши на графике не открывают строку DataTable (`role="slider"`, `data-row-click-ignore`).',
+      },
+      {
+        en: "The tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.",
+        ru: "Подсказка у курсора при ведении скрыта от вспомогательных технологий (`aria-hidden`): она повторяет `aria-valuetext`.",
+      },
+    ],
+  },
 };

@@ -44,4 +44,21 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "Give the hint an `id` and put it into the control's `aria-describedby` so screen readers read it with the field.",
+        ru: "Дайте подсказке `id` и добавьте его в `aria-describedby` контрола — скринридер прочтёт её вместе с полем.",
+      },
+      {
+        en: 'Add `role="alert"` to an error that appears after a user action.',
+        ru: 'Ошибке, которая появляется после действия пользователя, добавьте `role="alert"`.',
+      },
+      {
+        en: "`Hint.Icon` is decorative; the text carries the meaning.",
+        ru: "`Hint.Icon` декоративна: смысл несёт текст.",
+      },
+    ],
+  },
 };

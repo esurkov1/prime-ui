@@ -146,12 +146,16 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focuses a pressable (`asChild`) or selectable tile; a plain thumbnail takes no focus. |
 | `Enter` · `Space` | Opens the object (`asChild`) or toggles a selectable tile. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Next to a name the thumbnail is decorative: keep `alt=""` (default) and mark fallback icons `aria-hidden`.
 - Alone: give `Thumbnail.Image` a descriptive `alt`, or `role="img"` + `aria-label` on Root for a fallback-only thumbnail.
 - A preview that opens the object is `asChild` on a `<button>` or `<a>`; name it (`aria-label`) when the picture is all it shows.

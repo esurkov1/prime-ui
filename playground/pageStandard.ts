@@ -4,9 +4,15 @@
  * `**Kind:**`, and `src/test/docs-contract.test.ts` checks pages, examples and docs against it.
  *
  * A page kind is the shape of a component (what a reader needs to see), not its sidebar category:
- * `CATEGORY_PAGES` stays navigation only.
+ * `PLAYGROUND_NAV_CATEGORIES` (`playground/categories.ts`) stays navigation only.
+ *
+ * The comparison slots (`variants`, `sizes`, `states`, `with-icon`) of every kind are matrices of
+ * labelled cells: `matrix` for specimens with an intrinsic width, `matrix-wide` for specimens as
+ * wide as their container (navigation, composites, page regions).
  */
 import type { ExampleFramePreviewLayout } from "@/components/example-frame/ExampleFrame";
+import type { ApiPart } from "../scripts/docs/componentApi";
+import { triadsOf } from "../scripts/docs/contractLists";
 
 export const PAGE_KINDS = [
   "primitive",
@@ -144,11 +150,11 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   ],
   field: [
     { slot: "overview", required: true, layout: "stack-narrow" },
-    { slot: "variants", layout: "stack-narrow" },
-    { slot: "sizes", required: true, layout: "stack-narrow" },
-    { slot: "states", required: true, layout: "stack-narrow" },
+    { slot: "variants", layout: "matrix" },
+    { slot: "sizes", required: true, layout: "matrix" },
+    { slot: "states", required: true, layout: "matrix" },
     { slot: "validation", required: true, layout: "stack-narrow" },
-    { slot: "with-icon", layout: "stack-narrow" },
+    { slot: "with-icon", layout: "matrix" },
     { slot: SCENARIOS, layout: "stack-narrow" },
     { slot: "controlled", layout: "stack-narrow" },
     { slot: "controlled-open", layout: "stack-narrow" },
@@ -160,9 +166,9 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "overview", required: true, layout: "default" },
     { slot: "structure", layout: "row" },
     { slot: "variants", layout: "matrix" },
-    { slot: "sizes", layout: "row" },
+    { slot: "sizes", layout: "matrix" },
     { slot: "placement", layout: "row" },
-    { slot: "states", layout: "row" },
+    { slot: "states", layout: "matrix" },
     { slot: SCENARIOS, layout: "row" },
     { slot: "dismiss", layout: "row" },
     { slot: "controlled", layout: "row" },
@@ -172,10 +178,10 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   ],
   navigation: [
     { slot: "overview", required: true, layout: "stack" },
-    { slot: "variants", layout: "stack" },
-    { slot: "sizes", layout: "stack" },
-    { slot: "states", layout: "stack" },
-    { slot: "with-icon", layout: "stack" },
+    { slot: "variants", layout: "matrix-wide" },
+    { slot: "sizes", layout: "matrix-wide" },
+    { slot: "states", layout: "matrix-wide" },
+    { slot: "with-icon", layout: "matrix-wide" },
     { slot: "orientation", layout: "stack" },
     { slot: "overflow", layout: "stack" },
     { slot: SCENARIOS, layout: "stack" },
@@ -185,21 +191,23 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   ],
   composite: [
     { slot: "overview", required: true, layout: "stack" },
-    { slot: "variants", layout: "stack" },
-    { slot: "sizes", layout: "stack" },
+    { slot: "variants", layout: "matrix-wide" },
+    { slot: "sizes", layout: "matrix-wide" },
     { slot: "structure", layout: "stack" },
     { slot: SCENARIOS, layout: "stack" },
-    { slot: "states", layout: "stack" },
+    { slot: "states", layout: "matrix-wide" },
     { slot: "controlled", layout: "stack" },
     { slot: "narrow", required: true, layout: "stack" },
     { slot: "screen", layout: "full" },
   ],
   layout: [
     { slot: "overview", required: true, layout: "full" },
-    { slot: "variants", layout: "full" },
-    { slot: "sizes", layout: "full" },
+    // A layout region's variants are whole regions one under another, not cells.
+    { slot: "variants", layout: "stack" },
+    { slot: "sizes", layout: "matrix-wide" },
     { slot: "structure", layout: "full" },
     { slot: SCENARIOS, layout: "full" },
+    { slot: "dismiss", layout: "full" },
     { slot: "controlled", layout: "full" },
     { slot: "controlled-open", layout: "full" },
     { slot: "narrow", layout: "full" },
@@ -208,21 +216,15 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
 };
 
 /**
- * Slots a page must have because of its API: a prop axis on the root (first API table) must be
- * shown. `size` → sizes, `variant`/`tone`/`color` → variants, a state flag → states, a
- * controllable value (`onValueChange`/`defaultValue`, `onCheckedChange`/`defaultChecked`) →
- * controlled, a controllable open state (`onOpenChange`/`defaultOpen`) → controlled-open,
- * `closeOnOutsideClick` → dismiss. A bare `value` (ProgressBar) or `open` has nothing to control.
+ * Slots a page must have because of a prop axis on its root (first API table): `size` → sizes,
+ * `variant`/`tone`/`color` → variants, a state flag → states, `closeOnOutsideClick` → dismiss.
+ * Controllable state comes from the triads (`requiredSlots`): a bare `value` (ProgressBar) or
+ * `open` has nothing to control.
  */
 export const PROP_SLOTS: { props: string[]; slot: SlotId }[] = [
   { props: ["size"], slot: "sizes" },
   { props: ["variant", "tone", "color"], slot: "variants" },
   { props: ["disabled", "readOnly", "loading", "invalid"], slot: "states" },
-  {
-    props: ["onValueChange", "defaultValue", "onCheckedChange", "defaultChecked"],
-    slot: "controlled",
-  },
-  { props: ["onOpenChange", "defaultOpen"], slot: "controlled-open" },
   { props: ["closeOnOutsideClick"], slot: "dismiss" },
 ];
 
@@ -232,8 +234,13 @@ export type SlotRequirement = {
   by: string;
 };
 
-/** Every slot a page of `kind` must have, with the reason (the kind or the root prop). */
-export function requiredSlots(kind: PageKind, rootProps: readonly string[]): SlotRequirement[] {
+/**
+ * Every slot a page of `kind` must have, with the reason (the kind or the root prop). A triad on
+ * the root (`x` / `defaultX` / `onXChange`, scanned like the API vocabulary) requires
+ * `controlled-open` for `open` and `controlled` for any other state.
+ */
+export function requiredSlots(kind: PageKind, root: ApiPart | undefined): SlotRequirement[] {
+  const rootProps = (root?.props ?? []).map((prop) => prop.name);
   const required = new Map<SlotId, string>();
   for (const entry of KIND_SLOTS[kind]) {
     if (entry.required && entry.slot !== SCENARIOS) required.set(entry.slot, "kind");
@@ -242,7 +249,17 @@ export function requiredSlots(kind: PageKind, rootProps: readonly string[]): Slo
     const prop = props.find((name) => rootProps.includes(name));
     if (prop && !required.has(slot)) required.set(slot, prop);
   }
+  for (const state of root ? triadsOf(root) : []) {
+    const slot: SlotId = state === "open" ? "controlled-open" : "controlled";
+    const by = `on${state.charAt(0).toUpperCase()}${state.slice(1)}Change`;
+    if (!required.has(slot)) required.set(slot, by);
+  }
   return [...required].map(([slot, by]) => ({ slot, by }));
+}
+
+/** The preview layouts a kind's pages use: what a component-specific scenario may pick. */
+export function kindLayouts(kind: PageKind): ExampleFramePreviewLayout[] {
+  return [...new Set(KIND_SLOTS[kind].map((entry) => entry.layout))];
 }
 
 export function slotLayout(kind: PageKind, slot: SlotId | null): ExampleFramePreviewLayout {

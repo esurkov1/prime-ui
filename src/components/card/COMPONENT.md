@@ -174,12 +174,16 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | A card with `asChild` is one stop: focus lands on the whole link or button. |
 | `Enter` | Opens the link or presses the button of a card with `asChild`. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - With `asChild` the card is the link or button itself; its name is the text of its parts. Nothing interactive may sit inside it — put row actions next to the card instead.
 - `Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.
 - `Card.Title` renders `<h3>`; directly under the page title pass `as="h2"`.

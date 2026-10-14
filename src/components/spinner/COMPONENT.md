@@ -81,9 +81,13 @@ Spinner          <span role="status">; size and tone
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="status"` with a visually hidden `labels.loading`, so screen readers learn that something is loading.
 - When the host already announces it is busy (`aria-busy` on a button or a region), pass `aria-hidden="true"`.
 - Under `prefers-reduced-motion` the ring keeps turning, slower and linear, so the loading cue stays readable.

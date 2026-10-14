@@ -1,15 +1,4 @@
 import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
-
-const DIV_REST = 'Omit<HTMLAttributes<HTMLDivElement>, "children">';
-const SPAN_REST = 'Omit<HTMLAttributes<HTMLSpanElement>, "children">';
-
-const rest = (element: string, type: string): ApiProp => ({
-  name: "…rest",
-  type,
-  en: `\`className\` and the other attributes of the ${element}.`,
-  ru: "`className` и остальные атрибуты элемента.",
-});
 
 const focusRing: ApiProp = {
   name: "focusRing",
@@ -25,13 +14,6 @@ const disabled: ApiProp = {
   en: "Shows the color but takes no input (grayscale).",
   ru: "Показывает цвет, но не принимает ввод (в оттенках серого).",
 };
-
-const reactAria = (component: string): ApiProp => ({
-  name: "…rest",
-  type: `${component}Props (react-aria-components)`,
-  en: `The other props of the React Aria \`${component}\` (\`channel\`, \`colorSpace\`, \`aria-label\`…).`,
-  ru: `Остальные пропсы \`${component}\` из React Aria.`,
-});
 
 export const api: ComponentApi = {
   parts: [
@@ -83,6 +65,7 @@ export const api: ComponentApi = {
     {
       name: "ColorPicker.Panel",
       en: "`ref` → `HTMLDivElement`. Vertical stack of the parts with the standard gap; native `<div>` props.",
+      ru: "Вертикальная стопка частей со стандартным зазором; нативные пропсы `<div>`.",
       props: [
         {
           name: "surface",
@@ -124,42 +107,99 @@ export const api: ComponentApi = {
           ru: "Ярус поля.",
         },
         focusRing,
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
     {
       name: "ColorPicker.TriggerSwatch",
       en: "`ref` → `HTMLSpanElement`. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.",
-      props: [rest("`<span>`", SPAN_REST)],
+      ru: "Квадрат текущего цвета для кнопки-триггера (`aria-hidden`); следует размеру иконки хоста, например внутри `Button.Icon`.",
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the `<span>`.",
+          ru: "`className` и остальные атрибуты `<span>`.",
+        },
+      ],
     },
     {
       name: "ColorPicker.FormatSelect",
       en: "`ref` → `HTMLDivElement` (the wrapper). A kit Select of the value format (HSL · RGB · Hex), named by `labels.format`.",
-      props: [rest("wrapper `<div>`", DIV_REST)],
+      ru: "Select кита для формата значений (HSL · RGB · Hex), имя из `labels.format`.",
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the wrapper `<div>`.",
+          ru: "`className` и остальные атрибуты обёртки `<div>`.",
+        },
+      ],
     },
     {
       name: "ColorPicker.ChannelStrip",
       en: "`ref` → `HTMLDivElement`. One row: the eyedropper, then a field per channel of the current format (or one hex field); each field commits on blur / Enter.",
-      props: [focusRing, rest("row `<div>`", DIV_REST)],
+      ru: "Одна строка: пипетка, затем поле на каждый канал текущего формата (или одно hex-поле); поле применяется по blur / Enter.",
+      props: [
+        focusRing,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the row `<div>`.",
+          ru: "`className` и остальные атрибуты строки `<div>`.",
+        },
+      ],
     },
     {
       name: "ColorPicker.Area",
       en: "`ref` → `HTMLDivElement`. React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds `ColorPicker.AreaThumb`.",
-      props: [disabled, reactAria("ColorArea")],
+      ru: "`ColorArea` из React Aria: квадрат двух каналов (например, насыщенность × яркость). Держит `ColorPicker.AreaThumb`.",
+      props: [
+        disabled,
+        {
+          name: "…rest",
+          type: "ColorAreaProps (react-aria-components)",
+          en: "The other props of the React Aria `ColorArea` (`channel`, `colorSpace`, `aria-label`…).",
+          ru: "Остальные пропсы React Aria `ColorArea` (`channel`, `colorSpace`, `aria-label`…).",
+        },
+      ],
     },
     {
       name: "ColorPicker.AreaThumb · ColorPicker.Thumb",
       en: "`ref` → `HTMLDivElement`. React Aria `ColorThumb` of the area / of a slider track: a thumb-colored ring with the overlay shadow and a focus ring.",
-      props: [reactAria("ColorThumb")],
+      ru: "`ColorThumb` из React Aria для области или дорожки ползунка: кольцо цвета бегунка с тенью оверлея и кольцом фокуса.",
+      props: [
+        {
+          name: "…rest",
+          type: "ColorThumbProps (react-aria-components)",
+          en: "The other props of the React Aria `ColorThumb` (`channel`, `colorSpace`, `aria-label`…).",
+          ru: "Остальные пропсы React Aria `ColorThumb` (`channel`, `colorSpace`, `aria-label`…).",
+        },
+      ],
     },
     {
       name: "ColorPicker.Slider",
       en: "`ref` → `HTMLDivElement`. React Aria `ColorSlider` of one channel (hue, alpha…). Holds `SliderMeta` and `SliderTrack`.",
-      props: [disabled, reactAria("ColorSlider")],
+      ru: "`ColorSlider` из React Aria для одного канала (оттенок, прозрачность…). Держит `SliderMeta` и `SliderTrack`.",
+      props: [
+        disabled,
+        {
+          name: "…rest",
+          type: "ColorSliderProps (react-aria-components)",
+          en: "The other props of the React Aria `ColorSlider` (`channel`, `colorSpace`, `aria-label`…).",
+          ru: "Остальные пропсы React Aria `ColorSlider` (`channel`, `colorSpace`, `aria-label`…).",
+        },
+      ],
     },
     {
       name: "ColorPicker.SliderMeta",
       en: "`ref` → `HTMLDivElement`. The slider heading: a label and the current channel value.",
+      ru: "Заголовок ползунка: подпись и текущее значение канала.",
       props: [
         {
           name: "label",
@@ -168,13 +208,26 @@ export const api: ComponentApi = {
           en: "Visible label of the slider.",
           ru: "Видимая подпись ползунка.",
         },
-        rest("heading `<div>`", DIV_REST),
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the heading `<div>`.",
+          ru: "`className` и остальные атрибуты заголовка `<div>`.",
+        },
       ],
     },
     {
       name: "ColorPicker.SliderTrack",
       en: "`ref` → `HTMLDivElement`. React Aria `SliderTrack` with the channel gradient over a transparency checkerboard. Holds `ColorPicker.Thumb`.",
-      props: [reactAria("SliderTrack")],
+      ru: "`SliderTrack` из React Aria с градиентом канала поверх шахматки прозрачности. Держит `ColorPicker.Thumb`.",
+      props: [
+        {
+          name: "…rest",
+          type: "SliderTrackProps (react-aria-components)",
+          en: "The other props of the React Aria `SliderTrack` (`channel`, `colorSpace`, `aria-label`…).",
+          ru: "Остальные пропсы React Aria `SliderTrack` (`channel`, `colorSpace`, `aria-label`…).",
+        },
+      ],
     },
     {
       name: "ColorPicker.Swatches",
@@ -199,6 +252,7 @@ export const api: ComponentApi = {
     {
       name: "ColorPicker.EyeDropperButton",
       en: "`ref` → `HTMLButtonElement`. A square soft kit Button that opens the native EyeDropper, named by `labels.eyeDropper`; without browser support it is disabled and hidden from assistive tech.",
+      ru: "Квадратная soft-кнопка кита, открывает нативную пипетку EyeDropper, имя из `labels.eyeDropper`; без поддержки браузера неактивна и скрыта от вспомогательных технологий.",
       props: [
         {
           name: "children",
@@ -216,7 +270,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPresets.Root",
-      en: "A quick color from a fixed palette: a square trigger and a popover grid of presets. No DOM, except a field frame in a FieldList cell (the column heading as its label).",
+      en: "No DOM and no ref, except a field frame in a FieldList cell (the column heading as its label). A quick color from a fixed palette: a square trigger and a popover grid of presets.",
       ru: "Быстрый цвет из палитры: квадратный триггер и поповер с сеткой пресетов. Без DOM, кроме рамки поля в ячейке FieldList.",
       props: [
         {
@@ -336,11 +390,20 @@ export const api: ComponentApi = {
     {
       name: "ColorPresets.Swatch",
       en: "`ref` → `HTMLSpanElement`. The current color as a small square for a custom trigger; follows the host icon size, `aria-hidden`.",
-      props: [rest("`<span>`", SPAN_REST)],
+      ru: "Текущий цвет маленьким квадратом для своего триггера; следует размеру иконки хоста, `aria-hidden`.",
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the `<span>`.",
+          ru: "`className` и остальные атрибуты `<span>`.",
+        },
+      ],
     },
     {
       name: "ColorPresets.Content",
       en: '`ref` → `HTMLDivElement` (the panel). The floating panel with the swatch grid (`role="listbox"`); focus moves to the selected swatch.',
+      ru: 'Плавающая панель с сеткой образцов (`role="listbox"`); фокус переходит на выбранный образец.',
       props: [
         {
           name: "label",
@@ -362,7 +425,12 @@ export const api: ComponentApi = {
           en: "Alignment along the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it.",
           ru: "Выравнивание вдоль триггера. `auto` выравнивает панель по краю триггера, за которым больше места; `start`, `center` или `end` задают край явно.",
         },
-        rest("panel", 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "role">'),
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "role">',
+          en: "`className` and the other attributes of the panel.",
+          ru: "`className` и остальные атрибуты панели.",
+        },
       ],
     },
   ],
@@ -446,4 +514,60 @@ export const api: ComponentApi = {
       ru: "Образец «без цвета» ColorPresets и имя триггера без значения.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "ArrowLeft · ArrowRight · ArrowUp · ArrowDown",
+        en: "Move the area thumb or a slider; in the ColorPresets grid, move between swatches.",
+        ru: "Двигают ползунок области или канала; в сетке ColorPresets — между образцами.",
+      },
+      {
+        keys: "PageUp · PageDown",
+        en: "Larger steps on the area and the sliders.",
+        ru: "Крупный шаг области и ползунков.",
+      },
+      {
+        keys: "Home · End",
+        en: "Slider ends; the first / last swatch in the ColorPresets grid.",
+        ru: "Края ползунка; первый / последний образец в сетке ColorPresets.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Commit a field; pick the focused preset swatch and close.",
+        ru: "Применяет поле; выбирает образец пресета и закрывает панель.",
+      },
+      {
+        keys: "Tab",
+        en: "Moves through the parts; inside the ColorPresets grid returns to the trigger and closes.",
+        ru: "Ходит по частям; из сетки ColorPresets возвращает на триггер и закрывает.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the ColorPresets panel.",
+        ru: "Закрывает панель ColorPresets.",
+      },
+    ],
+    aria: [
+      {
+        en: 'Area and sliders are React Aria primitives with their own `role="slider"` names.',
+        ru: 'Область и ползунки — примитивы React Aria со своими именами `role="slider"`.',
+      },
+      {
+        en: "`TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (ColorPresets.Trigger names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).",
+        ru: "`TriggerSwatch` и `ColorPresets.Swatch` скрыты (`aria-hidden`) — дайте кнопке-триггеру `aria-label`; `ColorPresets.Trigger` называет свой элемент «`labels.trigger`: <цвет>», если у него нет своего `aria-label`.",
+      },
+      {
+        en: '`ColorPicker.Swatches` is a `role="radiogroup"` (ColorSwatches): name it with `label` or `aria-label`.',
+        ru: '`ColorPicker.Swatches` — `role="radiogroup"` (ColorSwatches): назовите через `label` или `aria-label`.',
+      },
+      {
+        en: 'The ColorPresets grid is `role="listbox"` with `role="option"` swatches (roving tabindex), named by the Content `label` or `labels.list`.',
+        ru: 'Сетка ColorPresets — `role="listbox"` с образцами `role="option"`, имя из `label` у Content или `labels.list`.',
+      },
+      {
+        en: "Channel fields are named by `labels` (`hue`, `red`…); HexInput by its label (`labels.hex` by default).",
+        ru: "Поля каналов названы `labels` (`hue`, `red`…); HexInput — своей подписью (по умолчанию `labels.hex`).",
+      },
+    ],
+  },
 };

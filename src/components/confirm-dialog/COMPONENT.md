@@ -84,6 +84,8 @@ The dialog is a Modal `s` with the floating surface, a header and a footer; ther
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` · `Shift+Tab` | Cycles focus inside the dialog; Cancel is focused first. |
@@ -91,6 +93,8 @@ The dialog is a Modal `s` with the floating surface, a header and a footer; ther
 | `Escape` | Closes the dialog unless the action runs; focus returns to the trigger. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="alertdialog"`, `aria-modal="true"`, named by `title`, described by `description`.
 - Cancel takes focus first — the least destructive choice.
 - While the action runs the confirm has `aria-busy="true"`; Cancel and the close button are disabled.

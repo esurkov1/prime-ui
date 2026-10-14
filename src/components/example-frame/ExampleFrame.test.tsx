@@ -113,6 +113,23 @@ describe("ExampleFrame", () => {
     client.mockRestore();
   });
 
+  it("lays a wide matrix out as one column of cells: no column count, no wrap", () => {
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(600);
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(343);
+    render(
+      <ExampleFrame code="" previewLayout="matrix-wide">
+        <div data-testid="row">
+          <div>underline</div>
+          <div>pill</div>
+        </div>
+      </ExampleFrame>,
+    );
+    const stage = screen.getByTestId("row").parentElement as HTMLElement;
+    expect(stage).toHaveAttribute("data-preview-layout", "matrix-wide");
+    expect(stage.style.getPropertyValue("--matrix-columns")).toBe("");
+    expect(stage).not.toHaveAttribute("data-matrix-wrap");
+  });
+
   it("puts the stage on the page (layer 0) by default", () => {
     render(
       <ExampleFrame code="">

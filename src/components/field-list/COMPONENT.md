@@ -110,6 +110,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the fields of a row, then to its remove button and on. |
@@ -117,6 +119,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `Alt + ↑` · `Alt + ↓` | With `reorderable`, moves the row up or down (from its handle). |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The rows are an `<ol>` named by the list `label` (`aria-labelledby`); the list gives each row its position.
 - The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.
 - In a narrow container the heading row goes and each field's label shows above it.

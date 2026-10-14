@@ -43,4 +43,32 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses a `soft` block so overflowing code can be scrolled.",
+        ru: "Фокус на блоке `soft`, чтобы прокрутить длинный код.",
+      },
+      {
+        keys: "← · →",
+        en: "Scroll a focused block horizontally.",
+        ru: "Горизонтальная прокрутка блока в фокусе.",
+      },
+    ],
+    aria: [
+      {
+        en: "Native `<pre>` / `<code>`; screen readers read the text.",
+        ru: "Нативные `<pre>` / `<code>`: скринридер читает текст.",
+      },
+      {
+        en: "A `soft` block is a Tab stop (`tabIndex=0`); pass `tabIndex={-1}` when it never overflows.",
+        ru: "Блок `soft` — точка табуляции (`tabIndex=0`); `tabIndex={-1}`, если он не переполняется.",
+      },
+      {
+        en: "Give standalone blocks an `aria-label` («Команда установки»).",
+        ru: "Самостоятельному блоку задайте `aria-label` («Команда установки»).",
+      },
+    ],
+  },
 };

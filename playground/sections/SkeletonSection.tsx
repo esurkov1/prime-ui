@@ -42,12 +42,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      'Заглушка декоративная: `aria-hidden="true"`, скринридер её не читает.',
-      'О загрузке сообщает область: `aria-busy` на ней (Crossfade, карточка, форма), при необходимости — `role="status"` с текстом.',
-      "Под `prefers-reduced-motion` заглушка не пульсирует.",
-    ],
-  },
 };

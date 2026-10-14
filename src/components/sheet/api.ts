@@ -26,4 +26,40 @@ export const api: ComponentApi = {
     dialogSlotsPart("Sheet", "Sheet.Trigger · Sheet.Close"),
   ],
   labels: dialogLabels,
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Escape",
+        en: "Closes the sheet (`closeOnEscape`); focus returns to the trigger.",
+        ru: "Закрывает шторку (`closeOnEscape`); фокус возвращается на триггер.",
+      },
+      {
+        keys: "Tab · Shift+Tab",
+        en: "Cycle focus inside the sheet.",
+        ru: "Переводит фокус по кругу внутри шторки.",
+      },
+    ],
+    aria: [
+      {
+        en: '`role="dialog"`, `aria-modal="true"`, named by Title — without a header by `aria-label` on `Sheet.Content`; described by Description.',
+        ru: '`role="dialog"` и `aria-modal="true"`; имя — `Sheet.Title`, а без шапки — `aria-label` на `Sheet.Content`.',
+      },
+      {
+        en: "Focus moves into the sheet on open and returns to the opener on close, including after a scrim click.",
+        ru: "При открытии фокус уходит в шторку, при закрытии — на элемент, открывший её.",
+      },
+      {
+        en: "The page behind is `inert`, scroll is locked; only the topmost layer reacts.",
+        ru: "Страница за шторкой неактивна (`inert`), прокрутка заблокирована; реагирует только верхний слой.",
+      },
+      {
+        en: "A swipe down is an extra way out; Escape and the scrim stay. The grab handle is `aria-hidden`.",
+        ru: "Свайп вниз за ручку или шапку — дополнительный способ закрыть шторку; Escape и подложка остаются. Ручка скрыта от скринридеров.",
+      },
+      {
+        en: 'A busy `Guard` holds every dismiss, the swipe included; a dirty one opens a `role="alertdialog"` confirm with focus on «Продолжить».',
+        ru: '`Sheet.Guard busy` удерживает все способы закрытия, свайп тоже; `dirty` открывает подтверждение `role="alertdialog"`.',
+      },
+    ],
+  },
 };

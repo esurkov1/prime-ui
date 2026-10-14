@@ -64,4 +64,21 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "The heading level comes from `as` by the page outline, the look from `variant`: never skip levels for size.",
+        ru: "Уровень заголовка задаёт `as` по структуре страницы, вид — `variant`: не пропускайте уровни ради размера.",
+      },
+      {
+        en: "`tone` never carries meaning alone — name the status in words.",
+        ru: "Цвет `tone` не несёт смысл один — статус называйте словом.",
+      },
+      {
+        en: "With `truncate` pass the full text in `title` when it matters.",
+        ru: "У `truncate` полный текст передайте в `title`, если он важен.",
+      },
+    ],
+  },
 };

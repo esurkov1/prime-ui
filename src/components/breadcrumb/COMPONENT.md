@@ -99,12 +99,16 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus between the level links; the current page is not focusable. |
 | `Enter` | Follows the link. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `nav` landmark with `aria-label` from `labels.nav`; an ordered list.
 - The current page has `aria-current="page"`; the chevrons are `aria-hidden` spans inside the levels, so every list item is a level.
 - Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» reads as `labels.ellipsis`.

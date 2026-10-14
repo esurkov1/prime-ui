@@ -37,4 +37,21 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "Renders a plain `<div>`; pass `aria-busy` while the region loads and `aria-live` or `role` when its changes must be announced.",
+        ru: "Обычный `<div>`: передайте `aria-busy` на время загрузки и `aria-live` или `role`, если смену нужно озвучить.",
+      },
+      {
+        en: "The leaving layer is `aria-hidden` and `inert`: screen readers and Tab never reach content that is going away.",
+        ru: "Уходящий слой — `aria-hidden` и `inert`: скринридер и Tab не попадают в исчезающее содержимое.",
+      },
+      {
+        en: "Move focus yourself when the focused control was in the old state (e.g. the retry button of an error).",
+        ru: "Если фокус был в старом состоянии (кнопка «Повторить» у ошибки), переведите его сами.",
+      },
+    ],
+  },
 };

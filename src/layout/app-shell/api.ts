@@ -119,4 +119,17 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "Main is the `<main>` landmark; the banner comes from AppHeader (`<header>`), the navigation landmarks from Sidebar and BottomNav (`<nav>`).",
+        ru: "Main — ориентир `<main>`; шапку `<header>` даёт AppHeader, ориентиры навигации — Sidebar и BottomNav (`<nav>`).",
+      },
+      {
+        en: "Give the page one `<h1>` (PageContent.Title).",
+        ru: "На странице один `<h1>` (PageContent.Title).",
+      },
+    ],
+  },
 };

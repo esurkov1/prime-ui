@@ -116,15 +116,19 @@ No `variant` or `tone`.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
-| `0`–`9` | Types into the first empty cell and moves to the next one. |
+| `0–9` | Types into the first empty cell and moves to the next one. |
 | `Backspace` | Clears the cell; on an empty cell moves to the previous one. |
 | `ArrowLeft` · `ArrowRight` | Moves between filled cells and the entry cell. |
 | `Home` · `End` | Jumps to the first cell / the entry cell. |
 | `Tab` | Leaves the code. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The cells sit in a `<fieldset>` (`role="group"`) named by the `label` (`aria-labelledby`) or `labels.group`; clicking the label focuses the first cell.
 - Each cell is named by `labels.cell` («Цифра 1 из 6») and has `autocomplete="one-time-code"` and `inputmode="numeric"`, so SMS codes are suggested on phones.
 - The hint or the error is linked to the group through `aria-describedby`; invalid cells carry `aria-invalid`.

@@ -142,4 +142,52 @@ export const api: ComponentApi = {
       ru: "Описание кнопки `holdToConfirm` для скринридеров (`aria-describedby`).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        en: "Presses the button (native `<button>`); with `holdToConfirm` the key is held until the fill completes.",
+        ru: "Нажимает кнопку (нативное поведение `<button>`); с `holdToConfirm` клавишу держат, пока не дойдёт заливка.",
+      },
+      {
+        keys: "Tab",
+        en: "Moves focus; a disabled button is skipped, with `asChild` it stays focusable with `aria-disabled`.",
+        ru: "Переводит фокус; неактивная кнопка пропускается, а с `asChild` остаётся в порядке фокуса с `aria-disabled`.",
+      },
+    ],
+    aria: [
+      {
+        en: 'Native `<button>`, `type="button"` by default, so it never submits a form by accident.',
+        ru: 'Нативный `<button type="button">`: случайно не отправит форму.',
+      },
+      {
+        en: "Icon-only buttons need `aria-label`; `Button.Icon` is `aria-hidden`.",
+        ru: "Кнопке только с иконкой нужен `aria-label`; `Button.Icon` скрыт (`aria-hidden`).",
+      },
+      {
+        en: "`progress` is visual only: put the share in the label or in `aria-describedby` («Скачивание 42%»).",
+        ru: "`progress` виден только глазами: долю пишите в подпись или в `aria-describedby` («Скачивание 42%»).",
+      },
+      {
+        en: '`shape="circle"` requires `aria-label`; its `progress` ring is `aria-hidden`, the share goes in the label or description («Отменить отправку», described by «Отправка 45%»).',
+        ru: '`shape="circle"` требует `aria-label`; кольцо `progress` скрыто (`aria-hidden`), долю называет подпись или `aria-describedby`.',
+      },
+      {
+        en: '`loading` sets `aria-busy="true"` and blocks the press; `progress` sets `aria-busy` and keeps the button pressable.',
+        ru: '`loading` ставит `aria-busy="true"` и блокирует нажатие; `progress` тоже ставит `aria-busy`, но кнопка остаётся нажимаемой.',
+      },
+      {
+        en: "`holdToConfirm` describes the gesture through `aria-describedby` (`labels.holdHint`); `Space` / `Enter` hold like a pointer.",
+        ru: "`holdToConfirm`: жест описан скринридеру через `aria-describedby` («Удерживайте, чтобы подтвердить»); Пробел и Enter удерживаются как указатель.",
+      },
+      {
+        en: "A changed label is announced once: the animated letters are hidden, the name is the new text.",
+        ru: "Смена подписи читается один раз: буквы анимации скрыты, имя кнопки — новый текст целиком.",
+      },
+      {
+        en: 'With `asChild` the disabled state is `aria-disabled="true"` without a native `disabled`.',
+        ru: 'С `asChild` неактивное состояние — `aria-disabled="true"` без нативного `disabled`.',
+      },
+    ],
+  },
 };

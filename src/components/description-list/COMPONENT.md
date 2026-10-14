@@ -38,7 +38,7 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else `"m"`` | Label and value type and the gap between pairs; without it the list takes the tier of its host (a Card, a Drawer, a form). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Label and value type and the gap between pairs; without it the list takes the tier of its host (a Card, a Drawer, a form). |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `horizontal` — the label in a column beside its value (one third of the width), stacking below 24rem of the list's own width; `vertical` — the label above its value at any width. |
 | `labels` | `Partial<DescriptionListLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDListElement>` | — | `className`, `id`, `data-*` and the other attributes of the element. |
@@ -94,12 +94,16 @@ No motion: the list is static text; a row action has the Button's own press and 
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves to the row actions (`DescriptionList.ItemAction`); the pairs themselves are not focusable. |
 | `Enter` · `Space` | Runs the row action. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The list is a `<dl>`: the label is a `<dt>`, the value a `<dd>`; screen readers read each pair as a term and its definition.
 - An empty value shows a muted `labels.empty` (hidden from assistive tech) and is read as `labels.emptyText`.
 - A row action is named by its `label`, which is also its tooltip; the icon is decorative.

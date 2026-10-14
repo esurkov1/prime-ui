@@ -120,4 +120,32 @@ export const api: ComponentApi = {
         : row,
     ),
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the tiles that open the viewer and the transfer disks",
+        ru: "Переходит по плиткам, которые открывают просмотрщик, и по дискам передачи",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the album in the viewer at this tile, or presses a transfer disk; in the viewer `←` `→` page and `Escape` closes, the focus returning to the tile",
+        ru: "Открывает альбом в просмотрщике на этой плитке или нажимает диск передачи; в просмотрщике ← → листают, Escape закрывает и возвращает фокус на плитку",
+      },
+    ],
+    aria: [
+      {
+        en: 'A tile is a button «Открыть: {alt}» (`labels.open`; without `alt` — «фото» or «видео») with `aria-haspopup="dialog"`; its picture is then decorative. The viewer is MediaViewer\'s dialog with its own names; on close the focus returns to the tile.',
+        ru: 'Плитка — кнопка «Открыть: {alt}» с `aria-haspopup="dialog"`; без `alt` — «фото» или «видео». Просмотрщик — диалог MediaViewer со своими именами; после закрытия фокус возвращается на плитку.',
+      },
+      {
+        en: "With `viewer={false}` and no open handlers a picture is an image with its own `alt`; the play mark and the length of a video are `aria-hidden`.",
+        ru: "С `viewer={false}` и без обработчиков открытия картинка — изображение со своим `alt`; метка воспроизведения и длительность видео скрыты от скринридеров.",
+      },
+      {
+        en: "A transfer disk is the cancel, retry or download button; the share is its accessible description («Отправка 42%»), the reason of a failure the retry's description; a refused cancel, retry or download is announced politely.",
+        ru: "Диск передачи — кнопка отмены, повтора или скачивания; доля передачи — её описание («Отправка 42%»), причина ошибки — описание повтора; отказ отмены, повтора или скачивания объявляется вежливо.",
+      },
+    ],
+  },
 };

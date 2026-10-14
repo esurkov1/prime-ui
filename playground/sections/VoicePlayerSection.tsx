@@ -59,31 +59,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Tab",
-        action:
-          "Переводит фокус: кнопка (или диск передачи), волна-ползунок, чип скорости, кнопка расшифровки.",
-      },
-      {
-        keys: "Enter · Space",
-        action:
-          "На кнопке — воспроизведение или пауза; на чипе — следующая скорость; на кнопке расшифровки — открыть или свернуть текст.",
-      },
-      { keys: "ArrowRight · ArrowUp", action: "На волне — вперёд на 5 секунд." },
-      { keys: "ArrowLeft · ArrowDown", action: "На волне — назад на 5 секунд." },
-      { keys: "PageUp · PageDown", action: "На волне — на 10 % записи вперёд или назад." },
-      { keys: "Home · End", action: "На волне — в начало или в конец." },
-    ],
-    aria: [
-      'Корень — `role="group"` с названием `labels.player` (или вашим `aria-label`).',
-      "Кнопка называется `labels.play` на паузе и `labels.pause` во время воспроизведения.",
-      'Пока запись в пути, не удалась или не скачана, кнопка `inert`, а на её месте диск передачи: кнопка с именем по направлению (`cancelUpload` / `cancelDownload`, `retryUpload` / `retryDownload` с описанием `notSent` / `notReceived`, `download`) и кольцо `role="progressbar"`; отказ объявляется.',
-      'Волна — `role="slider"` с `aria-valuemin`, `aria-valuemax` (секунды), `aria-valuenow` и `aria-valuetext` из `labels.position`.',
-      "Чип скорости называется `labels.rate`; пока `unplayed`, после времени читается `labels.unplayed` — точка не единственный признак.",
-      "На странице играет один плеер: запуск другого ставит текущий на паузу.",
-      "Кнопка расшифровки называется `labels.transcribe` или `labels.hideTranscript`, несёт `aria-expanded` и `aria-controls` на область текста; пока идёт запрос — `aria-busy` на кнопке и области. Текст читается как обычный абзац; ошибка запроса объявляется `labels.transcribeFailed`.",
-    ],
-  },
 };

@@ -85,4 +85,37 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "↑ · ↓ · ← · →",
+        en: "Scroll the focused region (with `tabIndex={0}`) by a step",
+        ru: "Прокручивают сфокусированную область (с `tabIndex={0}`) на шаг",
+      },
+      { keys: "PageUp · PageDown · Space", en: "Scroll by a screen", ru: "Прокручивают на экран" },
+      { keys: "Home · End", en: "To the start and to the end", ru: "К началу и к концу" },
+    ],
+    aria: [
+      {
+        en: "Renders a plain element; add `tabIndex={0}` and `aria-label` when the region has no focusable content but must scroll from the keyboard (the browser scrolls it; the ring is inset).",
+        ru: "Обычный элемент без роли: если внутри нет фокусируемого содержимого, дайте `tabIndex={0}` и `aria-label`, чтобы область прокручивалась с клавиатуры; кольцо фокуса — внутри края.",
+      },
+      {
+        en: "Choose a semantic `as` (`main`, `nav`, `aside`) when the region is a landmark.",
+        ru: "Для области-ориентира выберите `as` (`main`, `nav`, `aside`).",
+      },
+      {
+        en: "`edges` is only decoration: content under a fade or a shadow stays reachable and scrolls by wheel, touch and focus; focus and `scrollIntoView` stop clear of a fade.",
+        ru: "`edges` — только оформление: содержимое под затуханием или тенью доступно и прокручивается колесом, касанием и фокусом; фокус и `scrollIntoView` останавливаются вне затухания.",
+      },
+      {
+        en: "`lock` keeps the content in the focus order: a locked region does not scroll, its items stay reachable.",
+        ru: "`lock` не убирает содержимое из порядка фокуса: заблокированную область не прокрутить, но её элементы доступны.",
+      },
+      {
+        en: "While an edge load is pending the region is `aria-busy`; announcing new entries is the feed's job (a polite status or `aria-live` on a counter), so a busy chat does not read every message aloud.",
+        ru: "Пока промис `onReachStart` / `onReachEnd` не завершён, на области `aria-busy`; озвучить подгрузку — дело ленты (`aria-live` у счётчика или статуса).",
+      },
+    ],
+  },
 };

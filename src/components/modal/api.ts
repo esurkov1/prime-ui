@@ -57,4 +57,49 @@ export const api: ComponentApi = {
     dialogSlotsPart("Modal", "Modal.Trigger · Modal.Close · Modal.Confirm"),
   ],
   labels: dialogLabels,
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Escape",
+        en: "Closes the dialog (`closeOnEscape`); focus returns to the opener.",
+        ru: "Закрывает окно (`closeOnEscape`); фокус возвращается на триггер.",
+      },
+      {
+        keys: "Enter",
+        en: 'Clicks `Modal.Confirm` from a text field or the dialog itself. Enter on a button, link or `role="button"` (Cancel included) activates that element instead; a `<textarea>`, a `<select>`, an `<input>` of type checkbox / radio / file / button / submit / reset, a contenteditable element and the header keep their own Enter.',
+        ru: "Нажимает `Modal.Confirm` из текстового поля или самого окна; на кнопке или ссылке (включая «Отмена») срабатывает она сама; textarea, select, чекбокс и шапка оставляют Enter себе.",
+      },
+      {
+        keys: "Tab · Shift+Tab",
+        en: "Cycles focus inside the dialog.",
+        ru: "Переводит фокус по кругу внутри окна.",
+      },
+    ],
+    aria: [
+      {
+        en: '`role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.',
+        ru: '`role="dialog"` и `aria-modal="true"`; имя — `Modal.Title` (или `aria-label`), описание — `Modal.Description`.',
+      },
+      {
+        en: "Focus moves into the dialog on open (an `autoFocus` field wins) and returns to the opener on close — also after a scrim click (foundation §8).",
+        ru: "При открытии фокус уходит в окно (поле с `autoFocus` побеждает), при закрытии — на элемент, открывший окно, в том числе после клика по подложке.",
+      },
+      {
+        en: "The page behind is `inert` and its scroll is locked.",
+        ru: "Страница за окном неактивна (`inert`), прокрутка заблокирована.",
+      },
+      {
+        en: "Only the topmost layer reacts: a Select open inside the dialog closes first.",
+        ru: "Реагирует только верхний слой: Select, открытый внутри окна, закрывается первым.",
+      },
+      {
+        en: "On a narrow viewport a swipe down is an extra way out; the close button and Escape stay. A destructive confirm (`closeOnOutsideClick={false}`) does not close by swipe. The grab handle is `aria-hidden`.",
+        ru: "На узком экране свайп вниз — дополнительный способ закрыть; крестик и Escape остаются. Разрушительное подтверждение (`closeOnOutsideClick={false}`) свайпом не закрывается. Ручка — `aria-hidden`.",
+      },
+      {
+        en: 'A busy `Guard` keeps the close button and the `Close` child in place, `disabled`; a dirty one opens a `role="alertdialog"` confirm with focus on «Продолжить».',
+        ru: '`Modal.Guard busy` оставляет крестик и кнопку в `Modal.Close` на месте выключенными; `dirty` открывает подтверждение `role="alertdialog"` с фокусом на «Продолжить».',
+      },
+    ],
+  },
 };

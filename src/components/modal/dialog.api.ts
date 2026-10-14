@@ -128,6 +128,7 @@ export function dialogParts(name: "Modal" | "Drawer" | "Sheet", footerDefault: s
     {
       name: `${name}.Header`,
       en: "`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button]. + native `HTMLAttributes<HTMLElement>`.",
+      ru: "Рисует `<header>`: [Icon] [Title + Description] [Actions] [кнопка закрытия]. + нативные `HTMLAttributes<HTMLElement>`.",
       props: [
         {
           name: "showClose",
@@ -180,16 +181,19 @@ export function dialogParts(name: "Modal" | "Drawer" | "Sheet", footerDefault: s
     {
       name: `${name}.Title · ${name}.Description`,
       en: "`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.",
+      ru: "`<h2>` (title-m) / `<p>` (body-s, приглушённый); их id дают диалогу имя и описание. + нативные пропсы, кроме `id`.",
       props: [],
     },
     {
       name: `${name}.Body`,
       en: "`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.",
+      ru: "Единственная прокручиваемая зона (ScrollContainer), зазор 16 между блоками. + нативные пропсы `<div>`.",
       props: [],
     },
     {
       name: `${name}.Footer`,
       en: "`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start. + native `HTMLAttributes<HTMLElement>`.",
+      ru: "Рисует `<footer>` с действиями, главное последним, и необязательный `Meta` в начале. + нативные `HTMLAttributes<HTMLElement>`.",
       props: [
         {
           name: "layout",

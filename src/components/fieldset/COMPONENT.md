@@ -75,11 +75,15 @@ A Button inside a disabled group is disabled too (it reads the same context), so
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the group's fields; the fields of a disabled group are skipped. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The native `<fieldset>` is a group (`role="group"`) named by the `<legend>` text from `label`; without a heading give it `aria-label`.
 - `description` is linked to the group through `aria-describedby`.
 - `disabled` disables the native controls inside and passes a context to kit controls: they set their own `disabled` / `aria-disabled` and drop out of the Tab order.

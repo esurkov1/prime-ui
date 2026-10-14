@@ -127,11 +127,15 @@ No `open` prop: the parent mounts and unmounts the banner. A mounted banner ente
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Actions and the close button are regular buttons in Tab order. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The banner has no role of its own: give an error after an action `role="alert"`, a calm status `role="status"`, a page strip `role="region"` with `aria-label`.
 - The icon is `aria-hidden`: the title carries the meaning, not the color.
 - The close button is named by `labels.dismiss`. It leaves with the banner, so after dismissing the parent moves focus to a sensible place: the control that takes the banner's spot, or the next heading or action of the section (see `dismissible.tsx`).

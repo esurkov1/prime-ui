@@ -136,12 +136,16 @@ Root: `data-size`, `data-layout`. The panel height transitions through `grid-tem
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus between triggers; a disabled one is skipped. |
 | `Enter` · `Space` | Opens or closes the section. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The trigger is a native `<button>` inside an `<h3>` with `aria-expanded` and `aria-controls`.
 - The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.
 - The chevron and `Accordion.Icon` are `aria-hidden`.

@@ -179,4 +179,40 @@ export const api: ComponentApi = {
       ru: "Озвучивается, когда промис `onRemove` отклонён и бейдж остался; назовите бейдж («Фильтр «Москва» не убран»).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses the body of a pressable badge, then its action or remove segment.",
+        ru: "Фокус на теле нажимаемого бейджа, затем на действии или удалении.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Presses the focused body, remove or action button.",
+        ru: "Нажимает тело, удаление или действие в фокусе.",
+      },
+    ],
+    aria: [
+      {
+        en: "A read-only badge is plain text in a `<span>`, no role.",
+        ru: "Бейдж без действий — обычный текст в `<span>`, без роли.",
+      },
+      {
+        en: "`onPress` makes the body a `<button>` with `aria-pressed` when `pressed` is set; remove and `Badge.Action` are separate buttons with their own names.",
+        ru: "`onPress` делает тело `<button>` с `aria-pressed` при заданном `pressed`; удаление и `Badge.Action` — отдельные кнопки со своими именами.",
+      },
+      {
+        en: "Give every remove button a unique name with `labels.remove`; after removing, move focus to a neighbouring badge or the source field.",
+        ru: "Дайте каждому удалению уникальное имя через `labels.remove`, иначе скринридер услышит несколько одинаковых «Удалить».",
+      },
+      {
+        en: "While a removal is saved the badge has `aria-busy` and the segment `aria-disabled`; once a removal waits, the badge mounts a polite live region that speaks `labels.removeFailed` if the promise rejects.",
+        ru: "Пока удаление сохраняется (промис из `onRemove` или `loading`), у бейджа `aria-busy`, у сегмента `aria-disabled`; отказ объявляет вежливая live-область бейджа (`labels.removeFailed`).",
+      },
+      {
+        en: "`Badge.Dot` is `aria-hidden`; icon-only badges need `aria-label`. Color never carries meaning alone.",
+        ru: "`Badge.Dot` скрыт (`aria-hidden`); бейджу-иконке нужен `aria-label`. Цвет никогда не несёт смысл один — оставляйте слово.",
+      },
+    ],
+  },
 };

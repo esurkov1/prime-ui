@@ -93,12 +93,16 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` · `ArrowDown` | Open the system list (browser and OS behaviour). |
 | `ArrowUp` · `ArrowDown` | On the closed field change the value (in most browsers). |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - It is a real `<select>`: the role, the keyboard and the list come from the browser and the OS.
 - `label` is a `<label htmlFor>`; the hint and the error are linked by `aria-describedby`, the error sets `aria-invalid`.
 - The chevron is decorative (`aria-hidden`).

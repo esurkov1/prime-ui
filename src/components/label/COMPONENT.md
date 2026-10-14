@@ -92,9 +92,13 @@ The label has no hover or focus state; clicking it focuses the control bound wit
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Bind with `htmlFor` to a native control, or set `id` on the label and `aria-labelledby` on a custom control (a `role="radiogroup"`, a `fieldset` of cells).
 - The `*` is `aria-hidden`; requiredness must come from the control (`required`).
 - The optional marker and `Label.Description` are visible text and part of the accessible name; `Label.Icon` is `aria-hidden`.

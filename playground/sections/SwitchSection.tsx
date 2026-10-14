@@ -55,19 +55,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Переводит фокус на переключатель." },
-      {
-        keys: "Space",
-        action: "Переключает его (кроме `readOnly` и пока идёт сохранение).",
-      },
-    ],
-    aria: [
-      'Нативный `<input type="checkbox" role="switch">` без `aria-checked`: состояние переключателя — нативное `checked` поля, его и читает скринридер; поле скрыто поверх дорожки и обёрнут строкой-`<label>`.',
-      "`aria-invalid`, `aria-readonly` и `aria-describedby` (ваши id, затем подсказка или ошибка) — на input.",
-      "Без видимого текста назовите его через `aria-label` или `aria-labelledby` на `Switch.Root`.",
-      "Пока изменение сохраняется (`loading` или промис из `onCheckedChange`), на input `aria-busy`, а спиннер в бегунке скрыт от чтения с экрана; при отказе состояние возвращается, причину покажите через `error`.",
-    ],
-  },
 };

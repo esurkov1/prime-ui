@@ -174,12 +174,16 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Escape` | Closes the drawer (`closeOnEscape`); focus returns to the trigger. |
 | `Tab` · `Shift+Tab` | Cycle focus inside the drawer. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.
 - Focus moves into the panel on open and returns to the opener on close, including after a scrim click.
 - The page behind is `inert`, scroll is locked; only the topmost layer reacts.

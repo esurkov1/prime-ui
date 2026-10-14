@@ -224,4 +224,36 @@ export const api: ComponentApi = {
       ru: "Имя списка уведомлений снизу справа.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses the action and the close button; focus inside a stack expands it and pauses the timers.",
+        ru: "Фокус на действии и кнопке закрытия; фокус внутри стопки раскрывает её и ставит таймеры на паузу.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Presses the action or the close button.",
+        ru: "Нажимает действие или кнопку закрытия.",
+      },
+    ],
+    aria: [
+      {
+        en: 'Each stack is an `<ol>` named by the region label of its position; each card is an `<article>`: `role="status"` + `aria-live="polite"`, or `role="alert"` + `aria-live="assertive"` for `warning` / `danger`.',
+        ru: 'Каждая стопка — `<ol>` с именем из `labels` для своей позиции; карточка — `<article>` с `role="status"` (`aria-live="polite"`) или `role="alert"` для danger и warning.',
+      },
+      {
+        en: "The icon and the countdown are `aria-hidden`; the close button is named by `labels.close`.",
+        ru: "Иконка скрыта (`aria-hidden`); кнопка закрытия названа `labels.close`.",
+      },
+      {
+        en: "A toast is a non-modal live region, not a layer of the overlay stack: Escape and a press elsewhere belong to the page and to the topmost open layer, so a toast takes no `closeOnEscape` / `closeOnOutsideClick` — it leaves by its timer, the close button, a swipe or `dismiss()`.",
+        ru: "Уведомление — немодальная live-область, а не слой оверлеев: Escape и нажатие мимо принадлежат странице и верхнему открытому слою, поэтому у него нет `closeOnEscape` / `closeOnOutsideClick` — оно уходит по таймеру, крестику, свайпу или `dismiss()`.",
+      },
+      {
+        en: "Do not keep the only copy of important information in a toast with a timer — use `persistent` or a Banner.",
+        ru: "Важное не держите только в уведомлении с таймером — используйте `persistent` или Banner.",
+      },
+    ],
+  },
 };

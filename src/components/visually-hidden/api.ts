@@ -29,4 +29,17 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "The text stays in the accessibility tree: it joins the accessible name of the element around it.",
+        ru: "Текст остаётся в дереве доступности и входит в имя элемента вокруг.",
+      },
+      {
+        en: 'With `live="polite"` it is a polite live region (`role="status"`), with `live="assertive"` an alert (`role="alert"`) for what cannot wait; keep it mounted and change its text — a region mounted together with its message is often not read.',
+        ru: 'С `live="polite"` — вежливая живая область (`role="status"`), с `live="assertive"` — срочное объявление (`role="alert"`): держите её смонтированной и меняйте текст.',
+      },
+    ],
+  },
 };

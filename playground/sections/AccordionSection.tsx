@@ -57,18 +57,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Tab",
-        action: "Переводит фокус между заголовками разделов; неактивный пропускается.",
-      },
-      { keys: "Enter · Space", action: "Открывает или закрывает раздел." },
-    ],
-    aria: [
-      "Заголовок — нативная `<button>` внутри `<h3>` с `aria-expanded` и `aria-controls`.",
-      "Содержимое — `<section>` с `aria-labelledby`; закрытое — `inert` и `aria-hidden`, его поля выходят из порядка Tab.",
-      "Шеврон и `Accordion.Icon` скрыты (`aria-hidden`).",
-    ],
-  },
 };

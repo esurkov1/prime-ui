@@ -163,7 +163,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `…rest` | `Omit<ButtonRootProps, "variant" \| "tone" \| "size" \| "aria-label">` | — | The other Button props. |
 
 ### ColorPresets.Root
-A quick color from a fixed palette: a square trigger and a popover grid of presets. No DOM, except a field frame in a FieldList cell (the column heading as its label).
+No DOM and no ref, except a field frame in a FieldList cell (the column heading as its label). A quick color from a fixed palette: a square trigger and a popover grid of presets.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -275,6 +275,8 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `ArrowLeft` · `ArrowRight` · `ArrowUp` · `ArrowDown` | Move the area thumb or a slider; in the ColorPresets grid, move between swatches. |
@@ -285,6 +287,8 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `Escape` | Closes the ColorPresets panel. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Area and sliders are React Aria primitives with their own `role="slider"` names.
 - `TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (ColorPresets.Trigger names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).
 - `ColorPicker.Swatches` is a `role="radiogroup"` (ColorSwatches): name it with `label` or `aria-label`.

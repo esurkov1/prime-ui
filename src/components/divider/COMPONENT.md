@@ -80,9 +80,13 @@ No `variant`, `tone` or `color`: one hairline in `border-subtle`, label in `text
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="separator"`; vertical sets `aria-orientation="vertical"`.
 - A purely visual line between rows that are separate anyway → `role="presentation"`.
 - The label is read as the separator's text; an icon-only divider needs `aria-label`.

@@ -81,9 +81,13 @@ Hint is not interactive: hover and focus belong to the field.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Give the hint an `id` and put it into the control's `aria-describedby` so screen readers read it with the field.
 - Add `role="alert"` to an error that appears after a user action.
 - `Hint.Icon` is decorative; the text carries the meaning.

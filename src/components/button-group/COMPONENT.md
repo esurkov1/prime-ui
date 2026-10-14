@@ -129,12 +129,16 @@ Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus between segments; a disabled one is skipped. |
 | `Enter` · `Space` | Presses the segment (native `<button>`). |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The group element is `role="group"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. Set `role="toolbar"` on the outer container of several groups.
 - Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.
 - Toggle segments expose `aria-pressed`; in a toggle set pass `pressed={false}` to the inactive ones.

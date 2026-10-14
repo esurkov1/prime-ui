@@ -144,12 +144,16 @@ Timeline keeps no state and has no persistent selection: every row is highlighte
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Interactive rows are one Tab stop each; the focus ring is drawn inside the row. |
 | `Enter` · `Space` | Activates a button row; Enter opens a link row. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Each group is an `<ol>` labelled by its heading (`aria-labelledby`); events are `<li>`.
 - The dot is `aria-hidden`: put the status into the title or meta, not only the dot color.
 

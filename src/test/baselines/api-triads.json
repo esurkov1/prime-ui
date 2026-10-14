@@ -1,0 +1,6 @@
+[
+  "src/components/color-picker/api.ts: ColorPicker.Root.defaultFormat without format",
+  "src/components/color-picker/api.ts: ColorPicker.Root.defaultFormat without onFormatChange",
+  "src/components/tag-select/api.ts: TagSelect.defaultColor without color",
+  "src/components/tag-select/api.ts: TagSelect.defaultColor without onColorChange"
+]

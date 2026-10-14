@@ -138,6 +138,8 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `ArrowRight` · `ArrowUp` | Increases the value by `step`. |
@@ -146,6 +148,8 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 | `Home` · `End` | Jumps to `min` / `max`. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A native `<input type="range">` (`role="slider"`) on top of the visual layer.
 - `label` is a `<label htmlFor>`; otherwise `aria-label` is required.
 - `orientation="vertical"` turns the native range with `writing-mode`, so ↑ / ↓ and the pointer work natively; the input has `aria-orientation="vertical"`.

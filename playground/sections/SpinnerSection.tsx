@@ -35,12 +35,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      '`role="status"` со скрытым текстом `labels.loading`: скринридер узнаёт о загрузке.',
-      'Внутри хоста, который уже сообщает о загрузке (`aria-busy` на кнопке или области), передайте `aria-hidden="true"`.',
-      "Под `prefers-reduced-motion` кольцо продолжает вращаться — вдвое медленнее и равномерно, чтобы сигнал загрузки оставался читаемым.",
-    ],
-  },
 };

@@ -149,6 +149,7 @@ export const api: ComponentApi = {
     {
       name: "Textarea.Counter",
       en: "`ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/280` and announces `labels.counter`.",
+      ru: "Счётчик символов для строки поддержки; показывает `14/280` и объявляет `labels.counter`.",
       props: [
         {
           name: "current",
@@ -198,4 +199,68 @@ export const api: ComponentApi = {
     ...FIELD_COMMIT_LABELS,
     ...TEXT_FORMATTING_LABEL_ROWS,
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses the field, then the buttons in its corner; Enter inserts a line break instead of submitting the form.",
+        ru: "Фокус в поле, затем на кнопки в его углу; Enter переносит строку, а не отправляет форму.",
+      },
+      {
+        keys: "Mod+Enter",
+        en: "With `onCommit`: saves a changed text; focus stays in the field.",
+        ru: "С `onCommit`: сохраняет изменённый текст, фокус остаётся в поле.",
+      },
+      {
+        keys: "Escape",
+        en: "With `formatting`: first clears a selection with the toolbar. With `onCommit`: puts the committed text back.",
+        ru: "С `formatting`: сначала снимает выделение с панелью. С `onCommit`: возвращает сохранённый текст.",
+      },
+      {
+        keys: "Mod + B · Mod + I · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9",
+        en: "With `formatting`: bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works.",
+        ru: "С `formatting`: жирный, курсив, зачёркнутый, код, скрытый текст, ссылка и цитата для выделения; работает в любой раскладке.",
+      },
+      {
+        keys: "← · →",
+        en: "Move between the formatting buttons.",
+        ru: "Переходят по кнопкам панели форматирования.",
+      },
+      {
+        keys: "Home · End",
+        en: "Jump to the first / last formatting button.",
+        ru: "Переходят к первой / последней кнопке панели форматирования.",
+      },
+    ],
+    aria: [
+      {
+        en: "`label` renders `<label htmlFor>` bound to the textarea; without it set `aria-label`. A placeholder never replaces the label.",
+        ru: "`label` — настоящий `<label htmlFor>`; без него задайте `aria-label`. Плейсхолдер не заменяет подпись.",
+      },
+      {
+        en: 'Hint and error are linked via `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.',
+        ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`.',
+      },
+      {
+        en: "The field box is a `<div>`, not a `<label>`, so counter and hint never leak into the accessible name; clicking its padding focuses the textarea.",
+        ru: "Поле — `<div>`, а не `<label>`: счётчик и подсказка не попадают в имя поля. Клик по отступу фокусирует textarea.",
+      },
+      {
+        en: '`Textarea.Counter` shows `12/280` visually and announces `labels.counter` (`aria-live="polite"`).',
+        ru: '`Textarea.Counter` показывает «12/280», а скринридер читает `labels.counter` через `aria-live="polite"`.',
+      },
+      {
+        en: "`Textarea.Action` and `Textarea.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied`. A press on them never moves focus into the textarea.",
+        ru: "`Textarea.Action` и `Textarea.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied`.",
+      },
+      {
+        en: 'With `onCommit` the textarea carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.',
+        ru: "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
+      },
+      {
+        en: 'The formatting toolbar is `role="toolbar"` named `labels.formatting`, `aria-controls` the textarea, with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere). A press on a tool keeps the focus and the selection in the field.',
+        ru: 'Панель форматирования — `role="toolbar"` с именем `labels.formatting` и `aria-controls` на поле, с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами. Нажатие на кнопку оставляет фокус и выделение в поле.',
+      },
+    ],
+  },
 };

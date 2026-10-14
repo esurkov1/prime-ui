@@ -2,7 +2,6 @@ import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
 import {
   FIELD_COMMIT_LABELS,
   FIELD_COPY_LABELS,
-  FIELD_ROOT_REST,
   fieldActionPart,
   fieldCommitProp,
   fieldCopyPart,
@@ -15,16 +14,6 @@ const side = (en: string, ru: string): ApiProp => ({
   en,
   ru,
 });
-
-const rest = (element: "div" | "span", omit = '"children"'): ApiProp => {
-  const type = element === "div" ? "HTMLDivElement" : "HTMLSpanElement";
-  return {
-    name: "…rest",
-    type: `Omit<HTMLAttributes<${type}>, ${omit}>`,
-    en: `\`className\` and the other attributes of the \`<${element}>\`.`,
-    ru: `\`className\` и остальные атрибуты \`<${element}>\`.`,
-  };
-};
 
 export const api: ComponentApi = {
   parts: [
@@ -133,7 +122,12 @@ export const api: ComponentApi = {
           en: "Usually `Input.Wrapper`.",
           ru: "Обычно `Input.Wrapper` с полем и слотами.",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
     {
@@ -148,7 +142,12 @@ export const api: ComponentApi = {
           en: "`Field` and the slots: `Icon`, `Affix`, `InlineAffix`; the end segments `ClearButton`, `CopyButton`, `RevealButton`, `Action` in source order.",
           ru: "`Field`, `Icon`, `Affix`, `InlineAffix`; сегменты у конца — `ClearButton`, `CopyButton`, `RevealButton`, `Action` в порядке разметки.",
         },
-        rest("div"),
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the `<div>`.",
+          ru: "`className` и остальные атрибуты `<div>`.",
+        },
       ],
     },
     {
@@ -185,6 +184,7 @@ export const api: ComponentApi = {
     {
       name: "Input.Icon",
       en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`), centered between the edge and the text.",
+      ru: "Декоративная иконка (`aria-hidden`) по центру между краем и текстом.",
       props: [
         side("Side of the value.", "Сторона значения."),
         {
@@ -194,12 +194,18 @@ export const api: ComponentApi = {
           en: "An icon; kit icons without an explicit `size` take the field tier.",
           ru: "Иконка; без `size` берёт ярус поля.",
         },
-        rest("span"),
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the `<span>`.",
+          ru: "`className` и остальные атрибуты `<span>`.",
+        },
       ],
     },
     {
       name: "Input.Affix",
       en: "`ref` → `HTMLDivElement`. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.",
+      ru: "Секция с подложкой вплотную к краю (`aria-hidden`); обёртка убирает там свой отступ.",
       props: [
         side("Edge the section sits on.", "Край, к которому прилегает секция с подложкой."),
         {
@@ -209,12 +215,18 @@ export const api: ComponentApi = {
           en: "Static text: protocol, domain, country code.",
           ru: "Постоянный текст: протокол, домен, код страны.",
         },
-        rest("div"),
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other attributes of the `<div>`.",
+          ru: "`className` и остальные атрибуты `<div>`.",
+        },
       ],
     },
     {
       name: "Input.InlineAffix",
       en: "`ref` → `HTMLSpanElement`. Muted unit next to the value (`aria-hidden`).",
+      ru: "Приглушённая единица рядом со значением (`aria-hidden`).",
       props: [
         side("Side of the value.", "Сторона значения."),
         {
@@ -224,7 +236,12 @@ export const api: ComponentApi = {
           en: "Short unit: `₽`, `%`, `кг`.",
           ru: "Короткая единица: `₽`, `%`, `кг`.",
         },
-        rest("span"),
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the `<span>`.",
+          ru: "`className` и остальные атрибуты `<span>`.",
+        },
       ],
     },
     {
@@ -270,6 +287,7 @@ export const api: ComponentApi = {
     {
       name: "Input.Counter",
       en: "`ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/40` and announces `labels.counter`.",
+      ru: "Счётчик символов для строки поддержки; показывает `14/40` и объявляет `labels.counter`.",
       props: [
         {
           name: "current",
@@ -285,7 +303,12 @@ export const api: ComponentApi = {
           en: 'Limit; `current > max` turns the counter danger (`data-invalid="true"`).',
           ru: "Лимит; при `current > max` счётчик красный (`data-invalid`).",
         },
-        rest("span"),
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the `<span>`.",
+          ru: "`className` и остальные атрибуты `<span>`.",
+        },
       ],
     },
   ],
@@ -347,4 +370,62 @@ export const api: ComponentApi = {
       ru: "Слово уровня 4.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses the field, then the segments at its end (clear, copy, reveal, actions).",
+        ru: "Фокус в поле, затем на кнопки у его конца (очистка, копирование, показ пароля, действия).",
+      },
+      {
+        keys: "Enter · Space",
+        en: "On a segment: runs its action (the clear button returns focus to the field).",
+        ru: "На кнопке у конца поля: выполняет её действие (кнопка очистки возвращает фокус в поле).",
+      },
+      {
+        keys: "Enter",
+        en: "With `onCommit`: saves a changed value; focus stays in the field.",
+        ru: "С `onCommit`: сохраняет изменённое значение, фокус остаётся в поле.",
+      },
+      {
+        keys: "Escape",
+        en: "With `onCommit`: puts the committed value back.",
+        ru: "С `onCommit`: возвращает сохранённое значение.",
+      },
+    ],
+    aria: [
+      {
+        en: "`label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.",
+        ru: "`label` — настоящий `<label htmlFor>`; без него задайте `aria-label` на `Input.Field`. Плейсхолдер не заменяет подпись.",
+      },
+      {
+        en: 'Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.',
+        ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`.',
+      },
+      {
+        en: '`Input.Icon`, `Input.Affix`, `Input.InlineAffix` are `aria-hidden`: put the meaning in the label (e.g. "Сумма, ₽").',
+        ru: "`Input.Icon`, `Input.Affix`, `Input.InlineAffix` скрыты (`aria-hidden`): смысл единицы или префикса дублируйте в подписи.",
+      },
+      {
+        en: "`Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.",
+        ru: "`Input.ClearButton` — кнопка с именем `labels.clear` и `aria-controls` на поле.",
+      },
+      {
+        en: "`Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.",
+        ru: "`Input.Action` и `Input.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied` через живой регион.",
+      },
+      {
+        en: "`Input.RevealButton` is a toggle: a constant name `labels.reveal`, `aria-pressed` and `aria-controls` on the input; a pointer press keeps the focus in the field.",
+        ru: "`Input.RevealButton` — переключатель с `aria-pressed` и постоянным именем `labels.reveal`.",
+      },
+      {
+        en: 'With `onCommit` the input carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.',
+        ru: "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
+      },
+      {
+        en: '`Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.',
+        ru: '`Input.Counter` показывает «14/40», а скринридер читает `labels.counter` через `aria-live="polite"`.',
+      },
+    ],
+  },
 };

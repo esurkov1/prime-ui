@@ -2,13 +2,6 @@ import type { ComponentApi } from "../../../scripts/docs/componentApi";
 
 const MODE = '"expanded" | "compact" | "hidden"';
 
-const DIV_REST = {
-  name: "…rest",
-  type: "HTMLAttributes<HTMLDivElement>",
-  en: "`children`, `className` and the other div attributes.",
-  ru: "`children`, `className` и остальные атрибуты div.",
-};
-
 const OPEN_TRIAD = (what: { en: string; ru: string }) => [
   {
     name: "open",
@@ -95,14 +88,26 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
-        DIV_REST,
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
       ],
     },
     {
       name: "Sidebar.Header · Sidebar.Footer",
       en: "`ref` → `HTMLDivElement`. Header: one fixed-height row for `Sidebar.Brand` and the header Toggle. Footer: items, the item Toggle and `Sidebar.Account` (set apart by air) at the bottom.",
       ru: "Header — строка фиксированной высоты для `Sidebar.Brand` и Toggle в шапке. Footer — пункты, Toggle-пункт и `Sidebar.Account` (отделён воздухом) внизу.",
-      props: [DIV_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "Sidebar.Brand",
@@ -379,7 +384,12 @@ export const api: ComponentApi = {
           en: "Initial state (uncontrolled). Opens by itself when a child becomes the current page.",
           ru: "Начальное состояние (неуправляемый режим). Раскрывается сам, когда дочерний пункт становится текущим.",
         },
-        DIV_REST,
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
       ],
     },
     {
@@ -523,4 +533,79 @@ export const api: ComponentApi = {
       ru: "Подпись Toggle на узком экране и подложки.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves focus through the items; a disabled or folded one is skipped.",
+        ru: "Переводит фокус по пунктам; недоступный и свёрнутый пропускаются.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the section, presses the item, opens or closes a group or a sub-list; on the compact rail opens the flyout (of a sub-list or a folded group) and focuses the first child.",
+        ru: "Открывает раздел, нажимает кнопку пункта, сворачивает или разворачивает группу и вложенный список; в компактном рельсе открывает всплывающую панель (вложенного списка или свёрнутой группы) и ставит фокус на первый дочерний пункт.",
+      },
+      {
+        keys: "ArrowRight · ArrowLeft",
+        en: "On a parent item opens / closes the sub-list; on the compact rail → opens the flyout, ← in it returns focus to the parent.",
+        ru: "На родительском пункте раскрывает и сворачивает вложенный список; в компактном рельсе → открывает панель, ← в панели возвращает фокус на родителя.",
+      },
+      {
+        keys: "ArrowDown · ArrowUp · Home · End",
+        en: "Move focus between the items of a compact flyout.",
+        ru: "Переводят фокус по пунктам во всплывающей панели компактного рельса.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the flyout (focus returns to the parent) and the off-canvas panel on a narrow screen.",
+        ru: "Закрывает всплывающую панель (фокус возвращается на родителя) и выезжающую панель на узком экране.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The panel is a `<nav>` named by `labels.navigation`; groups are `role="group"` named by their label.',
+        ru: 'Панель — `<nav>` с именем из `labels.navigation`; группы — `role="group"` с подписью.',
+      },
+      {
+        en: 'The current item has `aria-current="page"`; in compact mode the label shows as a tooltip, so icon-only items keep a visible name.',
+        ru: 'Текущий пункт — `aria-current="page"`; в компактном режиме подпись видна как подсказка.',
+      },
+      {
+        en: "A collapsible group heading and a SubTrigger are buttons with `aria-expanded` and `aria-controls`; folded content is `inert`.",
+        ru: "Сворачиваемая группа и родительский пункт — кнопки с `aria-expanded` и `aria-controls`; свёрнутое содержимое `inert`.",
+      },
+      {
+        en: 'On the compact rail a SubTrigger and the `…` row of a folded group have `aria-haspopup="dialog"`; the flyout is a non-modal dialog named by the parent (the `…` row by the group label).',
+        ru: 'В компактном рельсе родительский пункт и строка `…` свёрнутой группы — `aria-haspopup="dialog"`; всплывающая панель названа ими.',
+      },
+      {
+        en: "On the rail a collapsible group heading stays the same disclosure button (folding it there brings the `…` row); hovering it shows the whole name in a tooltip.",
+        ru: "На рельсе заголовок сворачиваемой группы остаётся той же кнопкой-раскрывашкой (свёрнутая группа даёт строку `…`); при наведении подсказка показывает полное название.",
+      },
+      {
+        en: "An attention dot is decorative: the count it stands for is read inside. On the compact rail a plain count leaves the row visually but stays readable by screen readers.",
+        ru: "Точка внимания декоративна: счётчик, который она обозначает, читается внутри. На компактной полосе обычный счётчик уходит из строки визуально, но остаётся доступным скринридеру.",
+      },
+      {
+        en: "In compact mode the brand's name fades out but still names the link.",
+        ru: "В компактном режиме название бренда гаснет, но по-прежнему даёт имя ссылке.",
+      },
+      {
+        en: "A row action is its own button next to the item (never nested), named by `label` with a tooltip.",
+        ru: "Действие в строке — отдельная кнопка рядом с пунктом, с именем и подсказкой из `label`.",
+      },
+      {
+        en: "The account avatar is hidden from screen readers; the name and the muted line name the button.",
+        ru: "Аватар аккаунта скрыт от скринридеров; кнопку называют имя и приглушённая строка.",
+      },
+      {
+        en: "Off-canvas: scrim, focus trap and Escape; the scrim is a button labelled `labels.close`.",
+        ru: "Выезжающая панель: подложка, ловушка фокуса и Escape; подложка — кнопка с `labels.close`.",
+      },
+      {
+        en: "Toggle: `aria-expanded`, `aria-controls` → nav, label from `labels`.",
+        ru: "Toggle: `aria-expanded`, `aria-controls` на `<nav>`, подпись из `labels`.",
+      },
+    ],
+  },
 };

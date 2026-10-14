@@ -129,46 +129,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Enter · Space · ArrowDown · ArrowUp",
-        action: "На триггере открывают список; фокус уходит в поиск или список.",
-      },
-      {
-        keys: "ArrowDown · ArrowUp · Home · End",
-        action:
-          "В списке двигают подсветку по доступным пунктам по кругу; `Select.Action` — последняя остановка после пунктов.",
-      },
-      {
-        keys: "Enter · Space",
-        action:
-          "Выбирают подсвеченный пункт; одиночный выбор закрывает список и возвращает фокус на триггер. На `Select.Action` запускают действие и закрывают список.",
-      },
-      {
-        keys: "A–Я",
-        action: "Набор с клавиатуры: подсветка уходит на пункт с этой буквы или префикса.",
-      },
-      { keys: "Delete · Backspace", action: "На триггере с `clearable` очищают значение." },
-      {
-        keys: "Enter",
-        action: "При ошибке загрузки в открытом списке повторяет загрузку (`onRetry`).",
-      },
-      { keys: "Escape", action: "Закрывает список; фокус возвращается на триггер." },
-      {
-        keys: "Tab",
-        action: "Возвращает фокус на триггер, закрывает список и переходит дальше от триггера.",
-      },
-    ],
-    aria: [
-      'Триггер — `role="combobox"` с `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`; имя — `label`.',
-      'Список — `role="listbox"` (`aria-multiselectable` при `multiple`); пункты — `role="option"` с `aria-selected`; подсветка — через `aria-activedescendant`.',
-      "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`; при загрузке — `aria-busy`.",
-      'При загрузке список — `aria-busy`, а `labels.loading` объявляется вежливо; строки-скелеты скрыты от скринридеров; ошибка загрузки — `role="alert"`.',
-      "Подсветка, дошедшая до последнего пункта, запрашивает следующую порцию так же, как прокрутка.",
-      '`Select.Action` — `role="option"` в группе под прокруткой; список владеет группой через `aria-owns`, подсветка доходит до действия через `aria-activedescendant`.',
-      "Пока сохраняется обещание из `onValueChange`, триггер — `aria-busy`, а отказ объявляет `labels.changeFailed` вежливо.",
-      "Клик снаружи закрывает список без возврата фокуса: фокус остаётся там, куда нажали.",
-    ],
-  },
 };

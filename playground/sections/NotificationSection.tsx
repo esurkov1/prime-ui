@@ -62,20 +62,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Tab",
-        action:
-          "Фокус на действии и кнопке закрытия; фокус внутри стопки раскрывает её и ставит таймеры на паузу.",
-      },
-      { keys: "Enter · Space", action: "Нажимает действие или кнопку закрытия." },
-    ],
-    aria: [
-      'Каждая стопка — `<ol>` с именем из `labels` для своей позиции; карточка — `<article>` с `role="status"` (`aria-live="polite"`) или `role="alert"` для danger и warning.',
-      "Иконка скрыта (`aria-hidden`); кнопка закрытия названа `labels.close`.",
-      "Уведомление — немодальная live-область, а не слой оверлеев: Escape и нажатие мимо принадлежат странице и верхнему открытому слою, поэтому у него нет `closeOnEscape` / `closeOnOutsideClick` — оно уходит по таймеру, крестику, свайпу или `dismiss()`.",
-      "Важное не держите только в уведомлении с таймером — используйте `persistent` или Banner.",
-    ],
-  },
 };

@@ -35,17 +35,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Tab",
-        action: "Проходит по полям группы; в выключенной группе поля пропускаются.",
-      },
-    ],
-    aria: [
-      'Нативный `<fieldset>` — группа (`role="group"`), её имя — текст `<legend>` из `label`; без заголовка задайте `aria-label`.',
-      "`description` связан с группой через `aria-describedby`.",
-      "`disabled` выключает нативные контролы внутри и передаёт контекст контролам кита: они ставят свои `disabled` / `aria-disabled` и пропускаются при навигации.",
-    ],
-  },
 };

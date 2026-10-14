@@ -177,4 +177,33 @@ export const api: ComponentApi = {
       ru: "Пометка после подписи группы при `optional`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses the selected option (or the first one when nothing is selected).",
+        ru: "Фокус на выбранный вариант (или первый, если ничего не выбрано).",
+      },
+      {
+        keys: "ArrowDown · ArrowRight · ArrowUp · ArrowLeft",
+        en: "Selects the next or previous option of the group (native radio behaviour).",
+        ru: "Выбирает следующий или предыдущий вариант группы (нативное поведение radio).",
+      },
+      { keys: "Space", en: "Selects the focused option.", ru: "Выбирает вариант в фокусе." },
+    ],
+    aria: [
+      {
+        en: '`Radio.Group` is `role="radiogroup"`, named by its `label` through `aria-labelledby`, or by `aria-label`.',
+        ru: '`Radio.Group` — `role="radiogroup"`, названный подписью (`label`) через `aria-labelledby` или `aria-label`.',
+      },
+      {
+        en: "`aria-required`, `aria-invalid` and `aria-orientation` sit on the group; the group hint or error is in its `aria-describedby`.",
+        ru: "`aria-required`, `aria-invalid`, `aria-orientation` на группе; подсказка или ошибка группы — в её `aria-describedby`.",
+      },
+      {
+        en: 'Every option is a native `<input type="radio">` with the shared `name`; an option `hint` is linked through `aria-describedby`.',
+        ru: 'Каждый вариант — нативный `<input type="radio">` с общим `name`; описание варианта (`hint`) связано через `aria-describedby`.',
+      },
+    ],
+  },
 };

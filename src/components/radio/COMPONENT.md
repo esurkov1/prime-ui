@@ -125,6 +125,8 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focuses the selected option (or the first one when nothing is selected). |
@@ -132,6 +134,8 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 | `Space` | Selects the focused option. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `Radio.Group` is `role="radiogroup"`, named by its `label` through `aria-labelledby`, or by `aria-label`.
 - `aria-required`, `aria-invalid` and `aria-orientation` sit on the group; the group hint or error is in its `aria-describedby`.
 - Every option is a native `<input type="radio">` with the shared `name`; an option `hint` is linked through `aria-describedby`.

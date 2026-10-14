@@ -122,6 +122,8 @@ One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-s
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus: the disk (or the transfer disk), the waveform slider, the rate chip, the transcript button. |
@@ -132,6 +134,8 @@ One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-s
 | `Home` · `End` | On the waveform: to the start or the end. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The root is `role="group"` named by `labels.player` (or your `aria-label`).
 - The disk is named `labels.play` while paused and `labels.pause` while playing. While the recording is sent, received or not fetched the same button is the transfer, named by the direction — `cancelUpload` / `cancelDownload` described by `uploadProgress` / `downloadProgress` (`aria-busy`), after a failure `retryUpload` / `retryDownload` described by `notSent` / `notReceived`, `download` for a remote one; its ring is `aria-hidden`; a refused cancel, retry or download is announced (`role="status"`).
 - The waveform is `role="slider"` with `aria-valuemin`, `aria-valuemax` (seconds), `aria-valuenow` and `aria-valuetext` from `labels.position`.

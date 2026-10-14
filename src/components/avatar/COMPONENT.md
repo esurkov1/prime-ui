@@ -125,9 +125,13 @@ The soft fill is opaque: the soft hue is composited over the surface the avatar 
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `Avatar.Image` `alt`: empty when the name is written next to it, otherwise the name. Without a photo and without a name nearby, put `aria-label` on `Avatar.Root`.
 - `Avatar.Status` is `role="img"` with `aria-label` from `labels`. Every state has its own shape (full dot, crescent, dot with a bar, hollow ring), so presence never rests on color alone.
 - `Avatar.Group` is `role="group"`; give it `aria-label`. Give `Avatar.Overflow` an `aria-label` («Ещё 3 участника»).

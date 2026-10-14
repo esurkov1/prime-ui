@@ -340,4 +340,97 @@ export const api: ComponentApi = {
       ru: "Текст пустого состояния по умолчанию.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "The chart is one tab stop: the last active cell (a bar or a row header).",
+        ru: "Весь график — одна точка табуляции: последняя активная ячейка (полоса или заголовок строки).",
+      },
+      {
+        keys: "← · →",
+        en: "Along the row: its header, then its bars in time order. A row off screen is rendered and scrolled into view.",
+        ru: "По строке: заголовок строки, затем полосы по времени. Строки вне экрана дорисовываются и прокручиваются в поле зрения.",
+      },
+      {
+        keys: "↑ · ↓",
+        en: "From a bar, the bar nearest in time in the row above / below (rows without bars are skipped); from a row header, the next row's header, empty rows too.",
+        ru: "С полосы — ближайшая по времени полоса в строке выше / ниже (строки без полос пропускаются); с заголовка — заголовок соседней строки, в том числе пустой.",
+      },
+      {
+        keys: "Home · End",
+        en: "First / last bar of the row; with Ctrl, of the chart.",
+        ru: "Первая / последняя полоса строки; с Ctrl — всего графика.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "On a bar: selects it (`onSelect`). On a row header: opens the row (`onRowClick`) or follows its link (`getRowHref`).",
+        ru: "На полосе — выбирает её (`onSelect`); на заголовке строки — открывает строку (`onRowClick`) или переходит по её ссылке (`getRowHref`).",
+      },
+      {
+        keys: "Shift + ← · Shift + →",
+        en: "Moves the bar by one day, at every zoom.",
+        ru: "Сдвигает полосу на один день при любом масштабе.",
+      },
+      {
+        keys: "Shift + Alt + ← · Shift + Alt + →",
+        en: "Moves the bar by the zoom's unit (a week, a month).",
+        ru: "Сдвигает полосу на единицу масштаба (неделю, месяц).",
+      },
+      {
+        keys: "Ctrl + Shift + ← · Ctrl + Shift + →",
+        en: "Shortens / lengthens the bar by one day (⌘ on macOS); it stops at one day.",
+        ru: "Укорачивает / удлиняет полосу на день (⌘ на macOS); короче одного дня не становится.",
+      },
+      {
+        keys: "Ctrl + Shift + Alt + ← · Ctrl + Shift + Alt + →",
+        en: "Shortens / lengthens the bar by the zoom's unit.",
+        ru: "Укорачивает / удлиняет полосу на единицу масштаба.",
+      },
+      {
+        keys: "N",
+        en: "Creates a one-unit bar (`onBarCreate`): at today on a row header, right after the bar on a bar.",
+        ru: "Создаёт полосу в одну единицу масштаба (`onBarCreate`): на заголовке строки — на сегодня, на полосе — сразу после неё.",
+      },
+      {
+        keys: "Escape",
+        en: "Cancels a drag or the drawing of a new bar; closes the tooltip.",
+        ru: "Отменяет перетаскивание или рисование новой полосы; закрывает подсказку.",
+      },
+    ],
+    aria: [
+      {
+        en: 'A `role="grid"` named by `aria-label`: a header row of `columnheader`s (the first column and the time axis named `labels.timeline`), then a row per record with a `rowheader` (the row name) and a `gridcell` holding its bars. A grid because the bars are navigated in two dimensions: moving between rows, a screen reader announces the row.',
+        ru: '`role="grid"` с именем из `aria-label`: строка шапки с `columnheader` («Название» и шкала с именем `labels.timeline`), в каждой строке `rowheader` с именем строки и `gridcell` с полосами. Сетка выбрана ради двумерной навигации: при переходе между строками скринридер называет строку.',
+      },
+      {
+        en: "A bar is a `<button>` named «Задача: 6 июля 2026 — 10 июля 2026» (with «выполнено 50%» when it has progress); a milestone «Релиз: 20 июля 2026». The Tooltip with the dates opens on hover and on focus and closes as soon as the chart scrolls (scrollbar, wheel, touch); the next hover or focus opens it again. It points at the visible part of the bar and stays inside the timeline, never over the label column or the header; a bar with less than `--prime-space-6` in view shows none.",
+        ru: "Полоса — `<button>` с именем «Задача: 6 июля 2026 — 10 июля 2026», с процентом выполнения; веха — «Релиз: 20 июля 2026». Подсказка с датами и длительностью («5 – 18 октября · 14 дн.») открывается и при наведении, и при фокусе; `renderBarTooltip` добавляет строки под датами, но не заменяет их. При перетаскивании подсказка показывает новые даты, а полоса идёт точно за указателем и прилипает к целым дням.",
+      },
+      {
+        en: "An editable bar has `aria-keyshortcuts` and is described by `labels.editHint`; the new dates after an editing key are announced in a polite status, a refused change with `labels.changeFailed`.",
+        ru: "Редактируемая полоса описана `labels.editHint` и `aria-keyshortcuts`; новые даты после клавиш объявляются вежливым статусом, отказ — `labels.changeFailed`.",
+      },
+      {
+        en: "While `onBarChange` runs the bar and the grid are `aria-busy`. Loading without rows hides the skeletons and announces `labels.loading`.",
+        ru: "Пока `onBarChange` выполняется, полоса и сетка `aria-busy`; при загрузке без строк скелетоны скрыты, а статус `labels.loading` объявляется.",
+      },
+      {
+        en: "The axis tiers, weekends and the today line are `aria-hidden`: the dates live in the bar names.",
+        ru: "Шапка шкалы, выходные и линия «сегодня» скрыты (`aria-hidden`): даты есть в именах полос.",
+      },
+      {
+        en: 'A row header is a focusable cell; with `onBarCreate` it is described by `labels.createHint` and has `aria-keyshortcuts="N"`. A new bar is announced, a refused one with `labels.createFailed`; the ghost is `aria-hidden`.',
+        ru: 'Заголовок строки — фокусируемая ячейка; при `onBarCreate` описан `labels.createHint` и `aria-keyshortcuts="N"`. Новая полоса объявляется, отказ — `labels.createFailed`; призрак новой полосы скрыт.',
+      },
+      {
+        en: "With `getRowHref` the header's stop in the grid is a real `<a>` named by the row's content inside the `rowheader`: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work, Space follows it like Enter, and the arrows rove from it as from any cell. With `onRowClick` alone the header itself opens the row by a click, Enter or Space; a click on a control inside it never does.",
+        ru: "С `getRowHref` остановка заголовка в сетке — настоящая ссылка `<a>` с именем строки внутри `rowheader`; с `onRowClick` сам заголовок открывает строку кликом, Enter и Space.",
+      },
+      {
+        en: "Rows are virtualized: only the rows in view are in the DOM, while `aria-rowcount` on the grid and `aria-rowindex` on each row keep the full count.",
+        ru: "Строки виртуализированы: в DOM только видимые, но `aria-rowcount` на сетке и `aria-rowindex` на строках сохраняют полный счёт.",
+      },
+    ],
+  },
 };

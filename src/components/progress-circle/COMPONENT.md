@@ -143,9 +143,13 @@ Always controlled: pass the current `value` or `segments`.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Value mode: the svg is `role="progressbar"` with `aria-valuenow` / `-min` / `-max`; a string or number child becomes `aria-valuetext`. With `value={null}` there is no `aria-valuenow` — the share is unknown.
 - The turn never stops under reduced motion (twice as slow): it is the only sign the work goes on.
 - Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.

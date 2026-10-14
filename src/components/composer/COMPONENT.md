@@ -211,6 +211,8 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` | In the field sends the message; on a touch screen breaks the line. |
@@ -227,6 +229,8 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | `Delete` · `Backspace` | On a tile of the tray: removes the attachment; focus moves to its neighbour. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The composer is a `<form>` named «Новое сообщение»; the field is a `<textarea>` named «Сообщение» with `enterkeyhint="send"` (`enter` on touch).
 - A reply / edit bar describes the field (`aria-describedby`); when it appears after the first render the caret moves to the field. Its close button is «Отменить ответ» / «Отменить редактирование». A send that went through closes it.
 - The formatting toolbar is `role="toolbar"` with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere).
@@ -234,6 +238,8 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - A live region (`role="status"`) announces a recording started, locked, deleted and sent, and the record mode after a switch («Голосовое сообщение» / «Видеосообщение»); a refused microphone is a `role="alert"` message that also describes the field, never a thrown error.
 - While recording the paperclip and the field are `inert` under the bar; the bar's buttons are «Удалить запись» and «Приостановить запись» / «Продолжить запись» (`aria-keyshortcuts="Space"`), the action button «Отправить запись». Deleting brings the focus back to the action button. Pause and resume are announced. The timer and the waveform are decorative. While a finger holds a recording only `Escape` works (it throws the recording away); the delete and pause buttons keep their own Enter and Space.
 - The attachments are one `<ul>` named «Вложения» (FileUpload.Queue `layout="strip"`): every tile is «Фото N: name» / «Видео N: name» / «Файл N: name» with its upload state, `aria-keyshortcuts` for `Alt + ←` / `→` and `Delete`, a remove button «Убрать name»; the upload disk is a `progressbar` while the file goes up. Moves are announced by Dnd's live region, finished and failed files by the queue's. «Отправить как файлы, без сжатия» is a labelled Checkbox.
+- Touch: the buttons get a 44 px hit area; Enter breaks the line, the button sends.
+- Voice and video together: a single press records without holding, a double press (within 300 ms) switches the mode. The first press records silently until the window ends, so a double press shows no recording and sends nothing.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

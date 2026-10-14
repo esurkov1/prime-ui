@@ -55,9 +55,13 @@ One look: none. It renders no pixels and takes no room.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The text stays in the accessibility tree: it joins the accessible name of the element around it.
 - With `live="polite"` it is a polite live region (`role="status"`), with `live="assertive"` an alert (`role="alert"`) for what cannot wait; keep it mounted and change its text — a region mounted together with its message is often not read.
 

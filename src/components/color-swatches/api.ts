@@ -1,5 +1,4 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -128,7 +127,12 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
   ],
@@ -152,4 +156,42 @@ export const api: ComponentApi = {
       ru: "Пометка после подписи при `optional`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Enters on the selected swatch (or the first one).",
+        ru: "Вход на выбранный образец (или первый).",
+      },
+      {
+        keys: "ArrowRight · ArrowLeft",
+        en: "Moves to the next / previous swatch and selects it.",
+        ru: "Следующий / предыдущий образец с выбором.",
+      },
+      {
+        keys: "ArrowDown · ArrowUp",
+        en: "Moves one visual row down / up and selects.",
+        ru: "На видимый ряд ниже / выше с выбором.",
+      },
+      {
+        keys: "Home · End",
+        en: "Jumps to the first / last swatch and selects it.",
+        ru: "Первый / последний образец с выбором.",
+      },
+    ],
+    aria: [
+      {
+        en: '`role="radiogroup"` with one `role="radio"` button per swatch; the color name is the radio\'s name and `title`.',
+        ru: '`role="radiogroup"` с кнопкой `role="radio"` на каждый образец; название цвета — имя и `title` образца.',
+      },
+      {
+        en: "Named by `label`, `aria-labelledby`, `aria-label` or `labels.group`; the hint or the error is linked through `aria-describedby`.",
+        ru: "Группу называют `label`, `aria-labelledby`, `aria-label` или `labels.group`; подсказка или ошибка — через `aria-describedby`.",
+      },
+      {
+        en: "The check mark is decorative; the selection is announced by `aria-checked`.",
+        ru: "Галочка декоративна; выбор объявляет `aria-checked`.",
+      },
+    ],
+  },
 };

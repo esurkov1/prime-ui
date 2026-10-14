@@ -124,12 +124,16 @@ Motion: the color of the icon and the label changes over `fast`. Floating, the s
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` · `Shift+Tab` | Moves focus through the sections and the action; a disabled one is skipped. |
 | `Enter` | Opens the section (a link or a button) or runs the action. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A `<nav>` landmark named by `labels.nav` («Основные разделы») or its own `aria-label`.
 - The current section has `aria-current="page"`; visually it is the primary-color item among muted ones (a contrast step, not a hue); floating, it also sits on the selection capsule, so the accent is never the only cue.
 - The icon is hidden from assistive tech; the item is named by its label, the count is read after it («Заказы 12»).

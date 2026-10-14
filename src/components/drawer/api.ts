@@ -42,4 +42,44 @@ export const api: ComponentApi = {
     dialogSlotsPart("Drawer", "Drawer.Trigger · Drawer.Close"),
   ],
   labels: dialogLabels,
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Escape",
+        en: "Closes the drawer (`closeOnEscape`); focus returns to the trigger.",
+        ru: "Закрывает панель (`closeOnEscape`); фокус возвращается на триггер.",
+      },
+      {
+        keys: "Tab · Shift+Tab",
+        en: "Cycle focus inside the drawer.",
+        ru: "Переводит фокус по кругу внутри панели.",
+      },
+    ],
+    aria: [
+      {
+        en: '`role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.',
+        ru: '`role="dialog"` и `aria-modal="true"`; имя — `Drawer.Title` (или `aria-label`), описание — `Drawer.Description`.',
+      },
+      {
+        en: "Focus moves into the panel on open and returns to the opener on close, including after a scrim click.",
+        ru: "При открытии фокус уходит в панель, при закрытии — на элемент, открывший её, в том числе после клика по подложке.",
+      },
+      {
+        en: "The page behind is `inert`, scroll is locked; only the topmost layer reacts.",
+        ru: "Страница за панелью неактивна (`inert`), прокрутка заблокирована; реагирует только верхний слой.",
+      },
+      {
+        en: "A drawer opened from a Modal stacks above it.",
+        ru: "Панель, открытая из Modal, встаёт над ним.",
+      },
+      {
+        en: "No swipe: the close button, `Drawer.Close`, Escape and the scrim are the ways out.",
+        ru: "Свайпа нет: панель закрывают крестик, `Drawer.Close`, Escape и подложка.",
+      },
+      {
+        en: 'A busy `Guard` keeps the close button and the `Close` child in place, `disabled`; a dirty one opens a `role="alertdialog"` confirm with focus on «Продолжить».',
+        ru: '`Drawer.Guard busy` оставляет крестик и кнопку в `Drawer.Close` на месте выключенными; `dirty` открывает подтверждение `role="alertdialog"` с фокусом на «Продолжить».',
+      },
+    ],
+  },
 };

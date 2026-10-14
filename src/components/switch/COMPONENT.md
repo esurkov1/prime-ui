@@ -107,12 +107,16 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus to the switch. |
 | `Space` | Toggles it (not while `readOnly` or saving). |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A native `<input type="checkbox" role="switch">` (its native checked state is the switch state), visually hidden over the track and wrapped by the `<label>` row.
 - `aria-invalid`, `aria-readonly` and `aria-describedby` (your ids + the hint or the error) are set on the input.
 - Without visible text, name it with `aria-label` or `aria-labelledby` on `Switch.Root`.

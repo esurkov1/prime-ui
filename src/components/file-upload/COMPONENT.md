@@ -316,6 +316,8 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focuses the hidden file input (the zone or the add tile shows the ring), then the files and their buttons. |
@@ -325,6 +327,8 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | `Escape` | Cancels a tile drag in flight. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The zone is a `<label>` around a visually hidden but focusable `<input type="file">`. With `label` the input is named by it (`aria-labelledby`) and described by the hint or error; without it the zone text names the input — give a custom body without text an `aria-label` on Root.
 - `trigger="button"`: the kit Button takes the focus, named by the field label and its own text (or `aria-label`, required when it is an icon alone) and described by the hint or error; the input leaves the tab order.
 - `trigger="tile"`: the frame is a group named by the label; the add tile is the label of a hidden input («Добавить файлы») with the hint, the error and `aria-invalid` wired to it.

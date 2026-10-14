@@ -120,4 +120,32 @@ export const api: ComponentApi = {
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space · ArrowDown",
+        en: "Open the system list (browser and OS behaviour).",
+        ru: "Открывают системный список (поведение браузера и ОС).",
+      },
+      {
+        keys: "ArrowUp · ArrowDown",
+        en: "On the closed field change the value (in most browsers).",
+        ru: "На закрытом поле меняют значение (в большинстве браузеров).",
+      },
+    ],
+    aria: [
+      {
+        en: "It is a real `<select>`: the role, the keyboard and the list come from the browser and the OS.",
+        ru: "Это настоящий `<select>`: роль, клавиатура и список — от браузера и ОС.",
+      },
+      {
+        en: "`label` is a `<label htmlFor>`; the hint and the error are linked by `aria-describedby`, the error sets `aria-invalid`.",
+        ru: "`label` — `<label htmlFor>`; подсказка и ошибка связаны через `aria-describedby`, ошибка ставит `aria-invalid`.",
+      },
+      {
+        en: "The chevron is decorative (`aria-hidden`).",
+        ru: "Шеврон декоративен (`aria-hidden`).",
+      },
+    ],
+  },
 };

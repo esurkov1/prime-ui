@@ -104,6 +104,8 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Enters on the selected swatch (or the first one). |
@@ -112,6 +114,8 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 | `Home` · `End` | Jumps to the first / last swatch and selects it. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="radiogroup"` with one `role="radio"` button per swatch; the color name is the radio's name and `title`.
 - Named by `label`, `aria-labelledby`, `aria-label` or `labels.group`; the hint or the error is linked through `aria-describedby`.
 - The check mark is decorative; the selection is announced by `aria-checked`.

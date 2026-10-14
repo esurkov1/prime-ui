@@ -49,11 +49,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      "Main — ориентир `<main>`; шапку `<header>` даёт AppHeader, ориентиры навигации — Sidebar и BottomNav (`<nav>`).",
-      "На странице один `<h1>` (PageContent.Title).",
-    ],
-  },
 };

@@ -53,15 +53,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Переводит фокус между шагами; неактивный пропускается." },
-      { keys: "Enter · Space", action: "Выбирает шаг." },
-    ],
-    aria: [
-      'Семантический `<ol>`; каждый шаг — `<button>` внутри `<li>`, у активного — `aria-current="step"`.',
-      "Шевроны, индикатор и `Stepper.Arrow` скрыты (`aria-hidden`); имя шага — заголовок и описание.",
-      "Если степперов на странице несколько, дайте `<ol>` `aria-label`.",
-    ],
-  },
 };

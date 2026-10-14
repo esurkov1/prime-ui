@@ -179,6 +179,8 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Enters the list at one stop — the open dialog (or where the focus was last); the next Tab leaves the list. |
@@ -189,6 +191,8 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 | `Escape` | In the search field clears the query; in the menu closes it and returns the focus to the row. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, or a link with `href`.
 - The open dialog is `aria-current="true"` on a button, `"page"` on a link. Selection does not follow the focus: arrows only move it (a dialog may load a conversation); Enter, Space and a click open.
 - The row is named by its content: the name, glyphs with a `label` («Без звука», a verified mark), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.

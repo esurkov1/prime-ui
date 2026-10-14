@@ -139,6 +139,8 @@ Put it in a `Card` for a dashboard tile.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `←` · `→` · `↓` · `↑` | Previous or next point: `←` / `↓` back, `→` / `↑` forward, as on a slider. |
@@ -147,6 +149,8 @@ Put it in a `Card` for a dashboard tile.
 | `Escape` | Hides the tooltip and returns the headline to rest. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.
 - The headline with the value and change reads as plain text.
 - The change carries a sign and an arrow, never color alone; a negative bar goes down, not only red.

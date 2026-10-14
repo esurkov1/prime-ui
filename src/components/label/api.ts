@@ -73,4 +73,21 @@ export const api: ComponentApi = {
       ru: "Пометка после текста при `optional`.",
     },
   ],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: 'Bind with `htmlFor` to a native control, or set `id` on the label and `aria-labelledby` on a custom control (a `role="radiogroup"`, a `fieldset` of cells).',
+        ru: "Свяжите подпись с нативным контролом через `htmlFor`, с кастомным — через `id` и `aria-labelledby` на контроле.",
+      },
+      {
+        en: "The `*` is `aria-hidden`; requiredness must come from the control (`required`).",
+        ru: "`*` скрыта (`aria-hidden`): обязательность сообщает сам контрол (`required`).",
+      },
+      {
+        en: "The optional marker and `Label.Description` are visible text and part of the accessible name; `Label.Icon` is `aria-hidden`.",
+        ru: "Пометка «необязательно» и `Label.Description` — видимый текст и входят в имя поля; `Label.Icon` скрыт.",
+      },
+    ],
+  },
 };

@@ -144,4 +144,28 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Interactive rows are one Tab stop each; the focus ring is drawn inside the row.",
+        ru: "Интерактивные строки — по одной точке табуляции; кольцо фокуса внутри строки.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Activates a button row; Enter opens a link row.",
+        ru: "Активирует строку-кнопку; Enter открывает строку-ссылку.",
+      },
+    ],
+    aria: [
+      {
+        en: "Each group is an `<ol>` labelled by its heading (`aria-labelledby`); events are `<li>`.",
+        ru: "Каждая группа — `<ol>` с именем из заголовка (`aria-labelledby`); события — `<li>`.",
+      },
+      {
+        en: "The dot is `aria-hidden`: put the status into the title or meta, not only the dot color.",
+        ru: "Точка скрыта (`aria-hidden`): статус пишите в заголовке или мете, а не только цветом.",
+      },
+    ],
+  },
 };

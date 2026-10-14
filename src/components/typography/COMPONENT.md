@@ -91,9 +91,13 @@ Text has no interactive states.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The heading level comes from `as` by the page outline, the look from `variant`: never skip levels for size.
 - `tone` never carries meaning alone — name the status in words.
 - With `truncate` pass the full text in `title` when it matters.

@@ -185,6 +185,8 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | The header actions, then the legend as one stop (the entry focused last), then the chart's own focusable marks. |
@@ -193,6 +195,8 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `Enter` · `Space` | Shows or hides the entry's series. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The root is a `<figure>` named by `ChartFrame.Title` and described by `ChartFrame.Description`; `aria-busy` while loading.
 - A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.
 - `ChartFrame.Table` is a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.

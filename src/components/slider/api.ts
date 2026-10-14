@@ -176,4 +176,50 @@ export const api: ComponentApi = {
       ru: "Пометка после подписи при `optional`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "ArrowRight · ArrowUp",
+        en: "Increases the value by `step`.",
+        ru: "Увеличивает значение на `step`.",
+      },
+      {
+        keys: "ArrowLeft · ArrowDown",
+        en: "Decreases the value by `step`.",
+        ru: "Уменьшает значение на `step`.",
+      },
+      {
+        keys: "PageUp · PageDown",
+        en: "Changes the value by a larger step.",
+        ru: "Меняет значение крупным шагом.",
+      },
+      { keys: "Home · End", en: "Jumps to `min` / `max`.", ru: "Переход к `min` / `max`." },
+    ],
+    aria: [
+      {
+        en: 'A native `<input type="range">` (`role="slider"`) on top of the visual layer.',
+        ru: 'Нативный `<input type="range">` (`role="slider"`) поверх визуального слоя.',
+      },
+      {
+        en: "`label` is a `<label htmlFor>`; otherwise `aria-label` is required.",
+        ru: "`label` — настоящий `<label htmlFor>`; без него обязателен `aria-label`.",
+      },
+      {
+        en: '`orientation="vertical"` turns the native range with `writing-mode`, so ↑ / ↓ and the pointer work natively; the input has `aria-orientation="vertical"`.',
+        ru: '`orientation="vertical"` поворачивает нативный ползунок через `writing-mode`, поэтому ↑ / ↓ и указатель работают нативно; у поля `aria-orientation="vertical"`.',
+      },
+      {
+        en: "`formatValue` sets `aria-valuetext`, so screen readers announce the unit; the visual `<output>` is `aria-hidden`.",
+        ru: "`formatValue` задаёт `aria-valuetext`, скринридер читает единицы; видимый `<output>` скрыт (`aria-hidden`).",
+      },
+      {
+        en: "`aria-describedby` on the input: your ids + the hint or the error; `aria-invalid` when invalid.",
+        ru: "`aria-describedby` поля — ваши id и подсказка или ошибка; `aria-invalid` при ошибке.",
+      },
+      {
+        en: "While a commit is saved the input has `aria-busy`; say why a refused value went back with `error`.",
+        ru: "Пока значение сохраняется (промис из `onCommit`), у поля `aria-busy`; почему значение вернулось, покажите через `error`.",
+      },
+    ],
+  },
 };

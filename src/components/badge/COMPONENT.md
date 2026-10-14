@@ -146,12 +146,16 @@ Badge.Root          <span>: fill, tier dimensions
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focuses the body of a pressable badge, then its action or remove segment. |
 | `Enter` · `Space` | Presses the focused body, remove or action button. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A read-only badge is plain text in a `<span>`, no role.
 - `onPress` makes the body a `<button>` with `aria-pressed` when `pressed` is set; remove and `Badge.Action` are separate buttons with their own names.
 - Give every remove button a unique name with `labels.remove`; after removing, move focus to a neighbouring badge or the source field.

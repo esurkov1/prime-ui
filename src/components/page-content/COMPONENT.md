@@ -227,11 +227,15 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | On `PageContent.BackButton`: back from the detail to the list; focus returns to the list control that opened it. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Title is an `<h1>`; use one per page.
 - Give `PageContent.Page` an `aria-labelledby` that points at the Title `id` to name the region.
 - `PageContent.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`, so it is a region landmark with the heading's name; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).

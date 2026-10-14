@@ -153,4 +153,33 @@ export const api: ComponentApi = {
       ru: "Текст для скринридеров, когда все сегменты равны 0.",
     },
   ],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "Value mode: native `<progress>` — role `progressbar` with value and max.",
+        ru: "Режим значения: нативный `<progress>` — роль `progressbar` со значением и максимумом.",
+      },
+      {
+        en: 'Segments mode: `role="group"`; its text lists the shares of `max` («Видео: 38%, Документы: 21%»). With `label` (or `aria-label`) the group is named by it and described by the distribution — or by the legend when `legend` is on; without a name the distribution is the name.',
+        ru: 'Режим сегментов: `role="group"`; доли читаются текстом «Видео: 38%, Документы: 21%». С `label` полоса названа подписью, а доли — описание; с `legend` описанием становится легенда.',
+      },
+      {
+        en: "Rows: an `<ol>` named by `label`; each row reads as text («Москва 1 284 52%»), the bars are `aria-hidden`.",
+        ru: 'Рейтинг (`layout="rows"`): список `<ol>` с именем из `label`; каждая строка читается текстом «Москва 1 284 52%», полосы скрыты от скринридеров.',
+      },
+      {
+        en: "A category color always sits beside its name (legend, row), so color is never the only cue.",
+        ru: "Цвет категории всегда стоит рядом с её названием в легенде или строке — смысл не передаётся только цветом.",
+      },
+      {
+        en: "Without `label`, pass `aria-label`, otherwise a value bar has no accessible name.",
+        ru: "Без `label` задайте `aria-label`, иначе у полосы значения нет имени.",
+      },
+      {
+        en: "The `showValue` percentage is `aria-hidden`; while `loading` the root is `aria-busy` and the Skeletons are `aria-hidden`.",
+        ru: "Процент `showValue` скрыт от скринридеров (`aria-hidden`); во время `loading` корень помечен `aria-busy`, а заглушки скрыты (`aria-hidden`).",
+      },
+    ],
+  },
 };

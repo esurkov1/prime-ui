@@ -1,12 +1,5 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
 
-const rest = (element: string, tag: string) => ({
-  name: "…rest",
-  type: `HTMLAttributes<${element}>`,
-  en: `\`className\` and the other ${tag} attributes.`,
-  ru: `\`className\` и остальные атрибуты ${tag}.`,
-});
-
 export const api: ComponentApi = {
   parts: [
     {
@@ -66,14 +59,26 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Встроенные строки, см. Labels.",
         },
-        rest("HTMLElement", "figure"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLElement>",
+          en: "`className` and the other figure attributes.",
+          ru: "`className` и остальные атрибуты figure.",
+        },
       ],
     },
     {
       name: "ChartFrame.Header",
       en: "`ref` → `HTMLDivElement`. The top zone: title and description in the first column, `ChartFrame.Actions` at the end, under them when the panel is narrower than 24rem.",
       ru: "Верхняя зона: название и описание в первой колонке, `ChartFrame.Actions` в конце, под ними, когда панель уже 24rem.",
-      props: [rest("HTMLDivElement", "div")],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "ChartFrame.Title",
@@ -87,26 +92,52 @@ export const api: ComponentApi = {
           en: "Heading level that fits the page outline; the look does not change.",
           ru: "Уровень заголовка по структуре страницы; вид не меняется.",
         },
-        rest("HTMLHeadingElement", "heading"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLHeadingElement>",
+          en: "`className` and the other heading attributes.",
+          ru: "`className` и остальные атрибуты heading.",
+        },
       ],
     },
     {
       name: "ChartFrame.Description",
       en: "`ref` → `HTMLParagraphElement`. What the chart measures and over which period; describes the figure.",
       ru: "Что измеряет график и за какой период; описание фигуры.",
-      props: [rest("HTMLParagraphElement", "p")],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLParagraphElement>",
+          en: "`className` and the other p attributes.",
+          ru: "`className` и остальные атрибуты p.",
+        },
+      ],
     },
     {
       name: "ChartFrame.Actions",
       en: "`ref` → `HTMLDivElement`. Controls of the chart in the header: a period switch, an export button.",
       ru: "Управление графиком в заголовке: переключатель периода, кнопка выгрузки.",
-      props: [rest("HTMLDivElement", "div")],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "ChartFrame.Value",
       en: "`ref` → `HTMLDivElement`. The headline number (heading-m, tabular) with an optional `ChartFrame.Delta` beside it; a Skeleton of its geometry while loading, a muted dash after a load error (the number is unknown).",
       ru: "Главное число (heading-m, моноширинные цифры) с `ChartFrame.Delta` рядом; во время загрузки — Skeleton своей геометрии, после ошибки загрузки — приглушённое тире (число неизвестно).",
-      props: [rest("HTMLDivElement", "div")],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "ChartFrame.Delta",
@@ -120,7 +151,12 @@ export const api: ComponentApi = {
           en: "Color of the change: `success` — good, `danger` — bad; independent of the sign.",
           ru: "Цвет изменения: `success` — хорошо, `danger` — плохо; не зависит от знака.",
         },
-        rest("HTMLSpanElement", "span"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -147,7 +183,12 @@ export const api: ComponentApi = {
           en: "A chart that sizes itself to its container (an SVG with a `viewBox`, `ResponsiveContainer`); it fills the area.",
           ru: "График, который сам подстраивается под контейнер (SVG с `viewBox`, `ResponsiveContainer`); заполняет область.",
         },
-        rest("HTMLDivElement", "div"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
       ],
     },
     {
@@ -162,7 +203,12 @@ export const api: ComponentApi = {
           en: "Entries only name the series and do not toggle them.",
           ru: "Записи только называют ряды и не переключают их.",
         },
-        rest("HTMLUListElement", "ul"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLUListElement>",
+          en: "`className` and the other ul attributes.",
+          ru: "`className` и остальные атрибуты ul.",
+        },
       ],
     },
     {
@@ -189,7 +235,12 @@ export const api: ComponentApi = {
           en: "A point in `renderPlot` coordinates (the pointer, or the point the arrows reached): the tooltip floats right of it, left only without room; `null` hides it. Floating, it is `aria-hidden`.",
           ru: "Точка в координатах `renderPlot` (курсор или точка стрелок): подсказка справа от неё, слева — только без места; `null` скрывает. Парящая подсказка `aria-hidden`.",
         },
-        rest("HTMLDivElement", "div"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
       ],
     },
     {
@@ -204,7 +255,12 @@ export const api: ComponentApi = {
           en: "`{ label, values }` per point; `values` by series id, a missing one reads as «—».",
           ru: "`{ label, values }` на точку; `values` по id ряда, отсутствующее читается как «—».",
         },
-        rest("HTMLTableElement", "table"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLTableElement>",
+          en: "`className` and the other table attributes.",
+          ru: "`className` и остальные атрибуты table.",
+        },
       ],
     },
   ],
@@ -240,4 +296,54 @@ export const api: ComponentApi = {
       ru: "Заголовок первого столбца `ChartFrame.Table` (что такое строка).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "The header actions, then the legend as one stop (the entry focused last), then the chart's own focusable marks.",
+        ru: "Действия заголовка, затем легенда одной остановкой (запись, на которой был фокус), затем элементы графика, если они фокусируемы.",
+      },
+      {
+        keys: "← · → · ↑ · ↓",
+        en: "Previous or next legend entry, wrapping.",
+        ru: "Предыдущая или следующая запись легенды, по кругу.",
+      },
+      {
+        keys: "Home · End",
+        en: "First or last legend entry.",
+        ru: "Первая или последняя запись легенды.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Shows or hides the entry's series.",
+        ru: "Показать или скрыть ряд записи.",
+      },
+    ],
+    aria: [
+      {
+        en: "The root is a `<figure>` named by `ChartFrame.Title` and described by `ChartFrame.Description`; `aria-busy` while loading.",
+        ru: "Корень — `<figure>` с именем из `ChartFrame.Title` и описанием из `ChartFrame.Description`; во время загрузки `aria-busy`.",
+      },
+      {
+        en: "A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.",
+        ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
+      },
+      {
+        en: "`ChartFrame.Table` is a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.",
+        ru: "`ChartFrame.Table` — визуально скрытая таблица с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд.",
+      },
+      {
+        en: "A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.",
+        ru: "`ChartFrame.Tooltip` с `point` скрыт от вспомогательных технологий и пассивен (без фокуса, `Escape` прячет его до следующей точки): он повторяет то, что озвучивает сам график.",
+      },
+      {
+        en: 'The empty state is `role="status"`, the error `role="alert"` with the retry button.',
+        ru: 'Пустое состояние — `role="status"`, ошибка — `role="alert"` с кнопкой «Повторить».',
+      },
+      {
+        en: "The drawing is the library's: hide a decorative SVG (`aria-hidden`) when `ChartFrame.Table` carries the data; marks you make focusable need their own `aria-label`.",
+        ru: "Сам рисунок графика — забота библиотеки: скрывайте декоративный SVG (`aria-hidden`), когда данные есть в `ChartFrame.Table`.",
+      },
+    ],
+  },
 };

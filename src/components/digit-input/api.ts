@@ -1,5 +1,4 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -154,7 +153,12 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
   ],
@@ -184,4 +188,51 @@ export const api: ComponentApi = {
       ru: "Ошибка кода, чей промис `onComplete` отклонён без причины.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "0–9",
+        en: "Types into the first empty cell and moves to the next one.",
+        ru: "Ввод в первую пустую ячейку и переход к следующей.",
+      },
+      {
+        keys: "Backspace",
+        en: "Clears the cell; on an empty cell moves to the previous one.",
+        ru: "Стирает цифру; в пустой ячейке — переход к предыдущей.",
+      },
+      {
+        keys: "ArrowLeft · ArrowRight",
+        en: "Moves between filled cells and the entry cell.",
+        ru: "Ходит по заполненным ячейкам и ячейке ввода.",
+      },
+      {
+        keys: "Home · End",
+        en: "Jumps to the first cell / the entry cell.",
+        ru: "К первой ячейке / к ячейке ввода.",
+      },
+      { keys: "Tab", en: "Leaves the code.", ru: "Уходит из кода." },
+    ],
+    aria: [
+      {
+        en: 'The cells sit in a `<fieldset>` (`role="group"`) named by the `label` (`aria-labelledby`) or `labels.group`; clicking the label focuses the first cell.',
+        ru: 'Ячейки — в `<fieldset>` (`role="group"`), названном подписью (`aria-labelledby`) или `labels.group`; клик по подписи фокусирует первую ячейку.',
+      },
+      {
+        en: 'Each cell is named by `labels.cell` («Цифра 1 из 6») and has `autocomplete="one-time-code"` and `inputmode="numeric"`, so SMS codes are suggested on phones.',
+        ru: 'Каждая ячейка названа `labels.cell` («Цифра 1 из 6»), с `autocomplete="one-time-code"` и `inputmode="numeric"`.',
+      },
+      {
+        en: "The hint or the error is linked to the group through `aria-describedby`; invalid cells carry `aria-invalid`.",
+        ru: "Подсказка или ошибка связаны с группой через `aria-describedby`; ячейки при ошибке — `aria-invalid`.",
+      },
+      {
+        en: "While a code is checked the group has `aria-busy`; the reason of a refused code is spoken by a polite live region.",
+        ru: "Пока код проверяется (промис из `onComplete`), у группы `aria-busy`, ячейки только для чтения; причина отказа объявляется вежливой live-областью.",
+      },
+      {
+        en: "Paste and autofill of the whole code into any cell fill all cells.",
+        ru: "Вставка и автозаполнение всего кода в любую ячейку заполняют все ячейки.",
+      },
+    ],
+  },
 };

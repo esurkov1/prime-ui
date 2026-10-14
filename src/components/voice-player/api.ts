@@ -100,4 +100,64 @@ export const api: ComponentApi = {
       },
     ],
   }),
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves focus: the disk (or the transfer disk), the waveform slider, the rate chip, the transcript button.",
+        ru: "Переводит фокус: кнопка (или диск передачи), волна-ползунок, чип скорости, кнопка расшифровки.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "On the disk: play or pause; on the chip: the next speed; on the transcript button: open or close the text.",
+        ru: "На кнопке — воспроизведение или пауза; на чипе — следующая скорость; на кнопке расшифровки — открыть или свернуть текст.",
+      },
+      {
+        keys: "ArrowRight · ArrowUp",
+        en: "On the waveform: 5 seconds forward.",
+        ru: "На волне — вперёд на 5 секунд.",
+      },
+      {
+        keys: "ArrowLeft · ArrowDown",
+        en: "On the waveform: 5 seconds back.",
+        ru: "На волне — назад на 5 секунд.",
+      },
+      {
+        keys: "PageUp · PageDown",
+        en: "On the waveform: 10 % of the recording forward or back.",
+        ru: "На волне — на 10 % записи вперёд или назад.",
+      },
+      {
+        keys: "Home · End",
+        en: "On the waveform: to the start or the end.",
+        ru: "На волне — в начало или в конец.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The root is `role="group"` named by `labels.player` (or your `aria-label`).',
+        ru: 'Корень — `role="group"` с названием `labels.player` (или вашим `aria-label`).',
+      },
+      {
+        en: 'The disk is named `labels.play` while paused and `labels.pause` while playing. While the recording is sent, received or not fetched the same button is the transfer, named by the direction — `cancelUpload` / `cancelDownload` described by `uploadProgress` / `downloadProgress` (`aria-busy`), after a failure `retryUpload` / `retryDownload` described by `notSent` / `notReceived`, `download` for a remote one; its ring is `aria-hidden`; a refused cancel, retry or download is announced (`role="status"`).',
+        ru: 'Кнопка называется `labels.play` на паузе и `labels.pause` во время воспроизведения. Пока запись в пути, не удалась или не скачана, кнопка `inert`, а на её месте диск передачи: кнопка с именем по направлению (`cancelUpload` / `cancelDownload`, `retryUpload` / `retryDownload` с описанием `notSent` / `notReceived`, `download`) и кольцо `role="progressbar"`; отказ объявляется.',
+      },
+      {
+        en: 'The waveform is `role="slider"` with `aria-valuemin`, `aria-valuemax` (seconds), `aria-valuenow` and `aria-valuetext` from `labels.position`.',
+        ru: 'Волна — `role="slider"` с `aria-valuemin`, `aria-valuemax` (секунды), `aria-valuenow` и `aria-valuetext` из `labels.position`.',
+      },
+      {
+        en: "The rate chip is named `labels.rate`; while `unplayed`, `labels.unplayed` is read after the time — the dot is never the only cue.",
+        ru: "Чип скорости называется `labels.rate`; пока `unplayed`, после времени читается `labels.unplayed` — точка не единственный признак.",
+      },
+      {
+        en: "One sound at a time: starting a player pauses any other voice message or chat video, which reports `onPlayingChange(false)`.",
+        ru: "Один звук за раз: запуск плеера ставит на паузу любое другое голосовое или видео чата, и оно сообщает `onPlayingChange(false)`.",
+      },
+      {
+        en: 'The transcript button is named `labels.transcribe` / `labels.hideTranscript`, with `aria-expanded` and `aria-controls` on the text area; while asked, the button is `aria-busy` and the area stays closed. The text is a plain paragraph, read and selected as normal text; a failed request is announced with `labels.transcribeFailed` (`role="status"`).',
+        ru: "Кнопка расшифровки называется `labels.transcribe` или `labels.hideTranscript`, несёт `aria-expanded` и `aria-controls` на область текста; пока идёт запрос — `aria-busy` на кнопке и области. Текст читается как обычный абзац; ошибка запроса объявляется `labels.transcribeFailed`.",
+      },
+    ],
+  },
 };
