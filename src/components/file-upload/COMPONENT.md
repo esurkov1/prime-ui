@@ -61,7 +61,7 @@ FileUpload.Queue                the same files with no trigger of their own (a t
 FileUpload.Item                 a file row the set does not draw (own actions, a server-side job)
 ├─ FileUpload.FormatBadge       square kit Badge with the extension
 │  or FileUpload.ItemPreview    square kit Thumbnail of an image file
-├─ FileUpload.ItemName          one line, truncated (the set passes the name without its extension when a format badge shows it)
+├─ FileUpload.ItemText          one line, truncated (the set passes the name without its extension when a format badge shows it)
 ├─ FileUpload.ItemDescription   size, progress or error
 ├─ FileUpload.ItemActions       buttons at the end of the row (kit Button)
 └─ FileUpload.ItemProgress      the kit ProgressBar across the row
@@ -121,6 +121,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message under the field (a rejected file, too few files); implies `invalid`. |
 | `invalid` | `boolean` | — | Danger line and icon of the zone, `aria-invalid` on the input. A non-empty `error` implies it. |
+| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the drop zone and the add tile (`data-focus-ring="false"`); focus, keyboard and ARIA stay. The picker Button keeps its ring. |
 | `disabled` | `boolean` | `false` | Blocks picking and drag-and-drop; the files are read-only: no add tile, no reorder, no remove. |
 | `accept` | `string` | — | Native `accept` of the file input; dropped files outside it are not taken (MIME type, `type/*` or `.ext`; a file with no MIME type by its extension). |
 | `multiple` | `boolean` | — | Allows several files at once in the picker. |
@@ -205,7 +206,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `src` | `string` | — (required) | The picture: a URL, or the local `preview` of a queued file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the thumbnail frame. |
 
-### FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions
+### FileUpload.ItemText · FileUpload.ItemDescription · FileUpload.ItemActions
 `ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.
 
 | Prop | Type | Default | Description |
@@ -220,7 +221,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `value` | `number` | — (required) | Uploaded amount. |
 | `max` | `number` | — | Total amount (ProgressBar default). |
 | `tone` | `"accent" \| "neutral" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Fill color: `success` for a finished file, `danger` where a failed one stopped. |
-| `aria-label` | `string` | `"Загрузка файла"` | Accessible name of the bar (not the wrapper); name the file. |
+| `aria-label` | `string` | `labels.upload` | Accessible name of the bar (not the wrapper); name the file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
 ### Types
@@ -299,6 +300,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | `invalid` (Root) | danger line and icon | a rejected file without a message; otherwise pass `error` | — |
 | `invalid` (Item) | danger soft fill, danger ring, danger description | an upload failed | `false` |
 | `disabled` | disabled fill and text, drops ignored; the files read-only | uploading is unavailable, a published set | `false` |
+| `focusRing` | `false`: the zone and the add tile draw no focus ring; focus, keys and ARIA stay | the zone sits in a host that marks focus itself | `true` |
 
 **Combinations**
 - Recommended: `variant="solid"` inside Card / Modal; `error` on Root explaining the rule; `queue` on the root with `useUploadQueue`; `trigger="tile"` + `layout="grid"` + `cover` for an image gallery; `trigger="button"` + `FileUpload.Queue layout="strip"` for a tray.
@@ -386,6 +388,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | `uploading` | `"Загрузка {percent}%"` | A file in flight. |
 | `failed` | `"Не удалось загрузить"` | A failed file whose upload gave no reason. |
 | `progress` | `"Загрузка: {name}"` | Name of a row's progress bar. |
+| `upload` | `"Загрузка файла"` | Name of a `FileUpload.ItemProgress` without an `aria-label` of its own. |
 | `cancel` | `"Отменить загрузку: {name}"` | Name of the disk that cancels a tile's upload in flight. |
 | `retry` | `"Повторить загрузку: {name}"` | Name of the retry button of a failed row (the retry disk of a failed tile). |
 | `remove` | `"Убрать {name}"` | Name of the remove button of a file (it also stops an upload). |

@@ -27,6 +27,20 @@ describe("FileUpload", () => {
     expect(label).toHaveAttribute("data-size", "l");
   });
 
+  it("focusRing={false} marks the field so the zone draws no ring; focus stays", () => {
+    const { container } = render(<FileUpload.Root focusRing={false} aria-label="Договор" />);
+    const zone = container.querySelector("label");
+    expect(zone?.closest('[data-focus-ring="false"]')).not.toBeNull();
+    const input = screen.getByLabelText("Договор");
+    act(() => input.focus());
+    expect(input).toHaveFocus();
+  });
+
+  it("ItemProgress is named by labels.upload without an aria-label of its own", () => {
+    render(<FileUpload.ItemProgress value={40} />);
+    expect(screen.getByRole("progressbar", { name: "Загрузка файла" })).toBeInTheDocument();
+  });
+
   it("sets data-variant on root (dashed by default)", () => {
     const { container, rerender } = render(<FileUpload.Root />);
     const label = container.querySelector("label");
@@ -194,7 +208,7 @@ describe("FileUpload", () => {
     render(
       <FileUpload.Item>
         <FileUpload.FormatBadge format="pdf" color="red" />
-        <FileUpload.ItemName>report.pdf</FileUpload.ItemName>
+        <FileUpload.ItemText>report.pdf</FileUpload.ItemText>
         <FileUpload.ItemDescription>1,2 МБ</FileUpload.ItemDescription>
         <FileUpload.ItemProgress value={40} />
       </FileUpload.Item>,
@@ -231,7 +245,7 @@ describe("FileUpload", () => {
   it("sets data-size on file item", () => {
     const { container } = render(
       <FileUpload.Item size="l">
-        <FileUpload.ItemName>x</FileUpload.ItemName>
+        <FileUpload.ItemText>x</FileUpload.ItemText>
       </FileUpload.Item>,
     );
     const item = container.firstChild as HTMLElement;
@@ -241,7 +255,7 @@ describe("FileUpload", () => {
   it("sets data-invalid on a failed file item", () => {
     const { container } = render(
       <FileUpload.Item invalid>
-        <FileUpload.ItemName>x</FileUpload.ItemName>
+        <FileUpload.ItemText>x</FileUpload.ItemText>
       </FileUpload.Item>,
     );
     expect(container.firstChild).toHaveAttribute("data-invalid", "true");
@@ -251,7 +265,7 @@ describe("FileUpload", () => {
     const { container } = render(
       <FileUpload.Item size="s">
         <FileUpload.ItemPreview src="blob:photo" />
-        <FileUpload.ItemName>photo.jpg</FileUpload.ItemName>
+        <FileUpload.ItemText>photo.jpg</FileUpload.ItemText>
       </FileUpload.Item>,
     );
     const preview = container.querySelector("img") as HTMLImageElement;

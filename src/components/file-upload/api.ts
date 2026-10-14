@@ -123,6 +123,13 @@ export const api: ComponentApi = {
           ru: "Красная линия и иконка зоны, `aria-invalid` на input. Непустой `error` включает его.",
         },
         {
+          name: "focusRing",
+          type: "boolean",
+          default: "true",
+          en: '`false` hides only the visual focus ring of the drop zone and the add tile (`data-focus-ring="false"`); focus, keyboard and ARIA stay. The picker Button keeps its ring.',
+          ru: '`false` скрывает только кольцо фокуса зоны и плитки добавления (`data-focus-ring="false"`); фокус, клавиатура и ARIA остаются. Кнопка выбора сохраняет своё кольцо.',
+        },
+        {
           name: "disabled",
           type: "boolean",
           default: "false",
@@ -358,7 +365,7 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions",
+      name: "FileUpload.ItemText · FileUpload.ItemDescription · FileUpload.ItemActions",
       en: "`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.",
       ru: "Имя файла (одна строка с обрезкой), его описание (размер, прогресс, ошибка; danger в строке с ошибкой) и кнопки в конце строки.",
       props: [
@@ -398,7 +405,7 @@ export const api: ComponentApi = {
         {
           name: "aria-label",
           type: "string",
-          default: '"Загрузка файла"',
+          defaultNote: { en: "`labels.upload`", ru: "`labels.upload`" },
           en: "Accessible name of the bar (not the wrapper); name the file.",
           ru: "Доступное имя полосы (не обёртки); назовите файл.",
         },
@@ -459,6 +466,10 @@ export const api: ComponentApi = {
     uploading: { en: "A file in flight.", ru: "Файл загружается." },
     failed: { en: "A failed file whose upload gave no reason.", ru: "Загрузка упала без причины." },
     progress: { en: "Name of a row's progress bar.", ru: "Имя полосы прогресса строки." },
+    upload: {
+      en: "Name of a `FileUpload.ItemProgress` without an `aria-label` of its own.",
+      ru: "Имя `FileUpload.ItemProgress` без собственного `aria-label`.",
+    },
     cancel: {
       en: "Name of the disk that cancels a tile's upload in flight.",
       ru: "Имя диска, отменяющего идущую загрузку плитки.",

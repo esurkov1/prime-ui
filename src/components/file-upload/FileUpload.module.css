@@ -112,7 +112,8 @@
   background: var(--prime-color-accent-soft);
 }
 
-.root:has(.input:focus-visible) {
+/* `focusRing={false}` on the root (`data-focus-ring` on the field) hides only this ring. */
+.root:has(.input:focus-visible):not(:where([data-focus-ring="false"] *)) {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
@@ -294,7 +295,7 @@
   grid-area: badge;
 }
 
-.itemName {
+.itemText {
   grid-area: name;
   min-width: 0;
   overflow: hidden;
@@ -304,13 +305,6 @@
   color: var(--prime-color-text-primary);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* `href`: the name is a link to the file; it keeps the name's type and ellipsis (inline text). */
-.itemLink {
-  display: inline;
-  font-size: inherit;
-  line-height: inherit;
 }
 
 .itemDescription {
@@ -496,10 +490,11 @@
   transition:
     background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     border-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.addTarget:has(input:focus-visible) {
+.addTarget:has(input:focus-visible):not(:where([data-focus-ring="false"] *)) {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
@@ -562,10 +557,4 @@
   grid-column: 1 / -1;
   aspect-ratio: auto;
   min-block-size: calc(var(--prime-space-24) * 1.5);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .addTarget {
-    transition: none;
-  }
 }

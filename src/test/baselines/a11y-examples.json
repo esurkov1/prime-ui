@@ -10,7 +10,6 @@
   "src/components/field-list/examples/locked.tsx: dangling aria-controls",
   "src/components/field-list/examples/screen.tsx: dangling aria-controls",
   "src/components/file-upload/examples/screen.tsx: aria-label on a generic div",
-  "src/components/file-upload/examples/screen.tsx: dangling aria-controls",
   "src/components/gantt/examples/screen.tsx: aria-label on a generic div",
   "src/components/kanban/examples/cards.tsx: aria-label on a generic div",
   "src/components/kanban/examples/columns.tsx: aria-label on a generic div",

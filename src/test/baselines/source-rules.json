@@ -29,7 +29,6 @@
   "src/components/empty-page/EmptyPage.tsx: root default size = \"m\"",
   "src/components/field-list/FieldList.tsx: imports dnd/context (not its main module or types.ts)",
   "src/components/field-list/FieldList.tsx: imports dnd/useSortableList (not its main module or types.ts)",
-  "src/components/file-upload/FileUpload.tsx: imports dnd/context (not its main module or types.ts)",
   "src/components/gantt/Gantt.tsx: biome-ignore useExhaustiveDependencies",
   "src/components/gantt/Gantt.tsx: biome-ignore useExhaustiveDependencies #2",
   "src/components/gantt/Gantt.tsx: biome-ignore useExhaustiveDependencies #3",

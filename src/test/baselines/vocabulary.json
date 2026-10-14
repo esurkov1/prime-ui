@@ -2,7 +2,6 @@
   "src/components/button-group/api.ts: ButtonGroup.Item.type → `multiple` for one vs many (a `type` prop names no selection mode)",
   "src/components/chat/api.ts: Chat.Messages.type → `multiple` for one vs many (a `type` prop names no selection mode)",
   "src/components/composer/api.ts: Composer.Context.value → `messageId`",
-  "src/components/file-upload/api.ts: FileUpload.ItemName → `FileUpload.ItemText`",
   "src/components/gantt/api.ts: Gantt.onRowClick → `onItemOpen`",
   "src/components/gantt/api.ts: Gantt.onSelect → `onItemOpen`",
   "src/components/kanban/api.ts: Kanban.Root.onItemClick (not in the event vocabulary)",

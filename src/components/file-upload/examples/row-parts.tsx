@@ -8,7 +8,7 @@ export default function FileUploadRowPartsExample() {
     <div className={styles.column}>
       <FileUpload.Item>
         <FileUpload.FormatBadge format="pdf" color="red" />
-        <FileUpload.ItemName>Счёт № 318.pdf</FileUpload.ItemName>
+        <FileUpload.ItemText>Счёт № 318.pdf</FileUpload.ItemText>
         <FileUpload.ItemDescription>1,2 МБ · выставлен 12 марта</FileUpload.ItemDescription>
         <FileUpload.ItemActions>
           <Button.Root variant="ghost" tone="neutral" aria-label="Скачать Счёт № 318.pdf">
@@ -20,7 +20,7 @@ export default function FileUploadRowPartsExample() {
       </FileUpload.Item>
       <FileUpload.Item>
         <FileUpload.ItemPreview src="https://picsum.photos/seed/warehouse-gate/160/160" />
-        <FileUpload.ItemName>Отгрузка, паллет 4.jpg</FileUpload.ItemName>
+        <FileUpload.ItemText>Отгрузка, паллет 4.jpg</FileUpload.ItemText>
         <FileUpload.ItemDescription>820 КБ · снято при отгрузке</FileUpload.ItemDescription>
         <FileUpload.ItemActions>
           <Button.Root variant="ghost" tone="neutral" aria-label="Скачать Отгрузка, паллет 4.jpg">
@@ -32,13 +32,13 @@ export default function FileUploadRowPartsExample() {
       </FileUpload.Item>
       <FileUpload.Item>
         <FileUpload.FormatBadge format="xlsx" color="green" />
-        <FileUpload.ItemName>Отчёт по заказу.xlsx</FileUpload.ItemName>
+        <FileUpload.ItemText>Отчёт по заказу.xlsx</FileUpload.ItemText>
         <FileUpload.ItemDescription>Формируется · 60%</FileUpload.ItemDescription>
         <FileUpload.ItemProgress value={60} aria-label="Формируется: Отчёт по заказу.xlsx" />
       </FileUpload.Item>
       <FileUpload.Item invalid>
         <FileUpload.FormatBadge format="pdf" color="red" />
-        <FileUpload.ItemName>Акт сверки за март.pdf</FileUpload.ItemName>
+        <FileUpload.ItemText>Акт сверки за март.pdf</FileUpload.ItemText>
         <FileUpload.ItemDescription>
           Не удалось сформировать: нет данных за 31 марта
         </FileUpload.ItemDescription>

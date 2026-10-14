@@ -19,7 +19,6 @@
   "src/components/dnd/Dnd.module.css: animates background #2",
   "src/components/dnd/Dnd.module.css: local @keyframes dropFlash",
   "src/components/dnd/Dnd.module.css: local @keyframes lift",
-  "src/components/file-upload/FileUpload.module.css: reduced-motion block globals.css already covers (.addTarget)",
   "src/components/gantt/Gantt.module.css: local @keyframes ganttCellIn",
   "src/components/kanban/Kanban.module.css: reduced-motion block globals.css already covers (.item, .item > *, .header > *)",
   "src/components/message/Message.module.css: local @keyframes messageEnter",
