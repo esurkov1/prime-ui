@@ -70,7 +70,14 @@ describe("touch and input", () => {
     ]) {
       expect(cssValue(cssRule(file, selector), "font-size"), file).toBe("var(--field-input-text)");
     }
-    expect(read("components/native-select/NativeSelect.tsx")).toMatch(/fieldInputTextClass/);
+    for (const host of [
+      "components/native-select/NativeSelect.tsx",
+      "components/datepicker/DatepickerPanel.tsx",
+      "components/command-menu/CommandMenu.tsx",
+      "components/color-picker/ColorPicker.tsx",
+    ]) {
+      expect(read(host), host).toMatch(/fieldInputTextClass/);
+    }
     // Inputs outside the field tier raise their own text under the same query. DigitInput needs no
     // rule: its smallest cell already shows 16px digits (body-l).
     expect(
@@ -81,11 +88,7 @@ describe("touch and input", () => {
         ),
       ),
     ).toBe(true);
-    for (const file of [
-      "src/internal/menu.module.css",
-      "src/components/datepicker/Datepicker.module.css",
-      "src/components/color-picker/ColorPicker.module.css",
-    ]) {
+    for (const file of ["src/internal/menu.module.css"]) {
       const touch = cssRules(file).filter((rule) => rule.parents[0] === query);
       expect(
         touch.some((rule) =>
@@ -129,11 +132,11 @@ describe("touch and input", () => {
         ),
       ),
     ).toBe(true);
-    for (const file of [
-      "src/components/color-picker/ColorPresets.module.css",
-      "src/components/color-swatches/ColorSwatches.module.css",
-    ]) {
-      expect(decl(file, ".grid", "--swatch-base"), file).toMatch(/^max\(/);
+    // The swatch donor grows every swatch grid (ColorSwatches, ColorPresets) on both bases.
+    for (const selector of [".tier", '.tier[data-base="item"]']) {
+      expect(decl("src/internal/swatch.module.css", selector, "--swatch-base"), selector).toMatch(
+        /^max\(/,
+      );
     }
   });
 });
@@ -157,15 +160,12 @@ const VIEWPORT_QUERY_FILES = new Set([
   "src/internal/fieldTier.module.css",
   "src/internal/menu.module.css",
   "src/components/datepicker/Datepicker.module.css",
-  "src/components/color-picker/ColorPicker.module.css",
 ]);
 
 /** The touch text token: the field tier and the dense pickers that grow under the same query. */
 const TOUCH_TEXT_FILES = new Set([
   "src/internal/fieldTier.module.css",
   "src/internal/menu.module.css",
-  "src/components/datepicker/Datepicker.module.css",
-  "src/components/color-picker/ColorPicker.module.css",
 ]);
 
 /** TS that may read a media query: the hook and the reduced-motion check of presence. */

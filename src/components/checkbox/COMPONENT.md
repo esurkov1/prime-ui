@@ -47,6 +47,8 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `indeterminate` | `boolean` | `false` | Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`. |
 | `shape` | `"square" \| "circle"` | `"square"` | Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). Size, the check draw-in, the indeterminate bar and states are the same. |
+| `optional` | `boolean` | `false` | Muted `labels.optional` after the label text; the field may stay off. |
+| `labels` | `Partial<CheckboxLabels>` | — | Built-in strings, see Labels. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it. |
@@ -105,6 +107,7 @@ The circle changes only the outline (`--prime-radius-full`); the check draw-in, 
 | `indeterminate` | accent box with a horizontal bar | a parent checkbox over a partially selected group | `false` |
 | `invalid` | danger ring on the unchecked box | the message is shown elsewhere; otherwise pass `error` | `false` |
 | `disabled` | muted box, dimmed text and hint | the option is unavailable | `false` |
+| `optional` | muted `labels.optional` after the text | a form where most fields are required | `false` |
 
 **Combinations**
 - `indeterminate` only on a parent checkbox that controls a group; leaf options never use it.
@@ -152,7 +155,9 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No `labels`.
+| Key | Default | Used for |
+|---|---|---|
+| `optional` | `"необязательно"` | Marker after the label when `optional`. |
 
 ## Examples
 | Example | Shows |
@@ -164,7 +169,7 @@ No `labels`.
 | [without-label.tsx](examples/without-label.tsx) | Bare boxes in table rows, named by `aria-label` and submitted with `name` and `value`. |
 | [indicator.tsx](examples/indicator.tsx) | The box alone in a multi-select list: the option row carries `aria-selected`, the box only shows it — `Checkbox.Indicator`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the selection; «select all» turns indeterminate on a partial one — `checked`, `onCheckedChange`, `indeterminate`. |
-| [in-form.tsx](examples/in-form.tsx) | Consent in a sign-up form: a hint under the text, an error after a submit without the tick — `required`, `hint`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | Consent in a sign-up form: the required tick and an optional subscription, a hint under the text, an error after a submit without the tick — `required`, `optional`, `hint`, `error`. |
 
 ## Mistakes
 - `<Checkbox.Root onChange={…}>` → use `onCheckedChange={(checked) => …}`.

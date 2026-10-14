@@ -555,4 +555,53 @@ describe("TagSelect — overlay contract", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
+
+  it("closeOnEscape={false} and closeOnOutsideClick={false} keep the panel open", async () => {
+    const user = userEvent.setup();
+    render(
+      <div>
+        <BasicTagSelect closeOnEscape={false} closeOnOutsideClick={false} />
+        <div data-testid="outside">outside</div>
+      </div>,
+    );
+    await user.click(screen.getByRole("combobox"));
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    fireEvent.pointerDown(screen.getByTestId("outside"));
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("aria-controls names the list only while it is open", () => {
+    render(<BasicTagSelect />);
+    const input = screen.getByRole("combobox");
+    expect(input).not.toHaveAttribute("aria-controls");
+    fireEvent.focus(input);
+    expect(input).toHaveAttribute("aria-controls", screen.getByRole("listbox").id);
+  });
+
+  it("Shift+F10 and the context menu key open the «⋯» menu of the highlighted row", async () => {
+    const user = userEvent.setup();
+    const onOptionUpdate = vi.fn();
+    render(<BasicTagSelect onOptionUpdate={onOptionUpdate} />);
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    expect(input).toHaveAttribute("aria-keyshortcuts", "Shift+F10");
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    expect(await screen.findByRole("textbox", { name: "Название тега" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    fireEvent.keyDown(input, { key: "ContextMenu" });
+    const name = await screen.findByRole("textbox", { name: "Название тега" });
+    expect(name).toHaveValue("Beta");
+  });
+
+  it("fallbackColor paints a value without an option color", () => {
+    render(<BasicTagSelect defaultValue={["c"]} fallbackColor="purple" />);
+    const chip = screen
+      .getByRole("combobox")
+      .closest("[data-state]")
+      ?.querySelector('[data-chip-value="c"]');
+    expect(chip).toHaveAttribute("data-color", "purple");
+  });
 });

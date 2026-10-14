@@ -3,6 +3,9 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { cssRule, cssValue } from "@/test/css";
+import { withMotion } from "@/test/motion";
+
 import { CommandMenu } from "./CommandMenu";
 
 /** A scrim dismiss is a full click that starts and ends outside the panel. */
@@ -59,17 +62,26 @@ describe("CommandMenu", () => {
     expect(screen.getByRole("option", { name: "Beta" })).toBeInTheDocument();
   });
 
-  it("отфильтрованные пункты получают hidden, а CSS прячет [hidden] вопреки display: flex", async () => {
+  it("отфильтрованные пункты и группа без совпадений получают hidden и уходят из дерева доступности", async () => {
     const user = userEvent.setup();
-    render(<TestPalette />);
-    await user.type(screen.getByRole("combobox", { name: "Поиск команд" }), "bet");
-    const alpha = screen.getByText("Alpha").closest('[role="option"]');
-    expect(alpha).toHaveAttribute("hidden");
-    const fs = await import("node:fs");
-    const rows = fs.readFileSync("src/internal/menu.module.css", "utf8");
-    const own = fs.readFileSync("src/components/command-menu/CommandMenu.module.css", "utf8");
-    expect(rows).toMatch(/\.item\[hidden\]\s*\{\s*display: none;/);
-    expect(own).toMatch(/\.group\[hidden\]\s*\{\s*display: none;/);
+    render(
+      <CommandMenu.Root open onOpenChange={() => {}}>
+        <CommandMenu.Input aria-label="Поиск команд" />
+        <CommandMenu.List>
+          <CommandMenu.Group label="Разделы">
+            <CommandMenu.Item value="заказы">Заказы</CommandMenu.Item>
+          </CommandMenu.Group>
+          <CommandMenu.Group label="Действия">
+            <CommandMenu.Item value="счёт">Выставить счёт</CommandMenu.Item>
+          </CommandMenu.Group>
+        </CommandMenu.List>
+      </CommandMenu.Root>,
+    );
+    await user.type(screen.getByRole("combobox", { name: "Поиск команд" }), "счёт");
+    expect(screen.queryByRole("option", { name: "Заказы" })).not.toBeInTheDocument();
+    expect(screen.getByText("Заказы").closest('[role="option"]')).toHaveAttribute("hidden");
+    expect(screen.queryByRole("group", { name: "Разделы" })).not.toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Действия" })).toBeInTheDocument();
   });
 
   it("marks the matched part of item text while a query is typed", async () => {
@@ -192,7 +204,7 @@ describe("CommandMenu — size и labels", () => {
 });
 
 describe("CommandMenu — кольцо фокуса", () => {
-  it("строка поиска использует общий механизм focusRing={false}", () => {
+  it("поле поиска — постоянный фокус палитры: фокус на нём при открытии, кольца нет", () => {
     render(
       <CommandMenu.Root open onOpenChange={() => {}}>
         <CommandMenu.Input aria-label="Поиск команд" />
@@ -201,9 +213,9 @@ describe("CommandMenu — кольцо фокуса", () => {
         </CommandMenu.List>
       </CommandMenu.Root>,
     );
-    expect(screen.getByRole("combobox", { name: "Поиск команд" }).parentElement).toHaveAttribute(
-      "data-focus-ring",
-      "false",
+    expect(screen.getByRole("combobox", { name: "Поиск команд" })).toHaveFocus();
+    expect(cssValue(cssRule("src/internal/menu.module.css", ".searchInput"), "outline")).toBe(
+      "none",
     );
   });
 });
@@ -522,11 +534,12 @@ describe("CommandMenu — server search", () => {
     expect(onRetry).toHaveBeenCalledTimes(2);
   });
 
-  it("a load state change fades the new content in", () => {
+  it("a load state change cross-fades: the old list leaves inert while the error shows", () => {
+    withMotion();
     const { rerender } = render(<ServerPalette />);
-    const region = () => screen.getByRole("listbox").firstElementChild as HTMLElement;
-    expect(region().className).not.toMatch(/swapIn/);
+    expect(screen.getByRole("listbox").closest("[inert]")).toBeNull();
     rerender(<ServerPalette loadError="Ошибка" />);
-    expect(screen.getByRole("alert").className).toMatch(/swapIn/);
+    expect(screen.getByRole("alert").closest("[inert]")).toBeNull();
+    expect(screen.getByRole("listbox", { hidden: true }).closest("[inert]")).not.toBeNull();
   });
 });

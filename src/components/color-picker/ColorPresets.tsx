@@ -2,21 +2,20 @@ import * as React from "react";
 
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   DEFAULT_ALIGN,
   DEFAULT_SIDE,
   type PositionAlign,
   type PositionSide,
 } from "@/hooks/usePosition";
-import { useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { useFieldCell } from "@/internal/fieldCell";
-import { fieldTierClass } from "@/internal/fieldClasses";
-import { gridIndex } from "@/internal/rovingFocus";
+import { fieldLabelTextClass, fieldTierClass } from "@/internal/fieldClasses";
+import { useOpenState } from "@/internal/overlay/useOpenState";
 import { Slot } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
 import {
@@ -29,6 +28,9 @@ import {
   sameColor,
   swatchClass,
   swatchTierClass,
+  swatchTriggerClass,
+  useBalancedColumns,
+  useSwatchGrid,
   useSwatchOptions,
 } from "@/internal/swatch";
 
@@ -50,12 +52,6 @@ export const COLOR_PRESETS_LABELS: ColorPresetsLabels = {
   list: "Цвета",
   empty: "Без цвета",
 };
-
-/** Viewport width below which l / xl grids wrap to half the columns (foundation §9 breakpoint). */
-const NARROW_QUERY = "(max-width: 479px)";
-
-/** On a touch screen swatches grow to the touch target; this many still fit a 320px panel. */
-const COARSE_COLUMNS = 5;
 
 type Ctx = {
   value: string | null;
@@ -82,11 +78,12 @@ export type ColorPresetsRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  closeOnEscape?: boolean;
+  closeOnOutsideClick?: boolean;
   /** Swatches in panel order. Default: `COLOR_PRESETS` (16). */
   presets?: readonly ColorPreset[];
   /** Grid columns. Default: one row for up to 8 presets (+ "no color"), else 8; 16 → 8 × 2. */
   columns?: number;
-  /** Tier of the trigger, swatches and panel. Default: the host tier, else `m`. */
   size?: ControlSize;
   disabled?: boolean;
   /** Adds the "no color" swatch after the presets (value `null`); hue rows stay aligned. */
@@ -104,6 +101,8 @@ function ColorPresetsRoot({
   open: openProp,
   defaultOpen = false,
   onOpenChange,
+  closeOnEscape = true,
+  closeOnOutsideClick = true,
   presets = COLOR_PRESETS,
   columns: columnsProp,
   size: sizeProp,
@@ -113,17 +112,19 @@ function ColorPresetsRoot({
   labels: labelsProp,
   children,
 }: ColorPresetsRootProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
   const [value, setValue] = useControllableState<string | null>({
     value: valueProp,
     defaultValue,
     onChange: onValueChange,
   });
-  const [open, setOpen] = useControllableState({
-    value: openProp,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
+  const [open, setOpen] = useOpenState({
+    open: openProp,
+    defaultOpen,
+    onOpenChange,
+    disabled,
   });
   const triggerRef = React.useRef<HTMLElement | null>(null);
   // In a FieldList cell the column heading names the trigger, unless `labels.trigger` is given,
@@ -181,12 +182,18 @@ function ColorPresetsRoot({
   );
 
   const popover = (
-    <Popover.Root open={open && !disabled} onOpenChange={setOpen}>
+    <Popover.Root
+      open={open}
+      onOpenChange={setOpen}
+      closeOnEscape={closeOnEscape}
+      closeOnOutsideClick={closeOnOutsideClick}
+      openOnArrow
+    >
       {children}
     </Popover.Root>
   );
 
-  return (
+  return tier.provide(
     <ColorPresetsProvider value={ctx}>
       {cell ? (
         <FieldFrame size={size} ids={ids} disabled={disabled} optionalLabel="">
@@ -195,7 +202,7 @@ function ColorPresetsRoot({
       ) : (
         popover
       )}
-    </ColorPresetsProvider>
+    </ColorPresetsProvider>,
   );
 }
 ColorPresetsRoot.displayName = "ColorPresets.Root";
@@ -221,8 +228,8 @@ export type ColorPresetsTriggerProps = {
 
 /**
  * A slot: clones its one child into the panel's trigger. Name «<labels.trigger>: <color name>»,
- * `disabled` from the root, ArrowDown / ArrowUp open the panel; the child's own `aria-label`,
- * `disabled` and handlers win (Slot merge rules).
+ * `disabled` from the root, ArrowDown / ArrowUp open the panel (the Popover's `openOnArrow`); the
+ * child's own `aria-label`, `disabled` and handlers win (Slot merge rules).
  */
 function Trigger({ children }: ColorPresetsTriggerProps) {
   const { disabled, labels, selectedLabel, triggerRef, triggerId } = useColorPresetsContext();
@@ -233,12 +240,6 @@ function Trigger({ children }: ColorPresetsTriggerProps) {
         {...(triggerId ? { id: triggerId } : null)}
         disabled={disabled || undefined}
         aria-label={`${labels.trigger}: ${selectedLabel}`}
-        onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
-          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            event.preventDefault();
-            event.currentTarget.click();
-          }
-        }}
       >
         {children}
       </Slot>
@@ -262,7 +263,7 @@ function SwatchButton({ className, ...rest }: ColorPresetsSwatchButtonProps) {
       type="button"
       {...rest}
       data-size={size}
-      className={cx(fieldTierClass, styles.trigger, className)}
+      className={cx(fieldTierClass, swatchTriggerClass, className)}
     >
       <SwatchFill value={value} />
     </button>
@@ -281,18 +282,6 @@ export type ColorPresetsContentProps = Omit<
   /** The floating panel. */
   ref?: React.Ref<HTMLDivElement>;
 };
-
-function useNarrowViewport() {
-  const [narrow, setNarrow] = React.useState(false);
-  React.useEffect(() => {
-    const mql = window.matchMedia(NARROW_QUERY);
-    const update = () => setNarrow(mql.matches);
-    update();
-    mql.addEventListener("change", update);
-    return () => mql.removeEventListener("change", update);
-  }, []);
-  return narrow;
-}
 
 /** Floating panel (Popover overlay contract) with the swatch grid: `role="listbox"`. */
 function Content({
@@ -314,27 +303,20 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
   const { value, select, close, options, columns, size, labels, triggerRef } =
     useColorPresetsContext();
   const labelId = React.useId();
-  const narrow = useNarrowViewport();
-  // l / xl rows of more than 4 do not fit a 320px screen: wrap to half the columns.
-  const wraps = narrow && (size === "l" || size === "xl") && columns > 4;
-  // Touch-size swatches (the CSS grows them on a coarse pointer) take fewer columns; the arrow keys
-  // walk the same grid, so the count lives here and reaches the CSS as `--cpr-columns`.
-  const coarse = useMediaQuery("(pointer: coarse)");
-  const cols = coarse
-    ? Math.min(columns, COARSE_COLUMNS)
-    : wraps
-      ? Math.ceil(columns / 2)
-      : columns;
+  // The grid is `columns` wide while the panel has room; narrower (a 320px screen, touch-size
+  // swatches) it wraps into balanced rows, and the arrows walk the rows on screen.
+  const gridRef = React.useRef<HTMLDivElement>(null);
+  const balanced = useBalancedColumns(gridRef, options.length, "[role='option']");
 
   const selectedIndex = options.findIndex((o) => sameColor(o.value, value));
   const [active, setActive] = React.useState(Math.max(0, selectedIndex));
-  const itemRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+  const grid = useSwatchGrid(options.length);
 
   // Opening moves focus to the selected swatch (or the first one): the roving tab stop.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: focus once on mount
+  const [initial] = React.useState(Math.max(0, selectedIndex));
   React.useEffect(() => {
-    itemRefs.current[Math.max(0, selectedIndex)]?.focus({ preventScroll: true });
-  }, []);
+    grid.focus(initial);
+  }, [grid.focus, initial]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Tab") {
@@ -349,17 +331,18 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
       if (option) select(option.value);
       return;
     }
-    const next = gridIndex(event.key, active, options.length, cols);
-    if (next === null) return;
-    event.preventDefault();
-    setActive(next);
-    itemRefs.current[next]?.focus();
+    const next = grid.move(event, active, balanced ?? Math.min(columns, options.length));
+    if (next !== null) setActive(next);
   };
 
   return (
     <div className={styles.body}>
       {label != null ? (
-        <div id={labelId} className={styles.label} data-size={size}>
+        <div
+          id={labelId}
+          className={cx(fieldTierClass, fieldLabelTextClass, styles.label)}
+          data-size={size}
+        >
           {label}
         </div>
       ) : null}
@@ -367,9 +350,16 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
         role="listbox"
         aria-label={label != null ? undefined : labels.list}
         aria-labelledby={label != null ? labelId : undefined}
+        ref={gridRef}
         className={cx(swatchTierClass, styles.grid)}
         data-size={size}
-        style={{ "--cpr-columns": cols } as React.CSSProperties}
+        data-base="item"
+        style={
+          {
+            "--cpr-columns": Math.min(columns, options.length),
+            "--swatch-columns": balanced,
+          } as React.CSSProperties
+        }
         tabIndex={-1}
         onKeyDown={onKeyDown}
       >
@@ -379,9 +369,7 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
             // biome-ignore lint/a11y/useKeyWithClickEvents: keys are handled by the listbox (roving tabindex)
             <div
               key={option.value ?? "empty"}
-              ref={(el) => {
-                itemRefs.current[i] = el;
-              }}
+              ref={grid.itemRef(i)}
               role="option"
               aria-selected={selected}
               aria-label={option.label}

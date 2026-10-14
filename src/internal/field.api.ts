@@ -77,6 +77,17 @@ export const FIELD_OPTIONAL_LABEL_DOCS: LabelDocs<{ optional: string }> = {
   },
 };
 
+/**
+ * The description of the `required` label of a field whose control is a button (Datepicker,
+ * ColorField): a button takes no `aria-required`, so the word describes it (`ids.controlAria`).
+ */
+export const FIELD_REQUIRED_LABEL_DOCS: LabelDocs<{ required: string }> = {
+  required: {
+    en: "Read after the field name of a `required` field: its trigger is a button, which takes no `aria-required`.",
+    ru: "Читается после имени поля с `required`: его триггер — кнопка, у которой нет `aria-required`.",
+  },
+};
+
 /** `onCommit` of a text field (Input, Textarea); `keys` names the commit key. */
 export function fieldCommitProp(keys: { en: string; ru: string }): ApiProp {
   return {

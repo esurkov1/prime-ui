@@ -43,9 +43,13 @@ export default function SelectServerSearchExample() {
   const [total, setTotal] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [loadingMore, setLoadingMore] = React.useState(false);
+  const pageTimer = React.useRef(0);
 
-  // A new query asks the server after a pause; the results on screen stay until the answer.
+  // A new query asks the server after a pause; the results on screen stay until the answer. A
+  // next page still on its way belongs to the old query: it is dropped.
   React.useEffect(() => {
+    window.clearTimeout(pageTimer.current);
+    setLoadingMore(false);
     setLoading(true);
     const timer = window.setTimeout(() => {
       const found = findClients(search);
@@ -58,7 +62,7 @@ export default function SelectServerSearchExample() {
 
   const loadMore = () => {
     setLoadingMore(true);
-    window.setTimeout(() => {
+    pageTimer.current = window.setTimeout(() => {
       setClients((shown) => findClients(search).slice(0, shown.length + PAGE_SIZE));
       setLoadingMore(false);
     }, LATENCY_MS);

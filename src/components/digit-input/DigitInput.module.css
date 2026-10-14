@@ -163,8 +163,12 @@
   }
 }
 
+/* The success colours wash over the cells one after another; the ring and the fade keep no delay
+   (the delays follow the order of `.cell`'s transition: background, ring, colour, opacity). */
 .root[data-success="true"] .cell {
   background: var(--prime-color-success-soft);
   color: var(--prime-color-success-text);
-  transition-delay: calc(var(--digit-i) * var(--prime-motion-stagger) / 2);
+  transition-delay:
+    calc(var(--digit-i) * var(--prime-motion-stagger) / 2), var(--prime-motion-instant),
+    calc(var(--digit-i) * var(--prime-motion-stagger) / 2), var(--prime-motion-instant);
 }

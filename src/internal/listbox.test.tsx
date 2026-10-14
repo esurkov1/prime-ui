@@ -197,6 +197,38 @@ describe("listbox", () => {
     vi.useRealTimers();
   });
 
+  it("readers of different queries each keep a stable view until an item changes", () => {
+    const highlight = createStore<string | undefined>(undefined);
+    let registry: ListboxRegistry | null = null;
+    function Probe({ count }: { count: number }) {
+      registry = useListboxRegistry();
+      // The trigger's labels read every item, the open panel the query: both at once.
+      const all = useListboxView(registry);
+      const found = useListboxView(registry, "о");
+      return (
+        <div data-testid="views">
+          {`${all.navigable.length}/${found.matchCount}`}
+          {OPTIONS.slice(0, count).map((option) => (
+            <Option
+              key={option.id}
+              registry={registry as ListboxRegistry}
+              option={option}
+              highlight={highlight}
+              onActivate={() => {}}
+            />
+          ))}
+        </div>
+      );
+    }
+    const { rerender } = render(<Probe count={2} />);
+    const reader = registry as unknown as ListboxRegistry;
+    expect(reader.view("", true)).toBe(reader.view("", true));
+    expect(reader.view("о", true)).toBe(reader.view("о", true));
+    expect(screen.getByTestId("views")).toHaveTextContent("2/2");
+    rerender(<Probe count={4} />);
+    expect(screen.getByTestId("views")).toHaveTextContent("3/3");
+  });
+
   it("keeps an item's label and place after it unmounts", () => {
     const highlight = createStore<string | undefined>(undefined);
     let registry: ListboxRegistry | null = null;

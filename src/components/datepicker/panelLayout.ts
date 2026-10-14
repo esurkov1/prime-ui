@@ -9,16 +9,19 @@ export type PanelMetrics = {
   cell: number;
   /** Gap between months: `--prime-space-6`. */
   monthsGap: number;
-  /** Side padding of `.main` (both sides): `space-3` in the popover, none embedded (the host pads). */
+  /** Side padding of `.main` (both sides): the panel's `--dp-chrome` (none embedded, the host pads). */
   chrome: number;
 };
 
-/** Reads the panel geometry from the tokens on the document (theme and app overrides apply). */
-export function readPanelMetrics(size: ControlSize, embedded: boolean): PanelMetrics {
+/**
+ * Reads the panel geometry from the tokens on the document (theme and app overrides apply); the
+ * padding around the months from the panel's own `--dp-chrome`, the one the CSS pads with.
+ */
+export function readPanelMetrics(size: ControlSize, panel: HTMLElement | null): PanelMetrics {
   return {
     cell: readCssLengthPx(`--prime-control-${size}-item-height`, 0),
     monthsGap: readCssLengthPx("--prime-space-6", 0),
-    chrome: embedded ? 0 : readCssLengthPx("--prime-space-3", 0) * 2,
+    chrome: panel ? readCssLengthPx("--dp-chrome", 0, panel) * 2 : 0,
   };
 }
 

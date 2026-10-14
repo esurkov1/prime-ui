@@ -6,7 +6,12 @@ import { Button } from "@/components/button/Button";
 import { type UploadItem, useUploadQueue } from "@/hooks/useUploadQueue";
 import { Icon } from "@/icons";
 
-import { FileUpload, type FileUploadFile, type FileUploadRootProps } from "./FileUpload";
+import {
+  FileUpload,
+  type FileUploadFile,
+  type FileUploadPicker,
+  type FileUploadRootProps,
+} from "./FileUpload";
 
 function makeDataTransferWithFiles(files: File[]): DataTransfer {
   // jsdom has no DataTransfer; an iterable `files` is enough for Array.from
@@ -25,6 +30,20 @@ describe("FileUpload", () => {
     const { container } = render(<FileUpload.Root size="l" />);
     const label = container.querySelector("label");
     expect(label).toHaveAttribute("data-size", "l");
+  });
+
+  it("focusRing={false} marks the field so the zone draws no ring; focus stays", () => {
+    const { container } = render(<FileUpload.Root focusRing={false} aria-label="Договор" />);
+    const zone = container.querySelector("label");
+    expect(zone?.closest('[data-focus-ring="false"]')).not.toBeNull();
+    const input = screen.getByLabelText("Договор");
+    act(() => input.focus());
+    expect(input).toHaveFocus();
+  });
+
+  it("ItemProgress is named by labels.upload without an aria-label of its own", () => {
+    render(<FileUpload.ItemProgress value={40} />);
+    expect(screen.getByRole("progressbar", { name: "Загрузка файла" })).toBeInTheDocument();
   });
 
   it("sets data-variant on root (dashed by default)", () => {
@@ -153,10 +172,34 @@ describe("FileUpload", () => {
     expect(input).toHaveAttribute("multiple");
   });
 
-  it("forwards inputRef to the file input", () => {
-    const ref = React.createRef<HTMLInputElement>();
-    render(<FileUpload.Root inputRef={ref} />);
-    expect(ref.current?.type).toBe("file");
+  it("picker.open() opens the input; open({ accept }) narrows that one pick and its files", () => {
+    const picker = React.createRef<FileUploadPicker>();
+    const onFilesChange = vi.fn();
+    const { container } = render(
+      <FileUpload.Root picker={picker} accept=".pdf" onFilesChange={onFilesChange} />,
+    );
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const click = vi.spyOn(input, "click");
+    act(() => picker.current?.open({ accept: "image/*" }));
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(input.accept).toBe("image/*");
+    const photo = new File(["x"], "склад.jpg", { type: "image/jpeg" });
+    const scan = new File(["x"], "договор.pdf", { type: "application/pdf" });
+    fireEvent.change(input, { target: { files: [photo, scan] } });
+    expect(onFilesChange).toHaveBeenLastCalledWith([photo]);
+    act(() => picker.current?.open());
+    expect(input.accept).toBe(".pdf");
+    fireEvent.change(input, { target: { files: [photo, scan] } });
+    expect(onFilesChange).toHaveBeenLastCalledWith([scan]);
+  });
+
+  it("picker.open() does nothing on a disabled field", () => {
+    const picker = React.createRef<FileUploadPicker>();
+    const { container } = render(<FileUpload.Root picker={picker} disabled />);
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const click = vi.spyOn(input, "click");
+    act(() => picker.current?.open());
+    expect(click).not.toHaveBeenCalled();
   });
 
   it("renders custom children instead of default", () => {
@@ -194,7 +237,7 @@ describe("FileUpload", () => {
     render(
       <FileUpload.Item>
         <FileUpload.FormatBadge format="pdf" color="red" />
-        <FileUpload.ItemName>report.pdf</FileUpload.ItemName>
+        <FileUpload.ItemText>report.pdf</FileUpload.ItemText>
         <FileUpload.ItemDescription>1,2 МБ</FileUpload.ItemDescription>
         <FileUpload.ItemProgress value={40} />
       </FileUpload.Item>,
@@ -231,7 +274,7 @@ describe("FileUpload", () => {
   it("sets data-size on file item", () => {
     const { container } = render(
       <FileUpload.Item size="l">
-        <FileUpload.ItemName>x</FileUpload.ItemName>
+        <FileUpload.ItemText>x</FileUpload.ItemText>
       </FileUpload.Item>,
     );
     const item = container.firstChild as HTMLElement;
@@ -241,7 +284,7 @@ describe("FileUpload", () => {
   it("sets data-invalid on a failed file item", () => {
     const { container } = render(
       <FileUpload.Item invalid>
-        <FileUpload.ItemName>x</FileUpload.ItemName>
+        <FileUpload.ItemText>x</FileUpload.ItemText>
       </FileUpload.Item>,
     );
     expect(container.firstChild).toHaveAttribute("data-invalid", "true");
@@ -251,7 +294,7 @@ describe("FileUpload", () => {
     const { container } = render(
       <FileUpload.Item size="s">
         <FileUpload.ItemPreview src="blob:photo" />
-        <FileUpload.ItemName>photo.jpg</FileUpload.ItemName>
+        <FileUpload.ItemText>photo.jpg</FileUpload.ItemText>
       </FileUpload.Item>,
     );
     const preview = container.querySelector("img") as HTMLImageElement;

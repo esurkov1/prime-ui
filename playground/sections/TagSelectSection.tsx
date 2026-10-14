@@ -41,7 +41,7 @@ export const page: ComponentPageConfig = {
       scenario: "creatable",
       title: "Создание тегов",
       description:
-        "Набранный текст, которого нет в списке, становится новым тегом через строку «Создать» или Enter и сохраняется на сервере: чип ждёт занятым, а тег, от которого сервер отказался, уходит обратно — `creatable`, `onCreate`, `defaultColor`.",
+        "Набранный текст, которого нет в списке, становится новым тегом через строку «Создать» или Enter и сохраняется на сервере: чип ждёт занятым, а тег, от которого сервер отказался, уходит обратно — `creatable`, `onCreate`, `fallbackColor`.",
     },
     {
       scenario: "many-tags",
@@ -60,6 +60,11 @@ export const page: ComponentPageConfig = {
       title: "Подтверждение удаления",
       description:
         "Удаление общей метки сначала спрашивает: пока открыт диалог, строка ждёт со спиннером, «Отмена» оставляет метку и выбор — `onOptionDelete`.",
+    },
+    {
+      slot: "dismiss",
+      description:
+        "Список меток остаётся открытым, пока человек читает задачу рядом: закрывают его Escape или Tab — `closeOnOutsideClick`, `closeOnEscape`.",
     },
     {
       slot: "controlled",

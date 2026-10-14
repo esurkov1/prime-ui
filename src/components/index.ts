@@ -138,6 +138,7 @@ export { ChatList, formatChatTime } from "./chat-list/ChatList";
 export type {
   CheckboxIndicatorProps,
   CheckboxLabelProps,
+  CheckboxLabels,
   CheckboxRootProps,
   CheckboxShape,
 } from "./checkbox/Checkbox";
@@ -228,6 +229,7 @@ export {
   DEFAULT_DATEPICKER_PRESETS,
   datepickerPresets,
   formatDatepickerValue,
+  formatDateValue,
   YEARLESS_YEAR,
 } from "./datepicker/Datepicker";
 export type {
@@ -308,12 +310,13 @@ export type {
   FileUploadIconProps,
   FileUploadItemActionsProps,
   FileUploadItemDescriptionProps,
-  FileUploadItemNameProps,
   FileUploadItemPreviewProps,
   FileUploadItemProgressProps,
   FileUploadItemProps,
+  FileUploadItemTextProps,
   FileUploadLabels,
   FileUploadLayout,
+  FileUploadPicker,
   FileUploadQueueProps,
   FileUploadQueueSource,
   FileUploadRootProps,
@@ -623,6 +626,7 @@ export type {
 export { Stepper } from "./stepper/Stepper";
 export type {
   SwitchLabelProps,
+  SwitchLabels,
   SwitchRootProps,
 } from "./switch/Switch";
 export { Switch } from "./switch/Switch";

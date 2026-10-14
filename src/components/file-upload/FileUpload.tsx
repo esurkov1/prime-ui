@@ -2,8 +2,7 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
-import { DragControllerContext } from "@/components/dnd/context";
-import { Dnd } from "@/components/dnd/Dnd";
+import { Dnd, useDragAnnouncer } from "@/components/dnd/Dnd";
 import { Hint } from "@/components/hint/Hint";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { ProgressBar } from "@/components/progress-bar/ProgressBar";
@@ -25,6 +24,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import {
+  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -34,6 +34,7 @@ import { extensionOf, formatColor } from "@/internal/fileFormat";
 import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
@@ -111,6 +112,8 @@ export type FileUploadLabels = {
   failed: string;
   /** Name of the progress bar of a row: `{name}`. */
   progress: string;
+  /** Name of a `FileUpload.ItemProgress` that has no `aria-label` of its own. */
+  upload: string;
   /** Name of the disk that cancels a tile's upload in flight: `{name}`. */
   cancel: string;
   /** Name of the retry button of a failed file: `{name}`. */
@@ -153,6 +156,7 @@ export const FILE_UPLOAD_LABELS: FileUploadLabels = {
   uploading: "Загрузка {percent}%",
   failed: "Не удалось загрузить",
   progress: "Загрузка: {name}",
+  upload: "Загрузка файла",
   cancel: "Отменить загрузку: {name}",
   retry: "Повторить загрузку: {name}",
   remove: "Убрать {name}",
@@ -301,12 +305,12 @@ function FileUploadItemPreview({ src, className, ...rest }: FileUploadItemPrevie
 }
 FileUploadItemPreview.displayName = "FileUpload.ItemPreview";
 
-export type FileUploadItemNameProps = DivProps;
+export type FileUploadItemTextProps = DivProps;
 
-function FileUploadItemName({ className, ...rest }: FileUploadItemNameProps) {
-  return <div className={cx(styles.itemName, className)} {...rest} />;
+function FileUploadItemText({ className, ...rest }: FileUploadItemTextProps) {
+  return <div className={cx(styles.itemText, className)} {...rest} />;
 }
-FileUploadItemName.displayName = "FileUpload.ItemName";
+FileUploadItemText.displayName = "FileUpload.ItemText";
 
 export type FileUploadItemDescriptionProps = DivProps;
 
@@ -329,7 +333,7 @@ export type FileUploadItemProgressProps = Omit<DivProps, "children"> & {
   max?: number;
   /** Fill color: `success` for a finished file, `danger` where a failed one stopped. Default `accent`. */
   tone?: Tone;
-  /** Accessible name of the bar; name the file. Default «Загрузка файла». */
+  /** Accessible name of the bar; name the file. Default `FILE_UPLOAD_LABELS.upload`. */
   "aria-label"?: string;
 };
 
@@ -339,7 +343,7 @@ function FileUploadItemProgress({
   max,
   tone,
   className,
-  "aria-label": ariaLabel = "Загрузка файла",
+  "aria-label": ariaLabel = FILE_UPLOAD_LABELS.upload,
   ...rest
 }: FileUploadItemProgressProps) {
   return (
@@ -456,17 +460,17 @@ function kindOf(file: FileUploadFile, src: string | undefined): AttachmentTileKi
 
 /** Speaks through the shared Dnd live region (tiles), else through the set's own region. */
 function useAnnouncer() {
-  const controller = React.useContext(DragControllerContext);
+  const announce = useDragAnnouncer();
   const [message, setMessage] = React.useState("");
   // The same words twice still change the region (a no-break space), so they are spoken again.
   const say = React.useCallback(
     (text: string) => {
-      if (controller) controller.announce(text);
+      if (announce) announce(text);
       else setMessage((current) => (current === text ? `${text} ` : text));
     },
-    [controller],
+    [announce],
   );
-  return { say, message, own: controller === null };
+  return { say, message, own: announce === null };
 }
 
 /**
@@ -932,7 +936,7 @@ function FileRow({
         ) : (
           <FileUploadFormatBadge format={format || "—"} color={formatColor(format)} />
         )}
-        <FileUploadItemName title={file.name}>
+        <FileUploadItemText title={file.name}>
           {/* The extension stands in the badge; a picture row has none, so it keeps it. */}
           {file.href ? (
             <LinkButton
@@ -940,7 +944,7 @@ function FileRow({
               target="_blank"
               rel="noopener noreferrer"
               tone="neutral"
-              className={styles.itemLink}
+              inline
             >
               {picture ? file.name : splitFileName(file.name).base}
             </LinkButton>
@@ -949,7 +953,7 @@ function FileRow({
           ) : (
             splitFileName(file.name).base
           )}
-        </FileUploadItemName>
+        </FileUploadItemText>
         {parts.length > 0 ? (
           <FileUploadItemDescription>
             {/* One text, so a change of status morphs and a new percentage changes in place. */}
@@ -1012,9 +1016,8 @@ export type FileUploadQueueProps = Omit<
  * tiles of `value` and the uploads of `queue`, with retry, remove and reorder.
  */
 function FileUploadQueue(props: FileUploadQueueProps) {
-  const outer = React.useContext(DragControllerContext);
-  if ((props.layout ?? "list") === "list" || outer) return <FileUploadQueueSet {...props} />;
-  // Tiles reorder through Dnd: its own root unless one is already above.
+  if ((props.layout ?? "list") === "list") return <FileUploadQueueSet {...props} />;
+  // Tiles reorder through Dnd (a root inside another one is its children: one session).
   return (
     <Dnd.Root>
       <FileUploadQueueSet {...props} />
@@ -1037,7 +1040,7 @@ function FileUploadQueueSet({
   ...rest
 }: FileUploadQueueProps) {
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = { ...FILE_UPLOAD_LABELS, ...labelsProp };
+  const labels = useLabels(FILE_UPLOAD_LABELS, labelsProp);
   const set = useFileSet({ value, defaultValue, onValueChange, queue, cover, disabled, labels });
   return (
     <FileSetView
@@ -1055,15 +1058,24 @@ function FileUploadQueueSet({
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
+/** Opens the root's file picker from code (`FileUpload.Root` `picker`). */
+export type FileUploadPicker = {
+  /**
+   * Opens the picker; `accept` narrows this one pick (a «Фото» item of a menu) and the files it
+   * takes. Nothing happens while the field is disabled or its set is full.
+   */
+  open: (options?: { accept?: string }) => void;
+};
+
 export type FileUploadRootProps = FieldRootDomProps &
   FieldFrameProps &
+  FieldFocusRingProps &
   FileSetProps & {
     /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
     trigger?: FileUploadTrigger;
     variant?: FileUploadVariant;
-    /** Access to the hidden file input (open the picker programmatically). */
-    inputRef?: React.Ref<HTMLInputElement>;
+    picker?: React.Ref<FileUploadPicker>;
     accept?: string;
     multiple?: boolean;
     /** Most files in the set: the add tile counts them; files past it are not taken. */
@@ -1089,8 +1101,7 @@ export type FileUploadRootProps = FieldRootDomProps &
  * `aria-label` to the file input (the button with `trigger="button"`).
  */
 function FileUploadRoot(props: FileUploadRootProps) {
-  const outer = React.useContext(DragControllerContext);
-  if ((props.layout ?? "list") === "list" || outer) return <FileUploadField {...props} />;
+  if ((props.layout ?? "list") === "list") return <FileUploadField {...props} />;
   return (
     <Dnd.Root>
       <FileUploadField {...props} />
@@ -1109,7 +1120,7 @@ function FileUploadField({
   size: sizeProp,
   trigger = "dropzone",
   variant = "dashed",
-  inputRef,
+  picker,
   accept,
   multiple,
   max,
@@ -1130,6 +1141,7 @@ function FileUploadField({
   hint,
   error,
   id,
+  focusRing,
   labels: labelsProp,
   "aria-label": ariaLabel,
   children,
@@ -1137,14 +1149,17 @@ function FileUploadField({
 }: FileUploadRootProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = { ...FILE_UPLOAD_LABELS, ...labelsProp };
+  const labels = useLabels(FILE_UPLOAD_LABELS, labelsProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid });
   const set = useFileSet({ value, defaultValue, onValueChange, queue, cover, disabled, labels });
   const [dragOver, setDragOver] = React.useState(false);
   // Enter / leave pairs fire for every child the pointer crosses; the field is left at depth 0.
   const dragDepth = React.useRef(0);
   const ownInput = React.useRef<HTMLInputElement | null>(null);
-  const setInputRef = useMergedRefs(ownInput, inputRef);
+  /** The types of the pick in progress: `open({ accept })` narrows one pick, else `accept`. */
+  const pickAccept = React.useRef<string | undefined>(accept);
+  /** Set by `picker.open` just before it clicks the input: the next pick's own types. */
+  const requestedAccept = React.useRef<{ accept: string | undefined } | null>(null);
 
   const count = set.files.length;
   const room = max === undefined ? Number.POSITIVE_INFINITY : Math.max(0, max - count);
@@ -1154,17 +1169,30 @@ function FileUploadField({
   const button = trigger === "button";
   const tile = trigger === "tile";
 
-  const addFiles = (picked: readonly File[]) => {
+  const addFiles = (picked: readonly File[], types: string | undefined = accept) => {
     if (disabled) return;
-    const files = picked.filter((file) => acceptsFile(file, accept)).slice(0, room);
+    const files = picked.filter((file) => acceptsFile(file, types)).slice(0, room);
     if (files.length === 0) return;
     if (queue?.add) set.addToQueue(files);
     else onFilesChange?.(files);
   };
 
+  React.useImperativeHandle(
+    picker,
+    () => ({
+      open: (options = {}) => {
+        const input = ownInput.current;
+        if (!input || disabled || full) return;
+        requestedAccept.current = { accept: options.accept ?? accept };
+        input.click();
+      },
+    }),
+    [accept, disabled, full],
+  );
+
   const input = (
     <input
-      ref={setInputRef}
+      ref={ownInput}
       id={ids.controlId}
       type="file"
       className={cx(visuallyHiddenClass, styles.input)}
@@ -1177,7 +1205,16 @@ function FileUploadField({
       // the add tile is only marked off and its click opens no picker.
       aria-disabled={(tile && full) || undefined}
       onClick={(event) => {
-        if (tile && full) event.preventDefault();
+        if (tile && full) {
+          event.preventDefault();
+          return;
+        }
+        // The types of this pick: `picker.open({ accept })`, else the field's own.
+        const requested = requestedAccept.current;
+        requestedAccept.current = null;
+        pickAccept.current = requested ? requested.accept : accept;
+        if (pickAccept.current === undefined) event.currentTarget.removeAttribute("accept");
+        else event.currentTarget.accept = pickAccept.current;
       }}
       // The button is the control: the input only holds the files.
       tabIndex={button ? -1 : undefined}
@@ -1187,7 +1224,7 @@ function FileUploadField({
       aria-describedby={button ? undefined : ids.describedBy}
       aria-invalid={(!button && ids.invalid) || undefined}
       onChange={(event) => {
-        addFiles(Array.from(event.target.files ?? []));
+        addFiles(Array.from(event.target.files ?? []), pickAccept.current);
         event.target.value = "";
       }}
     />
@@ -1340,7 +1377,11 @@ function FileUploadField({
       {/* Files dropped anywhere on the field go in; the keyboard and picker path is the file input. */}
       <div
         className={styles.field}
-        {...toDataAttributes({ trigger, dropping: (tile && dragOver) || undefined })}
+        {...toDataAttributes({
+          trigger,
+          dropping: (tile && dragOver) || undefined,
+          "focus-ring": focusRing,
+        })}
         {...dropHandlers}
       >
         {control}
@@ -1376,7 +1417,7 @@ export const FileUpload = {
   Item: FileUploadItem,
   FormatBadge: FileUploadFormatBadge,
   ItemPreview: FileUploadItemPreview,
-  ItemName: FileUploadItemName,
+  ItemText: FileUploadItemText,
   ItemDescription: FileUploadItemDescription,
   ItemActions: FileUploadItemActions,
   ItemProgress: FileUploadItemProgress,

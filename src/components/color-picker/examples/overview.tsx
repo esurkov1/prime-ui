@@ -20,7 +20,7 @@ export default function ColorPickerOverviewExample() {
           <Popover.Content>
             <ColorPicker.Panel className={styles.panel}>
               <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                <ColorPicker.AreaThumb />
+                <ColorPicker.Thumb />
               </ColorPicker.Area>
               <ColorPicker.Slider channel="hue" colorSpace="hsl">
                 <ColorPicker.SliderTrack>

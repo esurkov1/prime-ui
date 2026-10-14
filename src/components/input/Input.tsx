@@ -2,11 +2,12 @@ import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
+import enterMotion from "@/internal/enterMotion.module.css";
 import {
   FieldActionButton,
   type FieldActionButtonProps,
@@ -26,9 +27,12 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import { MorphText } from "@/internal/MorphText";
+import { usePartPresence } from "@/internal/partPresence";
 import type { ControlSize, Tone } from "@/internal/states";
+import textTone from "@/internal/textTone.module.css";
 
 import { ProgressBar } from "../progress-bar/ProgressBar";
 import styles from "./Input.module.css";
@@ -107,6 +111,8 @@ type InputContextValue = {
   setRevealed: React.Dispatch<React.SetStateAction<boolean>>;
   /** The caret and selection kept across a reveal (changing `type` resets them). */
   selectionRef: React.RefObject<[number, number] | null>;
+  /** The root has rendered once: a part mounted after that arrived (it enters). */
+  mountedRef: React.RefObject<boolean>;
 };
 
 const [InputProvider, useInputContext] = createComponentContext<InputContextValue>("Input");
@@ -172,22 +178,27 @@ function InputRoot({
   ...rest
 }: InputRootProps) {
   const [strengthValue, setStrengthValue] = React.useState("");
-  const size = useControlSize(sizeProp);
-  const ids = useFieldFrame(id, { label, hint, error, invalid });
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
+  const ids = useFieldFrame(id, { label, hint, error, invalid, required });
   const labels = useLabels(INPUT_LABELS, labelsProp);
-  const { invalid: isInvalid, controlId: inputId, describedBy } = ids;
+  const { invalid: isInvalid, controlId: inputId, describedBy, required: isRequired } = ids;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const commit = useFieldCommit(inputRef, onCommit);
   const hasCommit = onCommit !== undefined;
   const [revealed, setRevealed] = React.useState(false);
   const selectionRef = React.useRef<[number, number] | null>(null);
+  const mountedRef = React.useRef(false);
+  React.useEffect(() => {
+    mountedRef.current = true;
+  }, []);
 
   const contextValue = React.useMemo(
     () => ({
       size,
       invalid: isInvalid,
       focusRing,
-      required,
+      required: isRequired,
       inputId,
       inputRef,
       describedBy,
@@ -198,12 +209,13 @@ function InputRoot({
       revealed,
       setRevealed,
       selectionRef,
+      mountedRef,
     }),
     [
       size,
       isInvalid,
       focusRing,
-      required,
+      isRequired,
       inputId,
       describedBy,
       labels,
@@ -222,7 +234,7 @@ function InputRoot({
 
   return (
     <InputProvider value={contextValue}>
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <FieldFrame
           {...rest}
           size={size}
@@ -236,7 +248,7 @@ function InputRoot({
             strength ? (
               <>
                 <span
-                  className={styles.strengthWord}
+                  className={cx(textTone.tone, styles.strengthWord)}
                   data-tone={level ? STRENGTH_TONES[level] : undefined}
                   aria-live="polite"
                 >
@@ -268,8 +280,8 @@ function InputRoot({
               aria-label={labels.strength}
             />
           ) : null}
-        </FieldFrame>
-      </ControlSizeProvider>
+        </FieldFrame>,
+      )}
     </InputProvider>
   );
 }
@@ -409,7 +421,12 @@ export type InputIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "childr
 
 function InputIcon({ side, children, className, ...rest }: InputIconProps) {
   return (
-    <span {...rest} className={cx(styles.icon, className)} data-side={side} aria-hidden="true">
+    <span
+      {...rest}
+      className={cx(iconSlotClass, styles.icon, className)}
+      data-side={side}
+      aria-hidden="true"
+    >
       {children}
     </span>
   );
@@ -466,15 +483,21 @@ export type InputClearButtonProps = Omit<
 
 /**
  * Trailing clear action. Render it only when the field has a value; clicking returns focus
- * to the input after `onClick` runs (clear the value in `onClick`).
+ * to the input after `onClick` runs (clear the value in `onClick`). It rises in when it appears
+ * after the field and closes up in place when it goes (`partPresence`).
  */
-function InputClearButton({ onClick, ref, ...rest }: InputClearButtonProps) {
-  const { inputId, inputRef, labels } = useInputContext();
+function InputClearButton({ onClick, className, ref, ...rest }: InputClearButtonProps) {
+  const { inputId, inputRef, labels, mountedRef } = useInputContext();
+  // Mounted after the field: the consumer rendered it for a value that just appeared.
+  const [arrived] = React.useState(() => mountedRef.current);
+  const presence = usePartPresence<HTMLButtonElement>({ axis: "inline" });
+  const setRefs = useMergedRefs(presence.ref, ref);
   return (
     <FieldActionButton
       tooltip={false}
       {...rest}
-      ref={ref}
+      ref={setRefs}
+      className={cx(arrived && enterMotion.enter, className)}
       label={labels.clear}
       aria-controls={inputId}
       onClick={(event) => {
@@ -540,6 +563,7 @@ export type InputRevealButtonProps = Omit<
  */
 function InputRevealButton({ onClick, onMouseDown, ref, ...rest }: InputRevealButtonProps) {
   const { inputId, inputRef, labels, revealed, setRevealed, selectionRef } = useInputContext();
+  const glyph = revealed ? "field.password.hide" : "field.password.show";
   return (
     <FieldActionButton
       tooltip={false}
@@ -565,7 +589,7 @@ function InputRevealButton({ onClick, onMouseDown, ref, ...rest }: InputRevealBu
         setRevealed((shown) => !shown);
       }}
     >
-      <Icon name={revealed ? "field.password.hide" : "field.password.show"} />
+      <Icon name={glyph} />
     </FieldActionButton>
   );
 }

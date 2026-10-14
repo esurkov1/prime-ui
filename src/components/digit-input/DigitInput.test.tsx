@@ -274,7 +274,7 @@ describe("DigitInput motion", () => {
     const cells = screen.getAllByRole("textbox");
     expect(cells.every((cell) => cell.getAttribute("data-focus-ring") === "false")).toBe(true);
     expect(ring).not.toHaveAttribute("data-visible");
-    fireEvent.focus(cells[0]);
+    act(() => cells[0].focus());
     expect(ring).toHaveAttribute("data-visible");
     fireEvent.blur(cells[0], { relatedTarget: document.body });
     expect(ring).not.toHaveAttribute("data-visible");

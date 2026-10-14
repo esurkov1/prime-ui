@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_REQUIRED_LABEL_DOCS } from "../../internal/field.api";
 import { COLOR_FIELD_LABELS } from "./ColorField";
 
 export const api: ComponentApi = {
@@ -43,9 +44,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Field tier (height 28 · 32 · 36 · 40 · 48); the panel uses the same tier.",
-          ru: "Ярус поля (высота 28 · 32 · 36 · 40 · 48); панель в том же ярусе.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Field tier (height 28 · 32 · 36 · 40 · 48); the panel uses the same tier. Without it the tier of its host, else `m`.",
+          ru: "Ярус поля (высота 28 · 32 · 36 · 40 · 48); панель в том же ярусе. Без него — ярус контейнера, иначе `m`.",
         },
         {
           name: "label",
@@ -57,8 +58,8 @@ export const api: ComponentApi = {
           name: "required",
           type: "boolean",
           default: "false",
-          en: "Red `*` after the label.",
-          ru: "Красная `*` после подписи.",
+          en: "Red `*` after the label; the field button is described by `labels.required` (a button takes no `aria-required`).",
+          ru: "Красная `*` после подписи; кнопку поля описывает `labels.required` (у кнопки нет `aria-required`).",
         },
         {
           name: "optional",
@@ -144,10 +145,6 @@ export const api: ComponentApi = {
     },
   ],
   labels: labelRows(COLOR_FIELD_LABELS, {
-    format: {
-      en: "Value format select (the ColorPicker labels are shared).",
-      ru: "Выбор формата значений (общие строки ColorPicker).",
-    },
     eyeDropper: { en: "Eyedropper button of the channels.", ru: "Кнопка пипетки." },
     hex: { en: "Hex cell of the channels.", ru: "Ячейка hex в строке каналов." },
     hue: { en: "Hue slider and the hue cell of the channels.", ru: "Ползунок и ячейка оттенка." },
@@ -168,6 +165,7 @@ export const api: ComponentApi = {
       en: "Accessible name of the preset swatches in the panel.",
       ru: "Имя группы готовых цветов в панели.",
     },
+    ...FIELD_REQUIRED_LABEL_DOCS,
   }),
   accessibility: {
     keyboard: [

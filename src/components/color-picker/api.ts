@@ -45,11 +45,30 @@ export const api: ComponentApi = {
           ru: 'Новый `Color` (`color.toString("hex")` — строка).',
         },
         {
+          name: "format",
+          type: '"hsl" | "rgb" | "hex"',
+          en: "Controlled value format of `FormatSelect` and `ChannelStrip`.",
+          ru: "Управляемый формат значений `FormatSelect` и `ChannelStrip`.",
+        },
+        {
           name: "defaultFormat",
           type: '"hsl" | "rgb" | "hex"',
           default: '"hsl"',
-          en: "Initial value format of `FormatSelect` and `ChannelStrip`.",
-          ru: "Начальный формат `FormatSelect` и `ChannelStrip`.",
+          en: "Initial value format, uncontrolled.",
+          ru: "Начальный формат значений без контроля.",
+        },
+        {
+          name: "onFormatChange",
+          type: '(format: "hsl" | "rgb" | "hex") => void',
+          en: "Called with the format picked in `FormatSelect`.",
+          ru: "Вызывается с форматом, выбранным в `FormatSelect`.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of the fields inside (`HexInput`, `FormatSelect`); without it the tier of its host (a panel, a popover), else `m`.",
+          ru: "Ярус полей внутри (`HexInput`, `FormatSelect`); без него — ярус контейнера (панель, поповер), иначе `m`.",
         },
         {
           name: "labels",
@@ -109,13 +128,6 @@ export const api: ComponentApi = {
           en: "Error message in the hint slot; marks the field invalid.",
           ru: "Текст ошибки на месте подсказки; поле становится ошибочным.",
         },
-        {
-          name: "size",
-          type: '"xs" | "s" | "m" | "l" | "xl"',
-          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Field tier. Without it the tier of its host (a panel, a popover), else `m`.",
-          ru: "Ярус поля. Без него — ярус хоста, иначе `m`.",
-        },
         focusRing,
         {
           name: "…rest",
@@ -167,8 +179,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPicker.Area",
-      en: "`ref` → `HTMLDivElement`. React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds `ColorPicker.AreaThumb`.",
-      ru: "`ColorArea` из React Aria: квадрат двух каналов (например, насыщенность × яркость). Держит `ColorPicker.AreaThumb`.",
+      en: "`ref` → `HTMLDivElement`. React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds a `ColorPicker.Thumb`.",
+      ru: "`ColorArea` из React Aria: квадрат двух каналов (например, насыщенность × яркость). Держит `ColorPicker.Thumb`.",
       props: [
         disabled,
         {
@@ -180,9 +192,9 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "ColorPicker.AreaThumb · ColorPicker.Thumb",
-      en: "`ref` → `HTMLDivElement`. React Aria `ColorThumb` of the area / of a slider track: a thumb-colored ring with the overlay shadow and a focus ring.",
-      ru: "`ColorThumb` из React Aria для области или дорожки ползунка: кольцо цвета бегунка с тенью оверлея и кольцом фокуса.",
+      name: "ColorPicker.Thumb",
+      en: "`ref` → `HTMLDivElement`. React Aria `ColorThumb` of the area or of a slider track: a thumb-colored ring with the overlay shadow and a focus ring, sized by its host.",
+      ru: "`ColorThumb` из React Aria для области или дорожки ползунка: кольцо цвета бегунка с тенью оверлея и кольцом фокуса, размер задаёт хост.",
       props: [
         {
           name: "…rest",
@@ -332,6 +344,20 @@ export const api: ComponentApi = {
           type: "(open: boolean) => void",
           en: "Called when the panel opens or closes.",
           ru: "Открытие и закрытие панели.",
+        },
+        {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the panel and returns focus to the trigger.",
+          ru: "Escape закрывает панель и возвращает фокус на триггер.",
+        },
+        {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "true",
+          en: "A press outside the panel and its trigger closes it; focus follows the pointer.",
+          ru: "Нажатие вне панели и триггера закрывает её; фокус остаётся там, куда нажали.",
         },
         {
           name: "presets",
@@ -513,6 +539,11 @@ export const api: ComponentApi = {
       optional: {
         en: "Marker after the label when `optional`.",
         ru: "Пометка после подписи при `optional`.",
+        part: "ColorPicker.Swatches",
+      },
+      colorNames: {
+        en: "Names of the palette hues (unused here: the picker swatches are colors).",
+        ru: "Названия оттенков палитры (здесь не используются: образцы пикера — цвета).",
         part: "ColorPicker.Swatches",
       },
     }),

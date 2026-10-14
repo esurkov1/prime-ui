@@ -82,13 +82,13 @@ export const page: ComponentPageConfig = {
       scenario: "custom-body",
       title: "Своё содержимое зоны",
       description:
-        "Своё содержимое: приглушённый заголовок со ссылкой выбора, строка форматов и кнопки источников вместо встроенного — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`.",
+        "Своё содержимое: приглушённый заголовок со ссылкой выбора, строка форматов и кнопки источников вместо встроенного; «Из галереи» выбирает только изображения — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`.",
     },
     {
       scenario: "avatar-upload",
       title: "Фото профиля",
       description:
-        "Круглая зона вокруг Avatar принимает изображения и показывает превью; кнопки открывают тот же input — `inputRef`, `accept`, `className`.",
+        "Круглая зона вокруг Avatar принимает изображения и показывает превью; кнопки открывают тот же выбор файла — `picker`, `accept`, `className`.",
     },
     {
       scenario: "row-parts",

@@ -2,6 +2,9 @@
  * Shared color swatch (ColorSwatches, ColorPresets, ColorPicker). Every swatch carries a faint inner
  * ring so white / near-background colors stay visible; the selection is a check mark that
  * contrasts with the color (no selection ring — a ring shows only for keyboard focus).
+ *
+ * Public hook: `--swatch-inline-size` — a host grid stretches its swatches across their columns
+ * (`100%`); the height stays the tier's.
  */
 
 /* ---- Color layers ---- */
@@ -16,27 +19,46 @@
   border-radius: inherit;
 }
 
-/* "No color": transparency checkerboard, 4 × 4 cells at any size. */
+/*
+ * The transparency checkerboard of the kit, from the surface's own fills: `--swatch-checker` is
+ * the pattern as a background layer. `.checkerboard` defines it for a host that lays a translucent
+ * color over it (the alpha track of ColorPicker); `.checker` paints "no color" with it, 4 × 4 cells
+ * at any size.
+ */
+.checkerboard,
 .checker {
-  background:
-    repeating-conic-gradient(
-      var(--prime-color-layer-current) 0deg 90deg,
-      var(--prime-color-fill-strong) 90deg 180deg
-    )
-    0 0 / 50% 50%;
+  --swatch-checker: repeating-conic-gradient(
+    var(--prime-color-layer-current) 0deg 90deg,
+    var(--prime-color-fill-strong) 90deg 180deg
+  );
+}
+
+.checker {
+  background: var(--swatch-checker) 0 0 / 50% 50%;
+}
+
+/* A palette hue (`palette.module.css` `.hue` on the swatch): its solid step. */
+.hueFill {
+  background: var(--hue-solid);
 }
 
 /*
  * ---- Tier of a swatch grid ----
- * swatch = base − 8, where the host picks the base: control height (20 · 24 · 28 · 32 · 40) or
- * menu item height (16 · 20 · 24 · 28 · 32); gap = control gap; radius steps with size.
+ * A swatch is the base − 8. The base is the control height (28 · 32 · 36 · 40 · 48 → swatches
+ * 20 · 24 · 28 · 32 · 40), or with `data-base="item"` the menu item height (24 · 28 · 32 · 36 · 40
+ * → swatches 16 · 20 · 24 · 28 · 32); gap = control gap; radius steps with size.
  */
 .tier {
   --swatch-base-control: var(--prime-control-m-height);
   --swatch-base-item: var(--prime-control-m-item-height);
+  --swatch-base: var(--swatch-base-control);
   --swatch-size: calc(var(--swatch-base) - var(--prime-space-2));
   --swatch-radius: var(--prime-radius-s);
   --swatch-gap: var(--prime-control-m-gap);
+}
+
+.tier[data-base="item"] {
+  --swatch-base: var(--swatch-base-item);
 }
 
 .tier[data-size="xs"] {
@@ -66,6 +88,25 @@
   --swatch-gap: var(--prime-control-xl-gap);
 }
 
+/* Touch: a swatch is a cell of a dense grid and its `::after` draws the inner edge, so its hit area
+   cannot grow invisibly past its neighbours. The swatch itself grows to the touch target, like a
+   menu row; the grid takes fewer columns or wraps into more rows. */
+@media (pointer: coarse) {
+  .tier {
+    --swatch-base: max(
+      var(--swatch-base-control),
+      calc(var(--prime-control-touch-target) + var(--prime-space-2))
+    );
+  }
+
+  .tier[data-base="item"] {
+    --swatch-base: max(
+      var(--swatch-base-item),
+      calc(var(--prime-control-touch-target) + var(--prime-space-2))
+    );
+  }
+}
+
 /* ---- Chip: the current color inside a trigger, at the host's icon size ---- */
 .chip {
   position: relative;
@@ -89,7 +130,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--swatch-size);
+  width: var(--swatch-inline-size, var(--swatch-size));
   height: var(--swatch-size);
   margin: 0;
   padding: 0;
@@ -97,12 +138,32 @@
   border-radius: var(--swatch-radius);
   background: none;
   cursor: pointer;
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* Faint inner edge above the color layer. */
+/* ---- Trigger: a square swatch button of the field height (`fieldTierClass` on it) ---- */
+.trigger {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: var(--field-h);
+  height: var(--field-h);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--field-radius);
+  background: var(--prime-color-field-bg);
+  cursor: pointer;
+}
+
+/* Faint inner edge above the color layer; the trigger's darkens on hover and while open. */
 .swatch::after,
-.chip::after {
+.chip::after,
+.trigger::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -111,13 +172,31 @@
   pointer-events: none;
 }
 
+/* The trigger's edge glides to the stronger fill: the states set its color, the edge transitions. */
+.trigger::after {
+  box-shadow: inset 0 0 0 var(--prime-border-width)
+    var(--swatch-edge, var(--prime-color-fill-subtle-active));
+  transition: box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.trigger[data-state="open"] {
+  --swatch-edge: var(--prime-color-fill-strong);
+}
+
+@media (hover: hover) {
+  .trigger:hover:not(:disabled, [aria-disabled="true"]) {
+    --swatch-edge: var(--prime-color-fill-strong);
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .swatch:hover:not(:disabled) {
+  .swatch:hover:not(:disabled, [aria-disabled="true"]) {
     transform: scale(var(--prime-motion-scale-hover));
   }
 }
 
-.swatch:focus-visible {
+.swatch:focus-visible,
+.trigger:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
@@ -128,7 +207,9 @@
   outline: none;
 }
 
-.swatch:disabled {
+/* Disabled: one look for every swatch and swatch trigger. */
+.swatch:is(:disabled, [aria-disabled="true"]),
+.trigger:is(:disabled, [aria-disabled="true"]) {
   cursor: not-allowed;
   filter: grayscale(1);
   opacity: var(--prime-opacity-disabled);
@@ -153,4 +234,9 @@
 /* «No color»: the checkerboard is the surface's own fills, so the mark follows the theme. */
 .swatch[data-contrast="surface"] .check {
   color: var(--prime-color-text-primary);
+}
+
+/* A palette hue: the hue's own foreground on its solid step. */
+.swatch[data-contrast="hue"] .check {
+  color: var(--hue-solid-fg);
 }

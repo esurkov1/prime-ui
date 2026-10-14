@@ -74,7 +74,7 @@
   align-items: center;
   gap: var(--prime-space-1);
   min-width: 0;
-  margin: calc(-1 * var(--prime-focus-space));
+  margin: calc(var(--prime-focus-space) * -1);
   padding: var(--prime-focus-space);
 }
 
@@ -206,14 +206,10 @@
 }
 
 /*
- * Chips sit on the field's own wash (foundation §4): neutral chips take a stronger wash, hue chips
- * a translucent wash of their hue, so every chip clearly steps off the field in both themes.
+ * Chips sit on the field's own wash (foundation §4): a gray chip is a text-ink wash over its ground
+ * (the palette), hue chips take a translucent wash of their hue, so every chip clearly steps off
+ * the field in both themes.
  */
-.control .chip[data-color="gray"]:not([data-disabled="true"]),
-.control .chipMore:not([data-disabled="true"]) {
-  background: var(--prime-color-fill-strong);
-}
-
 .control .chip:not([data-color="gray"], [data-disabled="true"]) {
   background: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
 }

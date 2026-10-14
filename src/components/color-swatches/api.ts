@@ -9,30 +9,44 @@ export const api: ComponentApi = {
       ru: 'Рамка поля (подпись → образцы → подсказка или ошибка) вокруг `role="radiogroup"` из кнопок-образцов с одной остановкой Tab.',
       props: [
         {
+          name: "mode",
+          type: '"color" | "palette"',
+          default: '"color"',
+          en: "`color` — any CSS color from `presets`; `palette` — a kit palette hue (`PaletteColor`) from `palette`, drawn from its solid step in both themes.",
+          ru: "`color` — любой CSS-цвет из `presets`; `palette` — оттенок палитры кита (`PaletteColor`) из `palette`, нарисованный его плотной ступенью в обеих темах.",
+        },
+        {
           name: "value",
-          type: "string | null",
-          en: "Controlled color; `null` — no color.",
-          ru: "Управляемый цвет; `null` — без цвета.",
+          type: "string | null · PaletteColor | null",
+          en: "Controlled color (a hue with `palette`); `null` — no color.",
+          ru: "Управляемый цвет (оттенок при `palette`); `null` — без цвета.",
         },
         {
           name: "defaultValue",
-          type: "string | null",
+          type: "string | null · PaletteColor | null",
           default: "null",
           en: "Initial color when uncontrolled.",
           ru: "Начальный цвет без контроля.",
         },
         {
           name: "onValueChange",
-          type: "(value: string | null) => void",
-          en: "Called with the preset `value` (as written in `presets`) or `null`.",
-          ru: "`value` пресета (как в `presets`) или `null`.",
+          type: "(value: string | null) => void · (value: PaletteColor | null) => void",
+          en: "Called with the preset `value` (as written in `presets`), the hue with `palette`, or `null`.",
+          ru: "`value` пресета (как в `presets`), оттенок при `palette` или `null`.",
         },
         {
           name: "presets",
           type: "readonly ColorPreset[]",
           default: "COLOR_PRESETS",
-          en: "Swatches in order: `{ value, label }`; the label is the swatch's accessible name and tooltip.",
-          ru: "Образцы по порядку: `{ value, label }`; label — имя и подсказка образца.",
+          en: "`color` mode: swatches in order, `{ value, label }`; the label is the swatch's accessible name and tooltip.",
+          ru: "Режим `color`: образцы по порядку, `{ value, label }`; label — имя и подсказка образца.",
+        },
+        {
+          name: "palette",
+          type: "readonly PaletteColor[]",
+          defaultNote: { en: "every hue", ru: "все оттенки" },
+          en: "`palette` mode: the hues in order; each is named by `labels.colorNames`.",
+          ru: "Режим `palette`: оттенки по порядку; имя каждого — `labels.colorNames`.",
         },
         {
           name: "size",
@@ -149,6 +163,10 @@ export const api: ComponentApi = {
     optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
+    },
+    colorNames: {
+      en: 'Names of the palette hues (`mode="palette"`), by `PaletteColor` key; merges by key.',
+      ru: 'Названия оттенков палитры (`mode="palette"`) по ключам `PaletteColor`; сливаются по ключам.',
     },
   }),
   accessibility: {

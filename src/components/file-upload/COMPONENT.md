@@ -61,7 +61,7 @@ FileUpload.Queue                the same files with no trigger of their own (a t
 FileUpload.Item                 a file row the set does not draw (own actions, a server-side job)
 ├─ FileUpload.FormatBadge       square kit Badge with the extension
 │  or FileUpload.ItemPreview    square kit Thumbnail of an image file
-├─ FileUpload.ItemName          one line, truncated (the set passes the name without its extension when a format badge shows it)
+├─ FileUpload.ItemText          one line, truncated (the set passes the name without its extension when a format badge shows it)
 ├─ FileUpload.ItemDescription   size, progress or error
 ├─ FileUpload.ItemActions       buttons at the end of the row (kit Button)
 └─ FileUpload.ItemProgress      the kit ProgressBar across the row
@@ -121,13 +121,14 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message under the field (a rejected file, too few files); implies `invalid`. |
 | `invalid` | `boolean` | — | Danger line and icon of the zone, `aria-invalid` on the input. A non-empty `error` implies it. |
+| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the drop zone and the add tile (`data-focus-ring="false"`); focus, keyboard and ARIA stay. The picker Button keeps its ring. |
 | `disabled` | `boolean` | `false` | Blocks picking and drag-and-drop; the files are read-only: no add tile, no reorder, no remove. |
 | `accept` | `string` | — | Native `accept` of the file input; dropped files outside it are not taken (MIME type, `type/*` or `.ext`; a file with no MIME type by its extension). |
 | `multiple` | `boolean` | — | Allows several files at once in the picker. |
 | `max` | `number` | — | Most files in the set: picked and dropped files are cut to the room left; the add tile counts `count из max` (the digits roll) and at the limit says «Лимит файлов» and takes nothing. |
 | `name` | `string` | — | Name of the file input inside a form. |
 | `onFilesChange` | `(files: File[]) => void` | — | Called with the picked or dropped files (of `accept`, cut to `max`); the input is reset, so the same file can be picked again. Not called when `queue.add` takes them. |
-| `inputRef` | `Ref<HTMLInputElement>` | — | The hidden file input, e.g. to open the picker from a button. |
+| `picker` | `Ref<{ open: (options?: { accept?: string }) => void }>` | — | Opens the file picker from code (a custom body button, a menu item): `open()`, or `open({ accept })` for one pick of other types that also filter its files. A disabled or full field does not open. |
 | `id` | `string` | — | Id of the file input (generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `labels` | `Partial<FileUploadLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | A zone: a custom body (`FileUpload.Body`) instead of the built-in one. `trigger="button"`: the button's content, `Button.Icon` and text (default: the paperclip and `labels.browse`). |
@@ -205,7 +206,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `src` | `string` | — (required) | The picture: a URL, or the local `preview` of a queued file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the thumbnail frame. |
 
-### FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions
+### FileUpload.ItemText · FileUpload.ItemDescription · FileUpload.ItemActions
 `ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.
 
 | Prop | Type | Default | Description |
@@ -220,7 +221,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `value` | `number` | — (required) | Uploaded amount. |
 | `max` | `number` | — | Total amount (ProgressBar default). |
 | `tone` | `"accent" \| "neutral" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Fill color: `success` for a finished file, `danger` where a failed one stopped. |
-| `aria-label` | `string` | `"Загрузка файла"` | Accessible name of the bar (not the wrapper); name the file. |
+| `aria-label` | `string` | `labels.upload` | Accessible name of the bar (not the wrapper); name the file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
 ### Types
@@ -299,6 +300,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | `invalid` (Root) | danger line and icon | a rejected file without a message; otherwise pass `error` | — |
 | `invalid` (Item) | danger soft fill, danger ring, danger description | an upload failed | `false` |
 | `disabled` | disabled fill and text, drops ignored; the files read-only | uploading is unavailable, a published set | `false` |
+| `focusRing` | `false`: the zone and the add tile draw no focus ring; focus, keys and ARIA stay | the zone sits in a host that marks focus itself | `true` |
 
 **Combinations**
 - Recommended: `variant="solid"` inside Card / Modal; `error` on Root explaining the rule; `queue` on the root with `useUploadQueue`; `trigger="tile"` + `layout="grid"` + `cover` for an image gallery; `trigger="button"` + `FileUpload.Queue layout="strip"` for a tray.
@@ -386,6 +388,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | `uploading` | `"Загрузка {percent}%"` | A file in flight. |
 | `failed` | `"Не удалось загрузить"` | A failed file whose upload gave no reason. |
 | `progress` | `"Загрузка: {name}"` | Name of a row's progress bar. |
+| `upload` | `"Загрузка файла"` | Name of a `FileUpload.ItemProgress` without an `aria-label` of its own. |
 | `cancel` | `"Отменить загрузку: {name}"` | Name of the disk that cancels a tile's upload in flight. |
 | `retry` | `"Повторить загрузку: {name}"` | Name of the retry button of a failed row (the retry disk of a failed tile). |
 | `remove` | `"Убрать {name}"` | Name of the remove button of a file (it also stops an upload). |
@@ -411,8 +414,8 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | [file-cards.tsx](examples/file-cards.tsx) | Materials of a warehouse inspection as cards: photos and documents in one grid, each with its picture or format and the name with the size in megabytes as the report gives it; new files upload in their cards and the order is set by drag or Alt + arrows — `trigger`, `layout`, `defaultValue`, `queue`, `formatSize`. |
 | [attachment-tray.tsx](examples/attachment-tray.tsx) | A reply to a client with a paperclip instead of a drop zone: the icon-only picker button, and the attachments as one scrolling row of tiles above the message — `trigger`, `aria-label`, `FileUpload.Queue`, `layout`. |
 | [saving.tsx](examples/saving.tsx) | Published listing photos with no picker, every change saved on the server: a moved or removed photo waits busy, and a change the server refuses puts the set back — `FileUpload.Queue`, `onValueChange`, `value`, `cover`. |
-| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and the formats line and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`. |
-| [avatar-upload.tsx](examples/avatar-upload.tsx) | A round zone around an Avatar that takes images and shows a preview; buttons open the same input — `inputRef`, `accept`, `className`. |
+| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and the formats line and source buttons instead of the built-in one; the gallery button picks only images — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`. |
+| [avatar-upload.tsx](examples/avatar-upload.tsx) | A round zone around an Avatar that takes images and shows a preview; buttons open the same picker — `picker`, `accept`, `className`. |
 | [row-parts.tsx](examples/row-parts.tsx) | Rows the set does not draw, built from parts: order documents with a download button, a photo with its preview, a report still being prepared and one that failed with a retry — `FileUpload.Item`, `FileUpload.FormatBadge`, `FileUpload.ItemPreview`, `FileUpload.ItemActions`, `FileUpload.ItemProgress`, `invalid`, `tone`. |
 | [controlled.tsx](examples/controlled.tsx) | Documents of a deal in one list: the files already on the server and new uploads after them, saved on every change, and a button brings back the saved set — `value`, `onValueChange`, `queue`. |
 | [in-form.tsx](examples/in-form.tsx) | A contract upload form: submit checks the required scan, its error shakes in and leaves once a file is picked or removed — `required`, `error`, `name`, `value`. |
@@ -422,7 +425,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 ## Mistakes
 - A `Label` and a `Hint` placed around the zone by hand → pass `label`, `hint`, `error`.
 - Nesting `FileUpload.Root` in another `<label>` → it already is one.
-- A plain `<button>` in a custom body expecting it to open the picker → call `inputRef.current?.click()` in its `onClick`; an inline «browse» link is `<LinkButton asChild><button type="button" onClick={…}>`.
+- A plain `<button>` in a custom body expecting it to open the picker → call `picker.current?.open()` in its `onClick` (`open({ accept })` for one pick of other types); an inline «browse» link is `<LinkButton asChild><button type="button" onClick={…}>`.
 - `labels.hint` → the built-in secondary line is `labels.description`; `hint` is the field hint under the zone.
 - A hand-written upload loop with its own progress, retry and abort per row → `useUploadQueue` + `queue`.
 - A zone recolored into a button for a paperclip → `trigger="button"`.

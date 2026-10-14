@@ -1,13 +1,7 @@
 [
   "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled #2",
-  "src/components/color-picker/ColorPresets.module.css: hover :not(:disabled) ignores aria-disabled",
-  "src/components/color-picker/ColorPresets.tsx: matchMedia outside useMediaQuery",
-  "src/components/datepicker/Datepicker.module.css: hover :not(:disabled) ignores aria-disabled",
-  "src/components/datepicker/Datepicker.module.css: hover :not(:disabled) ignores aria-disabled #2",
-  "src/components/slider/Slider.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/components/stepper/Stepper.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/components/stepper/Stepper.module.css: hover :not(:disabled) ignores aria-disabled #2",
-  "src/internal/swatch.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/layout/sidebar/Sidebar.module.css: hover transform without (pointer: fine)"
 ]

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { ColorSwatches } from "./ColorSwatches";
+import { COLOR_SWATCHES_LABELS, ColorSwatches } from "./ColorSwatches";
 
 const presets = [
   { value: "#ef4444", label: "Красный" },
@@ -15,6 +15,38 @@ describe("ColorSwatches", () => {
     expect(screen.getByRole("radiogroup", { name: "Цвет этапа" })).toBeInTheDocument();
     expect(screen.getAllByRole("radio")).toHaveLength(3);
     expect(screen.getByRole("radio", { name: "Зелёный" })).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("palette mode picks a kit hue by name and draws it from the palette", () => {
+    const onValueChange = vi.fn();
+    render(
+      <ColorSwatches
+        mode="palette"
+        label="Цвет этапа"
+        palette={["blue", "green"]}
+        defaultValue="blue"
+        onValueChange={onValueChange}
+      />,
+    );
+    const blue = screen.getByRole("radio", { name: "Синий" });
+    expect(blue).toHaveAttribute("aria-checked", "true");
+    expect(blue).toHaveAttribute("data-color", "blue");
+    expect(blue).toHaveAttribute("data-contrast", "hue");
+    fireEvent.keyDown(blue, { key: "ArrowRight" });
+    expect(onValueChange).toHaveBeenCalledWith("green");
+    expect(screen.getByRole("radio", { name: "Зелёный" })).toHaveFocus();
+  });
+
+  it("palette mode takes hue names from labels.colorNames", () => {
+    render(
+      <ColorSwatches
+        mode="palette"
+        palette={["blue", "red"]}
+        labels={{ colorNames: { ...COLOR_SWATCHES_LABELS.colorNames, blue: "Лазурь" } }}
+      />,
+    );
+    expect(screen.getByRole("radio", { name: "Лазурь" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Красный" })).toBeInTheDocument();
   });
 
   it("selects on click and calls onValueChange", () => {

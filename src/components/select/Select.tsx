@@ -10,9 +10,8 @@ import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidde
 import { useControllableState } from "@/hooks/useControllableState";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -24,24 +23,27 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
+import { GlyphSwap } from "@/internal/glyphSwap";
+import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
 import {
-  enabledOptions,
   handleListboxKeyDown,
   optionDomId,
   revealHighlighted,
-  type Store,
   useCreateStore,
+  useListboxRegistry,
+  useListboxView,
   useStoreSlice,
   useTypeahead,
 } from "@/internal/listbox";
 import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
-import { focusInto } from "@/internal/overlay/focus";
-import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { useOpenState } from "@/internal/overlay/useOpenState";
+import { usePartPresence } from "@/internal/partPresence";
+import { RegionSwap } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
-import swapMotion from "@/internal/swapMotion.module.css";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
@@ -58,8 +60,6 @@ import {
   splitItemChildren,
 } from "./SelectItem";
 import {
-  createItemRegistry,
-  normalize,
   type SelectContextValue,
   type SelectLabels,
   SelectProvider,
@@ -102,6 +102,8 @@ type SelectRootBase = FieldRootDomProps &
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
+    closeOnEscape?: boolean;
+    closeOnOutsideClick?: boolean;
     /** Clear segment in the trigger (and `Delete` / `Backspace` on it) while a value is selected. */
     clearable?: boolean;
     /** Form field name: hidden inputs submit the value (one per value with `multiple`). */
@@ -162,7 +164,7 @@ export type SelectRootProps = SelectRootBase & (SelectSingleProps | SelectMultip
 
 function SelectRoot(props: SelectRootProps) {
   const {
-    size = "m",
+    size: sizeProp,
     label,
     required = false,
     optional,
@@ -176,6 +178,8 @@ function SelectRoot(props: SelectRootProps) {
     open,
     defaultOpen = false,
     onOpenChange,
+    closeOnEscape = true,
+    closeOnOutsideClick = true,
     clearable = false,
     name,
     search,
@@ -198,9 +202,11 @@ function SelectRoot(props: SelectRootProps) {
     ...rest
   } = props;
   const multiple = props.multiple === true;
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
   const labels = useLabels(SELECT_LABELS, labelsProp);
-  const ids = useFieldFrame(id, { hint, error, invalid });
+  const ids = useFieldFrame(id, { label, hint, error, invalid, required });
 
   const [stored, setStored] = useControllableState<string | string[] | undefined>({
     value: props.value,
@@ -237,13 +243,9 @@ function SelectRoot(props: SelectRootProps) {
     [value],
   );
 
-  const [isOpen, setOpen] = useControllableState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
+  const [isOpen, setOpen] = useOpenState({ open, defaultOpen, onOpenChange, disabled });
   const highlight = useCreateStore<string | undefined>(undefined);
-  const [registry] = React.useState(createItemRegistry);
+  const registry = useListboxRegistry();
   const [query, setQuery] = useControllableState({
     value: search,
     defaultValue: defaultSearch,
@@ -283,7 +285,7 @@ function SelectRoot(props: SelectRootProps) {
       size,
       invalid: ids.invalid,
       focusRing,
-      required,
+      required: ids.required,
       disabled,
       placeholder,
       multiple,
@@ -302,6 +304,8 @@ function SelectRoot(props: SelectRootProps) {
       filter,
       isOpen,
       setOpen,
+      closeOnEscape,
+      closeOnOutsideClick,
       highlight,
       query,
       setQuery,
@@ -317,7 +321,7 @@ function SelectRoot(props: SelectRootProps) {
       ids.controlId,
       ids.describedBy,
       focusRing,
-      required,
+      ids.required,
       disabled,
       placeholder,
       multiple,
@@ -336,6 +340,8 @@ function SelectRoot(props: SelectRootProps) {
       filter,
       isOpen,
       setOpen,
+      closeOnEscape,
+      closeOnOutsideClick,
       highlight,
       query,
       setQuery,
@@ -343,7 +349,7 @@ function SelectRoot(props: SelectRootProps) {
     ],
   );
 
-  return (
+  return tier.provide(
     <FieldFrame
       {...rest}
       size={size}
@@ -357,16 +363,14 @@ function SelectRoot(props: SelectRootProps) {
       optionalLabel={labels.optional}
       className={className}
     >
-      <SelectProvider value={context}>
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-      </SelectProvider>
+      <SelectProvider value={context}>{children}</SelectProvider>
       {name
         ? (selected.length > 0 || multiple ? selected : [""]).map((item) => (
             <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
           ))
         : null}
       <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
-    </FieldFrame>
+    </FieldFrame>,
   );
 }
 SelectRoot.displayName = "Select.Root";
@@ -420,6 +424,8 @@ function SelectTrigger({
   // Options loading and a value saving look the same: a Spinner in place of the chevron.
   const busy = loading || saving;
   const showClear = clearable && selected.length > 0 && !disabled && !busy;
+  const clearPresence = usePartPresence<HTMLSpanElement>({ present: showClear, axis: "inline" });
+  const toggle = floatingTriggerProps({ open: isOpen, setOpen, openOnArrow: true });
 
   return (
     <button
@@ -428,9 +434,9 @@ function SelectTrigger({
       id={triggerId}
       type="button"
       role="combobox"
-      aria-expanded={isOpen}
+      aria-expanded={toggle["aria-expanded"]}
       aria-haspopup="listbox"
-      aria-controls={listboxId}
+      aria-controls={isOpen ? listboxId : undefined}
       aria-invalid={invalid || undefined}
       aria-required={required || undefined}
       aria-describedby={[ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined}
@@ -439,12 +445,14 @@ function SelectTrigger({
       className={cx(fieldTriggerClass, styles.trigger, className)}
       onClick={(event) => {
         onClick?.(event);
-        if (!event.defaultPrevented) setOpen(!isOpen);
+        if (!event.defaultPrevented) toggle.onClick();
       }}
       onKeyDown={(event) => {
         onKeyDown?.(event);
         if (event.defaultPrevented) return;
-        if (["ArrowDown", "ArrowUp", " ", "Enter"].includes(event.key)) {
+        toggle.onKeyDown?.(event);
+        if (event.defaultPrevented) return;
+        if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
           if (!isOpen) setOpen(true);
         } else if (showClear && (event.key === "Delete" || event.key === "Backspace")) {
@@ -453,7 +461,7 @@ function SelectTrigger({
         }
       }}
       {...toDataAttributes({
-        state: isOpen ? "open" : "closed",
+        state: toggle["data-state"],
         size,
         invalid: invalid || undefined,
         loading: busy || undefined,
@@ -471,7 +479,8 @@ function SelectTrigger({
         // clears with Delete / Backspace on the trigger. A touch target in height, like the clear
         // segment of a field (`FieldAction`).
         <span
-          className={cx(styles.clear, touchTargetBlockClass)}
+          ref={clearPresence.ref}
+          className={cx(styles.clear, touchTargetBlockClass, clearPresence.className)}
           aria-hidden="true"
           title={labels.clear}
           data-select-clear=""
@@ -485,7 +494,9 @@ function SelectTrigger({
         </span>
       ) : null}
       <span className={styles.chevron} aria-hidden="true">
-        {busy ? <Spinner aria-hidden="true" /> : <Icon name="nav.chevronDown" />}
+        <GlyphSwap>
+          {busy ? <Spinner aria-hidden="true" /> : <Icon name="nav.chevronDown" />}
+        </GlyphSwap>
       </span>
     </button>
   );
@@ -511,8 +522,9 @@ export type SelectValueProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "chil
 /** The picked label (labels joined in `multiple`), or the placeholder. */
 function SelectValue({ renderValue, className, ...rest }: SelectValueProps) {
   const { selected, registry, placeholder, multiple, size } = useSelectContext();
-  // Labels come from the items; re-read when they register.
-  const text = useStoreSlice(registry.version, () => selected.map(registry.labelOf).join(", "));
+  // Labels come from the items; the view re-renders the value when they register.
+  useListboxView(registry);
+  const text = selected.map(registry.labelOf).join(", ");
 
   if (selected.length > 0 && renderValue && !multiple) {
     const value = selected[0] ?? "";
@@ -565,8 +577,6 @@ type RegionState = "loading" | "error" | "ready";
 const LOADING_ROWS = 4;
 const LOADING_MORE_ROWS = 2;
 
-const hasContent = (node: React.ReactNode) => node != null && node !== false && node !== "";
-
 /** Skeleton rows in the option geometry; decorative (the list carries `aria-busy`). */
 function SkeletonRows({ count }: { count: number }) {
   return Array.from({ length: count }, (_, index) => (
@@ -600,7 +610,8 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
   const {
     isOpen,
     setOpen,
-    pick,
+    closeOnEscape,
+    closeOnOutsideClick,
     triggerId,
     listboxId,
     triggerRef,
@@ -622,6 +633,8 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
   } = useSelectContext();
 
   const listboxRef = React.useRef<HTMLElement | null>(null);
+  // A swap keeps the leaving list on screen a moment: the new one keeps the ref.
+  const setListboxRef = useMergedRefs(listboxRef);
   // `Select.Action` children stand under the scroller; everything else is the list.
   const items: React.ReactNode[] = [];
   const actions: React.ReactNode[] = [];
@@ -635,8 +648,8 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     open: isOpen,
     onOpenChange: setOpen,
     triggerRef,
-    closeOnEscape: true,
-    closeOnOutsideClick: true,
+    closeOnEscape,
+    closeOnOutsideClick,
     matchAnchorWidth: true,
     focusOnOpen: true,
     tabExit: "always",
@@ -644,8 +657,8 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
   });
 
   const highlighted = useStoreSlice(highlight, (value) => value);
-  const version = useStoreSlice(registry.version, (value) => value);
-  const isEmpty = !registry.anyMatch(filter ? normalize(query) : "");
+  const view = useListboxView(registry, query, filter);
+  const isEmpty = view.matchCount === 0;
   const typeahead = useTypeahead();
 
   const region: RegionState = hasContent(loadError)
@@ -653,31 +666,20 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     : loading && isEmpty
       ? "loading"
       : "ready";
-  // The first render stays still; every later load state fades in (foundation §1 rule 7).
-  const swapped = useStateSwap(region);
-  const swapClass = swapped ? swapMotion.swapIn : undefined;
 
   const { sentinelRef, request: requestMore } = useLoadMore({
     enabled: region === "ready" && hasMore && Boolean(onLoadMore) && !loading && !loadingMore,
     onLoadMore,
     scrollRef: listboxRef,
-    round: version,
+    round: view,
   });
+  const setSentinelRef = useMergedRefs(sentinelRef);
 
   // The highlight reached the last option (arrows, End, pointer): ask for more, as scrolling does.
+  const lastOption = view.navigable.filter((id) => !isActionValue(id)).at(-1);
   React.useEffect(() => {
-    if (highlighted === undefined) return;
-    if (enabledOptions(listboxRef.current).at(-1)?.dataset.value === highlighted) requestMore();
-  }, [highlighted, requestMore]);
-
-  // A swap hides or remounts the focused list: focus stays in the panel (the search, the list or
-  // the retry button).
-  const panelRef = floating.contentRef;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on every region swap
-  React.useEffect(() => {
-    const panel = panelRef.current;
-    if (isOpen && swapped && panel && !panel.contains(document.activeElement)) focusInto(panel);
-  }, [region, swapped, isOpen, panelRef]);
+    if (highlighted !== undefined && highlighted === lastOption) requestMore();
+  }, [highlighted, lastOption, requestMore]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (region === "error") {
@@ -692,33 +694,23 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     // In the search field Space, Home and End edit the text.
     if (inSearch && [" ", "Home", "End"].includes(event.key)) return;
     // The options, then the actions under the scroller: the arrows walk both.
-    const stops = enabledOptions(panelRef.current);
-    const ids = stops.map((stop) => stop.dataset.value ?? "");
-    const stopOf = (id: string) => stops.find((stop) => stop.dataset.value === id);
+    const ids = view.navigable;
     const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
     if (printable && !inSearch && (event.key !== " " || typeahead.isTyping())) {
       event.preventDefault();
-      const match = typeahead.find(
-        event.key,
-        ids,
-        highlight.get(),
-        (id) => stopOf(id)?.dataset.label ?? id,
-      );
+      const match = typeahead.find(event.key, ids, highlight.get(), registry.labelOf);
       if (match !== undefined) {
         highlight.set(match);
-        revealHighlighted(stopOf(match));
+        revealHighlighted(registry.nodeOf(match));
       }
       return;
     }
     const moved = handleListboxKeyDown(event, {
       ids,
       highlight,
-      activate: (value) => {
-        if (isActionValue(value)) document.getElementById(optionDomId(listboxId, value))?.click();
-        else pick(value);
-      },
+      activate: (value) => registry.activate(value),
     });
-    if (moved !== null) revealHighlighted(stopOf(moved));
+    if (moved !== null) revealHighlighted(registry.nodeOf(moved));
   };
 
   // Closed, the items still render (hidden, in place) so the trigger knows their labels.
@@ -738,7 +730,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     >
       {searchable ? (
         // The permanent focus of the panel: no ring, the caret is the indicator (foundation §7).
-        <div className={cx(menu.searchRow, styles.search)} data-focus-ring="false">
+        <div className={cx(menu.searchRow, styles.search)}>
           <Icon name="action.search" size="s" />
           <input
             type="text"
@@ -746,7 +738,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
             value={query}
             placeholder={labels.search}
             aria-label={labels.search}
-            aria-controls={listboxId}
+            aria-controls={region === "error" ? undefined : listboxId}
             aria-activedescendant={activeDescendant}
             aria-autocomplete="list"
             autoComplete="off"
@@ -756,63 +748,68 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
           />
         </div>
       ) : null}
-      <ScrollContainer
-        // A load state swap remounts the list, so its new content fades in.
-        key={swapped ? region : undefined}
-        ref={listboxRef}
-        id={listboxId}
-        role="listbox"
-        aria-multiselectable={multiple || undefined}
-        aria-labelledby={triggerId}
-        aria-activedescendant={searchable ? undefined : activeDescendant}
-        aria-busy={loading || loadingMore || saving || undefined}
-        aria-owns={actions.length > 0 && region !== "error" ? actionsId : undefined}
-        tabIndex={-1}
-        hidden={region === "error" ? true : undefined}
-        data-autofocus={searchable || region === "error" ? undefined : ""}
-        className={cx(styles.listbox, swapClass)}
-      >
-        {/* Items render while loading too: they register, and the first match ends the state. */}
-        {items}
-        {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
-        {region === "ready" && hasMore ? (
-          <div ref={sentinelRef} aria-hidden="true" className={menu.loadSentinel} />
-        ) : null}
-        {region === "ready" && loadingMore ? <SkeletonRows count={LOADING_MORE_ROWS} /> : null}
-      </ScrollContainer>
-      {region === "ready" && isEmpty ? (
-        <EmptyPage.Root layout="compact" role="status">
-          <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
-          {query !== "" && labels.emptyHint ? (
-            <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
-          ) : null}
-        </EmptyPage.Root>
-      ) : null}
-      {actions.length > 0 && region !== "error" ? (
-        // Owned by the listbox (`aria-owns`): its options for assistive tech, pinned under the
-        // scroller and the empty state for the eye.
-        // biome-ignore lint/a11y/useSemanticElements: a group of options inside a listbox, not a form fieldset
-        <div id={actionsId} role="group" className={styles.actions}>
-          {actions}
-        </div>
-      ) : null}
-      {region === "error" ? (
-        <EmptyPage.Root layout="compact" size={size} role="alert" className={swapClass}>
-          <EmptyPage.Title as="p">{loadError}</EmptyPage.Title>
-          {onRetry ? (
-            <EmptyPage.Actions>
-              <Button.Root variant="soft" tone="neutral" onClick={onRetry}>
-                <Button.Icon>
-                  <Icon name="action.refresh" />
-                </Button.Icon>
-                {labels.retry}
-              </Button.Root>
-            </EmptyPage.Actions>
-          ) : null}
-        </EmptyPage.Root>
-      ) : null}
+      {/* A load state swap cross-fades the region (foundation §1 rule 7); focus stays in it. */}
+      <RegionSwap state={region} fill>
+        {region === "error" ? (
+          <EmptyPage.Root layout="compact" size={size} role="alert">
+            <EmptyPage.Title as="p">{loadError}</EmptyPage.Title>
+            {onRetry ? (
+              <EmptyPage.Actions>
+                <Button.Root variant="soft" tone="neutral" onClick={onRetry}>
+                  <Button.Icon>
+                    <Icon name="action.refresh" />
+                  </Button.Icon>
+                  {labels.retry}
+                </Button.Root>
+              </EmptyPage.Actions>
+            ) : null}
+          </EmptyPage.Root>
+        ) : (
+          <>
+            <ScrollContainer
+              ref={setListboxRef}
+              id={listboxId}
+              role="listbox"
+              aria-multiselectable={multiple || undefined}
+              aria-labelledby={triggerId}
+              aria-activedescendant={searchable ? undefined : activeDescendant}
+              aria-busy={loading || loadingMore || saving || undefined}
+              aria-owns={actions.length > 0 ? actionsId : undefined}
+              tabIndex={-1}
+              data-autofocus={searchable ? undefined : ""}
+              className={styles.listbox}
+            >
+              {/* Items render while loading too: they register, and the first match ends it. */}
+              {items}
+              {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
+              {region === "ready" && hasMore ? (
+                <div ref={setSentinelRef} aria-hidden="true" className={menu.loadSentinel} />
+              ) : null}
+              {region === "ready" && loadingMore ? (
+                <SkeletonRows count={LOADING_MORE_ROWS} />
+              ) : null}
+            </ScrollContainer>
+            {region === "ready" && isEmpty ? (
+              <EmptyPage.Root layout="compact" size={size} role="status">
+                <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
+                {query !== "" && labels.emptyHint ? (
+                  <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
+                ) : null}
+              </EmptyPage.Root>
+            ) : null}
+            {actions.length > 0 ? (
+              // Owned by the listbox (`aria-owns`): its options for assistive tech, pinned under
+              // the scroller and the empty state for the eye.
+              // biome-ignore lint/a11y/useSemanticElements: a group of options inside a listbox, not a form fieldset
+              <div id={actionsId} role="group" className={styles.actions}>
+                {actions}
+              </div>
+            ) : null}
+          </>
+        )}
+      </RegionSwap>
       <VisuallyHidden live="polite">{loading || loadingMore ? labels.loading : ""}</VisuallyHidden>
-      <HighlightOnOpen listboxRef={listboxRef} panelRef={panelRef} highlight={highlight} />
+      <HighlightOnOpen />
     </FloatingPanel>
   );
 }
@@ -823,43 +820,38 @@ SelectContent.displayName = "Select.Content";
  * selected option; while searching, the first match (the first `Select.Action` when nothing
  * matches, so Enter runs it); closing clears the highlight.
  */
-function HighlightOnOpen({
-  listboxRef,
-  panelRef,
-  highlight,
-}: {
-  listboxRef: React.RefObject<HTMLElement | null>;
-  panelRef: React.RefObject<HTMLElement | null>;
-  highlight: Store<string | undefined>;
-}) {
-  const { isOpen, query, selected, registry } = useSelectContext();
-  const selectedRef = React.useRef(selected);
-  selectedRef.current = selected;
-  const version = useStoreSlice(registry.version, (value) => value);
+function HighlightOnOpen() {
+  const { isOpen, query, filter, selected, registry, highlight } = useSelectContext();
+  // Re-renders when the items (un)register: results of a server search arrive.
+  const view = useListboxView(registry, query, filter);
+  const latest = React.useRef({ query, filter, selected });
+  latest.current = { query, filter, selected };
 
+  // Read in the effect: the panel's items register in the same commit, just before it.
   React.useLayoutEffect(() => {
     if (!isOpen) return;
-    const options = enabledOptions(listboxRef.current);
-    const first = options.find((item) => selectedRef.current.includes(item.dataset.value ?? ""));
-    highlight.set(first?.dataset.value);
-    first?.scrollIntoView?.({ block: "nearest" });
+    const { query: text, filter: filtered, selected: picked } = latest.current;
+    const first = registry.view(text, filtered).navigable.find((id) => picked.includes(id));
+    highlight.set(first);
+    if (first !== undefined) revealHighlighted(registry.nodeOf(first));
     return () => highlight.set(undefined);
-  }, [isOpen, listboxRef, highlight]);
+  }, [isOpen, registry, highlight]);
 
-  // The panel lists the options first, then the actions.
+  // While searching, the first match: the options come first, then the actions.
+  const latestView = React.useRef(view);
+  latestView.current = view;
   React.useLayoutEffect(() => {
-    if (query !== "") highlight.set(enabledOptions(panelRef.current)[0]?.dataset.value);
-  }, [query, panelRef, highlight]);
+    if (query !== "") highlight.set(latestView.current.navigable[0]);
+  }, [query, highlight]);
 
   // Results that arrive later (a server search) take the highlight when it has none among them.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `version` changes when options (de)register
   React.useLayoutEffect(() => {
     if (query === "") return;
-    const options = enabledOptions(listboxRef.current);
-    if (!options.some((item) => item.dataset.value === highlight.get())) {
-      highlight.set((options[0] ?? enabledOptions(panelRef.current)[0])?.dataset.value);
+    const current = highlight.get();
+    if (current === undefined || isActionValue(current) || !view.navigable.includes(current)) {
+      highlight.set(view.navigable[0]);
     }
-  }, [version, query, listboxRef, panelRef, highlight]);
+  }, [view, query, highlight]);
 
   return null;
 }

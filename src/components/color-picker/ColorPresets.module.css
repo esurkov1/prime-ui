@@ -1,63 +1,9 @@
 /*
  * ColorPresets — quick color pick: a square swatch trigger + a popover grid of preset swatches
- * (the shared swatch, its tier and the trigger chip from internal/swatch.module.css).
+ * (the shared swatch, its tier, its trigger and the trigger chip from internal/swatch).
  * Tier T: trigger = control height · swatch = item-height − 8 (16 · 20 · 24 · 28 · 32) ·
  * gap = control gap · swatch radius steps with size (4 · 6 · 6 · 8 · 8).
  */
-
-/* ---- Trigger: square swatch button of the tier height (the shared field tier) ---- */
-.trigger {
-  position: relative;
-  box-sizing: border-box;
-  display: inline-flex;
-  flex-shrink: 0;
-  width: var(--field-h);
-  height: var(--field-h);
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
-  border-radius: var(--field-radius);
-  background: var(--prime-color-field-bg);
-  cursor: pointer;
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-/* Inner edge above the color layer; darkens on hover / open. */
-.trigger::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
-  pointer-events: none;
-  transition: box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.trigger[data-state="open"]::after {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-strong);
-}
-
-@media (hover: hover) {
-  .trigger:hover:not(:disabled)::after {
-    box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-strong);
-  }
-}
-
-.trigger:active:not(:disabled) {
-  transform: scale(var(--prime-motion-press-scale));
-}
-
-.trigger:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.trigger:disabled {
-  cursor: not-allowed;
-  filter: grayscale(1);
-  opacity: var(--prime-opacity-disabled);
-}
 
 /* ---- Panel: section label + swatch grid ---- */
 /* Label above the swatch grid inside the Popover panel. */
@@ -67,42 +13,28 @@
   gap: var(--prime-space-2);
 }
 
+/* The field label text of the tier (`fieldLabelTextClass`, set in TSX). */
 .label {
   color: var(--prime-color-text-secondary);
-  font-size: var(--prime-control-m-label-size);
   font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-control-m-label-line-height);
 }
 
-.label[data-size="xs"],
-.label[data-size="s"] {
-  font-size: var(--prime-control-xs-label-size);
-  line-height: var(--prime-control-xs-label-line-height);
-}
-
-.label[data-size="l"],
-.label[data-size="xl"] {
-  font-size: var(--prime-control-l-label-size);
-  line-height: var(--prime-control-l-label-line-height);
-}
-
-/* The shared swatch tier on the menu item base (swatches 16 · 20 · 24 · 28 · 32). */
+/*
+ * The shared swatch tier on the menu item base (`data-base="item"`, swatches 16 · 20 · 24 · 28 · 32;
+ * at least the touch target on a coarse pointer). The grid is `--cpr-columns` swatches wide while
+ * the panel has room; narrower it wraps, and `--swatch-columns` (measured) splits the rows evenly.
+ */
 .grid {
-  --swatch-base: var(--swatch-base-item);
   display: grid;
-  grid-template-columns: repeat(var(--cpr-columns, 8), var(--swatch-size));
+  grid-template-columns: repeat(var(--swatch-columns, auto-fill), var(--swatch-size));
   justify-content: start;
   gap: var(--swatch-gap);
+  inline-size: calc(
+    var(--cpr-columns) *
+    var(--swatch-size) +
+    (var(--cpr-columns) - 1) *
+    var(--swatch-gap)
+  );
+  max-inline-size: 100%;
   outline: none;
-}
-
-/* Touch: every swatch is a touch target itself (a hit area beyond it would cover its neighbours in
-   the dense grid); the panel takes fewer columns (`COARSE_COLUMNS`) so it still fits 320px. */
-@media (pointer: coarse) {
-  .grid {
-    --swatch-base: max(
-      var(--swatch-base-item),
-      calc(var(--prime-control-touch-target) + var(--prime-space-2))
-    );
-  }
 }

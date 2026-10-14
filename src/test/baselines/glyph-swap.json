@@ -1,18 +1,13 @@
 [
   "src/components/chart-frame/ChartFrame.tsx: useStateSwap outside the engine",
   "src/components/chart-frame/ChartFrame.tsx: useStateSwap outside the engine #2",
-  "src/components/command-menu/CommandMenu.tsx: key={swapped",
-  "src/components/command-menu/CommandMenu.tsx: useStateSwap outside the engine",
   "src/components/composer/Composer.tsx: glyph name ternary",
   "src/components/composer/Composer.tsx: glyph name ternary #2",
   "src/components/data-table/DataTable.tsx: useStateSwap outside the engine",
   "src/components/gantt/Gantt.tsx: useStateSwap outside the engine",
   "src/components/gantt/Gantt.tsx: useStateSwap outside the engine #2",
-  "src/components/input/Input.tsx: glyph name ternary",
   "src/components/progress-bar/ProgressBar.tsx: useStateSwap outside the engine",
   "src/components/progress-circle/ProgressCircle.tsx: useStateSwap outside the engine",
-  "src/components/select/Select.tsx: key={swapped",
-  "src/components/select/Select.tsx: useStateSwap outside the engine",
   "src/components/sparkline/Sparkline.tsx: useStateSwap outside the engine",
   "src/layout/sidebar/Sidebar.tsx: glyph name ternary"
 ]

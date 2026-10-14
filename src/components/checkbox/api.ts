@@ -1,4 +1,6 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_OPTIONAL_LABEL_DOCS } from "../../internal/field.api";
+import { CHECKBOX_LABELS } from "./Checkbox";
 
 export const api: ComponentApi = {
   parts: [
@@ -46,6 +48,19 @@ export const api: ComponentApi = {
           default: '"square"',
           en: "Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). Size, the check draw-in, the indeterminate bar and states are the same.",
           ru: "Контур: `square` — скруглённый квадрат; `circle` — круг (отметка выбора в списках и чатах). Размер, анимация галочки, полоска и состояния те же.",
+        },
+        {
+          name: "optional",
+          type: "boolean",
+          default: "false",
+          en: "Muted `labels.optional` after the label text; the field may stay off.",
+          ru: "Приглушённое `labels.optional` после текста подписи; поле можно не включать.",
+        },
+        {
+          name: "labels",
+          type: "Partial<CheckboxLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "hint",
@@ -173,7 +188,7 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: labelRows(CHECKBOX_LABELS, FIELD_OPTIONAL_LABEL_DOCS),
   accessibility: {
     keyboard: [
       { keys: "Tab", en: "Moves focus to the checkbox.", ru: "Переводит фокус на флажок." },

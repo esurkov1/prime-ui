@@ -1,7 +1,7 @@
 import type * as React from "react";
 
 import { createComponentContext } from "@/internal/context";
-import { createStore, type Store } from "@/internal/listbox";
+import type { ListboxRegistry, Store } from "@/internal/listbox";
 import type { ControlSize } from "@/internal/states";
 
 export type SelectLabels = {
@@ -25,49 +25,6 @@ export type SelectLabels = {
 
 export const normalize = (text: string) => text.trim().toLocaleLowerCase();
 
-type ItemEntry = { label: string; haystack: string; mounted: number };
-
-/**
- * The items of a Select: their labels (shown in the trigger; kept after an item unmounts, so the
- * label does not flicker while the list moves between the closed registry and the open panel)
- * and the mounted ones with their search text (the empty state). `version` changes on every
- * (un)registration.
- */
-export type ItemRegistry = {
-  version: Store<number>;
-  labelOf: (value: string) => string;
-  /** Registers a mounted item; returns the unregistration. */
-  register: (value: string, label: string, haystack: string) => () => void;
-  /** Some mounted item matches the normalized query. */
-  anyMatch: (query: string) => boolean;
-};
-
-export function createItemRegistry(): ItemRegistry {
-  const entries = new Map<string, ItemEntry>();
-  const version = createStore(0);
-  const bump = () => version.set(version.get() + 1);
-  return {
-    version,
-    labelOf: (value) => entries.get(value)?.label ?? value,
-    register: (value, label, haystack) => {
-      const entry = entries.get(value);
-      entries.set(value, { label, haystack, mounted: (entry?.mounted ?? 0) + 1 });
-      bump();
-      return () => {
-        const current = entries.get(value);
-        if (current) current.mounted -= 1;
-        bump();
-      };
-    },
-    anyMatch: (query) => {
-      for (const entry of entries.values()) {
-        if (entry.mounted > 0 && (query === "" || entry.haystack.includes(query))) return true;
-      }
-      return false;
-    },
-  };
-}
-
 export type SelectContextValue = {
   size: ControlSize;
   invalid: boolean;
@@ -78,7 +35,8 @@ export type SelectContextValue = {
   multiple: boolean;
   /** Selected values: one or none in single mode. */
   selected: string[];
-  registry: ItemRegistry;
+  /** The items and actions of the list (`@/internal/listbox`): labels, the query view, Enter. */
+  registry: ListboxRegistry;
   pick: (value: string) => void;
   clear: () => void;
   clearable: boolean;
@@ -94,6 +52,8 @@ export type SelectContextValue = {
   filter: boolean;
   isOpen: boolean;
   setOpen: (open: boolean) => void;
+  closeOnEscape: boolean;
+  closeOnOutsideClick: boolean;
   /** The highlighted option; items subscribe to their own slice of it. */
   highlight: Store<string | undefined>;
   query: string;

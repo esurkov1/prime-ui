@@ -277,8 +277,10 @@ export function DigitInput({
           disabled: disabled || undefined,
           "focus-ring": focusRing,
         })}
-        onFocus={(event) => {
-          const index = inputRefs.current.indexOf(event.target as unknown as HTMLInputElement);
+        onFocus={() => {
+          const focused = document.activeElement;
+          const index =
+            focused instanceof HTMLInputElement ? inputRefs.current.indexOf(focused) : -1;
           if (index >= 0) setFocusIndex(index);
         }}
         onBlur={(event) => {

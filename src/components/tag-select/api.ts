@@ -54,6 +54,20 @@ export const api: ComponentApi = {
           ru: "Вызывается при каждом открытии и закрытии: фокус, клик по полю, ввод, стрелки, Escape, нажатие снаружи; ввод закрывает список, когда ничего не подходит.",
         },
         {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the list; focus stays in the input.",
+          ru: "Escape закрывает список; фокус остаётся в поле.",
+        },
+        {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "true",
+          en: "A press outside the field and the list closes the list.",
+          ru: "Нажатие вне поля и списка закрывает список.",
+        },
+        {
           name: "creatable",
           type: "boolean",
           default: "false",
@@ -67,7 +81,7 @@ export const api: ComponentApi = {
           ru: "Создано новое значение, а не выбрано из `options`; оно сразу входит в выбор. Верните промис сохранения: чип ждёт занятым; при reject уходит (причину покажите через `error`).",
         },
         {
-          name: "defaultColor",
+          name: "fallbackColor",
           type: "PaletteColor",
           default: '"gray"',
           en: "Chip color of values without an option color, created ones included.",
@@ -146,9 +160,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Field tier; the list uses the same tier, chips one tier down.",
-          ru: "Ярус поля; список того же яруса, чипы на ярус меньше.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Field tier; the list uses the same tier, chips one tier down. Without it the tier of its host (a form, a panel with a size), else `m`.",
+          ru: "Ярус поля; список того же яруса, чипы на ярус меньше. Без него — ярус контейнера (форма, панель с размером), иначе `m`.",
         },
         {
           name: "focusRing",
@@ -269,6 +283,11 @@ export const api: ComponentApi = {
         keys: "Delete",
         en: "On a tag removes it; focus moves to the next tag, or to the input when none is left.",
         ru: "На теге удаляет его; фокус уходит на следующий тег, а если тегов не осталось — в поле.",
+      },
+      {
+        keys: "Shift+F10 · ContextMenu",
+        en: "With `onOptionUpdate` or `onOptionDelete`: opens the «⋯» menu of the highlighted row; Escape closes it.",
+        ru: "С `onOptionUpdate` или `onOptionDelete`: открывает меню «⋯» подсвеченной строки; Escape закрывает его.",
       },
       {
         keys: "Escape",

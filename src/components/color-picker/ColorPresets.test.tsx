@@ -127,6 +127,19 @@ describe("ColorPresets", () => {
     expect(screen.getByRole("button", { name: "Цвет: Без цвета" })).toBeInTheDocument();
   });
 
+  it("closeOnEscape={false} and closeOnOutsideClick={false} keep the panel open", () => {
+    render(
+      <div>
+        <Picker closeOnEscape={false} closeOnOutsideClick={false} />
+        <div data-testid="outside" />
+      </div>,
+    );
+    open();
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.pointerDown(screen.getByTestId("outside"));
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
   it("takes custom presets, columns and a section label", () => {
     const presets = [
       { value: "#000000", label: "Чёрный" },

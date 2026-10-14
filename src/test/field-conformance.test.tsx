@@ -180,6 +180,15 @@ const CONTROLS: Record<string, { ui: React.ReactElement; find: () => HTMLElement
   Button: { ui: <Button.Root>Сохранить</Button.Root>, find: () => [screen.getByRole("button")] },
 };
 
+/**
+ * A control whose role takes no `aria-required` (a `button` trigger) is described by the frame's
+ * required word instead (`ids.controlAria`, FieldFrame `requiredLabel`).
+ */
+const describedAsRequired = (element: HTMLElement) =>
+  (element.getAttribute("aria-describedby") ?? "")
+    .split(/\s+/)
+    .some((id) => id.endsWith("-required") && document.getElementById(id) !== null);
+
 const isDisabled = (element: HTMLElement) =>
   element.matches(":disabled") || element.getAttribute("aria-disabled") === "true";
 
@@ -271,7 +280,11 @@ describe("field conformance", () => {
         }
       })();
       if (!field) offenders.push(`cell/${name}: not named by the column heading`);
-      else if (field.getAttribute("aria-required") !== "true" && !field.hasAttribute("required")) {
+      else if (
+        field.getAttribute("aria-required") !== "true" &&
+        !field.hasAttribute("required") &&
+        !describedAsRequired(field)
+      ) {
         offenders.push(`cell/${name}: a required column leaves it optional`);
       }
       cleanup();

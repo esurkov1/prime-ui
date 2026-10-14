@@ -104,15 +104,10 @@
   box-sizing: content-box;
   width: var(--field-icon);
   height: var(--field-icon);
+  --prime-icon-size: var(--field-icon);
   color: var(--prime-color-text-muted);
   pointer-events: none;
   transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.icon > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .icon[data-side="start"] {
@@ -188,7 +183,7 @@
 
 /* Every segment after the first one closes the gap: the segments read as one row. */
 .wrapper > [data-field-action] ~ [data-field-action] {
-  margin-inline-start: calc(-1 * var(--field-gap));
+  margin-inline-start: calc(var(--field-gap) * -1);
 }
 
 .wrapper:has(input:disabled) > [data-field-action] {
@@ -209,20 +204,4 @@
   color: var(--prime-color-text-secondary);
   font-weight: var(--prime-font-weight-medium);
   transition: color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
-}
-
-.strengthWord[data-tone="danger"] {
-  color: var(--prime-color-danger-text);
-}
-
-.strengthWord[data-tone="warning"] {
-  color: var(--prime-color-warning-text);
-}
-
-.strengthWord[data-tone="accent"] {
-  color: var(--prime-color-accent-text);
-}
-
-.strengthWord[data-tone="success"] {
-  color: var(--prime-color-success-text);
 }

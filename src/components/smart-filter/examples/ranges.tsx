@@ -1,6 +1,7 @@
 /** Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip, and the bounds go to the server as from / to parameters — `kind`, `formatValue`, `matchesSmartFilter`, `isSmartFilterRange`. */
 import {
   Card,
+  formatDateValue,
   isSmartFilterRange,
   matchesSmartFilter,
   SmartFilter,
@@ -62,7 +63,7 @@ const DEALS = [
 const INITIAL: SmartFilterValue = { amount: { from: 50_000, to: 500_000 } };
 
 const asParam = (bound: number | Date) =>
-  bound instanceof Date ? bound.toISOString().slice(0, 10) : String(bound);
+  bound instanceof Date ? formatDateValue(bound) : String(bound);
 
 /** The query a server gets: a range becomes `key_from` / `key_to`, a selection its included values. */
 function toQuery(value: SmartFilterValue) {

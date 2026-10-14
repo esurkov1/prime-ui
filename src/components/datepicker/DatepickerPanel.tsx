@@ -9,7 +9,10 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { getViewportPadPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { RegionSwap } from "@/internal/RegionSwap";
 import { type ControlSize, stepDown } from "@/internal/states";
 
 import styles from "./Datepicker.module.css";
@@ -60,6 +63,8 @@ export type DatepickerLabels = {
   presetsTitle: string;
   /** Muted marker after the field label when `optional`. */
   optional: string;
+  /** Read after the field name of a `required` field (its trigger is a button). */
+  required: string;
 };
 
 export const DATEPICKER_LABELS: DatepickerLabels = {
@@ -80,6 +85,7 @@ export const DATEPICKER_LABELS: DatepickerLabels = {
   until: "до",
   presetsTitle: "Период",
   optional: "необязательно",
+  required: "обязательное поле",
 };
 
 export type CalendarOptions = {
@@ -252,24 +258,28 @@ export function DatepickerPanel(props: DatepickerPanelProps) {
   const value = useDatepickerValue(props);
   const { mode, value: _v, defaultValue, onValueChange, resetValue, ...other } = props;
   const {
-    options,
+    options: { size: sizeProp, ...options },
     rest: { className, ...dom },
   } = splitCalendarOptions(other);
-  return (
+  const tier = useHostTier(sizeProp);
+  return tier.provide(
     <PanelView
       {...options}
       {...value}
+      size={tier.size}
       labels={{ ...DATEPICKER_LABELS, ...options.labels }}
       embedded
       className={className}
       dom={dom}
-    />
+    />,
   );
 }
 DatepickerPanel.displayName = "Datepicker.Panel";
 
-type PanelViewProps = Omit<CalendarOptions, "labels"> &
+type PanelViewProps = Omit<CalendarOptions, "labels" | "size"> &
   DatepickerValue & {
+    /** The resolved tier (the Root's or the Panel's `useHostTier`). */
+    size: ControlSize;
     labels: DatepickerLabels;
     /** `Datepicker.Panel`: host content that takes its container's width; otherwise (the Root popover) it sizes to its content. */
     embedded: boolean;
@@ -283,7 +293,7 @@ type PanelViewProps = Omit<CalendarOptions, "labels"> &
 /** Presets aside (or above when narrow), 1–2 months, the step prompt, the footer. */
 export function PanelView(props: PanelViewProps) {
   const {
-    size = "m",
+    size,
     months: monthsProp = 1,
     presets = false,
     prompt = false,
@@ -318,7 +328,7 @@ export function PanelView(props: PanelViewProps) {
     hasPresets,
     embedded,
     available,
-    metrics: readPanelMetrics(size, embedded),
+    metrics: readPanelMetrics(size, panelNode),
   });
   const today = startOfDay(props.today ?? new Date());
 
@@ -419,6 +429,8 @@ export function PanelView(props: PanelViewProps) {
   };
 
   const onGridKeyDown = (event: React.KeyboardEvent) => {
+    // Only the day cells walk the grid: the month buttons keep their own keys.
+    if (!(event.target instanceof HTMLElement) || !event.target.hasAttribute("data-day")) return;
     const step = DAY_KEYS[event.key];
     const d = focusDay;
     if (step != null) {
@@ -527,7 +539,7 @@ export function PanelView(props: PanelViewProps) {
                 tone={pressed ? "accent" : "neutral"}
                 size={controlSize}
                 fullWidth={layout === "aside"}
-                className={styles.presetItem}
+                align="start"
                 pressed={pressed}
                 onClick={() => {
                   const r = preset.days(today);
@@ -551,7 +563,9 @@ export function PanelView(props: PanelViewProps) {
           onMouseLeave={() => preview && setHover(null)}
         >
           {visibleMonths.map((m, mi) => (
-            <div key={m.getTime()} className={styles.month}>
+            // Keyed by place: the header and its buttons stay while the grid swaps to the next month.
+            // biome-ignore lint/suspicious/noArrayIndexKey: one or two month places, never reordered
+            <div key={mi} className={styles.month}>
               <div className={styles.monthHeader}>
                 {mi === 0 ? (
                   <Button.Root
@@ -585,27 +599,30 @@ export function PanelView(props: PanelViewProps) {
                   <span className={styles.navSpacer} />
                 )}
               </div>
-              <MonthGrid
-                month={m.getTime()}
-                title={titles[mi] ?? ""}
-                rows={rows}
-                weekdays={weekdays}
-                weekStartsOn={weekStartsOn}
-                locale={locale}
-                yearless={yearless}
-                // Days of the neighbouring months only in a one-month view (two would repeat them).
-                showOutside={monthCount === 1}
-                today={today.getTime()}
-                disableFuture={disableFuture}
-                isDayDisabled={isDayDisabled}
-                focusDay={focusDay.getTime()}
-                focusTarget={focusTarget}
-                autoFocus={!embedded}
-                lo={lo}
-                hi={hi}
-                preview={preview}
-                events={dayEvents}
-              />
+              {/* Another month cross-fades in and the height glides (foundation §1 rule 7). */}
+              <RegionSwap state={m.getTime()}>
+                <MonthGrid
+                  month={m.getTime()}
+                  title={titles[mi] ?? ""}
+                  rows={rows}
+                  weekdays={weekdays}
+                  weekStartsOn={weekStartsOn}
+                  locale={locale}
+                  yearless={yearless}
+                  // Days of the neighbouring months only in a one-month view (two would repeat them).
+                  showOutside={monthCount === 1}
+                  today={today.getTime()}
+                  disableFuture={disableFuture}
+                  isDayDisabled={isDayDisabled}
+                  focusDay={focusDay.getTime()}
+                  focusTarget={focusTarget}
+                  autoFocus={!embedded}
+                  lo={lo}
+                  hi={hi}
+                  preview={preview}
+                  events={dayEvents}
+                />
+              </RegionSwap>
             </div>
           ))}
         </div>
@@ -620,6 +637,7 @@ export function PanelView(props: PanelViewProps) {
           <div className={styles.footer} data-time={withTime || undefined}>
             <div className={styles.footerFields}>
               <FooterField
+                size={controlSize}
                 label={isRange ? labels.rangeStart : labels.date}
                 date={footerFrom ? format(footerFrom, footerFormat) : ""}
                 time={withTime ? fromTime : null}
@@ -633,6 +651,7 @@ export function PanelView(props: PanelViewProps) {
                     —
                   </span>
                   <FooterField
+                    size={controlSize}
                     label={labels.rangeEnd}
                     date={footerTo ? format(footerTo, footerFormat) : ""}
                     time={withTime ? toTime : null}
@@ -812,10 +831,12 @@ const MonthGrid = React.memo(function MonthGrid({
 });
 
 /**
- * A read-only date with an optional time input: one segmented pill. The kit has no two-segment
- * field (Input would need a date affix plus a time field), so the footer draws this small pair.
+ * A read-only date with an optional time input: one segmented pill on the field surface and tier.
+ * The kit has no two-segment field (Input would need a date affix plus a time field), so the footer
+ * draws this small pair.
  */
 function FooterField({
+  size,
   label,
   date,
   time,
@@ -823,6 +844,7 @@ function FooterField({
   invalid,
   onTime,
 }: {
+  size: ControlSize;
   label: string;
   date: string;
   time: string | null;
@@ -831,7 +853,11 @@ function FooterField({
   onTime: (value: string) => void;
 }) {
   return (
-    <fieldset className={styles.field} aria-label={label}>
+    <fieldset
+      className={cx(fieldTierClass, fieldSurfaceClass, styles.field)}
+      data-size={size}
+      aria-label={label}
+    >
       <span className={styles.fieldDate} data-empty={date ? undefined : "true"}>
         {date || "—"}
       </span>
@@ -839,7 +865,7 @@ function FooterField({
         <input
           aria-label={timeLabel}
           aria-invalid={invalid || undefined}
-          className={styles.fieldTime}
+          className={cx(fieldInputTextClass, styles.fieldTime)}
           value={time}
           inputMode="numeric"
           maxLength={5}

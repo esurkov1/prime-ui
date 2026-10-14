@@ -255,7 +255,7 @@
    rounded end of the range show through. One outer glass edge, drawn outside the shape.
    The hover lift is for pointers only (foundation §7 rule 10); press works on touch too. */
 @media (hover: hover) and (pointer: fine) {
-  .input:not(:disabled):hover ~ .thumb {
+  .input:not(:disabled, [aria-disabled="true"]):hover ~ .thumb {
     transform: scale(var(--prime-motion-scale-hover));
     background: color-mix(in srgb, var(--slider-thumb-bg) var(--prime-tint-strong), transparent);
     box-shadow:

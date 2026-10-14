@@ -52,7 +52,7 @@
   flex-shrink: 0;
   align-items: center;
   min-height: var(--field-h);
-  margin-block-start: calc(-1 * var(--textarea-padding-y));
+  margin-block-start: calc(var(--textarea-padding-y) * -1);
   margin-inline-start: var(--field-gap);
 }
 

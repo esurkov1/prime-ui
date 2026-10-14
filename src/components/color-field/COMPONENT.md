@@ -50,9 +50,9 @@ ColorField                       field frame: label · field button · hint | er
 | `onValueChange` | `(value: string) => void` | — | Called with the new color as hex: `#RRGGBB`, or `#RRGGBBAA` when `alpha` lowers the opacity. A controlled field that does not take the value keeps its color. |
 | `presets` | `readonly ColorPreset[]` | — | Ready colors under the channels (`{ value, label }`), picked in one click; none by default. |
 | `alpha` | `boolean` | `false` | Adds the opacity slider; the value then carries alpha. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier (height 28 · 32 · 36 · 40 · 48); the panel uses the same tier. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier (height 28 · 32 · 36 · 40 · 48); the panel uses the same tier. Without it the tier of its host, else `m`. |
 | `label` | `ReactNode` | — | Field label above; with the hex it names the field button. |
-| `required` | `boolean` | `false` | Red `*` after the label. |
+| `required` | `boolean` | `false` | Red `*` after the label; the field button is described by `labels.required` (a button takes no `aria-required`). |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
@@ -132,7 +132,6 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`. A c
 
 | Key | Default | Used for |
 |---|---|---|
-| `format` | `"Формат значений цвета"` | Value format select (the ColorPicker labels are shared). |
 | `eyeDropper` | `"Пипетка"` | Eyedropper button of the channels. |
 | `hex` | `"Hex"` | Hex cell of the channels. |
 | `hue` | `"Оттенок, градусы"` | Hue slider and the hue cell of the channels. |
@@ -143,6 +142,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`. A c
 | `green` | `"Зелёный, 0–255"` | Green cell. |
 | `blue` | `"Синий, 0–255"` | Blue cell. |
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
+| `required` | `"обязательное поле"` | Read after the field name of a `required` field: its trigger is a button, which takes no `aria-required`. |
 | `presets` | `"Готовые цвета"` | Accessible name of the preset swatches in the panel. |
 
 ## Examples

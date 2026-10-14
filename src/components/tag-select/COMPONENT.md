@@ -51,9 +51,11 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `open` | `boolean` | — | Controlled open state of the list. |
 | `defaultOpen` | `boolean` | `false` | Initial open state, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: focus, a field click, typing, arrows, Escape, an outside press; typing closes it when nothing matches. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the list; focus stays in the input. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press outside the field and the list closes the list. |
 | `creatable` | `boolean` | `false` | A typed text that is not an option can be added (the Create row or Enter). |
 | `onCreate` | `(value: string) => void \| Promise<void>` | — | A new value was created, not picked from `options`; it joins the selection at once. Return the save's promise: the chip waits busy; on reject it leaves again (say why with `error`). |
-| `defaultColor` | `PaletteColor` | `"gray"` | Chip color of values without an option color, created ones included. |
+| `fallbackColor` | `PaletteColor` | `"gray"` | Chip color of values without an option color, created ones included. |
 | `onOptionUpdate` | `(value: string, updates: { label?: string; color?: PaletteColor }) => void \| Promise<void>` | — | Enables the row «⋯» menu to rename and recolor a tag; `value` never changes. Return the save's promise and apply the change to `options` before it resolves; on reject the option goes back. |
 | `onOptionDelete` | `(value: string) => void \| Promise<void>` | — | Enables «Удалить» in the row menu; the value also leaves the selection. A returned Promise defers it: resolve deletes, reject keeps everything (e.g. after a confirmation). |
 | `label` | `ReactNode` | — | Field label above; names the input. |
@@ -65,7 +67,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `disabled` | `boolean` | `false` | Disabled field and chips; the list never opens. |
 | `name` | `string` | — | Form field name: one hidden input per selected value (read with `formData.getAll(name)`). |
 | `placeholder` | `string` | `""` | Text in the input while no tag is picked. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier; the list uses the same tier, chips one tier down. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier; the list uses the same tier, chips one tier down. Without it the tier of its host (a form, a panel with a size), else `m`. |
 | `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `id` | `string` | — | Id of the input; generated when omitted. |
 | `labels` | `Partial<TagSelectLabels>` | — | Built-in strings, see Labels (`colorNames` merges by key). |
@@ -91,6 +93,8 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | `creatable` | a «Создать» row with the preview chip while the typed text is new | The dictionary is open | `false` |
 | `onOptionUpdate` / `onOptionDelete` | a «⋯» button on the highlighted row (always shown on touch screens) opening a rename / color / delete menu | Users keep their own tags | |
 | `disabled` | disabled fill, muted chips, no list | The value is read-only in this context | `false` |
+| `closeOnOutsideClick` | `false`: the list stays open on a press beside the field; Escape and Tab still close it | The person reads the page while tagging | `true` |
+| `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by Tab or a press outside | `true` |
 | `invalid` / `error` | danger inset ring (+ the message) | Validation failed | |
 
 ## States
@@ -126,6 +130,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | `Backspace` | In an empty input removes the last tag; on a tag removes it and focuses the previous tag. |
 | `ArrowLeft` · `ArrowRight` | From the start of the input move focus over the tags and back to the input. |
 | `Delete` | On a tag removes it; focus moves to the next tag, or to the input when none is left. |
+| `Shift+F10` · `ContextMenu` | With `onOptionUpdate` or `onOptionDelete`: opens the «⋯» menu of the highlighted row; Escape closes it. |
 | `Escape` | Closes the row «⋯» menu if it is open, otherwise the list. |
 
 ### ARIA
@@ -163,10 +168,11 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | [sizes.tsx](examples/sizes.tsx) | Every size tier with two picked tags; chips sit one tier below the field — `size`. |
 | [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one and one whose focus shows without the ring, with a disabled option in the list — `disabled`, `invalid`, `focusRing`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: removing the last region shakes the field and drops the error in, adding one clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
-| [creatable.tsx](examples/creatable.tsx) | A typed text that is not in the list becomes a new tag from the Create row or Enter and is saved on the server: the chip waits busy, and a tag the server refuses leaves again — `creatable`, `onCreate`, `defaultColor`. |
+| [creatable.tsx](examples/creatable.tsx) | A typed text that is not in the list becomes a new tag from the Create row or Enter and is saved on the server: the chip waits busy, and a tag the server refuses leaves again — `creatable`, `onCreate`, `fallbackColor`. |
 | [many-tags.tsx](examples/many-tags.tsx) | More tags than fit: at rest one row with «+N», focused every tag on up to three wrapped rows that scroll — `defaultValue`. |
 | [manage-tags.tsx](examples/manage-tags.tsx) | Users keep their own tag dictionary on the server: the row «⋯» menu renames, recolors or deletes an option, and «⋯» spins while a change is saved — `onOptionUpdate`, `onOptionDelete`. |
 | [confirm-delete.tsx](examples/confirm-delete.tsx) | Deleting a shared tag asks first: the row waits with a spinner while the dialog is open, cancelling keeps the tag and the selection — `onOptionDelete`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A tag list that stays open while the person reads the task beside it: Escape or Tab close it — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a preset button replaces the tags and the count follows them — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the list: a button opens it from code, Escape or an outside press closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A new task form: the required labels field is checked on submit, its error shakes the field and leaves once a label is added, a calm note confirms the task; the tags go with the form — `required`, `error`, `creatable`, `name`. |

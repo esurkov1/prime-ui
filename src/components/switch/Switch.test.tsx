@@ -34,6 +34,15 @@ describe("Switch", () => {
     expect(control).toBeChecked();
   });
 
+  it("optional draws labels.optional after the text", () => {
+    render(
+      <Switch.Root optional>
+        <Switch.Label>Уведомления по почте</Switch.Label>
+      </Switch.Root>,
+    );
+    expect(screen.getByText("необязательно")).toBeInTheDocument();
+  });
+
   it("toggles in uncontrolled mode", () => {
     render(
       <Switch.Root>

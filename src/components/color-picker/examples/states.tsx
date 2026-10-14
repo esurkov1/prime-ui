@@ -10,7 +10,7 @@ export default function ColorPickerStatesExample() {
       <ColorPicker.Root defaultValue="#30a46c">
         <ColorPicker.Panel className={styles.panel}>
           <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness" disabled>
-            <ColorPicker.AreaThumb />
+            <ColorPicker.Thumb />
           </ColorPicker.Area>
           <ColorPicker.Slider channel="hue" colorSpace="hsl" disabled>
             <ColorPicker.SliderMeta label="disabled" />

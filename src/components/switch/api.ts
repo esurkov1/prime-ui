@@ -1,4 +1,6 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_OPTIONAL_LABEL_DOCS } from "../../internal/field.api";
+import { SWITCH_LABELS } from "./Switch";
 
 export const api: ComponentApi = {
   parts: [
@@ -39,6 +41,19 @@ export const api: ComponentApi = {
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`.",
           ru: "Ярус дорожки (24×16 … 44×24), текста и отступа. Без него — ярус хоста (форма, панель), иначе `m`.",
+        },
+        {
+          name: "optional",
+          type: "boolean",
+          default: "false",
+          en: "Muted `labels.optional` after the label text; the field may stay off.",
+          ru: "Приглушённое `labels.optional` после текста подписи; поле можно не включать.",
+        },
+        {
+          name: "labels",
+          type: "Partial<SwitchLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "hint",
@@ -119,7 +134,7 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: labelRows(SWITCH_LABELS, FIELD_OPTIONAL_LABEL_DOCS),
   accessibility: {
     keyboard: [
       { keys: "Tab", en: "Moves focus to the switch.", ru: "Переводит фокус на переключатель." },

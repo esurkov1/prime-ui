@@ -17,11 +17,19 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { useFieldFrame } from "@/internal/FieldFrame";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Checkbox.module.css";
 
 export type CheckboxShape = "square" | "circle";
+
+export type CheckboxLabels = {
+  /** Muted marker after the label text when `optional`. */
+  optional: string;
+};
+
+export const CHECKBOX_LABELS: CheckboxLabels = { optional: "необязательно" };
 
 export type CheckboxRootProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -42,6 +50,8 @@ export type CheckboxRootProps = Omit<
   size?: ControlSize;
   /** Outline of the box: rounded square or full circle (a selection mark, like in messengers). */
   shape?: CheckboxShape;
+  optional?: boolean;
+  labels?: Partial<CheckboxLabels>;
   /** `Checkbox.Label`; without it the bare box renders (give it an `aria-label`). */
   children?: React.ReactNode;
   /** The native checkbox input. */
@@ -59,6 +69,8 @@ function CheckboxRoot({
   error,
   size: sizeProp,
   shape = "square",
+  optional = false,
+  labels: labelsProp,
   disabled: disabledProp = false,
   readOnly = false,
   className,
@@ -69,6 +81,7 @@ function CheckboxRoot({
 }: CheckboxRootProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
+  const labels = useLabels(CHECKBOX_LABELS, labelsProp);
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
   const [checked, setChecked] = useControllableState<boolean>({
     value: checkedProp,
@@ -79,9 +92,11 @@ function CheckboxRoot({
   const internalRef = React.useRef<HTMLInputElement>(null);
   const mergedRef = useMergedRefs(internalRef, ref);
 
-  React.useEffect(() => {
+  // The native flag follows the prop after every render: a click clears it in the browser, and a
+  // controlled owner that keeps the mixed state does not re-render with a new prop.
+  React.useLayoutEffect(() => {
     if (internalRef.current) internalRef.current.indeterminate = indeterminate;
-  }, [indeterminate]);
+  });
 
   return (
     <ChoiceField
@@ -91,6 +106,8 @@ function CheckboxRoot({
       disabled={disabled}
       readOnly={readOnly}
       required={inputRest.required}
+      optional={optional}
+      optionalLabel={labels.optional}
       hint={hint}
       error={error}
       className={cx(styles.root, className)}
@@ -105,6 +122,8 @@ function CheckboxRoot({
             disabled={disabled}
             checked={checked}
             onChange={(event) => {
+              // The click cleared the native mixed flag; the prop decides it.
+              event.target.indeterminate = indeterminate;
               // A native checkbox ignores `readOnly`: the state stays, focus and the value submit.
               if (!readOnly) setChecked(event.target.checked);
             }}

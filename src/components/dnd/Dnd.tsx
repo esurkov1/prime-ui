@@ -56,6 +56,15 @@ function DndRoot(props: DndRootProps) {
 }
 DndRoot.displayName = "Dnd.Root";
 
+/**
+ * The live region of the drag session above, for a host that announces its own changes of the same
+ * items (a FileUpload set of tiles): one region speaks them in order. `null` without a `Dnd.Root`.
+ */
+export function useDragAnnouncer(): ((message: string) => void) | null {
+  const controller = React.useContext(DragControllerContext);
+  return controller ? controller.announce : null;
+}
+
 function DndSession({ labels, children }: DndRootProps) {
   // The controller outlives renders and reads the current strings when it needs them.
   const labelsRef = React.useRef<DndLabels>(DND_LABELS);

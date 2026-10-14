@@ -131,6 +131,24 @@ describe("Textarea.Root", () => {
       expect(wrapper.dataset.value).toBe("from props");
     });
 
+    it("a form reset puts the default text back into the mirror and onValueChange", async () => {
+      const onValueChange = vi.fn();
+      const { container } = render(
+        <form>
+          <Root aria-label="Комментарий" defaultValue="Черновик" onValueChange={onValueChange} />
+        </form>,
+      );
+      const textarea = screen.getByRole("textbox", { name: "Комментарий" });
+      const wrapper = container.querySelector("[data-value]") as HTMLElement;
+      fireEvent.input(textarea, { target: { value: "Новый текст" } });
+      fireEvent.change(textarea, { target: { value: "Новый текст" } });
+      expect(wrapper.dataset.value).toBe("Новый текст");
+      onValueChange.mockClear();
+      act(() => (container.querySelector("form") as HTMLFormElement).reset());
+      await waitFor(() => expect(onValueChange).toHaveBeenCalledWith("Черновик"));
+      expect(wrapper.dataset.value).toBe("Черновик");
+    });
+
     it("calls onInput prop in addition to updating data-value", () => {
       const onInput = vi.fn();
       render(<Root placeholder="with handler" onInput={onInput} />);

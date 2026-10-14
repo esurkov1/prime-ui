@@ -1,4 +1,5 @@
 import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_REQUIRED_LABEL_DOCS } from "../../internal/field.api";
 import { DATEPICKER_LABELS } from "./DatepickerPanel";
 
 /** The value of both parts: the mode and the value triad. */
@@ -158,11 +159,25 @@ export const api: ComponentApi = {
           ru: "Клик по полю, Escape, нажатие снаружи или применённое значение.",
         },
         {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the calendar and returns focus to the field.",
+          ru: "Escape закрывает календарь и возвращает фокус на поле.",
+        },
+        {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "true",
+          en: "A press outside the calendar and the field closes it; focus follows the pointer.",
+          ru: "Нажатие вне календаря и поля закрывает его; фокус остаётся там, куда нажали.",
+        },
+        {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Field tier (height 28 · 32 · 36 · 40 · 48) and panel tier (day cell 24 · 28 · 32 · 36 · 40).",
-          ru: "Ярус поля (высота 28 · 32 · 36 · 40 · 48) и панели (клетка дня 24 · 28 · 32 · 36 · 40).",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Field tier (height 28 · 32 · 36 · 40 · 48) and panel tier (day cell 24 · 28 · 32 · 36 · 40). Without it the tier of its host, else `m`.",
+          ru: "Ярус поля (высота 28 · 32 · 36 · 40 · 48) и панели (клетка дня 24 · 28 · 32 · 36 · 40). Без него — ярус контейнера, иначе `m`.",
         },
         {
           name: "label",
@@ -186,8 +201,8 @@ export const api: ComponentApi = {
           name: "required",
           type: "boolean",
           default: "false",
-          en: "Red `*` after the label.",
-          ru: "Красная `*` после подписи.",
+          en: "Red `*` after the label; the field button is described by `labels.required` (a button takes no `aria-required`).",
+          ru: "Красная `*` после подписи; кнопку поля описывает `labels.required` (у кнопки нет `aria-required`).",
         },
         {
           name: "optional",
@@ -278,9 +293,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Panel tier (day cell 24 · 28 · 32 · 36 · 40).",
-          ru: "Ярус панели (клетка дня 24 · 28 · 32 · 36 · 40).",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Panel tier (day cell 24 · 28 · 32 · 36 · 40). Without it the tier of its host, else `m`.",
+          ru: "Ярус панели (клетка дня 24 · 28 · 32 · 36 · 40). Без него — ярус контейнера, иначе `m`.",
         },
         ...CALENDAR_OPTIONS,
         {
@@ -290,6 +305,14 @@ export const api: ComponentApi = {
           ru: "`className` и остальные атрибуты панели.",
         },
       ],
+    },
+  ],
+  functions: [
+    {
+      name: "formatDateValue(date, { withTime })",
+      type: "(date: Date, options?: { withTime?: boolean }) => string",
+      en: "A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-MM-ddTHH:mm` (the value of a `name`d field) — never `toISOString()`, which shifts the day to UTC.",
+      ru: "Дата так, как её отправляет форма, по местному времени: `yyyy-MM-dd`, с `withTime` — `yyyy-MM-ddTHH:mm` (значение поля с `name`); не `toISOString()`, который сдвигает день в UTC.",
     },
   ],
   labels: labelRows(DATEPICKER_LABELS, {
@@ -328,6 +351,7 @@ export const api: ComponentApi = {
       en: "Muted marker after the label when `optional`.",
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
+    ...FIELD_REQUIRED_LABEL_DOCS,
   }),
   accessibility: {
     keyboard: [

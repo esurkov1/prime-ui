@@ -18,7 +18,6 @@ export const RENAMED = {
     "Timeline.Value": "`Timeline.ItemValue`",
     "Timeline.ValueMeta": "`Timeline.ItemMeta`",
     "Timeline.GapMeta": "`Timeline.Description` of a gap",
-    "FileUpload.ItemName": "`FileUpload.ItemText`",
   } as Record<string, string>,
   /** `Part.prop` (or `*.prop` for every part) → the canonical name. */
   props: {

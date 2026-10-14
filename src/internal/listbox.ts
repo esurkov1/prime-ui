@@ -13,14 +13,6 @@ import { rovingIndex } from "@/internal/rovingFocus";
 export const optionDomId = (listboxId: string, value: string) =>
   `${listboxId}-opt-${value.replace(/\s+/g, "_")}`;
 
-/** Enabled options of a listbox, in DOM order. */
-export function enabledOptions(container: HTMLElement | null): HTMLElement[] {
-  if (!container) return [];
-  return Array.from(
-    container.querySelectorAll<HTMLElement>('[role="option"]:not([data-disabled="true"])'),
-  );
-}
-
 // ─── A small external store ──────────────────────────────────────────────────
 
 export type Store<T> = {
@@ -109,10 +101,11 @@ export type ListboxRegistry = {
 function createListboxRegistry(): ListboxRegistry {
   const entries = new Map<string, Entry>();
   const listeners = new Set<() => void>();
-  let version = 0;
-  let cached: { version: number; query: string; filter: boolean; view: ListboxView } | null = null;
+  // One view per query: readers with different queries (the trigger's labels, the open panel)
+  // each get a stable snapshot until an item changes.
+  const cached = new Map<string, ListboxView>();
   const changed = () => {
-    version += 1;
+    cached.clear();
     for (const listener of [...listeners]) listener();
   };
 
@@ -141,9 +134,9 @@ function createListboxRegistry(): ListboxRegistry {
     labelOf: (id) => entries.get(id)?.label ?? id,
     nodeOf: (id) => entries.get(id)?.node() ?? null,
     view(query, filter) {
-      if (cached?.version === version && cached.query === query && cached.filter === filter) {
-        return cached.view;
-      }
+      const key = `${filter ? "f" : "a"}:${query}`;
+      const known = cached.get(key);
+      if (known) return known;
       const needle = query.trim().toLocaleLowerCase();
       const shown = [...entries.entries()]
         .filter(
@@ -158,7 +151,7 @@ function createListboxRegistry(): ListboxRegistry {
         navigable: shown.filter(([, entry]) => !entry.disabled).map(([id]) => id),
         matchCount: shown.filter(([, entry]) => !entry.persistent).length,
       };
-      cached = { version, query, filter, view };
+      cached.set(key, view);
       return view;
     },
     subscribe(listener) {

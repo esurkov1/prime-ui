@@ -11,7 +11,7 @@
 - A required one-of-many question in a form.
 
 ## When not to use
-- 2–4 short view modes or filters that apply instantly → use [SegmentedControl](../segmented-control/COMPONENT.md) instead.
+- 2–5 short view modes or filters that apply instantly → use [SegmentedControl](../segmented-control/COMPONENT.md) instead.
 - A long list (8+ options) or limited space → use [Select](../select/COMPONENT.md) instead.
 - Independent yes/no options → use [Checkbox](../checkbox/COMPONENT.md) instead.
 - A single on/off setting → use [Switch](../switch/COMPONENT.md) instead.
