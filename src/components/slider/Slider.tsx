@@ -72,6 +72,18 @@ const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(mi
  * with a glass thumb, then hint or error. `className`, `ref` and the rest go to the frame, `id`
  * and `aria-label` to the range input.
  */
+/** Keys that change the value of a range input. */
+const VALUE_KEYS = new Set([
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "PageUp",
+  "PageDown",
+  "Home",
+  "End",
+]);
+
 export function Slider({
   value: valueProp,
   defaultValue,
@@ -118,6 +130,18 @@ export function Slider({
   /** Commits in flight: only the answer to the latest one counts. */
   const sequenceRef = React.useRef(0);
   const [pending, setPending] = React.useState(false);
+  const pendingRef = React.useRef(false);
+  pendingRef.current = pending;
+  /** The last value the person moved the thumb to (pointer or keys). */
+  const movedRef = React.useRef(safeValue);
+  // A value set from outside (the owner, a form reset) is the new starting point: a release or a
+  // key that changes nothing commits nothing. A commit in flight keeps its own baseline.
+  React.useEffect(() => {
+    if (safeValue === movedRef.current || pendingRef.current) return;
+    movedRef.current = safeValue;
+    committedRef.current = safeValue;
+    savedRef.current = safeValue;
+  }, [safeValue]);
   /** A refused commit glides the thumb back (no glide while it follows a drag). */
   const [settling, setSettling] = React.useState(false);
   const settleTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -206,6 +230,7 @@ export function Slider({
             onChange={(event) => {
               const next = Number.parseFloat(event.currentTarget.value);
               if (Number.isNaN(next)) return;
+              movedRef.current = next;
               setSettling(false);
               setValue(next);
             }}
@@ -213,7 +238,10 @@ export function Slider({
               committedRef.current = safeValue;
             }}
             onPointerUp={commit}
-            onKeyUp={commit}
+            onKeyUp={(event) => {
+              // Only a key that moves the thumb commits: Tab, Shift or Escape never do.
+              if (VALUE_KEYS.has(event.key)) commit(event);
+            }}
             aria-label={ariaLabel}
             aria-orientation={orientation === "vertical" ? "vertical" : undefined}
             aria-valuetext={formatValue ? valueText : undefined}

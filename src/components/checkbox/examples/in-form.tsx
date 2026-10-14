@@ -1,4 +1,4 @@
-/** Consent in a sign-up form: a hint under the text, an error after a submit without the tick — `required`, `hint`, `error`. */
+/** Consent in a sign-up form: the required tick and an optional subscription, a hint under the text, an error after a submit without the tick — `required`, `optional`, `hint`, `error`. */
 import { Button, Checkbox } from "prime-ui-kit";
 import * as React from "react";
 
@@ -23,7 +23,7 @@ export default function CheckboxInFormExample() {
       >
         <Checkbox.Label>Принимаю условия оферты</Checkbox.Label>
       </Checkbox.Root>
-      <Checkbox.Root name="news" hint="Не чаще раза в месяц, отписаться можно в профиле">
+      <Checkbox.Root name="news" optional hint="Не чаще раза в месяц, отписаться можно в профиле">
         <Checkbox.Label>Получать новости продукта</Checkbox.Label>
       </Checkbox.Root>
       <div className={styles.formActions}>

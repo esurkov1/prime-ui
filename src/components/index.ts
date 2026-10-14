@@ -138,6 +138,7 @@ export { ChatList, formatChatTime } from "./chat-list/ChatList";
 export type {
   CheckboxIndicatorProps,
   CheckboxLabelProps,
+  CheckboxLabels,
   CheckboxRootProps,
   CheckboxShape,
 } from "./checkbox/Checkbox";
@@ -624,6 +625,7 @@ export type {
 export { Stepper } from "./stepper/Stepper";
 export type {
   SwitchLabelProps,
+  SwitchLabels,
   SwitchRootProps,
 } from "./switch/Switch";
 export { Switch } from "./switch/Switch";

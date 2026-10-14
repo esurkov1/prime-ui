@@ -32,7 +32,7 @@ export default function DigitInputInFormExample() {
         length={PIN_LENGTH}
         mask
         required
-        hint={`Для примера — ${PIN}`}
+        hint="Четыре цифры, которые вы задали при выпуске карты"
         error={error}
         onValueChange={() => {
           setError(undefined);

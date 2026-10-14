@@ -12,12 +12,19 @@ import {
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { useInheritedDisabled } from "@/internal/disabledContext";
-import enterMotion from "@/internal/enterMotion.module.css";
 import { useFieldFrame } from "@/internal/FieldFrame";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./Switch.module.css";
+
+export type SwitchLabels = {
+  /** Muted marker after the label text when `optional`. */
+  optional: string;
+};
+
+export const SWITCH_LABELS: SwitchLabels = { optional: "необязательно" };
 
 export type SwitchRootProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -44,6 +51,8 @@ export type SwitchRootProps = Omit<
   error?: React.ReactNode;
   /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
+  optional?: boolean;
+  labels?: Partial<SwitchLabels>;
   /** `Switch.Label`; without it only the track renders (give it an `aria-label`). */
   children?: React.ReactNode;
   /** The native `role="switch"` input. */
@@ -60,6 +69,8 @@ function SwitchRoot({
   hint,
   error,
   size: sizeProp,
+  optional = false,
+  labels: labelsProp,
   disabled: disabledProp = false,
   readOnly = false,
   className,
@@ -69,6 +80,7 @@ function SwitchRoot({
   ...inputRest
 }: SwitchRootProps) {
   const size = useControlSize(sizeProp);
+  const labels = useLabels(SWITCH_LABELS, labelsProp);
   const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
   const [stored, setStored] = useControllableState<boolean>({
@@ -98,6 +110,8 @@ function SwitchRoot({
       readOnly={readOnly}
       busy={busy}
       required={inputRest.required}
+      optional={optional}
+      optionalLabel={labels.optional}
       hint={hint}
       error={error}
       className={cx(styles.root, className)}
@@ -127,9 +141,7 @@ function SwitchRoot({
             aria-hidden="true"
           >
             <span className={styles.thumb}>
-              {busy ? (
-                <Spinner aria-hidden="true" className={cx(styles.spinner, enterMotion.enter)} />
-              ) : null}
+              {busy ? <Spinner aria-hidden="true" className={styles.spinner} /> : null}
             </span>
           </span>
         </>

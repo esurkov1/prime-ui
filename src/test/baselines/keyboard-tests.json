@@ -111,7 +111,6 @@
   "src/components/slider/api.ts: keyboard ArrowLeft · ArrowDown — ArrowDown",
   "src/components/slider/api.ts: keyboard ArrowLeft · ArrowDown — ArrowLeft",
   "src/components/slider/api.ts: keyboard ArrowRight · ArrowUp — ArrowUp",
-  "src/components/slider/api.ts: keyboard Home · End — End",
   "src/components/slider/api.ts: keyboard Home · End — Home",
   "src/components/slider/api.ts: keyboard PageUp · PageDown — PageDown",
   "src/components/slider/api.ts: keyboard PageUp · PageDown — PageUp",

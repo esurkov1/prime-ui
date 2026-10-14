@@ -201,6 +201,28 @@ describe("Checkbox", () => {
     expect(checkbox.indeterminate).toBe(true);
   });
 
+  it("a click keeps the native mixed flag while the owner keeps indeterminate", () => {
+    const onCheckedChange = vi.fn();
+    render(
+      <Checkbox.Root indeterminate checked={false} onCheckedChange={onCheckedChange}>
+        <Checkbox.Label>Все заказы</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
+    fireEvent.click(checkbox);
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
+    expect(checkbox.indeterminate).toBe(true);
+  });
+
+  it("optional draws labels.optional after the text", () => {
+    render(
+      <Checkbox.Root optional labels={{ optional: "по желанию" }}>
+        <Checkbox.Label>Получать новости</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    expect(screen.getByText("по желанию")).toBeInTheDocument();
+  });
+
   it("sets data-state=indeterminate when indeterminate", () => {
     render(
       <Checkbox.Root indeterminate>

@@ -155,6 +155,33 @@ describe("Slider — commit", () => {
     expect(onCommit).toHaveBeenLastCalledWith(41);
   });
 
+  it("a key that does not move the thumb commits nothing", () => {
+    const onCommit = vi.fn();
+    render(<Slider aria-label="Громкость" defaultValue={20} onCommit={onCommit} />);
+    const input = screen.getByRole("slider", { name: "Громкость" });
+    fireEvent.change(input, { target: { value: "30" } });
+    fireEvent.keyUp(input, { key: "Tab" });
+    fireEvent.keyUp(input, { key: "Shift" });
+    expect(onCommit).not.toHaveBeenCalled();
+    fireEvent.keyUp(input, { key: "End" });
+    expect(onCommit).toHaveBeenCalledWith(30);
+  });
+
+  it("a value set from outside is the new start: a release where it stands commits nothing", () => {
+    const onCommit = vi.fn();
+    const { rerender } = render(
+      <Slider aria-label="Громкость" value={20} onValueChange={() => {}} onCommit={onCommit} />,
+    );
+    rerender(
+      <Slider aria-label="Громкость" value={60} onValueChange={() => {}} onCommit={onCommit} />,
+    );
+    const input = screen.getByRole("slider", { name: "Громкость" });
+    fireEvent.keyUp(input, { key: "ArrowRight" });
+    fireEvent.pointerDown(input);
+    fireEvent.pointerUp(input);
+    expect(onCommit).not.toHaveBeenCalled();
+  });
+
   it("async commit: busy until the answer; resolve keeps the value", async () => {
     let resolve: () => void = () => {};
     render(

@@ -312,11 +312,11 @@
 }
 
 @media (hover: hover) {
-  .day:hover:not(:disabled):not([data-edge="true"]) {
+  .day:hover:not(:disabled, [aria-disabled="true"], [data-edge="true"]) {
     background: var(--prime-color-fill-subtle);
   }
 
-  .cell[data-band] .day:hover:not(:disabled):not([data-edge="true"]) {
+  .cell[data-band] .day:hover:not(:disabled, [aria-disabled="true"], [data-edge="true"]) {
     background: var(--prime-color-accent-soft-hover);
   }
 }
