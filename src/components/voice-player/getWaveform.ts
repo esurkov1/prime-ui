@@ -1,14 +1,4 @@
-import { WAVEFORM_BARS } from "@/components/composer/useRecorder";
-
-type AudioCtor = typeof AudioContext;
-
-function audioContextCtor(): AudioCtor | undefined {
-  if (typeof window === "undefined") return undefined;
-  return (
-    window.AudioContext ??
-    (window as unknown as { webkitAudioContext?: AudioCtor }).webkitAudioContext
-  );
-}
+import { audioContextCtor, normalizePeaks, WAVEFORM_BARS } from "@/internal/audio";
 
 /** The loudest sample of every channel in `[from, to)`. */
 function peakOf(channels: readonly Float32Array[], from: number, to: number): number {
@@ -54,8 +44,7 @@ export async function getWaveform(
       const to = Math.max(from + 1, Math.floor(((i + 1) * length) / count));
       return peakOf(channels, from, Math.min(to, length));
     });
-    const loudest = Math.max(0, ...levels);
-    return loudest > 0 ? levels.map((level) => Math.round((level / loudest) * 100) / 100) : levels;
+    return normalizePeaks(levels);
   } finally {
     context.close().catch(() => {});
   }

@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { audioContextCtor, normalizePeaks, WAVEFORM_BARS } from "@/internal/audio";
+
 /** What the record button records: a voice message, or a round video message. */
 export type ComposerRecordMode = "voice" | "video";
 
@@ -19,8 +21,6 @@ export type RecorderError = "denied" | "missing" | "failed";
 /** `starting` — the press is answered, the device is not granted yet; `recording` — media flows. */
 export type RecorderStatus = "idle" | "starting" | "recording";
 
-/** Bars in a recording's `waveform`. */
-export const WAVEFORM_BARS = 48;
 /** Recordings shorter than this are dropped, like an accidental tap. */
 export const MIN_RECORDING_MS = 700;
 /** A round video message stops and sends itself at this length. */
@@ -72,8 +72,7 @@ export function toWaveform(samples: readonly number[], bars = WAVEFORM_BARS): nu
     const slice = samples.slice(from, to);
     result.push(slice.reduce((sum, value) => sum + value, 0) / slice.length);
   }
-  const peak = Math.max(...result);
-  return peak > 0 ? result.map((value) => Math.round((value / peak) * 100) / 100) : result;
+  return normalizePeaks(result);
 }
 
 /**
@@ -130,16 +129,6 @@ export type Recorder = {
   setPaused: (paused: boolean) => boolean;
   clearError: () => void;
 };
-
-type AudioCtor = typeof AudioContext;
-
-function audioContextCtor(): AudioCtor | undefined {
-  if (typeof window === "undefined") return undefined;
-  return (
-    window.AudioContext ??
-    (window as unknown as { webkitAudioContext?: AudioCtor }).webkitAudioContext
-  );
-}
 
 /**
  * Records a voice or a video message with `MediaRecorder`. `start` switches the state at once and
