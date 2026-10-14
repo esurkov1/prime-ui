@@ -11,12 +11,38 @@ The design contract for every component. Tokens live in `tokens/` and are genera
    used only where a separator is truly needed (table rows, list dividers). Controls have no visible
    outline: `--prime-color-border-control` is `transparent` and becomes visible only under
    `prefers-contrast: more`.
-2. **Everything is on the 4px grid.** Spacing, heights, paddings, gaps. The off-grid values are a
-   closed list, mirrored by the allowlist of `src/styles/tokens.test.ts`: 1px hairlines; the 2px focus
-   ring and the 2px motion blur (`--prime-motion-blur`); the typographic sizes and line heights (13px);
-   the xs and m checkbox (14 · 18); the s and l track (5 · 7); the xs icon (14); the s and l radius
-   (6 · 10); the BottomNav glass blur (`0.875rem`); and the `rem` thresholds of `@container`
-   conditions (§9).
+2. **Everything is on the 4px grid.** Spacing, heights, paddings, gaps. Off the grid by their kind:
+   the typographic sizes and line heights (13px; §5), the radii (the s and l radius 6 · 10; rule 5),
+   the blurs (the 2px `--prime-motion-blur`, the BottomNav glass blur `0.875rem`) and the `rem`
+   thresholds of `@container` conditions (§9). The off-grid lengths are a closed list, generated
+   from `tokens/offGrid.ts` by `bun run tokens:build`; `src/styles/tokens.test.ts` allows exactly
+   these:
+   <!-- off-grid:start -->
+   - `--prime-border-width` 1px — the hairline
+   - `--prime-focus-width` 2px — the focus ring
+   - `--prime-focus-offset` 2px — the gap between a control and its ring
+   - `--prime-focus-offset-inset` -2px — the ring drawn inside a field's edge
+   - `--prime-icon-xs` 14px — the icon scale meets the type scale at its smallest step
+   - `--prime-control-xs-icon` 14px — the glyph of the xs tier
+   - `--prime-control-xs-choice` 14px — the checkbox of the xs tier, paired with its 12px text
+   - `--prime-control-m-choice` 18px — the optical checkbox size next to 14px text
+   - `--prime-control-s-track` 5px — a line between the xs and m tracks
+   - `--prime-control-m-track` 6px — the m track line
+   - `--prime-control-l-track` 7px — a line between the m and xl tracks
+   - `--prime-badge-s-padding-x` 6px — the optical side air of a 20px chip with 12px text
+   - `--prime-badge-m-icon` 14px — the glyph of an m chip
+   - `--prime-badge-l-padding-x` 10px — the optical side air of a 28px chip with 13px text
+   - `--prime-bottom-nav-floating-height` 46px — the iOS 26 tab bar at three quarters
+   - `--prime-bottom-nav-floating-icon-size` 18px — the glyph in the floating capsule
+   - `--prime-bottom-nav-floating-item-gap` 2px — the air between the glyph and the 9px label
+   - `--prime-gallery-gap` 2px — a seam between the tiles of an album
+   - `--prime-tooltip-xs-padding-x` 6px — the side air of a 24px chip with 12px text
+   - `--prime-tooltip-s-padding-y` 6px — the block air that makes the s chip 28px
+   - `--prime-tooltip-m-padding-x` 10px — the side air of a 32px chip with 13px text
+   - `--prime-tooltip-m-padding-y` 6px — the block air that makes the m chip 32px
+   - `--prime-tooltip-arrow-width` 10px — the arrow base
+   - `--prime-tooltip-arrow-height` 5px — the arrow depth
+   <!-- off-grid:end -->
 3. **Proximity.** Inside a group elements sit closer than between groups:
    label → field 4–8 · field → hint 4 · tile → tile 16 · field → field 20 · block → block 24 ·
    group → group 32 · section → section 40–48. Tiles of one screen are one board (one gap on both

@@ -249,11 +249,17 @@ textarea:disabled::placeholder {
  *   control-height  the height a host gives the Buttons inside it (a glass disk as tall as the
  *                   BottomNav capsule); unset (`initial`) everywhere else, so a Button keeps the
  *                   height of its tier
+ *   icon-size       the glyph size a host gives the icons inside it (Button, Badge, a menu row);
+ *                   unset everywhere else, so an `Icon` follows the nearest control tier
+ *   choice-control-height  the height of the control a choice row centres its first line on
+ *                   (the Switch track); unset everywhere else, so the row takes the checkbox size
  */
 :root {
   --prime-layout-gutter: var(--prime-layout-gutter-s);
   --prime-bleed-inline: var(--prime-space-0);
   --prime-control-height: initial;
+  --prime-icon-size: initial;
+  --prime-choice-control-height: initial;
 }
 
 @media (min-width: 640px) {

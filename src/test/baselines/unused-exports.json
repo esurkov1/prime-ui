@@ -1,5 +1,4 @@
 [
-  "src/hooks/breakpoints.ts: HOVER_QUERY is unused",
   "src/hooks/useEdgeOverflow.ts: EdgeOverflow is unused",
   "src/hooks/useEdgeOverflow.ts: EdgeOverflowAxis is unused",
   "src/hooks/useEnterConfirm.ts: UseEnterConfirmOptions is unused",
