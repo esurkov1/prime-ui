@@ -1,8 +1,6 @@
 /** Loading and empty: placeholder rows in the rows' geometry cross-fade into the dialogs; a new workspace without dialogs shows its own empty state with an action — `loading`, `empty`. */
-import { Avatar, Button, Card, ChatList, EmptyPage, hueOf, Icon } from "prime-ui-kit";
+import { Avatar, Button, Card, ChatList, EmptyPage, hueOf, Icon, Typography } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 const NOW = new Date(2026, 9, 14, 15, 0);
 
@@ -59,19 +57,17 @@ export default function ChatListStatesExample() {
   }, [loading]);
 
   return (
-    <>
-      <div className={styles.stage}>
-        <div className={styles.bar}>
-          <Button.Root
-            variant="soft"
-            tone="neutral"
-            loading={loading}
-            onClick={() => setLoading(true)}
-          >
-            Обновить
-          </Button.Root>
-        </div>
-        <Card.Root className={styles.short}>
+    <div>
+      <div>
+        <Button.Root
+          variant="soft"
+          tone="neutral"
+          loading={loading}
+          onClick={() => setLoading(true)}
+        >
+          Обновить
+        </Button.Root>
+        <Card.Root>
           <ChatList.Root
             items={loading ? [] : DIALOGS}
             getKey={(item) => item.id}
@@ -80,28 +76,36 @@ export default function ChatListStatesExample() {
             renderItem={renderDialog}
           />
         </Card.Root>
+        <Typography as="span" variant="caption" tone="muted">
+          loading
+        </Typography>
       </div>
-      <Card.Root className={styles.short}>
-        <ChatList.Root
-          items={[] as Dialog[]}
-          getKey={(item) => item.id}
-          renderItem={renderDialog}
-          empty={
-            <EmptyPage.Root layout="compact">
-              <EmptyPage.Icon>
-                <Icon name="object.message" />
-              </EmptyPage.Icon>
-              <EmptyPage.Title>Диалогов пока нет</EmptyPage.Title>
-              <EmptyPage.Description>
-                Клиенты появятся здесь, когда напишут в чат на сайте.
-              </EmptyPage.Description>
-              <EmptyPage.Actions>
-                <Button.Root variant="soft">Настроить виджет</Button.Root>
-              </EmptyPage.Actions>
-            </EmptyPage.Root>
-          }
-        />
-      </Card.Root>
-    </>
+      <div>
+        <Card.Root>
+          <ChatList.Root
+            items={[] as Dialog[]}
+            getKey={(item) => item.id}
+            renderItem={renderDialog}
+            empty={
+              <EmptyPage.Root layout="compact">
+                <EmptyPage.Icon>
+                  <Icon name="object.message" />
+                </EmptyPage.Icon>
+                <EmptyPage.Title>Диалогов пока нет</EmptyPage.Title>
+                <EmptyPage.Description>
+                  Клиенты появятся здесь, когда напишут в чат на сайте.
+                </EmptyPage.Description>
+                <EmptyPage.Actions>
+                  <Button.Root variant="soft">Настроить виджет</Button.Root>
+                </EmptyPage.Actions>
+              </EmptyPage.Root>
+            }
+          />
+        </Card.Root>
+        <Typography as="span" variant="caption" tone="muted">
+          empty
+        </Typography>
+      </div>
+    </div>
   );
 }
