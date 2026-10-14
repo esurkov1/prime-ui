@@ -21,15 +21,9 @@
   "src/internal/fieldCell.ts: no fieldCell.test",
   "src/internal/fieldClasses.ts: no fieldClasses.test",
   "src/internal/fileFormat.ts: no fileFormat.test",
-  "src/internal/fileSize.ts: no fileSize.test",
-  "src/internal/formatClock.ts: no formatClock.test",
   "src/internal/iconBox.ts: no iconBox.test",
   "src/internal/iconLayout.ts: no iconLayout.test",
-  "src/internal/imageSlot.tsx: no imageSlot.test",
   "src/internal/listbox.ts: no listbox.test",
-  "src/internal/mediaDisk.tsx: no mediaDisk.test",
-  "src/internal/mediaFrame.ts: no mediaFrame.test",
-  "src/internal/mediaSession.ts: no mediaSession.test",
   "src/internal/mergeRefs.ts: no mergeRefs.test",
   "src/internal/messageList.tsx: no messageList.test",
   "src/internal/messagePart.tsx: no messagePart.test",
@@ -40,7 +34,5 @@
   "src/internal/sticky.ts: no sticky.test",
   "src/internal/surfaceDepth.tsx: no surfaceDepth.test",
   "src/internal/textFormattingToolbar.tsx: no textFormattingToolbar.test",
-  "src/internal/touchTarget.ts: no touchTarget.test",
-  "src/internal/transfer.ts: no transfer.test",
-  "src/internal/useNearView.ts: no useNearView.test"
+  "src/internal/touchTarget.ts: no touchTarget.test"
 ]

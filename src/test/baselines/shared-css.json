@@ -40,8 +40,6 @@
   "src/components/stepper/Stepper.module.css: control tier tokens outside fieldTier",
   "src/components/tabs/Tabs.module.css: control tier tokens outside fieldTier",
   "src/components/tabs/Tabs.module.css: visually-hidden clip outside VisuallyHidden",
-  "src/components/thumbnail/Thumbnail.module.css: control tier tokens outside fieldTier",
-  "src/components/thumbnail/Thumbnail.module.css: media shade outside mediaPill",
   "src/components/timeline/Timeline.module.css: control tier tokens outside fieldTier",
   "src/internal/ChoiceField.module.css: control tier tokens outside fieldTier",
   "src/internal/FieldFrame.module.css: control tier tokens outside fieldTier",
@@ -49,11 +47,7 @@
   "src/internal/attachmentTile.module.css: control tier tokens outside fieldTier",
   "src/internal/attachmentTile.module.css: media shade outside mediaPill",
   "src/internal/iconBox.module.css: control tier tokens outside fieldTier",
-  "src/internal/mediaDisk.module.css: control tier tokens outside fieldTier",
-  "src/internal/mediaDisk.module.css: media shade outside mediaPill",
-  "src/internal/mediaPill.module.css: control tier tokens outside fieldTier",
   "src/internal/menu.module.css: control tier tokens outside fieldTier",
   "src/internal/swatch.module.css: control tier tokens outside fieldTier",
-  "src/internal/transferDisk.module.css: control tier tokens outside fieldTier",
   "src/layout/sidebar/Sidebar.module.css: control tier tokens outside fieldTier"
 ]

@@ -20,10 +20,6 @@
   "src/components/select/Select.test.tsx: queries [class*=",
   "src/components/switch/Switch.test.tsx: getComputedStyle",
   "src/components/tabs/Tabs.test.tsx: reads a .module.css as text",
-  "src/components/thumbnail/Thumbnail.test.tsx: reads a .module.css as text",
   "src/components/timeline/Timeline.test.tsx: reads a .module.css as text",
-  "src/components/video-note/VideoNote.test.tsx: reads a .module.css as text",
-  "src/internal/palette.test.ts: reads a .module.css as text",
-  "src/internal/ring.test.tsx: reads a .module.css as text",
-  "src/internal/transferDisk.test.tsx: reads a .module.css as text"
+  "src/internal/palette.test.ts: reads a .module.css as text"
 ]
