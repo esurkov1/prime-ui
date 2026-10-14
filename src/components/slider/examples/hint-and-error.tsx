@@ -1,14 +1,12 @@
 /** A slider framed like every field: required marker, a hint, and an error in its place — `required`, `hint`, `error`, `optional`. */
-import { Slider } from "prime-ui-kit";
+import { Fieldset, Slider } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 export default function SliderHintAndErrorExample() {
   const [budget, setBudget] = React.useState(80);
 
   return (
-    <div className={styles.column}>
+    <Fieldset aria-label="Бюджет кампании">
       <Slider
         label="Бюджет кампании, тыс. ₽"
         required
@@ -28,6 +26,6 @@ export default function SliderHintAndErrorExample() {
         defaultValue={30}
         hint="По умолчанию показы распределяются равномерно"
       />
-    </div>
+    </Fieldset>
   );
 }

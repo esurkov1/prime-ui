@@ -155,6 +155,33 @@ describe("Slider — commit", () => {
     expect(onCommit).toHaveBeenLastCalledWith(41);
   });
 
+  it("every documented key commits the step the browser made with it", () => {
+    const onCommit = vi.fn();
+    render(<Slider aria-label="Громкость" defaultValue={50} step={5} onCommit={onCommit} />);
+    const input = screen.getByRole("slider", { name: "Громкость" });
+    // The browser moves a range on these keys (jsdom does not): the change lands, then the key up.
+    const step = (value: number) => fireEvent.change(input, { target: { value: String(value) } });
+    step(55);
+    fireEvent.keyUp(input, { key: "ArrowUp" });
+    expect(onCommit).toHaveBeenLastCalledWith(55);
+    step(50);
+    fireEvent.keyUp(input, { key: "ArrowDown" });
+    expect(onCommit).toHaveBeenLastCalledWith(50);
+    step(45);
+    fireEvent.keyUp(input, { key: "ArrowLeft" });
+    expect(onCommit).toHaveBeenLastCalledWith(45);
+    step(95);
+    fireEvent.keyUp(input, { key: "PageUp" });
+    expect(onCommit).toHaveBeenLastCalledWith(95);
+    step(45);
+    fireEvent.keyUp(input, { key: "PageDown" });
+    expect(onCommit).toHaveBeenLastCalledWith(45);
+    step(0);
+    fireEvent.keyUp(input, { key: "Home" });
+    expect(onCommit).toHaveBeenLastCalledWith(0);
+    expect(onCommit).toHaveBeenCalledTimes(6);
+  });
+
   it("a key that does not move the thumb commits nothing", () => {
     const onCommit = vi.fn();
     render(<Slider aria-label="Громкость" defaultValue={20} onCommit={onCommit} />);
