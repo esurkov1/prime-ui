@@ -82,6 +82,7 @@
   margin: 0;
   min-width: 0;
   overflow-wrap: anywhere;
+  text-wrap-style: balance;
   color: var(--prime-color-text-primary);
   /* Title and description follow the panel tier, like the controls inside it. */
   font-size: var(--po-text);
@@ -94,6 +95,7 @@
   margin: 0;
   min-width: 0;
   overflow-wrap: anywhere;
+  text-wrap-style: pretty;
   color: var(--prime-color-text-secondary);
   font-size: var(--po-desc);
   line-height: var(--po-desc-lh);

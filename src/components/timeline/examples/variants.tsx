@@ -27,8 +27,8 @@ const TONES: { tone: Tone; title: string; value: string }[] = [
 
 export default function TimelineVariantsExample() {
   return (
-    <div className={styles.stack}>
-      <Timeline.Root>
+    <>
+      <Timeline.Root className={styles.feed}>
         <Timeline.Group label="color">
           {COLORS.map((color) => (
             <Timeline.Item key={color} color={color}>
@@ -38,7 +38,7 @@ export default function TimelineVariantsExample() {
           ))}
         </Timeline.Group>
       </Timeline.Root>
-      <Timeline.Root>
+      <Timeline.Root className={styles.feed}>
         <Timeline.Group label="tone">
           {TONES.map(({ tone, title, value }) => (
             <Timeline.Item key={tone} tone={tone}>
@@ -51,6 +51,6 @@ export default function TimelineVariantsExample() {
           <Timeline.Gap tone="danger">Просрочка 30 дней</Timeline.Gap>
         </Timeline.Group>
       </Timeline.Root>
-    </div>
+    </>
   );
 }

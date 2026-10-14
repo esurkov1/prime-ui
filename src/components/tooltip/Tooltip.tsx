@@ -15,8 +15,11 @@ import styles from "./Tooltip.module.css";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type TooltipSide = PositionSide;
-/** A tooltip lines up with its trigger by choice: `auto` is for panels that grow. */
-export type TooltipAlign = Exclude<PositionAlign, "auto">;
+/**
+ * The anchored-layer vocabulary. A tooltip centres on its trigger by default (foundation §8);
+ * `auto` lines it up with the trigger edge that has more room beyond it, as a growing panel does.
+ */
+export type TooltipAlign = PositionAlign;
 
 const DEFAULT_DELAY_MS = 400;
 const DEFAULT_SKIP_DELAY_MS = 300;

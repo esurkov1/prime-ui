@@ -152,6 +152,7 @@ Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard
 ### ARIA
 - Each stack is an `<ol>` named by the region label of its position; each card is an `<article>`: `role="status"` + `aria-live="polite"`, or `role="alert"` + `aria-live="assertive"` for `warning` / `danger`.
 - The icon and the countdown are `aria-hidden`; the close button is named by `labels.close`.
+- A toast is a non-modal live region, not a layer of the overlay stack: Escape and a press elsewhere belong to the page and to the topmost open layer, so a toast takes no `closeOnEscape` / `closeOnOutsideClick` — it leaves by its timer, the close button, a swipe or `dismiss()`.
 - Do not keep the only copy of important information in a toast with a timer — use `persistent` or a Banner.
 
 ### Labels

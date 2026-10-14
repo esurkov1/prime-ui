@@ -7,9 +7,9 @@ const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function TimelineSizesExample() {
   return (
-    <div className={styles.stack}>
+    <>
       {SIZES.map((size) => (
-        <Timeline.Root key={size} size={size}>
+        <Timeline.Root key={size} size={size} className={styles.feed}>
           <Timeline.Group label={size}>
             <Timeline.Item>
               <Timeline.Title>Аренда закончилась · Иван К.</Timeline.Title>
@@ -28,6 +28,6 @@ export default function TimelineSizesExample() {
           </Timeline.Group>
         </Timeline.Root>
       ))}
-    </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./PageContent.module.css";
 
@@ -99,7 +100,7 @@ export type PageContentTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
 };
 
 function PageContentTitle({ className, ...rest }: PageContentTitleProps) {
-  return <h1 className={cx(styles.title, className)} {...rest} />;
+  return <h1 className={cx(textRole.headingM, styles.title, className)} {...rest} />;
 }
 PageContentTitle.displayName = "PageContent.Title";
 
@@ -118,7 +119,7 @@ function PageContentDescription({
 }: PageContentDescriptionProps) {
   return (
     <p
-      className={cx(styles.description, className)}
+      className={cx(textRole.bodyM, styles.description, className)}
       {...rest}
       {...toDataAttributes({ measure: measure === "full" ? "full" : undefined })}
     />
@@ -177,10 +178,12 @@ function PageContentSection({
         data-has-actions={actions.length > 0 ? "true" : undefined}
       >
         <div className={styles.sectionHeading}>
-          <h2 id={headingId} className={styles.sectionTitle}>
+          <h2 id={headingId} className={cx(textRole.titleM, styles.sectionTitle)}>
             {label}
           </h2>
-          {description ? <p className={styles.sectionDescription}>{description}</p> : null}
+          {description ? (
+            <p className={cx(textRole.bodyS, styles.sectionDescription)}>{description}</p>
+          ) : null}
         </div>
         {actions}
       </div>

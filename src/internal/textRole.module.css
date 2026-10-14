@@ -1,7 +1,7 @@
 /*
  * Text roles (`--prime-text-<role>-*`, foundation §5) as classes: size, line height, weight and
- * tracking in one place. Typography picks one by `variant`; component modules reuse them with
- * `composes: titleS from "…/internal/textRole.module.css";` instead of repeating four declarations.
+ * tracking in one place. Typography picks one by `variant`; component modules join them in TSX with
+ * `cx(textRole.titleS, styles.x)` instead of repeating four declarations — never cross-file `composes`.
  */
 .caption {
   font-size: var(--prime-text-caption-size);

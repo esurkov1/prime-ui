@@ -19,7 +19,7 @@ function BasicTooltip({
   defaultOpen?: boolean;
   onOpenChange?: (v: boolean) => void;
   side?: "top" | "bottom" | "left" | "right";
-  align?: "start" | "center" | "end";
+  align?: "auto" | "start" | "center" | "end";
   size?: "s" | "m" | "l" | "xl";
   delayDuration?: number;
 }) {
@@ -341,6 +341,14 @@ describe("Tooltip", () => {
       expect(tip).toHaveAttribute("data-size", "l");
       expect(tip).toHaveAttribute("data-side", "bottom");
       expect(tip).toHaveAttribute("data-align", "start");
+    });
+
+    it("centres on the trigger by default and takes `auto` alignment", () => {
+      const { unmount } = render(<BasicTooltip defaultOpen />);
+      expect(screen.getByRole("tooltip")).toHaveAttribute("data-align", "center");
+      unmount();
+      render(<BasicTooltip defaultOpen align="auto" />);
+      expect(screen.getByRole("tooltip")).toHaveAttribute("data-align", "auto");
     });
 
     it("renders a decorative arrow", async () => {

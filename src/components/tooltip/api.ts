@@ -98,10 +98,10 @@ export const api: ComponentApi = {
         },
         {
           name: "align",
-          type: '"start" | "center" | "end"',
+          type: '"auto" | "start" | "center" | "end"',
           default: '"center"',
-          en: "Alignment along the trigger: its start edge, centre or end edge; the arrow keeps pointing at the trigger.",
-          ru: "Выравнивание по триггеру: начало, центр или конец; стрелка всё равно указывает на триггер.",
+          en: "Alignment along the trigger: centred by default; `auto` lines the chip up with the trigger edge that has more room beyond it; `start` or `end` fix the edge. The arrow keeps pointing at the trigger.",
+          ru: "Выравнивание по триггеру: по умолчанию по центру; `auto` выравнивает чип по краю триггера, за которым больше места; `start` или `end` задают край явно. Стрелка всё равно указывает на триггер.",
         },
         {
           name: "size",

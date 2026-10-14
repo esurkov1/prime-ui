@@ -70,7 +70,7 @@ No DOM of its own: clones the single child and links it to the tooltip with `ari
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"top" \| "bottom" \| "left" \| "right"` | `"top"` | Preferred side; flips to the opposite one when it does not fit, then shifts inside the viewport. |
-| `align` | `"start" \| "center" \| "end"` | `"center"` | Alignment along the trigger: its start edge, centre or end edge; the arrow keeps pointing at the trigger. |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"center"` | Alignment along the trigger: centred by default; `auto` lines the chip up with the trigger edge that has more room beyond it; `start` or `end` fix the edge. The arrow keeps pointing at the trigger. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text and padding tier; also the size context of controls inside (a Kbd). |
 | `children` | `ReactNode` | — (required) | Hint text, optionally with a Kbd. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "role" \| "onPointerEnter" \| "onPointerLeave">` | — | `className`, `style` and the other attributes of the chip. |
@@ -100,9 +100,10 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 ### align (Content)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `start` | Chip starts at the trigger's start edge | Wide triggers, triggers at a container's start | |
 | `center` | Chip centred on the trigger | Most triggers | yes |
-| `end` | Chip ends at the trigger's end edge | Triggers at a container's end | |
+| `auto` | Lined up with the trigger edge that has more room: near the end of the screen the end edges meet and the chip grows toward the start, near the start the other way | A long chip on a wide trigger near a screen edge | |
+| `start` | Chip starts at the trigger's start edge | The chip must line up with the start of a block whatever room there is | |
+| `end` | Chip ends at the trigger's end edge | The chip must line up with the end of a block whatever room there is | |
 
 **Combinations** — size of the tooltip = size of the trigger control; a Kbd inside takes the tier one step down by itself.
 
@@ -133,6 +134,7 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 - `Tooltip.Trigger` composes the child's `ref`, sets `data-state` and chains the child's `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus` and `onBlur`.
 - The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.
 - The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.
+- Tooltip has no `closeOnEscape` / `closeOnOutsideClick` (foundation §8): it closes on pointer-leave, blur, a press on the trigger and Escape, and Escape cannot be turned off — WCAG 1.4.13 requires the chip to be dismissable without moving the pointer or focus.
 - A `disabled` control is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control.
 - A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.
 
@@ -146,7 +148,7 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | An icon-only button with a tooltip that repeats its name on hover and keyboard focus — `Tooltip.Trigger`, `Tooltip.Content`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier next to buttons of the same tier; take the tier of the control it describes — `size`. |
-| [placement.tsx](examples/placement.tsx) | Every side, and start / end alignment along the trigger; without room the chip flips and shifts, the arrow keeps pointing at the trigger — `side`, `align`. |
+| [placement.tsx](examples/placement.tsx) | Every side, and alignment by room, start and end along the trigger; without room the chip flips and shifts, the arrow keeps pointing at the trigger — `side`, `align`. |
 | [toolbar.tsx](examples/toolbar.tsx) | A formatting toolbar in one group: after the first tooltip the neighbours open at once, each with its name and shortcut — `Tooltip.Provider`. |
 | [disabled-trigger.tsx](examples/disabled-trigger.tsx) | Why an action is unavailable: the disabled button still shows its tooltip on hover and Tab, no wrapper needed — `Tooltip.Trigger`. |
 | [non-interactive-trigger.tsx](examples/non-interactive-trigger.tsx) | A status badge, an avatar and an information icon explain themselves: the kit makes each a tab stop, so the tooltip opens from the keyboard too — `Tooltip.Trigger`. |

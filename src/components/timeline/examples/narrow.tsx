@@ -20,7 +20,7 @@ const EVENTS = [
 
 export default function TimelineNarrowExample() {
   return (
-    <div className={styles.stack}>
+    <>
       {WIDTHS.map((width) => (
         <Timeline.Root key={width.id} className={width.className}>
           <Timeline.Group label={width.label}>
@@ -36,6 +36,6 @@ export default function TimelineNarrowExample() {
           </Timeline.Group>
         </Timeline.Root>
       ))}
-    </div>
+    </>
   );
 }

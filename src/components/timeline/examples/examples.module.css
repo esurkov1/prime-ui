@@ -6,14 +6,6 @@
   width: min(100%, calc(var(--prime-space-24) * 5));
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-10);
-  width: min(100%, calc(var(--prime-space-24) * 5));
-  min-width: 0;
-}
-
 /* narrow.tsx: a 375px phone column. */
 .phone {
   width: min(100%, calc(var(--prime-space-1) * 93.75));

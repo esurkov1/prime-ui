@@ -1,4 +1,4 @@
-/** Every side, and start / end alignment along the trigger; without room the chip flips and shifts, the arrow keeps pointing at the trigger — `side`, `align`. */
+/** Every side, and alignment by room, start and end along the trigger; without room the chip flips and shifts, the arrow keeps pointing at the trigger — `side`, `align`. */
 import { Button, Tooltip } from "prime-ui-kit";
 
 const PLACEMENTS = [
@@ -6,6 +6,7 @@ const PLACEMENTS = [
   { side: "bottom", align: "center" },
   { side: "left", align: "center" },
   { side: "right", align: "center" },
+  { side: "bottom", align: "auto" },
   { side: "bottom", align: "start" },
   { side: "bottom", align: "end" },
 ] as const;
