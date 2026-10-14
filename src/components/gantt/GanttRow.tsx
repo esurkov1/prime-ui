@@ -6,9 +6,12 @@ import * as React from "react";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Icon } from "@/icons";
+import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { isPlainClick, opensRow } from "@/internal/rowLink";
+import { stepDown } from "@/internal/states";
 
 import styles from "./Gantt.module.css";
 import { GanttBarView } from "./GanttBar";
@@ -136,6 +139,7 @@ function GanttRowView({
   hintId,
   createHintId,
 }: GanttRowProps) {
+  const barTier = stepDown(useControlSize(undefined));
   const start = new Date(rangeStart);
   const windowed = windowFrom <= windowTo;
   const on = (event: GanttTrackEvent) => (native: React.SyntheticEvent) =>
@@ -149,6 +153,8 @@ function GanttRowView({
   );
   // The header's grid stop: roving focus, and the create key when bars can be drawn.
   const stopProps = {
+    // With an avatar a narrow chart shows only the picture: the row label names the stop.
+    "aria-label": renderRowAvatar ? label : undefined,
     "aria-describedby": creatable ? createHintId : undefined,
     "aria-keyshortcuts": creatable ? "N" : undefined,
     onFocus: () => ctx.focus(navId),
@@ -218,7 +224,9 @@ function GanttRowView({
       )}
       <div
         role="gridcell"
-        className={styles.track}
+        // Bar text is one tier under the chart: the track carries that tier (`--field-*`).
+        className={cx(fieldTierClass, styles.track)}
+        data-size={barTier}
         data-row={index}
         data-creatable={creatable || undefined}
         onPointerDown={creatable ? on("pointerDown") : undefined}

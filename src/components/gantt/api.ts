@@ -47,8 +47,8 @@ export const api: ComponentApi = {
         {
           name: "renderRowAvatar",
           type: "(row: Row) => ReactNode",
-          en: "A picture before the row content (an `Avatar`). Below 36rem of chart width the column keeps only it; the name stays for assistive tech.",
-          ru: "Картинка перед содержимым строки (`Avatar`). Уже 36rem ширины графика колонка оставляет только её; имя остаётся для вспомогательных технологий.",
+          en: "A picture before the row content (an `Avatar`). Below 36rem of chart width the column keeps only it; the row header is then named by `getRowLabel` (`aria-label`).",
+          ru: "Картинка перед содержимым строки (`Avatar`). Уже 36rem ширины графика колонка оставляет только её; заголовок строки тогда назван `getRowLabel` (`aria-label`).",
         },
         {
           name: "getRowHref",
@@ -110,9 +110,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of rows, bars, header and toolbar controls: one-lane rows 28 · 32 · 44 · 48 · 52 px; a day is 32 · 40 · 48 px wide at `day`.",
-          ru: "Ярус строк, полос, шапки и контролов панели: строка в одну дорожку 28 · 32 · 44 · 48 · 52 px; день шириной 32 · 40 · 48 px при `day`.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of rows, bars, header and toolbar controls: one-lane rows 28 · 32 · 44 · 48 · 52 px; a day is 32 · 40 · 48 px wide at `day`; bar text one tier down. Without it the tier of its host, else `m`.",
+          ru: "Ярус строк, полос, шапки и контролов панели: строка в одну дорожку 28 · 32 · 44 · 48 · 52 px; день шириной 32 · 40 · 48 px при `day`; текст полос на ярус меньше. Без него — ярус контейнера, иначе `m`.",
         },
         {
           name: "readOnly",

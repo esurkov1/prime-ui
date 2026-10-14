@@ -5,6 +5,10 @@
  * length of a day for the zoom and tier, and every cell, line and bar is placed with
  * `calc(<days> * var(--gantt-day))` from the custom properties `--x`, `--span`, `--lane` set in TSX.
  * Weekends are a faint wash, column lines faint hairlines, today an accent line with a chip.
+ *
+ * Text comes from the field tier table: the root carries the chart tier (`fieldTierClass`: row
+ * text, header labels), each row's track one tier down (bar text). Bar and header-row heights are
+ * chart geometry on the spacing scale.
  */
 
 .root {
@@ -13,17 +17,11 @@
   --gantt-label-w: calc(var(--prime-space-24) * 2);
   --gantt-pad-x: var(--prime-space-3);
   --gantt-pad-y: var(--prime-space-2);
-  --gantt-bar-h: var(--prime-control-xs-height);
+  --gantt-bar-h: var(--prime-space-7);
   --gantt-lane-gap: var(--prime-space-1);
   --gantt-bar-radius: var(--prime-radius-s);
   --gantt-bar-pad-x: var(--prime-space-2);
-  --gantt-bar-text: var(--prime-control-s-text-size);
-  --gantt-bar-line-height: var(--prime-control-s-line-height);
-  --gantt-text: var(--prime-control-m-text-size);
-  --gantt-line-height: var(--prime-control-m-line-height);
-  --gantt-tier-h: var(--prime-control-xs-height);
-  --gantt-head-text: var(--prime-control-m-label-size);
-  --gantt-head-line-height: var(--prime-control-m-label-line-height);
+  --gantt-tier-h: var(--prime-space-7);
 
   /* One step off the surface for the head, as DataTable; the sticky column keeps the surface. */
   --gantt-surface: var(--prime-color-layer-current);
@@ -47,8 +45,8 @@
   background: var(--gantt-surface);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
-  font-size: var(--gantt-text);
-  line-height: var(--gantt-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
 }
 
 .root:dir(rtl) {
@@ -64,23 +62,15 @@
   --gantt-pad-y: var(--prime-space-1);
   --gantt-bar-radius: var(--prime-radius-xs);
   --gantt-bar-pad-x: var(--prime-space-1);
-  --gantt-bar-text: var(--prime-control-xs-text-size);
-  --gantt-bar-line-height: var(--prime-control-xs-line-height);
   --gantt-tier-h: var(--prime-space-6);
-  --gantt-head-text: var(--prime-control-xs-label-size);
-  --gantt-head-line-height: var(--prime-control-xs-label-line-height);
 }
 
 .root[data-size="xs"] {
   --gantt-bar-h: var(--prime-space-5);
-  --gantt-text: var(--prime-control-xs-text-size);
-  --gantt-line-height: var(--prime-control-xs-line-height);
 }
 
 .root[data-size="s"] {
   --gantt-bar-h: var(--prime-space-6);
-  --gantt-text: var(--prime-control-s-text-size);
-  --gantt-line-height: var(--prime-control-s-line-height);
 }
 
 .root[data-size="l"],
@@ -88,25 +78,16 @@
   --gantt-pad-x: var(--prime-space-4);
   --gantt-bar-radius: var(--prime-radius-m);
   --gantt-bar-pad-x: var(--prime-space-3);
-  --gantt-tier-h: var(--prime-control-s-height);
-  --gantt-head-text: var(--prime-control-l-label-size);
-  --gantt-head-line-height: var(--prime-control-l-label-line-height);
+  --gantt-tier-h: var(--prime-space-8);
 }
 
 .root[data-size="l"] {
-  --gantt-bar-h: var(--prime-control-s-height);
-  --gantt-bar-text: var(--prime-control-m-text-size);
-  --gantt-bar-line-height: var(--prime-control-m-line-height);
-  --gantt-text: var(--prime-control-l-text-size);
-  --gantt-line-height: var(--prime-control-l-line-height);
+  --gantt-bar-h: var(--prime-space-8);
 }
 
+/* The height of an `m` control: the 4px grid has no single step for it. */
 .root[data-size="xl"] {
-  --gantt-bar-h: var(--prime-control-m-height);
-  --gantt-bar-text: var(--prime-control-l-text-size);
-  --gantt-bar-line-height: var(--prime-control-l-line-height);
-  --gantt-text: var(--prime-control-xl-text-size);
-  --gantt-line-height: var(--prime-control-xl-line-height);
+  --gantt-bar-h: calc(var(--prime-space-8) + var(--prime-space-1));
 }
 
 /* Length of a day per zoom: a day column fits its number, a week its range, a month its name. */
@@ -246,8 +227,8 @@
 
   background: var(--gantt-head-bg);
   color: var(--prime-color-text-secondary);
-  font-size: var(--gantt-head-text);
-  line-height: var(--gantt-head-line-height);
+  font-size: var(--field-label-size);
+  line-height: var(--field-label-lh);
 }
 
 .corner {
@@ -267,11 +248,7 @@
 .cornerText {
   overflow: hidden;
   min-width: 0;
-  padding-block-end: calc(
-    (var(--gantt-tier-h) - var(--gantt-head-line-height)) /
-    2 -
-    var(--prime-space-1)
-  );
+  padding-block-end: calc((var(--gantt-tier-h) - var(--field-label-lh)) / 2 - var(--prime-space-1));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -524,6 +501,8 @@
   min-width: 0;
   padding: var(--gantt-pad-y) var(--gantt-pad-x);
   background: var(--gantt-surface);
+  box-shadow: inset 0 0 0 var(--gantt-label-w) transparent;
+  transition: box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* A row header is a keyboard stop of the grid (row navigation, `N` creates): full-bleed, so the
@@ -535,26 +514,16 @@
 
 /*
  * A header that opens its row (`onRowClick`, `getRowHref`): a pointer cursor and, under a mouse, a
- * wash under the content — on its own layer, since the header must stay opaque over the axis.
+ * wash under the content. The wash is an inset shadow over the opaque surface (the header must
+ * stay opaque over the axis); its spread, the column width, covers the whole header.
  */
 .rowHeader[data-clickable] {
   cursor: pointer;
 }
 
-.rowHeader[data-clickable]::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: var(--prime-z-below);
-  pointer-events: none;
-  background: var(--prime-color-fill-subtle-active);
-  opacity: 0;
-  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
 @media (hover: hover) {
-  .rowHeader[data-clickable]:hover::before {
-    opacity: 1;
+  .rowHeader[data-clickable]:hover {
+    box-shadow: inset 0 0 0 var(--gantt-label-w) var(--prime-color-fill-subtle-active);
   }
 }
 
@@ -654,9 +623,10 @@
   background: var(--bar-bg);
   color: var(--bar-fg);
   font: inherit;
-  font-size: var(--gantt-bar-text);
+  /* The track's tier (one under the chart). */
+  font-size: var(--field-text);
   font-weight: var(--prime-font-weight-medium);
-  line-height: var(--gantt-bar-line-height);
+  line-height: var(--field-lh);
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
@@ -937,9 +907,9 @@
   background: var(--prime-color-accent-soft);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-accent-default);
   color: var(--prime-color-accent-text);
-  font-size: var(--gantt-bar-text);
+  font-size: var(--field-text);
   font-weight: var(--prime-font-weight-medium);
-  line-height: var(--gantt-bar-line-height);
+  line-height: var(--field-lh);
   white-space: nowrap;
   pointer-events: none;
   transform: translateX(calc(var(--x) * var(--gantt-day) * var(--gantt-dir)));
@@ -1042,18 +1012,13 @@
     justify-content: space-between;
   }
 
-  /* With avatars the column keeps only them; the name stays for assistive tech. */
+  /* With avatars the column keeps only them; the stops carry the row label as their name (TSX). */
   .root[data-avatar] .frame {
     --gantt-label-w: calc(var(--prime-avatar-m) + 2 * var(--gantt-pad-x));
   }
 
   .root[data-avatar] .rowLabel,
   .root[data-avatar] .cornerText {
-    position: absolute;
-    overflow: hidden;
-    width: var(--prime-border-width);
-    height: var(--prime-border-width);
-    clip-path: inset(50%);
-    white-space: nowrap;
+    display: none;
   }
 }
