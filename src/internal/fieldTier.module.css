@@ -10,6 +10,7 @@
  *   --field-hint-size / --field-hint-lh     support row text      --field-hint-gap   field → hint
  *   --field-hint-icon                       icon of a support row
  *   --field-choice                          box of a checkbox / radio
+ *   --field-track                           thickness of a slider / progress track
  * No other stylesheet maps `--prime-control-<tier>-*`: hosts read these variables. The text
  * classes below set a text from the tier on the element that joins them:
  *   .labelText  field label (Label)   .hintText  support row (Hint, counter)
@@ -35,6 +36,7 @@
   --field-hint-gap: var(--prime-control-m-hint-gap);
   --field-hint-icon: var(--prime-icon-xs);
   --field-choice: var(--prime-control-m-choice);
+  --field-track: var(--prime-control-m-track);
   /* Resolved on the same element as the tier rows below, so it follows the tier. */
   --field-input-text: var(--field-text);
   --field-input-lh: var(--field-lh);
@@ -68,6 +70,7 @@
   --field-hint-lh: var(--prime-control-xs-hint-line-height);
   --field-hint-gap: var(--prime-control-xs-hint-gap);
   --field-choice: var(--prime-control-xs-choice);
+  --field-track: var(--prime-control-xs-track);
 }
 
 .tier[data-size="s"] {
@@ -86,6 +89,7 @@
   --field-hint-lh: var(--prime-control-s-hint-line-height);
   --field-hint-gap: var(--prime-control-s-hint-gap);
   --field-choice: var(--prime-control-s-choice);
+  --field-track: var(--prime-control-s-track);
 }
 
 .tier[data-size="l"] {
@@ -105,6 +109,7 @@
   --field-hint-gap: var(--prime-control-l-hint-gap);
   --field-hint-icon: var(--prime-icon-s);
   --field-choice: var(--prime-control-l-choice);
+  --field-track: var(--prime-control-l-track);
 }
 
 .tier[data-size="xl"] {
@@ -124,6 +129,7 @@
   --field-hint-gap: var(--prime-control-xl-hint-gap);
   --field-hint-icon: var(--prime-icon-s);
   --field-choice: var(--prime-control-xl-choice);
+  --field-track: var(--prime-control-xl-track);
 }
 
 /* Field label text: the label tier, weight 500 (foundation §6). */

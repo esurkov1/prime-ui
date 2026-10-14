@@ -33,6 +33,9 @@ const PUBLIC_HOOKS = [
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);
 
+/** The tier table defines the `--field-*` variables every host reads: it owns them, it never overrides. */
+const DEFINING_TABLES = new Set(["src/internal/fieldTier.module.css"]);
+
 const files = moduleCssFiles().filter((file) => !file.includes("/examples/"));
 
 describe("donor overrides", () => {
@@ -63,6 +66,7 @@ describe("donor overrides", () => {
         for (const decl of rule.decls) {
           if (!decl.prop.startsWith("--") || decl.prop.startsWith("--prime-")) continue;
           if (PUBLIC_HOOKS.some((hook) => hook.test(decl.prop))) continue;
+          if (DEFINING_TABLES.has(file)) continue;
           const users = [...(readers.get(decl.prop) ?? [])];
           if (users.length === 0) continue; // unread: css-modules.test.ts
           if (users.every((user) => path.posix.dirname(user) !== dir)) {
