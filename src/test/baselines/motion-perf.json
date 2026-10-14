@@ -1,6 +1,4 @@
 [
-  "src/components/chat/Chat.module.css: local @keyframes chatJumpIn",
-  "src/components/chat/Chat.module.css: local @keyframes chatJumpOut",
   "src/components/composer/Composer.module.css: local @keyframes composerPulse",
   "src/components/composer/Composer.module.css: reduced-motion block globals.css already covers (.dot)",
   "src/components/data-table/DataTable.module.css: grid-template-rows 0fr fold outside Disclosure",

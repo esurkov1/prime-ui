@@ -17,8 +17,6 @@
   "src/components/chart-frame/ChartFrame.module.css: local [data-tone] color (.delta[data-tone=\"warning\"])",
   "src/components/chart-frame/ChartFrame.module.css: reads --prime-text-body-s-tracking",
   "src/components/chart-frame/ChartFrame.module.css: reads --prime-text-caption-tracking",
-  "src/components/chat/Chat.module.css: reads --prime-text-title-s-tracking",
-  "src/components/chat/Chat.module.css: reads --prime-text-title-s-weight",
   "src/components/code-block/CodeBlock.module.css: reads --prime-text-code-tracking",
   "src/components/code-block/CodeBlock.module.css: reads --prime-text-code-weight",
   "src/components/command-menu/CommandMenu.module.css: reads --prime-text-caption-tracking",

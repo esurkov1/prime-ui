@@ -1,6 +1,5 @@
 [
   "src/components/chat-list/ChatList.module.css: px in @container (use rem)",
-  "src/components/chat/Chat.module.css: raw length in translate",
   "src/components/composer/Composer.module.css: numeric scale() in transform",
   "src/components/composer/Composer.module.css: raw length in translate",
   "src/components/composer/Composer.module.css: raw length in translate #2",

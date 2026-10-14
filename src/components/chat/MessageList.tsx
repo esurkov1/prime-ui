@@ -871,7 +871,11 @@ function JumpToEnd({ flow, labels }: { flow: MessageFlow; labels: MessageListLab
   if (!presence.mounted) return null;
   const count = atEnd ? 0 : unseen;
   return (
-    <div className={styles.jump} data-state={presence.state} onAnimationEnd={presence.onExitEnd}>
+    <div
+      className={cx(styles.jump, presence.state === "open" ? enterMotion.enter : enterMotion.exit)}
+      data-state={presence.state}
+      onAnimationEnd={presence.onExitEnd}
+    >
       <div className={styles.jumpBox}>
         <Button.Root
           variant="soft"
@@ -908,8 +912,9 @@ function Announcer({ setterRef }: { setterRef: React.RefObject<(text: string) =>
 
 /**
  * A bar stuck to the bottom of the conversation (the selection bar) keeps the «к последним» button
- * above it: its height goes to the list as `--message-bottom-bar`, which lifts the button (a
- * transform that glides, CSS). Measured by its own observer, so the list never re-renders for it.
+ * above it: its height goes to the list upward as `--message-bottom-lift`, which lifts the button
+ * (a transform that glides, CSS). Measured by its own observer, so the list never re-renders for
+ * it.
  */
 function useBottomBar(
   bar: React.RefObject<HTMLElement | null>,
@@ -921,13 +926,16 @@ function useBottomBar(
     const list = container.current;
     if (!shown || !element || !list) return;
     const write = () =>
-      list.style.setProperty("--message-bottom-bar", `${element.getBoundingClientRect().height}px`);
+      list.style.setProperty(
+        "--message-bottom-lift",
+        `${-element.getBoundingClientRect().height}px`,
+      );
     write();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(write);
     observer?.observe(element);
     return () => {
       observer?.disconnect();
-      list.style.removeProperty("--message-bottom-bar");
+      list.style.removeProperty("--message-bottom-lift");
     };
   }, [bar, container, shown]);
 }

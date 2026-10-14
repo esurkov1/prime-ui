@@ -10,6 +10,7 @@ import { ChatSeparator, ChatService, ChatUnread } from "@/components/chat/ChatRo
 import { ChatSelectionBar, MessageList } from "@/components/chat/MessageList";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { VideoNote } from "@/components/video-note/VideoNote";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Message } from "./Message";
 
@@ -682,17 +683,15 @@ describe("Message", () => {
     }
     const { rerender, container } = render(<Chat selected={null} />);
     const group = container.querySelector<HTMLElement>("[aria-label='Чат']");
-    expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("");
+    expect(group?.style.getPropertyValue("--message-bottom-lift")).toBe("");
     rerender(<Chat selected={["a"]} />);
     // The bar's height goes to the group in the commit it appears in: the button rises over it.
-    expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("56px");
+    expect(group?.style.getPropertyValue("--message-bottom-lift")).toBe("-56px");
     rerender(<Chat selected={null} />);
-    expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("");
-    const flat = readFileSync(join(__dirname, "../chat/Chat.module.css"), "utf8").replace(
-      /\s+/g,
-      " ",
+    expect(group?.style.getPropertyValue("--message-bottom-lift")).toBe("");
+    expect(cssValue(cssRule("src/components/chat/Chat.module.css", ".jumpBox"), "translate")).toBe(
+      "0 var(--message-bottom-lift, 0)",
     );
-    expect(flat).toContain("translate: 0 calc(-1 * var(--message-bottom-bar, 0px));");
     vi.restoreAllMocks();
   });
 

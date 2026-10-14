@@ -15,6 +15,7 @@ import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import type { Selection } from "@/internal/messageList";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Chat.module.css";
 import { ChatPinned } from "./ChatPinned";
@@ -234,7 +235,9 @@ function ChatTitle({ as: Tag = "h2", className, id, ...rest }: ChatTitleProps) {
     setHasTitle(true);
     return () => setHasTitle(false);
   }, [setHasTitle]);
-  return <Tag id={id ?? titleId} className={cx(styles.title, className)} {...rest} />;
+  return (
+    <Tag id={id ?? titleId} className={cx(textRole.titleS, styles.title, className)} {...rest} />
+  );
 }
 ChatTitle.displayName = "Chat.Title";
 
