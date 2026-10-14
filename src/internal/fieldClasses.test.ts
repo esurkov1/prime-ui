@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { cssRule, cssRules, cssValue } from "@/test/css";
 
-import { fieldTierClass, fieldTriggerClass } from "./fieldClasses";
+import { fieldCodeCellClass, fieldTierClass, fieldTriggerClass } from "./fieldClasses";
 import { touchTargetBlockClass } from "./touchTarget";
 
 const TIER = "src/internal/fieldTier.module.css";
@@ -49,5 +49,21 @@ describe("field classes", () => {
         rule.decls.some((d) => d.value.includes("var(--prime-control-touch-text-size)")),
       ),
     ).toBe(true);
+  });
+
+  it("a code cell is two steps above the control height: m 48, then l 56 and xl 64", () => {
+    expect(fieldCodeCellClass).toBeTruthy();
+    const code = (selector: string) => cssValue(cssRule(TIER, selector), "--field-code");
+    expect(code(".tier")).toBe("var(--prime-control-xl-height)");
+    expect(code('.tier[data-size="xs"]')).toBe("var(--prime-control-m-height)");
+    expect(code('.tier[data-size="s"]')).toBe("var(--prime-control-l-height)");
+    expect(code('.tier[data-size="l"]')).toBe("var(--prime-space-14)");
+    expect(code('.tier[data-size="xl"]')).toBe("var(--prime-space-16)");
+    const cell = cssRule(TIER, ".codeCell");
+    expect(cssValue(cell, "width")).toBe("var(--code-cell)");
+    expect(cssValue(cssRule(TIER, ".codeCell", ["@media (pointer: coarse)"]), "--code-cell")).toBe(
+      "max(var(--field-code), var(--prime-control-touch-target))",
+    );
+    expect(cssValue(cell, "border-radius")).toBe("var(--field-code-radius)");
   });
 });

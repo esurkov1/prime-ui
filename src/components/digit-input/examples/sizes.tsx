@@ -5,10 +5,12 @@ const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function DigitInputSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
-        <DigitInput key={size} size={size} label={size} defaultValue="2048" />
+        <div key={size}>
+          <DigitInput size={size} label={size} defaultValue="2048" />
+        </div>
       ))}
-    </>
+    </div>
   );
 }

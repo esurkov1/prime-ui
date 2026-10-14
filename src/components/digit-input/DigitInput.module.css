@@ -1,8 +1,8 @@
 /*
- * OTP / PIN cells: squares with the shared field surface, on their own scale two steps above the
- * control tiers — a code is the one thing on its screen, and a small cell is hard to hit and read:
- * xs 36 · s 40 · m 48 · l 56 · xl 64 (the label and support row keep the field tier). Digits are
- * tabular and grow with the cell.
+ * OTP / PIN cells: squares with the shared field surface, on the code-cell row of the tier table
+ * (`--field-code`, two steps above the control height): a code is the one thing on its screen,
+ * and a small cell is hard to hit and read (the label and support row keep the field tier).
+ * Digits are tabular and grow with the cell.
  * The label row and the support row come from FieldFrame; the frame hugs the cells.
  * A code is always one row: a container narrower than the row narrows the cells (they keep the
  * tier height) instead of wrapping a digit or a group onto a second line.
@@ -19,8 +19,6 @@
 }
 
 .root {
-  --digit-cell: var(--prime-control-xl-height);
-  --digit-radius: var(--prime-control-xl-radius);
   --digit-gap: var(--prime-space-3);
   --digit-cell-text: var(--prime-text-heading-s-size);
   --digit-cell-line-height: var(--prime-text-heading-s-line-height);
@@ -36,32 +34,24 @@
 }
 
 .root[data-size="xs"] {
-  --digit-cell: var(--prime-control-m-height);
-  --digit-radius: var(--prime-control-m-radius);
   --digit-gap: var(--prime-space-2);
   --digit-cell-text: var(--prime-text-body-l-size);
   --digit-cell-line-height: var(--prime-text-body-l-line-height);
 }
 
 .root[data-size="s"] {
-  --digit-cell: var(--prime-control-l-height);
-  --digit-radius: var(--prime-control-l-radius);
   --digit-gap: var(--prime-space-2);
   --digit-cell-text: var(--prime-text-title-l-size);
   --digit-cell-line-height: var(--prime-text-title-l-line-height);
 }
 
 .root[data-size="l"] {
-  --digit-cell: var(--prime-space-14);
-  --digit-radius: var(--prime-radius-l);
   --digit-gap: var(--prime-space-3);
   --digit-cell-text: var(--prime-text-heading-m-size);
   --digit-cell-line-height: var(--prime-text-heading-m-line-height);
 }
 
 .root[data-size="xl"] {
-  --digit-cell: var(--prime-space-16);
-  --digit-radius: var(--prime-radius-xl);
   --digit-gap: var(--prime-space-4);
   --digit-cell-text: var(--prime-text-heading-l-size);
   --digit-cell-line-height: var(--prime-text-heading-l-line-height);
@@ -72,13 +62,10 @@
   appearance: none;
   box-sizing: border-box;
   flex: 0 1 auto;
-  width: var(--digit-cell);
-  height: var(--digit-cell);
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--digit-radius);
   caret-color: var(--prime-color-accent-default);
   font: inherit;
   font-size: var(--digit-cell-text);
@@ -110,7 +97,7 @@
 .root[data-full-width="true"] .cell {
   flex: 1 1 0;
   width: auto;
-  max-width: calc(var(--digit-cell) * 1.5);
+  max-width: calc(var(--field-code) * 1.5);
 }
 
 .cell[data-group-start="true"] {
@@ -123,14 +110,15 @@
 
 /*
  * Motion. One focus ring for the row glides to the focused cell (`fast` · emphasized); it appears
- * in place (opacity) and never travels in from nowhere. A digit fades in as it lands. `success`
+ * in place (opacity) and never travels in from nowhere. A digit's ink fades in as it lands
+ * (`enterMotion.enterInk`, joined in TSX on a filled cell). `success`
  * turns the cells one after another, half a stagger step apart.
  */
 .ring {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
-  border-radius: var(--digit-radius);
+  border-radius: var(--field-code-radius);
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
   opacity: 0;
@@ -151,16 +139,6 @@
 
 .root[data-focus-ring="false"] .ring {
   display: none;
-}
-
-.cell[data-filled="true"] {
-  animation: primeDigitIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter);
-}
-
-@keyframes primeDigitIn {
-  from {
-    color: transparent;
-  }
 }
 
 /* The success colours wash over the cells one after another; the ring and the fade keep no delay

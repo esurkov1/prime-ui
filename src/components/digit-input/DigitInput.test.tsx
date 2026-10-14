@@ -250,6 +250,45 @@ describe("DigitInput focusRing", () => {
     expect(third).toHaveFocus();
   });
 
+  it("ArrowLeft and ArrowRight move between filled cells and the entry cell", async () => {
+    const user = userEvent.setup();
+    render(<DigitInput length={4} defaultValue="12" />);
+    const cell = (n: number) => screen.getByRole("textbox", { name: `Цифра ${n} из 4` });
+    cell(3).focus();
+    await user.keyboard("{ArrowLeft}");
+    expect(cell(2)).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(cell(1)).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(cell(1)).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    await user.keyboard("{ArrowRight}");
+    expect(cell(3)).toHaveFocus();
+    // Past the entry cell there is nothing to move to.
+    await user.keyboard("{ArrowRight}");
+    expect(cell(3)).toHaveFocus();
+  });
+
+  it("Tab enters at the entry cell and leaves the code from any cell", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <DigitInput length={4} defaultValue="12" />
+        <button type="button">Подтвердить</button>
+      </>,
+    );
+    const cell = (n: number) => screen.getByRole("textbox", { name: `Цифра ${n} из 4` });
+    await user.tab();
+    expect(cell(3)).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Подтвердить" })).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(cell(3)).toHaveFocus();
+    await user.keyboard("{Home}");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Подтвердить" })).toHaveFocus();
+  });
+
   it("label={false} names the group from labels.group, without a dangling aria-labelledby", () => {
     render(<DigitInput label={false} />);
     const group = screen.getByRole("group", { name: "Код" });

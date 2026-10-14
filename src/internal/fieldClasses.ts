@@ -22,6 +22,9 @@ export const fieldHintTextClass = tier.hintText;
  */
 export const fieldInputTextClass = tier.inputText;
 
+/** A cell of a one-time code (DigitInput): the `--field-code` square and its corner. */
+export const fieldCodeCellClass = tier.codeCell;
+
 /**
  * Tier + surface + trigger layout of a button-shaped field (`fieldTrigger.module.css`), its press
  * (the shared press feedback) and the touch hit area grown in height: a trigger fills its row, and xs and

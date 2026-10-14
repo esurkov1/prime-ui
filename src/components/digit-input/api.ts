@@ -203,7 +203,11 @@ export const api: ComponentApi = {
         en: "Jumps to the first cell / the entry cell.",
         ru: "К первой ячейке / к ячейке ввода.",
       },
-      { keys: "Tab", en: "Leaves the code.", ru: "Уходит из кода." },
+      {
+        keys: "Tab",
+        en: "Enters the code at the entry cell; from any cell, leaves it.",
+        ru: "Входит в код на ячейке ввода; из любой ячейки — выходит из кода.",
+      },
     ],
     aria: [
       {
