@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-2);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 /* Tile scenarios (gallery, file-cards, saving): a wider form column, caption → field 8. */
@@ -33,7 +33,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-8);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 .formActions {
@@ -55,7 +55,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-2);
-  width: min(100%, var(--prime-modal-width-m));
+  width: min(100%, var(--prime-layout-form-width-m));
 }
 
 .composerRow {
@@ -83,7 +83,7 @@
   align-items: center;
   gap: var(--prime-space-4);
   width: 100%;
-  max-width: var(--prime-modal-width-s);
+  max-width: var(--prime-layout-form-width-s);
 }
 
 /* The whole avatar is the drop target: a round zone that hugs it. */

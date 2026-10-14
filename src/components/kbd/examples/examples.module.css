@@ -14,14 +14,14 @@
   align-items: center;
   justify-content: center;
   gap: var(--prime-space-3);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 /* shortcut-list.tsx: action left, keys right. */
 .list {
   display: grid;
   gap: var(--prime-space-3);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
   margin: 0;
 }
 

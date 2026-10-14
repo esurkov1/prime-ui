@@ -2,7 +2,7 @@
 
 /* in-form.tsx: a form in a Card. */
 .formCard {
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 /* Field → field 20. */

@@ -9,7 +9,7 @@
 
 /* loading-region.tsx: the Card's size and its centered body. */
 .region {
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
   min-height: calc(var(--prime-space-24) * 2);
 }
 

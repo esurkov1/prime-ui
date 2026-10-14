@@ -2,7 +2,7 @@
 
 /* A dashboard card's width: the chart takes the card width. */
 .card {
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 /* compact: a client list, the name and its trend on one line per client. */

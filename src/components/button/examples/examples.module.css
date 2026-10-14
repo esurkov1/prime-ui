@@ -43,7 +43,7 @@
   position: absolute;
   inset-block-start: var(--prime-space-2);
   inset-inline-end: var(--prime-space-2);
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   display: flex;
   gap: var(--prime-space-2);
 }

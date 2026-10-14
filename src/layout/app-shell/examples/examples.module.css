@@ -32,7 +32,7 @@
 .phone {
   box-sizing: border-box;
   display: flex;
-  width: min(100%, var(--prime-drawer-width-s));
+  width: min(100%, var(--prime-layout-narrow-width));
   height: calc(var(--prime-space-24) * 5);
   margin-inline: auto;
   overflow: hidden;

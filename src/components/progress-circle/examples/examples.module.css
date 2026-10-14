@@ -11,7 +11,7 @@
 
 /* A dashboard card as wide as a short form: the legend sits beside the ring or drops under it. */
 .card {
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 .item {

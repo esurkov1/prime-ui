@@ -7,14 +7,14 @@
   align-items: flex-end;
   justify-content: center;
   gap: var(--prime-space-3);
-  width: min(100%, var(--prime-modal-width-m));
+  width: min(100%, var(--prime-layout-form-width-m));
 }
 
 /* applied-filters.tsx, server-tags.tsx: a row of badges above a list. */
 .filters {
   display: grid;
   gap: var(--prime-space-3);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 .badges {

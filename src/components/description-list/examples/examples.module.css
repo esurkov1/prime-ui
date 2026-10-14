@@ -2,12 +2,12 @@
 
 /* overview.tsx: a record card as wide as a dialog of size m. */
 .card {
-  width: min(100%, var(--prime-modal-width-m));
+  width: min(100%, var(--prime-layout-form-width-m));
 }
 
 /* structure.tsx: a column as wide as a short form. */
 .column {
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 /* sizes.tsx: one tier per block, its caption right under it, blocks apart. */
@@ -15,7 +15,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-8);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 .size {
@@ -32,7 +32,7 @@
 
 /* vertical.tsx: a record side panel. */
 .side {
-  width: min(100%, var(--prime-drawer-width-s));
+  width: min(100%, var(--prime-layout-narrow-width));
 }
 
 /* narrow.tsx: 320 px, the smallest supported viewport. */
