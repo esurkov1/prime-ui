@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -54,6 +55,24 @@ afterAll(() => {
 });
 
 const WAVE = [0.2, 0.6, 0.9, 0.4, 0.7, 0.3];
+
+describe("VoicePlayer keyboard", () => {
+  it("Tab moves disk → slider → rate chip; Enter and Space play and pause from the disk", async () => {
+    const user = userEvent.setup();
+    render(<VoicePlayer src="/voice.ogg" waveform={WAVE} duration={42} />);
+    await user.tab();
+    const disk = screen.getByRole("button", { name: "Воспроизвести голосовое сообщение" });
+    expect(disk).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("group")).toHaveAttribute("data-playing", "true");
+    await user.keyboard(" ");
+    expect(screen.getByRole("group")).not.toHaveAttribute("data-playing");
+    await user.tab();
+    expect(screen.getByRole("slider")).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: /Скорость воспроизведения/ })).toHaveFocus();
+  });
+});
 
 describe("VoicePlayer", () => {
   it("renders a named group with the play button, the slider and the total time", () => {

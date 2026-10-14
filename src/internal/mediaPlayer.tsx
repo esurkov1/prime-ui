@@ -174,7 +174,7 @@ type MediaEvents = {
   onDurationChange: () => void;
 };
 
-export type MediaPlayer = {
+type MediaPlayer = {
   /** Where the playback is: `idle` at the start, `playing`, `paused` past the start. */
   state: PlaybackState;
   /** The position in seconds: exact at rest, the whole second while playing. */

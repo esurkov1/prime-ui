@@ -13,8 +13,6 @@
   "src/components/notification/Notification.module.css: .iconWrap svg",
   "src/components/segmented-control/SegmentedControl.module.css: .icon > :global(svg)",
   "src/components/tabs/Tabs.module.css: .icon svg",
-  "src/components/thumbnail/Thumbnail.module.css: .fallback > svg",
-  "src/components/thumbnail/Thumbnail.module.css: .root[data-full-width=\"true\"] .fallback > svg",
   "src/internal/menu.module.css: .itemIcon > svg",
   "src/layout/bottom-nav/BottomNav.module.css: .icon > svg",
   "src/layout/sidebar/Sidebar.module.css: .icon > :global(svg)"

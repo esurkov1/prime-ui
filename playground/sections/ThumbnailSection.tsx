@@ -36,7 +36,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Без картинки (иконка или короткая подпись на заливке) и картинка с ошибкой, которая сама уходит в подложку.",
+        "Без картинки (иконка или короткая подпись на заливке) и картинка с ошибкой, которая сама уходит в подложку — `Thumbnail.Fallback`, `Thumbnail.Image`.",
     },
     {
       scenario: "ratios",

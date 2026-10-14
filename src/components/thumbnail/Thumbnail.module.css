@@ -122,7 +122,10 @@
   display: none;
 }
 
+/* The icon takes the tier's size through `--prime-icon-size` (the kit's `Icon` reads it). */
 .fallback {
+  --prime-icon-size: var(--thumb-icon);
+
   position: absolute;
   inset: 0;
   z-index: var(--prime-z-base);
@@ -135,16 +138,9 @@
   font-weight: var(--prime-font-weight-medium);
 }
 
-.fallback > svg {
-  flex-shrink: 0;
-  width: var(--thumb-icon);
-  height: var(--thumb-icon);
-}
-
 /* Full-width covers get a larger icon, so it does not look lost on a big tile. */
-.root[data-full-width="true"] .fallback > svg {
-  width: var(--prime-icon-xl);
-  height: var(--prime-icon-xl);
+.root[data-full-width="true"] {
+  --thumb-icon: var(--prime-icon-xl);
 }
 
 /* ─── Video ─────────────────────────────────────────────────────────────── */

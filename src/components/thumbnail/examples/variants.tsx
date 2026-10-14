@@ -1,7 +1,18 @@
 /** The fallback fill: a soft tint or a solid hue, in a color that means something — `variant`, `color`. */
 import { Icon, Thumbnail, Typography } from "prime-ui-kit";
 
-const COLORS = ["gray", "blue", "green", "orange", "red"] as const;
+const COLORS = [
+  "gray",
+  "blue",
+  "green",
+  "orange",
+  "red",
+  "yellow",
+  "purple",
+  "sky",
+  "pink",
+  "teal",
+] as const;
 const VARIANTS = ["soft", "solid"] as const;
 
 export default function ThumbnailVariantsExample() {

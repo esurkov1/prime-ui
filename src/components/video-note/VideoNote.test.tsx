@@ -41,6 +41,35 @@ const badge = (container: HTMLElement, name: string) =>
 
 const circleButton = () => screen.getByRole("button", { name: /видеосообщение|Пауза/ });
 
+describe("VideoNote keyboard", () => {
+  it("Tab reaches the disk; arrows, PageUp / PageDown, Home / End seek from it", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<VideoNote src={SRC} duration={60} />);
+    const video = container.querySelector("video") as HTMLVideoElement;
+    await user.tab();
+    const disk = circleButton();
+    expect(disk).toHaveFocus();
+    fireEvent.keyDown(disk, { key: "ArrowRight" });
+    expect(video.currentTime).toBe(5);
+    fireEvent.keyDown(disk, { key: "ArrowUp" });
+    expect(video.currentTime).toBe(10);
+    fireEvent.keyDown(disk, { key: "ArrowLeft" });
+    expect(video.currentTime).toBe(5);
+    fireEvent.keyDown(disk, { key: "ArrowDown" });
+    expect(video.currentTime).toBe(0);
+    fireEvent.keyDown(disk, { key: "PageUp" });
+    expect(video.currentTime).toBe(6);
+    fireEvent.keyDown(disk, { key: "PageDown" });
+    expect(video.currentTime).toBe(0);
+    fireEvent.keyDown(disk, { key: "End" });
+    expect(video.currentTime).toBe(60);
+    fireEvent.keyDown(disk, { key: "Home" });
+    expect(video.currentTime).toBe(0);
+    // From rest a seek leaves the note paused where it went.
+    expect(disk).toHaveAttribute("data-state", "paused");
+  });
+});
+
 describe("VideoNote", () => {
   it("is a group with the circle's button named by the play label, described by the duration", () => {
     const { container } = render(<VideoNote src={SRC} duration={75} unplayed />);
