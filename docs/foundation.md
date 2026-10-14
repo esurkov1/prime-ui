@@ -11,8 +11,12 @@ The design contract for every component. Tokens live in `tokens/` and are genera
    used only where a separator is truly needed (table rows, list dividers). Controls have no visible
    outline: `--prime-color-border-control` is `transparent` and becomes visible only under
    `prefers-contrast: more`.
-2. **Everything is on the 4px grid.** Spacing, heights, paddings, gaps. The only non-grid values are
-   1px hairlines, 2px focus ring, and a few typographic sizes (13px).
+2. **Everything is on the 4px grid.** Spacing, heights, paddings, gaps. The off-grid values are a
+   closed list, mirrored by the allowlist of `src/styles/tokens.test.ts`: 1px hairlines; the 2px focus
+   ring and the 2px motion blur (`--prime-motion-blur`); the typographic sizes and line heights (13px);
+   the xs and m checkbox (14 · 18); the s and l track (5 · 7); the xs icon (14); the s and l radius
+   (6 · 10); the BottomNav glass blur (`0.875rem`); and the `rem` thresholds of `@container`
+   conditions (§9).
 3. **Proximity.** Inside a group elements sit closer than between groups:
    label → field 4–8 · field → hint 4 · tile → tile 16 · field → field 20 · block → block 24 ·
    group → group 32 · section → section 40–48. Tiles of one screen are one board (one gap on both
@@ -39,7 +43,8 @@ Path → variable: `control.m.labelSize` → `--prime-control-m-label-size` (cam
 
 Components MUST NOT use `--prime-ref-*`, raw hex/rgb, or raw `px/rem` values. Allowed literals:
 `0`, `1px` hairline via `--prime-border-width`, `100%`, `auto`, unitless flex/grid numbers,
-percentages for geometry (`50%` for circles), and `calc()` over tokens.
+percentages for geometry (`50%` for circles), `calc()` over tokens, and `rem` thresholds in
+`@container` conditions (custom properties cannot be used there; §9).
 A component may define private custom properties (`--btn-h`) that are assigned from tokens.
 
 ## 3. Color roles
@@ -62,6 +67,22 @@ A component may define private custom properties (`--btn-h`) that are assigned f
 Light and dark are full themes, not inversions: the surface ladder rises from a near-black page in
 dark (§4), and accent/status move to lighter steps. All text pairs pass WCAG AA (≥ 4.5:1), focus
 ring ≥ 3:1 — including `text.muted` on every layer and on every control fill of it.
+
+### Chart palette
+
+Categories wear the chart colors; statuses wear the tones (`danger`, `success`…).
+
+| Token | Use |
+|---|---|
+| `color.chart.1` … `8` | categorical series in one fixed order: blue, orange, teal, yellow, pink, green, purple, red. Assign in order, never cycle; a ninth series folds into `other` |
+| `color.chart.other` | the «Прочее» share |
+| `color.chart.grid` / `axis` | gridlines / the axis line and ticks (axis labels wear text tokens) |
+| `color.chart.scale.1` … `5`, `scaleFg` | sequential magnitude (heatmap cells) in one hue from near the ground to full; `scaleFg` is the text on steps 4–5 |
+
+Every series step keeps ≥ 3:1 against every layer ground (layers 0–4 and the floating layers) in both
+themes; `src/theme/chartColors.test.ts` checks it. Palette hues (`color` props) map onto the same steps
+through `--hue-chart` (`src/internal/palette.module.css`), so a category keeps its color in a chart and
+in a ProgressBar share.
 
 ## 4. Surfaces: the ladder and the depth context
 
@@ -192,13 +213,22 @@ cards `--prime-card-radius` (12); floating panels `--prime-panel-radius` (12) wi
 
 Elevation: `--prime-shadow-raised` (a card on the page, barely there; `--prime-layer-shadow`) · `--prime-shadow-overlay` (menus, popovers,
 tooltips, datepicker) · `--prime-shadow-modal` (modal, drawer, sheet).
-Z-index: `--prime-z-*` only. Every overlay shares `--prime-z-overlay` and portals to `<body>` when it
-opens, so the open order is the stacking order; toasts sit above on `--prime-z-toast`.
+Z-index: `--prime-z-*` only, never a number. Two groups:
+- Page level: a sticky surface (AppHeader, a DataTable head, the Gantt head) on `--prime-z-sticky`;
+  every overlay shares `--prime-z-overlay` and portals to `<body>` when it opens, so the open order is
+  the stacking order; toasts sit above on `--prime-z-toast`.
+- Local steps, for stacking parts inside one component that makes its own stacking context:
+  `--prime-z-below` · `--prime-z-base` · `--prime-z-raised` · `--prime-z-above` · `--prime-z-top`
+  (a folder tab over its strip, a thumb over its track, a badge over an avatar, controls over media).
+  They never compete with the page-level group.
 
 Focus ring must never be clipped (hard rule):
 - Fields (Input, Textarea, Select/TagSelect/Datepicker triggers, DigitInput cells, ColorPicker channels, search fields in panels)
   draw the ring INSIDE their edge: `outline: var(--prime-focus-width) solid var(--prime-color-focus-ring); outline-offset: var(--prime-focus-offset-inset);`.
-- Everything else (buttons, links, tabs, chips, checkboxes, menu items use background instead) uses the outer ring with `--prime-focus-offset`.
+- Switcher items draw the ring inside too, because their track or strip clips: a Tabs tab draws it
+  inset in the folder's own shape (an inset `box-shadow` on the tab's shape layer), a SegmentedControl
+  item uses `--prime-focus-offset-inset`. The tab panel keeps the outer ring.
+- Everything else (buttons, links, chips, checkboxes, menu items use background instead) uses the outer ring with `--prime-focus-offset`.
 - Every element with `overflow: auto | hidden | scroll | clip` that holds focusable content does exactly one of:
   (a) padded content — keeps at least `--prime-focus-space` between its edge and the content (Modal/Drawer/Sheet body, panels, tab lists);
   (b) full-bleed content — content touches the edges and is clipped by the container's radius; every focusable inside
@@ -237,15 +267,19 @@ Motion tokens:
 | `--prime-motion-stagger` | 80 ms | step of a staggered first render |
 | `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | `:active` scale; compact for icon-only and small targets |
 | `--prime-motion-loop` | 570 ms | period unit of a loading loop (Spinner: one turn in 3 units, 6 under reduced motion) |
+| `--prime-motion-blur` | 2px | hides a change of shape while two states swap in place (icon → check, letters) |
 
-Under `prefers-reduced-motion` durations and stagger collapse to 0 and press scales to 1 (globals.css);
-JS animations must also check it. A loading loop is information, not decoration: it reads
-`--prime-motion-loop`, which reduced motion does not zero, and only slows down.
+Under `prefers-reduced-motion` `globals.css` zeroes the movement clocks — `xfast`, `fast`, `base`,
+`slow`, `stagger` and the message-morph duration — and sets both press scales to 1; JS animations
+must also check it. Two kinds of motion are information and keep a clock that reduced motion does not
+zero: opacity and color feedback (a fade, a fill or color change of state) reads a separate group of
+feedback durations, so a state still eases in instead of flipping; a loading loop reads
+`--prime-motion-loop` and only slows down.
 Every component is designed with its micro-animations, not only its static states. Rules (after Emil Kowalski):
 
 1. **Ask first: should it move at all?** By frequency: keyboard-driven or 100+/day actions (option highlight
    while arrowing, row hover, menu navigation, command palette) get no movement — color/fill change only,
-   at most `fast`. Tens/day (hover, tabs, toggles): small and quick. Occasional (modals, drawers, toasts):
+   at most `xfast`. Tens/day (hover, tabs, toggles): small and quick. Occasional (modals, drawers, toasts):
    standard overlay motion. Rare (empty states, success, onboarding): may carry delight.
 2. **Every motion has a purpose:** feedback (press), state change (check, toggle, selection moving),
    spatial continuity (a panel grows out of its trigger, an indicator slides between tabs), or preventing a
@@ -257,8 +291,14 @@ Every component is designed with its micro-animations, not only its static state
    target: no bounce, no springs past the end value.
    Never `ease-in` for UI. Exit is never slower than enter.
 5. **Animate `transform` and `opacity`** (plus color/fill/shadow for state). Not `width`, `height`, `margin`,
-   `padding`, `top/left`. Where size must animate (accordion, progress), prefer `transform` / `scale` /
-   `grid-template-rows`; never `transition: all` — list the properties.
+   `padding`, `top/left`; never `transition: all` — list the properties. Where size must animate, prefer
+   `transform` / `scale` (progress fills). The exceptions are a closed list, each with one engine,
+   and `src/styles/motion-perf.test.ts` allows nothing else:
+   - **height glide** — a region that swaps its content glides to the new height (`Crossfade`, the
+     Notification stack);
+   - **row fold** — a part that folds open or closed animates `grid-template-rows` 0fr ↔ 1fr
+     (`Disclosure`: Accordion, DataTable expanded rows);
+   - **text width** — a label that morphs into another text glides its `width` (`MorphText`).
 6. **Press.** Every pressable control: `:active` → `scale(var(--prime-motion-press-scale))`
    (`-compact` for icon-only and small targets), over `fast`, `transform` only. Release returns by the same transition. Disabled and loading never scale.
 7. **Never from nothing.** Entrances start from `opacity: 0` + a small offset (`--prime-space-1/2`) or
@@ -273,12 +313,15 @@ Every component is designed with its micro-animations, not only its static state
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
    for one-shot enter/exit (overlay presence, spinner, skeleton) and one-shot gestures (icons, rule 13;
    a field's error shake, rule 14).
-10. **Hover is for pointers.** Hover transforms/lifts only inside `@media (hover: hover) and (pointer: fine)`;
-    plain color hover is fine. No hover movement on dense rows and cells, except the icon gesture (rule 13).
+10. **Hover is for pointers.** Every `:hover` rule, a color or fill change included, sits inside
+    `@media (hover: hover)`; a hover transform or lift also needs `(pointer: fine)`:
+    `@media (hover: hover) and (pointer: fine)`. `src/styles/touch.test.ts` enforces both. No hover
+    movement on dense rows and cells, except the icon gesture (rule 13).
 11. **Lists.** Items entering/leaving fade + shift; stagger only for first-render of short groups
     (`--prime-motion-stagger` steps, ≤ 6 items) and never blocks interaction.
 12. **Reduced motion** is already global through the tokens. Anything not tokenized (JS, `animation-delay`) must
-    be gated by `prefers-reduced-motion`. Movement may go; opacity/color feedback should stay.
+    be gated by `prefers-reduced-motion`. Movement goes; opacity and color feedback stays, on the
+    feedback durations that reduced motion does not zero (see the token notes above).
 13. **Icon gestures.** Every kit glyph carries one small gesture about its meaning (an arrow steps its way,
     a gear turns, a bell swings, a check draws) from one vocabulary (`src/icons/glyphMotion.module.css`). It
     plays once, to completion, when a pointer enters the icon's host (button, link, tab, label) or a finger
@@ -333,15 +376,21 @@ neighbour must be three different colors.
 
 ### Overlay contract
 
-Every floating layer — Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer, Popover (and Datepicker /
-ColorPicker popovers built on it), Dropdown, Select panel, TagSelect panel, Tooltip — behaves the same way, so "click empty space closes what is open"
-holds across the kit.
+Every layer on the layer stack — Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer, Popover,
+Dropdown, the Select, TagSelect, Datepicker and ColorPresets panels, the Sidebar off-canvas and the
+reaction picker of `Message.Reactions` — behaves the same way, so "click empty space closes what is
+open" holds across the kit. Tooltip and Notification are the two layers outside this contract (below).
 
 - **Dismiss.** A layer closes on (a) a pointerdown outside the layer and its trigger — for Modal / Drawer /
-  Sheet / CommandMenu / MediaViewer that is the scrim — and (b) Escape. Tooltip closes on pointer-leave / blur / Escape.
-  Opt out with `closeOnOutsideClick={false}` (ConfirmDialog turns it off itself); the layer still blocks the
-  layers below it. A form inside a Modal / Drawer / Sheet holds closing with `X.Guard` (`busy` while it saves,
-  `dirty` to ask before unsaved changes are lost).
+  Sheet / CommandMenu / MediaViewer / the Sidebar off-canvas that is the scrim — and (b) Escape. Every
+  layer of the set takes `closeOnOutsideClick` and `closeOnEscape` (both default `true`, §10); the
+  stack hooks (`useFloatingLayer`, `useModalLayer`) take both as required options, so no layer can
+  skip them. ConfirmDialog takes both with `closeOnOutsideClick` default `false`. With outside click
+  off, the layer still blocks the layers below it. A form inside a Modal / Drawer / Sheet holds
+  closing with `X.Guard` (`busy` while it saves, `dirty` to ask before unsaved changes are lost).
+- **Exempt.** Tooltip closes on pointer-leave / blur / Escape and takes neither prop (Escape cannot be
+  turned off, WCAG 1.4.13). Notification is a non-modal live region outside the stack and takes
+  neither.
 - **Topmost only.** Open layers form one stack (`src/internal/overlay/layerStack.ts`).
   Only the topmost layer reacts: one click or one Escape closes one layer. A click inside a nested child layer
   (a Select open inside a Modal, a manage Popover inside a TagSelect panel) never closes the parent, even though
@@ -394,9 +443,19 @@ Components carry no motion code of their own for these layers.
   `overflow-wrap: anywhere` (multi-line). Truncated text gets a `title` or Tooltip when it matters.
 - Every screen works from 320 to 2560px and at 400% zoom without losing a function: narrow first,
   break by content, rearrange instead of hiding, fluid by default.
-- Composite components adapt with container queries (`container-type: inline-size`) where their own
-  width matters (Card, PageToolbar, DataTable toolbar, Modal footer, Datepicker months), media queries
-  only for the app shell and the overlay form (bottom sheets below 640).
+- Components adapt with container queries (`container-type: inline-size`) where their own width
+  matters (Card, PageToolbar, DataTable toolbar, Modal footer, Datepicker months, Tabs, Stepper,
+  ChatList, FieldList, the field frame). Container thresholds are written in `rem`
+  (`@container (max-width: 30rem)`) — the one place a raw length is allowed (§2).
+- Viewport width queries (`@media (max-width | min-width)`) are allowed for exactly four things:
+  - the app shell (AppShell, AppHeader);
+  - the overlay form below 640: Modal and its dialog parts, Drawer, Popover actions, Datepicker
+    months, the Notification zone, `overlayMotion`;
+  - touch text: editable field text at 16px under `(pointer: coarse), (max-width: 639px)`
+    (`src/internal/fieldTier.module.css`, and the ColorPicker and Datepicker inputs);
+  - menu rows at the touch height (`src/internal/menu.module.css`).
+  Input queries (`hover`, `pointer`) and preference queries (`prefers-*`) are not width queries and
+  go wherever input decides interaction. The one height query is the sticky stop below.
 - Breakpoints (for media queries; CSS vars cannot be used there): 640 · 768 · 1024 · 1280; "below a
   breakpoint" is `max-width: <bp − 1>px`.
 - Input decides interaction, not width: `:hover` styles only inside `@media (hover: hover)`; whatever
@@ -404,18 +463,32 @@ Components carry no motion code of their own for these layers.
   controls get a 44px hit area (`--prime-control-touch-target`, `src/internal/touchTarget`) and menu
   rows are at least 44px; editable field text is at least 16px under `(pointer: coarse), (max-width:
   639px)` (`--prime-control-touch-text-size`) so iOS never zooms.
-- Switchers never wrap: they scroll inside themselves, stretched items tend to equal width and never
-  shrink below their label, the selection indicator moves only after a person's choice.
+- Switchers — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — all scroll through
+  one scroller (`src/internal/SwitcherScroller`). They never wrap: they scroll inside themselves,
+  stretched items tend to equal width and never shrink below their label, the selection indicator
+  moves only after a person's choice. Host duty: a switcher's host gives it a bounded width — a flex
+  or grid child that holds a switcher sets `min-width: 0` (the PageToolbar View slot does), otherwise
+  the switcher grows the row instead of scrolling.
 - Scroll overflow is always visible: a cut-off item, an edge fade or an edge shadow (`useEdgeOverflow`).
-- Sticky headers stop sticking on screens lower than 480px; overlays respect safe-area insets.
-- The page panel is `PageToolbar`: one row from a 56rem container, exactly two rows below it, the
-  primary action always at the end of the top row.
+- Sticky headers (AppHeader, the DataTable head, the Gantt head) stop sticking on screens lower than
+  480px: `@media (max-height: 479px)`, the one height query, lives in `src/internal/sticky`. Overlays
+  respect safe-area insets.
+- The page panel is `PageToolbar`, the page's tools row in `AppHeader.Tools`. Its rows follow the
+  row model in `src/components/page-toolbar/COMPONENT.md` (Layout by width): one row from a 56rem
+  container; below it Tools + Actions, then Chips, then Sections and View on full rows; on a phone,
+  when the Tools would get less than 18rem beside the Actions, the Actions take their own row under
+  them. The primary action is always at the end of the top row it shares with the Tools.
 - Field affixes (units like `%`, `°`, `₽`, prefixes like `https://`) are flex items in the field row next to the value,
   separated by the tier `gap`; never absolutely positioned, never sized with a fixed width. A numeric value with a unit
   is one group: value (tabular-nums) + unit, aligned the same way in every field of a row. Field widths come from the
   layout (grid columns / flex), not from per-field fixed widths, so nothing clips at any size tier.
-- Modal footer: actions right-aligned with `gap: 8`; on phones (below 640) and in a dialog narrower than
-  360px they stack full width, primary last.
+- Dialog footer (`X.Footer` of Modal, Drawer, Sheet) has two layouts:
+  - `fill` — equal-width actions across the footer, gap `--prime-space-3`; the default for Modal
+    `xs`–`m`;
+  - `end` — actions at the end edge, gap `--prime-space-2`; the default for Modal `l`–`xl`, Drawer
+    and Sheet.
+  On phones (below 640) and in a dialog narrower than 360px (a container query) both stack full
+  width with gap `--prime-space-2`, primary last.
 - Overlays near the viewport edge flip/shift, keep `--prime-space-2` from the edge.
 
 ## 10. API contract (v1)
@@ -424,22 +497,24 @@ No backward compatibility, no aliases, no `@deprecated` props, no legacy types. 
 
 | Concept | API | Notes |
 |---|---|---|
-| Size | `size?: "xs" \| "s" \| "m" \| "l" \| "xl"`, default `"m"` | Type `ControlSize` from `src/internal/states.ts`. Overlays that size by width (Modal, Drawer) use the subset they need. Avatar adds `"2xl"`. |
-| Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Button also takes `shade` — the media shade with a blur, for a button over media (a picture, a video, a video circle). Component-specific structural variants (FileUpload `dashed \| solid`, Card templates, Kanban `well \| plain`, Sparkline `area \| line \| bars`, Thumbnail `soft \| solid`, CodeBlock `soft \| ghost`). Tabs has no variant: navigation tabs are always a folder (horizontal) or pills (vertical); choosing a value is SegmentedControl are allowed and documented. |
-| Semantic color | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | Components use the subset that makes sense (Button: `accent \| neutral \| success \| danger`, default `accent`). Destructive = `danger`, never `error`. Button also takes `inherit` (with `ghost \| soft \| outline`) for an action on a colored host: color, fills and focus ring derive from the host's `currentColor`; a host never recolors a Button with a CSS override. |
-| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, Thumbnail, Icon (a category hue from data; takes the place of `tone`), and the parts that host a palette hue: `SegmentedControl.Item` (dot + tinted thumb), count badges (`Tabs.Count`, `SegmentedControl.Count`, `Sidebar.ItemCount`, `BottomNav.ItemCount`), `FileUpload.FormatBadge`, `Timeline.Item` (dot), `Message.Author` / `Message.Reply` (the author's hue, `hueOf(id)`), a contact's avatar in a message, Gantt bars, Kanban columns, ChartFrame series, TagSelect options (tag hue), ProgressBar / ProgressCircle segments (a category share in its chart color, `--hue-chart`; takes the place of `tone`). |
+| Size | `size?: "xs" \| "s" \| "m" \| "l" \| "xl"`, default `"m"` | Type `ControlSize` from `src/internal/states.ts`. `size` lives on the root; the one exception is an overlay's `Content`, which takes `size` for its width: Popover, Dropdown, Tooltip, CommandMenu and Modal take the full `ControlSize`, Drawer drops `"xs"`. The width is the Content's own — Dropdown Content does not inherit the trigger's size. Avatar adds `"2xl"`. |
+| Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Button also takes `shade` — the media shade with a blur, for a button over media (a picture, a video, a video circle). Component-specific structural variants (FileUpload `dashed \| solid`, Card templates, Kanban `plain \| line \| well`, Sparkline `area \| line \| bars`, Thumbnail `soft \| solid`, CodeBlock `soft \| ghost`) are allowed and documented. Tabs has no variant: navigation tabs are always a folder, in both orientations; choosing a value is SegmentedControl. |
+| Semantic color | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | Components use the subset that makes sense (Button: `accent \| neutral \| success \| danger`, default `accent`). Destructive = `danger`, never `error`. Button also takes `inherit` (with `ghost \| soft \| outline`) for an action on a colored host: color, fills and focus ring derive from the host's `currentColor`; a host never recolors a Button with a CSS override. LinkButton takes `accent \| neutral \| muted` — `muted` is the quiet link of a trail (muted text, primary on hover, no underline) — and the `inline` flag for a link inside running text. Badge takes a status `tone`: `neutral \| success \| warning \| danger \| info`. |
+| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, Thumbnail, Icon (a category hue from data), and the parts that host a palette hue: `SegmentedControl.Item` (dot + tinted thumb), count badges (`Tabs.Count`, `SegmentedControl.Count`, `Sidebar.ItemCount`, `BottomNav.ItemCount`), `FileUpload.FormatBadge`, `Timeline.Item` (dot), `Message.Author` / `Message.Reply` (the author's hue, `hueOf(id)`), a contact's avatar in a message, Gantt bars, Kanban columns, ChartFrame series, TagSelect options (tag hue), ProgressBar / ProgressCircle segments (a category share in its chart color, `--hue-chart`). Where a component takes both `tone` and `color` (Badge, ProgressBar / ProgressCircle segments), they are mutually exclusive: a status or a category, never both. |
 | Validation | `invalid?: boolean`; fields with a support row also take `hint?: ReactNode` and `error?: ReactNode` | A non-empty `error` implies `invalid`. Sets `aria-invalid`, `data-invalid`. |
-| Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, `Radio.Group`, DigitInput, Pagination, ColorPicker, ColorField, ColorSwatches, Kanban, SmartFilter, Composer. Native text inputs (Input, Textarea) keep native `value`/`onChange` and add `onValueChange(string)`. |
-| Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch, a selectable Thumbnail. |
-| Other state | `x` / `defaultX` / `onXChange(x)` | The same triad for every other stateful aspect: DataTable `sort`, `page`, `selected`, `expanded`, `hiddenColumns`; `search` of Select, CommandMenu, SmartFilter, Chat; MediaViewer and Gallery `index`; ChartFrame `hiddenSeries`; Gantt `scale`; Kanban `columnOrder`. The new value is always the first argument. |
+| Value | `value` / `defaultValue` / `onValueChange(value)` | Select, NativeSelect, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Stepper, `Radio.Group`, DigitInput, Pagination, ColorPicker, ColorPresets, ColorField, ColorSwatches, FileUpload, FieldList, Kanban, SmartFilter, Composer, ChatList, `Chat.Pinned`. Native text inputs (Input, Textarea) keep native `value`/`onChange` and add `onValueChange(string)`. |
+| Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch, a selectable Thumbnail, Dropdown checkbox items. |
+| Pressed | `pressed` / `defaultPressed` / `onPressedChange(pressed)` | A toggle button: Button.Root and Badge.Root. Sets `aria-pressed` and `data-pressed`; the on state takes the selected look. A pressable badge has no separate press callback. |
+| Other state | `x` / `defaultX` / `onXChange(x)` | The same triad for every other stateful aspect: DataTable `sort`, `page`, `selected`, `expanded`, `hiddenColumns`, `collapsedGroups`; `search` of Select, CommandMenu, SmartFilter, Chat, ChatList; Chat `selected`; MediaViewer and Gallery `index`; ChartFrame `hiddenSeries`; Gantt `scale`; Kanban `columnOrder`; Sidebar `mode`; VoicePlayer `rate`; ExampleFrame `colorScheme` and `viewport`; Composer `recordMode`. The new value is always the first argument. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure. |
-| Dismiss | `closeOnOutsideClick?: boolean` (default `true`), `closeOnEscape?: boolean` (default `true`) | One name everywhere: Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer, Popover, Dropdown. ConfirmDialog turns outside click off itself; a form holds closing with `X.Guard`. No `closeOnOverlayClick`. See §8 Overlay contract. |
+| Dismiss | `closeOnOutsideClick?: boolean` (default `true`), `closeOnEscape?: boolean` (default `true`) | One name on every layer-stack overlay: Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer, Popover, Dropdown, Select, TagSelect, Datepicker, ColorPresets, the Sidebar off-canvas, `Message.Reactions`. ConfirmDialog takes both with `closeOnOutsideClick` default `false`; a form holds closing with `X.Guard`. Tooltip and Notification take neither. No `closeOnOverlayClick`. See §8 Overlay contract. |
 | Flags | `disabled`, `readOnly`, `required`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing?: boolean`, default `true` | Fields only. `false` hides the visual ring (`data-focus-ring="false"`), never focus or the error ring; see §7. |
 | Built-in strings | `labels?: Partial<XLabels>` | Every system string (aria labels, default texts, counters) lives in one `labels` object with Russian defaults. Visible content goes through children/slots, not labels. |
 | Structure | Compound `X.Root` + `X.Part` when a component has parts; a single export for leaf components without parts. | |
 | DOM state | `data-size`, `data-variant`, `data-tone`, `data-color`, `data-invalid`, `data-disabled`, `data-loading`, `data-state` (`open \| closed \| checked \| unchecked \| indeterminate \| active \| inactive`) | CSS styles only from these and ARIA. |
 
-Forms: `label`, `hint`, `error`, `required`, `optional` work the same in every field.
+Forms: `label`, `hint`, `error`, `required`, `optional` work the same in every field, in `Radio.Group`
+and in a Checkbox / Switch row (the shared `src/internal/ChoiceField`).
 Required = red `*` after the label text (`aria-hidden`) + native `required`. Optional = muted
 «необязательно» right after the label text (from `labels.optional`). Placeholder never replaces the label.
