@@ -161,10 +161,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .face,
-  .tile > .action {
-    transition: none;
-  }
-}

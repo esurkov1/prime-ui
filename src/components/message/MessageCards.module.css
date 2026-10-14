@@ -68,7 +68,6 @@ a.mapFrame:focus-visible {
 @keyframes livePulse {
   from {
     opacity: 0.5;
-    transform: scale(1);
   }
 
   to {

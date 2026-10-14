@@ -113,12 +113,7 @@ export function MessageAvatar({ className, ...rest }: MessageAvatarProps) {
 MessageAvatar.displayName = "Message.Avatar";
 
 export type MessageAuthorProps = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
-  /**
-   * The author's hue: one per person in a group chat. Default: a hue stable per name
-   * (`hueOf(name)`); pass `hueOf(user.id)` to keep it per person.
-   */
   color?: PaletteColor;
-  /** The member's own title in this chat, muted after the name («Админ», «Бухгалтерия»). */
   tag?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -183,12 +178,7 @@ MessageAuthorIcon.displayName = "Message.AuthorIcon";
 // ─── Text ─────────────────────────────────────────────────────────────────────
 
 export type MessageTextProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /**
-   * The text. A string renders its Markdown subset (**bold**, _italic_, ~~strike~~, `code`,
-   * ``` blocks, [links](url), bare URLs, `> ` quotes) as elements, never as HTML.
-   */
   children: React.ReactNode;
-  /** Render a string as is, without its Markdown. Default `false`. */
   plain?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -257,19 +247,9 @@ export type MessageReplyLabels = {
 export const MESSAGE_REPLY_LABELS: MessageReplyLabels = { reply: "Ответ на сообщение" };
 
 export type MessageReplyProps = Omit<React.HTMLAttributes<HTMLElement>, "color" | "onClick"> & {
-  /** Who wrote the quoted message. */
   author: React.ReactNode;
-  /** The author's hue (the same as their `Message.Author`). Default `blue`. */
   color?: PaletteColor;
-  /**
-   * The `value` of the quoted message: a press brings it into view in the group and flashes it,
-   * moving the focus to it. Makes the quote a button.
-   */
   target?: string;
-  /**
-   * A press on the quote (after `target` is shown): load the original when it is not in the list
-   * yet. Makes the quote a button.
-   */
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   labels?: Partial<MessageReplyLabels>;
   ref?: React.Ref<HTMLElement>;
@@ -335,7 +315,6 @@ export const MESSAGE_FORWARDED_LABELS: MessageForwardedLabels = {
 };
 
 export type MessageForwardedProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** Who wrote the original message. */
   from: string;
   labels?: Partial<MessageForwardedLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -674,7 +653,6 @@ function ReactionChip({ reaction, labels, pending, toggle }: ReactionChipProps) 
 }
 
 export type MessageReactionsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** The reactions to the message; a press on a chip calls `Message.Root onReactionToggle`. */
   items: readonly MessageReaction[];
   closeOnOutsideClick?: boolean;
   closeOnEscape?: boolean;

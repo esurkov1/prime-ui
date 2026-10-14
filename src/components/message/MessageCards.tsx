@@ -28,15 +28,10 @@ export const MESSAGE_LOCATION_LABELS: MessageLocationLabels = {
 };
 
 export type MessageLocationProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** A map picture of the place (your static map service: the kit ships no map). */
   src: string;
-  /** Opens the place in a map (a new tab). */
   href?: string;
-  /** The place («Склад на Складочной»). */
   title?: string;
-  /** Its address. */
   address?: string;
-  /** A location shared live: a pulsing pin and a «Трансляция» mark. */
   live?: boolean;
   labels?: Partial<MessageLocationLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -115,9 +110,7 @@ defineMessagePart(MessageLocation, { shell: "fill", meta: "inline", bleed: true,
 export type MessageContactProps = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
   name: string;
   phone?: string;
-  /** The person's photo; without it the initials. */
   src?: string;
-  /** Hue of the initials. Default `blue`. */
   color?: PaletteColor;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
@@ -178,11 +171,9 @@ defineMessagePart(MessageContact, { shell: "fill", meta: "inline", sized: true }
 
 export type MessageLinkPreviewProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
   href: string;
-  /** The site's name, in the accent color. */
   site?: string;
   title?: string;
   description?: string;
-  /** The page's picture, full width under the text (16 : 9, its box final before it loads). */
   image?: string;
   ref?: React.Ref<HTMLAnchorElement>;
 };

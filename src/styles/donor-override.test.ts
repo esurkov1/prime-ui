@@ -29,6 +29,8 @@ const PUBLIC_HOOKS = [
   /^--hairline-inset$/,
   /^--floating-width$/,
   /^--scroll-fade-depth$/,
+  // Avatar's ground on a host that is not a layer of the ladder (Avatar COMPONENT.md).
+  /^--avatar-ring$/,
 ];
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);

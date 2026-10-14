@@ -127,11 +127,7 @@ function Meta({ time, dateTime, edited, status, labels, reserve, className }: Me
   return (
     <span className={cx(styles.meta, className)} data-message-meta={reserve ? undefined : ""}>
       {edited ? <span className={styles.edited}>{labels.edited}</span> : null}
-      {time ? (
-        <time className={styles.time} dateTime={reserve ? undefined : dateTime}>
-          {time}
-        </time>
-      ) : null}
+      {time ? <time dateTime={reserve ? undefined : dateTime}>{time}</time> : null}
       {status && reserve ? (
         // The spacer holds the box only (a fixed size): no glyphs to build per message.
         <span className={styles.status} />
@@ -397,33 +393,14 @@ const ACTIONS_ESTIMATE = 40;
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type MessageRootProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> & {
-  /** The id of the message: selection, `onNewMessage`, `onRead`, `jumpTo`, `Message.Reply target`. */
   value?: string;
-  /** `incoming` on the start side on a surface fill, `outgoing` on the end side in the accent hue. */
   direction?: MessageDirection;
-  /**
-   * The place in a run of one author's messages (`Chat.Messages items` sets it): sets the small gap inside a
-   * run and the tail on its last bubble. Default `single`.
-   */
   position?: MessagePosition;
-  /** When it was sent: a `Date` (shown with `formatTime`) or the text to show. */
   time?: Date | string;
-  /** Display of a `Date` time. Default «09:05». */
   formatTime?: (date: Date) => string;
-  /** The text was edited: «изменено» before the time. */
   edited?: boolean;
-  /** Delivery of an outgoing message: clock → ✓ → ✓✓, or failed with a retry. */
   status?: MessageStatus;
-  /**
-   * Sends a failed message again (the retry button beside it). A returned promise shows `sending`
-   * until it settles; a rejection leaves it failed.
-   */
   onRetry?: AsyncHandler;
-  /**
-   * The reader puts or takes back a reaction: a chip of `Message.Reactions`, a double tap (the
-   * chat's quick reaction), `L`, or the reaction bar. A returned promise keeps the chip pending until it
-   * settles; update the reactions when it resolves. Without it reactions are read-only.
-   */
   onReactionToggle?: AsyncHandler<[emoji: string], unknown>;
   labels?: Partial<MessageLabels>;
   ref?: React.Ref<HTMLElement>;

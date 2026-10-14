@@ -556,6 +556,10 @@ describe("Message", () => {
     expect(article).toHaveFocus();
     await userEvent.keyboard("{Shift>}{F10}{/Shift}");
     expect(await screen.findByRole("menuitem", { name: "Ответить" })).toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    expect(article).toHaveFocus();
+    await userEvent.keyboard("{ContextMenu}");
+    expect(await screen.findByRole("menuitem", { name: "Ответить" })).toBeInTheDocument();
   });
 
   it("puts an inline keyboard under the bubble: rows in order, Tab reaches each button, no tail", async () => {

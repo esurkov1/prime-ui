@@ -60,6 +60,6 @@
   }
   30% {
     opacity: 1;
-    transform: translateY(calc(-1 * var(--prime-space-1)));
+    transform: translateY(calc(var(--prime-space-1) * -1));
   }
 }
