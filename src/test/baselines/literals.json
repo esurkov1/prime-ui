@@ -49,6 +49,5 @@
   "src/layout/sidebar/Sidebar.module.css: raw duration in transition #4",
   "src/layout/sidebar/Sidebar.module.css: raw length in --sb-notch",
   "src/layout/sidebar/Sidebar.module.css: raw length in --sb-notch #2",
-  "src/layout/sidebar/Sidebar.module.css: raw length in --sb-width",
-  "src/styles/controls.css: raw duration in transition"
+  "src/layout/sidebar/Sidebar.module.css: raw length in --sb-width"
 ]

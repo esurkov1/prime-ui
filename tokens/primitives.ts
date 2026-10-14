@@ -229,6 +229,7 @@ export const primitiveTokens = {
     380: "380ms",
     570: "570ms",
     1200: "1200ms",
+    never: "600000s",
   },
   easing: {
     /**

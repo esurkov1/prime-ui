@@ -95,6 +95,7 @@
   --prime-ref-duration-380: 380ms;
   --prime-ref-duration-570: 570ms;
   --prime-ref-duration-80: 80ms;
+  --prime-ref-duration-never: 600000s;
   --prime-ref-easing-emphasized: cubic-bezier(0.32, 0.72, 0, 1);
   --prime-ref-easing-enter: cubic-bezier(0, 0, 0, 1);
   --prime-ref-easing-exit: cubic-bezier(0.23, 1, 0.32, 1);

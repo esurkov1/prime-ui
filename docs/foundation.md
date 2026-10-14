@@ -300,6 +300,7 @@ Motion tokens:
 | `--prime-motion-fade-slow` | 570 ms | opacity and color feedback of drawers, sheets |
 | `--prime-motion-hold-confirm` | 1200 ms | length of a hold-to-confirm press (Button `holdToConfirm`); a gesture time, not motion |
 | `--prime-motion-instant` | 0 ms | a stopped clock: the value of the zeroed clocks |
+| `--prime-motion-never` | 600000 s | a clock that never runs out in a session: the browser's autofill paint of a field is pushed out of reach; never zeroed |
 | `--prime-motion-scale-mark` | 0.6 | start of a glyph or a dot drawn in place (a check, a swapped icon, a radio dot) |
 | `--prime-motion-scale-pop` | 0.8 | start of a small part that pops in (a reaction, a button that appears in a row) |
 | `--prime-motion-scale-settle` | 0.9 | start of a tile part or a disk that settles into place |
