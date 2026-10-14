@@ -13,11 +13,8 @@
   "src/components/message/MessageReactionBar.module.css: .bar flips transform #2",
   "src/components/native-select/NativeSelect.module.css: .placeholder flips color",
   "src/components/scroll-container/ScrollContainer.module.css: .root flips background-color",
-  "src/components/segmented-control/SegmentedControl.module.css: .root flips box-shadow",
   "src/components/select/Select.module.css: .item flips background",
   "src/components/select/Select.module.css: .item flips background #2",
-  "src/components/tabs/Tabs.module.css: .item flips opacity",
-  "src/components/tabs/Tabs.module.css: .item flips opacity #2",
   "src/components/tag-select/TagSelect.module.css: .colorRow flips background",
   "src/internal/ChoiceField.module.css: .field flips background",
   "src/internal/ChoiceField.module.css: .field flips background #2",
@@ -25,6 +22,5 @@
   "src/internal/FieldFrame.module.css: .supportText flips color",
   "src/internal/richText.module.css: .spoiler flips background-color",
   "src/internal/richText.module.css: .spoiler flips background-color #2",
-  "src/internal/richText.module.css: .spoiler flips color",
-  "src/layout/sidebar/Sidebar.module.css: .headerToggle flips color"
+  "src/internal/richText.module.css: .spoiler flips color"
 ]

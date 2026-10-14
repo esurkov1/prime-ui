@@ -24,20 +24,7 @@
   "src/components/message/MessageReactionBar.module.css: * 1 factor in transform",
   "src/components/message/MessageTyping.module.css: * 1 factor in transform",
   "src/components/notification/Notification.module.css: * 1 factor in --ntf-edge-shift",
-  "src/components/segmented-control/SegmentedControl.module.css: * 1 factor in margin-block",
   "src/components/select/Select.module.css: * 1 factor in margin",
   "src/components/select/Select.module.css: * 1 factor in margin #2",
-  "src/components/tabs/Tabs.module.css: * 1 factor in margin-inline",
-  "src/internal/sticky.module.css: * 1 factor in --sticky-bleed",
-  "src/layout/bottom-nav/BottomNav.module.css: * 1 factor in inset-block-start",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path #2",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path #3",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in inset-block-start",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in inset-block-start #2",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in margin-inline",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #2",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #3",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #4"
+  "src/internal/sticky.module.css: * 1 factor in --sticky-bleed"
 ]

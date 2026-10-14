@@ -90,6 +90,5 @@
   "src/internal/swatch.module.css: sets --swatch-gap, private to src/components/color-picker/ColorPresets.module.css #2",
   "src/internal/swatch.module.css: sets --swatch-gap, private to src/components/color-picker/ColorPresets.module.css #3",
   "src/internal/swatch.module.css: sets --swatch-gap, private to src/components/color-picker/ColorPresets.module.css #4",
-  "src/internal/swatch.module.css: sets --swatch-gap, private to src/components/color-picker/ColorPresets.module.css #5",
-  "src/layout/sidebar/Sidebar.module.css: sets --avatar-slot-size, private to src/components/avatar/Avatar.module.css"
+  "src/internal/swatch.module.css: sets --swatch-gap, private to src/components/color-picker/ColorPresets.module.css #5"
 ]

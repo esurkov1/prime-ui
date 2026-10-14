@@ -1,6 +1,5 @@
 [
   "src/components/badge: sets aria-pressed, no selector",
-  "src/components/breadcrumb: list-style none without role=\"list\"",
   "src/components/button: sets aria-pressed, no selector",
   "src/components/card: list-style none without role=\"list\"",
   "src/components/chart-frame: list-style none without role=\"list\"",
@@ -12,8 +11,6 @@
   "src/components/input: sets aria-pressed, no selector",
   "src/components/media-viewer: sets aria-current, no selector",
   "src/components/progress-bar: list-style none without role=\"list\"",
-  "src/components/stepper: list-style none without role=\"list\"",
-  "src/components/stepper: sets aria-current, no selector",
   "src/components/tag-select: sets aria-pressed, no selector",
   "src/components/timeline: list-style none without role=\"list\""
 ]

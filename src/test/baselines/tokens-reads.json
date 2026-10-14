@@ -1,6 +1,5 @@
 [
   "src/components/badge/Badge.module.css: --prime-icon-size",
-  "src/components/button-group/ButtonGroup.module.css: --prime-icon-size",
   "src/components/button/Button.module.css: --prime-icon-size",
   "src/components/color-picker/ColorPresets.tsx: --prime-icon-size",
   "src/components/switch/Switch.module.css: --prime-switch-h",
@@ -13,6 +12,5 @@
   "src/internal/iconBox.module.css: --prime-icon-size",
   "src/internal/iconBox.ts: --prime-icon-size",
   "src/internal/swatch.module.css: --prime-icon-size",
-  "src/internal/swatch.tsx: --prime-icon-size",
-  "src/layout/bottom-nav/BottomNav.module.css: --prime-icon-size"
+  "src/internal/swatch.tsx: --prime-icon-size"
 ]

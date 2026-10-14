@@ -1,7 +1,6 @@
 [
   "src/components/accordion/Accordion.module.css: control tier tokens outside fieldTier",
   "src/components/banner/Banner.module.css: control tier tokens outside fieldTier",
-  "src/components/breadcrumb/Breadcrumb.module.css: control tier tokens outside fieldTier",
   "src/components/button/Button.module.css: media shade outside mediaPill",
   "src/components/card/Card.module.css: control tier tokens outside fieldTier",
   "src/components/chart-frame/ChartFrame.module.css: control tier tokens outside fieldTier",
@@ -25,15 +24,11 @@
   "src/components/pagination/Pagination.module.css: control tier tokens outside fieldTier",
   "src/components/popover/Popover.module.css: control tier tokens outside fieldTier",
   "src/components/progress-bar/ProgressBar.module.css: control tier tokens outside fieldTier",
-  "src/components/segmented-control/SegmentedControl.module.css: control tier tokens outside fieldTier",
   "src/components/slider/Slider.module.css: control tier tokens outside fieldTier",
   "src/components/sparkline/Sparkline.module.css: control tier tokens outside fieldTier",
-  "src/components/stepper/Stepper.module.css: control tier tokens outside fieldTier",
-  "src/components/tabs/Tabs.module.css: control tier tokens outside fieldTier",
   "src/components/timeline/Timeline.module.css: control tier tokens outside fieldTier",
   "src/internal/ProgressLegend.module.css: control tier tokens outside fieldTier",
   "src/internal/iconBox.module.css: control tier tokens outside fieldTier",
   "src/internal/menu.module.css: control tier tokens outside fieldTier",
-  "src/internal/swatch.module.css: control tier tokens outside fieldTier",
-  "src/layout/sidebar/Sidebar.module.css: control tier tokens outside fieldTier"
+  "src/internal/swatch.module.css: control tier tokens outside fieldTier"
 ]
