@@ -515,7 +515,7 @@ export function PanelView(props: PanelViewProps) {
     <div
       {...dom}
       ref={panelRef}
-      className={cx(menu.tier, styles.panel, className)}
+      className={cx(fieldTierClass, menu.tier, styles.panel, className)}
       data-size={size}
       data-embedded={embedded ? "true" : undefined}
       data-compact={compact ? "true" : undefined}

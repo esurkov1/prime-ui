@@ -22,7 +22,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
-import { fieldTriggerClass } from "@/internal/fieldClasses";
+import { fieldTierClass, fieldTriggerClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
@@ -687,7 +687,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
       {...rest}
       floating={floating}
       size={size}
-      className={cx(menu.tier, menu.menu, styles.content, className)}
+      className={cx(fieldTierClass, menu.tier, menu.menu, styles.content, className)}
       onKeyDown={handleKeyDown}
       {...toDataAttributes({ searching: query !== "" || undefined })}
     >

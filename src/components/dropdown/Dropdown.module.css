@@ -56,7 +56,7 @@
 /* Two lines grow the row from the tier height with the tier gap above and below. */
 .item:has(> .itemBody) {
   align-items: center;
-  padding-block: var(--menu-gap);
+  padding-block: var(--field-gap);
 }
 
 .itemBody {

@@ -111,7 +111,7 @@ describe("touch and input", () => {
       ),
     ).toBe(true);
     expect(decl("src/internal/menu.module.css", ".tier", "--menu-item-h")).toBe(
-      "max(var(--menu-tier-item-h), var(--prime-control-touch-target))",
+      "max(var(--field-item-h), var(--prime-control-touch-target))",
     );
     for (const file of [
       "components/button/Button.tsx",

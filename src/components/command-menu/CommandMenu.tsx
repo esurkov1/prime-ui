@@ -18,6 +18,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldInputTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { hasContent } from "@/internal/hasContent";
+import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import {
   handleListboxKeyDown,
@@ -279,7 +280,7 @@ function CommandMenuRoot({
     >
       <Modal.Content {...rest} size="l" placement="top" className={cx(styles.content, className)}>
         {/* `display: contents`: carries the tier variables without breaking the panel's flex column. */}
-        <div className={cx(menu.tier, styles.tier)} data-size={size}>
+        <div className={cx(fieldTierClass, menu.tier, styles.tier)} data-size={size}>
           {tier.provide(
             <CommandMenuState
               labels={labels}
@@ -632,7 +633,9 @@ export type CommandMenuItemIconProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 /** Leading glyph of an item at the tier icon size (a kit `Icon` follows it). */
 function CommandMenuItemIcon({ className, ...rest }: CommandMenuItemIconProps) {
-  return <span aria-hidden="true" className={cx(menu.itemIcon, className)} {...rest} />;
+  return (
+    <span aria-hidden="true" className={cx(menu.itemIcon, iconSlotClass, className)} {...rest} />
+  );
 }
 CommandMenuItemIcon.displayName = "CommandMenu.ItemIcon";
 

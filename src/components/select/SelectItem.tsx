@@ -9,6 +9,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { iconSlotClass } from "@/internal/iconBox";
 import { optionDomId, useListboxItem, useStoreSlice } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { nodeText } from "@/internal/nodeText";
@@ -25,7 +26,9 @@ export type SelectItemIconProps = SpanProps;
 
 /** A leading glyph of an option (decorative). */
 export function SelectItemIcon({ className, ...rest }: SelectItemIconProps) {
-  return <span aria-hidden="true" className={cx(menu.itemIcon, className)} {...rest} />;
+  return (
+    <span aria-hidden="true" className={cx(menu.itemIcon, iconSlotClass, className)} {...rest} />
+  );
 }
 SelectItemIcon.displayName = "Select.ItemIcon";
 

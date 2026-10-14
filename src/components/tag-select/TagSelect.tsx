@@ -806,7 +806,7 @@ export function TagSelect({
         aria-labelledby={ariaLabel ? undefined : (ariaLabelledBy ?? ids.labelledBy)}
         tabIndex={-1}
         ref={scrollerRef}
-        className={cx(menu.tier, menu.menu, styles.panel)}
+        className={cx(fieldTierClass, menu.tier, menu.menu, styles.panel)}
       >
         {labels.panelHint ? (
           <div className={cx(textRole.caption, styles.panelHint)}>{labels.panelHint}</div>

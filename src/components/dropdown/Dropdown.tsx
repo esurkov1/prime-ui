@@ -14,6 +14,8 @@ import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
@@ -25,6 +27,7 @@ import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot, type SlotPartProps, slotChild } from "@/internal/slot";
 import { type ControlSize, OVERLAY_CONTENT_SIZE, type Tone } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 
 import styles from "./Dropdown.module.css";
 
@@ -181,7 +184,7 @@ function DropdownContent({
       scroll
       id={menuId}
       role="menu"
-      className={cx(menu.tier, menu.menu, className)}
+      className={cx(fieldTierClass, menu.tier, menu.menu, className)}
       onKeyDown={(event) => {
         onKeyDown?.(event);
         if (!event.defaultPrevented) moveFocus(event);
@@ -273,7 +276,14 @@ function DropdownItem({
     role: "menuitem",
     tabIndex: -1,
     disabled,
-    className: cx(menu.item, menu.focusRow, styles.item, className),
+    // A danger row takes its ink from the tone ladder; a disabled row keeps the disabled ink.
+    className: cx(
+      menu.item,
+      menu.focusRow,
+      tone === "danger" && !disabled && cx(textTone.tone, menu.tonedRow),
+      styles.item,
+      className,
+    ),
     ...toDataAttributes({ tone, disabled: disabled || undefined }),
     // Enter and Space reach here as the native click (Enter only on a link).
     onClick: (event: React.MouseEvent<HTMLElement>) => {
@@ -368,7 +378,9 @@ export type DropdownItemIconProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 /** Leading glyph of an item at the menu's icon size (a kit `Icon` follows it). */
 function DropdownItemIcon({ className, ...rest }: DropdownItemIconProps) {
-  return <span aria-hidden="true" className={cx(menu.itemIcon, className)} {...rest} />;
+  return (
+    <span aria-hidden="true" className={cx(menu.itemIcon, iconSlotClass, className)} {...rest} />
+  );
 }
 DropdownItemIcon.displayName = "Dropdown.ItemIcon";
 

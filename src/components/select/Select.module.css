@@ -146,7 +146,7 @@
 
 /* Search row: full bleed across the panel padding, the tier row height. */
 .search {
-  gap: var(--menu-gap);
+  gap: var(--field-gap);
   height: var(--menu-item-h);
   margin: calc(var(--prime-panel-padding) * -1) calc(var(--prime-panel-padding) * -1)
     var(--prime-panel-padding);
@@ -199,7 +199,7 @@
 
 /* Two-line option: grows from the tier item height with tier padding. */
 .item[data-rich="true"] {
-  padding-block: var(--menu-gap);
+  padding-block: var(--field-gap);
 }
 
 .item[data-rich="true"] .itemText {

@@ -4,6 +4,7 @@ import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
+import textTone from "@/internal/textTone.module.css";
 import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Dropdown } from "./Dropdown";
@@ -335,11 +336,18 @@ describe("Dropdown", () => {
         </Dropdown.Trigger>
         <Dropdown.Content>
           <Dropdown.Item tone="danger">Delete</Dropdown.Item>
+          <Dropdown.Item tone="danger" disabled>
+            Archive
+          </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    expect(screen.getByRole("menuitem", { name: "Delete" })).toHaveAttribute("data-tone", "danger");
+    const danger = screen.getByRole("menuitem", { name: "Delete" });
+    expect(danger).toHaveAttribute("data-tone", "danger");
+    // The ink comes from the shared tone ladder; a disabled row keeps the disabled ink.
+    expect(danger).toHaveClass(textTone.tone);
+    expect(screen.getByRole("menuitem", { name: "Archive" })).not.toHaveClass(textTone.tone);
   });
 
   // ─── Groups ──────────────────────────────────────────────────────────────────

@@ -72,8 +72,8 @@
   min-width: 0;
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
-  font-size: var(--menu-text);
-  line-height: var(--menu-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
 }
 
 .panel[data-layout="stacked"] {

@@ -7,6 +7,7 @@ import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import menu from "@/internal/menu.module.css";
 import type { PaletteColor } from "@/internal/states";
@@ -143,7 +144,7 @@ export function TagOptionMenu({
             <>
               <Divider className={menu.separator} />
               <div className={cx(textRole.caption, menu.groupLabel)}>{labels.colors}</div>
-              <div className={menu.tier} data-size="s">
+              <div className={cx(fieldTierClass, menu.tier)} data-size="s">
                 {TAG_COLORS.map((hue) => (
                   <button
                     key={hue}

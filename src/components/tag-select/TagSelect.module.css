@@ -235,7 +235,7 @@
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  gap: var(--menu-gap);
+  gap: var(--field-gap);
   min-width: 0;
   height: var(--menu-item-h);
   padding: 0;
@@ -261,10 +261,10 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--menu-icon);
-  height: var(--menu-icon);
+  width: var(--field-icon);
+  height: var(--field-icon);
   color: var(--prime-color-text-muted);
-  --prime-icon-size: var(--menu-icon);
+  --prime-icon-size: var(--field-icon);
 }
 
 .createLabel {
