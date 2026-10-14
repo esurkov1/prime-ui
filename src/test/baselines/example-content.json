@@ -1,9 +1,5 @@
 [
-  "src/components/card/examples/overview.tsx: fields with a submit and no <form>",
-  "src/components/empty-page/examples/compact.tsx: Button repeats its host's size=\"s\"",
-  "src/components/empty-page/examples/narrow.tsx: Button repeats its host's size=\"s\"",
   "src/components/example-frame/examples/controlled.tsx: fields with a submit and no <form>",
-  "src/components/list/examples/overview.tsx: List as conversations (ChatList)",
   "src/components/login-form/examples/forgot-password.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/reset-password.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/verification-code.tsx: fields with a submit and no <form>",

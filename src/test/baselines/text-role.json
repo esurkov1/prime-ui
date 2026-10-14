@@ -1,8 +1,5 @@
 [
   "src/components/button/Button.module.css: local [data-tone] color (.root[data-tone=\"inherit\"][data-loading-overlay=\"true\"])",
-  "src/components/card/Card.module.css: local [data-tone] color (.delta[data-tone=\"danger\"])",
-  "src/components/card/Card.module.css: local [data-tone] color (.delta[data-tone=\"success\"])",
-  "src/components/card/Card.module.css: local [data-tone] color (.delta[data-tone=\"warning\"])",
   "src/components/card/Card.module.css: reads --prime-text-body-s-tracking",
   "src/components/card/Card.module.css: reads --prime-text-display-s-tracking",
   "src/components/card/Card.module.css: reads --prime-text-heading-l-tracking",
@@ -12,9 +9,6 @@
   "src/components/card/Card.module.css: reads --prime-text-heading-m-weight",
   "src/components/card/Card.module.css: reads --prime-text-title-m-tracking",
   "src/components/card/Card.module.css: reads --prime-text-title-m-weight",
-  "src/components/chart-frame/ChartFrame.module.css: local [data-tone] color (.delta[data-tone=\"danger\"])",
-  "src/components/chart-frame/ChartFrame.module.css: local [data-tone] color (.delta[data-tone=\"success\"])",
-  "src/components/chart-frame/ChartFrame.module.css: local [data-tone] color (.delta[data-tone=\"warning\"])",
   "src/components/chart-frame/ChartFrame.module.css: reads --prime-text-body-s-tracking",
   "src/components/chart-frame/ChartFrame.module.css: reads --prime-text-caption-tracking",
   "src/components/chat/Chat.module.css: reads --prime-text-title-s-tracking",

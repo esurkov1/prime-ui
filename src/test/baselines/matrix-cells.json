@@ -30,8 +30,6 @@
   "src/components/input/examples/with-icon.tsx: not rows of labelled cells",
   "src/components/kanban/examples/states.tsx: not rows of labelled cells",
   "src/components/list/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/login-form/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/login-form/examples/states.tsx: not rows of labelled cells",
   "src/components/modal/examples/sizes.tsx: not rows of labelled cells",
   "src/components/native-select/examples/sizes.tsx: not rows of labelled cells",
   "src/components/native-select/examples/states.tsx: not rows of labelled cells",
