@@ -1,4 +1,3 @@
 [
-  "src/components/confirm-dialog/api.ts: ConfirmDialog.Root.error",
   "src/components/data-table/api.ts: DataTable.error"
 ]

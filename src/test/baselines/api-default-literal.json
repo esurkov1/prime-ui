@@ -33,7 +33,6 @@
   "src/components/link-button/api.ts: LinkButton.size",
   "src/components/message/api.ts: Message.File.formatSize",
   "src/components/message/api.ts: Message.Root.formatTime",
-  "src/components/popover/api.ts: Popover.Content.initialFocus",
   "src/components/progress-bar/api.ts: ProgressBar · segments mode.formatValue",
   "src/components/progress-circle/api.ts: ProgressCircle · segments mode.formatValue",
   "src/components/radio/api.ts: Radio.Group.size",

@@ -4,7 +4,6 @@
   "src/components/chart-frame/examples/narrow.tsx: `children`",
   "src/components/checkbox/examples/states.tsx: `checked`",
   "src/components/media-viewer/examples/video.tsx: `autoPlay`",
-  "src/components/modal/examples/structure.tsx: `Modal.Body`",
   "src/components/progress-circle/examples/inner-content.tsx: `children`",
   "src/components/progress-circle/examples/under-way.tsx: `children`",
   "src/components/switch/examples/states.tsx: `checked`",
