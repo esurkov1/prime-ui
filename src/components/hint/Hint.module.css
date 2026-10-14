@@ -10,7 +10,6 @@
   gap: var(--prime-space-1);
   min-width: 0;
   font-family: var(--prime-font-family-sans);
-  letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   overflow-wrap: anywhere;
   transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);

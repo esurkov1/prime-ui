@@ -11,7 +11,7 @@ import { hasNativeTabStop } from "@/internal/overlay/focus";
 import tooltipSurface from "@/internal/overlay/tooltipSurface.module.css";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { SlotPartProps } from "@/internal/slot";
-import type { ControlSize } from "@/internal/states";
+import { type ControlSize, OVERLAY_CONTENT_SIZE } from "@/internal/states";
 
 import styles from "./Tooltip.module.css";
 
@@ -342,7 +342,7 @@ export type TooltipContentProps = Omit<
 
 function TooltipContent({
   children,
-  size = "m",
+  size = OVERLAY_CONTENT_SIZE,
   side = "top",
   align = "center",
   className,

@@ -1,7 +1,8 @@
 /*
  * The faint zone hairline of a surface (foundation §2): a 1px line in `--prime-color-border-faint`
  * under a header or above a footer — a card, a dialog, a board column. It is a background image,
- * so it takes no room and moves nothing. Join `.top` or `.bottom` in TSX (never cross-file
+ * so it takes no room and moves nothing, and it shows only between two zones. Join `.top` or
+ * `.bottom` in TSX (never cross-file
  * `composes`); the host sets `--hairline-inset` to its side padding to inset the line from both
  * edges (`0%`, the default, runs it edge to edge: the inset is a length or a percentage, never the
  * unitless `0` of `--prime-space-0`, which `calc` cannot take beside `100%`). It composes with the
@@ -29,4 +30,12 @@
 
 .bottom {
   background-position: center bottom;
+}
+
+/* A line separates two zones: a header with no zone after it, a footer with none before it, and a
+   footer right under a header (the header's line is already there) draw none. */
+.bottom:last-child,
+.top:first-child,
+.bottom + .top {
+  background-image: none;
 }

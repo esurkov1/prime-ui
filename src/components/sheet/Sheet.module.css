@@ -1,15 +1,13 @@
 /*
  * Sheet — a panel raised from the bottom edge over the scrim, for a short task that ends by
- * itself: the dialog shell (DialogParts.module.css; the zones are each optional here, the content
- * alone is a sheet too) on the shared bottom-sheet surface (internal/sheet: a grab handle on top,
- * height by content up to the top gap, the scrim following a swipe). Centred at
- * `--prime-sheet-width` on a tablet or desktop, full width on a phone. On the one overlay level: a
- * sheet opened from another overlay is portaled later, so it stacks above it.
+ * itself: the dialog shell (internal/overlay/DialogParts, with the sheet's side padding; the zones
+ * are each optional here, the content alone is a sheet too) on the shared bottom-sheet surface
+ * (internal/sheet: a grab handle on top, height by content up to the top gap, the scrim following a
+ * swipe). Centred at `--prime-sheet-width` on a tablet or desktop, full width on a phone. On the
+ * one overlay level: a sheet opened from another overlay is portaled later, so it stacks above it.
  */
 
 .panel {
-  --dialog-padding: var(--prime-sheet-padding);
-
   width: min(100vw, var(--prime-sheet-width));
 }
 

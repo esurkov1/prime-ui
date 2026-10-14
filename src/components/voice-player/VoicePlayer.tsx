@@ -1,12 +1,13 @@
 import * as React from "react";
+import { Button } from "@/components/button/Button";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useElementSize } from "@/hooks/useElementSize";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { cx } from "@/internal/cx";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
-import { MorphText } from "@/internal/MorphText";
 import {
   MEDIA_PLAYER_LABELS,
   type MediaPlayerLabels,
@@ -20,9 +21,8 @@ import {
   useMediaPlayer,
 } from "@/internal/mediaPlayer";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
-import press from "@/internal/press.module.css";
 import textRole from "@/internal/textRole.module.css";
-import { touchTargetBlockClass, touchTargetClass } from "@/internal/touchTarget";
+import { touchTargetBlockClass } from "@/internal/touchTarget";
 
 import styles from "./VoicePlayer.module.css";
 
@@ -163,24 +163,14 @@ export function VoicePlayer(props: VoicePlayerProps) {
     progressProperty: "--vp-progress",
   });
   const { state, position, seeking, transcript, disabled, covered, inactive } = player;
-  const [barCount, setBarCount] = React.useState(DEFAULT_BARS);
+  // Bars of a fixed width and gap fill the waveform: their count follows its observed width.
+  const waveSize = useElementSize(waveRef);
+  const barCount = waveSize && waveSize.width > 0 ? barsFor(waveSize.width) : DEFAULT_BARS;
 
   const total = Math.max(0, player.duration ?? 0);
   const playing = state === "playing";
   const showElapsed = playing || seeking || position > 0;
   const bars = React.useMemo(() => resample(waveform, barCount), [waveform, barCount]);
-
-  // Bars of a fixed width and gap fill the waveform: their count follows its observed width.
-  React.useEffect(() => {
-    const wave = waveRef.current;
-    if (!wave || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(([entry]) => {
-      const width = entry?.contentRect.width ?? 0;
-      if (width > 0) setBarCount(barsFor(width));
-    });
-    observer.observe(wave);
-    return () => observer.disconnect();
-  }, []);
 
   const fractionAt = (clientX: number) => {
     const wave = waveRef.current;
@@ -281,16 +271,18 @@ export function VoicePlayer(props: VoicePlayerProps) {
             </span>
             <UnplayedDot shown={unplayed} />
             {unplayed ? <VisuallyHidden>{labels.unplayed}</VisuallyHidden> : null}
-            {/* Own button: Button's smallest tier is taller than the caption row it sits in. */}
-            <button
-              type="button"
-              className={cx(touchTargetClass, press.pressCompact, styles.rate)}
+            {/* A chip in the caption row: as tall as the line, in its type (`density="inline"`). */}
+            <Button.Root
+              variant="soft"
+              tone="neutral"
+              density="inline"
+              className={styles.rate}
               aria-label={formatLabel(labels.rate, { rate: rateText })}
               disabled={inactive}
               onClick={cycleRate}
             >
-              <MorphText>{rateText}</MorphText>
-            </button>
+              {rateText}
+            </Button.Root>
             {open ? null : spacer}
           </div>
         </div>

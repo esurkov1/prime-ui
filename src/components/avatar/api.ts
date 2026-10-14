@@ -104,9 +104,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl" | "2xl"',
-          default: '"m"',
-          en: "Size of every `Avatar.Root` / `Avatar.Overflow` inside without its own `size`.",
-          ru: "Размер каждого `Avatar.Root` / `Avatar.Overflow` внутри без своего `size`.",
+          en: "Size of every `Avatar.Root` / `Avatar.Overflow` inside without its own `size`; unset, they stay `m`.",
+          ru: "Размер каждого `Avatar.Root` / `Avatar.Overflow` внутри без своего `size`; без него они `m`.",
         },
         {
           name: "…rest",

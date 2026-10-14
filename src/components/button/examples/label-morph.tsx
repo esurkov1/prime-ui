@@ -1,4 +1,4 @@
-/** A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `children`, `loading`, `tone`. */
+/** A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `loading`, `tone`. */
 import { Button } from "prime-ui-kit";
 import * as React from "react";
 

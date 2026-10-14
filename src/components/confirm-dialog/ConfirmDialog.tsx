@@ -2,6 +2,8 @@ import * as React from "react";
 
 import { Banner } from "@/components/banner/Banner";
 import { Button } from "@/components/button/Button";
+import { Icon } from "@/icons";
+import { useLabels } from "@/internal/labels";
 import {
   DialogBody,
   DialogClose,
@@ -13,12 +15,10 @@ import {
   DialogTrigger,
   type DialogTriggerProps,
   useDialogGuard,
-} from "@/components/modal/DialogParts";
-import { ModalContent, ModalRoot } from "@/components/modal/ModalDialog";
-import { Icon } from "@/icons";
-import enterMotion from "@/internal/enterMotion.module.css";
-import { useLabels } from "@/internal/labels";
+} from "@/internal/overlay/DialogParts";
+import { ModalContent, ModalRoot } from "@/internal/overlay/ModalDialog";
 import { useOpenState } from "@/internal/overlay/useOpenState";
+import { usePartPresence } from "@/internal/partPresence";
 
 export type ConfirmDialogLabels = {
   /** The cancel button. */
@@ -99,6 +99,8 @@ function ConfirmDialogRoot({
   };
 
   const message = failure === null ? null : failure || labels.error;
+  // The failure zone rises in when a try fails and closes up in place when the next one starts.
+  const errorZone = usePartPresence<HTMLDivElement>({ present: message !== null, axis: "block" });
 
   return (
     <ModalRoot
@@ -116,8 +118,8 @@ function ConfirmDialogRoot({
           {description ? <DialogDescription>{description}</DialogDescription> : null}
         </DialogHeader>
         {message ? (
-          <DialogBody>
-            <Banner.Root tone="danger" size="s" role="alert" className={enterMotion.enter}>
+          <DialogBody ref={errorZone.ref} className={errorZone.className}>
+            <Banner.Root tone="danger" size="s" role="alert">
               <Banner.Content>
                 <Banner.Icon>
                   <Icon name="status.danger" />

@@ -1,36 +1,43 @@
 /** A regular, a disabled and a destructive item; arrow keys skip the disabled one — `disabled`, `tone`. */
-import { Button, Dropdown, Icon } from "prime-ui-kit";
+import { Button, Dropdown, Icon, Typography } from "prime-ui-kit";
 
 export default function DropdownStatesExample() {
   return (
-    <Dropdown.Root>
-      <Dropdown.Trigger>
-        <Button.Root variant="soft" tone="neutral">
-          Документ
-        </Button.Root>
-      </Dropdown.Trigger>
-      <Dropdown.Content>
-        <Dropdown.Item>
-          <Dropdown.ItemIcon>
-            <Icon name="action.copy" />
-          </Dropdown.ItemIcon>
-          Дублировать
-        </Dropdown.Item>
-        <Dropdown.Item disabled>
-          <Dropdown.ItemIcon>
-            <Icon name="status.locked" />
-          </Dropdown.ItemIcon>
-          Архивировать
-          <Dropdown.ItemDescription>Доступно владельцу документа</Dropdown.ItemDescription>
-        </Dropdown.Item>
-        <Dropdown.Separator />
-        <Dropdown.Item tone="danger">
-          <Dropdown.ItemIcon>
-            <Icon name="action.delete" />
-          </Dropdown.ItemIcon>
-          Удалить
-        </Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown.Root>
+    <div>
+      <div>
+        <Dropdown.Root>
+          <Dropdown.Trigger>
+            <Button.Root variant="soft" tone="neutral">
+              Документ
+            </Button.Root>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item>
+              <Dropdown.ItemIcon>
+                <Icon name="action.copy" />
+              </Dropdown.ItemIcon>
+              Дублировать
+            </Dropdown.Item>
+            <Dropdown.Item disabled>
+              <Dropdown.ItemIcon>
+                <Icon name="status.locked" />
+              </Dropdown.ItemIcon>
+              Архивировать
+              <Dropdown.ItemDescription>Доступно владельцу документа</Dropdown.ItemDescription>
+            </Dropdown.Item>
+            <Dropdown.Separator />
+            <Dropdown.Item tone="danger">
+              <Dropdown.ItemIcon>
+                <Icon name="action.delete" />
+              </Dropdown.ItemIcon>
+              Удалить
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+        <Typography as="span" variant="caption" tone="muted">
+          disabled · tone="danger"
+        </Typography>
+      </div>
+    </div>
   );
 }

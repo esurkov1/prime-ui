@@ -26,9 +26,9 @@ const PEOPLE = [
 
 export default function AvatarPresenceExample() {
   return (
-    <ul className={styles.people}>
+    <div className={styles.people}>
       {PEOPLE.map((person) => (
-        <li key={person.status} className={styles.person}>
+        <div key={person.status} className={styles.person}>
           <Avatar.Root color={person.color}>
             {"src" in person ? <Avatar.Image src={person.src} /> : null}
             <Avatar.Fallback>{person.initials}</Avatar.Fallback>
@@ -40,8 +40,8 @@ export default function AvatarPresenceExample() {
           <Typography as="span" variant="body-m">
             {person.name}
           </Typography>
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }

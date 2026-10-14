@@ -1,16 +1,1 @@
-[
-  "src/components/avatar/Avatar.tsx: root default size = \"m\"",
-  "src/components/confirm-dialog/ConfirmDialog.tsx: imports modal/DialogParts (not its main module or types.ts)",
-  "src/components/confirm-dialog/ConfirmDialog.tsx: imports modal/ModalDialog (not its main module or types.ts)",
-  "src/components/drawer/Drawer.tsx: imports modal/DialogGuard (not its main module or types.ts)",
-  "src/components/drawer/Drawer.tsx: imports modal/DialogParts (not its main module or types.ts)",
-  "src/components/drawer/Drawer.tsx: root default size = \"m\"",
-  "src/components/dropdown/Dropdown.tsx: root default size = \"m\"",
-  "src/components/modal/ModalDialog.tsx: root default size = \"m\"",
-  "src/components/popover/Popover.tsx: root default size = \"m\"",
-  "src/components/sheet/Sheet.tsx: imports modal/DialogGuard (not its main module or types.ts)",
-  "src/components/sheet/Sheet.tsx: imports modal/DialogParts (not its main module or types.ts)",
-  "src/components/thumbnail/Thumbnail.tsx: root default size = \"m\"",
-  "src/components/thumbnail/Thumbnail.tsx: size mapping outside states.ts",
-  "src/components/tooltip/Tooltip.tsx: root default size = \"m\""
-]
+[]

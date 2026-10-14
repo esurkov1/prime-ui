@@ -2,8 +2,6 @@
 import { Button, Icon, Input, Modal } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
-
 export default function ModalDismissExample() {
   const formId = React.useId();
   const [open, setOpen] = React.useState(false);
@@ -34,7 +32,6 @@ export default function ModalDismissExample() {
         <Modal.Body>
           <form
             id={formId}
-            className={styles.form}
             onSubmit={(event) => {
               event.preventDefault();
               setSaving(true);

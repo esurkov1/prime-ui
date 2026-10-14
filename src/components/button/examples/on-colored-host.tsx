@@ -1,28 +1,28 @@
-/** Actions on a colored strip take its text color: a ghost icon close and a soft action — `tone="inherit"`. */
-import { Button, Icon } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+/** Actions on a solid banner take its text color: a soft action and a ghost one beside it — `tone="inherit"`. */
+import { Banner, Button } from "prime-ui-kit";
 
 const HOSTS = [
-  { className: styles.accentHost, text: "Доступна новая версия редактора" },
-  { className: styles.inverseHost, text: "Режим только для чтения" },
-];
+  { tone: "accent", text: "Доступна новая версия редактора", action: "Обновить", later: "Позже" },
+  { tone: "neutral", text: "Режим только для чтения", action: "Запросить доступ", later: "Скрыть" },
+] as const;
 
 export default function ButtonOnColoredHostExample() {
   return (
     <>
-      {HOSTS.map(({ className, text }) => (
-        <div key={text} className={className}>
-          <span className={styles.hostText}>{text}</span>
-          <Button.Root variant="soft" tone="inherit" size="s">
-            Обновить
-          </Button.Root>
-          <Button.Root variant="ghost" tone="inherit" size="s" aria-label="Закрыть">
-            <Button.Icon>
-              <Icon name="action.close" />
-            </Button.Icon>
-          </Button.Root>
-        </div>
+      {HOSTS.map(({ tone, text, action, later }) => (
+        <Banner.Root key={text} variant="solid" tone={tone}>
+          <Banner.Content>
+            <Banner.Title>{text}</Banner.Title>
+          </Banner.Content>
+          <Banner.Actions>
+            <Button.Root variant="soft" tone="inherit">
+              {action}
+            </Button.Root>
+            <Button.Root variant="ghost" tone="inherit">
+              {later}
+            </Button.Root>
+          </Banner.Actions>
+        </Banner.Root>
       ))}
     </>
   );

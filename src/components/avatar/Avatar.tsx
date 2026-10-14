@@ -109,8 +109,11 @@ export type AvatarGroupProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** An overlapping row of avatars (`role="group"`); rings match the surface. */
-function AvatarGroup({ size = "m", className, role = "group", ...rest }: AvatarGroupProps) {
+/**
+ * An overlapping row of avatars (`role="group"`); rings match the surface. Its `size` is the size
+ * of every member without its own (they default to `m`).
+ */
+function AvatarGroup({ size, className, role = "group", ...rest }: AvatarGroupProps) {
   return (
     <AvatarGroupSizeContext.Provider value={size}>
       <div

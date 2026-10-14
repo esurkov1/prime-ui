@@ -184,8 +184,8 @@ export const api: ComponentApi = {
         {
           name: "pressed",
           type: "boolean",
-          en: "Toggle state of the action: `aria-pressed`.",
-          ru: "Состояние переключения действия: `aria-pressed`.",
+          en: "Toggle state of the action: `aria-pressed`; on, the segment stays shown with the pressed wash.",
+          ru: "Состояние переключения действия: `aria-pressed`; включённый сегмент виден всегда и залит как нажатый.",
         },
         {
           name: "disabled",

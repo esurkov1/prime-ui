@@ -1,7 +1,3 @@
 [
-  "src/components/accordion/Accordion.module.css: control tier tokens outside fieldTier",
-  "src/components/button/Button.module.css: media shade outside mediaPill",
-  "src/components/modal/DialogParts.module.css: control tier tokens outside fieldTier",
-  "src/components/popover/Popover.module.css: control tier tokens outside fieldTier",
   "src/internal/menu.module.css: control tier tokens outside fieldTier"
 ]

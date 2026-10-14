@@ -124,7 +124,7 @@ export const dialogContentAriaProps: ApiProp[] = [
 ];
 
 /** The default of the footer `layout`: one value, or one per width tier (Modal). */
-export type FooterDefault = { value: string } | { note: ApiText };
+type FooterDefault = { value: string } | { note: ApiText };
 
 export function dialogParts(name: DialogName, footerDefault: FooterDefault): ApiPart[] {
   return [

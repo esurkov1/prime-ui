@@ -3,8 +3,9 @@
  * Geometry comes from the shared tier table (`internal/fieldTier`, set from `data-size` in TSX), so
  * a placeholder takes exactly the room of what replaces it: text lines use the tier text size and
  * line height, `control` the control height and radius, `circle` the avatar size of the tier.
- * Motion: a slow opacity pulse (keyframes are allowed for a skeleton, foundation §7 rule 9); under
- * reduced motion it stands still.
+ * Motion: a slow opacity pulse (keyframes are allowed for a skeleton, foundation §7 rule 9) on the
+ * movement clock; under reduced motion globals.css zeroes that clock, so the pulse has no length and
+ * the placeholder stands still at full opacity.
  */
 .root {
   /* One step above the surface's control fill, so a placeholder reads on every layer and theme
@@ -94,12 +95,5 @@
 
   to {
     opacity: 0.6;
-  }
-}
-
-/* An endless pulse would freeze at an arbitrary frame once durations collapse: stand still. */
-@media (prefers-reduced-motion: reduce) {
-  .root {
-    animation: none;
   }
 }

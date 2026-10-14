@@ -87,7 +87,7 @@ MediaViewer has no `variant`, `size` or `tone`: the stage is always near black, 
 | State | Driven by | DOM |
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the dialog; mounted until the picture has flown back into its thumbnail (or faded) |
-| page | `index` / `defaultIndex` / `onIndexChange` | `data-current` on the page on screen; the pages around it are `aria-hidden` and `inert`; `onIndexChange` fires once the page has settled |
+| page | `index` / `defaultIndex` / `onIndexChange` | `data-current` on the page on screen; the pages around it are `aria-hidden` and `inert`; `onIndexChange` fires once the page has settled; its thumbnail carries `aria-current="true"` and a ring in the light ink |
 | far slide | a thumbnail, `Home` / `End` | the far item is mounted as the neighbour on its side and slides in; the real neighbour there is hidden meanwhile |
 | zoomed | a pinch (also a trackpad pinch), a double tap, ⌘ / Ctrl + wheel, the zoom button, `+` / `-` / `0` — about the point, up to `maxZoom` | `data-zoomed` on the dialog; the zoom button turns «Уменьшить» |
 | gesture | a finger or the mouse dragging | `data-gesture="page \| pan \| pinch \| dismiss"` on the dialog |

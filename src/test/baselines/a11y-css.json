@@ -1,6 +1,3 @@
 [
-  "src/components/badge: sets aria-pressed, no selector",
-  "src/components/button: sets aria-pressed, no selector",
-  "src/components/input: sets aria-pressed, no selector",
-  "src/components/media-viewer: sets aria-current, no selector"
+  "src/components/input: sets aria-pressed, no selector"
 ]

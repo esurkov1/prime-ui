@@ -1,6 +1,6 @@
 /*
- * Modal — a raised panel over the scrim, on the dialog shell (DialogParts.module.css: the zones,
- * their padding and the inset hairlines; only the body scrolls). Centred at its width tier, or
+ * Modal.Content (and ConfirmDialog) — a raised panel over the scrim, on the dialog shell
+ * (DialogParts.module.css: the zones, their padding and the inset hairlines; only the body scrolls). Centred at its width tier, or
  * near the top (`placement="top"`: a palette whose list grows downward, the search row never
  * jumps). Below 640px of viewport a centred dialog is a bottom sheet — the shared sheet surface
  * (internal/sheet) with `data-sheet` — and this geometry steps aside.
@@ -8,7 +8,6 @@
 
 .content {
   --modal-width: var(--prime-modal-width-m);
-  --dialog-padding: var(--prime-modal-padding);
 }
 
 .content[data-size="xs"] {

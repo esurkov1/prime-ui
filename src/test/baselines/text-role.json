@@ -1,15 +1,4 @@
 [
-  "src/components/button/Button.module.css: local [data-tone] color (.root[data-tone=\"inherit\"][data-loading-overlay=\"true\"])",
-  "src/components/code-block/CodeBlock.module.css: reads --prime-text-code-tracking",
-  "src/components/code-block/CodeBlock.module.css: reads --prime-text-code-weight",
-  "src/components/dropdown/Dropdown.module.css: reads --prime-text-caption-tracking",
-  "src/components/hint/Hint.module.css: reads --prime-text-caption-tracking",
-  "src/components/modal/DialogParts.module.css: reads --prime-text-body-s-weight",
-  "src/components/modal/DialogParts.module.css: reads --prime-text-body-s-weight #2",
-  "src/components/modal/DialogParts.module.css: reads --prime-text-title-m-tracking",
-  "src/components/modal/DialogParts.module.css: reads --prime-text-title-m-weight",
-  "src/components/popover/Popover.module.css: reads --prime-text-title-s-tracking",
-  "src/components/popover/Popover.module.css: reads --prime-text-title-s-weight",
   "src/internal/mediaPill.module.css: reads --prime-text-caption-tracking",
   "src/internal/menu.module.css: local [data-tone] color (.item[data-tone=\"danger\"]:not([data-disabled=\"true\"]), .item[data-tone=\"danger\"]:not([data-disabled=\"true\"]) .itemIcon)"
 ]

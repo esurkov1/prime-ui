@@ -118,7 +118,7 @@ export const api: ComponentApi = {
             ru: "`true` с `Popover.Trigger`, `false` с `Popover.Anchor`",
           },
           en: "Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger.",
-          ru: "Фокус переходит в панель при открытии (`[data-autofocus]`, иначе первый фокусируемый, иначе панель). Включите для панели с `Anchor`, открытой командой — пунктом Dropdown, — чтобы фокус не остался на кнопке меню.",
+          ru: "Фокус переходит в панель при открытии (`[data-autofocus]`, иначе первый фокусируемый, иначе панель). Включите для привязанной панели, открытой командой — пунктом Dropdown, — чтобы фокус не остался на кнопке меню.",
         },
         {
           name: "flush",

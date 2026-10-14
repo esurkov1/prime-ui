@@ -224,7 +224,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
       <Ring
         value={0}
         weight="data"
-        track={gap === "none" || total === 0 ? "surface" : false}
+        track={gap === "none" || total === 0 ? "surface" : "none"}
         className={styles.svg}
         role="group"
         {...a11y}
@@ -243,7 +243,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
         spin={spin}
         weight="data"
         // `inherit` keeps the ring's own track, a tint of the host's color.
-        track={tone === "inherit" ? true : "surface"}
+        track={tone === "inherit" ? "line" : "surface"}
         className={styles.svg}
         role="progressbar"
         aria-valuenow={unknown ? undefined : value}

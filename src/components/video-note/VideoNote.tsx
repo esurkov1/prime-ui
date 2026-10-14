@@ -133,7 +133,7 @@ function VideoNoteInner(props: VideoNoteProps) {
             onError={() => setFrame("error")}
           />
         </span>
-        <Ring ref={ringRef} value={0} live track={false} weight="band" className={styles.ring} />
+        <Ring ref={ringRef} value={0} live track="none" weight="band" className={styles.ring} />
         {/* The whole circle takes a press (a pointer aid only: the disk below is the control that
             focus, keys and assistive tech reach). */}
         <span

@@ -134,6 +134,7 @@ A bottom sheet is always full width, whatever `width` says.
 | State | Driven by | DOM |
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state="open" \| "closed"` on the panel (closed while the exit animation plays) and on the trigger, `aria-expanded` on the trigger |
+| dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape and a press outside close the panel; `false` turns that way off |
 | side | `side` and the room next to the trigger | `data-side` (resolved) |
 | size | `size` on Content | `data-size` |
 | width | `width` on Content | `data-width` on the anchored panel |

@@ -1,9 +1,4 @@
 [
-  "src/components/avatar/examples/examples.module.css: list-style",
-  "src/components/button/examples/examples.module.css: background",
-  "src/components/button/examples/examples.module.css: background #2",
-  "src/components/button/examples/examples.module.css: border-radius",
-  "src/components/code-block/examples/examples.module.css: component token",
   "src/components/dnd/examples/examples.module.css: background",
   "src/components/dnd/examples/examples.module.css: background #2",
   "src/components/dnd/examples/examples.module.css: background #3",
@@ -20,12 +15,5 @@
   "src/components/dnd/examples/examples.module.css: text-align",
   "src/components/dnd/examples/examples.module.css: text-align #2",
   "src/components/dnd/examples/examples.module.css: text-align #3",
-  "src/components/dnd/examples/examples.module.css: text-align #4",
-  "src/components/skeleton/examples/examples.module.css: border-bottom",
-  "src/components/skeleton/examples/examples.module.css: border-bottom #2",
-  "src/components/skeleton/examples/examples.module.css: list-style",
-  "src/components/typography/examples/examples.module.css: border-inline-start",
-  "src/components/typography/examples/examples.module.css: text-align",
-  "src/components/typography/examples/examples.module.css: text-align #2",
-  "src/components/typography/examples/examples.module.css: text-align #3"
+  "src/components/dnd/examples/examples.module.css: text-align #4"
 ]

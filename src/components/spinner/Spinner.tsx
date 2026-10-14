@@ -58,7 +58,7 @@ export function Spinner({
       {...toDataAttributes({ size, tone: tone === "default" ? undefined : tone })}
       {...rest}
     >
-      <Ring value={null} className={styles.ring} />
+      <Ring value={null} track="faint" className={styles.ring} />
       <VisuallyHidden>{labels.loading}</VisuallyHidden>
     </span>
   );

@@ -1,22 +1,20 @@
 /* ─── Popover ────────────────────────────────────────────────────────────────
  * Free-form content on the shared floating surface (`internal/floatingSurface.module.css`, which
  * also owns the width modes): tier padding and gap, scrolls inside the room next to its trigger
- * (`--float-max-h`). On a phone it stands in a bottom sheet (`data-sheet`).
+ * (`--float-max-h`). On a phone it stands in a bottom sheet (`data-sheet`). The text follows the
+ * panel tier through the shared field tier (`internal/fieldTier`, joined in TSX): body text
+ * `--field-text`, the description the label row `--field-label-size`.
  */
 
 .content {
   --po-pad: var(--prime-panel-content-padding);
   --po-gap: var(--prime-space-3);
-  --po-text: var(--prime-control-m-text-size);
-  --po-lh: var(--prime-control-m-line-height);
-  --po-desc: var(--prime-control-m-label-size);
-  --po-desc-lh: var(--prime-control-m-label-line-height);
 
   gap: var(--po-gap);
   max-height: var(--float-max-h, none);
   padding: var(--po-pad);
-  font-size: var(--po-text);
-  line-height: var(--po-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
 }
 
 .content[data-size="xs"],
@@ -25,41 +23,19 @@
   --po-gap: var(--prime-space-2);
 }
 
-.content[data-size="xs"] {
-  --po-text: var(--prime-control-xs-text-size);
-  --po-lh: var(--prime-control-xs-line-height);
-  --po-desc: var(--prime-control-xs-label-size);
-  --po-desc-lh: var(--prime-control-xs-label-line-height);
-}
-
-.content[data-size="s"] {
-  --po-text: var(--prime-control-s-text-size);
-  --po-lh: var(--prime-control-s-line-height);
-  --po-desc: var(--prime-control-s-label-size);
-  --po-desc-lh: var(--prime-control-s-label-line-height);
-}
-
 .content[data-size="l"] {
   --po-gap: var(--prime-space-4);
-  --po-text: var(--prime-control-l-text-size);
-  --po-lh: var(--prime-control-l-line-height);
-  --po-desc: var(--prime-control-l-label-size);
-  --po-desc-lh: var(--prime-control-l-label-line-height);
 }
 
 .content[data-size="xl"] {
   --po-pad: var(--prime-space-5);
   --po-gap: var(--prime-space-4);
-  --po-text: var(--prime-control-xl-text-size);
-  --po-lh: var(--prime-control-xl-line-height);
-  --po-desc: var(--prime-control-xl-label-size);
-  --po-desc-lh: var(--prime-control-xl-label-line-height);
 }
 
 /* Flush: rows reach the panel edges; the content owns its spacing. */
 .content[data-flush="true"] {
-  --po-pad: 0px;
-  --po-gap: 0px;
+  --po-pad: var(--prime-space-0);
+  --po-gap: var(--prime-space-0);
 }
 
 /* ─── Title / description / actions ─────────────────────────────────────── */
@@ -77,11 +53,11 @@
   overflow-wrap: anywhere;
   text-wrap-style: balance;
   color: var(--prime-color-text-primary);
-  /* Title and description follow the panel tier, like the controls inside it. */
-  font-size: var(--po-text);
-  font-weight: var(--prime-text-title-s-weight);
-  line-height: var(--po-lh);
-  letter-spacing: var(--prime-text-title-s-tracking);
+  /* Title and description follow the panel tier, like the controls inside it: the title is the
+     body text set semibold. */
+  font-size: var(--field-text);
+  font-weight: var(--prime-font-weight-semibold);
+  line-height: var(--field-lh);
 }
 
 .description {
@@ -90,8 +66,8 @@
   overflow-wrap: anywhere;
   text-wrap-style: pretty;
   color: var(--prime-color-text-secondary);
-  font-size: var(--po-desc);
-  line-height: var(--po-desc-lh);
+  font-size: var(--field-label-size);
+  line-height: var(--field-label-lh);
 }
 
 .actions {

@@ -29,6 +29,8 @@ export const RING_DATA_STROKE = RING_PATH / (11 * Math.PI);
  */
 type RingWeight = "data" | "line" | "band";
 
+type RingTrack = "line" | "faint" | "surface" | "none";
+
 type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
   /**
    * The share drawn, `0…1`; `null` — under way, the share unknown: a quarter arc that always
@@ -38,11 +40,12 @@ type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
   /** The ring turns at any share (one turn = 3 × `--prime-motion-loop`); the arc never under 8%. */
   spin?: boolean;
   /**
-   * A full circle under the arc. `true` (default) — faint, in the host's color (a ring on a
-   * colored host or over media); `"surface"` — the track of a line on a surface
-   * (`fill-strong`, as ProgressBar's); `false` — none.
+   * The full circle under the arc: `line` — `currentColor` at the line tint, for a ring on a
+   * colored host or over media (default); `faint` — at the hover tint, for a ring that is only a
+   * loading cue (Spinner); `surface` — `fill-strong`, the track of a line on a surface (as
+   * ProgressBar's); `none` — no track.
    */
-  track?: boolean | "surface";
+  track?: RingTrack;
   /** Default `line`. */
   weight?: RingWeight;
   /**
@@ -104,7 +107,7 @@ export function RingCap({
 export function Ring({
   value,
   spin = false,
-  track = true,
+  track = "line",
   weight = "line",
   live = false,
   className,
@@ -127,7 +130,7 @@ export function Ring({
       style={live ? style : ({ ...style, "--ring-value": share } as React.CSSProperties)}
       {...toDataAttributes({
         weight,
-        track: track === "surface" ? track : undefined,
+        track: track === "faint" || track === "surface" ? track : undefined,
         spin: turning || undefined,
         // An empty arc still at rest draws nothing (a round cap would leave a dot).
         empty: (!live && !turning && share === 0) || undefined,
@@ -135,7 +138,7 @@ export function Ring({
       })}
     >
       <g className={styles.turn}>
-        {track ? <RingCircle className={styles.track} /> : null}
+        {track === "none" ? null : <RingCircle className={styles.track} />}
         {children ?? <RingCircle className={styles.arc} />}
       </g>
     </svg>

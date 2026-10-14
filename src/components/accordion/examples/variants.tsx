@@ -1,8 +1,6 @@
 /** One surface with hairlines between items, or every item as its own card — `layout`. */
 import { Accordion, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 const LAYOUTS = ["grouped", "separate"] as const;
 
 const SECTIONS = [
@@ -12,12 +10,9 @@ const SECTIONS = [
 
 export default function AccordionVariantsExample() {
   return (
-    <>
+    <div>
       {LAYOUTS.map((layout) => (
-        <div key={layout} className={styles.panel}>
-          <Typography as="span" variant="caption" tone="muted">
-            {layout}
-          </Typography>
+        <div key={layout}>
           <Accordion.Root layout={layout} defaultValue="plan">
             {SECTIONS.map((section) => (
               <Accordion.Item key={section.value} value={section.value}>
@@ -28,8 +23,11 @@ export default function AccordionVariantsExample() {
               </Accordion.Item>
             ))}
           </Accordion.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            {layout}
+          </Typography>
         </div>
       ))}
-    </>
+    </div>
   );
 }

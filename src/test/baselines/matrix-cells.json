@@ -1,10 +1,1 @@
-[
-  "src/components/accordion/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/accordion/examples/variants.tsx: not rows of labelled cells",
-  "src/components/drawer/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/dropdown/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/dropdown/examples/states.tsx: not rows of labelled cells",
-  "src/components/modal/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/popover/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/tooltip/examples/sizes.tsx: not rows of labelled cells"
-]
+[]

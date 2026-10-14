@@ -1,7 +1,3 @@
 [
-  "src/components/accordion/examples/sizes.tsx: imports CSS",
-  "src/components/accordion/examples/states.tsx: imports CSS",
-  "src/components/accordion/examples/variants.tsx: imports CSS",
-  "src/components/accordion/examples/with-icon.tsx: imports CSS",
   "src/components/dnd/examples/states.tsx: imports CSS"
 ]

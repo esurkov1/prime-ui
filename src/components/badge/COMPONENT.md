@@ -86,7 +86,7 @@ Badge.Root          <span>: fill, tier dimensions
 | `label` | `string` | — (required) | Accessible name and tooltip («Скрыть billing»). |
 | `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — (required) | Runs the action. |
 | `persistent` | `boolean` | `false` | Keeps the action shown, not only on hover and focus (while the state it sets is on). |
-| `pressed` | `boolean` | — | Toggle state of the action: `aria-pressed`. |
+| `pressed` | `boolean` | — | Toggle state of the action: `aria-pressed`; on, the segment stays shown with the pressed wash. |
 | `disabled` | `boolean` | `false` | The action is unavailable. |
 | `children` | `ReactNode` | — | A custom glyph at the tier icon size; a minus by default. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "onClick" \| "children">` | — | `className` and the other button attributes. |

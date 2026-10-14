@@ -86,7 +86,7 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           en: "`ConfirmDialog.Trigger`; nothing when `open` comes from code.",
-          ru: "`ConfirmDialog.Trigger`; ничего, если открытием управляет код.",
+          ru: "`ConfirmDialog.Trigger`; ничего, если `open` задаёт код.",
         },
       ],
     },

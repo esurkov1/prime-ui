@@ -1,10 +1,1 @@
-[
-  "src/components/code-block/api.ts: keyboard Tab — Tab",
-  "src/components/code-block/api.ts: keyboard ← · → — ←",
-  "src/components/code-block/api.ts: keyboard ← · → — →",
-  "src/components/drawer/api.ts: keyboard Tab · Shift+Tab — Shift+Tab",
-  "src/components/drawer/api.ts: keyboard Tab · Shift+Tab — Tab",
-  "src/components/sheet/api.ts: keyboard Tab · Shift+Tab — Shift+Tab",
-  "src/components/sheet/api.ts: keyboard Tab · Shift+Tab — Tab",
-  "src/components/tooltip/api.ts: keyboard Tab — Tab"
-]
+[]

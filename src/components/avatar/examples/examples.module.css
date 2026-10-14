@@ -9,13 +9,10 @@
   gap: var(--prime-space-3);
 }
 
-/* presence.tsx: a short people list. */
+/* presence.tsx: a short column of people. */
 .people {
   display: grid;
   gap: var(--prime-space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 .person {

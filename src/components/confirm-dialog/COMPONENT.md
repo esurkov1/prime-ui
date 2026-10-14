@@ -81,7 +81,7 @@ The dialog is a Modal `s` with the floating surface, a header and a footer; ther
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the dialog (closed while the exit motion plays) |
 | running | `onConfirm` returned a pending Promise | the confirm `data-loading="true"` and `aria-busy="true"`; Cancel and the close button `disabled` in place; Escape ignored |
-| failed | `onConfirm` rejected | a danger Banner with `role="alert"` drops in under the header with the rejection's `Error.message` (or string, else `labels.error`); the confirm is ready again; the next try or closing clears it |
+| failed | `onConfirm` rejected | a danger Banner with `role="alert"` drops in under the header with the rejection's `Error.message` (or string, else `labels.error`); the confirm is ready again; the next try or closing clears it, and the body closes up in place |
 
 ## Layout & spacing
 - Modal `s`: 440 wide, the footer fills with two equal buttons; a bottom sheet on a phone, buttons stacked full width.
@@ -134,5 +134,5 @@ The dialog is a Modal `s` with the floating surface, a header and a footer; ther
 - `tone="accent"` for a delete → destructive is always `danger`.
 
 ## Related
-- **Built from:** [Modal](../modal/COMPONENT.md) (`s`, the header and footer parts), [Button](../button/COMPONENT.md) (Cancel, the confirm with `loading`), [Banner](../banner/COMPONENT.md) (the failure message), `Icon` (`status.danger` in the Banner)
+- **Built from:** the dialog Modal stands on (`internal/overlay/ModalDialog` at `s`, the header, body and footer of `internal/overlay/DialogParts`), [ScrollContainer](../scroll-container/COMPONENT.md) (the body), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (pictures the shared icon slot recognises), [Button](../button/COMPONENT.md) (Cancel, the confirm with `loading`), [Banner](../banner/COMPONENT.md) (the failure message), `Icon` (`status.danger` in the Banner)
 - **See also:** [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md), [Notification](../notification/COMPONENT.md)

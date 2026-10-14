@@ -52,6 +52,7 @@ export const api: ComponentApi = {
       },
       {
         keys: "← · →",
+        native: true,
         en: "Scroll a focused block horizontally.",
         ru: "Горизонтальная прокрутка блока в фокусе.",
       },

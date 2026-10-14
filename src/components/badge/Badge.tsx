@@ -231,8 +231,9 @@ function BadgeRoot({
         pending: busy || undefined,
         pressable: toggle || undefined,
         pressed: (toggle && pressed) || undefined,
+        // A pressed action stays shown: its state must be seen, not only revealed on hover.
         action: actionElement
-          ? actionElement.props.persistent
+          ? actionElement.props.persistent || actionElement.props.pressed
             ? "persistent"
             : "reveal"
           : undefined,

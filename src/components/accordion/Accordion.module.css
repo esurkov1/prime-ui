@@ -2,18 +2,21 @@
  * Accordion — Graphite. The root is a layer of the surface ladder (`data-depth`, foundation §4).
  * grouped: one surface (card radius), hairline separators between items, no outer border.
  * separate: the root is transparent and every item paints the layer, with a gap between them.
+ * The header row takes the control tier of `data-size` from the shared field tier (`fieldTierClass`
+ * on the root, joined in TSX): its text, icon and height (the control height plus row air).
  */
 
 .root {
-  --acc-text-size: var(--prime-control-m-text-size);
-  --acc-line-height: var(--prime-control-m-line-height);
+  --acc-text-size: var(--field-text);
+  --acc-line-height: var(--field-lh);
   --acc-content-size: var(--prime-text-body-m-size);
   --acc-content-line-height: var(--prime-text-body-m-line-height);
-  --acc-icon: var(--prime-control-m-icon);
+  --acc-icon: var(--field-icon);
   --acc-gap: var(--prime-space-3);
   --acc-pad-x: var(--prime-space-4);
   --acc-pad-y: var(--prime-space-3);
-  --acc-min-height: calc(var(--prime-control-m-height) + var(--prime-space-4));
+  --acc-row-air: var(--prime-space-4);
+  --acc-min-height: calc(var(--field-h) + var(--acc-row-air));
 
   display: flex;
   flex-direction: column;
@@ -29,48 +32,34 @@
 }
 
 .root[data-size="xs"] {
-  --acc-text-size: var(--prime-control-xs-text-size);
-  --acc-line-height: var(--prime-control-xs-line-height);
   --acc-content-size: var(--prime-text-caption-size);
   --acc-content-line-height: var(--prime-text-caption-line-height);
-  --acc-icon: var(--prime-control-xs-icon);
   --acc-gap: var(--prime-space-2);
   --acc-pad-x: var(--prime-space-3);
   --acc-pad-y: var(--prime-space-2);
-  --acc-min-height: calc(var(--prime-control-xs-height) + var(--prime-space-2));
+  --acc-row-air: var(--prime-space-2);
 }
 
 .root[data-size="s"] {
-  --acc-text-size: var(--prime-control-s-text-size);
-  --acc-line-height: var(--prime-control-s-line-height);
   --acc-content-size: var(--prime-text-body-s-size);
   --acc-content-line-height: var(--prime-text-body-s-line-height);
-  --acc-icon: var(--prime-control-s-icon);
   --acc-gap: var(--prime-space-2);
   --acc-pad-x: var(--prime-space-3);
   --acc-pad-y: var(--prime-space-2);
-  --acc-min-height: calc(var(--prime-control-s-height) + var(--prime-space-2));
+  --acc-row-air: var(--prime-space-2);
 }
 
 .root[data-size="l"] {
-  --acc-text-size: var(--prime-control-l-text-size);
-  --acc-line-height: var(--prime-control-l-line-height);
-  --acc-icon: var(--prime-control-l-icon);
   --acc-pad-x: var(--prime-space-5);
   --acc-pad-y: var(--prime-space-4);
-  --acc-min-height: calc(var(--prime-control-l-height) + var(--prime-space-4));
 }
 
 .root[data-size="xl"] {
-  --acc-text-size: var(--prime-control-xl-text-size);
-  --acc-line-height: var(--prime-control-xl-line-height);
   --acc-content-size: var(--prime-text-body-l-size);
   --acc-content-line-height: var(--prime-text-body-l-line-height);
-  --acc-icon: var(--prime-control-xl-icon);
   --acc-gap: var(--prime-space-4);
   --acc-pad-x: var(--prime-space-6);
   --acc-pad-y: var(--prime-space-4);
-  --acc-min-height: calc(var(--prime-control-xl-height) + var(--prime-space-4));
 }
 
 /* ---------- Items ---------- */

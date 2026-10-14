@@ -824,7 +824,7 @@ describe("Button — pressed", () => {
   it("the selected look covers pressed and the current page", () => {
     const selected = cssRule(
       CSS,
-      '.root:is([data-pressed="true"], [data-current="true"], [aria-current="page"])[data-variant]',
+      '.root:is([aria-pressed="true"], [data-current="true"], [aria-current="page"])[data-variant]',
     );
     expect(cssValue(selected, "--btn-bg")).toBe("var(--prime-color-accent-soft)");
   });

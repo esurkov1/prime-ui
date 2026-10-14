@@ -21,6 +21,7 @@ import { motionDurationMs } from "@/internal/motionTiming";
 import { captureOpener } from "@/internal/overlay/focus";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import { Portal } from "@/internal/Portal";
+import { swallowNextClick } from "@/internal/swallowNextClick";
 import textRole from "@/internal/textRole.module.css";
 
 import styles from "./MediaViewer.module.css";
@@ -918,10 +919,8 @@ const STRIP_GLIDE_MS = 70;
 /** A mouse moves this far before a press on the row becomes a drag. */
 const STRIP_DRAG_SLOP = 4;
 
-const swallow = (event: Event) => {
-  event.preventDefault();
-  event.stopPropagation();
-};
+/** A thumbnail's picture would be dragged out as a file and cancel the mouse drag. */
+const preventDrag = (event: Event) => event.preventDefault();
 
 /**
  * Every item as a thumbnail, in a row that only mounts what is in view (hundreds of items cost a
@@ -1107,15 +1106,11 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
     };
     const onUp = () => {
       // A drag is not a press: the click that ends it does not open a thumbnail.
-      if (drag?.moved) {
-        scroller.addEventListener("click", swallow, { capture: true, once: true });
-        window.setTimeout(() => scroller.removeEventListener("click", swallow, true), 0);
-      }
+      if (drag?.moved) swallowNextClick(scroller);
       drag = null;
     };
     scroller.addEventListener("wheel", onWheel, { passive: false });
-    // A thumbnail's picture would be dragged out as a file and cancel the mouse drag.
-    scroller.addEventListener("dragstart", swallow);
+    scroller.addEventListener("dragstart", preventDrag);
     scroller.addEventListener("touchstart", take, { passive: true });
     scroller.addEventListener("pointerdown", onDown);
     window.addEventListener("pointermove", onMove);
@@ -1124,7 +1119,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
     return () => {
       stopGlide();
       scroller.removeEventListener("wheel", onWheel);
-      scroller.removeEventListener("dragstart", swallow);
+      scroller.removeEventListener("dragstart", preventDrag);
       scroller.removeEventListener("touchstart", take);
       scroller.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointermove", onMove);
@@ -1156,7 +1151,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
         key={at}
         asChild
         size="l"
-        className={styles.thumb}
+        className={cx(pill.inkValue, styles.thumb)}
         style={{ insetInlineStart: `${pad + at * metrics.pitch}px` }}
         data-thumb={at}
       >

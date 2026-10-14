@@ -7,6 +7,13 @@
 export const controlSizes = ["xs", "s", "m", "l", "xl"] as const;
 export type ControlSize = (typeof controlSizes)[number];
 
+/**
+ * The default `size` of an overlay's `Content` (Modal, Drawer, Popover, Dropdown, Tooltip): a width
+ * tier of its own that never follows the host's tier (foundation §10), so it does not resolve
+ * through `useHostTier`.
+ */
+export const OVERLAY_CONTENT_SIZE = "m" satisfies ControlSize;
+
 /** The tier `n` steps smaller, never below `xs`: a control nested in another (foundation §6 pairing). */
 export function stepDown(size: ControlSize, n = 1): ControlSize {
   return controlSizes[Math.max(0, controlSizes.indexOf(size) - n)] ?? "xs";

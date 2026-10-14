@@ -6,7 +6,7 @@
  */
 import * as React from "react";
 
-import { Avatar } from "@/components/avatar/Avatar";
+import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
@@ -21,19 +21,22 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
-import { SheetHandle } from "@/internal/overlay/FloatingPanel";
-import { LayerProvider } from "@/internal/overlay/layerStack";
-import { useOpenState } from "@/internal/overlay/useOpenState";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import sheetStyles from "@/internal/sheet.module.css";
 import { Slot, type SlotPartProps } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./DialogParts.module.css";
+import { SheetHandle } from "./FloatingPanel";
+import { LayerProvider } from "./layerStack";
+import { useOpenState } from "./useOpenState";
 
 // ─── Root state (Modal.Root, Drawer.Root, Sheet.Root) ────────────────────────
 
@@ -72,7 +75,7 @@ export type DialogRootOptions = {
 };
 
 /** What a `Guard` inside the content holds the dialog to. */
-export type DialogGuardState = {
+type DialogGuardState = {
   /** A request runs: no way to dismiss; the close button is disabled. */
   busy: boolean;
   /** Unsaved changes: a dismiss asks first. */
@@ -81,7 +84,7 @@ export type DialogGuardState = {
 
 const NO_GUARD: DialogGuardState = { busy: false, dirty: false };
 
-export type DialogRootState = {
+type DialogRootState = {
   open: boolean;
   setOpen: (open: boolean) => void;
   /**
@@ -189,19 +192,24 @@ export function useDialogGuard({ busy, dirty }: DialogGuardState): DialogRootSta
 // ─── Panel (Modal.Content, Drawer.Content, Sheet.Content) ────────────────────
 
 /** Footer actions: `fill` — equal-width buttons in one row; `end` — auto-width, right-aligned. */
-export type DialogFooterLayout = "fill" | "end";
+type DialogFooterLayout = "fill" | "end";
 
 /**
  * When the panel is a bottom sheet that swipes down to close: `never` (Drawer, a Modal near the
  * top), `compact` (a centred Modal on a viewport below 640px), `always` (Sheet).
  */
-export type DialogSwipe = "never" | "compact" | "always";
+type DialogSwipe = "never" | "compact" | "always";
+
+/**
+ * Which dialog the panel is: it picks the side padding of the zones (`--prime-<kind>-padding`) and
+ * the enter / exit motion while the panel is not a bottom sheet (a drawer slides from its side).
+ */
+type DialogKind = "modal" | "drawer" | "sheet";
 
 type DialogPanelProps = React.HTMLAttributes<HTMLDivElement> & {
+  kind: DialogKind;
   /** The component's own panel class: its geometry and width tiers. */
   panelClassName: string;
-  /** Its enter / exit motion while it is not a bottom sheet (a sheet slides). */
-  motion: "dialog" | "drawer";
   swipe: DialogSwipe;
   footerLayout: DialogFooterLayout;
   /** Portal target. Default `document.body`. */
@@ -252,8 +260,8 @@ type DialogPanelBodyProps = Omit<DialogPanelProps, "container"> & {
 
 /** Mounted inside the portal so the modal layer sees the attached node. */
 function DialogPanelBody({
+  kind,
   panelClassName,
-  motion,
   swipe: swipePolicy,
   footerLayout,
   overlayClassName,
@@ -335,9 +343,10 @@ function DialogPanelBody({
           panelClassName,
           sheet
             ? cx(sheetStyles.surface, sheetStyles.swipeY, overlayMotion.sheet)
-            : overlayMotion[motion],
+            : overlayMotion[kind === "drawer" ? "drawer" : "dialog"],
           className,
         )}
+        data-kind={kind}
         data-state={state}
         data-depth="floating"
         data-sheet={sheet ? "" : undefined}
@@ -463,25 +472,29 @@ export type DialogIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "child
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** A person or an object stands for itself: a picture child needs no filled tile around it. */
-function isMedia(children: React.ReactNode): boolean {
-  return (
-    React.isValidElement(children) &&
-    (children.type === Avatar.Root || children.type === Thumbnail.Root)
-  );
+/**
+ * A person or an object stands for itself: a picture child needs no filled tile around it. An
+ * avatar fills the 40px icon box (size `l`); a thumbnail keeps its `m` height (40) and its ratio.
+ */
+function mediaOf(children: React.ReactNode): React.ReactNode | null {
+  if (!React.isValidElement(children)) return null;
+  if (children.type === Avatar.Root) {
+    return React.cloneElement(children as React.ReactElement<AvatarRootProps>, { size: "l" });
+  }
+  return children.type === Thumbnail.Root ? children : null;
 }
 
 export function DialogIcon({ tone = "neutral", children, className, ...rest }: DialogIconProps) {
-  const media = isMedia(children);
+  const media = mediaOf(children);
   return (
     <span
       {...rest}
       className={cx(media ? undefined : iconBoxStyles.tile, styles.icon, className)}
       data-tone={media ? undefined : tone}
-      data-media={media || undefined}
+      data-media={media ? true : undefined}
       aria-hidden="true"
     >
-      {children}
+      {media ?? children}
     </span>
   );
 }
@@ -499,7 +512,7 @@ export function DialogTitle({ className, ...rest }: DialogTitleProps) {
     registerTitle(true);
     return () => registerTitle(false);
   }, [registerTitle]);
-  return <h2 id={titleId} className={cx(styles.title, className)} {...rest} />;
+  return <h2 id={titleId} className={cx(textRole.titleM, styles.title, className)} {...rest} />;
 }
 DialogTitle.displayName = "Dialog.Title";
 
@@ -513,7 +526,9 @@ export function DialogDescription({ className, ...rest }: DialogDescriptionProps
     registerDescription(true);
     return () => registerDescription(false);
   }, [registerDescription]);
-  return <p id={descriptionId} className={cx(styles.description, className)} {...rest} />;
+  return (
+    <p id={descriptionId} className={cx(textRole.bodyS, styles.description, className)} {...rest} />
+  );
 }
 DialogDescription.displayName = "Dialog.Description";
 
@@ -538,7 +553,7 @@ export function DialogHeader({
 
   return (
     <header
-      className={cx(styles.header, className)}
+      className={cx(hairline.bottom, styles.header, className)}
       data-has-description={hasDescription ? "true" : undefined}
       {...rest}
     >
@@ -577,7 +592,7 @@ export type DialogActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 export function DialogActions({ className, children, ...rest }: DialogActionsProps) {
   useDialogShell("Actions");
   return (
-    <div className={cx(styles.actions, className)} {...rest}>
+    <div className={cx(fieldTierClass, styles.actions, className)} data-size="s" {...rest}>
       <ControlSizeProvider value="s">{children}</ControlSizeProvider>
     </div>
   );
@@ -608,7 +623,7 @@ export function DialogFooter({ layout, className, ...rest }: DialogFooterProps) 
   const { footerLayout } = useDialogShell("Footer");
   return (
     <footer
-      className={cx(styles.footer, className)}
+      className={cx(hairline.top, styles.footer, className)}
       data-layout={layout ?? footerLayout}
       {...rest}
     />
@@ -626,7 +641,7 @@ export type DialogMetaProps = React.HTMLAttributes<HTMLParagraphElement> & {
  */
 export function DialogMeta({ className, ...rest }: DialogMetaProps) {
   useDialogShell("Meta");
-  return <p className={cx(styles.meta, className)} {...rest} />;
+  return <p className={cx(textRole.bodyS, styles.meta, className)} {...rest} />;
 }
 DialogMeta.displayName = "Dialog.Meta";
 

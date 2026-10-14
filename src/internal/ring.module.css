@@ -9,8 +9,8 @@
  *   data — 1/12 of the diameter, never under the line weight (ProgressCircle);
  *   band — one spacing step: a playback or recording band over the edge of a round video.
  * The fill (`--ring-fill`) is the only hook a host sets. The track is the host's color at the
- * line tint, or `fill-strong` with `data-track="surface"` (a ring on a surface, as a ProgressBar
- * track).
+ * line tint, fainter with `data-track="faint"` (a loading cue), or `fill-strong` with
+ * `data-track="surface"` (a ring on a surface, as a ProgressBar track).
  *
  * Motion (foundation §7): the share glides on the arc (`stroke-dashoffset`, `base` · standard);
  * the turn is the `rotate` of the inner group, so it runs on the compositor, the share keeps
@@ -30,6 +30,11 @@
   height: 100%;
   overflow: visible;
   pointer-events: none;
+}
+
+/* A ring that is only a loading cue (Spinner): a fainter track under the turning arc. */
+.ring[data-track="faint"] {
+  --ring-track: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
 }
 
 .ring[data-weight="data"] {

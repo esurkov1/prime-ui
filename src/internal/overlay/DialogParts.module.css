@@ -1,9 +1,9 @@
 /*
  * The dialog shell of Modal, Drawer and Sheet, and their header / body / footer. Every zone owns
- * its side padding (`--dialog-padding`, set by the component's panel class): the scrolling body
+ * its side padding (`--dialog-padding`, the padding token of the panel's kind): the scrolling body
  * keeps it inside the scroll box, so focus rings of edge-to-edge fields are never clipped
- * (foundation §7). Header and footer are separated by a faint hairline (a 1px background line
- * inset by the same padding):
+ * (foundation §7). Header and footer are separated by the faint zone hairline (internal/hairline,
+ * joined in TSX, inset by the same padding):
  *
  *   header  24 top · 20 bottom
  *   ─────── body 20 · gap 16 (scrolls)
@@ -21,14 +21,11 @@
 /*
  * The `role="dialog"` panel, next to the component's own geometry class (Modal centred, Drawer at
  * an edge) or the bottom-sheet surface (internal/sheet): the floating layer of the ladder, a
- * column whose body alone scrolls, the hairline tokens and the `prime-dialog` container.
+ * column whose body alone scrolls, the side padding of its kind and the `prime-dialog` container.
  */
 .shell {
-  --dialog-hairline: linear-gradient(
-    var(--prime-color-border-faint),
-    var(--prime-color-border-faint)
-  );
-  --dialog-hairline-size: calc(100% - 2 * var(--dialog-padding)) var(--prime-border-width);
+  --dialog-padding: var(--prime-modal-padding);
+  --hairline-inset: var(--dialog-padding);
 
   container: prime-dialog / inline-size;
   z-index: var(--prime-z-overlay);
@@ -42,6 +39,14 @@
   outline: none;
   font-size: var(--prime-text-body-m-size);
   line-height: var(--prime-text-body-m-line-height);
+}
+
+.shell[data-kind="drawer"] {
+  --dialog-padding: var(--prime-drawer-padding);
+}
+
+.shell[data-kind="sheet"] {
+  --dialog-padding: var(--prime-sheet-padding);
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────────── */
@@ -59,11 +64,6 @@
   row-gap: var(--prime-space-1);
   min-width: 0;
   padding: var(--prime-space-6) var(--dialog-padding) var(--prime-space-5);
-}
-
-/* Faint inset hairline under the header when a body or footer follows. */
-.header:not(:last-child) {
-  background: var(--dialog-hairline) center bottom / var(--dialog-hairline-size) no-repeat;
 }
 
 /* Title, description and any custom text sit in the text column. */
@@ -123,11 +123,10 @@
 
 /*
  * The record's picture (`Avatar.Root`, `Thumbnail.Root`): no tile of its own, the picture is the
- * mark. An avatar fills the 40px box; a thumbnail keeps its `m` height (40) and its ratio.
+ * mark. An avatar takes size `l` (40, set in TSX); a thumbnail keeps its `m` height (40) and its
+ * ratio.
  */
 .icon[data-media="true"] {
-  --avatar-slot-size: var(--prime-avatar-l);
-
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
@@ -135,13 +134,10 @@
   height: var(--prime-space-10);
 }
 
+/* Title (title-m) and description (body-s): the text role is joined in TSX (internal/textRole). */
 .title {
   margin: 0;
   color: var(--prime-color-text-primary);
-  font-size: var(--prime-text-title-m-size);
-  line-height: var(--prime-text-title-m-line-height);
-  font-weight: var(--prime-text-title-m-weight);
-  letter-spacing: var(--prime-text-title-m-tracking);
   overflow-wrap: anywhere;
   text-wrap-style: balance;
 }
@@ -149,15 +145,13 @@
 .description {
   margin: 0;
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  font-weight: var(--prime-text-body-s-weight);
   overflow-wrap: anywhere;
 }
 
 /*
- * A row of controls at the end of the header, before the close button (tier s: the close
- * button's height). With a description it hangs from the top, centered on the title's first line.
+ * A row of controls at the end of the header, before the close button (tier s, joined in TSX: the
+ * close button's height `--field-h`). With a description it hangs from the top, centered on the
+ * title's first line.
  */
 .actions {
   grid-column: actions;
@@ -171,20 +165,18 @@
 }
 
 .header[data-has-description="true"] > .actions {
-  min-height: var(--prime-control-s-height);
-  margin-block: calc((var(--prime-text-title-m-line-height) - var(--prime-control-s-height)) / 2);
+  min-height: var(--field-h);
+  margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
 }
 
 /*
- * Square ghost close (tier s). With a description it hangs from the top, centered on the title's
- * first line; the inline pull puts the glyph on the content edge.
+ * The ghost icon-only close (a square Button of tier s, whose own `--field-h` centres it). With a
+ * description it hangs from the top, centered on the title's first line; the inline pull puts the
+ * glyph on the content edge.
  */
 .close {
   grid-column: close;
   grid-row: 1;
-  width: var(--prime-control-s-height);
-  min-width: var(--prime-control-s-height);
-  padding-inline: 0;
   margin-inline: var(--prime-space-4) calc(var(--prime-space-2) * -1);
 }
 
@@ -194,7 +186,7 @@
 }
 
 .header[data-has-description="true"] > .close {
-  margin-block: calc((var(--prime-text-title-m-line-height) - var(--prime-control-s-height)) / 2);
+  margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
 }
 
 /* ─── Body ───────────────────────────────────────────────────────────────── */
@@ -227,11 +219,6 @@
   align-items: center;
   min-width: 0;
   padding: var(--prime-space-5) var(--dialog-padding) var(--prime-space-6);
-}
-
-/* Footer after a body gets the hairline above it (after a header the header already draws one). */
-.footer:not(:first-child):not(.header + .footer) {
-  background: var(--dialog-hairline) center top / var(--dialog-hairline-size) no-repeat;
 }
 
 .footer:first-child {
@@ -275,14 +262,12 @@
   gap: var(--prime-space-2);
 }
 
+/* Body-s muted (the text role is joined in TSX). */
 .meta {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  font-weight: var(--prime-text-body-s-weight);
   overflow-wrap: anywhere;
 }
 
@@ -310,7 +295,7 @@
   }
 }
 
-@container prime-dialog (max-width: 359px) {
+@container prime-dialog (max-width: 22.4375rem) {
   .footer[data-layout] {
     display: flex;
     flex-direction: column;

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Button } from "@/components/button/Button";
 import { swipe } from "@/test/mobile";
@@ -62,6 +63,18 @@ const handleOf = (dialog: HTMLElement) =>
 const headerOf = (dialog: HTMLElement) => dialog.querySelector("header") as HTMLElement;
 
 describe("Sheet", () => {
+  it("Tab and Shift+Tab cycle inside the open sheet", async () => {
+    const user = userEvent.setup();
+    render(<TitledSheet defaultOpen />);
+    const close = screen.getByRole("button", { name: "Закрыть" });
+    const action = screen.getByRole("button", { name: "Повторить заказ" });
+    action.focus();
+    await user.tab();
+    expect(close).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(action).toHaveFocus();
+  });
+
   it("opens from Trigger as a modal dialog with a hidden grab handle first", () => {
     render(<TitledSheet />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
