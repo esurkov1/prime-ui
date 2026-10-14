@@ -21,7 +21,8 @@
  * Tools and stretch across it, so the search is never squeezed (an icon-only action still fits
  * beside them). Wide is one line that never wraps. Rules: the Tools are the stretchy item; a slot
  * alone in its row takes the full width. Slots move only visually (`order`); the DOM — and the Tab
- * order — stays the JSX order. All controls share the toolbar tier, so rows stay level.
+ * order — is the wide layout's reading order (Tools, Sections, View, Actions, Chips), set by the
+ * root. All controls share the toolbar tier, so rows stay level.
  */
 .root {
   container-type: inline-size;
@@ -106,10 +107,11 @@
   min-width: 0;
 }
 
-/* The View's controls share its row equally; each keeps its content width. */
+/* The View's controls share its row equally; a control narrower than its content gives way (its
+   own content scrolls or truncates), so the row never overflows a phone. */
 .view > * {
   flex: 1 1 0;
-  min-width: max-content;
+  min-width: 0;
 }
 
 /* Wide: one line that never wraps, Chips under it. When room runs short the Tools give way first,
