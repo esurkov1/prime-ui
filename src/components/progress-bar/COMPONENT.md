@@ -134,7 +134,7 @@ Always controlled: pass the current `value` or `segments` on every render.
 - Label → line: the tier `label-gap` (`--prime-space-1` xs/s, `--prime-space-2` m–xl). The label is primary, medium weight; the percentage secondary, tabular numbers.
 - Bar → legend `--prime-space-3` (12). Rows (`layout="rows"`) are 12 apart, each header 4 above its bar: the label (secondary, truncates) takes the free width, the value (primary, medium) and the share (muted, at least 4ch) line up at the end in tabular numbers.
 - `hairline` gaps and `steps` cells are ¾ of the line thickness apart.
-- Stack several bars with `--prime-space-4`–`--prime-space-5`.
+- Stack several bars 16–20 apart (a gap on their parent).
 
 ## Accessibility
 

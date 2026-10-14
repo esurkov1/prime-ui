@@ -7,6 +7,7 @@ import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 
@@ -54,12 +55,10 @@ export type PaginationProps = Omit<
   "defaultValue" | "onChange"
 > & {
   ref?: React.Ref<HTMLElement>;
-  /** Current page (1-based), controlled. */
   value?: number;
   defaultValue?: number;
   onValueChange?: (page: number) => void;
   totalPages: number;
-  /** Pages on each side of the current one before an ellipsis. */
   siblingCount?: number;
   size?: ControlSize;
   compact?: boolean;
@@ -94,7 +93,7 @@ export function Pagination({
     <nav
       {...rest}
       aria-label={labels.nav}
-      className={cx(styles.root, className)}
+      className={cx(fieldTierClass, styles.root, className)}
       {...toDataAttributes({ size, compact: mode })}
     >
       <div className={styles.list}>

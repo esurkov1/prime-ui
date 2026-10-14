@@ -194,5 +194,5 @@ Put it in a `Card` for a dashboard tile.
 - A full Sparkline squeezed into a table cell, or its headline hidden with CSS → `layout="compact"`.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (change), [Skeleton](../skeleton/COMPONENT.md) (loading), `Icon` (trend arrow), `ChartTooltip` (the chart tooltip shared with ChartFrame)
+- **Built from:** [Badge](../badge/COMPONENT.md) (change), [Skeleton](../skeleton/COMPONENT.md) (loading), `Icon` (trend arrow), `ChartTooltip` (the chart tooltip shared with ChartFrame), [ScrollContainer](../scroll-container/COMPONENT.md) (the tooltip's floating panel)
 - **See also:** [ChartFrame](../chart-frame/COMPONENT.md), [DataTable](../data-table/COMPONENT.md) (a compact Sparkline per row), [Card](../card/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

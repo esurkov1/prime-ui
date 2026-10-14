@@ -1,54 +1,23 @@
 /*
- * ProgressBar — same line as Slider: thickness T = --prime-control-<tier>-track.
+ * ProgressBar — same line as Slider: thickness T = the tier's track (`--field-track` of the tier
+ * table, `fieldTierClass` joined in TSX; the label row reads `--field-label-*`).
  * Value mode: one pill with a rounded leading end over a `fill-strong` track.
  * Segments mode: parts of a whole in one pill (or separate pills with `hairline`), the free
  * capacity up to `max` stays track.
  */
 
 .root {
-  --pb-track: var(--prime-control-m-track);
-  --pb-gap: calc(var(--pb-track) * 3 / 4);
-  --pb-label-gap: var(--prime-control-m-label-gap);
-  --pb-label-size: var(--prime-control-m-label-size);
-  --pb-label-line-height: var(--prime-control-m-label-line-height);
+  --pb-gap: calc(var(--field-track) * 3 / 4);
   --pb-fill: var(--prime-color-accent-default);
   --pb-rest: var(--prime-color-fill-strong);
 
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--pb-label-gap);
+  gap: var(--field-label-gap);
   width: 100%;
   min-width: 0;
   font-family: var(--prime-font-family-sans);
-}
-
-.root[data-size="xs"] {
-  --pb-track: var(--prime-control-xs-track);
-  --pb-label-gap: var(--prime-control-xs-label-gap);
-  --pb-label-size: var(--prime-control-xs-label-size);
-  --pb-label-line-height: var(--prime-control-xs-label-line-height);
-}
-
-.root[data-size="s"] {
-  --pb-track: var(--prime-control-s-track);
-  --pb-label-gap: var(--prime-control-s-label-gap);
-  --pb-label-size: var(--prime-control-s-label-size);
-  --pb-label-line-height: var(--prime-control-s-label-line-height);
-}
-
-.root[data-size="l"] {
-  --pb-track: var(--prime-control-l-track);
-  --pb-label-gap: var(--prime-control-l-label-gap);
-  --pb-label-size: var(--prime-control-l-label-size);
-  --pb-label-line-height: var(--prime-control-l-label-line-height);
-}
-
-.root[data-size="xl"] {
-  --pb-track: var(--prime-control-xl-track);
-  --pb-label-gap: var(--prime-control-xl-label-gap);
-  --pb-label-size: var(--prime-control-xl-label-size);
-  --pb-label-line-height: var(--prime-control-xl-label-line-height);
 }
 
 /* Tone of the whole bar (value mode) or of one part (segments: a segment or a row's fill). */
@@ -87,7 +56,7 @@
 
 /* Loading: a Skeleton in the bar's geometry — the track's thickness and pill. */
 .barSkeleton {
-  height: var(--pb-track);
+  height: var(--field-track);
   min-height: 0;
   border-radius: var(--prime-radius-full);
 }
@@ -118,8 +87,8 @@
   align-items: baseline;
   gap: var(--prime-space-2);
   min-width: 0;
-  font-size: var(--pb-label-size);
-  line-height: var(--pb-label-line-height);
+  font-size: var(--field-label-size);
+  line-height: var(--field-label-lh);
 }
 
 .rowLabel {
@@ -157,8 +126,8 @@
   justify-content: space-between;
   gap: var(--prime-space-3);
   min-width: 0;
-  font-size: var(--pb-label-size);
-  line-height: var(--pb-label-line-height);
+  font-size: var(--field-label-size);
+  line-height: var(--field-label-lh);
 }
 
 .label {
@@ -194,7 +163,7 @@
 
   position: relative;
   display: flex;
-  height: var(--pb-track);
+  height: var(--field-track);
   overflow: hidden;
   border-radius: var(--prime-radius-full);
   background: var(--pb-rest);
@@ -292,10 +261,10 @@
   display: block;
   height: 100%;
   background: var(--pb-fill);
-  transform: scaleX(0);
+  scale: 0 1;
   transform-origin: left center;
   transition:
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    scale var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
   transition-delay: calc(var(--pb-step-order) * var(--prime-motion-stagger) / 2);
 }
@@ -305,5 +274,5 @@
 }
 
 .step[data-filled]::after {
-  transform: scaleX(1);
+  scale: 1;
 }
