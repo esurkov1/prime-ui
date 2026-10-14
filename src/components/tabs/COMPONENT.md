@@ -27,8 +27,8 @@ import { Tabs } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItemWidth; no surface
-├─ Tabs.List              role="tablist" on a ScrollContainer, sliding folder; collapses, then scrolls
+Tabs.Root                 value, size (else the host tier), orientation, tone, fullWidth, min/maxItemWidth
+├─ Tabs.List              role="tablist" on the switcher row, sliding folder; collapses, then scrolls
 │  ├─ Tabs.Item           one tab (role="tab") in an item wrapper; onRemove adds a close button; parts:
 │  │  ├─ Tabs.Icon        decorative icon; hidden first, kept last
 │  │  ├─ Tabs.Label       title; keeps its width when it turns medium weight
@@ -51,7 +51,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `defaultValue` | `string` | `""` | Initial active tab (uncontrolled). With `""` no tab is selected. |
 | `onValueChange` | `(value: string) => void` | — | Called with the new active value. |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. Vertical: a column of sections beside the panel, which becomes a horizontal strip in a container below 600px. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel; a tab is at least the control height. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel; a tab is at least the control height. Without it the tier of the host. |
 | `fullWidth` | `boolean` | `true` | Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`; `false` sizes each tab to its content within the same bounds. |
 | `tone` | `"neutral" \| "accent"` | `"neutral"` | Colour of the active tab: `neutral` is primary text with an accent icon, `accent` puts text and icon in accent. |
 | `minItemWidth` | `number \| string` | 2.5 × control height | Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). |
@@ -61,7 +61,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other div attributes. |
 
 ### Tabs.List
-`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` with the sliding folder. When tabs do not fit it hides icons and descriptions, then labels (only when every tab has an icon), then scrolls; the active tab stays in view.
+`ref` → `HTMLDivElement`. `role="tablist"` on the switcher row (a sideways `ScrollContainer`) with the sliding folder. When tabs do not fit it hides icons and descriptions, then labels (only when every tab has an icon), then scrolls; the active tab stays in view.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -182,18 +182,18 @@ Avoid icons or descriptions on only some tabs (uneven rows; without an icon on e
 |---|---|---|
 | active | `value` / `defaultValue` | item `aria-selected="true"`, `data-state="active"`, `tabIndex=0`; others `data-state="inactive"`, `tabIndex=-1` |
 | hover | pointer | text → primary; the folder shape in `fill-faint`, under the folder |
-| pressed | pointer down | the tab content scales to `--prime-motion-press-scale-compact` |
-| focus-visible | keyboard | focus ring inside the tab, above the folder; the panel shows an inset ring |
+| pressed | pointer down | the tab content scales to `--prime-motion-press-scale-compact` (`internal/press`) |
+| focus-visible | keyboard | the tab draws an inset ring in its own shape, above the folder; the focused panel draws the outer ring |
 | disabled | `disabled` on Item | native `disabled`, `data-disabled="true"`, `text-disabled`; a removable tab loses its close button |
 | removable | `onRemove` on Item | item wrapper `data-removable="true"`, close button, tab `aria-keyshortcuts="Delete"` |
 | closing, confirm pending | `onRemove` returned a promise that has not settled | the close button is `loading` (`aria-busy`); the tab, its selection and focus stay; resolved → the neighbour takes over, rejected → nothing changes |
 | two-line | `Tabs.Description` child | `data-two-line="true"` |
-| collapsed | tabs wider than the list, or a label that would be cut (horizontal) | list `data-collapse="full" \| "compact" \| "icon"`: `compact` hides icons and descriptions; `icon` hides labels (sr-only, shown in a `Tooltip`), counts and close buttons, only when every tab has an icon |
-| overflow | tabs at their narrowest (content width, `minItemWidth` or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (ScrollContainer), faded edges as deep as the hidden part at most (they grow and melt with the scroll, never switch); the active tab is kept in view and clear of the fades on mount and on every value change, the first and the last tab scroll all the way to the end — only the list scrolls, never the page |
+| collapsed | tabs wider than the list, or a label that would be cut (horizontal) | list `data-collapse="full" \| "compact" \| "icon"`: `compact` hides icons and descriptions; `icon` takes labels, counts and close buttons out of the row — a `VisuallyHidden` copy of the label names the tab and a `Tooltip` shows it — only when every tab has an icon |
+| overflow | tabs at their narrowest (content width, `minItemWidth` or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (the switcher row, a ScrollContainer), faded edges as deep as the hidden part at most (they grow and melt with the scroll, never switch); the active tab is kept in view and clear of the fades on mount and on every value change, the first and the last tab scroll all the way to the end — only the list scrolls, never the page. A column (a wide vertical list) has plain edges |
 
 The indicator glides (`emphasized` + `base`, `data-animate="true"`) only into a choice by click, arrow keys or closing the active tab; on mount, a value set from outside, a resize, font loading, tabs added or removed and collapse it is placed without motion, and it stays still under `prefers-reduced-motion`. The list scrolls smoothly to the active tab only after such a choice too.
 
-Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; List `data-indicator="folder"`, its indicator `data-axis="x" | "y"` (follows the list's direction, so a vertical list in a narrow container gets the top folder); Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted; a panel's content enters each time it opens.
+Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; the folder (the list's first child, `data-indicator`) `data-axis="x" | "y"` (follows the list's direction, so a vertical list in a narrow container gets the top folder); Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted, and a tab points at its panel (`aria-controls`) only while the panel is in the document; a panel's content enters each time it opens.
 
 ## Layout & spacing
 - Tabs are a bar, not a surface: the root has no fill, padding, radius or `data-depth`. On a page or in a `Card.Body`, put it straight into the host's padded region and the panel content straight into `Tabs.Panel`. The strip's edges and the panel content share the host's content edge; the panel stands one tier gap below the strip (`--prime-space-3` … `--prime-space-8`).
@@ -214,7 +214,8 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 ```
 - The folder paints the host's `layer-current`, so the active tab is always the colour of the surface it stands on; controls in a panel read the host's field and fill tokens.
 - Vertical: the column is as wide as its widest section (at least four control heights, at most 40% of the root) and as tall as its sections; the panel sits beside it, one gap away.
-- The list never wraps: it collapses, then scrolls horizontally with faded edges (hidden scrollbar, `overscroll-behavior: contain`). Give the list's container a width (`min-width: 0` on flex children).
+- The list is a switcher (foundation §9): it never wraps — it collapses, then scrolls horizontally with faded edges (hidden scrollbar, `overscroll-behavior: contain`). Give the list's container a width (`min-width: 0` on flex children).
+- Without `size` the tabs take the tier of their host (a Card, a Drawer, a form), else `m`.
 - A horizontal tab is never narrower than its content (`min-width: max-content`; the tab bounds that content between `minItemWidth` and `maxItemWidth`), so a label is never cut to make room. Full width, tabs tend to equal widths, not widths in proportion to their labels (`flex: 1 1 0`): a long label keeps its width, the short ones share the rest.
 - A vertical Tabs.Root is a size container: give it a width (it measures itself to switch to a row).
 
@@ -234,11 +235,11 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- WAI-ARIA tabs pattern: `tablist` / `tab` / `tabpanel` with `aria-controls` / `aria-labelledby` wired automatically; give `Tabs.List` an `aria-label`.
+- WAI-ARIA tabs pattern: `tablist` / `tab` / `tabpanel` with `aria-controls` / `aria-labelledby` wired automatically; a tab names its panel in `aria-controls` only while the panel is in the document. Give `Tabs.List` an `aria-label`.
 - Selection follows focus; the panel is focusable (`tabIndex=0`).
 - In a two-line tab the accessible name is label (+ count); `Tabs.Description` becomes `aria-describedby`.
 - `Tabs.Icon` and `Tabs.Separator` are `aria-hidden`.
-- When only icons are left, the label stays for screen readers (sr-only) and shows in a `Tooltip` on hover and focus.
+- When only icons are left, a `VisuallyHidden` copy of the label names the tab and the label shows in a `Tooltip` on hover and focus.
 - The close button of a removable tab is named after it (`labels.remove`) and stays out of the Tab order; the tab announces `aria-keyshortcuts="Delete"`.
 
 ### Labels
@@ -276,5 +277,5 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 - Tabs inside `Drawer.Body` / `Modal.Body` under the header → a floating strip under the header's hairline; wrap the header and the body in `Tabs.Root` and put `Tabs.List` into the header.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Button](../button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), Icon (`action.close`)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (`internal/SwitcherScroller`, the list), [Badge](../badge/COMPONENT.md), [Button](../button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (the label of an icon-only tab), Icon (`action.close`); `internal/selectionIndicator` (the folder), `internal/press`
 - **See also:** [SegmentedControl](../segmented-control/COMPONENT.md), [ButtonGroup](../button-group/COMPONENT.md), [Accordion](../accordion/COMPONENT.md)

@@ -64,7 +64,7 @@ export const page: ComponentPageConfig = {
       scenario: "router",
       title: "Ссылки роутера",
       description:
-        "Ссылка роутера как пункт: роутер ставит `aria-current`, и пункт показан текущим; рендерьте внутри роутера — `asChild`.",
+        "Ссылка роутера как пункт: роутер отмечает открытый раздел, и пункт показан текущим; рендерьте внутри роутера — `asChild`.",
     },
     {
       scenario: "in-app-shell",

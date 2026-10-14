@@ -2,15 +2,16 @@
  * SegmentedControl — Graphite. Choose one value / mode.
  * Track: `fill-muted` (a step off the host in both themes) with a faint 1px ring, padding 2px (xs, s)
  * or 4px (m–xl). Outer height = control height of the tier, so a single-line group lines up with
- * Button / Input of the same size. The selected segment is a floating thumb one step lighter than the
- * track with its own faint ring; it slides between segments. Segment radius = track radius − padding.
+ * Button / Input of the same size. The selected segment is the thumb (`internal/selectionIndicator`)
+ * in `--prime-color-control-selected` — white in light, a lighter step above the track in dark —
+ * with its own faint ring; it slides between segments. Segment radius = track radius − padding.
  * Two-line segments (with `SegmentedControl.Description`) grow the track to their content.
- * Narrow containers: segments never wrap; the row scrolls horizontally with edge fades.
- * `fullWidth` stretches the group: single-line segments tend to equal widths but never get narrower
- * than their label (the row scrolls instead), two-line segments grow from their content width.
+ * Narrow containers: segments never wrap (`internal/SwitcherScroller`); when every segment has an
+ * icon they drop their titles (`data-collapse="icon"`), and what still does not fit scrolls with
+ * edge fades. `fullWidth` stretches the group: single-line segments tend to equal widths but never
+ * get narrower than their label (the row scrolls instead), two-line segments grow from their content
+ * width.
  */
-
-/* Selected thumb: `--prime-color-control-selected` (white in light, a lighter step above the track in dark). */
 
 /*
  * Field frame (label · track · support row): hugs the track unless `fullWidth`. Zero specificity,
@@ -38,6 +39,8 @@
   --seg-height: calc(var(--seg-control-height) - 2 * var(--seg-pad));
   --seg-item-radius: calc(var(--seg-radius) - var(--seg-pad));
   --seg-two-line-min: calc(3 * var(--seg-control-height));
+  /* The edge overlays' width: the viewport's fade depth, so a revealed segment clears them. */
+  --seg-fade: var(--prime-space-8);
   /* Two-line segment: tier padding; description = tier hint size (one step below the label). */
   --seg-two-line-pad-x: var(--prime-control-m-padding-x);
   --seg-two-line-pad-y: var(--prime-space-2);
@@ -133,7 +136,8 @@
 /* ─── Viewport (a ScrollContainer, hidden bar) → list (the track, holds the thumb) ──── */
 
 .viewport {
-  display: flex;
+  --scroll-fade-depth: var(--seg-fade);
+
   flex: 1 1 auto;
 }
 
@@ -158,7 +162,7 @@
   position: absolute;
   inset-block: var(--seg-pad);
   z-index: var(--prime-z-above);
-  width: var(--prime-space-8);
+  width: var(--seg-fade);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
@@ -311,7 +315,10 @@
   white-space: nowrap;
 }
 
+/* A kit Icon takes the tier's size from `--prime-icon-size`; a raw svg too (`iconSlotClass`). */
 .icon {
+  --prime-icon-size: var(--seg-icon);
+
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -321,25 +328,21 @@
   line-height: 0;
 }
 
-.icon > :global(svg) {
-  display: block;
-  width: 100%;
-  height: 100%;
+/* Collapsed to icons: the title leaves the row (Label renders a VisuallyHidden copy and the item a
+   tooltip), the segment turns square like an icon-only one. */
+.list[data-collapse="icon"] :is(.label, .count, .description) {
+  display: none;
+}
+
+.list[data-collapse="icon"] .item {
+  min-width: var(--seg-height);
+  padding-inline: var(--prime-space-2);
 }
 
 .count {
   flex-shrink: 0;
   align-self: center;
   font-variant-numeric: tabular-nums;
-}
-
-/* Gray soft equals the track fill; a text wash keeps a neutral count visible on track and thumb. */
-.item .count[data-color="gray"] {
-  background: color-mix(
-    in srgb,
-    var(--prime-color-text-primary) var(--prime-tint-faint),
-    transparent
-  );
 }
 
 .description {
@@ -386,24 +389,15 @@
   grid-column: 2 / -1;
 }
 
-/* ─── Thumb (geometry written from TS) ──────────────────────────────────────── */
+/* ─── Thumb (the shared selection indicator: placed from TS, glides into a choice) ─ */
 
 .thumb {
-  position: absolute;
-  top: 0;
-  left: 0;
   z-index: var(--prime-z-base);
   border-radius: var(--seg-item-radius);
   background: var(--prime-color-control-selected);
   box-shadow:
     inset 0 0 0 var(--prime-border-width) var(--seg-thumb-ring),
     var(--prime-shadow-raised);
-  pointer-events: none;
-  opacity: 0;
-}
-
-.thumb[data-visible="true"] {
-  opacity: 1;
 }
 
 /* Colored option selected: soft fill of its hue + a 1px ring of the hue text at low alpha. */
@@ -415,24 +409,7 @@
     var(--prime-shadow-raised);
 }
 
-/* Glides only into a user's choice (layout changes snap it); color follows on `standard`.
-   Position rides `left`/`top`, not `transform`, on purpose: a transform transition makes the thumb a
-   composited layer, and Safari then misses its overlap with the later segments inside a scrolling
-   row and paints their text under the thumb until the glide ends (WebKit PR #75750). A thumb that
-   stays in normal paint order cannot cover the text; size already animates the same way. */
-.thumb[data-animate="true"] {
-  transition:
-    left var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    top var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
-}
-
 .root[data-disabled="true"] .thumb {
   background: var(--prime-color-fill-muted-hover);
   box-shadow: none;
 }
-
-/* Reduced motion: the root never sets `data-animate` then, and the duration tokens are 0. */

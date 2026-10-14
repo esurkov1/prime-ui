@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "BottomNav.Root",
-      en: "`ref` → `HTMLElement`. The `<nav>`: the bar of items in equal columns and the actions beside it. Inside `AppShell.Footer` it shows only while no Sidebar rail is on screen.",
-      ru: "`<nav>`: полоса пунктов равными колонками и действия рядом с ней. Внутри `AppShell.Footer` видна, только пока на экране нет рейла Sidebar.",
+      en: "`ref` → `HTMLElement`. The `<nav>`: the bar of items in equal columns — a switcher row that scrolls when they do not fit — and the actions beside it. Inside `AppShell.Footer` it shows only while no Sidebar rail is on screen.",
+      ru: "`<nav>`: полоса пунктов равными колонками — строка переключателя, которая прокручивается, если они не помещаются, — и действия рядом с ней. Внутри `AppShell.Footer` видна, только пока на экране нет рейла Sidebar.",
       props: [
         {
           name: "iconOnly",
@@ -45,8 +45,8 @@ export const api: ComponentApi = {
           name: "current",
           type: "boolean",
           default: "false",
-          en: 'Current section: `aria-current="page"`; the icon and the label turn primary (the others are muted); floating, the item is in the accent on the selection capsule (the others in full ink).',
-          ru: 'Текущий раздел: `aria-current="page"`; иконка и подпись становятся основного цвета (остальные приглушены); в капсуле — акцентного цвета на капсуле выбора (остальные основного).',
+          en: 'Current section: `aria-current="page"`; the icon and the label turn primary (the others are muted) and the glyph sits on a soft pill; floating, the item is in the accent on the selection capsule (the others in full ink).',
+          ru: 'Текущий раздел: `aria-current="page"`; иконка и подпись становятся основного цвета (остальные приглушены), глиф стоит на мягкой плашке; в капсуле — акцентного цвета на капсуле выбора (остальные основного).',
         },
         {
           name: "disabled",
@@ -150,8 +150,8 @@ export const api: ComponentApi = {
     },
     {
       name: "BottomNav.Action",
-      en: '`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral solid) beside the bar for the screen\'s main action. Placed before the first item it stands at the start, otherwise at the end.',
-      ru: 'Круглая Button (`shape="circle"`, `l`, нейтральная заливка) рядом с полосой для главного действия экрана. Перед первым пунктом встаёт в начале, иначе в конце.',
+      en: '`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral; `solid` beside the flat bar, `glass` as tall as the floating capsule) for the screen\'s main action. Placed before the first item it stands at the start, otherwise at the end.',
+      ru: 'Круглая Button (`shape="circle"`, `l`, нейтральная; `solid` рядом с плоской полосой, `glass` высотой с плавающую капсулу) для главного действия экрана. Перед первым пунктом встаёт в начале, иначе в конце.',
       props: [
         {
           name: "aria-label",
@@ -198,8 +198,8 @@ export const api: ComponentApi = {
         ru: "Ориентир `<nav>` с именем `labels.nav` («Основные разделы») или своим `aria-label`.",
       },
       {
-        en: 'The current section has `aria-current="page"`; visually it is the primary-color item among muted ones (a contrast step, not a hue); floating, it also sits on the selection capsule, so the accent is never the only cue.',
-        ru: 'Текущий раздел — `aria-current="page"`: иконка и подпись основного цвета, остальные приглушены; в капсуле — акцентного цвета на капсуле выбора, так что цвет не единственный признак.',
+        en: 'The current section has `aria-current="page"`; visually it is the primary-color item among muted ones with its glyph on a pill, floating it sits on the selection capsule — colour is never the only cue.',
+        ru: 'Текущий раздел — `aria-current="page"`: иконка и подпись основного цвета, глиф на плашке, остальные приглушены; в капсуле — на капсуле выбора, так что цвет не единственный признак.',
       },
       {
         en: "The icon is hidden from assistive tech; the item is named by its label, the count is read after it («Заказы 12»).",

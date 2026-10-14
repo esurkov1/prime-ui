@@ -1,15 +1,19 @@
 import * as React from "react";
-import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
+
 import { useControllableState } from "@/hooks/useControllableState";
+import { useElementSize, useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { useLabels } from "@/internal/labels";
+import { RegionSwap } from "@/internal/RegionSwap";
 import {
   SurfaceDepthProvider,
   useNestedSurfaceDepth,
   useStageDepth,
 } from "@/internal/surfaceDepth";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 import { suspendTransitions } from "@/theme/applyTheme";
 
 import { Button } from "../button/Button";
@@ -71,6 +75,9 @@ export const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
   codeRegion: "Код примера",
 };
 
+/** A frame narrower than this many `--prime-space-20` steps stacks its toolbar. */
+const NARROW_STEPS = 8;
+
 /** How long the copy button shows «copied» / «error» before it returns to «copy». */
 const COPY_FEEDBACK_MS = 2000;
 
@@ -92,30 +99,42 @@ const holdsStretch = (node: Node) =>
  * elements per frame). A MutationObserver re-reads only when a change can matter.
  */
 function usePreviewFacts(
-  stageRef: React.RefObject<HTMLDivElement | null>,
+  stageRef: React.RefObject<HTMLElement | null>,
   layout: ExampleFramePreviewLayout,
   active: boolean,
 ) {
-  React.useLayoutEffect(() => {
-    const stage = stageRef.current;
-    if (!active || !stage) return;
-    // The width the column grid needs, measured when it overflowed; while the rows wrap the grid
-    // is not laid out, so the stage returns to it only once it is at least this wide again.
-    let gridWidth = 0;
-    const fitMatrix = (remeasure: boolean) => {
+  // The width the column grid needs, measured when it overflowed; while the rows wrap the grid is
+  // not laid out, so the stage returns to it only once it is at least this wide again.
+  const gridWidth = React.useRef(0);
+  const fitMatrix = React.useCallback(
+    (stage: HTMLElement, remeasure: boolean) => {
       if (layout !== "matrix") {
         stage.removeAttribute("data-matrix-wrap");
         return;
       }
       if (stage.hasAttribute("data-matrix-wrap")) {
-        if (!remeasure && stage.clientWidth < gridWidth) return;
+        if (!remeasure && stage.clientWidth < gridWidth.current) return;
         stage.removeAttribute("data-matrix-wrap");
       }
       if (stage.scrollWidth > stage.clientWidth + 1) {
-        gridWidth = stage.scrollWidth;
+        gridWidth.current = stage.scrollWidth;
         stage.setAttribute("data-matrix-wrap", "");
       }
-    };
+    },
+    [layout],
+  );
+
+  useResizeEffect(
+    stageRef,
+    () => {
+      if (stageRef.current) fitMatrix(stageRef.current, false);
+    },
+    { enabled: active && layout === "matrix" },
+  );
+
+  React.useLayoutEffect(() => {
+    const stage = stageRef.current;
+    if (!active || !stage) return;
     // Stretching only latches on: a virtualized list mounts and unmounts its rows while it
     // scrolls, and a full-width card leaving the window must not narrow the stage under the reader.
     const read = () => {
@@ -136,7 +155,7 @@ function usePreviewFacts(
       } else {
         stage.style.removeProperty("--matrix-columns");
       }
-      fitMatrix(true);
+      fitMatrix(stage, true);
     };
     read();
     const observer = new MutationObserver((records) => {
@@ -159,16 +178,8 @@ function usePreviewFacts(
       attributes: true,
       attributeFilter: ["data-full-width"],
     });
-    const resize =
-      layout === "matrix" && typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(() => fitMatrix(false))
-        : null;
-    resize?.observe(stage);
-    return () => {
-      observer.disconnect();
-      resize?.disconnect();
-    };
-  }, [stageRef, layout, active]);
+    return () => observer.disconnect();
+  }, [stageRef, layout, active, fitMatrix]);
 }
 
 export type ExampleFrameProps = Omit<React.HTMLAttributes<HTMLDivElement>, "onCopy"> & {
@@ -229,7 +240,7 @@ export function ExampleFrame({
   const mergedRef = useMergedRefs(rootRef, ref);
   const depth = useNestedSurfaceDepth();
   const stageDepth = useStageDepth();
-  const stageRef = React.useRef<HTMLDivElement>(null);
+  const stageRef = React.useRef<HTMLElement>(null);
   usePreviewFacts(stageRef, previewLayout, pane === "preview");
   const previousScheme = React.useRef(colorScheme);
   React.useLayoutEffect(() => {
@@ -251,11 +262,16 @@ export function ExampleFrame({
         onColorSchemeChange={showThemeToggle ? setColorScheme : undefined}
         onCopy={onCopy}
       />
-      {pane === "preview" ? (
-        <div className={styles.previewShell}>
+      {/* The pane switch cross-fades and glides the height between the preview and the code. */}
+      <RegionSwap state={pane}>
+        {pane === "preview" ? (
           <div className={styles.previewViewport} data-viewport={viewport}>
-            <div
+            {/* The stage scrolls a preview wider than itself (a table without its own scroll)
+                under edge shadows, never clips it. */}
+            <ScrollContainer
               ref={stageRef}
+              axis="horizontal"
+              edges="shadow"
               className={styles.previewInner}
               data-preview-layout={previewLayout}
               data-theme={colorScheme}
@@ -264,24 +280,24 @@ export function ExampleFrame({
               {/* The stage is a page of its own (or the layer the docs ask for); surfaces inside
                   count from it. Never wrap `children` in an element: the layouts use `> *`. */}
               <SurfaceDepthProvider value={stageDepth}>{children}</SurfaceDepthProvider>
-            </div>
+            </ScrollContainer>
           </div>
-        </div>
-      ) : (
-        // Plain CodeBlock is not focusable itself; the scrolling pane takes keyboard focus instead.
-        // The pane carries the theme, so the block inherits it (and trims the source itself).
-        <ScrollContainer
-          as="section"
-          axis="both"
-          edges="shadow"
-          className={styles.codePane}
-          data-theme={colorScheme}
-          tabIndex={0}
-          aria-label={labels.codeRegion}
-        >
-          <CodeBlock variant="ghost" code={code} />
-        </ScrollContainer>
-      )}
+        ) : (
+          // Plain CodeBlock is not focusable itself; the scrolling pane takes keyboard focus
+          // instead. The pane carries the theme, so the block inherits it (and trims the source).
+          <ScrollContainer
+            as="section"
+            axis="both"
+            edges="shadow"
+            className={styles.codePane}
+            data-theme={colorScheme}
+            tabIndex={0}
+            aria-label={labels.codeRegion}
+          >
+            <CodeBlock variant="ghost" code={code} />
+          </ScrollContainer>
+        )}
+      </RegionSwap>
     </div>
   );
 }
@@ -313,6 +329,16 @@ function ExampleFrameToolbar({
   onCopy,
 }: ExampleFrameToolbarProps) {
   const [copyState, setCopyState] = React.useState<"idle" | "copied" | "error">("idle");
+  const toolbarRef = React.useRef<HTMLDivElement>(null);
+  const toolbarSize = useElementSize(toolbarRef);
+  // A narrow frame (under 8 × `--prime-space-20`, 640 at the default root size) stacks the two
+  // switches, each across the toolbar with its segments sharing the width; the viewport switch
+  // drops its titles by itself when even then they do not fit.
+  const narrow =
+    toolbarSize !== null &&
+    toolbarSize.width > 0 &&
+    toolbarSize.width <
+      NARROW_STEPS * readCssLengthPx("--prime-space-20", TOKEN_DEFAULTS["--prime-space-20"]);
 
   React.useEffect(() => {
     if (copyState === "idle") return;
@@ -332,12 +358,16 @@ function ExampleFrameToolbar({
 
   const copyLabel =
     copyState === "copied" ? labels.copied : copyState === "error" ? labels.copyError : labels.copy;
+  // Button.Icon cross-fades a glyph that changes in place.
+  const themeGlyph = colorScheme === "light" ? "theme.dark" : "theme.light";
+  const copyGlyph = copyState === "copied" ? "action.check" : "action.copy";
 
   return (
-    <div className={styles.toolbar}>
+    <div ref={toolbarRef} className={styles.toolbar} data-narrow={narrow || undefined}>
       <div className={styles.toolbarLine1}>
         <SegmentedControl.Root
           className={styles.toolbarPaneSegment}
+          fullWidth={narrow}
           value={pane}
           onValueChange={(v) => onPaneChange(v as Pane)}
           size="s"
@@ -367,11 +397,7 @@ function ExampleFrameToolbar({
               aria-label={colorScheme === "light" ? labels.themeDark : labels.themeLight}
             >
               <Button.Icon>
-                {colorScheme === "light" ? (
-                  <Icon name="theme.dark" size="s" tone="secondary" />
-                ) : (
-                  <Icon name="theme.light" size="s" tone="secondary" />
-                )}
+                <Icon name={themeGlyph} size="s" tone="secondary" />
               </Button.Icon>
             </Button.Root>
           ) : null}
@@ -383,13 +409,8 @@ function ExampleFrameToolbar({
             onClick={handleCopy}
             aria-label={copyLabel}
           >
-            {/* Button.Icon cross-fades copy ↔ check in place. */}
             <Button.Icon data-copy-state={copyState}>
-              <Icon
-                name={copyState === "copied" ? "action.check" : "action.copy"}
-                size="s"
-                tone="secondary"
-              />
+              <Icon name={copyGlyph} size="s" tone="secondary" />
             </Button.Icon>
           </Button.Root>
         </div>
@@ -397,6 +418,7 @@ function ExampleFrameToolbar({
       {pane === "preview" ? (
         <SegmentedControl.Root
           className={styles.toolbarViewportSegment}
+          fullWidth={narrow}
           value={viewport}
           onValueChange={(v) => onViewportChange(v as ExampleFrameViewport)}
           size="s"
@@ -407,11 +429,7 @@ function ExampleFrameToolbar({
               <SegmentedControl.Icon>
                 <Icon name={`viewport.${option}`} />
               </SegmentedControl.Icon>
-              {/* A phone-width frame hides the visible label; the hidden one keeps the name. */}
-              <span className={styles.viewportLabel} aria-hidden="true">
-                {labels[option]}
-              </span>
-              <VisuallyHidden>{labels[option]}</VisuallyHidden>
+              {labels[option]}
             </SegmentedControl.Item>
           ))}
         </SegmentedControl.Root>

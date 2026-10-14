@@ -3,6 +3,8 @@
  * Segments are separated by a hairline gap that shows the surface behind;
  * only the outer corners are rounded, inner corners are square.
  * Geometry is Button's: the shared field tier (`internal/fieldTier`) on the root.
+ * A row is a switcher (`internal/SwitcherScroller`): it never wraps or truncates, what does not fit
+ * scrolls inside it with faded edges; a column stacks.
  */
 /*
  * Field frame (label · segments · support row): hugs the group unless `fullWidth`. Zero
@@ -21,19 +23,19 @@
   /* Optical compensation: the icon side gets padX − 4px, never closer than 8px (xs). */
   --bg-px-icon: max(calc(var(--field-button-px) - var(--prime-space-1)), var(--prime-space-2));
 
-  display: inline-flex;
+  display: flex;
   gap: var(--prime-border-width);
   max-width: 100%;
-  vertical-align: middle;
 }
 
 .root[data-orientation="vertical"] {
+  display: inline-flex;
   flex-direction: column;
   align-items: stretch;
+  vertical-align: middle;
 }
 
 .root[data-full-width="true"] {
-  display: flex;
   width: 100%;
 }
 
@@ -41,6 +43,7 @@
   position: relative;
   box-sizing: border-box;
   display: inline-flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   gap: var(--field-gap);
@@ -62,7 +65,9 @@
   transition:
     background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    outline-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .item[data-leading-icon="true"] {
@@ -80,35 +85,37 @@
 }
 
 @media (hover: hover) {
-  .item:hover:not(:disabled) {
+  .item:hover:not(:disabled, [aria-disabled="true"]) {
     background: var(--prime-color-fill-muted-hover);
     color: var(--prime-color-text-primary);
   }
 }
 
-/* Press (foundation §7 rule 6): compact for icon-only segments; disabled never scales. */
-.item:active:not(:disabled) {
-  background: var(--prime-color-fill-strong);
-  transform: scale(var(--prime-motion-press-scale));
+/* Press (foundation §7 rule 6) is the shared `internal/press`, joined in TSX: a scale only, so a
+   pressed segment keeps its fill (compact for icon-only segments; disabled never scales). */
+
+/* The focus ring: outside the segment in a column, inside it in a row — the row scrolls (clips). */
+.item {
+  outline: var(--prime-focus-width) solid transparent;
+  outline-offset: var(--prime-focus-offset-inset);
 }
 
-.item[data-icon-only="true"]:active:not(:disabled) {
-  transform: scale(var(--prime-motion-press-scale-compact));
+.root[data-orientation="vertical"] > .item {
+  outline-offset: var(--prime-focus-offset);
 }
 
 .item:focus-visible {
   z-index: var(--prime-z-raised);
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
+  outline-color: var(--prime-color-focus-ring);
 }
 
-.item[data-state="active"] {
+.item[aria-pressed="true"] {
   background: var(--prime-color-accent-soft);
   color: var(--prime-color-accent-text);
 }
 
 @media (hover: hover) {
-  .item[data-state="active"]:hover:not(:disabled) {
+  .item[aria-pressed="true"]:hover:not(:disabled, [aria-disabled="true"]) {
     background: var(--prime-color-accent-soft-hover);
     color: var(--prime-color-accent-text);
   }
@@ -125,9 +132,11 @@
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
+/* Full width: segments tend to equal widths and never get narrower than their label; when they do
+   not fit, the row scrolls. */
 .root[data-full-width="true"]:not([data-orientation="vertical"]) > .item {
   flex: 1 1 0;
-  min-width: 0;
+  min-width: max-content;
 }
 
 /* Outer corners only. */
@@ -151,6 +160,7 @@
   border-end-end-radius: var(--field-radius);
 }
 
+/* A kit Icon takes the tier's size from `--prime-icon-size`; a raw svg too (`iconSlotClass`). */
 .icon {
   display: inline-flex;
   flex-shrink: 0;
@@ -158,9 +168,4 @@
   justify-content: center;
   width: var(--prime-icon-size);
   height: var(--prime-icon-size);
-}
-
-.icon > svg {
-  width: 100%;
-  height: 100%;
 }

@@ -31,10 +31,10 @@
 
 /*
  * Toolbar: one line while it fits, wraps otherwise. The pane switch keeps its content width;
- * the device switch is pushed to the end and takes the rest of the line after a wrap.
+ * the device switch is pushed to the end. Narrower than 8 × `--prime-space-20` (`data-narrow`,
+ * measured in TS) the two switches stack, each across the toolbar with `fullWidth` segments.
  */
 .toolbar {
-  container-type: inline-size;
   display: flex;
   flex-shrink: 0;
   flex-wrap: wrap;
@@ -66,61 +66,29 @@
   margin-left: auto;
 }
 
+/* The switches shrink with the toolbar and scroll inside themselves (they are switchers). */
 .toolbarPaneSegment {
   flex: 0 1 auto;
   min-width: 0;
-  width: fit-content;
-  max-width: 100%;
 }
 
 .toolbarViewportSegment {
   flex: 0 1 auto;
   min-width: 0;
   margin-left: auto;
-  width: fit-content;
 }
 
-/* Let the segment groups shrink below their content so the toolbar can wrap. */
-.toolbar .toolbarPaneSegment,
-.toolbar .toolbarViewportSegment {
-  min-width: 0;
+.toolbar[data-narrow] .toolbarLine1 {
+  flex: 1 1 100%;
 }
 
-@container (width < 40rem) {
-  .toolbarLine1 {
-    flex: 1 1 100%;
-    width: 100%;
-  }
-
-  .toolbarPaneSegment {
-    flex: 1 1 auto;
-    width: 100%;
-  }
-
-  .toolbarViewportSegment {
-    flex: 1 1 100%;
-    width: 100%;
-    margin-left: 0;
-  }
-
-  /* Stretched groups share the width equally, like `fullWidth`. */
-  .toolbarPaneSegment :global([role="radio"]),
-  .toolbarViewportSegment :global([role="radio"]) {
-    flex: 1 1 0;
-    min-width: 0;
-  }
+.toolbar[data-narrow] .toolbarPaneSegment {
+  flex: 1 1 auto;
 }
 
-/* Phone-width frame: device labels would be cut to «Деск…»; keep the icons. The visible label is
-   `aria-hidden`; a VisuallyHidden copy names the option at every width. */
-@container (width < 25rem) {
-  .viewportLabel {
-    display: none;
-  }
-}
-
-.previewShell {
-  min-width: 0;
+.toolbar[data-narrow] .toolbarViewportSegment {
+  flex: 1 1 100%;
+  margin-left: 0;
 }
 
 .previewViewport {
@@ -157,11 +125,9 @@
   min-height: calc(var(--prime-space-20) * 2);
   padding: var(--prime-space-6) var(--prime-space-4);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-layer-current);
+  background-color: var(--prime-color-layer-current);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
   color: var(--prime-color-text-primary);
-  /* Clip content wider than the card (wide button groups, tables without their own scroll). */
-  overflow: hidden;
 }
 
 /*

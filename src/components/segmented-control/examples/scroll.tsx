@@ -1,4 +1,4 @@
-/** Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view. */
+/** Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view — `defaultValue`. */
 import { SegmentedControl } from "prime-ui-kit";
 
 export default function SegmentedControlScrollExample() {

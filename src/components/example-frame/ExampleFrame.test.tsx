@@ -1,10 +1,9 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { StageDepthProvider } from "@/internal/surfaceDepth";
+import { cssRules } from "@/test/css";
 
 import { ExampleFrame } from "./ExampleFrame";
 
@@ -156,6 +155,35 @@ describe("ExampleFrame", () => {
     expect(onViewportChange).toHaveBeenCalledWith("tablet");
   });
 
+  it("Tab walks the toolbar; ArrowLeft goes back to the previous device", async () => {
+    const user = userEvent.setup();
+    render(
+      <ExampleFrame code="x" defaultViewport="tablet">
+        preview
+      </ExampleFrame>,
+    );
+    await user.tab();
+    expect(screen.getByRole("radio", { name: "Превью" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Включить тёмную тему" })).toHaveFocus();
+    await user.tab();
+    await user.tab();
+    expect(screen.getByRole("radio", { name: "Планшет" })).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("radio", { name: "Десктоп" })).toBeChecked();
+  });
+
+  it("the stage scrolls a preview wider than itself under edge shadows instead of clipping it", () => {
+    render(
+      <ExampleFrame code="x">
+        <p>preview</p>
+      </ExampleFrame>,
+    );
+    const stage = screen.getByText("preview").parentElement as HTMLElement;
+    expect(stage).toHaveAttribute("data-edges", "shadow");
+    expect(stage).toHaveAttribute("data-preview-layout", "default");
+  });
+
   it("switches to the code pane", () => {
     render(<ExampleFrame code="const answer = 42;">preview</ExampleFrame>);
     fireEvent.click(screen.getByRole("radio", { name: "Код" }));
@@ -189,17 +217,14 @@ describe("ExampleFrame", () => {
   });
 
   it("stretches a preview block only by a zero-specificity width, so an example's own width wins", () => {
-    const css = readFileSync(
-      path.resolve(process.cwd(), "src/components/example-frame/ExampleFrame.module.css"),
-      "utf8",
-    );
-    const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(
-      ([, selector, body]) =>
-        selector.includes("[data-preview-stretch]") && /(^|[\s;])width\s*:/.test(body),
+    const rules = cssRules("src/components/example-frame/ExampleFrame.module.css").filter(
+      (rule) =>
+        rule.selector.includes("[data-preview-stretch]") &&
+        rule.decls.some((decl) => decl.prop === "width"),
     );
     expect(rules.length).toBeGreaterThan(0);
-    for (const [, selector] of rules) {
-      for (const part of selector.replace(/\/\*[\s\S]*?\*\//g, "").split(",")) {
+    for (const rule of rules) {
+      for (const part of rule.selector.split(",")) {
         expect(part.trim()).toMatch(/^:where\(.+\) > :where\(.+\)$/);
       }
     }

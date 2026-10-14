@@ -1,19 +1,17 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { touchTargetBlockClass } from "@/internal/touchTarget";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { SegmentedControl } from "./SegmentedControl";
+import styles from "./SegmentedControl.module.css";
 
-const segmentedModuleCssPath = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "SegmentedControl.module.css",
-);
+const CSS = "src/components/segmented-control/SegmentedControl.module.css";
+const value = (selector: string, prop: string, parents?: string[]) =>
+  cssValue(cssRule(CSS, selector, parents), prop);
 
 function renderSegmented(overrides?: { disabled?: boolean }) {
   return render(
@@ -29,20 +27,18 @@ function renderSegmented(overrides?: { disabled?: boolean }) {
 // Button / Input). Segment height is derived as height − 2 × track padding.
 describe("SegmentedControl — размеры (регрессия CSS)", () => {
   it("каждый ярус берёт высоту контрола своего же яруса", () => {
-    const css = readFileSync(segmentedModuleCssPath, "utf8");
-
     // m is the default on the base rule; every other tier overrides it.
-    const base = css.match(/\.root\s*\{[^}]*\}/s)?.[0] ?? "";
-    expect(base).toContain("--seg-control-height: var(--prime-control-m-height)");
+    expect(value(".root", "--seg-control-height")).toBe("var(--prime-control-m-height)");
     for (const tier of ["xs", "s", "l", "xl"] as const) {
-      const block =
-        css.match(new RegExp(`\\.root\\[data-size="${tier}"\\]\\s*\\{[^}]*\\}`, "s"))?.[0] ?? "";
-      expect(block).toContain(`--seg-control-height: var(--prime-control-${tier}-height)`);
+      expect(value(`.root[data-size="${tier}"]`, "--seg-control-height")).toBe(
+        `var(--prime-control-${tier}-height)`,
+      );
     }
-    expect(css).toContain("height: var(--seg-control-height);");
-    expect(css).toContain("--seg-height: calc(var(--seg-control-height) - 2 * var(--seg-pad))");
-    expect(css).toContain("--seg-item-radius: calc(var(--seg-radius) - var(--seg-pad))");
-    expect(css).not.toContain("prime-sys");
+    expect(value(".root", "height")).toBe("var(--seg-control-height)");
+    expect(value(".root", "--seg-height")).toBe(
+      "calc(var(--seg-control-height) - 2 * var(--seg-pad))",
+    );
+    expect(value(".root", "--seg-item-radius")).toBe("calc(var(--seg-radius) - var(--seg-pad))");
   });
 
   it("каждый сегмент растит зону касания по высоте, а область прокрутки её не обрезает", () => {
@@ -50,8 +46,9 @@ describe("SegmentedControl — размеры (регрессия CSS)", () => {
     for (const item of screen.getAllByRole("radio")) {
       expect(item).toHaveClass(touchTargetBlockClass);
     }
-    const css = readFileSync(segmentedModuleCssPath, "utf8");
-    expect(css).toMatch(/@media \(pointer: coarse\) \{\s*\.viewport \{[^}]*padding-block:/);
+    expect(value(".viewport", "padding-block", ["@media (pointer: coarse)"])).toBe(
+      "var(--seg-touch-grow)",
+    );
   });
 });
 
@@ -307,11 +304,9 @@ describe("SegmentedControl — thumb and parts", () => {
   });
 
   it("the track clips the thumb inline, so moving the selection never grows the scroll area", () => {
-    const css = readFileSync(segmentedModuleCssPath, "utf8");
-    const block = css.match(/\.list\s*\{[^}]*\}/s)?.[0] ?? "";
-    expect(block).toContain("position: relative;");
+    expect(value(".list", "position")).toBe("relative");
     // Inline only: the block axis stays visible for the segments' touch hit areas.
-    expect(block).toContain("overflow-x: clip;");
+    expect(value(".list", "overflow-x")).toBe("clip");
   });
 
   it("the thumb glides only after a user change, and never under reduced motion", () => {
@@ -447,12 +442,14 @@ describe("SegmentedControl — thumb and parts", () => {
   });
 
   it("full width: segments tend to equal widths and never get narrower than their label", () => {
-    const css = readFileSync(segmentedModuleCssPath, "utf8");
-    expect(css).toMatch(/\.root\[data-full-width="true"\] \.item \{\s*flex: 1 1 0;/);
-    expect(css).toMatch(
-      /\.root\[data-full-width="true"\] \.item:not\(\[data-icon-only="true"\], \[data-two-line="true"\]\) \{\s*min-width: max-content;/,
-    );
-    expect(css).toMatch(/\.root\[data-full-width="true"\] \.list \{\s*flex: 1 0 auto;/);
+    expect(value('.root[data-full-width="true"] .item', "flex")).toBe("1 1 0");
+    expect(
+      value(
+        '.root[data-full-width="true"] .item:not([data-icon-only="true"], [data-two-line="true"])',
+        "min-width",
+      ),
+    ).toBe("max-content");
+    expect(value('.root[data-full-width="true"] .list', "flex")).toBe("1 0 auto");
   });
 
   it("hides the thumb when nothing is selected", () => {
@@ -511,6 +508,106 @@ describe("SegmentedControl — two-line segments", () => {
     expect(plain).not.toHaveAttribute("data-two-line");
     expect(plain).not.toHaveAttribute("aria-describedby");
   });
+
+  it("a plain-text title of a two-line segment is its label: every reference resolves", () => {
+    render(
+      <SegmentedControl.Root defaultValue="fleet" aria-label="Автопарк">
+        <SegmentedControl.Item value="fleet">
+          В парке
+          <SegmentedControl.Description>на линии и в резерве</SegmentedControl.Description>
+        </SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    const item = screen.getByRole("radio", { name: "В парке" });
+    expect(item).toHaveAccessibleDescription("на линии и в резерве");
+    for (const id of (item.getAttribute("aria-labelledby") ?? "").split(" ")) {
+      expect(document.getElementById(id), id).not.toBeNull();
+    }
+  });
+});
+
+describe("SegmentedControl — narrow row", () => {
+  const VIEWS = [
+    { value: "board", label: "Доска", icon: "▦" },
+    { value: "list", label: "Список", icon: "≡" },
+    { value: "calendar", label: "Календарь", icon: "◷" },
+  ];
+
+  function renderViews(icons: boolean) {
+    return render(
+      <SegmentedControl.Root defaultValue="board" aria-label="Вид">
+        {VIEWS.map((view) => (
+          <SegmentedControl.Item key={view.value} value={view.value}>
+            {icons ? <SegmentedControl.Icon>{view.icon}</SegmentedControl.Icon> : null}
+            {view.label}
+          </SegmentedControl.Item>
+        ))}
+      </SegmentedControl.Root>,
+    );
+  }
+
+  function mockOverflow() {
+    return [
+      vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(400),
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(150),
+    ];
+  }
+
+  it("drops the titles when the row does not fit and every segment has an icon; names stay", () => {
+    const spies = mockOverflow();
+    try {
+      renderViews(true);
+      const list = screen.getByRole("radio", { name: "Доска" }).parentElement as HTMLElement;
+      expect(list).toHaveAttribute("data-collapse", "icon");
+      for (const view of VIEWS) {
+        expect(screen.getByRole("radio", { name: view.label })).toBeInTheDocument();
+      }
+    } finally {
+      for (const spy of spies) spy.mockRestore();
+    }
+  });
+
+  it("keeps the titles and scrolls when a segment has no icon", () => {
+    const spies = mockOverflow();
+    try {
+      renderViews(false);
+      const list = screen.getByRole("radio", { name: "Доска" }).parentElement as HTMLElement;
+      expect(list).toHaveAttribute("data-collapse", "full");
+    } finally {
+      for (const spy of spies) spy.mockRestore();
+    }
+  });
+
+  it("keeps the titles while the row fits", () => {
+    renderViews(true);
+    const list = screen.getByRole("radio", { name: "Доска" }).parentElement as HTMLElement;
+    expect(list).toHaveAttribute("data-collapse", "full");
+    expect(value('.list[data-collapse="icon"] :is(.label, .count, .description)', "display")).toBe(
+      "none",
+    );
+  });
+});
+
+describe("SegmentedControl — Tab", () => {
+  it("Tab enters the group on the selected segment and leaves it", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <SegmentedControl.Root defaultValue="b" aria-label="Период">
+          <SegmentedControl.Item value="a">День</SegmentedControl.Item>
+          <SegmentedControl.Item value="b">Неделя</SegmentedControl.Item>
+        </SegmentedControl.Root>
+        <button type="button">Дальше</button>
+      </>,
+    );
+    await user.tab();
+    expect(screen.getByRole("radio", { name: "Неделя" })).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(screen.getByRole("radio", { name: "День" })).toHaveFocus();
+    expect(screen.getByRole("radio", { name: "День" })).toBeChecked();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Дальше" })).toHaveFocus();
+  });
 });
 
 describe("SegmentedControl — цвет пунктов", () => {
@@ -532,15 +629,16 @@ describe("SegmentedControl — цвет пунктов", () => {
     renderStatus();
     const ok = screen.getByRole("radio", { name: "Исправен" });
     expect(ok).toHaveAttribute("data-color", "green");
-    expect(ok.querySelector('[class*="dot"]')).not.toBeNull();
+    expect(ok.querySelector(`.${styles.dot}`)).not.toBeNull();
     const plain = screen.getByRole("radio", { name: "Без цвета" });
     expect(plain).not.toHaveAttribute("data-color");
-    expect(plain.querySelector('[class*="dot"]')).toBeNull();
+    expect(plain.querySelector(`.${styles.dot}`)).toBeNull();
   });
 
   it("бегунок берёт цвет выбранного пункта и сбрасывает его на нейтральный", async () => {
-    const { container } = renderStatus();
-    const thumb = container.querySelector('[class*="thumb"]') as HTMLElement;
+    renderStatus();
+    const thumb = screen.getByRole("radio", { name: "Исправен" }).parentElement
+      ?.firstElementChild as HTMLElement;
     expect(thumb).toHaveAttribute("data-color", "green");
     fireEvent.click(screen.getByRole("radio", { name: "Нужно ТО" }));
     await waitFor(() => expect(thumb).toHaveAttribute("data-color", "orange"));
@@ -549,11 +647,13 @@ describe("SegmentedControl — цвет пунктов", () => {
   });
 
   it("цвет бегунка меняется на fade-такте той же длины, что и движение", () => {
-    const css = readFileSync(segmentedModuleCssPath, "utf8");
-    const rule = css.slice(css.indexOf('.thumb[data-animate="true"] {'));
-    const block = rule.slice(0, rule.indexOf("}"));
-    expect(block).toMatch(/background-color var\(--prime-motion-fade-base\)/);
-    expect(block).toMatch(/box-shadow var\(--prime-motion-fade-base\)/);
+    const glide = cssValue(
+      cssRule("src/internal/selectionIndicator.module.css", '.indicator[data-animate="true"]'),
+      "transition",
+    );
+    expect(glide).toMatch(/background-color var\(--prime-motion-fade-base\)/);
+    expect(glide).toMatch(/box-shadow var\(--prime-motion-fade-base\)/);
+    expect(glide).toMatch(/left var\(--prime-motion-duration-base\)/);
   });
 });
 
@@ -609,20 +709,20 @@ describe("SegmentedControl field frame", () => {
   });
 
   it("edge fades are logical: start / end sides and gradients flip under RTL", () => {
-    const css = readFileSync(segmentedModuleCssPath, "utf8");
-    const blocks = (selector: RegExp) =>
-      [...css.matchAll(new RegExp(`${selector.source}\\s*\\{[^}]*\\}`, "g"))]
-        .map((m) => m[0])
-        .join("\n");
-    const before = blocks(/(?<=\n)\.root::before/);
-    const after = blocks(/(?<=\n)\.root::after/);
-    expect(before).toContain("inset-inline-start:");
-    expect(after).toContain("inset-inline-end:");
-    expect(`${before}${after}`).not.toMatch(/(^|[\s;{])(left|right):/m);
-    expect(`${before}${after}`).not.toMatch(/to (left|right)/);
-    const rtl = css.match(/\.root:dir\(rtl\)\s*\{[^}]*\}/s)?.[0] ?? "";
-    expect(rtl).toContain("--seg-fade-to-end: to left;");
-    expect(rtl).toContain("--seg-fade-to-start: to right;");
+    const decls = (pseudo: string) =>
+      cssRules(CSS)
+        .filter((rule) => rule.selector.split(",").some((part) => part.trim() === `.root${pseudo}`))
+        .flatMap((rule) => rule.decls);
+    const before = decls("::before");
+    const after = decls("::after");
+    expect(before.map((decl) => decl.prop)).toContain("inset-inline-start");
+    expect(after.map((decl) => decl.prop)).toContain("inset-inline-end");
+    for (const decl of [...before, ...after]) {
+      expect(decl.prop).not.toMatch(/^(left|right)$/);
+      expect(decl.value).not.toMatch(/to (left|right)/);
+    }
+    expect(value(".root:dir(rtl)", "--seg-fade-to-end")).toBe("to left");
+    expect(value(".root:dir(rtl)", "--seg-fade-to-start")).toBe("to right");
   });
 
   it("in RTL the fades follow the negative scroll offset", () => {

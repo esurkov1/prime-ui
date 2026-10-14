@@ -1,19 +1,23 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import type { ControlSize } from "@/internal/states";
+import { cssRule, cssValue } from "@/test/css";
+
 import { Tabs } from "./Tabs";
 
-const TABS_CSS = readFileSync(
-  path.join(path.dirname(fileURLToPath(import.meta.url)), "Tabs.module.css"),
-  "utf8",
-);
+const CSS = "src/components/tabs/Tabs.module.css";
+const INDICATOR_CSS = "src/internal/selectionIndicator.module.css";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** A sized host (a panel, a form) around the tabs. */
+function ButtonHost({ size, children }: { size: ControlSize; children: React.ReactNode }) {
+  return <ControlSizeProvider value={size}>{children}</ControlSizeProvider>;
+}
 
 function BasicTabs({
   defaultValue = "tab1",
@@ -420,10 +424,9 @@ describe("Tabs — indicator", () => {
   it("renders one hidden folder indicator before the triggers in a horizontal list", () => {
     render(<BasicTabs />);
     const list = screen.getByRole("tablist");
-    expect(list).toHaveAttribute("data-indicator", "folder");
     const indicator = list.firstElementChild;
     expect(indicator).toHaveAttribute("aria-hidden", "true");
-    expect(list.querySelectorAll('[aria-hidden="true"][data-visible]')).toHaveLength(1);
+    expect(list.querySelectorAll('[aria-hidden="true"][data-indicator]')).toHaveLength(1);
   });
 
   it("scrolls horizontally with an edge fade and a hidden scrollbar", () => {
@@ -458,11 +461,11 @@ describe("Tabs — indicator", () => {
     );
     const indicator = screen.getByRole("tablist").firstElementChild as HTMLElement;
     expect(indicator).toHaveAttribute("data-visible", "true");
-    expect(indicator.style.transform).toBe("translate(0px, 0px)");
+    expect(indicator.style.left).toBe("0px");
     expect(indicator.style.width).toBe("60px");
     commits = 0;
     fireEvent.click(screen.getByRole("tab", { name: "tab2" }));
-    expect(indicator.style.transform).toBe("translate(80px, 0px)");
+    expect(indicator.style.left).toBe("80px");
     // One commit for the selection; measuring the indicator adds none.
     expect(commits).toBe(1);
     vi.restoreAllMocks();
@@ -493,7 +496,7 @@ describe("Tabs — indicator", () => {
 
       // A value set from outside snaps.
       rerender(<Tabs.Root value="tab2">{items}</Tabs.Root>);
-      expect(indicator.style.transform).toBe("translate(80px, 0px)");
+      expect(indicator.style.left).toBe("80px");
       expect(indicator).not.toHaveAttribute("data-animate");
 
       // A click applied by the owner glides; the flag clears when the glide ends.
@@ -505,7 +508,7 @@ describe("Tabs — indicator", () => {
       fireEvent.click(screen.getByRole("tab", { name: "tab1" }));
       rerender(<Tabs.Root value="tab1">{items}</Tabs.Root>);
       expect(indicator).toHaveAttribute("data-animate", "true");
-      fireEvent.transitionEnd(indicator, { propertyName: "transform" });
+      fireEvent.transitionEnd(indicator, { propertyName: "left" });
       expect(indicator).not.toHaveAttribute("data-animate");
     } finally {
       vi.unstubAllGlobals();
@@ -513,7 +516,7 @@ describe("Tabs — indicator", () => {
     }
   });
 
-  it("glides the indicator on arrow keys, never under reduced motion", () => {
+  it("glides the indicator on arrow keys", () => {
     vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
       this: HTMLElement,
     ) {
@@ -523,29 +526,42 @@ describe("Tabs — indicator", () => {
     vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(32);
     try {
       vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
-      const { unmount } = render(<BasicTabs />);
+      render(<BasicTabs />);
       const indicator = screen.getByRole("tablist").firstElementChild as HTMLElement;
       fireEvent.keyDown(screen.getByRole("tab", { name: "Tab 1" }), { key: "ArrowRight" });
       expect(indicator).toHaveAttribute("data-animate", "true");
-      unmount();
-      vi.unstubAllGlobals();
-
-      // Test setup reports `prefers-reduced-motion: reduce`.
-      render(<BasicTabs />);
-      const still = screen.getByRole("tablist").firstElementChild as HTMLElement;
-      fireEvent.click(screen.getByRole("tab", { name: "Tab 2" }));
-      expect(still.style.transform).toBe("translate(80px, 0px)");
-      expect(still).not.toHaveAttribute("data-animate");
     } finally {
       vi.unstubAllGlobals();
       vi.restoreAllMocks();
     }
   });
 
-  it("the indicator transition is declared only under data-animate", () => {
-    const base = TABS_CSS.match(/\n\.indicator \{[^}]*\}/s)?.[0] ?? "";
-    expect(base).not.toContain("transition");
-    expect(TABS_CSS).toMatch(/\.indicator\[data-animate="true"\] \{\s*transition:/);
+  it("never glides the indicator under reduced motion", () => {
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return valueOfBox(this) === "tab2" ? 80 : 0;
+    });
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(60);
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(32);
+    try {
+      // Test setup reports `prefers-reduced-motion: reduce`.
+      render(<BasicTabs />);
+      const still = screen.getByRole("tablist").firstElementChild as HTMLElement;
+      fireEvent.click(screen.getByRole("tab", { name: "Tab 2" }));
+      expect(still.style.left).toBe("80px");
+      expect(still).not.toHaveAttribute("data-animate");
+    } finally {
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("the folder glides only under data-animate, and its geometry never as a transform", () => {
+    const base = cssValue(cssRule(INDICATOR_CSS, ".indicator"), "transition");
+    expect(base).not.toMatch(/left|width|transform/);
+    const glide = cssValue(cssRule(INDICATOR_CSS, '.indicator[data-animate="true"]'), "transition");
+    expect(glide).toMatch(/^left /);
+    expect(glide).not.toContain("transform");
   });
 
   it("scrolls the list to the selected tab on mount without a glide, smoothly after a choice", () => {
@@ -628,12 +644,16 @@ describe("Tabs — indicator", () => {
 
   it("uses the folder in a vertical list too, and has no surface of its own", () => {
     const { container } = render(<BasicTabs orientation="vertical" />);
-    expect(screen.getByRole("tablist")).toHaveAttribute("data-indicator", "folder");
+    const folder = screen.getByRole("tablist").firstElementChild;
+    expect(folder).toHaveAttribute("aria-hidden", "true");
+    expect(folder).toHaveAttribute("data-indicator");
     expect(container.querySelector("[data-depth]")).toBeNull();
   });
 
   it("keeps the panel bare: no fill and no padding, it is the host's content", () => {
-    expect(TABS_CSS).not.toMatch(/\.panel \{[^}]*(padding|background)/s);
+    const panel = cssRule(CSS, ".panel").decls.map((decl) => decl.prop);
+    expect(panel).not.toContain("padding");
+    expect(panel).not.toContain("background");
   });
 });
 
@@ -691,7 +711,6 @@ function IconTabs({ withIcons = true }: { withIcons?: boolean }) {
   );
 }
 
-/** Content width of the list at each collapse level; the list itself is `clientWidth` wide. */
 /**
  * Lays the tabs out for the collapse level the list currently has: every item is
  * `widths[level] / 3` wide, side by side; the list is `clientWidth` wide. `extra` sizes other
@@ -742,11 +761,13 @@ describe("Tabs — width and collapse", () => {
 
   it("full width: tabs tend to equal widths and never get narrower than their content", () => {
     const h = '.root[data-orientation="horizontal"]';
-    expect(TABS_CSS).toContain(`${h} .item {\n  flex: 0 1 auto;\n  min-width: max-content;`);
-    expect(TABS_CSS).toContain(
-      `${h} .tab {\n  min-width: var(--tabs-item-min);\n  max-width: var(--tabs-item-max);\n}`,
-    );
-    expect(TABS_CSS).toContain(`${h}[data-full-width="true"] .item {\n  flex: 1 1 0;\n}`);
+    const item = cssRule(CSS, `${h} .item`);
+    expect(cssValue(item, "flex")).toBe("0 1 auto");
+    expect(cssValue(item, "min-width")).toBe("max-content");
+    const tab = cssRule(CSS, `${h} .tab`);
+    expect(cssValue(tab, "min-width")).toBe("var(--tabs-item-min)");
+    expect(cssValue(tab, "max-width")).toBe("var(--tabs-item-max)");
+    expect(cssValue(cssRule(CSS, `${h}[data-full-width="true"] .item`), "flex")).toBe("1 1 0");
   });
 
   it("shows everything while the items fit", () => {
@@ -1061,5 +1082,83 @@ describe("Tabs — removable tabs", () => {
       </Tabs.Root>,
     );
     expect(screen.getByRole("button", { name: "Убрать Счета" })).toBeInTheDocument();
+  });
+});
+
+describe("Tabs — references and tier", () => {
+  it("a tab points at its panel only while the panel is in the document", () => {
+    render(
+      <Tabs.Root defaultValue="orders">
+        <Tabs.List aria-label="Разделы">
+          <Tabs.Item value="orders">Заказы</Tabs.Item>
+          <Tabs.Item value="invoices">Счета</Tabs.Item>
+        </Tabs.List>
+        <Tabs.Panel value="orders">Список заказов</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    const orders = screen.getByRole("tab", { name: "Заказы" });
+    const panel = screen.getByRole("tabpanel");
+    expect(orders).toHaveAttribute("aria-controls", panel.id);
+    expect(panel).toHaveAccessibleName("Заказы");
+    // No panel for «Счета»: its tab names none.
+    const invoices = screen.getByRole("tab", { name: "Счета" });
+    expect(invoices).not.toHaveAttribute("aria-controls");
+    fireEvent.click(invoices);
+    expect(invoices).not.toHaveAttribute("aria-controls");
+    expect(orders).not.toHaveAttribute("aria-controls");
+    expect(screen.queryByRole("tabpanel")).toBeNull();
+  });
+
+  it("takes the tier of its host when it has no size, and its own size wins", () => {
+    const { container, rerender } = render(
+      <ButtonHost size="s">
+        <Tabs.Root defaultValue="a">
+          <Tabs.List>
+            <Tabs.Item value="a">A</Tabs.Item>
+          </Tabs.List>
+        </Tabs.Root>
+      </ButtonHost>,
+    );
+    const root = () => container.querySelector('[data-orientation="horizontal"]');
+    expect(root()).toHaveAttribute("data-size", "s");
+    rerender(
+      <ButtonHost size="s">
+        <Tabs.Root defaultValue="a" size="l">
+          <Tabs.List>
+            <Tabs.Item value="a">A</Tabs.Item>
+          </Tabs.List>
+        </Tabs.Root>
+      </ButtonHost>,
+    );
+    expect(root()).toHaveAttribute("data-size", "l");
+  });
+
+  it("collapsed to icons, a tab keeps its name through a hidden copy of the label", () => {
+    mockListWidths({ full: 600, compact: 500, icon: 120 }, 200);
+    try {
+      render(<IconTabs />);
+      const list = screen.getByRole("tablist");
+      expect(list).toHaveAttribute("data-collapse", "icon");
+      for (const tab of screen.getAllByRole("tab")) expect(tab).toHaveAccessibleName();
+    } finally {
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("Tab moves into the active tab and on to the panel", async () => {
+    const user = userEvent.setup();
+    render(
+      <Tabs.Root defaultValue="b">
+        <Tabs.List aria-label="Разделы">
+          <Tabs.Item value="a">A</Tabs.Item>
+          <Tabs.Item value="b">B</Tabs.Item>
+        </Tabs.List>
+        <Tabs.Panel value="b">Панель B</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    await user.tab();
+    expect(screen.getByRole("tab", { name: "B" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("tabpanel")).toHaveFocus();
   });
 });

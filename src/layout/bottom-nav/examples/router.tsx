@@ -1,13 +1,14 @@
-/** A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. */
+/** A router link as the item: the router marks the open section and the item shows it as current; render it inside a router — `asChild`. */
 import { BottomNav, Icon } from "prime-ui-kit";
 import { NavLink } from "react-router-dom";
 
 import styles from "./examples.module.css";
 
 const LINKS = [
-  { to: "/app-shell", label: "Каркас", icon: "nav.layoutGrid" },
-  { to: "/bottom-nav", label: "Навигация", icon: "nav.menu" },
-  { to: "/sidebar", label: "Сайдбар", icon: "nav.sidebarExpand" },
+  { to: "/", label: "Главная", icon: "nav.home" },
+  { to: "/orders", label: "Заказы", icon: "object.package" },
+  { to: "/clients", label: "Клиенты", icon: "object.users" },
+  { to: "/settings", label: "Настройки", icon: "action.settings" },
 ] as const;
 
 export default function BottomNavRouterExample() {
@@ -17,7 +18,7 @@ export default function BottomNavRouterExample() {
       <BottomNav.Root>
         {LINKS.map((link) => (
           <BottomNav.Item key={link.to} asChild>
-            <NavLink to={link.to}>
+            <NavLink to={link.to} end>
               <BottomNav.ItemIcon>
                 <Icon name={link.icon} />
               </BottomNav.ItemIcon>

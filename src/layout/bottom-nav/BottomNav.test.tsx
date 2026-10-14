@@ -1,9 +1,12 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
+import press from "@/internal/press.module.css";
+import { touchTargetRowClass } from "@/internal/touchTarget";
+import { cssRule, cssValue } from "@/test/css";
 
 import { BottomNav } from "./BottomNav";
 
@@ -214,5 +217,99 @@ describe("BottomNav", () => {
     render(<Nav onSelect={onSelect} />);
     fireEvent.click(screen.getByRole("button", { name: "Отчёты" }));
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("the items are a switcher: they scroll inside the bar, never squeezed below their label", () => {
+    render(<Nav />);
+    const track = screen.getByRole("button", { name: "Главная" }).parentElement as HTMLElement;
+    expect(track).toHaveAttribute("data-edges", "fade");
+    const css = "src/layout/bottom-nav/BottomNav.module.css";
+    expect(cssValue(cssRule(css, ".track"), "grid-auto-columns")).toBe("minmax(max-content, 1fr)");
+    expect(cssRule(css, ".label").decls.map((decl) => decl.prop)).not.toContain("text-overflow");
+  });
+
+  it("the current item is told by more than colour: its glyph sits on a pill in the flat bar", () => {
+    const rule = cssRule(
+      "src/layout/bottom-nav/BottomNav.module.css",
+      '.root:not([data-floating="true"]) .item[aria-current="page"] .glyph',
+    );
+    expect(cssValue(rule, "background")).toBe("var(--prime-color-fill-muted)");
+  });
+
+  it("every item presses its glyph; floating items are touch rows", () => {
+    const { rerender } = render(
+      <BottomNav.Root>
+        <BottomNav.Item current>Главная</BottomNav.Item>
+      </BottomNav.Root>,
+    );
+    const item = () => screen.getByRole("button", { name: "Главная" });
+    expect(item()).toHaveClass(press.pressHost);
+    expect(item().lastElementChild).toHaveClass(press.pressPartCompact);
+    expect(item()).not.toHaveClass(touchTargetRowClass);
+    rerender(
+      <BottomNav.Root floating>
+        <BottomNav.Item current>Главная</BottomNav.Item>
+      </BottomNav.Root>,
+    );
+    expect(item()).toHaveClass(touchTargetRowClass);
+  });
+
+  it("the action is a solid disk in the flat bar and the Button glass disk when floating", () => {
+    const { rerender } = render(
+      <BottomNav.Root>
+        <BottomNav.Item current>Главная</BottomNav.Item>
+        <BottomNav.Action aria-label="Новый заказ">
+          <svg />
+        </BottomNav.Action>
+      </BottomNav.Root>,
+    );
+    const action = () => screen.getByRole("button", { name: "Новый заказ" });
+    expect(action()).toHaveAttribute("data-variant", "solid");
+    rerender(
+      <BottomNav.Root floating>
+        <BottomNav.Item current>Главная</BottomNav.Item>
+        <BottomNav.Action aria-label="Новый заказ">
+          <svg />
+        </BottomNav.Action>
+      </BottomNav.Root>,
+    );
+    expect(action()).toHaveAttribute("data-variant", "glass");
+  });
+
+  it("the floating capsule glides to the item a person picks", async () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+    const offsets = vi
+      .spyOn(HTMLElement.prototype, "offsetLeft", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.textContent?.trim() === "Заказы" ? 80 : 0;
+      });
+    function Floating() {
+      const [current, setCurrent] = React.useState("home");
+      return (
+        <BottomNav.Root floating>
+          <BottomNav.Item current={current === "home"} onClick={() => setCurrent("home")}>
+            Главная
+          </BottomNav.Item>
+          <BottomNav.Item current={current === "orders"} onClick={() => setCurrent("orders")}>
+            Заказы
+          </BottomNav.Item>
+        </BottomNav.Root>
+      );
+    }
+    try {
+      render(<Floating />);
+      const selection = screen
+        .getByRole("navigation")
+        .querySelector("[data-visible]") as HTMLElement;
+      expect(selection).not.toHaveAttribute("data-animate");
+      fireEvent.click(screen.getByRole("button", { name: "Заказы" }));
+      await waitFor(() => expect(selection.style.left).toBe("80px"));
+      expect(selection).toHaveAttribute("data-animate", "true");
+      fireEvent.transitionEnd(selection, { propertyName: "left" });
+      expect(selection).not.toHaveAttribute("data-animate");
+    } finally {
+      offsets.mockRestore();
+      vi.unstubAllGlobals();
+    }
   });
 });

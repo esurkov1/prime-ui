@@ -21,9 +21,11 @@ import { ExampleFrame } from "prime-ui-kit";
 
 ## Anatomy
 ```
-ExampleFrame               frame: toolbar + preview stage or code pane
+ExampleFrame               frame: toolbar + the pane (a region swap between preview and code)
 ├─ (toolbar)               SegmentedControl Preview / Code, theme Button, copy Button, device SegmentedControl
-└─ (stage)                 children, laid out by previewLayout
+└─ (pane)
+   ├─ (stage)              preview: a sideways ScrollContainer with children, laid out by previewLayout
+   └─ (code pane)          code: a focusable ScrollContainer section with the CodeBlock
 ```
 
 ## API
@@ -55,12 +57,12 @@ ExampleFrame               frame: toolbar + preview stage or code pane
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `default` | single block centered in the stage | one component | yes |
-| `stack` | centered column, gap 16, children capped at 640px (`10 × --prime-space-16`) so `width: 100%` blocks stay centered; a child with `fullWidth` or a table stretches | several blocks one under another | |
+| `stack` | centered column, gap 16, children capped at the stack measure (`10 × --prime-space-16`) so `width: 100%` blocks stay centered; a child with `fullWidth` or a table stretches | several blocks one under another | |
 | `stack-narrow` | column, children capped at `7 × --prime-space-16` and centered | forms and narrow columns | |
 | `full` | column, gap 16, every child takes the whole stage width | page structure: app shells, page regions | |
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
 | `matrix` | centered grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns (up to 12) line up across rows, are never narrower than their content and grow to 320 / 160 / 128px for 1 / 2 / 3+ columns, so width-less specimens (Slider, `width: 100%` blocks) get a real cell; centered vertically too; when the grid is wider than the stage (a phone frame) each row wraps its cells, centered (`data-matrix-wrap` on the stage) | variant, size and state matrices | |
-| `matrix-wide` | the same rows of labelled cells, one cell under another, each as wide as the stage up to 640px (`10 × --prime-space-16`), the caption under the specimen | matrices of specimens as wide as their container: tabs, toolbars, tables | |
+| `matrix-wide` | the same rows of labelled cells, one cell under another, each as wide as the stage up to the stack measure (`10 × --prime-space-16`), the caption under the specimen | matrices of specimens as wide as their container: tabs, toolbars, tables | |
 
 ### viewport
 | Value | Looks like | Use when | Default |
@@ -80,7 +82,7 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| pane | toolbar switch (internal, starts at Preview) | preview stage or code pane is rendered; the device switch shows only with the preview |
+| pane | toolbar switch (internal, starts at Preview) | preview stage or code pane is rendered; the switch cross-fades the two and glides the height (`internal/RegionSwap`); the device switch shows only with the preview |
 | viewport | `viewport` / `defaultViewport` | `data-viewport` on the preview viewport |
 | theme | `colorScheme` / `defaultColorScheme` | `data-theme` on the stage and code pane |
 | layout | `previewLayout` | `data-preview-layout` on the stage |
@@ -88,8 +90,8 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 
 ## Layout & spacing
 - The frame is `max-width: 100%`; long code lines scroll inside the code pane instead of widening the page. The code pane is at most `min(512px, 70vh)` high and scrolls both ways.
-- The stage is at least 160 high with `--prime-space-6` / `--prime-space-4` padding; content wider than it is clipped (`matrix` wraps its rows instead).
-- The toolbar wraps below 40rem of frame width; below 25rem the visible device labels are hidden (icons stay, each option keeps a screen-reader name).
+- The stage is at least 160 high with `--prime-space-6` / `--prime-space-4` padding; content wider than it scrolls inside it under edge shadows (`matrix` wraps its rows instead).
+- The toolbar wraps when it does not fit on one line; narrower than 8 × `--prime-space-20` (measured on the toolbar) the two switches stack, each across the toolbar with `fullWidth` segments. When even then the device titles do not fit, the device switch drops them by itself (icons stay, each option keeps its name).
 - The device width switches at once: `max-width` is layout, so it does not animate.
 - Stack frames one per demo block; spacing between blocks comes from the page.
 
@@ -142,5 +144,5 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 - Expecting `colorScheme` to change the page theme → it only themes the frame's stage and code pane.
 
 ## Related
-- **Built from:** [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [CodeBlock](../code-block/COMPONENT.md), Icon (`view.*`, `viewport.*`, `theme.*`, `action.copy`, `action.check`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [CodeBlock](../code-block/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md) (the stage, the code pane), Icon (`view.*`, `viewport.*`, `theme.*`, `action.copy`, `action.check`); `internal/RegionSwap` (the pane switch)
 - **See also:** [Card](../card/COMPONENT.md)

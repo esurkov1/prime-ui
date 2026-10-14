@@ -37,9 +37,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel; a tab is at least the control height.",
-          ru: "Ярус контрола: кегль, иконка, отступы, скругление папки и зазор между полосой и панелью; вкладка не ниже высоты контрола.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+          en: "Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel; a tab is at least the control height. Without it the tier of the host.",
+          ru: "Ярус контрола: кегль, иконка, отступы, скругление папки и зазор между полосой и панелью; вкладка не ниже высоты контрола. Без него — ярус хоста.",
         },
         {
           name: "fullWidth",
@@ -91,8 +91,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.List",
-      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` with the sliding folder. When tabs do not fit it hides icons and descriptions, then labels (only when every tab has an icon), then scrolls; the active tab stays in view.',
-      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой. Если вкладки не помещаются, скрывает иконки и описания, затем подписи (только если иконка есть у каждой вкладки), затем прокручивается; активная вкладка остаётся на виду.',
+      en: '`ref` → `HTMLDivElement`. `role="tablist"` on the switcher row (a sideways `ScrollContainer`) with the sliding folder. When tabs do not fit it hides icons and descriptions, then labels (only when every tab has an icon), then scrolls; the active tab stays in view.',
+      ru: '`role="tablist"` на строке переключателя (горизонтальный `ScrollContainer`) со скользящей папкой. Если вкладки не помещаются, скрывает иконки и описания, затем подписи (только если иконка есть у каждой вкладки), затем прокручивается; активная вкладка остаётся на виду.',
       props: [
         {
           name: "children",
@@ -311,8 +311,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "WAI-ARIA tabs pattern: `tablist` / `tab` / `tabpanel` with `aria-controls` / `aria-labelledby` wired automatically; give `Tabs.List` an `aria-label`.",
-        ru: "Паттерн WAI-ARIA tabs: `tablist` / `tab` / `tabpanel`, `aria-controls` и `aria-labelledby` связываются сами; дайте `Tabs.List` `aria-label`.",
+        en: "WAI-ARIA tabs pattern: `tablist` / `tab` / `tabpanel` with `aria-controls` / `aria-labelledby` wired automatically; a tab names its panel in `aria-controls` only while the panel is in the document. Give `Tabs.List` an `aria-label`.",
+        ru: "Паттерн WAI-ARIA tabs: `tablist` / `tab` / `tabpanel`, `aria-controls` и `aria-labelledby` связываются сами; вкладка указывает панель в `aria-controls`, только пока та в документе. Дайте `Tabs.List` `aria-label`.",
       },
       {
         en: "Selection follows focus; the panel is focusable (`tabIndex=0`).",
@@ -327,8 +327,8 @@ export const api: ComponentApi = {
         ru: "`Tabs.Icon` и `Tabs.Separator` скрыты (`aria-hidden`).",
       },
       {
-        en: "When only icons are left, the label stays for screen readers (sr-only) and shows in a `Tooltip` on hover and focus.",
-        ru: "Когда остаются только иконки, подпись остаётся для экранного диктора, а при наведении и фокусе показывается в `Tooltip`.",
+        en: "When only icons are left, a `VisuallyHidden` copy of the label names the tab and the label shows in a `Tooltip` on hover and focus.",
+        ru: "Когда остаются только иконки, вкладку называет копия подписи в `VisuallyHidden`, а сама подпись показывается в `Tooltip` при наведении и фокусе.",
       },
       {
         en: 'The close button of a removable tab is named after it (`labels.remove`) and stays out of the Tab order; the tab announces `aria-keyshortcuts="Delete"`.',

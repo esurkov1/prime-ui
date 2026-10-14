@@ -47,7 +47,7 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "controlled",
-      description: "Один из нескольких: активный сегмент хранит родитель и ставит `pressed`.",
+      description: "Один из нескольких: активный сегмент хранит родитель — `pressed`.",
     },
     {
       slot: "in-form",
