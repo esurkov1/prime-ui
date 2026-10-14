@@ -1261,7 +1261,7 @@ function VideoPreview({
           onLoadedData={() => setReady(true)}
         />
       ) : null}
-      <Ring value={0} live weight="band" track={false} className={styles.previewRing} />
+      <Ring value={0} live weight="band" track="none" className={styles.previewRing} />
     </div>
   );
 }

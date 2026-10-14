@@ -82,13 +82,24 @@ describe("Ring", () => {
 
   it("live: the host writes the share, so the ring sets none and does not glide", () => {
     const ref = React.createRef<SVGSVGElement>();
-    const { container } = render(<Ring ref={ref} value={0.5} live track={false} />);
+    const { container } = render(<Ring ref={ref} value={0.5} live track="none" />);
     const svg = svgOf(container);
     expect(ref.current).toBe(svg);
     expect(svg.style.getPropertyValue("--ring-value")).toBe("");
     expect(svg).toHaveAttribute("data-live", "true");
     expect(svg.querySelectorAll("circle")).toHaveLength(1);
     expect(cssValue(cssRule(CSS, ".ring[data-live] .arc"), "transition")).toBe("none");
+  });
+
+  it("draws a fainter track for a loading cue (`faint`), the line tint by default", () => {
+    const { container } = render(<Ring value={null} track="faint" />);
+    const svg = svgOf(container);
+    expect(svg).toHaveAttribute("data-track", "faint");
+    expect(svg.querySelectorAll("circle")).toHaveLength(2);
+    expect(cssValue(cssRule(CSS, '.ring[data-track="faint"]'), "--ring-track")).toContain(
+      "var(--prime-tint-hover)",
+    );
+    expect(cssValue(cssRule(CSS, ".ring"), "--ring-track")).toContain("var(--prime-tint-line)");
   });
 
   it("takes a role from its host and then is no longer hidden", () => {

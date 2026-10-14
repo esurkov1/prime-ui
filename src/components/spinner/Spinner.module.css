@@ -18,10 +18,8 @@
   contain: paint;
 }
 
-/* Two classes: the ring's own defaults never win over the host's. */
-.root > .ring {
-  --ring-track: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
-
+/* The ring takes the faint track of a loading cue (`track="faint"`, set in TSX). */
+.ring {
   position: relative;
   z-index: var(--prime-z-raised);
 }

@@ -30,6 +30,11 @@
   pointer-events: none;
 }
 
+/* A ring that is only a loading cue (Spinner): a fainter track under the turning arc. */
+.ring[data-track="faint"] {
+  --ring-track: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
+}
+
 .ring[data-weight="data"] {
   --ring-stroke: max(calc(100% / 12), calc(var(--prime-border-width) * 2));
 }

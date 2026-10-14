@@ -238,7 +238,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
       <Ring
         value={0}
         weight="data"
-        track={gap === "none" || total === 0}
+        track={gap === "none" || total === 0 ? "line" : "none"}
         className={styles.svg}
         role="group"
         {...a11y}

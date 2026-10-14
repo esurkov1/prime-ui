@@ -29,6 +29,8 @@ export const RING_DATA_STROKE = RING_PATH / (11 * Math.PI);
  */
 type RingWeight = "data" | "line" | "band";
 
+type RingTrack = "line" | "faint" | "none";
+
 type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
   /**
    * The share drawn, `0…1`; `null` — under way, the share unknown: a quarter arc that always
@@ -37,8 +39,11 @@ type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
   value: number | null;
   /** The ring turns at any share (one turn = 3 × `--prime-motion-loop`); the arc never under 8%. */
   spin?: boolean;
-  /** A faint full circle under the arc. Default `true`. */
-  track?: boolean;
+  /**
+   * The full circle under the arc: `line` — `currentColor` at the line tint (default); `faint` — at
+   * the hover tint, for a ring that is only a loading cue (Spinner); `none` — no track.
+   */
+  track?: RingTrack;
   /** Default `line`. */
   weight?: RingWeight;
   /**
@@ -100,7 +105,7 @@ export function RingCap({
 export function Ring({
   value,
   spin = false,
-  track = true,
+  track = "line",
   weight = "line",
   live = false,
   className,
@@ -123,6 +128,7 @@ export function Ring({
       style={live ? style : ({ ...style, "--ring-value": share } as React.CSSProperties)}
       {...toDataAttributes({
         weight,
+        track: track === "faint" ? "faint" : undefined,
         spin: turning || undefined,
         // An empty arc still at rest draws nothing (a round cap would leave a dot).
         empty: (!live && !turning && share === 0) || undefined,
@@ -130,7 +136,7 @@ export function Ring({
       })}
     >
       <g className={styles.turn}>
-        {track ? <RingCircle className={styles.track} /> : null}
+        {track === "none" ? null : <RingCircle className={styles.track} />}
         {children ?? <RingCircle className={styles.arc} />}
       </g>
     </svg>
