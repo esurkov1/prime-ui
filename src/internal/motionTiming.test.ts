@@ -7,6 +7,7 @@ import {
   motionTiming,
   motionToken,
   readCssDurationMs,
+  readElementDurationMs,
 } from "./motionTiming";
 import { TOKEN_DEFAULTS } from "./tokenDefaults";
 
@@ -22,6 +23,17 @@ describe("motionTiming", () => {
 
   it("falls back to the token default when the CSS cannot be read", () => {
     expect(motionDurationMs("base")).toBe(TOKEN_DEFAULTS["--prime-motion-duration-base"]);
+  });
+
+  it("reads a component clock as it applies to an element, 0 when unset", () => {
+    const element = document.createElement("div");
+    document.body.append(element);
+    expect(readElementDurationMs(element, "--prime-message-morph-duration")).toBe(0);
+    element.style.setProperty("--prime-message-morph-duration", "300ms");
+    expect(readElementDurationMs(element, "--prime-message-morph-duration")).toBe(300);
+    element.style.setProperty("--prime-message-morph-duration", "0.1s");
+    expect(readElementDurationMs(element, "--prime-message-morph-duration")).toBe(100);
+    element.remove();
   });
 
   it("a stopped clock (reduced motion) reads as 0, not as the default", () => {

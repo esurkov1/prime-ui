@@ -237,9 +237,8 @@
 
 /* ---------- Head ---------- */
 
+/* Sticks through `stickySurfaceClass` (joined in TSX), which also lets it go on a short screen. */
 .head {
-  position: sticky;
-  top: 0;
   z-index: var(--gantt-z-head);
   display: flex;
   width: 100%;
@@ -1063,13 +1062,5 @@
     height: var(--prime-border-width);
     clip-path: inset(50%);
     white-space: nowrap;
-  }
-}
-
-/* Short landscape screens (foundation §9: sticky headers stop below 480px of window height): the
-   chart's scroller is bounded by the window, and a size container would need a fixed height. */
-@media (max-height: 479px) {
-  .head {
-    position: relative;
   }
 }

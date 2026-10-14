@@ -24,7 +24,6 @@
   --tabs-icon: var(--prime-control-m-icon);
   --tabs-radius: var(--prime-control-m-radius);
   --tabs-pad-x: var(--prime-control-m-padding-x);
-  --tabs-indicator: calc(var(--prime-control-m-track) / 2);
   --tabs-folder-radius: var(--prime-radius-l);
   --tabs-flare: var(--prime-radius-m);
   --tabs-rise: var(--prime-space-1);
@@ -51,7 +50,6 @@
   --tabs-icon: var(--prime-control-xs-icon);
   --tabs-radius: var(--prime-control-xs-radius);
   --tabs-pad-x: var(--prime-control-xs-padding-x);
-  --tabs-indicator: calc(var(--prime-control-xs-track) / 2);
   --tabs-folder-radius: var(--prime-radius-m);
   --tabs-flare: var(--prime-radius-s);
   --tabs-panel-gap: var(--prime-space-3);
@@ -65,7 +63,6 @@
   --tabs-icon: var(--prime-control-s-icon);
   --tabs-radius: var(--prime-control-s-radius);
   --tabs-pad-x: var(--prime-control-s-padding-x);
-  --tabs-indicator: calc(var(--prime-control-s-track) / 2);
   --tabs-folder-radius: var(--prime-radius-m);
   --tabs-flare: var(--prime-radius-s);
   --tabs-panel-gap: var(--prime-space-4);
@@ -79,7 +76,6 @@
   --tabs-icon: var(--prime-control-l-icon);
   --tabs-radius: var(--prime-control-l-radius);
   --tabs-pad-x: var(--prime-control-l-padding-x);
-  --tabs-indicator: calc(var(--prime-control-l-track) / 2);
   --tabs-folder-radius: var(--prime-radius-xl);
   --tabs-flare: var(--prime-radius-l);
   --tabs-rise: var(--prime-space-2);
@@ -95,7 +91,6 @@
   --tabs-icon: var(--prime-control-xl-icon);
   --tabs-radius: var(--prime-control-xl-radius);
   --tabs-pad-x: var(--prime-control-xl-padding-x);
-  --tabs-indicator: calc(var(--prime-control-xl-track) / 2);
   --tabs-folder-radius: var(--prime-radius-xl);
   --tabs-flare: var(--prime-radius-l);
   --tabs-rise: var(--prime-space-2);
@@ -154,7 +149,8 @@
 
 /* ---------- List ---------- */
 
-/* A ScrollContainer (horizontal, edge fade, hidden scrollbar): it scrolls, never wraps. */
+/* The switcher row (`internal/SwitcherScroller`: a sideways ScrollContainer, edge fade, hidden
+   scrollbar): it scrolls, never wraps. */
 .list {
   position: relative;
   isolation: isolate;
@@ -189,62 +185,38 @@
   }
 }
 
-/* ---------- Indicator ---------- */
+/* ---------- Folder ---------- */
 
-.indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* The folder: the shared selection indicator (`internal/selectionIndicator`: placed from TS, glides
+   only into a person's choice) drawn as the panel surface under the active tab, flaring into the
+   panel at both sides. The list sets its axis (`data-axis`, from the list's direction): `x` rises
+   from the panel's top edge, `y` reaches out of the panel's inline-start edge. */
+.folder {
   z-index: var(--prime-z-raised);
-  pointer-events: none;
-  opacity: 0;
-}
-
-.indicator[data-visible="true"] {
-  opacity: 1;
-}
-
-/* Glides only into a person's choice (click, arrows, closing the active tab): position (translate
-   from TS) and size move to the new tab on one curve. Mount, resize, font loading, tab changes and
-   collapse place it without motion. The size glides as `width` / `height`, not a scale: the
-   folder's corner radius and its flares would stretch (a documented exception in
-   src/styles/motion-perf.test.ts). */
-.indicator[data-animate="true"] {
-  transition:
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-/* The folder: the panel surface under the active tab, flaring into the panel at both sides. The
-   list sets its axis (`data-axis`, from the list's direction): `x` rises from the panel's top edge,
-   `y` reaches out of the panel's inline-start edge. */
-.indicatorFolder {
   /* The flare size in px for the script (a flare at the list edge is `display: none`, so its own
      width cannot be read then); scroll margin has no effect on a non-scrolled element. */
   scroll-margin-top: var(--tabs-flare);
   background: var(--prime-color-layer-current);
 }
 
-.indicatorFolder::before,
-.indicatorFolder::after {
+.folder::before,
+.folder::after {
   content: "";
   position: absolute;
   width: var(--tabs-flare);
   height: var(--tabs-flare);
 }
 
-.indicatorFolder[data-axis="x"] {
+.folder[data-axis="x"] {
   border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
 }
 
-.indicatorFolder[data-axis="x"]::before,
-.indicatorFolder[data-axis="x"]::after {
+.folder[data-axis="x"]::before,
+.folder[data-axis="x"]::after {
   bottom: 0;
 }
 
-.indicatorFolder[data-axis="x"]::before {
+.folder[data-axis="x"]::before {
   right: 100%;
   background: radial-gradient(
     circle at 0 0,
@@ -253,7 +225,7 @@
   );
 }
 
-.indicatorFolder[data-axis="x"]::after {
+.folder[data-axis="x"]::after {
   left: 100%;
   background: radial-gradient(
     circle at 100% 0,
@@ -262,16 +234,16 @@
   );
 }
 
-.indicatorFolder[data-axis="y"] {
+.folder[data-axis="y"] {
   border-radius: var(--tabs-folder-radius) 0 0 var(--tabs-folder-radius);
 }
 
-.indicatorFolder[data-axis="y"]::before,
-.indicatorFolder[data-axis="y"]::after {
+.folder[data-axis="y"]::before,
+.folder[data-axis="y"]::after {
   right: 0;
 }
 
-.indicatorFolder[data-axis="y"]::before {
+.folder[data-axis="y"]::before {
   bottom: 100%;
   background: radial-gradient(
     circle at 0 0,
@@ -280,7 +252,7 @@
   );
 }
 
-.indicatorFolder[data-axis="y"]::after {
+.folder[data-axis="y"]::after {
   top: 100%;
   background: radial-gradient(
     circle at 0 100%,
@@ -291,8 +263,8 @@
 
 /* At the list edge the folder meets the frame: no flare there. `display: none`, not `visibility`:
    a hidden flare would still lengthen the scroll by its width. */
-.indicatorFolder[data-edge-start="true"]::before,
-.indicatorFolder[data-edge-end="true"]::after {
+.folder[data-edge-start="true"]::before,
+.folder[data-edge-end="true"]::after {
   display: none;
 }
 
@@ -379,7 +351,8 @@
   outline: none;
 }
 
-/* The content row: icon, label, count — or the two-line grid. Pressing scales it as one. */
+/* The content row: icon, label, count — or the two-line grid. Pressing the tab scales it as one
+   (`internal/press`, joined in TSX). */
 .content {
   position: relative;
   z-index: var(--prime-z-above);
@@ -387,11 +360,6 @@
   align-items: center;
   gap: var(--tabs-gap);
   min-width: 0;
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.tab:active:not([data-disabled="true"]) .content {
-  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 /* Two-line item: label + count on the first line, description on the second. */
@@ -506,7 +474,10 @@
 
 /* ---------- Item parts ---------- */
 
+/* A kit Icon takes the tier's size from `--prime-icon-size`; a raw svg too (`iconSlotClass`). */
 .icon {
+  --prime-icon-size: var(--tabs-icon);
+
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -516,12 +487,6 @@
   line-height: 0;
   color: var(--prime-color-text-muted);
   transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .tab[aria-selected="true"] .icon {
@@ -607,7 +572,8 @@
   padding-block: 0;
 }
 
-/* icon: a square of icons; the label stays for screen readers (sr-only) and fills the tooltip. */
+/* icon: a square of icons; the visible label leaves the row, a VisuallyHidden copy keeps naming the
+   tab (rendered by Tabs.Label at this level) and the label fills the tooltip. */
 .root .list[data-collapse="icon"] .item,
 .root .list[data-collapse="icon"] .tab {
   min-width: var(--tabs-height);
@@ -623,13 +589,7 @@
 }
 
 .list[data-collapse="icon"] .label {
-  position: absolute;
-  width: var(--prime-border-width);
-  height: var(--prime-border-width);
-  margin: calc(-1 * var(--prime-border-width));
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  display: none;
 }
 
 /* ---------- Separator ---------- */
@@ -677,15 +637,6 @@
 
 /* ---------- Vertical → horizontal row in narrow containers ---------- */
 
-/* As a column the list never scrolls sideways: no edge fade, or it would dim the folder where it
-   joins the panel. (Doubled class: wins over ScrollContainer's fade whatever the CSS order.) */
-@container (width > 37.5rem) {
-  .root[data-orientation="vertical"] .list.list {
-    overflow: visible;
-    mask-image: none;
-  }
-}
-
 /* The column becomes the horizontal strip above the panel: the folder turns to rise from the top
    (the list reports `data-axis="x"` to the indicator), and the strip scrolls with faded edges. */
 @container (max-width: 37.5rem) {
@@ -710,17 +661,5 @@
 
   .root[data-orientation="vertical"] .separator {
     display: none;
-  }
-}
-
-/* Reduced motion: the list never sets `data-animate` on the indicator then. */
-@media (prefers-reduced-motion: reduce) {
-  .content,
-  .remove {
-    transition: none;
-  }
-
-  .tab:active .content {
-    transform: none;
   }
 }

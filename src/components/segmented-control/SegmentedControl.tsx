@@ -1,8 +1,10 @@
 import * as React from "react";
 
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useResizeEffect } from "@/hooks/useElementSize";
 import { prefersReducedMotion } from "@/hooks/usePresence";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -13,13 +15,23 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { iconSlotClass } from "@/internal/iconBox";
 import palette from "@/internal/palette.module.css";
+import { labelPlainText, useTextPartId, useTextParts } from "@/internal/parts";
 import { rovingIndex } from "@/internal/rovingFocus";
+import { SwitcherScroller } from "@/internal/SwitcherScroller";
+import {
+  endIndicatorGlide,
+  placeIndicator,
+  revealInScroller,
+  selectionIndicatorClass,
+  setFlag,
+} from "@/internal/selectionIndicator";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 
 import { Badge } from "../badge/Badge";
-import { ScrollContainer } from "../scroll-container/ScrollContainer";
+import { Tooltip } from "../tooltip/Tooltip";
 import styles from "./SegmentedControl.module.css";
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -35,51 +47,38 @@ type SegmentedControlContextValue = {
 const [SegmentedControlProvider, useSegmentedControlContext] =
   createComponentContext<SegmentedControlContextValue>("SegmentedControl");
 
+/**
+ * How much of each segment the row shows: `full` everything; `icon` only icons (when the row does
+ * not fit and every segment has one) — the label stays for screen readers and in a tooltip.
+ */
+type SegmentedControlCollapse = "full" | "icon";
+
+const CollapseContext = React.createContext<SegmentedControlCollapse>("full");
+
 const ENABLED_ITEM = '[role="radio"]:not([data-disabled="true"])';
 const CHECKED_ITEM = '[role="radio"][aria-checked="true"]';
 
-/** Writes only a change: an unchanged flag must not restyle the row on every resize frame. */
-function setFlag(element: HTMLElement, name: string, on: boolean) {
-  if (on === element.hasAttribute(name)) return;
-  if (on) element.setAttribute(name, "true");
-  else element.removeAttribute(name);
+/** The thumb takes the hue of the checked segment (`color`), or none. */
+function syncThumbColor(thumb: HTMLElement, active: HTMLElement | null) {
+  const color = active?.dataset.color;
+  if (color === thumb.dataset.color) return;
+  if (color) thumb.dataset.color = color;
+  else delete thumb.dataset.color;
 }
 
 /**
- * Thumb and edge fades follow layout, not React state: they are written straight to the DOM, so a
- * resize or a font swap never re-renders the group. The thumb lives inside the track (`.list`,
- * `overflow: clip`), so its box can never widen the scroll area of the viewport.
+ * The widest level at which the row fits its viewport: icons alone go only when every segment has
+ * one. The level is applied to the DOM and measured in place, so React re-renders only when it
+ * changes.
  */
-function syncThumb(list: HTMLElement, thumb: HTMLElement, animate: boolean) {
-  const active = list.querySelector<HTMLElement>(CHECKED_ITEM);
-  if (!active) {
-    setFlag(thumb, "data-visible", false);
-    setFlag(thumb, "data-animate", false);
-    return;
-  }
-  const left = `${active.offsetLeft}px`;
-  const top = `${active.offsetTop}px`;
-  const width = `${active.offsetWidth}px`;
-  const height = `${active.offsetHeight}px`;
-  const moved =
-    thumb.style.left !== left ||
-    thumb.style.top !== top ||
-    thumb.style.width !== width ||
-    thumb.style.height !== height;
-  // Glide only into a user's choice; a layout change (resize, fonts, new items) snaps the thumb.
-  if (moved) {
-    setFlag(thumb, "data-animate", animate && thumb.hasAttribute("data-visible"));
-    thumb.style.left = left;
-    thumb.style.top = top;
-    thumb.style.width = width;
-    thumb.style.height = height;
-  }
-  const color = active.dataset.color;
-  if (color !== thumb.dataset.color) {
-    if (color) thumb.dataset.color = color;
-    else delete thumb.dataset.color;
-  }
-  setFlag(thumb, "data-visible", true);
+function fitCollapse(viewport: HTMLElement, list: HTMLElement): SegmentedControlCollapse {
+  list.dataset.collapse = "full";
+  const fits = list.scrollWidth <= viewport.clientWidth + 0.5;
+  const items = list.querySelectorAll('[role="radio"]');
+  const icons = list.querySelectorAll(`[role="radio"] > .${styles.icon}`);
+  const level = fits || items.length === 0 || icons.length < items.length ? "full" : "icon";
+  list.dataset.collapse = level;
+  return level;
 }
 
 /**
@@ -104,22 +103,6 @@ function applyOverflow(viewport: HTMLElement, overflow: { start: boolean; end: b
   if (!root) return;
   setFlag(root, "data-overflow-start", overflow.start);
   setFlag(root, "data-overflow-end", overflow.end);
-}
-
-/**
- * Scroll offset that shows `item` clear of the edge fades (the neighbour stays under the fade), or
- * the current offset when it already is.
- */
-function revealOffset(viewport: HTMLElement, item: HTMLElement): number {
-  const root = viewport.parentElement;
-  const fade = root ? Number.parseFloat(getComputedStyle(root, "::before").width) || 0 : 0;
-  const view = viewport.scrollLeft;
-  const start = item.offsetLeft;
-  const end = start + item.offsetWidth;
-  let left = view;
-  if (start - fade < view) left = start - fade;
-  else if (end + fade > view + viewport.clientWidth) left = end + fade - viewport.clientWidth;
-  return Math.min(Math.max(left, 0), viewport.scrollWidth - viewport.clientWidth);
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -182,7 +165,8 @@ function SegmentedControlRoot({
   "aria-describedby": ariaDescribedBy,
   ...rest
 }: SegmentedControlRootProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const [selectedValue, setSelectedValue] = useControllableState<string>({
@@ -201,6 +185,7 @@ function SegmentedControlRoot({
   /** The value the row last scrolled into view; `null` until the first commit. */
   const revealedValueRef = React.useRef<string | null>(null);
   const [firstEnabled, setFirstEnabled] = React.useState("");
+  const [collapse, setCollapse] = React.useState<SegmentedControlCollapse>("full");
 
   const onSelect = React.useCallback(
     (nextValue: string) => {
@@ -220,7 +205,10 @@ function SegmentedControlRoot({
 
     const userChange = userChangeRef.current;
     userChangeRef.current = false;
-    syncThumb(list, thumb, userChange && !prefersReducedMotion());
+    setCollapse(fitCollapse(viewport, list));
+    const active = list.querySelector<HTMLElement>(CHECKED_ITEM);
+    placeIndicator(thumb, active, userChange && !prefersReducedMotion());
+    syncThumbColor(thumb, active);
     // The first enabled item is the tab stop only while nothing is selected; with a value no
     // state is written, so a commit never schedules another render.
     if (!selectedValue) {
@@ -231,36 +219,32 @@ function SegmentedControlRoot({
     // changes (only the row scrolls, not the page). It glides only into a user's choice.
     const valueChanged = revealedValueRef.current !== selectedValue;
     revealedValueRef.current = selectedValue;
-    const active = list.querySelector<HTMLElement>(CHECKED_ITEM);
-    if (valueChanged && active && viewport.scrollWidth > viewport.clientWidth) {
-      const left = revealOffset(viewport, active);
-      if (Math.abs(left - viewport.scrollLeft) >= 1 && typeof viewport.scrollTo === "function") {
-        const smooth = userChange && !prefersReducedMotion();
-        scrollTargetRef.current = smooth ? left : null;
-        viewport.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
-      }
+    if (valueChanged && active) {
+      const smooth = userChange && !prefersReducedMotion();
+      const left = revealInScroller(viewport, active, smooth);
+      if (left !== null) scrollTargetRef.current = smooth ? left : null;
     }
     syncOverflow(viewport, scrollTargetRef.current ?? undefined);
   });
 
   // Layout changes outside React: container resize, font load, two-line height.
-  React.useLayoutEffect(() => {
-    const viewport = viewportRef.current;
-    const list = listRef.current;
-    const thumb = thumbRef.current;
-    if (!viewport || !list || !thumb || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => {
+  useResizeEffect(
+    viewportRef,
+    () => {
+      const viewport = viewportRef.current;
+      const list = listRef.current;
+      const thumb = thumbRef.current;
+      if (!viewport || !list || !thumb) return;
       scrollTargetRef.current = null;
+      setCollapse(fitCollapse(viewport, list));
       // Read the row before the thumb is written: a write in between would force a second layout
       // on every frame of a container resize (a sidebar collapsing beside the page).
       const overflow = measureOverflow(viewport);
-      syncThumb(list, thumb, false);
+      placeIndicator(thumb, list.querySelector<HTMLElement>(CHECKED_ITEM), false);
       applyOverflow(viewport, overflow);
-    });
-    ro.observe(viewport);
-    ro.observe(list);
-    return () => ro.disconnect();
-  }, []);
+    },
+    { children: true },
+  );
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     onKeyDown?.(event);
@@ -322,12 +306,10 @@ function SegmentedControlRoot({
             "full-width": fullWidth || undefined,
           })}
         >
-          {/* Edge fades are overlays on the still root (see CSS), so the viewport scrolls without a mask. */}
-          <ScrollContainer
+          {/* Edge fades are overlays on the still root (see CSS), so the row scrolls without a mask. */}
+          <SwitcherScroller
             ref={viewportRef}
-            axis="horizontal"
             edges="none"
-            scrollbar="hidden"
             className={styles.viewport}
             onScroll={(event) => {
               const viewport = event.currentTarget;
@@ -345,21 +327,19 @@ function SegmentedControlRoot({
               scrollTargetRef.current = null;
             }}
           >
-            <div ref={listRef} className={styles.list}>
+            <div ref={listRef} className={styles.list} data-collapse={collapse}>
               {/* First in DOM order so it always paints below the segments. */}
               <div
                 ref={thumbRef}
-                className={cx(palette.hue, styles.thumb)}
+                className={cx(selectionIndicatorClass, palette.hue, styles.thumb)}
                 aria-hidden="true"
-                onTransitionEnd={(event) => {
-                  if (event.target === event.currentTarget && event.propertyName === "left") {
-                    setFlag(event.currentTarget, "data-animate", false);
-                  }
-                }}
+                onTransitionEnd={endIndicatorGlide}
               />
-              <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+              {tier.provide(
+                <CollapseContext.Provider value={collapse}>{children}</CollapseContext.Provider>,
+              )}
             </div>
-          </ScrollContainer>
+          </SwitcherScroller>
         </div>
       </FieldFrame>
     </SegmentedControlProvider>
@@ -405,18 +385,18 @@ function hasChildOfType(children: React.ReactNode, type: React.ElementType): boo
   );
 }
 
-/** Ids of an item's text parts: name = label + count, description = second line. */
-const ItemPartsContext = React.createContext<{ itemId: string } | null>(null);
-
-/** Text children become a `SegmentedControl.Label` span, like an explicit label. */
-function wrapText(children: React.ReactNode): React.ReactNode {
-  return React.Children.map(children, (child) =>
-    (typeof child === "string" || typeof child === "number") && String(child).trim() !== "" ? (
-      <span className={styles.label}>{child}</span>
-    ) : (
-      child
-    ),
-  );
+/** The segment's title: plain text children or the children of its `SegmentedControl.Label`. */
+function labelOf(children: React.ReactNode): React.ReactNode {
+  for (const child of React.Children.toArray(children)) {
+    if (typeof child === "string" || typeof child === "number") return child;
+    if (
+      React.isValidElement<SegmentedControlLabelProps>(child) &&
+      child.type === SegmentedControlLabel
+    ) {
+      return child.props.children;
+    }
+  }
+  return null;
 }
 
 function SegmentedControlItem({
@@ -430,15 +410,16 @@ function SegmentedControlItem({
   ...rest
 }: SegmentedControlItemProps) {
   const ctx = useSegmentedControlContext();
+  const collapse = React.useContext(CollapseContext);
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
   const isChecked = ctx.value === value;
   const isDisabled = ctx.rootDisabled || disabled;
   const isTabStop = !isDisabled && ctx.focusValue === value;
-  const itemId = React.useId();
   const twoLine = hasChildOfType(children, SegmentedControlDescription);
-  const hasCount = hasChildOfType(children, SegmentedControlCount);
-  const parts = React.useMemo(() => ({ itemId }), [itemId]);
+  const parts = useTextParts();
+  const label = labelOf(children);
 
-  return (
+  const segment = (
     // biome-ignore lint/a11y/useSemanticElements: radiogroup of buttons with roving tabindex (WAI-ARIA APG)
     <button
       {...rest}
@@ -446,8 +427,8 @@ function SegmentedControlItem({
       role="radio"
       type="button"
       aria-checked={isChecked}
-      aria-labelledby={twoLine ? cx(`${itemId}-label`, hasCount && `${itemId}-count`) : undefined}
-      aria-describedby={twoLine ? `${itemId}-description` : undefined}
+      aria-labelledby={parts.labelledBy}
+      aria-describedby={parts.describedBy}
       {...toDataAttributes({
         state: isChecked ? "checked" : "unchecked",
         disabled: isDisabled || undefined,
@@ -465,8 +446,18 @@ function SegmentedControlItem({
       }}
     >
       {color ? <Badge.Dot className={styles.dot} /> : null}
-      <ItemPartsContext.Provider value={parts}>{wrapText(children)}</ItemPartsContext.Provider>
+      {parts.provide(labelPlainText(children, SegmentedControlLabel))}
     </button>
+  );
+
+  // A segment with a title keeps one Tooltip around it, so the button never remounts (and never
+  // loses focus) when the row collapses; it opens only while the title is hidden.
+  if (label === null) return segment;
+  return (
+    <Tooltip.Root open={collapse === "icon" && tooltipOpen} onOpenChange={setTooltipOpen}>
+      <Tooltip.Trigger>{segment}</Tooltip.Trigger>
+      {collapse === "icon" ? <Tooltip.Content>{label}</Tooltip.Content> : null}
+    </Tooltip.Root>
   );
 }
 
@@ -482,7 +473,7 @@ export type SegmentedControlIconProps = {
 
 function SegmentedControlIcon({ children, className, ...rest }: SegmentedControlIconProps) {
   return (
-    <span className={cx(styles.icon, className)} aria-hidden="true" {...rest}>
+    <span className={cx(iconSlotClass, styles.icon, className)} aria-hidden="true" {...rest}>
       {children}
     </span>
   );
@@ -498,17 +489,26 @@ export type SegmentedControlLabelProps = {
   ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
-/** Segment title on one line; never truncated. Plain text children are wrapped automatically. */
+/**
+ * Segment title on one line; never truncated. Plain text children are wrapped automatically. In a
+ * row collapsed to icons the visible title leaves the row and a VisuallyHidden copy keeps naming
+ * the segment.
+ */
 function SegmentedControlLabel({ children, className, ...rest }: SegmentedControlLabelProps) {
-  const parts = React.useContext(ItemPartsContext);
+  const id = useTextPartId("label");
+  const iconOnly = React.useContext(CollapseContext) === "icon";
   return (
-    <span
-      id={parts ? `${parts.itemId}-label` : undefined}
-      className={cx(styles.label, className)}
-      {...rest}
-    >
-      {children}
-    </span>
+    <>
+      <span
+        id={id}
+        className={cx(styles.label, className)}
+        aria-hidden={iconOnly || undefined}
+        {...rest}
+      >
+        {children}
+      </span>
+      {iconOnly ? <VisuallyHidden>{children}</VisuallyHidden> : null}
+    </>
   );
 }
 
@@ -527,13 +527,9 @@ function SegmentedControlDescription({
   className,
   ...rest
 }: SegmentedControlDescriptionProps) {
-  const parts = React.useContext(ItemPartsContext);
+  const id = useTextPartId("description");
   return (
-    <span
-      id={parts ? `${parts.itemId}-description` : undefined}
-      className={cx(styles.description, className)}
-      {...rest}
-    >
+    <span id={id} className={cx(styles.description, className)} {...rest}>
       {children}
     </span>
   );
@@ -560,14 +556,9 @@ function SegmentedControlCount({
   className,
   ...rest
 }: SegmentedControlCountProps) {
-  const parts = React.useContext(ItemPartsContext);
+  const id = useTextPartId("count");
   return (
-    <Badge.Root
-      {...rest}
-      id={parts ? `${parts.itemId}-count` : undefined}
-      color={color}
-      className={cx(styles.count, className)}
-    >
+    <Badge.Root {...rest} id={id} color={color} className={cx(styles.count, className)}>
       {children}
     </Badge.Root>
   );

@@ -1,8 +1,7 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { act, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { cssRule, cssValue } from "@/test/css";
 
 import { ScrollContainer } from "./ScrollContainer";
 
@@ -117,7 +116,10 @@ describe("ScrollContainer: a region whose content fits is no scroller", () => {
   });
 
   it("CSS: a region that fits clips instead of scrolling", () => {
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
-    expect(css).toMatch(/\.root\[data-fits\]\s*\{\s*overflow: hidden;/);
+    const rule = cssRule(
+      "src/components/scroll-container/ScrollContainer.module.css",
+      ".root[data-fits]",
+    );
+    expect(cssValue(rule, "overflow")).toBe("hidden");
   });
 });

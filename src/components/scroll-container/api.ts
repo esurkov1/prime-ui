@@ -37,10 +37,10 @@ export const api: ComponentApi = {
         },
         {
           name: "snap",
-          type: "boolean",
+          type: 'boolean | "mandatory"',
           default: "false",
-          en: 'Scrolling comes to rest on the start of a child (proximity snapping). For strips of tiles and cards; not with `anchor="end"`.',
-          ru: 'Прокрутка останавливается на начале дочернего элемента (мягкая привязка). Для полос плиток и карточек; не вместе с `anchor="end"`.',
+          en: 'Scrolling comes to rest on the start of a child: `true` near one (strips of tiles and cards), `"mandatory"` always on one (board columns, a carousel). A Dnd drag inside turns it off; not with `anchor="end"`.',
+          ru: 'Прокрутка останавливается на начале дочернего элемента: `true` — рядом с ним (полосы плиток), `"mandatory"` — всегда на нём (колонки доски, карусель). Перетаскивание Dnd внутри её отключает; не с `anchor="end"`.',
         },
         {
           name: "anchor",
@@ -97,8 +97,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "Renders a plain element; add `tabIndex={0}` and `aria-label` when the region has no focusable content but must scroll from the keyboard (the browser scrolls it; the ring is inset).",
-        ru: "Обычный элемент без роли: если внутри нет фокусируемого содержимого, дайте `tabIndex={0}` и `aria-label`, чтобы область прокручивалась с клавиатуры; кольцо фокуса — внутри края.",
+        en: 'Renders a plain element; a region named by `aria-label` / `aria-labelledby` becomes `role="region"` (a `role` of its own wins, e.g. `log`). Add `tabIndex={0}` and a name when the region has no focusable content but must scroll from the keyboard (the browser scrolls it; the ring is inset).',
+        ru: 'Обычный элемент; область с именем (`aria-label` / `aria-labelledby`) получает `role="region"` (собственная `role` важнее, например `log`). Если внутри нет фокусируемого содержимого, дайте `tabIndex={0}` и имя, чтобы область прокручивалась с клавиатуры; кольцо фокуса — внутри края.',
       },
       {
         en: "Choose a semantic `as` (`main`, `nav`, `aside`) when the region is a landmark.",

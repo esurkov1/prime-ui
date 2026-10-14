@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { prefersReducedMotion } from "@/hooks/usePresence";
+
 /** A wheel event this soon after the last one continues the same gesture. */
 const GESTURE_GAP_MS = 200;
 /** One line of `deltaMode = 1` (a mouse wheel in Firefox), px. */
@@ -12,10 +14,6 @@ let listeners = 0;
 const onWindowWheel = (event: WheelEvent) => {
   if (!event.defaultPrevented) passingUntil = event.timeStamp + GESTURE_GAP_MS;
 };
-
-const reducedMotion = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
 
 /**
  * A vertical wheel over a strip that scrolls only sideways (`axis="horizontal"`) scrolls the strip:
@@ -50,7 +48,7 @@ export function useWheelToInline(ref: React.RefObject<HTMLElement | null>, enabl
       target = next;
       node.scrollTo({
         left: rtl ? -next : next,
-        behavior: reducedMotion() ? "auto" : "smooth",
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
       });
       window.clearTimeout(settle);
       settle = window.setTimeout(() => {

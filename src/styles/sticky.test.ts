@@ -20,6 +20,7 @@ function walk(dir: string): string[] {
 
 /** Stylesheets whose sticky rules need no seam cover, with the reason. */
 const EXEMPT: Record<string, string> = {
+  "internal/sticky.module.css": "the sticky surface itself: the seam cover the others join",
   "layout/app-shell/AppShell.module.css":
     "the nav column and the footer hold their own surfaces and stick to the window, not to a scroller edge with content under it",
   "components/chat/Chat.module.css":
@@ -48,15 +49,14 @@ describe("sticky surfaces", () => {
   }
 });
 
-/** The one height query (foundation §9): a sticky header stops sticking on a short screen. */
-const HEIGHT_QUERY_FILES = new Set([
-  "layout/app-header/AppHeader.module.css",
-  "components/data-table/DataTable.module.css",
-  "components/gantt/Gantt.module.css",
-]);
+/**
+ * The one height query (foundation §9): a sticky header stops sticking on a short screen. It lives
+ * in the shared sticky surface only; the headers join `stickySurfaceClass`.
+ */
+const HEIGHT_QUERY_FILES = new Set(["internal/sticky.module.css"]);
 
 describe("the height query", () => {
-  it("only the sticky headers use `max-height: 479px`, each citing foundation §9", () => {
+  it("only the sticky surface uses `max-height: 479px`, citing foundation §9", () => {
     const offenders: string[] = [];
     for (const file of walk(root).filter((name) => name.endsWith(".css"))) {
       const rel = path.relative(root, file);

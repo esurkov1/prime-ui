@@ -1,0 +1,37 @@
+/*
+ * The sliding selection indicator of a switcher (the Tabs folder, the SegmentedControl thumb, the
+ * floating BottomNav capsule): one element under the items, placed over the selected one from TS
+ * (`placeIndicator`). The host draws its look (fill, radius, flares) on the same element.
+ *
+ * It glides only into a person's choice (`data-animate`, set by the host for that commit);
+ * mount, resize, fonts and items coming or going place it without motion, and under reduced
+ * motion the host never sets the flag. The geometry rides `left` / `top` / `width` / `height`, not
+ * a transform, on purpose: a transform transition makes the indicator a composited layer, and
+ * Safari then misses its overlap with the later items inside a scrolling row and paints their text
+ * under it until the glide ends (WebKit PR #75750). An indicator that stays in normal paint order
+ * cannot cover the text. A scale would stretch the radius and the label anyway (the indicator
+ * exception of foundation §7 rule 5).
+ */
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.indicator[data-visible="true"] {
+  opacity: 1;
+}
+
+.indicator[data-animate="true"] {
+  transition:
+    left var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    top var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
+}

@@ -3,10 +3,21 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
+import { useResizeEffect } from "@/hooks/useElementSize";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { iconSlotClass } from "@/internal/iconBox";
+import press from "@/internal/press.module.css";
+import { SwitcherScroller } from "@/internal/SwitcherScroller";
+import {
+  endIndicatorGlide,
+  placeIndicator,
+  selectionIndicatorClass,
+} from "@/internal/selectionIndicator";
 import { Slot } from "@/internal/slot";
 import type { PaletteColor, Variant } from "@/internal/states";
+import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./BottomNav.module.css";
 
@@ -21,8 +32,10 @@ export const BOTTOM_NAV_LABELS: BottomNavLabels = {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
+type BottomNavLook = { iconOnly: boolean; floating: boolean };
+
 /** Labels stay in the DOM in `iconOnly`: they name the items for assistive tech. */
-const IconOnlyContext = React.createContext(false);
+const LookContext = React.createContext<BottomNavLook>({ iconOnly: false, floating: false });
 
 export type BottomNavRootProps = React.HTMLAttributes<HTMLElement> & {
   /** Icons without visible labels; the labels still name the items for screen readers. */
@@ -39,31 +52,14 @@ export type BottomNavRootProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-/** Toggles a boolean `data-*` flag without touching React state. */
-function setFlag(element: HTMLElement, name: string, on: boolean) {
-  if (on) element.setAttribute(name, "true");
-  else element.removeAttribute(name);
-}
-
 /**
- * Puts the selection capsule under the current item. It glides when the current item changes
- * (a person's choice) and snaps on a layout change (resize, fonts, new items).
+ * Puts the selection capsule (the shared selection indicator) under the current item. It glides
+ * when the current item changes (a person's choice) and snaps on a layout change (resize, fonts,
+ * new items).
  */
-function syncSelection(bar: HTMLElement, selection: HTMLElement, animate: boolean) {
-  const current = bar.querySelector<HTMLElement>('[aria-current="page"]');
-  if (!current) {
-    setFlag(selection, "data-visible", false);
-    setFlag(selection, "data-animate", false);
-    return;
-  }
-  const left = `${current.offsetLeft}px`;
-  const width = `${current.offsetWidth}px`;
-  if (selection.style.left !== left || selection.style.width !== width) {
-    setFlag(selection, "data-animate", animate && selection.hasAttribute("data-visible"));
-  }
-  selection.style.left = left;
-  selection.style.width = width;
-  setFlag(selection, "data-visible", true);
+function syncSelection(track: HTMLElement, selection: HTMLElement, animate: boolean) {
+  const current = track.querySelector<HTMLElement>('[aria-current="page"]');
+  placeIndicator(selection, current, animate && !prefersReducedMotion());
 }
 
 /** Actions before the first item stand at the start of the bar, the rest at its end. */
@@ -94,37 +90,40 @@ function BottomNavRoot({
   children,
   ...rest
 }: BottomNavRootProps) {
-  const barRef = React.useRef<HTMLDivElement>(null);
+  const trackRef = React.useRef<HTMLElement>(null);
   const selectionRef = React.useRef<HTMLSpanElement>(null);
   const { start, items, end } = splitRootChildren(children);
+  const look = React.useMemo(() => ({ iconOnly, floating }), [iconOnly, floating]);
 
   // The current item can change outside this render (a router link sets `aria-current` itself),
   // so the capsule follows the attribute, not the props.
   React.useLayoutEffect(() => {
-    const bar = barRef.current;
+    const track = trackRef.current;
     const selection = selectionRef.current;
-    if (!floating || !bar || !selection) return;
-    syncSelection(bar, selection, false);
-    const mutation = new MutationObserver(() => syncSelection(bar, selection, true));
-    mutation.observe(bar, {
+    if (!floating || !track || !selection) return;
+    syncSelection(track, selection, false);
+    const mutation = new MutationObserver(() => syncSelection(track, selection, true));
+    mutation.observe(track, {
       subtree: true,
       childList: true,
       attributes: true,
       attributeFilter: ["aria-current"],
     });
-    const resize =
-      typeof ResizeObserver === "undefined"
-        ? null
-        : new ResizeObserver(() => syncSelection(bar, selection, false));
-    resize?.observe(bar);
-    return () => {
-      mutation.disconnect();
-      resize?.disconnect();
-    };
+    return () => mutation.disconnect();
   }, [floating]);
 
+  useResizeEffect(
+    trackRef,
+    () => {
+      const track = trackRef.current;
+      const selection = selectionRef.current;
+      if (track && selection) syncSelection(track, selection, false);
+    },
+    { enabled: floating, children: true },
+  );
+
   return (
-    <IconOnlyContext.Provider value={iconOnly}>
+    <LookContext.Provider value={look}>
       <nav
         aria-label={labels?.nav ?? BOTTOM_NAV_LABELS.nav}
         {...rest}
@@ -135,15 +134,24 @@ function BottomNavRoot({
         })}
       >
         {start}
-        <div ref={barRef} className={styles.bar}>
-          {floating ? (
-            <span ref={selectionRef} className={styles.selection} aria-hidden="true" />
-          ) : null}
-          {items}
+        {/* The bar is the surface (the flat edge or the glass capsule); the items scroll inside it
+            as a switcher when they do not fit, never squeezed or cut. */}
+        <div className={styles.bar}>
+          <SwitcherScroller ref={trackRef} className={styles.track}>
+            {floating ? (
+              <span
+                ref={selectionRef}
+                className={cx(selectionIndicatorClass, styles.selection)}
+                aria-hidden="true"
+                onTransitionEnd={endIndicatorGlide}
+              />
+            ) : null}
+            {items}
+          </SwitcherScroller>
         </div>
         {end}
       </nav>
-    </IconOnlyContext.Provider>
+    </LookContext.Provider>
   );
 }
 BottomNavRoot.displayName = "BottomNav.Root";
@@ -160,17 +168,18 @@ export type BottomNavActionProps = Omit<React.ComponentPropsWithoutRef<"button">
 
 /**
  * A round button beside the bar for the screen's main action (create, search, assistant): a
- * `Button shape="circle"` (`l`, neutral) — in a flat bar a muted disk at its edge, in `floating` a
- * glass disk as tall as the capsule (the capsule's own glass, set on the Button by class: Button
- * has no glass look).
+ * `Button shape="circle"` (`l`, neutral) — in a flat bar a solid disk at its edge, in `floating` a
+ * Button `glass` disk as tall as the capsule (the bar gives it its height); the bar draws the rim
+ * and the lift around it.
  */
 function BottomNavAction({ className, children, ...rest }: BottomNavActionProps) {
+  const { floating } = React.useContext(LookContext);
   return (
     <Button.Root
       {...rest}
       shape="circle"
       size="l"
-      variant="solid"
+      variant={floating ? "glass" : "solid"}
       tone="neutral"
       className={cx(styles.action, className)}
     >
@@ -189,7 +198,9 @@ export type BottomNavItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>,
 
 /** The item glyph above the label. */
 function BottomNavItemIcon({ className, ...rest }: BottomNavItemIconProps) {
-  return <span {...rest} className={cx(styles.icon, className)} aria-hidden="true" />;
+  return (
+    <span {...rest} className={cx(iconSlotClass, styles.icon, className)} aria-hidden="true" />
+  );
 }
 BottomNavItemIcon.displayName = "BottomNav.ItemIcon";
 
@@ -245,7 +256,7 @@ function splitItemChildren(children: React.ReactNode, iconOnly: boolean) {
     <>
       <span className={iconOnly ? visuallyHiddenClass : styles.label}>{label}</span>
       {/* Keeps the words apart in the accessible name; a flex container renders no space. */}{" "}
-      <span className={styles.glyph}>{icon}</span>
+      <span className={cx(styles.glyph, press.pressPartCompact)}>{icon}</span>
     </>
   );
 }
@@ -285,10 +296,10 @@ function BottomNavItem({
   ref,
   ...rest
 }: BottomNavItemProps) {
-  const iconOnly = React.useContext(IconOnlyContext);
+  const { iconOnly, floating } = React.useContext(LookContext);
   const shared = {
     ...rest,
-    className: cx(styles.item, className),
+    className: cx(styles.item, press.pressHost, floating && touchTargetRowClass, className),
     onClick: (event: React.MouseEvent<HTMLElement>) => {
       if (disabled) {
         event.preventDefault();

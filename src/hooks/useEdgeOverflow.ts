@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { readCssLengthPx } from "@/hooks/usePosition";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
 /** The axes a region scrolls along: only those are measured. */
 export type EdgeOverflowAxis = "vertical" | "horizontal" | "both";
@@ -24,7 +25,8 @@ const same = (a: EdgeOverflow, b: EdgeOverflow) =>
  * With `depth` it also writes how far the hidden content reaches on each side to the region itself
  * (`--edge-top` / `--edge-bottom` / `--edge-start` / `--edge-end`, px), so a fade is as deep as
  * that distance at most: it grows as the region scrolls away from an edge and melts as it comes
- * back. A distance is written capped at `--prime-space-8` (the deepest fade) and only when it
+ * back. A distance is written capped at `--scroll-fade-depth` (the deepest fade, read on the
+ * region) and only when it
  * changes, so away from the edges a scroll frame writes nothing and restyles nothing.
  */
 export function useEdgeOverflow(
@@ -39,7 +41,9 @@ export function useEdgeOverflow(
     if (!axis || !node) return;
     const inline = axis !== "vertical";
     const block = axis !== "horizontal";
-    const cap = depth ? readCssLengthPx("--prime-space-8", 32) : 0;
+    const cap = depth
+      ? readCssLengthPx("--scroll-fade-depth", TOKEN_DEFAULTS["--prime-space-8"], node)
+      : 0;
     const written = new Map<string, number>();
     const write = (name: string, distance: number) => {
       const value = Math.min(cap, Math.max(0, Math.round(distance)));

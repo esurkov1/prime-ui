@@ -7,11 +7,11 @@ import type {
   MessageReactionOption,
   MessageUser,
 } from "@/components/message/types";
-import { useScrollRegion } from "@/components/scroll-container/useScrollEdges";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
+import { useScrollRegion } from "@/hooks/useScrollRegion";
 import { useVirtualRows } from "@/hooks/useVirtualRows";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
@@ -237,9 +237,6 @@ function rowsOf(children: React.ReactNode): { rows: Row[]; tail: React.ReactNode
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((value, index) => value === b[index]);
 
-/** A hold outlasts the change it covers by this much (a late frame). */
-const HOLD_SLACK_MS = 120;
-
 /** Extra rows the window renders above and below the view. */
 const OVERSCAN = 8;
 
@@ -426,16 +423,7 @@ export function MessageList({
   // A size change in place plays on the message clock as one stroke (`bubbleMorph`): the view
   // holds still for it.
   const holdView = React.useMemo(
-    () =>
-      region
-        ? () => {
-            const raw = getComputedStyle(document.documentElement).getPropertyValue(
-              "--prime-message-morph-duration",
-            );
-            const ms = Number.parseFloat(raw) * (raw.trim().endsWith("ms") ? 1 : 1000) || 0;
-            region.hold(ms + HOLD_SLACK_MS);
-          }
-        : undefined,
+    () => (region ? () => region.hold("--prime-message-morph-duration") : undefined),
     [region],
   );
 

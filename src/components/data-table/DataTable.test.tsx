@@ -9,6 +9,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Badge } from "@/components/badge/Badge";
 import { Kbd } from "@/components/kbd/Kbd";
+import { stickySurfaceClass } from "@/internal/sticky";
 import swapMotion from "@/internal/swapMotion.module.css";
 
 import { DataTable, type DataTableColumn } from "./DataTable";
@@ -1146,11 +1147,9 @@ describe("DataTable edge cue", () => {
     expect(css).toMatch(/\.frame::before,\n\.frame::after \{[^}]*position: absolute/);
   });
 
-  it("CSS: on short landscape screens the sticky head scrolls with the rows", () => {
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-    expect(css).toMatch(
-      /@media \(max-height: 479px\) \{\s*\.root\[data-sticky-header="true"\] \.headCell \{\s*top: auto;/,
-    );
+  it("the sticky head is the shared sticky surface (it lets go on a short screen)", () => {
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} stickyHeader />);
+    expect(screen.getByRole("columnheader", { name: "Name" })).toHaveClass(stickySurfaceClass);
   });
 });
 

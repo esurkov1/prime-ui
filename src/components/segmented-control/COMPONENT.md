@@ -25,10 +25,10 @@ import { SegmentedControl } from "prime-ui-kit";
 ## Anatomy
 ```
 SegmentedControl.Root                 field frame: label row · track · support row (hint | error)
-└─ (track)                            role="radiogroup"; sliding thumb, scrolling row, keyboard
+└─ (track)                            role="radiogroup"; sliding thumb, switcher row, keyboard
    └─ SegmentedControl.Item           role="radio" button, one option
       ├─ SegmentedControl.Icon        icon slot (optional; icon-only → square segment)
-      ├─ SegmentedControl.Label       title, one line (optional; plain text is wrapped automatically)
+      ├─ SegmentedControl.Label       title, one line (optional; plain text becomes the label)
       ├─ SegmentedControl.Count       counter Badge after the label (optional)
       └─ SegmentedControl.Description second line; makes the segment two-line (optional)
 ```
@@ -39,7 +39,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### SegmentedControl.Root
-`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="radiogroup">` track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row · support row. The frame hugs the track unless `fullWidth`.
+`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="radiogroup">` track with the sliding thumb and the switcher row (titles go before it scrolls, when every segment has an icon) · support row. The frame hugs the track unless `fullWidth`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -132,7 +132,7 @@ Track is `fill-muted` with a faint 1px ring; the selected segment is a floating 
 ### color (Count)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `gray` | neutral soft badge (text wash so it reads on track and thumb) | plain counters | yes |
+| `gray` | neutral soft badge (a wash of the text ink, so it reads on track and thumb) | plain counters | yes |
 | other palette hues | soft badge of the hue | the count has a status meaning | |
 
 ### Flags
@@ -155,13 +155,15 @@ Colour all items or none; do not give an item and its Count the same hue; prefer
 | invalid | `invalid` or non-empty `error` | track `data-invalid="true"` + `aria-invalid="true"`, inset danger ring on the track; the error replaces the hint; the track shakes once when an error arrives |
 | required | `required` | red `*` after the label, `aria-required="true"` on the radiogroup |
 | focus-visible | keyboard | focus ring inside the segment |
-| overflow | row wider than the container | root `data-overflow-start` / `data-overflow-end`: edge fades in the track color |
+| collapsed | row wider than the container and every segment has an icon | row `data-collapse="icon"`: titles, counts and descriptions leave the row, segments turn square; a `VisuallyHidden` copy of the title names each segment and a `Tooltip` shows it |
+| overflow | row still wider than the container | root `data-overflow-start` / `data-overflow-end`: edge fades in the track color |
 
-Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb glides (`emphasized` + `base`, `data-animate`) only into a user's choice (click, arrows); a value set from outside and layout changes snap it; it stays still under `prefers-reduced-motion`. It sits inside the segment track, which clips it, so moving the selection never changes the row's scroll area. When the row scrolls, the selected segment is kept in view on mount and on every value change: only the row scrolls, never the page, and the scroll glides only after a user's choice.
+Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb (the shared selection indicator) glides (`emphasized` + `base`, `data-animate`) only into a user's choice (click, arrows); a value set from outside and layout changes snap it; it stays still under `prefers-reduced-motion`. It sits inside the segment track, which clips it, so moving the selection never changes the row's scroll area. When the row scrolls, the selected segment is kept in view on mount and on every value change: only the row scrolls, never the page, and the scroll glides only after a user's choice.
 
 ## Layout & spacing
 - In a form it is a field: label → track `label-gap`, track → support row `hint-gap`, field → field `--prime-space-5` like every field.
-- Width is content-based by default; segments never wrap. In a narrow container the row scrolls horizontally with fading edges.
+- Width is content-based by default; the row is a switcher (foundation §9): segments never wrap or truncate. In a narrow container segments with icons drop their titles first, then the row scrolls horizontally with fading edges.
+- Without `size` the control takes the tier of its host (a toolbar, a form), else `m`.
 - On a coarse pointer each segment's hit area grows to the 44 px touch target in height; the track keeps its tier height.
 - In a toolbar: gap `--prime-space-3` between controls; keep every control at one size.
 - Caption under a group: gap `--prime-space-2`.
@@ -185,8 +187,8 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 - The track is `role="radiogroup"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. `aria-disabled` when disabled.
 - Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.
 - Items are `<button role="radio" aria-checked>` with roving `tabIndex`.
-- Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description.
-- Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users).
+- Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description; plain text is the label, so every reference resolves.
+- Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users). In a row collapsed to icons a `VisuallyHidden` copy of the title names the segment and a `Tooltip` shows it.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -204,7 +206,7 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before the label and square icon-only segments named for screen readers — `SegmentedControl.Icon`, `aria-label`. |
 | [colors.tsx](examples/colors.tsx) | A status per option: a dot of its hue before the label and a tinted thumb when chosen — `color`. |
 | [full-width.tsx](examples/full-width.tsx) | The group fills its column; segments tend to equal widths and a long label keeps its own — `fullWidth`. |
-| [scroll.tsx](examples/scroll.tsx) | Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view. |
+| [scroll.tsx](examples/scroll.tsx) | Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view — `defaultValue`. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a metric on the second — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the choice and updates other content from it — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen; an optional choice beside it — `label`, `hint`, `required`, `error`, `optional`. |
@@ -219,5 +221,5 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 - Expecting segments to wrap on narrow screens → they scroll; use `fullWidth` or fewer options.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (`internal/SwitcherScroller`, the row), [Badge](../badge/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md) (the title of a collapsed segment), [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md); `internal/selectionIndicator` (the thumb)
 - **See also:** [Tabs](../tabs/COMPONENT.md), [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [ButtonGroup](../button-group/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md)

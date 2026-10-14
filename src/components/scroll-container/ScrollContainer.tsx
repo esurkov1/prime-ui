@@ -1,12 +1,14 @@
 import * as React from "react";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { ScrollRegionContext } from "@/hooks/useScrollRegion";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { namedRole } from "@/internal/namedRole";
 
 import styles from "./ScrollContainer.module.css";
 import { useFitFlag } from "./useFitFlag";
-import { type ScrollEdgeHandler, ScrollRegionContext, useScrollEdges } from "./useScrollEdges";
+import { type ScrollEdgeHandler, useScrollEdges } from "./useScrollEdges";
 import { useWheelToInline } from "./useWheelToInline";
 
 export type ScrollContainerAxis = "vertical" | "horizontal" | "both";
@@ -31,8 +33,12 @@ export type ScrollContainerProps = React.HTMLAttributes<HTMLElement> & {
   scrollbar?: "thin" | "hidden";
   /** The person cannot scroll the region (wheel, touch, keys, autoscroll); it keeps its place. */
   lock?: boolean;
-  /** Scrolling comes to rest on the start of a child (proximity snapping): strips of tiles. */
-  snap?: boolean;
+  /**
+   * Scrolling comes to rest on the start of a child: `true` when it ends near one (strips of
+   * tiles), `"mandatory"` always on one (board columns, a carousel). A drag of the kit's Dnd
+   * inside the region turns it off while it lasts.
+   */
+  snap?: boolean | "mandatory";
   /**
    * `end` — a chat or a log: the region starts at the end and stays there while content arrives,
    * as long as the person is at the end; scrolled away, what they look at stays put. Default `start`.
@@ -95,6 +101,8 @@ export function ScrollContainer({
           className,
         )}
         aria-busy={scroll.busy || undefined}
+        // A named region is a landmark a screen reader can reach (`region`); a role of its own wins.
+        role={namedRole(rest, "region")}
         {...toDataAttributes({
           edges: edges === "none" ? undefined : edges,
           "overflow-top": overflow.top || undefined,
@@ -102,7 +110,7 @@ export function ScrollContainer({
           "overflow-start": overflow.start || undefined,
           "overflow-end": overflow.end || undefined,
           lock: lock || undefined,
-          snap: snap || undefined,
+          snap: snap === "mandatory" ? "mandatory" : snap ? "proximity" : undefined,
           anchor: scroll.keepPosition ? anchor : undefined,
         })}
         {...rest}

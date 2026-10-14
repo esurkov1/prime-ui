@@ -43,3 +43,67 @@ export function splitParts<P = unknown>(
   }
   return { parts, rest };
 }
+
+/** Plain text children become `Label` elements, so every item title is its labelling part. */
+export function labelPlainText(
+  children: React.ReactNode,
+  Label: React.ComponentType<{ children: React.ReactNode }>,
+): React.ReactNode {
+  return React.Children.map(children, (child) =>
+    (typeof child === "string" || typeof child === "number") && String(child).trim() !== ""
+      ? React.createElement(Label, null, child)
+      : child,
+  );
+}
+
+/** A text part of an item: its title, a count after it, the second line. */
+type TextPart = "label" | "count" | "description";
+
+type TextPartsRegistry = { register: (part: TextPart, id: string) => () => void };
+
+const TextPartsContext = React.createContext<TextPartsRegistry | null>(null);
+
+/**
+ * The text parts of a two-line item (a tab, a segment): its `Label`, `Count` and `Description`
+ * register their ids (`useTextPartId`), and the item takes its name from the label and the count
+ * and its description from the second line — by ids that are in the document, never guessed. A
+ * one-line item (no description) is named by its content and gets neither attribute.
+ */
+export function useTextParts(): {
+  provide: (children: React.ReactNode) => React.ReactElement;
+  labelledBy: string | undefined;
+  describedBy: string | undefined;
+} {
+  const [ids, setIds] = React.useState<Partial<Record<TextPart, string>>>({});
+  const register = React.useCallback((part: TextPart, id: string) => {
+    setIds((prev) => (prev[part] === id ? prev : { ...prev, [part]: id }));
+    return () =>
+      setIds((prev) => {
+        if (prev[part] !== id) return prev;
+        const next = { ...prev };
+        delete next[part];
+        return next;
+      });
+  }, []);
+  const registry = React.useMemo(() => ({ register }), [register]);
+  const provide = React.useCallback(
+    (children: React.ReactNode) =>
+      React.createElement(TextPartsContext.Provider, { value: registry }, children),
+    [registry],
+  );
+  const name = [ids.label, ids.count].filter(Boolean).join(" ");
+  const twoLine = ids.description !== undefined;
+  return {
+    provide,
+    labelledBy: twoLine && name ? name : undefined,
+    describedBy: ids.description,
+  };
+}
+
+/** The id of a text part inside an item (`useTextParts`); `undefined` outside one. */
+export function useTextPartId(part: TextPart): string | undefined {
+  const id = React.useId();
+  const registry = React.useContext(TextPartsContext);
+  React.useLayoutEffect(() => registry?.register(part, id), [registry, part, id]);
+  return registry ? id : undefined;
+}

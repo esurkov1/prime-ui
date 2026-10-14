@@ -2,10 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import type * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Message } from "@/components/message/Message";
-import {
-  type ScrollRegion,
-  ScrollRegionContext,
-} from "@/components/scroll-container/useScrollEdges";
+import { type ScrollRegion, ScrollRegionContext } from "@/hooks/useScrollRegion";
 
 import { MessageList } from "./MessageList";
 

@@ -1,13 +1,5 @@
 /* Layout of the SegmentedControl scenarios: semantic tokens only. */
 
-/* controlled.tsx: the group and the content it drives, start-aligned in one column. */
-.stack {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--prime-space-3);
-}
-
 /* in-form.tsx: field → field and fields → action at the form rhythm; controls keep their width. */
 .form {
   display: grid;

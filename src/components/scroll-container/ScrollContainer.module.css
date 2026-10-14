@@ -99,32 +99,42 @@
   overflow: hidden;
 }
 
-/* `snap`: scrolling comes to rest on the start of a child; a host aligns deeper items itself. */
+/* `snap`: scrolling comes to rest on the start of a child (`proximity` near one, `mandatory`
+   always); a host aligns deeper items itself. */
 .vertical[data-snap] {
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y var(--snap-strictness);
 }
 
 .horizontal[data-snap] {
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x var(--snap-strictness);
 }
 
 .both[data-snap] {
-  scroll-snap-type: both proximity;
+  scroll-snap-type: both var(--snap-strictness);
+}
+
+.root[data-snap="proximity"] {
+  --snap-strictness: proximity;
+}
+
+.root[data-snap="mandatory"] {
+  --snap-strictness: mandatory;
 }
 
 .root[data-snap] > * {
   scroll-snap-align: start;
 }
 
-/* A drag's edge auto-scroll (Dnd) moves the region in small steps: snapping would pull it back. */
-:global(html[data-dnd-active]) .root[data-snap] {
+/* A drag of a list inside the region (Dnd marks the lists of the carried kind) auto-scrolls it in
+   small steps near an edge: snapping would pull it back. */
+.root[data-snap]:has([data-dnd-carrying]) {
   scroll-snap-type: none;
 }
 
 /*
- * Edge fade (`edges="fade"`): a mask over every edge where content is hidden, `--prime-space-8`
+ * Edge fade (`edges="fade"`): a mask over every edge where content is hidden, `--scroll-fade-depth`
  * deep at most and never deeper than the hidden content reaches (`--edge-*`, written by
- * `useEdgeOverflow` only while it changes — within the last `--prime-space-8` of an edge): the
+ * `useEdgeOverflow` only while it changes — within the last fade depth of an edge): the
  * fade grows as the region scrolls away from an edge and melts as it comes back, so it never
  * switches on or off. One gradient per axis, intersected; an edge without hidden content has a
  * zero-depth fade. The mask follows the scroll position itself — nothing animates (foundation §7,
@@ -173,6 +183,12 @@
   inherits: false;
 }
 
+/* The fade depth: `--prime-space-8`. A public hook: a switcher that draws its own edge overlays
+   (SegmentedControl) sets it to their width, so a revealed item lands clear of them. */
+:where(.root) {
+  --scroll-fade-depth: var(--prime-space-8);
+}
+
 .root[data-edges="fade"] {
   --fade-top: 0px;
   --fade-bottom: 0px;
@@ -187,31 +203,31 @@
 
 /* Focus and `scrollIntoView` land clear of the fade, as does a snapped child. */
 .vertical[data-edges="fade"] {
-  scroll-padding-block: var(--prime-space-8);
+  scroll-padding-block: var(--scroll-fade-depth);
 }
 
 .horizontal[data-edges="fade"] {
-  scroll-padding-inline: var(--prime-space-8);
+  scroll-padding-inline: var(--scroll-fade-depth);
 }
 
 .both[data-edges="fade"] {
-  scroll-padding: var(--prime-space-8);
+  scroll-padding: var(--scroll-fade-depth);
 }
 
 .root[data-edges="fade"][data-overflow-top="true"] {
-  --fade-top: min(var(--prime-space-8), var(--edge-top, var(--prime-space-8)));
+  --fade-top: min(var(--scroll-fade-depth), var(--edge-top, var(--scroll-fade-depth)));
 }
 
 .root[data-edges="fade"][data-overflow-bottom="true"] {
-  --fade-bottom: min(var(--prime-space-8), var(--edge-bottom, var(--prime-space-8)));
+  --fade-bottom: min(var(--scroll-fade-depth), var(--edge-bottom, var(--scroll-fade-depth)));
 }
 
 .root[data-edges="fade"][data-overflow-start="true"] {
-  --fade-start: min(var(--prime-space-8), var(--edge-start, var(--prime-space-8)));
+  --fade-start: min(var(--scroll-fade-depth), var(--edge-start, var(--scroll-fade-depth)));
 }
 
 .root[data-edges="fade"][data-overflow-end="true"] {
-  --fade-end: min(var(--prime-space-8), var(--edge-end, var(--prime-space-8)));
+  --fade-end: min(var(--scroll-fade-depth), var(--edge-end, var(--scroll-fade-depth)));
 }
 
 .root[data-edges="fade"]:is(

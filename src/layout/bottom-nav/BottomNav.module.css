@@ -4,13 +4,17 @@
  * columns; the current section is in the primary color, the others muted.
  *
  * Flat (default): a 52 bar at the edge on the surface with a faint top divider; it keeps the
- * home-indicator inset (safe area) below its items. `iconOnly` hides the labels visually (they
- * still name the items) and lowers the bar to 48.
+ * home-indicator inset (safe area) below its items. The current item's glyph sits on a soft pill,
+ * so it is told by more than its colour. `iconOnly` hides the labels visually (they still name the
+ * items) and lowers the bar to 48.
  *
  * Floating (the iOS 26 tab bar): a glass capsule over the content with a hairline rim of light,
  * 46 high (40 icons only), across the width left beside its actions; 18 glyphs over semibold 9
  * labels, all in full ink, the current one in the accent on a selection capsule that glides to it.
- * A `BottomNav.Action` is a glass disk as tall as the capsule.
+ * A `BottomNav.Action` is a Button `glass` disk as tall as the capsule.
+ *
+ * The items are a switcher (`internal/SwitcherScroller`): equal columns while they fit, never
+ * squeezed below their label; what does not fit scrolls inside the bar.
  *
  * Inside `AppShell.Footer` the bar leaves while the Sidebar rail is on screen (AppShell hides the
  * footer): there Sidebar navigates.
@@ -34,16 +38,22 @@
   min-height: var(--prime-bottom-nav-icon-only-height);
 }
 
-/* The items: equal columns. */
+/* The surface of the items: the flat bar's row, or the glass capsule. */
 .bar {
   position: relative;
-  display: grid;
+  display: flex;
   flex: 1 1 auto;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  align-items: stretch;
   align-self: stretch;
   min-width: 0;
+}
+
+/* The items: equal columns, each at least as wide as its label. */
+.track {
+  display: grid;
+  flex: 1 1 auto;
+  grid-auto-columns: minmax(max-content, 1fr);
+  grid-auto-flow: column;
+  align-items: stretch;
 }
 
 /*
@@ -53,6 +63,8 @@
  */
 .root[data-floating="true"] {
   --bn-height: var(--prime-bottom-nav-floating-height);
+  /* The action disk is as tall as the capsule (Button host height). */
+  --prime-control-height: var(--bn-height);
 
   position: absolute;
   inset-inline: var(--prime-bottom-nav-floating-inset);
@@ -68,6 +80,24 @@
 
 .root[data-floating="true"][data-icon-only="true"] {
   --bn-height: var(--prime-bottom-nav-floating-icon-only-height);
+}
+
+/* Touch: every item of the capsule is a row at least the touch target high
+   (`touchTargetRowClass`, joined in TSX), so the capsule — and the action beside it — grow to
+   hold it. */
+@media (pointer: coarse) {
+  .root[data-floating="true"] {
+    --bn-touch-height: calc(
+      var(--prime-control-touch-target) +
+      2 *
+      var(--prime-bottom-nav-floating-padding)
+    );
+    --bn-height: max(var(--prime-bottom-nav-floating-height), var(--bn-touch-height));
+  }
+
+  .root[data-floating="true"][data-icon-only="true"] {
+    --bn-height: max(var(--prime-bottom-nav-floating-icon-only-height), var(--bn-touch-height));
+  }
 }
 
 /*
@@ -112,19 +142,21 @@
 
 /* Fills the width left beside the actions; the items share it equally. */
 .root[data-floating="true"] > .bar {
-  background: var(--prime-color-bg-glass);
-  grid-auto-rows: calc(var(--bn-height) - var(--prime-bottom-nav-floating-padding) * 2);
   align-self: auto;
   padding: var(--prime-bottom-nav-floating-padding);
   border-radius: var(--prime-radius-full);
+  background: var(--prime-color-bg-glass);
 }
 
-/* No see-through where the user asked for less transparency. */
-@media (prefers-reduced-transparency: reduce) {
-  .root[data-floating="true"] > .bar,
-  .root[data-floating="true"] > .action[data-variant] {
-    --btn-bg: var(--prime-color-bg-glass-solid);
+.root[data-floating="true"] .track {
+  grid-auto-rows: calc(var(--bn-height) - var(--prime-bottom-nav-floating-padding) * 2);
+  border-radius: var(--prime-radius-full);
+}
 
+/* No see-through where the user asked for less transparency (the action is a Button `glass`,
+   which does the same itself). */
+@media (prefers-reduced-transparency: reduce) {
+  .root[data-floating="true"] > .bar {
     background: var(--prime-color-bg-glass-solid);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -132,35 +164,17 @@
 }
 
 /*
- * The selection capsule: a lighter wash of ink under the current item, no rim. It glides to the item a person picks; a layout change snaps it. It fades when nothing is
- * current. Under reduced motion the durations are 0, so it jumps.
+ * The selection capsule: the shared selection indicator (`internal/selectionIndicator`) as a
+ * lighter wash of ink under the current item, no rim. It glides to the item a person picks; a
+ * layout change snaps it. It fades when nothing is current; under reduced motion it jumps.
  */
 .selection {
-  position: absolute;
-  top: var(--prime-bottom-nav-floating-padding);
-  bottom: var(--prime-bottom-nav-floating-padding);
-  left: 0;
   border-radius: var(--prime-radius-full);
   background: color-mix(
     in srgb,
     var(--prime-color-text-primary) var(--prime-tint-soft),
     transparent
   );
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.selection[data-visible="true"] {
-  opacity: 1;
-}
-
-/* Rides `left`/`width` like the SegmentedControl thumb: no composited layer over the labels. */
-.selection[data-animate="true"] {
-  transition:
-    left var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* ─── Item ───────────────────────────────────────────────────────────────── */
@@ -189,7 +203,8 @@
   transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* Holds the icon and the count's anchor; no fill of its own. */
+/* Holds the icon and the count's anchor; gives under the finger (`internal/press`). The current
+   item's glyph sits on a soft pill in the flat bar (floating, the capsule marks it). */
 .glyph {
   position: relative;
   display: grid;
@@ -197,7 +212,10 @@
   place-items: center;
   width: var(--prime-bottom-nav-glyph-width);
   height: var(--prime-bottom-nav-glyph-height);
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  border-radius: var(--prime-radius-full);
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .icon {
@@ -210,19 +228,12 @@
   height: var(--prime-icon-size);
 }
 
-.icon > svg {
-  width: 100%;
-  height: 100%;
-}
-
+/* A label is never cut: the column is at least as wide as it, and the row scrolls instead. */
 .label {
-  max-width: 100%;
-  overflow: hidden;
   font-size: var(--prime-bottom-nav-label-size);
   font-weight: var(--prime-font-weight-medium);
   line-height: var(--prime-bottom-nav-label-line-height);
   white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 /* On the icon's top-end corner, half outside it (the icon is 20: its corner is 10 off centre). */
@@ -235,11 +246,15 @@
 
 /* ─── States ─────────────────────────────────────────────────────────────
  * Two states only: current and not. No hover fill — the current section is the one in the
- * primary color (and, floating, on the selection capsule).
+ * primary color with its glyph on a pill (floating: on the selection capsule).
  */
 
 .item[aria-current="page"] {
   color: var(--prime-color-text-primary);
+}
+
+.root:not([data-floating="true"]) .item[aria-current="page"] .glyph {
+  background: var(--prime-color-fill-muted);
 }
 
 .item:focus-visible {
@@ -289,24 +304,10 @@
   color: var(--prime-color-text-disabled);
 }
 
-/* The glyph gives under the finger. */
-.root[data-floating="true"] .item:not([data-disabled="true"]):active .glyph {
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
 /* ─── Action ─────────────────────────────────────────────────────────────── */
 
-/* Floating: a glass disk as tall as the capsule. Button (neutral solid, circle) has no glass look
-   and no capsule-high tier: the capsule's glass and height go on it by class, through the
-   variables its colors and tier read (`[data-variant]` lifts this over its tone × variant). */
-.root[data-floating="true"] > .action[data-variant] {
-  --field-h: var(--bn-height);
-  --btn-bg: var(--prime-color-bg-glass);
-  --btn-bg-hover: color-mix(
-    in srgb,
-    var(--prime-color-text-primary) 8%,
-    var(--prime-color-bg-glass)
-  );
-  --btn-bg-active: var(--btn-bg-hover);
+/* Floating: the Button `glass` disk, as tall as the capsule (the root sets the host height); its
+   glyph is the capsule's icon size. */
+.root[data-floating="true"] > .action {
   --prime-icon-size: var(--prime-bottom-nav-floating-icon-size);
 }

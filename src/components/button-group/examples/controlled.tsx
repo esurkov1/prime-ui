@@ -1,4 +1,4 @@
-/** One of several: the active segment lives in parent state and gets `pressed`. */
+/** One of several: the active segment lives in parent state — `pressed`. */
 import { ButtonGroup } from "prime-ui-kit";
 import * as React from "react";
 

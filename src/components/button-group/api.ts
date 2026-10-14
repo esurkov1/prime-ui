@@ -6,8 +6,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "ButtonGroup.Root",
-      en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="group">` with the segments · support row; sets the tier and orientation of every segment and passes the tier to nested icons. The frame hugs the group unless `fullWidth`.',
-      ru: 'Поле: подпись · `<div role="group">` с сегментами · строка поддержки; задаёт ярус и направление всех сегментов и передаёт ярус иконкам. Рамка облегает группу, если не задан `fullWidth`.',
+      en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="group">` with the segments (a row scrolls as a switcher, a column stacks) · support row; sets the tier and orientation of every segment. The frame hugs the group unless `fullWidth`.',
+      ru: 'Поле: подпись · `<div role="group">` с сегментами (ряд прокручивается как переключатель, колонка складывается стопкой) · строка поддержки; задаёт ярус и направление всех сегментов. Рамка облегает группу, если не задан `fullWidth`.',
       props: [
         {
           name: "size",
@@ -26,8 +26,8 @@ export const api: ComponentApi = {
         {
           name: "fullWidth",
           type: "boolean",
-          en: "Stretches the group; horizontal segments share the width equally.",
-          ru: "Растянуть группу; горизонтальные сегменты делят ширину поровну.",
+          en: "Stretches the group; horizontal segments tend to equal widths but never get narrower than their label (the row scrolls instead).",
+          ru: "Растянуть группу; горизонтальные сегменты стремятся к равной ширине, но не уже своей подписи (иначе ряд прокручивается).",
         },
         ...fieldGroupProps("group", "ButtonGroupLabels"),
         {
@@ -56,13 +56,6 @@ export const api: ComponentApi = {
           ru: 'Состояние переключателя: `aria-pressed` и `data-state="active" | "inactive"`. Не задавайте для обычного действия.',
         },
         {
-          name: "type",
-          type: '"button" | "submit" | "reset"',
-          default: '"button"',
-          en: "Native button type.",
-          ru: "Тип нативной кнопки.",
-        },
-        {
           name: "disabled",
           type: "boolean",
           en: "Native disabled; a disabled `Fieldset` around the group sets it too.",
@@ -77,8 +70,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "ButtonHTMLAttributes<HTMLButtonElement>",
-          en: "`onClick`, `className`, `aria-*` and the other button attributes.",
-          ru: "`onClick`, `className`, `aria-*` и остальные атрибуты кнопки.",
+          en: '`type` (`"button"` unless set: `"submit"` / `"reset"` in a form), `onClick`, `className`, `aria-*` and the other button attributes.',
+          ru: '`type` (`"button"`, если не задан: `"submit"` / `"reset"` в форме), `onClick`, `className`, `aria-*` и остальные атрибуты кнопки.',
         },
       ],
     },

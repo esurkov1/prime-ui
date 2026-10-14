@@ -18,7 +18,6 @@
   "src/internal/messagePart.tsx: no messagePart.test",
   "src/internal/overlay/layerStack.ts: no layerStack.test",
   "src/internal/progressSegments.ts: no progressSegments.test",
-  "src/internal/sticky.ts: no sticky.test",
   "src/internal/surfaceDepth.tsx: no surfaceDepth.test",
   "src/internal/textFormattingToolbar.tsx: no textFormattingToolbar.test"
 ]

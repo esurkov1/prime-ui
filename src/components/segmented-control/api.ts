@@ -9,8 +9,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "SegmentedControl.Root",
-      en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="radiogroup">` track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row · support row. The frame hugs the track unless `fullWidth`.',
-      ru: 'Поле: подпись · дорожка `<div role="radiogroup">` со скользящим бегунком, клавиатурой и строкой с горизонтальной прокруткой `ScrollContainer` · строка поддержки. Рамка облегает дорожку, если не задан `fullWidth`.',
+      en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="radiogroup">` track with the sliding thumb and the switcher row (titles go before it scrolls, when every segment has an icon) · support row. The frame hugs the track unless `fullWidth`.',
+      ru: 'Поле: подпись · дорожка `<div role="radiogroup">` со скользящим бегунком и строкой переключателя (подписи уходят раньше прокрутки, если иконка есть у каждого сегмента) · строка поддержки. Рамка облегает дорожку, если не задан `fullWidth`.',
       props: [
         {
           name: "value",
@@ -253,12 +253,12 @@ export const api: ComponentApi = {
         ru: 'Варианты — `<button role="radio" aria-checked>` с перемещаемым `tabIndex`.',
       },
       {
-        en: "Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description.",
-        ru: "В двухстрочном сегменте `aria-labelledby` — подпись (и счётчик), `aria-describedby` — описание.",
+        en: "Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description; plain text is the label, so every reference resolves.",
+        ru: "В двухстрочном сегменте `aria-labelledby` — подпись (и счётчик), `aria-describedby` — описание; простой текст становится подписью, так что каждая ссылка находит элемент.",
       },
       {
-        en: "Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users).",
-        ru: "Иконки скрыты (`aria-hidden`); сегменту только с иконкой нужен `aria-label`.",
+        en: "Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users). In a row collapsed to icons a `VisuallyHidden` copy of the title names the segment and a `Tooltip` shows it.",
+        ru: "Иконки скрыты (`aria-hidden`); сегменту только с иконкой нужен `aria-label` (и Tooltip для зрячих). В строке, свёрнутой до иконок, сегмент называет копия подписи в `VisuallyHidden`, а `Tooltip` показывает её.",
       },
     ],
   },

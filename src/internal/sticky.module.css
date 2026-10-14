@@ -1,5 +1,6 @@
 /*
- * A sticky surface that sticks to the start edge of its scroller (`top: 0`).
+ * A sticky surface that sticks to the start edge of its scroller (`top: 0`): the AppHeader, the
+ * DataTable head, the Gantt head.
  *
  * WebKit snaps a sticky layer and the scrolled content to device pixels on their own: with a
  * fractional scroller offset (a toolbar line height, zoom, a 1.5x or 3x display) the two round
@@ -15,5 +16,17 @@
   --sticky-bleed: 0 calc(-1 * var(--prime-border-width)) 0 0
     var(--sticky-bg, var(--prime-color-layer-current));
 
+  position: sticky;
+  top: 0;
   box-shadow: var(--sticky-bleed);
+}
+
+/* The one height query (foundation §9): on a screen lower than 480px (a phone on its side) a sticky
+   header would take a large share of the window, so it scrolls with the content. `top: auto`, not
+   `position: static`: the box stays positioned for what it holds and a host's sideways sticking
+   (the DataTable's first column) keeps working. */
+@media (max-height: 479px) {
+  .surface {
+    top: auto;
+  }
 }

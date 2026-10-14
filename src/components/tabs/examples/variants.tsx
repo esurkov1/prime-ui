@@ -11,30 +11,26 @@ const SECTIONS = [
 
 export default function TabsVariantsExample() {
   return (
-    <>
+    <div>
       {TONES.map((tone) => (
-        <Tabs.Root key={tone} tone={tone} defaultValue="orders">
-          <Tabs.List aria-label="Продажи">
-            {SECTIONS.map((section) => (
-              <Tabs.Item key={section.value} value={section.value}>
-                <Tabs.Icon>
-                  <Icon name={section.icon} />
-                </Tabs.Icon>
-                <Tabs.Label>{section.label}</Tabs.Label>
-              </Tabs.Item>
-            ))}
-          </Tabs.List>
-          {SECTIONS.map((section) => (
-            <Tabs.Panel key={section.value} value={section.value}>
-              <Typography variant="body-m" tone="secondary">
-                {tone === "neutral"
-                  ? "Спокойный акцент: цвет только у иконки."
-                  : "Активная вкладка целиком в акцентном цвете."}
-              </Typography>
-            </Tabs.Panel>
-          ))}
-        </Tabs.Root>
+        <div key={tone}>
+          <Tabs.Root tone={tone} defaultValue="orders">
+            <Tabs.List aria-label="Продажи">
+              {SECTIONS.map((section) => (
+                <Tabs.Item key={section.value} value={section.value}>
+                  <Tabs.Icon>
+                    <Icon name={section.icon} />
+                  </Tabs.Icon>
+                  <Tabs.Label>{section.label}</Tabs.Label>
+                </Tabs.Item>
+              ))}
+            </Tabs.List>
+          </Tabs.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            {tone}
+          </Typography>
+        </div>
       ))}
-    </>
+    </div>
   );
 }

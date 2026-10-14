@@ -1,4 +1,4 @@
-/** A strip of warehouse cards that comes to rest on a card's start, scrolled by touch, a trackpad or the mouse wheel — `snap`, `axis`. */
+/** A strip of warehouse cards that always comes to rest on a card's start, scrolled by touch, a trackpad or the mouse wheel — `snap`, `axis`. */
 import { Card, ScrollContainer, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -14,7 +14,7 @@ const WAREHOUSES = [
 
 export default function ScrollContainerSnapExample() {
   return (
-    <ScrollContainer axis="horizontal" snap scrollbar="hidden" aria-label="Склады">
+    <ScrollContainer axis="horizontal" snap="mandatory" scrollbar="hidden" aria-label="Склады">
       <ul className={styles.tiles}>
         {WAREHOUSES.map((warehouse) => (
           <li key={warehouse.id} className={styles.tile}>

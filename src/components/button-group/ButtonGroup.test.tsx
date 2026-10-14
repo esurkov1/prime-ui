@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { DisabledProvider } from "@/internal/disabledContext";
+import press from "@/internal/press.module.css";
+import { cssRule, cssValue } from "@/test/css";
 
 import { ButtonGroup } from "./ButtonGroup";
 
@@ -224,5 +226,55 @@ describe("ButtonGroup field frame", () => {
     );
     expect(screen.getByRole("button", { name: "CSV" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "PDF" })).toBeDisabled();
+  });
+
+  it("a row is a switcher that scrolls inside itself; a column stacks", () => {
+    const { rerender } = render(
+      <ButtonGroup.Root aria-label="Период">
+        <ButtonGroup.Item pressed>День</ButtonGroup.Item>
+        <ButtonGroup.Item pressed={false}>Неделя</ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    const group = screen.getByRole("group", { name: "Период" });
+    expect(group).toHaveAttribute("data-edges", "fade");
+    rerender(
+      <ButtonGroup.Root aria-label="Период" orientation="vertical">
+        <ButtonGroup.Item pressed>День</ButtonGroup.Item>
+        <ButtonGroup.Item pressed={false}>Неделя</ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    expect(screen.getByRole("group", { name: "Период" })).not.toHaveAttribute("data-edges");
+  });
+
+  it("full width: segments tend to equal widths and never get narrower than their label", () => {
+    const rule = cssRule(
+      "src/components/button-group/ButtonGroup.module.css",
+      '.root[data-full-width="true"]:not([data-orientation="vertical"]) > .item',
+    );
+    expect(cssValue(rule, "flex")).toBe("1 1 0");
+    expect(cssValue(rule, "min-width")).toBe("max-content");
+  });
+
+  it("presses by scale only: the shared press, compact for an icon-only segment", () => {
+    render(
+      <ButtonGroup.Root aria-label="Правка">
+        <ButtonGroup.Item>Отменить</ButtonGroup.Item>
+        <ButtonGroup.Item aria-label="Повторить">
+          <ButtonGroup.Icon>
+            <svg />
+          </ButtonGroup.Icon>
+        </ButtonGroup.Item>
+      </ButtonGroup.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Отменить" })).toHaveClass(press.press);
+    expect(screen.getByRole("button", { name: "Повторить" })).toHaveClass(press.pressCompact);
+  });
+
+  it("styles the toggled segment from aria-pressed", () => {
+    const rule = cssRule(
+      "src/components/button-group/ButtonGroup.module.css",
+      '.item[aria-pressed="true"]',
+    );
+    expect(cssValue(rule, "background")).toBe("var(--prime-color-accent-soft)");
   });
 });

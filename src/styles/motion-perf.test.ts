@@ -130,15 +130,10 @@ const LAYOUT_TRANSITIONS: Record<string, string[]> = {
     "max-width",
     "grid-template-rows",
   ],
-  // Indicators sized to their item: a scale would stretch the label or the radius.
-  "src/components/segmented-control/SegmentedControl.module.css": [
-    "left",
-    "top",
-    "width",
-    "height",
-  ],
-  "src/components/tabs/Tabs.module.css": ["width", "height"],
-  "src/layout/bottom-nav/BottomNav.module.css": ["left", "width"],
+  // The one sliding selection indicator (Tabs folder, SegmentedControl thumb, BottomNav capsule),
+  // sized to its item: a scale would stretch the label or the radius, and a transform would make
+  // WebKit paint the items' text under it (the note in the file).
+  "src/internal/selectionIndicator.module.css": ["left", "top", "width", "height"],
   // A refused commit glides the thumb and the fill back; a vertical slider along the block axis.
   "src/components/slider/Slider.module.css": [
     "inset-inline-start",

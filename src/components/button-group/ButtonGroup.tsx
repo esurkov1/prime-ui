@@ -1,5 +1,6 @@
 import type * as React from "react";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -10,7 +11,10 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { iconSlotClass } from "@/internal/iconBox";
 import { iconLayout } from "@/internal/iconLayout";
+import press from "@/internal/press.module.css";
+import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./ButtonGroup.module.css";
@@ -29,7 +33,10 @@ export type ButtonGroupRootProps = Omit<FieldRootDomProps, "dir"> &
     orientation?: ButtonGroupOrientation;
     /** Tier. Default: the tier of the surrounding control (a toolbar, a panel), else `m`. */
     size?: ControlSize;
-    /** Stretch the group to its container; horizontal segments share the width equally. */
+    /**
+     * Stretch the group to its container; horizontal segments tend to equal widths but never get
+     * narrower than their label — when they do not fit, the row scrolls.
+     */
     fullWidth?: boolean;
     /** Invalid state: a danger ring on every segment and `aria-invalid` on the group. */
     invalid?: boolean;
@@ -67,8 +74,12 @@ function ButtonGroupRoot({
   "aria-describedby": ariaDescribedBy,
   ...rest
 }: ButtonGroupRootProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
+  const horizontal = orientation !== "vertical";
+  // A row is a switcher: it scrolls inside itself, never wraps (foundation §9). A column stacks.
+  const Group = horizontal ? SwitcherScroller : "div";
   return (
     <FieldFrame
       {...rest}
@@ -85,8 +96,7 @@ function ButtonGroupRoot({
       className={cx(styles.field, className)}
       data-full-width={fullWidth || undefined}
     >
-      {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: `role` is `group` or the consumer's `toolbar`, both take a name */}
-      <div
+      <Group
         id={ids.controlId}
         role={role}
         aria-label={ariaLabel}
@@ -96,14 +106,14 @@ function ButtonGroupRoot({
         aria-required={required || undefined}
         className={cx(fieldTierClass, styles.root)}
         {...toDataAttributes({
-          orientation: orientation === "vertical" ? orientation : undefined,
+          orientation: horizontal ? undefined : orientation,
           size,
           invalid: ids.invalid || undefined,
           "full-width": fullWidth,
         })}
       >
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-      </div>
+        {tier.provide(children)}
+      </Group>
     </FieldFrame>
   );
 }
@@ -134,7 +144,7 @@ function ButtonGroupItem({
       ref={ref}
       type={type}
       disabled={disabled || undefined}
-      className={cx(styles.item, className)}
+      className={cx(styles.item, layout.iconOnly ? press.pressCompact : press.press, className)}
       aria-pressed={pressed}
       {...toDataAttributes({
         state: pressed === undefined ? undefined : pressed ? "active" : "inactive",
@@ -158,7 +168,7 @@ export type ButtonGroupIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "
 
 function ButtonGroupIcon({ children, className, ...rest }: ButtonGroupIconProps) {
   return (
-    <span className={cx(styles.icon, className)} aria-hidden="true" {...rest}>
+    <span className={cx(iconSlotClass, styles.icon, className)} aria-hidden="true" {...rest}>
       {children}
     </span>
   );

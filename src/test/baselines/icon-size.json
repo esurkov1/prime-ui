@@ -1,15 +1,11 @@
 [
   "src/components/accordion/Accordion.module.css: .icon svg",
   "src/components/banner/Banner.module.css: .icon svg",
-  "src/components/button-group/ButtonGroup.module.css: .icon > svg",
   "src/components/card/Card.module.css: .icon svg",
   "src/components/empty-page/EmptyPage.module.css: .iconWrap svg",
   "src/components/input/Input.module.css: .icon > svg",
   "src/components/login-form/LoginForm.module.css: .logo > svg, .logo > img",
   "src/components/notification/Notification.module.css: .iconWrap svg",
-  "src/components/segmented-control/SegmentedControl.module.css: .icon > :global(svg)",
-  "src/components/tabs/Tabs.module.css: .icon svg",
   "src/internal/menu.module.css: .itemIcon > svg",
-  "src/layout/bottom-nav/BottomNav.module.css: .icon > svg",
   "src/layout/sidebar/Sidebar.module.css: .icon > :global(svg)"
 ]

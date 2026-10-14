@@ -302,9 +302,9 @@
   border-inline-start: var(--dt-column-divider-width) solid var(--dt-divider-color);
 }
 
+/* The sticky head: `stickySurfaceClass` (joined in TSX) sticks it and lets it go on a short
+   screen; here only its stacking. */
 .root[data-sticky-header="true"] .headCell {
-  position: sticky;
-  top: 0;
   z-index: var(--dt-z-sticky-header);
 }
 
@@ -981,8 +981,6 @@ tbody + tbody > .groupRow > .groupCell {
 
 /* Sticky head and first column: the leading head cells stick to both edges. */
 .cornerCellSticky {
-  position: sticky;
-  top: 0;
   z-index: var(--dt-z-sticky-corner);
 }
 
@@ -1089,15 +1087,6 @@ tbody + tbody > .groupRow > .groupCell {
 .pagination {
   flex: 1 1 0%;
   min-width: 0;
-}
-
-/* Short landscape screens (foundation §9: sticky headers stop below 480px of window height): a
-   sticky head would take a large share of the window, so it scrolls with the rows (a sticky first
-   column still sticks sideways). */
-@media (max-height: 479px) {
-  .root[data-sticky-header="true"] .headCell {
-    top: auto;
-  }
 }
 
 @container (max-width: 30rem) {

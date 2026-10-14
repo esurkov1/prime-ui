@@ -17,4 +17,6 @@ export const TOKEN_DEFAULTS = {
   "--prime-panel-offset": 4,
   "--prime-space-2": 8,
   "--prime-space-6": 24,
+  "--prime-space-8": 32,
+  "--prime-space-20": 80,
 } as const;
