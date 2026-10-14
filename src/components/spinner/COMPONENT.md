@@ -114,5 +114,5 @@ No keyboard interaction.
 - A spinner for a known progress → ProgressBar / ProgressCircle.
 
 ## Related
-- **Built from:** `internal/ring` (the ring drawing, shared with ProgressCircle and the circle Button)
+- **Built from:** `internal/ring` (the ring drawing, shared with ProgressCircle and the circle Button), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Skeleton](../skeleton/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md), [Button](../button/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

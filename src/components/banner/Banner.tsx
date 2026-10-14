@@ -8,7 +8,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { leaveInPlace } from "@/internal/leaveInPlace";
-import type { ControlSize, Tone, Variant } from "@/internal/states";
+import { type ControlSize, compactTier, type Tone, type Variant } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Banner.module.css";
@@ -32,15 +32,6 @@ type BannerContextValue = {
 };
 
 const BannerContext = React.createContext<BannerContextValue | null>(null);
-
-/** The corner close is a compact ghost button: one tier below the banner, never under `xs`. */
-const CORNER_CLOSE_SIZE: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "xs",
-  l: "s",
-  xl: "s",
-};
 
 export type BannerRootProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Treatment: `soft` tinted fill (default), `solid` saturated fill, `outline` surface with a tone ring. */
@@ -112,7 +103,7 @@ function BannerRoot({
                 <Button.Root
                   variant="ghost"
                   tone="inherit"
-                  size={CORNER_CLOSE_SIZE[size]}
+                  size={compactTier(size)}
                   aria-label={dismissLabel}
                   onClick={onDismiss}
                 >

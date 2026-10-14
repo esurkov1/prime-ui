@@ -4,6 +4,7 @@ import { Button } from "@/components/button/Button";
 import { Dnd } from "@/components/dnd/Dnd";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import type { UploadItem } from "@/hooks/useUploadQueue";
 import { Icon } from "@/icons";
@@ -14,7 +15,6 @@ import { formatClock } from "@/internal/formatClock";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { TransferOverlay } from "@/internal/transferDisk";
 import { useNearView } from "@/internal/useNearView";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./attachmentTile.module.css";
 

@@ -207,5 +207,5 @@ Motion: it opens out of the thumbnail it was opened from — the picture grows f
 - `autoPlay` left on for videos people need to read beside (a recording next to a form) → `autoPlay={false}`; the play disk starts it.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (bars, arrows, play disk, video controls), [Slider](../slider/COMPONENT.md) (video seek; the sound level, `orientation="vertical"`), [Thumbnail](../thumbnail/COMPONENT.md) (filmstrip), [ScrollContainer](../scroll-container/COMPONENT.md) (filmstrip), [Spinner](../spinner/COMPONENT.md) (loading without a thumbnail), `Icon`
+- **Built from:** [Button](../button/COMPONENT.md) (bars, arrows, play disk, video controls), [Slider](../slider/COMPONENT.md) (video seek; the sound level, `orientation="vertical"`), [Thumbnail](../thumbnail/COMPONENT.md) (filmstrip), [ScrollContainer](../scroll-container/COMPONENT.md) (filmstrip), [Spinner](../spinner/COMPONENT.md) (loading without a thumbnail), `Icon`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Gallery](../gallery/COMPONENT.md) and [Message](../message/COMPONENT.md) (`Message.Media`): their albums open MediaViewer by themselves, [Thumbnail](../thumbnail/COMPONENT.md) (a pressable thumbnail), [Modal](../modal/COMPONENT.md), [VideoNote](../video-note/COMPONENT.md)

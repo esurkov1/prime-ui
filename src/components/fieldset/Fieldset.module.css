@@ -1,8 +1,9 @@
 /*
  * Fieldset — a frameless group of fields (foundation §1 rule 3): heading `title-s`, heading → its
  * fields 16, heading → description 4, field → field 20. No border, padding or fill: the group is
- * made by proximity, groups stand 32 apart in the form around them. The native `<legend>` stays the
- * rendered legend (it names the group); spacing hangs on the body after it, never on the legend.
+ * made by proximity, groups stand 32 apart in the form around them. Without a legend it is the
+ * plain field column of a form. The native `<legend>` stays the rendered legend (it names the
+ * group); spacing hangs on the body after it, never on the legend.
  */
 .root {
   box-sizing: border-box;

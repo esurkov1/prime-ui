@@ -56,7 +56,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `children` | `ReactNode` | — | `Checkbox.Label`. Without it only the box renders — give the root an `aria-label`. |
 | `className` | `string` | — | Class on the field `<div>`. |
-| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | `name`, `value`, `required`, `aria-label`, `onBlur`… on the native input. |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | `name`, `value`, `required` (also a red `*` after the text), `aria-label`, `onBlur`… on the native input. |
 
 ### Checkbox.Label
 `ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.
@@ -146,7 +146,7 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 - A native `<input type="checkbox">` (visually hidden over the box, so validation bubbles point at it), wrapped by the `<label>` row.
 - `aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.
 - Without visible text, pass `aria-label` on `Checkbox.Root` (it lands on the input).
-- `required` goes to the native input; no asterisk is drawn — state it in the text or the hint.
+- `required` goes to the native input and draws a red `*` after the text; the `*` is `aria-hidden`, the input reports the requirement.
 - `Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked`.
 
 ### Labels
@@ -175,5 +175,5 @@ No `labels`.
 - `style` on `Checkbox.Root` expecting to style the field → it goes to the hidden input; use `className`.
 
 ## Related
-- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`); the row is a native `<label>`
+- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md); the row is a native `<label>`
 - **See also:** [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md); `Checkbox.Indicator` inside [Select](../select/COMPONENT.md) and [TagSelect](../tag-select/COMPONENT.md) rows

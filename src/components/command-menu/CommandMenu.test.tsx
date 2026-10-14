@@ -152,7 +152,8 @@ describe("CommandMenu — пустое состояние и футер", () => 
     expect(screen.queryByText("Ничего не найдено")).not.toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Раздел" })).toBeInTheDocument();
     await user.type(screen.getByRole("combobox", { name: "Поиск команд" }), "zzz");
-    expect(screen.getByRole("status")).toHaveTextContent("Ничего не найдено");
+    // The empty state is a status of its own, beside the list's loading announcement.
+    expect(screen.getByText("Ничего не найдено").closest('[role="status"]')).not.toBeNull();
     expect(screen.getByText("Навигация")).toBeInTheDocument();
   });
 });
@@ -361,8 +362,8 @@ describe("CommandMenu — a persistent item", () => {
     const input = screen.getByRole("combobox", { name: "Поиск команд" });
     await user.type(input, "zeta");
     // Never a match: the empty state still shows, the text only.
-    const empty = screen.getByRole("status");
-    expect(empty).toHaveTextContent("Ничего не найдено");
+    const empty = screen.getByText("Ничего не найдено").closest('[role="status"]');
+    expect(empty).not.toBeNull();
     const create = screen.getByRole("option", { name: "Создать «zeta»" });
     expect(empty).not.toContainElement(create);
     expect(create).toHaveAttribute("aria-selected", "true");

@@ -5,8 +5,13 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
-import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
-import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import {
+  type FieldFocusRingProps,
+  FieldFrame,
+  type FieldFrameProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
+import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./NativeSelect.module.css";
@@ -19,6 +24,7 @@ export type NativeSelectLabels = {
 export const NATIVE_SELECT_LABELS: NativeSelectLabels = { optional: "необязательно" };
 
 export type NativeSelectProps = FieldFrameProps &
+  FieldFocusRingProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size" | "multiple" | "children"> & {
     size?: ControlSize;
     /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
@@ -45,7 +51,7 @@ export function NativeSelect({
   hint,
   error,
   invalid,
-  focusRing = true,
+  focusRing,
   disabled: disabledProp = false,
   placeholder,
   id,
@@ -89,7 +95,7 @@ export function NativeSelect({
             aria-invalid={ids.invalid || undefined}
             value={value}
             defaultValue={initial}
-            className={cx(fieldSurfaceClass, styles.select)}
+            className={cx(fieldSurfaceClass, fieldInputTextClass, styles.select)}
             onChange={(event) => {
               onChange?.(event);
               onValueChange?.(event.target.value);
@@ -97,7 +103,7 @@ export function NativeSelect({
             {...toDataAttributes({
               size,
               invalid: ids.invalid || undefined,
-              "focus-ring": focusRing ? undefined : false,
+              "focus-ring": focusRing,
             })}
           >
             {placeholder ? (

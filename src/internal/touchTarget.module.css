@@ -1,11 +1,17 @@
 /*
- * Touch hit area (WCAG 2.5.5): on a coarse pointer an invisible ::after grows the hit area of a
- * control smaller than `--prime-control-touch-target` (44px) to that size, centred on it; the
- * visual size stays the tier's. A larger control keeps its own box.
- *   .target       grows both axes (a standalone control)
- *   .targetBlock  grows the height only (a segment beside other content of the same host)
- * The host keeps ::after free and does not clip its overflow. Any position other than static makes
- * it the containing block; the default `relative` has zero specificity, so a host's own wins.
+ * Touch hit area (WCAG 2.5.5): on a coarse pointer a control smaller than
+ * `--prime-control-touch-target` (44px) gets a hit area of that size.
+ *   .target       an invisible ::after grows both axes, centred (a standalone control)
+ *   .targetBlock  the ::after grows the height only (a segment beside other content of the host)
+ *   .targetRow    the row itself is at least 44px tall (a row of a stacked list: a hit area
+ *                 outside it would cover the rows around it)
+ * The visual size of a `.target` / `.targetBlock` host stays the tier's. Such a host keeps ::after
+ * free and never clips its own overflow (clipping goes on an inner element). Any position other
+ * than static makes it the containing block; the default `relative` has zero specificity, so a
+ * host's own wins.
+ * `.targetRow` sets `--touch-row-min` (44px on a coarse pointer, unset otherwise) and, with zero
+ * specificity, `min-height` from it. A row with a `min-height` of its own folds the variable in:
+ * `min-height: max(var(--row-h), var(--touch-row-min, 0px))`.
  */
 @media (pointer: coarse) {
   :where(.target, .targetBlock) {
@@ -22,4 +28,12 @@
   .targetBlock::after {
     inset-inline: 0;
   }
+
+  .targetRow {
+    --touch-row-min: var(--prime-control-touch-target);
+  }
+}
+
+:where(.targetRow) {
+  min-height: var(--touch-row-min, auto);
 }

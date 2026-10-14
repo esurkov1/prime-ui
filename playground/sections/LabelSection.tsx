@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Отдельная подпись над собранным вручную полем, связанная с его input через `htmlFor` и `id`.",
+        "Подпись над календарём без своей подписи: даёт ему имя через `id` и `aria-labelledby` — `id`.",
     },
     { slot: "sizes", description: "Все размеры; подпись берёт размер поля под ней — `size`." },
     {

@@ -259,5 +259,5 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 - Deleting from the menu without a question → open a `ConfirmDialog` from the menu item.
 
 ## Related
-- **Built from:** [List](../list/COMPONENT.md) (rows, current fill, focus, touch height), [Input](../input/COMPONENT.md) (search), [ScrollContainer](../scroll-container/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md) (counts), [Dropdown](../dropdown/COMPONENT.md) (row menu), [Dnd](../dnd/COMPONENT.md) (the glide of a new order)
+- **Built from:** [List](../list/COMPONENT.md) (rows, current fill, focus, touch height), [Input](../input/COMPONENT.md) (search), [ScrollContainer](../scroll-container/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md) (counts), [Dropdown](../dropdown/COMPONENT.md) (row menu), [Dnd](../dnd/COMPONENT.md) (the glide of a new order), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Chat](../chat/COMPONENT.md), [Message](../message/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [PageContent](../page-content/COMPONENT.md), [ConfirmDialog](../confirm-dialog/COMPONENT.md)

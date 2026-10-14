@@ -2,47 +2,13 @@
  * Choice layout and states shared by Checkbox / Radio / Switch:
  *   grid  [control] [text]
  *         [       ] [hint / error]
- * The label row is a subgrid of the root so descriptions align with the text column. The control
- * cell is one text line tall (or the control's height if taller), so the control is optically
- * centred on the first line. A component sets `--prime-choice-control-height` when its control
- * is not a square of `--prime-choice-size` (Switch).
+ * The tier is the field tier (`fieldTierClass` with `data-size` on the field, or on
+ * `Checkbox.Indicator` outside a field): `--field-choice` box, `--field-gap`, `--field-text` /
+ * `--field-lh`. The label row is a subgrid of the root so descriptions align with the text column.
+ * The control cell is one text line tall (or the control's height if taller), so the control is
+ * optically centred on the first line. A component sets `--prime-choice-control-height` when its
+ * control is not a square of `--field-choice` (Switch).
  */
-
-/* ---- Tier (the field, and Checkbox.Indicator outside a field) ---- */
-.tier {
-  --prime-choice-size: var(--prime-control-m-choice);
-  --prime-choice-gap: var(--prime-control-m-gap);
-  --prime-choice-text: var(--prime-control-m-text-size);
-  --prime-choice-line-height: var(--prime-control-m-line-height);
-}
-
-.tier[data-size="xs"] {
-  --prime-choice-size: var(--prime-control-xs-choice);
-  --prime-choice-gap: var(--prime-control-xs-gap);
-  --prime-choice-text: var(--prime-control-xs-text-size);
-  --prime-choice-line-height: var(--prime-control-xs-line-height);
-}
-
-.tier[data-size="s"] {
-  --prime-choice-size: var(--prime-control-s-choice);
-  --prime-choice-gap: var(--prime-control-s-gap);
-  --prime-choice-text: var(--prime-control-s-text-size);
-  --prime-choice-line-height: var(--prime-control-s-line-height);
-}
-
-.tier[data-size="l"] {
-  --prime-choice-size: var(--prime-control-l-choice);
-  --prime-choice-gap: var(--prime-control-l-gap);
-  --prime-choice-text: var(--prime-control-l-text-size);
-  --prime-choice-line-height: var(--prime-control-l-line-height);
-}
-
-.tier[data-size="xl"] {
-  --prime-choice-size: var(--prime-control-xl-choice);
-  --prime-choice-gap: var(--prime-control-xl-gap);
-  --prime-choice-text: var(--prime-control-xl-text-size);
-  --prime-choice-line-height: var(--prime-control-xl-line-height);
-}
 
 /* ---- Field ---- */
 .field {
@@ -54,7 +20,7 @@
   min-width: 0;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  column-gap: var(--prime-choice-gap);
+  column-gap: var(--field-gap);
   row-gap: 0;
   align-content: start;
 }
@@ -64,17 +30,18 @@
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: subgrid;
-  column-gap: var(--prime-choice-gap);
+  column-gap: var(--field-gap);
   align-items: start;
   width: 100%;
   min-width: 0;
   font-family: var(--prime-font-family-sans);
-  font-size: var(--prime-choice-text);
-  line-height: var(--prime-choice-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   font-weight: var(--prime-font-weight-regular);
   color: var(--prime-color-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .field[data-readonly="true"] .row {
@@ -91,10 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: max(
-    var(--prime-choice-control-height, var(--prime-choice-size)),
-    var(--prime-choice-line-height)
-  );
+  height: max(var(--prime-choice-control-height, var(--field-choice)), var(--field-lh));
 }
 
 /* Native input stays over the control (for validation bubbles) but is invisible. */
@@ -119,11 +83,23 @@
   min-width: 0;
 }
 
+/* ---- The square box of a checkbox or a radio (the host sets its radius) ---- */
+.box {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--field-choice);
+  height: var(--field-choice);
+}
+
 /*
  * ---- Visual control states ----
  * Fills read variables with defaults, so a host only tunes them on its root: `--choice-bg-hover`,
- * `--choice-bg-disabled-checked`, `--choice-bg-duration` (pace of the fill change). Read-only and
- * disabled take no hover or press. Hosts never restyle `.visual` itself, so file order is free.
+ * `--choice-bg-disabled-checked`, `--choice-bg-duration` (pace of the fill change). Read-only,
+ * disabled and busy take no hover or press. Press is `press.pressPartCompact` under the row's
+ * `press.pressHost` (joined in TSX); hosts never restyle `.visual` itself, so file order is free.
  */
 .visual {
   background: var(--prime-color-fill-strong);
@@ -132,18 +108,13 @@
     background-color var(--choice-bg-duration, var(--prime-motion-fade-fast))
     var(--prime-motion-easing-standard),
     box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
   .field:not([data-disabled="true"], [data-readonly="true"]) .row:hover .visual {
     background: var(--prime-color-fill-strong-hover);
   }
-}
-
-/* Tactile press: a small target, so the compact scale. */
-.field:not([data-disabled="true"], [data-readonly="true"]) .row:active .visual {
-  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 :is(
@@ -182,7 +153,6 @@
 :is(.field[data-disabled="true"] .visual, .visual[data-disabled="true"]) {
   background: var(--prime-color-fill-muted);
   box-shadow: none;
-  transform: none;
 }
 
 :is(

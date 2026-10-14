@@ -1,17 +1,14 @@
-import type * as React from "react";
+import * as React from "react";
 
-import { Hint } from "@/components/hint/Hint";
+import { LabelMarks } from "@/components/label/Label";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import {
-  type FieldIds,
-  leavingErrorClass,
-  useErrorShake,
-  useLeavingError,
-} from "@/internal/FieldFrame";
+import { type FieldIds, FieldSupport, useErrorShake, useLeavingError } from "@/internal/FieldFrame";
 import frameStyles from "@/internal/FieldFrame.module.css";
-import type { ControlSize, DataState } from "@/internal/states";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import press from "@/internal/press.module.css";
+import type { CheckState, ControlSize } from "@/internal/states";
 import { touchTargetClass } from "@/internal/touchTarget";
 
 import styles from "./ChoiceField.module.css";
@@ -31,18 +28,42 @@ export const choiceInputClass = styles.input;
  * invalid and disabled come from the field state. A host tunes the fills with `--choice-bg*`.
  * Outside a field (`Checkbox.Indicator`) the element's own `data-state` / `data-disabled` drive it.
  */
-export const choiceVisualClass = styles.visual;
+export const choiceVisualClass = cx(styles.visual, press.pressPartCompact);
 
-/** `--prime-choice-size` / gap / text of the tier in `data-size` on the same element. */
-export const choiceTierClass = styles.tier;
+/**
+ * The square box of a checkbox or a radio: the tier's choice size (`--field-choice`), the mark
+ * centred in it. The host sets only its corner radius and draws the mark or the dot.
+ */
+export const choiceBoxClass = styles.box;
+
+type ChoiceMarks = {
+  required: boolean;
+  optional: boolean;
+  optionalLabel: string;
+  disabled: boolean;
+};
+
+const ChoiceMarksContext = React.createContext<ChoiceMarks | null>(null);
 
 type ChoiceFieldProps = {
   ids: FieldIds;
   size: ControlSize;
-  state: Extract<DataState, "checked" | "unchecked" | "indeterminate">;
+  state: CheckState;
   disabled: boolean;
   /** The state is shown but does not change: no hover or press. */
   readOnly?: boolean;
+  /** A change is being saved (a promise from the handler): no press. */
+  busy?: boolean;
+  /** Red `*` after the text (`LabelMarks`); the native input carries `required`. */
+  required?: boolean;
+  /** Muted `optionalLabel` after the text. */
+  optional?: boolean;
+  optionalLabel?: string;
+  /**
+   * An option of a group (a radio in `Radio.Group`): the group frame shakes and announces its
+   * error, the option does neither.
+   */
+  groupOption?: boolean;
   hint?: React.ReactNode;
   error?: React.ReactNode;
   /** The native input (with `choiceInputClass`) followed by its aria-hidden visual. */
@@ -57,18 +78,27 @@ export function ChoiceField({
   state,
   disabled,
   readOnly = false,
+  busy = false,
+  required = false,
+  optional = false,
+  optionalLabel = "",
+  groupOption = false,
   hint,
   error,
   control,
   className,
   children,
 }: ChoiceFieldProps) {
-  const shake = useErrorShake(ids.invalid, error);
+  const shake = useErrorShake(!groupOption && ids.invalid, error);
   const leaving = useLeavingError(ids.showError, error);
+  const marks = React.useMemo(
+    () => ({ required, optional, optionalLabel, disabled }),
+    [required, optional, optionalLabel, disabled],
+  );
   return (
     <ControlSizeProvider value={size}>
       <div
-        className={cx(styles.tier, styles.field, className)}
+        className={cx(fieldTierClass, styles.field, className)}
         {...toDataAttributes({
           size,
           state,
@@ -79,32 +109,27 @@ export function ChoiceField({
       >
         <label
           htmlFor={ids.controlId}
-          className={cx(styles.row, frameStyles.shakeSelf)}
-          data-shake={shake}
+          className={cx(styles.row, press.pressHost)}
+          data-loading={busy || undefined}
         >
-          <span className={cx(styles.controlCell, touchTargetClass)}>{control}</span>
-          {children}
-        </label>
-        {ids.showError ? (
-          <Hint.Root id={ids.errorId} size={size} invalid className={styles.support}>
-            {error}
-          </Hint.Root>
-        ) : leaving ? (
-          <Hint.Root
-            size={size}
-            invalid
-            aria-hidden="true"
-            data-state="closed"
-            onAnimationEnd={leaving.onExitEnd}
-            className={cx(styles.support, leavingErrorClass)}
+          <span
+            className={cx(styles.controlCell, frameStyles.shakeSelf, touchTargetClass)}
+            data-shake={shake}
           >
-            {leaving.node}
-          </Hint.Root>
-        ) : ids.showHint ? (
-          <Hint.Root id={ids.hintId} size={size} disabled={disabled} className={styles.support}>
-            {hint}
-          </Hint.Root>
-        ) : null}
+            {control}
+          </span>
+          <ChoiceMarksContext value={marks}>{children}</ChoiceMarksContext>
+        </label>
+        <FieldSupport
+          ids={ids}
+          size={size}
+          hint={hint}
+          error={error}
+          leaving={leaving}
+          disabled={disabled}
+          live={!groupOption}
+          className={styles.support}
+        />
       </div>
     </ControlSizeProvider>
   );
@@ -114,7 +139,24 @@ export type ChoiceLabelProps = React.HTMLAttributes<HTMLSpanElement> & {
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** The visible text of a choice; it sits in the text column of the label row. */
-export function ChoiceLabel({ className, ...rest }: ChoiceLabelProps) {
-  return <span className={cx(styles.text, className)} {...rest} />;
+/** The visible text of a choice; it sits in the text column of the label row, marks after it. */
+export function ChoiceLabel({ className, children, ...rest }: ChoiceLabelProps) {
+  const marks = React.use(ChoiceMarksContext);
+  const marked = marks && (marks.required || marks.optional);
+  return (
+    <span className={cx(styles.text, className)} {...rest}>
+      {children}
+      {marked ? (
+        <>
+          {" "}
+          <LabelMarks
+            required={marks.required}
+            optional={marks.optional}
+            optionalLabel={marks.optionalLabel}
+            disabled={marks.disabled}
+          />
+        </>
+      ) : null}
+    </span>
+  );
 }

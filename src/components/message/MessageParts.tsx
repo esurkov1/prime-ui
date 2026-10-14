@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown, type DropdownContentProps } from "@/components/dropdown/Dropdown";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
@@ -17,7 +18,6 @@ import palette from "@/internal/palette.module.css";
 import { RollingNumber } from "@/internal/RollingNumber";
 import { RichText } from "@/internal/richText";
 import type { PaletteColor } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Message.module.css";
 import type { MessageUser } from "./types";

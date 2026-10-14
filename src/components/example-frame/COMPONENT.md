@@ -142,5 +142,5 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 - Expecting `colorScheme` to change the page theme → it only themes the frame's stage and code pane.
 
 ## Related
-- **Built from:** [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [CodeBlock](../code-block/COMPONENT.md), Icon (`view.*`, `viewport.*`, `theme.*`, `action.copy`, `action.check`)
+- **Built from:** [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [CodeBlock](../code-block/COMPONENT.md), Icon (`view.*`, `viewport.*`, `theme.*`, `action.copy`, `action.check`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Card](../card/COMPONENT.md)

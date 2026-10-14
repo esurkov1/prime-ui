@@ -2,7 +2,7 @@
  * Shared recipes have one home (CLAUDE.md §2):
  * - the control tier tokens of a size (`--prime-control-xs|s|l|xl-*`) are mapped once, in
  *   `src/internal/fieldTier.module.css`; everything else reads the tier variables it sets;
- * - the visually-hidden clip (`clip-path: inset(50%)`) is `src/internal/VisuallyHidden`;
+ * - the visually-hidden clip (`clip-path: inset(50%)`) is `src/components/visually-hidden/VisuallyHidden`;
  * - the dark shade over media (`--prime-color-media-shade`) is `src/internal/mediaPill`.
  *
  * In ratchet mode (`shared-css`): the copies found when the guard landed are the baseline.
@@ -18,7 +18,7 @@ const RECIPES: { home: string; rule: string; test: (css: string) => number }[] =
     test: (css) => css.match(/--prime-control-(xs|s|l|xl)-/g)?.length ?? 0,
   },
   {
-    home: "src/internal/VisuallyHidden.module.css",
+    home: "src/components/visually-hidden/VisuallyHidden.module.css",
     rule: "visually-hidden clip outside VisuallyHidden",
     test: (css) => css.match(/clip-path:\s*inset\(50%\)/g)?.length ?? 0,
   },

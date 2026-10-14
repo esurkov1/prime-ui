@@ -3,6 +3,7 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -10,6 +11,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
+  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -24,7 +26,6 @@ import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { TagOptionMenu } from "./TagOptionMenu";
 import styles from "./TagSelect.module.css";
@@ -132,7 +133,8 @@ function canCreate(
 }
 
 export type TagSelectProps = FieldRootDomProps &
-  FieldFrameProps & {
+  FieldFrameProps &
+  FieldFocusRingProps & {
     /** Available tags: value, label and chip color. */
     options: TagSelectOption[];
     value?: string[];
@@ -200,7 +202,7 @@ export function TagSelect({
   name,
   placeholder = "",
   invalid: invalidProp,
-  focusRing = true,
+  focusRing,
   size = "m",
   label,
   required = false,
@@ -688,7 +690,7 @@ export function TagSelect({
             state: shown ? "open" : "closed",
             disabled: disabled || undefined,
             invalid: ids.invalid || undefined,
-            "focus-ring": focusRing ? undefined : false,
+            "focus-ring": focusRing,
           })}
         >
           <ScrollContainer
@@ -775,9 +777,7 @@ export function TagSelect({
                 <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
               ))
             : null}
-          <VisuallyHidden role="status" aria-live="polite">
-            {announcement}
-          </VisuallyHidden>
+          <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
 
           {/* An invisible row of every chip: the widths behind «+N». */}
           <MeasureRow

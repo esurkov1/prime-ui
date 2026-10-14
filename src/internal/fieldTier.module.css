@@ -1,13 +1,22 @@
 /*
- * One tier table for fields and controls (foundation §6). The element with this class carries
+ * The one tier table of fields and controls (foundation §6). The element with `.tier` carries
  * `data-size`; the table resolves there and cascades to its parts:
  *   --field-h       control height            --field-icon    icon size
  *   --field-px      field padding-x           --field-radius  corner radius
  *   --field-gap     tier gap (value ↔ unit)   --field-text    text size
  *   --field-lh      line height               --field-button-px  button / segment padding-x
  *   --field-input-text / --field-input-lh   text of an editable value (input, textarea, select)
- * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` in TSX (never a
- * cross-file `composes`, which the bundler cannot order), so it ships with the components.
+ *   --field-label-size / --field-label-lh   field label text      --field-label-gap  label → field
+ *   --field-hint-size / --field-hint-lh     support row text      --field-hint-gap   field → hint
+ *   --field-hint-icon                       icon of a support row
+ *   --field-choice                          box of a checkbox / radio
+ * No other stylesheet maps `--prime-control-<tier>-*`: hosts read these variables. The text
+ * classes below set a text from the tier on the element that joins them:
+ *   .labelText  field label (Label)   .hintText  support row (Hint, counter)
+ *   .inputText  an editable value outside a field box (a search row, a channel cell)
+ * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` and the text classes
+ * in TSX (never a cross-file `composes`, which the bundler cannot order), so it ships with the
+ * components.
  */
 .tier {
   --field-h: var(--prime-control-m-height);
@@ -18,6 +27,14 @@
   --field-text: var(--prime-control-m-text-size);
   --field-lh: var(--prime-control-m-line-height);
   --field-button-px: var(--prime-control-m-padding-x);
+  --field-label-size: var(--prime-control-m-label-size);
+  --field-label-lh: var(--prime-control-m-label-line-height);
+  --field-label-gap: var(--prime-control-m-label-gap);
+  --field-hint-size: var(--prime-control-m-hint-size);
+  --field-hint-lh: var(--prime-control-m-hint-line-height);
+  --field-hint-gap: var(--prime-control-m-hint-gap);
+  --field-hint-icon: var(--prime-icon-xs);
+  --field-choice: var(--prime-control-m-choice);
   /* Resolved on the same element as the tier rows below, so it follows the tier. */
   --field-input-text: var(--field-text);
   --field-input-lh: var(--field-lh);
@@ -44,6 +61,13 @@
   --field-text: var(--prime-control-xs-text-size);
   --field-lh: var(--prime-control-xs-line-height);
   --field-button-px: var(--prime-control-xs-padding-x);
+  --field-label-size: var(--prime-control-xs-label-size);
+  --field-label-lh: var(--prime-control-xs-label-line-height);
+  --field-label-gap: var(--prime-control-xs-label-gap);
+  --field-hint-size: var(--prime-control-xs-hint-size);
+  --field-hint-lh: var(--prime-control-xs-hint-line-height);
+  --field-hint-gap: var(--prime-control-xs-hint-gap);
+  --field-choice: var(--prime-control-xs-choice);
 }
 
 .tier[data-size="s"] {
@@ -55,6 +79,13 @@
   --field-text: var(--prime-control-s-text-size);
   --field-lh: var(--prime-control-s-line-height);
   --field-button-px: var(--prime-control-s-padding-x);
+  --field-label-size: var(--prime-control-s-label-size);
+  --field-label-lh: var(--prime-control-s-label-line-height);
+  --field-label-gap: var(--prime-control-s-label-gap);
+  --field-hint-size: var(--prime-control-s-hint-size);
+  --field-hint-lh: var(--prime-control-s-hint-line-height);
+  --field-hint-gap: var(--prime-control-s-hint-gap);
+  --field-choice: var(--prime-control-s-choice);
 }
 
 .tier[data-size="l"] {
@@ -66,6 +97,14 @@
   --field-text: var(--prime-control-l-text-size);
   --field-lh: var(--prime-control-l-line-height);
   --field-button-px: var(--prime-control-l-padding-x);
+  --field-label-size: var(--prime-control-l-label-size);
+  --field-label-lh: var(--prime-control-l-label-line-height);
+  --field-label-gap: var(--prime-control-l-label-gap);
+  --field-hint-size: var(--prime-control-l-hint-size);
+  --field-hint-lh: var(--prime-control-l-hint-line-height);
+  --field-hint-gap: var(--prime-control-l-hint-gap);
+  --field-hint-icon: var(--prime-icon-s);
+  --field-choice: var(--prime-control-l-choice);
 }
 
 .tier[data-size="xl"] {
@@ -77,4 +116,33 @@
   --field-text: var(--prime-control-xl-text-size);
   --field-lh: var(--prime-control-xl-line-height);
   --field-button-px: var(--prime-control-xl-padding-x);
+  --field-label-size: var(--prime-control-xl-label-size);
+  --field-label-lh: var(--prime-control-xl-label-line-height);
+  --field-label-gap: var(--prime-control-xl-label-gap);
+  --field-hint-size: var(--prime-control-xl-hint-size);
+  --field-hint-lh: var(--prime-control-xl-hint-line-height);
+  --field-hint-gap: var(--prime-control-xl-hint-gap);
+  --field-hint-icon: var(--prime-icon-s);
+  --field-choice: var(--prime-control-xl-choice);
+}
+
+/* Field label text: the label tier, weight 500 (foundation §6). */
+.labelText {
+  font-size: var(--field-label-size);
+  line-height: var(--field-label-lh);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+/* Support row text: always smaller than the field text (foundation §6). */
+.hintText {
+  --prime-icon-size: var(--field-hint-icon);
+  font-size: var(--field-hint-size);
+  line-height: var(--field-hint-lh);
+  font-weight: var(--prime-font-weight-regular);
+}
+
+/* An editable value: the tier text, at least 16px on touch screens and narrow viewports. */
+.inputText {
+  font-size: var(--field-input-text);
+  line-height: var(--field-input-lh);
 }

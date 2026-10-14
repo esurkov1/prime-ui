@@ -71,7 +71,7 @@ export function createItemRegistry(): ItemRegistry {
 export type SelectContextValue = {
   size: ControlSize;
   invalid: boolean;
-  focusRing: boolean;
+  focusRing: boolean | undefined;
   required: boolean;
   disabled: boolean;
   placeholder: string | undefined;

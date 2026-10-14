@@ -11,7 +11,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { rovingIndex } from "@/internal/rovingFocus";
-import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
+import { type ControlSize, compactTier, type PaletteColor } from "@/internal/states";
 
 import { Badge } from "../badge/Badge";
 import { Button } from "../button/Button";
@@ -640,7 +640,7 @@ function TabsItem({
           <Button.Root
             variant="ghost"
             tone="neutral"
-            size={stepDown(size, 2)}
+            size={compactTier(size)}
             tabIndex={-1}
             loading={removing}
             aria-label={formatLabel(labels.remove, { label: labelText })}

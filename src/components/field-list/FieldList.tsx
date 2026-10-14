@@ -293,7 +293,7 @@ export function FieldList<T extends object>({
               <FieldCellContext
                 // biome-ignore lint/suspicious/noArrayIndexKey: a cell is its column
                 key={column}
-                value={cellValue(heading?.label ?? "", single)}
+                value={cellValue(heading?.label ?? "", single, Boolean(heading?.required))}
               >
                 <div className={styles.cell} data-width={heading?.width ?? "fill"}>
                   {cell}
@@ -385,7 +385,7 @@ export function FieldList<T extends object>({
                       size={size}
                       required={column.required}
                       disabled={disabled}
-                      className={styles.heading}
+                      secondary
                     >
                       {column.label}
                     </Label.Root>
@@ -448,11 +448,11 @@ FieldList.displayName = "FieldList";
 const cellValues = new Map<string, FieldCell>();
 
 /** One stable context value per heading, so the cells do not re-render the fields for nothing. */
-function cellValue(label: string, single: boolean): FieldCell {
-  const key = `${single ? "1" : "n"}:${label}`;
+function cellValue(label: string, single: boolean, required: boolean): FieldCell {
+  const key = `${single ? "1" : "n"}:${required ? "r" : "o"}:${label}`;
   let value = cellValues.get(key);
   if (!value) {
-    value = { label, hidden: single ? "always" : "wide" };
+    value = { label, hidden: single ? "always" : "wide", required };
     cellValues.set(key, value);
   }
   return value;

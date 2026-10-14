@@ -186,5 +186,5 @@ No keyboard interaction.
 - A grey box while the data loads → `loading` draws the Skeleton in the bar's geometry.
 
 ## Related
-- **Built from:** [Skeleton](../skeleton/COMPONENT.md)
+- **Built from:** [Skeleton](../skeleton/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ProgressCircle](../progress-circle/COMPONENT.md), [Slider](../slider/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md), [Spinner](../spinner/COMPONENT.md)

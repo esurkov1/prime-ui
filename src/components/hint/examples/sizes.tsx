@@ -1,4 +1,4 @@
-/** Every size tier, matching the field above: 12/16 for xs–m, 13/20 for l and xl — `size`. */
+/** Every size tier, one per field tier: 12/16 for xs–m, 13/20 for l and xl — `size`. */
 import { Hint, Typography } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;

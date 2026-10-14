@@ -7,6 +7,7 @@ import { Message } from "@/components/message/Message";
 import type { MessagePosition } from "@/components/message/types";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
@@ -14,7 +15,6 @@ import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import type { Selection } from "@/internal/messageList";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Chat.module.css";
 import { ChatPinned } from "./ChatPinned";

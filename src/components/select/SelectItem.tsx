@@ -10,13 +10,10 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { optionDomId, useStoreSlice } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
-import { type ControlSize, stepDown } from "@/internal/states";
+import { type ControlSize, stepDown, tierMappings } from "@/internal/states";
 
 import styles from "./Select.module.css";
 import { normalize, useSelectContext } from "./selectContext";
-
-/** Thumbnail / Avatar tier for a Select tier: the media of a row stays inside the row height. */
-const MEDIA_SIZE: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "s", l: "s", xl: "m" };
 
 /** Plain text of a node tree (a title made of nodes still has a label). */
 function textOf(node: React.ReactNode): string {
@@ -152,7 +149,7 @@ export function sizeMedia(leading: React.ReactNode[], size: ControlSize): React.
     React.isValidElement<ThumbnailRootProps | AvatarRootProps>(node) &&
     (node.type === Thumbnail.Root || node.type === Avatar.Root)
       ? React.cloneElement(node, {
-          size: node.props.size ?? MEDIA_SIZE[size],
+          size: node.props.size ?? tierMappings.rowMedia[size],
           className: cx(styles.media, node.props.className),
           "aria-hidden": true,
         } as Partial<ThumbnailRootProps & AvatarRootProps>)

@@ -13,6 +13,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
+  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -42,7 +43,8 @@ export const COLOR_FIELD_LABELS: ColorFieldLabels = {
 const FALLBACK_COLOR = "#000000";
 
 export type ColorFieldProps = FieldRootDomProps &
-  FieldFrameProps & {
+  FieldFrameProps &
+  FieldFocusRingProps & {
     /** Controlled color: a CSS color string (hex, `rgb()`, `hsl()`). */
     value?: string;
     defaultValue?: string;
@@ -96,7 +98,7 @@ export function ColorField({
   size = "m",
   disabled: disabledProp = false,
   invalid: invalidProp,
-  focusRing = true,
+  focusRing,
   name,
   id,
   label,
@@ -180,7 +182,7 @@ export function ColorField({
                 size,
                 invalid: ids.invalid || undefined,
                 disabled: disabled || undefined,
-                "focus-ring": focusRing ? undefined : false,
+                "focus-ring": focusRing,
               })}
             >
               <SwatchChip value={color.toString("css")} className={styles.swatch} />

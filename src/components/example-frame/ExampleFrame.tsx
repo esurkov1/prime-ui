@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
@@ -10,7 +10,6 @@ import {
   useNestedSurfaceDepth,
   useStageDepth,
 } from "@/internal/surfaceDepth";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { suspendTransitions } from "@/theme/applyTheme";
 
 import { Button } from "../button/Button";

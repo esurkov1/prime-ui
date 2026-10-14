@@ -187,5 +187,5 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 - Saving a setting in `onValueChange` → it fires on every step of a drag; save in `onCommit`.
 
 ## Related
-- **Built from:** the field frame — [Label](../label/COMPONENT.md) (`label`) and [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **Built from:** the field frame — [Label](../label/COMPONENT.md) (`label`) and [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ProgressBar](../progress-bar/COMPONENT.md) (the same track scale), [Input](../input/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

@@ -20,7 +20,6 @@ const ALLOWED: Record<string, string> = {
   "src/layout/app-header/AppHeader.module.css": "the bare-svg logo slot",
   "src/components/select/Select.module.css": "the chevron only turns (transform)",
   "src/components/tag-select/TagSelect.module.css": "the chevron only turns (transform)",
-  "src/internal/FieldAction.module.css": "the copy cross-fade only transitions the glyph",
 };
 
 const SVG_SELECTOR = /(^|[\s>+~(,])svg\b/;

@@ -61,14 +61,16 @@ describe("touch and input", () => {
       ),
       tier,
     ).toBe(true);
-    // Tier-based fields set their editable text from the input variables, never the tier text.
+    // Tier-based fields set their editable text from the input variables, never the tier text:
+    // in their own rule, or by joining the tier's `.inputText` (`fieldInputTextClass`).
     for (const [file, selector] of [
       ["src/components/input/Input.module.css", ".field"],
       ["src/components/textarea/Textarea.module.css", ".textarea"],
-      ["src/components/native-select/NativeSelect.module.css", ".select"],
+      [tier, ".inputText"],
     ]) {
       expect(cssValue(cssRule(file, selector), "font-size"), file).toBe("var(--field-input-text)");
     }
+    expect(read("components/native-select/NativeSelect.tsx")).toMatch(/fieldInputTextClass/);
     // Inputs outside the field tier raise their own text under the same query. DigitInput needs no
     // rule: its smallest cell already shows 16px digits (body-l).
     expect(

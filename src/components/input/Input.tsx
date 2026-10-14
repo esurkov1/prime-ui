@@ -1,4 +1,5 @@
 import * as React from "react";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
@@ -9,7 +10,6 @@ import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldActionButton,
   type FieldActionButtonProps,
-  FieldActionSegment,
   FieldCopyButton,
 } from "@/internal/FieldAction";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/internal/FieldCommit";
 import {
   FieldCounter,
+  type FieldFocusRingProps,
   FieldFrame,
   type FieldRootDomProps,
   useFieldFrame,
@@ -28,7 +29,6 @@ import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import { MorphText } from "@/internal/MorphText";
 import type { ControlSize, Tone } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { ProgressBar } from "../progress-bar/ProgressBar";
 import styles from "./Input.module.css";
@@ -90,7 +90,7 @@ const STRENGTH_TONES: Record<Exclude<PasswordStrength, 0>, Tone> = {
 type InputContextValue = {
   size: ControlSize;
   invalid: boolean;
-  focusRing: boolean;
+  focusRing: boolean | undefined;
   required: boolean;
   inputId: string;
   /** `Input.Field` attaches it; `Input.ClearButton` returns focus through it. */
@@ -113,53 +113,48 @@ const [InputProvider, useInputContext] = createComponentContext<InputContextValu
 
 // ---- InputRoot ----
 
-export type InputRootProps = FieldRootDomProps & {
-  /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
-  size?: ControlSize;
-  /** Invalid state: danger ring on the field and `aria-invalid` on the input. A non-empty `error` implies it. */
-  invalid?: boolean;
-  /**
-   * Draws the focus ring on `Input.Wrapper` (default). `false` hides only the visual ring — focus,
-   * keyboard and ARIA are unchanged, the error ring still shows. Turn it off only where focus is
-   * otherwise obvious (a single search field with a caret, e.g. a command palette); WCAG 2.4.7.
-   */
-  focusRing?: boolean;
-  label?: React.ReactNode;
-  /** Shows a red `*` after the label and sets native `required` on `Input.Field`. */
-  required?: boolean;
-  /** Shows the muted optional marker after the label text (`labels.optional`). */
-  optional?: boolean;
-  hint?: React.ReactNode;
-  /** Error message; replaces the hint in the same slot and implies `invalid`. */
-  error?: React.ReactNode;
-  /** Right-aligned slot of the support row, e.g. `<Input.Counter current={n} max={50} />`. */
-  counter?: React.ReactNode;
-  /** Always render the support row so an appearing error does not shift the layout. */
-  reserveSupportRow?: boolean;
-  /** Explicit id for the underlying <input>; auto-generated if omitted. */
-  id?: string;
-  /**
-   * A password strength meter under the field: four steps that fill as the value grows stronger,
-   * with the level word on the right of the support row. Use on new-password fields.
-   */
-  strength?: boolean;
-  /** Replaces the kit's estimate (`getPasswordStrength`): return 0 (empty) … 4 (hard). */
-  getStrength?: (value: string) => PasswordStrength;
-  /**
-   * Saves the field on its own (inline editing): fires with the value on blur and Enter when it
-   * differs from the last committed one; Escape reverts to it. Return a Promise to show a spinner
-   * at the field's edge while it runs (the field stays editable, Tab moves on); a rejection puts
-   * the committed value back — show why through `error`. Success shows a brief check.
-   */
-  onCommit?: FieldCommitHandler;
-  labels?: Partial<InputLabels>;
-  children: React.ReactNode;
-};
+export type InputRootProps = FieldRootDomProps &
+  FieldFocusRingProps & {
+    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
+    size?: ControlSize;
+    /** Invalid state: danger ring on the field and `aria-invalid` on the input. A non-empty `error` implies it. */
+    invalid?: boolean;
+    label?: React.ReactNode;
+    /** Shows a red `*` after the label and sets native `required` on `Input.Field`. */
+    required?: boolean;
+    /** Shows the muted optional marker after the label text (`labels.optional`). */
+    optional?: boolean;
+    hint?: React.ReactNode;
+    /** Error message; replaces the hint in the same slot and implies `invalid`. */
+    error?: React.ReactNode;
+    /** Right-aligned slot of the support row, e.g. `<Input.Counter current={n} max={50} />`. */
+    counter?: React.ReactNode;
+    /** Always render the support row so an appearing error does not shift the layout. */
+    reserveSupportRow?: boolean;
+    /** Explicit id for the underlying <input>; auto-generated if omitted. */
+    id?: string;
+    /**
+     * A password strength meter under the field: four steps that fill as the value grows stronger,
+     * with the level word on the right of the support row. Use on new-password fields.
+     */
+    strength?: boolean;
+    /** Replaces the kit's estimate (`getPasswordStrength`): return 0 (empty) … 4 (hard). */
+    getStrength?: (value: string) => PasswordStrength;
+    /**
+     * Saves the field on its own (inline editing): fires with the value on blur and Enter when it
+     * differs from the last committed one; Escape reverts to it. Return a Promise to show a spinner
+     * at the field's edge while it runs (the field stays editable, Tab moves on); a rejection puts
+     * the committed value back — show why through `error`. Success shows a brief check.
+     */
+    onCommit?: FieldCommitHandler;
+    labels?: Partial<InputLabels>;
+    children: React.ReactNode;
+  };
 
 function InputRoot({
   size: sizeProp,
   invalid,
-  focusRing = true,
+  focusRing,
   label,
   required = false,
   optional = false,
@@ -297,7 +292,7 @@ function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
       {...toDataAttributes({
         size,
         invalid: invalid || undefined,
-        "focus-ring": focusRing ? undefined : false,
+        "focus-ring": focusRing,
       })}
     >
       {children}
@@ -476,7 +471,8 @@ export type InputClearButtonProps = Omit<
 function InputClearButton({ onClick, ref, ...rest }: InputClearButtonProps) {
   const { inputId, inputRef, labels } = useInputContext();
   return (
-    <FieldActionSegment
+    <FieldActionButton
+      tooltip={false}
       {...rest}
       ref={ref}
       label={labels.clear}
@@ -487,7 +483,7 @@ function InputClearButton({ onClick, ref, ...rest }: InputClearButtonProps) {
       }}
     >
       <Icon name="action.close" />
-    </FieldActionSegment>
+    </FieldActionButton>
   );
 }
 InputClearButton.displayName = "Input.ClearButton";
@@ -545,7 +541,8 @@ export type InputRevealButtonProps = Omit<
 function InputRevealButton({ onClick, onMouseDown, ref, ...rest }: InputRevealButtonProps) {
   const { inputId, inputRef, labels, revealed, setRevealed, selectionRef } = useInputContext();
   return (
-    <FieldActionSegment
+    <FieldActionButton
+      tooltip={false}
       {...rest}
       ref={ref}
       label={labels.reveal}
@@ -569,7 +566,7 @@ function InputRevealButton({ onClick, onMouseDown, ref, ...rest }: InputRevealBu
       }}
     >
       <Icon name={revealed ? "field.password.hide" : "field.password.show"} />
-    </FieldActionSegment>
+    </FieldActionButton>
   );
 }
 InputRevealButton.displayName = "Input.RevealButton";

@@ -24,4 +24,23 @@ describe("VisuallyHidden (public)", () => {
     rerender(<VisuallyHidden live="assertive">Не удалось сохранить</VisuallyHidden>);
     expect(screen.getByRole("alert")).toHaveAttribute("aria-live", "assertive");
   });
+
+  it("owns the region attributes: a hand-set role or aria-live never overrides live", () => {
+    // The props type has no role / aria-live / aria-atomic / aria-relevant; untyped spread still loses.
+    const loose = { role: "note", "aria-live": "off", "aria-atomic": false } as object;
+    render(
+      <VisuallyHidden live="polite" {...loose}>
+        Счёт сохранён
+      </VisuallyHidden>,
+    );
+    const status = screen.getByRole("status");
+    expect(status).toHaveAttribute("aria-live", "polite");
+    expect(status).toHaveAttribute("aria-atomic", "true");
+  });
+
+  it("is no region without live", () => {
+    render(<VisuallyHidden>Три счёта ждут оплаты</VisuallyHidden>);
+    expect(screen.getByText("Три счёта ждут оплаты")).not.toHaveAttribute("role");
+    expect(screen.getByText("Три счёта ждут оплаты")).not.toHaveAttribute("aria-live");
+  });
 });

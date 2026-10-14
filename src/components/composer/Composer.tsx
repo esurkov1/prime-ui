@@ -9,6 +9,7 @@ import { FileUpload } from "@/components/file-upload/FileUpload";
 import { Hint } from "@/components/hint/Hint";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Textarea } from "@/components/textarea/Textarea";
+import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -30,7 +31,6 @@ import { type ControlSize, stepDown } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { TEXT_FORMATTING_LABELS, type TextFormattingLabels } from "@/internal/textFormatting";
 import { useTextFormatting } from "@/internal/textFormattingToolbar";
-import { VisuallyHidden, visuallyHiddenClass } from "@/internal/VisuallyHidden";
 import styles from "./Composer.module.css";
 import { drawLiveWave, type LiveWaveSize, type LiveWaveStyle } from "./liveWave";
 import {

@@ -176,5 +176,5 @@ No keyboard interaction.
 - Categories painted with `tone` → use `color`; a hand-built legend beside the ring → `legend`.
 
 ## Related
-- **Built from:** [Skeleton](../skeleton/COMPONENT.md), `internal/ring` (the ring drawing, shared with Spinner and the circle Button), `internal/glyphSwap` (the center cross-fade)
+- **Built from:** [Skeleton](../skeleton/COMPONENT.md), `internal/ring` (the ring drawing, shared with Spinner and the circle Button), `internal/glyphSwap` (the center cross-fade), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ProgressBar](../progress-bar/COMPONENT.md), [Card](../card/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [Button](../button/COMPONENT.md)

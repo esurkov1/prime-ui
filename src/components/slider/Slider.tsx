@@ -25,7 +25,7 @@ export type SliderLabels = {
 export const SLIDER_LABELS: SliderLabels = { optional: "необязательно" };
 
 export type SliderProps = FieldRootDomProps &
-  Omit<FieldFrameProps, "focusRing"> & {
+  FieldFrameProps & {
     value?: number;
     defaultValue?: number;
     onValueChange?: (value: number) => void;

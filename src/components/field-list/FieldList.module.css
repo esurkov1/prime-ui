@@ -82,22 +82,6 @@
   margin-block-end: calc(var(--prime-control-xl-label-gap) - var(--prime-space-3));
 }
 
-/*
- * A column heading is a Label one step quieter than the list's own label above it (secondary
- * text), so the list name reads first; one line, cut with an ellipsis in a compact column.
- */
-.head .heading {
-  display: block;
-  color: var(--prime-color-text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.head .heading[aria-disabled="true"] {
-  color: var(--prime-color-text-disabled);
-}
-
 /* On wide rows the cells are the row's own grid items, under their headings. */
 .cells {
   display: contents;

@@ -1,26 +1,20 @@
 /*
  * Checkbox box on the shared choice layout and states (internal/ChoiceField.module.css): this file
- * is only the box geometry; the check / bar mark is `internal/CheckMark`. `Checkbox.Indicator` is the same box outside
+ * is only the box corner; the check / bar mark is `internal/CheckMark`. `Checkbox.Indicator` is the same box outside
  * a field, its tier and state from its own data-*; the row that hosts it owns hover and press.
  */
 .root,
 .indicator {
-  --prime-choice-radius: var(--prime-radius-xs);
+  --checkbox-radius: var(--prime-radius-xs);
 }
 
 :is(.root, .indicator)[data-size="xl"] {
-  --prime-choice-radius: var(--prime-radius-s);
+  --checkbox-radius: var(--prime-radius-s);
 }
 
+/* With `choiceBoxClass` (the box geometry, set in TSX): only the corner and the mark color. */
 .control {
-  box-sizing: border-box;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--prime-choice-size);
-  height: var(--prime-choice-size);
-  border-radius: var(--prime-choice-radius);
+  border-radius: var(--checkbox-radius);
   color: var(--prime-color-accent-fg);
 }
 

@@ -9,6 +9,7 @@ import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Input } from "@/components/input/Input";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { Typography } from "@/components/typography/Typography";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import * as iconSet from "@/icon-set";
 import { Icon, type IconName } from "@/icons";
 import type { Glyph } from "@/icons/glyph";
@@ -17,7 +18,6 @@ import { cx } from "@/internal/cx";
 import enter from "@/internal/enterMotion.module.css";
 import { useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { touchTargetClass } from "@/internal/touchTarget";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import s from "./IconsPage.module.css";
@@ -135,7 +135,7 @@ function IconCatalog() {
         </Typography>
       </div>
 
-      <VisuallyHidden role="status" aria-live="polite">
+      <VisuallyHidden live="polite">
         {copied
           ? copied.ok
             ? `Скопировано: ${snippet(copied.entry)}`

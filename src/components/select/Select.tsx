@@ -6,6 +6,7 @@ import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Spinner } from "@/components/spinner/Spinner";
+import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
@@ -15,6 +16,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
+  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -41,7 +43,6 @@ import type { ControlSize } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
-import { VisuallyHidden, visuallyHiddenClass } from "@/internal/VisuallyHidden";
 
 import styles from "./Select.module.css";
 import {
@@ -88,7 +89,8 @@ export const SELECT_LABELS: SelectLabels = {
 // ─── Root ────────────────────────────────────────────────────────────────────
 
 type SelectRootBase = FieldRootDomProps &
-  FieldFrameProps & {
+  FieldFrameProps &
+  FieldFocusRingProps & {
     size?: ControlSize;
     disabled?: boolean;
     placeholder?: string;
@@ -166,7 +168,7 @@ function SelectRoot(props: SelectRootProps) {
     hint,
     error,
     invalid,
-    focusRing = true,
+    focusRing,
     disabled: disabledProp = false,
     placeholder,
     id,
@@ -362,9 +364,7 @@ function SelectRoot(props: SelectRootProps) {
             <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
           ))
         : null}
-      <VisuallyHidden role="status" aria-live="polite">
-        {announcement}
-      </VisuallyHidden>
+      <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
     </FieldFrame>
   );
 }
@@ -457,7 +457,7 @@ function SelectTrigger({
         invalid: invalid || undefined,
         loading: busy || undefined,
         disabled: disabled || undefined,
-        "focus-ring": focusRing ? undefined : false,
+        "focus-ring": focusRing,
         "icon-only": iconOnly || undefined,
       })}
     >
@@ -802,9 +802,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
           ) : null}
         </EmptyPage.Root>
       ) : null}
-      <VisuallyHidden aria-live="polite">
-        {loading || loadingMore ? labels.loading : ""}
-      </VisuallyHidden>
+      <VisuallyHidden live="polite">{loading || loadingMore ? labels.loading : ""}</VisuallyHidden>
       <HighlightOnOpen listboxRef={listboxRef} panelRef={panelRef} highlight={highlight} />
     </FloatingPanel>
   );

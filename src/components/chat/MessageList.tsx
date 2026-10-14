@@ -8,6 +8,7 @@ import type {
   MessageUser,
 } from "@/components/message/types";
 import { useScrollRegion } from "@/components/scroll-container/useScrollEdges";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
@@ -35,7 +36,6 @@ import {
 import { MessageHighlightContext } from "@/internal/messagePart";
 import { createReadReceipts, type ReadReceipts } from "@/internal/readReceipts";
 import { useRangeSelection } from "@/internal/useRangeSelection";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Chat.module.css";
 import { createMessageFlow, type MessageFlow } from "./messageFlow";
@@ -923,7 +923,7 @@ const noSubscribe = () => () => {};
 function Announcer({ setterRef }: { setterRef: React.RefObject<(text: string) => void> }) {
   const [text, setText] = React.useState("");
   setterRef.current = setText;
-  return <VisuallyHidden role="status">{text}</VisuallyHidden>;
+  return <VisuallyHidden live="polite">{text}</VisuallyHidden>;
 }
 
 // ─── Selection bar ────────────────────────────────────────────────────────────

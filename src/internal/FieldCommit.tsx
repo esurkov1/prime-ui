@@ -1,11 +1,14 @@
 import * as React from "react";
 
 import { Spinner } from "@/components/spinner/Spinner";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { setControlValue, type ValueControl } from "@/internal/controlValue";
 import { cx } from "@/internal/cx";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { GlyphSwap } from "@/internal/glyphSwap";
+import { isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./FieldCommit.module.css";
 
@@ -17,18 +20,10 @@ import styles from "./FieldCommit.module.css";
 export type FieldCommitHandler = (value: string) => void | Promise<void>;
 
 /** `idle` · `pending` (a Promise is running) · `saved` (a brief quiet confirmation). */
-export type FieldCommitState = "idle" | "pending" | "saved";
+type FieldCommitState = "idle" | "pending" | "saved";
 
 /** How long the check stays after a save before it fades out. */
 const SAVED_MS = 1600;
-
-function isThenable(value: unknown): value is PromiseLike<void> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as PromiseLike<void>).then === "function"
-  );
-}
 
 export type FieldCommit = {
   state: FieldCommitState;
@@ -105,7 +100,7 @@ export function useFieldCommit(
       fail();
       return;
     }
-    if (!isThenable(result)) {
+    if (!isPromiseLike(result)) {
       succeed();
       setState("saved");
       return;
@@ -137,8 +132,9 @@ export type FieldCommitLabels = {
 };
 
 /**
- * The commit status at the field's edge: a spinner while saving, then a check that fades out. A
- * polite live region says «saving» / «saved»; the glyphs are hidden from assistive tech.
+ * The commit status at the field's edge: a spinner while saving, then a check that cross-fades in
+ * its place (`GlyphSwap`) and leaves. The slot enters and leaves with `enterMotion`. A polite live
+ * region says «saving» / «saved»; the glyphs are hidden from assistive tech.
  */
 export function FieldCommitStatus({
   state,
@@ -158,17 +154,21 @@ export function FieldCommitStatus({
     <>
       {presence.mounted ? (
         <span
-          className={cx(styles.status, className)}
-          data-state={presence.state}
+          className={cx(
+            styles.status,
+            presence.state === "open" ? enterMotion.enter : enterMotion.exit,
+            className,
+          )}
           data-commit={glyph}
           aria-hidden="true"
           onAnimationEnd={presence.onExitEnd}
         >
-          <Spinner aria-hidden="true" className={styles.glyph} data-glyph="pending" />
-          <Icon name="action.check" className={styles.glyph} data-glyph="saved" />
+          <GlyphSwap>
+            {glyph === "saved" ? <Icon name="action.check" /> : <Spinner aria-hidden="true" />}
+          </GlyphSwap>
         </span>
       ) : null}
-      <VisuallyHidden aria-live="polite">
+      <VisuallyHidden live="polite">
         {state === "pending" ? labels.saving : state === "saved" ? labels.saved : ""}
       </VisuallyHidden>
     </>

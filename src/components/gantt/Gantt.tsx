@@ -10,6 +10,7 @@ import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -33,7 +34,6 @@ import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import swapMotion from "@/internal/swapMotion.module.css";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Gantt.module.css";
 import { GanttRow, type GanttRowContext, type GanttGhost as Ghost } from "./GanttRow";
@@ -1575,7 +1575,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             <VisuallyHidden id={createHintId}>{labels.createHint}</VisuallyHidden>
           ) : null}
           {bodyState === "loading" ? (
-            <VisuallyHidden role="status">{labels.loading}</VisuallyHidden>
+            <VisuallyHidden live="polite">{labels.loading}</VisuallyHidden>
           ) : null}
           <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
         </div>

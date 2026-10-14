@@ -1,46 +1,19 @@
 /*
- * Support text under a field. `data-size` is the tier of the paired field; typography comes
- * from `--prime-control-<T>-hint-*` (always smaller than the field text, foundation §6).
+ * Support text under a field. `data-size` is the tier of the paired field; the text comes from the
+ * field tier (`fieldTierClass` + `fieldHintTextClass`, joined in TSX): always smaller than the
+ * field text (foundation §6), the icon `--field-hint-icon`.
  */
 .root {
-  --prime-hint-size: var(--prime-control-m-hint-size);
-  --prime-hint-line-height: var(--prime-control-m-hint-line-height);
-  --prime-hint-icon: var(--prime-icon-xs);
   margin: 0;
   display: flex;
   align-items: flex-start;
   gap: var(--prime-space-1);
   min-width: 0;
   font-family: var(--prime-font-family-sans);
-  font-size: var(--prime-hint-size);
-  line-height: var(--prime-hint-line-height);
-  font-weight: var(--prime-font-weight-regular);
   letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   overflow-wrap: anywhere;
   transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.root[data-size="xs"] {
-  --prime-hint-size: var(--prime-control-xs-hint-size);
-  --prime-hint-line-height: var(--prime-control-xs-hint-line-height);
-}
-
-.root[data-size="s"] {
-  --prime-hint-size: var(--prime-control-s-hint-size);
-  --prime-hint-line-height: var(--prime-control-s-hint-line-height);
-}
-
-.root[data-size="l"] {
-  --prime-hint-size: var(--prime-control-l-hint-size);
-  --prime-hint-line-height: var(--prime-control-l-hint-line-height);
-  --prime-hint-icon: var(--prime-icon-s);
-}
-
-.root[data-size="xl"] {
-  --prime-hint-size: var(--prime-control-xl-hint-size);
-  --prime-hint-line-height: var(--prime-control-xl-hint-line-height);
-  --prime-hint-icon: var(--prime-icon-s);
 }
 
 /*
@@ -49,7 +22,7 @@
  * into an error in the same slot.
  */
 .root[data-invalid="true"] {
-  --enter-shift: calc(-1 * var(--prime-space-1));
+  --enter-shift: calc(var(--prime-space-1) * -1);
 
   color: var(--prime-color-danger-text);
 }
@@ -58,18 +31,12 @@
   color: var(--prime-color-text-disabled);
 }
 
-/* Icon is centred on the first line box: height = line-height, glyph = hint icon size. */
+/* Icon is centred on the first line box: height = line height, glyph = the hint icon size. */
 .icon {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--prime-hint-icon);
-  height: var(--prime-hint-line-height);
-}
-
-.icon > svg {
-  display: block;
-  width: var(--prime-hint-icon);
-  height: var(--prime-hint-icon);
+  width: var(--field-hint-icon);
+  height: var(--field-hint-lh);
 }

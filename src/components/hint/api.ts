@@ -10,9 +10,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the paired field: 12/16 for xs–m, 13/20 for l and xl.",
-          ru: "Ярус поля над подсказкой: 12/16 для xs–m, 13/20 для l и xl.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of the paired field: 12/16 for xs–m, 13/20 for l and xl. Without it the tier of its host, else `m`.",
+          ru: "Ярус поля над подсказкой: 12/16 для xs–m, 13/20 для l и xl. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "invalid",
@@ -25,8 +25,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Disabled text color, next to a disabled control.",
-          ru: "Цвет неактивного текста — под неактивным контролом.",
+          en: "Disabled text color, next to a disabled control. A disabled `Fieldset` around the hint sets it too.",
+          ru: "Цвет неактивного текста — под неактивным контролом. Выключенный `Fieldset` вокруг подсказки включает его тоже.",
         },
         {
           name: "children",
@@ -37,8 +37,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLParagraphElement>",
-          en: "`children`, `id`, `role`, `className` and the other paragraph attributes.",
-          ru: "`children`, `id`, `role`, `className` и остальные атрибуты абзаца.",
+          en: "`children`, `id`, `aria-live`, `className` and the other paragraph attributes.",
+          ru: "`children`, `id`, `aria-live`, `className` и остальные атрибуты абзаца.",
         },
       ],
     },
@@ -65,8 +65,8 @@ export const api: ComponentApi = {
         ru: "Дайте подсказке `id` и добавьте его в `aria-describedby` контрола — скринридер прочтёт её вместе с полем.",
       },
       {
-        en: 'Add `role="alert"` to an error that appears after a user action.',
-        ru: 'Ошибке, которая появляется после действия пользователя, добавьте `role="alert"`.',
+        en: 'Inside a field the frame announces an error that arrives: its support slot is a polite live region. A standalone Hint whose text changes after an action stays mounted with `aria-live="polite"`.',
+        ru: 'Внутри поля рамка сама объявляет пришедшую ошибку: её строка поддержки — вежливая живая область. Отдельный Hint, текст которого меняется после действия, остаётся смонтированным с `aria-live="polite"`.',
       },
       {
         en: "`Hint.Icon` is decorative; the text carries the meaning.",

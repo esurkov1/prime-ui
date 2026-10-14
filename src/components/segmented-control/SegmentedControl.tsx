@@ -132,7 +132,7 @@ export type SegmentedControlLabels = {
 export const SEGMENTED_CONTROL_LABELS: SegmentedControlLabels = { optional: "необязательно" };
 
 export type SegmentedControlRootProps = Omit<FieldRootDomProps, "dir"> &
-  Omit<FieldFrameProps, "focusRing"> & {
+  FieldFrameProps & {
     value?: string;
     defaultValue?: string;
     onValueChange?: (value: string) => void;

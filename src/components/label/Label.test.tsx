@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { Fieldset } from "@/components/fieldset/Fieldset";
 import { Icon } from "@/icons";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { iconBoxStyles } from "@/internal/iconBox";
 
 import { Label } from "./Label";
@@ -96,5 +98,30 @@ describe("Label", () => {
       </Label.Root>,
     );
     expect(screen.getByTestId("child")).toBeInTheDocument();
+  });
+
+  it("takes the tier of its host without a size of its own", () => {
+    render(
+      <ControlSizeProvider value="xl">
+        <Label.Root>Рабочая почта</Label.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByText("Рабочая почта")).toHaveAttribute("data-size", "xl");
+  });
+
+  it("dims with its marks inside a disabled Fieldset", () => {
+    render(
+      <Fieldset label="Реквизиты" disabled>
+        <Label.Root required>ИНН</Label.Root>
+      </Fieldset>,
+    );
+    const label = screen.getByText("ИНН");
+    expect(label).toHaveAttribute("data-disabled", "true");
+    expect(label).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("secondary: a quieter one-line heading", () => {
+    render(<Label.Root secondary>Количество</Label.Root>);
+    expect(screen.getByText("Количество")).toHaveAttribute("data-secondary", "true");
   });
 });

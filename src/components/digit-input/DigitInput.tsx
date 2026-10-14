@@ -1,11 +1,12 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
+  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -15,7 +16,6 @@ import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 import { isPromiseLike } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./DigitInput.module.css";
 
@@ -49,7 +49,8 @@ function reasonOf(error: unknown, fallback: string): string {
 }
 
 export type DigitInputProps = FieldRootDomProps &
-  FieldFrameProps & {
+  FieldFrameProps &
+  FieldFocusRingProps & {
     /** Number of cells. */
     length?: number;
     /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
@@ -109,7 +110,7 @@ export function DigitInput({
   disabled: disabledProp,
   invalid,
   success = false,
-  focusRing = true,
+  focusRing,
   label,
   required,
   optional,
@@ -274,7 +275,7 @@ export function DigitInput({
           success: (shownSuccess && !ids.invalid) || undefined,
           pending: verifying || undefined,
           disabled: disabled || undefined,
-          "focus-ring": focusRing ? undefined : false,
+          "focus-ring": focusRing,
         })}
         onFocus={(event) => {
           const index = inputRefs.current.indexOf(event.target as unknown as HTMLInputElement);
@@ -363,7 +364,7 @@ export function DigitInput({
             }}
           />
         ))}
-        <VisuallyHidden role="status" aria-live="polite">
+        <VisuallyHidden live="polite">
           {verification?.state === "refused" ? verification.reason : ""}
         </VisuallyHidden>
       </fieldset>

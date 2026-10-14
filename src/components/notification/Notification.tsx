@@ -5,7 +5,13 @@ import { Button } from "@/components/button/Button";
 import { Icon, type IconName } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { type ControlSize, type PaletteColor, stepDown, type Tone } from "@/internal/states";
+import {
+  type ControlSize,
+  compactTier,
+  type PaletteColor,
+  stepDown,
+  type Tone,
+} from "@/internal/states";
 
 import styles from "./Notification.module.css";
 
@@ -204,7 +210,7 @@ function CardView({
           <Button.Root
             variant="ghost"
             tone="neutral"
-            size={stepDown(size, 2)}
+            size={compactTier(size)}
             aria-label={labels.close}
             onClick={onClose}
           >

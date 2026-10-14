@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
@@ -24,7 +24,6 @@ import {
 } from "@/internal/mediaPlayer";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import { touchTargetBlockClass, touchTargetClass } from "@/internal/touchTarget";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./VoicePlayer.module.css";
 

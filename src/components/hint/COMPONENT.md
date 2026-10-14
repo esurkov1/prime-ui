@@ -6,7 +6,7 @@
 > Help text or a validation error under a field.
 
 ## When to use
-- Under a custom control without `hint` / `error` props, or a hand-built field, where you wire the ids yourself: format rules, limits, where the value comes from.
+- Under a control without `hint` / `error` props (an embedded `Datepicker.Panel`, a custom control), where you wire the ids yourself: format rules, limits, where the value comes from.
 - As the error message of such a control (`invalid`), in the same slot as the hint.
 
 ## When not to use
@@ -35,11 +35,11 @@ Hint.Root      <p> with the text
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the paired field: 12/16 for xs–m, 13/20 for l and xl. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the paired field: 12/16 for xs–m, 13/20 for l and xl. Without it the tier of its host, else `m`. |
 | `invalid` | `boolean` | `false` | Error styling: danger text that drops in (fade + 4 px from above). |
-| `disabled` | `boolean` | `false` | Disabled text color, next to a disabled control. |
+| `disabled` | `boolean` | `false` | Disabled text color, next to a disabled control. A disabled `Fieldset` around the hint sets it too. |
 | `children` | `ReactNode` | — | Text, optionally with `Hint.Icon` first. |
-| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `id`, `role`, `className` and the other paragraph attributes. |
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `id`, `aria-live`, `className` and the other paragraph attributes. |
 
 ### Hint.Icon
 `ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line.
@@ -68,19 +68,19 @@ The hint is always smaller than the field text; use the field's size.
 | `invalid` | Danger text, drops in | Validation error | `false` |
 | `disabled` | Disabled text | Under a disabled control | `false` |
 
-**Combinations** — one element switches between the hint text and the error text with `invalid` (no layout jump); add `role="alert"` to an error shown after a user action. `invalid` and `disabled` together make no sense. There is no success state: use neutral text, or a [Banner](../banner/COMPONENT.md) for a result.
+**Combinations** — one element switches between the hint text and the error text with `invalid` (no layout jump); a standalone hint that changes after an action stays mounted with `aria-live="polite"` (inside a field the frame does it). `invalid` and `disabled` together make no sense. There is no success state: use neutral text, or a [Banner](../banner/COMPONENT.md) for a result.
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | error | `invalid` | `data-invalid="true"`; the message drops in over `fast` (fade + `--prime-space-1` from above, no shake, no layout shift) and the color eases from the hint color |
-| disabled | `disabled` | `data-disabled="true"` |
-| size | `size` | `data-size` |
+| disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"` |
+| size | `size`, else the host tier | `data-size` |
 
 Hint is not interactive: hover and focus belong to the field.
 
 ## Layout & spacing
-- Field → hint: the tier `hint-gap` (`--prime-control-<size>-hint-gap`), set by the field layout, not by Hint.
+- Field → hint: the tier `--field-hint-gap`, set by the field layout, not by Hint. The text and the icon size come from the field tier (`--field-hint-size`, `--field-hint-lh`, `--field-hint-icon`).
 - Icon → text gap: `--prime-space-1`. Long text wraps (`overflow-wrap: anywhere`).
 
 ## Accessibility
@@ -94,7 +94,7 @@ No keyboard interaction.
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - Give the hint an `id` and put it into the control's `aria-describedby` so screen readers read it with the field.
-- Add `role="alert"` to an error that appears after a user action.
+- Inside a field the frame announces an error that arrives: its support slot is a polite live region. A standalone Hint whose text changes after an action stays mounted with `aria-live="polite"`.
 - `Hint.Icon` is decorative; the text carries the meaning.
 
 ### Labels
@@ -105,17 +105,18 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Help text under a hand-built field, linked to its input by `id` and `aria-describedby`. |
-| [sizes.tsx](examples/sizes.tsx) | Every size tier, matching the field above: 12/16 for xs–m, 13/20 for l and xl — `size`. |
+| [overview.tsx](examples/overview.tsx) | Help text under a calendar that has no hint of its own, linked to it through `id` and `aria-describedby` — `id`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier, one per field tier: 12/16 for xs–m, 13/20 for l and xl — `size`. |
 | [states.tsx](examples/states.tsx) | Default help text next to an error and a hint under a disabled control — `invalid`, `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A leading icon centred on the first line, in the default and the error state — `Hint.Icon`. |
-| [hint-or-error.tsx](examples/hint-or-error.tsx) | After a check the error replaces the hint in the same element, without a layout jump, and is announced — `invalid`, `role`. |
+| [hint-or-error.tsx](examples/hint-or-error.tsx) | After a check the error replaces the hint in the same element, without a layout jump, and a polite region reads it — `invalid`, `aria-live`. |
 
 ## Mistakes
 - `<Hint.Root>` under an Input → use `hint` / `error` on `Input.Root`; it links the ids itself.
 - A separate hint and error element at the same time → one element; the error replaces the hint.
 - Hint without `id` + `aria-describedby` → the screen reader does not connect it to the field.
-- Hint size different from the field size → use the same `size`.
+- Hint size different from the field size → use the same `size`, or none inside a sized host.
+- `role="alert"` on a field error → none; the field frame announces it, a standalone hint takes `aria-live="polite"`.
 
 ## Related
 - **Built from:** —

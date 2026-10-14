@@ -1,9 +1,8 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { afterMotionMs, readCssDurationMs } from "@/internal/motionTiming";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./MorphText.module.css";
 

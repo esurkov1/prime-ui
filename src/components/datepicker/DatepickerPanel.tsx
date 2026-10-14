@@ -4,13 +4,13 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { getViewportPadPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
-import type { ControlSize } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
+import { type ControlSize, stepDown } from "@/internal/states";
 
 import styles from "./Datepicker.module.css";
 import {
@@ -33,7 +33,6 @@ import {
 import {
   readPanelMetrics,
   resolvePanelLayout,
-  STEP_DOWN,
   useAvailableWidth,
   useViewportWidth,
 } from "./panelLayout";
@@ -495,7 +494,7 @@ export function PanelView(props: PanelViewProps) {
   const footerFrom = isRange ? (sorted?.[0] ?? dayA) : dayA;
   const footerTo = isRange ? (sorted?.[1] ?? null) : null;
   const footerFormat = yearless ? "dd.MM" : "dd.MM.yyyy";
-  const controlSize = STEP_DOWN[size];
+  const controlSize = stepDown(size);
   const layout = presetsAside || !hasPresets ? "aside" : "stacked";
 
   return (
@@ -544,7 +543,7 @@ export function PanelView(props: PanelViewProps) {
 
       <div className={styles.main}>
         {/* One announcement for the visible months, not one live region per month. */}
-        <VisuallyHidden aria-live="polite">{titles.join(" — ")}</VisuallyHidden>
+        <VisuallyHidden live="polite">{titles.join(" — ")}</VisuallyHidden>
         {/* biome-ignore lint/a11y/noStaticElementInteractions: arrow keys are delegated to the day grid */}
         <div
           className={styles.months}

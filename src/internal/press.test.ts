@@ -46,8 +46,8 @@ describe("press", () => {
     }
   });
 
-  it("the scale goes and returns on the fast clock", () => {
-    const base = cssRules(CSS).find((rule) => rule.selector.startsWith(".press,"));
+  it("the scale goes and returns on the fast clock; a host's own transition wins", () => {
+    const base = cssRules(CSS).find((rule) => rule.selector.startsWith(":where(.press,"));
     expect(base && cssValue(base, "transition")).toBe(
       "scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard)",
     );

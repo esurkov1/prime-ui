@@ -1,11 +1,12 @@
 import * as React from "react";
 
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { GlyphSwap } from "@/internal/glyphSwap";
 import { Slot } from "@/internal/slot";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./FieldAction.module.css";
 
@@ -20,62 +21,54 @@ export type FieldActionButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "aria-label" | "children"
 > & {
-  /** Accessible name and tooltip («Позвонить», «Открыть профиль»). */
   label: string;
-  /** Renders the one child (an `<a href>`, a router link) with the segment's look and behaviour. */
   asChild?: boolean;
-  /** The glyph, or with `asChild` the element that carries it. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** The segment element itself: the shared class, `data-field-action` and the accessible name. */
-function segment({
+/**
+ * A named icon action at the field's edge. The glyph cross-fades when it changes (`GlyphSwap`:
+ * reveal ⇄ hide, copy → check). With a tooltip by default; `tooltip={false}` for a kit control
+ * whose glyph says it all (Input's clear and reveal): the name stays accessible, nothing floats
+ * over the field.
+ */
+export function FieldActionButton({
   label,
   asChild = false,
+  tooltip = true,
   className,
   disabled,
   type = "button",
   children,
   ref,
   ...rest
-}: FieldActionButtonProps) {
+}: FieldActionButtonProps & { tooltip?: boolean }) {
   const shared = {
     ...rest,
     className: cx(fieldActionClass, className),
     "aria-label": label,
     "data-field-action": "",
   };
-  return asChild ? (
-    <Slot {...shared} ref={ref as React.Ref<HTMLElement>} aria-disabled={disabled || undefined}>
+  const segment = asChild ? (
+    <Slot {...shared} ref={ref} aria-disabled={disabled || undefined}>
       {children}
     </Slot>
   ) : (
     <button {...shared} ref={ref} type={type} disabled={disabled}>
-      {children}
+      <GlyphSwap>{children}</GlyphSwap>
     </button>
   );
-}
-
-/**
- * A segment without a tooltip, for a kit control whose glyph says it all (Input's clear and
- * reveal): the name stays accessible, nothing floats over the field.
- */
-export function FieldActionSegment(props: FieldActionButtonProps) {
-  return segment(props);
-}
-
-/** A named icon action at the field's edge with a tooltip. */
-export function FieldActionButton(props: FieldActionButtonProps) {
+  if (!tooltip) return segment;
   return (
     <Tooltip.Root>
-      <Tooltip.Trigger>{segment(props)}</Tooltip.Trigger>
-      <Tooltip.Content>{props.label}</Tooltip.Content>
+      <Tooltip.Trigger>{segment}</Tooltip.Trigger>
+      <Tooltip.Content>{label}</Tooltip.Content>
     </Tooltip.Root>
   );
 }
 
-export type CopyState = "idle" | "copied" | "error";
+type CopyState = "idle" | "copied" | "error";
 
 /** How long the copy button says «copied» / «error» before it returns to «copy». */
 const COPY_FEEDBACK_MS = 1600;
@@ -89,7 +82,7 @@ export type FieldCopyLabels = {
   copyError: string;
 };
 
-export type FieldCopyButtonProps = Omit<
+type FieldCopyButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "aria-label" | "children" | "type"
 > & {
@@ -100,8 +93,8 @@ export type FieldCopyButtonProps = Omit<
 };
 
 /**
- * Copies a field's value: the copy glyph morphs into a check (both stay mounted and cross-fade in
- * place), the name and tooltip switch to `copied`, a polite live region repeats it.
+ * Copies a field's value: the copy glyph cross-fades into a check, the name and tooltip switch to
+ * `copied`, a polite live region repeats it.
  */
 export function FieldCopyButton({ getText, labels, onClick, ...rest }: FieldCopyButtonProps) {
   const [state, setState] = React.useState<CopyState>("idle");
@@ -114,12 +107,14 @@ export function FieldCopyButton({ getText, labels, onClick, ...rest }: FieldCopy
 
   const label =
     state === "copied" ? labels.copied : state === "error" ? labels.copyError : labels.copy;
+  const glyph = state === "copied" ? "action.check" : "action.copy";
 
   return (
     <>
       <FieldActionButton
         {...rest}
         label={label}
+        data-copy-state={state}
         onClick={async (event) => {
           onClick?.(event);
           if (event.defaultPrevented) return;
@@ -131,12 +126,9 @@ export function FieldCopyButton({ getText, labels, onClick, ...rest }: FieldCopy
           }
         }}
       >
-        <span className={styles.copyGlyphs} data-copy-state={state}>
-          <Icon name="action.copy" data-glyph="copy" />
-          <Icon name="action.check" data-glyph="check" />
-        </span>
+        <Icon name={glyph} />
       </FieldActionButton>
-      <VisuallyHidden aria-live="polite">{state === "idle" ? "" : label}</VisuallyHidden>
+      <VisuallyHidden live="polite">{state === "idle" ? "" : label}</VisuallyHidden>
     </>
   );
 }

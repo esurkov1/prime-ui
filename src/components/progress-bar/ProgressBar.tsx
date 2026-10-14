@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -18,7 +18,6 @@ import {
 } from "@/internal/progressSegments";
 import type { ControlSize, Tone } from "@/internal/states";
 import swap from "@/internal/swapMotion.module.css";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { Skeleton } from "../skeleton/Skeleton";
 import styles from "./ProgressBar.module.css";

@@ -6,8 +6,8 @@
 > Text that screen readers read and nobody sees: the words behind an icon, a badge or a change on the screen.
 
 ## When to use
-- A count or a status the layout shows by position or colour, said in words («: три счёта ждут оплаты»).
-- An announcement after an action that changes no visible text: `role="status"` + `aria-live="polite"`, the message set after the action.
+- A count or a status the layout shows by position or colour, said in words («ждут оплаты: 3»).
+- An announcement after an action that changes no visible text: `live="polite"`, the message set after the action.
 - A description for `aria-describedby` that sighted users read elsewhere on the screen.
 
 ## When not to use
@@ -37,7 +37,7 @@ VisuallyHidden    <span>: out of sight (1px, clipped), pinned to its containing 
 |---|---|---|---|
 | `children` | `ReactNode` | — | The text to read. |
 | `live` | `"polite" \| "assertive"` | — | An announcement region, read as a whole on every change: `polite` — `role="status"`, `assertive` — `role="alert"` (urgent only). |
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `id` (to point `aria-describedby` at it), `className` and the other span attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "role" \| "aria-live" \| "aria-atomic" \| "aria-relevant">` | — | `id` (to point `aria-describedby` at it), `className` and the other span attributes; the region attributes come only from `live`. |
 
 ## Variants
 One look: none. It renders no pixels and takes no room.
@@ -79,7 +79,7 @@ No `labels`.
 ## Mistakes
 - `display: none` or `hidden` for screen-reader text → both remove it from the accessibility tree.
 - A live region mounted with its first message → mount it empty, then set the text.
-- `role="status"` and `aria-live` written by hand → `live="polite"` sets them together, atomic.
+- `role="status"` and `aria-live` written by hand → `live="polite"` sets them together, atomic; the props have no `role` / `aria-live`, and `live` wins over any passed through.
 - `live="assertive"` for a routine result («Сохранено») → it interrupts the reader; keep it for errors that block.
 - VisuallyHidden as the only name of a button that has `aria-label` → the `aria-label` wins; use one of them.
 - Hidden text that repeats the visible label → screen readers read it twice.

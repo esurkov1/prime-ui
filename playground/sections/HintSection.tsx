@@ -21,11 +21,11 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Подсказка под собранным вручную полем, связанная с его input через `id` и `aria-describedby`.",
+        "Подсказка под календарём без своей подсказки, связанная с ним через `id` и `aria-describedby` — `id`.",
     },
     {
       slot: "sizes",
-      description: "Все ярусы под стать полю: 12/16 для xs–m, 13/20 для l и xl — `size`.",
+      description: "Все ярусы, по одному на ярус поля: 12/16 для xs–m, 13/20 для l и xl — `size`.",
     },
     {
       slot: "states",
@@ -41,7 +41,7 @@ export const page: ComponentPageConfig = {
       scenario: "hint-or-error",
       title: "Ошибка вместо подсказки",
       description:
-        "После проверки ошибка занимает место подсказки в том же элементе без скачка и озвучивается — `invalid`, `role`.",
+        "После проверки ошибка занимает место подсказки в том же элементе без скачка, вежливая область её зачитывает — `invalid`, `aria-live`.",
     },
   ],
   api,

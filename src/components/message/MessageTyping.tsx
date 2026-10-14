@@ -1,11 +1,10 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { defineRowKind, useMessageList } from "@/internal/messageList";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Message.module.css";
 import typing from "./MessageTyping.module.css";

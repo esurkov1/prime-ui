@@ -12,8 +12,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. Without it the tier of its host, else `m`.",
-          ru: "Ярус поля под подписью: xs/s 12/16 · m 13/20 · l/xl 14/20, начертание 500. Без него — ярус хоста, иначе `m`.",
+          en: "Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. Without it the tier of its host, else `m`; the label provides its tier to the icons inside.",
+          ru: "Ярус поля под подписью: xs/s 12/16 · m 13/20 · l/xl 14/20, начертание 500. Без него — ярус хоста, иначе `m`; подпись передаёт свой ярус иконкам внутри.",
         },
         {
           name: "required",
@@ -30,8 +30,14 @@ export const api: ComponentApi = {
         {
           name: "disabled",
           type: "boolean",
-          en: "Disabled color for the text and the markers, `aria-disabled`.",
-          ru: "Цвет неактивного текста для подписи и пометок, `aria-disabled`.",
+          en: "Disabled color for the text and the markers, `aria-disabled`. A disabled `Fieldset` around the label sets it too.",
+          ru: "Цвет неактивного текста для подписи и пометок, `aria-disabled`. Выключенный `Fieldset` вокруг подписи включает его тоже.",
+        },
+        {
+          name: "secondary",
+          type: "boolean",
+          en: "Quieter: secondary text on one line, cut with an ellipsis — a column heading under the group's own label (FieldList).",
+          ru: "Тише: вторичный цвет в одну строку с многоточием — заголовок колонки под подписью группы (FieldList).",
         },
         {
           name: "labels",

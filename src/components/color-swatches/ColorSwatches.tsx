@@ -42,7 +42,7 @@ export const COLOR_SWATCHES_LABELS: ColorSwatchesLabels = {
 };
 
 export type ColorSwatchesProps = FieldRootDomProps &
-  Omit<FieldFrameProps, "focusRing"> & {
+  FieldFrameProps & {
     /** Controlled color; `null` — no color. */
     value?: string | null;
     defaultValue?: string | null;

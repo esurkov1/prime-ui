@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
@@ -8,7 +8,6 @@ import { HighlightMatch } from "@/internal/HighlightMatch";
 import { useMessageHighlight, useMessagePart } from "@/internal/messagePart";
 import type { SurfaceDepth } from "@/internal/surfaceDepth";
 import { isPromiseLike } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./transcript.module.css";
 
@@ -191,7 +190,7 @@ export function useTranscript(
           </div>
         ) : null}
       </Disclosure>
-      <VisuallyHidden role="status">{announcement}</VisuallyHidden>
+      <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
     </>
   );
 

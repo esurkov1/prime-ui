@@ -163,5 +163,5 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`. A c
 - Expecting a `Color` object in `onValueChange` → the field speaks hex strings; use ColorPicker parts for `Color`.
 
 ## Related
-- **Built from:** [ColorPicker](../color-picker/COMPONENT.md) (area, sliders, channel strip, swatches), [Popover](../popover/COMPONENT.md), [ColorSwatches](../color-swatches/COMPONENT.md) (`presets`), [Button](../button/COMPONENT.md) (eyedropper), `Icon` (chevron), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame)
+- **Built from:** [ColorPicker](../color-picker/COMPONENT.md) (area, sliders, channel strip, swatches), [Popover](../popover/COMPONENT.md), [ColorSwatches](../color-swatches/COMPONENT.md) (`presets`), [Button](../button/COMPONENT.md) (eyedropper), `Icon` (chevron), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ColorSwatches](../color-swatches/COMPONENT.md), [ColorPicker](../color-picker/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md)

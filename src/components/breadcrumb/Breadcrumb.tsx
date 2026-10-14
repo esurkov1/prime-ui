@@ -1,11 +1,10 @@
 import * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { LinkButton } from "../link-button/LinkButton";
 import styles from "./Breadcrumb.module.css";

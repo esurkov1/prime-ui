@@ -214,7 +214,7 @@ describe("ColorPresets", () => {
 
   it("in a FieldList cell renders the column heading as the label of its trigger", () => {
     const { container } = render(
-      <FieldCellContext.Provider value={{ label: "Цвет метки", hidden: "wide" }}>
+      <FieldCellContext.Provider value={{ label: "Цвет метки", hidden: "wide", required: false }}>
         <Picker defaultValue="#5068F5" />
       </FieldCellContext.Provider>,
     );

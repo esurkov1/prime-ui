@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Spinner } from "@/components/spinner/Spinner";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
@@ -14,7 +15,6 @@ import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { isPromiseLike } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Badge.module.css";
 import { markEdgeIcons } from "./edgeIcons";
@@ -276,9 +276,7 @@ function BadgeRoot({
       ) : null}
       {/* Mounted once a removal waits (empty), so its refusal is spoken when it comes. */}
       {onRemove && (removing || failure) ? (
-        <VisuallyHidden role="status" aria-live="polite">
-          {failure}
-        </VisuallyHidden>
+        <VisuallyHidden live="polite">{failure}</VisuallyHidden>
       ) : null}
     </span>
   );

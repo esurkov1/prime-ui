@@ -3,12 +3,12 @@ import * as React from "react";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import type { PaletteColor } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./MessageCards.module.css";
 

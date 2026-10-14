@@ -2,11 +2,11 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { type ControlSize, stepDown } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./DescriptionList.module.css";
 

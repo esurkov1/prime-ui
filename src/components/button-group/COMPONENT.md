@@ -172,5 +172,5 @@ Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical
 - A `Label` + `Hint` pair wired by hand around a toggle set in a form → `label`, `hint`, `error` on the root.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Button](../button/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Tabs](../tabs/COMPONENT.md)
