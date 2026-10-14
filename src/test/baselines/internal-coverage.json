@@ -1,7 +1,4 @@
 [
-  "src/hooks/useEdgeOverflow.ts: no useEdgeOverflow.test",
-  "src/hooks/useEnterConfirm.ts: no useEnterConfirm.test",
-  "src/hooks/useMergedRefs.ts: no useMergedRefs.test",
   "src/internal/AnchorRectContext.tsx: no AnchorRectContext.test",
   "src/internal/ChartTooltip.tsx: no ChartTooltip.test",
   "src/internal/Portal.tsx: no Portal.test",

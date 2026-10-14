@@ -1,6 +1,7 @@
 /**
- * `bun run tokens:build` — `tokens/*.ts` → `src/styles/{tokens,theme-light,theme-dark}.css` and
- * `src/internal/tokenDefaults.ts`.
+ * `bun run tokens:build` — `tokens/*.ts` → `src/styles/{tokens,theme-light,theme-dark}.css`,
+ * `src/internal/tokenDefaults.ts` and the off-grid list of foundation §1 rule 2 (between
+ * `<!-- off-grid:start -->` and `<!-- off-grid:end -->` in `docs/foundation.md`).
  * Light is `semantic.ts` itself; dark is `semantic.ts` with `themes/dark.ts` laid over it, and its
  * file keeps only what differs from light.
  *
@@ -9,13 +10,14 @@
  *   primitive or a semantic token;
  * - a semantic value holds no raw color and no `var()`: colors are references (the computed surface
  *   ladder `color.layer` is the one exception);
- * - every semantic length of a size, a padding or a gap is on the 4px grid, unless `OFF_GRID` names
- *   it with its reason.
+ * - every semantic length of a size, a padding or a gap is on the 4px grid, unless `OFF_GRID`
+ *   (`tokens/offGrid.ts`) names it with its reason.
  */
-import { rename, writeFile } from "node:fs/promises";
+import { readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { REF_PREFIX, SYS_PREFIX, toVarName } from "../tokens/naming";
+import { OFF_GRID } from "../tokens/offGrid";
 import { primitiveTokens } from "../tokens/primitives";
 import { semanticTokens } from "../tokens/semantic";
 import { darkThemeOverrides } from "../tokens/themes/dark";
@@ -100,37 +102,6 @@ function onGridKind(key: string): boolean {
   );
 }
 
-/**
- * The deliberate exceptions to the 4px grid (foundation §1 rule 2), each with its reason. A length
- * named here that lands on the grid, or one off the grid missing from here, fails the build.
- */
-const OFF_GRID: Record<string, string> = {
-  "border.width": "the 1px hairline",
-  "focus.width": "the 2px focus ring",
-  "focus.offset": "the 2px gap between a control and its ring",
-  "focus.offsetInset": "the ring drawn 2px inside a field's edge",
-  "icon.xs": "a 14px glyph: the icon scale meets the type scale at its smallest step",
-  "control.xs.icon": "the 14px glyph of the xs tier",
-  "control.xs.choice": "the 14px checkbox of the xs tier, paired with its 12px text",
-  "control.m.choice": "an 18px checkbox: the optical size next to 14px text",
-  "control.s.track": "a 5px line between the xs and m tracks",
-  "control.m.track": "a 6px line",
-  "control.l.track": "a 7px line between the m and xl tracks",
-  "badge.s.paddingX": "6px: the optical side air of a 20px chip with 12px text",
-  "badge.m.icon": "the 14px glyph of an m chip",
-  "badge.l.paddingX": "10px: the optical side air of a 28px chip with 13px text",
-  "bottomNav.floatingHeight": "46px: the iOS 26 tab bar at three quarters",
-  "bottomNav.floatingIconSize": "an 18px glyph in the floating capsule",
-  "bottomNav.floatingItemGap": "2px between the glyph and the 9px label",
-  "gallery.gap": "a 2px seam between the tiles of an album",
-  "tooltip.xs.paddingX": "6px: the side air of a 24px chip with 12px text",
-  "tooltip.s.paddingY": "6px: the block air that makes the s chip 28px",
-  "tooltip.m.paddingX": "10px: the side air of a 32px chip with 13px text",
-  "tooltip.m.paddingY": "6px: the block air that makes the m chip 32px",
-  "tooltip.arrowWidth": "a 10px arrow base",
-  "tooltip.arrowHeight": "a 5px arrow depth",
-};
-
 const px = (length: string): number | null => {
   const match = /^(-?[\d.]+)(rem|px)$/.exec(length.trim());
   if (!match) return null;
@@ -157,6 +128,25 @@ for (const key of Object.keys(OFF_GRID)) {
 
 if (errors.length > 0) {
   throw new Error(`Token source check failed:\n${errors.join("\n")}`);
+}
+
+// ─── Foundation §1 rule 2 ───────────────────────────────────────────────────
+
+const OFF_GRID_START = "<!-- off-grid:start -->";
+const OFF_GRID_END = "<!-- off-grid:end -->";
+
+/** `doc` with the off-grid list of rule 2 (a nested list item, one line per `OFF_GRID` token). */
+function withOffGridList(doc: string): string {
+  const from = doc.indexOf(OFF_GRID_START);
+  const to = doc.indexOf(OFF_GRID_END);
+  if (from === -1 || to < from) {
+    throw new Error(`docs/foundation.md: no ${OFF_GRID_START} … ${OFF_GRID_END}`);
+  }
+  const lines = Object.entries(OFF_GRID).map(
+    ([key, reason]) =>
+      `   - \`${toVarName(key, SYS_PREFIX)}\` ${px(literal(semantic[key]))}px — ${reason}`,
+  );
+  return `${doc.slice(0, from + OFF_GRID_START.length)}\n${lines.join("\n")}\n   ${doc.slice(to)}`;
 }
 
 // ─── CSS ────────────────────────────────────────────────────────────────────
@@ -232,7 +222,10 @@ async function writeAtomic(file: string, content: string) {
 
 const srcDir = path.resolve(import.meta.dirname, "../src");
 const stylesDir = path.join(srcDir, "styles");
+const foundation = path.resolve(import.meta.dirname, "../docs/foundation.md");
+const foundationDoc = await readFile(foundation, "utf8");
 await Promise.all([
+  writeAtomic(foundation, withOffGridList(foundationDoc)),
   writeAtomic(path.join(stylesDir, "tokens.css"), cssBlock(":root", primitives, REF_PREFIX)),
   writeAtomic(
     path.join(stylesDir, "theme-light.css"),

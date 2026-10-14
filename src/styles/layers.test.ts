@@ -1,16 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  DARK_LAYERS,
-  floatingLayer,
-  LAYER_STEP,
-  LIGHT_LAYERS,
-  layerLadder,
-  lightnessOf,
-} from "../../tokens/layers";
+import { LIGHT_LAYERS } from "../../tokens/layers";
 import { primitiveTokens } from "../../tokens/primitives";
 import { semanticTokens } from "../../tokens/semantic";
 import { darkThemeOverrides } from "../../tokens/themes/dark";
+import { LAYER_STEP, lightness, surfaceLadder } from "../test/layers";
 
 /** `{color.gray.600}` → the primitive's hex. */
 function primitiveColor(ref: string): string {
@@ -31,35 +25,35 @@ const contrast = (a: string, b: string) => {
   const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
   return (x + 0.05) / (y + 0.05);
 };
-const gap = (a: string, b: string) => Math.abs(lightnessOf(a) - lightnessOf(b));
+const gap = (a: string, b: string) => Math.abs(lightness(a) - lightness(b));
 
 describe("surface ladder", () => {
   it("light: the card snaps to white, deeper layers alternate with the page tone", () => {
-    const ladder = layerLadder(LIGHT_LAYERS);
-    expect(ladder.map((l) => l.bg)).toEqual([
+    const ladder = surfaceLadder("light");
+    expect(ladder.slice(0, 5).map((l) => l.bg)).toEqual([
       LIGHT_LAYERS.page,
       "#ffffff",
       ladder[2].bg,
       "#ffffff",
       ladder[2].bg,
     ]);
-    expect(lightnessOf(ladder[2].bg)).toBeLessThan(1);
+    expect(lightness(ladder[2].bg)).toBeLessThan(1);
     // Floating layers over a white card stay white; the shadow carries their depth.
-    expect(floatingLayer(LIGHT_LAYERS).bg).toBe("#ffffff");
+    expect(ladder[5].bg).toBe("#ffffff");
   });
 
   it("dark: every nested layer is one step lighter, starting from near black", () => {
-    const ladder = layerLadder(DARK_LAYERS);
+    const ladder = surfaceLadder("dark").slice(0, 5);
     for (let d = 1; d < ladder.length; d++) {
-      const step = lightnessOf(ladder[d].bg) - lightnessOf(ladder[d - 1].bg);
+      const step = lightness(ladder[d].bg) - lightness(ladder[d - 1].bg);
       expect(step).toBeCloseTo(LAYER_STEP, 2);
     }
   });
 
   // A snap to the edge shortens a step, never below half of it (with less room the step reflects).
   it("keeps neighbours apart: layers, fills on them, the selected thumb on the track", () => {
-    for (const theme of [LIGHT_LAYERS, DARK_LAYERS]) {
-      const ladder = [...layerLadder(theme), floatingLayer(theme)];
+    for (const theme of ["light", "dark"] as const) {
+      const ladder = surfaceLadder(theme);
       for (let d = 1; d < 5; d++) {
         expect(gap(ladder[d - 1].bg, ladder[d].bg)).toBeGreaterThan(LAYER_STEP / 2);
       }
@@ -72,10 +66,10 @@ describe("surface ladder", () => {
 
   it("keeps muted text at AA on every layer and every fill", () => {
     for (const [theme, text] of [
-      [LIGHT_LAYERS, primitiveColor(semanticTokens.color.text.muted)],
-      [DARK_LAYERS, primitiveColor(darkThemeOverrides.color.text.muted)],
+      ["light", primitiveColor(semanticTokens.color.text.muted)],
+      ["dark", primitiveColor(darkThemeOverrides.color.text.muted)],
     ] as const) {
-      for (const layer of [...layerLadder(theme), floatingLayer(theme)]) {
+      for (const layer of surfaceLadder(theme)) {
         expect(contrast(text, layer.bg)).toBeGreaterThanOrEqual(4.5);
         expect(contrast(text, layer.fill)).toBeGreaterThanOrEqual(4.5);
       }

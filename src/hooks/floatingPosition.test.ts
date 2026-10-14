@@ -1,12 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  type ComputeFloatingOptions,
-  computeFloatingPosition,
-  DEFAULT_ALIGN,
-  DEFAULT_SIDE,
-  readCssLengthPx,
-} from "./usePosition";
+import { computeFloatingPosition } from "./floatingPosition";
+import { DEFAULT_ALIGN, DEFAULT_SIDE, readCssLengthPx } from "./usePosition";
+
+type FloatingOptions = Parameters<typeof computeFloatingPosition>[5];
 
 const anchor = (left: number, width: number) =>
   ({ left, right: left + width, top: 100, bottom: 140, width, height: 40 }) as DOMRectReadOnly;
@@ -118,7 +115,7 @@ describe("computeFloatingPosition — narrow viewport", () => {
 });
 
 describe("computeFloatingPosition — sides and arrow", () => {
-  const base: ComputeFloatingOptions = {
+  const base: FloatingOptions = {
     side: "top",
     align: "center",
     offset: 8,

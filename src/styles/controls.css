@@ -128,8 +128,8 @@
     -webkit-text-fill-color: var(--prime-color-text-primary);
     caret-color: var(--prime-color-text-primary);
     transition:
-      background-color 600000s 0s,
-      color 600000s 0s;
+      background-color var(--prime-motion-never),
+      color var(--prime-motion-never);
   }
 
   input:is(:-webkit-autofill, :autofill):disabled {

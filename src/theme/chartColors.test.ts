@@ -3,10 +3,10 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { DARK_LAYERS, floatingLayer, LIGHT_LAYERS, layerLadder } from "../../tokens/layers";
 import { primitiveTokens } from "../../tokens/primitives";
 import { semanticTokens } from "../../tokens/semantic";
 import { darkThemeOverrides } from "../../tokens/themes/dark";
+import { surfaceLadder } from "../test/layers";
 import { chartColors } from "./chartColors";
 
 const read = (file: string) =>
@@ -62,11 +62,11 @@ describe("chartColors", () => {
   // A series is a graphical object (WCAG 1.4.11): 3:1 against every ground a chart stands on —
   // each layer of the ladder and the floating layer — in both themes.
   it("keeps every categorical series at 3:1 on every layer ground of both themes", () => {
-    for (const [theme, layers, chart] of [
-      ["light", LIGHT_LAYERS, semanticTokens.color.chart],
-      ["dark", DARK_LAYERS, darkThemeOverrides.color.chart],
+    for (const [theme, chart] of [
+      ["light", semanticTokens.color.chart],
+      ["dark", darkThemeOverrides.color.chart],
     ] as const) {
-      const grounds = [...layerLadder(layers), floatingLayer(layers)].map((layer) => layer.bg);
+      const grounds = surfaceLadder(theme).map((layer) => layer.bg);
       for (const series of SERIES) {
         const color = primitiveColor(chart[series]);
         for (const ground of grounds) {

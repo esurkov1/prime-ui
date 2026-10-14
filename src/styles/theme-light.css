@@ -394,6 +394,7 @@
   --prime-motion-hold-confirm: var(--prime-ref-duration-1200);
   --prime-motion-instant: var(--prime-ref-duration-0);
   --prime-motion-loop: var(--prime-ref-duration-570);
+  --prime-motion-never: var(--prime-ref-duration-never);
   --prime-motion-press-scale: 0.98;
   --prime-motion-press-scale-compact: 0.96;
   --prime-motion-scale-burst: 1.4;

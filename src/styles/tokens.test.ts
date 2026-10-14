@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { paletteColors } from "@/internal/states";
 
+import { SYS_PREFIX, toVarName } from "../../tokens/naming";
+import { OFF_GRID } from "../../tokens/offGrid";
 import { read as readRepo, walk } from "../test/contract-utils";
 import { ratchet } from "../test/ratchet";
 
@@ -132,7 +134,14 @@ describe("generated token styles", () => {
     ratchet("tokens-reads", [...offenders]);
   });
 
-  it("keeps semantic heights, widths, paddings and gaps on the 4px grid (tokens-grid)", () => {
+  // The exceptions are the list of foundation §1 rule 2, which `tokens:build` writes from
+  // `tokens/offGrid.ts`.
+  it("keeps semantic heights, widths, paddings and gaps on the 4px grid, but for foundation's list", () => {
+    const rule = readRepo("docs/foundation.md").split("<!-- off-grid:start -->")[1] ?? "";
+    const listed = [
+      ...(rule.split("<!-- off-grid:end -->")[0] ?? "").matchAll(/^\s+- `(--prime-[\w-]+)`/gm),
+    ].map((m) => m[1]);
+    expect(listed).toEqual(Object.keys(OFF_GRID).map((key) => toVarName(key, SYS_PREFIX)));
     const tokens = read("tokens.css");
     const theme = read("theme-light.css");
     const refs = new Map(
@@ -153,8 +162,10 @@ describe("generated token styles", () => {
       if (!/-(height|width|padding(-[a-z]+)?|gap)$/.test(name)) continue;
       if (/(text|line-height|border|icon|radius|font|stroke|ring)/.test(name)) continue;
       const value_ = px(value.trim());
-      if (value_ !== null && value_ % 4 !== 0) offenders.push(`${name}: ${value_}px`);
+      if (value_ !== null && value_ % 4 !== 0 && !listed.includes(name)) {
+        offenders.push(`${name}: ${value_}px`);
+      }
     }
-    ratchet("tokens-grid", offenders);
+    expect(offenders).toEqual([]);
   });
 });

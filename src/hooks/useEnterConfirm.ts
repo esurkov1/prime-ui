@@ -14,7 +14,7 @@ function ownsEnter(target: EventTarget | null): boolean {
   return false;
 }
 
-export type UseEnterConfirmOptions = {
+type UseEnterConfirmOptions = {
   enabled: boolean;
   containerRef: React.RefObject<HTMLElement | null>;
   /** Replaces the default (a `click()` on `confirmRef`). */

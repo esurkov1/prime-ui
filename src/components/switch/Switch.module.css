@@ -4,39 +4,39 @@
  * Thumb inset = (height − thumb) / 2, travel = width − height.
  */
 .root {
-  --prime-switch-w: var(--prime-switch-m-width);
-  --prime-switch-h: var(--prime-switch-m-height);
-  --prime-switch-thumb: var(--prime-switch-m-thumb);
-  --prime-switch-inset: calc((var(--prime-switch-h) - var(--prime-switch-thumb)) / 2);
-  --prime-switch-travel: calc(var(--prime-switch-w) - var(--prime-switch-h));
-  --prime-choice-control-height: var(--prime-switch-h);
+  --sw-w: var(--prime-switch-m-width);
+  --sw-h: var(--prime-switch-m-height);
+  --sw-thumb: var(--prime-switch-m-thumb);
+  --sw-inset: calc((var(--sw-h) - var(--sw-thumb)) / 2);
+  --sw-travel: calc(var(--sw-w) - var(--sw-h));
+  --prime-choice-control-height: var(--sw-h);
   /* The track fill changes at the thumb's pace; a disabled «on» keeps a soft accent. */
   --choice-bg-duration: var(--prime-motion-duration-base);
   --choice-bg-disabled-checked: var(--prime-color-accent-soft);
 }
 
 .root[data-size="xs"] {
-  --prime-switch-w: var(--prime-switch-xs-width);
-  --prime-switch-h: var(--prime-switch-xs-height);
-  --prime-switch-thumb: var(--prime-switch-xs-thumb);
+  --sw-w: var(--prime-switch-xs-width);
+  --sw-h: var(--prime-switch-xs-height);
+  --sw-thumb: var(--prime-switch-xs-thumb);
 }
 
 .root[data-size="s"] {
-  --prime-switch-w: var(--prime-switch-s-width);
-  --prime-switch-h: var(--prime-switch-s-height);
-  --prime-switch-thumb: var(--prime-switch-s-thumb);
+  --sw-w: var(--prime-switch-s-width);
+  --sw-h: var(--prime-switch-s-height);
+  --sw-thumb: var(--prime-switch-s-thumb);
 }
 
 .root[data-size="l"] {
-  --prime-switch-w: var(--prime-switch-l-width);
-  --prime-switch-h: var(--prime-switch-l-height);
-  --prime-switch-thumb: var(--prime-switch-l-thumb);
+  --sw-w: var(--prime-switch-l-width);
+  --sw-h: var(--prime-switch-l-height);
+  --sw-thumb: var(--prime-switch-l-thumb);
 }
 
 .root[data-size="xl"] {
-  --prime-switch-w: var(--prime-switch-xl-width);
-  --prime-switch-h: var(--prime-switch-xl-height);
-  --prime-switch-thumb: var(--prime-switch-xl-thumb);
+  --sw-w: var(--prime-switch-xl-width);
+  --sw-h: var(--prime-switch-xl-height);
+  --sw-thumb: var(--prime-switch-xl-thumb);
 }
 
 .track {
@@ -44,23 +44,23 @@
   box-sizing: border-box;
   flex-shrink: 0;
   display: block;
-  width: var(--prime-switch-w);
-  height: var(--prime-switch-h);
+  width: var(--sw-w);
+  height: var(--sw-h);
   border-radius: var(--prime-radius-full);
 }
 
 .thumb {
   /* A spinner inside sizes itself from here, a ring inside the thumb's edge. */
-  --prime-icon-size: calc(var(--prime-switch-thumb) - var(--prime-space-1));
+  --prime-icon-size: calc(var(--sw-thumb) - var(--prime-space-1));
 
   position: absolute;
-  top: var(--prime-switch-inset);
-  left: var(--prime-switch-inset);
+  top: var(--sw-inset);
+  left: var(--sw-inset);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--prime-switch-thumb);
-  height: var(--prime-switch-thumb);
+  width: var(--sw-thumb);
+  height: var(--sw-thumb);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-control-thumb);
   box-shadow: var(--prime-shadow-raised);
@@ -70,7 +70,7 @@
 }
 
 .root[data-state="checked"] .thumb {
-  transform: translateX(var(--prime-switch-travel));
+  transform: translateX(var(--sw-travel));
   color: var(--prime-color-accent-default);
 }
 

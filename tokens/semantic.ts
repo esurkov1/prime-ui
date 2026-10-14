@@ -522,6 +522,11 @@ export const semanticTokens = {
      * every clock while a theme switches.
      */
     instant: "{duration.0}",
+    /**
+     * A clock that never runs out in a session: the browser's autofill paint of a field is pushed
+     * out of reach with it (`controls.css`). Not motion, so nothing zeroes it.
+     */
+    never: "{duration.never}",
   },
 
   /**

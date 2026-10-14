@@ -5,7 +5,7 @@ import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 /** What holds a panel that could otherwise swipe away (a dialog `Guard`). */
 type SwipeGuard = "busy" | "dirty" | null;
 
-export type UseSwipeDismissOptions = {
+type UseSwipeDismissOptions = {
   /**
    * The gesture exists: the panel draws a grab handle and a drag can dismiss it. Off where the
    * panel takes no swipe at all (a wide viewport, `closeOnOutsideClick={false}`).

@@ -3,17 +3,10 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import {
-  DARK_LAYERS,
-  floatingLayer,
-  LAYER_STEP,
-  LIGHT_LAYERS,
-  layerLadder,
-  lightnessOf,
-} from "../../tokens/layers";
 import { primitiveTokens } from "../../tokens/primitives";
 import { semanticTokens } from "../../tokens/semantic";
 import { darkThemeOverrides } from "../../tokens/themes/dark";
+import { LAYER_STEP, lightness, surfaceLadder } from "../test/layers";
 import { HUE_CHART } from "./palette";
 import { paletteColors } from "./states";
 
@@ -66,14 +59,14 @@ describe("palette", () => {
       "--hue-soft: color-mix( in srgb, var(--prime-color-text-primary) var(--prime-tint-soft), transparent )",
     );
     const alpha = Number.parseFloat(semanticTokens.tint.soft) / 100;
-    for (const [theme, layers, ink] of [
-      ["light", LIGHT_LAYERS, semanticTokens.color.text.primary],
-      ["dark", DARK_LAYERS, darkThemeOverrides.color.text.primary],
+    for (const [theme, ink] of [
+      ["light", semanticTokens.color.text.primary],
+      ["dark", darkThemeOverrides.color.text.primary],
     ] as const) {
-      for (const layer of [...layerLadder(layers), floatingLayer(layers)]) {
+      for (const layer of surfaceLadder(theme)) {
         for (const ground of [layer.bg, layer.fill, layer.fillHover, layer.selected]) {
           const chip = wash(primitiveColor(ink), alpha, ground);
-          const gap = Math.abs(lightnessOf(chip) - lightnessOf(ground));
+          const gap = Math.abs(lightness(chip) - lightness(ground));
           expect(gap, `${theme} gray soft on ${ground}`).toBeGreaterThan(LAYER_STEP);
         }
       }

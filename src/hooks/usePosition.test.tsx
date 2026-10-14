@@ -4,12 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
 
-import {
-  type AnchorPoint,
-  computeFloatingPosition,
-  type PositionSide,
-  usePosition,
-} from "./usePosition";
+import { computeFloatingPosition } from "./floatingPosition";
+import { type AnchorPoint, type PositionSide, usePosition } from "./usePosition";
 
 const OFFSET = 8;
 const PAD = 8;

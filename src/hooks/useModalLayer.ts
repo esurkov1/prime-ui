@@ -6,7 +6,7 @@ import { type DismissReason, type LayerEntry, useLayer } from "@/internal/overla
 import { useInertSiblings } from "./useInertSiblings";
 import { useScrollLock } from "./useScrollLock";
 
-export type UseModalLayerOptions = {
+type UseModalLayerOptions = {
   open: boolean;
   /** Escape asks the layer to close (the owner's `closeOnEscape`). */
   closeOnEscape: boolean;
@@ -16,7 +16,7 @@ export type UseModalLayerOptions = {
   onDismiss: (reason: DismissReason) => void;
 };
 
-export type ModalLayer<T extends HTMLElement> = {
+type ModalLayer<T extends HTMLElement> = {
   /** Attach to the panel (`role="dialog"`): the trap container and the inside of the layer. */
   ref: React.RefObject<T | null>;
   /** Pass to `<LayerProvider value={layer}>` around the content: nested layers stack above. */
