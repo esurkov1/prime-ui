@@ -41,8 +41,8 @@ const CONTENT = [
   {
     name: "badge",
     type: "string | number",
-    en: "A counter next to the title (a `Badge` in the tone hue).",
-    ru: "Счётчик рядом с заголовком (`Badge` оттенка тона).",
+    en: "A counter next to the title (a `Badge` of the same `tone`).",
+    ru: "Счётчик рядом с заголовком (`Badge` того же `tone`).",
   },
   {
     name: "action",

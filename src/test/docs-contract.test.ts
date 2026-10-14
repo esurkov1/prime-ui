@@ -36,7 +36,7 @@ import {
   slotOrder,
 } from "../../playground/pageStandard";
 import { type ApiPart, applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentApi";
-import { EVENTS, NATIVE_EVENTS, RENAMED } from "../../scripts/docs/vocabulary";
+import { EVENTS, KEPT, NATIVE_EVENTS, RENAMED } from "../../scripts/docs/vocabulary";
 import { NotificationProvider } from "../components/notification/NotificationStore";
 import {
   apiTexts,
@@ -530,7 +530,8 @@ function apiOffenders(rel: string, api: ComponentApi): Record<string, string[]> 
       }
       if (prop.name === "error" && !props.has("hint")) out.support.push(`${at}: ${where}`);
       const renamed = RENAMED.props[where] ?? RENAMED.props[`*.${prop.name}`];
-      if (renamed && prop.name !== "…rest") out.vocabulary.push(`${at}: ${where} → ${renamed}`);
+      if (renamed && prop.name !== "…rest" && !KEPT.has(where))
+        out.vocabulary.push(`${at}: ${where} → ${renamed}`);
       if (/^on[A-Z]/.test(prop.name)) {
         for (const event of prop.name.split(" · ")) {
           if (!/^on\w+Change$/.test(event) && !EVENTS.has(event) && !NATIVE_EVENTS.has(event)) {

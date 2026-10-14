@@ -26,11 +26,8 @@ import styles from "./Notification.module.css";
 
 export type NotificationProviderProps = {
   children: React.ReactNode;
-  /** Default position for `notify()` calls without one. Default `top-right`. */
   position?: NotificationPosition;
-  /** Max visible toasts per stack (position × tone). Default 5. */
   max?: number;
-  /** Built-in strings: the close button and the region names per position. */
   labels?: Partial<NotificationLabels>;
 };
 

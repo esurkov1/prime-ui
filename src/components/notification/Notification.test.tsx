@@ -4,7 +4,7 @@ import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { exitTimeoutMs } from "@/internal/motionTiming";
-import { withMotion } from "@/test/motion";
+import { type MotionHarness, withMotion } from "@/test/motion";
 
 import { NotificationCard, type NotificationDismissReason } from "./Notification";
 import styles from "./Notification.module.css";
@@ -401,6 +401,7 @@ describe("Notification", () => {
       vi.useFakeTimers({
         toFake: ["setTimeout", "clearTimeout", "requestAnimationFrame", "cancelAnimationFrame"],
       });
+      const motion = withMotion();
       render(
         <NotificationProvider>
           <TimedHarness />
@@ -408,49 +409,54 @@ describe("Notification", () => {
       );
       fireEvent.click(screen.getByRole("button", { name: "push timed" }));
       expect(screen.getByText("Timed")).toBeInTheDocument();
+      return motion;
     }
 
-    /** The countdown line: a CSS animation of the toast's duration. */
-    function countdownLine() {
+    /** The countdown clock: the animation of the countdown line. */
+    function countdown(motion: MotionHarness) {
       const line = document.querySelector<HTMLElement>(`.${styles.progressValue}`);
       if (!line) throw new Error("no countdown line");
-      return line;
+      const clock = motion.on(line).at(-1);
+      if (!clock) throw new Error("no countdown clock");
+      return clock;
     }
 
-    it("runs the countdown as a CSS animation and expires when it ends", () => {
-      renderTimed();
-      const line = countdownLine();
-      expect(line.style.animationDuration).toBe("1000ms");
-      expect(line.style.animationPlayState).toBe("running");
-      // No per-frame JS: time alone does not dismiss it, the line running out does.
+    it("runs the countdown as a linear clock of the duration and expires when it runs out", () => {
+      const motion = renderTimed();
+      const clock = countdown(motion);
+      expect(clock.options).toMatchObject({ duration: 1000, easing: "linear" });
+      expect(clock.animation.playState).toBe("running");
+      // No per-frame JS: time alone does not dismiss it, the clock running out does.
       advance(5000);
       expect(screen.getByText("Timed")).toBeInTheDocument();
       act(() => {
-        fireEvent.animationEnd(line);
+        clock.finish();
       });
       advance(exitTimeoutMs("fast"));
       expect(screen.queryByText("Timed")).not.toBeInTheDocument();
     });
 
     it("pauses the countdown while the stack is hovered", () => {
-      renderTimed();
+      const motion = renderTimed();
       const list = screen.getByRole("list", { name: "Уведомления сверху справа" });
 
       fireEvent.mouseEnter(list);
-      expect(countdownLine().style.animationPlayState).toBe("paused");
+      expect(countdown(motion).animation.playState).toBe("paused");
 
       fireEvent.mouseLeave(list);
       advance(100); // collapse delay; the countdown resumes once the stack collapses
       expect(list).toHaveAttribute("data-expanded", "false");
-      expect(countdownLine().style.animationPlayState).toBe("running");
+      expect(countdown(motion).animation.playState).toBe("running");
     });
 
     it("pauses while the document is hidden and resumes where it stopped", () => {
-      renderTimed();
+      const motion = renderTimed();
       setVisibility("hidden");
-      expect(countdownLine().style.animationPlayState).toBe("paused");
+      const clock = countdown(motion);
+      expect(clock.animation.playState).toBe("paused");
       setVisibility("visible");
-      expect(countdownLine().style.animationPlayState).toBe("running");
+      expect(countdown(motion)).toBe(clock);
+      expect(clock.animation.playState).toBe("running");
     });
   });
 
@@ -550,7 +556,10 @@ describe("NotificationCard", () => {
 
     rerender(<NotificationCard tone="danger" title="Ошибка" badge={3} onDismiss={onDismiss} />);
     expect(screen.getByRole("alert")).toBeInTheDocument();
-    expect(screen.getByText("3").closest("[data-color]")).toHaveAttribute("data-color", "red");
+    // The counter is a Badge of the card's tone.
+    const badge = screen.getByText("3").closest("[data-tone]");
+    expect(badge).not.toBe(screen.getByRole("alert"));
+    expect(badge).toHaveAttribute("data-tone", "danger");
     fireEvent.click(screen.getByRole("button", { name: "Закрыть уведомление" }));
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
@@ -670,6 +679,21 @@ describe("Notification — onDismiss", () => {
     await user.keyboard("{Enter}");
     expect(screen.getAllByRole("button", { name: "Закрыть уведомление" })).toHaveLength(1);
     expect(screen.getByRole("button", { name: "Отменить" })).toHaveFocus();
+  });
+
+  it("presses the action and the close button with Space", async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn();
+    render(<Undo onDismiss={onDismiss} />);
+    const push = screen.getByRole("button", { name: "push" });
+    await user.click(push);
+    await user.click(push);
+    screen.getAllByRole("button", { name: "Отменить" })[0]?.focus();
+    await user.keyboard("[Space]");
+    expect(onDismiss).toHaveBeenLastCalledWith("Удалено 2", "action");
+    screen.getByRole("button", { name: "Закрыть уведомление" }).focus();
+    await user.keyboard("[Space]");
+    expect(onDismiss).toHaveBeenLastCalledWith("Удалено 1", "close");
   });
 
   it("returns focus to where it came from when the last card leaves", async () => {

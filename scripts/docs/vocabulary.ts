@@ -28,6 +28,12 @@ export const RENAMED = {
   } as Record<string, string>,
 };
 
+/** `Part.prop` names `RENAMED` lists that a part keeps on purpose (CLAUDE.md §1), each with why. */
+export const KEPT = new Set([
+  // The static rendering of a `notify()` record: the same `NotificationContent` data, `icon` included.
+  "NotificationCard.icon",
+]);
+
 /** Event props beyond the triads (`onXChange`) and native DOM events, each with one meaning. */
 export const EVENTS = new Set([
   "onSelect", // activates a menu or command item

@@ -33,25 +33,31 @@ function ReportsForm() {
 
   return (
     <Card.Root className={styles.formCard}>
-      <form
-        ref={formRef}
-        className={styles.form}
-        onSubmit={(event) => {
-          event.preventDefault();
-          save();
-        }}
-      >
-        <Input.Root label="Почта для отчётов" hint="Без «@» сохранение завершится ошибкой" required>
-          <Input.Wrapper>
-            <Input.Field value={email} onChange={(event) => setEmail(event.target.value)} />
-          </Input.Wrapper>
-        </Input.Root>
-        <div className={styles.actions}>
-          <Button.Root type="submit" loading={saving}>
-            Сохранить
-          </Button.Root>
-        </div>
-      </form>
+      <Card.Body>
+        <form
+          ref={formRef}
+          className={styles.form}
+          onSubmit={(event) => {
+            event.preventDefault();
+            save();
+          }}
+        >
+          <Input.Root
+            label="Почта для отчётов"
+            hint="Без «@» сохранение завершится ошибкой"
+            required
+          >
+            <Input.Wrapper>
+              <Input.Field value={email} onChange={(event) => setEmail(event.target.value)} />
+            </Input.Wrapper>
+          </Input.Root>
+          <div className={styles.actions}>
+            <Button.Root type="submit" loading={saving}>
+              Сохранить
+            </Button.Root>
+          </div>
+        </form>
+      </Card.Body>
     </Card.Root>
   );
 }

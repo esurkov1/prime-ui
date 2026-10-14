@@ -14,6 +14,8 @@ export type RecordedAnimation = {
   /** Settles the animation: fires `finish` listeners and `onfinish`, resolves `finished`. */
   finish: () => void;
   cancelled: boolean;
+  /** The animation `Element.animate` returned (`pause()` / `play()` move its `playState`). */
+  animation: Animation;
 };
 
 export type MotionHarness = {
@@ -78,8 +80,12 @@ export function withMotion(): MotionHarness {
         animation.oncancel?.();
       },
       finish: () => record.finish(),
-      play: () => {},
-      pause: () => {},
+      play: () => {
+        if (animation.playState === "paused") animation.playState = "running";
+      },
+      pause: () => {
+        if (animation.playState === "running") animation.playState = "paused";
+      },
       reverse: () => {},
       commitStyles: () => {},
       persist: () => {},
@@ -89,6 +95,7 @@ export function withMotion(): MotionHarness {
       keyframes,
       options,
       cancelled: false,
+      animation: animation as unknown as Animation,
       finish: () => {
         if (animation.playState === "finished") return;
         animation.playState = "finished";
