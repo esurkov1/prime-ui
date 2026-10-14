@@ -1,4 +1,4 @@
-/** In a phone-width column the page actions wrap under the heading instead of squeezing it. */
+/** In a phone-width column the page actions wrap under the heading instead of squeezing it — `PageContent.Actions`. */
 import { Button, PageContent } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

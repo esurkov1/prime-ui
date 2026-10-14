@@ -7,7 +7,7 @@
 
 ## When to use
 - Lists and tables split into pages, usually in their footer.
-- Narrow places (cards, mobile footers) — `compact` or `compact="auto"`.
+- Narrow places (cards, mobile footers): it turns compact by itself below 22rem of its width; `compact` forces that view.
 
 ## When not to use
 - Steps of a process with names and statuses → use [Stepper](../stepper/COMPONENT.md).
@@ -23,8 +23,8 @@ import { Pagination } from "prime-ui-kit";
 ```
 Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ├─ previous             ghost icon-only Button (nav.chevronLeft)
-├─ pages                ghost Buttons with numbers, the current one soft accent; «…» for skipped ranges (aria-hidden)
-├─ summary              «3 / 12» in the compact view
+├─ pages                ghost `tight` Buttons with numbers, the current one in the Button `current` state; «…» for skipped ranges (aria-hidden)
+├─ summary              «3 / 12» in the compact view (below 22rem, or `compact`)
 └─ next                 ghost icon-only Button (nav.chevronRight)
 ```
 
@@ -33,7 +33,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Pagination
-`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with `Button`s: ghost previous and next, ghost page numbers with ellipses, the current page soft accent.
+`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with `Button`s: ghost previous and next, ghost page numbers with ellipses, the current page in the Button `current` state.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -42,8 +42,8 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 | `defaultValue` | `number` | `1` | Initial page, uncontrolled. |
 | `onValueChange` | `(page: number) => void` | — | Called when a page button or an arrow picks another page. |
 | `siblingCount` | `number` | `1` | Pages on each side of the current one before an ellipsis (when `totalPages > 2·siblingCount+5`). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier of the buttons: height 28 · 32 · 36 · 40 · 48. |
-| `compact` | `boolean \| "auto"` | `false` | `true` — arrows + «current / total» instead of numbers; `"auto"` — fills the parent and turns compact below 22rem of its width. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Control tier of the buttons: height 28 · 32 · 36 · 40 · 48. Without it the tier of its host, else `m`. |
+| `compact` | `boolean` | `false` | Always arrows + «current / total» instead of numbers. Without it the nav fills its parent and shows that view only below 22rem of its width. |
 | `labels` | `Partial<PaginationLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "defaultValue" \| "onChange">` | — | `className`, `data-*` and the other `<nav>` attributes; `aria-label` comes from `labels.nav`. |
 
@@ -52,9 +52,8 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ### compact
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `false` | arrows around page numbers; «…» for skipped ranges | desktop list and table footers | yes |
-| `true` | arrows around «3 / 12» (current in primary medium, total muted, tabular figures) | cards, mobile footers, tight toolbars | |
-| `"auto"` | fills the parent; the full row right-aligned, below 22rem of container width the compact view with arrows at the edges | responsive footers (DataTable uses it) | |
+| `false` | fills the parent: arrows around page numbers right-aligned, «…» for skipped ranges; below 22rem of its width the compact view with arrows at the edges | list and table footers, anywhere the width varies | yes |
+| `true` | arrows around «3 / 12» (current in primary medium, total muted, tabular figures) at any width | tight toolbars, a pager that must never show numbers | |
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -75,16 +74,16 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| current page | `value` / `defaultValue` | `aria-current="page"` on a soft accent Button: `accent-soft` fill, `accent-text` |
+| current page | `value` / `defaultValue` | the Button `current` state: `aria-current="page"`, `data-current`, the selected fill |
 | hover / active | pointer | `fill-subtle` / `fill-subtle-active`, primary text, press scale |
 | focus-visible | keyboard | outer focus ring of the Button |
 | disabled arrow | first / last page | native `disabled`, `text-disabled` |
-| size / compact | `size`, `compact` | `data-size`, `data-compact` (`"true"` · `"false"` · `"auto"`) |
+| size / compact | `size` (else the host tier), `compact` | `data-size`, `data-compact` (`"auto"` · `"compact"`) |
 
 ## Layout & spacing
 - In a list footer: the range text on the left, rows-per-page Select and Pagination on the right (`justify-content: space-between`), the row wraps.
-- `compact="auto"` needs a parent with a width — it is a size container.
-- Page numbers keep a square footprint up to two digits; wider numbers grow the button.
+- By default the nav fills its parent and is a size container: it needs a parent with a width.
+- Page numbers use the Button `tight` density: tabular figures, a square footprint up to two digits; wider numbers grow the button.
 
 ## Accessibility
 
@@ -122,13 +121,13 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; buttons are as high as Button and Input of the same tier, 28 to 48 px — `size`. |
 | [overflow.tsx](examples/overflow.tsx) | Up to 7 pages without an ellipsis, then a window around the current page; a wider window — `siblingCount`. |
 | [controlled.tsx](examples/controlled.tsx) | A list footer owns the page: changing rows per page returns it to page 1 — `value`, `onValueChange`. |
-| [narrow.tsx](examples/narrow.tsx) | A 320 px card footer: `compact` always shows «current / total», `compact="auto"` switches by the container width — `compact`. |
+| [narrow.tsx](examples/narrow.tsx) | A 320 px card footer: by default the numbers give way to «current / total» on a narrow width, `compact` always shows it — `compact`. |
 
 ## Mistakes
 - `page` / `onPageChange` → use `value` / `onValueChange`.
 - A 0-based page index → pages start at `1`.
 - Passing `aria-label` to rename the landmark → use `labels={{ nav: "…" }}`.
-- `compact="auto"` inside a shrink-wrapped flex item → give the parent a width.
+- Pagination inside a shrink-wrapped flex item → give the parent a width; it measures its own container.
 - A pager under a DataTable → the table renders its own.
 
 ## Related

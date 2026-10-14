@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 
 import { DescriptionList } from "./DescriptionList";
@@ -76,6 +77,25 @@ describe("DescriptionList", () => {
     expect(action).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("a row action may be a link with the button look (asChild)", () => {
+    render(
+      <DescriptionList.Root>
+        <DescriptionList.Item label="Почта">
+          finance@severny-veter.ru
+          <DescriptionList.ItemAction label="Написать" asChild>
+            <a href="mailto:finance@severny-veter.ru">
+              <Icon name="action.send" />
+            </a>
+          </DescriptionList.ItemAction>
+        </DescriptionList.Item>
+      </DescriptionList.Root>,
+    );
+    expect(screen.getByRole("link", { name: "Написать" })).toHaveAttribute(
+      "href",
+      "mailto:finance@severny-veter.ru",
+    );
   });
 
   it("forwards refs and native attributes", () => {

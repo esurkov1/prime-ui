@@ -1,4 +1,4 @@
-/** An operations feed: one labelled group, a line through the dots, the row under the pointer highlighted — `Timeline.Group`, `Timeline.Value`. */
+/** An operations feed: one labelled group, a line through the dots, the row under the pointer highlighted — `Timeline.Group`, `Timeline.ItemValue`. */
 import { Timeline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -34,11 +34,11 @@ export default function TimelineOverviewExample() {
       <Timeline.Group label="Недавно">
         {EVENTS.map((event) => (
           <Timeline.Item key={event.id}>
-            <Timeline.Title>{event.title}</Timeline.Title>
-            <Timeline.Meta>
-              <Timeline.MetaPrimary>{event.date}</Timeline.MetaPrimary> · {event.ago}
-            </Timeline.Meta>
-            <Timeline.Value>{event.value}</Timeline.Value>
+            <Timeline.ItemTitle>{event.title}</Timeline.ItemTitle>
+            <Timeline.ItemMeta>
+              <strong>{event.date}</strong> · {event.ago}
+            </Timeline.ItemMeta>
+            <Timeline.ItemValue>{event.value}</Timeline.ItemValue>
           </Timeline.Item>
         ))}
       </Timeline.Group>

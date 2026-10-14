@@ -11,9 +11,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type.",
-          ru: "Толщина линии 4 → 8 px (`--prime-control-<tier>-track`, как у Slider) и шрифт подписи.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type. Without it the tier of its host, else `m`.",
+          ru: "Толщина линии 4 → 8 px (`--prime-control-<tier>-track`, как у Slider) и шрифт подписи. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "label",

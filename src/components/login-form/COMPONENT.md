@@ -22,14 +22,14 @@ import { LoginForm } from "prime-ui-kit";
 
 ## Anatomy
 ```
-LoginForm.Root                      surface: card fill, radius, shadow
+LoginForm.Root                      width cap; a Card inside: card fill, radius, shadow
 ├─ LoginForm.Header
 │  ├─ LoginForm.Logo                tile with the product mark
 │  ├─ LoginForm.Title               h1
 │  └─ LoginForm.Description
 └─ LoginForm.Body
    ├─ LoginForm.Actions             provider buttons
-   ├─ Divider.Root                  «или»
+   ├─ Divider                       «или»
    ├─ LoginForm.Form                <form>: Input.Root … · Button submit
    │  └─ LoginForm.Actions          primary button + ghost back action
    └─ LoginForm.Footer              «Нет аккаунта? <LinkButton>»
@@ -41,7 +41,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### LoginForm.Root
-`ref` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts.
+`ref` → `HTMLDivElement`. The sign-in form: a Card (fill, radius, shadow) capped at a small modal's width, the tier rhythm; provides its size to the parts.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -167,7 +167,7 @@ Root carries `data-size`, `data-align` and `data-flat`.
 - header → body `--prime-space-8` (gap on Root); provider buttons → divider → form `--prime-space-4`; field → field → submit `--prime-space-5`; submit → back action `--prime-space-3`; form → footer `--prime-space-6`.
 - Spacing is `gap` on parents; no margins between parts.
 - The card has no border, takes the full width up to the small modal width. To center it on a page, wrap it in your own flex container on the page.
-- The form is a layer of the surface ladder like Card (`data-depth`): on the page it is white in light with the raised whisper, fields inside are one step off it.
+- The form is a Card, a layer of the surface ladder (`data-depth`): on the page it is white in light with the raised whisper, fields inside are one step off it.
 
 ## Accessibility
 
@@ -198,12 +198,12 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a centered header with the product's named mark — `align`, `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Padding, gaps and text roles of the card follow the tier; the fields and buttons take the same one — `size`. |
 | [structure.tsx](examples/structure.tsx) | The minimal form: no logo, description or footer, no shadow for a host that already is a surface and a second-level title under the host page's own heading — `flat`, `as`. |
-| [register.tsx](examples/register.tsx) | Sign-up: five fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. |
+| [register.tsx](examples/register.tsx) | Sign-up: four fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. |
 | [forgot-password.tsx](examples/forgot-password.tsx) | Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. |
 | [reset-password.tsx](examples/reset-password.tsx) | A new password after the e-mail link: a strength meter on the first field and a mismatch error under the second one — `strength`, `error`. |
 | [verification-code.tsx](examples/verification-code.tsx) | The second step with a one-time code: a rejected code shows its error under the cells, resend is a quiet action — `DigitInput`, `LoginForm.Actions`. |
 | [states.tsx](examples/states.tsx) | The submit cycle: the button is busy while the request runs, a failed request shows a danger Banner and marks the password — `loading`, `invalid`. |
-| [narrow.tsx](examples/narrow.tsx) | On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width. |
+| [narrow.tsx](examples/narrow.tsx) | On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width — `LoginForm.Form`. |
 
 ## Mistakes
 - A separate block of your own for provider buttons → put them in `LoginForm.Actions`.
@@ -213,5 +213,5 @@ No `labels`.
 - Repeating the card `size` on every field and button → set it once on Root; fields and buttons follow it.
 
 ## Related
-- **Built from:** [Typography](../typography/COMPONENT.md) (`Title`, `Description`, `Footer`)
-- **See also:** [Input](../input/COMPONENT.md), [Fieldset](../fieldset/COMPONENT.md) (disables the fields while signing in), [Card](../card/COMPONENT.md) (the same surface for forms on an app page), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [Banner](../banner/COMPONENT.md), [Modal](../modal/COMPONENT.md)
+- **Built from:** [Card](../card/COMPONENT.md) (the surface), [Typography](../typography/COMPONENT.md) (`Title`, `Description`, `Footer`), the icon tile (`iconBox` `.tile`, the `start` logo)
+- **See also:** [Input](../input/COMPONENT.md), [Fieldset](../fieldset/COMPONENT.md) (disables the fields while signing in), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [Banner](../banner/COMPONENT.md), [Modal](../modal/COMPONENT.md)

@@ -1,4 +1,5 @@
 import { Checkbox } from "@/components/checkbox/Checkbox";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
@@ -99,6 +100,8 @@ export function Head<Row>({
                     strokeWidth={2}
                   />
                 </button>
+              ) : column.hideHeader ? (
+                <VisuallyHidden>{column.header}</VisuallyHidden>
               ) : (
                 <span className={styles.headLabel}>{column.header}</span>
               )}

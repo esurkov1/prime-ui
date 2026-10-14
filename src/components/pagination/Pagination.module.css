@@ -1,7 +1,9 @@
 /*
- * Pagination: ghost neutral Buttons of the tier; the current page is a soft accent Button with
- * `aria-current="page"`. This file only lays them out, tightens the padding of the numbers and
- * sizes the ellipsis and the compact summary to the tier.
+ * Pagination: ghost neutral Buttons of the tier; the current page is the Button's `current` state
+ * (`aria-current="page"`, the selected look) and the numbers use its `tight` density. This file
+ * only lays them out and sizes the ellipsis and the compact summary to the tier. By default the
+ * nav fills its parent and is a size container: below 22rem the numbers give way to
+ * «current / total» (`compact` forces that view), so it fits 320px.
  */
 .root {
   --pg-size: var(--prime-control-m-height);
@@ -40,7 +42,7 @@
   --pg-gap: var(--prime-space-2);
 }
 
-/* `compact="auto"`: the nav fills its parent and becomes a size container for the list. */
+/* Default: the nav fills its parent and becomes a size container for the list. */
 .root[data-compact="auto"] {
   display: block;
   width: 100%;
@@ -58,11 +60,8 @@
   justify-content: flex-end;
 }
 
-/* Page numbers stay square up to two digits: the Button keeps its height as min-width. */
-.page[data-size] {
+.pageItem {
   flex-shrink: 0;
-  padding-inline: var(--prime-space-1);
-  font-variant-numeric: tabular-nums;
 }
 
 .ellipsis {

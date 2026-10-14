@@ -24,7 +24,7 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 | [Sales pipeline board](#sales-pipeline-board) | kanban | [screen.tsx](../src/components/kanban/examples/screen.tsx) | AppHeader titles the page (`h1` + a Description with the open deals and their sum) and carries a PageToolbar with SmartFilter search, a board / list SegmentedControl and the one primary action; Crossfade between a `plain` Kanban (stages without wells, deal cards on the page) and a DataTable of the same deals, column totals in `renderColumnMeta`, moves saved through an `onValueChange` promise that the server can refuse, the deal in a Drawer with a DescriptionList and stage actions, skeleton first load |
 | [App frame](#app-frame) | app-shell | [screen.tsx](../src/layout/app-shell/examples/screen.tsx) | Sidebar rail on a wide screen, floating BottomNav in `AppShell.Footer` on a phone («Ещё» opens the Sidebar panel), AppHeader with the menu button and the page title (`h1`) with a line of data, counts on items, a home page that cross-fades between sections |
 | [Media library](#media-library) | file-upload | [screen.tsx](../src/components/file-upload/examples/screen.tsx) | AppHeader titles the page (`h1` + a Description with the object) and carries a PageToolbar with sections and counts, search (`SmartFilter` with `fields={[]}`), order and «Загрузить»; uploads through `useUploadQueue` in `FileUpload` tiles (`trigger="tile"`, `layout="grid"`) with progress, a failure and retry, a done file moving into the library; a grid of `Thumbnail` / `Thumbnail.Video` tiles that open `MediaViewer` out of the tile (`getOrigin`, `thumbnails`, `renderActions`) or, in selection mode, are picked (`checked`) for bulk download and a `ConfirmDialog` delete; a Skeleton first load and a filtered `EmptyPage` in a `Crossfade` |
-| [Resource schedule](#resource-schedule) | gantt | [screen.tsx](../src/components/gantt/examples/screen.tsx) | AppHeader titles the page (`h1` + a Description with the people shown) and carries a `PageToolbar` with search, role / client filters, team sections and «Назначить» over a full-height `Gantt` (`scrollHeight="fill"`); people with avatars, client hues, lanes for overlaps, locked absences and milestones; moves saved through an async `onBarChange` or refused and glided back, new work drawn with `onBarCreate` and named in a Modal (cancel fades the ghost), `onSelect` details in a Drawer with a `DescriptionList` and a confirmed removal, `loading` and filtered `empty` |
+| [Resource schedule](#resource-schedule) | gantt | [screen.tsx](../src/components/gantt/examples/screen.tsx) | AppHeader titles the page (`h1` + a Description with the people shown) and carries a `PageToolbar` with search, role / client filters, team sections and «Назначить» over a full-height `Gantt` (`scrollHeight="fill"`); people with avatars, client hues, lanes for overlaps, locked absences and milestones; moves saved through an async `onBarChange` or refused and glided back, new work drawn with `onBarCreate` and named in a Modal (cancel fades the ghost), `onItemOpen` details in a Drawer with a `DescriptionList` and a confirmed removal, `loading` and filtered `empty` |
 
 Pick the closest one, rename the domain, keep the skeleton. Change structure only when the task needs
 it, and then by the rules below.
@@ -56,7 +56,7 @@ AppShell.Root                      once per app (layouts.md#app-frame-once-per-a
 │  └─ AppHeader.Tools              second row → PageToolbar.Root: search and filter, sections,
 │                                  view, the primary action; Chips under them
 └─ AppShell.Main                   gutters + top air (24, 32 from 1024px); the page renders here
-   └─ PageContent.Page | Root      the page you deliver
+   └─ PageContent.Root             the page you deliver
       └─ PageContent.Body          blocks 24 apart, starting at main's top air
          ├─ PageContent.Grid       every tile of the screen, 16 on both axes
          │  └─ PageContent.Cell    span (of 12), rows; the tile fills it
@@ -70,7 +70,7 @@ Document page: the header without a title, and in main
 
 - A screen component renders its page: its `AppHeader.Root` (through the shell's `header`) and its
   body. Styles, `applyTheme`, `NotificationProvider` and `AppShell` live at the app root.
-- `PageContent.Page` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
+- `PageContent.Root as="section"` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
   settings, `maxWidth="readable"` for one narrow column of text or fields.
 - No outer padding, no margins: `AppShell.Main` has the gutters and the top air under the header,
   `PageContent` has block → block 24, section → section 40, tile → tile 16 (and header → body 24 on
@@ -287,7 +287,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | a form saved and still on screen | the submit button's text: «Сохранено» |
 | a state of the page or a section that persists (sync failed, trial ends, read-only) | `Banner` as the first block of `PageContent.Body` (or inside the Card it concerns) |
 | a problem with one field | the field's `error` |
-| a region failed to load | the region shows it in place: DataTable `error`, `EmptyPage` with `EmptyPage.Icon tone="danger"` and «Повторить» |
+| a region failed to load | the region shows it in place: DataTable `loadError`, `EmptyPage` with `EmptyPage.Icon tone="danger"` and «Повторить» |
 | a region is loading | DataTable `loading`; otherwise a `Skeleton` in the geometry of the content + `aria-busy` on the region; `Spinner` only when there is no shape to hold |
 | a region changes state (loading → data → empty → error, another record) | its content in `Crossfade state={status}` — always, so the change flows instead of flipping |
 | nothing here yet (first run) | `EmptyPage` with one action (`tone="accent"` icon for a call to start) |
@@ -424,7 +424,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - Columns are a CSS module on flex-wrap without breakpoints: the main one grows, the side one holds ~18rem and drops below when the main one runs out of room.
 - A section without a frame is `PageContent.Section label`: an h2 heading 16 px above the table; `Card variant="panel"` only for standalone blocks of the side column. A table is already a filled block — never put it in a card.
 - «Label → value» pairs about the client are `DescriptionList.Root orientation="vertical"` with `DescriptionList.Item label`; amounts are tabular figures, the total is larger (`title-m`) and ends where the «Сумма» column ends (the table cell inset).
-- History is a `Timeline`: events top-down from the latest, dates in `Timeline.Meta`; a row highlights on hover.
+- History is a `Timeline`: events top-down from the latest, dates in `Timeline.ItemMeta`; a row highlights on hover.
 
 ### Settings page
 
@@ -483,7 +483,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - The header carries the page: `AppHeader.Title` with an `AppHeader.Description` line of data — the accounts and the date of the statement the screen stands on; main has no `PageContent.Header`.
 - An error that concerns the whole page is a `Banner tone="danger"` as the first block of `PageContent.Body` with a «Повторить» action; the action's result is a `Notification`.
-- A region's error is in the region's place: `error` on the `DataTable` (the table head stays), not a pop-up.
+- A region's error is in the region's place: `loadError` on the `DataTable` (the table head stays), not a pop-up.
 - Table loading is `loading` + `loadingRows` (a skeleton of rows); card loading is a `Skeleton` in the shape of its rows and `aria-busy` on the card, and the block's height does not change. The state change is smooth: the card's region is in `Crossfade state={status}`, the table body changes by itself.
 - Stale data beats emptiness: the balances are shown as of the previous date, and that is said on the right in `Card.Header`.
 - Empty on the first run is `EmptyPage size="s"` inside the panel: an icon with `tone="accent"`, what it is and why, one action. An empty filter result is the table's `empty`.
@@ -516,7 +516,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The board is the main area of the page, so its `variant` is the default, `plain`: stages without wells, headers and deal cards stand right on the page — one level of nesting, no frames of your own around the columns.
 - The placement of deals is `value` as `{ [stage]: id[] }`; `onValueChange` returns the request's promise and applies `value` only after the answer; a server refusal returns the card to its place.
 - Stage totals are in `renderColumnMeta` («2 сделки · 3 575 000 ₽»), the stage color is the column's `color`.
-- A deal opens through `onItemClick` of `Kanban.Root` (click, Enter, Space; never after a drag) in a `Drawer` with a `DescriptionList`; no `onClick` / `onKeyDown` of your own on the card; a deal with its own page — `getItemHref`. The stage change is available in the panel too — dragging is not the only way; `Drawer.Guard busy` holds the panel while saving.
+- A deal opens through `onItemOpen` of `Kanban.Root` (click, Enter, Space; never after a drag) in a `Drawer` with a `DescriptionList`; no `onClick` / `onKeyDown` of your own on the card; a deal with its own page — `getItemHref`. The stage change is available in the panel too — dragging is not the only way; `Drawer.Guard busy` holds the panel while saving.
 - The first load is `loading` on `Kanban` and `DataTable`: skeletons in the geometry of cards and rows.
 
 ### App frame
@@ -556,5 +556,5 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - `onBarChange` returns a promise and changes the data only after the service answers: while it runs the bar is busy; a refusal (work on an absence) is `notify` and `throw`, and the bar returns to its previous dates by itself.
 - `onBarCreate`: a range drawn on an empty place holds a busy draft while a `Modal` with `Modal.Guard busy` asks for the name and the client; saving adds the bar and resolves the promise, cancel rejects it — the draft dissolves. Work over an absence is refused at once.
 - The legend of client hues is a row of `Badge.Root color` with `Badge.Dot` in the chart's `toolbar`; `renderBarTooltip` names the client in the tooltip under the dates, so the client reads not only by color.
-- `onSelect` opens a `Drawer` with a `DescriptionList` (the person, the client `Badge`, the period and duration, `ProgressBar`); removing a task is a `ConfirmDialog` with an async `onConfirm`.
+- `onItemOpen` opens a `Drawer` with a `DescriptionList` (the person, the client `Badge`, the period and duration, `ProgressBar`); removing a task is a `ConfirmDialog` with an async `onConfirm`.
 - States are on the chart itself: `loading` draws `Skeleton` placeholder rows in its geometry, `empty` an `EmptyPage size="s"` with «Сбросить фильтры»; the panel stays in place.

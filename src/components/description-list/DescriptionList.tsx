@@ -108,7 +108,7 @@ function DescriptionListItem({ label, children, className, ...rest }: Descriptio
             value
           )}
         </span>
-        {action}
+        {action ? <span className={styles.action}>{action}</span> : null}
       </dd>
     </div>
   );
@@ -121,21 +121,19 @@ export type DescriptionListItemActionProps = Omit<
 > & {
   /** Accessible name and tooltip of the action («Копировать», «Позвонить»). */
   label: string;
-  /** The icon (`<Icon name="…" />`). */
   children: React.ReactNode;
+  asChild?: boolean;
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** The kit row action (`internal/RowAction`): a ghost icon Button one tier below the list. */
-function DescriptionListItemAction({
-  label,
-  children,
-  className,
-  ...rest
-}: DescriptionListItemActionProps) {
+/**
+ * The kit row action (`internal/RowAction`): a ghost icon Button one tier below the list, centred
+ * on the value's first line.
+ */
+function DescriptionListItemAction({ label, children, ...rest }: DescriptionListItemActionProps) {
   const { size } = React.useContext(DescriptionListContext);
   return (
-    <RowAction {...rest} label={label} size={size} className={cx(styles.action, className)}>
+    <RowAction {...rest} label={label} size={size}>
       {children}
     </RowAction>
   );

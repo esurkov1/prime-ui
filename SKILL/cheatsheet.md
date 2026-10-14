@@ -101,7 +101,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Long lists are virtualized inside the kit: pass the whole array to `DataTable` (with `scrollHeight` or `paging="infinite"`; over 100 rows — grouped, `onReorder` and `renderExpanded` bodies render every row, keep those short or paged), `TagSelect options`, `Chat.Messages items`, `Gantt rows` — never slice it by hand, never wrap a kit list in react-window / react-virtual or your own windowing. Big remote data is still paged or loaded on scroll by the server (`source="server"`, `onLoadMore`).
 - Data the server sorts and pages (thousands of records): `source="server"` + `rowCount`, controlled `sort` / `page` as the request, `page` back to 1 on a new search or filter, old rows kept with `loading` while the next page loads — not a server page passed to the default client mode, and not `rows={[]}` between pages.
 - Categories (sources, platforms, regions) get `color` and the same order of `chartColors` in charts; statuses and meanings get `tone` — never paint categories with tones.
-- A chart with axes or several series: `<ChartFrame.Root series state>` around the library (or your SVG) with `ChartFrame.Plot renderPlot`, `Legend`, `Table` — not a hand-made Card with a grey box while loading and a legend of colored dots.
+- A chart with axes or several series: `<ChartFrame.Root series rows state>` around the library (or your SVG) with `ChartFrame.Plot renderPlot` and `Legend`; `rows` is the data table screen readers get — not a hand-made Card with a grey box while loading and a legend of colored dots.
 - A tooltip on your own SVG chart: `<ChartFrame.Tooltip point={{ x, y }} items>` with the pointer in plot coordinates — not a `foreignObject` or a div placed and clamped by hand; it flips only when out of room.
 - Amounts, counts and dates are `numeric` columns; statuses are `Badge.Root color` from one status → color map.
 - Rows people order by hand: `onReorder(id, beforeId)` (apply it with `moveBefore`, return the save's Promise) — not a Dnd list rebuilt next to the table.
@@ -110,7 +110,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A trend in a table row is `<Sparkline layout="compact">` in the column's `cell` (a column `width`, series built once, not inline, the same `min` / `max` on every row when rows compare by size); the number itself goes in its own column. A missing day is `value: null`, never `0`.
 - Properties of one record: `<DescriptionList.Root>` of `DescriptionList.Item` — not a hand-made grid of label / value text, not a one-row DataTable.
 - Who is busy when, a plan with dates: `Gantt` with `onBarChange` / `onBarCreate` — not bars drawn by hand or a DataTable of start and end dates. Statuses moved by hand: `Kanban` — `plain` (default, a header plate) or `line` (a header over a line) for a board that is the page's main region, `variant="well"` only when columns must read as bounded queues (WIP limits, sparse columns); never a Card or a filled box around a column.
-- Open a board card with `Kanban.Root onItemClick` (click, Enter, Space, never after a drag) or `getItemHref`; a Gantt row with `onRowClick` / `getRowHref` (the DataTable contract), a bar with `onSelect`; more facts in a bar tooltip with `renderBarTooltip` (it adds lines under the dates). A legend of hues is a row of `Badge.Root color` + `Badge.Dot` in the host's `toolbar`, the category also in text. Hour slots (bookings, appointments) are not Gantt — its unit is a calendar day.
+- Open a board card with `Kanban.Root onItemOpen` (click, Enter, Space, never after a drag) or `getItemHref`; a Gantt row with `onRowClick` / `getRowHref` (the DataTable contract), a bar with `onItemOpen`; more facts in a bar tooltip with `renderBarTooltip` (it adds lines under the dates). A legend of hues is a row of `Badge.Root color` + `Badge.Dot` in the host's `toolbar`, the category also in text. Hour slots (bookings, appointments) are not Gantt — its unit is a calendar day.
 
 ## Chat
 
@@ -165,7 +165,7 @@ State change is continuous in the whole kit: every region that changes what it s
 - Region loading: `<Skeleton>` in the geometry of the data — same rows, same gaps (`<Skeleton />` for a text line, `shape="circle"` for an avatar, `shape="control"` for a field, `shape="block"` for an image or chart) — not a spinner in an empty card, not a grey box or shimmer you draw.
 - `Spinner` only where there is no shape to hold (a running job, a status line); a busy button is `<Button.Root loading>`.
 - Refreshing data already on screen: keep it, set `aria-busy` — not back to a skeleton on every refetch.
-- Table states in place: `loading` (+ `loadingRows`), `empty`, `error` on `DataTable` — the head and toolbar stay.
+- Table states in place: `loading` (+ `loadingRows`), `empty`, `loadError` on `DataTable` — the head and toolbar stay.
 - First run of a page or region: `EmptyPage.Root` + `EmptyPage.Icon` + `EmptyPage.Title` + `EmptyPage.Description` + `EmptyPage.Actions` with one action — not «Здесь пока ничего нет».
 - Page-level persistent problem: `<Banner.Root tone="danger">` first in `PageContent.Body`; the result of an action: `useNotifications().notify({ tone, title })`.
 
@@ -262,7 +262,7 @@ export function ProfilePage() {
 ```
 
 A region with all its states — loading, data, empty, error — that flow into each other. Copy this
-shape for every block that fetches data (a table uses DataTable `loading` / `empty` / `error` instead):
+shape for every block that fetches data (a table uses DataTable `loading` / `empty` / `loadError` instead):
 
 ```tsx
 import { Button, Card, Crossfade, EmptyPage, Icon, Skeleton, Typography } from "prime-ui-kit";

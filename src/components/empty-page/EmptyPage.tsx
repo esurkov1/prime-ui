@@ -2,12 +2,13 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import type { TagRef } from "@/internal/polymorphic";
 import type { ControlSize, Tone } from "@/internal/states";
+import { usePendingAction } from "@/internal/usePendingChanges";
 
 import styles from "./EmptyPage.module.css";
 
@@ -31,7 +32,6 @@ const EmptyPageContext = React.createContext<Ctx>({
 });
 
 export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Control height, type and spacing tier. Default `m`. */
   size?: ControlSize;
   /**
    * `default` — a block sized by its content.
@@ -51,7 +51,7 @@ export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
 
 /** Parts rise in on first render, except in `compact` (it appears on every keystroke). */
 function EmptyPageRoot({
-  size = "m",
+  size: sizeProp,
   layout = "default",
   tone = "neutral",
   labels,
@@ -59,8 +59,9 @@ function EmptyPageRoot({
   children,
   ...rest
 }: EmptyPageRootProps) {
+  const { size, provide } = useHostTier(sizeProp);
   const context: Ctx = { tone, labels: { ...EMPTY_PAGE_LABELS, ...labels } };
-  return (
+  return provide(
     <div
       className={cx(styles.root, layout !== "compact" && enterMotion.enterBaseChildren, className)}
       role={tone === "danger" ? "alert" : undefined}
@@ -71,10 +72,8 @@ function EmptyPageRoot({
         tone: tone === "neutral" ? undefined : tone,
       })}
     >
-      <EmptyPageContext.Provider value={context}>
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-      </EmptyPageContext.Provider>
-    </div>
+      <EmptyPageContext.Provider value={context}>{children}</EmptyPageContext.Provider>
+    </div>,
   );
 }
 EmptyPageRoot.displayName = "EmptyPage.Root";
@@ -91,7 +90,13 @@ export type EmptyPageIconProps = React.HTMLAttributes<HTMLDivElement> & {
 function EmptyPageIcon({ tone: toneProp, className, ...rest }: EmptyPageIconProps) {
   const { tone: rootTone } = React.useContext(EmptyPageContext);
   return (
-    <div className={cx(styles.iconWrap, className)} data-tone={toneProp ?? rootTone} {...rest} />
+    // The tile is decorative: the title says what the state is.
+    <div
+      aria-hidden="true"
+      className={cx(styles.iconWrap, className)}
+      data-tone={toneProp ?? rootTone}
+      {...rest}
+    />
   );
 }
 EmptyPageIcon.displayName = "EmptyPage.Icon";
@@ -148,37 +153,18 @@ export type EmptyPageRetryButtonProps = Omit<
 /** The kit's «Повторить» for an error state: an outline neutral Button with the refresh icon. */
 function EmptyPageRetryButton({ onRetry, children, disabled, ...rest }: EmptyPageRetryButtonProps) {
   const { labels } = React.useContext(EmptyPageContext);
-  const [pending, setPending] = React.useState(false);
-  const mounted = React.useRef(true);
-  React.useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-
-  const retry = () => {
-    if (pending) return;
-    const result = onRetry();
-    if (!(result instanceof Promise)) return;
-    setPending(true);
-    result
-      .catch(() => {
-        // The owner keeps the error state and says why; the button is ready for another try.
-      })
-      .finally(() => {
-        if (mounted.current) setPending(false);
-      });
-  };
+  // One retry at a time; on a rejection the owner keeps the error state and says why, and the
+  // button is ready for another try.
+  const retry = usePendingAction(onRetry);
 
   return (
     <Button.Root
       {...rest}
       variant="outline"
       tone="neutral"
-      loading={pending}
+      loading={retry.pending}
       disabled={disabled}
-      onClick={retry}
+      onClick={() => retry.run?.()}
     >
       <Button.Icon>
         <Icon name="action.refresh" />

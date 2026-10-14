@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "PageToolbar.Root",
-      en: "`ref` → `HTMLDivElement`. The page panel: one row from 56rem of its own width, stacked rows below. Any slot may be left out; JSX order is the Tab order — write Tools, Sections, View, Actions, Chips.",
-      ru: "Панель страницы: одна строка от 56rem своей ширины, уже — строки друг под другом. Любой слот можно опустить; порядок в JSX — порядок Tab: Tools, Sections, View, Actions, Chips.",
+      en: "`ref` → `HTMLDivElement`. The page panel: one row from 56rem of its own width, stacked rows below. Any slot may be left out; whatever the JSX order, the DOM and Tab order is Tools, Sections, View, Actions, Chips. Named (`aria-label`), it is a `group`.",
+      ru: "Панель страницы: одна строка от 56rem своей ширины, уже — строки друг под другом. Любой слот можно опустить; каким бы ни был порядок в JSX, порядок в DOM и Tab — Tools, Sections, View, Actions, Chips. С именем (`aria-label`) — `group`.",
       props: [
         {
           name: "…rest",
@@ -86,12 +86,12 @@ export const api: ComponentApi = {
     keyboard: [],
     aria: [
       {
-        en: 'A plain `<div>`: when a page has more than one panel, give each `role="group"` and an `aria-label` (a name on a `<div>` without a role is ignored by assistive tech).',
-        ru: 'Обычный `<div>`: если на странице несколько панелей, дайте каждой `role="group"` и `aria-label` — имя на `<div>` без роли скринридер не читает.',
+        en: 'With an `aria-label` the root is `role="group"` named by it: when a page has more than one panel, name each.',
+        ru: 'С `aria-label` корень — `role="group"` с этим именем: если на странице несколько панелей, назовите каждую.',
       },
       {
-        en: "Slots move only visually (`order`); the Tab order is the JSX order. Write the slots in the reading order of the wide layout — Tools, Sections, View, Actions, Chips. In the narrow layout the action is shown beside the tools but reached after the view.",
-        ru: "Порядок слотов меняется только визуально (`order`); порядок Tab совпадает с порядком в JSX — пишите слоты в порядке чтения: инструменты, разделы, вид, действие, чипы.",
+        en: "The root renders the slots in the wide layout's reading order — Tools, Sections, View, Actions, Chips — whatever the JSX order; the narrow layout moves them only visually (`order`).",
+        ru: "Корень выводит слоты в порядке чтения широкой раскладки — инструменты, разделы, вид, действие, чипы — независимо от порядка в JSX; узкая раскладка двигает их только визуально (`order`).",
       },
       {
         en: "An icon-only primary action carries `aria-label`.",

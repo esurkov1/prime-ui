@@ -1,4 +1,4 @@
-/** On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page. */
+/** On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page — `Kanban.Root`, `columns`. */
 import { Avatar, Kanban } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

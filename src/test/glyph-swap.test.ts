@@ -3,7 +3,7 @@
  * Each kind of state continuity has one engine (core decision 4 of the fix plan): a glyph that
  * changes in place cross-fades through its GlyphSwap host (`Button.Icon`, ProgressCircle children,
  * `src/internal/glyphSwap`), never a ternary of two icons that flips; a region keyed to remount
- * (`key={swapped …}`) and `useStateSwap` outside its engine are local copies of the region swap.
+ * (`key={swapped …}`) is a local copy of the region swap (`src/internal/RegionSwap`).
  *
  * In ratchet mode (`glyph-swap`): the offenders found when the check landed are the baseline.
  */
@@ -17,7 +17,7 @@ const sources = walk("src", /\.tsx?$/).filter(
 /** The engines themselves. */
 const ENGINES = new Set([
   "src/internal/glyphSwap.tsx",
-  "src/hooks/useStateSwap.ts",
+  "src/internal/RegionSwap.tsx",
   "src/components/crossfade/Crossfade.tsx",
 ]);
 
@@ -31,7 +31,6 @@ describe("glyph and region swaps", () => {
         [/\?\s*\(?\s*<Icon\b[^>]*\/>\s*\)?\s*:\s*\(?\s*<Icon\b/g, "glyph ternary"],
         [/<Icon\s+name=\{[^}]*\?\s*"[\w.]+"\s*:\s*"[\w.]+"/g, "glyph name ternary"],
         [/key=\{swapped\b/g, "key={swapped"],
-        [/\buseStateSwap\(/g, "useStateSwap outside the engine"],
       ];
       for (const [pattern, rule] of rules) {
         for (const _ of text.matchAll(pattern)) offenders.push(`${file}: ${rule}`);

@@ -8,21 +8,31 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { PageToolbar } from "./PageToolbar";
 
 describe("PageToolbar", () => {
-  it("keeps the JSX order in the DOM, so the Tab order is the reading order", () => {
+  it("renders the slots in the reading order whatever the JSX order, so the Tab order is fixed", () => {
     render(
       <PageToolbar.Root>
+        <PageToolbar.Chips data-testid="chips">Фильтры</PageToolbar.Chips>
+        <PageToolbar.Actions data-testid="actions" />
+        <PageToolbar.View data-testid="view" />
         <PageToolbar.Tools data-testid="tools" />
         <PageToolbar.Sections data-testid="sections" />
-        <PageToolbar.View data-testid="view" />
-        <PageToolbar.Actions data-testid="actions" />
       </PageToolbar.Root>,
     );
-    const ids = ["tools", "sections", "view", "actions"].map((id) => screen.getByTestId(id));
+    const ids = ["tools", "sections", "view", "actions", "chips"].map((id) =>
+      screen.getByTestId(id),
+    );
     for (let i = 1; i < ids.length; i++) {
       expect(ids[i - 1].compareDocumentPosition(ids[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING,
       );
     }
+  });
+
+  it("is a group when named, a plain div otherwise", () => {
+    const { rerender, container } = render(<PageToolbar.Root aria-label="Заказы" />);
+    expect(screen.getByRole("group", { name: "Заказы" })).toBeInTheDocument();
+    rerender(<PageToolbar.Root />);
+    expect(container.firstElementChild).not.toHaveAttribute("role");
   });
 
   it("renders only the slots: no spacer element that would add a second row gap", () => {

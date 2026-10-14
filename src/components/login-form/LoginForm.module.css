@@ -1,7 +1,7 @@
 /*
- * LoginForm — Graphite sign-in surface. A layer of the ladder like Card (`data-depth`, foundation §4):
- * the layer fill, card radius, the raised whisper on the page, no border; fields inside are one
- * step off it.
+ * LoginForm — Graphite sign-in surface: a Card (the layer of the ladder, foundation §4 — the layer
+ * fill, card radius, the raised whisper on the page, no border; fields inside are one step off it)
+ * capped at a small modal's width, its content in the form's rhythm.
  * Rhythm (proximity scale): header → body 32, social → divider → form 16, field → field → submit 20,
  * submit → back action 12, form → footer 24. Spacing is `gap` on the parent.
  * The tier (`data-size`) only widens padding and gaps; text roles are set in LoginForm.tsx.
@@ -14,23 +14,19 @@
   --lf-logo: var(--prime-control-xl-height);
   --lf-logo-icon: var(--prime-icon-l);
 
+  width: 100%;
+  max-width: var(--prime-modal-width-s);
+  min-width: 0;
+}
+
+/* Inside the Card: the padding of the tier and the header → body rhythm. */
+.content {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--lf-gap);
-  width: 100%;
-  max-width: var(--prime-modal-width-s);
   min-width: 0;
   padding: var(--lf-pad);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
-  text-align: start;
-}
-
-.root:not([data-flat="true"]) {
-  box-shadow: var(--prime-layer-shadow);
 }
 
 .root[data-size="xs"],
@@ -65,7 +61,11 @@
   text-align: center;
 }
 
-.logo {
+/* A centered header: a round mark above the text. (A start header's logo is the icon tile.) */
+.root[data-align="center"] .logo {
+  /* A kit Icon in the mark takes the logo's icon size. */
+  --prime-icon-size: var(--lf-logo-icon);
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,8 +79,8 @@
   overflow: hidden;
 }
 
-.logo > svg,
-.logo > img {
+/* A product picture in the mark. */
+.root[data-align="center"] .logo > img {
   width: var(--lf-logo-icon);
   height: var(--lf-logo-icon);
   flex: none;
@@ -142,15 +142,10 @@
   grid-column: -2 / -1;
 }
 
+/* The accent icon tile (`iconBox` `.tile`) beside the title and the description. */
 .root[data-align="start"] .logo {
-  --lf-logo: var(--prime-space-10);
-  --lf-logo-icon: var(--prime-icon-m);
-
   grid-column: 1;
   grid-row: 1 / span 2;
-  margin: 0;
-  border-radius: var(--prime-radius-l);
-  background: var(--prime-color-accent-soft);
 }
 
 .root[data-align="start"] .footer {

@@ -29,7 +29,7 @@ import { PageContent } from "prime-ui-kit";
 
 ## Anatomy
 ```
-PageContent.Root | PageContent.Page        column; Root adds maxWidth and fill, Page renders <section>
+PageContent.Root                           column (<div>, or <section> with as="section"); maxWidth, fill
 ├─ PageContent.Header                      heading column + actions in one wrapping row
 │  ├─ PageContent.Title                    <h1>, heading-m
 │  ├─ PageContent.Description              <p>, secondary body-m
@@ -40,8 +40,8 @@ PageContent.Root | PageContent.Page        column; Root adds maxWidth and fill, 
    ├─ PageContent.Section                  <section> + <h2> label, 40 from its neighbours
    │  └─ PageContent.Actions               a link or button at the end of the section heading
    └─ PageContent.Split                    list + detail; a container (prime-split)
-      ├─ PageContent.List                  list pane: 16–20rem column, or the whole split while closed
-      └─ PageContent.Detail                detail pane: the rest, or the whole split while open
+      ├─ PageContent.Panel kind="list"     list pane: 16–20rem column, or the whole split while closed
+      └─ PageContent.Panel kind="detail"   detail pane: the rest, or the whole split while open
          └─ PageContent.BackButton         back to the list, only while one pane shows
 ```
 
@@ -50,20 +50,14 @@ PageContent.Root | PageContent.Page        column; Root adds maxWidth and fill, 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### PageContent.Root
-`ref` → `HTMLDivElement`. The page column inside `main`: header → body 24 apart, centred under its cap.
+`ref` → `HTMLElement` (`<div>` or `<section>`). The page column inside `main`: header → body 24 apart, centred under its cap.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `as` | `"div" \| "section"` | `"div"` | `section` — the whole app page as a region; name it with `aria-labelledby` → the Title `id`. |
 | `maxWidth` | `"full" \| "readable" \| "wide"` | `"full"` | Cap of the column, centred: `full` — the whole main; `readable` — the reading measure `--prime-layout-reading-max-width` (42rem); `wide` — the content width `--prime-layout-content-max-width` (75rem). |
 | `fill` | `boolean` | `false` | The page takes the height of main (`AppShell.Root fillViewport`) and the body takes what the header leaves: for a full-height table, board, chat or `PageContent.Split`. |
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Header, Body), `className` and the other div attributes. |
-
-### PageContent.Page
-`ref` → `HTMLElement`. The whole app page as a `<section>` (the same column, the full panel width); name it with `aria-labelledby` → the Title `id`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `aria-labelledby`, `className` and the other section attributes. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (Header, Body), `className` and the other attributes. |
 
 ### PageContent.Header
 `ref` → `HTMLDivElement`. Heading column and page actions in one wrapping row; `PageContent.Actions` children move to the end.
@@ -136,20 +130,14 @@ PageContent.Root | PageContent.Page        column; Root adds maxWidth and fill, 
 | `defaultOpen` | `boolean` | `false` | Initial open state, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | `PageContent.BackButton` closes the detail (`false`); clear the chosen record there. |
 | `labels` | `Partial<PageContentLabels>` | — | Built-in strings, see Labels. |
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`PageContent.List`, `PageContent.Detail`), `className` and the other div attributes. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (two `PageContent.Panel`s: `list`, then `detail`), `className` and the other div attributes. |
 
-### PageContent.List
-`ref` → `HTMLDivElement`. The list pane: a column whose last child takes the free height (a Card with its own ScrollContainer). Focusable from code (`tabindex=-1`, no ring): going back lands on the control that had focus, else here.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `aria-label`, `className` and the other div attributes. |
-
-### PageContent.Detail
-`ref` → `HTMLDivElement`. The detail pane, built like the list pane; focus lands here when it opens on a narrow split. Show a hint («Выберите диалог») while nothing is chosen: a wide split always shows this pane.
+### PageContent.Panel
+`ref` → `HTMLDivElement`. A pane of the split: a column whose last child takes the free height (a Card with its own ScrollContainer). Focusable from code (`tabindex=-1`, no ring).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `kind` | `"list" \| "detail"` | — (required) | `list` — the 16–20rem column, or the whole split while closed; going back refocuses its last control. `detail` — the rest, or the whole split while open; focus lands here when it opens. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `aria-label`, `className` and the other div attributes. |
 
 ### PageContent.BackButton
@@ -222,7 +210,7 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 - Grid lays itself out from its own width (container `prime-grid`), never from the window, so a board beside an open Sidebar folds on its own. A Cell stretches its child: the tiles of a row share one height; a chart in a `rows={2}` cell fills it with `ChartFrame.Plot height="fill"`. `dense` flow lets a small tile fill a hole left by a wide one.
 - `fill` needs a main with a height: `AppShell.Root fillViewport` (main scrolls inside the panel). The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`.
 - Split takes the free height of a filling page and lays itself out from its own width (container `prime-split`), never from the window: a split beside an open Sidebar may be narrow on a wide screen. Each pane is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there, so the list and the thread scroll separately. The records of the list pane are a [List](../list/COMPONENT.md).
-- The detail pane is on screen all the time on a wide split: while nothing is chosen it shows a short hint («Выберите диалог»), never an empty card.
+- The detail pane is on screen all the time on a wide split: while nothing is chosen it shows a short hint («Выберите обращение»), never an empty card. A newly chosen record cross-fades in (`Crossfade` keyed by its id).
 
 ## Accessibility
 
@@ -237,9 +225,9 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - `PageContent.Title` is an `<h1>`; use one per page.
-- Give `PageContent.Page` an `aria-labelledby` that points at the Title `id` to name the region.
+- Give `PageContent.Root as="section"` an `aria-labelledby` that points at the Title `id` to name the region.
 - `PageContent.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`, so it is a region landmark with the heading's name; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).
-- Name `PageContent.List` and `PageContent.Detail` with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).
+- Name both `PageContent.Panel`s with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).
 - `PageContent.BackButton` is named by `labels.back` and is shown only while the split shows one pane.
 
 ### Labels
@@ -256,8 +244,8 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 | [variants.tsx](examples/variants.tsx) | The same page column at three caps: the whole main, a wide dashboard column, a reading column — `maxWidth`. |
 | [grid.tsx](examples/grid.tsx) | A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `PageContent.Grid`, `PageContent.Cell`, `span`, `rows`. |
 | [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading, a heading column beside a panel — `PageContent.Section`, `label`, `description`, `PageContent.Actions`, `layout`. |
-| [list-detail.tsx](examples/list-detail.tsx) | A support inbox as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one — `PageContent.Split`, `PageContent.BackButton`, `fill`. |
-| [narrow.tsx](examples/narrow.tsx) | In a phone-width column the page actions wrap under the heading instead of squeezing it. |
+| [list-detail.tsx](examples/list-detail.tsx) | A ticket queue as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one; the chosen ticket cross-fades in — `PageContent.Split`, `PageContent.Panel`, `PageContent.BackButton`, `fill`. |
+| [narrow.tsx](examples/narrow.tsx) | In a phone-width column the page actions wrap under the heading instead of squeezing it — `PageContent.Actions`. |
 | [screen.tsx](examples/screen.tsx) | A settings page: sections with a heading column and a panel, a form saved by its own button, switches that apply at once and a danger zone with a confirm — `layout`, `maxWidth`. |
 
 ## Mistakes

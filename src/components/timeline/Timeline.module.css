@@ -225,7 +225,9 @@
   line-height: var(--tl-title-line-height);
   text-align: start;
   text-decoration: none;
-  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .row[data-tone="neutral"] {
@@ -320,7 +322,6 @@
   overflow-wrap: anywhere;
 }
 
-.metaPrimary,
 .meta strong {
   color: var(--prime-color-text-primary);
   font-weight: var(--prime-font-weight-medium);

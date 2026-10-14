@@ -5,9 +5,16 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "PageContent.Root",
-      en: "`ref` → `HTMLDivElement`. The page column inside `main`: header → body 24 apart, centred under its cap.",
+      en: "`ref` → `HTMLElement` (`<div>` or `<section>`). The page column inside `main`: header → body 24 apart, centred under its cap.",
       ru: "Колонка страницы внутри `main`: шапка и тело с ритмом 24, по центру под своим ограничением.",
       props: [
+        {
+          name: "as",
+          type: '"div" | "section"',
+          default: '"div"',
+          en: "`section` — the whole app page as a region; name it with `aria-labelledby` → the Title `id`.",
+          ru: "`section` — вся страница приложения как область; назовите её через `aria-labelledby` на `id` заголовка.",
+        },
         {
           name: "maxWidth",
           type: '"full" | "readable" | "wide"',
@@ -24,22 +31,9 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (Header, Body), `className` and the other div attributes.",
-          ru: "`children` (Header, Body), `className` и остальные атрибуты div.",
-        },
-      ],
-    },
-    {
-      name: "PageContent.Page",
-      en: "`ref` → `HTMLElement`. The whole app page as a `<section>` (the same column, the full panel width); name it with `aria-labelledby` → the Title `id`.",
-      ru: "Вся страница приложения как `<section>` (та же колонка во всю ширину панели); назовите её через `aria-labelledby` на `id` заголовка.",
-      props: [
-        {
-          name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `aria-labelledby`, `className` and the other section attributes.",
-          ru: "`children`, `aria-labelledby`, `className` и остальные атрибуты section.",
+          en: "`children` (Header, Body), `className` and the other attributes.",
+          ru: "`children` (Header, Body), `className` и остальные атрибуты.",
         },
       ],
     },
@@ -221,29 +215,23 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (`PageContent.List`, `PageContent.Detail`), `className` and the other div attributes.",
-          ru: "`children` (`PageContent.List`, `PageContent.Detail`), `className` и остальные атрибуты div.",
+          en: "`children` (two `PageContent.Panel`s: `list`, then `detail`), `className` and the other div attributes.",
+          ru: "`children` (две `PageContent.Panel`: `list`, затем `detail`), `className` и остальные атрибуты div.",
         },
       ],
     },
     {
-      name: "PageContent.List",
-      en: "`ref` → `HTMLDivElement`. The list pane: a column whose last child takes the free height (a Card with its own ScrollContainer). Focusable from code (`tabindex=-1`, no ring): going back lands on the control that had focus, else here.",
-      ru: "Панель списка: колонка, последний ребёнок которой занимает свободную высоту (Card со своим ScrollContainer). Фокусируется из кода (`tabindex=-1`, без обводки): при возврате фокус попадает на элемент, где был, иначе сюда.",
+      name: "PageContent.Panel",
+      en: "`ref` → `HTMLDivElement`. A pane of the split: a column whose last child takes the free height (a Card with its own ScrollContainer). Focusable from code (`tabindex=-1`, no ring).",
+      ru: "Панель сплита: колонка, последний ребёнок которой занимает свободную высоту (Card со своим ScrollContainer). Фокусируется из кода (`tabindex=-1`, без обводки).",
       props: [
         {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children`, `aria-label`, `className` and the other div attributes.",
-          ru: "`children`, `aria-label`, `className` и остальные атрибуты div.",
+          name: "kind",
+          type: '"list" | "detail"',
+          required: true,
+          en: "`list` — the 16–20rem column, or the whole split while closed; going back refocuses its last control. `detail` — the rest, or the whole split while open; focus lands here when it opens.",
+          ru: "`list` — колонка 16–20rem или весь сплит, пока детали закрыты; при возврате фокус — на её последний элемент. `detail` — остальное или весь сплит, пока открыты; при открытии фокус здесь.",
         },
-      ],
-    },
-    {
-      name: "PageContent.Detail",
-      en: "`ref` → `HTMLDivElement`. The detail pane, built like the list pane; focus lands here when it opens on a narrow split. Show a hint («Выберите диалог») while nothing is chosen: a wide split always shows this pane.",
-      ru: "Панель деталей, устроена как панель списка; в узком сплите при открытии фокус попадает сюда. Пока ничего не выбрано, покажите подсказку («Выберите диалог»): в широком сплите панель видна всегда.",
-      props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
@@ -286,16 +274,16 @@ export const api: ComponentApi = {
         ru: "`PageContent.Title` — `<h1>`; один на страницу.",
       },
       {
-        en: "Give `PageContent.Page` an `aria-labelledby` that points at the Title `id` to name the region.",
-        ru: "Назовите `PageContent.Page` через `aria-labelledby` на `id` заголовка.",
+        en: 'Give `PageContent.Root as="section"` an `aria-labelledby` that points at the Title `id` to name the region.',
+        ru: 'Назовите `PageContent.Root as="section"` через `aria-labelledby` на `id` заголовка.',
       },
       {
         en: "`PageContent.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`, so it is a region landmark with the heading's name; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).",
         ru: "`PageContent.Section` — `<section>`, названный своим `<h2>` (`label`) через `aria-labelledby`.",
       },
       {
-        en: 'Name `PageContent.List` and `PageContent.Detail` with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).',
-        ru: 'Назовите панели `PageContent.List` и `PageContent.Detail` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера. Панели получают фокус только из кода (`tabindex="-1"`, без кольца).',
+        en: 'Name both `PageContent.Panel`s with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).',
+        ru: 'Назовите обе `PageContent.Panel` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера. Панели получают фокус только из кода (`tabindex="-1"`, без кольца).',
       },
       {
         en: "`PageContent.BackButton` is named by `labels.back` and is shown only while the split shows one pane.",

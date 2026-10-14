@@ -52,12 +52,24 @@
   margin-inline-start: auto;
 }
 
+/* A field: its name in a 6rem column beside its values; a row narrower than 24rem stacks the name
+   over the values (intrinsic wrap: the values keep at least 17rem beside the name). */
 .row {
-  display: grid;
-  grid-template-columns: var(--prime-space-24) minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--prime-space-4);
+  gap: var(--prime-space-2) var(--prime-space-4);
   padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+.row > :first-child {
+  flex: 0 0 var(--prime-space-24);
+  min-width: 0;
+}
+
+.row > :last-child {
+  flex: 1 1 calc(var(--prime-space-24) * 3 - var(--prime-space-4));
+  min-width: 0;
 }
 
 .values {

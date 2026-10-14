@@ -197,8 +197,8 @@ export default function DescriptionListScreenExample() {
                     <Timeline.Group>
                       {HISTORY.map((event) => (
                         <Timeline.Item key={event.id}>
-                          <Timeline.Title>{event.title}</Timeline.Title>
-                          <Timeline.Meta>{event.date}</Timeline.Meta>
+                          <Timeline.ItemTitle>{event.title}</Timeline.ItemTitle>
+                          <Timeline.ItemMeta>{event.date}</Timeline.ItemMeta>
                         </Timeline.Item>
                       ))}
                     </Timeline.Group>

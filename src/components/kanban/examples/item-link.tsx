@@ -1,4 +1,4 @@
-/** Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemClick`. */
+/** Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemOpen`. */
 import { Badge, Kanban, type KanbanValue, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -71,7 +71,7 @@ export default function KanbanItemLinkExample() {
         getLabel={(ticket) => `${ticket.id}: ${ticket.title}`}
         defaultValue={PLACEMENT}
         getItemHref={(ticket) => `/support/${ticket.id}`}
-        onItemClick={(ticket, event) => {
+        onItemOpen={(ticket, event) => {
           // A client-side router goes here (navigate(href)); the page itself never reloads.
           event.preventDefault();
           setOpened(ticket);

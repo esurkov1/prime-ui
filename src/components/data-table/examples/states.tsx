@@ -1,4 +1,4 @@
-/** Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `error`. */
+/** Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `loadError`. */
 import { Button, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -32,7 +32,7 @@ export default function DataTableStatesExample() {
         <DataTable
           columns={COLUMNS}
           rows={NO_PAYMENTS}
-          error={
+          loadError={
             <>
               Не удалось загрузить платежи
               <Button.Root variant="outline" tone="neutral" size="s">

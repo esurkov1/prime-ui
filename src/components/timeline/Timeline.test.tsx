@@ -5,6 +5,8 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import press from "@/internal/press.module.css";
+
 import { Timeline } from "./Timeline";
 import styles from "./Timeline.module.css";
 
@@ -18,11 +20,11 @@ function Feed({ onSelect }: { onSelect?: (id: string) => void }) {
       <Timeline.Group label="Недавно">
         {rows.map((row) => (
           <Timeline.Item key={row.id} onClick={onSelect ? () => onSelect(row.id) : undefined}>
-            <Timeline.Title>{row.title}</Timeline.Title>
-            <Timeline.Meta>
-              <Timeline.MetaPrimary>{row.date}</Timeline.MetaPrimary> · 15 д. назад
-            </Timeline.Meta>
-            <Timeline.Value>{row.value}</Timeline.Value>
+            <Timeline.ItemTitle>{row.title}</Timeline.ItemTitle>
+            <Timeline.ItemMeta>
+              <strong>{row.date}</strong> · 15 д. назад
+            </Timeline.ItemMeta>
+            <Timeline.ItemValue>{row.value}</Timeline.ItemValue>
           </Timeline.Item>
         ))}
       </Timeline.Group>
@@ -38,7 +40,7 @@ describe("Timeline", () => {
           <Timeline.Group label="Недавно">
             {["Счёт оплачен", "Заказ отправлен", "Заказ доставлен"].slice(0, count).map((title) => (
               <Timeline.Item key={title}>
-                <Timeline.Title>{title}</Timeline.Title>
+                <Timeline.ItemTitle>{title}</Timeline.ItemTitle>
               </Timeline.Item>
             ))}
           </Timeline.Group>
@@ -65,7 +67,7 @@ describe("Timeline", () => {
     const items = within(list).getAllByRole("listitem");
     expect(items).toHaveLength(2);
     expect(within(items[0]).getByText("Аренда закончилась")).toHaveClass(styles.title);
-    expect(within(items[0]).getByText("21.09.26")).toHaveClass(styles.metaPrimary);
+    expect(within(items[0]).getByText("21.09.26").tagName).toBe("STRONG");
     expect(screen.queryByRole("button")).toBeNull();
   });
 
@@ -74,7 +76,7 @@ describe("Timeline", () => {
       <Timeline.Root size="s">
         <Timeline.Group>
           <Timeline.Item>
-            <Timeline.Title>Один</Timeline.Title>
+            <Timeline.ItemTitle>Один</Timeline.ItemTitle>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>,
@@ -100,10 +102,10 @@ describe("Timeline", () => {
       <Timeline.Root>
         <Timeline.Group>
           <Timeline.Item>
-            <Timeline.Title>Default</Timeline.Title>
+            <Timeline.ItemTitle>Default</Timeline.ItemTitle>
           </Timeline.Item>
           <Timeline.Item color="teal" tone="danger">
-            <Timeline.Title>Toned</Timeline.Title>
+            <Timeline.ItemTitle>Toned</Timeline.ItemTitle>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>,
@@ -143,11 +145,11 @@ describe("Timeline", () => {
       <Timeline.Root>
         <Timeline.Group>
           <Timeline.Item href="/events/1">
-            <Timeline.Title>Link row</Timeline.Title>
+            <Timeline.ItemTitle>Link row</Timeline.ItemTitle>
           </Timeline.Item>
           <Timeline.Item asChild>
             <a href="/events/2" data-custom="yes">
-              <Timeline.Title>Custom row</Timeline.Title>
+              <Timeline.ItemTitle>Custom row</Timeline.ItemTitle>
             </a>
           </Timeline.Item>
         </Timeline.Group>
@@ -162,14 +164,44 @@ describe("Timeline", () => {
     expect(within(links[1]).getByText("Custom row")).toBeInTheDocument();
   });
 
+  it("interactive rows give under the press; a static row does not", () => {
+    render(
+      <Timeline.Root>
+        <Timeline.Group>
+          <Timeline.Item onClick={() => undefined}>
+            <Timeline.ItemTitle>Button row</Timeline.ItemTitle>
+          </Timeline.Item>
+          <Timeline.Item>
+            <Timeline.ItemTitle>Static row</Timeline.ItemTitle>
+          </Timeline.Item>
+        </Timeline.Group>
+      </Timeline.Root>,
+    );
+    expect(screen.getByRole("button")).toHaveClass(press.press);
+    expect(screen.getByText("Static row").parentElement).not.toHaveClass(press.press);
+  });
+
+  it("asChild needs one element child", () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    expect(() =>
+      render(
+        <Timeline.Root>
+          <Timeline.Group>
+            <Timeline.Item asChild>text</Timeline.Item>
+          </Timeline.Group>
+        </Timeline.Root>,
+      ),
+    ).toThrow("Timeline.Item asChild needs a single element child");
+  });
+
   it("value is a right-aligned tabular cell with an optional tone", () => {
     render(
       <Timeline.Root>
         <Timeline.Group>
           <Timeline.Item>
-            <Timeline.Title>Row</Timeline.Title>
-            <Timeline.Value>+6 300 ฿</Timeline.Value>
-            <Timeline.Value tone="danger">−689 ฿</Timeline.Value>
+            <Timeline.ItemTitle>Row</Timeline.ItemTitle>
+            <Timeline.ItemValue>+6 300 ฿</Timeline.ItemValue>
+            <Timeline.ItemValue tone="danger">−689 ฿</Timeline.ItemValue>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>,
@@ -180,15 +212,15 @@ describe("Timeline", () => {
     expect(screen.getByText("−689 ฿")).toHaveAttribute("data-tone", "danger");
   });
 
-  it("value takes a muted second line via ValueMeta", () => {
+  it("value takes a muted second line from an ItemMeta inside it", () => {
     render(
       <Timeline.Root>
         <Timeline.Group>
           <Timeline.Item>
-            <Timeline.Title>ТО: замена масла</Timeline.Title>
-            <Timeline.Value>
-              900 ฿<Timeline.ValueMeta>ТО</Timeline.ValueMeta>
-            </Timeline.Value>
+            <Timeline.ItemTitle>ТО: замена масла</Timeline.ItemTitle>
+            <Timeline.ItemValue>
+              900 ฿<Timeline.ItemMeta>ТО</Timeline.ItemMeta>
+            </Timeline.ItemValue>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>,
@@ -205,14 +237,14 @@ describe("Timeline", () => {
         <Timeline.Group label="История работ">
           <Timeline.Gap>
             Без обслуживания 26 дней · 300 км
-            <Timeline.GapMeta>сейчас</Timeline.GapMeta>
+            <Timeline.Description>сейчас</Timeline.Description>
           </Timeline.Gap>
           <Timeline.Item>
-            <Timeline.Title>ТО: замена масла</Timeline.Title>
+            <Timeline.ItemTitle>ТО: замена масла</Timeline.ItemTitle>
           </Timeline.Item>
           <Timeline.Gap tone="warning">100 дней · 4 400 км без обслуживания</Timeline.Gap>
           <Timeline.Item>
-            <Timeline.Title>Резина зад + работа</Timeline.Title>
+            <Timeline.ItemTitle>Резина зад + работа</Timeline.ItemTitle>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>,
@@ -252,7 +284,7 @@ describe("Timeline", () => {
       <Timeline.Root>
         <Timeline.Group label="Операции">
           <Timeline.Item href="#a">
-            <Timeline.Title>Аренда закончилась</Timeline.Title>
+            <Timeline.ItemTitle>Аренда закончилась</Timeline.ItemTitle>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>,

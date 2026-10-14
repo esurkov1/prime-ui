@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function PageContentOverviewExample() {
   return (
     <div className={styles.main}>
-      <PageContent.Page aria-labelledby="settings-heading">
+      <PageContent.Root as="section" aria-labelledby="settings-heading">
         <PageContent.Header>
           <PageContent.Title id="settings-heading">Настройки</PageContent.Title>
           <PageContent.Description>
@@ -35,7 +35,7 @@ export default function PageContentOverviewExample() {
             </Card.Body>
           </Card.Root>
         </PageContent.Body>
-      </PageContent.Page>
+      </PageContent.Root>
     </div>
   );
 }

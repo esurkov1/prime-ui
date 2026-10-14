@@ -61,13 +61,13 @@ export default function AppShellTemplateExample() {
           </AppHeader.Root>
         }
       >
-        <PageContent.Page>
+        <PageContent.Root as="section">
           <PageContent.Body>
             <Typography variant="body-m" tone="secondary">
               {page.note}
             </Typography>
           </PageContent.Body>
-        </PageContent.Page>
+        </PageContent.Root>
       </AppShell.Template>
     </div>
   );

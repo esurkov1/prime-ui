@@ -23,7 +23,15 @@ export default function ChartFrameControlledExample() {
   const [hidden, setHidden] = React.useState<string[]>(["ads"]);
 
   return (
-    <ChartFrame.Root series={SERIES} hiddenSeries={hidden} onHiddenSeriesChange={setHidden}>
+    <ChartFrame.Root
+      series={SERIES}
+      hiddenSeries={hidden}
+      onHiddenSeriesChange={setHidden}
+      rows={MONTHS.map((month, i) => ({
+        label: month,
+        values: { site: LEADS.site[i], partners: LEADS.partners[i], ads: LEADS.ads[i] },
+      }))}
+    >
       <ChartFrame.Header>
         <ChartFrame.Title>Лиды по источникам</ChartFrame.Title>
         <ChartFrame.Description>Май — октябрь</ChartFrame.Description>
@@ -81,12 +89,6 @@ export default function ChartFrameControlledExample() {
         }}
       />
       <ChartFrame.Legend />
-      <ChartFrame.Table
-        rows={MONTHS.map((month, i) => ({
-          label: month,
-          values: { site: LEADS.site[i], partners: LEADS.partners[i], ads: LEADS.ads[i] },
-        }))}
-      />
     </ChartFrame.Root>
   );
 }

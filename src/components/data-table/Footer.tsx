@@ -1,10 +1,8 @@
 import { Pagination } from "@/components/pagination/Pagination";
-import type { ControlSize } from "@/internal/states";
 
 import styles from "./DataTable.module.css";
 
 type FooterProps = {
-  size: ControlSize;
   /** Range line («Показано 1–5 из 23»), or nothing. */
   range: string | null;
   pagination: { page: number; totalPages: number; onPageChange: (page: number) => void } | null;
@@ -12,8 +10,8 @@ type FooterProps = {
   status: string | null;
 };
 
-/** Range line, Pagination and the infinite-scroll status under the table. */
-export function Footer({ size, range, pagination, status }: FooterProps) {
+/** Range line, Pagination (the table's tier from context) and the infinite-scroll status under the table. */
+export function Footer({ range, pagination, status }: FooterProps) {
   if (range === null && pagination === null && status === null) return null;
   return (
     <div className={styles.footer}>
@@ -24,8 +22,6 @@ export function Footer({ size, range, pagination, status }: FooterProps) {
           value={pagination.page}
           totalPages={pagination.totalPages}
           onValueChange={pagination.onPageChange}
-          size={size}
-          compact="auto"
         />
       ) : null}
       {status !== null ? (

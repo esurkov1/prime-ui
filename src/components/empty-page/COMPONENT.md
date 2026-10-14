@@ -40,7 +40,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Icon tile, title type and padding; given to the controls inside. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Icon tile, title type and padding; given to the controls inside. Without it the tier of its host, else `m`. |
 | `layout` | `"default" \| "fill" \| "compact"` | `"default"` | `default` sizes by content; `fill` stretches to the parent's height and centers; `compact` — a quiet state inside a menu or list: smaller text and icon, no entrance motion. |
 | `tone` | `"neutral" \| "danger"` | `"neutral"` | `neutral` — nothing here (yet); `danger` — the region failed to load: the icon tile turns danger and the root is `role="alert"` unless you pass a `role`. |
 | `labels` | `Partial<EmptyPageLabels>` | — | Built-in strings, see Labels. |
@@ -143,7 +143,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 - `tone="danger"` makes the root `role="alert"`, so the failure is announced when it appears; a `role` you pass replaces it.
 - The title is an `<h2>` (`as` picks `h3` / `h4` by the outline, `p` inside menus, lists and table cells); link the root to it with `aria-labelledby` when the empty state replaces a whole region.
 - In a filtered menu or list set `role="status"`, so screen readers announce «Ничего не найдено».
-- The icon is decorative: pass it with `aria-hidden`.
+- `EmptyPage.Icon` is `aria-hidden`: the tile is decorative, the title says what the state is.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -160,11 +160,11 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 | [sizes.tsx](examples/sizes.tsx) | Every tier changes the icon tile, the title and the padding; buttons in Actions take the same size — `size`. |
 | [data-region.tsx](examples/data-region.tsx) | An empty data region: the empty state stretches over the rest of a card with a header — `layout`. |
 | [region-error.tsx](examples/region-error.tsx) | A data region that failed to load: the error state takes the region, the retry shows its loading until the data cross-fades in; its text comes from labels — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`, `labels`. |
-| [compact.tsx](examples/compact.tsx) | The quiet empty state of a search panel: no entrance motion, smaller text, a paragraph title, one action — `layout`, `as`. |
-| [narrow.tsx](examples/narrow.tsx) | In a 320 px side panel the text wraps under the tile and the actions wrap to a second line. |
+| [compact.tsx](examples/compact.tsx) | The quiet empty state of a search popover: no entrance motion, smaller text, a paragraph title, one action — `layout`, `as`. |
+| [narrow.tsx](examples/narrow.tsx) | In a 320 px side panel the text wraps under the tile and the actions wrap to a second line — `EmptyPage.Actions`. |
 
 ## Mistakes
-- Buttons in a non-`m` EmptyPage without `size` → they take the root's tier from context; do not pass another one.
+- A `size` on the Buttons of a sized EmptyPage → leave it out: they take the root's tier from context.
 - A failed load drawn as a neutral empty state → `tone="danger"` on the root; the icon follows.
 - A hand-made «Повторить» with its own pending flag → `EmptyPage.RetryButton` with an async `onRetry`.
 - Clearing the error the moment the retry starts → keep the error state until the retry settles; the button shows the wait.

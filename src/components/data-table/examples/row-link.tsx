@@ -45,7 +45,8 @@ export default function DataTableRowLinkExample() {
     },
     {
       id: "actions",
-      header: "",
+      header: "Действия",
+      hideHeader: true,
       align: "end",
       cell: (row) =>
         row.total ? null : (

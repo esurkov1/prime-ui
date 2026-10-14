@@ -6,16 +6,16 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { useSwapIn } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import swapMotion from "@/internal/swapMotion.module.css";
 import { DataTableColumnsMenu } from "./ColumnsMenu";
 import { DataTableColumnsContext, type DataTableColumnsContextValue } from "./context";
 import styles from "./DataTable.module.css";
@@ -217,8 +217,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   expanded?: React.Key[];
   defaultExpanded?: React.Key[];
   onExpandedChange?: (expanded: React.Key[]) => void;
-  /** Load error: replaces the body with a message in `role="alert"`. */
-  error?: React.ReactNode;
+  loadError?: React.ReactNode;
   /** Skeleton rows while `loading` without rows. Default `min(pageSize, 5)`. */
   loadingRows?: number;
   /** Panel above the table (search, filters, actions). Wraps on narrow widths. */
@@ -331,7 +330,7 @@ export function DataTable<Row>({
   expanded,
   defaultExpanded = EMPTY_KEYS,
   onExpandedChange,
-  error,
+  loadError,
   loadingRows,
   toolbar,
   getRowGroup,
@@ -343,10 +342,8 @@ export function DataTable<Row>({
   ref,
   ...rest
 }: DataTableProps<Row>) {
-  // Keyed by content: an inline `labels` object would otherwise re-render every row on each render.
-  const labelsKey = labelsProp ? JSON.stringify(labelsProp) : "";
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `labelsKey` is the content of `labelsProp`.
-  const labels = React.useMemo(() => ({ ...DATA_TABLE_LABELS, ...labelsProp }), [labelsKey]);
+  // Stable across inline `labels` objects: otherwise every row would re-render on each render.
+  const labels = useLabels(DATA_TABLE_LABELS, labelsProp);
   const infinite = paging === "infinite";
   const paged = paging === "pages";
   const server = source === "server";
@@ -643,16 +640,14 @@ export function DataTable<Row>({
   });
 
   // ─── States ───
-  const hasError = error != null && error !== false;
+  const hasError = loadError != null && loadError !== false;
   const showSkeleton = !hasError && loading && displayedCount === 0;
   const showEmpty = !hasError && !loading && displayedCount === 0;
   const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
-  /* Body state swaps (loading → rows → empty / error) cross-fade: the body remounts under its
-     state key and fades in; the first render, sorting and paging stay still (same state). A
-     replaced server page (`rowArrival.batch`) cross-fades the same way. */
-  const stateSwapped = useStateSwap(bodyState);
-  const bodySwapped = stateSwapped || rowArrival.batch > 0;
-  const bodyKey = bodySwapped ? `${bodyState}-${rowArrival.batch}` : undefined;
+  /* Body state swaps (loading → rows → empty / error) fade in place: rows cannot be laid over a
+     table, so the body remounts under its state key and fades in; the first render, sorting and
+     paging stay still (same state). A replaced server page (`rowArrival.batch`) swaps the same way. */
+  const { key: bodyKey, className: swapClass } = useSwapIn(`${bodyState}-${rowArrival.batch}`);
   const totalColumns =
     columns.length + (reorder.enabled ? 1 : 0) + (selectable ? 1 : 0) + (expandEnabled ? 1 : 0);
   const fillHeight = scrollHeight === "fill";
@@ -879,7 +874,6 @@ export function DataTable<Row>({
         : reorder.enabled
           ? [{ key: "", rows: entries(0, flat.rows.length) }]
           : [];
-  const swapClass = bodySwapped ? swapMotion.swapIn : undefined;
 
   const groupHeader = (segment: Segment) => {
     if (!groups) return null;
@@ -1040,7 +1034,7 @@ export function DataTable<Row>({
                           selectable={selectable}
                           expandEnabled={expandEnabled}
                           reorderable={reorder.enabled}
-                          error={error}
+                          loadError={loadError}
                           empty={empty}
                           emptyLabel={labels.empty}
                           skeletonRows={Math.max(
@@ -1080,7 +1074,6 @@ export function DataTable<Row>({
             ) : null}
 
             <Footer
-              size={size}
               range={
                 showRange
                   ? formatLabel(labels.range, {

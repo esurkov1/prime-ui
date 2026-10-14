@@ -16,7 +16,6 @@ import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { useVirtualRows } from "@/hooks/useVirtualRows";
 import {
   AnchorRectProvider,
@@ -27,13 +26,16 @@ import {
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { createEdgeAutoScroll } from "@/internal/edgeAutoScroll";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
+import { DRAG_THRESHOLD_PX, useLongPress } from "@/internal/longPress";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import swapMotion from "@/internal/swapMotion.module.css";
+import { isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./Gantt.module.css";
 import { GanttRow, type GanttRowContext, type GanttGhost as Ghost } from "./GanttRow";
@@ -56,11 +58,11 @@ import {
   shiftDate,
   snapHysteresis,
   stickyFloor,
+  unitDays,
   unitStart,
   visibleSegment,
   weekOffset,
 } from "./ganttModel";
-import { useEdgeAutoScroll } from "./useEdgeAutoScroll";
 
 export type { GanttBar, GanttDates, GanttScale } from "./ganttModel";
 
@@ -129,7 +131,7 @@ export const GANTT_LABELS: GanttLabels = {
 
 export type GanttProps<Row, Bar extends GanttBar = GanttBar> = Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  "children" | "onSelect"
+  "children"
 > & {
   /** The outer surface `<div>`; `aria-label` / `aria-labelledby` name the grid inside. */
   ref?: React.Ref<HTMLDivElement>;
@@ -183,8 +185,7 @@ export type GanttProps<Row, Bar extends GanttBar = GanttBar> = Omit<
   toolbar?: React.ReactNode;
   /** Max height of the scroll viewport in px; `"fill"` — the chart takes its parent's height. */
   scrollHeight?: number | "fill";
-  /** A bar was activated (click, Enter, Space): open its record. */
-  onSelect?: (bar: Bar, row: Row) => void;
+  onItemOpen?: (bar: Bar, row: Row) => void;
   /**
    * New dates of a bar after a drag or an editing key, in whole scale units. Update your data with
    * them. A returned Promise keeps the bar at the new dates and busy until it settles; on reject it
@@ -217,10 +218,6 @@ const SKELETON_ROWS: readonly (readonly (readonly [number, number])[])[] = [
   [[1, 3]],
 ];
 
-/** Pointer travel before a press on empty space becomes drawing (a gesture threshold). */
-const DRAW_THRESHOLD_PX = 4;
-/** A held finger on an empty cell creates a bar there. */
-const LONG_PRESS_MS = 500;
 /** Row geometry before the stylesheet can be read (jsdom, first render): the `m` tier. */
 const FALLBACK_GEOMETRY = { padY: 8, barH: 28, laneGap: 4, border: 1 };
 
@@ -235,25 +232,6 @@ type RowModel<Row, Bar> = {
   lanes: Map<string, number>;
   laneCount: number;
 };
-
-function isPromise(value: unknown): value is Promise<unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as Promise<unknown>).then === "function"
-  );
-}
-
-/** A length custom property of `element` in px (`rem` or `px` after the tokens resolve). */
-function readLength(element: Element, name: string, fallback: number): number {
-  const raw = getComputedStyle(element).getPropertyValue(name).trim();
-  const value = Number.parseFloat(raw);
-  if (!Number.isFinite(value)) return fallback;
-  if (raw.endsWith("rem")) {
-    return value * (Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
-  }
-  return raw.endsWith("px") || value === 0 ? value : fallback;
-}
 
 /**
  * A resource or project schedule: rows with bars on a time axis (day / week / month), a sticky
@@ -283,7 +261,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   empty,
   toolbar,
   scrollHeight,
-  onSelect,
+  onItemOpen,
   onBarChange,
   onBarCreate,
   labels: labelsProp,
@@ -390,9 +368,9 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     if (!onBarChange || sameDates(dates, bar)) return;
     const result = onBarChange(dates, bar, row);
     if (announce) setAnnouncement(nameFor(bar, dates));
-    if (!isPromise(result)) return;
+    if (!isPromiseLike(result)) return;
     setPending((prev) => new Map(prev).set(bar.id, dates));
-    result
+    Promise.resolve(result)
       .catch(() => setAnnouncement(formatLabel(labels.changeFailed, { label: bar.label })))
       .finally(() =>
         setPending((prev) => {
@@ -423,7 +401,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     const id = `ghost-${++ghostSeq.current}`;
     const result = onBarCreate(dates, item.row);
     setAnnouncement(nameFor({ label: labels.newBar }, dates));
-    if (!isPromise(result)) {
+    if (!isPromiseLike(result)) {
       setGhost(item.key, null);
       return;
     }
@@ -483,11 +461,31 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   dayPxRef.current = dayPx;
   const directionRef = React.useRef(direction);
   directionRef.current = direction;
-  const timelineStart = React.useCallback(() => {
-    const view = scrollRef.current?.getBoundingClientRect();
-    return (view?.left ?? 0) + labelWidth();
-  }, [labelWidth]);
-  const autoScroll = useEdgeAutoScroll(scrollRef, timelineStart);
+  // A gesture on the time axis scrolls the chart sideways near its edges; the start edge is the
+  // end of the pinned column. One loop for every gesture: each names what it re-reads.
+  const onAutoScrolled = React.useRef<() => void>(() => {});
+  const [edgeScroll] = React.useState(() =>
+    createEdgeAutoScroll({
+      scrollers: [],
+      axes: { x: true, y: false },
+      insets: () => ({ inlineStart: labelWidth() }),
+      onScrolled: () => onAutoScrolled.current(),
+    }),
+  );
+  React.useEffect(() => () => edgeScroll.stop(), [edgeScroll]);
+  const autoScroll = React.useMemo(
+    () => ({
+      follow: (clientX: number, onScrolled: () => void) => {
+        const viewport = scrollRef.current;
+        if (!viewport) return;
+        onAutoScrolled.current = onScrolled;
+        edgeScroll.setScrollers([viewport]);
+        edgeScroll.follow({ x: clientX, y: 0 });
+      },
+      stop: () => edgeScroll.stop(),
+    }),
+    [edgeScroll],
+  );
 
   /** Row heights from the stylesheet of the tier: estimates before a row is measured. */
   const [geometry, setGeometry] = React.useState(FALLBACK_GEOMETRY);
@@ -496,10 +494,10 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     const root = rootRef.current;
     if (!root) return;
     const next = {
-      padY: readLength(root, "--gantt-pad-y", FALLBACK_GEOMETRY.padY),
-      barH: readLength(root, "--gantt-bar-h", FALLBACK_GEOMETRY.barH),
-      laneGap: readLength(root, "--gantt-lane-gap", FALLBACK_GEOMETRY.laneGap),
-      border: readLength(root, "--prime-border-width", FALLBACK_GEOMETRY.border),
+      padY: readCssLengthPx("--gantt-pad-y", FALLBACK_GEOMETRY.padY, root),
+      barH: readCssLengthPx("--gantt-bar-h", FALLBACK_GEOMETRY.barH, root),
+      laneGap: readCssLengthPx("--gantt-lane-gap", FALLBACK_GEOMETRY.laneGap, root),
+      border: readCssLengthPx("--prime-border-width", FALLBACK_GEOMETRY.border, root),
     };
     setGeometry((prev) =>
       prev.padY === next.padY &&
@@ -890,10 +888,19 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     touch: boolean;
     id: string;
   } | null>(null);
-  const longPress = React.useRef<{ timer: number; x: number; pointerId: number } | null>(null);
+  // A finger resting on an empty cell picks it up: the press names what it starts.
+  const pressStart = React.useRef<(() => void) | null>(null);
+  const longPress = useLongPress({
+    enabled: creatable,
+    onLongPress: () => {
+      const start = pressStart.current;
+      pressStart.current = null;
+      start?.();
+    },
+  });
   const cancelLongPress = () => {
-    if (longPress.current) window.clearTimeout(longPress.current.timer);
-    longPress.current = null;
+    pressStart.current = null;
+    longPress.cancel();
   };
 
   const drawTo = () => {
@@ -982,31 +989,25 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             if (event.pointerType === "touch") {
               // A long press picks the cell up: release creates one unit, a drag draws days.
               const pointerId = event.pointerId;
-              cancelLongPress();
-              longPress.current = {
-                x: event.clientX,
-                pointerId,
-                timer: window.setTimeout(() => {
-                  longPress.current = null;
-                  const current = start(true);
-                  drawing.current = current;
-                  track.setPointerCapture?.(pointerId);
-                  setGhost(item.key, { id: current.id, dates: datesOf(cell), status: "drawing" });
-                }, LONG_PRESS_MS),
+              pressStart.current = () => {
+                const current = start(true);
+                drawing.current = current;
+                track.setPointerCapture?.(pointerId);
+                setGhost(item.key, { id: current.id, dates: datesOf(cell), status: "drawing" });
               };
+              longPress.handlers.onPointerDown(event);
               return;
             }
             drawing.current = start(false);
             track.setPointerCapture?.(event.pointerId);
           },
           onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => {
-            const press = longPress.current;
-            if (press && Math.abs(event.clientX - press.x) > DRAW_THRESHOLD_PX) cancelLongPress();
+            longPress.handlers.onPointerMove(event);
             const current = drawing.current;
             if (current && event.pointerId === current.pointerId) {
               current.clientX = event.clientX;
               current.alt = event.altKey;
-              if (Math.abs(event.clientX - current.x) < DRAW_THRESHOLD_PX) {
+              if (Math.abs(event.clientX - current.x) < DRAG_THRESHOLD_PX) {
                 // Still on the pressed spot (a touch pick-up keeps its one-unit ghost).
                 if (!current.moved || current.touch) return;
               }
@@ -1044,7 +1045,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           },
           onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => {
             // A long-press on touch creates; the system menu would cover it.
-            if (longPress.current) event.preventDefault();
+            if (pressStart.current) event.preventDefault();
           },
           onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => {
             if (event.target !== event.currentTarget) return;
@@ -1167,8 +1168,9 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   // ─── Region state ───
   const bodyState = model.length > 0 ? "rows" : loading ? "loading" : "empty";
-  const bodySwapped = useStateSwap(bodyState);
-  const scaleSwapped = useStateSwap(scale);
+  // A new zoom fades the grid in place: laid over, the old grid would show other dates at the
+  // scroll offset of the new one.
+  const scaleSwap = useSwapIn(scale);
   const fillHeight = scrollHeight === "fill";
   const hasAvatar = renderRowAvatar !== undefined;
 
@@ -1256,7 +1258,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     trackHandlers,
     focusCell: setActiveId as (id: string) => void,
     model,
-    onSelect,
+    onItemOpen,
     onRowClick,
     commit,
     nameFor,
@@ -1266,31 +1268,35 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     trackHandlers,
     focusCell: setActiveId,
     model,
-    onSelect,
+    onItemOpen,
     onRowClick,
     commit,
     nameFor,
     labels,
   };
-  const cellRefs = React.useRef(new Map<string, (node: HTMLElement | null) => void>());
+  const cellRefs = React.useRef(new Map<string, React.RefCallback<HTMLElement>>());
   const rowContext = React.useMemo<GanttRowContext>(
     () => ({
       register: (id) => {
         let ref = cellRefs.current.get(id);
         if (!ref) {
+          // A cell of a leaving body (RegionSwap) unregisters only itself, never its successor.
           ref = (node) => {
-            if (node) cellNodes.current.set(id, node);
-            else cellNodes.current.delete(id);
+            if (!node) return;
+            cellNodes.current.set(id, node);
+            return () => {
+              if (cellNodes.current.get(id) === node) cellNodes.current.delete(id);
+            };
           };
           cellRefs.current.set(id, ref);
         }
         return ref;
       },
       focus: (id) => latest.current.focusCell(id),
-      select: (barId, rowIndex) => {
+      open: (barId, rowIndex) => {
         const item = latest.current.model[rowIndex];
         const bar = item?.bars.find((candidate) => candidate.id === barId);
-        if (item && bar) latest.current.onSelect?.(bar, item.row);
+        if (item && bar) latest.current.onItemOpen?.(bar, item.row);
       },
       openRow: (rowIndex, event) => {
         const item = latest.current.model[rowIndex];
@@ -1330,7 +1336,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   let body: React.ReactNode;
   if (bodyState === "loading") {
-    const unit = scale === "day" ? 1 : scale === "week" ? 7 : 30;
+    const unit = unitDays(scale);
     const origin = todayInRange ? todayX : 0;
     body = SKELETON_ROWS.map((bars, index) => (
       // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
@@ -1480,13 +1486,13 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
                 <FloatingBoundaryProvider value={timelineBoundary}>
                   <Tooltip.Provider>
                     <div
-                      key={scaleSwapped ? scale : undefined}
+                      key={scaleSwap.key}
                       role="grid"
                       aria-label={ariaLabel}
                       aria-labelledby={ariaLabelledBy}
                       aria-rowcount={bodyState === "rows" ? model.length + 1 : undefined}
                       aria-busy={loading || pending.size > 0 || undefined}
-                      className={cx(styles.grid, scaleSwapped && swapMotion.swapIn)}
+                      className={cx(styles.grid, scaleSwap.className)}
                       style={gridStyle}
                       onKeyDown={onGridKeyDown}
                     >
@@ -1548,21 +1554,24 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
                         </div>
                       </div>
 
-                      <div
-                        key={bodySwapped ? bodyState : undefined}
-                        role="rowgroup"
-                        className={cx(styles.body, bodySwapped && swapMotion.swapIn)}
-                        data-state={bodyState}
-                        aria-hidden={bodyState === "loading" || undefined}
-                        style={
-                          bodyState === "rows"
-                            ? ({ "--rows-height": `${virtual.totalSize}px` } as React.CSSProperties)
-                            : undefined
-                        }
-                      >
-                        {bodyState === "empty" ? null : backdrop}
-                        {body}
-                      </div>
+                      <RegionSwap state={bodyState}>
+                        <div
+                          role="rowgroup"
+                          className={styles.body}
+                          data-state={bodyState}
+                          aria-hidden={bodyState === "loading" || undefined}
+                          style={
+                            bodyState === "rows"
+                              ? ({
+                                  "--rows-height": `${virtual.totalSize}px`,
+                                } as React.CSSProperties)
+                              : undefined
+                          }
+                        >
+                          {bodyState === "empty" ? null : backdrop}
+                          {body}
+                        </div>
+                      </RegionSwap>
                     </div>
                   </Tooltip.Provider>
                 </FloatingBoundaryProvider>

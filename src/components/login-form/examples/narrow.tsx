@@ -1,4 +1,4 @@
-/** On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width. */
+/** On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width — `LoginForm.Form`. */
 import { Button, Input, LinkButton, LoginForm } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

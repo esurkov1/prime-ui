@@ -1,6 +1,6 @@
 import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { useStateSwap } from "@/hooks/useStateSwap";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
@@ -16,9 +16,8 @@ import {
   resolveValue,
   segmentFill,
 } from "@/internal/progressSegments";
+import { RegionSwap } from "@/internal/RegionSwap";
 import type { ControlSize, Tone } from "@/internal/states";
-import swap from "@/internal/swapMotion.module.css";
-
 import { Skeleton } from "../skeleton/Skeleton";
 import styles from "./ProgressBar.module.css";
 
@@ -30,7 +29,6 @@ export type ProgressBarProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
    * `aria-label` when the text around it already says what is loading.
    */
   label?: string;
-  /** Default `m`. */
   size?: ControlSize;
   /** Shows the rounded filled percentage at the end of the label row (`bar` layout). */
   showValue?: boolean;
@@ -101,7 +99,7 @@ function useStepOrder(filled: number, count: number): number[] {
 export function ProgressBar(props: ProgressBarProps) {
   const {
     label,
-    size = "m",
+    size: sizeProp,
     showValue = false,
     loading = false,
     className,
@@ -121,8 +119,7 @@ export function ProgressBar(props: ProgressBarProps) {
   } = props;
   const labelId = React.useId();
   const descriptionId = React.useId();
-  const swapped = useStateSwap(loading ? "loading" : "data");
-  const swapClass = swapped ? swap.swapIn : undefined;
+  const { size, provide } = useHostTier(sizeProp);
 
   const stepResolved = !segmentsProp && steps ? resolveValue(valueProp ?? 0, maxProp) : null;
   const stepCount = stepResolved
@@ -148,7 +145,7 @@ export function ProgressBar(props: ProgressBarProps) {
   if (segmentsProp && layout === "rows") {
     const rows = resolveRows(segmentsProp, scale, maxProp);
     body = loading ? (
-      <div key="loading" className={cx(styles.rows, swapClass)}>
+      <div className={styles.rows}>
         {Array.from({ length: segmentsProp.length || LOADING_ROWS }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder rows
           <div key={i} className={styles.row}>
@@ -158,7 +155,7 @@ export function ProgressBar(props: ProgressBarProps) {
         ))}
       </div>
     ) : (
-      <ol key="data" className={cx(styles.rows, swapClass)} {...nameProps}>
+      <ol className={styles.rows} {...nameProps}>
         {rows.map(({ segment, ratio, percent: share }, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: rows in source order
           <li key={i} className={styles.row}>
@@ -192,14 +189,14 @@ export function ProgressBar(props: ProgressBarProps) {
     const showLegend = legend && segments.length > 0;
 
     body = loading ? (
-      <div key="loading" className={cx(styles.stack, swapClass)}>
+      <div className={styles.stack}>
         {barSkeleton}
         {legend ? (
           <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size={size} />
         ) : null}
       </div>
     ) : (
-      <div key="data" className={cx(styles.stack, swapClass)}>
+      <div className={styles.stack}>
         {named && !showLegend ? <VisuallyHidden id={descriptionId}>{text}</VisuallyHidden> : null}
         {/* biome-ignore lint/a11y/useSemanticElements: a distribution is a group of parts, not a fieldset */}
         <div
@@ -244,14 +241,14 @@ export function ProgressBar(props: ProgressBarProps) {
     tone = toneProp ?? "accent";
 
     body = loading ? (
-      <Skeleton key="loading" shape="block" className={cx(styles.barSkeleton, swapClass)} />
+      <Skeleton shape="block" className={styles.barSkeleton} />
     ) : (
-      <React.Fragment key="data">
+      <>
         <progress value={value} max={max} {...nameProps} className={styles.native} />
         {/* Visual bar: the native element is transparent; one pill slides over the track, or
             whole cells fill one after another. */}
         {steps ? (
-          <span className={cx(styles.bar, swapClass)} aria-hidden="true" data-steps="true">
+          <span className={styles.bar} aria-hidden="true" data-steps="true">
             {stepOrder.map((order, i) => (
               <span
                 // biome-ignore lint/suspicious/noArrayIndexKey: cells of a fixed scale
@@ -264,20 +261,20 @@ export function ProgressBar(props: ProgressBarProps) {
           </span>
         ) : (
           <span
-            className={cx(styles.bar, swapClass)}
+            className={styles.bar}
             aria-hidden="true"
             style={{ "--pb-ratio": resolved.ratio } as React.CSSProperties}
           >
             <span className={styles.fill} />
           </span>
         )}
-      </React.Fragment>
+      </>
     );
   }
 
   const valueShown = showValue && layout === "bar" && !loading && percent !== null;
 
-  return (
+  return provide(
     <div
       className={cx(styles.root, className)}
       aria-busy={loading || undefined}
@@ -298,7 +295,7 @@ export function ProgressBar(props: ProgressBarProps) {
           ) : null}
         </div>
       ) : null}
-      {body}
-    </div>
+      <RegionSwap state={loading ? "loading" : "data"}>{body}</RegionSwap>
+    </div>,
   );
 }

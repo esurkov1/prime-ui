@@ -197,11 +197,11 @@ describe("Gantt", () => {
   });
 
   it("selects a bar by click (a native button: Enter and Space click too)", () => {
-    const onSelect = vi.fn();
-    render(<Chart onSelect={onSelect} />);
+    const onItemOpen = vi.fn();
+    render(<Chart onItemOpen={onItemOpen} />);
     fireEvent.click(bar(/^Отпуск/));
-    expect(onSelect).toHaveBeenLastCalledWith(PEOPLE[1].bars[0], PEOPLE[1]);
-    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onItemOpen).toHaveBeenLastCalledWith(PEOPLE[1].bars[0], PEOPLE[1]);
+    expect(onItemOpen).toHaveBeenCalledTimes(1);
   });
 
   it("is one tab stop; arrows move between bars and rows, Home / End to the row ends", () => {
@@ -317,12 +317,12 @@ describe("Gantt", () => {
       return { width, height: 0, left: 0, right: width, top: 0, bottom: 0 } as DOMRect;
     });
     const onBarChange = vi.fn();
-    const onSelect = vi.fn();
+    const onItemOpen = vi.fn();
     render(
       <Chart
         range={{ start: day(7, 6), end: day(8, 3) }}
         onBarChange={onBarChange}
-        onSelect={onSelect}
+        onItemOpen={onItemOpen}
       />,
     );
     const audit = bar(/^Аудит склада/);
@@ -339,7 +339,7 @@ describe("Gantt", () => {
       PEOPLE[0].bars[0],
       PEOPLE[0],
     );
-    expect(onSelect).not.toHaveBeenCalled();
+    expect(onItemOpen).not.toHaveBeenCalled();
   });
 
   it("resizes from the end grip; Escape drops a drag", () => {

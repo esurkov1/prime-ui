@@ -1,45 +1,48 @@
-/** A support inbox as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one — `PageContent.Split`, `PageContent.BackButton`, `fill`. */
-import { Card, List, PageContent, ScrollContainer, Typography } from "prime-ui-kit";
+/** A ticket queue as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one; the chosen ticket cross-fades in — `PageContent.Split`, `PageContent.Panel`, `PageContent.BackButton`, `fill`. */
+import { Card, Crossfade, List, PageContent, ScrollContainer, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-type Dialog = { id: string; client: string; unread: number; messages: string[] };
+type Ticket = { id: string; subject: string; client: string; open: number; notes: string[] };
 
-const DIALOGS: Dialog[] = [
+const TICKETS: Ticket[] = [
   {
-    id: "granit",
+    id: "T-4821",
+    subject: "Счёт без НДС",
     client: "ООО «Гранит»",
-    unread: 2,
-    messages: [
+    open: 2,
+    notes: [
       "Счёт № 4821 пришёл без НДС.",
-      "Проверю реквизиты и вернусь.",
+      "Проверили реквизиты: ставка не подставилась из договора.",
       "Нужно провести до пятницы.",
-      "Исправили ставку, новый счёт № 4830 на почте.",
+      "Исправили ставку, новый счёт № 4830 отправлен на почту.",
     ],
   },
   {
-    id: "leto",
+    id: "T-4817",
+    subject: "Перенос доставки",
     client: "ООО «Лето»",
-    unread: 0,
-    messages: ["Можно перенести доставку на среду?", "Да, перенесли на 15 октября."],
+    open: 0,
+    notes: ["Просят перенести доставку на среду.", "Перенесли на 15 октября, склад предупреждён."],
   },
   {
-    id: "kozlov",
+    id: "T-4809",
+    subject: "Подключение ЭДО",
     client: "ИП Козлов",
-    unread: 1,
-    messages: ["Подключите, пожалуйста, ЭДО.", "Пришлите идентификатор в Диадоке."],
+    open: 1,
+    notes: ["Нужно подключить ЭДО.", "Запросили идентификатор в Диадоке."],
   },
 ];
 
 export default function PageContentListDetailExample() {
-  const [dialogId, setDialogId] = React.useState<string | null>(null);
-  // The last opened dialog stays in the detail while the narrow split goes back to the list.
-  const [shown, setShown] = React.useState<Dialog | null>(null);
+  const [ticketId, setTicketId] = React.useState<string | null>(null);
+  // The last opened ticket stays in the detail while the narrow split goes back to the list.
+  const [shown, setShown] = React.useState<Ticket | null>(null);
 
-  const open = (dialog: Dialog) => {
-    setDialogId(dialog.id);
-    setShown(dialog);
+  const open = (ticket: Ticket) => {
+    setTicketId(ticket.id);
+    setShown(ticket);
   };
 
   return (
@@ -47,57 +50,60 @@ export default function PageContentListDetailExample() {
       <PageContent.Root fill>
         <PageContent.Body>
           <PageContent.Split
-            open={dialogId !== null}
+            open={ticketId !== null}
             onOpenChange={(next) => {
-              if (!next) setDialogId(null);
+              if (!next) setTicketId(null);
             }}
           >
-            <PageContent.List aria-label="Диалоги">
+            <PageContent.Panel kind="list" aria-label="Обращения">
               <Card.Root className={styles.paneCard}>
                 <ScrollContainer className={styles.pane}>
-                  <List.Root className={styles.dialogs}>
-                    {DIALOGS.map((dialog) => (
+                  <List.Root className={styles.tickets}>
+                    {TICKETS.map((ticket) => (
                       <List.Item
-                        key={dialog.id}
-                        current={dialog.id === dialogId}
-                        onClick={() => open(dialog)}
+                        key={ticket.id}
+                        current={ticket.id === ticketId}
+                        onClick={() => open(ticket)}
                       >
-                        <List.ItemText>{dialog.client}</List.ItemText>
-                        {dialog.unread > 0 ? (
-                          <List.ItemCount color="blue">{dialog.unread}</List.ItemCount>
+                        <List.ItemText>{ticket.subject}</List.ItemText>
+                        <List.ItemDescription>{ticket.client}</List.ItemDescription>
+                        {ticket.open > 0 ? (
+                          <List.ItemCount color="blue">{ticket.open}</List.ItemCount>
                         ) : null}
                       </List.Item>
                     ))}
                   </List.Root>
                 </ScrollContainer>
               </Card.Root>
-            </PageContent.List>
+            </PageContent.Panel>
 
-            <PageContent.Detail aria-label="Переписка">
+            <PageContent.Panel kind="detail" aria-label="Обращение">
               <Card.Root className={styles.paneCard}>
                 <div className={styles.threadHeader}>
                   <PageContent.BackButton />
                   <Typography as="h2" variant="title-s">
-                    {shown?.client ?? "Выберите диалог"}
+                    {shown ? `${shown.id} · ${shown.subject}` : "Выберите обращение"}
                   </Typography>
                 </div>
                 <ScrollContainer anchor="end" className={styles.pane}>
-                  {shown ? (
-                    <ul className={styles.messages}>
-                      {shown.messages.map((text) => (
-                        <li key={text}>
-                          <Typography variant="body-m">{text}</Typography>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <Typography variant="body-m" tone="muted" className={styles.hint}>
-                      Переписка откроется здесь.
-                    </Typography>
-                  )}
+                  <Crossfade state={shown?.id ?? "none"}>
+                    {shown ? (
+                      <ul className={styles.notes}>
+                        {shown.notes.map((text) => (
+                          <li key={text}>
+                            <Typography variant="body-m">{text}</Typography>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <Typography variant="body-m" tone="muted" className={styles.hint}>
+                        История обращения откроется здесь.
+                      </Typography>
+                    )}
+                  </Crossfade>
                 </ScrollContainer>
               </Card.Root>
-            </PageContent.Detail>
+            </PageContent.Panel>
           </PageContent.Split>
         </PageContent.Body>
       </PageContent.Root>

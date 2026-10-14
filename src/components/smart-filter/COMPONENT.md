@@ -59,11 +59,11 @@ The toolbar and the chips are separate parts so a page can put them in different
 | `search` | `string` | — | Search text, controlled. |
 | `defaultSearch` | `string` | `""` | Initial search text, uncontrolled. |
 | `onSearchChange` | `(search: string) => void` | — | Every keystroke; debounce in the owner when it asks a server. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the filter button, the search, the tags and the panel. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the filter button, the search, the tags and the panel. Without it the tier of its host, else `m`. |
 | `collapsedLimit` | `number` | `12` | Values of one field shown before «Ещё N» (not while searching). |
 | `labels` | `Partial<SmartFilterLabels>` | — | Built-in strings, see Labels. |
-| `className` | `string` | — | Class on the root. |
 | `children` | `ReactNode` | — (required) | `SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "onChange">` | — | `className` and the other div attributes. |
 
 ### SmartFilter.Toolbar
 `ref` → `HTMLDivElement`. A `<div>`: the search Input first, then the filter Button (a count Badge while filters apply); the anchor of the panel, a flush Popover.
@@ -157,7 +157,7 @@ same height and type.
 |---|---|---|
 | closed / open | filter button, search focus | button `aria-expanded`; the panel is a Popover below the toolbar |
 | value neutral | no selection | gray Badge |
-| value shown | press | blue Badge, `aria-pressed="true"`, `data-mode="include"` |
+| value shown | press | the Badge's pressed (selected) look, `aria-pressed="true"`, `data-mode="include"` |
 | value hidden | «−», Alt+click, Shift+Enter | red Badge with «НЕ», `data-mode="exclude"`; its «−» stays visible and unhides |
 | cannot hide | last value of a `finite` field | the «−» is disabled |
 | searching | `search` | only matching values, the match in `accent-text` (a `<mark>`); fields with nothing found in a compact EmptyPage; the «Искать» row closes the panel |
@@ -167,10 +167,10 @@ same height and type.
 | no filters | empty value | no count on the button, no Chips |
 
 ## Layout & spacing
-- The panel is a flush Popover as wide as the toolbar; every section is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`, footer `--prime-space-2` × `--prime-space-4`), Dividers run edge to edge, the field label column is `--prime-space-24`.
-- The toolbar is one row of controls (`--prime-space-2` gap): the search first, growing from 9rem (`--prime-space-24` × 1.5), then the filter button at its own width. When less than 9rem is left beside the button, the button moves under the search; every row stays one control high. Search first, filter second — the active filters (`SmartFilter.Chips`) sit right under them.
+- The panel is a flush Popover as wide as the toolbar; every section is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`, footer `--prime-space-2` × `--prime-space-4`), Dividers run edge to edge, the field label column is `--prime-space-24`; a row narrower than 24rem stacks the label over the values (an intrinsic wrap, no breakpoint).
+- The toolbar is one row of controls (`--prime-space-2` gap): the search first, growing from 9rem (`--prime-space-24` × 1.5), then the filter button at its own width. When less than 9rem is left beside the button, the button moves under the search; every row stays one control high. Search first, filter second — the active filters (`SmartFilter.Chips`) sit under them.
 - Chips are Badges of the toolbar tier on the badge scale (`xs` → `s`), so a tag sits lower than the controls above it; «Добавить фильтр» is a tag of the same tier and «Сбросить все» a LinkButton with the tag's text size.
-- Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end.
+- Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end. The chips row rises in with the first filter and closes up in place with the last (`partPresence`).
 - Option groups stack `--prime-space-3` apart, a caption `--prime-space-1` above each group's values. A range row holds two equal Inputs with a dash between them, centred on the field label.
 - While typing a search a range row stays only when its field name matches.
 - The root is a flex column (`--prime-space-3`): Toolbar, then Chips.

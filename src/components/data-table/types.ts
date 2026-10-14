@@ -27,6 +27,11 @@ export type DataTableColumn<Row> = {
    * up, with the sort indicator at the end edge.
    */
   headerAlign?: DataTableCellAlign;
+  /**
+   * The header names the column for assistive tech only (an action column): the head cell looks
+   * empty, the `<th>` keeps `header` as its name.
+   */
+  hideHeader?: boolean;
   width?: string;
   minWidth?: string;
   maxWidth?: string;

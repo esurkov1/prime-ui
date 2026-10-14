@@ -7,24 +7,11 @@
 
 /** Part segments, props and values that name a concept the vocabulary names differently. */
 export const RENAMED = {
-  parts: {
-    "PageContent.List": "a `PageContent.Panel` (list and detail are panels of the split)",
-    "PageContent.Detail": "a `PageContent.Panel` (list and detail are panels of the split)",
-    "PageContent.Page": '`PageContent.Root as="section"`',
-    "Timeline.Title": "`Timeline.ItemTitle`",
-    "Timeline.Meta": "`Timeline.ItemMeta`",
-    "Timeline.MetaPrimary": "`Timeline.ItemMeta`",
-    "Timeline.Value": "`Timeline.ItemValue`",
-    "Timeline.ValueMeta": "`Timeline.ItemMeta`",
-    "Timeline.GapMeta": "`Timeline.Description` of a gap",
-  } as Record<string, string>,
+  parts: {} as Record<string, string>,
   /** `Part.prop` (or `*.prop` for every part) → the canonical name. */
   props: {
     "Chat.Messages.current": "`jumpTo`",
     "Composer.Context.value": "`messageId`",
-    "Kanban.Root.onItemClick": "`onItemOpen`",
-    "Gantt.onSelect": "`onItemOpen`",
-    "Gantt.onRowClick": "`onItemOpen`",
     "*.type": "`multiple` for one vs many (a `type` prop names no selection mode)",
     "*.fillWidth": "`fullWidth`",
     "*.leadingIcon": "an `X.Icon` part",

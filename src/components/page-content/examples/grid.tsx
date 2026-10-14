@@ -20,6 +20,8 @@ const WEEKS = [
   { week: "5 нед", orders: 352 },
 ];
 
+const ROWS = WEEKS.map(({ week, orders }) => ({ label: week, values: { orders } }));
+
 const MARGIN = { top: 8, right: 8, bottom: 24, left: 8 };
 
 const formatOrders = (value: number) => `${value.toLocaleString("ru-RU")} заказов`;
@@ -39,7 +41,7 @@ export default function PageContentGridExample() {
             </PageContent.Cell>
           ))}
           <PageContent.Cell span={8} rows={2}>
-            <ChartFrame.Root series={SERIES} formatValue={formatOrders}>
+            <ChartFrame.Root series={SERIES} rows={ROWS} formatValue={formatOrders}>
               <ChartFrame.Header>
                 <ChartFrame.Title>Заказы по неделям</ChartFrame.Title>
                 <ChartFrame.Description>Октябрь</ChartFrame.Description>

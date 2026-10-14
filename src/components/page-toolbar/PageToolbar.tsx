@@ -1,6 +1,8 @@
-import * as React from "react";
+import type * as React from "react";
 
 import { cx } from "@/internal/cx";
+import { namedRole } from "@/internal/namedRole";
+import { flattenChildren, isPart } from "@/internal/parts";
 
 import styles from "./PageToolbar.module.css";
 
@@ -10,22 +12,28 @@ export type PageToolbarRootProps = DivProps;
 
 /**
  * The panel at the top of a page: search and filter, sections, view options and the primary
- * action, with the active filters right under the search. It lays itself out from its own width —
- * one row when wide, stacked rows when narrow — so the slots keep fixed places at any width. Parts
- * may be left out; the JSX order is the Tab order.
+ * action, with the active filters under the top row. It lays itself out from its own width — one
+ * row when wide, stacked rows when narrow — so the slots keep fixed places at any width. Parts may
+ * be left out; whatever the JSX order, the DOM (and Tab) order is Tools, Sections, View, Actions,
+ * Chips. Named (`aria-label`), it is a `group`.
  */
 function PageToolbarRoot({ className, children, ref, ...rest }: PageToolbarRootProps) {
   // The chips row lives under the bar, so the bar can keep one line when wide. The root is the
   // size container; the layout inside it is what the container query restyles.
-  const items = React.Children.toArray(children);
-  const isChips = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === PageToolbarChips;
+  const items = flattenChildren(children);
+  const of = (Part: React.ElementType) => items.filter((child) => isPart(child, Part));
+  const other = items.filter(
+    (child) => !SLOT_ORDER.some((Part) => isPart(child, Part)) && !isPart(child, PageToolbarChips),
+  );
 
   return (
-    <div {...rest} ref={ref} className={cx(styles.root, className)}>
+    <div {...rest} ref={ref} role={namedRole(rest, "group")} className={cx(styles.root, className)}>
       <div className={styles.layout}>
-        <div className={styles.bar}>{items.filter((child) => !isChips(child))}</div>
-        {items.filter(isChips)}
+        <div className={styles.bar}>
+          {SLOT_ORDER.flatMap(of)}
+          {other}
+        </div>
+        {of(PageToolbarChips)}
       </div>
     </div>
   );
@@ -42,7 +50,7 @@ PageToolbarSections.displayName = "PageToolbar.Sections";
 
 export type PageToolbarToolsProps = DivProps;
 
-/** Search and filter button (`SmartFilter.Toolbar`): the first slot and the stretchy one, the Chips sit right under it. */
+/** Search and filter button (`SmartFilter.Toolbar`): the first slot and the stretchy one; the Chips sit under the top row. */
 function PageToolbarTools({ className, ...rest }: PageToolbarToolsProps) {
   return <div {...rest} className={cx(styles.tools, className)} />;
 }
@@ -66,11 +74,19 @@ PageToolbarActions.displayName = "PageToolbar.Actions";
 
 export type PageToolbarChipsProps = DivProps;
 
-/** Active filters (`SmartFilter.Chips`) in their own row right under the search; the row disappears when empty. */
+/** Active filters (`SmartFilter.Chips`) in their own row under the top row; the row disappears when empty. */
 function PageToolbarChips({ className, ...rest }: PageToolbarChipsProps) {
   return <div {...rest} className={cx(styles.chips, className)} />;
 }
 PageToolbarChips.displayName = "PageToolbar.Chips";
+
+/** The DOM and Tab order of the bar's slots: the reading order of the wide layout. */
+const SLOT_ORDER: React.ElementType[] = [
+  PageToolbarTools,
+  PageToolbarSections,
+  PageToolbarView,
+  PageToolbarActions,
+];
 
 export const PageToolbar = {
   Root: PageToolbarRoot,

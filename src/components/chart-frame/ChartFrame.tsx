@@ -3,17 +3,19 @@ import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden
 import { useControllableState } from "@/hooks/useControllableState";
 import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { HUE_CHART } from "@/internal/palette";
 import type { TagRef } from "@/internal/polymorphic";
+import press from "@/internal/press.module.css";
+import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import { rovingIndex } from "@/internal/rovingFocus";
 import type { PaletteColor, Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import swap from "@/internal/swapMotion.module.css";
 import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 import { touchTargetClass } from "@/internal/touchTarget";
 import { chartColors } from "@/theme/chartColors";
 
@@ -59,6 +61,14 @@ export type ChartFramePlotArea = {
   series: ChartFramePlotSeries[];
 };
 
+/** One point of the chart's data: a row of the table the root gives assistive tech. */
+export type ChartFrameRow = {
+  /** The point the row stands for («Неделя 41»): the row header. */
+  label: string;
+  /** Values by series id; a missing value reads as «—». */
+  values: Record<string, number | undefined>;
+};
+
 export type ChartFrameLabels = {
   /** Title of the empty state. */
   empty: string;
@@ -68,7 +78,7 @@ export type ChartFrameLabels = {
   retry: string;
   /** Accessible name of the legend. */
   legend: string;
-  /** Header of the first column of `ChartFrame.Table` (what a row is). */
+  /** Header of the first column of the data table (what a row is). */
   category: string;
 };
 
@@ -105,13 +115,8 @@ type ChartFrameContextValue = {
   plotRef: React.RefObject<HTMLDivElement | null>;
 };
 
-const ChartFrameContext = React.createContext<ChartFrameContextValue | null>(null);
-
-function useChartFrame(part: string): ChartFrameContextValue {
-  const context = React.useContext(ChartFrameContext);
-  if (!context) throw new Error(`ChartFrame.${part} must be inside ChartFrame.Root`);
-  return context;
-}
+const [ChartFrameProvider, useChartFrame] =
+  createComponentContext<ChartFrameContextValue>("ChartFrame");
 
 const EMPTY_IDS: string[] = [];
 
@@ -124,6 +129,7 @@ export type ChartFrameRootProps = React.HTMLAttributes<HTMLElement> & {
   state?: ChartFrameState;
   /** The series in drawing order: the legend, tooltip rows, table columns and plot colors. */
   series?: ChartFrameSeries[];
+  rows: ChartFrameRow[];
   /** Ids of the series turned off in the legend (controlled). */
   hiddenSeries?: string[];
   /** Initially hidden series (uncontrolled). Default none. */
@@ -144,12 +150,14 @@ export type ChartFrameRootProps = React.HTMLAttributes<HTMLElement> & {
 /**
  * A dashboard panel around any chart (Recharts, ECharts, visx, Chart.js or a hand-drawn SVG): a
  * surface of the depth ladder named by its title, with a headline value, the measured plot area, a
- * series legend that turns series on and off, a tooltip body and a table for assistive tech. The
- * state (loading / empty / error / ready) lives on the root; every part shows its own side of it.
+ * series legend that turns series on and off and a tooltip body. The root renders the data
+ * (`rows`) as a visually hidden table for assistive tech. The state (loading / empty / error /
+ * ready) lives on the root; every part shows its own side of it.
  */
 function ChartFrameRoot({
   state = "ready",
   series = [],
+  rows,
   hiddenSeries: hiddenProp,
   defaultHiddenSeries = EMPTY_IDS,
   onHiddenSeriesChange,
@@ -215,8 +223,17 @@ function ChartFrameRoot({
       data-state={state}
     >
       <SurfaceDepthProvider value={depth}>
-        <ChartFrameContext.Provider value={context}>{children}</ChartFrameContext.Provider>
+        <ChartFrameProvider value={context}>{children}</ChartFrameProvider>
       </SurfaceDepthProvider>
+      {state === "ready" ? (
+        <HiddenTable
+          rows={rows}
+          series={resolved}
+          formatValue={formatValue}
+          category={context.labels.category}
+          titleId={hasTitle ? titleId : undefined}
+        />
+      ) : null}
     </figure>
   );
 }
@@ -242,7 +259,7 @@ export type ChartFrameTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
 
 /** The name of the chart: heads the panel and names the figure. */
 function ChartFrameTitle({ as: Tag = "h3", className, ref, ...rest }: ChartFrameTitleProps) {
-  const { titleId, setHasTitle } = useChartFrame("Title");
+  const { titleId, setHasTitle } = useChartFrame("ChartFrame.Title");
   React.useLayoutEffect(() => {
     setHasTitle(true);
     return () => setHasTitle(false);
@@ -264,7 +281,7 @@ export type ChartFrameDescriptionProps = React.HTMLAttributes<HTMLParagraphEleme
 
 /** What the chart measures and over which period; describes the figure. */
 function ChartFrameDescription({ className, ...rest }: ChartFrameDescriptionProps) {
-  const { descriptionId, setHasDescription } = useChartFrame("Description");
+  const { descriptionId, setHasDescription } = useChartFrame("ChartFrame.Description");
   React.useLayoutEffect(() => {
     setHasDescription(true);
     return () => setHasDescription(false);
@@ -294,24 +311,20 @@ export type ChartFrameValueProps = React.HTMLAttributes<HTMLDivElement> & {
  * While loading it is a Skeleton of its own geometry; after a load error it is a dash.
  */
 function ChartFrameValue({ className, children, ...rest }: ChartFrameValueProps) {
-  const { state } = useChartFrame("Value");
+  const { state } = useChartFrame("ChartFrame.Value");
   const shown = state === "loading" || state === "error" ? state : "data";
-  const swapped = useStateSwap(shown);
-  const swapClass = swapped ? swap.swapIn : undefined;
   return (
     <div {...rest} className={cx(textRole.headingM, styles.value, className)}>
-      {shown === "loading" ? (
-        <Skeleton shape="block" className={cx(styles.valueSkeleton, swapClass)} />
-      ) : shown === "error" ? (
-        // The data failed to load: the number is unknown, not the last one seen.
-        <span key="error" className={cx(styles.valueContent, styles.valueUnknown, swapClass)}>
-          —
-        </span>
-      ) : (
-        <span key="data" className={cx(styles.valueContent, swapClass)}>
-          {children}
-        </span>
-      )}
+      <RegionSwap state={shown}>
+        {shown === "loading" ? (
+          <Skeleton shape="block" className={styles.valueSkeleton} />
+        ) : shown === "error" ? (
+          // The data failed to load: the number is unknown, not the last one seen.
+          <span className={cx(styles.valueContent, styles.valueUnknown)}>—</span>
+        ) : (
+          <span className={styles.valueContent}>{children}</span>
+        )}
+      </RegionSwap>
     </div>
   );
 }
@@ -325,7 +338,8 @@ export type ChartFrameDeltaProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 /** The change of the headline value («+12% к сентябрю»); the sign is in the text, not only the color. */
 function ChartFrameDelta({ tone = "neutral", className, ...rest }: ChartFrameDeltaProps) {
-  return <span {...rest} className={cx(styles.delta, className)} data-tone={tone} />;
+  // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
+  return <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />;
 }
 ChartFrameDelta.displayName = "ChartFrame.Delta";
 
@@ -361,7 +375,7 @@ function ChartFramePlot({
   ref,
   ...rest
 }: ChartFramePlotProps) {
-  const { state, series, labels, onRetry, plotRef } = useChartFrame("Plot");
+  const { state, series, labels, onRetry, plotRef } = useChartFrame("ChartFrame.Plot");
   const mergedRef = useMergedRefs(plotRef, ref);
   const size = useElementSize(plotRef, { enabled: renderPlot !== undefined });
 
@@ -435,11 +449,12 @@ export type ChartFrameLegendProps = React.HTMLAttributes<HTMLUListElement> & {
  * hidden series keeps its place and color: its swatch turns hollow and its name quiet.
  */
 function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLegendProps) {
-  const { state, series, toggle, formatValue, labels } = useChartFrame("Legend");
+  const { state, series, toggle, formatValue, labels } = useChartFrame("ChartFrame.Legend");
   const [focusIndex, setFocusIndex] = React.useState(0);
   const buttons = React.useRef<Array<HTMLButtonElement | null>>([]);
   const loading = state === "loading";
-  const swapped = useStateSwap(loading ? "loading" : "data");
+  // A legend value sits in a button (phrasing content only): it fades in place.
+  const valueSwap = useSwapIn(loading ? "loading" : "data");
   const active = Math.min(focusIndex, Math.max(series.length - 1, 0));
 
   if (series.length === 0) return null;
@@ -471,12 +486,13 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
             {item.value !== undefined ? (
               loading ? (
                 <Skeleton
+                  key={valueSwap.key}
                   shape="text"
                   size="xs"
-                  className={cx(styles.legendValueSkeleton, swapped && swap.swapIn)}
+                  className={cx(styles.legendValueSkeleton, valueSwap.className)}
                 />
               ) : (
-                <span className={cx(styles.legendValue, swapped && swap.swapIn)}>
+                <span key={valueSwap.key} className={cx(styles.legendValue, valueSwap.className)}>
                   {formatValue(item.value)}
                 </span>
               )
@@ -495,7 +511,7 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
                   buttons.current[index] = node;
                 }}
                 type="button"
-                className={cx(styles.entry, styles.toggle, touchTargetClass)}
+                className={cx(styles.entry, styles.toggle, press.press, touchTargetClass)}
                 aria-pressed={!item.hidden}
                 tabIndex={index === active ? 0 : -1}
                 data-hidden={item.hidden || undefined}
@@ -545,7 +561,7 @@ export type ChartFrameTooltipProps = React.HTMLAttributes<HTMLDivElement> & {
  * It must render inside `ChartFrame.Root`.
  */
 function ChartFrameTooltip({ label, items, point, className, ...rest }: ChartFrameTooltipProps) {
-  const { series, formatValue, plotRef } = useChartFrame("Tooltip");
+  const { series, formatValue, plotRef } = useChartFrame("ChartFrame.Tooltip");
   const rows = items.flatMap((item) => {
     const entry = series.find((candidate) => candidate.id === item.id);
     if (entry?.hidden) return [];
@@ -586,17 +602,12 @@ function ChartFrameTooltip({ label, items, point, className, ...rest }: ChartFra
 }
 ChartFrameTooltip.displayName = "ChartFrame.Tooltip";
 
-export type ChartFrameTableRow = {
-  /** The point the row stands for («Неделя 41»): the row header. */
-  label: string;
-  /** Values by series id; a missing value reads as «—». */
-  values: Record<string, number | undefined>;
-};
-
-export type ChartFrameTableProps = React.TableHTMLAttributes<HTMLTableElement> & {
-  /** The chart's data, one row per point. */
-  rows: ChartFrameTableRow[];
-  ref?: React.Ref<HTMLTableElement>;
+type HiddenTableProps = {
+  rows: ChartFrameRow[];
+  series: ResolvedSeries[];
+  formatValue: (value: number) => string;
+  category: string;
+  titleId: string | undefined;
 };
 
 /**
@@ -604,15 +615,13 @@ export type ChartFrameTableProps = React.TableHTMLAttributes<HTMLTableElement> &
  * shown series, named by the chart title. Present only while the data is ready. A visible table is
  * a `DataTable`.
  */
-function ChartFrameTable({ rows, className, ...rest }: ChartFrameTableProps) {
-  const { state, series, formatValue, labels, titleId } = useChartFrame("Table");
-  if (state !== "ready") return null;
+function HiddenTable({ rows, series, formatValue, category, titleId }: HiddenTableProps) {
   const columns = series.filter((item) => !item.hidden);
   return (
-    <table aria-labelledby={titleId} {...rest} className={cx(visuallyHiddenClass, className)}>
+    <table aria-labelledby={titleId} className={visuallyHiddenClass}>
       <thead>
         <tr>
-          <th scope="col">{labels.category}</th>
+          <th scope="col">{category}</th>
           {columns.map((column) => (
             <th key={column.id} scope="col">
               {column.label}
@@ -634,7 +643,6 @@ function ChartFrameTable({ rows, className, ...rest }: ChartFrameTableProps) {
     </table>
   );
 }
-ChartFrameTable.displayName = "ChartFrame.Table";
 
 export const ChartFrame = {
   Root: ChartFrameRoot,
@@ -647,5 +655,4 @@ export const ChartFrame = {
   Plot: ChartFramePlot,
   Legend: ChartFrameLegend,
   Tooltip: ChartFrameTooltip,
-  Table: ChartFrameTable,
 };

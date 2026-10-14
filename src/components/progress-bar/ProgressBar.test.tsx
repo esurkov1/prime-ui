@@ -2,6 +2,9 @@ import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { withMotion } from "@/test/motion";
+
 import { ProgressBar } from "./ProgressBar";
 
 describe("ProgressBar", () => {
@@ -11,14 +14,22 @@ describe("ProgressBar", () => {
   });
 
   it("sets data-size on root default m", () => {
-    render(<ProgressBar value={40} />);
-    const bar = screen.getByRole("progressbar");
-    expect(bar.parentElement).toHaveAttribute("data-size", "m");
+    const { container } = render(<ProgressBar value={40} />);
+    expect(container.firstElementChild).toHaveAttribute("data-size", "m");
+  });
+
+  it("takes the host tier without its own size", () => {
+    const { container } = render(
+      <ControlSizeProvider value="s">
+        <ProgressBar value={40} />
+      </ControlSizeProvider>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-size", "s");
   });
 
   it("sets data-size from size prop", () => {
-    render(<ProgressBar value={40} size="xl" />);
-    expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-size", "xl");
+    const { container } = render(<ProgressBar value={40} size="xl" />);
+    expect(container.firstElementChild).toHaveAttribute("data-size", "xl");
   });
 
   it("sets value and max attributes on native progress", () => {
@@ -45,8 +56,8 @@ describe("ProgressBar", () => {
   });
 
   it("defaults data-tone to accent and reflects tone", () => {
-    const { rerender } = render(<ProgressBar value={40} />);
-    const root = () => screen.getByRole("progressbar").parentElement;
+    const { container, rerender } = render(<ProgressBar value={40} />);
+    const root = () => container.firstElementChild;
     expect(root()).toHaveAttribute("data-tone", "accent");
     rerender(<ProgressBar value={40} tone="danger" />);
     expect(root()).toHaveAttribute("data-tone", "danger");
@@ -62,8 +73,8 @@ describe("ProgressBar", () => {
   });
 
   it("merges className on root", () => {
-    render(<ProgressBar value={5} className="custom-bar" />);
-    expect(screen.getByRole("progressbar").parentElement).toHaveClass("custom-bar");
+    const { container } = render(<ProgressBar value={5} className="custom-bar" />);
+    expect(container.firstElementChild).toHaveClass("custom-bar");
   });
 
   it("reflects tone in value mode", () => {
@@ -277,6 +288,16 @@ describe("ProgressBar", () => {
       rerender(<ProgressBar label="Импорт" value={40} />);
       expect(root).not.toHaveAttribute("aria-busy");
       expect(screen.getByRole("progressbar", { name: "Импорт" })).toHaveAttribute("value", "40");
+    });
+
+    it("keeps the skeleton as a leaving layer while the data fades in", () => {
+      withMotion();
+      const { container, rerender } = render(<ProgressBar label="Импорт" value={0} loading />);
+      rerender(<ProgressBar label="Импорт" value={40} />);
+      const leaving = container.querySelector("[data-state='closed']");
+      expect(leaving).toHaveAttribute("aria-hidden", "true");
+      expect(leaving?.querySelector("progress")).toBeNull();
+      expect(container.querySelector("[data-state='open'] progress")).toBeInTheDocument();
     });
 
     it("draws legend and row placeholders while loading", () => {

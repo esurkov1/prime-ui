@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "ChartFrame.Root",
-      en: "`ref` → `HTMLElement` (`<figure>`). The panel: a surface of the depth ladder, a figure named by `ChartFrame.Title` and described by `ChartFrame.Description`, `aria-busy` while loading. Owns the state, the series and which of them are hidden; every part reads them.",
-      ru: "Панель: поверхность лестницы глубины, фигура с именем из `ChartFrame.Title` и описанием из `ChartFrame.Description`, `aria-busy` во время загрузки. Хранит состояние, ряды и какие из них скрыты; все части читают их отсюда.",
+      en: "`ref` → `HTMLElement` (`<figure>`). The panel: a surface of the depth ladder, a figure named by `ChartFrame.Title` and described by `ChartFrame.Description`, `aria-busy` while loading. Owns the state, the series, the hidden ones and the data (`rows`); every part reads them.",
+      ru: "Панель: поверхность лестницы глубины, фигура с именем из `ChartFrame.Title` и описанием из `ChartFrame.Description`, `aria-busy` во время загрузки. Хранит состояние, ряды, скрытые из них и данные (`rows`); все части читают их отсюда.",
       props: [
         {
           name: "state",
@@ -21,6 +21,13 @@ export const api: ComponentApi = {
           default: "[]",
           en: "The series in drawing order, `{ id, label, color?, value? }`: legend entries, tooltip rows, table columns and `renderPlot` colors. `color` is a palette hue; `value` is the legend summary.",
           ru: "Ряды в порядке отрисовки, `{ id, label, color?, value? }`: записи легенды, строки подсказки, столбцы таблицы и цвета для `renderPlot`. `color` — оттенок палитры; `value` — итог в легенде.",
+        },
+        {
+          name: "rows",
+          type: "ChartFrameRow[]",
+          required: true,
+          en: "The chart's data, `{ label, values }` per point (`values` by series id, a missing one reads as «—»): a visually hidden table for screen readers in the `ready` state.",
+          ru: "Данные графика, `{ label, values }` на точку (`values` по id ряда, отсутствующее — «—»): визуально скрытая таблица для скринридеров в состоянии `ready`.",
         },
         {
           name: "hiddenSeries",
@@ -244,26 +251,6 @@ export const api: ComponentApi = {
         },
       ],
     },
-    {
-      name: "ChartFrame.Table",
-      en: "`ref` → `HTMLTableElement`. The chart's data as a visually hidden table for screen readers, named by the title: a row per point, a column per shown series. Present only in the `ready` state. A visible table is a `DataTable`.",
-      ru: "Данные графика визуально скрытой таблицей для скринридеров с именем из заголовка: строка на точку, столбец на показанный ряд. Есть только в состоянии `ready`. Видимая таблица — `DataTable`.",
-      props: [
-        {
-          name: "rows",
-          type: "ChartFrameTableRow[]",
-          required: true,
-          en: "`{ label, values }` per point; `values` by series id, a missing one reads as «—».",
-          ru: "`{ label, values }` на точку; `values` по id ряда, отсутствующее читается как «—».",
-        },
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLTableElement>",
-          en: "`className` and the other table attributes.",
-          ru: "`className` и остальные атрибуты table.",
-        },
-      ],
-    },
   ],
   labels: labelRows(CHART_FRAME_LABELS, {
     empty: { en: "Title of the empty state.", ru: "Заголовок пустого состояния." },
@@ -274,8 +261,8 @@ export const api: ComponentApi = {
     },
     legend: { en: "Accessible name of the legend.", ru: "Доступное имя легенды." },
     category: {
-      en: "Header of the first column of `ChartFrame.Table` (what a row is).",
-      ru: "Заголовок первого столбца `ChartFrame.Table` (что такое строка).",
+      en: "Header of the first column of the data table (what a row is).",
+      ru: "Заголовок первого столбца таблицы данных (что такое строка).",
     },
   }),
   accessibility: {
@@ -311,8 +298,8 @@ export const api: ComponentApi = {
         ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан; список легенды назван `labels.legend`. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
       },
       {
-        en: "`ChartFrame.Table` is a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.",
-        ru: "`ChartFrame.Table` — визуально скрытая таблица с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд, значения через `formatValue`.",
+        en: "The root renders `rows` as a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.",
+        ru: "Корень выводит `rows` визуально скрытой таблицей с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд, значения через `formatValue`.",
       },
       {
         en: "A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.",
@@ -323,8 +310,8 @@ export const api: ComponentApi = {
         ru: 'Пустое состояние — `role="status"`, ошибка — `role="alert"` с кнопкой «Повторить».',
       },
       {
-        en: "The drawing is the library's: hide a decorative SVG (`aria-hidden`) when `ChartFrame.Table` carries the data; marks you make focusable need their own `aria-label`.",
-        ru: "Сам рисунок графика — забота библиотеки: скрывайте декоративный SVG (`aria-hidden`), когда данные есть в `ChartFrame.Table`; фокусируемым меткам нужен свой `aria-label`.",
+        en: "The drawing is the library's: hide a decorative SVG (`aria-hidden`), the data table carries the data; marks you make focusable need their own `aria-label`.",
+        ru: "Сам рисунок графика — забота библиотеки: скрывайте декоративный SVG (`aria-hidden`), данные несёт таблица данных; фокусируемым меткам нужен свой `aria-label`.",
       },
     ],
   },

@@ -616,7 +616,7 @@ export default function ChatScreenExample() {
               if (!next) setDialogId(null);
             }}
           >
-            <PageContent.List aria-label="Диалоги">
+            <PageContent.Panel kind="list" aria-label="Диалоги">
               <Card.Root className={styles.paneCard}>
                 <ChatList.Root
                   items={foundDialogs}
@@ -650,9 +650,9 @@ export default function ChatScreenExample() {
                   }}
                 />
               </Card.Root>
-            </PageContent.List>
+            </PageContent.Panel>
 
-            <PageContent.Detail aria-label="Переписка">
+            <PageContent.Panel kind="detail" aria-label="Переписка">
               <Card.Root className={styles.paneCard}>
                 <Chat.Root typing={clientTyping}>
                   <Chat.Header>
@@ -709,7 +709,7 @@ export default function ChatScreenExample() {
                   </Chat.Footer>
                 </Chat.Root>
               </Card.Root>
-            </PageContent.Detail>
+            </PageContent.Panel>
           </PageContent.Split>
         </PageContent.Body>
       </PageContent.Root>

@@ -2,6 +2,8 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+
 import { Pagination } from "./Pagination";
 
 describe("Pagination", () => {
@@ -27,6 +29,16 @@ describe("Pagination", () => {
       "data-size",
       "xl",
     );
+  });
+
+  it("takes the host tier without its own size and sizes its buttons with it", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <Pagination value={1} totalPages={5} onValueChange={() => undefined} />
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByRole("navigation")).toHaveAttribute("data-size", "s");
+    expect(screen.getByRole("button", { name: "Страница 1" })).toHaveAttribute("data-size", "s");
   });
 
   it("calls onValueChange with previous page when Previous is clicked", () => {
@@ -102,13 +114,14 @@ describe("Pagination", () => {
 
     const current = screen.getByRole("button", { name: "Страница 3" });
     expect(current).toHaveAttribute("aria-current", "page");
-    // The current page is accent (soft), the others neutral ghost.
-    expect(current).toHaveAttribute("data-tone", "accent");
-    expect(current).toHaveAttribute("data-variant", "soft");
+    // The current page is the Button's current state; every number is the same ghost button.
+    expect(current).toHaveAttribute("data-current", "true");
+    expect(current).toHaveAttribute("data-variant", "ghost");
+    expect(current).toHaveAttribute("data-density", "tight");
 
     const other = screen.getByRole("button", { name: "Страница 2" });
     expect(other).not.toHaveAttribute("aria-current");
-    expect(other).toHaveAttribute("data-tone", "neutral");
+    expect(other).not.toHaveAttribute("data-current");
     expect(other).toHaveAttribute("data-variant", "ghost");
   });
 
@@ -122,13 +135,13 @@ describe("Pagination", () => {
   it("renders current/total summary instead of page numbers in compact mode", () => {
     render(<Pagination value={3} totalPages={12} onValueChange={() => undefined} compact />);
     const nav = screen.getByRole("navigation", { name: "Навигация по страницам" });
-    expect(nav).toHaveAttribute("data-compact", "true");
+    expect(nav).toHaveAttribute("data-compact", "compact");
     expect(screen.queryByRole("button", { name: "Страница 3" })).not.toBeInTheDocument();
     expect(nav).toHaveTextContent("3/из12");
   });
 
-  it("keeps page buttons and adds summary for compact auto", () => {
-    render(<Pagination value={3} totalPages={12} onValueChange={() => undefined} compact="auto" />);
+  it("adapts to its container by default: page buttons, the summary for a narrow width", () => {
+    render(<Pagination value={3} totalPages={12} onValueChange={() => undefined} />);
     expect(screen.getByRole("navigation", { name: "Навигация по страницам" })).toHaveAttribute(
       "data-compact",
       "auto",

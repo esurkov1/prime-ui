@@ -36,7 +36,7 @@ PageToolbar.Root                 container: its own width picks the layout
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### PageToolbar.Root
-`ref` → `HTMLDivElement`. The page panel: one row from 56rem of its own width, stacked rows below. Any slot may be left out; JSX order is the Tab order — write Tools, Sections, View, Actions, Chips.
+`ref` → `HTMLDivElement`. The page panel: one row from 56rem of its own width, stacked rows below. Any slot may be left out; whatever the JSX order, the DOM and Tab order is Tools, Sections, View, Actions, Chips. Named (`aria-label`), it is a `group`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -95,7 +95,7 @@ PageToolbar has no variants: the layout follows the toolbar's width.
 | narrow | container < 56rem | one wrapping flex line of real rows only (`order` + full-row slots): a missing slot makes no row, every row is 12 from the next |
 | action on its own row | narrow, and the Tools (or the Sections in their place) would get less than 18rem beside the Actions | the Actions wrap under them and stretch across the row; an Actions slot alone in the toolbar keeps its buttons at the end |
 | no Tools | Sections without Tools; View without Tools and Sections | that slot takes the Tools' place: first and stretchy, beside the action, so the action stays at the top row's end |
-| alone in a row | Tools or Sections without Actions; View when narrow | that slot stretches to the full row; the View's controls share it equally |
+| alone in a row | Tools or Sections without Actions; View when narrow | that slot stretches to the full row; the View's controls share it equally and may shrink below their content (`min-width: 0`), so the row fits a phone |
 | no chips | `PageToolbar.Chips` empty (`SmartFilter.Chips` renders nothing) | the chips row takes no space |
 
 ## Layout & spacing
@@ -117,8 +117,8 @@ No keyboard interaction.
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- A plain `<div>`: when a page has more than one panel, give each `role="group"` and an `aria-label` (a name on a `<div>` without a role is ignored by assistive tech).
-- Slots move only visually (`order`); the Tab order is the JSX order. Write the slots in the reading order of the wide layout — Tools, Sections, View, Actions, Chips. In the narrow layout the action is shown beside the tools but reached after the view.
+- With an `aria-label` the root is `role="group"` named by it: when a page has more than one panel, name each.
+- The root renders the slots in the wide layout's reading order — Tools, Sections, View, Actions, Chips — whatever the JSX order; the narrow layout moves them only visually (`order`).
 - An icon-only primary action carries `aria-label`.
 
 ### Labels
@@ -129,7 +129,7 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | The panel of an orders page: search and filter, sections with counts, the period and the primary action in one row; active filters right under the search — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`. |
+| [overview.tsx](examples/overview.tsx) | The panel of an orders page: search and filter, sections with counts, the period and the primary action in one row; active filters under the top row — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`. |
 | [without-search.tsx](examples/without-search.tsx) | A dashboard panel without search on a tablet-width column: the sections fill the top row, the period selector alone in the bottom row stretches to the full width — `PageToolbar.Sections`, `PageToolbar.View`. |
 | [save-changes.tsx](examples/save-changes.tsx) | A settings page: sections of the form on the left, the save action with the number of changes at the end of the top row — never a sticky bar at the bottom of a phone screen — `PageToolbar.Actions`. |
 | [narrow.tsx](examples/narrow.tsx) | A phone-width column: search and filter on top, the primary action on its own row under them, then the active filters, the sections and the period, every row 12 apart — `PageToolbar.Root`. |

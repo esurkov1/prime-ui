@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Панель настроек компании: шапка, поля на заливке поверхности и кнопки в подвале — `Card.Header`, `Card.Body`, `Card.Footer`.",
+        "Форма настроек компании на карточке: шапка, поля на заливке поверхности и кнопка отправки в подвале — `Card.Header`, `Card.Body`, `Card.Footer`.",
     },
     {
       slot: "variants",

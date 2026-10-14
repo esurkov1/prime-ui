@@ -23,8 +23,6 @@
   min-width: 0;
   max-width: 100%;
   border-radius: var(--prime-card-radius);
-  /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-layer-current);
   background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
@@ -50,17 +48,13 @@
   appearance: none;
   transition:
     box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .root[data-interactive]:hover {
     box-shadow: var(--prime-shadow-overlay);
   }
-}
-
-.root[data-interactive]:active {
-  transform: scale(var(--prime-motion-press-scale));
 }
 
 .root[data-interactive]:focus-visible {
@@ -238,18 +232,6 @@
   letter-spacing: var(--prime-text-body-s-tracking);
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
-}
-
-.delta[data-tone="success"] {
-  color: var(--prime-color-success-text);
-}
-
-.delta[data-tone="warning"] {
-  color: var(--prime-color-warning-text);
-}
-
-.delta[data-tone="danger"] {
-  color: var(--prime-color-danger-text);
 }
 
 /* The reference line of a KPI: quiet caption at the bottom of the tile. */

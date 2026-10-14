@@ -30,7 +30,7 @@ export default function BottomNavInAppShellExample() {
           </AppHeader.Start>
         </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Page>
+          <PageContent.Root as="section">
             <PageContent.Body>
               {ORDERS.map((order) => (
                 <Typography key={order} variant="body-m">
@@ -44,7 +44,7 @@ export default function BottomNavInAppShellExample() {
                 Новый заказ
               </Button.Root>
             </PageContent.Body>
-          </PageContent.Page>
+          </PageContent.Root>
         </AppShell.Main>
         <AppShell.Footer>
           <BottomNav.Root>

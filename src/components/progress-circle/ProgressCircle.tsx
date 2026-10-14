@@ -1,6 +1,5 @@
 import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { GlyphSwap } from "@/internal/glyphSwap";
@@ -16,9 +15,9 @@ import {
   resolveValue,
   segmentFill,
 } from "@/internal/progressSegments";
+import { RegionSwap } from "@/internal/RegionSwap";
 import { RING_DATA_STROKE, RING_PATH, Ring, RingCap, RingCircle } from "@/internal/ring";
 import type { ControlSize, Tone } from "@/internal/states";
-import swap from "@/internal/swapMotion.module.css";
 
 import { Skeleton } from "../skeleton/Skeleton";
 import styles from "./ProgressCircle.module.css";
@@ -180,8 +179,6 @@ export function ProgressCircle(props: ProgressCircleProps) {
     ...rest
   } = props;
   const descriptionId = React.useId();
-  const swapped = useStateSwap(loading ? "loading" : "data");
-  const swapClass = swapped ? swap.swapIn : undefined;
   const isText = typeof children === "string" || typeof children === "number";
   const showInner =
     !loading &&
@@ -213,40 +210,36 @@ export function ProgressCircle(props: ProgressCircleProps) {
     }
     if (free > 0 && total > 0) arcs.push({ start: cursor, length: free * unit, rest: true });
     const showLegend = legend && segments.length > 0;
+    // The centre text (a total, a share) is hidden from the ring itself, so it joins the name.
     const a11y = label
-      ? { "aria-label": label, "aria-describedby": descriptionId }
+      ? {
+          "aria-label": valueText ? `${label}, ${valueText}` : label,
+          "aria-describedby": descriptionId,
+        }
       : { "aria-label": text };
     if (label && !showLegend) {
       description = <VisuallyHidden id={descriptionId}>{text}</VisuallyHidden>;
     }
     if (legend) {
       legendNode = loading ? (
-        <ProgressLegendSkeleton
-          key="loading"
-          rows={segmentsProp.length || LOADING_ROWS}
-          size={size}
-          className={cx(styles.legend, swapClass)}
-        />
+        <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size={size} />
       ) : showLegend ? (
         <ProgressLegend
-          key="data"
           id={label ? descriptionId : undefined}
           segments={segments}
           scale={scale}
           formatValue={formatValue}
           size={size}
-          className={cx(styles.legend, swapClass)}
         />
       ) : null;
     }
 
     ring = (
       <Ring
-        key="data"
         value={0}
         weight="data"
         track={gap === "none" || total === 0}
-        className={cx(styles.svg, swapClass)}
+        className={styles.svg}
         role="group"
         {...a11y}
         {...toDataAttributes({ "segment-gap": gap })}
@@ -260,11 +253,10 @@ export function ProgressCircle(props: ProgressCircleProps) {
     tone = toneProp ?? "accent";
     ring = (
       <Ring
-        key="data"
         value={unknown ? null : ratio}
         spin={spin}
         weight="data"
-        className={cx(styles.svg, swapClass)}
+        className={styles.svg}
         role="progressbar"
         aria-valuenow={unknown ? undefined : value}
         aria-valuemin={0}
@@ -277,11 +269,9 @@ export function ProgressCircle(props: ProgressCircleProps) {
 
   const body = (
     <>
-      {loading ? (
-        <Skeleton key="loading" shape="block" className={cx(styles.ringSkeleton, swapClass)} />
-      ) : (
-        ring
-      )}
+      <RegionSwap state={loading ? "loading" : "data"} fill>
+        {loading ? <Skeleton shape="block" className={styles.ringSkeleton} /> : ring}
+      </RegionSwap>
       {loading ? null : description}
       {showInner ? (
         <div className={styles.inner} aria-hidden={valueText !== undefined ? true : undefined}>
@@ -301,7 +291,9 @@ export function ProgressCircle(props: ProgressCircleProps) {
     return (
       <div className={cx(styles.root, className)} {...rootProps}>
         <div className={styles.ring}>{body}</div>
-        {legendNode}
+        <RegionSwap state={loading ? "loading" : "data"} className={styles.legend}>
+          {legendNode}
+        </RegionSwap>
       </div>
     );
   }

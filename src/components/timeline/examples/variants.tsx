@@ -32,8 +32,8 @@ export default function TimelineVariantsExample() {
         <Timeline.Group label="color">
           {COLORS.map((color) => (
             <Timeline.Item key={color} color={color}>
-              <Timeline.Title>{color}</Timeline.Title>
-              <Timeline.Meta>Категория события</Timeline.Meta>
+              <Timeline.ItemTitle>{color}</Timeline.ItemTitle>
+              <Timeline.ItemMeta>Категория события</Timeline.ItemMeta>
             </Timeline.Item>
           ))}
         </Timeline.Group>
@@ -42,9 +42,9 @@ export default function TimelineVariantsExample() {
         <Timeline.Group label="tone">
           {TONES.map(({ tone, title, value }) => (
             <Timeline.Item key={tone} tone={tone}>
-              <Timeline.Title>{title}</Timeline.Title>
-              <Timeline.Meta>{tone}</Timeline.Meta>
-              <Timeline.Value tone={tone}>{value}</Timeline.Value>
+              <Timeline.ItemTitle>{title}</Timeline.ItemTitle>
+              <Timeline.ItemMeta>{tone}</Timeline.ItemMeta>
+              <Timeline.ItemValue tone={tone}>{value}</Timeline.ItemValue>
             </Timeline.Item>
           ))}
           <Timeline.Gap tone="warning">Оплата задерживается 10 дней</Timeline.Gap>

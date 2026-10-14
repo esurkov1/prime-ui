@@ -175,7 +175,7 @@ export default function CrossfadeScreenExample() {
               paging="none"
               loading={status === "loading"}
               loadingRows={3}
-              error={status === "error" ? "Платежи появятся после загрузки выписки" : undefined}
+              loadError={status === "error" ? "Платежи появятся после загрузки выписки" : undefined}
               empty="Все платежи разнесены"
             />
           </PageContent.Section>

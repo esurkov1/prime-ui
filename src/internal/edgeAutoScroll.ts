@@ -35,7 +35,7 @@ type EdgeInsets = {
 };
 
 /** Speed toward an edge `distance` px away from the pointer: 0 outside the zone. */
-export function edgeSpeed(distance: number, zone = EDGE_ZONE_PX): number {
+function edgeSpeed(distance: number, zone = EDGE_ZONE_PX): number {
   if (distance > zone) return 0;
   return MAX_SPEED_PX_PER_MS * (1 - Math.max(distance, 0) / zone);
 }

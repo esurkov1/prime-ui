@@ -14,7 +14,7 @@ const ISSUES = `${REPO}/issues`;
 
 export default function IntroPage() {
   return (
-    <PageContent.Page aria-labelledby="playground-intro">
+    <PageContent.Root as="section" aria-labelledby="playground-intro">
       <PageContent.Header>
         <PageContent.Title id="playground-intro">Prime UI</PageContent.Title>
         <PageContent.Description measure="readable">
@@ -135,6 +135,6 @@ export default function IntroPage() {
           </ul>
         </PageContent.Section>
       </PageContent.Body>
-    </PageContent.Page>
+    </PageContent.Root>
   );
 }

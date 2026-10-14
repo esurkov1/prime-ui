@@ -41,7 +41,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "narrow",
       description:
-        'Подвал карточки 320 px: `compact` всегда показывает «текущая / всего», `compact="auto"` переключается по ширине контейнера — `compact`.',
+        "Подвал карточки 320 px: по умолчанию номера на узкой ширине уступают «текущая / всего», `compact` показывает так всегда — `compact`.",
     },
   ],
   api,

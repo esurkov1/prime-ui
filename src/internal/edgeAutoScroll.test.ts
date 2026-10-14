@@ -2,7 +2,6 @@ import {
   createEdgeAutoScroll,
   EDGE_ZONE_PX,
   edgeScrollers,
-  edgeSpeed,
   MAX_SPEED_PX_PER_MS,
 } from "./edgeAutoScroll";
 
@@ -39,9 +38,20 @@ describe("edgeAutoScroll", () => {
   });
 
   it("speed grows toward the edge and is zero outside the zone", () => {
-    expect(edgeSpeed(EDGE_ZONE_PX + 1)).toBe(0);
-    expect(edgeSpeed(0)).toBe(MAX_SPEED_PX_PER_MS);
-    expect(edgeSpeed(EDGE_ZONE_PX / 2)).toBeCloseTo(MAX_SPEED_PX_PER_MS / 2);
+    /** How far one 16 ms frame scrolls with the pointer at `y` (the scroller is 200 tall). */
+    const stepAt = (y: number) => {
+      const node = scroller("auto", "auto");
+      const auto = createEdgeAutoScroll({ scrollers: [node], onScrolled: () => {} });
+      auto.follow({ x: 100, y });
+      frames(1);
+      auto.stop();
+      return node.scrollTop;
+    };
+    expect(stepAt(200 - EDGE_ZONE_PX - 1)).toBe(0);
+    const full = stepAt(200);
+    expect(full).toBeGreaterThan(0);
+    expect(full).toBeCloseTo(MAX_SPEED_PX_PER_MS * 16, 0);
+    expect(stepAt(200 - EDGE_ZONE_PX / 2)).toBeCloseTo(full / 2, 0);
   });
 
   it("scrolls toward the edge near the pointer and reports each step", () => {

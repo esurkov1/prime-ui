@@ -3,16 +3,17 @@
 **Category:** navigation
 **Kind:** navigation
 
-> A selectable navigation list of rows: the master half of a list + detail screen (conversations, tickets, mail, records).
+> A selectable navigation list of rows: the master half of a list + detail screen (tickets, mail, records).
 
 ## When to use
-- The list side of a list + detail screen (`PageContent.Split` → `PageContent.List`): dialogs, tickets, letters, invoices worked through one by one; the open one is `current`.
+- The list side of a list + detail screen (`PageContent.Split` → `PageContent.Panel kind="list"`): tickets, letters, invoices worked through one by one; the open one is `current`.
 - A short column of records that each open something — a page (`href`, `asChild` with a router link) or a detail pane (`onClick`).
 - A short list the team puts in order (funnel stages, queues, priorities) — `onReorder`, a `value` per item.
 
 ## When not to use
 - App sections → use [Sidebar](../../layout/sidebar/COMPONENT.md) (wide) and [BottomNav](../../layout/bottom-nav/COMPONENT.md) (phone).
 - Panels of one screen → use [Tabs](../tabs/COMPONENT.md).
+- Conversations of a messenger or an inbox (a preview, «печатает…», unread counts) → use [ChatList](../chat-list/COMPONENT.md).
 - Many records compared by columns, sorted, filtered or selected in bulk → use [DataTable](../data-table/COMPONENT.md).
 - A static list of facts inside a card (no selection, nothing opens) → use `Card.List` of [Card](../card/COMPONENT.md) `variant="list"`.
 - Picking a value from options → use [Select](../select/COMPONENT.md) or [Radio](../radio/COMPONENT.md); a menu of commands → [Dropdown](../dropdown/COMPONENT.md).
@@ -26,7 +27,7 @@ import { List } from "prime-ui-kit";
 ```
 List.Root                   <ul aria-label>; size → row tier (ControlSizeProvider); onReorder → Dnd.Sortable <ul>
 └─ List.Item                <li> with a full-width <button> | <a href> | asChild element; current, disabled
-   │                         value; with onReorder: Dnd.Handle (or a Spinner while saving) before the row element
+   │                         value; with onReorder: Dnd.Handle (busy while saving) before the row element
    ├─ List.ItemIcon         leading Avatar.Root / Icon (aria-hidden); after the text — a trailing glyph
    ├─ List.ItemText         primary line, truncates
    ├─ List.ItemDescription  second line, muted, truncates
@@ -46,7 +47,7 @@ List.Root                   <ul aria-label>; size → row tier (ControlSizeProvi
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: height, text, icon and avatar size; counts take one tier down. |
 | `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — | Rows reorder by a leading handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back. |
 | `labels` | `Partial<ListLabels>` | — | Built-in strings, see Labels. |
-| `aria-label` | `string` | — | Name of the list for screen readers («Диалоги»), when no visible heading names it. |
+| `aria-label` | `string` | — | Name of the list for screen readers («Обращения»), when no visible heading names it. |
 | `children` | `ReactNode` | — | `List.Item`s. |
 | `…rest` | `HTMLAttributes<HTMLUListElement>` | — | `className` and the other `ul` attributes. |
 
@@ -137,13 +138,14 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 | focus-visible | keyboard | the focus ring inside the row edge |
 | disabled | `disabled` | `disabled` on a button; `aria-disabled="true"`, no `href` on a link, `tabindex="-1"` on an `asChild` element; `data-disabled="true"`; disabled text; in a reorderable list the handle is disabled and the row holds its place |
 | reorderable | `onReorder` | `data-reorderable="true"` on the root (a `Dnd.Sortable` `<ul>`); each `<li>` is a sortable item (`data-dnd-item` = `value`) with a leading `Dnd.Handle`; drag by the handle (a touch hold on touch), Alt + ↑ / ↓ from the handle or the row; a lifted row leaves a dashed gap in the row's radius, its neighbours glide, the copy (handle and row, in the row's padding and radius) follows the pointer and sets down in its new place without a jump |
-| saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, a `Spinner` stands in for the handle, the row content dims to 0.6 (`--prime-motion-fade-fast` both ways); a rejection glides the row back |
+| saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, the handle is busy (Dnd: a spinner in the disabled grip), the row content dims to 0.6 (`--prime-motion-fade-fast` both ways); a rejection glides the row back |
+| rows come and go | the data adds or takes out a `List.Item` (`value`, else its key) | a new row rises in once (`enterMotion`), a removed one closes up in place (`listPresence`); the first render stays still |
 
-Root attribute: `data-size`. The fill changes on `background-color` with `--prime-motion-fade-xfast` both ways (a fade: reduced motion keeps it).
+Root attributes: `data-size`, `role="list"` (the list style reset would drop the list semantics in WebKit). The fill changes on `background-color` with `--prime-motion-fade-xfast` both ways (a fade: reduced motion keeps it).
 
 ## Layout & spacing
 - The root fills its container (`width: 100%`); rows are 4px apart, each row a full-width button with the tier radius and field padding.
-- Put the list on a surface: a `Card.Root` pane in `PageContent.List`, with a `ScrollContainer` around it when it is long — the list never scrolls by itself.
+- Put the list on a surface: a `Card.Root` pane in `PageContent.Panel kind="list"`, with a `ScrollContainer` around it when it is long — the list never scrolls by itself.
 - Row: leading icon · body (text over description) · trail. Beside two lines the trail stacks — meta on top, count below; beside one line they sit in a row.
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
@@ -179,11 +181,11 @@ Root attribute: `data-size`. The fill changes on `background-color` with `--prim
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Support dialogs with a preview, the time and the unread count; a click opens a dialog and makes it the current row — `current`, `onClick`. |
+| [overview.tsx](examples/overview.tsx) | A support ticket queue with the client, the last update and the open count; a click opens a ticket and makes it the current row — `current`, `onClick`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: row height, text, icon and count follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | The open record, a regular row and an unavailable one — `current`, `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients and icons of queues; the slot sizes the avatar to the row tier — `List.ItemIcon`. |
-| [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate. |
+| [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. |
 | [as-link.tsx](examples/as-link.tsx) | Rows as links to the invoice pages: a plain link, or your router link through the slot — `href`, `asChild`. |
 | [reorder.tsx](examples/reorder.tsx) | Funnel stages in the team's order: a stage moves by its handle or Alt+arrows and is saved on the server — `onReorder`, `value`. |
 
@@ -197,5 +199,5 @@ Root attribute: `data-size`. The fill changes on `background-color` with `--prim
 - `onReorder` that rolls the order back itself on an error → return the promise; a rejection moves the row back.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, `Dnd.Handle`), [Spinner](../spinner/COMPONENT.md) (a move being saved)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`)
 - **See also:** [PageContent](../page-content/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md), [Avatar](../avatar/COMPONENT.md)

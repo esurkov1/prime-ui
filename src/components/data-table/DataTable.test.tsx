@@ -9,6 +9,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Badge } from "@/components/badge/Badge";
 import { Kbd } from "@/components/kbd/Kbd";
+import rowLink from "@/internal/rowLink.module.css";
 import { stickySurfaceClass } from "@/internal/sticky";
 import swapMotion from "@/internal/swapMotion.module.css";
 
@@ -378,13 +379,13 @@ describe("DataTable", () => {
     fireEvent.click(screen.getByRole("button", { name: "Name" }));
     expect(body(container)).toBe(loaded);
 
-    rerender(<DataTable rows={[]} columns={columns} error="Не удалось загрузить" />);
+    rerender(<DataTable rows={[]} columns={columns} loadError="Не удалось загрузить" />);
     expect(body(container)).not.toBe(loaded);
     expect(body(container)).toHaveClass(swapMotion.swapIn);
   });
 
   it("renders error state instead of rows", () => {
-    render(<DataTable rows={rows} columns={columns} error="Не удалось загрузить" />);
+    render(<DataTable rows={rows} columns={columns} loadError="Не удалось загрузить" />);
     expect(screen.getByRole("alert")).toHaveTextContent("Не удалось загрузить");
     expect(screen.queryByText("A")).not.toBeInTheDocument();
   });
@@ -720,8 +721,12 @@ describe("DataTable CSS contract", () => {
       // `data-depth` is the surface ladder's attribute; a sub-row must never take it.
       expect(child).not.toHaveAttribute("data-depth");
       expect(child).toHaveAttribute("data-animate", "true");
-      // A sub-row folds open like the detail panel.
-      expect(child).toHaveAttribute("data-fold", "opening");
+      // A sub-row folds open like the detail panel: its cells' content is a disclosure that opens.
+      expect(child).toHaveAttribute("data-fold", "open");
+      expect(within(child).getByText("Выплата").closest("[data-state]")).toHaveAttribute(
+        "data-state",
+        "open",
+      );
       expect(collapse.getAttribute("aria-controls")?.split(" ")).toContain(child.id);
       expect(screen.getByText("Денис").closest("tr")).toHaveAttribute("data-expanded", "true");
       await user.click(collapse);
@@ -1306,12 +1311,20 @@ describe("DataTable opening rows", () => {
     expect(screen.getAllByRole("link")).toHaveLength(2);
   });
 
-  it("CSS: controls stand above the link copies and the focused row rings all its cells", () => {
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-    expect(css).toMatch(/:where\(\.row\[data-link="true"\] > \.cell\)/);
-    expect(css).toMatch(
-      /\[data-row-click-ignore\]\s*\) \{\s*position: relative;\s*z-index: var\(--prime-z-raised\);/,
+  it("a link row lifts its controls above the link copies (rowLink host); a focused row rings all its cells", () => {
+    render(
+      <DataTable
+        rows={DEALS}
+        columns={dealColumns()}
+        getRowKey={(row) => row.id}
+        paging="none"
+        getRowHref={(row) => `/deals/${row.id}`}
+        isRowClickable={(row) => !row.summary}
+      />,
     );
+    expect(rowOf("Итого")).not.toHaveClass(rowLink.host);
+    expect(screen.getAllByRole("link")[0].closest("tr")).toHaveClass(rowLink.host);
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
     expect(css).toMatch(/\.row:is\(:focus-visible, :has\(\.rowLink:focus-visible\)\) > \.cell \{/);
   });
 });
@@ -1624,7 +1637,11 @@ describe("DataTable row groups", () => {
     expect(close).toHaveAttribute("aria-expanded", "true");
     const row = screen.getByRole("cell", { name: "Лето" }).closest("tr") as HTMLElement;
     // The rows fold in like expanded sub-rows.
-    expect(row).toHaveAttribute("data-fold", "opening");
+    expect(row).toHaveAttribute("data-fold", "open");
+    expect(within(row).getByText("Лето").closest("[data-state]")).toHaveAttribute(
+      "data-state",
+      "open",
+    );
     expect(close.getAttribute("aria-controls")?.split(" ")).toContain(row.id);
     expect(screen.getAllByRole("rowheader")[1]).toHaveAttribute("data-sticky", "true");
 
@@ -1721,7 +1738,7 @@ describe("DataTable state content", () => {
     box(screen.getByText("Ничего не найдено").parentElement as HTMLElement);
     rerender(<DataTable rows={[]} columns={columns} />);
     box(screen.getByRole("status"));
-    rerender(<DataTable rows={[]} columns={columns} error="Не удалось загрузить" />);
+    rerender(<DataTable rows={[]} columns={columns} loadError="Не удалось загрузить" />);
     box(screen.getByRole("alert"));
   });
 });

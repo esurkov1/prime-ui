@@ -37,7 +37,7 @@ export const page: ComponentPageConfig = {
       scenario: "register",
       title: "Регистрация",
       description:
-        "Регистрация: пять полей в колонку, шкала надёжности у нового пароля и несовпадение — ошибкой поля — `strength`, `error`, `LoginForm.Form`.",
+        "Регистрация: четыре поля в колонку, шкала надёжности у нового пароля и несовпадение — ошибкой поля — `strength`, `error`, `LoginForm.Form`.",
     },
     {
       scenario: "forgot-password",
@@ -65,7 +65,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "narrow",
       description:
-        "На экране шириной с телефон карточка сохраняет отступы, шапка переносится, кнопки остаются на всю ширину.",
+        "На экране шириной с телефон карточка сохраняет отступы, шапка переносится, кнопки остаются на всю ширину — `LoginForm.Form`.",
     },
   ],
   api,

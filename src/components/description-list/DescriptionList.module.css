@@ -11,8 +11,6 @@
   --dl-text-size: var(--prime-control-m-text-size);
   --dl-line-height: var(--prime-control-m-line-height);
   --dl-row-gap: var(--prime-space-3);
-  /* A row action is one tier smaller; the value keeps the row at least that tall. */
-  --dl-action: var(--prime-control-s-height);
 
   container-type: inline-size;
   display: flex;
@@ -29,7 +27,6 @@
   --dl-text-size: var(--prime-control-xs-text-size);
   --dl-line-height: var(--prime-control-xs-line-height);
   --dl-row-gap: var(--prime-space-2);
-  --dl-action: var(--prime-control-xs-height);
 }
 
 .root[data-size="s"] {
@@ -38,7 +35,6 @@
   --dl-text-size: var(--prime-control-s-text-size);
   --dl-line-height: var(--prime-control-s-line-height);
   --dl-row-gap: var(--prime-space-2);
-  --dl-action: var(--prime-control-xs-height);
 }
 
 .root[data-size="l"] {
@@ -47,7 +43,6 @@
   --dl-text-size: var(--prime-control-l-text-size);
   --dl-line-height: var(--prime-control-l-line-height);
   --dl-row-gap: var(--prime-space-4);
-  --dl-action: var(--prime-control-m-height);
 }
 
 .root[data-size="xl"] {
@@ -56,7 +51,6 @@
   --dl-text-size: var(--prime-control-xl-text-size);
   --dl-line-height: var(--prime-control-xl-line-height);
   --dl-row-gap: var(--prime-space-4);
-  --dl-action: var(--prime-control-l-height);
 }
 
 .item {
@@ -106,9 +100,12 @@
   color: var(--prime-color-text-muted);
 }
 
-/* The action centres on the value's first line and never pushes the row taller than it is. */
+/* The action's box is the value's first line: the action centres in it (overflowing it evenly), so
+   it sits on that line at every tier and never pushes the row taller than the text. */
 .action {
+  display: flex;
   flex-shrink: 0;
   align-self: flex-start;
-  margin-block: calc((var(--dl-line-height) - var(--dl-action)) / 2);
+  align-items: center;
+  height: var(--dl-line-height);
 }

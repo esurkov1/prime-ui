@@ -3,7 +3,7 @@
  * card of its own: rows are transparent with a `fill-subtle` wash on hover; the current row takes
  * the surface's fill two ladder steps off it (`fill-muted-hover`), as the Sidebar's current item.
  * A one-line row is the control height of the tier; a second line (description) or an avatar
- * makes it taller. On a coarse pointer a row is at least the touch target.
+ * makes it taller. On a coarse pointer a row is at least the touch target (`touchTargetRowClass`).
  */
 
 .root {
@@ -81,12 +81,6 @@
   --list-radius: var(--prime-control-xl-radius);
 }
 
-@media (pointer: coarse) {
-  .root {
-    --list-row-h: max(var(--list-h), var(--prime-control-touch-target));
-  }
-}
-
 .row {
   display: flex;
   min-width: 0;
@@ -102,7 +96,7 @@
   gap: var(--list-gap);
   width: 100%;
   min-width: 0;
-  min-height: var(--list-row-h, var(--list-h));
+  min-height: max(var(--list-h), var(--touch-row-min, var(--prime-space-0)));
   margin: 0;
   padding-block: calc((var(--list-h) - var(--list-lh)) / 2);
   padding-inline: var(--list-pad-x);

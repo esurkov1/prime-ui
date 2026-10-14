@@ -10,7 +10,20 @@ import * as React from "react";
 
 const SERIES: ChartFrameSeries[] = [{ id: "orders", label: "Заказы" }];
 
-const DAYS = [132, 158, 141, 176, 190, 164, 203, 188, 214, 197];
+const DAYS = [
+  { day: "1 окт", orders: 132 },
+  { day: "2 окт", orders: 158 },
+  { day: "3 окт", orders: 141 },
+  { day: "4 окт", orders: 176 },
+  { day: "5 окт", orders: 190 },
+  { day: "6 окт", orders: 164 },
+  { day: "7 окт", orders: 203 },
+  { day: "8 окт", orders: 188 },
+  { day: "9 окт", orders: 214 },
+  { day: "10 окт", orders: 197 },
+];
+
+const ROWS = DAYS.map(({ day, orders }) => ({ label: day, values: { orders } }));
 
 const formatOrders = (value: number) => value.toLocaleString("ru-RU");
 
@@ -32,6 +45,7 @@ export default function ChartFrameStatesExample() {
       <ChartFrame.Root
         state={state}
         series={SERIES}
+        rows={ROWS}
         formatValue={formatOrders}
         onRetry={() =>
           new Promise<void>((resolve) => {
@@ -52,18 +66,17 @@ export default function ChartFrameStatesExample() {
         <ChartFrame.Plot
           renderPlot={({ width, height, series }) => {
             const band = width / DAYS.length;
-            const max = Math.max(...DAYS);
+            const max = Math.max(...DAYS.map((d) => d.orders));
             return (
               <svg width={width} height={height} aria-hidden="true">
                 <line x1={0} x2={width} y1={height} y2={height} stroke={chartColors.axis} />
-                {DAYS.map((value, i) => (
+                {DAYS.map(({ day, orders }, i) => (
                   <rect
-                    // biome-ignore lint/suspicious/noArrayIndexKey: one bar per day, in order
-                    key={i}
+                    key={day}
                     x={band * i + 4}
-                    y={height - (height * value) / max}
+                    y={height - (height * orders) / max}
                     width={band - 8}
-                    height={(height * value) / max}
+                    height={(height * orders) / max}
                     rx={2}
                     fill={series[0].color}
                   />

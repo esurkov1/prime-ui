@@ -115,7 +115,7 @@ The stroke is always 1/12 of the diameter (the kit ring's `data` weight). These 
 | icon change | a new icon in `children` (another `name`) | the old one shrinks to 0.6 and fades, the new one grows in (`fast`) and plays its gesture once; a changing number updates in place |
 | segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the svg, `data-tone` or `data-color` on every arc and cap; arcs glide by dash, caps by `rotate` |
 | legend | `legend` | `data-legend` on the root, which becomes a wrapping row of the ring and the `<ul>` |
-| loading | `loading` | `aria-busy` on the root; a Skeleton ring (mask of the stroke) and legend lines; the data cross-fades in (`swapMotion`) |
+| loading | `loading` | `aria-busy` on the root; a Skeleton ring (mask of the stroke) and legend lines; the data cross-fades in (`RegionSwap`) |
 | reduced motion | `prefers-reduced-motion` | arcs and icons change instantly; a turning ring turns twice as slow and never stops |
 
 Always controlled: pass the current `value` or `segments`.
@@ -139,7 +139,7 @@ No keyboard interaction.
 
 - Value mode: the svg is `role="progressbar"` with `aria-valuenow` / `-min` / `-max`; a string or number child becomes `aria-valuetext`. With `value={null}` there is no `aria-valuenow` — the share is unknown.
 - The turn never stops under reduced motion (twice as slow): it is the only sign the work goes on.
-- Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.
+- Segments mode: the svg is `role="group"`; with `aria-label` it is named by it and the text in the centre («Хранилище, 72%») and described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.
 - A category color always sits beside its name in the legend, so color is never the only cue.
 - While `loading` the root is `aria-busy` and the Skeletons are `aria-hidden`.
 - Always pass `aria-label`: a caption next to the ring is not linked to it.
@@ -164,6 +164,7 @@ No keyboard interaction.
 | [under-way.tsx](examples/under-way.tsx) | An import whose share is not known yet turns a quarter arc, then fills and swaps its icon; a sync turns while its share grows — `value`, `spin`, `children`. |
 | [segments.tsx](examples/segments.tsx) | Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list with its own spoken text — `segments`, `segmentGap`, `labels`. |
 | [legend.tsx](examples/legend.tsx) | A ring of category shares with a legend beside it, in the categories' chart colors — `color`, `legend`, `formatValue`. |
+| [on-color.tsx](examples/on-color.tsx) | A ring on a colored host takes the host's text color — `tone`. |
 
 ## Mistakes
 - No `aria-label` (even with a visible caption) → screen readers get an unnamed progressbar.

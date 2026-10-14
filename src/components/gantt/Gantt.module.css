@@ -904,18 +904,11 @@
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-muted);
   pointer-events: none;
-  animation: ganttCellIn var(--prime-motion-duration-xfast) var(--prime-motion-easing-enter);
 }
 
 @media (hover: none) {
   .createCell {
     display: none;
-  }
-}
-
-@keyframes ganttCellIn {
-  from {
-    opacity: 0;
   }
 }
 

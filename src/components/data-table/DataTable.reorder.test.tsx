@@ -150,7 +150,9 @@ describe("DataTable onReorder", () => {
     expect(order()).toEqual(["b", "a", "c"]);
     const row = document.querySelector('tr[data-dnd-item="a"]');
     expect(row).toHaveAttribute("aria-busy", "true");
-    expect(screen.queryByRole("button", { name: "Переместить строку Лиды" })).toBeNull();
+    // The grip is busy (Dnd's busy handle), not replaced.
+    expect(handle("Лиды")).toHaveAttribute("aria-busy", "true");
+    expect(handle("Лиды")).toBeDisabled();
 
     await act(async () => {
       reject(new Error("Сервер недоступен"));

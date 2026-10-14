@@ -64,11 +64,11 @@ Gantt                          surface (layer of the ladder), size container
 | `empty` | `ReactNode` | — | Empty-state content when `rows` is empty; a string goes into a compact `EmptyPage`. Defaults to `labels.empty`. |
 | `toolbar` | `ReactNode` | — | Content at the start of the toolbar (title, filters, a primary action); the zoom and «Сегодня» sit at its end. |
 | `scrollHeight` | `number \| "fill"` | — | Max height of the viewport in px, so the header sticks while rows scroll; `"fill"` — the chart takes its flex / grid parent's height. |
-| `onSelect` | `(bar: Bar, row: Row) => void` | — | A bar was activated (click, Enter, Space): open its record. A drag never selects. |
+| `onItemOpen` | `(bar: Bar, row: Row) => void` | — | A bar was activated (click, Enter, Space): open its record. A drag never opens it. |
 | `onBarChange` | `(dates: GanttDates, bar: Bar, row: Row) => void \| Promise<void>` | — | New dates of a bar after a drag or an editing key — update your data. A returned Promise keeps the bar busy at the new dates; a rejection glides it back. Without it bars cannot be edited. |
 | `onBarCreate` | `(dates: GanttDates, row: Row) => void \| Promise<void>` | — | A new bar in a row: drawn across empty space, a double-click, a touch long-press or `N`. Add it to your data; a returned Promise keeps a busy ghost in place. Without it nothing can be created. |
 | `labels` | `Partial<GanttLabels>` | — | Built-in strings, see Labels. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "onSelect">` | — | `aria-label` (the grid's name), `className` and the other div attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `aria-label` (the grid's name), `className` and the other div attributes. |
 
 ### Types
 
@@ -148,7 +148,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - Header: two quiet mono tiers. The upper tier (months as `MM.yyyy` — «09.2026» — or years at `month`) is the faintest text on the chart and has no lines: a period is told by its label, which starts at the period's first column (at `week`, the first ISO week: the one whose Thursday is in the month) and rides the start of the visible axis while the period is on screen. The lower tier has faint hairlines; the column that opens a new period gets a slightly stronger line, down through the rows too. The today line and the «Сегодня» flag lie over the labels; today's cell is an accent chip with the kit's chip radius (a single digit is a small rectangle, never a circle).
 - The header (two tiers) and the first column stick inside the chart's own scroller; pass `scrollHeight` (or `"fill"` in a sized parent) so the header sticks while rows scroll. Below 480 px of screen height the header scrolls with the rows.
 - Virtualization: rows render only in view (plus an overscan) at offsets computed from their lanes and corrected by measuring, so the total height and the scrollbar stay exact; header cells, period lines and bars render only inside the visible time window plus a screen on each side; weekends and day / week column lines are CSS patterns, not elements. A focused, dragged, pending or new bar stays rendered wherever the chart scrolls.
-- Editing precision: a move, a resize and a drawing snap to whole days at every zoom (at the month zoom a day is 4 px, so the snap holds a day until the pointer clearly leaves it); hold Alt to snap to the zoom's week or month. A bar is at least one day long: a resize past the opposite edge stops there and never flips. On touch a long press picks a bar up, then it drags like a pointer.
+- Editing precision: a move, a resize and a drawing snap to whole days at every zoom (at the month zoom a day is 4 px, so the snap holds a day until the pointer clearly leaves it); hold Alt to snap to the zoom's week or month. A bar is at least one day long: a resize past the opposite edge stops there and never flips. On touch a finger held on a bar picks it up, then it drags like a pointer.
 - Creating: on empty space the cursor is a crosshair and, on pointer devices, the cell under it is washed with a «+». Drag across a row to draw a range in days, double-click (or long-press on touch) for one unit of the zoom; a drag after the long press draws days. While drawing, a ghost with a dates and duration tooltip follows the pointer. Without `onBarCreate` (or with `readOnly`) nothing can be created and empty space shows no create cursor. Near the edges of the axis a drag, a resize and a drawing scroll the chart.
 - Tooltip: the bar's title, then its dates · duration · progress; `renderBarTooltip` adds lines under them (a client, planned hours) and never replaces them — the dates are what the bar means on the axis, and the same tooltip shows the new dates while dragging.
 - A legend of bar colours goes in `toolbar`: a row of `Badge.Root color` + `Badge.Dot` with the category name, one per hue the bars use; the toolbar wraps it. Say the category in the bar label or the tooltip too, never only by colour.
@@ -168,7 +168,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | `←` · `→` | Along the row: its header, then its bars in time order. A row off screen is rendered and scrolled into view. |
 | `↑` · `↓` | From a bar, the bar nearest in time in the row above / below (rows without bars are skipped); from a row header, the next row's header, empty rows too. |
 | `Home` · `End` | First / last bar of the row; with Ctrl, of the chart. |
-| `Enter` · `Space` | On a bar: selects it (`onSelect`). On a row header: opens the row (`onRowClick`) or follows its link (`getRowHref`). |
+| `Enter` · `Space` | On a bar: opens its record (`onItemOpen`). On a row header: opens the row (`onRowClick`) or follows its link (`getRowHref`). |
 | `Shift + ←` · `Shift + →` | Moves the bar by one day, at every zoom. |
 | `Shift + Alt + ←` · `Shift + Alt + →` | Moves the bar by the zoom's unit (a week, a month). |
 | `Ctrl + Shift + ←` · `Ctrl + Shift + →` | Shortens / lengthens the bar by one day (⌘ on macOS); it stops at one day. |
@@ -218,20 +218,20 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | [overview.tsx](examples/overview.tsx) | A project plan: work streams with phases, progress and a launch milestone that move and stretch by pointer or keyboard — `getRowBars`, `onBarChange`. |
 | [variants.tsx](examples/variants.tsx) | Bars colored by category with palette hues, and by status with tones that win over the hue — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier: one-lane rows from 28 to 52 px, bars, header and toolbar controls of the tier — `size`. |
-| [occupancy.tsx](examples/occupancy.tsx) | Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onSelect`, `readOnly`. |
+| [occupancy.tsx](examples/occupancy.tsx) | Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `readOnly`. |
 | [large.tsx](examples/large.tsx) | Two thousand people over two years stay fast: only the rows and days in view are rendered, keyboard focus reaches any row, and new bars are drawn on empty space — `rows`, `range`, `scrollHeight`, `onBarCreate`. |
 | [row-link.tsx](examples/row-link.tsx) | A team by client: each row header is a link to the person's profile that a plain click opens in place, each tooltip adds the client and the planned hours under the dates, and a legend of client hues stands in the toolbar — `getRowHref`, `onRowClick`, `renderBarTooltip`. |
 | [states.tsx](examples/states.tsx) | Skeleton rows in the chart's geometry while it loads, an empty period and a report you may only look at, its today line on the report day — `loading`, `empty`, `readOnly`, `today`. |
 | [controlled.tsx](examples/controlled.tsx) | The zoom owned by the page: presets in the toolbar and the built-in switch change one state — `scale`, `onScaleChange`. |
 | [narrow.tsx](examples/narrow.tsx) | At 360 px the first column keeps only the avatars, the toolbar moves to its own row and the axis scrolls under the pinned column — `renderRowAvatar`. |
-| [screen.tsx](examples/screen.tsx) | A team schedule as a work screen: the title with the people shown and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onSelect`. |
+| [screen.tsx](examples/screen.tsx) | A team schedule as a work screen: the title with the people shown and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`. |
 
 ## Mistakes
 - Updating the rows before the request succeeds (optimistic) → the chart cannot glide back on reject; update them when `onBarChange` resolves, or before you resolve it.
 - An inclusive `end` (`{ start: 3 July, end: 3 July }` for a one-day task) → that is a milestone; `end` is the day after the last one.
 - Status only by bar color → put it into the label too («Отпуск», «Просрочено»).
 - Dates with times expecting hour precision → the chart works in calendar days.
-- A `<div onClick>` inside `renderRow` to open a bar's or a row's record → use `onSelect` for a bar and `onRowClick` / `getRowHref` for a row: they work from the keyboard too.
+- A `<div onClick>` inside `renderRow` to open a bar's or a row's record → use `onItemOpen` for a bar and `onRowClick` / `getRowHref` for a row: they work from the keyboard too.
 - Replacing the dates in the tooltip with your own text → `renderBarTooltip` adds lines under them; the dates stay.
 - Wrapping the chart in a Card → it is a surface itself; place it directly in the page or a Card body only as the card's one content.
 - Expecting the page to scroll to today → «Сегодня» scrolls only the chart.

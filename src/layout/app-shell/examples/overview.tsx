@@ -54,13 +54,13 @@ export default function AppShellOverviewExample() {
           </AppHeader.Actions>
         </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Page>
+          <PageContent.Root as="section">
             <PageContent.Body>
               <Typography variant="body-m" tone="secondary">
                 Выручка за месяц — 4,8 млн ₽, на 12% больше, чем в сентябре.
               </Typography>
             </PageContent.Body>
-          </PageContent.Page>
+          </PageContent.Root>
         </AppShell.Main>
       </AppShell.Root>
     </div>

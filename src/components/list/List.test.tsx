@@ -7,6 +7,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { moveBefore } from "@/components/dnd/useSortableList";
 
+import enterMotion from "@/internal/enterMotion.module.css";
+
 import { List } from "./List";
 import styles from "./List.module.css";
 
@@ -285,7 +287,11 @@ describe("List onReorder", () => {
     });
     expect(order()).toEqual(["talks", "lead", "contract"]);
     expect(document.querySelector('li[data-dnd-item="lead"]')).toHaveAttribute("aria-busy", "true");
-    expect(screen.queryByRole("button", { name: "Переместить Лид" })).toBeNull();
+    // The grip stays, busy (Dnd's busy handle).
+    expect(screen.getByRole("button", { name: "Переместить Лид" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
 
     await act(async () => {
       reject(new Error("Сервер недоступен"));
@@ -293,6 +299,35 @@ describe("List onReorder", () => {
     expect(order()).toEqual(["lead", "talks", "contract"]);
     expect(document.querySelector('li[data-dnd-item="lead"]')).not.toHaveAttribute("aria-busy");
     expect(screen.getByRole("button", { name: "Переместить Лид" })).toBeInTheDocument();
+  });
+
+  it("keeps its list role with the list style reset", () => {
+    render(
+      <List.Root aria-label="Обращения">
+        <List.Item>Счёт без НДС</List.Item>
+      </List.Root>,
+    );
+    expect(screen.getByRole("list", { name: "Обращения" })).toHaveAttribute("role", "list");
+  });
+
+  it("a row the data adds rises in; the first render stays still", () => {
+    function Queue({ ids }: { ids: string[] }) {
+      return (
+        <List.Root aria-label="Обращения">
+          {ids.map((id) => (
+            <List.Item key={id} value={id}>
+              {id}
+            </List.Item>
+          ))}
+        </List.Root>
+      );
+    }
+    const { rerender } = render(<Queue ids={["T-1"]} />);
+    expect(screen.getByRole("listitem")).not.toHaveClass(enterMotion.enter);
+    rerender(<Queue ids={["T-1", "T-2"]} />);
+    const [first, second] = screen.getAllByRole("listitem");
+    expect(first).not.toHaveClass(enterMotion.enter);
+    expect(second).toHaveClass(enterMotion.enter);
   });
 
   it("names the handle from labels", () => {

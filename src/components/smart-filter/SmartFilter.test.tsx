@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { matchIndex } from "@/internal/HighlightMatch";
 
 import {
@@ -259,6 +261,31 @@ describe("SmartFilter", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Сбросить все" }));
     expect(onValue).toHaveBeenLastCalledWith({ other: { include: ["x"], exclude: [] } });
+  });
+
+  it("takes the host tier without its own size", () => {
+    const { container } = render(
+      <ControlSizeProvider value="l">
+        <SmartFilter.Root fields={FIELDS}>
+          <SmartFilter.Toolbar />
+        </SmartFilter.Root>
+      </ControlSizeProvider>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-size", "l");
+  });
+
+  it("the chips row rises in when the first filter applies", () => {
+    function Filtered({ value }: { value: SmartFilterValue }) {
+      return (
+        <SmartFilter.Root fields={FIELDS} value={value}>
+          <SmartFilter.Chips data-testid="chips" />
+        </SmartFilter.Root>
+      );
+    }
+    const { rerender } = render(<Filtered value={{}} />);
+    expect(screen.queryByTestId("chips")).toBeNull();
+    rerender(<Filtered value={{ method: { include: ["GET"], exclude: [] } }} />);
+    expect(screen.getByTestId("chips")).toHaveClass(enterMotion.enter);
   });
 
   it("tag row: tags take the tag tier (never below s), «add» is a text action of their type and opens the panel", () => {

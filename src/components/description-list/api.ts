@@ -78,8 +78,15 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: 'The icon (`<Icon name="…" />`).',
-          ru: 'Иконка (`<Icon name="…" />`).',
+          en: 'The icon (`<Icon name="…" />`); with `asChild`, the one link whose children are the icon.',
+          ru: 'Иконка (`<Icon name="…" />`); с `asChild` — единственная ссылка с иконкой внутри.',
+        },
+        {
+          name: "asChild",
+          type: "boolean",
+          default: "false",
+          en: "The action is the child link (`mailto:`, another page) with the button look.",
+          ru: "Действие — дочерняя ссылка (`mailto:`, другая страница) с видом кнопки.",
         },
         {
           name: "…rest",

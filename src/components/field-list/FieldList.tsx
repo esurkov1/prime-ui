@@ -1,8 +1,7 @@
 import * as React from "react";
 
 import { Button } from "@/components/button/Button";
-import { DragControllerContext } from "@/components/dnd/context";
-import { Dnd } from "@/components/dnd/Dnd";
+import { Dnd, DndLock } from "@/components/dnd/Dnd";
 import { moveBefore } from "@/components/dnd/useSortableList";
 import { Label } from "@/components/label/Label";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -134,12 +133,6 @@ function cellsOf(node: React.ReactNode): React.ReactNode[] {
   );
 }
 
-/** Mounts the drag session the rows need, unless the app already has one above the list. */
-function ReorderSession({ children }: { children: React.ReactNode }) {
-  const outer = React.useContext(DragControllerContext);
-  return outer ? children : <Dnd.Root>{children}</Dnd.Root>;
-}
-
 const FOCUSABLE = "input, textarea, select, button, [tabindex]:not([tabindex='-1'])";
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -185,10 +178,12 @@ export function FieldList<T extends object>({
     onChange: onValueChange as ((next: readonly T[]) => void) | undefined,
   });
   const ids = useFieldFrame(undefined, { label, hint, error });
-  // The list is named by the visible label, else by the consumer's `aria-labelledby` / `aria-label`.
+  // The list is named by the visible label, else by the consumer's `aria-labelledby` / `aria-label`,
+  // and described by the list's hint and error, which speak for every row.
   const listName = {
     "aria-labelledby": ids.labelledBy ?? ariaLabelledBy,
     "aria-label": ids.labelledBy || ariaLabelledBy ? undefined : ariaLabel,
+    "aria-describedby": ids.describedBy,
   };
   const addRef = React.useRef<HTMLButtonElement>(null);
   const rows = React.useRef(new Map<string, HTMLElement>());
@@ -280,9 +275,7 @@ export function FieldList<T extends object>({
                 disabled={disabled}
               />
             ) : locked ? (
-              <span className={styles.lock} role="img" aria-label={labels.locked}>
-                <Icon name="status.locked" />
-              </span>
+              <DndLock aria-label={labels.locked} />
             ) : null}
           </span>
         ) : null}
@@ -395,7 +388,7 @@ export function FieldList<T extends object>({
               </div>
             ) : null}
             {reorderable ? (
-              <ReorderSession>
+              <Dnd.Root>
                 <Dnd.Sortable
                   as="ol"
                   handle
@@ -410,7 +403,7 @@ export function FieldList<T extends object>({
                   }
                   renderItem={renderRow}
                 />
-              </ReorderSession>
+              </Dnd.Root>
             ) : (
               <ol className={styles.rows} {...listName}>
                 {items.map(renderRow)}

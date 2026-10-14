@@ -3,10 +3,12 @@
 import type { Locale } from "date-fns";
 import * as React from "react";
 
-import { isPlainClick, opensRow } from "@/components/data-table/rowEvents";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Icon } from "@/icons";
+import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { isPlainClick, opensRow } from "@/internal/rowLink";
 
 import styles from "./Gantt.module.css";
 import { GanttBarView } from "./GanttBar";
@@ -39,9 +41,9 @@ export type GanttTrackEvent =
  * row re-renders only when its own props change — scrolling mounts new rows and leaves the rest.
  */
 export type GanttRowContext = {
-  register: (id: string) => (node: HTMLElement | null) => void;
+  register: (id: string) => React.RefCallback<HTMLElement>;
   focus: (id: string) => void;
-  select: (barId: string, rowIndex: number) => void;
+  open: (barId: string, rowIndex: number) => void;
   /** `onRowClick` of the row at `rowIndex`. */
   openRow: (
     rowIndex: number,
@@ -229,7 +231,7 @@ function GanttRowView({
       >
         {hover && !ghost ? (
           <span
-            className={styles.createCell}
+            className={cx(styles.createCell, enterMotion.enterFade)}
             style={{ "--x": hover.x, "--span": hover.span } as React.CSSProperties}
             aria-hidden="true"
           >
@@ -262,7 +264,7 @@ function GanttRowView({
               direction={ctx.direction}
               scrollLeft={ctx.scrollLeft}
               autoScroll={ctx.autoScroll}
-              onActivate={() => ctx.select(bar.id, index)}
+              onActivate={() => ctx.open(bar.id, index)}
               onFocusBar={() => ctx.focus(bar.id)}
               onTipChange={ctx.registerTip}
               canShowTip={ctx.canShowTip}

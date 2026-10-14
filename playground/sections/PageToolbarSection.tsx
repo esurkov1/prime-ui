@@ -30,7 +30,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Панель страницы заказов: поиск и фильтр, разделы со счётчиками, период и главное действие в одну строку, активные фильтры прямо под поиском — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`.",
+        "Панель страницы заказов: поиск и фильтр, разделы со счётчиками, период и главное действие в одну строку, активные фильтры под верхней строкой — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`.",
     },
     {
       scenario: "without-search",

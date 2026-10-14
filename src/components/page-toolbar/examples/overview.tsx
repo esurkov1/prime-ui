@@ -1,4 +1,4 @@
-/** The panel of an orders page: search and filter, sections with counts, the period and the primary action in one row; active filters right under the search — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`. */
+/** The panel of an orders page: search and filter, sections with counts, the period and the primary action in one row; active filters under the top row — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`. */
 import {
   Button,
   Icon,

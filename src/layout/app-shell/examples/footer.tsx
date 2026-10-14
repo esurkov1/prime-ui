@@ -31,7 +31,7 @@ export default function AppShellFooterExample() {
           </AppHeader.Start>
         </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Page>
+          <PageContent.Root as="section">
             <PageContent.Body>
               {INVOICES.map((invoice) => (
                 <Typography key={invoice} variant="body-m">
@@ -39,7 +39,7 @@ export default function AppShellFooterExample() {
                 </Typography>
               ))}
             </PageContent.Body>
-          </PageContent.Page>
+          </PageContent.Root>
         </AppShell.Main>
         <AppShell.Footer>
           <BottomNav.Root>
