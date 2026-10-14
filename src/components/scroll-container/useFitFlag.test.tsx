@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { act, render, screen } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ScrollContainer } from "./ScrollContainer";
 
@@ -43,8 +43,8 @@ function size(node: HTMLElement, scroll: number, client: number) {
 }
 
 describe("ScrollContainer: a region whose content fits is no scroller", () => {
-  beforeAll(() => vi.stubGlobal("ResizeObserver", StubResizeObserver));
-  afterAll(() => vi.unstubAllGlobals());
+  // Globals are unstubbed after every test (`unstubGlobals`), so each test stubs its own.
+  beforeEach(() => vi.stubGlobal("ResizeObserver", StubResizeObserver));
 
   it("marks data-fits while the content fits and drops it once the content outgrows the region", () => {
     render(

@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 
+import { afterEach } from "vitest";
+
 /*
  * jsdom has no matchMedia. Tests run with `prefers-reduced-motion: reduce`, so overlays
  * (`usePresence`) unmount synchronously on close instead of waiting for an exit animation that
@@ -31,3 +33,19 @@ if (typeof window !== "undefined") {
   if (!("AnimationEvent" in window)) w.AnimationEvent = class AnimationEvent extends Event {};
   if (!("TransitionEvent" in window)) w.TransitionEvent = class TransitionEvent extends Event {};
 }
+
+/*
+ * jsdom has no layout, so `scrollIntoView` is missing; components call it for a keyboard-moved
+ * highlight (`block: "nearest"`). A test that asserts the call spies on it.
+ */
+if (typeof window !== "undefined" && typeof Element.prototype.scrollIntoView !== "function") {
+  Element.prototype.scrollIntoView = () => {};
+}
+
+/*
+ * A test that sets a custom property on the document (a motion duration, a theme value) leaves
+ * it for the next test otherwise.
+ */
+afterEach(() => {
+  if (typeof document !== "undefined") document.documentElement.removeAttribute("style");
+});
