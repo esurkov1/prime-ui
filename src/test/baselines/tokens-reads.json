@@ -8,7 +8,6 @@
   "src/components/hint/Hint.module.css: --prime-hint-icon",
   "src/components/hint/Hint.module.css: --prime-hint-line-height",
   "src/components/hint/Hint.module.css: --prime-hint-size",
-  "src/components/kbd/Kbd.module.css: --prime-icon-size",
   "src/components/label/Label.module.css: --prime-label-line-height",
   "src/components/label/Label.module.css: --prime-label-size",
   "src/components/radio/Radio.module.css: --prime-choice-size",

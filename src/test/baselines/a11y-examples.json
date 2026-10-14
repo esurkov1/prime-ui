@@ -1,9 +1,4 @@
 [
-  "src/components/avatar/examples/overview.tsx: aria-label on a generic div",
-  "src/components/avatar/examples/sizes.tsx: aria-label on a generic div",
-  "src/components/avatar/examples/states.tsx: aria-label on a generic div",
-  "src/components/avatar/examples/team-group.tsx: aria-label on a generic div",
-  "src/components/badge/examples/with-icon.tsx: aria-label on a generic span",
   "src/components/card/examples/screen.tsx: aria-label on a generic div",
   "src/components/chat/examples/screen.tsx: aria-label on a generic div",
   "src/components/color-picker/examples/panel.tsx: dangling aria-controls",

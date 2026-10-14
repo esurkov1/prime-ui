@@ -23,7 +23,6 @@
   "src/internal/fileFormat.ts: no fileFormat.test",
   "src/internal/fileSize.ts: no fileSize.test",
   "src/internal/formatClock.ts: no formatClock.test",
-  "src/internal/iconBox.ts: no iconBox.test",
   "src/internal/iconLayout.ts: no iconLayout.test",
   "src/internal/imageSlot.tsx: no imageSlot.test",
   "src/internal/listbox.ts: no listbox.test",

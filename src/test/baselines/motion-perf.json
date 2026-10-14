@@ -52,8 +52,6 @@
   "src/components/timeline/Timeline.module.css: reduced-motion block globals.css already covers (.row, .dot, .title)",
   "src/components/video-note/VideoNote.module.css: reduced-motion block globals.css already covers (.circle, .media, .video, .ring, .play)",
   "src/components/voice-player/VoicePlayer.module.css: local @keyframes vpDotOut",
-  "src/icons/glyphMotion.module.css: animates stroke-dasharray",
-  "src/icons/glyphMotion.module.css: animates stroke-dasharray #2",
   "src/internal/FieldCommit.module.css: local @keyframes commitIn",
   "src/internal/FieldCommit.module.css: local @keyframes commitOut",
   "src/internal/FieldFrame.module.css: local @keyframes field-error-leave",

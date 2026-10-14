@@ -1,5 +1,4 @@
 [
-  "src/components/badge/examples/in-controls.tsx: `size`",
   "src/components/button/examples/label-morph.tsx: `children`",
   "src/components/chart-frame/examples/narrow.tsx: `children`",
   "src/components/checkbox/examples/states.tsx: `checked`",

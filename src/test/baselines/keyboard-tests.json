@@ -1,7 +1,5 @@
 [
   "src/components/accordion/api.ts: keyboard Tab — Tab",
-  "src/components/badge/api.ts: keyboard Enter · Space — Enter",
-  "src/components/badge/api.ts: keyboard Enter · Space — Space",
   "src/components/breadcrumb/api.ts: keyboard Enter — Enter",
   "src/components/card/api.ts: keyboard Tab — Tab",
   "src/components/chart-frame/api.ts: keyboard Enter · Space — Enter",
@@ -84,8 +82,6 @@
   "src/components/kanban/api.ts: keyboard Alt + ↑ · Alt + ↓ — Alt + ↑",
   "src/components/kanban/api.ts: keyboard Escape — Escape",
   "src/components/kanban/api.ts: keyboard Tab — Tab",
-  "src/components/link-button/api.ts: keyboard Enter — Enter",
-  "src/components/link-button/api.ts: keyboard Tab — Tab",
   "src/components/media-viewer/api.ts: keyboard + · - — +",
   "src/components/media-viewer/api.ts: keyboard + · - — -",
   "src/components/media-viewer/api.ts: keyboard ArrowLeft · ArrowRight — ArrowLeft",
