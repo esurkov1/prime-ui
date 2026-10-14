@@ -48,9 +48,3 @@
   flex: none;
   font-variant-numeric: tabular-nums;
 }
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
-}

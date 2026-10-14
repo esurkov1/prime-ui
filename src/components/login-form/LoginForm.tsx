@@ -1,11 +1,12 @@
-import type * as React from "react";
+import * as React from "react";
 
+import { Card } from "@/components/card/Card";
 import { Typography, type TypographyRole } from "@/components/typography/Typography";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { iconBoxStyles } from "@/internal/iconBox";
 import type { ControlSize } from "@/internal/states";
-import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./LoginForm.module.css";
 
@@ -36,6 +37,9 @@ const FOOTER_ROLE: Record<ControlSize, TypographyRole> = {
 /** Tier of the text parts: the root's `size`, provided through the control-size context. */
 const useLoginFormSize = (): ControlSize => useOptionalControlSize() ?? "m";
 
+/** The header layout of the root: the logo of a `start` header is the kit's icon tile. */
+const AlignContext = React.createContext<"center" | "start">("start");
+
 export type LoginFormRootProps = {
   /** Tier of spacing and type; fields and buttons inside without their own `size` take it. Default `m`. */
   size?: ControlSize;
@@ -60,18 +64,22 @@ function LoginFormRoot({
   ref,
   ...rest
 }: LoginFormRootProps) {
-  const depth = useNestedSurfaceDepth();
+  // The surface is a Card (layer fill, radius, depth, whisper); the root caps its width and the
+  // content lays out the form's rhythm inside the card's padding.
   return (
     <div
       ref={ref}
       {...rest}
       className={cx(styles.root, className)}
-      data-depth={depth}
       {...toDataAttributes({ size, align, flat })}
     >
-      <SurfaceDepthProvider value={depth}>
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-      </SurfaceDepthProvider>
+      <Card.Root flat={flat}>
+        <div className={styles.content}>
+          <AlignContext value={align}>
+            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+          </AlignContext>
+        </div>
+      </Card.Root>
     </div>
   );
 }
@@ -105,10 +113,12 @@ export type LoginFormLogoProps = {
  * mark (`role="img"`), since a plain `<div>` cannot carry a name.
  */
 function LoginFormLogo({ className, children, ...rest }: LoginFormLogoProps) {
+  const align = React.useContext(AlignContext);
   return (
     <div
       role={rest["aria-label"] ? "img" : undefined}
-      className={cx(styles.logo, className)}
+      className={cx(styles.logo, align === "start" && iconBoxStyles.tile, className)}
+      data-tone={align === "start" ? "accent" : undefined}
       {...rest}
     >
       {children}

@@ -204,7 +204,7 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A company settings panel: a header, fields on the surface fill and buttons in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. |
+| [overview.tsx](examples/overview.tsx) | A company settings form on a card: a header, fields on the surface fill and the submit button in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. |
 | [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change in every tone and a reference line — `variant`, `Card.Delta`, `tone`, `Card.Meta`. |
 | [kpi-media.tsx](examples/kpi-media.tsx) | A KPI with a sparkline or a fill level in the bottom slot of `mini` — `Card.Media`. |
 | [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a short description and a period switch, and a Sparkline with the period total over its chart — `Card.Header`, `Card.Description`, `Card.Body`. |

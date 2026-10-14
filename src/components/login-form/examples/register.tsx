@@ -1,4 +1,4 @@
-/** Sign-up: five fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. */
+/** Sign-up: four fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. */
 import { Button, Divider, Icon, Input, LinkButton, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 

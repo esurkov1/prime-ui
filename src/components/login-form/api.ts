@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "LoginForm.Root",
-      en: "`ref` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts.",
-      ru: "Карточка входа: заливка, радиус и тень карточки, ритм яруса; передаёт размер частям.",
+      en: "`ref` → `HTMLDivElement`. The sign-in form: a Card (fill, radius, shadow) capped at a small modal's width, the tier rhythm; provides its size to the parts.",
+      ru: "Форма входа: Card (заливка, радиус, тень) не шире малого модального окна, ритм яруса; передаёт размер частям.",
       props: [
         {
           name: "size",

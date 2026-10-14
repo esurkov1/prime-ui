@@ -2,7 +2,8 @@ import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { Slot } from "@/internal/slot";
+import press from "@/internal/press.module.css";
+import { Slot, slotChild } from "@/internal/slot";
 import type { Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";
@@ -38,7 +39,7 @@ function CardRoot({
   const depth = useNestedSurfaceDepth();
   const rootProps = {
     ...rest,
-    className: cx(styles.root, className),
+    className: cx(styles.root, asChild && press.press, className),
     "data-depth": depth,
     ...toDataAttributes({
       variant,
@@ -48,10 +49,7 @@ function CardRoot({
   };
 
   if (asChild) {
-    const child = React.Children.only(children);
-    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
-      throw new Error("Card.Root asChild needs a single element child");
-    }
+    const child = slotChild(children, "Card.Root");
     return (
       <Slot {...rootProps}>
         {React.cloneElement(

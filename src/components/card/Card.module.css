@@ -50,17 +50,13 @@
   appearance: none;
   transition:
     box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .root[data-interactive]:hover {
     box-shadow: var(--prime-shadow-overlay);
   }
-}
-
-.root[data-interactive]:active {
-  transform: scale(var(--prime-motion-press-scale));
 }
 
 .root[data-interactive]:focus-visible {
