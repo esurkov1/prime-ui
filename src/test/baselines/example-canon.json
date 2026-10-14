@@ -1,6 +1,5 @@
 [
   "src/components/banner/examples/overview.tsx: JSDoc tail",
-  "src/components/button-group/examples/controlled.tsx: JSDoc tail",
   "src/components/chart-frame/examples/states.tsx: biome-ignore",
   "src/components/chart-frame/examples/tooltip.tsx: arrow-key onKeyDown",
   "src/components/chat/examples/overview.tsx: biome-ignore",
@@ -20,7 +19,6 @@
   "src/components/login-form/examples/narrow.tsx: JSDoc tail",
   "src/components/page-content/examples/narrow.tsx: JSDoc tail",
   "src/components/scroll-container/examples/overview.tsx: JSDoc tail",
-  "src/components/segmented-control/examples/scroll.tsx: JSDoc tail",
   "src/components/smart-filter/examples/ranges.tsx: toISOString().slice",
   "src/components/stepper/examples/narrow.tsx: JSDoc tail",
   "src/components/timeline/examples/narrow.tsx: JSDoc tail",

@@ -6,8 +6,6 @@
   "src/components/composer/Composer.tsx: glyph name ternary",
   "src/components/composer/Composer.tsx: glyph name ternary #2",
   "src/components/data-table/DataTable.tsx: useStateSwap outside the engine",
-  "src/components/example-frame/ExampleFrame.tsx: glyph name ternary",
-  "src/components/example-frame/ExampleFrame.tsx: glyph ternary",
   "src/components/gantt/Gantt.tsx: useStateSwap outside the engine",
   "src/components/gantt/Gantt.tsx: useStateSwap outside the engine #2",
   "src/components/input/Input.tsx: glyph name ternary",

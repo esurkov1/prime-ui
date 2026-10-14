@@ -8,7 +8,6 @@
   "src/components/switch/Switch.module.css: --prime-switch-thumb",
   "src/components/switch/Switch.module.css: --prime-switch-travel",
   "src/components/switch/Switch.module.css: --prime-switch-w",
-  "src/components/tabs/Tabs.module.css: --prime-bleed-inline",
   "src/icons/glyph.tsx: --prime-icon-size",
   "src/internal/ChoiceField.module.css: --prime-choice-control-height",
   "src/internal/iconBox.module.css: --prime-icon-size",

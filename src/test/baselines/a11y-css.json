@@ -2,7 +2,6 @@
   "src/components/badge: sets aria-pressed, no selector",
   "src/components/breadcrumb: list-style none without role=\"list\"",
   "src/components/breadcrumb: sets aria-current, no selector",
-  "src/components/button-group: sets aria-pressed, no selector",
   "src/components/button: sets aria-pressed, no selector",
   "src/components/card: list-style none without role=\"list\"",
   "src/components/chart-frame: list-style none without role=\"list\"",

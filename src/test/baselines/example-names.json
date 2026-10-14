@@ -5,7 +5,6 @@
   "src/components/progress-circle/examples/inner-content.tsx: `children`",
   "src/components/progress-circle/examples/under-way.tsx: `children`",
   "src/components/switch/examples/states.tsx: `checked`",
-  "src/layout/bottom-nav/examples/router.tsx: `aria-current`",
   "src/layout/sidebar/examples/narrow.tsx: `offCanvas`",
   "src/layout/sidebar/examples/router.tsx: `aria-current`"
 ]
