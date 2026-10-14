@@ -36,7 +36,7 @@ Dnd.Root                         session owner: overlay (portal), live region, l
 ├─ Dnd.Draggable                 an item to carry elsewhere; stays in place, faded, until the drop
 └─ Dnd.DropZone                  a box that takes dropped items
 ```
-A drag in flight is drawn by `Dnd.Root` as a clone of the lifted element above every layer, following the pointer; an item without a fill of its own flies on the fill of the surface it was lifted from (`--prime-color-layer-current`). A refusal with a reason shows the reason in a chip under the clone. The page gets `data-dnd-active="mouse | touch | pen"` on `<html>` for the length of the gesture.
+A drag in flight is drawn by `Dnd.Root` as a clone of the lifted element above every layer, following the pointer. The clone flies inside empty copies (`display: contents`) of its ancestors up to the nearest surface (`data-depth`) and that surface's `data-theme`, so the host's variables and selectors (a List row's tier padding and radius) dress it exactly as the item in place, and it sets down without a jump; an item without a fill of its own flies on the fill of the surface it was lifted from (`--prime-color-layer-current`). A refusal with a reason shows the reason in a chip under the clone. The page gets `data-dnd-active="mouse | touch | pen"` on `<html>` for the length of the gesture.
 
 ## API
 
@@ -190,7 +190,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - The list gap is `--prime-space-2`; override it with `className` (widen the rule with `[data-axis]` so it wins: `.gallery[data-axis] { gap: … }`).
 - A grid (`axis="grid"`) is `display: grid`: the host sets the tracks (`grid-template-columns`) and the cells' size; the gap takes a cell, and a carried item resizes to the cell it would land in.
 - The reason chip stands `--prime-tooltip-offset` under the carried copy, start-aligned, at most `--prime-tooltip-max-width` wide.
-- The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a fill, a radius and padding on its own class — the clone is portalled to `<body>`, ancestor selectors do not reach it. A table row is the exception: it flies inside empty copies (`display: contents`) of its ancestors up to the nearest surface (`data-depth`), so the table's own cell styles still apply.
+- The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a radius on its own class (the gap and the clone's fill take it) and keep the row's look within its ancestors up to the nearest surface (`data-depth`) — the clone flies inside empty copies (`display: contents`) of exactly those, so their variables and selectors still apply. A table row flies in a one-row copy of its table inside them.
 - A scrollable ancestor under the pointer auto-scrolls within 64 px of its edge (a `ScrollContainer` strip works).
 - Keep a zone's height stable between states; it only changes fill and outline.
 
@@ -246,7 +246,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - A `Dnd.SortableItem` `id` that differs from `getId(item)` → the item never moves.
 - Rendering items yourself instead of through `renderItem` → the list cannot draw the gap or the optimistic order.
 - Using `index` as the id → ids must survive a reorder.
-- Styling a row from an ancestor selector (`.list .row`) → the flying clone loses it.
+- Styling a row from an ancestor above the nearest surface (`data-depth`) → the flying clone loses it; keep the row's look on the row and its hosts inside the surface.
 - Starting a drag from a button inside a row without `handle` → presses on controls are theirs; use `Dnd.Handle`.
 - A drag-only move with no alternative → add a button or a menu for the same action.
 - `aria-label` on an item that shows a title and a description → it hides them; point `aria-labelledby` / `aria-describedby` at them.

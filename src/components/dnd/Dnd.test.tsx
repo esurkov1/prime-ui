@@ -1412,8 +1412,41 @@ describe("the carried copy", () => {
     boxes.set("card", { left: 0, top: 0, width: 100, height: 40 });
     pressOn(screen.getByTestId("card"), 10, 10);
     moveTo(60, 60);
-    const copy = document.querySelector("[data-dnd-overlay]")?.firstElementChild as HTMLElement;
+    const copy = document.querySelector("[data-dnd-overlay] [data-dnd-copy]") as HTMLElement;
     expect(copy.style.backgroundColor).toBe("rgb(250, 250, 251)");
+    releaseAt(60, 60);
+  });
+
+  it("flies inside empty copies of its host up to the surface and its theme", () => {
+    render(
+      <div data-theme="dark">
+        <div data-testid="page">
+          <div data-depth="1">
+            <ul data-size="s" aria-label="Этапы">
+              <Dnd.Root>
+                <Dnd.Draggable kind="card" id="c1" data-testid="card">
+                  Строка
+                </Dnd.Draggable>
+              </Dnd.Root>
+            </ul>
+          </div>
+        </div>
+      </div>,
+    );
+    boxes.set("card", { left: 0, top: 0, width: 100, height: 40 });
+    pressOn(screen.getByTestId("card"), 10, 10);
+    moveTo(60, 60);
+    const overlay = document.querySelector("[data-dnd-overlay]") as HTMLElement;
+    const copy = overlay.querySelector<HTMLElement>("[data-dnd-copy]");
+    // The host's tier attributes reach the copy (a List row's padding and radius hang on them).
+    const host = copy?.closest<HTMLElement>('[data-size="s"]');
+    expect(host?.style.display).toBe("contents");
+    expect(copy?.closest('[data-depth="1"]')).not.toBeNull();
+    expect(copy?.closest('[data-theme="dark"]')).not.toBeNull();
+    // Nothing above the surface but its theme, and no copy answers to the original's name.
+    expect(overlay.querySelector("[data-testid]")).toBeNull();
+    expect(overlay.querySelector("[aria-label]")).toBeNull();
+    expect(screen.getAllByLabelText("Этапы")).toHaveLength(1);
     releaseAt(60, 60);
   });
 });

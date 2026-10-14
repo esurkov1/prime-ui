@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
@@ -6,6 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import { moveBefore } from "@/components/dnd/useSortableList";
 
 import { List } from "./List";
+import styles from "./List.module.css";
 
 function Dialogs({ onOpen }: { onOpen?: (id: string) => void }) {
   const [current, setCurrent] = React.useState("granit");
@@ -299,5 +302,34 @@ describe("List onReorder", () => {
       </List.Root>,
     );
     expect(screen.getByRole("button", { name: "Этап Лид" })).toBeInTheDocument();
+  });
+
+  it("carries a row in a copy of the list, so the copy keeps the row's tier padding and shape", () => {
+    render(
+      <List.Root aria-label="Этапы" size="s" onReorder={() => {}}>
+        <List.Item value="lead">Лид</List.Item>
+        <List.Item value="talks">Переговоры</List.Item>
+      </List.Root>,
+    );
+    const pointer = { pointerId: 1, pointerType: "mouse", button: 0 };
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Переместить Лид" }), {
+      ...pointer,
+      clientX: 10,
+      clientY: 10,
+    });
+    fireEvent.pointerMove(window, { ...pointer, clientX: 10, clientY: 60 });
+    const copy = document.querySelector<HTMLElement>("[data-dnd-overlay] [data-dnd-copy]");
+    expect(copy).toHaveClass(styles.row ?? "", styles.sortableRow ?? "");
+    // The tier variables (`--list-pad-x`, `--list-radius`…) hang on the root: the copy stands in it.
+    const root = copy?.parentElement;
+    expect(root).toHaveClass(styles.root ?? "");
+    expect(root).toHaveAttribute("data-size", "s");
+    expect(root?.style.display).toBe("contents");
+    fireEvent.pointerUp(window, { ...pointer, clientX: 10, clientY: 60 });
+  });
+
+  it("CSS: a sortable row has the row radius (the carried copy and its gap take it)", () => {
+    const css = readFileSync(join(__dirname, "List.module.css"), "utf8");
+    expect(css).toMatch(/\.sortableRow \{[^}]*border-radius: var\(--list-radius\);/);
   });
 });

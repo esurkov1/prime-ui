@@ -20,13 +20,39 @@ function isTransparent(color: string): boolean {
 }
 
 /**
- * A table row cannot fly on its own: outside its table its cells shrink to their content and lose
- * every style their table and its host give them. It flies in a one-row copy of its table with
- * each column fixed at the width it has now, inside empty copies (`display: contents`) of the
- * elements up to the nearest surface (`data-depth`), so the host's selectors and variables still
- * apply. Returns the outermost copy and the table, which carries the lift.
+ * The copy flies in empty copies (`display: contents`) of the elements its original stands in, up
+ * to the nearest surface (`data-depth`) and its theme (`data-theme`): what a host gives its items — tier variables (a List row's
+ * padding, radius, gap), context selectors, the surface fill — reaches the copy as it reaches the
+ * original. Without them the copy flies bare and snaps into its look when the real item appears.
  */
-function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect) {
+function inHostCopy(parent: HTMLElement | null, inner: HTMLElement): HTMLElement {
+  let outer = inner;
+  const wrap = (node: HTMLElement) => {
+    const shell = node.cloneNode(false) as HTMLElement;
+    shell.style.display = "contents";
+    shell.append(outer);
+    outer = shell;
+  };
+  let node = parent;
+  while (node && node !== document.body) {
+    wrap(node);
+    if (node.hasAttribute("data-depth")) {
+      // A theme scoped above the surface (a dark panel on a light page) colours the copy too.
+      const theme = node.parentElement?.closest<HTMLElement>("[data-theme]");
+      if (theme && theme !== document.documentElement && theme !== document.body) wrap(theme);
+      break;
+    }
+    node = node.parentElement;
+  }
+  return outer;
+}
+
+/**
+ * A table row cannot fly on its own: outside its table its cells shrink to their content and lose
+ * every style their table gives them. It flies in a one-row copy of its table with each column
+ * fixed at the width it has now. Returns the table, which carries the lift.
+ */
+function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect): HTMLElement {
   const table = row.closest("table");
   const sheet = (table?.cloneNode(false) ?? document.createElement("table")) as HTMLElement;
   sheet.style.tableLayout = "fixed";
@@ -47,17 +73,7 @@ function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect) 
     document.createElement("tbody")) as HTMLElement;
   body.append(copy);
   sheet.append(columns, body);
-  let outer: HTMLElement = sheet;
-  let node = table?.parentElement ?? null;
-  while (node && node !== document.body) {
-    const shell = node.cloneNode(false) as HTMLElement;
-    shell.style.display = "contents";
-    shell.append(outer);
-    outer = shell;
-    if (node.hasAttribute("data-depth")) break;
-    node = node.parentElement;
-  }
-  return { outer, lifted: sheet };
+  return sheet;
 }
 
 function cloneFor(preview: DragPreview): HTMLElement {
@@ -72,33 +88,35 @@ function cloneFor(preview: DragPreview): HTMLElement {
     const layer = source.getPropertyValue("--prime-color-layer-current").trim();
     if (layer) clone.style.backgroundColor = layer;
   }
-  const { outer, lifted } =
-    preview.element instanceof HTMLTableRowElement
-      ? inTableCopy(preview.element, clone, preview.origin)
-      : { outer: clone, lifted: clone };
+  const row = preview.element instanceof HTMLTableRowElement ? preview.element : null;
+  const lifted = row ? inTableCopy(row, clone, preview.origin) : clone;
+  const outer = inHostCopy(
+    row ? (row.closest("table")?.parentElement ?? null) : preview.element.parentElement,
+    lifted,
+  );
   outer.setAttribute("aria-hidden", "true");
-  // A copy must not answer to the original's identity: two elements with one id or item marker make
-  // every lookup (the engine's, a test's, a screen reader's) a coin toss.
+  // A copy must not answer to the original's identity: two elements with one id, name or item marker
+  // make every lookup (the engine's, a test's, a screen reader's) a coin toss.
   for (const node of [outer, ...outer.querySelectorAll("*")]) {
     node.removeAttribute("id");
     node.removeAttribute("data-testid");
+    node.removeAttribute("aria-label");
+    node.removeAttribute("aria-labelledby");
+    node.removeAttribute("aria-describedby");
     node.removeAttribute("data-dnd-item");
     node.removeAttribute("data-dnd-kind");
     node.removeAttribute("data-dragging");
     node.removeAttribute("data-lifted");
     node.removeAttribute("tabindex");
   }
+  clone.setAttribute("data-dnd-copy", "");
   lifted.classList.add(styles.lift);
   return outer;
 }
 
 /** The element that lifts and sets down: the copy itself, or the table a copied row flies in. */
 function liftedIn(host: HTMLElement): HTMLElement | null {
-  const first = host.firstElementChild;
-  if (!(first instanceof HTMLElement)) return null;
-  return first.classList.contains(styles.lift ?? "")
-    ? first
-    : (first.querySelector<HTMLElement>("table") ?? first);
+  return host.querySelector<HTMLElement>(`.${styles.lift}`);
 }
 
 /**
@@ -390,8 +408,8 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         return;
       }
       if (event.type === "resize") {
-        const copy = host.firstElementChild;
-        if (copy instanceof HTMLElement) {
+        const copy = liftedIn(host);
+        if (copy) {
           resizeRef.current?.();
           resizeRef.current = resizeCopy(
             copy,
