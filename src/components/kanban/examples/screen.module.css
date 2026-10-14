@@ -2,10 +2,9 @@
    panel (`AppShell.Root fillViewport` + `PageContent.Root fill`) and the board or the list takes
    the free height; every column scrolls inside the board, never the page. */
 
-/* Company cell: the name over the deal id. */
+/* Company cell: the name over the deal id (the column's `minWidth` keeps it on its lines). */
 .company {
   display: grid;
-  white-space: nowrap;
 }
 
 /* Owner: avatar, then the name. */
@@ -13,5 +12,4 @@
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-2);
-  white-space: nowrap;
 }

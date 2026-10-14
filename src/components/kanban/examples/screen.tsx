@@ -237,6 +237,7 @@ const COLUMNS: DataTableColumn<DealRow>[] = [
     header: "Компания",
     accessor: "company",
     sortable: true,
+    minWidth: "14rem",
     cell: (row) => (
       <span className={styles.company}>
         <Typography as="span" variant="body-m">
@@ -252,6 +253,7 @@ const COLUMNS: DataTableColumn<DealRow>[] = [
   {
     id: "owner",
     header: "Ответственный",
+    minWidth: "12rem",
     cell: (row) => (
       <span className={styles.owner}>
         {ownerAvatar(row.owner)}

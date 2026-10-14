@@ -116,14 +116,14 @@ export const api: ComponentApi = {
         {
           name: "renderColumnMeta",
           type: "(column: KanbanColumn) => ReactNode",
-          en: "The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»).",
-          ru: "Строка меты под названием и описанием колонки: цифры этапа («12 сделок · 4,8 млн ₽»).",
+          en: "The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). Like `description`, it describes the column's list.",
+          ru: "Строка меты под названием и описанием колонки: цифры этапа («12 сделок · 4,8 млн ₽»). Как и `description`, описывает список колонки.",
         },
         {
           name: "canDrop",
           type: "(id: string, columnId: string) => boolean | string",
-          en: "A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card).",
-          ru: "Правило процесса: колонка `columnId` не принимает карточку `id` — `false` или строка с причиной (озвучивается и видна под переносимой карточкой).",
+          en: "A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). The column turns `danger` before the release.",
+          ru: "Правило процесса: колонка `columnId` не принимает карточку `id` — `false` или строка с причиной (озвучивается и видна под переносимой карточкой). Колонка становится `danger` до отпускания.",
         },
         {
           name: "variant",
@@ -330,6 +330,10 @@ export const api: ComponentApi = {
       {
         en: "Touch: a drag starts after a hold; a finger that moves first scrolls the board.",
         ru: "Касание: перенос начинается после удержания, движение пальца раньше — обычная прокрутка доски.",
+      },
+      {
+        en: "A board named by `aria-label` or `aria-labelledby` is a `group` with that name; an unnamed one has no role.",
+        ru: "Доска с `aria-label` или `aria-labelledby` — это `group` с этим именем; без имени роли нет.",
       },
       {
         en: "While loading the root has `aria-busy`; skeletons are hidden from assistive tech.",

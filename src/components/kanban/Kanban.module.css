@@ -77,9 +77,8 @@
 
 /* plain: the header is a filled plate as wide as the cards (one ladder step off the board's surface,
    the well's fill), in place of the hairline. line keeps the base header: bare, over the faint
-   inset hairline. */
+   inset hairline. Its padding around the title row makes it taller than a control `l`. */
 .root[data-variant="plain"] .header {
-  min-block-size: var(--prime-control-l-height);
   margin-inline: var(--kanban-inset);
   padding-block: var(--prime-space-3);
   padding-inline: var(--prime-space-3) var(--prime-space-2);
@@ -128,14 +127,11 @@
   opacity: var(--prime-opacity-busy);
 }
 
+/* `title-m` (`textRole.titleM`, joined in TSX). */
 .title {
   min-width: 0;
   margin: 0;
   overflow: hidden;
-  font-size: var(--prime-text-title-m-size);
-  font-weight: var(--prime-text-title-m-weight);
-  line-height: var(--prime-text-title-m-line-height);
-  letter-spacing: var(--prime-text-title-m-tracking);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -148,16 +144,14 @@
   gap: var(--prime-space-1);
 }
 
+/* The caption parts (`textRole.caption`, joined in TSX): the description, the meta line, the card's
+   top zone and meta line. */
 .description {
   grid-row: 2;
   grid-column: 1 / -1;
   min-width: 0;
   margin: 0;
   overflow: hidden;
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-text-caption-weight);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -172,10 +166,6 @@
   min-width: 0;
   margin-block-start: var(--prime-space-1);
   overflow: hidden;
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-text-caption-weight);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -314,7 +304,8 @@
   color: var(--prime-color-text-secondary);
 }
 
-/* The card's top zone: a muted caption row over a faint hairline (as the column header). */
+/* The card's top zone: a muted caption row over a faint hairline (as the column header), at least
+   as tall as an `xs` control (`fieldTierClass` + `data-size="xs"`, joined in TSX). */
 .itemHeader {
   --prime-icon-size: var(--prime-icon-xs);
 
@@ -322,12 +313,8 @@
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
-  min-block-size: var(--prime-control-xs-height);
+  min-block-size: var(--field-h);
   padding-block-end: var(--prime-space-2);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-text-caption-weight);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -340,13 +327,11 @@
   margin-inline-start: auto;
 }
 
+/* `body-m` (`textRole.bodyM`, joined in TSX) at the medium weight. */
 .itemTitle {
   display: -webkit-box;
   overflow: hidden;
-  font-size: var(--prime-text-body-m-size);
   font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-body-m-line-height);
-  letter-spacing: var(--prime-text-body-m-tracking);
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -355,10 +340,6 @@
 
 .itemDescription {
   overflow: hidden;
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-text-caption-weight);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
@@ -377,13 +358,14 @@
   min-width: 0;
 }
 
-/* Counts at the start; the last child, unless a count, at the end (the assignee). */
+/* Counts at the start; the last child, unless a count, at the end (the assignee). At least as tall
+   as an `xs` control (`fieldTierClass` + `data-size="xs"`, joined in TSX). */
 .footer {
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
   min-width: 0;
-  min-block-size: var(--prime-control-xs-height);
+  min-block-size: var(--field-h);
 }
 
 .footer > * {
@@ -416,12 +398,4 @@
   block-size: var(--prime-badge-s-height);
   min-block-size: 0;
   border-radius: var(--prime-badge-s-radius);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .item,
-  .item > *,
-  .header > * {
-    transition: none;
-  }
 }

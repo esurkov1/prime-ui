@@ -1,8 +1,5 @@
-/** Loading draws skeleton cards in the card geometry and cross-fades the cards in; an empty column keeps its drop area; a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. */
-import { Badge, Button, Icon, Kanban, Switch } from "prime-ui-kit";
-import * as React from "react";
-
-import styles from "./examples.module.css";
+/** Loading draws skeleton cards in the card geometry; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. */
+import { Badge, Kanban, Typography } from "prime-ui-kit";
 
 type Order = { id: string; title: string; total: string; closed?: boolean };
 
@@ -26,61 +23,43 @@ const PLACEMENT = {
   shipped: ["ORD-5524", "ORD-5518"],
 };
 
-const LOAD_MS = 1200;
+const STATES = [
+  { caption: "loading", loading: true, disabled: false },
+  { caption: "Kanban.Item disabled", loading: false, disabled: false },
+  { caption: "disabled", loading: false, disabled: true },
+];
 
 export default function KanbanStatesExample() {
-  const [loading, setLoading] = React.useState(true);
-  const [readOnly, setReadOnly] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!loading) return;
-    const timer = window.setTimeout(() => setLoading(false), LOAD_MS);
-    return () => window.clearTimeout(timer);
-  }, [loading]);
-
-  return (
-    <div className={styles.stage}>
-      <div className={styles.toolbar}>
-        <Switch.Root checked={readOnly} onCheckedChange={setReadOnly}>
-          <Switch.Label>Только просмотр</Switch.Label>
-        </Switch.Root>
-        <div className={styles.spacer} />
-        <Button.Root
-          variant="soft"
-          tone="neutral"
-          loading={loading}
-          onClick={() => setLoading(true)}
-        >
-          <Button.Icon>
-            <Icon name="action.refresh" />
-          </Button.Icon>
-          Обновить
-        </Button.Root>
+  return STATES.map((state) => (
+    <div key={state.caption}>
+      <div>
+        <Kanban.Root
+          aria-label={`Заказы склада: ${state.caption}`}
+          columns={COLUMNS}
+          items={ORDERS}
+          getId={(order) => order.id}
+          getLabel={(order) => order.id}
+          defaultValue={PLACEMENT}
+          loading={state.loading}
+          disabled={state.disabled}
+          renderItem={(order) => (
+            <Kanban.Item disabled={order.closed}>
+              <Kanban.ItemTitle>{order.id}</Kanban.ItemTitle>
+              <Kanban.ItemDescription>
+                {order.title} · {order.total}
+              </Kanban.ItemDescription>
+              {order.closed ? (
+                <Kanban.ItemBadges>
+                  <Badge.Root color="gray">Закрыт</Badge.Root>
+                </Kanban.ItemBadges>
+              ) : null}
+            </Kanban.Item>
+          )}
+        />
+        <Typography as="span" variant="caption" tone="muted">
+          {state.caption}
+        </Typography>
       </div>
-      <Kanban.Root
-        aria-label="Заказы склада"
-        className={styles.board}
-        columns={COLUMNS}
-        items={ORDERS}
-        getId={(order) => order.id}
-        getLabel={(order) => order.id}
-        defaultValue={PLACEMENT}
-        loading={loading}
-        disabled={readOnly}
-        renderItem={(order) => (
-          <Kanban.Item disabled={order.closed}>
-            <Kanban.ItemTitle>{order.id}</Kanban.ItemTitle>
-            <Kanban.ItemDescription>
-              {order.title} · {order.total}
-            </Kanban.ItemDescription>
-            {order.closed ? (
-              <Kanban.ItemBadges>
-                <Badge.Root color="gray">Закрыт</Badge.Root>
-              </Kanban.ItemBadges>
-            ) : null}
-          </Kanban.Item>
-        )}
-      />
     </div>
-  );
+  ));
 }
