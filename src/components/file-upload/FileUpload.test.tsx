@@ -252,7 +252,7 @@ describe("FileUpload", () => {
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 
-  it("renders file item row with a decorative kit Badge and a progress bar", () => {
+  it("renders file item row with a decorative format tile and a progress bar", () => {
     render(
       <FileUpload.Item>
         <FileUpload.FormatBadge format="pdf" color="red" />
@@ -262,7 +262,7 @@ describe("FileUpload", () => {
       </FileUpload.Item>,
     );
 
-    const badge = screen.getByText("PDF");
+    const badge = screen.getByText("PDF").closest("[data-color]");
     expect(badge).toHaveAttribute("data-color", "red");
     expect(badge).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByText("report.pdf")).toBeInTheDocument();
@@ -463,7 +463,7 @@ describe("FileUpload.Queue, a queue only", () => {
     );
     const list = screen.getByRole("list", { name: "Вложения" });
     expect(list.children).toHaveLength(2);
-    expect(screen.getByText("PDF")).toHaveAttribute("data-color", "red");
+    expect(screen.getByText("PDF").closest("[data-color]")).toHaveAttribute("data-color", "red");
     expect(screen.getByText("2 КБ · Загрузка 40%")).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "Загрузка: Отчёт.pdf" })).toHaveAttribute(
       "value",

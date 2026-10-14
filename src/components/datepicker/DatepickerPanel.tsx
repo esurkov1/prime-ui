@@ -12,6 +12,7 @@ import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import menu from "@/internal/menu.module.css";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { type ControlSize, stepDown } from "@/internal/states";
@@ -262,12 +263,13 @@ export function DatepickerPanel(props: DatepickerPanelProps) {
     rest: { className, ...dom },
   } = splitCalendarOptions(other);
   const tier = useHostTier(sizeProp);
+  const labels = useLabels(DATEPICKER_LABELS, options.labels);
   return tier.provide(
     <PanelView
       {...options}
       {...value}
       size={tier.size}
-      labels={{ ...DATEPICKER_LABELS, ...options.labels }}
+      labels={labels}
       embedded
       className={className}
       dom={dom}

@@ -185,8 +185,6 @@
   --fu-item-name-line-height: var(--field-lh);
   --fu-item-meta: var(--field-hint-size);
   --fu-item-meta-line-height: var(--field-hint-lh);
-  --fu-item-badge: var(--field-h);
-  --fu-item-badge-radius: var(--prime-radius-m);
   --fu-item-radius: var(--prime-radius-l);
   box-sizing: border-box;
   display: grid;
@@ -221,14 +219,12 @@
 .item[data-size="xs"] {
   --fu-item-pad: var(--prime-space-2);
   --fu-item-gap: var(--prime-space-2);
-  --fu-item-badge-radius: var(--prime-radius-s);
   --fu-item-radius: var(--prime-radius-m);
 }
 
 .item[data-size="s"] {
   --fu-item-pad: var(--prime-space-2);
   --fu-item-gap: var(--prime-space-2);
-  --fu-item-badge-radius: var(--prime-radius-s);
   --fu-item-radius: var(--prime-radius-m);
 }
 
@@ -239,7 +235,6 @@
 .item[data-size="xl"] {
   --fu-item-pad: var(--prime-space-4);
   --fu-item-gap: var(--prime-space-4);
-  --fu-item-badge-radius: var(--prime-radius-l);
   --fu-item-radius: var(--prime-radius-xl);
 }
 
@@ -248,19 +243,9 @@
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
-/* The kit Badge as a square tile of the row tier. */
-/* A square of plain text: the Badge's single line takes the square's height and centres the text.
-   `[aria-hidden]` (set here, by FormatBadge) lifts the rule over the Badge's own line height. */
-.item .formatBadge[aria-hidden] {
+/* The format (a Thumbnail's short label) stands where an image file's picture would. */
+.formatBadge {
   grid-area: badge;
-  justify-content: center;
-  width: var(--fu-item-badge);
-  height: var(--fu-item-badge);
-  padding-inline: 0;
-  border-radius: var(--fu-item-badge-radius);
-  font-weight: var(--prime-font-weight-semibold);
-  line-height: var(--fu-item-badge);
-  text-align: center;
 }
 
 /* An image file's picture (the kit Thumbnail of the row tier) where the badge would stand. */

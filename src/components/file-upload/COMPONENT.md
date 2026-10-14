@@ -60,7 +60,7 @@ FileUpload.Root                 field frame: label → trigger → files → hin
 FileUpload.Queue                the same files with no trigger of their own (a tray whose paperclip lives elsewhere)
 
 FileUpload.Item                 a file row the set does not draw (own actions, a server-side job)
-├─ FileUpload.FormatBadge       square kit Badge with the extension
+├─ FileUpload.FormatBadge       square kit Thumbnail labelled with the extension
 │  or FileUpload.ItemPreview    square kit Thumbnail of an image file
 ├─ FileUpload.ItemText          one line, truncated (the set passes the name without its extension when a format badge shows it)
 ├─ FileUpload.ItemDescription   size, progress or error
@@ -191,13 +191,13 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the item parts), `className` and the other div attributes. |
 
 ### FileUpload.FormatBadge
-`ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the row's name is trimmed of the extension and the accessible name carries it whole).
+`ref` → `HTMLDivElement`. The file format as the short label of a square kit Thumbnail of the row tier, where an image file shows its picture (`aria-hidden`: the accessible name carries the extension).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `format` | `string` | — (required) | File extension; shown upper-case, cut to 8 characters. |
-| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the badge. |
-| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other attributes of the badge. |
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the tile. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the tile. |
 
 ### FileUpload.ItemPreview
 `ref` → `HTMLDivElement`. An image file's picture in place of the format badge: a square kit Thumbnail of the row tier (`aria-hidden`: the name names the file), the image icon while it loads or if it fails.
@@ -446,5 +446,5 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 - Styling a tile from an ancestor (`.gallery li`) → the carried clone is portalled to `<body>` and loses it.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (`FormatBadge`), [Thumbnail](../thumbnail/COMPONENT.md) (`ItemPreview`, video tiles), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`, a [Spinner](../spinner/COMPONENT.md) while a transfer waits), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (the cover pill), [Thumbnail](../thumbnail/COMPONENT.md) (`FormatBadge`, `ItemPreview`, video tiles), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`, a [Spinner](../spinner/COMPONENT.md) while a transfer waits), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Composer](../composer/COMPONENT.md) (its attachment tray is `FileUpload.Queue layout="strip"`), [LinkButton](../link-button/COMPONENT.md) (an inline browse link in a custom body), [Avatar](../avatar/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

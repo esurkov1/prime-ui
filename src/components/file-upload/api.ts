@@ -319,8 +319,8 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.FormatBadge",
-      en: "`ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the row's name is trimmed of the extension and the accessible name carries it whole).",
-      ru: "Формат файла — квадратный Badge кита в ярусе строки (`aria-hidden`: имя в строке без расширения, доступное имя содержит его целиком).",
+      en: "`ref` → `HTMLDivElement`. The file format as the short label of a square kit Thumbnail of the row tier, where an image file shows its picture (`aria-hidden`: the accessible name carries the extension).",
+      ru: "Формат файла — короткая подпись квадратного Thumbnail кита в ярусе строки, на месте картинки файла-изображения (`aria-hidden`: расширение есть в доступном имени).",
       props: [
         {
           name: "format",
@@ -333,14 +333,14 @@ export const api: ComponentApi = {
           name: "color",
           type: '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"',
           default: '"gray"',
-          en: "Palette hue of the badge.",
-          ru: "Цвет палитры бейджа.",
+          en: "Palette hue of the tile.",
+          ru: "Цвет палитры плитки.",
         },
         {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children" | "color">',
-          en: "`className` and the other attributes of the badge.",
-          ru: "`className` и остальные атрибуты бейджа.",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "color">',
+          en: "`className` and the other attributes of the tile.",
+          ru: "`className` и остальные атрибуты плитки.",
         },
       ],
     },
