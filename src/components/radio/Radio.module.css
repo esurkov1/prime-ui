@@ -22,7 +22,7 @@
 
 .root[data-state="checked"] .dot {
   opacity: 1;
-  transform: scale(1);
+  transform: none;
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);

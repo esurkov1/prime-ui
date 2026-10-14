@@ -9,12 +9,13 @@ import {
   choiceInputClass,
   choiceVisualClass,
 } from "@/internal/ChoiceField";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/FieldFrame";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Radio.module.css";
@@ -45,26 +46,16 @@ export type RadioGroupProps = Omit<FieldRootDomProps, "dir"> & {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** Native `name` shared by the radios; generated when omitted. */
   name?: string;
-  /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
   disabled?: boolean;
-  /** Group heading above the options; names the radiogroup (`aria-labelledby`). */
   label?: React.ReactNode;
-  /** Red `*` after the label, native `required` on the radios, `aria-required` on the group. */
   required?: boolean;
-  /** Muted `labels.optional` marker after the label. */
   optional?: boolean;
-  /** Help text under the options. Hidden while `error` is shown. */
   hint?: React.ReactNode;
-  /** Error message under the options; implies `invalid`. */
   error?: React.ReactNode;
-  /** Invalid state for every radio (`aria-invalid` on the group and the inputs). */
   invalid?: boolean;
-  /** `vertical` stacks the options, `horizontal` lays them out in a wrapping row. */
   orientation?: "vertical" | "horizontal";
-  /** Id of the `role="radiogroup"` element; generated when omitted. */
   id?: string;
   labels?: Partial<RadioGroupLabels>;
   children?: React.ReactNode;
@@ -97,7 +88,9 @@ function RadioGroup({
   children,
   ...rest
 }: RadioGroupProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
+  const labels = useLabels(RADIO_GROUP_LABELS, labelsProp);
   const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const name = nameProp ?? ids.controlId;
@@ -120,7 +113,7 @@ function RadioGroup({
 
   return (
     <RadioGroupProvider value={ctxValue}>
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <FieldFrame
           {...rest}
           size={size}
@@ -131,7 +124,7 @@ function RadioGroup({
           hint={hint}
           error={error}
           disabled={disabled}
-          optionalLabel={labelsProp?.optional ?? RADIO_GROUP_LABELS.optional}
+          optionalLabel={labels.optional}
           group
           className={className}
         >
@@ -149,8 +142,8 @@ function RadioGroup({
           >
             {children}
           </div>
-        </FieldFrame>
-      </ControlSizeProvider>
+        </FieldFrame>,
+      )}
     </RadioGroupProvider>
   );
 }
@@ -162,13 +155,9 @@ export type RadioRootProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "type" | "size" | "checked" | "defaultChecked" | "onChange" | "name" | "value"
 > & {
-  /** Value reported to `Radio.Group` when this option is chosen. */
   value: string;
-  /** Description under the option text. */
   hint?: React.ReactNode;
-  /** `Radio.Label`; without it only the circle renders (give it an `aria-label`). */
   children?: React.ReactNode;
-  /** The native radio input. */
   ref?: React.Ref<HTMLInputElement>;
 };
 
