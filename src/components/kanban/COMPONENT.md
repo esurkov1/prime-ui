@@ -32,7 +32,7 @@ import {
 ```
 Kanban.Root                          board: horizontal strip of columns, its own Dnd.Root if none above
 └─ <ul> (Dnd.Sortable, axis x)       the columns in `columnOrder`
-   └─ <li> column (from `columns`)   bare (`plain`) or a `fill-muted` well (`well`)
+   └─ <li> column (from `columns`)   no well, a header plate (`plain`) or a `fill-muted` well (`well`)
       ├─ header                      title (h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
       │  ├─ description              muted line under the title (`column.description`)
       │  └─ meta                     the stage's figures (`renderColumnMeta(column)`)
@@ -126,7 +126,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `plain` | no wells: the column is its header (title, count, a faint hairline) and its cards, which stand on the board's host — each card a surface one ladder step off it (white on the light page), as a Card on the page; air between the columns separates them | the board is the page's main region (a pipeline, a task board, a queue screen) or sits in a Card or Drawer — one level of nesting, cards are the only boxes | yes |
+| `plain` | no wells: the column is its header — a filled plate as wide as the cards (title, count) — and its cards, which stand on the board's host, each a surface one ladder step off it (white on the light page), as a Card on the page | the board is the page's main region (a pipeline, a task board, a queue screen) or sits in a Card or Drawer — one level of nesting, cards are the only boxes | yes |
 | `well` | every column is a filled well (`fill-muted`, radius `l`) holding its cards (the selected step of the well) | columns must read as bounded queues: WIP limits and capacity, many sparse or empty columns whose drop area must show, a dense board of many narrow columns | |
 
 Do not wrap a `plain` board's columns in your own boxes, and do not put a `well` board inside a filled box of your own — both are the double nesting the variants exist to avoid.
@@ -169,9 +169,9 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - Give the root a height (`className`): columns span it and every column body scrolls on its own; without one the columns take the height of the tallest.
 - The board is a size container. From 40rem of its own width columns keep a fixed 18rem; below it a column takes 85% of the board and snaps (`scroll-snap-type: x mandatory`), so the next column peeks. Snapping is off while a drag auto-scrolls the strip.
 - The strip scrolls sideways inside the board, never the page. Cards sit at the top of their column; the drop area runs to the bottom of the column, so a card can be released anywhere in it.
-- `plain`: column gap `--prime-space-4`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
+- `plain`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
 - The column title is `title-m`; the header is at least a control `m` tall, its text starts where the card text does.
-- A faint inset hairline (`--prime-color-border-faint`, as in a dialog header) separates the header from the cards.
+- `well`: a faint inset hairline (`--prime-color-border-faint`, as in a dialog header) separates the header from the cards. `plain`: the header is a filled plate (`--prime-color-fill-muted`, `--prime-radius-l`) as wide as the cards, in place of the hairline.
 - The header is a grid: the title, the count, the actions and the grip at the end on the first row; the description under the title on the second, the meta line under it (`--prime-space-1` above, caption, `text-secondary`).
 - A card is on `--prime-shadow-raised`: in `plain` the next layer of the board's host (`--prime-color-layer-current` of its own depth), in `well` `--prime-color-control-selected` (two ladder steps off its well; white in light).
 - `Kanban.ItemHeader` is a muted caption row over a faint hairline (`--prime-color-border-faint`); a card without it starts with its title or a full-width `Thumbnail` cover.
@@ -217,7 +217,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A release board: cards move within and between columns by drag, a touch hold or Alt + arrows; a card shows its meta line, labels, comments and assignee — `Kanban.Root`, `Kanban.Item`, `renderItem`, `renderColumnActions`. |
-| [variants.tsx](examples/variants.tsx) | The same release board in both looks: bare columns whose header and cards stand on the page, and columns as filled wells holding their cards — `variant`. |
+| [variants.tsx](examples/variants.tsx) | The same release board in both looks: columns without wells — a header plate and cards standing on the page — and columns as filled wells holding their cards — `variant`. |
 | [structure.tsx](examples/structure.tsx) | Cards take only the parts they need: a title alone, a meta line, labels, a footer with counts and an assignee — `Kanban.ItemTitle`, `Kanban.ItemDescription`, `Kanban.ItemBadges`, `Kanban.ItemFooter`, `Kanban.ItemCount`. |
 | [cards.tsx](examples/cards.tsx) | Three kinds of cards on one board: a plain note, a ticket with a header row of key and priority, a design task with a cover — `Kanban.ItemHeader`, `Thumbnail`, `Kanban.ItemFooter`. |
 | [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule, its columns drawn as wells so each reads as a bounded queue: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`, `variant`. |

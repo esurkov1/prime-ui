@@ -59,20 +59,30 @@
 }
 
 /*
- * plain: no wells, one level of nesting. The header and the cards stand on the board's host: the
- * cards are surfaces one ladder step off it (`data-depth` on each card) and widen to almost the
- * full column (the inset keeps only the focus ring inside); air between the columns separates them,
- * so their gap is wider than between wells.
+ * plain: no wells. The cards and the header carry the column: the cards widen to almost the full
+ * column (the inset keeps only the focus ring inside), so the cards of neighbouring columns stand
+ * closer than in wells.
  */
 .root[data-variant="plain"] {
-  --kanban-gap: var(--prime-space-4);
+  --kanban-gap: var(--prime-space-3);
   --kanban-inset: var(--prime-space-1);
 }
 
 .root[data-variant="plain"] .column {
-  padding-block-start: var(--prime-space-1);
+  padding-block-start: 0;
   border-radius: 0;
   background: none;
+}
+
+/* Without a well the header carries the column: a filled plate as wide as the cards (one ladder
+   step off the board's surface, the well's fill), in place of the hairline. */
+.root[data-variant="plain"] .header {
+  min-block-size: var(--prime-control-l-height);
+  margin-inline: var(--kanban-inset);
+  padding-block: var(--prime-space-3);
+  padding-inline: var(--prime-space-3) var(--prime-space-2);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-fill-muted);
 }
 
 @container (width < 40rem) {

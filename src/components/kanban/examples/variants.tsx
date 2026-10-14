@@ -1,4 +1,4 @@
-/** The same release board in both looks: bare columns whose header and cards stand on the page, and columns as filled wells holding their cards — `variant`. */
+/** The same release board in both looks: columns without wells — a header plate and cards standing on the page — and columns as filled wells holding their cards — `variant`. */
 import { Badge, Kanban, type KanbanVariant, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
