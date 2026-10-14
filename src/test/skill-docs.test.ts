@@ -349,7 +349,7 @@ describe("aggregates", () => {
 
 describe("Setup docs", () => {
   const exportsMap = JSON.parse(read("package.json")).exports as Record<string, string>;
-  const setupDocs = ["README.md", ...skillDocs, "playground/pages/IntroPage.tsx"];
+  const setupDocs = ["README.md", ...skillDocs, "playground/foundation/snippets/install.tsx"];
 
   it.each(setupDocs)("%s names only exported package entries", (doc) => {
     const entries = [...read(doc).matchAll(/prime-ui-kit\/([a-z-]+\.css)/g)].map((m) => m[1]);

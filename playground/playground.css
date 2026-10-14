@@ -50,15 +50,6 @@ body {
 
 /* --- Chrome ------------------------------------------------------------------ */
 
-.playgroundVisuallyHidden {
-  position: absolute;
-  width: var(--prime-border-width);
-  height: var(--prime-border-width);
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
 /* The playground mark inside `Sidebar.BrandLogo` (the slot sizes and places it). */
 .playgroundBrandMark {
   box-sizing: border-box;
@@ -79,11 +70,18 @@ body {
   opacity: 0.5;
 }
 
-/* While an example's module and source load: the frame's footprint, no motion. */
-.playgroundFramePending {
-  min-height: calc(var(--prime-space-24) * 2);
-  border-radius: var(--prime-radius-xl);
-  background: var(--prime-color-fill-muted);
+/* While an example's module and source load: Skeletons in the frame's shape (toolbar, stage). */
+.playgroundFramePlaceholder {
+  display: grid;
+  gap: var(--prime-space-3);
+}
+
+.playgroundFramePlaceholderToolbar {
+  max-width: calc(var(--prime-space-24) * 2);
+}
+
+.playgroundFramePlaceholderStage {
+  min-height: calc(var(--prime-space-20) * 2);
 }
 
 /* --- Preview layers --------------------------------------------------------

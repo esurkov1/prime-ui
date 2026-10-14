@@ -17,7 +17,7 @@ export function DocPage({
 }: {
   title: string;
   description: React.ReactNode;
-  /** `full` lets the lead run the page width (component and pattern pages). */
+  /** `full` lets the lead run the page width (component pages). */
   measure?: "readable" | "full";
   children: React.ReactNode;
 }) {

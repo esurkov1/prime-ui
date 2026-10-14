@@ -45,10 +45,7 @@ export function PlaygroundSearch({
   };
 
   return (
-    <CommandMenu.Root open={open} onOpenChange={onOpenChange}>
-      <CommandMenu.Title className="playgroundVisuallyHidden">
-        Поиск по playground
-      </CommandMenu.Title>
+    <CommandMenu.Root open={open} onOpenChange={onOpenChange} aria-label="Поиск по playground">
       <CommandMenu.Input placeholder="Компонент, токен или проп…" aria-label="Поиск страниц" />
       <CommandMenu.List>
         <CommandMenu.Empty />
