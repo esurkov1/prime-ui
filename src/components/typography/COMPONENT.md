@@ -42,6 +42,7 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 | `as` | `"p" \| "span" \| "div" \| "h1" \| "h2" \| "h3" \| "h4" \| "h5" \| "h6" \| "small" \| "blockquote" \| "article" \| "section" \| "header" \| "footer" \| "aside" \| "nav" \| "main"` | `"p"` | The element, by the page outline; the role keeps the look. |
 | `weight` | `"regular" \| "medium" \| "semibold"` | — | Overrides the role's weight. |
 | `tracking` | `"normal" \| "tight" \| "tighter" \| "wide"` | — | Overrides the role's tracking with a `--prime-font-tracking-*` step. |
+| `numeric` | `"proportional" \| "tabular"` | `"proportional"` | `tabular` — every digit as wide as the others: amounts, times and counts line up in a column and keep their width. |
 | `italic` | `boolean` | `false` | Italic, for quotes and titles of works. |
 | `truncate` | `boolean` | `false` | One line with an ellipsis; set `title` when the full text matters. |
 | `children` | `ReactNode` | — | The text. |
@@ -72,6 +73,12 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 |---|---|---|---|
 | `italic` | italic | quotes, titles of works | `false` |
 | `truncate` | one line with an ellipsis | names in fixed-width cells | `false` |
+
+### numeric
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `proportional` | the font's own figures | running text | yes |
+| `tabular` | every digit as wide as the others | amounts, times and counts in a column, a number that changes in place | |
 
 `weight` (`regular` · `medium` · `semibold`) and `tracking` (`normal` 0 · `tight` −0.01em · `tighter` −0.02em · `wide` +0.01em, from `--prime-font-tracking-*`) override the role.
 
@@ -118,10 +125,12 @@ No `labels`.
 | [inline-emphasis.tsx](examples/inline-emphasis.tsx) | Values emphasized inside running text by nested spans with another weight — `as`, `weight`. |
 | [semantic-tag.tsx](examples/semantic-tag.tsx) | The tag follows the page outline and the role sets the look, so a section title can be an `h2` at title size — `as`. |
 | [truncate.tsx](examples/truncate.tsx) | A long product name clamped to one line with an ellipsis; the full text stays in the tooltip — `truncate`, `title`. |
+| [numeric.tsx](examples/numeric.tsx) | Invoice amounts in a column line up digit under digit with tabular figures — `numeric`. |
 | [article.tsx](examples/article.tsx) | A help article from landmarks, headings and a quote at the reading width — `as`, `variant`. |
 
 ## Mistakes
 - `variant="h1"` → `variant="heading-m"` (or another role) plus `as="h1"`.
+- `font-variant-numeric: tabular-nums` in your own class around a number → `numeric="tabular"`.
 - Missing `variant` → it is required.
 - `tone="error"` → `tone="danger"`; `color="gray"` → `tone="muted"`.
 - `truncate` on an inline span in a flex row that does not shrink → use a block element and `min-width: 0`.

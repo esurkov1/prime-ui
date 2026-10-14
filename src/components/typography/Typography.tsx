@@ -69,16 +69,12 @@ export type TypographyAs =
 
 export type TypographyProps = {
   as?: TypographyAs;
-  /** Text role (`--prime-text-<role>-*`). */
   variant: TypographyRole;
-  /** Overrides the role's weight. Omit to use the role's own weight. */
   weight?: TypographyWeight;
-  /** Overrides the role's tracking. Omit to use the role's own tracking. */
   tracking?: TypographyTracking;
-  /** Clamp to one line with an ellipsis (set `title` when the full text matters). */
+  numeric?: "proportional" | "tabular";
   truncate?: boolean;
   italic?: boolean;
-  /** Text color. Default `default` (primary text). */
   tone?: TextTone;
   children?: React.ReactNode;
   className?: string;
@@ -91,6 +87,7 @@ export function Typography({
   variant,
   weight,
   tracking,
+  numeric = "proportional",
   truncate = false,
   italic = false,
   tone = "default",
@@ -108,6 +105,7 @@ export function Typography({
         variant,
         weight,
         tracking,
+        numeric: numeric === "tabular" ? "tabular" : undefined,
         tone: tone === "default" ? undefined : tone,
         ...(italic ? { italic: true } : {}),
         ...(truncate ? { truncate: true } : {}),
