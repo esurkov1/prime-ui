@@ -2,8 +2,6 @@
 import { Button, Fieldset, Input, Modal } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
-
 const CLIENT = { company: "ООО «Северный ветер»", email: "office@nwind.ru" };
 
 /** Pretends to send the form. */
@@ -46,7 +44,7 @@ export default function ModalGuardExample() {
           <Modal.Description>Реквизиты для счетов и актов</Modal.Description>
         </Modal.Header>
         <Modal.Body>
-          <form id={formId} className={styles.form} onSubmit={submit}>
+          <form id={formId} onSubmit={submit}>
             <Fieldset disabled={saving}>
               <Input.Root label="Компания">
                 <Input.Wrapper>

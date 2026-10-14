@@ -2,8 +2,6 @@
 import { Button, Drawer, Fieldset, Input, Textarea } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
-
 /** Pretends to send the form. */
 function saveTask() {
   return new Promise((resolve) => setTimeout(resolve, 1200));
@@ -43,7 +41,7 @@ export default function DrawerGuardExample() {
         </Drawer.Header>
         <Drawer.Body>
           <Drawer.Guard busy={saving} dirty={dirty} />
-          <form id={formId} className={styles.form} onSubmit={submit}>
+          <form id={formId} onSubmit={submit}>
             <Fieldset disabled={saving}>
               <Input.Root label="Название">
                 <Input.Wrapper>

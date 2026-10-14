@@ -1,8 +1,6 @@
 /** A settings form in a dialog: the footer submit button submits the form, Enter in a field does the same, and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. */
-import { Button, Icon, Input, Modal, Select, Switch } from "prime-ui-kit";
+import { Button, Fieldset, Icon, Input, Modal, Select, Switch } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 export default function ModalInFormExample() {
   const formId = React.useId();
@@ -41,30 +39,32 @@ export default function ModalInFormExample() {
           <Modal.Description>Изменения увидят все участники команды.</Modal.Description>
         </Modal.Header>
         <Modal.Body>
-          <form id={formId} className={styles.form} noValidate onSubmit={submit}>
-            <Input.Root label="Название" required error={error} reserveSupportRow>
-              <Input.Wrapper>
-                <Input.Field
-                  name="name"
-                  defaultValue="Сайт компании"
-                  autoFocus
-                  onValueChange={() => setError(undefined)}
-                />
-              </Input.Wrapper>
-            </Input.Root>
-            <Select.Root label="Ответственный" defaultValue="anna">
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content>
-                <Select.Item value="anna">Анна Смирнова</Select.Item>
-                <Select.Item value="igor">Игорь Петров</Select.Item>
-                <Select.Item value="olga">Ольга Ким</Select.Item>
-              </Select.Content>
-            </Select.Root>
-            <Switch.Root name="notify" defaultChecked>
-              <Switch.Label>Уведомлять участников об изменениях</Switch.Label>
-            </Switch.Root>
+          <form id={formId} noValidate onSubmit={submit}>
+            <Fieldset>
+              <Input.Root label="Название" required error={error} reserveSupportRow>
+                <Input.Wrapper>
+                  <Input.Field
+                    name="name"
+                    defaultValue="Сайт компании"
+                    autoFocus
+                    onValueChange={() => setError(undefined)}
+                  />
+                </Input.Wrapper>
+              </Input.Root>
+              <Select.Root label="Ответственный" defaultValue="anna">
+                <Select.Trigger>
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="anna">Анна Смирнова</Select.Item>
+                  <Select.Item value="igor">Игорь Петров</Select.Item>
+                  <Select.Item value="olga">Ольга Ким</Select.Item>
+                </Select.Content>
+              </Select.Root>
+              <Switch.Root name="notify" defaultChecked>
+                <Switch.Label>Уведомлять участников об изменениях</Switch.Label>
+              </Switch.Root>
+            </Fieldset>
           </form>
         </Modal.Body>
         <Modal.Footer>

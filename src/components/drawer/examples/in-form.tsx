@@ -1,8 +1,6 @@
 /** A settings form in the panel: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Drawer.Body`, `Drawer.Footer`, `error`. */
-import { Button, Drawer, Icon, Input, Select, Switch } from "prime-ui-kit";
+import { Button, Drawer, Fieldset, Icon, Input, Select, Switch } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 export default function DrawerInFormExample() {
   const formId = React.useId();
@@ -41,34 +39,36 @@ export default function DrawerInFormExample() {
           <Drawer.Description>Изменения увидят все участники</Drawer.Description>
         </Drawer.Header>
         <Drawer.Body>
-          <form id={formId} className={styles.form} noValidate onSubmit={submit}>
-            <Input.Root label="Название" required error={error} reserveSupportRow>
-              <Input.Wrapper>
-                <Input.Field
-                  name="name"
-                  defaultValue="Команда продукта"
-                  autoFocus
-                  onValueChange={() => setError(undefined)}
-                />
-              </Input.Wrapper>
-            </Input.Root>
-            <Input.Root label="Адрес" hint="Только латиница, цифры и дефис">
-              <Input.Wrapper>
-                <Input.Field name="slug" defaultValue="product-team" />
-              </Input.Wrapper>
-            </Input.Root>
-            <Select.Root label="Язык интерфейса" defaultValue="ru">
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content>
-                <Select.Item value="ru">Русский</Select.Item>
-                <Select.Item value="en">English</Select.Item>
-              </Select.Content>
-            </Select.Root>
-            <Switch.Root name="digest" defaultChecked>
-              <Switch.Label>Еженедельная сводка на почту</Switch.Label>
-            </Switch.Root>
+          <form id={formId} noValidate onSubmit={submit}>
+            <Fieldset>
+              <Input.Root label="Название" required error={error} reserveSupportRow>
+                <Input.Wrapper>
+                  <Input.Field
+                    name="name"
+                    defaultValue="Команда продукта"
+                    autoFocus
+                    onValueChange={() => setError(undefined)}
+                  />
+                </Input.Wrapper>
+              </Input.Root>
+              <Input.Root label="Адрес" hint="Только латиница, цифры и дефис">
+                <Input.Wrapper>
+                  <Input.Field name="slug" defaultValue="product-team" />
+                </Input.Wrapper>
+              </Input.Root>
+              <Select.Root label="Язык интерфейса" defaultValue="ru">
+                <Select.Trigger>
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="ru">Русский</Select.Item>
+                  <Select.Item value="en">English</Select.Item>
+                </Select.Content>
+              </Select.Root>
+              <Switch.Root name="digest" defaultChecked>
+                <Switch.Label>Еженедельная сводка на почту</Switch.Label>
+              </Switch.Root>
+            </Fieldset>
           </form>
         </Drawer.Body>
         <Drawer.Footer>

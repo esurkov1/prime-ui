@@ -1,8 +1,0 @@
-/* Layout of the Drawer scenarios: semantic tokens only. */
-
-/* in-form.tsx: field groups get 20 between them, a step above plain body blocks. */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
-}
