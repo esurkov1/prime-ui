@@ -48,7 +48,7 @@ Gantt                          surface (layer of the ladder), size container
 | `getRowLabel` | `(row: Row) => string` | — (required) | Row name: the first column text by default and the row header for assistive tech. |
 | `getRowBars` | `(row: Row) => Bar[]` | — (required) | Bars of a row (`GanttBar`); bars that overlap in time stack into lanes and grow the row. |
 | `renderRow` | `(row: Row) => ReactNode` | — | First-column content instead of the label (a name with a role or a code). |
-| `renderRowAvatar` | `(row: Row) => ReactNode` | — | A picture before the row content (an `Avatar`). Below 36rem of chart width the column keeps only it; the name stays for assistive tech. |
+| `renderRowAvatar` | `(row: Row) => ReactNode` | — | A picture before the row content (an `Avatar`). Below 36rem of chart width the column keeps only it; the row header is then named by `getRowLabel` (`aria-label`). |
 | `getRowHref` | `(row: Row) => string` | — | The row header is a link: a real `<a>` fills the first column and is the row's stop in the grid, so a click, ⌘/Ctrl-click, a middle click and «open in new tab» work on it; Space follows it like Enter. |
 | `onRowClick` | `(row: Row, event: GanttRowClickEvent) => void` | — | Opens a row in place (a profile in a Drawer): a click on its header, Enter or Space; never from a control inside it. With `getRowHref` it gets plain clicks: `event.preventDefault()` routes in the app. |
 | `renderBarTooltip` | `(bar: Bar, row: Row) => ReactNode` | — | Extra lines of a bar's tooltip (a client, hours, an owner), under its title and the dates line — those always stay, the dates and the duration are what the bar means on the axis. |
@@ -58,7 +58,7 @@ Gantt                          surface (layer of the ladder), size container
 | `range` | `{ start: Date; end: Date }` | — | The time axis, snapped to whole units. Default: every bar and today with room on both sides (a week of days, two weeks, a month), at least 35 days / 14 weeks / 12 months. |
 | `today` | `Date` | today | The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it. |
 | `locale` | `Locale` | `ru` | date-fns locale of the header, tooltips and spoken dates. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of rows, bars, header and toolbar controls: one-lane rows 28 · 32 · 44 · 48 · 52 px; a day is 32 · 40 · 48 px wide at `day`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of rows, bars, header and toolbar controls: one-lane rows 28 · 32 · 44 · 48 · 52 px; a day is 32 · 40 · 48 px wide at `day`; bar text one tier down. Without it the tier of its host, else `m`. |
 | `readOnly` | `boolean` | `false` | No moving, resizing or creating; bars still select and show their dates. |
 | `loading` | `boolean` | `false` | Without rows — skeleton rows in the chart's geometry and a status for screen readers; with rows they stay and the grid is `aria-busy`. |
 | `empty` | `ReactNode` | — | Empty-state content when `rows` is empty; a string goes into a compact `EmptyPage`. Defaults to `labels.empty`. |
@@ -128,7 +128,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | State | Driven by | DOM |
 |---|---|---|
 | zoom | `scale` / `defaultScale` | `data-scale` on the root; the grid cross-fades into the new zoom, the day in the middle stays in the middle |
-| tier | `size` | `data-size` on the root |
+| tier | `size` (else the host tier) | `data-size` on the root; each row's track carries the tier one down (`data-size`), the size of the bar text |
 | bar color | `color` / `tone` | `data-color` (without a tone) or `data-tone` on the bar |
 | milestone | `start` equal to `end` | `data-milestone`: a diamond on its day, the label beside it |
 | label beside | the label does not fit the bar (measured) | `data-label="inside" \| "outside" \| "hidden"` (beside the bar when there is room, else hidden; the name and the tooltip keep it) |
@@ -139,7 +139,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | pending | `onBarChange` returned a Promise | `data-pending`, `aria-busy`, a Spinner; reject → the bar glides back |
 | loading | `loading` without rows | Skeleton rows with one or two bars each in a real bar's height, radius and lane, under the column and today lines; `aria-busy`, status `labels.loading`; data cross-fades in |
 | empty | `rows` empty | a compact `EmptyPage` (`empty` or `labels.empty`), cross-faded in |
-| row opens | `onRowClick` / `getRowHref` | `data-clickable` on the row header: a pointer cursor and a hover wash under its content; with `getRowHref` the content is an `<a>` whose hit area fills the header |
+| row opens | `onRowClick` / `getRowHref` | `data-clickable` on the row header: a pointer cursor and a hover wash under its content (an inset shadow over the opaque header, faded both ways); with `getRowHref` the content is an `<a>` whose hit area fills the header |
 | scrolled | the axis hides content at an edge | `data-overflow-start` / `data-overflow-end`: an edge shadow from the pinned column / at the end |
 
 ## Layout & spacing

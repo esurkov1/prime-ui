@@ -1,5 +1,4 @@
 [
-  "src/components/chart-frame/examples/tooltip.tsx: arrow-key onKeyDown",
   "src/components/checkbox/examples/indicator.tsx: arrow-key onKeyDown",
   "src/components/checkbox/examples/overview.tsx: JSDoc tail",
   "src/components/checkbox/examples/without-label.tsx: JSDoc tail",

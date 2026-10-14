@@ -2,8 +2,6 @@
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Gantt, type GanttBar, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 type Row = { id: string; name: string; bars: GanttBar[] };
 
 const WEEK = startOfWeek(startOfToday(), { weekStartsOn: 1 });
@@ -52,30 +50,34 @@ const BY_STATUS: Row[] = [
 
 export default function GanttVariantsExample() {
   return (
-    <div className={styles.specimens}>
-      <div className={styles.specimen}>
-        <Gantt
-          aria-label="Проекты по направлениям"
-          rows={BY_PROJECT}
-          getRowKey={(row) => row.id}
-          getRowLabel={(row) => row.name}
-          getRowBars={(row) => row.bars}
-        />
-        <Typography as="span" variant="caption" tone="muted">
-          color
-        </Typography>
+    <div>
+      <div>
+        <div>
+          <Gantt
+            aria-label="Проекты по направлениям"
+            rows={BY_PROJECT}
+            getRowKey={(row) => row.id}
+            getRowLabel={(row) => row.name}
+            getRowBars={(row) => row.bars}
+          />
+          <Typography as="span" variant="caption" tone="muted">
+            color
+          </Typography>
+        </div>
       </div>
-      <div className={styles.specimen}>
-        <Gantt
-          aria-label="Задачи по статусу"
-          rows={BY_STATUS}
-          getRowKey={(row) => row.id}
-          getRowLabel={(row) => row.name}
-          getRowBars={(row) => row.bars}
-        />
-        <Typography as="span" variant="caption" tone="muted">
-          tone
-        </Typography>
+      <div>
+        <div>
+          <Gantt
+            aria-label="Задачи по статусу"
+            rows={BY_STATUS}
+            getRowKey={(row) => row.id}
+            getRowLabel={(row) => row.name}
+            getRowBars={(row) => row.bars}
+          />
+          <Typography as="span" variant="caption" tone="muted">
+            tone
+          </Typography>
+        </div>
       </div>
     </div>
   );

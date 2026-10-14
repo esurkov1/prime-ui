@@ -23,10 +23,11 @@ import {
   FloatingBoundaryProvider,
   type FloatingBoundaryResolver,
 } from "@/internal/AnchorRectContext";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { createEdgeAutoScroll } from "@/internal/edgeAutoScroll";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { DRAG_THRESHOLD_PX, useLongPress } from "@/internal/longPress";
@@ -133,70 +134,30 @@ export type GanttProps<Row, Bar extends GanttBar = GanttBar> = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children"
 > & {
-  /** The outer surface `<div>`; `aria-label` / `aria-labelledby` name the grid inside. */
   ref?: React.Ref<HTMLDivElement>;
-  /** Rows: people, rooms, vehicles, tasks. Only the rows in view are rendered. */
   rows: Row[];
-  /** Stable row id. */
   getRowKey: (row: Row) => React.Key;
-  /** Row name: the first column text by default, and the row header for assistive tech. */
   getRowLabel: (row: Row) => string;
-  /** Bars of a row; overlapping bars stack into lanes. */
   getRowBars: (row: Row) => Bar[];
-  /** First-column content instead of the label (a name with a role or a code). */
   renderRow?: (row: Row) => React.ReactNode;
-  /** A picture before the row content (an `Avatar`); on a narrow chart the column keeps only it. */
   renderRowAvatar?: (row: Row) => React.ReactNode;
-  /**
-   * The row header is a link: a real `<a>` fills the first column and is the row's stop in the
-   * grid, so a click, ⌘/Ctrl-click, a middle click and «open in new tab» work on it.
-   */
   getRowHref?: (row: Row) => string;
-  /**
-   * Opens a row in place: a click on its header (never on a control inside it, never from a
-   * portal) or Enter / Space on the focused header. With `getRowHref` it gets the plain clicks
-   * only — call `event.preventDefault()` there to route in the app instead of loading the page.
-   */
   onRowClick?: (row: Row, event: GanttRowClickEvent) => void;
-  /**
-   * Extra content of a bar's tooltip, under its title and the dates line (which always stay: the
-   * dates are what the bar means on the axis). A client, hours, an owner.
-   */
   renderBarTooltip?: (bar: Bar, row: Row) => React.ReactNode;
-  /** Zoom, controlled. */
   scale?: GanttScale;
-  /** Initial zoom, uncontrolled. */
   defaultScale?: GanttScale;
   onScaleChange?: (scale: GanttScale) => void;
-  /** The time axis; default — every bar and today with room on both sides. */
   range?: GanttDates;
-  /** The day of the today line. Default — the current day. */
   today?: Date;
-  /** date-fns locale of the header and the dates. Default `ru`. */
   locale?: Locale;
   size?: ControlSize;
-  /** No moving, resizing or creating; bars still select and show their dates. */
   readOnly?: boolean;
-  /** Skeleton rows while there are no rows yet; with rows they stay and the grid is busy. */
   loading?: boolean;
-  /** Empty-state content (e.g. `EmptyPage`); defaults to `labels.empty`. */
   empty?: React.ReactNode;
-  /** Content at the start of the toolbar (title, filters); the zoom and «Сегодня» sit at its end. */
   toolbar?: React.ReactNode;
-  /** Max height of the scroll viewport in px; `"fill"` — the chart takes its parent's height. */
   scrollHeight?: number | "fill";
   onItemOpen?: (bar: Bar, row: Row) => void;
-  /**
-   * New dates of a bar after a drag or an editing key, in whole scale units. Update your data with
-   * them. A returned Promise keeps the bar at the new dates and busy until it settles; on reject it
-   * glides back. Without it, bars cannot be edited.
-   */
   onBarChange?: (dates: GanttDates, bar: Bar, row: Row) => void | Promise<void>;
-  /**
-   * A bar was drawn on an empty spot of a row (drag, double-click, long-press, `N`), in whole scale
-   * units. Add it to your data. A returned Promise keeps a busy ghost in place until it settles;
-   * on reject the ghost fades out. Without it, nothing can be created.
-   */
   onBarCreate?: (dates: GanttDates, row: Row) => void | Promise<void>;
   labels?: Partial<GanttLabels>;
 };
@@ -255,7 +216,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   range: rangeProp,
   today: todayProp,
   locale = ru,
-  size = "m",
+  size: sizeProp,
   readOnly = false,
   loading = false,
   empty,
@@ -272,6 +233,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   ref,
   ...rest
 }: GanttProps<Row, Bar>) {
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const labels = useLabels(GANTT_LABELS, labelsProp);
   const depth = useNestedSurfaceDepth();
   const rootRef = React.useRef<HTMLDivElement | null>(null);
@@ -489,10 +452,12 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   /** Row heights from the stylesheet of the tier: estimates before a row is measured. */
   const [geometry, setGeometry] = React.useState(FALLBACK_GEOMETRY);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the tier (`size`) changes the stylesheet values read here
+  // The stylesheet values follow the tier (`data-size`): read once per tier.
+  const geometryTier = React.useRef<ControlSize | null>(null);
   React.useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root) return;
+    if (!root || geometryTier.current === size) return;
+    geometryTier.current = size;
     const next = {
       padY: readCssLengthPx("--gantt-pad-y", FALLBACK_GEOMETRY.padY, root),
       barH: readCssLengthPx("--gantt-bar-h", FALLBACK_GEOMETRY.barH, root),
@@ -507,7 +472,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
         ? prev
         : next,
     );
-  }, [size]);
+  });
   const [headHeight, setHeadHeight] = React.useState(0);
   React.useLayoutEffect(() => {
     const height = headRef.current?.getBoundingClientRect().height ?? 0;
@@ -589,8 +554,14 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     const to = Math.ceil((left + 2 * visible) / step) * step;
     setTimeWindow((prev) => (prev && prev[0] === from && prev[1] === to ? prev : [from, to]));
   }, [dayPx, labelWidth]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new zoom or axis moves the window
-  React.useLayoutEffect(() => updateTimeWindow(), [updateTimeWindow, scale, range]);
+  // A new zoom or axis moves the window: recomputed once per axis (the length of a day follows it).
+  const windowAxis = React.useRef<string | null>(null);
+  React.useLayoutEffect(() => {
+    const axis = `${scale}:${range.start.getTime()}:${range.end.getTime()}`;
+    if (windowAxis.current === axis) return;
+    windowAxis.current = axis;
+    updateTimeWindow();
+  });
   React.useEffect(() => {
     const viewport = scrollRef.current;
     if (!viewport || typeof ResizeObserver === "undefined") return;
@@ -951,13 +922,15 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   // Escape while drawing drops the ghost; the track holds no focus, so the document listens.
   const isDrawing = [...ghosts.values()].some((ghost) => ghost.status === "drawing");
-  // biome-ignore lint/correctness/useExhaustiveDependencies: listens while a ghost is being drawn
+  // Listens only while a ghost is being drawn; the latest `stopDrawing` is read at the key press.
+  const stopDrawingRef = React.useRef(stopDrawing);
+  stopDrawingRef.current = stopDrawing;
   React.useEffect(() => {
     if (!isDrawing) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       event.preventDefault();
-      stopDrawing(false);
+      stopDrawingRef.current(false);
     };
     document.addEventListener("keydown", onKey, true);
     return () => document.removeEventListener("keydown", onKey, true);
@@ -1059,24 +1032,30 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
    * Label widths by text: measured once per text and tier, so scrolling (bars mounting) reads no
    * layout. Reads come first and writes after, so a pass never forces a layout per bar.
    */
-  const labelWidths = React.useRef(new Map<string, number>());
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new tier changes every text width
-  React.useLayoutEffect(() => labelWidths.current.clear(), [size]);
-  const barPad = React.useRef<number | null>(null);
+  // Kept per tier: a new tier changes every text width and the bar padding.
+  const textCache = React.useRef<{
+    tier: ControlSize;
+    widths: Map<string, number>;
+    pad: number | null;
+  }>({ tier: size, widths: new Map(), pad: null });
   const measureBars = () => {
+    if (textCache.current.tier !== size) {
+      textCache.current = { tier: size, widths: new Map(), pad: null };
+    }
+    const cache = textCache.current;
     const bars: { node: HTMLElement; width: number }[] = [];
     for (const node of cellNodes.current.values()) {
       if (node.dataset.ganttBar === undefined) continue;
       const label = node.querySelector<HTMLElement>("[data-gantt-label]");
       if (!label) continue;
       const text = label.textContent ?? "";
-      let width = labelWidths.current.get(text);
+      let width = cache.widths.get(text);
       if (width === undefined) {
         width = label.scrollWidth;
-        if (width > 0) labelWidths.current.set(text, width);
+        if (width > 0) cache.widths.set(text, width);
       }
-      if (barPad.current === null && node.dataset.milestone === undefined) {
-        barPad.current = Number.parseFloat(getComputedStyle(node).paddingInlineStart) || 0;
+      if (cache.pad === null && node.dataset.milestone === undefined) {
+        cache.pad = Number.parseFloat(getComputedStyle(node).paddingInlineStart) || 0;
       }
       bars.push({ node, width });
     }
@@ -1092,7 +1071,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     const gap = readCssLengthPx("--prime-space-2", 8);
     const milestoneSize = geometry.barH;
     const bars = measureBars();
-    const pad = barPad.current ?? 0;
+    const pad = textCache.current.pad ?? 0;
     const startPx = (node: HTMLElement) =>
       node.dataset.milestone === undefined
         ? Number(node.dataset.x) * px
@@ -1146,13 +1125,13 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     if (!force && shiftedAt.current === hidden) return;
     shiftedAt.current = hidden;
     const px = dayPx();
-    const pad = barPad.current ?? 0;
+    const pad = textCache.current.pad ?? 0;
     for (const node of cellNodes.current.values()) {
       if (node.dataset.ganttBar === undefined) continue;
       let shift = 0;
       if (node.dataset.label === "inside" && hidden > 0) {
         const text = node.querySelector("[data-gantt-label]")?.textContent ?? "";
-        const width = labelWidths.current.get(text) ?? 0;
+        const width = textCache.current.widths.get(text) ?? 0;
         const room = Number(node.dataset.span) * px - 2 * pad - width;
         shift = Math.min(Math.max(hidden - Number(node.dataset.x) * px, 0), Math.max(room, 0));
       }
@@ -1435,11 +1414,11 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   return (
     <SurfaceDepthProvider value={depth}>
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <div
           {...rest}
           ref={mergedRootRef}
-          className={cx(styles.root, className)}
+          className={cx(fieldTierClass, styles.root, className)}
           style={style}
           data-depth={depth}
           {...toDataAttributes({
@@ -1502,7 +1481,13 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
                         aria-rowindex={1}
                         className={cx(styles.head, stickySurfaceClass)}
                       >
-                        <div ref={cornerRef} role="columnheader" className={styles.corner}>
+                        <div
+                          ref={cornerRef}
+                          role="columnheader"
+                          // With avatars a narrow chart shows no column text: the name stays.
+                          aria-label={hasAvatar ? labels.rowsHeader : undefined}
+                          className={styles.corner}
+                        >
                           <span className={styles.cornerText}>{labels.rowsHeader}</span>
                         </div>
                         <div
@@ -1587,8 +1572,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             <VisuallyHidden live="polite">{labels.loading}</VisuallyHidden>
           ) : null}
           <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
-        </div>
-      </ControlSizeProvider>
+        </div>,
+      )}
     </SurfaceDepthProvider>
   );
 }

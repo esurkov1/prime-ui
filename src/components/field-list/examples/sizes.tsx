@@ -1,5 +1,5 @@
 /** Every tier: the headings, the fields, the handle and the buttons follow the list's size — `size`. */
-import { FieldList, type FieldListColumn, Input } from "prime-ui-kit";
+import { FieldList, type FieldListColumn, Input, Typography } from "prime-ui-kit";
 
 type Contact = { id: string; name: string; phone: string };
 
@@ -11,32 +11,38 @@ const CONTACTS: Contact[] = [{ id: "buyer", name: "Анна Лебедева", p
 
 export default function FieldListSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
-        <FieldList
-          key={size}
-          size={size}
-          label={size}
-          columns={COLUMNS}
-          defaultValue={CONTACTS}
-          getId={(contact) => contact.id}
-          getLabel={(contact) => contact.name}
-          renderItem={(contact) => (
-            <>
-              <Input.Root>
-                <Input.Wrapper>
-                  <Input.Field defaultValue={contact.name} />
-                </Input.Wrapper>
-              </Input.Root>
-              <Input.Root>
-                <Input.Wrapper>
-                  <Input.Field type="tel" defaultValue={contact.phone} />
-                </Input.Wrapper>
-              </Input.Root>
-            </>
-          )}
-        />
+        <div key={size}>
+          <div>
+            <FieldList
+              size={size}
+              label="Контакты покупателя"
+              columns={COLUMNS}
+              defaultValue={CONTACTS}
+              getId={(contact) => contact.id}
+              getLabel={(contact) => contact.name}
+              renderItem={(contact) => (
+                <>
+                  <Input.Root>
+                    <Input.Wrapper>
+                      <Input.Field defaultValue={contact.name} />
+                    </Input.Wrapper>
+                  </Input.Root>
+                  <Input.Root>
+                    <Input.Wrapper>
+                      <Input.Field type="tel" defaultValue={contact.phone} />
+                    </Input.Wrapper>
+                  </Input.Root>
+                </>
+              )}
+            />
+            <Typography as="span" variant="caption" tone="muted">
+              {size}
+            </Typography>
+          </div>
+        </div>
       ))}
-    </>
+    </div>
   );
 }

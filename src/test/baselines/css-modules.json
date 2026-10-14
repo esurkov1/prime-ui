@@ -1,7 +1,1 @@
-[
-  "src/components/field-list/FieldList.module.css: --fl-compact is never read",
-  "src/components/field-list/FieldList.module.css: --fl-end is never read",
-  "src/components/field-list/FieldList.module.css: --fl-lead is never read",
-  "src/components/field-list/FieldList.module.css: --fl-m is never read",
-  "src/components/field-list/FieldList.module.css: --fl-s is never read"
-]
+[]

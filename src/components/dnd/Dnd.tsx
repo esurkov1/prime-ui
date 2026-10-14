@@ -29,6 +29,7 @@ import { useSortableList } from "./useSortableList";
 
 export type { DragItem, DragOutcome } from "./dragSession";
 export type { DndLabels } from "./labels";
+/** Applies a reorder to an array; hosts of `Dnd.Sortable` (FieldList) take it from this module. */
 export { moveBefore } from "./useSortableList";
 
 /**

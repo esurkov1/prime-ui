@@ -11,9 +11,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Row tier: height, text, icon and avatar size; counts take one tier down.",
-          ru: "Ярус строк: высота, кегль, размер иконки и аватара; счётчики — на ярус меньше.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Row tier: height, text, icon and avatar size; counts take one tier down. Without it the tier of its host, else `m`.",
+          ru: "Ярус строк: высота, кегль, размер иконки и аватара; счётчики — на ярус меньше. Без него — ярус контейнера, иначе `m`.",
         },
         {
           name: "onReorder",
@@ -119,8 +119,8 @@ export const api: ComponentApi = {
     },
     {
       name: "List.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` sized to the tier, or an `Icon`. After the text it is a trailing glyph.",
-      ru: "Ведущий слот `aria-hidden`: `Avatar.Root` под ярус строки или `Icon`. После текста — замыкающий значок.",
+      en: "`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), or an `Icon`. After the text it is a trailing glyph.",
+      ru: "Ведущий слот `aria-hidden`: `Avatar.Root` (без своего `size` берёт ярус строки) или `Icon`. После текста — замыкающий значок.",
       props: [
         {
           name: "children",

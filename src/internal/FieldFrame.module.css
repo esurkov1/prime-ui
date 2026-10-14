@@ -20,10 +20,10 @@
 /*
  * A field in a FieldList cell (`fieldCell`): its label is the column heading, read but not shown
  * while the heading row is on screen (the sr-only class is joined in TSX). When the list stacks its
- * rows into blocks in a narrow container (479px), the heading row goes and each field shows its
- * label. `prime-field-list` is the container FieldList sets.
+ * rows into blocks in a narrow container (under 30rem), the heading row goes and each field shows
+ * its label. `prime-field-list` is the container FieldList sets, with the same query.
  */
-@container prime-field-list (max-width: 29.9375rem) {
+@container prime-field-list (width < 30rem) {
   .label.cellLabel {
     position: static;
     width: auto;

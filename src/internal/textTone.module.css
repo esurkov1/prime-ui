@@ -25,3 +25,8 @@
 .tone[data-tone="danger"] {
   color: var(--prime-color-danger-text);
 }
+
+/* `info` completes the semantic `Tone` for hosts that take one (a Timeline value). */
+.tone[data-tone="info"] {
+  color: var(--prime-color-info-text);
+}

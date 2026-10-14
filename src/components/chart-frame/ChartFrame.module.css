@@ -98,16 +98,17 @@
   border-radius: var(--prime-radius-s);
 }
 
-/* body-s at medium weight, written out: a composed role plus a weight override is order-dependent. */
+/* The body-s role comes from TSX. */
 .delta {
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-1);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  letter-spacing: var(--prime-text-body-s-tracking);
   color: var(--prime-color-text-secondary);
+}
+
+/* Medium weight over the role's regular one (a delta always carries its `data-tone`). */
+.delta[data-tone] {
+  font-weight: var(--prime-font-weight-medium);
 }
 
 /* ---------- Plot ---------- */
@@ -147,13 +148,13 @@
   border-radius: var(--prime-radius-xs);
 }
 
-/* Kit type on any SVG chart: axis labels and annotations read as captions in the muted color. A
-   library's presentation attributes lose to these; a class of the consumer still wins (:where). */
+/* Kit type on any SVG chart: axis labels and annotations read as captions in the muted color (the
+   canvas carries the caption role, so the tracking is inherited). A library's presentation
+   attributes lose to these; a class of the consumer still wins (:where). */
 .plot :where(svg text) {
   fill: var(--prime-color-text-muted);
   font-family: var(--prime-font-family-sans);
   font-size: var(--prime-text-caption-size);
-  letter-spacing: var(--prime-text-caption-tracking);
   font-variant-numeric: tabular-nums;
 }
 
@@ -200,12 +201,13 @@
   min-width: 0;
 }
 
+/* A chip one `xs` control high: the entry carries the field tier at `xs` (`--field-h`). */
 .entry {
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
-  min-height: var(--prime-control-xs-height);
+  min-height: var(--field-h);
   padding: 0 var(--prime-space-2);
   border: 0;
   border-radius: var(--prime-radius-s);
@@ -248,12 +250,13 @@
   transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
-/* Hidden: the swatch is a ring (a shape change, not only a color one) and the name goes quiet. */
-.toggle[data-hidden] {
+/* Hidden (`aria-pressed="false"`): the swatch is a ring (a shape change, not only a color one) and
+   the name goes quiet. */
+.toggle[aria-pressed="false"] {
   color: var(--prime-color-text-muted);
 }
 
-.toggle[data-hidden] .swatch {
+.toggle[aria-pressed="false"] .swatch {
   background: transparent;
   box-shadow: inset 0 0 0 calc(var(--prime-border-width) * 1.5) var(--chart-frame-swatch);
 }
@@ -272,7 +275,7 @@
   white-space: nowrap;
 }
 
-.toggle[data-hidden] .legendValue {
+.toggle[aria-pressed="false"] .legendValue {
   color: inherit;
 }
 

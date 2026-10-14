@@ -1,7 +1,5 @@
-/** Leading avatars of clients and icons of queues; the slot sizes the avatar to the row tier — `List.ItemIcon`. */
-import { Avatar, Card, Icon, List } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+/** Leading avatars of clients and icons of queues; an avatar takes the row tier — `List.ItemIcon`. */
+import { Avatar, Icon, List, Typography } from "prime-ui-kit";
 
 const CLIENTS = [
   { id: "belova", name: "Ирина Белова", company: "ООО «Гранит»", initials: "ИБ", color: "blue" },
@@ -11,9 +9,9 @@ const CLIENTS = [
 
 export default function ListWithIconExample() {
   return (
-    <>
-      <Card.Root className={styles.pane}>
-        <Card.Body>
+    <div>
+      <div>
+        <div>
           <List.Root aria-label="Клиенты">
             {CLIENTS.map((client, index) => (
               <List.Item key={client.id} current={index === 0}>
@@ -27,10 +25,11 @@ export default function ListWithIconExample() {
               </List.Item>
             ))}
           </List.Root>
-        </Card.Body>
-      </Card.Root>
-      <Card.Root className={styles.pane}>
-        <Card.Body>
+          <Typography as="span" variant="caption" tone="muted">
+            Avatar.Root
+          </Typography>
+        </div>
+        <div>
           <List.Root aria-label="Очереди">
             <List.Item current>
               <List.ItemIcon>
@@ -53,8 +52,11 @@ export default function ListWithIconExample() {
               <List.ItemText>Доставка</List.ItemText>
             </List.Item>
           </List.Root>
-        </Card.Body>
-      </Card.Root>
-    </>
+          <Typography as="span" variant="caption" tone="muted">
+            Icon
+          </Typography>
+        </div>
+      </div>
+    </div>
   );
 }

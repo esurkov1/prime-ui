@@ -1,13 +1,16 @@
 import * as React from "react";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Dnd } from "@/components/dnd/Dnd";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { InteractiveElement } from "@/internal/interactiveElement";
+import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
 import { nodeText } from "@/internal/nodeText";
 import { flattenChildren, isPart } from "@/internal/parts";
@@ -42,18 +45,9 @@ const rowKey = (item: React.ReactElement<ListItemProps>, index: number): string 
   item.props.value ?? String(item.key ?? index);
 
 export type ListRootProps = Omit<React.HTMLAttributes<HTMLUListElement>, "children"> & {
-  /** Row tier: height, text, icon and avatar size; counts take one tier down. Default `m`. */
   size?: ControlSize;
-  /**
-   * Rows reorder by a leading handle (drag, a touch hold, Alt + ↑ / ↓): the row `id` now stands
-   * in front of `beforeId` (`List.Item` `value`s; `null` — last). Apply it with `moveBefore`.
-   * Return a promise to save on a server: the row stays in its new place with a busy handle, a
-   * rejection moves it back. Every `List.Item` then needs a `value`.
-   */
   onReorder?: (id: string, beforeId: string | null) => void | Promise<void>;
-  /** Built-in strings. */
   labels?: Partial<ListLabels>;
-  /** `List.Item`s. */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLUListElement>;
 };
@@ -63,8 +57,17 @@ export type ListRootProps = Omit<React.HTMLAttributes<HTMLUListElement>, "childr
  * records). Rows are buttons or links; the open record is `current`; rows the data adds or takes
  * out rise in and close up in place.
  */
-function ListRoot({ size = "m", onReorder, labels, className, children, ...rest }: ListRootProps) {
-  const handleLabel = labels?.reorderItem ?? LIST_LABELS.reorderItem;
+function ListRoot({
+  size: sizeProp,
+  onReorder,
+  labels,
+  className,
+  children,
+  ...rest
+}: ListRootProps) {
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
+  const handleLabel = useLabels(LIST_LABELS, labels).reorderItem;
   const reorder = React.useMemo<ReorderContextValue>(() => ({ handleLabel }), [handleLabel]);
   const latest = React.useRef(onReorder);
   latest.current = onReorder;
@@ -89,49 +92,45 @@ function ListRoot({ size = "m", onReorder, labels, className, children, ...rest 
   );
 
   if (onReorder === undefined) {
-    return (
-      <ControlSizeProvider value={size}>
-        <PresenceContext value={presence}>
-          <ul
-            // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
-            role="list"
-            {...rest}
-            className={cx(styles.root, className)}
-            {...toDataAttributes({ size })}
-          >
-            {nodes.map((node) =>
-              isPart<ListItemProps>(node, ListItem) ? keyed(node, items.indexOf(node)) : node,
-            )}
-          </ul>
-        </PresenceContext>
-      </ControlSizeProvider>
+    return tier.provide(
+      <PresenceContext value={presence}>
+        <ul
+          // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+          role="list"
+          {...rest}
+          className={cx(fieldTierClass, styles.root, className)}
+          {...toDataAttributes({ size })}
+        >
+          {nodes.map((node) =>
+            isPart<ListItemProps>(node, ListItem) ? keyed(node, items.indexOf(node)) : node,
+          )}
+        </ul>
+      </PresenceContext>,
     );
   }
 
   const { ref, ...listRest } = rest;
-  return (
-    <ControlSizeProvider value={size}>
-      <ReorderContext value={reorder}>
-        <PresenceContext value={presence}>
-          <Dnd.Root>
-            <Dnd.Sortable
-              role="list"
-              {...listRest}
-              ref={ref as React.Ref<HTMLElement>}
-              as="ul"
-              items={items}
-              getId={itemId}
-              getLabel={itemLabelOf}
-              onReorder={move}
-              renderItem={(item) => keyed(item, items.indexOf(item))}
-              handle
-              className={cx(styles.root, className)}
-              {...toDataAttributes({ size, reorderable: true })}
-            />
-          </Dnd.Root>
-        </PresenceContext>
-      </ReorderContext>
-    </ControlSizeProvider>
+  return tier.provide(
+    <ReorderContext value={reorder}>
+      <PresenceContext value={presence}>
+        <Dnd.Root>
+          <Dnd.Sortable
+            role="list"
+            {...listRest}
+            ref={ref as React.Ref<HTMLElement>}
+            as="ul"
+            items={items}
+            getId={itemId}
+            getLabel={itemLabelOf}
+            onReorder={move}
+            renderItem={(item) => keyed(item, items.indexOf(item))}
+            handle
+            className={cx(fieldTierClass, styles.root, className)}
+            {...toDataAttributes({ size, reorderable: true })}
+          />
+        </Dnd.Root>
+      </PresenceContext>
+    </ReorderContext>,
   );
 }
 ListRoot.displayName = "List.Root";
@@ -150,17 +149,27 @@ function itemLabelOf(item: React.ReactElement<ListItemProps>): string {
 // ─── Parts of an item ─────────────────────────────────────────────────────────
 
 export type ListItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** An `Avatar.Root` (sized by the row) or an `Icon`. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
 
 /**
- * The leading picture of a row: an avatar the slot sizes to the tier, or an icon. After the text
- * it is a quiet trailing glyph. Decorative: the text names the row.
+ * The leading picture of a row: an avatar of the row tier, or an icon. After the text it is a
+ * quiet trailing glyph. Decorative: the text names the row.
  */
-function ListItemIcon({ className, ...rest }: ListItemIconProps) {
-  return <span {...rest} className={cx(styles.icon, className)} aria-hidden="true" />;
+function ListItemIcon({ className, children, ...rest }: ListItemIconProps) {
+  const size = useControlSize(undefined);
+  // An avatar without its own `size` takes the row tier through its public `size`.
+  const sized = React.Children.map(children, (child) =>
+    isPart<{ size?: unknown }>(child, Avatar.Root) && child.props.size === undefined
+      ? React.cloneElement(child, { size })
+      : child,
+  );
+  return (
+    <span {...rest} className={cx(styles.icon, className)} aria-hidden="true">
+      {sized}
+    </span>
+  );
 }
 ListItemIcon.displayName = "List.ItemIcon";
 
@@ -198,11 +207,8 @@ export type ListItemCountProps = Omit<
   React.HTMLAttributes<HTMLSpanElement>,
   "children" | "color"
 > & {
-  /** Badge hue. Default `gray`; a hue for what needs attention (unread). */
   color?: PaletteColor;
-  /** The number (or a short status). */
   children: React.ReactNode;
-  /** The Badge `<span>`. */
   ref?: React.Ref<HTMLSpanElement>;
 };
 
@@ -296,30 +302,18 @@ const NO_PRESENCE: Pick<ListPresence, "entering" | "leaving"> = {
 };
 
 type ListItemOwnProps = {
-  /** Stable id of the row; required in a reorderable list (`List.Root` `onReorder`). */
   value?: string;
-  /**
-   * The open record: the selected fill and `aria-current` — `"true"` on a button, `"page"` on a
-   * link (`href`, `asChild`). Links rendered by a router may set it themselves.
-   */
   current?: boolean;
   disabled?: boolean;
-  /** Render the single child element (a router link) as the row; its children are the content. */
   asChild?: boolean;
-  /**
-   * Content and parts: `List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`,
-   * `List.ItemCount`.
-   */
   children?: React.ReactNode;
 };
 
 export type ListItemProps = ListItemOwnProps &
   Omit<React.ComponentPropsWithoutRef<"button">, keyof ListItemOwnProps> & {
-    /** Renders an `<a>` instead of a `<button>`. */
     href?: string;
     target?: string;
     rel?: string;
-    /** The `<button>`, `<a>` or the `asChild` element (not the `<li>`). */
     ref?: React.Ref<HTMLElement>;
   };
 
@@ -400,7 +394,7 @@ function ListItem({
       disabled={disabled}
       className={cx(rowClass, styles.sortableRow)}
     >
-      <span className={styles.grip}>
+      <span className={cx(fieldTierClass, styles.grip)} data-size="xs">
         <Dnd.Handle aria-label={label.trim()} disabled={disabled} />
       </span>
       {element}

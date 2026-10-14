@@ -1,12 +1,15 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { addDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import type * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { read } from "@/test/contract-utils";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Gantt, type GanttBar } from "./Gantt";
+import styles from "./Gantt.module.css";
 import {
   applyEdit,
   assignLanes,
@@ -476,55 +479,87 @@ describe("Gantt", () => {
     expect(onRowClick).toHaveBeenCalledTimes(3);
   });
 
-  it("makes the row header a link with getRowHref: the grid stop, plain clicks to onRowClick", () => {
+  it("makes the row header a link with getRowHref: the stop of the row in the grid", async () => {
+    const user = userEvent.setup();
+    render(<Chart getRowHref={(person) => `#/team/${person.id}`} />);
+    const header = screen.getByRole("rowheader", { name: "Анна Котова" });
+    const link = within(header).getByRole("link", { name: "Анна Котова" });
+    expect(link).toHaveAttribute("href", "#/team/anna");
+    // ← from the first bar reaches the link; ↓ and ↑ walk the row links.
+    act(() => bar(/^Аудит склада/).focus());
+    await user.keyboard("{ArrowLeft}");
+    expect(link).toHaveFocus();
+    expect(link.tabIndex).toBe(0);
+    await user.keyboard("{ArrowDown}");
+    const next = within(screen.getByRole("rowheader", { name: "Илья Гордеев" })).getByRole("link");
+    expect(next).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(link).toHaveFocus();
+  });
+
+  it("sends the plain clicks of a row link to onRowClick; Space clicks it like Enter", async () => {
+    const user = userEvent.setup();
     const onRowClick = vi.fn((_person: Person, event: React.SyntheticEvent) =>
       event.preventDefault(),
     );
     render(<Chart getRowHref={(person) => `#/team/${person.id}`} onRowClick={onRowClick} />);
-    const header = screen.getByRole("rowheader", { name: "Анна Котова" });
-    const link = within(header).getByRole("link", { name: "Анна Котова" });
-    expect(link).toHaveAttribute("href", "#/team/anna");
-    // ← from the first bar reaches the link: it is the row header's stop in the grid.
-    const audit = bar(/^Аудит склада/);
-    act(() => audit.focus());
-    fireEvent.keyDown(audit, { key: "ArrowLeft" });
-    expect(link).toHaveFocus();
-    expect(link.tabIndex).toBe(0);
-    fireEvent.keyDown(link, { key: "ArrowDown" });
-    expect(
-      within(screen.getByRole("rowheader", { name: "Илья Гордеев" })).getByRole("link"),
-    ).toHaveFocus();
+    const link = within(screen.getByRole("rowheader", { name: "Анна Котова" })).getByRole("link");
     fireEvent.click(link);
     expect(onRowClick).toHaveBeenCalledTimes(1);
     expect(onRowClick.mock.calls[0][0]).toBe(PEOPLE[0]);
-    // A modified click is the browser's (new tab); Space clicks the link like Enter.
+    // A modified click is the browser's (new tab).
     fireEvent.click(link, { metaKey: true });
     fireEvent.click(link, { ctrlKey: true });
     expect(onRowClick).toHaveBeenCalledTimes(1);
-    fireEvent.keyDown(link, { key: " " });
+    act(() => link.focus());
+    await user.keyboard(" ");
     expect(onRowClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("is one Tab stop: Tab enters the grid at its stop and leaves it at once", async () => {
+    const user = userEvent.setup();
+    render(<Chart />);
+    // The toolbar comes first: the zoom switch and «Сегодня».
+    const audit = bar(/^Аудит склада/);
+    while (document.activeElement !== audit) {
+      await user.tab();
+      if (document.activeElement === document.body) break;
+    }
+    expect(audit).toHaveFocus();
+    await user.tab();
+    const focused = document.activeElement;
+    expect(focused === document.body || !screen.getByRole("grid").contains(focused)).toBe(true);
+  });
+
+  it("takes the host tier without its own size; the bar text is one tier down", () => {
+    render(
+      <ControlSizeProvider value="l">
+        <Chart />
+      </ControlSizeProvider>,
+    );
+    const root = screen.getByRole("grid").closest("[data-depth]");
+    expect(root).toHaveAttribute("data-size", "l");
+    const track = bar(/^Аудит склада/).closest("[role='gridcell']");
+    expect(track).toHaveAttribute("data-size", "m");
   });
 
   it("sizes the grid, head, rows and backdrop from the axis length, not from the viewport", () => {
     // jsdom has no layout: the contract lives in the CSS. A max-content grid let engines drop the
     // fixed axis basis, and the head fill, row lines and washes stopped at the viewport width.
-    const css = read("src/components/gantt/Gantt.module.css");
-    const rule = (selector: string) =>
-      css.match(new RegExp(`^${selector.replace(".", "\\.")} \\{([^}]*)\\}`, "m"))?.[1] ?? "";
-    expect(rule(".grid")).toMatch(
-      /width: max\(100%, calc\(var\(--gantt-label-w\) \+ var\(--gantt-axis-w\)\)\);/,
+    const file = "src/components/gantt/Gantt.module.css";
+    const grid = cssRule(file, ".grid");
+    expect(cssValue(grid, "width")).toBe(
+      "max(100%, calc(var(--gantt-label-w) + var(--gantt-axis-w)))",
     );
-    expect(rule(".grid")).toMatch(
-      /--gantt-axis-w: calc\(var\(--gantt-days\) \* var\(--gantt-day\)\);/,
-    );
-    expect(css).toMatch(
-      /^\.backdropWash,\n\.backdropLines \{[^}]*\bwidth: var\(--gantt-axis-w\);/m,
+    expect(cssValue(grid, "--gantt-axis-w")).toBe("calc(var(--gantt-days) * var(--gantt-day))");
+    expect(cssValue(cssRule(file, ".backdropWash, .backdropLines"), "width")).toBe(
+      "var(--gantt-axis-w)",
     );
     for (const selector of [".axis", ".track"]) {
-      expect(rule(selector), selector).toMatch(/\bwidth: var\(--gantt-axis-w\);/);
+      expect(cssValue(cssRule(file, selector), "width"), selector).toBe("var(--gantt-axis-w)");
     }
     for (const selector of [".corner", ".rowHeader"]) {
-      expect(rule(selector), selector).toMatch(/\bwidth: var\(--gantt-label-w\);/);
+      expect(cssValue(cssRule(file, selector), "width"), selector).toBe("var(--gantt-label-w)");
     }
     render(<Chart range={{ start: day(7, 6), end: day(8, 3) }} />);
     expect(screen.getByRole("grid").style.getPropertyValue("--gantt-days")).toBe("28");
@@ -768,7 +803,7 @@ describe("Gantt day-precise editing", () => {
     fireEvent.pointerDown(grip, { clientX: 100, button: 0, pointerType: "mouse" });
     fireEvent.pointerMove(audit, { clientX: 112, pointerType: "mouse" });
     expect(screen.getByRole("tooltip")).toHaveTextContent("6 – 11 июля · 6 дн.");
-    expect(document.querySelector('[class*="dayGuide"]')).not.toBeNull();
+    expect(document.querySelector(`.${styles.dayGuide}`)).not.toBeNull();
     fireEvent.pointerUp(audit, { clientX: 112, pointerType: "mouse" });
     expect(onBarChange).toHaveBeenCalledWith(
       { start: day(7, 6), end: day(7, 12) },

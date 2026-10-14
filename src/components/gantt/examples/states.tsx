@@ -2,8 +2,6 @@
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Gantt, type GanttBar, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 type Vehicle = { id: string; name: string; bars: GanttBar[] };
 
 const WEEK = startOfWeek(startOfToday(), { weekStartsOn: 1 });
@@ -36,36 +34,42 @@ const chartProps = {
 
 export default function GanttStatesExample() {
   return (
-    <div className={styles.specimens}>
-      <div className={styles.specimen}>
-        <Gantt aria-label="Загрузка машин" rows={NO_VEHICLES} loading {...chartProps} />
-        <Typography as="span" variant="caption" tone="muted">
-          loading
-        </Typography>
+    <div>
+      <div>
+        <div>
+          <Gantt aria-label="Загрузка машин" rows={NO_VEHICLES} loading {...chartProps} />
+          <Typography as="span" variant="caption" tone="muted">
+            loading
+          </Typography>
+        </div>
       </div>
-      <div className={styles.specimen}>
-        <Gantt
-          aria-label="Рейсы машин"
-          rows={NO_VEHICLES}
-          empty="На этой неделе рейсов нет"
-          {...chartProps}
-        />
-        <Typography as="span" variant="caption" tone="muted">
-          empty
-        </Typography>
+      <div>
+        <div>
+          <Gantt
+            aria-label="Рейсы машин"
+            rows={NO_VEHICLES}
+            empty="На этой неделе рейсов нет"
+            {...chartProps}
+          />
+          <Typography as="span" variant="caption" tone="muted">
+            empty
+          </Typography>
+        </div>
       </div>
-      <div className={styles.specimen}>
-        <Gantt
-          aria-label="Рейсы машин, только просмотр"
-          rows={FLEET}
-          readOnly
-          today={REPORT_DAY}
-          onBarChange={() => undefined}
-          {...chartProps}
-        />
-        <Typography as="span" variant="caption" tone="muted">
-          readOnly · today
-        </Typography>
+      <div>
+        <div>
+          <Gantt
+            aria-label="Рейсы машин, только просмотр"
+            rows={FLEET}
+            readOnly
+            today={REPORT_DAY}
+            onBarChange={() => undefined}
+            {...chartProps}
+          />
+          <Typography as="span" variant="caption" tone="muted">
+            readOnly · today
+          </Typography>
+        </div>
       </div>
     </div>
   );

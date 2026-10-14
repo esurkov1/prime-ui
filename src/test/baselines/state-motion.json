@@ -2,6 +2,5 @@
   "src/components/card/Card.module.css: .root flips box-shadow",
   "src/components/dropdown/Dropdown.module.css: .item flips background",
   "src/components/dropdown/Dropdown.module.css: .item flips background #2",
-  "src/components/gantt/Gantt.module.css: .rowHeader flips opacity",
   "src/components/scroll-container/ScrollContainer.module.css: .root flips background-color"
 ]

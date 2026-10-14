@@ -39,7 +39,7 @@ A leaf: rows come from `value` through `renderItem`, which returns one element p
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### FieldList
-Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editable list of records of one shape: column headings once, a row of fields per record (`<ol>`), remove per row, add under the rows; rows stack under 480 px.
+Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editable list of records of one shape: column headings once, a row of fields per record (`<ol>`), remove per row, add under the rows; rows stack in a container under 30rem.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -61,7 +61,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `hint` | `ReactNode` | — | Help text under the list; hidden while `error` shows. |
 | `error` | `ReactNode` | — | A problem of the list as a whole («Добавьте хотя бы одну позицию»); a field's own error goes on that field. |
 | `disabled` | `boolean` | `false` | Disables every field, handle and button; a disabled `Fieldset` around it sets it too. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the headings, buttons and the kit fields that read the host tier. Without it the host tier, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the headings, buttons and the kit fields that read the host tier. Without it the host tier, else `m`. |
 | `labels` | `Partial<FieldListLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
@@ -98,14 +98,15 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | pinned row | `getLocked(item)` | `data-locked="true"` on the `<li>`; a lock, no remove button |
 | invalid | `error` (the list), a field's own `error` | the list's message under the add row; a field's under the field in its row |
 | disabled | `disabled` (or a disabled Fieldset) | `data-disabled="true"` on the frame; fields, handles and buttons disabled through the kit's disabled context |
-| stacked | container narrower than 480 px | heading row hidden, each row's fields in one column with their labels shown |
+| stacked | container narrower than 30rem | heading row hidden, each row's fields in one column with their labels shown |
+| rows come and go | the add button, a remove button, a new `value` | a row the data adds rises in once (`enterMotion`), a removed one closes up in place and the rows below glide up (`listPresence`); the heading row rises in with the first row and closes up with the last (`partPresence`); the first render stays still |
 
 ## Layout & spacing
 - Rows 12 apart (`--prime-space-3`); columns 12 apart; the heading row sits at the tier's label gap above the first row.
-- Every row and the heading row share one track list: `[lead] [columns] [end]`; the lead fits the grip, the end fits a remove button of the tier.
+- Every row and the heading row share one track list: `[lead] [columns] [end]`; the lead is one `xs` control wide (the grip or the lock), the end fits a remove button of the tier.
 - The handle, the lock and the remove button stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
 - The add button lines up with the first column of fields, 12 under the last row.
-- Under 480 px of its own width (a container query): rows stack, fields 16 apart inside a row, rows 24 apart.
+- Under 30rem of its own width (a container query): rows stack, fields 16 apart inside a row, rows 24 apart.
 
 ## Accessibility
 
@@ -121,7 +122,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- The rows are an `<ol>` named by the list `label` (`aria-labelledby`); the list gives each row its position.
+- The rows are an `<ol role="list">` named by the list `label` (`aria-labelledby`); the list gives each row its position, and the role keeps it under `list-style: none` in WebKit.
 - The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.
 - The `<ol>` is described by the list's `hint` and `error` (`aria-describedby`), which speak for every row.
 - In a narrow container the heading row goes and each field's label shows above it.
@@ -166,5 +167,5 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A grip, a remove button and an add button drawn by hand around a `.map()` of fields → FieldList.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Label](../label/COMPONENT.md) (headings), the field frame (label, hint, error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Label](../label/COMPONENT.md) (headings), the field frame (label, [Hint](../hint/COMPONENT.md) for the hint and error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md) (icon-only trigger), [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`), [Fieldset](../fieldset/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

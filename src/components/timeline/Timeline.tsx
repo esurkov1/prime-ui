@@ -1,13 +1,17 @@
 import * as React from "react";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { hasContent } from "@/internal/hasContent";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import palette from "@/internal/palette.module.css";
 import { isPart } from "@/internal/parts";
 import press from "@/internal/press.module.css";
 import { slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./Timeline.module.css";
@@ -15,28 +19,38 @@ import styles from "./Timeline.module.css";
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type TimelineRootProps = {
-  /** Tier of text, dots and row rhythm. Default `m` (rows 64px). */
   size?: ControlSize;
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLDivElement>;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
-function TimelineRoot({ size = "m", children, className, ...rest }: TimelineRootProps) {
-  return (
-    <ControlSizeProvider value={size}>
-      <div {...rest} className={cx(styles.root, className)} {...toDataAttributes({ size })}>
-        {children}
-      </div>
-    </ControlSizeProvider>
+function TimelineRoot({ size: sizeProp, children, className, ...rest }: TimelineRootProps) {
+  const tier = useHostTier(sizeProp);
+  return tier.provide(
+    <div
+      {...rest}
+      className={cx(fieldTierClass, styles.root, className)}
+      {...toDataAttributes({ size: tier.size })}
+    >
+      {children}
+    </div>,
   );
 }
 TimelineRoot.displayName = "Timeline.Root";
 
 // ─── Group ────────────────────────────────────────────────────────────────────
 
+/** The text role of a group heading per tier: one step under the rows on xs and s. */
+const GROUP_LABEL_ROLE: Record<ControlSize, string> = {
+  xs: textRole.caption,
+  s: textRole.bodyS,
+  m: textRole.titleS,
+  l: textRole.titleM,
+  xl: textRole.titleM,
+};
+
 export type TimelineGroupProps = {
-  /** Group heading (e.g. «Недавно»); labels the list via `aria-labelledby`. */
   label?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -56,8 +70,9 @@ const isGap = (child: React.ReactNode) => React.isValidElement(child) && child.t
 
 /** One labelled `<ol>` of events. The connecting line runs from its first dot to its last. */
 function TimelineGroup({ label, children, className, ...rest }: TimelineGroupProps) {
+  const size = useControlSize(undefined);
   const labelId = React.useId();
-  const hasLabel = label !== undefined && label !== null && label !== false;
+  const hasLabel = hasContent(label);
   const events = React.Children.toArray(children);
   const items = events.map((child, index) => (
     <EdgeContext.Provider
@@ -75,11 +90,13 @@ function TimelineGroup({ label, children, className, ...rest }: TimelineGroupPro
   return (
     <div className={styles.group}>
       {hasLabel ? (
-        <div id={labelId} className={styles.groupLabel}>
+        <div id={labelId} className={cx(GROUP_LABEL_ROLE[size], styles.groupLabel)}>
           {label}
         </div>
       ) : null}
       <ol
+        // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+        role="list"
         aria-labelledby={hasLabel ? labelId : undefined}
         {...rest}
         className={cx(styles.list, className)}
@@ -102,19 +119,13 @@ function edgeAttributes({ first, last, beforeGap }: EdgeValue) {
 // ─── Item ─────────────────────────────────────────────────────────────────────
 
 export type TimelineItemProps = {
-  /** Decorative dot hue (categorization). Default `blue`, shown at reduced emphasis. */
   color?: PaletteColor;
-  /** Semantic dot color (status). Wins over `color`; shown at full emphasis. */
   tone?: Tone;
-  /** Renders the row as a link. */
   href?: string;
-  /** Renders the row as the single child element (router link etc.); the dot is prepended to its children. */
   asChild?: boolean;
-  /** Renders the row as a `button` (unless `href` / `asChild`). */
   onClick?: React.MouseEventHandler<HTMLElement>;
   children: React.ReactNode;
   className?: string;
-  /** The row element (`a`, `button`, `div` or the `asChild` element). */
   ref?: React.Ref<HTMLElement>;
 } & Omit<React.HTMLAttributes<HTMLElement>, "children" | "color" | "onClick"> &
   Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, "target" | "rel" | "download">;
@@ -262,7 +273,11 @@ function TimelineItemValue({
   ...rest
 }: TimelineItemValueProps) {
   return (
-    <span {...rest} className={cx(styles.value, className)} {...toDataAttributes({ tone })}>
+    <span
+      {...rest}
+      className={cx(styles.value, textTone.tone, className)}
+      {...toDataAttributes({ tone })}
+    >
       <ValueContext.Provider value={true}>{children}</ValueContext.Provider>
     </span>
   );
@@ -282,7 +297,6 @@ function TimelineDescription({ className, ...rest }: TimelineDescriptionProps) {
 TimelineDescription.displayName = "Timeline.Description";
 
 export type TimelineGapProps = {
-  /** Caption color and hollow dot. Default `neutral` (muted); `warning` / `danger` flag a long interval. */
   tone?: Tone;
   children: React.ReactNode;
   className?: string;

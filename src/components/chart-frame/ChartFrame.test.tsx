@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -134,7 +135,6 @@ describe("ChartFrame", () => {
     expect(entry).toHaveTextContent("1 200");
     fireEvent.click(entry);
     expect(entry).toHaveAttribute("aria-pressed", "false");
-    expect(entry).toHaveAttribute("data-hidden", "true");
     expect(onHiddenSeriesChange).toHaveBeenLastCalledWith(["new"]);
     fireEvent.click(entry);
     expect(onHiddenSeriesChange).toHaveBeenLastCalledWith([]);
@@ -176,6 +176,45 @@ describe("ChartFrame", () => {
     fireEvent.keyDown(second, { key: "Home" });
     expect(first).toHaveFocus();
     fireEvent.keyDown(first, { key: " " });
+  });
+
+  it("keyboard: Tab enters the legend once, arrows wrap both ways, Enter and Space toggle", async () => {
+    const user = userEvent.setup();
+    const onHiddenSeriesChange = vi.fn();
+    render(
+      <ChartFrame.Root series={SERIES} rows={ROWS} onHiddenSeriesChange={onHiddenSeriesChange}>
+        <ChartFrame.Header>
+          <ChartFrame.Title>Выручка</ChartFrame.Title>
+          <ChartFrame.Actions>
+            <button type="button">Экспорт</button>
+          </ChartFrame.Actions>
+        </ChartFrame.Header>
+        <ChartFrame.Legend />
+      </ChartFrame.Root>,
+    );
+    const legend = within(screen.getByRole("list", { name: "Ряды графика" }));
+    const [first, second] = legend.getAllByRole("button");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Экспорт" })).toHaveFocus();
+    await user.tab();
+    expect(first).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(second).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(first).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(second).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(second).toHaveAttribute("aria-pressed", "false");
+    expect(onHiddenSeriesChange).toHaveBeenLastCalledWith(["renewals"]);
+    await user.keyboard(" ");
+    expect(second).toHaveAttribute("aria-pressed", "true");
+    expect(onHiddenSeriesChange).toHaveBeenLastCalledWith([]);
+    // One stop: the next Tab leaves the legend from the entry focused last.
+    await user.tab();
+    expect(document.body).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(second).toHaveFocus();
   });
 
   it("a read-only legend names series without buttons", () => {

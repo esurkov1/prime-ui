@@ -4,17 +4,13 @@
  * The 2px `border-subtle` line is drawn per `li` around the dot and spans the first to the last dot.
  * The row under the pointer or with keyboard focus: `fill-subtle-active` pill (radius l), accent
  * title and dot; interactive rows add an inset focus ring. Below 20rem of root width the value moves
- * under the meta.
+ * under the meta. The title is the field tier text (`fieldTierClass` on the root, `--field-*`);
+ * the group heading takes a text role per tier in TSX.
  */
 
 .root {
-  --tl-title-size: var(--prime-control-m-text-size);
-  --tl-title-line-height: var(--prime-control-m-line-height);
   --tl-meta-size: var(--prime-text-body-s-size);
   --tl-meta-line-height: var(--prime-text-body-s-line-height);
-  --tl-label-size: var(--prime-text-title-s-size);
-  --tl-label-line-height: var(--prime-text-title-s-line-height);
-  --tl-label-tracking: var(--prime-text-title-s-tracking);
   --tl-label-gap: var(--prime-space-2);
   --tl-group-gap: var(--prime-space-4);
   --tl-dot: calc(var(--prime-space-2) + var(--prime-border-width) * 2);
@@ -38,13 +34,8 @@
 }
 
 .root[data-size="xs"] {
-  --tl-title-size: var(--prime-control-xs-text-size);
-  --tl-title-line-height: var(--prime-control-xs-line-height);
   --tl-meta-size: var(--prime-text-caption-size);
   --tl-meta-line-height: var(--prime-text-caption-line-height);
-  --tl-label-size: var(--prime-text-caption-size);
-  --tl-label-line-height: var(--prime-text-caption-line-height);
-  --tl-label-tracking: var(--prime-text-caption-tracking);
   --tl-label-gap: var(--prime-space-1);
   --tl-group-gap: var(--prime-space-3);
   --tl-dot: var(--prime-space-2);
@@ -57,12 +48,8 @@
 }
 
 .root[data-size="s"] {
-  --tl-title-size: var(--prime-control-s-text-size);
-  --tl-title-line-height: var(--prime-control-s-line-height);
   --tl-meta-size: var(--prime-text-caption-size);
   --tl-meta-line-height: var(--prime-text-caption-line-height);
-  --tl-label-size: var(--prime-text-body-s-size);
-  --tl-label-line-height: var(--prime-text-body-s-line-height);
   --tl-label-gap: var(--prime-space-1);
   --tl-dot: var(--prime-space-2);
   --tl-gap-pad-y: var(--prime-space-1);
@@ -74,13 +61,8 @@
 }
 
 .root[data-size="l"] {
-  --tl-title-size: var(--prime-control-l-text-size);
-  --tl-title-line-height: var(--prime-control-l-line-height);
   --tl-meta-size: var(--prime-text-body-m-size);
   --tl-meta-line-height: var(--prime-text-body-m-line-height);
-  --tl-label-size: var(--prime-text-title-m-size);
-  --tl-label-line-height: var(--prime-text-title-m-line-height);
-  --tl-label-tracking: var(--prime-text-title-m-tracking);
   --tl-label-gap: var(--prime-space-2);
   --tl-group-gap: var(--prime-space-5);
   --tl-dot: var(--prime-space-3);
@@ -89,13 +71,8 @@
 }
 
 .root[data-size="xl"] {
-  --tl-title-size: var(--prime-control-xl-text-size);
-  --tl-title-line-height: var(--prime-control-xl-line-height);
   --tl-meta-size: var(--prime-text-body-m-size);
   --tl-meta-line-height: var(--prime-text-body-m-line-height);
-  --tl-label-size: var(--prime-text-title-m-size);
-  --tl-label-line-height: var(--prime-text-title-m-line-height);
-  --tl-label-tracking: var(--prime-text-title-m-tracking);
   --tl-label-gap: var(--prime-space-3);
   --tl-group-gap: var(--prime-space-5);
   --tl-dot: var(--prime-space-3);
@@ -117,16 +94,18 @@
   min-width: 0;
 }
 
+/* The text role comes from TSX per tier (caption · body-s · title-s · title-m). */
 .groupLabel {
   /* Starts at the dots' leading edge, so heading and dots share one vertical edge. */
   padding-inline: calc(var(--tl-pad-start) + (var(--tl-dot-col) - var(--tl-dot)) / 2)
     var(--tl-pad-end);
   color: var(--prime-color-text-primary);
-  font-size: var(--tl-label-size);
-  line-height: var(--tl-label-line-height);
-  font-weight: var(--prime-font-weight-semibold);
-  letter-spacing: var(--tl-label-tracking);
   overflow-wrap: anywhere;
+}
+
+/* A heading is semibold on every tier, over the regular weight of the small roles. */
+.group > .groupLabel {
+  font-weight: var(--prime-font-weight-semibold);
 }
 
 .list {
@@ -221,8 +200,8 @@
   background: transparent;
   color: var(--prime-color-text-primary);
   font: inherit;
-  font-size: var(--tl-title-size);
-  line-height: var(--tl-title-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   text-align: start;
   text-decoration: none;
   transition:
@@ -341,26 +320,6 @@
   white-space: nowrap;
 }
 
-.value[data-tone="accent"] {
-  color: var(--prime-color-accent-text);
-}
-
-.value[data-tone="success"] {
-  color: var(--prime-color-success-text);
-}
-
-.value[data-tone="warning"] {
-  color: var(--prime-color-warning-text);
-}
-
-.value[data-tone="danger"] {
-  color: var(--prime-color-danger-text);
-}
-
-.value[data-tone="info"] {
-  color: var(--prime-color-info-text);
-}
-
 /* Second line under the value (category, unit): meta size, muted, regular. */
 .valueMeta {
   color: var(--prime-color-text-muted);
@@ -455,13 +414,5 @@
     text-align: start;
     white-space: normal;
     overflow-wrap: anywhere;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .row,
-  .dot,
-  .title {
-    transition: none;
   }
 }
