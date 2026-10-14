@@ -23,7 +23,7 @@ import { ChartFrame, type ChartFrameSeries, chartColors } from "prime-ui-kit";
 
 ## Anatomy
 ```
-ChartFrame.Root              <figure>; surface of the depth ladder; state, series, hidden series
+ChartFrame.Root              <figure>; surface of the depth ladder; state, series, hidden series, rows
 ├─ ChartFrame.Header         <div>; title column · actions
 │  ├─ ChartFrame.Title       <h3>; names the figure and the table
 │  ├─ ChartFrame.Description <p>; describes the figure
@@ -32,8 +32,8 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 │  └─ ChartFrame.Delta       <span>; change with a tone
 ├─ ChartFrame.Plot           <div>; fixed height, measured; Crossfade of plot / Skeleton / empty / error
 ├─ ChartFrame.Legend         <ul>; a toggle button per series: swatch · name · value
-├─ ChartFrame.Table          <table>; visually hidden data, ready state only
-└─ ChartFrame.Tooltip        <div>; with `point` portaled beside that point of the plot, else in place for a library's tooltip hook
+├─ ChartFrame.Tooltip        <div>; with `point` portaled beside that point of the plot, else in place for a library's tooltip hook
+└─ (data table)             <table> drawn by the root from `rows`; visually hidden, ready state only
 ```
 
 ## API
@@ -41,12 +41,13 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### ChartFrame.Root
-`ref` → `HTMLElement` (`<figure>`). The panel: a surface of the depth ladder, a figure named by `ChartFrame.Title` and described by `ChartFrame.Description`, `aria-busy` while loading. Owns the state, the series and which of them are hidden; every part reads them.
+`ref` → `HTMLElement` (`<figure>`). The panel: a surface of the depth ladder, a figure named by `ChartFrame.Title` and described by `ChartFrame.Description`, `aria-busy` while loading. Owns the state, the series, the hidden ones and the data (`rows`); every part reads them.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `state` | `"ready" \| "loading" \| "empty" \| "error"` | `"ready"` | What the chart region shows: the plot, Skeletons while `loading`, the empty state, or the load error with a retry (`onRetry`). Changes cross-fade at the same height. |
 | `series` | `ChartFrameSeries[]` | `[]` | The series in drawing order, `{ id, label, color?, value? }`: legend entries, tooltip rows, table columns and `renderPlot` colors. `color` is a palette hue; `value` is the legend summary. |
+| `rows` | `ChartFrameRow[]` | — (required) | The chart's data, `{ label, values }` per point (`values` by series id, a missing one reads as «—»): a visually hidden table for screen readers in the `ready` state. |
 | `hiddenSeries` | `string[]` | — | Ids of the series turned off in the legend (controlled). |
 | `defaultHiddenSeries` | `string[]` | `[]` | Initially hidden series (uncontrolled). |
 | `onHiddenSeriesChange` | `(hiddenSeries: string[]) => void` | — | The legend turned a series on or off; gets the new list of hidden ids. |
@@ -127,14 +128,6 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `point` | `{ x: number; y: number } \| null` | — | A point in `renderPlot` coordinates (the pointer, or the point the arrows reached): the tooltip floats right of it, left only without room; `null` hides it. Floating, it is `aria-hidden`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
-### ChartFrame.Table
-`ref` → `HTMLTableElement`. The chart's data as a visually hidden table for screen readers, named by the title: a row per point, a column per shown series. Present only in the `ready` state. A visible table is a `DataTable`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `rows` | `ChartFrameTableRow[]` | — (required) | `{ label, values }` per point; `values` by series id, a missing one reads as «—». |
-| `…rest` | `HTMLAttributes<HTMLTableElement>` | — | `className` and the other table attributes. |
-
 ## Variants
 
 ### Delta tone
@@ -165,7 +158,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| ready | `state="ready"` | `data-state="ready"` on the root; the plot; the legend values; `ChartFrame.Table` present |
+| ready | `state="ready"` | `data-state="ready"` on the root; the plot; the legend values; the data table present |
 | loading | `state="loading"` | `data-state="loading"` and `aria-busy` on the root; Skeletons of the value, the plot and the legend values; the title, actions and legend names stay |
 | empty | `state="empty"` | `data-state="empty"` on the root; EmptyPage `compact` (`role="status"`, `labels.empty`) in the plot's place |
 | error | `state="error"` | `data-state="error"` on the root; the value is a muted dash; EmptyPage `compact` `tone="danger"` (`role="alert"`, `labels.error`) with the retry button when `onRetry` is set; it waits for a returned Promise |
@@ -199,10 +192,10 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 
 - The root is a `<figure>` named by `ChartFrame.Title` and described by `ChartFrame.Description`; `aria-busy` while loading.
 - A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.
-- `ChartFrame.Table` is a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.
+- The root renders `rows` as a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.
 - A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.
 - The empty state is `role="status"`, the error `role="alert"` with the retry button.
-- The drawing is the library's: hide a decorative SVG (`aria-hidden`) when `ChartFrame.Table` carries the data; marks you make focusable need their own `aria-label`.
+- The drawing is the library's: hide a decorative SVG (`aria-hidden`), the data table carries the data; marks you make focusable need their own `aria-label`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -213,7 +206,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `error` | `"Не удалось загрузить график"` | Title of the error state. |
 | `retry` | `"Повторить"` | Text of the retry button in the error state. |
 | `legend` | `"Ряды графика"` | Accessible name of the legend. |
-| `category` | `"Период"` | Header of the first column of `ChartFrame.Table` (what a row is). |
+| `category` | `"Период"` | Header of the first column of the data table (what a row is). |
 
 ## Examples
 | Example | Shows |
@@ -223,12 +216,12 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | [fill-height.tsx](examples/fill-height.tsx) | Revenue against the plan beside two KPI tiles: the plot takes the height of the stretched grid cell, and the plan line starts hidden until the legend turns it on — `height`, `defaultHiddenSeries`. |
 | [states.tsx](examples/states.tsx) | Loading, empty, error and data swap in the plot's place without moving the panel; the error retries, and the legend of the one series only names it — `state`, `onRetry`, `readOnly`. |
 | [controlled.tsx](examples/controlled.tsx) | Lead sources with totals in the legend; the hidden series live in the page state and one button shows them all again — `hiddenSeries`, `onHiddenSeriesChange`. |
-| [narrow.tsx](examples/narrow.tsx) | A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `children`, `height`. |
+| [narrow.tsx](examples/narrow.tsx) | A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `height`, `rows`. |
 
 ### With a chart library
 ```tsx
 // Recharts: explicit sizes from renderPlot, the kit tooltip body in `content`.
-<ChartFrame.Root series={SERIES} formatValue={formatRubles}>
+<ChartFrame.Root series={SERIES} rows={tableRows} formatValue={formatRubles}>
   <ChartFrame.Header>
     <ChartFrame.Title>Выручка</ChartFrame.Title>
   </ChartFrame.Header>
@@ -253,7 +246,6 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
     )}
   />
   <ChartFrame.Legend />
-  <ChartFrame.Table rows={tableRows} />
 </ChartFrame.Root>
 ```
 ECharts and Chart.js take the same `width`, `height` and `series[i].color`; their HTML tooltips are strings, so use their own tooltip there or `ChartFrame.Tooltip` with `point` from their hover event.
@@ -265,7 +257,7 @@ ECharts and Chart.js take the same `width`, `height` and `series[i].color`; thei
 - An empty chart with axes and no data → `state="empty"`.
 - A legend for a single series → the title already names it; leave `ChartFrame.Legend` out.
 - Two y-axes of different measures in one frame → two ChartFrames side by side.
-- The data only in the drawing → add `ChartFrame.Table`; screen readers cannot read a plot.
+- `rows` that leave points out of the drawing → pass every point the plot draws; screen readers read the table, not the plot.
 - A hand-drawn chart with its tooltip placed by hand (a `foreignObject`, clamped coordinates) → `ChartFrame.Tooltip` with `point`: it flips only when out of room and never jumps at the middle.
 
 ## Related

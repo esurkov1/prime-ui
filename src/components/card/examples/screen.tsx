@@ -225,7 +225,14 @@ export default function CardScreenExample() {
 
             {/* The chart spans two rows beside the two panels and fills their height. */}
             <PageContent.Cell span={8} rows={2}>
-              <ChartFrame.Root series={BILLING_SERIES} formatValue={formatMillionsShort}>
+              <ChartFrame.Root
+                series={BILLING_SERIES}
+                formatValue={formatMillionsShort}
+                rows={BILLING[period].map((row) => ({
+                  label: row.label,
+                  values: { invoiced: row.invoiced, paid: row.paid },
+                }))}
+              >
                 <ChartFrame.Header>
                   <ChartFrame.Title as="h2">Выставлено и оплачено</ChartFrame.Title>
                   <ChartFrame.Description>Счета за период, млн ₽</ChartFrame.Description>
@@ -290,12 +297,6 @@ export default function CardScreenExample() {
                   }}
                 />
                 <ChartFrame.Legend />
-                <ChartFrame.Table
-                  rows={BILLING[period].map((row) => ({
-                    label: row.label,
-                    values: { invoiced: row.invoiced, paid: row.paid },
-                  }))}
-                />
               </ChartFrame.Root>
             </PageContent.Cell>
 

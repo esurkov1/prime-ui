@@ -43,7 +43,11 @@ export default function ChartFrameOverviewExample() {
   const total = last.values.new + last.values.renewals;
 
   return (
-    <ChartFrame.Root series={SERIES} formatValue={formatMillions}>
+    <ChartFrame.Root
+      series={SERIES}
+      formatValue={formatMillions}
+      rows={points.map((p) => ({ label: p.month, values: p.values }))}
+    >
       <ChartFrame.Header>
         <ChartFrame.Title>Выручка</ChartFrame.Title>
         <ChartFrame.Description>По месяцам, в млн ₽</ChartFrame.Description>
@@ -121,7 +125,6 @@ export default function ChartFrameOverviewExample() {
         }}
       />
       <ChartFrame.Legend />
-      <ChartFrame.Table rows={points.map((p) => ({ label: p.month, values: p.values }))} />
     </ChartFrame.Root>
   );
 }

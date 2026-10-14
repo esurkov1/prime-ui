@@ -27,7 +27,7 @@ function Frame({
   renderPlot?: (area: ChartFramePlotArea) => React.ReactNode;
 }) {
   return (
-    <ChartFrame.Root state={state} series={SERIES} {...rest}>
+    <ChartFrame.Root state={state} series={SERIES} rows={ROWS} {...rest}>
       <ChartFrame.Header>
         <ChartFrame.Title>Выручка</ChartFrame.Title>
         <ChartFrame.Description>По месяцам</ChartFrame.Description>
@@ -37,7 +37,6 @@ function Frame({
       </ChartFrame.Value>
       <ChartFrame.Plot renderPlot={renderPlot} />
       <ChartFrame.Legend />
-      <ChartFrame.Table rows={ROWS} />
     </ChartFrame.Root>
   );
 }
@@ -109,7 +108,7 @@ describe("ChartFrame", () => {
 
   it("height: a number sets the plot height; fill marks the plot and sets none", () => {
     const { rerender } = render(
-      <ChartFrame.Root series={SERIES}>
+      <ChartFrame.Root series={SERIES} rows={ROWS}>
         <ChartFrame.Plot data-testid="area" height={200} />
       </ChartFrame.Root>,
     );
@@ -118,7 +117,7 @@ describe("ChartFrame", () => {
     expect(area).not.toHaveAttribute("data-height");
 
     rerender(
-      <ChartFrame.Root series={SERIES}>
+      <ChartFrame.Root series={SERIES} rows={ROWS}>
         <ChartFrame.Plot data-testid="area" height="fill" />
       </ChartFrame.Root>,
     );
@@ -181,12 +180,12 @@ describe("ChartFrame", () => {
 
   it("a read-only legend names series without buttons", () => {
     render(
-      <ChartFrame.Root series={SERIES}>
+      <ChartFrame.Root series={SERIES} rows={ROWS}>
         <ChartFrame.Legend readOnly />
       </ChartFrame.Root>,
     );
     expect(screen.queryByRole("button")).toBeNull();
-    expect(screen.getByText("Продления")).toBeInTheDocument();
+    expect(within(screen.getByRole("list")).getByText("Продления")).toBeInTheDocument();
   });
 
   it("loading: aria-busy, Skeletons for the value and the plot, no table", () => {
@@ -249,6 +248,16 @@ describe("ChartFrame", () => {
     expect(within(table).getByText("4200 ₽")).toBeInTheDocument();
   });
 
+  it("the data table comes from the root's rows: no part is needed to expose the data", () => {
+    render(
+      <ChartFrame.Root series={SERIES} rows={ROWS}>
+        <ChartFrame.Plot renderPlot={() => <svg aria-hidden="true" />} />
+      </ChartFrame.Root>,
+    );
+    const table = screen.getByRole("table");
+    expect(within(table).getAllByRole("row")).toHaveLength(ROWS.length + 1);
+  });
+
   it("the table reads a missing value as a dash", () => {
     render(<Frame />);
     const cells = within(screen.getByRole("table")).getAllByRole("cell");
@@ -263,7 +272,7 @@ describe("ChartFrame", () => {
 
   it("the tooltip names rows from the series, formats values and skips hidden series", () => {
     render(
-      <ChartFrame.Root series={SERIES} defaultHiddenSeries={["renewals"]}>
+      <ChartFrame.Root series={SERIES} rows={ROWS} defaultHiddenSeries={["renewals"]}>
         <ChartFrame.Tooltip
           label="Неделя 41"
           items={[
@@ -273,16 +282,16 @@ describe("ChartFrame", () => {
         />
       </ChartFrame.Root>,
     );
-    expect(screen.getByText("Неделя 41")).toBeInTheDocument();
-    expect(screen.getByText("Новые клиенты")).toBeInTheDocument();
-    expect(screen.getByText("61")).toBeInTheDocument();
-    expect(screen.queryByText("Продления")).toBeNull();
+    const tooltip = screen.getByText("Неделя 41").parentElement as HTMLElement;
+    expect(within(tooltip).getByText("Новые клиенты")).toBeInTheDocument();
+    expect(within(tooltip).getByText("61")).toBeInTheDocument();
+    expect(within(tooltip).queryByText("Продления")).toBeNull();
   });
 
   it("floats the tooltip beside a point of the plot, aria-hidden, and Escape hides it", () => {
     function Floating({ point }: { point: { x: number; y: number } | null }) {
       return (
-        <ChartFrame.Root series={SERIES}>
+        <ChartFrame.Root series={SERIES} rows={ROWS}>
           <ChartFrame.Plot data-testid="area">
             <svg />
           </ChartFrame.Plot>
@@ -311,7 +320,7 @@ describe("ChartFrame", () => {
 
   it("renders a self-sizing chart from children", () => {
     render(
-      <ChartFrame.Root>
+      <ChartFrame.Root rows={[]}>
         <ChartFrame.Plot height={120} data-testid="area">
           <svg data-testid="self" />
         </ChartFrame.Plot>

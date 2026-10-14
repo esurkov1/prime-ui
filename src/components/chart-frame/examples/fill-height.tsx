@@ -29,6 +29,10 @@ export default function ChartFrameFillHeightExample() {
           series={SERIES}
           defaultHiddenSeries={["plan"]}
           formatValue={formatMillions}
+          rows={MONTHS.map((row) => ({
+            label: row.month,
+            values: { fact: row.fact, plan: row.plan },
+          }))}
         >
           <ChartFrame.Header>
             <ChartFrame.Title as="h2">Выручка и план</ChartFrame.Title>
@@ -90,12 +94,6 @@ export default function ChartFrameFillHeightExample() {
             }}
           />
           <ChartFrame.Legend />
-          <ChartFrame.Table
-            rows={MONTHS.map((row) => ({
-              label: row.month,
-              values: { fact: row.fact, plan: row.plan },
-            }))}
-          />
         </ChartFrame.Root>
       </PageContent.Cell>
 

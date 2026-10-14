@@ -408,7 +408,7 @@ const CASES: Case[] = [
     "ChartFrame.Plot",
     "DIV",
     (ref) => (
-      <ChartFrame.Root>
+      <ChartFrame.Root rows={[]}>
         <ChartFrame.Plot ref={ref} data-testid="part" renderPlot={() => null} />
       </ChartFrame.Root>
     ),

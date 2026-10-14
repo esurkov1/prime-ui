@@ -56,7 +56,6 @@ export const PART_REFS = {
   "ChartFrame.Plot": ["HTMLDivElement"],
   "ChartFrame.Legend": ["HTMLUListElement"],
   "ChartFrame.Tooltip": ["HTMLDivElement"],
-  "ChartFrame.Table": ["HTMLTableElement"],
   "Chat.Root": ["HTMLDivElement"],
   "Chat.Header": ["HTMLDivElement"],
   "Chat.Title": ["HTMLHeadingElement"],

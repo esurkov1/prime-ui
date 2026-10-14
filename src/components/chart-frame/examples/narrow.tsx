@@ -1,18 +1,37 @@
-/** A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `children`, `height`. */
-import { Button, ChartFrame, chartColors, Icon } from "prime-ui-kit";
+/** A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `height`, `rows`. */
+import { Button, ChartFrame, type ChartFrameSeries, chartColors, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const MRR = [6.1, 6.3, 6.2, 6.6, 6.9, 7.0, 7.4, 7.3, 7.8, 8.1, 8.0, 8.4];
+const SERIES: ChartFrameSeries[] = [{ id: "mrr", label: "Выручка" }];
+
+const MRR = [
+  { month: "ноя", value: 6.1 },
+  { month: "дек", value: 6.3 },
+  { month: "янв", value: 6.2 },
+  { month: "фев", value: 6.6 },
+  { month: "мар", value: 6.9 },
+  { month: "апр", value: 7.0 },
+  { month: "май", value: 7.4 },
+  { month: "июн", value: 7.3 },
+  { month: "июл", value: 7.8 },
+  { month: "авг", value: 8.1 },
+  { month: "сен", value: 8.0 },
+  { month: "окт", value: 8.4 },
+];
+
+const ROWS = MRR.map(({ month, value }) => ({ label: month, values: { mrr: value } }));
 
 const LINE = MRR.map(
-  (v, i) => `${i ? "L" : "M"}${(i / (MRR.length - 1)) * 100},${(9 - v) * 25}`,
+  ({ value }, i) => `${i ? "L" : "M"}${(i / (MRR.length - 1)) * 100},${(9 - value) * 25}`,
 ).join("");
+
+const formatMillions = (value: number) => `${value.toLocaleString("ru-RU")} млн ₽`;
 
 export default function ChartFrameNarrowExample() {
   return (
     <div className={styles.narrow}>
-      <ChartFrame.Root>
+      <ChartFrame.Root series={SERIES} rows={ROWS} formatValue={formatMillions}>
         <ChartFrame.Header>
           <ChartFrame.Title>Регулярная выручка</ChartFrame.Title>
           <ChartFrame.Description>За 12 месяцев</ChartFrame.Description>

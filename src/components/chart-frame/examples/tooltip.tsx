@@ -27,7 +27,14 @@ export default function ChartFrameTooltipExample() {
   const [pointer, setPointer] = React.useState<{ x: number; y: number } | null>(null);
 
   return (
-    <ChartFrame.Root series={SERIES} formatValue={formatCount}>
+    <ChartFrame.Root
+      series={SERIES}
+      formatValue={formatCount}
+      rows={WEEKS.map((week) => ({
+        label: week.label,
+        values: { paid: week.paid, pending: week.pending },
+      }))}
+    >
       <ChartFrame.Header>
         <ChartFrame.Title>Счета по неделям</ChartFrame.Title>
         <ChartFrame.Description>Выставлено за последние 6 недель</ChartFrame.Description>
@@ -143,12 +150,6 @@ export default function ChartFrameTooltipExample() {
         }}
       />
       <ChartFrame.Legend />
-      <ChartFrame.Table
-        rows={WEEKS.map((week) => ({
-          label: week.label,
-          values: { paid: week.paid, pending: week.pending },
-        }))}
-      />
     </ChartFrame.Root>
   );
 }
