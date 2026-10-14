@@ -57,6 +57,7 @@
 
 /* ─── Narrow viewport: bottom sheet ──────────────────────────────────────── */
 
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
   .overlay {
     place-items: end stretch;

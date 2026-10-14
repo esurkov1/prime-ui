@@ -110,6 +110,7 @@
 }
 
 /* Phones (below 640, where the popover is a bottom sheet): buttons stack full width, primary last. */
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
   .actions {
     flex-direction: column;
