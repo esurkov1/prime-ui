@@ -1,26 +1,25 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { mergeLabels, useLabels } from "./labels";
+import { useLabels } from "./labels";
 
 type Labels = { empty: string; retry: string };
 
 const DEFAULTS: Labels = { empty: "Нет данных", retry: "Повторить" };
 
-describe("mergeLabels", () => {
+describe("useLabels", () => {
   it("puts defined overrides over the defaults", () => {
-    expect(mergeLabels(DEFAULTS, { retry: "Ещё раз", empty: undefined })).toEqual({
-      empty: "Нет данных",
-      retry: "Ещё раз",
-    });
+    const { result } = renderHook(() =>
+      useLabels(DEFAULTS, { retry: "Ещё раз", empty: undefined }),
+    );
+    expect(result.current).toEqual({ empty: "Нет данных", retry: "Ещё раз" });
   });
 
   it("returns the defaults themselves without overrides", () => {
-    expect(mergeLabels(DEFAULTS, undefined)).toBe(DEFAULTS);
+    const { result } = renderHook(() => useLabels(DEFAULTS, undefined));
+    expect(result.current).toBe(DEFAULTS);
   });
-});
 
-describe("useLabels", () => {
   it("keeps its identity while an inline object keeps its content", () => {
     const { result, rerender } = renderHook(
       ({ labels }: { labels?: Partial<Labels> }) => useLabels(DEFAULTS, labels),

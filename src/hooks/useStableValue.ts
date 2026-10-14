@@ -4,7 +4,7 @@ import * as React from "react";
  * Shallow equality: the same value, or two arrays / plain objects whose items or own keys are the
  * same values (`Object.is`).
  */
-export function shallowEqual(a: unknown, b: unknown): boolean {
+function shallowEqual(a: unknown, b: unknown): boolean {
   if (Object.is(a, b)) return true;
   if (typeof a !== "object" || typeof b !== "object" || a === null || b === null) return false;
   if (Array.isArray(a) || Array.isArray(b)) {

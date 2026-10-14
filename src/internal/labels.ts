@@ -12,8 +12,8 @@ export function useLabels<L extends object>(defaults: L, labels: Partial<L> | un
   return React.useMemo(() => mergeLabels(defaults, overrides), [defaults, overrides]);
 }
 
-/** The defaults with every defined override on top (outside a component: a store, a helper). */
-export function mergeLabels<L extends object>(defaults: L, labels: Partial<L> | undefined): L {
+/** The defaults with every defined override on top. */
+function mergeLabels<L extends object>(defaults: L, labels: Partial<L> | undefined): L {
   if (!labels) return defaults;
   const merged = { ...defaults };
   for (const key of Object.keys(labels) as (keyof L)[]) {

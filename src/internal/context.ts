@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export type ComponentContextOptions = {
+type ComponentContextOptions = {
   /**
    * What the parts must be inside, as the error names it. Default: the name itself when it is a
    * part (`"Radio.Group"`, `"Stepper.Item"`), else its root (`"Input"` → `Input.Root`).

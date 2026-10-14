@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { highlightTsx, type TsxToken } from "./highlightTsx";
+import { highlightTsx } from "./highlightTsx";
+
+type TsxToken = ReturnType<typeof highlightTsx>[number];
 
 const kinds = (tokens: TsxToken[]) => tokens.filter((token) => token.kind !== "text");
 

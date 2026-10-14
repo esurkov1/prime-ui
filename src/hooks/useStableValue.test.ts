@@ -1,19 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { shallowEqual, useStableValue } from "./useStableValue";
-
-describe("shallowEqual", () => {
-  it("compares arrays by items and objects by own keys", () => {
-    expect(shallowEqual([1, "a"], [1, "a"])).toBe(true);
-    expect(shallowEqual([1], [1, 2])).toBe(false);
-    expect(shallowEqual({ a: 1, b: undefined }, { a: 1, b: undefined })).toBe(true);
-    expect(shallowEqual({ a: 1, b: undefined }, { a: 1, c: undefined })).toBe(false);
-    expect(shallowEqual({ a: {} }, { a: {} })).toBe(false);
-    expect(shallowEqual([1], { 0: 1 })).toBe(false);
-    expect(shallowEqual(null, {})).toBe(false);
-  });
-});
+import { useStableValue } from "./useStableValue";
 
 describe("useStableValue", () => {
   it("keeps the reference while the content is equal", () => {
@@ -26,6 +14,24 @@ describe("useStableValue", () => {
     rerender({ value: ["a", "c"] });
     expect(result.current).toEqual(["a", "c"]);
     expect(result.current).not.toBe(first);
+  });
+
+  it("compares arrays by items and objects by own keys by default", () => {
+    const stable = (first: unknown, next: unknown) => {
+      const { result, rerender } = renderHook(({ value }) => useStableValue(value), {
+        initialProps: { value: first },
+      });
+      const kept = result.current;
+      rerender({ value: next });
+      return result.current === kept;
+    };
+    expect(stable([1, "a"], [1, "a"])).toBe(true);
+    expect(stable([1], [1, 2])).toBe(false);
+    expect(stable({ a: 1, b: undefined }, { a: 1, b: undefined })).toBe(true);
+    expect(stable({ a: 1, b: undefined }, { a: 1, c: undefined })).toBe(false);
+    expect(stable({ a: {} }, { a: {} })).toBe(false);
+    expect(stable([1], { 0: 1 })).toBe(false);
+    expect(stable(null, {})).toBe(false);
   });
 
   it("takes an own equality", () => {
