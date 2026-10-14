@@ -23,8 +23,6 @@
   min-width: 0;
   max-width: 100%;
   border-radius: var(--prime-card-radius);
-  /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-layer-current);
   background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
@@ -234,18 +232,6 @@
   letter-spacing: var(--prime-text-body-s-tracking);
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
-}
-
-.delta[data-tone="success"] {
-  color: var(--prime-color-success-text);
-}
-
-.delta[data-tone="warning"] {
-  color: var(--prime-color-warning-text);
-}
-
-.delta[data-tone="danger"] {
-  color: var(--prime-color-danger-text);
 }
 
 /* The reference line of a KPI: quiet caption at the bottom of the tile. */

@@ -96,7 +96,7 @@
   gap: var(--list-gap);
   width: 100%;
   min-width: 0;
-  min-height: max(var(--list-h), var(--touch-row-min, 0px));
+  min-height: max(var(--list-h), var(--touch-row-min, var(--prime-space-0)));
   margin: 0;
   padding-block: calc((var(--list-h) - var(--list-lh)) / 2);
   padding-inline: var(--list-pad-x);

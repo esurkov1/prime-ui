@@ -110,18 +110,6 @@
   color: var(--prime-color-text-secondary);
 }
 
-.delta[data-tone="success"] {
-  color: var(--prime-color-success-text);
-}
-
-.delta[data-tone="warning"] {
-  color: var(--prime-color-warning-text);
-}
-
-.delta[data-tone="danger"] {
-  color: var(--prime-color-danger-text);
-}
-
 /* ---------- Plot ---------- */
 
 .plot {

@@ -63,6 +63,9 @@
 
 /* A centered header: a round mark above the text. (A start header's logo is the icon tile.) */
 .root[data-align="center"] .logo {
+  /* A kit Icon in the mark takes the logo's icon size. */
+  --prime-icon-size: var(--lf-logo-icon);
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -76,7 +79,7 @@
   overflow: hidden;
 }
 
-.root[data-align="center"] .logo > svg,
+/* A product picture in the mark. */
 .root[data-align="center"] .logo > img {
   width: var(--lf-logo-icon);
   height: var(--lf-logo-icon);

@@ -14,6 +14,7 @@ import { rovingIndex } from "@/internal/rovingFocus";
 import type { PaletteColor, Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 import { touchTargetClass } from "@/internal/touchTarget";
 import { chartColors } from "@/theme/chartColors";
 
@@ -341,7 +342,10 @@ export type ChartFrameDeltaProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 /** The change of the headline value («+12% к сентябрю»); the sign is in the text, not only the color. */
 function ChartFrameDelta({ tone = "neutral", className, ...rest }: ChartFrameDeltaProps) {
-  return <span {...rest} className={cx(styles.delta, className)} data-tone={tone} />;
+  // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
+  return (
+    <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />
+  );
 }
 ChartFrameDelta.displayName = "ChartFrame.Delta";
 

@@ -7,6 +7,7 @@ import { Slot, slotChild } from "@/internal/slot";
 import type { Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 
 import styles from "./Card.module.css";
 
@@ -149,7 +150,10 @@ export type CardDeltaProps = SpanProps & {
 };
 
 function CardDelta({ className, tone = "neutral", ...rest }: CardDeltaProps) {
-  return <span {...rest} className={cx(styles.delta, className)} data-tone={tone} />;
+  // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
+  return (
+    <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />
+  );
 }
 CardDelta.displayName = "Card.Delta";
 
