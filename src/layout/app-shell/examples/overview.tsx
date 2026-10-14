@@ -55,7 +55,7 @@ export default function AppShellOverviewExample() {
           </AppHeader.Start>
         </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Section>
+          <PageContent.Page>
             <PageContent.Header>
               {/* In a real app this is PageContent.Title (the page h1). */}
               <Typography as="h2" variant="heading-m">
@@ -75,7 +75,7 @@ export default function AppShellOverviewExample() {
                 Выручка за месяц — 4,8 млн ₽, 37 сделок в работе.
               </Typography>
             </PageContent.Body>
-          </PageContent.Section>
+          </PageContent.Page>
         </AppShell.Main>
       </AppShell.Root>
     </div>

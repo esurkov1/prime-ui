@@ -36,7 +36,7 @@ export function Example() {
 
 export default function IntroPage() {
   return (
-    <PageContent.Section aria-labelledby="playground-intro">
+    <PageContent.Page aria-labelledby="playground-intro">
       <PageContent.Header>
         <PageContent.Title id="playground-intro">Prime UI</PageContent.Title>
         <PageContent.Description measure="readable">
@@ -163,6 +163,6 @@ export default function IntroPage() {
           </div>
         </div>
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }

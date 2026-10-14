@@ -113,7 +113,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 
 ## Layout & spacing
 - Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (the Sidebar rail is layer 1, the panel the page: white rail beside a gray page in light, a rail one step lighter than the near-black page in dark).
-- Gutters in Main (and in an `AppHeader.Root` in the panel): `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px. Main top padding `--prime-space-6` (24) → `--prime-space-10` (40) from 1024px; bottom `--prime-space-16`. Children of Main start from their own gutters, not the shell's.
+- Gutters in Main (and in an `AppHeader.Root` in the panel): `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px. Main top padding `--prime-space-6` (24) → `--prime-space-8` (32) from 1024px; bottom `--prime-space-16`. Children of Main start from their own gutters, not the shell's.
 - A page that fills the panel height (`PageContent.Root fill`): Main's bottom padding drops to the side gutter, so no long scroll tail stays under it.
 - Main scrolls with `overscroll-behavior: contain`, so its scroll never chains to the document.
 - Nav column: sticky at the top, viewport high, `z-index: --prime-z-sticky` (above the panel, so the compact Sidebar toggle can ride the rail edge); with `fillViewport` it fills the shell height instead.

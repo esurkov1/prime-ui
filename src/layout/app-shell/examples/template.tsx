@@ -39,7 +39,7 @@ export default function AppShellTemplateExample() {
           </Sidebar.Root>
         }
       >
-        <PageContent.Section>
+        <PageContent.Page>
           <PageContent.Header>
             {/* In a real app this is PageContent.Title (the page h1). */}
             <Typography as="h2" variant="heading-m">
@@ -47,7 +47,7 @@ export default function AppShellTemplateExample() {
             </Typography>
             <PageContent.Description>{page.text}</PageContent.Description>
           </PageContent.Header>
-        </PageContent.Section>
+        </PageContent.Page>
       </AppShell.Template>
     </div>
   );

@@ -1,21 +1,14 @@
 /* Screen states: the layout keeps its shape in every state, only the content of a region changes. */
 
-/* The banner and the panels as one block with no gap of its own: the 40 under the banner lives in its
-   slot inside the Crossfade, so it arrives and leaves with the banner. */
+/* The banner and the panels as one block with no gap of its own: the 24 under the banner (the body's
+   block gap) lives in its slot inside the Crossfade, so it arrives and leaves with the banner. */
 .lead {
   display: grid;
   min-width: 0;
 }
 
 .bannerSlot {
-  padding-block-end: var(--prime-space-10);
-}
-
-.panels {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-20) * 4)), 1fr));
-  align-items: stretch;
-  gap: var(--prime-space-4);
+  padding-block-end: var(--prime-space-6);
 }
 
 /* Skeleton rows mirror the account rows, so the card keeps its height when data arrives. */
@@ -44,11 +37,4 @@
 
 .amount {
   font-variant-numeric: tabular-nums;
-}
-
-/* A section without a card: heading 16 above the table. */
-.region {
-  display: grid;
-  gap: var(--prime-space-4);
-  min-width: 0;
 }

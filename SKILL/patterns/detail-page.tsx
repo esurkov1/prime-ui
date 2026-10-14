@@ -74,7 +74,7 @@ const COLUMNS: DataTableColumn<Line>[] = [
 
 export default function DetailPagePattern() {
   return (
-    <PageContent.Section aria-labelledby="invoice-title">
+    <PageContent.Page aria-labelledby="invoice-title">
       <PageContent.Header>
         <Breadcrumb.Root>
           <Breadcrumb.Item href="#invoices">Счета</Breadcrumb.Item>
@@ -114,10 +114,7 @@ export default function DetailPagePattern() {
       </PageContent.Header>
       <PageContent.Body>
         <div className={styles.columns}>
-          <section className={styles.main} aria-labelledby="invoice-lines">
-            <Typography as="h2" variant="title-m" id="invoice-lines">
-              Позиции
-            </Typography>
+          <PageContent.Section label="Позиции" className={styles.main}>
             <DataTable
               columns={COLUMNS}
               rows={LINES}
@@ -152,7 +149,7 @@ export default function DetailPagePattern() {
                 </dd>
               </div>
             </dl>
-          </section>
+          </PageContent.Section>
           <aside className={styles.aside} aria-label="Клиент и история">
             <Card.Root variant="panel">
               <Card.Header>
@@ -204,6 +201,6 @@ export default function DetailPagePattern() {
           </aside>
         </div>
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }

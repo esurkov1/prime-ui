@@ -11,7 +11,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Grid and spacing
 - [ ] Every spacing, size and gap in my CSS is a `--prime-space-*` (or another `--prime-*`) token on the 4px grid.
 - [ ] Spacing is `gap` on the parent; no margins on children; no outer padding duplicating `AppShell.Main` / `PageContent.Body`.
-- [ ] Proximity holds: field→field 20, inline controls 8, group→group 32, section→section 40.
+- [ ] Proximity holds: inline controls 8, tile→tile 16 (one `PageContent.Grid`), field→field 20, block→block 24, group→group 32, section→section 40 (`PageContent.Section`).
 - [ ] Inside a group things are visibly closer than between groups.
 
 ## Sizes and alignment

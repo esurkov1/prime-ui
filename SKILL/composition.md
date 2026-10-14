@@ -33,21 +33,24 @@ AppShell.Root                      once per app (layouts.md#app-frame-once-per-a
 ├─ AppShell.Nav → Sidebar          navigation rail, one layer above the page
 ├─ AppHeader.Root                  menu button / title or path / ⌘K search / app actions
 └─ AppShell.Main                   gutters; the page renders here
-   └─ PageContent.Section | Root   the page you deliver
-      ├─ PageContent.Header
+   └─ PageContent.Page | Root      the page you deliver
+      ├─ PageContent.Header        24 above the body
       │  ├─ Breadcrumb             only below a top-level section; first child → 8 above the title
       │  ├─ PageContent.Title      the one h1
       │  ├─ PageContent.Description one sentence of context (or a status Badge + the key fact)
       │  └─ PageContent.Actions    page buttons; wrap under the title on narrow screens
-      └─ PageContent.Body          blocks 40 apart: Banner, KPI grid, table, sections, Cards
+      └─ PageContent.Body          blocks 24 apart: Banner, the tile grid, a table, Cards
+         ├─ PageContent.Grid       every tile of the screen, 16 on both axes
+         │  └─ PageContent.Cell    span (of 12), rows; the tile fills it
+         └─ PageContent.Section    a new topic: h2 label (+ Actions), 40 from its neighbours
 ```
 
 - A screen component renders only its page. Styles, `applyTheme`, `NotificationProvider` and
   `AppShell` live at the app root.
-- `PageContent.Section` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
+- `PageContent.Page` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
   settings, `maxWidth="readable"` for one narrow column of text or fields.
-- No outer padding, no margins: `AppShell.Main` has the gutters, `PageContent` has header → body 32 and
-  block → block 40. Your CSS lays out only the inside of a block.
+- No outer padding, no margins: `AppShell.Main` has the gutters, `PageContent` has header → body 24,
+  block → block 24, section → section 40 and tile → tile 16. Your CSS lays out only the inside of a block.
 
 ```tsx
 import { Button, Dropdown, Icon, PageContent } from "prime-ui-kit";
@@ -90,16 +93,19 @@ Every gap is a `--prime-space-N` token (N × 4px) set as `gap` on the parent. Cl
 | label → field, field → hint | 4–8 | built into fields — never add |
 | buttons, chips, filters in a row | 8 | `--prime-space-2` |
 | text lines of one item (name over meta) | 0–4 | `--prime-space-1` |
-| heading → its content (group, section without a card) | 16 | `--prime-space-4` |
-| tile → tile in a grid (KPI, panels) | 16 | `--prime-space-4` |
+| heading → its content (group, section) | 16 | `--prime-space-4` (`PageContent.Section` does it) |
+| tile → tile, both axes (KPI, charts, panels) | 16 | `PageContent.Grid` |
 | field → field, switch → switch | 20 | `--prime-space-5` |
 | main column → side column | 24 | `--prime-space-6` |
+| page header → body | 24 | `PageContent` |
+| block → block on a page | 24 | `PageContent.Body` |
 | group → group in a form | 32 | `--prime-space-8` |
-| page header → body | 32 | `PageContent` |
-| block → block on a page | 40 | `PageContent.Body` |
+| section → section (a new topic with an `h2`) | 40 | `PageContent.Section` |
 
 A screen with one gap everywhere reads as a list of unrelated things. Use at least three levels: inside
-an item, between items, between blocks.
+an item, between items, between blocks. The tiles of one screen are one board: put them all in one
+`PageContent.Grid` (one gap on both axes), never a grid per row — and keep the large air for a new topic
+with its own heading (`PageContent.Section`).
 
 ## 3. Hierarchy — air first, then type
 
@@ -315,6 +321,6 @@ export function RevenuePanel() {
 }
 ```
 
-For a plain KPI row use `Card.Root variant="stat-trend"` (Label · Value · Delta) in an `auto-fit` grid —
-see [patterns/dashboard.tsx](patterns/dashboard.tsx). When the trend over days matters, put a
+For a plain KPI row use `Card.Root variant="stat-trend"` (Label · Value · Delta), each in a
+`PageContent.Cell span={3}` of the page's `PageContent.Grid` — see [patterns/dashboard.tsx](patterns/dashboard.tsx). When the trend over days matters, put a
 `Sparkline` in the `Card.Body` instead: it brings the value, the change and a line to scrub.

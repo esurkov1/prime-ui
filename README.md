@@ -131,7 +131,7 @@ export function App() {
         </Sidebar.Root>
       }
     >
-      <PageContent.Section>
+      <PageContent.Page>
         <PageContent.Header>
           <PageContent.Title>New client</PageContent.Title>
         </PageContent.Header>
@@ -143,7 +143,7 @@ export function App() {
           </Input.Root>
           <Button.Root>Invite</Button.Root>
         </PageContent.Body>
-      </PageContent.Section>
+      </PageContent.Page>
     </AppShell.Template>
   );
 }
@@ -171,7 +171,7 @@ Short rules that keep code correct — for people and for AI coding assistants:
 |---|---|
 | Tokens only | Components read semantic variables `--prime-*` (`--prime-space-4`, `--prime-color-text-secondary`, `--prime-control-m-height`). Your own CSS uses the same tokens. |
 | Fill, not lines | Surfaces stand on one ladder: the page and four nested layers, one OKLab lightness step apart, computed at build time. Light: gray page, white card, deeper layers alternate. Dark: a near-black page, every layer a step lighter. A field, chip or neutral button is one step off the layer it sits on, so nothing merges; controls have no visible outline. |
-| Proximity | label → field 4–8 · field → field 20 · group → group 32 · section → section 40–48. |
+| Proximity | label → field 4–8 · tile → tile 16 · field → field 20 · block → block 24 · group → group 32 · section → section 40–48. |
 | One size axis | `size` is `xs · s · m · l · xl` (28 · 32 · 36 · 40 · 48), default `m`. |
 | Semantic vs decorative color | `tone` carries meaning (`danger` for destructive), `color` is a palette hue for badges, tags and avatars. |
 

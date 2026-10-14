@@ -346,8 +346,12 @@ function ChartFrameDelta({ tone = "neutral", className, ...rest }: ChartFrameDel
 ChartFrameDelta.displayName = "ChartFrame.Delta";
 
 export type ChartFramePlotProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** Height of the plot area in px. Default 240, 160 when the panel is narrower than 30rem. */
-  height?: number;
+  /**
+   * Height of the plot area in px. Default 240, 160 when the panel is narrower than 30rem. `fill` —
+   * the plot takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the
+   * default height at least.
+   */
+  height?: number | "fill";
   /**
    * Renders the chart at the measured size — for libraries that need explicit `width` and
    * `height` (Recharts without `ResponsiveContainer`, Chart.js, visx). Gets every series with its
@@ -413,8 +417,9 @@ function ChartFramePlot({
       {...rest}
       ref={mergedRef}
       className={cx(styles.plot, className)}
+      data-height={height === "fill" ? "fill" : undefined}
       style={
-        height !== undefined
+        typeof height === "number"
           ? ({ ...style, "--chart-frame-plot-height": `${height}px` } as React.CSSProperties)
           : style
       }

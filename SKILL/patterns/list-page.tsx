@@ -268,7 +268,7 @@ export default function ListPagePattern() {
   };
 
   return (
-    <PageContent.Section aria-labelledby="invoices-title">
+    <PageContent.Page aria-labelledby="invoices-title">
       <PageContent.Header>
         <PageContent.Title id="invoices-title">Счета</PageContent.Title>
         <PageContent.Description>
@@ -329,6 +329,6 @@ export default function ListPagePattern() {
           }
         />
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }

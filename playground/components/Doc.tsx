@@ -24,7 +24,7 @@ export function DocPage({
   children: React.ReactNode;
 }) {
   return (
-    <PageContent.Section>
+    <PageContent.Page>
       <PageContent.Header>
         <PageContent.Title>{title}</PageContent.Title>
         <PageContent.Description measure={measure}>{description}</PageContent.Description>
@@ -32,7 +32,7 @@ export function DocPage({
       <PageContent.Body>
         <div className="demoExamples">{children}</div>
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }
 

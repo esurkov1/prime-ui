@@ -362,7 +362,7 @@ export default function MediaLibraryPattern() {
   const totalSize = visible.reduce((sum, media) => sum + media.size, 0);
 
   return (
-    <PageContent.Section aria-labelledby="media-title">
+    <PageContent.Page aria-labelledby="media-title">
       <PageContent.Header>
         <PageContent.Title id="media-title">Медиатека объекта</PageContent.Title>
         <PageContent.Description>
@@ -437,20 +437,19 @@ export default function MediaLibraryPattern() {
           inputRef={inputRef}
         />
 
-        <section className={styles.library} aria-labelledby="files-title">
-          <div className={styles.libraryHeader}>
-            <div className={styles.heading}>
-              <Typography as="h2" variant="title-m" id="files-title">
-                Файлы
-              </Typography>
-              <Typography as="p" variant="caption" tone="muted" aria-live="polite">
-                {selecting
-                  ? `Выбрано: ${selected.size}`
-                  : loading
-                    ? "Загружаем…"
-                    : `${visible.length} ${filesWord(visible.length)} · ${formatFileSize(totalSize)}`}
-              </Typography>
-            </div>
+        <PageContent.Section
+          label="Файлы"
+          description={
+            <span aria-live="polite">
+              {selecting
+                ? `Выбрано: ${selected.size}`
+                : loading
+                  ? "Загружаем…"
+                  : `${visible.length} ${filesWord(visible.length)} · ${formatFileSize(totalSize)}`}
+            </span>
+          }
+        >
+          <PageContent.Actions>
             <Crossfade state={selecting ? "select" : "browse"}>
               {selecting ? (
                 <div className={styles.bar}>
@@ -500,7 +499,7 @@ export default function MediaLibraryPattern() {
                 </div>
               )}
             </Crossfade>
-          </div>
+          </PageContent.Actions>
 
           <Crossfade state={state} aria-busy={loading}>
             {loading ? (
@@ -612,7 +611,7 @@ export default function MediaLibraryPattern() {
               </EmptyPage.Root>
             ) : null}
           </Crossfade>
-        </section>
+        </PageContent.Section>
 
         <MediaViewer
           items={viewerItems}
@@ -633,6 +632,6 @@ export default function MediaLibraryPattern() {
           )}
         />
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }

@@ -66,7 +66,7 @@ export default function ScreenStatesPattern() {
   };
 
   return (
-    <PageContent.Section aria-labelledby="reconcile-title">
+    <PageContent.Page aria-labelledby="reconcile-title">
       <PageContent.Header>
         <PageContent.Title id="reconcile-title">Сверка с банком</PageContent.Title>
         <PageContent.Description>
@@ -100,75 +100,76 @@ export default function ScreenStatesPattern() {
             ) : null}
           </Crossfade>
 
-          <div className={styles.panels}>
-            <Card.Root variant="panel" aria-busy={status === "loading"}>
-              <Card.Header>
-                <Card.Title as="h2">Остатки</Card.Title>
-                <Typography as="span" variant="caption" tone="muted">
-                  {status === "ready" ? "на 7 октября" : "на 6 октября"}
-                </Typography>
-              </Card.Header>
-              <Card.Body>
-                {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
-                <Crossfade state={status === "loading" ? "loading" : "ready"}>
-                  {status === "loading" ? (
-                    <ul className={styles.accounts}>
-                      {ACCOUNTS.map((account) => (
-                        <li key={account.name} className={styles.account}>
-                          <Skeleton className={styles.nameBar} />
-                          {/* title-m is the l text tier: 16 / 24. */}
-                          <Skeleton size="l" className={styles.balanceBar} />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <ul className={styles.accounts}>
-                      {ACCOUNTS.map((account) => (
-                        <li key={account.name} className={styles.account}>
-                          <Typography as="span" variant="body-m" tone="secondary">
-                            {account.name}
-                          </Typography>
-                          <Typography as="span" variant="title-m" className={styles.amount}>
-                            {account.balance}
-                          </Typography>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </Crossfade>
-              </Card.Body>
-            </Card.Root>
+          <PageContent.Grid>
+            <PageContent.Cell span={6}>
+              <Card.Root variant="panel" aria-busy={status === "loading"}>
+                <Card.Header>
+                  <Card.Title as="h2">Остатки</Card.Title>
+                  <Typography as="span" variant="caption" tone="muted">
+                    {status === "ready" ? "на 7 октября" : "на 6 октября"}
+                  </Typography>
+                </Card.Header>
+                <Card.Body>
+                  {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
+                  <Crossfade state={status === "loading" ? "loading" : "ready"}>
+                    {status === "loading" ? (
+                      <ul className={styles.accounts}>
+                        {ACCOUNTS.map((account) => (
+                          <li key={account.name} className={styles.account}>
+                            <Skeleton className={styles.nameBar} />
+                            {/* title-m is the l text tier: 16 / 24. */}
+                            <Skeleton size="l" className={styles.balanceBar} />
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <ul className={styles.accounts}>
+                        {ACCOUNTS.map((account) => (
+                          <li key={account.name} className={styles.account}>
+                            <Typography as="span" variant="body-m" tone="secondary">
+                              {account.name}
+                            </Typography>
+                            <Typography as="span" variant="title-m" className={styles.amount}>
+                              {account.balance}
+                            </Typography>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Crossfade>
+                </Card.Body>
+              </Card.Root>
+            </PageContent.Cell>
 
-            <Card.Root variant="panel">
-              <Card.Header>
-                <Card.Title as="h2">Правила разнесения</Card.Title>
-              </Card.Header>
-              <Card.Body>
-                <EmptyPage.Root size="s" aria-labelledby="rules-empty">
-                  <EmptyPage.Icon tone="accent">
-                    <Icon name="action.filter" />
-                  </EmptyPage.Icon>
-                  <EmptyPage.Title as="h3" id="rules-empty">
-                    Правил пока нет
-                  </EmptyPage.Title>
-                  <EmptyPage.Description>
-                    Правило свяжет платёж со счётом по ИНН или назначению.
-                  </EmptyPage.Description>
-                  <EmptyPage.Actions>
-                    <Button.Root variant="soft" tone="neutral">
-                      Создать правило
-                    </Button.Root>
-                  </EmptyPage.Actions>
-                </EmptyPage.Root>
-              </Card.Body>
-            </Card.Root>
-          </div>
+            <PageContent.Cell span={6}>
+              <Card.Root variant="panel">
+                <Card.Header>
+                  <Card.Title as="h2">Правила разнесения</Card.Title>
+                </Card.Header>
+                <Card.Body>
+                  <EmptyPage.Root size="s" aria-labelledby="rules-empty">
+                    <EmptyPage.Icon tone="accent">
+                      <Icon name="action.filter" />
+                    </EmptyPage.Icon>
+                    <EmptyPage.Title as="h3" id="rules-empty">
+                      Правил пока нет
+                    </EmptyPage.Title>
+                    <EmptyPage.Description>
+                      Правило свяжет платёж со счётом по ИНН или назначению.
+                    </EmptyPage.Description>
+                    <EmptyPage.Actions>
+                      <Button.Root variant="soft" tone="neutral">
+                        Создать правило
+                      </Button.Root>
+                    </EmptyPage.Actions>
+                  </EmptyPage.Root>
+                </Card.Body>
+              </Card.Root>
+            </PageContent.Cell>
+          </PageContent.Grid>
         </div>
 
-        <section className={styles.region} aria-labelledby="unmatched-title">
-          <Typography as="h2" variant="title-m" id="unmatched-title">
-            Неразнесённые платежи
-          </Typography>
+        <PageContent.Section label="Неразнесённые платежи">
           <DataTable
             columns={COLUMNS}
             rows={status === "ready" ? PAYMENTS : []}
@@ -179,8 +180,8 @@ export default function ScreenStatesPattern() {
             error={status === "error" ? "Платежи появятся после загрузки выписки" : undefined}
             empty="Все платежи разнесены"
           />
-        </section>
+        </PageContent.Section>
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }

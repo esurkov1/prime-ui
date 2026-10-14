@@ -17,10 +17,7 @@
 }
 
 .main {
-  display: grid;
   flex: 999 1 calc(var(--prime-space-24) * 5);
-  gap: var(--prime-space-4);
-  min-width: 0;
 }
 
 .aside {

@@ -35,11 +35,13 @@ Things that belong together sit closer than things that do not.
 | inline controls in a row (buttons, filters) | 8 | `--prime-space-2` |
 | switch → switch in a settings list | 20 | `--prime-space-5` |
 | group → group (fieldset, form section) | 32 | `--prime-space-8` |
-| card → card in a grid | 16 | `--prime-space-4` |
-| section → section on a page | 40 | `--prime-space-10` — `PageContent.Body` already does it |
+| tile → tile, both axes (KPI cards, charts, panels) | 16 | `--prime-space-4` — `PageContent.Grid` already does it |
+| block → block on a page (page header → body too) | 24 | `--prime-space-6` — `PageContent` already does it |
+| section → section on a page (a new topic with an `h2`) | 40 | `PageContent.Section` already does it |
 
-`PageContent.Body` already spaces its direct blocks (cards, tables, sections) 40 apart and `AppShell.Main`
-already carries the page gutters — do not add your own outer padding.
+`PageContent.Body` already spaces its direct blocks 24 apart, a `PageContent.Section` 40 from its
+neighbours, `PageContent.Grid` its tiles 16 on both axes, and `AppShell.Main` already carries the page
+gutters — do not add your own outer padding.
 
 ## 3. Size axis
 

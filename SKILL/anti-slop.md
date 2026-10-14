@@ -115,7 +115,7 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 /* good — proximity scale */
 .form { display: grid; gap: var(--prime-space-8); }   /* group → group 32 */
 .group { display: grid; gap: var(--prime-space-5); }  /* field → field 20 */
-/* section → section 40 comes from PageContent.Body */
+/* block → block 24 and section → section 40 come from PageContent.Body / PageContent.Section */
 ```
 
 ## 7. `div` instead of a ready component

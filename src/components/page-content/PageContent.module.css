@@ -1,14 +1,15 @@
 /*
- * Page column primitives. Edge gutters come from `AppShell.Main`; here only measure and rhythm:
- * header → body 32, block → block inside the body 40 (section → section, foundation §1.3).
+ * Page column primitives. Edge gutters come from `AppShell.Main`; here only measure and rhythm
+ * (foundation §1.3): header → body 24, block → block inside the body 24, a titled section 40 from
+ * its neighbours, tile → tile 16 on both axes of the grid.
  */
 
 .root,
-.section {
+.page {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-8);
+  gap: var(--prime-space-6);
   width: 100%;
   min-width: 0;
 }
@@ -80,8 +81,177 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-10);
+  gap: var(--prime-space-6);
   min-width: 0;
+}
+
+/*
+ * A titled section: heading → content 16. A new topic stands 40 from its neighbours — the body's 24
+ * plus 16 on the side of a section (the body is a flex column, so margins add and never collapse).
+ */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.body > .section:not(:first-child),
+.body > .section + * {
+  margin-block-start: var(--prime-space-4);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  min-width: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  flex: 1 1 calc(var(--prime-layout-reading-max-width) / 2);
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+/* The content of a section: its blocks 16 apart (a table and its totals, a panel and its note). */
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+/*
+ * `aside`: ~16rem of heading column beside the content; the column drops above once the content
+ * would get narrower than 30rem (intrinsic wrap, no breakpoint).
+ */
+.section[data-layout="aside"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--prime-space-4) var(--prime-space-10);
+}
+
+.section[data-layout="aside"] > .sectionHeader {
+  flex: 1 1 calc(var(--prime-space-16) * 4);
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.section[data-layout="aside"] > .sectionContent {
+  flex: 999 1 calc(var(--prime-space-24) * 5);
+}
+
+.sectionTitle {
+  composes: titleM from "../../internal/textRole.module.css";
+  margin: 0;
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap-style: balance;
+}
+
+.sectionDescription {
+  composes: bodyS from "../../internal/textRole.module.css";
+  margin: 0;
+  max-width: var(--prime-layout-reading-max-width);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
+  text-wrap-style: pretty;
+}
+
+/*
+ * Tiles: one 12-column grid with one gap on both axes, so the rows of a dashboard read as one
+ * board. Columns follow the grid's own width (container query, the numbers are written out — a
+ * custom property cannot stand in a container condition): narrow — every cell takes the row; from
+ * 30rem — small cells (KPI, span 1–3) pair up; from 40rem — spans 5–6 take half the row too, a third
+ * stays a third, wide cells the whole row; from 64rem — every cell its own span. `dense` lets a small cell fill a hole left by a wide one.
+ */
+.grid {
+  container: prime-grid / inline-size;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-flow: row dense;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+/* The child (a Card, a ChartFrame) stretches to the cell, so the tiles of a row share one height. */
+.cell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-column: span 12;
+  min-width: 0;
+}
+
+@container prime-grid (min-width: 30rem) {
+  .cell:is([data-span="1"], [data-span="2"], [data-span="3"]) {
+    grid-column: span 6;
+  }
+}
+
+@container prime-grid (min-width: 40rem) {
+  .cell:is([data-span="5"], [data-span="6"]) {
+    grid-column: span 6;
+  }
+
+  .cell[data-span="4"] {
+    grid-column: span 4;
+  }
+
+  .cell[data-rows="2"] {
+    grid-row: span 2;
+  }
+
+  .cell[data-rows="3"] {
+    grid-row: span 3;
+  }
+
+  .cell[data-rows="4"] {
+    grid-row: span 4;
+  }
+}
+
+@container prime-grid (min-width: 64rem) {
+  .cell[data-span="1"] {
+    grid-column: span 1;
+  }
+
+  .cell[data-span="2"] {
+    grid-column: span 2;
+  }
+
+  .cell[data-span="3"] {
+    grid-column: span 3;
+  }
+
+  .cell[data-span="5"] {
+    grid-column: span 5;
+  }
+
+  .cell[data-span="7"] {
+    grid-column: span 7;
+  }
+
+  .cell[data-span="8"] {
+    grid-column: span 8;
+  }
+
+  .cell[data-span="9"] {
+    grid-column: span 9;
+  }
+
+  .cell[data-span="10"] {
+    grid-column: span 10;
+  }
+
+  .cell[data-span="11"] {
+    grid-column: span 11;
+  }
 }
 
 /*

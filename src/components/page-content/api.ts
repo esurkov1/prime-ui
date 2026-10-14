@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "PageContent.Root",
-      en: "`ref` → `HTMLDivElement`. The page column inside `main`: header → body 32 apart, centred under its cap.",
-      ru: "Колонка страницы внутри `main`: шапка и тело с ритмом 32, по центру под своим ограничением.",
+      en: "`ref` → `HTMLDivElement`. The page column inside `main`: header → body 24 apart, centred under its cap.",
+      ru: "Колонка страницы внутри `main`: шапка и тело с ритмом 24, по центру под своим ограничением.",
       props: [
         {
           name: "maxWidth",
@@ -30,9 +30,9 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "PageContent.Section",
-      en: "`ref` → `HTMLElement`. The same column as a `<section>`, without a cap; name it with `aria-labelledby` → the Title `id`.",
-      ru: "Та же колонка как `<section>` без ограничения ширины; назовите её через `aria-labelledby` на `id` заголовка.",
+      name: "PageContent.Page",
+      en: "`ref` → `HTMLElement`. The whole app page as a `<section>` (the same column, the full panel width); name it with `aria-labelledby` → the Title `id`.",
+      ru: "Вся страница приложения как `<section>` (та же колонка во всю ширину панели); назовите её через `aria-labelledby` на `id` заголовка.",
       props: [
         {
           name: "…rest",
@@ -103,14 +103,80 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Body",
-      en: "`ref` → `HTMLDivElement`. The page content; blocks 40 apart.",
-      ru: "Содержимое страницы; блоки с отступом 40.",
+      en: "`ref` → `HTMLDivElement`. The page content: blocks of one screen 24 apart, a `PageContent.Section` 40 from its neighbours.",
+      ru: "Содержимое страницы: блоки одного экрана через 24, `PageContent.Section` — через 40 от соседей.",
       props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
           en: "`children`, `className` and the other div attributes.",
           ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "PageContent.Section",
+      en: "`ref` → `HTMLElement`. A titled section of the page — a `<section>` named by its `h2` (title-m): the heading with an optional description and `PageContent.Actions` at its end, then the content 16 below. Stands 40 from its neighbours in Body.",
+      ru: "Раздел страницы с заголовком — `<section>`, названный своим `h2` (title-m): заголовок с необязательным описанием и `PageContent.Actions` в конце, под ним через 16 — содержимое. Стоит через 40 от соседей в Body.",
+      props: [
+        {
+          name: "label",
+          type: "ReactNode",
+          required: true,
+          en: "The visible heading (`h2`); it also names the section.",
+          ru: "Видимый заголовок (`h2`); он же называет раздел.",
+        },
+        {
+          name: "description",
+          type: "ReactNode",
+          en: "One line of context under the heading, in secondary body-s.",
+          ru: "Строка пояснения под заголовком, вторичным body-s.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "title">',
+          en: "`children` (the content; `PageContent.Actions` goes to the heading row), `className` and the other section attributes.",
+          ru: "`children` (содержимое; `PageContent.Actions` уходит в строку заголовка), `className` и остальные атрибуты section.",
+        },
+      ],
+    },
+    {
+      name: "PageContent.Grid",
+      en: "`ref` → `HTMLDivElement`. The grid of the page's tiles (KPI cards, charts, panels): 12 columns, 16 apart on both axes, so its rows read as one board. A size container: cells fold by its own width (see Grid columns).",
+      ru: "Сетка плиток страницы (KPI, графики, панели): 12 колонок, 16 по обеим осям, так что её ряды читаются как одна доска. Контейнер размера: ячейки складываются по её собственной ширине.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (`PageContent.Cell`), `className` and the other div attributes.",
+          ru: "`children` (`PageContent.Cell`), `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "PageContent.Cell",
+      en: "`ref` → `HTMLDivElement`. One tile place in `PageContent.Grid`; its child (a Card, a ChartFrame) stretches to it, so the tiles of a row share one height.",
+      ru: "Место одной плитки в `PageContent.Grid`; её ребёнок (Card, ChartFrame) растягивается на неё, так что плитки ряда одной высоты.",
+      props: [
+        {
+          name: "span",
+          type: "1 | 2 | … | 12",
+          default: "12",
+          en: "Columns of 12 on a wide grid (64rem+). Narrower grids round it: see Grid columns in COMPONENT.md.",
+          ru: "Колонок из 12 в широкой сетке (от 64rem). В более узкой сетке округляется: малые плитки — по две в ряд от 30rem, `span` 4 — треть от 40rem, широкие — на весь ряд.",
+        },
+        {
+          name: "rows",
+          type: "1 | 2 | 3 | 4",
+          default: "1",
+          en: 'Rows the cell spans from 40rem: a chart beside two stacked tiles (`ChartFrame.Plot height="fill"` fills the height).',
+          ru: 'Сколько рядов занимает ячейка от 40rem: график рядом с двумя плитками друг под другом (`ChartFrame.Plot height="fill"` заполняет высоту).',
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (one tile), `className` and the other div attributes.",
+          ru: "`children` (одна плитка), `className` и остальные атрибуты div.",
         },
       ],
     },

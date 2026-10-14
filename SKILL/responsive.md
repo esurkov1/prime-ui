@@ -208,9 +208,11 @@ export function OrdersPanel() {
 `toolbar`; the key column `hideable: false`); `stickyFirstColumn` for the name. On phones a table / cards switch in `PageToolbar.View` is fine — silently dropping columns
 by breakpoint is not. Never ask to rotate the phone.
 
-**Card grids.** Columns come from the card's minimum width, not from a list of breakpoints:
-`grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr))`.
-Cards align to the top; a card with a list shows 6–8 rows and scrolls inside (`ScrollContainer`).
+**Card grids.** The tiles of a page are `PageContent.Grid` + `PageContent.Cell span`: it folds by its own
+width (below 30rem every tile takes the row, then small tiles pair up, from 64rem each its span),
+not by the window. Tiles of a row share one height; a card with a list shows 6–8 rows and scrolls inside
+(`ScrollContainer`). A grid inside one block (thumbnails, fields) is the block's own
+`repeat(auto-fill, minmax(min(100%, …), 1fr))`.
 
 **Forms.** One column on phones. Pairs («от / до», two buttons) wrap with
 `flex: 1 1 calc(var(--prime-space-24) * 2)` instead of shrinking. Labels above fields (the kit's

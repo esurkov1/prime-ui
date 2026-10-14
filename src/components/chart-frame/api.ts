@@ -130,10 +130,10 @@ export const api: ComponentApi = {
       props: [
         {
           name: "height",
-          type: "number",
+          type: 'number | "fill"',
           default: "240, 160 under 30rem",
-          en: "Height of the plot area in px.",
-          ru: "Высота области графика в px.",
+          en: "Height of the plot area in px. `fill` takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the default height at least.",
+          ru: "Высота области графика в px. `fill` занимает свободную высоту растянутой панели (`PageContent.Cell` с `rows`), но не меньше высоты по умолчанию.",
         },
         {
           name: "renderPlot",

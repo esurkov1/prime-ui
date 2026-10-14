@@ -76,7 +76,8 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 - `Card.Root` only for a bounded block with its own title: a KPI tile (`variant="stat-trend"`), a settings panel (`variant="panel"`), side facts — not around a whole section, a form field or a page.
 - Never a card in a card, and never a `DataTable` inside a Card — the table is already a filled block.
-- Section without a card: `<Typography as="h2" variant="title-m">` + the content.
+- Section without a card: `<PageContent.Section label="…">` + the content (a link or button beside the heading in `PageContent.Actions`) — not a hand-made `<section>` + `Typography as="h2"` + own gap.
+- The tiles of a screen (KPI cards, charts, panels): one `<PageContent.Grid>` with a `<PageContent.Cell span>` per tile — not an `auto-fit` grid per row (the rows would stand 24 apart instead of 16).
 - Depth from fill, not lines: no borders around blocks; `<Divider />` only inside a block.
 - Every scroll region is a `ScrollContainer` — never `overflow: auto` on a `div`: its hidden edges fade by themselves (`edges="shadow"` on a filled surface, `"none"` only for a page column), `scrollbar="hidden"` on strips, `snap` on strips of cards, `lock` to hold a list still, `anchor="end"` for a log. Kit components already scroll through it; do not wrap them again.
 - Tabs are a bar, not a container: `Tabs.Root` stands in the host's padding and the panel content goes straight into `Tabs.Panel` — never a Card or a padded `div` around the tabs or inside a panel. In a Modal / Drawer, `Tabs.Root` wraps `X.Header` + `X.Body` and `Tabs.List` goes last into the header — not a tab strip at the top of the body.
@@ -184,7 +185,7 @@ Full rules: [responsive.md](responsive.md).
 
 ## Spacing and values
 
-- Gaps are `gap` on the parent with `--prime-space-N` (N × 4px): 8 in a row of buttons, 20 field → field, 32 group → group; `PageContent.Body` already spaces blocks 40 — not margins, not outer padding.
+- Gaps are `gap` on the parent with `--prime-space-N` (N × 4px): 8 in a row of buttons, 16 tile → tile, 20 field → field, 32 group → group; `PageContent` already spaces blocks 24 and sections 40 — not margins, not outer padding.
 - Tokens only: `var(--prime-space-4)`, `var(--prime-color-text-secondary)`, `var(--prime-radius-m)` — never raw `px` / `rem` / hex, never `--prime-ref-*`, never inline `style`.
 - Text through `Typography` roles (`title-m`, `title-s`, `body-m`, `caption`) and `tone="secondary" | "muted"` — not `font-size` or `color` in CSS.
 

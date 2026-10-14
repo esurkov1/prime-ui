@@ -156,7 +156,7 @@ export default function DashboardPattern() {
   const [period, setPeriod] = React.useState<Period>("month");
 
   return (
-    <PageContent.Section aria-labelledby="dashboard-title">
+    <PageContent.Page aria-labelledby="dashboard-title">
       <PageContent.Header>
         <PageContent.Title id="dashboard-title">Обзор</PageContent.Title>
         <PageContent.Description>Продажи и оплаты по всем менеджерам.</PageContent.Description>
@@ -179,153 +179,162 @@ export default function DashboardPattern() {
         </PageContent.Actions>
       </PageContent.Header>
       <PageContent.Body>
-        {/* Another period is another set of values: the row cross-fades instead of flipping. */}
-        <Crossfade state={period}>
-          <div className={styles.kpis}>
-            {KPIS[period].map((kpi) => (
-              <Card.Root key={kpi.label} variant="stat-trend">
-                <Card.Label>{kpi.label}</Card.Label>
-                <Card.Value>{kpi.value}</Card.Value>
-                <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
-              </Card.Root>
-            ))}
-          </div>
-        </Crossfade>
+        {/* One board: every tile of the screen in one grid, 16 apart on both axes. */}
+        <PageContent.Grid>
+          {KPIS[period].map((kpi) => (
+            <PageContent.Cell key={kpi.label} span={3}>
+              {/* Another period is another set of values: the tile cross-fades instead of flipping. */}
+              <Crossfade state={period}>
+                <Card.Root variant="stat-trend">
+                  <Card.Label>{kpi.label}</Card.Label>
+                  <Card.Value>{kpi.value}</Card.Value>
+                  <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
+                </Card.Root>
+              </Crossfade>
+            </PageContent.Cell>
+          ))}
 
-        <Card.Root variant="panel">
-          <Card.Body>
-            <Sparkline
-              data={REVENUE[period]}
-              label="Выручка по дням"
-              summary="sum"
-              formatValue={formatRubles}
-            />
-          </Card.Body>
-        </Card.Root>
+          <PageContent.Cell>
+            <Card.Root variant="panel">
+              <Card.Body>
+                <Sparkline
+                  data={REVENUE[period]}
+                  label="Выручка по дням"
+                  summary="sum"
+                  formatValue={formatRubles}
+                />
+              </Card.Body>
+            </Card.Root>
+          </PageContent.Cell>
 
-        <ChartFrame.Root series={BILLING_SERIES} formatValue={formatMillionsShort}>
-          <ChartFrame.Header>
-            <ChartFrame.Title as="h2">Выставлено и оплачено</ChartFrame.Title>
-            <ChartFrame.Description>Счета за период, млн ₽</ChartFrame.Description>
-          </ChartFrame.Header>
-          <ChartFrame.Plot
-            renderPlot={({ width, height, series }) => {
-              const rows = BILLING[period];
-              const top = Math.ceil(Math.max(...rows.map((row) => row.invoiced)));
-              const innerH = height - BILLING_MARGIN.top - BILLING_MARGIN.bottom;
-              const band = (width - BILLING_MARGIN.left) / rows.length;
-              const bar = Math.min(28, (band - 16) / series.length);
-              const y = (value: number) => BILLING_MARGIN.top + innerH * (1 - value / top);
-              return (
-                <svg width={width} height={height} aria-hidden="true">
-                  {[0, top / 2, top].map((tick) => (
-                    <g key={tick}>
-                      <line
-                        x1={BILLING_MARGIN.left}
-                        x2={width}
-                        y1={y(tick)}
-                        y2={y(tick)}
-                        stroke={tick === 0 ? chartColors.axis : chartColors.grid}
-                      />
-                      <text
-                        x={BILLING_MARGIN.left - 8}
-                        y={y(tick)}
-                        textAnchor="end"
-                        dominantBaseline="middle"
-                      >
-                        {tick.toLocaleString("ru-RU")}
-                      </text>
-                    </g>
-                  ))}
-                  {rows.map((row, i) => {
-                    const center = BILLING_MARGIN.left + band * i + band / 2;
-                    return (
-                      <g key={row.label}>
-                        {series.map((s, j) => {
-                          const value = s.id === "paid" ? row.paid : row.invoiced;
-                          return (
-                            <rect
-                              key={s.id}
-                              data-hidden={s.hidden}
-                              x={center - (bar * series.length) / 2 + bar * j}
-                              y={y(value)}
-                              width={bar - 2}
-                              height={y(0) - y(value)}
-                              rx={2}
-                              fill={s.color}
-                            />
-                          );
-                        })}
-                        <text x={center} y={height - 4} textAnchor="middle">
-                          {row.label}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-              );
-            }}
-          />
-          <ChartFrame.Legend />
-          <ChartFrame.Table
-            rows={BILLING[period].map((row) => ({
-              label: row.label,
-              values: { invoiced: row.invoiced, paid: row.paid },
-            }))}
-          />
-        </ChartFrame.Root>
-
-        <div className={styles.panels}>
-          <Card.Root variant="panel">
-            <Card.Header>
-              <Card.Title as="h2">План продаж</Card.Title>
-              <Typography as="span" variant="caption" tone="muted">
-                Октябрь
-              </Typography>
-            </Card.Header>
-            <Card.Body>
-              <div className={styles.bars}>
-                {PLAN.map((row) => (
-                  <ProgressBar
-                    key={row.manager}
-                    value={row.value}
-                    label={row.manager}
-                    tone={row.value < 50 ? "warning" : "accent"}
-                    showValue
-                  />
-                ))}
-              </div>
-            </Card.Body>
-          </Card.Root>
-
-          <Card.Root variant="panel">
-            <Card.Header>
-              <Card.Title as="h2">Дебиторка</Card.Title>
-              <Typography as="span" variant="caption" tone="muted">
-                8,2 млн ₽
-              </Typography>
-            </Card.Header>
-            <Card.Body>
-              <ProgressBar
-                segments={RECEIVABLES}
-                label="По сроку оплаты"
-                legend
-                formatValue={formatMillions}
+          {/* The chart spans two rows beside the two panels and fills their height. */}
+          <PageContent.Cell span={8} rows={2}>
+            <ChartFrame.Root series={BILLING_SERIES} formatValue={formatMillionsShort}>
+              <ChartFrame.Header>
+                <ChartFrame.Title as="h2">Выставлено и оплачено</ChartFrame.Title>
+                <ChartFrame.Description>Счета за период, млн ₽</ChartFrame.Description>
+              </ChartFrame.Header>
+              <ChartFrame.Plot
+                height="fill"
+                renderPlot={({ width, height, series }) => {
+                  const rows = BILLING[period];
+                  const top = Math.ceil(Math.max(...rows.map((row) => row.invoiced)));
+                  const innerH = height - BILLING_MARGIN.top - BILLING_MARGIN.bottom;
+                  const band = (width - BILLING_MARGIN.left) / rows.length;
+                  const bar = Math.min(28, (band - 16) / series.length);
+                  const y = (value: number) => BILLING_MARGIN.top + innerH * (1 - value / top);
+                  return (
+                    <svg width={width} height={height} aria-hidden="true">
+                      {[0, top / 2, top].map((tick) => (
+                        <g key={tick}>
+                          <line
+                            x1={BILLING_MARGIN.left}
+                            x2={width}
+                            y1={y(tick)}
+                            y2={y(tick)}
+                            stroke={tick === 0 ? chartColors.axis : chartColors.grid}
+                          />
+                          <text
+                            x={BILLING_MARGIN.left - 8}
+                            y={y(tick)}
+                            textAnchor="end"
+                            dominantBaseline="middle"
+                          >
+                            {tick.toLocaleString("ru-RU")}
+                          </text>
+                        </g>
+                      ))}
+                      {rows.map((row, i) => {
+                        const center = BILLING_MARGIN.left + band * i + band / 2;
+                        return (
+                          <g key={row.label}>
+                            {series.map((s, j) => {
+                              const value = s.id === "paid" ? row.paid : row.invoiced;
+                              return (
+                                <rect
+                                  key={s.id}
+                                  data-hidden={s.hidden}
+                                  x={center - (bar * series.length) / 2 + bar * j}
+                                  y={y(value)}
+                                  width={bar - 2}
+                                  height={y(0) - y(value)}
+                                  rx={2}
+                                  fill={s.color}
+                                />
+                              );
+                            })}
+                            <text x={center} y={height - 4} textAnchor="middle">
+                              {row.label}
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  );
+                }}
               />
-            </Card.Body>
-          </Card.Root>
-        </div>
+              <ChartFrame.Legend />
+              <ChartFrame.Table
+                rows={BILLING[period].map((row) => ({
+                  label: row.label,
+                  values: { invoiced: row.invoiced, paid: row.paid },
+                }))}
+              />
+            </ChartFrame.Root>
+          </PageContent.Cell>
 
-        <section className={styles.recent} aria-labelledby="payments-title">
-          <div className={styles.recentHeader}>
-            <Typography as="h2" variant="title-m" id="payments-title">
-              Последние оплаты
-            </Typography>
+          <PageContent.Cell span={4}>
+            <Card.Root variant="panel">
+              <Card.Header>
+                <Card.Title as="h2">План продаж</Card.Title>
+                <Typography as="span" variant="caption" tone="muted">
+                  Октябрь
+                </Typography>
+              </Card.Header>
+              <Card.Body>
+                <div className={styles.bars}>
+                  {PLAN.map((row) => (
+                    <ProgressBar
+                      key={row.manager}
+                      value={row.value}
+                      label={row.manager}
+                      tone={row.value < 50 ? "warning" : "accent"}
+                      showValue
+                    />
+                  ))}
+                </div>
+              </Card.Body>
+            </Card.Root>
+          </PageContent.Cell>
+
+          <PageContent.Cell span={4}>
+            <Card.Root variant="panel">
+              <Card.Header>
+                <Card.Title as="h2">Дебиторка</Card.Title>
+                <Typography as="span" variant="caption" tone="muted">
+                  8,2 млн ₽
+                </Typography>
+              </Card.Header>
+              <Card.Body>
+                <ProgressBar
+                  segments={RECEIVABLES}
+                  label="По сроку оплаты"
+                  legend
+                  formatValue={formatMillions}
+                />
+              </Card.Body>
+            </Card.Root>
+          </PageContent.Cell>
+        </PageContent.Grid>
+
+        {/* A new topic: a titled section, set off by more air than the tiles. */}
+        <PageContent.Section label="Последние оплаты">
+          <PageContent.Actions>
             <LinkButton href="#invoices">Все счета</LinkButton>
-          </div>
+          </PageContent.Actions>
           <DataTable columns={COLUMNS} rows={PAYMENTS} getRowKey={(row) => row.id} paging="none" />
-        </section>
+        </PageContent.Section>
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }

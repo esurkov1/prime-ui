@@ -54,7 +54,7 @@ export default function AppHeaderInAppShellExample() {
           <AppHeader.Search>Поиск</AppHeader.Search>
         </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Section>
+          <PageContent.Page>
             <PageContent.Body>
               {ORDERS.map((order) => (
                 <Typography key={order} variant="body-m">
@@ -62,7 +62,7 @@ export default function AppHeaderInAppShellExample() {
                 </Typography>
               ))}
             </PageContent.Body>
-          </PageContent.Section>
+          </PageContent.Page>
         </AppShell.Main>
       </AppShell.Root>
     </div>

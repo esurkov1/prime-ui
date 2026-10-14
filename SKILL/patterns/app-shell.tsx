@@ -213,7 +213,7 @@ export default function AppShellPattern() {
       >
         {/* Another section is another page: it cross-fades instead of flipping. */}
         <Crossfade state={current}>
-          <PageContent.Section aria-labelledby="page-title">
+          <PageContent.Page aria-labelledby="page-title">
             <PageContent.Header>
               <PageContent.Title id="page-title">{section.label}</PageContent.Title>
               <PageContent.Description>
@@ -225,15 +225,17 @@ export default function AppShellPattern() {
             <PageContent.Body>
               {current === "today" ? (
                 <>
-                  <div className={styles.kpis}>
+                  <PageContent.Grid>
                     {KPIS.map((kpi) => (
-                      <Card.Root key={kpi.label} variant="stat-trend">
-                        <Card.Label>{kpi.label}</Card.Label>
-                        <Card.Value>{kpi.value}</Card.Value>
-                        <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
-                      </Card.Root>
+                      <PageContent.Cell key={kpi.label} span={4}>
+                        <Card.Root variant="stat-trend">
+                          <Card.Label>{kpi.label}</Card.Label>
+                          <Card.Value>{kpi.value}</Card.Value>
+                          <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
+                        </Card.Root>
+                      </PageContent.Cell>
                     ))}
-                  </div>
+                  </PageContent.Grid>
                   <Card.Root variant="list">
                     <Card.Header>
                       <Card.Title as="h2">Задачи на сегодня</Card.Title>
@@ -276,7 +278,7 @@ export default function AppShellPattern() {
                 </Card.Root>
               )}
             </PageContent.Body>
-          </PageContent.Section>
+          </PageContent.Page>
         </Crossfade>
       </AppShell.Template>
 

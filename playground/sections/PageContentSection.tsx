@@ -7,8 +7,8 @@ export const page: ComponentPageConfig = {
   nav: {
     segment: "page-content",
     label: "Page Content",
-    summary: "Страница: заголовок, описание, действия, секции",
-    keywords: ["страница", "заголовок", "секция", "title", "description", "actions"],
+    summary: "Страница: заголовок, действия, разделы, сетка плиток",
+    keywords: ["страница", "заголовок", "раздел", "сетка", "дашборд", "плитки", "grid", "section"],
     icon: PanelTop,
     order: 3,
   },
@@ -16,7 +16,7 @@ export const page: ComponentPageConfig = {
   title: "PageContent",
   kind: "layout",
   description:
-    "Структура страницы внутри основной колонки: заголовок, описание, действия страницы и блоки содержимого; страница во всю высоту панели и раскладка «список + детали».",
+    "Структура страницы внутри основной колонки: заголовок, действия и блоки содержимого, разделы с заголовком и сетка плиток дашборда; страница во всю высоту панели и раскладка «список + детали».",
   examples: [
     {
       slot: "overview",
@@ -27,6 +27,18 @@ export const page: ComponentPageConfig = {
       slot: "variants",
       description:
         "Одна колонка с тремя ограничениями: весь main, широкая колонка дашборда, колонка для чтения — `maxWidth`.",
+    },
+    {
+      scenario: "grid",
+      title: "Сетка плиток",
+      description:
+        "Доска дашборда: четыре KPI, график на два ряда рядом с двумя плитками, один отступ по обеим осям — `PageContent.Grid`, `PageContent.Cell`, `span`, `rows`.",
+    },
+    {
+      scenario: "sections",
+      title: "Разделы",
+      description:
+        "Плитки одного экрана рядом, новая тема отделена воздухом, ссылка в конце заголовка, колонка заголовка рядом с панелью — `PageContent.Section`, `label`, `description`, `PageContent.Actions`, `layout`.",
     },
     {
       scenario: "list-detail",
@@ -51,7 +63,8 @@ export const page: ComponentPageConfig = {
     ],
     aria: [
       "`PageContent.Title` — `<h1>`; один на страницу.",
-      "Назовите `PageContent.Section` через `aria-labelledby` на `id` заголовка.",
+      "Назовите `PageContent.Page` через `aria-labelledby` на `id` заголовка.",
+      "`PageContent.Section` — `<section>`, названный своим `<h2>` (`label`) через `aria-labelledby`.",
       "Назовите панели `PageContent.List` и `PageContent.Detail` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера.",
       "`PageContent.BackButton` названа `labels.back` и видна, только пока сплит показывает одну панель.",
     ],

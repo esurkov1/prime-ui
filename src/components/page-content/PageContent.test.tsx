@@ -56,16 +56,73 @@ describe("PageContent", () => {
     expect(container.firstChild).not.toHaveAttribute("data-max-width");
   });
 
-  it("renders Section as semantic region", () => {
+  it("renders Page as a semantic region", () => {
     render(
-      <PageContent.Section aria-label="Doc">
+      <PageContent.Page aria-label="Doc">
         <PageContent.Header>
           <PageContent.Title>Doc</PageContent.Title>
         </PageContent.Header>
-      </PageContent.Section>,
+      </PageContent.Page>,
     );
 
     expect(document.querySelector("section")).toHaveAttribute("aria-label", "Doc");
+  });
+
+  it("Section: a region named by its h2, description under it, Actions at the end of the heading", () => {
+    render(
+      <PageContent.Body>
+        <PageContent.Section label="Последние счета" description="За октябрь">
+          <PageContent.Actions>
+            <a href="#invoices">Все счета</a>
+          </PageContent.Actions>
+          <p>Таблица</p>
+        </PageContent.Section>
+      </PageContent.Body>,
+    );
+
+    const region = screen.getByRole("region", { name: "Последние счета" });
+    const heading = screen.getByRole("heading", { level: 2, name: "Последние счета" });
+    expect(region).toContainElement(heading);
+    expect(screen.getByText("За октябрь").tagName).toBe("P");
+    const link = screen.getByRole("link", { name: "Все счета" });
+    expect(heading.parentElement?.parentElement).toContainElement(link);
+    expect(screen.getByText("Таблица").parentElement).not.toContainElement(link);
+  });
+
+  it("Section: layout aside sets data-layout; stack sets nothing", () => {
+    const { rerender } = render(<PageContent.Section label="Компания" layout="aside" />);
+    expect(screen.getByRole("region")).toHaveAttribute("data-layout", "aside");
+    rerender(<PageContent.Section label="Компания" />);
+    expect(screen.getByRole("region")).not.toHaveAttribute("data-layout");
+  });
+
+  it("Cell: span defaults to the full row; rows only when more than one", () => {
+    render(
+      <PageContent.Grid>
+        <PageContent.Cell data-testid="full" />
+        <PageContent.Cell data-testid="tile" span={3} />
+        <PageContent.Cell data-testid="chart" span={8} rows={2} />
+      </PageContent.Grid>,
+    );
+
+    expect(screen.getByTestId("full")).toHaveAttribute("data-span", "12");
+    expect(screen.getByTestId("full")).not.toHaveAttribute("data-rows");
+    expect(screen.getByTestId("tile")).toHaveAttribute("data-span", "3");
+    expect(screen.getByTestId("chart")).toHaveAttribute("data-rows", "2");
+  });
+
+  it("CSS: blocks 24 apart, a section 40 from its neighbours, tiles 16 on both axes", () => {
+    const css = readFileSync(join(__dirname, "PageContent.module.css"), "utf8");
+    expect(css).toMatch(/\.body \{[^}]*gap: var\(--prime-space-6\)/);
+    expect(css).toMatch(
+      /\.body > \.section:not\(:first-child\),\n\.body > \.section \+ \* \{\s*margin-block-start: var\(--prime-space-4\);/,
+    );
+    expect(css).toMatch(
+      /\.grid \{[^}]*container: prime-grid \/ inline-size;[^}]*gap: var\(--prime-space-4\)/,
+    );
+    expect(css).toMatch(/@container prime-grid \(min-width: 30rem\)/);
+    expect(css).toMatch(/@container prime-grid \(min-width: 40rem\)/);
+    expect(css).toMatch(/@container prime-grid \(min-width: 64rem\)/);
   });
 
   it("sets data-measure on Description when measure is full", () => {

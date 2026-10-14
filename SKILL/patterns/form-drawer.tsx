@@ -107,7 +107,7 @@ export default function FormDrawerPattern() {
   };
 
   return (
-    <PageContent.Section aria-labelledby="clients-title">
+    <PageContent.Page aria-labelledby="clients-title">
       <PageContent.Header>
         <PageContent.Title id="clients-title">Клиенты</PageContent.Title>
         <PageContent.Description>
@@ -235,6 +235,6 @@ export default function FormDrawerPattern() {
       <PageContent.Body>
         <DataTable columns={COLUMNS} rows={clients} getRowKey={(row) => row.id} paging="none" />
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }

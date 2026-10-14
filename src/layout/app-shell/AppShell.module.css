@@ -3,7 +3,7 @@
  * the surface ladder: gray in light, near black in dark) and the navigation column beside it is a
  * surface one layer above (Sidebar sets its own `data-depth`). No inset, radius, shadow or border:
  * the boundary is the fill change. Gutters inside the content plane: 16 → 24 from 640px → 32 from 1024px; top air
- * 24 → 40 from 1024px.
+ * 24 → 32 from 1024px.
  */
 
 /*
@@ -47,7 +47,7 @@
 @media (min-width: 1024px) {
   .root {
     --shell-gutter: var(--prime-layout-gutter-l);
-    --shell-top: var(--prime-space-10);
+    --shell-top: var(--prime-space-8);
   }
 }
 

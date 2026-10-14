@@ -1,24 +1,4 @@
-/* Settings page: heading column + panel per section; wraps into one column without breakpoints. */
-
-.section {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--prime-space-4) var(--prime-space-10);
-}
-
-/* ~16rem of heading and lead text; drops above the panel once the panel would get < 30rem. */
-.lead {
-  display: grid;
-  flex: 1 1 calc(var(--prime-space-16) * 4);
-  gap: var(--prime-space-1);
-  min-width: 0;
-}
-
-.panel {
-  flex: 999 1 calc(var(--prime-space-24) * 5);
-  min-width: 0;
-}
+/* Settings page: each section is a PageContent.Section layout="aside"; here only the panels' insides. */
 
 /* Field → field 20. */
 

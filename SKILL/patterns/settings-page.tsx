@@ -78,21 +78,12 @@ export default function SettingsPagePattern() {
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
-        <section className={styles.section} aria-labelledby="company-title">
-          <div className={styles.lead}>
-            <Typography as="h2" variant="title-m" id="company-title">
-              Компания
-            </Typography>
-            <Typography variant="body-m" tone="secondary">
-              Попадают в счета, акты и письма клиентам.
-            </Typography>
-          </div>
-          <form
-            className={styles.panel}
-            noValidate
-            onSubmit={save}
-            onReset={() => setInnError(undefined)}
-          >
+        <PageContent.Section
+          layout="aside"
+          label="Компания"
+          description="Попадают в счета, акты и письма клиентам."
+        >
+          <form noValidate onSubmit={save} onReset={() => setInnError(undefined)}>
             <Card.Root variant="panel">
               <Card.Body>
                 <Fieldset disabled={saving}>
@@ -144,73 +135,61 @@ export default function SettingsPagePattern() {
               </Card.Footer>
             </Card.Root>
           </form>
-        </section>
+        </PageContent.Section>
 
-        <section className={styles.section} aria-labelledby="alerts-title">
-          <div className={styles.lead}>
-            <Typography as="h2" variant="title-m" id="alerts-title">
-              Уведомления
-            </Typography>
-            <Typography variant="body-m" tone="secondary">
-              Включаются сразу, без сохранения.
-            </Typography>
-          </div>
-          <div className={styles.panel}>
-            <Card.Root variant="panel">
-              <Card.Body>
-                <Fieldset aria-labelledby="alerts-title">
-                  {ALERTS.map((alert) => (
-                    <Switch.Root
-                      key={alert.name}
-                      name={alert.name}
-                      defaultChecked={alert.defaultChecked}
-                      hint={alert.hint}
-                    >
-                      <Switch.Label>{alert.label}</Switch.Label>
-                    </Switch.Root>
-                  ))}
-                </Fieldset>
-              </Card.Body>
-            </Card.Root>
-          </div>
-        </section>
-
-        <section className={styles.section} aria-labelledby="danger-title">
-          <div className={styles.lead}>
-            <Typography as="h2" variant="title-m" id="danger-title">
-              Рабочее пространство
-            </Typography>
-            <Typography variant="body-m" tone="secondary">
-              Действия, которые нельзя отменить.
-            </Typography>
-          </div>
-          <div className={styles.panel}>
-            <Card.Root variant="panel">
-              <Card.Body>
-                <div className={styles.danger}>
-                  <div className={styles.dangerText}>
-                    <Typography variant="title-s">Удалить пространство</Typography>
-                    <Typography variant="body-s" tone="secondary">
-                      Счета, клиенты и история будут удалены для всех участников.
-                    </Typography>
-                  </div>
-                  <ConfirmDialog.Root
-                    title="Удалить «Прайм Софт»?"
-                    description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
-                    confirmLabel="Удалить пространство"
-                    onConfirm={removeWorkspace}
+        <PageContent.Section
+          layout="aside"
+          label="Уведомления"
+          description="Включаются сразу, без сохранения."
+        >
+          <Card.Root variant="panel">
+            <Card.Body>
+              <Fieldset aria-label="Уведомления">
+                {ALERTS.map((alert) => (
+                  <Switch.Root
+                    key={alert.name}
+                    name={alert.name}
+                    defaultChecked={alert.defaultChecked}
+                    hint={alert.hint}
                   >
-                    <ConfirmDialog.Trigger>
-                      <Button.Root variant="outline" tone="danger">
-                        Удалить
-                      </Button.Root>
-                    </ConfirmDialog.Trigger>
-                  </ConfirmDialog.Root>
+                    <Switch.Label>{alert.label}</Switch.Label>
+                  </Switch.Root>
+                ))}
+              </Fieldset>
+            </Card.Body>
+          </Card.Root>
+        </PageContent.Section>
+
+        <PageContent.Section
+          layout="aside"
+          label="Рабочее пространство"
+          description="Действия, которые нельзя отменить."
+        >
+          <Card.Root variant="panel">
+            <Card.Body>
+              <div className={styles.danger}>
+                <div className={styles.dangerText}>
+                  <Typography variant="title-s">Удалить пространство</Typography>
+                  <Typography variant="body-s" tone="secondary">
+                    Счета, клиенты и история будут удалены для всех участников.
+                  </Typography>
                 </div>
-              </Card.Body>
-            </Card.Root>
-          </div>
-        </section>
+                <ConfirmDialog.Root
+                  title="Удалить «Прайм Софт»?"
+                  description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
+                  confirmLabel="Удалить пространство"
+                  onConfirm={removeWorkspace}
+                >
+                  <ConfirmDialog.Trigger>
+                    <Button.Root variant="outline" tone="danger">
+                      Удалить
+                    </Button.Root>
+                  </ConfirmDialog.Trigger>
+                </ConfirmDialog.Root>
+              </div>
+            </Card.Body>
+          </Card.Root>
+        </PageContent.Section>
       </PageContent.Body>
     </PageContent.Root>
   );

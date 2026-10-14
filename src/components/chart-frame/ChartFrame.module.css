@@ -131,6 +131,13 @@
   height: var(--chart-frame-plot-height, var(--cf-plot-height));
 }
 
+/* `fill`: the plot grows into the free height of a stretched panel, never below the default. */
+.plot[data-height="fill"] {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: var(--cf-plot-height);
+}
+
 .canvas {
   position: relative;
   min-width: 0;

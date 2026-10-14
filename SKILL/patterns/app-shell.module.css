@@ -1,12 +1,5 @@
 /* App shell: the frame (Sidebar / BottomNav / AppHeader) lays itself out; this file only places the
-   home page's blocks. Blocks 40 apart come from PageContent.Body. */
-
-/* KPI row: as many ~14rem tiles as fit, one column on a phone. */
-.kpis {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-14) * 4)), 1fr));
-  gap: var(--prime-space-4);
-}
+   home page's blocks. The rhythm comes from PageContent.Body, the tiles from PageContent.Grid. */
 
 /* A list row: the text at the start, the meta (time, sum) at the end. */
 .row {

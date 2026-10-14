@@ -3,12 +3,14 @@
 **Category:** page
 **Kind:** layout
 
-> Page structure inside the main column: title, description, page actions and content sections; a page as high as the panel and the list + detail layout.
+> Page structure inside the main column: title, page actions and content blocks, titled sections and the tile grid of a dashboard; a page as high as the panel and the list + detail layout.
 
 ## When to use
 - Every route rendered inside `AppShell.Main`: a page heading (`<h1>`), an intro line, page-level actions and the page body.
 - A text page held to a reading measure (`PageContent.Root maxWidth="readable"`).
 - A wide dashboard page capped at the content width (`maxWidth="wide"`).
+- The tiles of a dashboard — KPI cards, charts, panels — as one board (`PageContent.Grid` + `PageContent.Cell`).
+- A new topic of the page with its own heading and a link or button beside it (`PageContent.Section`); a settings page with a heading column beside each panel (`layout="aside"`).
 - A page whose body takes the rest of the panel's height — a log table, a board, a chat (`fill`).
 - Mail, a messenger, a ticket queue: a list and the chosen record side by side, one at a time on a narrow panel (`PageContent.Split`).
 
@@ -16,7 +18,8 @@
 - The app frame (navigation rail, header, scrolling main column) → use [AppShell](../../layout/app-shell/COMPONENT.md).
 - A bounded block inside the page → use [Card](../card/COMPONENT.md).
 - An empty / error / not-found page → use [EmptyPage](../empty-page/COMPONENT.md).
-- Arbitrary headings inside content → use [Typography](../typography/COMPONENT.md).
+- A heading inside a card → `Card.Title`; text headings inside prose → use [Typography](../typography/COMPONENT.md).
+- A grid inside one block (thumbnails, fields, bars in a panel) → the block's own CSS grid; `PageContent.Grid` places the page's tiles.
 - Details that open over the list and close again (a record from a table) → use [Drawer](../drawer/COMPONENT.md); `Split` is for a list people work through record by record.
 
 ## Import
@@ -26,12 +29,16 @@ import { PageContent } from "prime-ui-kit";
 
 ## Anatomy
 ```
-PageContent.Root | PageContent.Section     column; Root adds maxWidth and fill, Section renders <section>
+PageContent.Root | PageContent.Page        column; Root adds maxWidth and fill, Page renders <section>
 ├─ PageContent.Header                      heading column + actions in one wrapping row
 │  ├─ PageContent.Title                    <h1>, heading-m
 │  ├─ PageContent.Description              <p>, secondary body-m
 │  └─ PageContent.Actions                  page buttons (moved to the end of the header row)
-└─ PageContent.Body                        page content, blocks 40 apart
+└─ PageContent.Body                        page content, blocks 24 apart
+   ├─ PageContent.Grid                     12-column tile grid, 16 on both axes; a container (prime-grid)
+   │  └─ PageContent.Cell                  one tile place: span, rows; its child fills it
+   ├─ PageContent.Section                  <section> + <h2> label, 40 from its neighbours
+   │  └─ PageContent.Actions               a link or button at the end of the section heading
    └─ PageContent.Split                    list + detail; a container (prime-split)
       ├─ PageContent.List                  list pane: 16–20rem column, or the whole split while closed
       └─ PageContent.Detail                detail pane: the rest, or the whole split while open
@@ -43,7 +50,7 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth and fill, 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### PageContent.Root
-`ref` → `HTMLDivElement`. The page column inside `main`: header → body 32 apart, centred under its cap.
+`ref` → `HTMLDivElement`. The page column inside `main`: header → body 24 apart, centred under its cap.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -51,8 +58,8 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth and fill, 
 | `fill` | `boolean` | `false` | The page takes the height of main (`AppShell.Root fillViewport`) and the body takes what the header leaves: for a full-height table, board, chat or `PageContent.Split`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Header, Body), `className` and the other div attributes. |
 
-### PageContent.Section
-`ref` → `HTMLElement`. The same column as a `<section>`, without a cap; name it with `aria-labelledby` → the Title `id`.
+### PageContent.Page
+`ref` → `HTMLElement`. The whole app page as a `<section>` (the same column, the full panel width); name it with `aria-labelledby` → the Title `id`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -88,11 +95,36 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth and fill, 
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Buttons), `className` and the other div attributes. |
 
 ### PageContent.Body
-`ref` → `HTMLDivElement`. The page content; blocks 40 apart.
+`ref` → `HTMLDivElement`. The page content: blocks of one screen 24 apart, a `PageContent.Section` 40 from its neighbours.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
+
+### PageContent.Section
+`ref` → `HTMLElement`. A titled section of the page — a `<section>` named by its `h2` (title-m): the heading with an optional description and `PageContent.Actions` at its end, then the content 16 below. Stands 40 from its neighbours in Body.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `ReactNode` | — (required) | The visible heading (`h2`); it also names the section. |
+| `description` | `ReactNode` | — | One line of context under the heading, in secondary body-s. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content; `PageContent.Actions` goes to the heading row), `className` and the other section attributes. |
+
+### PageContent.Grid
+`ref` → `HTMLDivElement`. The grid of the page's tiles (KPI cards, charts, panels): 12 columns, 16 apart on both axes, so its rows read as one board. A size container: cells fold by its own width (see Grid columns).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`PageContent.Cell`), `className` and the other div attributes. |
+
+### PageContent.Cell
+`ref` → `HTMLDivElement`. One tile place in `PageContent.Grid`; its child (a Card, a ChartFrame) stretches to it, so the tiles of a row share one height.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `span` | `1 \| 2 \| … \| 12` | `12` | Columns of 12 on a wide grid (64rem+). Narrower grids round it: see Grid columns in COMPONENT.md. |
+| `rows` | `1 \| 2 \| 3 \| 4` | `1` | Rows the cell spans from 40rem: a chart beside two stacked tiles (`ChartFrame.Plot height="fill"` fills the height). |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (one tile), `className` and the other div attributes. |
 
 ### PageContent.Split
 `ref` → `HTMLDivElement`. List + detail (mail, a messenger, a ticket queue): side by side from 48rem of its own width, one pane at a time below it, focus following the pane that comes into view.
@@ -148,6 +180,20 @@ One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s
 |---|---|---|---|
 | `fill` (Root) | the page is as high as main; the body takes what the header leaves; main keeps gutter-high air under it | a full-height table, board, chat or `PageContent.Split` in an `AppShell.Root fillViewport` | `false` |
 
+### layout (Section)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `stack` | the heading row over the content, 16 apart | a topic of a dashboard, a list or a detail page | ✓ |
+| `aside` | a ~16rem heading column beside the content, above it once the content would get < 30rem | a settings page: a heading column beside each panel | |
+
+### Grid columns
+| Grid width | Cell `span` 1–3 | `span` 4 | `span` 5–6 | `span` 7–12 | `rows` |
+|---|---|---|---|---|---|
+| < 30rem | the row | the row | the row | the row | — |
+| 30–40rem | half | the row | the row | the row | — |
+| 40–64rem | half | a third | half | the row | spans |
+| ≥ 64rem | its span | its span | its span | its span | spans |
+
 ### Split layout
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -161,14 +207,18 @@ One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s
 | filling | `fill` | `data-fill="true"` on Root; `AppShell.Main` drops its long bottom air for it |
 | full-width intro | `measure="full"` | `data-measure="full"` on Description |
 | with actions | `PageContent.Actions` child | `data-has-actions="true"` on Header |
+| section heading column | `layout="aside"` on Section | `data-layout="aside"` on Section (absent for `stack`) |
+| section with actions | `PageContent.Actions` child of Section | `data-has-actions="true"` on the section heading row |
+| tile span | `span` / `rows` on Cell | `data-span="1"…"12"` (always), `data-rows="2"…"4"` (absent for 1) |
 | detail open | `open` / `defaultOpen` on Split | `data-open="true"` on Split; narrow: the list is `display: none`, else the detail is |
 | pane swap | `open` changes on a narrow split | the pane that comes into view enters once (`enterMotion.enterBase`: base, opacity + a 4 px rise); focus moves into the detail, or back to the list control; a wide split moves nothing |
 
 ## Layout & spacing
 - No outer padding: edge gutters come from `AppShell.Main`.
-- Header → Body `--prime-space-8` (32); blocks inside Body `--prime-space-10` (40); Title → Description `--prime-space-2` (8); buttons in Actions `--prime-space-2`; heading → Actions `--prime-space-6` (24) side by side, `--prime-space-4` (16) once they wrap below.
+- Header → Body `--prime-space-6` (24); blocks inside Body `--prime-space-6` (24); a `PageContent.Section` 40 from its neighbours (the body's 24 + `--prime-space-4`); tile → tile in a Grid `--prime-space-4` (16) on both axes; section heading → content `--prime-space-4` (16), heading → description `--prime-space-1` (4); Title → Description `--prime-space-2` (8); buttons in Actions `--prime-space-2`; heading → Actions `--prime-space-6` (24) side by side, `--prime-space-4` (16) once they wrap below.
 - Header is a wrapping row: actions stay to the right of the title while the heading keeps half a reading measure, otherwise they wrap below it — no breakpoint needed, works from 320px.
 - Title and Description wrap long words (`overflow-wrap: anywhere`).
+- Grid lays itself out from its own width (container `prime-grid`), never from the window, so a board beside an open Sidebar folds on its own. A Cell stretches its child: the tiles of a row share one height; a chart in a `rows={2}` cell fills it with `ChartFrame.Plot height="fill"`. `dense` flow lets a small tile fill a hole left by a wide one.
 - `fill` needs a main with a height: `AppShell.Root fillViewport` (main scrolls inside the panel). The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`.
 - Split takes the free height of a filling page and lays itself out from its own width (container `prime-split`), never from the window: a split beside an open Sidebar may be narrow on a wide screen. Each pane is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there, so the list and the thread scroll separately. The records of the list pane are a [List](../list/COMPONENT.md).
 - The detail pane is on screen all the time on a wide split: while nothing is chosen it shows a short hint («Выберите диалог»), never an empty card.
@@ -182,7 +232,8 @@ One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s
 
 ### ARIA
 - Title is an `<h1>`; use one per page.
-- Give `PageContent.Section` an `aria-labelledby` that points at the Title `id` to name the region.
+- Give `PageContent.Page` an `aria-labelledby` that points at the Title `id` to name the region.
+- `PageContent.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`, so it is a region landmark with the heading's name; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).
 - Name `PageContent.List` and `PageContent.Detail` with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).
 - `PageContent.BackButton` is named by `labels.back` and is shown only while the split shows one pane.
 
@@ -198,18 +249,22 @@ One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A page in the main column: title, description and page actions, then the body blocks — `PageContent.Actions`. |
 | [variants.tsx](examples/variants.tsx) | The same page column at three caps: the whole main, a wide dashboard column, a reading column — `maxWidth`. |
+| [grid.tsx](examples/grid.tsx) | A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `PageContent.Grid`, `PageContent.Cell`, `span`, `rows`. |
+| [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading, a heading column beside a panel — `PageContent.Section`, `label`, `description`, `PageContent.Actions`, `layout`. |
 | [list-detail.tsx](examples/list-detail.tsx) | A support inbox as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one — `PageContent.Split`, `PageContent.BackButton`, `fill`. |
 | [narrow.tsx](examples/narrow.tsx) | In a phone-width column the page actions wrap under the heading instead of squeezing it. |
 
 ## Mistakes
 - Padding on `PageContent.Root` to imitate gutters → gutters come from `AppShell.Main`.
 - Actions placed outside Header → put `PageContent.Actions` inside `PageContent.Header` so it aligns with the title and wraps.
-- Several `PageContent.Title` on one page → one `<h1>`, sub-headings via Typography.
-- Margins between blocks in Body → Body already sets the 40 gap.
+- Several `PageContent.Title` on one page → one `<h1>`; a topic of the page is a `PageContent.Section` with its `<h2>`.
+- A hand-made `<section>` + `Typography as="h2"` + own gap CSS → `PageContent.Section label`.
+- Each row of cards in its own auto-fit grid → the rows stand 24 apart instead of 16; put every tile of the screen in one `PageContent.Grid`.
+- Margins between blocks in Body → Body already sets the 24 gap and the 40 around a Section.
 - Computing a height from `100vh` minus the header for a full-height table or chat → `PageContent.Root fill` and a filling child.
 - A list + detail built with window media queries → `PageContent.Split` follows its own width.
 - Unmounting the detail content the moment the narrow split goes back → keep the last record until another is chosen (the pane leaves with it on screen).
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md) (`PageContent.BackButton`), Icon (`nav.chevronLeft`)
-- **See also:** [AppShell](../../layout/app-shell/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Card](../card/COMPONENT.md), [List](../list/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Drawer](../drawer/COMPONENT.md)
+- **See also:** [AppShell](../../layout/app-shell/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Card](../card/COMPONENT.md), [ChartFrame](../chart-frame/COMPONENT.md), [List](../list/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Drawer](../drawer/COMPONENT.md)

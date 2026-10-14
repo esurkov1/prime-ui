@@ -14,7 +14,9 @@ The design contract for every component. Tokens live in `tokens/` and are genera
 2. **Everything is on the 4px grid.** Spacing, heights, paddings, gaps. The only non-grid values are
    1px hairlines, 2px focus ring, and a few typographic sizes (13px).
 3. **Proximity.** Inside a group elements sit closer than between groups:
-   label → field 4–8 · field → hint 4 · field → field 20 · group → group 32 · section → section 40–48.
+   label → field 4–8 · field → hint 4 · tile → tile 16 · field → field 20 · block → block 24 ·
+   group → group 32 · section → section 40–48. Tiles of one screen are one board (one gap on both
+   axes); only a new topic with its own heading gets the large air.
 4. **One size axis.** `xs · s · m · l · xl`. Default is always `m`. Controls of the same size line up
    perfectly in a row (Button, Input, Select, Datepicker trigger, SegmentedControl, Tabs).
 5. **Nested radius = outer radius − padding.** Panel 12 with padding 4 → items 8.

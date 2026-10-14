@@ -107,6 +107,25 @@ describe("ChartFrame", () => {
     );
   });
 
+  it("height: a number sets the plot height; fill marks the plot and sets none", () => {
+    const { rerender } = render(
+      <ChartFrame.Root series={SERIES}>
+        <ChartFrame.Plot data-testid="area" height={200} />
+      </ChartFrame.Root>,
+    );
+    const area = screen.getByTestId("area");
+    expect(area.style.getPropertyValue("--chart-frame-plot-height")).toBe("200px");
+    expect(area).not.toHaveAttribute("data-height");
+
+    rerender(
+      <ChartFrame.Root series={SERIES}>
+        <ChartFrame.Plot data-testid="area" height="fill" />
+      </ChartFrame.Root>,
+    );
+    expect(area).toHaveAttribute("data-height", "fill");
+    expect(area.style.getPropertyValue("--chart-frame-plot-height")).toBe("");
+  });
+
   it("toggles series from the legend with aria-pressed and reports the hidden ids", () => {
     const onHiddenSeriesChange = vi.fn();
     render(<Frame onHiddenSeriesChange={onHiddenSeriesChange} />);

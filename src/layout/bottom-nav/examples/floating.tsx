@@ -44,7 +44,7 @@ export default function BottomNavFloatingExample() {
           </AppHeader.Start>
         </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Section>
+          <PageContent.Page>
             <PageContent.Body>
               <div className={styles.options}>
                 <Switch.Root checked={iconOnly} onCheckedChange={setIconOnly}>
@@ -65,7 +65,7 @@ export default function BottomNavFloatingExample() {
                 </div>
               ))}
             </PageContent.Body>
-          </PageContent.Section>
+          </PageContent.Page>
         </AppShell.Main>
         <AppShell.Footer>
           <BottomNav.Root floating iconOnly={iconOnly}>

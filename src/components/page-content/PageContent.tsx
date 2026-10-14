@@ -42,14 +42,15 @@ function PageContentRoot({
 }
 PageContentRoot.displayName = "PageContent.Root";
 
-export type PageContentSectionProps = React.HTMLAttributes<HTMLElement> & {
+export type PageContentPageProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-function PageContentSection({ className, ...rest }: PageContentSectionProps) {
-  return <section className={cx(styles.section, className)} {...rest} />;
+/** The whole page as a `<section>` (full panel width): `Header` with the one h1, then `Body`. */
+function PageContentPage({ className, ...rest }: PageContentPageProps) {
+  return <section className={cx(styles.page, className)} {...rest} />;
 }
-PageContentSection.displayName = "PageContent.Section";
+PageContentPage.displayName = "PageContent.Page";
 
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
@@ -63,12 +64,22 @@ PageContentActions.displayName = "PageContent.Actions";
 
 export type PageContentHeaderProps = DivProps;
 
+function isActions(child: React.ReactNode) {
+  return React.isValidElement(child) && child.type === PageContentActions;
+}
+
+/** Splits children into `PageContent.Actions` and the rest (compares element types). */
+function splitActions(children: React.ReactNode) {
+  const items = React.Children.toArray(children);
+  return {
+    actions: items.filter(isActions),
+    rest: items.filter((child) => !isActions(child)),
+  };
+}
+
 /** Title and description stack on the left; `PageContent.Actions` children go to the end. */
 function PageContentHeader({ className, children, ...rest }: PageContentHeaderProps) {
-  const items = React.Children.toArray(children);
-  const isActions = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === PageContentActions;
-  const actions = items.filter(isActions);
+  const { actions, rest: heading } = splitActions(children);
 
   return (
     <div
@@ -76,7 +87,7 @@ function PageContentHeader({ className, children, ...rest }: PageContentHeaderPr
       data-has-actions={actions.length > 0 ? "true" : undefined}
       {...rest}
     >
-      <div className={styles.heading}>{items.filter((child) => !isActions(child))}</div>
+      <div className={styles.heading}>{heading}</div>
       {actions}
     </div>
   );
@@ -121,6 +132,98 @@ function PageContentBody({ className, ...rest }: PageContentBodyProps) {
   return <div className={cx(styles.body, className)} {...rest} />;
 }
 PageContentBody.displayName = "PageContent.Body";
+
+/** Where the heading of a section stands: over its content or in a column beside it. */
+export type PageContentSectionLayout = "stack" | "aside";
+
+export type PageContentSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
+  /** The visible heading of the section (an `h2`). */
+  label: React.ReactNode;
+  /** One line of context under the heading. */
+  description?: React.ReactNode;
+  /**
+   * `stack` — the heading over the content; `aside` — a heading column beside the content (a
+   * settings page), dropping above it once the content would get narrower than 30rem.
+   */
+  layout?: PageContentSectionLayout;
+  ref?: React.Ref<HTMLElement>;
+};
+
+/**
+ * A titled section of the page: an `h2` heading (with an optional description and
+ * `PageContent.Actions` at its end) over its content. Sections stand further apart than the plain
+ * blocks of the body, so the air shows where a new topic starts.
+ */
+function PageContentSection({
+  label,
+  description,
+  layout = "stack",
+  className,
+  children,
+  ...rest
+}: PageContentSectionProps) {
+  const headingId = React.useId();
+  const { actions, rest: content } = splitActions(children);
+
+  return (
+    <section
+      aria-labelledby={headingId}
+      className={cx(styles.section, className)}
+      {...rest}
+      {...toDataAttributes({ layout: layout === "aside" ? "aside" : undefined })}
+    >
+      <div
+        className={styles.sectionHeader}
+        data-has-actions={actions.length > 0 ? "true" : undefined}
+      >
+        <div className={styles.sectionHeading}>
+          <h2 id={headingId} className={styles.sectionTitle}>
+            {label}
+          </h2>
+          {description ? <p className={styles.sectionDescription}>{description}</p> : null}
+        </div>
+        {actions}
+      </div>
+      <div className={styles.sectionContent}>{content}</div>
+    </section>
+  );
+}
+PageContentSection.displayName = "PageContent.Section";
+
+export type PageContentGridProps = DivProps;
+
+/**
+ * The grid of the page's tiles (KPI cards, charts, panels): 12 columns, one gap on both axes.
+ * Columns follow the grid's own width, so tiles fold on a narrow panel by themselves.
+ */
+function PageContentGrid({ className, ...rest }: PageContentGridProps) {
+  return <div className={cx(styles.grid, className)} {...rest} />;
+}
+PageContentGrid.displayName = "PageContent.Grid";
+
+/** Columns of 12 a cell spans on a wide grid. */
+export type PageContentCellSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+/** Rows a cell spans. */
+export type PageContentCellRows = 1 | 2 | 3 | 4;
+
+export type PageContentCellProps = DivProps & {
+  /** Columns of 12 on a wide grid; a medium grid rounds to half or full, a narrow one to full. */
+  span?: PageContentCellSpan;
+  /** Rows the cell spans; its child fills the height. */
+  rows?: PageContentCellRows;
+};
+
+/** One tile place in `PageContent.Grid`; its child (a Card, a ChartFrame) fills it. */
+function PageContentCell({ span = 12, rows = 1, className, ...rest }: PageContentCellProps) {
+  return (
+    <div
+      className={cx(styles.cell, className)}
+      {...rest}
+      {...toDataAttributes({ span, rows: rows === 1 ? undefined : rows })}
+    />
+  );
+}
+PageContentCell.displayName = "PageContent.Cell";
 
 // ─── List + detail ──────────────────────────────────────────────────────────────────────────
 
@@ -344,12 +447,15 @@ PageContentBackButton.displayName = "PageContent.BackButton";
 
 export const PageContent = {
   Root: PageContentRoot,
-  Section: PageContentSection,
+  Page: PageContentPage,
   Header: PageContentHeader,
   Actions: PageContentActions,
   Title: PageContentTitle,
   Description: PageContentDescription,
   Body: PageContentBody,
+  Section: PageContentSection,
+  Grid: PageContentGrid,
+  Cell: PageContentCell,
   Split: PageContentSplit,
   List: PageContentList,
   Detail: PageContentDetail,

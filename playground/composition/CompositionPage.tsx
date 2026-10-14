@@ -39,12 +39,13 @@ const RHYTHM: Row[] = [
   { what: "кнопки и фильтры в ряд", value: "8", how: "`--prime-space-2`" },
   { what: "строки одного элемента (имя над мета)", value: "0–4", how: "`--prime-space-1`" },
   { what: "заголовок группы → её поля", value: "16", how: "`--prime-space-4`" },
-  { what: "плитка → плитка в сетке", value: "16", how: "`--prime-space-4`" },
+  { what: "плитка → плитка, по обеим осям", value: "16", how: "даёт `PageContent.Grid`" },
   { what: "поле → поле, переключатель → переключатель", value: "20", how: "`--prime-space-5`" },
   { what: "основная колонка → боковая", value: "24", how: "`--prime-space-6`" },
+  { what: "шапка страницы → содержимое", value: "24", how: "даёт `PageContent`" },
+  { what: "блок → блок страницы", value: "24", how: "даёт `PageContent.Body`" },
   { what: "группа → группа в форме", value: "32", how: "`--prime-space-8`" },
-  { what: "шапка страницы → содержимое", value: "32", how: "даёт `PageContent`" },
-  { what: "блок → блок страницы", value: "40", how: "даёт `PageContent.Body`" },
+  { what: "раздел → раздел (новая тема с h2)", value: "40", how: "даёт `PageContent.Section`" },
 ];
 
 const TYPE: Row[] = [
@@ -82,12 +83,12 @@ export default function CompositionPage() {
           </li>
           <li>
             {renderInlineCode(
-              "Страница — `PageContent.Section` (или `PageContent.Root maxWidth` для узкой колонки): `Header` с `Title`, одной строкой `Description` и `Actions`, затем `Body` с блоками.",
+              "Страница — `PageContent.Page` (или `PageContent.Root maxWidth` для узкой колонки): `Header` с `Title`, одной строкой `Description` и `Actions`, затем `Body` с блоками.",
             )}
           </li>
           <li>
             {renderInlineCode(
-              "Внешних отступов не добавляйте: поля даёт `AppShell.Main`, расстояния между блоками — `PageContent.Body`. Ваш CSS раскладывает только внутренность блока через `gap`.",
+              "Внешних отступов не добавляйте: поля даёт `AppShell.Main`, расстояния между блоками — `PageContent.Body`, между разделами — `PageContent.Section`, между плитками — `PageContent.Grid`. Ваш CSS раскладывает только внутренность блока через `gap`.",
             )}
           </li>
         </DocList>
@@ -126,7 +127,7 @@ export default function CompositionPage() {
           </li>
           <li>
             {renderInlineCode(
-              "`Card` — для самостоятельного блока (метрика, панель настроек, сведения сбоку). Раздел, который и так один в своей области, — заголовок и содержимое без карточки.",
+              "`Card` — для самостоятельного блока (метрика, панель настроек, сведения сбоку). Раздел, который и так один в своей области, — `PageContent.Section` с заголовком и содержимым без карточки. Все плитки экрана — одна `PageContent.Grid`, а не сетка на каждый ряд.",
             )}
           </li>
           <li>

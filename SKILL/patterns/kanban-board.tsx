@@ -386,7 +386,7 @@ export default function KanbanBoardPattern() {
   const nextStage = STAGE_BY_ID.get(stageOrder[stageOrder.indexOf(dealStage) + 1] ?? "");
 
   return (
-    <PageContent.Section aria-labelledby="deals-title">
+    <PageContent.Page aria-labelledby="deals-title">
       <PageContent.Header>
         <PageContent.Title id="deals-title">Сделки</PageContent.Title>
         <PageContent.Description>
@@ -607,6 +607,6 @@ export default function KanbanBoardPattern() {
           </Drawer.Content>
         </Drawer.Root>
       </PageContent.Body>
-    </PageContent.Section>
+    </PageContent.Page>
   );
 }
