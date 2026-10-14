@@ -415,6 +415,7 @@ describe("Button shape circle", () => {
     );
     const link = screen.getByRole("link", { name: "Скачать Счёт-2381.pdf" });
     expect(link).toHaveAttribute("data-shape", "circle");
+    expect(link).toHaveAttribute("data-icon-only", "true");
     expect(link).toHaveAttribute("data-size", "xl");
     expect(link).toHaveAttribute("href", "/files/2381.pdf");
   });

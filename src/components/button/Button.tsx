@@ -200,7 +200,14 @@ function ButtonRoot({
 }: ButtonRootProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
-  const layout = iconLayout(children, ButtonIcon);
+  // With `asChild` the content is the child's own children (a link holding only a Button.Icon is
+  // an icon-only button too).
+  const layout = iconLayout(
+    asChild && React.isValidElement<{ children?: React.ReactNode }>(children)
+      ? children.props.children
+      : children,
+    ButtonIcon,
+  );
   const hold = useHoldToConfirm(holdToConfirm && !disabled && !loadingProp, onConfirm);
   // A toggle when any part of the pressed triad is given; an ordinary action otherwise.
   const toggle =
