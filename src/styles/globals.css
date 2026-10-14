@@ -249,7 +249,7 @@ textarea:disabled::placeholder {
  */
 :root {
   --prime-layout-gutter: var(--prime-layout-gutter-s);
-  --prime-bleed-inline: 0px;
+  --prime-bleed-inline: var(--prime-space-0);
 }
 
 @media (min-width: 640px) {
@@ -270,15 +270,15 @@ textarea:disabled::placeholder {
 :root[data-theme-switching],
 [data-theme-switching],
 [data-theme-switching] [data-theme] {
-  --prime-motion-duration-xfast: 0ms;
-  --prime-motion-duration-fast: 0ms;
-  --prime-motion-duration-base: 0ms;
-  --prime-motion-duration-slow: 0ms;
-  --prime-motion-fade-xfast: 0ms;
-  --prime-motion-fade-fast: 0ms;
-  --prime-motion-fade-base: 0ms;
-  --prime-motion-fade-slow: 0ms;
-  --prime-message-morph-duration: 0ms;
+  --prime-motion-duration-xfast: var(--prime-motion-instant);
+  --prime-motion-duration-fast: var(--prime-motion-instant);
+  --prime-motion-duration-base: var(--prime-motion-instant);
+  --prime-motion-duration-slow: var(--prime-motion-instant);
+  --prime-motion-fade-xfast: var(--prime-motion-instant);
+  --prime-motion-fade-fast: var(--prime-motion-instant);
+  --prime-motion-fade-base: var(--prime-motion-instant);
+  --prime-motion-fade-slow: var(--prime-motion-instant);
+  --prime-message-morph-duration: var(--prime-motion-instant);
 }
 
 /* Reduced motion: movement goes — durations, stagger and press scale collapse — while fades and
@@ -289,12 +289,12 @@ textarea:disabled::placeholder {
   :root[data-theme],
   :root,
   [data-theme] {
-    --prime-motion-duration-xfast: 0ms;
-    --prime-motion-duration-fast: 0ms;
-    --prime-motion-duration-base: 0ms;
-    --prime-motion-duration-slow: 0ms;
-    --prime-motion-stagger: 0ms;
-    --prime-message-morph-duration: 0ms;
+    --prime-motion-duration-xfast: var(--prime-motion-instant);
+    --prime-motion-duration-fast: var(--prime-motion-instant);
+    --prime-motion-duration-base: var(--prime-motion-instant);
+    --prime-motion-duration-slow: var(--prime-motion-instant);
+    --prime-motion-stagger: var(--prime-motion-instant);
+    --prime-message-morph-duration: var(--prime-motion-instant);
     --prime-motion-press-scale: 1;
     --prime-motion-press-scale-compact: 1;
   }

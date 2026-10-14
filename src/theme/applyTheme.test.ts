@@ -62,8 +62,8 @@ describe("applyTheme", () => {
     expect(start).toBeGreaterThan(-1);
     const block = globals.slice(start, globals.indexOf("}", start));
     for (const clock of ["xfast", "fast", "base", "slow"]) {
-      expect(block).toContain(`--prime-motion-duration-${clock}: 0ms;`);
-      expect(block).toContain(`--prime-motion-fade-${clock}: 0ms;`);
+      expect(block).toContain(`--prime-motion-duration-${clock}: var(--prime-motion-instant);`);
+      expect(block).toContain(`--prime-motion-fade-${clock}: var(--prime-motion-instant);`);
     }
     expect(globals).not.toMatch(/!important/);
   });

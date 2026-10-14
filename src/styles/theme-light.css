@@ -391,6 +391,7 @@
   --prime-motion-fade-slow: var(--prime-ref-duration-570);
   --prime-motion-fade-xfast: var(--prime-ref-duration-150);
   --prime-motion-hold-confirm: var(--prime-ref-duration-1200);
+  --prime-motion-instant: var(--prime-ref-duration-0);
   --prime-motion-loop: var(--prime-ref-duration-570);
   --prime-motion-press-scale: 0.98;
   --prime-motion-press-scale-compact: 0.96;

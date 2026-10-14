@@ -517,6 +517,11 @@ export const semanticTokens = {
      * so reduced motion keeps it.
      */
     holdConfirm: "{duration.1200}",
+    /**
+     * A clock stopped: the value `globals.css` gives the movement clocks under reduced motion and
+     * every clock while a theme switches.
+     */
+    instant: "{duration.0}",
   },
 
   /**

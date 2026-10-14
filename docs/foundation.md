@@ -268,13 +268,30 @@ Motion tokens:
 | `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | `:active` scale; compact for icon-only and small targets |
 | `--prime-motion-loop` | 570 ms | period unit of a loading loop (Spinner: one turn in 3 units, 6 under reduced motion) |
 | `--prime-motion-blur` | 2px | hides a change of shape while two states swap in place (icon → check, letters) |
+| `--prime-motion-fade-xfast` | 150 ms | opacity and color feedback on dense rows, cells, options |
+| `--prime-motion-fade-fast` | 230 ms | opacity and color feedback of press, hover, small panels, exits |
+| `--prime-motion-fade-base` | 380 ms | opacity and color feedback of dialogs, toggles, content swaps |
+| `--prime-motion-fade-slow` | 570 ms | opacity and color feedback of drawers, sheets |
+| `--prime-motion-hold-confirm` | 1200 ms | length of a hold-to-confirm press (Button `holdToConfirm`); a gesture time, not motion |
+| `--prime-motion-instant` | 0 ms | a stopped clock: the value of the zeroed clocks |
+| `--prime-motion-scale-mark` | 0.6 | start of a glyph or a dot drawn in place (a check, a swapped icon, a radio dot) |
+| `--prime-motion-scale-pop` | 0.8 | start of a small part that pops in (a reaction, a button that appears in a row) |
+| `--prime-motion-scale-settle` | 0.9 | start of a tile part or a disk that settles into place |
+| `--prime-motion-scale-enter` | 0.96 | start of a block entering in place (a bar, a bubble; rule 7) |
+| `--prime-motion-scale-lift` | 1.02 | a picked-up item (a drag source) |
+| `--prime-motion-scale-hover` | 1.1 | a small target under a fine pointer (a swatch, a slider thumb) |
+| `--prime-motion-scale-emphasis` | 1.2 | a glyph a pointer or focus singles out (a reaction) |
+| `--prime-motion-scale-grab` | 1.25 | a thumb held by the pointer |
+| `--prime-motion-scale-burst` | 1.4 | the peak of a one-shot pick (a reaction chosen) |
+| `--prime-motion-scale-pulse` | 2 | a ring that spreads out of a live mark and fades |
 
-Under `prefers-reduced-motion` `globals.css` zeroes the movement clocks — `xfast`, `fast`, `base`,
-`slow`, `stagger` and the message-morph duration — and sets both press scales to 1; JS animations
-must also check it. Two kinds of motion are information and keep a clock that reduced motion does not
-zero: opacity and color feedback (a fade, a fill or color change of state) reads a separate group of
-feedback durations, so a state still eases in instead of flipping; a loading loop reads
-`--prime-motion-loop` and only slows down.
+Under `prefers-reduced-motion` `globals.css` sets the movement clocks — `xfast`, `fast`, `base`,
+`slow`, `stagger` and the message-morph duration — to `--prime-motion-instant` and both press scales
+to 1; JS animations must also check it. Two kinds of motion are information and keep a clock that
+reduced motion does not zero: opacity and color feedback (a fade, a fill or color change of state)
+reads the `--prime-motion-fade-*` group, so a state still eases in instead of flipping; a loading
+loop reads `--prime-motion-loop` and only slows down. A gesture time (`--prime-motion-hold-confirm`)
+is not motion and keeps its length.
 Every component is designed with its micro-animations, not only its static states. Rules (after Emil Kowalski):
 
 1. **Ask first: should it move at all?** By frequency: keyboard-driven or 100+/day actions (option highlight
@@ -464,7 +481,7 @@ Components carry no motion code of their own for these layers.
   rows are at least 44px; editable field text is at least 16px under `(pointer: coarse), (max-width:
   639px)` (`--prime-control-touch-text-size`) so iOS never zooms.
 - Switchers — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — all scroll through
-  one scroller (`src/internal/SwitcherScroller`). They never wrap: they scroll inside themselves,
+  one shared scroller. They never wrap: they scroll inside themselves,
   stretched items tend to equal width and never shrink below their label, the selection indicator
   moves only after a person's choice. Host duty: a switcher's host gives it a bounded width — a flex
   or grid child that holds a switcher sets `min-width: 0` (the PageToolbar View slot does), otherwise

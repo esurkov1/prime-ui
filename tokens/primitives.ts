@@ -221,6 +221,7 @@ export const primitiveTokens = {
   },
 
   duration: {
+    0: "0ms",
     80: "80ms",
     150: "150ms",
     230: "230ms",
