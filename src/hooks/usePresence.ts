@@ -13,7 +13,7 @@ export function prefersReducedMotion(): boolean {
   );
 }
 
-export type UsePresenceOptions = {
+type UsePresenceOptions = {
   /** Longest exit duration of the layer — the timeout fallback when no `animationend` arrives. */
   exitDuration?: MotionDurationToken;
 };

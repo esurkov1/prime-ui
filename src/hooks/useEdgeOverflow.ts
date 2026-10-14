@@ -4,13 +4,13 @@ import { readCssLengthPx } from "@/hooks/usePosition";
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
 /** The axes a region scrolls along: only those are measured. */
-export type EdgeOverflowAxis = "vertical" | "horizontal" | "both";
+type EdgeOverflowAxis = "vertical" | "horizontal" | "both";
 
 /**
  * Edges of a scroll region that hide content: `start` / `end` along the inline axis (logical,
  * RTL-aware), `top` / `bottom` along the block axis.
  */
-export type EdgeOverflow = { start: boolean; end: boolean; top: boolean; bottom: boolean };
+type EdgeOverflow = { start: boolean; end: boolean; top: boolean; bottom: boolean };
 
 const NONE: EdgeOverflow = { start: false, end: false, top: false, bottom: false };
 

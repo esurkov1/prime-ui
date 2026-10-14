@@ -1,17 +1,4 @@
 [
-  "src/hooks/useEdgeOverflow.ts: EdgeOverflow is unused",
-  "src/hooks/useEdgeOverflow.ts: EdgeOverflowAxis is unused",
-  "src/hooks/useEnterConfirm.ts: UseEnterConfirmOptions is unused",
-  "src/hooks/useModalLayer.ts: ModalLayer is test-only",
-  "src/hooks/useModalLayer.ts: UseModalLayerOptions is unused",
-  "src/hooks/usePosition.ts: ComputeFloatingOptions is test-only",
-  "src/hooks/usePosition.ts: ComputedFloatPosition is unused",
-  "src/hooks/usePosition.ts: computeFloatingPosition is test-only",
-  "src/hooks/usePresence.ts: UsePresenceOptions is unused",
-  "src/hooks/useSwipeDismiss.ts: UseSwipeDismissOptions is unused",
-  "src/hooks/useVirtualRows.ts: UseVirtualRowsOptions is unused",
-  "src/hooks/useVirtualRows.ts: VirtualRow is unused",
-  "src/hooks/useVirtualRows.ts: VirtualRows is unused",
   "src/internal/AnchorRectContext.tsx: AnchorRect is unused",
   "src/internal/ChartTooltip.tsx: ChartTooltipProps is unused",
   "src/internal/Disclosure.tsx: DisclosureProps is unused",
@@ -49,12 +36,5 @@
   "src/internal/textFormattingToolbar.tsx: TextFormatting is unused",
   "src/internal/textFormattingToolbar.tsx: TextFormattingOptions is unused",
   "src/internal/usePendingChanges.ts: MaybePromise is unused",
-  "src/internal/useRangeSelection.ts: RangeSelectionOptions is unused",
-  "tokens/layers.ts: LAYER_DEPTH is unused",
-  "tokens/layers.ts: LAYER_STEP is test-only",
-  "tokens/layers.ts: LayerColors is unused",
-  "tokens/layers.ts: LayerTheme is unused",
-  "tokens/layers.ts: floatingLayer is test-only",
-  "tokens/layers.ts: layerLadder is test-only",
-  "tokens/layers.ts: lightnessOf is test-only"
+  "src/internal/useRangeSelection.ts: RangeSelectionOptions is unused"
 ]

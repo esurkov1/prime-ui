@@ -2,9 +2,9 @@ import * as React from "react";
 import { flushSync } from "react-dom";
 
 /** A row to render: its index, top offset and height in px. */
-export type VirtualRow = { index: number; start: number; size: number };
+type VirtualRow = { index: number; start: number; size: number };
 
-export type UseVirtualRowsOptions = {
+type UseVirtualRowsOptions = {
   /** Number of rows. */
   count: number;
   /** The scroll container the rows scroll in (vertically). */
@@ -41,7 +41,7 @@ export type UseVirtualRowsOptions = {
   sticky?: readonly number[];
 };
 
-export type VirtualRows = {
+type VirtualRows = {
   /** Rows to render, by index: the visible range, the overscan and the pinned rows. */
   rows: VirtualRow[];
   /** Height of all rows, px: the size of the scrolled content. */

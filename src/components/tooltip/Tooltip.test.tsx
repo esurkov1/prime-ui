@@ -412,7 +412,7 @@ describe("Tooltip — overlay contract", () => {
 
 // ─── Placement ────────────────────────────────────────────────────────────────
 
-// The geometry (sides, flip, shift, arrow) is covered by `computeFloatingPosition` in usePosition.
+// The geometry (sides, flip, shift, arrow) is covered by `computeFloatingPosition` (src/hooks/floatingPosition).
 describe("placement", () => {
   it("positions the chip with the shared anchored positioning and an arrow offset", () => {
     render(<BasicTooltip defaultOpen side="right" />);

@@ -15,11 +15,11 @@
 import { primitiveTokens } from "./primitives";
 
 /** ΔL in OKLab between neighbouring layers. */
-export const LAYER_STEP = 0.03;
+const LAYER_STEP = 0.03;
 /** Layers 0…4: the page and four nested surfaces. */
-export const LAYER_DEPTH = 4;
+const LAYER_DEPTH = 4;
 
-export type LayerTheme = {
+type LayerTheme = {
   /** The page color (layer 0). */
   page: string;
   /** Lightness window: no color goes outside it. */
@@ -78,7 +78,7 @@ function oklabToHex([L, a, b]: Lab): string {
     .join("")}`;
 }
 
-export const lightnessOf = (hex: string) => hexToOklab(hex)[0];
+const lightnessOf = (hex: string) => hexToOklab(hex)[0];
 
 /** Lightness L with the page's hue and chroma; the white ceiling is pure white. */
 function paint(theme: LayerTheme, L: number): string {
@@ -91,7 +91,7 @@ function paint(theme: LayerTheme, L: number): string {
  * `steps` steps from L towards `dir`. Reflects when less than half a step of room is left (unless
  * `reflect` is off), snaps to the edge when less than half a step would remain after the move.
  */
-export function move(theme: LayerTheme, L: number, dir: 1 | -1, steps = 1, reflect = true) {
+function move(theme: LayerTheme, L: number, dir: 1 | -1, steps = 1, reflect = true) {
   const room = dir > 0 ? theme.hi - L : L - theme.lo;
   const d = reflect && room < LAYER_STEP / 2 ? -dir : dir;
   let next = L + d * steps * LAYER_STEP;
@@ -100,7 +100,7 @@ export function move(theme: LayerTheme, L: number, dir: 1 | -1, steps = 1, refle
   return Math.min(theme.hi, Math.max(theme.lo, next));
 }
 
-export type LayerColors = {
+type LayerColors = {
   /** The layer itself. */
   bg: string;
   /** Fields, chips, segmented tracks, neutral buttons on this layer. */
@@ -122,7 +122,7 @@ function colorsAt(theme: LayerTheme, L: number): LayerColors {
 }
 
 /** Layers 0…LAYER_DEPTH of a theme, each one step from its parent. */
-export function layerLadder(theme: LayerTheme): LayerColors[] {
+function layerLadder(theme: LayerTheme): LayerColors[] {
   const out: LayerColors[] = [];
   let L = lightnessOf(theme.page);
   for (let depth = 0; depth <= LAYER_DEPTH; depth++) {
@@ -133,7 +133,7 @@ export function layerLadder(theme: LayerTheme): LayerColors[] {
 }
 
 /** Floating layers (popovers, menus, modals, drawers) sit one step above a card and never reflect. */
-export function floatingLayer(theme: LayerTheme): LayerColors {
+function floatingLayer(theme: LayerTheme): LayerColors {
   const card = move(theme, lightnessOf(theme.page), 1);
   return colorsAt(theme, move(theme, card, 1, 1, false));
 }
