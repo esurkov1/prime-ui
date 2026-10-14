@@ -54,7 +54,6 @@
   "src/internal/textFormattingToolbar.tsx: TextFormatting is unused",
   "src/internal/textFormattingToolbar.tsx: TextFormattingOptions is unused",
   "src/internal/usePendingChanges.ts: MaybePromise is unused",
-  "src/internal/usePendingChanges.ts: usePendingAction is test-only",
   "src/internal/useRangeSelection.ts: RangeSelectionOptions is unused",
   "tokens/layers.ts: LAYER_DEPTH is unused",
   "tokens/layers.ts: LAYER_STEP is test-only",
