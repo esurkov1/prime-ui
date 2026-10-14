@@ -65,7 +65,9 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
   ring in both themes, never conveys meaning by color alone, and has keyboard tests.
 - Responsive is part of the code (foundation §9, `SKILL/responsive.md`): every component works from
   320px and adapts to its own container (container queries); viewport breakpoints 640 · 768 · 1024 ·
-  1280 (`max-width: 639px` style) only for the app shell and overlay form. `:hover` only inside
+  1280 (`max-width: 639px` style) only for the app shell and overlay form; one height query: a sticky
+  header (AppHeader, DataTable head, Gantt head) stops sticking under `@media (max-height: 479px)`
+  (foundation §9), with a comment citing it. `:hover` only inside
   `@media (hover: hover)`, nothing hover-only; small controls get the touch hit area
   (`src/internal/touchTarget`); editable text uses `--field-input-text` (16px on touch). Switchers
   scroll, never wrap or truncate; indicators move only after a person's choice. `src/styles/touch.test.ts`
@@ -107,7 +109,8 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
   only the text.
 - Icons go in parts (`X.Icon`, `X.ItemIcon`, `X.TriggerIcon`) — never `icon` / `leading` / `trailing` /
   `leadingIcon` props or component-type props (`icon={Comp}`). Only data passed as arrays or options
-  (`notify()`, `options`) carries `icon: ReactNode`.
+  (`notify()`, `options`) carries `icon: ReactNode` — and `NotificationCard`, the static rendering
+  of a `notify()` record (the same `NotificationContent`).
 
 **Props and callbacks**
 - The primary value is `value` / `defaultValue` / `onValueChange` (`checked`, `open` per §10). Any other
@@ -115,14 +118,16 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
   The new value is always the first callback argument.
 - Event names: `onSelect` activates a menu / command item; `onRemove` takes a value out of a selection;
   `onDelete` destroys an entity; `onDismiss` closes a message (Banner, Notification).
-- Dismiss: every overlay takes `closeOnOutsideClick` and `closeOnEscape` (default `true`, §10).
+- Dismiss: every overlay of the layer stack takes `closeOnOutsideClick` and `closeOnEscape`
+  (default `true`, §10). Tooltip (closes on pointer-leave / blur / Escape; Escape cannot be turned
+  off, WCAG 1.4.13) and Notification (a non-modal live region outside the stack) take neither.
 - Selection mode: `multiple?: boolean` for one vs many (not `type`); `mode` only for structurally
   different values (Datepicker `single | range`). Mutually exclusive behaviours are one enum prop, not
   a set of booleans with impossible combinations (DataTable `paging: "pages" | "infinite" | "none"`).
   Status words: `selected` (choice), `current`
   (navigation location, `aria-current`), `pressed` (toggle button). Tone words for statuses
   (`danger`, never `error`). Flags keep §10 names (`fullWidth`, not `fillWidth`).
-- Anchored layers position with `side` (`top | right | bottom | left`) and `align` (`auto | start | center | end`, default `auto` — the edge with more room).
+- Anchored layers position with `side` (`top | right | bottom | left`) and `align` (`auto | start | center | end`, default `auto` — the edge with more room); Tooltip centres on its trigger by default (foundation §8) and takes `auto` explicitly.
 - `color` only on the components §10 lists.
 - A visible text label is `label`; a name only for assistive tech is the native `aria-label`, never
   `label`.
@@ -180,6 +185,8 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | menu / listbox rows, a floating panel | `src/internal/menu.module.css`, `floatingSurface.module.css`, `listbox.ts` (listbox keyboard) |
 | the matched part of a label while searching | `src/internal/HighlightMatch` (`HighlightMatch`, `highlightChildren`) |
 | a `{token}` label template | `src/internal/formatLabel` |
+| records of one shape a person adds, edits and removes in a form (lines, contacts, specs, prices by period) | `FieldList` (headings once, a field per cell named by its column) — never a `.map()` of labelled fields |
+| an icon picker or a small choice in a dense row | `Select` with only `Select.TriggerIcon` (icon-only trigger) |
 | a bounded block in an example (panel, card) | `Card` (`Card.Root` + `Card.Body`) — never a hand-drawn card in CSS |
 | a person / object picture | `Avatar` / `Thumbnail`; image load state via `src/hooks/useImageStatus` |
 | a table, pagination, row selection | `DataTable`, `Pagination`, `Checkbox` |
@@ -308,7 +315,7 @@ export const page: ComponentPageConfig = {
   Skeleton, Banner, Sparkline, VisuallyHidden, Gallery; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup, VoicePlayer, VideoNote;
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   ColorField, FileUpload; overlay — Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu,
-  Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination, List; composite — DataTable, Kanban,
+  Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination, List; composite — DataTable, FieldList, Kanban,
   Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Chat, ChatList, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
   PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·
@@ -385,7 +392,10 @@ A component change is done only when all of these agree. Do them in the same cha
    by copying `SKILL/`. Every ```tsx block in SKILL
    compiles against the kit (checked by `skill-docs.test.ts`) unless marked ```tsx partial.
    `cheatsheet.md` is the one-page «do X, not Y» entry (read first): update it when a shared rule or a
-   cross-component decision changes. A new or changed screen pattern goes to `SKILL/patterns/` with an
+   cross-component decision changes. `ux.md` holds what goes on a screen (the brief, data shape →
+   layout, label economy, copy, friction). A UX bug seen in a screen built with the skill becomes three
+   things in one change: a rule with bad → good in `ux.md` or `anti-slop.md`, a line in
+   `checklist.md`, and a case in `evals/prime-ui-kit/evals.json` (run with the skill-creator evals). A new or changed screen pattern goes to `SKILL/patterns/` with an
    entry in `playground/composition/patterns.ts` and a row in `SKILL/composition.md`.
 9. **README.md** — when the public surface changes (new component, export, count, install step).
 
@@ -411,7 +421,7 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `tokens/` | `primitives.ts` → `semantic.ts` → `themes/{light,dark}.ts`; `bun run tokens:build` generates `src/styles/{tokens,theme-light,theme-dark}.css` (never edit those by hand) |
 | `src/components/<dir>/` | one component: `X.tsx`, `X.module.css`, `X.test.tsx`, `api.ts`, `COMPONENT.md`, `examples/` |
 | `src/layout/` | AppShell, AppHeader, Sidebar, BottomNav (same structure) |
-| `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`), contexts (`ControlSizeContext`, `AnchorRectContext`, `disabledContext` — a disabled `Fieldset`), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`), `MenuGroup`, `FieldFrame`, `FieldCommit`, `FieldAction`, `ChoiceField`, `fieldClasses`, `iconLayout`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `useRangeSelection` (click / Shift / drag-paint selection of a list: DataTable rows, chat messages), `edgeAutoScroll` (scrolling near an edge during a drag), `messageList` (the contract between `Chat.Messages` and its messages: selection store, row kinds, jumps), `messagePart` (the contract between a message and its content parts), `palette` (`hueOf`, a hue stable per id), `sticky` (`stickySurfaceClass` for a block-start sticky surface), `richText` (the Markdown subset of a chat as React elements), `mediaPlayer` (the shared API and parts of VoicePlayer and VideoNote), `transfer` + `transferDisk` (the transfer of content, either way), `ring` (the one ring drawing: ProgressCircle, Spinner, the circle Button), `mediaDisk` (the still disk over media: a video's play mark), `glyphSwap` (a glyph cross-fade), `mediaPill` (the pill over media), `mediaSession` (one sound at a time), `transcript` (the transcript of a voice / video message), `readReceipts`, `usePendingChanges` (the pending state of a promise-returning handler), `leaveInPlace`, `progressSegments` + `ProgressLegend` (ProgressBar / ProgressCircle segments), `fileFormat`, `fileName`, `mediaKind`, `attachmentTile` + `useNearView` (FileUpload / Gallery tiles), `Disclosure`, `CheckMark`, `surfaceDepth` (the depth ladder), `imageSlot`, `fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`), `MorphText`, `RollingNumber`, `ChartTooltip` (the chart tooltip: ChartFrame, Sparkline), `VisuallyHidden`, `slot`, `cx`, `data-attributes`; CSS: `overlayMotion`, `enterMotion`, `chartTooltip`, `swapMotion`, `floatingSurface`, `sheet`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole`, `touchTarget`, `sticky` |
+| `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`), contexts (`ControlSizeContext`, `AnchorRectContext`, `disabledContext` — a disabled `Fieldset`), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`), `MenuGroup`, `FieldFrame`, `fieldCell` (a FieldList cell names the field inside by its column heading), `FieldCommit`, `FieldAction`, `ChoiceField`, `fieldClasses`, `iconLayout`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `useRangeSelection` (click / Shift / drag-paint selection of a list: DataTable rows, chat messages), `edgeAutoScroll` (scrolling near an edge during a drag), `messageList` (the contract between `Chat.Messages` and its messages: selection store, row kinds, jumps), `messagePart` (the contract between a message and its content parts), `palette` (`hueOf`, a hue stable per id), `sticky` (`stickySurfaceClass` for a block-start sticky surface), `richText` (the Markdown subset of a chat as React elements), `mediaPlayer` (the shared API and parts of VoicePlayer and VideoNote), `transfer` + `transferDisk` (the transfer of content, either way), `ring` (the one ring drawing: ProgressCircle, Spinner, the circle Button), `mediaDisk` (the still disk over media: a video's play mark), `glyphSwap` (a glyph cross-fade), `mediaPill` (the pill over media), `mediaSession` (one sound at a time), `transcript` (the transcript of a voice / video message), `readReceipts`, `usePendingChanges` (the pending state of a promise-returning handler), `leaveInPlace`, `progressSegments` + `ProgressLegend` (ProgressBar / ProgressCircle segments), `fileFormat`, `fileName`, `mediaKind`, `attachmentTile` + `useNearView` (FileUpload / Gallery tiles), `Disclosure`, `CheckMark`, `surfaceDepth` (the depth ladder), `imageSlot`, `fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`), `MorphText`, `RollingNumber`, `ChartTooltip` (the chart tooltip: ChartFrame, Sparkline), `VisuallyHidden`, `slot`, `cx`, `data-attributes`; CSS: `overlayMotion`, `enterMotion`, `chartTooltip`, `swapMotion`, `floatingSurface`, `sheet`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole`, `touchTarget`, `sticky` |
 | `src/hooks/` | `useModalLayer`, `useInertSiblings`, `useScrollLock`, `usePresence`, `usePosition`, `useControllableState`, `useMergedRefs`, `useImageStatus`, `useStateSwap`, `useEnterConfirm`, `useEdgeOverflow`, `useMediaQuery`, `useSwipeDismiss`, `useVirtualRows` (rows of measured height rendered only in view: Gantt, Chat, DataTable, TagSelect), `useTokenValue` (public), `useUploadQueue` (public: the upload queue of FileUpload) |
 | `src/icons/` | public `<Icon name>` registry and `createIcon`; `glyphs/` (Lucide drawings, one gesture each), `glyph.tsx` (`defineGlyph`), `glyphMotion.module.css` (gesture vocabulary), `iconPlay.ts` (when gestures play) — the only icon source for components; notices in `THIRD_PARTY_NOTICES` |
 | `src/index.ts`, `src/components/index.ts`, `src/layout/index.ts` | public exports |
@@ -424,7 +434,8 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `scripts/` | `build-tokens.ts`, `bundle-lib.ts`, `build-docs.ts` + `docs/componentApi.ts` (api schema, markdown) |
 | `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component (shared helpers in `contract-utils.ts`) |
 | `src/test/part-refs.test.tsx` | refs of every part: a typed check, runtime cases for merged or redirected refs |
-| `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `choosing`, `components` (index), `composition` (screen assembly guide), `layouts`, `responsive` (narrow screens, touch, `PageToolbar`), `api-contract`, `foundations`, `anti-slop`, `checklist` |
+| `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `ux` (what goes on a screen: brief, data shape → layout, label economy, copy, friction), `choosing`, `components` (index), `composition` (screen assembly guide), `layouts`, `responsive` (narrow screens, touch, `PageToolbar`), `api-contract`, `foundations`, `anti-slop`, `checklist` |
+| `evals/prime-ui-kit/` | skill evals (skill-creator `evals.json`): prompts with checkable expectations for the UX bugs the skill must not repeat; `files/` holds the screens the «change an existing screen» cases start from. Not shipped |
 | `SKILL/patterns/` | composition patterns: one working screen per file (`<name>.tsx` + `<name>.module.css`, `export default function <Name>Pattern`); the one source for the skill and the playground «Композиция» pages |
 | `playground/composition/` | composition pages: `patterns.ts` (page text per pattern), `PatternPage.tsx`, `CompositionPage.tsx` (principles), `patternRegistry.ts` (glob loader) |
 | `src/test/patterns-contract.test.ts` | pattern canon, links from `SKILL/composition.md`, playground list, render smoke test |

@@ -15,6 +15,7 @@ is, and is shown live with its code in the playground (category «Компози
 | One record | [detail-page.tsx](patterns/detail-page.tsx) | Breadcrumb + status in the header, actions by weight, main column + side column of Cards, Timeline |
 | Settings | [settings-page.tsx](patterns/settings-page.tsx) | heading column + panel per section, form with its own save, Switches that apply at once, danger zone with a confirm |
 | Create in a side panel | [form-drawer.tsx](patterns/form-drawer.tsx) | Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
+| Record editor | [record-editor.tsx](patterns/record-editor.tsx) | a plan card edited on a page: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), selling points as one reorderable column, the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
 | Dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch, KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
 | Screen states | [screen-states.tsx](patterns/screen-states.tsx) | page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
 | Messenger | [chat.tsx](patterns/chat.tsx) | PageContent.Split of a `ChatList` (live last message, ticks, unread counts, «печатает…») and a `Chat`: `Chat.Header` with the back button, avatar, title, the status that turns into «печатает…» (`typing`) and the search button, `Chat.Search`, `Chat.Pinned`, `Chat.Messages` from `items` + a stable `renderMessage` (dates, runs, the unread band and service events from the data, history loaded above with `hasOlder` / `onLoadOlder`), every kind of Message (photos, file, contact, voice in a VoicePlayer with a transcript, round video), reactions, reply and edit from the menu through `Composer.Context value` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Chat.Root typing`), unread counts from `onNewMessage` and `onRead`, selection with `Chat.SelectionBar`, delivery ticks, the Composer in `Chat.Footer` |
@@ -168,6 +169,12 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 - Labels above every field (`label`), placeholder is an example value, help in `hint`, problems in
   `error` — after blur or on submit. Mark the minority (`required` or `optional`).
+- Records of one shape that a person adds, edits and removes are a `FieldList`: one row per record,
+  the column headings once above the rows, small attributes (an icon, a color) in `compact`
+  columns. Never a label in every row, never numbered labels, never one record split over lines.
+- One value in several units is one row of fields under one heading, each unit in its field's
+  `Input.InlineAffix`; a base value with overrides is one `FieldList` with the base pinned first.
+  The shape of the data decides the layout: [ux.md](ux.md#2-the-shape-of-the-data-decides-the-layout).
 - Fields 20 apart; related short fields side by side in an `auto-fit` grid with `align-items: start`
   (`reserveSupportRow` on Input / Textarea keeps neighbours aligned); groups 32 apart, each a
   `Fieldset label` (its `title-s` heading 16 above the fields, no frame); no dividers between groups.

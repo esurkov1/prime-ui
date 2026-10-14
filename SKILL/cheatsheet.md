@@ -39,6 +39,10 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A record card that saves each field: `<Input.Root onCommit={save}>` (save returns a Promise) — not hand-written blur / Enter / Escape handlers or a field disabled while saving.
 - Markdown text outside a chat (an announcement, a task description) is `<Textarea.Root formatting>`: the Composer's toolbar, hotkeys and subset (`**`, `_`, `~~`, `` ` ``, `||spoiler||`, links, `> `) — not a hand-made toolbar over a textarea. Turn it on only where the text is shown with its Markdown.
 - Copy or call next to a value: `Input.CopyButton`, `Input.Action` inside `Input.Wrapper` — not a Button beside the field; a password: `Input.RevealButton`.
+- Records of one shape a person adds and removes (invoice lines, contacts, specs, prices by period): `<FieldList columns={[{ label: "Услуга" }, { label: "Цена", width: "m" }]} value onValueChange getId createItem addLabel renderItem={(item, row) => <>…fields without label…</>} />` — the headings stand once, every field takes its column heading as its label; not a `.map()` of fields with a `label` in every row, not «Позиция 1», «Позиция 2».
+- Small attributes in a row of fields: an icon-only `Select` (`<Select.Trigger><Select.TriggerIcon>…</Select.TriggerIcon></Select.Trigger>`, no `Select.Value`) and a `ColorPresets` swatch in `width: "compact"` columns — not a full-width Select and a ColorField on a line of their own.
+- A base value with overrides (a price and its changes by month): one `FieldList`, the base as the first row pinned by `getLocked` — not a separate field above a list in another geometry.
+- One value in several units (a deposit in ₽, $, ฿): the fields side by side in one row under one heading, each unit in `Input.InlineAffix` — not a label per field, not the unit in the label and in the field.
 
 ## State
 
@@ -188,6 +192,19 @@ Full rules: [responsive.md](responsive.md).
 - Gaps are `gap` on the parent with `--prime-space-N` (N × 4px): 8 in a row of buttons, 16 tile → tile, 20 field → field, 32 group → group; `PageContent` already spaces blocks 24 and sections 40 — not margins, not outer padding.
 - Tokens only: `var(--prime-space-4)`, `var(--prime-color-text-secondary)`, `var(--prime-radius-m)` — never raw `px` / `rem` / hex, never `--prime-ref-*`, never inline `style`.
 - Text through `Typography` roles (`title-m`, `title-s`, `body-m`, `caption`) and `tone="secondary" | "muted"` — not `font-size` or `color` in CSS.
+
+## UX — what goes on the screen
+
+- Five lines of brief before the JSX: who and what for, the data and its shape, the main action, the states, the narrow screen ([ux.md](ux.md)) — not a layout picked by habit.
+- The shape of the data picks the layout: one record → a form or a `DescriptionList`; records a person edits → `FieldList`; records a person reads → `DataTable` ([the table](ux.md#2-the-shape-of-the-data-decides-the-layout)).
+- Every label carries something new: once per column, never numbered, never repeating its heading; no hint that explains what the layout shows (a lock already says «закреплено»).
+- Buttons say the verb and the object («Выставить счёт»), errors say how to fix it («Формат: +7 912 404-18-20»), empty states offer the next step — not «ОК», «Ошибка», «Нет данных».
+- Money, numbers and dates through `Intl` (`ru-RU`); «ёлочки», `…`, a non-breaking space before a unit — not `toFixed` and string glue.
+- Friction matches the cost: a reversible action at once with «Отменить» in a `Notification`; `ConfirmDialog` only for irreversible or weighty ones, naming the thing and the loss — not «Вы уверены?» on every delete.
+- A disabled control says why when the reason is not on screen; an action without permission is hidden.
+- Tabs, filters, search, page and the open record live in the URL.
+- Changing a screen that exists: audit it against [ux.md](ux.md), [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md) first, fix the shape, then make the change.
+- Before handing over, look at it in a browser: both themes, 1280 and 375 px, every text read aloud.
 
 ## Anti-slop
 

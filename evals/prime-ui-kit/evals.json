@@ -1,0 +1,83 @@
+{
+  "skill_name": "prime-ui-kit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Сделай на prime-ui-kit редактор характеристик тарифа: у каждой характеристики есть иконка, название параметра, значение и цвет иконки. Первые три характеристики (сотрудники, хранилище, поддержка) всегда первые, остальные можно перетаскивать, добавлять и удалять.",
+      "expected_output": "One FieldList: one row per spec with the headings once, an icon-only Select and a ColorPresets swatch in compact columns, the first three rows pinned by getLocked, the rest reorderable.",
+      "files": [],
+      "expectations": [
+        "The specs are a FieldList (or one grid row per record with the column headings rendered once), not a .map() of fields that each carry a label",
+        "The words «Иконка», «Параметр», «Значение» and «Цвет» appear as visible labels once each, not once per row",
+        "Each spec is one row: the icon and the color are compact controls (Select with only Select.TriggerIcon, ColorPresets) in the same row as the name and the value",
+        "The first three specs are pinned with getLocked (a lock in place of the handle) and the list is reorderable",
+        "No hint or paragraph explains that the first specs stay first",
+        "Every field in a row has an accessible name (the FieldList column heading or an aria-label)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Добавь в карточку тарифа блок «Преимущества»: список коротких текстов, порядок важен, можно добавлять и удалять.",
+      "expected_output": "A one-column FieldList, reorderable, with createItem and an addLabel; no numbered labels, no heading per row.",
+      "files": [],
+      "expectations": [
+        "The list is a FieldList with one column and reorderable",
+        "No label is numbered («Преимущество 1», «Пункт 2») and no field repeats the block heading as its visible label",
+        "The add button says what it adds («Добавить преимущество»)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Нужен блок цены тарифа: базовая цена в месяц и её изменения с определённого месяца (с 1 июля другая цена и т.д.), плюс разовая плата за подключение в рублях, долларах и евро.",
+      "expected_output": "The base price is the first, pinned row of the same FieldList as its changes; the setup fee is three fields in one row under one heading, the currency inside each field.",
+      "files": [],
+      "expectations": [
+        "The base price and its changes are one FieldList; the base row is pinned (getLocked) and comes first",
+        "The column headings of the price list appear once, not above every row",
+        "The currency or unit is shown once per field (Input.InlineAffix), not in the label as well",
+        "The three setup fees sit in one row under one group heading, each field named for assistive tech, not three labelled fields on their own lines"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Вот форма тарифа (evals/prime-ui-kit/files/plan-form.tsx). Добавь в неё поле «Пробный период, дней».",
+      "expected_output": "The agent audits the screen first and reports and fixes the shape bugs (labels per row, numbered labels, a split record, the explaining hint, the base price apart from its changes, three currency labels, the «ОК» button), then adds the field.",
+      "files": [
+        "evals/prime-ui-kit/files/plan-form.tsx"
+      ],
+      "expectations": [
+        "Before or with the change, the answer names the UX problems of the existing form (repeated labels, numbered labels, a record over two lines, an explaining hint, the deposit labels, a button without an object)",
+        "The specs become one row per record with the headings once (FieldList)",
+        "«Преимущество {n}» labels are gone",
+        "The submit button says the verb and the object («Сохранить тариф»), not «ОК»",
+        "The new field «Пробный период» has inputMode numeric and the unit «дней» in one place"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Сделай список счетов клиента с удалением строки. Удалённый счёт можно восстановить в течение нескольких секунд.",
+      "expected_output": "Delete at once and offer «Отменить» in a Notification (action, commit in onDismiss); no ConfirmDialog on each delete.",
+      "files": [],
+      "expectations": [
+        "Deleting a row removes it at once and shows a Notification with an «Отменить» action",
+        "The deletion is committed in onDismiss when the toast leaves without an undo",
+        "No ConfirmDialog or «Вы уверены?» opens for a single reversible delete",
+        "The empty state of the list offers the next step, not just «Нет данных»"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Сделай форму выставления счёта: клиент, дата, позиции (услуга, количество, цена), итог внизу. Счёт уходит клиенту по почте.",
+      "expected_output": "A brief first; line items as a FieldList; the total through Intl; sending the invoice is a weighty outward action with a ConfirmDialog naming the client and the amount; the primary button says «Выставить счёт».",
+      "files": [],
+      "expectations": [
+        "The answer starts with a short brief: the person, the data and its shape, the main action, the states, the narrow screen",
+        "The line items are a FieldList with the headings once and an add button «Добавить позицию»",
+        "The total is formatted with Intl.NumberFormat ru-RU currency RUB",
+        "The primary button names the action and the object («Выставить счёт»)",
+        "Sending asks for confirmation in a ConfirmDialog that names the client and the amount, not «Вы уверены?»",
+        "The date defaults to today"
+      ]
+    }
+  ]
+}

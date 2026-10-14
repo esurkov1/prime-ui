@@ -6,10 +6,12 @@ description: >
   navigation on prime-ui-kit; when
   choosing which kit component fits a task; when a needed component is missing and must be composed from
   the kit; when adding loading, empty and error states, feedback, motion or micro-animation to a screen;
-  and when reviewing a screen for design-system compliance (spacing rhythm, sizes, tokens, states,
-  motion, a11y, narrow screens). Triggers: build a screen, page, form, table, board, schedule, chat,
-  uploads, settings, dashboard, navigation; which component to use; animate, transition, loading state; prime-ui-kit; review a screen
-  against the design system — in any language.
+  when changing or redesigning a screen that exists; and when reviewing a screen for design-system and
+  UX compliance (data shape and layout, repeated or redundant labels, copy, friction, spacing rhythm,
+  sizes, tokens, states, motion, a11y, narrow screens). Triggers: build a screen, page, form, table,
+  board, schedule, chat, uploads, settings, dashboard, navigation; repeating fields, add another row;
+  which component to use; animate, transition, loading state; prime-ui-kit; improve, fix or review a
+  screen against the design system — in any language.
 ---
 
 # prime-ui-kit
@@ -24,25 +26,31 @@ region, `Skeleton` while it loads).
 
 0. **First** — [cheatsheet.md](cheatsheet.md): one page of the decisions agents most often get wrong,
    each as «do this, not that» with the exact API. Then follow the steps in order; each names its file.
-1. **The app frame, once per app** — [layouts.md](layouts.md): styles, theme, providers, `AppShell`
+   Changing a screen that exists: audit it first ([ux.md](ux.md#8-changing-a-screen-someone-built)),
+   then make the change.
+1. **Brief** — [ux.md](ux.md): five lines before any JSX (who and what for, the data and its shape,
+   the main action, the states, the narrow screen); the shape of the data decides the layout, every
+   label must carry something new, friction matches the cost of a mistake.
+2. **The app frame, once per app** — [layouts.md](layouts.md): styles, theme, providers, `AppShell`
    with `Sidebar` and `AppHeader`, page wrappers, auth screens. A screen you deliver renders only its page.
-2. **Choose** — [choosing.md](choosing.md): the category by task, then the component, then the pairs
+3. **Choose** — [choosing.md](choosing.md): the category by task, then the component, then the pairs
    that are easy to confuse.
-3. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
+4. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
    states, a11y, mistakes) and its `examples/`. Never guess a prop; copy structure from an example.
-4. **Compose the screen** — [composition.md](composition.md): start from the closest working screen in
+5. **Compose the screen** — [composition.md](composition.md): start from the closest working screen in
    [patterns/](patterns/) and keep its skeleton; rhythm, hierarchy, surfaces and type in
    [foundations.md](foundations.md).
-5. **Write the JSX** — [api-contract.md](api-contract.md): prop names, controlled state, events (async
+6. **Write the JSX** — [api-contract.md](api-contract.md): prop names, controlled state, events (async
    events return the request's Promise), forms and their submit flow (`Fieldset disabled`), uploads
    (`useUploadQueue`), destructive actions (`ConfirmDialog`), helpers (`groupMessages` for chat rows you build yourself),
    icon names.
-6. **States and motion** — [motion.md](motion.md): every region loads, empties and fails without
+7. **States and motion** — [motion.md](motion.md): every region loads, empties and fails without
    flipping; what the kit animates by itself and when to move your own elements.
-7. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page panel is
+8. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page panel is
    `PageToolbar`, nothing is hidden on phones, touch follows `(hover)` / `(pointer)`.
-8. **Check** — [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md). Fix every «no», then hand
-   over.
+9. **Check** — [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md), then look at the screen
+   in a browser: both themes, 1280 and 375 px ([ux.md](ux.md#9-look-at-it-before-handing-it-over)). Fix
+   every «no», then hand over.
 
 ## Where things are
 
@@ -63,6 +71,7 @@ project under `node_modules/prime-ui-kit/src/`.
 | File | Read when |
 |---|---|
 | [cheatsheet.md](cheatsheet.md) | first — the most frequent decisions and mistakes in one page |
+| [ux.md](ux.md) | before the layout of every screen and before changing one — the brief, data shape → layout, label economy, copy, friction, defaults, the visual check |
 | [layouts.md](layouts.md) | once per app — the app frame, page wrappers, auth screens |
 | [choosing.md](choosing.md) | unsure which component fits (Gantt / Timeline / Kanban / DataTable, Message / Composer, FileUpload list / grid / gallery / strip, ColorField / ColorPicker…); how to confirm a destructive action |
 | [components.md](components.md) | finding a component and its `COMPONENT.md` / `examples/` |
@@ -110,7 +119,8 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 5. Air is hierarchy: tighter inside a group, wider between groups, widest between sections — spacing via
    `gap` on the parent, never margins.
 6. One primary action per area. The rest are `soft`/`ghost`/`outline` with `tone="neutral"`.
-7. Labels above fields, always. Placeholder is an example value, never the label.
+7. Labels above fields, always — once per column for records in rows (`FieldList`), never numbered
+   («Пункт 1»), never repeating their heading. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
    the page title is `PageContent.Title`). No custom font sizes.
 9. Overlays (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select,

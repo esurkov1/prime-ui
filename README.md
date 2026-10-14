@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 79 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 80 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -201,6 +201,7 @@ accessibility, examples and common mistakes.
 | [**Label**](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) | Field label (native `<label>`) with required and optional markers. |
 | [**Hint**](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) | Help text or a validation error under a field. |
 | [**Fieldset**](https://github.com/esurkov1/prime-ui/blob/main/src/components/fieldset/COMPONENT.md) | A frameless group of form fields: a `title-s` legend, the form rhythm and one `disabled` for all of them. |
+| [**FieldList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/field-list/COMPONENT.md) | An editable list of records of one shape: one row of fields per record, the column headings once, add, remove, reorder and pinned rows. |
 
 ### Selection (`selection`)
 

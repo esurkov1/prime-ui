@@ -30,6 +30,7 @@ Type a value, and the field anatomy: label, hint, error.
 | Label | Field label (native `<label>`) with required and optional markers. | [COMPONENT.md](../src/components/label/COMPONENT.md) · [examples](../src/components/label/examples/) |
 | Hint | Help text or a validation error under a field. | [COMPONENT.md](../src/components/hint/COMPONENT.md) · [examples](../src/components/hint/examples/) |
 | Fieldset | A frameless group of form fields: a `title-s` legend, the form rhythm and one `disabled` for all of them. | [COMPONENT.md](../src/components/fieldset/COMPONENT.md) · [examples](../src/components/fieldset/examples/) |
+| FieldList | An editable list of records of one shape: one row of fields per record, the column headings once, add, remove, reorder, pinned rows. | [COMPONENT.md](../src/components/field-list/COMPONENT.md) · [examples](../src/components/field-list/examples/) |
 
 ## Selection (`selection`)
 

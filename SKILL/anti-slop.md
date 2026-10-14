@@ -107,6 +107,78 @@ and inside a card, in both themes: rest, hover and the neighbour must be three d
 
 A search field in a toolbar may go without a visible label, but then it needs `aria-label`.
 
+## 5a. A label in every row, a record split over lines
+
+The most common shape bug of generated forms: rules for one field applied to a list of records.
+
+```tsx partial
+// bad — «Иконка · Параметр · Значение · Цвет» repeated in every record, a record on two lines,
+// numbered labels, a hint that explains the lock
+{specs.map((spec, index) => (
+  <div key={spec.id} className={styles.grid}>
+    <Select.Root label="Иконка">…</Select.Root>
+    <Input.Root label={`Параметр ${index + 1}`}>…</Input.Root>
+    <Input.Root label="Значение">…</Input.Root>
+    <ColorField label="Цвет иконки" />
+  </div>
+))}
+<Typography variant="body-s">Первые три всегда первыми. Остальные можно перетаскивать.</Typography>
+
+// good — one row per record, the headings once, compact columns for the small attributes
+<FieldList
+  label="Характеристики"
+  columns={[
+    { label: "Иконка", width: "compact" },
+    { label: "Параметр" },
+    { label: "Значение" },
+    { label: "Цвет", width: "compact" },
+  ]}
+  reorderable
+  getLocked={(spec) => spec.pinned}
+  value={specs}
+  onValueChange={setSpecs}
+  getId={(spec) => spec.id}
+  getLabel={(spec) => spec.name}
+  createItem={newSpec}
+  addLabel="Добавить характеристику"
+  renderItem={(spec, row) => (
+    <>
+      <Select.Root value={spec.icon} onValueChange={(icon) => row.update({ icon })}>
+        <Select.Trigger>
+          <Select.TriggerIcon><Icon name={spec.icon} /></Select.TriggerIcon>
+        </Select.Trigger>
+        <Select.Content>…</Select.Content>
+      </Select.Root>
+      <Input.Root>…</Input.Root>
+      <Input.Root>…</Input.Root>
+      <ColorPresets.Root value={spec.color} onValueChange={…}>…</ColorPresets.Root>
+    </>
+  )}
+/>
+```
+
+The same for one value in several units — one heading, the fields in a row, the unit inside:
+
+```tsx partial
+// bad — three labels, the currency in the label and again in the field, one field on a line of its own
+<Input.Root label="Депозит, $" optional>…<Input.InlineAffix side="end">$</Input.InlineAffix>…</Input.Root>
+<Input.Root label="Депозит, ฿" optional>…</Input.Root>
+<Input.Root label="Депозит, ₽" optional>…</Input.Root>
+
+// good — a group heading, three fields in one row, each named for assistive tech
+<Fieldset label="Депозит">
+  <div className={styles.row}>
+    <Input.Root>
+      <Input.Wrapper>
+        <Input.Field aria-label="Депозит в долларах" inputMode="decimal" />
+        <Input.InlineAffix side="end">$</Input.InlineAffix>
+      </Input.Wrapper>
+    </Input.Root>
+    {/* ฿ and ₽ the same */}
+  </div>
+</Fieldset>
+```
+
 ## 6. Everything on one level of air
 
 ```css

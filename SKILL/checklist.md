@@ -8,6 +8,24 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] One `PageContent.Header` with title, one-line description and actions; blocks in `PageContent.Body`.
 - [ ] Cards only for standalone blocks; no card around a table, a single field or the whole page.
 
+## UX ([ux.md](ux.md))
+- [ ] I wrote the brief first: who and what for, the data and its shape, the main action, the states, the narrow screen.
+- [ ] Every entity is laid out by its shape: one record is one row or one block, never split over lines;
+      records a person edits are a `FieldList`, records a person reads a `DataTable`.
+- [ ] Labels on a form of rows ≤ columns + the list label: no label repeated per row, none numbered
+      («Пункт 1»), none repeating its heading; a unit in one place (the field's affix).
+- [ ] No text that explains the layout; every hint says what the person cannot see.
+- [ ] Buttons say the verb and the object; errors say how to fix it; empty states offer the next step.
+- [ ] Money, numbers and dates through `Intl` with `ru-RU`; «ёлочки», `…`, a non-breaking space before units.
+- [ ] Friction matches the cost: reversible → do it and offer «Отменить»; irreversible → `ConfirmDialog`
+      naming the thing and the loss; bulk → the count.
+- [ ] A disabled control says why when the reason is off screen; an action without permission is hidden.
+- [ ] Defaults prefill what the system knows; each field has the control and `inputMode` its data needs;
+      rare settings sit behind a disclosure.
+- [ ] Tabs, filters, search, page and the open record are in the URL.
+- [ ] I looked at the screen in a browser: both themes, 1280 and 375 px, the longest real values, an
+      empty list, an error on every field.
+
 ## Grid and spacing
 - [ ] Every spacing, size and gap in my CSS is a `--prime-space-*` (or another `--prime-*`) token on the 4px grid.
 - [ ] Spacing is `gap` on the parent; no margins on children; no outer padding duplicating `AppShell.Main` / `PageContent.Body`.

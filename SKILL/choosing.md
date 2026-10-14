@@ -8,7 +8,7 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | The user needs to… | Category |
 |---|---|
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
-| type a value (text, number, code, file, photos), group the fields of a form | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint, Fieldset |
+| type a value (text, number, code, file, photos), group the fields of a form, edit a list of records of one shape | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint, Fieldset, FieldList |
 | pick from options, toggle, set a range, filter, a date or a color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorField, ColorPicker, ColorSwatches |
 | see data: status labels, people, objects, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, Accordion, Sparkline, ChartFrame |
 | hold a conversation: pick a dialog, read and send chat messages of every kind | Messages — Chat, ChatList, Message, Gallery, VoicePlayer, VideoNote, Composer |
@@ -33,7 +33,8 @@ Input with `Input.InlineAffix`. Search and filters above a list or table → Sma
 (`fields={[]}`); a lone search
 field outside a list (a picker, a settings section, a panel) → Input with `Input.Icon` + `type="search"`
 and `aria-label`. Several fields of a form under one heading → Fieldset (`label`, `disabled` while the
-form saves).
+form saves). Several records of the same fields that a person adds, edits and removes (invoice lines,
+contacts, specs, prices by period) → FieldList: one row per record, the headings once.
 
 **Selection.**
 
@@ -141,6 +142,7 @@ collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user →
 | Pair | Rule |
 |---|---|
 | List / Sidebar / Tabs / Card list / DataTable | List: the records of a list + detail screen (dialogs, tickets, mail), one open at a time (`current`), each row a button or a link with a text line, a preview, meta and a count. Sidebar: the sections of the **app**. Tabs: panels of **one screen**. `Card.List` (`variant="list"`): static facts in a card, nothing opens. DataTable: many records compared by columns, sorted, filtered, selected in bulk. |
+| FieldList / DataTable / Fieldset / TagSelect | FieldList: records of one shape a person **edits** in a form, a row of fields each, added and removed by hand, up to four short fields per row. DataTable: records a person **reads**, sorts, filters and selects; edits open a Drawer. Fieldset: **one** record's fields under a heading. TagSelect: values **picked** from options, shown as tags. One value in several units is none of them — fields in one row under one heading. |
 | Tabs / SegmentedControl | Tabs switch **panels of content** (navigation inside a screen). SegmentedControl switches a **value or mode** of the same content (period, view mode, filter). |
 | Modal / Drawer / Sheet / Popover / Tooltip | Modal: blocking decision or a short form (≤ 4 fields) that needs full attention. Drawer: long form, filters, record details beside the page, while keeping page context. Sheet: a short task that ends by itself — a pick, an action, a short note — raised from the bottom edge. Popover: small non-modal panel anchored to a control (quick edit, explanation with a link). Tooltip: a few words naming or explaining a control, no interactive content. |
 | Select / NativeSelect | Select: the kit's floating list — icons, descriptions, groups, search, `multiple`, `clearable`. NativeSelect: a plain text list where the OS picker is better (phones) or the value must post with a form by `name`. |
