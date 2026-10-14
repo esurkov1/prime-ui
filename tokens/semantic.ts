@@ -679,6 +679,8 @@ export const semanticTokens = {
   mediaViewer: {
     pageGap: "{space.6}",
     inset: "{space.4}",
+    /** The widest the caption and the video control bar stand. */
+    barWidth: "40rem",
   },
 
   /**

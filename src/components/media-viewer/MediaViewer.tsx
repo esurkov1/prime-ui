@@ -8,14 +8,16 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { motionDurationMs, prefersReducedMotion, usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import pill from "@/internal/mediaPill.module.css";
 import { activeElement } from "@/internal/overlay/focus";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import { Portal } from "@/internal/Portal";
+import textRole from "@/internal/textRole.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./MediaViewer.module.css";
@@ -808,7 +810,13 @@ function ViewerSlide({
     "--viewer-box-height": `${box.height}px`,
   } as React.CSSProperties;
 
-  const caption = item.caption ? <p className={styles.caption}>{item.caption}</p> : null;
+  // The spinner and the error fade out as they leave; both stand in one cell, so they cross-fade.
+  const busy = usePresence(status === "loading" && !item.thumbnail, { exitDuration: "fast" });
+  const failed = usePresence(status === "error", { exitDuration: "fast" });
+
+  const caption = item.caption ? (
+    <p className={cx(textRole.bodyS, styles.caption)}>{item.caption}</p>
+  ) : null;
   const retry = () => {
     setStatus("loading");
     setCovered(false);
@@ -868,8 +876,13 @@ function ViewerSlide({
               }}
             />
           </div>
-          {status === "loading" && !item.thumbnail ? (
-            <div className={styles.center}>
+          {busy.mounted ? (
+            <div
+              className={cx(styles.center, styles.slot, enterMotion.enter)}
+              data-hidden={busy.state === "closed" || undefined}
+              aria-hidden={busy.state === "closed" || undefined}
+              onTransitionEnd={busy.onExitEnd}
+            >
               <Spinner size="xl" />
             </div>
           ) : null}
@@ -880,10 +893,16 @@ function ViewerSlide({
           ) : null}
         </>
       )}
-      {status === "error" ? (
-        <div className={cx(styles.center, styles.error)} data-viewer-chrome="">
+      {failed.mounted ? (
+        <div
+          className={cx(styles.center, styles.slot, styles.error, enterMotion.enterBase)}
+          data-viewer-chrome=""
+          data-hidden={failed.state === "closed" || undefined}
+          inert={failed.state === "closed"}
+          onTransitionEnd={failed.onExitEnd}
+        >
           <Icon name="object.image" />
-          <p className={styles.errorText}>{labels.loadError}</p>
+          <p className={cx(textRole.bodyS, styles.errorText)}>{labels.loadError}</p>
           <Button.Root variant="soft" tone="neutral" size="s" onClick={retry}>
             {labels.retry}
           </Button.Root>

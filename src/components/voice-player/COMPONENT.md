@@ -84,7 +84,7 @@ One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-s
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `unplayed` | an accent dot after the time; it leaves with a fade and scale | the recipient has not listened yet | |
+| `unplayed` | an accent dot after the time; it rises in with a fade and sinks out the same way | the recipient has not listened yet | |
 | `disabled` | muted disk, no played bars, disabled time | the recording cannot be played (deleted, expired) | |
 
 ## States

@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatClock } from "@/internal/formatClock";
@@ -75,6 +76,9 @@ function VideoNoteInner(props: VideoNoteProps) {
   // `idle` — the still first frame at the start; `playing` / `paused` — a playback.
   const [state, setState] = React.useState<PlaybackState>("idle");
   const [frame, setFrame] = React.useState<"loading" | "loaded" | "error">("loading");
+  // The skeleton stays under the first frame while the frame fades in over it (`base`), then goes:
+  // the circle never shows a blank between the two.
+  const placeholder = usePresence(frame === "loading", { exitDuration: "base" });
   const [metaDuration, setMetaDuration] = React.useState<number | null>(null);
   const [current, setCurrent] = React.useState(0);
   const stateRef = React.useRef(state);
@@ -218,7 +222,7 @@ function VideoNoteInner(props: VideoNoteProps) {
       >
         {/* The clip: one stable, always-composited round layer; nothing on it changes per frame. */}
         <span className={styles.media} aria-hidden="true">
-          {frame === "loading" ? <Skeleton shape="block" className={styles.fill} /> : null}
+          {placeholder.mounted ? <Skeleton shape="block" className={styles.fill} /> : null}
           {/* Own `<video>`, not `Thumbnail.Video`: the circle is its own play control and ring. */}
           {/* biome-ignore lint/a11y/useMediaCaption: a face-to-camera message; its words are the transcript */}
           <video

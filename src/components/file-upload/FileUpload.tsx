@@ -1275,14 +1275,14 @@ function FileUploadField({
             <Icon name="action.add" />
           </span>
           <span className={styles.addText}>
-            {full ? labels.full : empty ? labels.empty : labels.add}
+            <MorphText>{full ? labels.full : empty ? labels.empty : labels.add}</MorphText>
           </span>
           {countText !== null ? (
             <span className={styles.addHint}>
               <RollingNumber>{countText}</RollingNumber>
             </span>
           ) : empty ? (
-            <span className={styles.addHint}>{labels.emptyHint}</span>
+            <span className={cx(styles.addHint, enterMotion.enter)}>{labels.emptyHint}</span>
           ) : null}
         </label>
       </li>

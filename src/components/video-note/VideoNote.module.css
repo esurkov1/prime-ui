@@ -71,7 +71,9 @@
   border-radius: var(--prime-radius-full);
 }
 
+/* Positioned, so the frame fades in above the skeleton that holds the circle until it lands. */
 .video {
+  position: relative;
   display: block;
   inline-size: 100%;
   block-size: 100%;

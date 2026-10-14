@@ -342,6 +342,7 @@
   --prime-layout-sidebar-collapsed-width: var(--prime-ref-space-14);
   --prime-layout-sidebar-width: 15.5rem;
   --prime-media-disk-blur: var(--prime-ref-space-1);
+  --prime-media-viewer-bar-width: 40rem;
   --prime-media-viewer-inset: var(--prime-ref-space-4);
   --prime-media-viewer-page-gap: var(--prime-ref-space-6);
   --prime-message-card-width: 16rem;

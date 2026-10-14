@@ -370,8 +370,9 @@
   inset-block-start: 0;
 }
 
+/* A date or a service line is never wider than a bubble. */
 .pill {
-  max-inline-size: min(28rem, 100%);
+  max-inline-size: min(var(--prime-message-max-width), 100%);
   padding-block: var(--prime-space-1);
   padding-inline: var(--prime-space-3);
   border-radius: var(--prime-radius-full);

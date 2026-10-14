@@ -132,6 +132,11 @@ img.media[data-loaded] {
   pointer-events: none;
 }
 
+/* The spinner and the error share the middle cell: one fades out as the other comes in. */
+.slot {
+  grid-area: 1 / 1;
+}
+
 .error {
   --prime-icon-size: var(--prime-icon-xl);
 
@@ -143,8 +148,6 @@ img.media[data-loaded] {
 }
 
 .errorText {
-  composes: bodyS from "../../internal/textRole.module.css";
-
   margin: 0;
   color: var(--prime-color-media-shade-fg);
 }
@@ -252,9 +255,7 @@ img.media[data-loaded] {
 }
 
 .caption {
-  composes: bodyS from "../../internal/textRole.module.css";
-
-  max-inline-size: min(40rem, 100%);
+  max-inline-size: min(var(--prime-media-viewer-bar-width), 100%);
   margin: 0;
   padding: var(--prime-space-2) var(--prime-space-3);
   border-radius: var(--prime-radius-l);
@@ -274,7 +275,7 @@ img.media[data-loaded] {
   display: flex;
   align-items: center;
   gap: var(--prime-space-2);
-  inline-size: min(40rem, 100%);
+  inline-size: min(var(--prime-media-viewer-bar-width), 100%);
   padding: var(--prime-space-1);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-media-pill);

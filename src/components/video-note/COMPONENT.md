@@ -79,7 +79,7 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| loading | the first frame not drawn yet | `data-frame="loading"` on the circle: a Skeleton fills it, the video fades in (`base`) once loaded |
+| loading | the first frame not drawn yet | `data-frame="loading"` on the circle: a Skeleton fills it; once loaded the video fades in over it (`base`), then the Skeleton goes |
 | at rest | idle | `data-state="idle"` on the circle; the still first frame (or `poster`) with the play disk and the duration; nothing plays, loops or decodes past the metadata and the first frame — a long chat costs nothing until a press |
 | playing | the disk (or a press on the circle), `playing` / `defaultPlaying` | `data-playing="true"` on the root, `data-state="playing"`; sound from the start, the ring fills over the edge every frame (one CSS variable on the ring), the duration counts down, the disk's glyph turns to pause and the disk fades out (it stays while it has the keyboard focus); `onPlayingChange(true)`; any other sound pauses |
 | paused | the disk or the circle again, another sound starting, `playing={false}` | `data-state="paused"`, the disk with the play glyph comes back, the ring stays; `onPlayingChange(false)` |

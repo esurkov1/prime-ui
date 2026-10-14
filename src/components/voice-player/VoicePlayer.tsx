@@ -6,6 +6,7 @@ import { readCssLengthPx } from "@/hooks/usePosition";
 import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { MorphText } from "@/internal/MorphText";
@@ -429,7 +430,7 @@ export function VoicePlayer(props: VoicePlayerProps) {
             </span>
             {dot.mounted ? (
               <span
-                className={styles.dot}
+                className={cx(styles.dot, enterMotion.enter)}
                 data-state={dot.state}
                 onAnimationEnd={dot.onExitEnd}
                 aria-hidden="true"

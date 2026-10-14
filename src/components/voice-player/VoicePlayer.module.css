@@ -147,24 +147,17 @@
   block-size: calc(var(--prime-space-1) * 1.5);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-accent-default);
-  animation: vpDotIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
 }
 
+/* It comes in with the kit's part entrance (`enterMotion.enter`) and leaves the way it came. */
 .dot[data-state="closed"] {
   animation: vpDotOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
-}
-
-@keyframes vpDotIn {
-  from {
-    opacity: 0;
-    transform: scale(0.4);
-  }
 }
 
 @keyframes vpDotOut {
   to {
     opacity: 0;
-    transform: scale(0.4);
+    transform: translateY(var(--prime-space-1));
   }
 }
 

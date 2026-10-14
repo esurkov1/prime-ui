@@ -209,6 +209,38 @@ describe("VideoNote", () => {
     expect(circle).toHaveAttribute("data-frame", "loaded");
   });
 
+  it("keeps the skeleton under the first frame while it fades in, then removes it", () => {
+    // With motion: the reduced-motion default of the tests drops the placeholder at once.
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+    vi.useFakeTimers();
+    try {
+      const { container } = render(<VideoNote src={SRC} />);
+      const skeleton = () =>
+        container.querySelector(
+          '[data-message-outline] [aria-hidden="true"] > [aria-hidden="true"]',
+        );
+      expect(skeleton()).not.toBeNull();
+      fireEvent.loadedData(container.querySelector("video") as HTMLVideoElement);
+      expect(skeleton()).not.toBeNull();
+      act(() => vi.advanceTimersByTime(1000));
+      expect(skeleton()).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   describe("one sound at a time with voice messages", () => {
     beforeEach(() => {
       const paused = new WeakMap<HTMLMediaElement, boolean>();
