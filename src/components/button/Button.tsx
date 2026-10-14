@@ -56,7 +56,6 @@ type ButtonShapeProps =
     }
   | {
       shape: "circle";
-      /** A circle has no visible label: it is named here. */
       "aria-label": string;
     };
 

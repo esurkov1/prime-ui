@@ -100,8 +100,15 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
-### Card.Label · Card.Value · Card.Delta
-`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates), the value (tabular, sized by the template and the card width) and the change.
+### Card.Label · Card.Value
+`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates) and the value (tabular, sized by the template and the card width).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.Delta
+`ref` → `HTMLSpanElement`. The change of a metric beside its value.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -179,7 +186,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 | Key | Action |
 |---|---|
 | `Tab` | A card with `asChild` is one stop: focus lands on the whole link or button. |
-| `Enter` | Opens the link or presses the button of a card with `asChild`. |
+| `Enter` · `Space` | Opens the link (`Enter`) or presses the button (`Enter`, `Space`) of a card with `asChild`. |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

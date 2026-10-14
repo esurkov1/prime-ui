@@ -79,11 +79,11 @@ useSidebar()                       state hook for custom parts inside Root
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Sidebar.Root
-`forwardRef` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items.
+`ref` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; counters and row actions one tier down. The rail width does not change. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; coloured counts and row actions one tier down, plain counts keep the item size. The rail width does not change. |
 | `mode` | `"expanded" \| "compact" \| "hidden"` | — | Desktop mode (controlled): full rail, icon rail with tooltips and flyouts, or hidden. |
 | `defaultMode` | `"expanded" \| "compact" \| "hidden"` | `"expanded"` | Initial mode (uncontrolled). |
 | `onModeChange` | `(mode: SidebarMode) => void` | — | Called with the new mode (Toggle, `useSidebar().setMode`). |
@@ -103,7 +103,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.Brand
-`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.
+`ref` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -122,7 +122,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.Content
-`forwardRef` → `HTMLElement`. The scrolling middle: a `ScrollContainer` with edge fades and no scrollbar; rows scrolled into view stop clear of the fades.
+`ref` → `HTMLElement`. The scrolling middle: a `ScrollContainer` with edge fades and no scrollbar; rows scrolled into view stop clear of the fades.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -141,13 +141,15 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items, Subs), `className` and the other div attributes. |
 
 ### Sidebar.Item
-`forwardRef` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode. With `Sidebar.ItemAction` the element and the action sit side by side in a row `<div>`.
+`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode. With `Sidebar.ItemAction` the element and the action sit side by side in a row `<div>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `current` | `boolean` | `false` | Current page: `aria-current="page"`, `data-state="active"`; a muted fill and primary text and icon colour. |
 | `disabled` | `boolean` | `false` | Not interactive: `disabled` / `aria-disabled`, `data-disabled`; a link loses its `href`. |
 | `href` | `string` | — | Renders an `<a>` (with `target`, `rel`). |
+| `target` | `string` | — | Where the `<a>` opens (`href` only). |
+| `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
 | `children` | `ReactNode` | — | Label (also the compact tooltip) and parts: `Sidebar.ItemIcon` (before the label — leading, after it — trailing), `Sidebar.ItemCount`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
@@ -200,7 +202,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.SubTrigger
-`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. On the compact rail it opens the flyout (`aria-haspopup="dialog"`).
+`ref` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. On the compact rail it opens the flyout (`aria-haspopup="dialog"`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -215,7 +217,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items), `className` (on the list) and the other div attributes. |
 
 ### Sidebar.Account
-`forwardRef` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line and a ↕ chevron. A button, so it is a `Dropdown.Trigger` child; in compact mode only the avatar stays, with the name as a tooltip.
+`ref` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line and a ↕ chevron. A button, so it is a `Dropdown.Trigger` child; in compact mode only the avatar stays, with the name as a tooltip.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -224,7 +226,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">` | — | `onClick`, `aria-*`, `className` and the other button attributes. |
 
 ### Sidebar.Toggle
-`forwardRef` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.
+`ref` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -355,7 +357,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - A row action is its own button next to the item (never nested), named by `label` with a tooltip.
 - The account avatar is hidden from screen readers; the name and the muted line name the button.
 - Off-canvas: scrim, focus trap and Escape; the scrim is a button labelled `labels.close`.
-- Toggle: `aria-expanded`, `aria-controls` → nav, label from `labels`.
+- Toggle: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

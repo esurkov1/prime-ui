@@ -20,7 +20,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier: the cell is a square on its own scale, two steps above the control heights (36 · 40 · 48 · 56 · 64); label and hint follow the field tier. Without it the tier of its host (LoginForm, a panel), else `m`.",
-          ru: "Ярус: ячейка — квадрат своей шкалы, на две ступени крупнее контролов (36 · 40 · 48 · 56 · 64); подпись и подсказка — по ярусу поля.",
+          ru: "Ярус: ячейка — квадрат своей шкалы, на две ступени крупнее контролов (36 · 40 · 48 · 56 · 64); подпись и подсказка — по ярусу поля. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "label",
@@ -56,7 +56,7 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           en: "Danger ring and danger digits on every cell, `aria-invalid`. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо и цифры, `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо и цифры, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "success",
@@ -134,13 +134,13 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring on the cells (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: "`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются.",
+          ru: '`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "id",
           type: "string",
           en: "Id of the first cell (the label points at it); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id первой ячейки (на неё указывает подпись); иначе генерируется.",
+          ru: "Id первой ячейки (на неё указывает подпись); иначе генерируется. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-describedby",

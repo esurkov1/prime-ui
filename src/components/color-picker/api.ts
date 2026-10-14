@@ -1,4 +1,6 @@
 import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BUTTON_LABELS } from "../button/Button";
+import { COLOR_SWATCHES_LABELS } from "../color-swatches/ColorSwatches";
 import { COLOR_PICKER_LABELS } from "./ColorPicker";
 import { COLOR_PRESETS_LABELS } from "./ColorPresets";
 
@@ -7,7 +9,7 @@ const focusRing: ApiProp = {
   type: "boolean",
   default: "true",
   en: '`false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay.',
-  ru: "`false` скрывает только кольцо фокуса полей; фокус, клавиатура и ARIA остаются.",
+  ru: '`false` скрывает только кольцо фокуса полей; фокус, клавиатура и ARIA остаются. Атрибут — `data-focus-ring="false"`.',
 };
 
 const disabled: ApiProp = {
@@ -22,7 +24,7 @@ export const api: ComponentApi = {
     {
       name: "ColorPicker.Root",
       en: "No DOM. Holds the color (React Aria `ColorPicker`) and the value format for every part inside.",
-      ru: "Без DOM. Держит цвет и формат значений для всех частей внутри.",
+      ru: "Без DOM. Держит цвет (React Aria `ColorPicker`) и формат значений для всех частей внутри.",
       props: [
         {
           name: "value",
@@ -76,6 +78,12 @@ export const api: ComponentApi = {
           en: "`none` — layout only (inside a Popover or Card). `raised` — a standalone floating panel: raised background, panel radius and padding, overlay shadow.",
           ru: "`none` — только раскладка; `raised` — самостоятельная панель с фоном, радиусом и тенью.",
         },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (the parts), `className` and the other div attributes.",
+          ru: "`children` (части), `className` и остальные атрибуты div.",
+        },
       ],
     },
     {
@@ -106,7 +114,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Field tier. Without it the tier of its host (a panel, a popover), else `m`.",
-          ru: "Ярус поля.",
+          ru: "Ярус поля. Без него — ярус хоста, иначе `m`.",
         },
         focusRing,
         {
@@ -234,7 +242,7 @@ export const api: ComponentApi = {
     {
       name: "ColorPicker.Swatches",
       en: "`ref` → `HTMLDivElement` (the ColorSwatches field frame). The kit `ColorSwatches` bound to the picker color: a pick sets the color, editing the color moves the selection. Takes every ColorSwatches prop except the value ones, `allowEmpty` and `name`.",
-      ru: "`ColorSwatches`, связанный с цветом пикера: выбор меняет цвет, правка цвета двигает выбор.",
+      ru: "`ColorSwatches`, связанный с цветом пикера: выбор меняет цвет, правка цвета двигает выбор. Принимает все пропсы ColorSwatches, кроме пропсов значения, `allowEmpty` и `name`.",
       props: [
         {
           name: "presets",
@@ -244,10 +252,16 @@ export const api: ComponentApi = {
           ru: "Образцы `{ value, label }`; label — имя образца.",
         },
         {
+          name: "label · hint · error · invalid · required · optional · disabled · size · id · labels · aria-label · aria-labelledby · aria-describedby",
+          type: "ColorSwatchesProps",
+          en: "As on `ColorSwatches`.",
+          ru: "Как у `ColorSwatches`.",
+        },
+        {
           name: "…rest",
           type: 'Omit<ColorSwatchesProps, "value" | "defaultValue" | "onValueChange" | "allowEmpty" | "name">',
-          en: "`label`, `size`, `aria-label`, `disabled`…",
-          ru: "`label`, `size`, `aria-label`, `disabled`…",
+          en: "`className` and the other attributes of the field frame.",
+          ru: "`className` и остальные атрибуты рамки поля.",
         },
       ],
     },
@@ -263,10 +277,16 @@ export const api: ComponentApi = {
           ru: "Своё содержимое; по умолчанию иконка пипетки.",
         },
         {
+          name: "asChild · fullWidth · holdToConfirm · onConfirm · labels · loading · pressed · progress · shape",
+          type: "ButtonRootProps",
+          en: "As on `Button.Root`.",
+          ru: "Как у `Button.Root`.",
+        },
+        {
           name: "…rest",
           type: 'Omit<ButtonRootProps, "variant" | "tone" | "size" | "aria-label">',
-          en: "The other Button props.",
-          ru: "Остальные пропсы Button.",
+          en: "`onClick`, `className` and the other button attributes.",
+          ru: "`onClick`, `className` и остальные атрибуты кнопки.",
         },
       ],
     },
@@ -331,7 +351,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`.",
-          ru: "Ярус триггера, образцов и панели.",
+          ru: "Ярус триггера, образцов и панели. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "disabled",
@@ -360,12 +380,19 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "`ColorPresets.Trigger` and `ColorPresets.Content`.",
+          ru: "`ColorPresets.Trigger` и `ColorPresets.Content`.",
+        },
       ],
     },
     {
       name: "ColorPresets.Trigger",
       en: "No DOM: clones the single child into the panel's trigger, merges `ref` and `onClick` (toggles), names it «`labels.trigger`: <color name>», sets `disabled` from the root and opens the panel on ArrowDown / ArrowUp. The child's own `aria-label`, `disabled` and handlers win.",
-      ru: "Без DOM: клонирует дочерний элемент в триггер панели, называет его «`labels.trigger`: <цвет>», берёт `disabled` от корня, ArrowDown / ArrowUp открывают панель. Собственные `aria-label`, `disabled` и обработчики элемента главнее.",
+      ru: "Без DOM: клонирует дочерний элемент в триггер панели, объединяет `ref` и `onClick` (переключает), называет его «`labels.trigger`: <цвет>», берёт `disabled` от корня, ArrowDown / ArrowUp открывают панель. Собственные `aria-label`, `disabled` и обработчики элемента главнее.",
       props: [
         {
           name: "children",
@@ -472,6 +499,30 @@ export const api: ComponentApi = {
         part: "ColorPresets.Root",
       },
     }),
+    ...labelRows(COLOR_SWATCHES_LABELS, {
+      group: {
+        en: "Name of the swatch group without a visible `label` and `aria-label`.",
+        ru: "Имя группы образцов без видимой `label` и `aria-label`.",
+        part: "ColorPicker.Swatches",
+      },
+      empty: {
+        en: "Name of the «no color» swatch (never shown here: the picker has no `allowEmpty`).",
+        ru: "Имя образца «без цвета» (здесь не показывается: у пикера нет `allowEmpty`).",
+        part: "ColorPicker.Swatches",
+      },
+      optional: {
+        en: "Marker after the label when `optional`.",
+        ru: "Пометка после подписи при `optional`.",
+        part: "ColorPicker.Swatches",
+      },
+    }),
+    ...labelRows(BUTTON_LABELS, {
+      holdHint: {
+        en: "Description of the button with `holdToConfirm`.",
+        ru: "Описание кнопки с `holdToConfirm`.",
+        part: "ColorPicker.EyeDropperButton",
+      },
+    }),
   ],
   accessibility: {
     keyboard: [
@@ -512,7 +563,7 @@ export const api: ComponentApi = {
         ru: 'Область и ползунки — примитивы React Aria со своими именами `role="slider"`.',
       },
       {
-        en: "`TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (ColorPresets.Trigger names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).",
+        en: "`TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (`ColorPresets.Trigger` names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).",
         ru: "`TriggerSwatch` и `ColorPresets.Swatch` скрыты (`aria-hidden`) — дайте кнопке-триггеру `aria-label`; `ColorPresets.Trigger` называет свой элемент «`labels.trigger`: <цвет>», если у него нет своего `aria-label`.",
       },
       {

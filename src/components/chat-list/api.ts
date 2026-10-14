@@ -194,7 +194,19 @@ export const api: ComponentApi = {
           name: "href",
           type: "string",
           en: "Renders an `<a>` instead of a `<button>` (a dialog with its own URL).",
-          ru: "Делает строку ссылкой `<a>` (у диалога свой адрес).",
+          ru: "Делает строку ссылкой `<a>` вместо `<button>` (у диалога свой адрес).",
+        },
+        {
+          name: "target",
+          type: "string",
+          en: "Where the `<a>` opens (`href` only).",
+          ru: "Где открывается `<a>` (только с `href`).",
+        },
+        {
+          name: "rel",
+          type: "string",
+          en: "Relationship of the `<a>` (`href` only).",
+          ru: "Отношение ссылки `<a>` (только с `href`).",
         },
         {
           name: "children",
@@ -394,11 +406,11 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, or a link with `href`.",
-        ru: "Список — `<ul>` с именем «Диалоги» (`labels.list`); каждая строка — `<li>` с кнопкой или ссылкой.",
+        ru: "Список — `<ul>` с именем «Диалоги» (`labels.list`); каждая строка — `<li>` с кнопкой или ссылкой при `href`.",
       },
       {
         en: 'The open dialog is `aria-current="true"` on a button, `"page"` on a link. Selection does not follow the focus: arrows only move it (a dialog may load a conversation); Enter, Space and a click open.',
-        ru: 'Открытый диалог — `aria-current="true"` на кнопке, `aria-current="page"` на ссылке. Выбор не следует за фокусом: стрелки только переводят фокус, открывают Enter, Space и клик.',
+        ru: 'Открытый диалог — `aria-current="true"` на кнопке, `"page"` на ссылке. Выбор не следует за фокусом: стрелки только переводят фокус, открывают Enter, Space и клик.',
       },
       {
         en: "The row is named by its content: the name, glyphs with a `label` («Без звука», a verified mark), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.",
@@ -406,7 +418,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While the other side types, the preview is `aria-hidden` and «печатает…» is read; a draft reads «Черновик: …».",
-        ru: "Пока собеседник печатает, превью скрыто от скринридера, читается «печатает…».",
+        ru: "Пока собеседник печатает, превью — `aria-hidden`, читается «печатает…»; черновик читается «Черновик: …».",
       },
       {
         en: 'A row with a menu has `aria-keyshortcuts="Shift+F10"`; the menu is a `Dropdown` (`menu` / `menuitem`).',

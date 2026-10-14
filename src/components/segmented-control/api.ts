@@ -43,7 +43,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`.",
-          ru: "Ярус; внешняя высота равна высоте контрола 28 · 32 · 36 · 40 · 48.",
+          ru: "Ярус; внешняя высота равна высоте контрола 28 · 32 · 36 · 40 · 48. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "fullWidth",

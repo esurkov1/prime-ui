@@ -135,9 +135,22 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Card.Label · Card.Value · Card.Delta",
-      en: "`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates), the value (tabular, sized by the template and the card width) and the change.",
-      ru: "Текст метрики: подпись (body-s, обрезается), значение (табличные цифры, размер по шаблону и ширине карточки) и изменение.",
+      name: "Card.Label · Card.Value",
+      en: "`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates) and the value (tabular, sized by the template and the card width).",
+      ru: "Текст метрики: подпись (body-s, обрезается) и значение (табличные цифры, размер по шаблону и ширине карточки).",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLElement>",
+          en: "`children`, `className` and the other attributes of the element.",
+          ru: "`children`, `className` и остальные атрибуты элемента.",
+        },
+      ],
+    },
+    {
+      name: "Card.Delta",
+      en: "`ref` → `HTMLSpanElement`. The change of a metric beside its value.",
+      ru: "Изменение метрики рядом со значением.",
       props: [
         {
           name: "tone",
@@ -190,9 +203,10 @@ export const api: ComponentApi = {
         ru: "Карточка с `asChild` — одна остановка: фокус на ссылке или кнопке целиком.",
       },
       {
-        keys: "Enter",
-        en: "Opens the link or presses the button of a card with `asChild`.",
-        ru: "Открывает ссылку или нажимает кнопку карточки с `asChild`.",
+        keys: "Enter · Space",
+        en: "Opens the link (`Enter`) or presses the button (`Enter`, `Space`) of a card with `asChild`.",
+        ru: "Открывает ссылку (`Enter`) или нажимает кнопку (`Enter`, `Space`) карточки с `asChild`.",
+        native: true,
       },
     ],
     aria: [

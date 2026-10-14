@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "Badge.Root",
       en: "`ref` → `HTMLSpanElement`. The chip: fill, tier dimensions; a read-only badge is one `<span>`, `onPress` makes the body a `<button>`, `onRemove` adds a remove segment.",
-      ru: "Чип: заливка и размеры яруса; без действий — один `<span>`, `onPress` делает тело кнопкой, `onRemove` добавляет сегмент удаления.",
+      ru: "Чип: заливка и размеры яруса; без действий — один `<span>`, `onPress` делает тело `<button>`, `onRemove` добавляет сегмент удаления.",
       props: [
         {
           name: "color",
@@ -45,7 +45,7 @@ export const api: ComponentApi = {
           name: "onPress",
           type: "(event: MouseEvent<HTMLButtonElement>) => void",
           en: "Makes the body a `<button>` covering the whole badge (a toggle chip, a filter value); gets the event, so Alt / Shift clicks can mean more.",
-          ru: "Делает тело кнопкой во весь бейдж (переключатель, значение фильтра); получает событие, так что Alt / Shift могут значить другое.",
+          ru: "Делает тело `<button>` во весь бейдж (переключатель, значение фильтра); получает событие, так что Alt / Shift могут значить другое.",
         },
         {
           name: "pressed",
@@ -58,6 +58,12 @@ export const api: ComponentApi = {
           type: "boolean",
           en: "Muted look for every variant, `aria-disabled`; the body button, remove and action get native `disabled`.",
           ru: "Приглушённый вид в любом варианте, `aria-disabled`; кнопки внутри получают `disabled`.",
+        },
+        {
+          name: "className",
+          type: "string",
+          en: "Class on the badge.",
+          ru: "Класс на бейдже.",
         },
         {
           name: "labels",
@@ -74,8 +80,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLSpanElement>",
-          en: "`className`, `aria-label` (icon-only) and the other span attributes.",
-          ru: "`className`, `aria-label` (для бейджа-иконки) и остальные атрибуты span.",
+          en: "`aria-label` (icon-only) and the other span attributes.",
+          ru: "`aria-label` (для бейджа-иконки) и остальные атрибуты span.",
         },
       ],
     },
@@ -92,30 +98,42 @@ export const api: ComponentApi = {
           ru: "Иконка (`Icon`).",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the icon box.",
+          ru: "Класс на блоке иконки.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
-          en: "`className` and the other span attributes.",
-          ru: "`className` и остальные атрибуты span.",
+          en: "The other span attributes.",
+          ru: "Остальные атрибуты span.",
         },
       ],
     },
     {
       name: "Badge.Dot",
       en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier and the color set on it.",
-      ru: "Точка цвета текста, `aria-hidden`; у края становится сегментом. Отдельно (метка на иконке, перед подписью) берёт ярус контейнера и заданный на ней цвет.",
+      ru: "Точка `<span>` цвета текста, `aria-hidden`; у края становится сегментом. Отдельно (метка на иконке, перед подписью) берёт ярус контейнера и заданный на ней цвет.",
       props: [
+        {
+          name: "className",
+          type: "string",
+          en: "Class on the dot.",
+          ru: "Класс на точке.",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLSpanElement>",
-          en: "`className` and the other span attributes.",
-          ru: "`className` и остальные атрибуты span.",
+          en: "The other span attributes.",
+          ru: "Остальные атрибуты span.",
         },
       ],
     },
     {
       name: "Badge.Action",
       en: "`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus (always shown on touch); the width never changes. One per badge, not together with `onRemove`.",
-      ru: "Кнопка-сегмент в конце, появляется при наведении и фокусе, на сенсорных экранах видна всегда; место зарезервировано, ширина не меняется. Одна на бейдж, не вместе с `onRemove`.",
+      ru: "Сегмент `<button>` в конце, появляется при наведении и фокусе, на сенсорных экранах видна всегда; место зарезервировано, ширина не меняется. Одна на бейдж, не вместе с `onRemove`.",
       props: [
         {
           name: "label",
@@ -204,7 +222,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While a removal is saved the badge has `aria-busy` and the segment `aria-disabled`; once a removal waits, the badge mounts a polite live region that speaks `labels.removeFailed` if the promise rejects.",
-        ru: "Пока удаление сохраняется (промис из `onRemove` или `loading`), у бейджа `aria-busy`, у сегмента `aria-disabled`; отказ объявляет вежливая live-область бейджа (`labels.removeFailed`).",
+        ru: "Пока удаление сохраняется, у бейджа `aria-busy`, у сегмента `aria-disabled`; когда удаление ждёт, бейдж ставит вежливую live-область, которая объявит `labels.removeFailed`, если промис отклонён.",
       },
       {
         en: "`Badge.Dot` is `aria-hidden`; icon-only badges need `aria-label`. Color never carries meaning alone.",

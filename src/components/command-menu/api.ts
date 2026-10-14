@@ -142,14 +142,21 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Title · CommandMenu.Description",
-      en: "`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.",
-      ru: "Видимый заголовок и описание над поиском; дают диалогу имя и описание.",
-      props: [],
+      en: "`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog.",
+      ru: "`<h2>` / `<p>` над строкой поиска; дают диалогу имя и описание.",
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "id">',
+          en: "`children`, `className` and the other attributes except `id`.",
+          ru: "`children`, `className` и остальные атрибуты, кроме `id`.",
+        },
+      ],
     },
     {
       name: "CommandMenu.Input",
-      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list, showing `CommandMenu.Root` `search`; takes focus on open. + native input props except `value` / `defaultValue`.',
-      ru: 'Строка поиска: иконка и поле `role="combobox"`, управляющее списком, с запросом из `CommandMenu.Root`; получает фокус при открытии.',
+      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list, showing `CommandMenu.Root` `search`; takes focus on open.',
+      ru: 'Строка поиска: иконка и `<input role="combobox">`, управляющее списком, с `search` из `CommandMenu.Root`; получает фокус при открытии.',
       props: [
         {
           name: "placeholder",
@@ -158,18 +165,31 @@ export const api: ComponentApi = {
           en: "Placeholder; also the default accessible name comes from `labels.search`.",
           ru: "Плейсхолдер; имя поля по умолчанию — `labels.search`.",
         },
+        {
+          name: "…rest",
+          type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type" | "role" | "value" | "defaultValue">',
+          en: "`className` and the other input attributes except `value` / `defaultValue`.",
+          ru: "`className` и остальные атрибуты input, кроме `value` / `defaultValue`.",
+        },
       ],
     },
     {
       name: "CommandMenu.List",
-      en: '`ref` → `HTMLElement`. The scrolling `role="listbox"` under the search row; draws the load states of Root: skeleton rows, more rows loading at the end, the error with a retry. + native props.',
-      ru: 'Прокручиваемый список результатов `role="listbox"`; рисует состояния загрузки: строки-скелеты, догрузку в конце, ошибку с повтором.',
-      props: [],
+      en: '`ref` → `HTMLElement`. The scrolling `role="listbox"` under the search row; draws the load states of Root: skeleton rows, more rows loading at the end, the error with a retry.',
+      ru: 'Прокручиваемый `role="listbox"` под строкой поиска; рисует состояния загрузки Root: строки-скелеты, догрузку в конце, ошибку с повтором.',
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "role" | "id">',
+          en: "`children`, `className` and the other attributes.",
+          ru: "`children`, `className` и остальные атрибуты.",
+        },
+      ],
     },
     {
       name: "CommandMenu.Group",
-      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.',
-      ru: "Раздел пунктов с подписью; скрывается, если ни один пункт не подходит.",
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match.',
+      ru: '`<div role="group">` с именем из `label`; скрывается, если ни один пункт не подходит.',
       props: [
         {
           name: "label",
@@ -177,12 +197,18 @@ export const api: ComponentApi = {
           en: "Heading of the group (caption, muted); also its accessible name.",
           ru: "Подпись раздела (caption, приглушённая) и его доступное имя.",
         },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "role">',
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
       ],
     },
     {
       name: "CommandMenu.Item",
-      en: '`ref` → `HTMLButtonElement`. `<button role="option">`; the active item has `aria-selected` and the highlight fill. + native button props.',
-      ru: 'Пункт `role="option"`; активный выделен заливкой и `aria-selected`.',
+      en: '`ref` → `HTMLButtonElement`. `<button role="option">`; the active item has `aria-selected` and the highlight fill.',
+      ru: '`<button role="option">`; активный выделен заливкой и `aria-selected`.',
       props: [
         {
           name: "value",
@@ -217,18 +243,51 @@ export const api: ComponentApi = {
           en: "Shown whatever the query and never counted as a match (`CommandMenu.Empty` still shows); the arrows reach it after the matches. One «create from the query» item at the end of the list.",
           ru: "Виден при любом запросе и не считается совпадением (`CommandMenu.Empty` всё равно показывается); стрелки доходят до него после совпадений. Один пункт «Создать из запроса» в конце списка.",
         },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "role" | "id" | "onSelect">',
+          en: "`children`, `className` and the other button attributes.",
+          ru: "`children`, `className` и остальные атрибуты кнопки.",
+        },
       ],
     },
     {
-      name: "CommandMenu.ItemIcon · CommandMenu.ItemShortcut",
-      en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.",
-      ru: "Иконка в начале пункта (`aria-hidden`) / подсказка клавиш (`Kbd`) в конце пункта — подсказка, не обработчик.",
-      props: [],
+      name: "CommandMenu.ItemIcon",
+      en: "`ref` → `HTMLSpanElement`. The `aria-hidden` leading glyph of the item.",
+      ru: "Ведущая иконка пункта (`aria-hidden`).",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the `Icon`), `className` and the other span attributes.",
+          ru: "`children` (`Icon`), `className` и остальные атрибуты span.",
+        },
+      ],
+    },
+    {
+      name: "CommandMenu.ItemShortcut",
+      en: "`ref` → `HTMLElement` (the `<kbd>`). A `Kbd` key hint at the end of the item — a hint, not a handler.",
+      ru: "Подсказка клавиш `Kbd` в конце пункта — подсказка, не обработчик.",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "The keys («⌘K»).",
+          ru: "Клавиши («⌘K»).",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "children">',
+          en: "`className` and the other attributes.",
+          ru: "`className` и остальные атрибуты.",
+        },
+      ],
     },
     {
       name: "CommandMenu.ItemText",
-      en: "`ref` → `HTMLSpanElement`. A `<span>` column: the title with an ellipsis and an optional description line. + native `<span>` props.",
-      ru: "Текст пункта: заголовок с многоточием и необязательная строка описания.",
+      en: "`ref` → `HTMLSpanElement`. A `<span>` column: the title with an ellipsis and an optional description line.",
+      ru: "Колонка `<span>`: заголовок с многоточием и необязательная строка описания.",
       props: [
         {
           name: "description",
@@ -236,25 +295,57 @@ export const api: ComponentApi = {
           en: "Second line (path, details): caption, muted.",
           ru: "Вторая строка (путь, детали): caption, приглушённая.",
         },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the title), `className` and the other span attributes.",
+          ru: "`children` (заголовок), `className` и остальные атрибуты span.",
+        },
       ],
     },
     {
       name: "CommandMenu.Empty",
       en: '`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty` and `labels.emptyHint`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.',
       ru: 'Компактный EmptyPage (`role="status"`), пока ничего не найдено и не грузится: `labels.empty` и `labels.emptyHint`, только текст. Действие для запроса — `persistent` `CommandMenu.Item` в конце списка.',
-      props: [],
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "role" | "children">',
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
-      name: "CommandMenu.Footer · CommandMenu.FooterHint",
-      en: "`ref` → `HTMLDivElement` / `HTMLSpanElement`. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.",
-      ru: "Нижняя строка подсказок / одна подсказка: каждая клавиша в своём Kbd и подпись.",
+      name: "CommandMenu.Footer",
+      en: "`ref` → `HTMLDivElement`. A bottom row of `CommandMenu.FooterHint`s with a hairline above.",
+      ru: "Нижняя строка из `CommandMenu.FooterHint` с тонкой линией сверху.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "CommandMenu.FooterHint",
+      en: "`ref` → `HTMLSpanElement`. One hint: every entry of `keys` in its own `Kbd`, then the label (`children`).",
+      ru: "Одна подсказка: каждая клавиша из `keys` в своём `Kbd`, затем подпись (`children`).",
       props: [
         {
           name: "keys",
           type: "ReactNode[]",
           required: true,
-          en: "FooterHint: the keys (text or icons).",
-          ru: "FooterHint: клавиши (текст или иконки).",
+          en: "The keys (text or icons).",
+          ru: "Клавиши (текст или иконки).",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the label), `className` and the other span attributes.",
+          ru: "`children` (подпись), `className` и остальные атрибуты span.",
         },
       ],
     },
@@ -262,15 +353,15 @@ export const api: ComponentApi = {
   labels: labelRows(COMMAND_MENU_LABELS, {
     search: {
       en: "Default placeholder and accessible name of `CommandMenu.Input`.",
-      ru: "Плейсхолдер и имя поля поиска по умолчанию.",
+      ru: "Плейсхолдер и имя `CommandMenu.Input` по умолчанию.",
     },
     empty: {
       en: "`CommandMenu.Empty`: nothing matches the query.",
-      ru: "Пустой результат: по запросу ничего нет.",
+      ru: "`CommandMenu.Empty`: по запросу ничего нет.",
     },
     emptyHint: {
       en: 'Second line of `CommandMenu.Empty`; `""` hides it.',
-      ru: "Вторая строка пустого результата; пустая строка скрывает её.",
+      ru: 'Вторая строка `CommandMenu.Empty`; `""` скрывает её.',
     },
     loading: {
       en: "Announced while `loading` or `loadingMore`.",

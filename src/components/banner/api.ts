@@ -104,7 +104,7 @@ export const api: ComponentApi = {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
           en: "`children` (Buttons in the banner `size`), `className` and the other div attributes.",
-          ru: "`children` (Button размера баннера), `className` и остальные атрибуты div.",
+          ru: "`children` (Button в `size` баннера), `className` и остальные атрибуты div.",
         },
       ],
     },
@@ -131,7 +131,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The close button is named by `labels.dismiss`. It leaves with the banner, so after dismissing the parent moves focus to a sensible place: the control that takes the banner's spot, or the next heading or action of the section (see `dismissible.tsx`).",
-        ru: "Кнопка закрытия названа `labels.dismiss` и уходит вместе с баннером: после закрытия родитель переводит фокус в разумное место — на элемент, занявший место баннера, или на следующий заголовок или действие раздела.",
+        ru: "Кнопка закрытия названа `labels.dismiss` и уходит вместе с баннером: после закрытия родитель переводит фокус в разумное место — на элемент, занявший место баннера, или на следующий заголовок или действие раздела (см. `dismissible.tsx`).",
       },
     ],
   },

@@ -81,7 +81,7 @@ export const api: ComponentApi = {
       props: [
         {
           name: "…rest",
-          type: 'Omit<DividerProps, "orientation" | "children">',
+          type: 'Omit<DividerProps, "orientation" | "children" | "align" | "size">',
           en: "`className` and the other div attributes.",
           ru: "`className` и остальные атрибуты div.",
         },
@@ -89,8 +89,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Tools",
-      en: "`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, wherever it is written.",
-      ru: "Инструменты страницы в шапке (`PageToolbar.Root`): вторая строка шапки во всю ширину под строкой заголовка, где бы она ни была написана.",
+      en: "`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, as a direct child of `AppHeader.Root`.",
+      ru: "Инструменты страницы в шапке (`PageToolbar.Root`): вторая строка шапки во всю ширину под строкой заголовка, прямой потомок `AppHeader.Root`.",
       props: [
         {
           name: "…rest",

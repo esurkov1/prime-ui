@@ -51,6 +51,8 @@ BottomNav.Root                 <nav>, safe-area inset below
 | `current` | `boolean` | `false` | Current section: `aria-current="page"`; the icon and the label turn primary (the others are muted); floating, the item is in the accent on the selection capsule (the others in full ink). |
 | `disabled` | `boolean` | `false` | Not interactive: `disabled` / `aria-disabled`, `data-disabled`, out of the Tab order; an `href` link loses its `href`, an `asChild` child keeps its own and only its clicks are blocked. |
 | `href` | `string` | — | Renders an `<a>` (with `target`, `rel`). |
+| `target` | `string` | — | Where the `<a>` opens (`href` only). |
+| `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
 | `children` | `ReactNode` | — | `BottomNav.ItemIcon`, an optional `BottomNav.ItemCount` and a short label (one word). |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |

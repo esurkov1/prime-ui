@@ -67,14 +67,14 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо, `aria-invalid`, `data-invalid`.",
+          ru: "Ошибка без текста: красное кольцо, `aria-invalid`, `data-invalid`. Непустой `error` включает его.",
         },
         {
           name: "focusRing",
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: "`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются.",
+          ru: '`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "counter",
@@ -93,7 +93,7 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+          ru: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "strength",

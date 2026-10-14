@@ -37,7 +37,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`.",
-          ru: "Ярус кружков, текста, подписи и подсказки.",
+          ru: "Ярус кружков, текста, подписи и подсказки. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "label",
@@ -76,7 +76,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger ring on the unchecked circles and `aria-invalid` on the group and the inputs. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо у невыбранных кружков, `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо у невыбранных кружков, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",

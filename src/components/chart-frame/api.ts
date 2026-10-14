@@ -308,15 +308,15 @@ export const api: ComponentApi = {
       },
       {
         en: "A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.",
-        ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
+        ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан; список легенды назван `labels.legend`. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
       },
       {
         en: "`ChartFrame.Table` is a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.",
-        ru: "`ChartFrame.Table` — визуально скрытая таблица с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд.",
+        ru: "`ChartFrame.Table` — визуально скрытая таблица с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд, значения через `formatValue`.",
       },
       {
         en: "A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.",
-        ru: "`ChartFrame.Tooltip` с `point` скрыт от вспомогательных технологий и пассивен (без фокуса, `Escape` прячет его до следующей точки): он повторяет то, что озвучивает сам график.",
+        ru: "`ChartFrame.Tooltip` с `point` — `aria-hidden` и пассивен (без фокуса и нажатий; `Escape` прячет его до следующей точки): он повторяет то, что озвучивает сам график, — дайте фокусируемому графику `aria-valuetext`, как ползунку в примере с подсказкой.",
       },
       {
         en: 'The empty state is `role="status"`, the error `role="alert"` with the retry button.',
@@ -324,7 +324,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The drawing is the library's: hide a decorative SVG (`aria-hidden`) when `ChartFrame.Table` carries the data; marks you make focusable need their own `aria-label`.",
-        ru: "Сам рисунок графика — забота библиотеки: скрывайте декоративный SVG (`aria-hidden`), когда данные есть в `ChartFrame.Table`.",
+        ru: "Сам рисунок графика — забота библиотеки: скрывайте декоративный SVG (`aria-hidden`), когда данные есть в `ChartFrame.Table`; фокусируемым меткам нужен свой `aria-label`.",
       },
     ],
   },

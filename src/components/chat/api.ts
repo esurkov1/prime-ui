@@ -544,7 +544,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The list is `role="log"`: new messages are announced politely; its name is `Chat.Title` (`aria-labelledby`), else `labels.messages`, or your `aria-label`. It is one tab stop; the messages carry `aria-posinset` / `aria-setsize`, so the keyboard reaches rows the window does not render. In selection mode it is a `listbox` with `aria-multiselectable`, the messages `option`s with `aria-selected`.',
-        ru: 'Лента — `role="log"`: новые сообщения вежливо объявляются; её имя — `Chat.Title` (`aria-labelledby`), без заголовка — `labels.messages`. В режиме выбора — `listbox` с `aria-multiselectable`, сообщения — `option` с `aria-selected`.',
+        ru: 'Лента — `role="log"`: новые сообщения вежливо объявляются; её имя — `Chat.Title` (`aria-labelledby`), без заголовка — `labels.messages` или ваш `aria-label`. Это одна остановка Tab; сообщения несут `aria-posinset` / `aria-setsize`, поэтому клавиатура доходит до строк вне окна отрисовки. В режиме выбора — `listbox` с `aria-multiselectable`, сообщения — `option` с `aria-selected`.',
       },
       {
         en: "`Chat.SearchButton` is a toggle (`aria-pressed`); the search field takes the focus as it opens and keeps it while the chat steps through matches; the place of the match («2 из 5», «Нет совпадений») is announced politely.",
@@ -556,7 +556,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The «к последним» button is named «К последним сообщениям», with the count «Новых сообщений: N. …»; the badge is `aria-hidden`.",
-        ru: "Кнопка «К последним сообщениям» со счётчиком «Новых сообщений: N»; значок счётчика скрыт от скринридеров.",
+        ru: "Кнопка «к последним» называется «К последним сообщениям», со счётчиком «Новых сообщений: N. …»; значок — `aria-hidden`.",
       },
       {
         en: "`Chat.SelectionBar` is a `toolbar` named by the count «Выбрано: N», which is announced politely as it changes.",
@@ -564,6 +564,10 @@ export const api: ComponentApi = {
       },
       {
         en: "The quick reaction (double tap, `L`) is announced politely.",
+        ru: "Быстрая реакция (двойное касание, `L`) объявляется вежливо.",
+      },
+      {
+        en: "One sound at a time on the page: a voice message, a video note and a chat video pause each other.",
         ru: "На странице звучит одно: голосовое, видеосообщение или видео из чата ставят друг друга на паузу.",
       },
       {
@@ -572,7 +576,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While `loading` the messages' region is `aria-busy`, the placeholders are `aria-hidden`, and «Загрузка сообщений» (`labels.loading`) is announced politely.",
-        ru: "Первая загрузка (`loading`): область ленты — `aria-busy`, заглушки скрыты от скринридеров, «Загрузка сообщений» (`labels.loading`) объявляется вежливо.",
+        ru: "Первая загрузка (`loading`): область ленты — `aria-busy`, заглушки — `aria-hidden`, «Загрузка сообщений» (`labels.loading`) объявляется вежливо.",
       },
       {
         en: "A message reached by a jump or the current search match is not announced as such: a reply's target takes the focus, a search keeps it in its field; the others stepping back is visual only.",

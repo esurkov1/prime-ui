@@ -75,7 +75,19 @@ export const api: ComponentApi = {
           name: "href",
           type: "string",
           en: "Renders an `<a>` instead of a `<button>`; dropped while `disabled`.",
-          ru: "Делает строку ссылкой `<a>`; при `disabled` убирается.",
+          ru: "Делает строку ссылкой `<a>` вместо `<button>`; при `disabled` убирается.",
+        },
+        {
+          name: "target",
+          type: "string",
+          en: "Where the `<a>` opens (`href` only).",
+          ru: "Где открывается `<a>` (только с `href`).",
+        },
+        {
+          name: "rel",
+          type: "string",
+          en: "Relationship of the `<a>` (`href` only).",
+          ru: "Отношение ссылки `<a>` (только с `href`).",
         },
         {
           name: "asChild",

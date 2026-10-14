@@ -1,9 +1,0 @@
-[
-  "src/layout/sidebar/api.ts: Sidebar.Account",
-  "src/layout/sidebar/api.ts: Sidebar.Brand",
-  "src/layout/sidebar/api.ts: Sidebar.Content",
-  "src/layout/sidebar/api.ts: Sidebar.Item",
-  "src/layout/sidebar/api.ts: Sidebar.Root",
-  "src/layout/sidebar/api.ts: Sidebar.SubTrigger",
-  "src/layout/sidebar/api.ts: Sidebar.Toggle"
-]

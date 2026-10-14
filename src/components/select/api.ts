@@ -200,7 +200,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "true",
           en: '`false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring.',
-          ru: "`false` скрывает кольцо фокуса, но не фокус и не кольцо ошибки.",
+          ru: '`false` скрывает кольцо фокуса, но не фокус и не кольцо ошибки. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "id",

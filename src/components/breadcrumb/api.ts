@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "Breadcrumb.Root",
       en: "`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.",
-      ru: "`<nav>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и сворачивает средние уровни в узком контейнере.",
+      ru: "`<nav aria-label>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и сворачивает средние уровни в узком контейнере.",
       props: [
         {
           name: "size",
@@ -105,7 +105,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "`nav` landmark with `aria-label` from `labels.nav`; an ordered list.",
-        ru: "Область `nav` с `aria-label` из `labels.nav` и упорядоченный список `<ol>`.",
+        ru: "Область `nav` с `aria-label` из `labels.nav` и упорядоченный список.",
       },
       {
         en: 'The current page has `aria-current="page"`; the chevrons are `aria-hidden` spans inside the levels, so every list item is a level.',
@@ -113,7 +113,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» reads as `labels.ellipsis`.",
-        ru: "При 3+ уровнях в контейнере уже 30rem средние уровни получают `display: none` — уходят из раскладки, порядка Tab и дерева доступности; на их месте «…», скрытый текст которого (`labels.ellipsis`) читается скринридером.",
+        ru: "Свёрнутые средние уровни уходят из раскладки и порядка Tab (без невидимых остановок фокуса); автоматическое «…» читается как `labels.ellipsis`.",
       },
       {
         en: "Icon-only links need `aria-label` on the Item.",

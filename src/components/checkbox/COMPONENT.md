@@ -61,6 +61,10 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 ### Checkbox.Label
 `ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.
 
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
+
 ### Checkbox.Indicator
 `ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.
 

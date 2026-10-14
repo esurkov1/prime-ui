@@ -38,7 +38,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`.",
-          ru: "Ярус дорожки (24×16 … 44×24), текста и отступа.",
+          ru: "Ярус дорожки (24×16 … 44×24), текста и отступа. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "hint",
@@ -57,7 +57,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger ring on the off track and `aria-invalid`. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо у выключенной дорожки, `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо у выключенной дорожки, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",
@@ -77,7 +77,7 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the input (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id input; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+          ru: "Id input; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-describedby",

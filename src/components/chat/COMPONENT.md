@@ -290,6 +290,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 - The «к последним» button is named «К последним сообщениям», with the count «Новых сообщений: N. …»; the badge is `aria-hidden`.
 - `Chat.SelectionBar` is a `toolbar` named by the count «Выбрано: N», which is announced politely as it changes.
 - The quick reaction (double tap, `L`) is announced politely.
+- One sound at a time on the page: a voice message, a video note and a chat video pause each other.
 - «Печатает…» in the header is visible text; in the list the typing bubble is a polite `status` «Собеседник печатает».
 - While `loading` the messages' region is `aria-busy`, the placeholders are `aria-hidden`, and «Загрузка сообщений» (`labels.loading`) is announced politely.
 - A message reached by a jump or the current search match is not announced as such: a reply's target takes the focus, a search keeps it in its field; the others stepping back is visual only.

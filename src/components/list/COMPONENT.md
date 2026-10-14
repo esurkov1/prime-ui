@@ -59,6 +59,8 @@ List.Root                   <ul aria-label>; size → row tier (ControlSizeProvi
 | `current` | `boolean` | `false` | The open record: the selected fill and `aria-current` — `"true"` on a button, `"page"` on a link. |
 | `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | Opens the record; not called while `disabled`. |
 | `href` | `string` | — | Renders an `<a>` instead of a `<button>`; dropped while `disabled`. |
+| `target` | `string` | — | Where the `<a>` opens (`href` only). |
+| `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | Renders the single child (a router link) as the row; its children are the content. |
 | `disabled` | `boolean` | `false` | Muted and out of the Tab order: a disabled button, or `aria-disabled` and no navigation on a link. |
 | `children` | `ReactNode` | — | `List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`; loose text becomes the text line. |

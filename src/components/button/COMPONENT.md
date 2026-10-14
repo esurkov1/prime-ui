@@ -61,7 +61,8 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Native button type; not forwarded with `asChild`. |
 | `disabled` | `boolean` | — | Disabled state; `loading` also disables. |
 | `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → a square icon-only button that needs `aria-label`. A changed label morphs letter by letter. |
-| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | `onClick`, `className`, `aria-*`, `data-*` and the other button attributes. |
+| `aria-label` | `string` | — | The name of a button without a visible label; required with `shape="circle"`. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size" \| "aria-pressed">` | — | `onClick`, `className`, `aria-*`, `data-*` and the other button attributes. |
 
 ### Button.Icon
 `ref` → `HTMLSpanElement`. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
@@ -69,7 +70,8 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`). |
-| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
+| `className` | `string` | — | Class on the icon box. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
 ## Variants
 

@@ -65,7 +65,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the track thickness T (thumb 4.5T × 3T), the label, the value and the hint. Without it the tier of its host (a form, a panel), else `m`.",
-          ru: "Ярус толщины дорожки T (ползунок 4.5T × 3T), подписи и значения.",
+          ru: "Ярус толщины дорожки T (ползунок 4.5T × 3T), подписи и значения. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "tone",
@@ -121,7 +121,7 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           en: "`aria-invalid` on the range input and a danger focus ring on the thumb. A non-empty `error` implies it.",
-          ru: "`aria-invalid` на input и красное кольцо фокуса у ползунка.",
+          ru: "`aria-invalid` на input и красное кольцо фокуса у ползунка. Непустой `error` включает его.",
         },
         {
           name: "showValue",
@@ -140,7 +140,7 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the range input (generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id input; иначе генерируется.",
+          ru: "Id input; иначе генерируется. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-label",

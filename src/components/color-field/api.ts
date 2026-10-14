@@ -82,7 +82,7 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           en: "Danger ring and `aria-invalid` without a message. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо и `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо и `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",
@@ -96,7 +96,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring (`data-focus-ring="false"`); focus, keyboard and ARIA are unchanged.',
-          ru: "`false` прячет только видимое кольцо фокуса; фокус, клавиатура и ARIA не меняются.",
+          ru: '`false` прячет только видимое кольцо фокуса; фокус, клавиатура и ARIA не меняются. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "name",
@@ -108,13 +108,13 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the field button; hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id кнопки поля; иначе генерируется.",
+          ru: "Id кнопки поля; иначе генерируется. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-label",
           type: "string",
           en: "Accessible name without a visible `label`; the current hex is appended.",
-          ru: "Имя без видимой подписи; к нему добавляется текущий hex.",
+          ru: "Имя без видимой `label`; к нему добавляется текущий hex.",
         },
         {
           name: "aria-labelledby",
@@ -155,7 +155,7 @@ export const api: ComponentApi = {
     lightness: { en: "Lightness cell.", ru: "Ячейка яркости." },
     alpha: {
       en: "Opacity slider (`alpha`) and the opacity cell.",
-      ru: "Ползунок и ячейка непрозрачности.",
+      ru: "Ползунок непрозрачности (`alpha`) и ячейка непрозрачности.",
     },
     red: { en: "Red cell.", ru: "Ячейка красного." },
     green: { en: "Green cell.", ru: "Ячейка зелёного." },

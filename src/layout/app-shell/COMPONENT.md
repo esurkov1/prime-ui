@@ -71,6 +71,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `fillViewport` | `boolean` | `false` | As on `AppShell.Root`: only `<main>` scrolls. |
 | `nav` | `ReactNode` | — | Navigation column content; without it the panel takes the full width. |
 | `header` | `ReactNode` | — | The top bar of the panel, an `AppHeader.Root`; no header when omitted. |
 | `footer` | `ReactNode` | — | Footer content (`BottomNav`); no footer when omitted. |
@@ -132,7 +133,7 @@ No keyboard interaction.
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - Main is the `<main>` landmark; the banner comes from AppHeader (`<header>`), the navigation landmarks from Sidebar and BottomNav (`<nav>`).
-- Give the page one `<h1>` (PageContent.Title).
+- One `<h1>` per page: `AppHeader.Title` on app pages, `PageContent.Title` on a document page (whose header then has no title).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
