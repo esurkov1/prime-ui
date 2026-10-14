@@ -229,8 +229,8 @@ export const api: ComponentApi = {
           name: "kind",
           type: '"list" | "detail"',
           required: true,
-          en: "`list` — the 16–20rem column, or the whole split while closed; going back lands on its control that had focus. `detail` — the rest, or the whole split while open; focus lands here when it opens. While nothing is chosen the detail shows a hint («Выберите обращение»).",
-          ru: "`list` — колонка 16–20rem или весь сплит, пока детали закрыты; при возврате фокус встаёт на её элемент, где был. `detail` — остальное или весь сплит, пока открыты; при открытии фокус попадает сюда. Пока ничего не выбрано, детали показывают подсказку («Выберите обращение»).",
+          en: "`list` — the 16–20rem column, or the whole split while closed; going back refocuses its last control. `detail` — the rest, or the whole split while open; focus lands here when it opens.",
+          ru: "`list` — колонка 16–20rem или весь сплит, пока детали закрыты; при возврате фокус — на её последний элемент. `detail` — остальное или весь сплит, пока открыты; при открытии фокус здесь.",
         },
         {
           name: "…rest",

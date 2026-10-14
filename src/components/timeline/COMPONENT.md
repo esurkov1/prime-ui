@@ -59,7 +59,7 @@ Timeline.Root                    size container, sets the tier
 | `…rest` | `Omit<OlHTMLAttributes<HTMLOListElement>, "children">` | — | The other ol attributes. |
 
 ### Timeline.Item
-`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot); an interactive row gives under the press and has the touch row height.
+`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot); an interactive row gives under the press.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

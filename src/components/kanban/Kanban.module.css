@@ -88,18 +88,9 @@
 }
 
 @container (width < 40rem) {
-  .scroller {
-    scroll-snap-type: x mandatory;
-  }
-
   .column {
     inline-size: 85cqi;
   }
-}
-
-/* Snapping would pull the strip back while a drag auto-scrolls it. */
-:global(html[data-dnd-active]) .scroller {
-  scroll-snap-type: none;
 }
 
 /*
@@ -115,10 +106,8 @@
   padding-block-end: var(--prime-space-3);
   /* The title starts where the card text does: the inset plus the card padding. */
   padding-inline: calc(var(--kanban-inset) + var(--prime-space-3)) var(--kanban-inset);
-  /* The faint inset hairline under the header (as in a dialog header), as wide as the cards. */
-  background:
-    linear-gradient(var(--prime-color-border-faint), var(--prime-color-border-faint)) center bottom
-    / calc(100% - 2 * var(--kanban-inset)) var(--prime-border-width) no-repeat;
+  /* The faint inset hairline under the header (`hairline.bottom`), as wide as the cards. */
+  --hairline-inset: var(--kanban-inset);
 }
 
 .header[data-reorderable] {
@@ -129,22 +118,13 @@
   grid-column: 4;
 }
 
-/* While the column's move is saved, a spinner stands in the grip's box (DataTable's handle cell). */
-.gripSpinner {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: var(--prime-control-xs-height);
-  block-size: var(--prime-control-xs-height);
-  color: var(--prime-color-text-muted);
-}
-
-/* A column whose move is being saved: its heading quiets down until the answer, both ways eased. */
-.header > :not(.gripSpinner) {
+/* A column whose move is being saved (Dnd marks it): its heading quiets down until the answer,
+   both ways eased; the busy grip stays clear. */
+.header > :not(.grip) {
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.column[data-pending] .header > :not(.gripSpinner) {
+.column[data-pending] .header > :not(.grip) {
   opacity: var(--prime-opacity-busy);
 }
 
@@ -236,13 +216,6 @@
   list-style: none;
 }
 
-/* An empty column: Dnd's empty state, the text and a hint inside the dashed drop slot Dnd draws at
-   the top of the drop area; Dnd steps it out of the flow and fades it once a card's gap opens. */
-.empty {
-  padding-block: var(--prime-space-6);
-  pointer-events: none;
-}
-
 /* The card. Its look is on its own class: the carried clone is portalled out of the column. */
 .item {
   position: relative;
@@ -286,7 +259,7 @@
 }
 
 /*
- * A card that opens (`onItemClick`, `getItemHref`) keeps the grab cursor while it drags; on a
+ * A card that opens (`onItemOpen`, `getItemHref`) keeps the grab cursor while it drags; on a
  * read-only board it shows the pointer.
  */
 .item[data-clickable][data-disabled] {
@@ -315,33 +288,6 @@
 .item:has(> .itemLink:focus-visible) {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
-}
-
-/* Zero specificity: a control's own `position` / `z-index` always wins. */
-:where(.item[data-link])
-  :where(
-    a[href]:not(.itemLink),
-    button,
-    input,
-    select,
-    textarea,
-    label,
-    summary,
-    [tabindex]:not([tabindex="-1"]),
-    [role="button"],
-    [role="link"],
-    [role="checkbox"],
-    [role="switch"],
-    [role="menuitem"],
-    [role="option"],
-    [role="tab"],
-    [role="slider"],
-    [role="combobox"],
-    [role="textbox"],
-    [data-row-click-ignore]
-  ) {
-  position: relative;
-  z-index: var(--prime-z-above);
 }
 
 /*
@@ -384,9 +330,6 @@
   letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
-  background:
-    linear-gradient(var(--prime-color-border-faint), var(--prime-color-border-faint)) center bottom
-    / 100% var(--prime-border-width) no-repeat;
 }
 
 .itemHeader > * {

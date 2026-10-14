@@ -1,4 +1,4 @@
-/** Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onSelect`, `readOnly`. */
+/** Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `readOnly`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Avatar, Gantt, type GanttBar, type GanttDates, Typography } from "prime-ui-kit";
 import * as React from "react";
@@ -138,7 +138,7 @@ export default function GanttOccupancyExample() {
       )}
       onBarChange={moveBar}
       onBarCreate={addBar}
-      onSelect={(bar, person) => setSelected(`${bar.label} · ${person.name}`)}
+      onItemOpen={(bar, person) => setSelected(`${bar.label} · ${person.name}`)}
       toolbar={
         <Typography as="span" variant="body-s" tone="muted">
           {selected ?? "Выберите задачу, чтобы открыть карточку"}

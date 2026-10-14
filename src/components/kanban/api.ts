@@ -95,10 +95,17 @@ export const api: ComponentApi = {
           ru: "Карточка — ссылка: настоящий `<a>` с именем из `getLabel` накрывает её и служит остановкой Tab — клик, ⌘/Ctrl-клик, средняя кнопка, новая вкладка. Нажатие по-прежнему тащит карточку; перетаскивание не ведёт по ссылке.",
         },
         {
-          name: "onItemClick",
-          type: "(item: T, event: KanbanItemClickEvent) => void",
+          name: "onItemOpen",
+          type: "(item: T, event: KanbanItemOpenEvent) => void",
           en: "Opens a card in place (a Drawer): a click, Enter or Space; never from a control inside it or after a drag. With `getItemHref` it gets plain clicks: `event.preventDefault()` routes in the app.",
           ru: "Открывает карточку на месте (Drawer): клик, Enter или Space; не от контрола внутри и не после перетаскивания. С `getItemHref` получает обычные клики: `event.preventDefault()` — переход роутером.",
+        },
+        {
+          name: "columnTitleAs",
+          type: '"h2" | "h3" | "h4"',
+          default: '"h3"',
+          en: "Heading level of the column titles in the page outline; the look does not change.",
+          ru: "Уровень заголовков колонок в структуре страницы; вид не меняется.",
         },
         {
           name: "renderColumnActions",
@@ -136,8 +143,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Read-only board: no drag, no keyboard moves, no column grips; `onItemClick` and `getItemHref` still open cards.",
-          ru: "Доска только для чтения: без перетаскивания, переноса с клавиатуры и ручек колонок; `onItemClick` и `getItemHref` по-прежнему открывают карточки.",
+          en: "Read-only board: no drag, no keyboard moves, no column grips; `onItemOpen` and `getItemHref` still open cards.",
+          ru: "Доска только для чтения: без перетаскивания, переноса с клавиатуры и ручек колонок; `onItemOpen` и `getItemHref` по-прежнему открывают карточки.",
         },
         {
           name: "labels",
@@ -168,8 +175,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "id">',
-          en: "`children` (the card parts), `className` and the other attributes; `onClick` / `onKeyDown` run before `onItemClick` opens the card — `preventDefault()` keeps it closed.",
-          ru: "`children` (части карточки), `className` и остальные атрибуты; `onClick` / `onKeyDown` выполняются раньше, чем `onItemClick` открывает карточку, — `preventDefault()` оставляет её закрытой.",
+          en: "`children` (the card parts), `className` and the other attributes; `onClick` / `onKeyDown` run before `onItemOpen` opens the card — `preventDefault()` keeps it closed.",
+          ru: "`children` (части карточки), `className` и остальные атрибуты; `onClick` / `onKeyDown` выполняются раньше, чем `onItemOpen` открывает карточку, — `preventDefault()` оставляет её закрытой.",
         },
       ],
     },
@@ -280,8 +287,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Enter · Space",
-        en: "Opens the focused card (`onItemClick`) or follows its link (`getItemHref`).",
-        ru: "Открывает карточку в фокусе (`onItemClick`) или переходит по её ссылке (`getItemHref`).",
+        en: "Opens the focused card (`onItemOpen`) or follows its link (`getItemHref`).",
+        ru: "Открывает карточку в фокусе (`onItemOpen`) или переходит по её ссылке (`getItemHref`).",
       },
       {
         keys: "Alt + ↑ · Alt + ↓",
@@ -317,8 +324,8 @@ export const api: ComponentApi = {
         ru: "Счётчик колонки озвучивается текстом («Карточек: 3 из 5»), а не только цветом; полная колонка ещё и показывает `count / limit`.",
       },
       {
-        en: "With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemClick` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.",
-        ru: "С `getItemHref` карточку накрывает настоящая ссылка `<a>` с именем из `getLabel` — она и остановка Tab; Alt + стрелки с неё переносят карточку, нажатие тащит её, а отпускание после перетаскивания не переходит по ссылке. Клик, ⌘/Ctrl-клик, средний клик и «открыть в новой вкладке» работают по всей карточке, Space переходит по ссылке как Enter; контролы внутри карточки стоят над ссылкой. С одним `onItemClick` карточка открывается кликом, Enter или Space; контрол внутри её не открывает, а открываемая карточка остаётся остановкой Tab на доске с `disabled`.",
+        en: "With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemOpen` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.",
+        ru: "С `getItemHref` карточку накрывает настоящая ссылка `<a>` с именем из `getLabel` — она и остановка Tab; Alt + стрелки с неё переносят карточку, нажатие тащит её, а отпускание после перетаскивания не переходит по ссылке. Клик, ⌘/Ctrl-клик, средний клик и «открыть в новой вкладке» работают по всей карточке, Space переходит по ссылке как Enter; контролы внутри карточки стоят над ссылкой. С одним `onItemOpen` карточка открывается кликом, Enter или Space; контрол внутри её не открывает, а открываемая карточка остаётся остановкой Tab на доске с `disabled`.",
       },
       {
         en: "Touch: a drag starts after a hold; a finger that moves first scrolls the board.",
@@ -329,8 +336,8 @@ export const api: ComponentApi = {
         ru: "Пока идёт загрузка, у доски `aria-busy`; скелетоны скрыты от чтения с экрана.",
       },
       {
-        en: "While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).",
-        ru: "Пока перенос сохраняется, у карточки или колонки `aria-busy` (её спиннер скрыт от вспомогательных технологий); отказ объявляется (`labels.moveFailed`, `labels.columnMoveFailed`).",
+        en: "While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech, a column's busy grip says so itself); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).",
+        ru: "Пока перенос сохраняется, у карточки или колонки `aria-busy` (её спиннер скрыт от вспомогательных технологий, занятая ручка колонки сообщает о себе сама); отказ объявляется (`labels.moveFailed`, `labels.columnMoveFailed`).",
       },
     ],
   },

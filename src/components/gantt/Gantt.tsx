@@ -128,7 +128,7 @@ export const GANTT_LABELS: GanttLabels = {
 
 export type GanttProps<Row, Bar extends GanttBar = GanttBar> = Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  "children" | "onSelect"
+  "children"
 > & {
   /** The outer surface `<div>`; `aria-label` / `aria-labelledby` name the grid inside. */
   ref?: React.Ref<HTMLDivElement>;
@@ -182,8 +182,7 @@ export type GanttProps<Row, Bar extends GanttBar = GanttBar> = Omit<
   toolbar?: React.ReactNode;
   /** Max height of the scroll viewport in px; `"fill"` — the chart takes its parent's height. */
   scrollHeight?: number | "fill";
-  /** A bar was activated (click, Enter, Space): open its record. */
-  onSelect?: (bar: Bar, row: Row) => void;
+  onItemOpen?: (bar: Bar, row: Row) => void;
   /**
    * New dates of a bar after a drag or an editing key, in whole scale units. Update your data with
    * them. A returned Promise keeps the bar at the new dates and busy until it settles; on reject it
@@ -282,7 +281,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   empty,
   toolbar,
   scrollHeight,
-  onSelect,
+  onItemOpen,
   onBarChange,
   onBarCreate,
   labels: labelsProp,
@@ -1256,7 +1255,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     trackHandlers,
     focusCell: setActiveId as (id: string) => void,
     model,
-    onSelect,
+    onItemOpen,
     onRowClick,
     commit,
     nameFor,
@@ -1266,7 +1265,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     trackHandlers,
     focusCell: setActiveId,
     model,
-    onSelect,
+    onItemOpen,
     onRowClick,
     commit,
     nameFor,
@@ -1291,10 +1290,10 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
         return ref;
       },
       focus: (id) => latest.current.focusCell(id),
-      select: (barId, rowIndex) => {
+      open: (barId, rowIndex) => {
         const item = latest.current.model[rowIndex];
         const bar = item?.bars.find((candidate) => candidate.id === barId);
-        if (item && bar) latest.current.onSelect?.(bar, item.row);
+        if (item && bar) latest.current.onItemOpen?.(bar, item.row);
       },
       openRow: (rowIndex, event) => {
         const item = latest.current.model[rowIndex];

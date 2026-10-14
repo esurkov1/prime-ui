@@ -147,10 +147,10 @@ export const api: ComponentApi = {
           ru: 'Максимальная высота области прокрутки в px, чтобы шапка держалась при прокрутке строк; `"fill"` — график берёт высоту flex / grid-родителя.',
         },
         {
-          name: "onSelect",
+          name: "onItemOpen",
           type: "(bar: Bar, row: Row) => void",
-          en: "A bar was activated (click, Enter, Space): open its record. A drag never selects.",
-          ru: "Полосу активировали (клик, Enter, Space): откройте её запись. Перетаскивание не выбирает.",
+          en: "A bar was activated (click, Enter, Space): open its record. A drag never opens it.",
+          ru: "Полосу активировали (клик, Enter, Space): откройте её запись. Перетаскивание её не открывает.",
         },
         {
           name: "onBarChange",
@@ -172,7 +172,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "onSelect">',
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
           en: "`aria-label` (the grid's name), `className` and the other div attributes.",
           ru: "`aria-label` (имя сетки), `className` и остальные атрибуты div.",
         },
@@ -322,8 +322,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Enter · Space",
-        en: "On a bar: selects it (`onSelect`). On a row header: opens the row (`onRowClick`) or follows its link (`getRowHref`).",
-        ru: "На полосе — выбирает её (`onSelect`); на заголовке строки — открывает строку (`onRowClick`) или переходит по её ссылке (`getRowHref`).",
+        en: "On a bar: opens its record (`onItemOpen`). On a row header: opens the row (`onRowClick`) or follows its link (`getRowHref`).",
+        ru: "На полосе — открывает её запись (`onItemOpen`); на заголовке строки — открывает строку (`onRowClick`) или переходит по её ссылке (`getRowHref`).",
       },
       {
         keys: "Shift + ← · Shift + →",

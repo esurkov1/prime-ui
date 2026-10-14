@@ -41,7 +41,7 @@ export type GanttTrackEvent =
 export type GanttRowContext = {
   register: (id: string) => React.RefCallback<HTMLElement>;
   focus: (id: string) => void;
-  select: (barId: string, rowIndex: number) => void;
+  open: (barId: string, rowIndex: number) => void;
   /** `onRowClick` of the row at `rowIndex`. */
   openRow: (
     rowIndex: number,
@@ -262,7 +262,7 @@ function GanttRowView({
               direction={ctx.direction}
               scrollLeft={ctx.scrollLeft}
               autoScroll={ctx.autoScroll}
-              onActivate={() => ctx.select(bar.id, index)}
+              onActivate={() => ctx.open(bar.id, index)}
               onFocusBar={() => ctx.focus(bar.id)}
               onTipChange={ctx.registerTip}
               canShowTip={ctx.canShowTip}

@@ -1,4 +1,4 @@
-/** A team schedule as a work screen: the title with the people shown and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onSelect`. */
+/** A team schedule as a work screen: the title with the people shown and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`. */
 import {
   AppHeader,
   Avatar,
@@ -535,7 +535,7 @@ export default function GanttScreenExample() {
             )}
             onBarChange={moveBar}
             onBarCreate={startCreate}
-            onSelect={(bar, row) => {
+            onItemOpen={(bar, row) => {
               setSelected({ bar, person: findPerson(row.id) });
               setDetailOpen(true);
             }}

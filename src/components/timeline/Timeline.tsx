@@ -248,7 +248,6 @@ function TimelineItemMeta({ children, className, ...rest }: TimelineItemMetaProp
 TimelineItemMeta.displayName = "Timeline.ItemMeta";
 
 export type TimelineItemValueProps = SpanPartProps & {
-  /** Text color. Default `neutral` (primary text). */
   tone?: Tone;
 };
 

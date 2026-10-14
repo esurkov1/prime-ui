@@ -87,8 +87,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Timeline.Item",
-      en: "`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot); an interactive row gives under the press and has the touch row height.",
-      ru: "`<li>` со строкой: `<div>`, `<button>` (`onClick`), `<a>` (`href`) или свой элемент (`asChild`); точка добавляется в начало. Строка под курсором или в фокусе выделяется (плашка, акцентные заголовок и точка); интерактивная строка поддаётся при нажатии и не ниже сенсорной строки.",
+      en: "`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot); an interactive row gives under the press.",
+      ru: "`<li>` со строкой: `<div>`, `<button>` (`onClick`), `<a>` (`href`) или свой элемент (`asChild`); точка добавляется в начало. Строка под курсором или в фокусе выделяется (плашка, акцентные заголовок и точка); интерактивная строка поддаётся при нажатии.",
       props: [
         {
           name: "color",

@@ -17,19 +17,17 @@ import styles from "./examples.module.css";
 
 type Deal = { id: string; client: string; amount: number };
 
-/** The column colors offered in the editor: a swatch per palette hue. */
-const COLUMN_COLORS: { color: PaletteColor; value: string; label: string }[] = [
-  { color: "gray", value: "#71717a", label: "Серый" },
-  { color: "blue", value: "#5068f5", label: "Синий" },
-  { color: "teal", value: "#14b8a6", label: "Бирюзовый" },
-  { color: "green", value: "#22c55e", label: "Зелёный" },
-  { color: "yellow", value: "#eab308", label: "Жёлтый" },
-  { color: "orange", value: "#f97316", label: "Оранжевый" },
-  { color: "red", value: "#ef4444", label: "Красный" },
-  { color: "purple", value: "#a855f7", label: "Фиолетовый" },
+/** The stage hues offered in the editor. */
+const STAGE_HUES: PaletteColor[] = [
+  "gray",
+  "blue",
+  "teal",
+  "green",
+  "yellow",
+  "orange",
+  "red",
+  "purple",
 ];
-
-const PRESETS = COLUMN_COLORS.map(({ value, label }) => ({ value, label }));
 
 const COLUMNS: KanbanColumn[] = [
   {
@@ -142,14 +140,11 @@ export default function KanbanColumnsExample() {
                 </Input.Wrapper>
               </Input.Root>
               <ColorSwatches
+                mode="palette"
                 label="Цвет"
-                presets={PRESETS}
-                value={COLUMN_COLORS.find((entry) => entry.color === column.color)?.value ?? null}
-                onValueChange={(value) =>
-                  updateColumn(column.id, {
-                    color: COLUMN_COLORS.find((entry) => entry.value === value)?.color,
-                  })
-                }
+                palette={STAGE_HUES}
+                value={column.color ?? null}
+                onValueChange={(color) => updateColumn(column.id, { color: color ?? undefined })}
               />
               {column.locked ? null : (
                 <Popover.Actions>

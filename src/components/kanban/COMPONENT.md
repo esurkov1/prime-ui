@@ -33,7 +33,7 @@ import {
 Kanban.Root                          board: horizontal strip of columns, its own Dnd.Root if none above
 └─ <ul> (Dnd.Sortable, axis x)       the columns in `columnOrder`
    └─ <li> column (from `columns`)   no well with a header plate (`plain`) or a header line (`line`), or a `fill-muted` well (`well`)
-      ├─ header                      title (h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
+      ├─ header                      title (`columnTitleAs`, h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
       │  ├─ description              muted line under the title (`column.description`)
       │  └─ meta                     the stage's figures (`renderColumnMeta(column)`)
       └─ <ul> (Dnd.Sortable)         own vertical scroll; Skeleton cards while loading; EmptyPage (Dnd `empty`) when empty
@@ -69,13 +69,14 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `onColumnOrderChange` | `(order: readonly string[], move: KanbanColumnMove) => void \| Promise<void>` | — | A column moved: the new order, then `{ id, index }` to save. Return the save's promise: the column waits busy in its new place; a rejection glides it back. |
 | `renderItem` | `(item: T) => ReactNode` | — (required) | Renders one card; return a `Kanban.Item`. |
 | `getItemHref` | `(item: T) => string` | — | The card is a link: a real `<a>` named by `getLabel` covers it and is its tab stop — a click, ⌘/Ctrl-click, a middle click, a new tab. A press on it still drags the card; a drag never follows it. |
-| `onItemClick` | `(item: T, event: KanbanItemClickEvent) => void` | — | Opens a card in place (a Drawer): a click, Enter or Space; never from a control inside it or after a drag. With `getItemHref` it gets plain clicks: `event.preventDefault()` routes in the app. |
+| `onItemOpen` | `(item: T, event: KanbanItemOpenEvent) => void` | — | Opens a card in place (a Drawer): a click, Enter or Space; never from a control inside it or after a drag. With `getItemHref` it gets plain clicks: `event.preventDefault()` routes in the app. |
+| `columnTitleAs` | `"h2" \| "h3" \| "h4"` | `"h3"` | Heading level of the column titles in the page outline; the look does not change. |
 | `renderColumnActions` | `(column: KanbanColumn) => ReactNode` | — | Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier. |
 | `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). |
 | `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). |
 | `variant` | `"plain" \| "line" \| "well"` | `"plain"` | No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues). |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
-| `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; `onItemClick` and `getItemHref` still open cards. |
+| `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; `onItemOpen` and `getItemHref` still open cards. |
 | `labels` | `Partial<KanbanLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue">` | — | `className` (the board height), `aria-label` and the other div attributes. |
 
@@ -85,7 +86,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `disabled` | `boolean` | `false` | This card cannot be dragged or moved. |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `children` (the card parts), `className` and the other attributes; `onClick` / `onKeyDown` run before `onItemClick` opens the card — `preventDefault()` keeps it closed. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `children` (the card parts), `className` and the other attributes; `onClick` / `onKeyDown` run before `onItemOpen` opens the card — `preventDefault()` keeps it closed. |
 
 ### Kanban.ItemHeader
 `ref` → `HTMLDivElement`. Optional top row of a card: the key or project at the start, the last child (a priority `Badge`, an assignee) at the end.
@@ -158,17 +159,17 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 | empty | no cards | a compact `EmptyPage` in Dnd's dashed drop slot at the top (`fill-strong` dashed line, no fill): «Нет карточек» and the hint «Перетащите сюда карточку»; a `disabled` board shows the text alone; the whole column stays a drop area |
 | loading | `loading` | `aria-busy` and `data-loading` on the root; `Skeleton` cards; `Crossfade` swaps them for the cards |
 | disabled | `disabled` / `Kanban.Item disabled` | `data-disabled` on the root / card; no `aria-roledescription`, no shortcuts, no column grips |
-| saving | `onValueChange` / `onColumnOrderChange` returned a pending promise | the card (column) stays in its new place with `aria-busy` and `data-pending`; a card's content quiets to 0.6 under a centred `Spinner`, a column's heading quiets and a spinner stands in for its grip; it does not move again until the answer |
-| opens | `onItemClick` / `getItemHref` | `data-clickable` (in place) or `data-link` (a link over the card, its focus ring drawn on the card); a card that opens lifts on hover on a read-only board too |
+| saving | `onValueChange` / `onColumnOrderChange` returned a pending promise | the card (column) stays in its new place with `aria-busy` and `data-pending`; a card's content quiets to 0.6 under a centred `Spinner`, a column's heading quiets and its grip is busy (Dnd); it does not move again until the answer |
+| opens | `onItemOpen` / `getItemHref` | `data-clickable` (in place) or `data-link` (a link over the card, its focus ring drawn on the card); a card that opens lifts on hover on a read-only board too |
 | refused save | the promise rejected | the card glides back to its old column and place (every card it pushed aside glides too), a column glides back in the strip; `labels.moveFailed` / `labels.columnMoveFailed` is announced |
 
-Motion: the hover lift (shadow, the card rises above its neighbours) and the empty slot fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing); a saving card or column quiets (`fast`, both ways) and its spinner enters (`enterMotion`); a refused save glides back (`base`), never jumps. Under `prefers-reduced-motion` all of it is off.
+Motion: the hover lift (shadow, the card rises above its neighbours) and the empty slot fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing); a saving card or column quiets (`fast`, both ways) and its spinner fades in by itself; a refused save glides back (`base`, the list's FLIP glide), never jumps. Under `prefers-reduced-motion` all of it is off.
 
 A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps the move from happening. A controlled owner applies the new `value` (or `columnOrder`) once the request succeeds — in the promise chain, before the returned promise resolves — never before the answer.
 
 ## Layout & spacing
 - Give the root a height (`className`): columns span it and every column body scrolls on its own; without one the columns take the height of the tallest.
-- The board is a size container. From 40rem of its own width columns keep a fixed 18rem; below it a column takes 85% of the board and snaps (`scroll-snap-type: x mandatory`), so the next column peeks. Snapping is off while a drag auto-scrolls the strip.
+- The board is a size container. From 40rem of its own width columns keep a fixed 18rem; below it a column takes 85% of the board, so the next column peeks. The strip snaps to the start of a column (ScrollContainer `snap="mandatory"`); snapping is off while a drag carries a card.
 - The strip scrolls sideways inside the board, never the page. Cards sit at the top of their column; the drop area runs to the bottom of the column, so a card can be released anywhere in it.
 - `plain` / `line`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
 - The column title is `title-m`; the header is at least a control `m` tall, its text starts where the card text does.
@@ -186,7 +187,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the cards, column by column. |
-| `Enter` · `Space` | Opens the focused card (`onItemClick`) or follows its link (`getItemHref`). |
+| `Enter` · `Space` | Opens the focused card (`onItemOpen`) or follows its link (`getItemHref`). |
 | `Alt + ↑` · `Alt + ↓` | Moves the card one place inside its column. |
 | `Alt + ←` · `Alt + →` | On a card: moves it to the neighbouring column at the same row (or its end). On a column grip: moves the column one place. Focus follows. The direction follows the writing direction (`dir="rtl"`: ← goes forward). |
 | `Escape` | Cancels a drag in flight. |
@@ -198,10 +199,10 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position («Колонка «…»: позиция 2 из 4», `labels.column`). A locked column has a lock named «Закреплено» instead.
 - A live region (`role="status"`) announces grabbed, dropped, «position N of M», a move to another column by its title and a refusal with its reason (`labels`, Dnd's labels).
 - The count is spoken as text («Карточек: 3 из 5»), not only by colour; a full column also reads `count / limit`.
-- With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemClick` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.
+- With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemOpen` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.
 - Touch: a drag starts after a hold; a finger that moves first scrolls the board.
 - While loading the root has `aria-busy`; skeletons are hidden from assistive tech.
-- While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).
+- While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech, a column's busy grip says so itself); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -228,19 +229,19 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule, its columns drawn as wells so each reads as a bounded queue: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`, `variant`. |
 | [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
 | [saving.tsx](examples/saving.tsx) | Every move is saved on the server: the card waits busy in its new place, and an invoice the server refuses to close glides back to its column — `onValueChange`. |
-| [item-link.tsx](examples/item-link.tsx) | Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemClick`. |
+| [item-link.tsx](examples/item-link.tsx) | Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemOpen`. |
 | [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry and cross-fades the cards in; an empty column keeps its drop area; a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The placement lives in the parent: every move arrives with its source, target and position to save, and a button resets the board — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page. |
-| [screen.tsx](examples/screen.tsx) | A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemClick`. |
+| [screen.tsx](examples/screen.tsx) | A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. |
 
 ## Mistakes
 - Returning something other than `Kanban.Item` from `renderItem` → the card does not drag and Alt + arrows do nothing.
 - Using the array index as the card id → ids must survive a move.
 - Keeping the status only on the item and no `value` → the board draws nothing; build `defaultValue` (or `value`) from your data: `{ [status]: ids }`.
 - No height on the root inside a fixed region → the page scrolls instead of the column.
-- A hover-only action on a card → touch has no hover; put the action in the card or open the card on click (`onItemClick`).
-- `onClick` / `onKeyDown` on `Kanban.Item` to open a card → `onItemClick` (click, Enter, Space, never after a drag) or `getItemHref` for a page of its own.
+- A hover-only action on a card → touch has no hover; put the action in the card or open the card on click (`onItemOpen`).
+- `onClick` / `onKeyDown` on `Kanban.Item` to open a card → `onItemOpen` (click, Enter, Space, never after a drag) or `getItemHref` for a page of its own.
 - `getItemHref` without `getLabel` → the link is named by the card id; pass a human name.
 - Drawing your own box (a Card, a filled `div`) around each column, or around a `well` board → pick the `variant`: `plain` or `line` for one level of nesting, `well` when columns must read as bounded queues.
 - Styling a card from an ancestor (`.board .card`) → the flying clone is portalled to `<body>` and loses it; put the class on `Kanban.Item`.

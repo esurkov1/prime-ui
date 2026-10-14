@@ -1,4 +1,4 @@
-/** A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemClick`. */
+/** A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. */
 import {
   AppHeader,
   Avatar,
@@ -440,7 +440,7 @@ export default function KanbanScreenExample() {
                 }}
                 renderColumnMeta={figures}
                 loading={loading}
-                onItemClick={(item) => openDeal(item.id)}
+                onItemOpen={(item) => openDeal(item.id)}
                 renderItem={(item) => (
                   <Kanban.Item>
                     <Kanban.ItemTitle>{item.company}</Kanban.ItemTitle>

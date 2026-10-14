@@ -137,7 +137,7 @@ PageContent.Root                           column (<div>, or <section> with as="
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `kind` | `"list" \| "detail"` | — (required) | `list` — the 16–20rem column, or the whole split while closed; going back lands on its control that had focus. `detail` — the rest, or the whole split while open; focus lands here when it opens. While nothing is chosen the detail shows a hint («Выберите обращение»). |
+| `kind` | `"list" \| "detail"` | — (required) | `list` — the 16–20rem column, or the whole split while closed; going back refocuses its last control. `detail` — the rest, or the whole split while open; focus lands here when it opens. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `aria-label`, `className` and the other div attributes. |
 
 ### PageContent.BackButton
