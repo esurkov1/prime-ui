@@ -227,7 +227,7 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 - `PageContent.Title` is an `<h1>`; use one per page.
 - Give `PageContent.Root as="section"` an `aria-labelledby` that points at the Title `id` to name the region.
 - `PageContent.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`, so it is a region landmark with the heading's name; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).
-- Name both `PageContent.Panel`s with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).
+- Name both `PageContent.Panel`s with `aria-label`: a named pane is `role="region"`, a landmark. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).
 - `PageContent.BackButton` is named by `labels.back` and is shown only while the split shows one pane.
 
 ### Labels

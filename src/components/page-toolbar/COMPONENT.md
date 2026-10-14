@@ -8,7 +8,7 @@
 ## When to use
 - A list, registry or dashboard page whose top holds several of: sections with counts, a filter and search, a period or view switch, the primary action.
 - A settings page with sections and a «Сохранить N изменений» action that must stay reachable on a phone.
-- Any page that has to work from 320px with the same controls as on desktop — nothing is hidden, the slots only move.
+- Any page that has to work on the narrowest supported screen (a 320 px phone) with the same controls as on desktop — nothing is hidden, the slots only move.
 
 ## When not to use
 - One or two buttons of the page and nothing else → `AppHeader.Actions` in the [AppHeader](../../layout/app-header/COMPONENT.md) title row.
