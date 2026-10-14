@@ -41,7 +41,7 @@ export const api: ComponentApi = {
         {
           name: "formatTime",
           type: "(date: Date) => string",
-          default: "«09:05»",
+          defaultNote: { en: "«09:05»", ru: "«09:05»" },
           en: "Display of a `Date` time.",
           ru: "Показ времени из `Date`.",
         },

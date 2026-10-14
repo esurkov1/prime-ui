@@ -44,7 +44,7 @@ export const api: ComponentApi = {
         {
           name: "getLabel",
           type: "(item: T) => string",
-          default: "the id",
+          defaultNote: { en: "the `id`", ru: "`id`" },
           en: "Spoken by the live region.",
           ru: "Что произносит live-область.",
         },
@@ -92,7 +92,7 @@ export const api: ComponentApi = {
         {
           name: "kind",
           type: "string",
-          default: "unique per list",
+          defaultNote: { en: "unique per list", ru: "своё у каждого списка" },
           en: "Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move.",
           ru: "Списки с общим `kind` обмениваются элементами (доска): мышью на точное место, с клавиатуры — Alt + стрелки поперёк оси. Назовите каждый список: имя произносится при переносе.",
         },
@@ -211,7 +211,7 @@ export const api: ComponentApi = {
         {
           name: "label",
           type: "string",
-          default: "the id",
+          defaultNote: { en: "the `id`", ru: "`id`" },
           en: "Spoken by the live region.",
           ru: "Что произносит live-область.",
         },

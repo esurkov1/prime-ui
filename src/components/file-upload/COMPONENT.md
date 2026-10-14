@@ -107,14 +107,14 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 |---|---|---|---|
 | `trigger` | `"dropzone" \| "button" \| "tile"` | `"dropzone"` | `dropzone`: the drop area. `button`: a compact picker button, no zone and no drop (a composer paperclip). `tile`: an add tile as the last cell of the files. |
 | `variant` | `"dashed" \| "solid"` | `"dashed"` | The look of the drop zone: `dashed` shows the drop line; `solid` keeps only the fill (cards, modals). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size. |
 | `value` | `readonly FileUploadFile[]` | — | Files in their order (controlled): `{ id, name, size?, type?, src?, alt?, href? }` — on the server or uploads of `queue` by id. `src`: picture or video; `alt` spoken for the name; `href` links name or tile to the file. |
 | `defaultValue` | `readonly FileUploadFile[]` | `[]` | Initial files (uncontrolled). |
 | `onValueChange` | `(value: readonly FileUploadFile[]) => void \| Promise<void>` | — | The set changed (a reorder, a removal, files added to `queue`), with the whole new list. Return the save's promise: the touched files wait busy, a rejection puts the set back and is announced. |
 | `queue` | `Pick<UploadQueue, "items" \| "retry" \| "remove"> & Partial<Pick<UploadQueue, "add" \| "move">>` | — | The uploads: `useUploadQueue(…)` or an object of that shape. Each file on its way shows its upload; removing a file aborts it. With `add`, picked and dropped files go into the queue. |
 | `layout` | `"list" \| "grid" \| "strip"` | `"list"` | `list`: a row per file. `grid`: square tiles that wrap to the set's width and reorder. `strip`: one sideways-scrolling row of tiles (an attachment tray). |
 | `cover` | `boolean` | `false` | Tiles only: the first file is the cover («Обложка», 2 × 2 in a `grid`). Reordering a file to the first place makes it the cover. |
-| `formatSize` | `(bytes: number) => string` | `Russian digits, Б · КБ · МБ · ГБ` | Display of a file size («820 КБ», «1,2 МБ»). |
+| `formatSize` | `(bytes: number) => string` | Russian digits, Б · КБ · МБ · ГБ | Display of a file size («820 КБ», «1,2 МБ»). |
 | `label` | `ReactNode` | — | Field label above the trigger; names the file input and the list of files. |
 | `required` | `boolean` | — | Red `*` after the label and native `required` on the input. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
@@ -161,7 +161,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `queue` | `Pick<UploadQueue, "items" \| "retry" \| "remove"> & Partial<Pick<UploadQueue, "add" \| "move">>` | — | The uploads: `useUploadQueue(…)` or an object of that shape. Each file on its way shows its upload; removing a file aborts it. With `add`, picked and dropped files go into the queue. |
 | `layout` | `"list" \| "grid" \| "strip"` | `"list"` | `list`: a row per file. `grid`: square tiles that wrap to the set's width and reorder. `strip`: one sideways-scrolling row of tiles (an attachment tray). |
 | `cover` | `boolean` | `false` | Tiles only: the first file is the cover («Обложка», 2 × 2 in a `grid`). Reordering a file to the first place makes it the cover. |
-| `formatSize` | `(bytes: number) => string` | `Russian digits, Б · КБ · МБ · ГБ` | Display of a file size («820 КБ», «1,2 МБ»). |
+| `formatSize` | `(bytes: number) => string` | Russian digits, Б · КБ · МБ · ГБ | Display of a file size («820 КБ», «1,2 МБ»). |
 | `disabled` | `boolean` | `false` | Read-only files: no reorder, no remove. |
 | `labels` | `Partial<FileUploadLabels>` | — | Row and tile strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLUListElement>, "children" \| "defaultValue">` | — | `className`, `aria-label` (name the list) and the other attributes of the `<ul>`. |
@@ -171,7 +171,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the padding, text and the format badge. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the padding, text and the format badge. Without it the tier of its host, else `m`. |
 | `invalid` | `boolean` | `false` | A failed upload: danger wash and ring, danger description. |
 
 ### FileUpload.FormatBadge
@@ -202,7 +202,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `value` | `number` | — (required) | Uploaded amount. |
 | `max` | `number` | — | Total amount (ProgressBar default). |
 | `tone` | `"accent" \| "neutral" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Fill color: `success` for a finished file, `danger` where a failed one stopped. |
-| `aria-label` | `string` | `«Загрузка файла»` | Accessible name of the bar (not the wrapper); name the file. |
+| `aria-label` | `string` | `"Загрузка файла"` | Accessible name of the bar (not the wrapper); name the file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
 ### useUploadQueue

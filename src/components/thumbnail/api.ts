@@ -158,7 +158,7 @@ export const api: ComponentApi = {
         {
           name: "formatDuration",
           type: "(seconds: number) => string",
-          default: "m:ss (h:mm:ss from an hour)",
+          defaultNote: { en: "`m:ss` (`h:mm:ss` from an hour)", ru: "`m:ss` (`h:mm:ss` от часа)" },
           en: "Display of the duration badge.",
           ru: "Показ длительности.",
         },

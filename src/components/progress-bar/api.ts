@@ -113,7 +113,7 @@ export const api: ComponentApi = {
         {
           name: "formatValue",
           type: "(value: number) => string",
-          default: "Russian digit groups",
+          defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
           en: "Display of a part's value in the legend and the rows («1 840 000 ₽»).",
           ru: "Вид значения части в легенде и строках («1 840 000 ₽»).",
         },

@@ -142,7 +142,7 @@ export function fieldCopyPart(name: string, where: { en: string; ru: string }): 
       {
         name: "value",
         type: "string",
-        default: "the field's value",
+        defaultNote: { en: "the field's value", ru: "значение поля" },
         en: "Text to copy instead of the field's current value.",
         ru: "Текст для копирования вместо текущего значения поля.",
       },

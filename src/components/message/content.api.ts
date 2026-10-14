@@ -57,7 +57,10 @@ export const contentParts: ApiPart[] = [
       {
         name: "formatSize",
         type: "(bytes: number) => string",
-        default: "Russian digits, Б · КБ · МБ · ГБ",
+        defaultNote: {
+          en: "Russian digits, Б · КБ · МБ · ГБ",
+          ru: "русские цифры, Б · КБ · МБ · ГБ",
+        },
         en: "Display of `fileSize`.",
         ru: "Показ `fileSize`.",
       },

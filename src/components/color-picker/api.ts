@@ -104,7 +104,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Field tier. Without it the tier of its host (a panel, a popover), else `m`.",
           ru: "Ярус поля.",
         },
@@ -329,7 +329,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`.",
           ru: "Ярус триггера, образцов и панели.",
         },

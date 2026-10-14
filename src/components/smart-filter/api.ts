@@ -171,7 +171,7 @@ export const api: ComponentApi = {
         {
           name: "formatValue",
           type: "(value: number) => string",
-          default: "Russian digit groups",
+          defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
           en: "`range` fields: a bound in the chip («1 000 ₽»).",
           ru: "Поля `range`: граница в теге («1 000 ₽»).",
         },

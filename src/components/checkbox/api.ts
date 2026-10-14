@@ -36,7 +36,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`.",
           ru: "Ярус квадрата, текста и отступа.",
         },

@@ -52,7 +52,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 |---|---|---|---|
 | `mode` | `"single" \| "range"` | — (required) | One date or a period; sets the value type. |
 | `value` | `Date \| null  ·  DatepickerRange` | — | Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set. |
-| `defaultValue` | `Date \| null  ·  DatepickerRange` | `null · { from: null, to: null }` | Initial value, uncontrolled. |
+| `defaultValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Initial value, uncontrolled. |
 | `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
 | `open` | `boolean` | — | Controlled visibility of the panel. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
@@ -95,8 +95,8 @@ Shared by `Datepicker.Root` and `Datepicker.Panel`.
 | `isDayDisabled` | `(day: Date) => boolean` | — | Days that cannot be picked. |
 | `disableFuture` | `boolean` | `false` | Future days are muted and cannot be picked. |
 | `yearless` | `boolean` | `false` | An annual day + month: no year, months wrap around inside `YEARLESS_YEAR`. |
-| `resetValue` | `Date \| null  ·  DatepickerRange` | `null · { from: null, to: null }` | Value applied by Reset. |
-| `today` | `Date` | `new Date()` | «Today» for highlighting, presets and `disableFuture`. |
+| `resetValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Value applied by Reset. |
+| `today` | `Date` | today | «Today» for highlighting, presets and `disableFuture`. |
 | `locale` | `Locale` | `ru` | date-fns locale of titles, weekdays and day names. |
 | `weekStartsOn` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | `1` | First day of the week (1 — Monday). |
 | `labels` | `Partial<DatepickerLabels>` | — | Built-in strings, see Labels. |

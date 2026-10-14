@@ -42,7 +42,7 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 | `defaultValue` | `string` | — | Initial value when uncontrolled. |
 | `onValueChange` | `(value: string) => void` | — | Called with the value of the newly chosen option. |
 | `name` | `string` | — | Native `name` shared by the radios; generated when omitted. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
 | `label` | `ReactNode` | — | Group heading above the options; names the radiogroup through `aria-labelledby`. Without it, pass `aria-label`. |
 | `required` | `boolean` | `false` | Red `*` after the label, native `required` on the radios and `aria-required` on the group. |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |

@@ -24,7 +24,10 @@ export const api: ComponentApi = {
         {
           name: "defaultValue",
           type: "Date | null  ·  DatepickerRange",
-          default: "null · { from: null, to: null }",
+          defaultNote: {
+            en: "`null` · `{ from: null, to: null }`",
+            ru: "`null` · `{ from: null, to: null }`",
+          },
           en: "Initial value, uncontrolled.",
           ru: "Начальное значение без контроля.",
         },
@@ -240,14 +243,17 @@ export const api: ComponentApi = {
         {
           name: "resetValue",
           type: "Date | null  ·  DatepickerRange",
-          default: "null · { from: null, to: null }",
+          defaultNote: {
+            en: "`null` · `{ from: null, to: null }`",
+            ru: "`null` · `{ from: null, to: null }`",
+          },
           en: "Value applied by Reset.",
           ru: "Значение, которое ставит «Сбросить».",
         },
         {
           name: "today",
           type: "Date",
-          default: "new Date()",
+          defaultNote: { en: "today", ru: "сегодня" },
           en: "«Today» for highlighting, presets and `disableFuture`.",
           ru: "«Сегодня» для подсветки, пресетов и `disableFuture`.",
         },

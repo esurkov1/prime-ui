@@ -70,7 +70,7 @@ The svg is `role="group"`: parts clockwise from the top, described by the legend
 | `max` | `number` | — | Total capacity. Default: the sum of the parts (they close the ring); a larger `max` leaves the rest as track. |
 | `segmentGap` | `"none" \| "hairline"` | `"none"` | `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. |
 | `legend` | `boolean` | `false` | A legend beside the ring (below it when the row is narrow), one row per part: color · name · value · share; it becomes the group's description. The root turns into the row of ring and legend. |
-| `formatValue` | `(value: number) => string` | `Russian digit groups` | Display of a part's value in the legend («38 ГБ»). |
+| `formatValue` | `(value: number) => string` | Russian digit groups | Display of a part's value in the legend («38 ГБ»). |
 | `labels` | `Partial<ProgressCircleLabels>` | — | Built-in strings, see Labels. |
 
 ## Variants

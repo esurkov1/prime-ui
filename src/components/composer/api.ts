@@ -87,7 +87,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the field, the buttons and the bar text. Without it the tier of its host, else `m`.",
           ru: "Ярус поля, кнопок и текста плашки. Без него — ярус хоста, иначе `m`.",
         },

@@ -54,8 +54,8 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel; a tab is at least the control height. |
 | `fullWidth` | `boolean` | `true` | Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`; `false` sizes each tab to its content within the same bounds. |
 | `tone` | `"neutral" \| "accent"` | `"neutral"` | Colour of the active tab: `neutral` is primary text with an accent icon, `accent` puts text and icon in accent. |
-| `minItemWidth` | `number \| string` | `2.5 × control height` | Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). |
-| `maxItemWidth` | `number \| string` | `7 × control height` | Widest a horizontal tab gets, px or a CSS length (`"none"` lifts the cap); a longer label ends with an ellipsis. |
+| `minItemWidth` | `number \| string` | 2.5 × control height | Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). |
+| `maxItemWidth` | `number \| string` | 7 × control height | Widest a horizontal tab gets, px or a CSS length (`"none"` lifts the cap); a longer label ends with an ellipsis. |
 | `labels` | `Partial<TabsLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | `Tabs.List` and `Tabs.Panel`s. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other div attributes. |

@@ -32,7 +32,7 @@ export const api: ComponentApi = {
         {
           name: "getLabel",
           type: "(item: T) => string",
-          default: "the id",
+          defaultNote: { en: "the `id`", ru: "`id`" },
           en: "Spoken by the live region.",
           ru: "Что произносит live-область.",
         },

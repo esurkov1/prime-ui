@@ -12,8 +12,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Label and value type and the gap between pairs; without it the list takes the tier of its host (a Card, a Drawer, a form).",
-          ru: "Шрифт подписи и значения и зазор между парами; без него список берёт ярус хоста (Card, Drawer, форма).",
+          en: "Label and value type and the gap between pairs; without it the list takes the tier of a sized host (a Drawer, a Modal).",
+          ru: "Шрифт подписи и значения и зазор между парами; без него список берёт ярус хоста с размером (Drawer, Modal).",
         },
         {
           name: "orientation",

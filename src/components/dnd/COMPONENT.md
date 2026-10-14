@@ -57,14 +57,14 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 |---|---|---|---|
 | `items` | `readonly T[]` | — (required) | Items in their current order. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id; must match `Dnd.SortableItem id`. |
-| `getLabel` | `(item: T) => string` | `the id` | Spoken by the live region. |
+| `getLabel` | `(item: T) => string` | the `id` | Spoken by the live region. |
 | `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — (required) | Item `id` lands in front of `beforeId` (`null` = last); in linked lists `id` may come from another list. Apply it with `moveBefore`; return a promise to save on a server (a rejection moves the item back). |
 | `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap. |
 | `children` | `ReactNode` | — | Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`. |
 | `axis` | `"x" \| "y" \| "grid"` | `"y"` | A column, a single row, or a wrapping grid (`display: grid`; the host sets the tracks and the cells' size, the gap takes a cell). Keyboard: Alt + ↑ / ↓ in a column, Alt + ← / → in a row and a grid. |
 | `handle` | `boolean` | `false` | Only `Dnd.Handle` starts a drag; the rest of the item stays free for clicks and text selection. |
 | `disabled` | `boolean` | `false` | No drag, no keyboard reorder. |
-| `kind` | `string` | `unique per list` | Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move. |
+| `kind` | `string` | unique per list | Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move. |
 | `canDrop` | `(id: string) => boolean \| string` | — | Refuses an item by id: `false`, or a string that says why (spoken and shown under the carried copy). The list turns `danger` before the release. |
 | `empty` | `ReactNode` | — | Shown while the list has no items; fades out when a gap opens in the list, so the gap takes its place. |
 | `as` | `"div" \| "ul" \| "ol" \| "tbody"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr`. |
@@ -97,7 +97,7 @@ Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a 
 | `kind` | `string` | — (required) | What it is; zones accept by kind. |
 | `id` | `string` | — (required) | Unique within its kind. |
 | `data` | `TData` | — | Payload handed to the zone's `onDrop`. |
-| `label` | `string` | `the id` | Spoken by the live region. |
+| `label` | `string` | the `id` | Spoken by the live region. |
 | `disabled` | `boolean` | `false` | Not draggable. |
 | `handle` | `boolean` | `false` | Only a `Dnd.Handle` inside starts the drag. |
 | `as` | `"div" \| "li" \| "span" \| "article" \| "section"` | `"div"` | Element. |

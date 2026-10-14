@@ -47,7 +47,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | `defaultValue` | `string` | `""` | Initial value (uncontrolled); `""` — nothing selected. |
 | `onValueChange` | `(value: string) => void` | — | Called with the new value on click or arrow keys. |
 | `disabled` | `boolean` | `false` | Disables the whole group. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | `false` | Fills the container; single-line segments tend to equal widths but never get narrower than their label — when they do not fit, the row scrolls. |
 | `label` | `ReactNode` | — | Heading above the control; names the `radiogroup` (`aria-labelledby`). Without it give the root an `aria-label`. |
 | `required` | `boolean` | `false` | Red `*` after the label and `aria-required` on the `radiogroup`. |

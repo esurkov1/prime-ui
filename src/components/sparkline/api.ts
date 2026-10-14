@@ -60,7 +60,7 @@ export const api: ComponentApi = {
         {
           name: "highlight",
           type: "number",
-          default: "the latest point with a value",
+          defaultNote: { en: "the latest point with a value", ru: "последняя точка со значением" },
           en: 'Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average`.',
           ru: 'Индекс точки в покое при `summary="latest"` (текущий месяц): заголовок возвращается к ней; в `bars` остальные столбики тише. Не сочетается с `sum` / `average`.',
         },
@@ -98,7 +98,7 @@ export const api: ComponentApi = {
         {
           name: "formatValue",
           type: "(value: number) => string",
-          default: "Russian digit groups",
+          defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
           en: "Display of a value in the headline, the tooltip, the reference description and the spoken point («312 400 ₽»).",
           ru: "Вид значения в заголовке, подсказке, описании ориентира и в озвучке точки («312 400 ₽»).",
         },

@@ -181,7 +181,7 @@ export const api: ComponentApi = {
         {
           name: "defaultValue",
           type: "string",
-          default: "the last item",
+          defaultNote: { en: "the last item", ru: "последний" },
           en: "The one shown first (uncontrolled): the newest.",
           ru: "Показанное сначала (неуправляемое): самое новое.",
         },
@@ -281,7 +281,7 @@ export const api: ComponentApi = {
         {
           name: "now",
           type: "Date",
-          default: "new Date()",
+          defaultNote: { en: "today", ru: "сегодня" },
           en: "«Today» for the dates.",
           ru: "«Сегодня» для дат.",
         },
@@ -315,14 +315,17 @@ export const api: ComponentApi = {
         {
           name: "quickReaction",
           type: "string | false",
-          default: "«👍»",
+          default: '"👍"',
           en: "The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`. `false` — off.",
           ru: "Реакция двойного касания (и `L`) по сообщению: ставит или снимает её через `onReactionToggle`. `false` — выключено.",
         },
         {
           name: "reactionOptions",
           type: "readonly { emoji: string; label: string }[]",
-          default: "👍 🔥 🤣 👌 🤔 😢 😱, then 7 more",
+          defaultNote: {
+            en: "👍 🔥 🤣 👌 🤔 😢 😱, then 7 more",
+            ru: "👍 🔥 🤣 👌 🤔 😢 😱, затем ещё 7",
+          },
           en: "The reactions of the bar above a message (long press, long hover or `R`): the first seven in a row, «⌄» opens the rest. `label` names each toggle button.",
           ru: "Реакции панели над сообщением (долгое нажатие, долгое наведение или `R`): первые семь в ряд, «⌄» раскрывает остальные. `label` называет каждую кнопку.",
         },

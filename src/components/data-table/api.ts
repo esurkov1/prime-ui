@@ -258,7 +258,10 @@ export const api: ComponentApi = {
         {
           name: "scrollHeight",
           type: 'number | string | "fill"',
-          default: '360 with paging="infinite"',
+          defaultNote: {
+            en: '`360` with `paging="infinite"`, else none',
+            ru: '`360` при `paging="infinite"`, иначе нет',
+          },
           en: 'Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of its flex / grid parent (or a sized block), the rows scroll inside, infinite paging follows it.',
           ru: 'Максимальная высота области прокрутки (число — px); `"fill"` — таблица занимает высоту flex / grid-родителя (или блока с высотой), строки прокручиваются внутри, бесконечная прокрутка работает в ней.',
         },
@@ -340,7 +343,7 @@ export const api: ComponentApi = {
         {
           name: "isRowClickable",
           type: "(row: Row) => boolean",
-          default: "every row",
+          defaultNote: { en: "every row", ru: "каждая строка" },
           en: "Which rows open (`getRowHref` and `onRowClick` alike); `false` for a total or a service row — no link, no focus, no cursor.",
           ru: "Какие строки открываются (и `getRowHref`, и `onRowClick`); `false` — для итоговой или служебной строки: без ссылки, фокуса и курсора.",
         },
@@ -353,7 +356,7 @@ export const api: ComponentApi = {
         {
           name: "renderGroupHeader",
           type: "(group: DataTableGroup<Row>) => ReactNode",
-          default: "the group key",
+          defaultNote: { en: "the group key", ru: "ключ группы" },
           en: "Content of a group header; `group.rows` holds every row of the group (all pages) for totals. Children are laid out start / end in the visible width.",
           ru: "Содержимое заголовка группы; в `group.rows` все строки группы (со всех страниц) для итогов. Дети раскладываются по краям видимой ширины.",
         },
@@ -475,7 +478,10 @@ export const api: ComponentApi = {
         {
           name: "align",
           type: '"start" | "center" | "end"',
-          default: '"start" ("end" with numeric)',
+          defaultNote: {
+            en: '`"start"` (`"end"` with `numeric`)',
+            ru: '`"start"` (`"end"` при `numeric`)',
+          },
           en: "Cell alignment; heads do not follow it.",
           ru: "Выравнивание ячеек; заголовки за ним не следуют.",
         },

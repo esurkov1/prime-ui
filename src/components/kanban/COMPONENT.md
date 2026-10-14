@@ -59,7 +59,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `columns` | `readonly KanbanColumn[]` | — (required) | Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder`. `color` is a `PaletteColor` for the count badge, `limit` a WIP limit, `locked` keeps a system stage in place. |
 | `items` | `readonly T[]` | — (required) | Every card the board can show; `value` decides where each one stands. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id of a card, the one used in `value`. |
-| `getLabel` | `(item: T) => string` | `the id` | Spoken by the live region. |
+| `getLabel` | `(item: T) => string` | the `id` | Spoken by the live region. |
 | `value` | `KanbanValue` | — | Card ids per column (controlled): `{ [columnId]: id[] }`. Ids missing from `items` are skipped. |
 | `defaultValue` | `KanbanValue` | `{}` | Initial card ids per column (uncontrolled). |
 | `onValueChange` | `(value: KanbanValue, move: KanbanMove) => void \| Promise<void>` | — | A card moved: the new placement, then `{ id, from, to, index }` to save. Return the save's promise: the card waits busy in its new place; a rejection glides it back. |

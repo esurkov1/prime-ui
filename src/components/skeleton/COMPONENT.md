@@ -37,7 +37,7 @@ Skeleton           <span aria-hidden="true">; data-shape, data-size
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `shape` | `"text" \| "control" \| "circle" \| "block"` | `"text"` | `text` — lines of the tier's text; `control` — a field or button of the tier; `circle` — an avatar of the tier; `block` — a box that fills its container (image, chart, card). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the text line (control text size and line height), the control height or the avatar size. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the text line (control text size and line height), the control height or the avatar size. |
 | `lines` | `number` | `1` | `text` only: number of lines; the last of several is 60% wide. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` (width, height of a `block`), `data-*` and the other span attributes. |
 

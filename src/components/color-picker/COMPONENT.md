@@ -82,7 +82,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `label` | `ReactNode` | — | Field label; defaults to `labels.hex`. |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Field tier. Without it the tier of its host (a panel, a popover), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier. Without it the tier of its host (a panel, a popover), else `m`. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
@@ -175,7 +175,7 @@ No DOM and no ref, except a field frame in a FieldList cell (the column heading 
 | `onOpenChange` | `(open: boolean) => void` | — | Called when the panel opens or closes. |
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in panel order. |
 | `columns` | `number` | — | Grid columns; default one row for up to 8 presets (+ «no color»), else 8. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`. |
 | `disabled` | `boolean` | `false` | The trigger is disabled and does not open the panel. A disabled `Fieldset` around it sets it too. |
 | `allowEmpty` | `boolean` | `false` | Adds the «no color» swatch after the presets (value `null`). |
 | `closeOnSelect` | `boolean` | `true` | Close the panel after a pick (focus returns to the trigger). |

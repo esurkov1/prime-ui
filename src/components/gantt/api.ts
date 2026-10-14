@@ -96,7 +96,7 @@ export const api: ComponentApi = {
         {
           name: "today",
           type: "Date",
-          default: "new Date()",
+          defaultNote: { en: "today", ru: "сегодня" },
           en: "The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it.",
           ru: "День линии «сегодня»; график открывается с ним на трети ширины, а «Сегодня» прокручивает к нему.",
         },

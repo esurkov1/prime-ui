@@ -68,7 +68,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `direction` | `"incoming" \| "outgoing"` | `"incoming"` | `incoming` — on the start side, a surface one step off the chat; `outgoing` — on the end side, in the accent hue (`--prime-color-message-outgoing-*`), everything inside recolors with it. |
 | `position` | `"single" \| "first" \| "middle" \| "last"` | `"single"` | The place in a run of one author (`Chat.Messages items` sets it): `single` and `last` end a run with the tail (and a group chat's avatar); `single` and `first` show the author's header. |
 | `time` | `Date \| string` | — | When it was sent: a `Date` shown with `formatTime` (and put in `<time dateTime>`), or the text to show. |
-| `formatTime` | `(date: Date) => string` | `«09:05»` | Display of a `Date` time. |
+| `formatTime` | `(date: Date) => string` | «09:05» | Display of a `Date` time. |
 | `edited` | `boolean` | `false` | The text was edited: `labels.edited` before the time. |
 | `status` | `"sending" \| "sent" \| "read" \| "failed"` | — | Delivery of an outgoing message: a clock, one check, two checks (accent), or a danger mark; the glyphs cross-fade from one state to the next. Named for assistive tech by `labels`. |
 | `onRetry` | `() => void \| Promise<void>` | — | Sends a failed message again: a ghost danger button beside the bubble. A returned promise shows `sending` until it settles; a rejection leaves it failed. |
@@ -156,7 +156,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 |---|---|---|---|
 | `name` | `string` | — (required) | The file name with its extension (the format tile reads it). |
 | `fileSize` | `number` | — | Bytes, shown as «1,2 МБ». |
-| `formatSize` | `(bytes: number) => string` | `Russian digits, Б · КБ · МБ · ГБ` | Display of `fileSize`. |
+| `formatSize` | `(bytes: number) => string` | Russian digits, Б · КБ · МБ · ГБ | Display of `fileSize`. |
 | `href` | `string` | — | Where to get it: the tile becomes the download link «Скачать {name}». |
 | `preview` | `string` | — | A picture of the file (an image, the first page) in the tile in place of the format. |
 | `transfer` | `"remote" \| "queued" \| "loading" \| "failed" \| "done"` | — | The transfer of the file, either way (`TransferState`): `queued` / `loading` — the cancel cross and the share ring; `failed` — retry; `remote` — download; `done` — the disk fades out. |

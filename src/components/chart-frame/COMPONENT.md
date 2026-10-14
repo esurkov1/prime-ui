@@ -50,7 +50,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `hiddenSeries` | `string[]` | — | Ids of the series turned off in the legend (controlled). |
 | `defaultHiddenSeries` | `string[]` | `[]` | Initially hidden series (uncontrolled). |
 | `onHiddenSeriesChange` | `(hiddenSeries: string[]) => void` | — | The legend turned a series on or off; gets the new list of hidden ids. |
-| `formatValue` | `(value: number) => string` | `Russian digit groups` | Display of a value in the legend, the tooltip and the table («8,4 млн ₽»). |
+| `formatValue` | `(value: number) => string` | Russian digit groups | Display of a value in the legend, the tooltip and the table («8,4 млн ₽»). |
 | `onRetry` | `() => void \| Promise<void>` | — | Loads the data again from the `error` state and shows the retry button; a returned Promise keeps the button loading until it settles. |
 | `labels` | `Partial<ChartFrameLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other figure attributes. |
@@ -104,7 +104,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `height` | `number \| "fill"` | `240, 160 under 30rem` | Height of the plot area in px. `fill` takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the default height at least. |
+| `height` | `number \| "fill"` | `240`, `160` under `30rem` | Height of the plot area in px. `fill` takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the default height at least. |
 | `renderPlot` | `(area: ChartFramePlotArea) => ReactNode` | — | Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden }` — for libraries that need explicit sizes (Chart.js, visx). |
 | `children` | `ReactNode` | — | A chart that sizes itself to its container (an SVG with a `viewBox`, `ResponsiveContainer`); it fills the area. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |

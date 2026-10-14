@@ -40,7 +40,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier of every segment: height 28 · 32 · 36 · 40 · 48, padding, text, icon. Without it the tier of its host (a toolbar, a panel), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Control tier of every segment: height 28 · 32 · 36 · 40 · 48, padding, text, icon. Without it the tier of its host (a toolbar, a panel), else `m`. |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Direction of the segments; `vertical` stretches them to the widest. |
 | `fullWidth` | `boolean` | — | Stretches the group; horizontal segments share the width equally. |
 | `label` | `ReactNode` | — | Heading above the control; names the `group` (`aria-labelledby`). Without it give the root an `aria-label`. |

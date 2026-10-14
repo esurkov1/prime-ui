@@ -11,7 +11,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. Without it the tier of its host, else `m`.",
           ru: "Ярус поля под подписью: xs/s 12/16 · m 13/20 · l/xl 14/20, начертание 500.",
         },

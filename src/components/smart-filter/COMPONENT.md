@@ -91,7 +91,7 @@ One entry of `fields`: data, not a part. Selected values missing from `options` 
 | `options` | `{ value: string; label: string; icon?: ReactNode; group?: string }[]` | — (required) | `options` fields: values; `icon` is a decorative kit Icon before the label; values with one `group` stay together under that heading, groups in the order they first appear. |
 | `finite` | `boolean` | `true` | `options` fields: a fixed set — hiding every value is refused. `false` for an open set (services, users). |
 | `multiple` | `boolean` | `true` | `options` fields: many values at once. `false` — one value and no hiding: a press picks only that value, a second press clears it (an API that takes one value per field). |
-| `formatValue` | `(value: number) => string` | `Russian digit groups` | `range` fields: a bound in the chip («1 000 ₽»). |
+| `formatValue` | `(value: number) => string` | Russian digit groups | `range` fields: a bound in the chip («1 000 ₽»). |
 
 ### matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange
 Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list of values to ask a server for. `isSmartFilterRange(entry)` tells a range from a selection.

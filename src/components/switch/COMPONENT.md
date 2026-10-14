@@ -42,7 +42,7 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
 | `onCheckedChange` | `(checked: boolean) => void \| Promise<void>` | — | Called with the new state on every toggle. Return the save's promise: the thumb waits with a spinner; a controlled owner sets `checked` before resolving; on reject the thumb goes back (say why with `error`). |
 | `loading` | `boolean` | `false` | Saving, for an owner that tracks the request itself: a spinner in the thumb, `aria-busy` on the input, presses do nothing. A promise from `onCheckedChange` does the same on its own. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the off track and `aria-invalid`. A non-empty `error` implies it. |

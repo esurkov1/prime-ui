@@ -56,7 +56,7 @@ Gantt                          surface (layer of the ladder), size container
 | `defaultScale` | `"day" \| "week" \| "month"` | `"week"` | Initial zoom, uncontrolled. |
 | `onScaleChange` | `(scale: GanttScale) => void` | — | The zoom switch changed. The day in the middle of the view stays in the middle. |
 | `range` | `{ start: Date; end: Date }` | — | The time axis, snapped to whole units. Default: every bar and today with room on both sides (a week of days, two weeks, a month), at least 35 days / 14 weeks / 12 months. |
-| `today` | `Date` | `new Date()` | The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it. |
+| `today` | `Date` | today | The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it. |
 | `locale` | `Locale` | `ru` | date-fns locale of the header, tooltips and spoken dates. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of rows, bars, header and toolbar controls: one-lane rows 28 · 32 · 44 · 48 · 52 px; a day is 32 · 40 · 48 px wide at `day`. |
 | `readOnly` | `boolean` | `false` | No moving, resizing or creating; bars still select and show their dates. |

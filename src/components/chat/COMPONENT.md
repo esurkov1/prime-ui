@@ -152,7 +152,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 |---|---|---|---|
 | `items` | `readonly { value: string; text: string }[]` | — (required) | The pinned messages, oldest first: the `value` of each `Message.Root` and one line of it («Фото», «Голосовое сообщение» for media). |
 | `value` | `string` | — | The pinned message shown (controlled). |
-| `defaultValue` | `string` | `the last item` | The one shown first (uncontrolled): the newest. |
+| `defaultValue` | `string` | the last item | The one shown first (uncontrolled): the newest. |
 | `onValueChange` | `(value: string) => void` | — | The shown message changed: a press stepped to the next older one (the oldest wraps to the newest). |
 | `onSelect` | `(value: string) => void` | — | A press on the bar, after the chat has jumped to the message: load it when it is not in the list yet. |
 | `onRemove` | `(value: string) => void` | — | Unpin the shown message: a ghost close button at the end. Without it no button. |
@@ -173,13 +173,13 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `isService` | `(item: T) => boolean` | — | An event of the chat, not a message: it stands alone and breaks the runs around it. |
 | `unread` | `string` | — | The key of the first unread item: the «Непрочитанные сообщения» band stands above it. |
 | `groupWindow` | `number` | `5` | Messages of one author further apart than this many minutes start a new run. |
-| `now` | `Date` | `new Date()` | «Today» for the dates. |
+| `now` | `Date` | today | «Today» for the dates. |
 | `formatDate` | `(date: Date, now: Date) => string` | `formatMessageDate` | The label of a date. |
 | `loading` | `boolean` | `false` | The first load: bubble-shaped `Skeleton`s on both sides stand in the list's place (`aria-busy`, `labels.loading` announced), then cross-fade into the messages; none of them counts as new. |
 | `hasOlder` | `boolean` | `false` | Older history exists: a bubble-shaped placeholder stands above the first message and `onLoadOlder` runs when the reader reaches the top. |
 | `onLoadOlder` | `() => void \| Promise<void>` | — | Load older messages and prepend them (while `hasOlder`); the reader's place is kept. |
-| `quickReaction` | `string \| false` | `«👍»` | The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`. `false` — off. |
-| `reactionOptions` | `readonly { emoji: string; label: string }[]` | `👍 🔥 🤣 👌 🤔 😢 😱, then 7 more` | The reactions of the bar above a message (long press, long hover or `R`): the first seven in a row, «⌄» opens the rest. `label` names each toggle button. |
+| `quickReaction` | `string \| false` | `"👍"` | The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`. `false` — off. |
+| `reactionOptions` | `readonly { emoji: string; label: string }[]` | 👍 🔥 🤣 👌 🤔 😢 😱, then 7 more | The reactions of the bar above a message (long press, long hover or `R`): the first seven in a row, «⌄» opens the rest. `label` names each toggle button. |
 | `reader` | `MessageUser` | — | The reader (`{ id, name: «Вы», src?, color? }`): a reaction they put shows them among the chip's avatars at once, before the data comes back; matched by `id`. |
 | `onNewMessage` | `(value: string, details: { direction: "incoming" \| "outgoing" }) => void` | — | A message was added at the end after mount, sent or received: for a sound, a counter, a title badge. Not called for the first render, history or a message put back in the middle. |
 | `onRead` | `(values: string[]) => void` | — | Incoming messages the reader has seen (at least half on screen while the page is visible); batched per frame, each `value` once per mount. Send read receipts from here. |

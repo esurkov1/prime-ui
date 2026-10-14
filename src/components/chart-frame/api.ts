@@ -44,7 +44,7 @@ export const api: ComponentApi = {
         {
           name: "formatValue",
           type: "(value: number) => string",
-          default: "Russian digit groups",
+          defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
           en: "Display of a value in the legend, the tooltip and the table («8,4 млн ₽»).",
           ru: "Вид значения в легенде, подсказке и таблице («8,4 млн ₽»).",
         },
@@ -168,7 +168,7 @@ export const api: ComponentApi = {
         {
           name: "height",
           type: 'number | "fill"',
-          default: "240, 160 under 30rem",
+          defaultNote: { en: "`240`, `160` under `30rem`", ru: "`240`, `160` уже `30rem`" },
           en: "Height of the plot area in px. `fill` takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the default height at least.",
           ru: "Высота области графика в px. `fill` занимает свободную высоту растянутой панели (`PageContent.Cell` с `rows`), но не меньше высоты по умолчанию.",
         },

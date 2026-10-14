@@ -48,7 +48,7 @@ const SET_PROPS: ApiProp[] = [
   {
     name: "formatSize",
     type: "(bytes: number) => string",
-    default: "Russian digits, Б · КБ · МБ · ГБ",
+    defaultNote: { en: "Russian digits, Б · КБ · МБ · ГБ", ru: "русские цифры, Б · КБ · МБ · ГБ" },
     en: "Display of a file size («820 КБ», «1,2 МБ»).",
     ru: "Показ размера файла («820 КБ», «1,2 МБ»).",
   },
@@ -78,7 +78,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size.",
           ru: "Ярус отступов зоны, иконки, заголовка, кнопки, подписи, подсказки и строк. Без него — ярус хоста (форма, панель), иначе `m`. Плитки держат свой размер.",
         },
@@ -261,7 +261,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the padding, text and the format badge. Without it the tier of its host, else `m`.",
           ru: "Ярус отступов, текста и бейджа формата. Без него — ярус хоста, иначе `m`.",
         },
@@ -355,7 +355,7 @@ export const api: ComponentApi = {
         {
           name: "aria-label",
           type: "string",
-          default: "«Загрузка файла»",
+          default: '"Загрузка файла"',
           en: "Accessible name of the bar (not the wrapper); name the file.",
           ru: "Доступное имя полосы (не обёртки); назовите файл.",
         },

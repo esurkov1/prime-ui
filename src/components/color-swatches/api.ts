@@ -37,7 +37,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the swatches (height 20 · 24 · 28 · 32 · 40); the label and hint keep the host tier. Without it the swatches take the host tier too.",
           ru: "Ярус образцов: высота = высота контрола − 8 (20 · 24 · 28 · 32 · 40), зазор яруса; ширина — по колонке. Подпись и подсказка остаются в ярусе окружения, иначе `m`.",
         },

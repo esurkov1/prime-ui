@@ -42,7 +42,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `defaultValue` | `string \| null` | `null` | Initial color when uncontrolled. |
 | `onValueChange` | `(value: string \| null) => void` | — | Called with the preset `value` (as written in `presets`) or `null`. |
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in order: `{ value, label }`; the label is the swatch's accessible name and tooltip. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the swatches (height 20 · 24 · 28 · 32 · 40); the label and hint keep the host tier. Without it the swatches take the host tier too. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the swatches (height 20 · 24 · 28 · 32 · 40); the label and hint keep the host tier. Without it the swatches take the host tier too. |
 | `label` | `ReactNode` | — | Label above the swatches; names the radiogroup (`aria-labelledby`). |
 | `required` | `boolean` | — | Red `*` after the label and `aria-required` on the group. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |

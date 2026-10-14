@@ -41,7 +41,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier for text, padding, radius, label and hint. One line of text sits exactly like an Input of the same size. Without it the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier for text, padding, radius, label and hint. One line of text sits exactly like an Input of the same size. Without it the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
 | `label` | `ReactNode` | — | Label above the field (`<label htmlFor>`). Without it, set `aria-label`. |
 | `required` | `boolean` | — | Native `required` on the textarea and a red `*` after the label (`aria-hidden`). |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |
@@ -78,7 +78,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | `the field's value` | Text to copy instead of the field's current value. |
+| `value` | `string` | the field's value | Text to copy instead of the field's current value. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | `onClick`, `disabled` and the other button attributes. |
 
 ### Textarea.Action

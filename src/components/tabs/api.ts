@@ -58,14 +58,14 @@ export const api: ComponentApi = {
         {
           name: "minItemWidth",
           type: "number | string",
-          default: "2.5 × control height",
+          defaultNote: { en: "2.5 × control height", ru: "2,5 × высота контрола" },
           en: "Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`).",
           ru: "Наименьшая ширина горизонтальной вкладки с подписью, px или CSS-длина; вкладка к тому же не уже своего содержимого (до `maxItemWidth`).",
         },
         {
           name: "maxItemWidth",
           type: "number | string",
-          default: "7 × control height",
+          defaultNote: { en: "7 × control height", ru: "7 × высота контрола" },
           en: 'Widest a horizontal tab gets, px or a CSS length (`"none"` lifts the cap); a longer label ends with an ellipsis.',
           ru: 'Наибольшая ширина горизонтальной вкладки, px или CSS-длина (`"none"` снимает предел); длиннее — подпись обрезается многоточием.',
         },

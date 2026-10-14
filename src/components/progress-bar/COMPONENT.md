@@ -68,7 +68,7 @@ A `role="group"` bar of parts, named by `label` and described by the legend or t
 | `max` | `number` | — | Total capacity. Default: the sum of the parts; a larger `max` leaves the rest as track. |
 | `segmentGap` | `"none" \| "hairline"` | `"none"` | `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout. |
 | `legend` | `boolean` | `false` | A legend under the bar, one row per part: color · name · value · share; it becomes the group's description. `bar` layout. |
-| `formatValue` | `(value: number) => string` | `Russian digit groups` | Display of a part's value in the legend and the rows («1 840 000 ₽»). |
+| `formatValue` | `(value: number) => string` | Russian digit groups | Display of a part's value in the legend and the rows («1 840 000 ₽»). |
 | `layout` | `"bar" \| "rows"` | `"bar"` | `bar` — every part in one bar; `rows` — a ranking: an `<ol>`, one row per part with label · value · share over its own bar. |
 | `scale` | `"sum" \| "max" \| "first"` | `"sum"` | `rows` only: what 100% is. `sum` — bars and shares of the total (`max` raises it); `max` — the leader is a full bar, shares stay of the total; `first` — bars and shares against the first row (a funnel). |
 | `labels` | `Partial<ProgressBarLabels>` | — | Built-in strings, see Labels. |
