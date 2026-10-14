@@ -49,8 +49,17 @@ function message() {
   row.append(column);
   document.body.append(row);
   const hold = vi.fn();
-  const morph = createBubbleMorph(() => ({ column, bubble, fill, row, hold }));
-  return { row, column, bubble, fill, text, meta, slot, morph, hold };
+  /** The conversation's scroller, once the message stands in one (`inScroller`). */
+  const view: { scroller: HTMLElement | null } = { scroller: null };
+  const morph = createBubbleMorph(() => ({
+    column,
+    bubble,
+    fill,
+    row,
+    scroller: view.scroller,
+    hold,
+  }));
+  return { row, column, bubble, fill, text, meta, slot, morph, hold, view };
 }
 
 const clipOf = (animation: FakeAnimation) =>
@@ -180,7 +189,7 @@ describe("bubbleMorph", () => {
   function inScroller(rowTop: number) {
     const m = message();
     const scroller = document.createElement("div");
-    scroller.style.overflowY = "auto";
+    m.view.scroller = scroller;
     let scrollTop = 1000;
     Object.defineProperty(scroller, "scrollTop", {
       get: () => scrollTop,
@@ -240,7 +249,6 @@ describe("bubbleMorph", () => {
     // A list row holding the unread band and the message (a fragment row), between a date above
     // and the typing row below.
     const scroller = document.createElement("div");
-    scroller.style.overflowY = "auto";
     let scrollTop = 1000;
     Object.defineProperty(scroller, "scrollTop", {
       get: () => scrollTop,
@@ -263,7 +271,14 @@ describe("bubbleMorph", () => {
     const typing = document.createElement("div");
     scroller.append(date, listRow, typing);
     document.body.append(scroller);
-    const morph = createBubbleMorph(() => ({ column, bubble, fill, row: listRow, hold: vi.fn() }));
+    const morph = createBubbleMorph(() => ({
+      column,
+      bubble,
+      fill,
+      row: listRow,
+      scroller,
+      hold: vi.fn(),
+    }));
     place(scroller, { left: 0, top: 0, width: 300, height: 600 });
     const at = (contentTop: number, height: number) => () => ({
       left: 0,

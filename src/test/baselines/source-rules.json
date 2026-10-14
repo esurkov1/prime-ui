@@ -32,8 +32,6 @@
   "src/components/list/List.tsx: local promise check",
   "src/components/list/List.tsx: root default size = \"m\"",
   "src/components/login-form/LoginForm.tsx: root default size = \"m\"",
-  "src/components/message/Message.tsx: local promise check",
-  "src/components/message/Message.tsx: local promise check #2",
   "src/components/modal/ModalDialog.tsx: root default size = \"m\"",
   "src/components/pagination/Pagination.tsx: root default size = \"m\"",
   "src/components/popover/Popover.tsx: root default size = \"m\"",

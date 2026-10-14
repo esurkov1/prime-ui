@@ -21,6 +21,9 @@ export function MessageMedia({ className, items, ...rest }: MessageMediaProps) {
     <Gallery
       {...rest}
       items={items}
+      // The media sets the bubble's width: the row is its limit, never the bubble, which it bleeds
+      // over — a caption wraps to it and never widens the bubble.
+      maxSize="85cqi"
       data-message-bleed=""
       data-depth={album ? neutralDepth : undefined}
       className={cx(styles.media, className)}

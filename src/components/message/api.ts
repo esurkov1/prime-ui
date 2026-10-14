@@ -254,6 +254,20 @@ export const api: ComponentApi = {
           ru: "`{ emoji, count, selected?, users? }` — `count` — всего, `selected` — своя реакция читателя, `users` (`{ id, name, src?, color? }[]`, в порядке реакций) — кто поставил; без `users` чип показывает счётчик.",
         },
         {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "true",
+          en: "A press outside closes the message's reaction bar.",
+          ru: "Нажатие мимо закрывает панель реакций сообщения.",
+        },
+        {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the message's reaction bar.",
+          ru: "Escape закрывает панель реакций сообщения.",
+        },
+        {
           name: "labels",
           type: "Partial<MessageReactionsLabels>",
           en: "Built-in strings, see Labels.",
@@ -356,7 +370,6 @@ export const api: ComponentApi = {
         en: "The retry button beside a failed message.",
         ru: "Кнопка повтора рядом с неотправленным.",
       },
-      menu: { en: "The name of the context menu.", ru: "Имя контекстного меню." },
       select: {
         en: "The menu item that starts selection mode with the message.",
         ru: "Пункт меню, который начинает выбор с этого сообщения.",
@@ -444,8 +457,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Escape",
-        en: "Closes the menu or the reaction bar",
-        ru: "Закрывает меню или панель реакций",
+        en: "Closes the menu, or the reaction bar unless `Message.Reactions closeOnEscape={false}`",
+        ru: "Закрывает меню или панель реакций, если не `Message.Reactions closeOnEscape={false}`",
       },
     ],
     aria: [

@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type * as React from "react";
@@ -8,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GalleryItem } from "@/components/gallery/Gallery";
 import { MessagePartProvider, messagePartOf } from "@/internal/messagePart";
 import type { SurfaceDepth } from "@/internal/surfaceDepth";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 import { MessageContact, MessageLinkPreview, MessageLocation } from "./MessageCards";
 import { MessageFile } from "./MessageFile";
 
@@ -55,13 +53,12 @@ describe("Message.Media: a Gallery shaped by its message", () => {
     const root = container.firstElementChild as HTMLElement;
     expect(root).toHaveAttribute("data-album", "true");
     expect(root).toHaveAttribute("data-depth", "2");
-    const css = readFileSync(
-      path.join(process.cwd(), "src/components/message/MessageMedia.module.css"),
-      "utf8",
-    );
-    expect(css).toMatch(
-      /\.media\[data-album\] \{\s*background: var\(--prime-color-layer-current\);\s*\}/,
-    );
+    expect(
+      cssValue(
+        cssRule("src/components/message/MessageMedia.module.css", ".media[data-album]"),
+        "background",
+      ),
+    ).toBe("var(--prime-color-layer-current)");
     // A single picture needs no backing.
     const single = render(
       <InMessage>
@@ -234,19 +231,19 @@ describe("Message cards", () => {
   });
 
   it("one card width for file, contact and location; the link preview spans the bubble", () => {
-    const read = (file: string) =>
-      readFileSync(path.join(process.cwd(), `src/components/message/${file}`), "utf8");
-    const cards = read("MessageCards.module.css");
-    expect(read("MessageFile.module.css")).toMatch(
-      /inline-size: min\(var\(--prime-message-card-width\), 75cqi\);/,
-    );
-    expect(cards).toMatch(
-      /\.contact \{[^}]*inline-size: min\(var\(--prime-message-card-width\), 75cqi\);/,
-    );
-    expect(cards).toMatch(/\.location \{[^}]*--prime-message-card-width/);
-    expect(cards).toMatch(
-      /\.preview \{[^}]*min-inline-size: min\(var\(--prime-message-card-width\), 75cqi\);/,
-    );
-    expect(cards).toMatch(/\.previewCard \{[^}]*overflow-wrap: anywhere;/);
+    const card = "min(var(--prime-message-card-width), 75cqi)";
+    const cards = (selector: string) =>
+      cssRule("src/components/message/MessageCards.module.css", selector);
+    expect(
+      cssRules("src/components/message/MessageFile.module.css").some((item) =>
+        item.decls.some((decl) => decl.prop === "inline-size" && decl.value === card),
+      ),
+    ).toBe(true);
+    expect(cssValue(cards(".contact"), "inline-size")).toBe(card);
+    expect(
+      cards(".location").decls.some((decl) => decl.value.includes("--prime-message-card-width")),
+    ).toBe(true);
+    expect(cssValue(cards(".preview"), "min-inline-size")).toBe(card);
+    expect(cssValue(cards(".previewCard"), "overflow-wrap")).toBe("anywhere");
   });
 });

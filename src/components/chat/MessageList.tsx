@@ -385,11 +385,14 @@ export function MessageList({
     (article: HTMLElement, value: string, direction: MessageDirection) => {
       if (flow.isFresh(value)) {
         article.dataset.enter = direction;
-        // The message column plays it (a direct child of the article).
+        // The message column plays it (a direct child of the article), once.
+        const column = article.querySelector<HTMLElement>(":scope > [data-message-column]");
+        column?.classList.add(enterMotion.enter);
         const clear = (event: AnimationEvent) => {
           const target = event.target as Element | null;
           if (target !== article && target?.parentElement !== article) return;
           delete article.dataset.enter;
+          column?.classList.remove(enterMotion.enter);
           article.removeEventListener("animationend", clear);
         };
         article.addEventListener("animationend", clear);

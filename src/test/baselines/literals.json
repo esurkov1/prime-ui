@@ -21,7 +21,6 @@
   "src/components/kanban/Kanban.module.css: numeric z-index",
   "src/components/kanban/Kanban.module.css: numeric z-index #2",
   "src/components/kanban/Kanban.module.css: numeric z-index #3",
-  "src/components/message/Message.module.css: raw duration in --disclosure-duration",
   "src/components/message/MessageCards.module.css: numeric scale() in transform",
   "src/components/message/MessageReactionBar.module.css: raw duration in --out",
   "src/components/message/MessageReactionBar.module.css: raw duration in transition-delay",

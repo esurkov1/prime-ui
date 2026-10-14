@@ -53,15 +53,6 @@
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* No format: the document glyph on the muted fill. */
-.tile:is(:not([data-color]), [data-color="gray"]) {
-  color: var(--prime-color-text-muted);
-}
-
-.tile:is(:not([data-color]), [data-color="gray"]) > .face {
-  background: var(--prime-color-fill-muted);
-}
-
 .format {
   font-size: var(--prime-text-caption-size);
   font-weight: var(--prime-font-weight-semibold);

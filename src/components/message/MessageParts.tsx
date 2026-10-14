@@ -10,6 +10,7 @@ import { Disclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch } from "@/internal/HighlightMatch";
+import { InteractiveElement } from "@/internal/interactiveElement";
 import { useMessageList } from "@/internal/messageList";
 import { defineMessagePart, useMessageHighlight, useMessagePart } from "@/internal/messagePart";
 import { exitTimeoutMs } from "@/internal/motionTiming";
@@ -37,8 +38,6 @@ export type MessageLabels = {
   failed: string;
   /** The retry button beside a failed message. */
   retry: string;
-  /** The name of the context menu. */
-  menu: string;
   /** The menu item that starts selection mode with this message. */
   select: string;
   /** Announced when the quick reaction is put: `{emoji}`. */
@@ -61,7 +60,6 @@ export const MESSAGE_LABELS: MessageLabels = {
   read: "Прочитано",
   failed: "Не отправлено",
   retry: "Повторить отправку",
-  menu: "Действия с сообщением",
   select: "Выбрать",
   reactionAdded: "Реакция {emoji} поставлена",
   reactionRemoved: "Реакция {emoji} снята",
@@ -300,30 +298,28 @@ export function MessageReply({
     </>
   );
   const props = {
+    ...rest,
+    ref: ref as React.Ref<HTMLElement>,
     "data-message-fit": "",
     className: cx(styles.reply, palette.hue, className),
     ...toDataAttributes({ color }),
   };
-  if (onClick || target !== undefined) {
-    return (
-      <button
-        type="button"
-        {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
-        {...props}
-        ref={ref as React.Ref<HTMLButtonElement>}
-        onClick={(event) => {
-          if (target !== undefined) reveal(target, true);
-          onClick?.(event);
-        }}
-      >
-        {body}
-      </button>
-    );
-  }
-  return (
-    <div {...rest} {...props} ref={ref as React.Ref<HTMLDivElement>}>
+  // A quote that jumps to its original is a button; one that only shows the quote is static.
+  return onClick || target !== undefined ? (
+    <InteractiveElement
+      {...props}
+      element="button"
+      onClick={(event) => {
+        if (target !== undefined) reveal(target, true);
+        onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+      }}
+    >
       {body}
-    </div>
+    </InteractiveElement>
+  ) : (
+    <InteractiveElement {...props} element="static">
+      {body}
+    </InteractiveElement>
   );
 }
 MessageReply.displayName = "Message.Reply";
@@ -679,6 +675,8 @@ function ReactionChip({ reaction, labels, pending, toggle }: ReactionChipProps) 
 export type MessageReactionsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /** The reactions to the message; a press on a chip calls `Message.Root onReactionToggle`. */
   items: readonly MessageReaction[];
+  closeOnOutsideClick?: boolean;
+  closeOnEscape?: boolean;
   labels?: Partial<MessageReactionsLabels>;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -691,6 +689,9 @@ export type MessageReactionsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
  */
 export function MessageReactions({
   items,
+  // Read by `Message.Root` for the reaction bar it opens.
+  closeOnOutsideClick: _closeOnOutsideClick,
+  closeOnEscape: _closeOnEscape,
   labels: labelsProp,
   className,
   ...rest

@@ -2,6 +2,8 @@ import * as React from "react";
 
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { Disclosure } from "@/internal/Disclosure";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -30,6 +32,8 @@ export const DEFAULT_REACTION_OPTIONS: readonly MessageReactionOption[] = [
 
 /** How many reactions the collapsed row shows. */
 const ROW = 7;
+/** The extra emoji stagger over at most this many steps: past it they go together. */
+const STAGGER_MAX = 6;
 
 export type ReactionBarLabels = {
   /** The name of the bar. */
@@ -51,6 +55,8 @@ type ReactionBarProps = {
   onPick: (emoji: string) => void;
   /** Opened from the keyboard: focus moves to the first reaction. */
   focusOnOpen: boolean;
+  closeOnOutsideClick: boolean;
+  closeOnEscape: boolean;
   labels: ReactionBarLabels;
   onPointerEnter?: () => void;
   onPointerLeave?: () => void;
@@ -64,9 +70,11 @@ function Reaction({
   hovered,
   onHover,
   onPick,
+  className,
 }: {
   option: MessageReactionOption;
   index: number;
+  className?: string;
   selected: boolean;
   picked: boolean;
   hovered: boolean;
@@ -76,7 +84,7 @@ function Reaction({
   return (
     <button
       type="button"
-      className={cx(styles.reaction, touchTargetClass)}
+      className={cx(styles.reaction, touchTargetClass, className)}
       style={{ "--i": index } as React.CSSProperties}
       aria-label={option.label}
       aria-pressed={selected}
@@ -110,6 +118,8 @@ export function ReactionBar({
   selected,
   onPick,
   focusOnOpen,
+  closeOnOutsideClick,
+  closeOnEscape,
   labels,
   onPointerEnter,
   onPointerLeave,
@@ -120,8 +130,8 @@ export function ReactionBar({
     open,
     onOpenChange,
     triggerRef: anchorRef,
-    closeOnEscape: true,
-    closeOnOutsideClick: true,
+    closeOnEscape,
+    closeOnOutsideClick,
     side: "top",
     align,
     focusOnOpen,
@@ -179,12 +189,13 @@ export function ReactionBar({
             hovered={hovered === option.emoji}
             onHover={hover(option.emoji)}
             onPick={() => pick(option.emoji)}
+            className={enterMotion.enter}
           />
         ))}
         {rest.length > 0 ? (
           <button
             type="button"
-            className={cx(styles.reaction, styles.more, touchTargetClass)}
+            className={cx(styles.reaction, styles.more, touchTargetClass, enterMotion.enter)}
             style={{ "--i": quick.length } as React.CSSProperties}
             aria-label={labels.more}
             aria-expanded={expanded}
@@ -197,9 +208,16 @@ export function ReactionBar({
         ) : null}
       </div>
       {rest.length > 0 ? (
-        // The rest glides open under the row (rows 0fr → 1fr) and back. Its emoji stay mounted
-        // both ways, so the folding rows keep their content while the height glides to 0.
-        <div className={styles.extra} aria-hidden={!expanded || undefined} inert={!expanded}>
+        // The rest glides open under the row (`Disclosure`) and back. Its emoji stay mounted both
+        // ways, so the folding rows keep their content while the height glides to 0. `--n`: the
+        // extra emoji in the stagger, at most `STAGGER_MAX` steps (the rest go together).
+        <Disclosure
+          open={expanded}
+          className={styles.extra}
+          style={{ "--n": Math.min(rest.length, STAGGER_MAX) } as React.CSSProperties}
+          aria-hidden={!expanded || undefined}
+          inert={!expanded}
+        >
           <div className={styles.extraInner}>
             {rest.map((option, index) => (
               <Reaction
@@ -214,7 +232,7 @@ export function ReactionBar({
               />
             ))}
           </div>
-        </div>
+        </Disclosure>
       ) : null}
     </FloatingPanel>
   );

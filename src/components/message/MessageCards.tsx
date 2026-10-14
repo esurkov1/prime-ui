@@ -90,7 +90,7 @@ export function MessageLocation({
           <div className={styles.placeTitle}>
             {title ? <span data-message-selectable="">{title}</span> : null}
             {live ? (
-              <Badge.Root size="xs" color="green">
+              <Badge.Root size="xs" tone="success">
                 <Badge.Dot />
                 {labels.live}
               </Badge.Root>

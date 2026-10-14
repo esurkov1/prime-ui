@@ -1,29 +1,13 @@
 /*
  * Message.Typing: «печатает…» at the end of a conversation — an incoming bubble of three dots. It
- * enters floating up and fading in while its height opens, and leaves closing its height (`fast`)
- * — or at once, when the reply that ends it arrives in the same update and takes its place. Its
- * block axis clips, so a closed row leaves nothing under the end of the list. The dots rise and
- * fade one after another on the loading loop (`--prime-motion-loop`): reduced motion slows it,
- * never stops it.
+ * is a disclosure (`internal/Disclosure`, `fast`): it fades in while its height opens, and leaves
+ * closing its height — or at once, when the reply that ends it arrives in the same update and
+ * takes its place. Its clip keeps a closed row from leaving anything under the end of the list.
+ * The dots rise and fade one after another on the loading loop (`--prime-motion-loop`): reduced
+ * motion slows it, never stops it.
  */
 .root {
-  display: grid;
-  grid-template-rows: 1fr;
-  overflow-x: visible;
-  overflow-y: clip;
-  opacity: 1;
-  transition:
-    grid-template-rows var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-xfast) var(--prime-motion-easing-exit);
-}
-
-.root[data-state="open"] {
-  animation: typingOpen var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
-}
-
-.root[data-state="closed"] {
-  grid-template-rows: 0fr;
-  opacity: 0;
+  --disclosure-duration: var(--prime-motion-duration-fast);
 }
 
 .row {
@@ -35,10 +19,6 @@
   /* The row geometry of an incoming message: the same start inset and gap below it. */
   padding-block: var(--prime-message-gap) calc(var(--prime-message-group-gap) / 2);
   padding-inline: var(--prime-space-2);
-}
-
-.root[data-state="open"] .row {
-  animation: typingRise var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
 }
 
 .bubble {
@@ -69,19 +49,6 @@
 
 .dot:nth-child(3) {
   animation-delay: calc(var(--prime-motion-loop) * 2 / 3);
-}
-
-@keyframes typingOpen {
-  from {
-    grid-template-rows: 0fr;
-    opacity: 0;
-  }
-}
-
-@keyframes typingRise {
-  from {
-    transform: translateY(var(--prime-space-3));
-  }
 }
 
 @keyframes typingDot {

@@ -43,7 +43,7 @@ Message.Root                      role="article" row «{author}, {time}» (an op
 │                                 over a picture or a circle)
 ├─ Message.Actions                a row of a bot's inline keyboard under the bubble (Button.Root children);
 │                                 several make several rows
-├─ Message.Menu                   Dropdown.Content opened at the pointer (+ «Выбрать» in a chat with a selection)
+├─ Message.Menu                   Dropdown.Content anchored to the message (Dropdown.Anchor) at the pointer (+ «Выбрать» in a chat with a selection)
 └─ [reaction bar]                 floating toolbar above the bubble: long press, long hover, `R`
 
 Message.Typing                    «печатает…»: an incoming bubble of three dots, the last row of a list
@@ -212,6 +212,8 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `items` | `MessageReaction[]` | — (required) | `{ emoji, count, selected?, users? }` — `count` is the total, `selected` the reader's own reaction, `users` (`{ id, name, src?, color? }[]`, in the order they put it) who put it; without `users` the chip shows the count. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press outside closes the message's reaction bar. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the message's reaction bar. |
 | `labels` | `Partial<MessageReactionsLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
@@ -322,7 +324,7 @@ The list-level settings a message reads — the group chat's author header and a
 | transferring media / file, sent or received (one look both ways) | `transfer`, `transferProgress`, `transferDirection` (of an item for media) | media: the picture dims under the shared transfer disk in the middle — a 40px disk on the media shade (backdrop blur) with a white ×, the progress drawn as a ring along its inner edge (the disk is a Button `shape="circle"` `variant="shade"`; the ring is its `progress` ring — the kit ring at the line weight, 2px, a 32% white track, a white arc from 12 o'clock gliding `base`, always turning; the button is `aria-busy` and described by «Отправка {percent}%» / «Загрузка {percent}%» by the direction), the play mark of a video gives way; pressing the disk cancels; done — the ring fills, then the disk fades and shrinks to 0.9 (`fast`), the picture returns to full; failed — the disk turns danger with a retry arrow («Повторить отправку» / «Повторить загрузку», described by «Не отправилось» / «Не загрузилось»); `remote` — the download arrow on the same disk, no ring (`onDownload`). A file: the same disk at the tile's size (`xl`, 48px) covers its round tile, always shown — the ring along its edge, the × on the media shade; failed — the danger retry and the reason under the name; done — it fades away and the face (or the download link) is back. Voice and video messages draw the same transfer on their own play disk (VoicePlayer, VideoNote). Every one is the same disk (`internal/transferDisk`): one ring proportion, track, start, motion and cancel / retry / download. The size line shows «{done} из {total}». The name and the size line never move |
 | transfer pending | `onCancel` / `onRetry` returned a promise | a `Spinner` in the disk's glyph place, `aria-busy`, no second press; a rejection leaves the transfer as it was and announces `cancelFailed` / `retryFailed` |
 | selection mode | the chat's `selected` (not `null`) | an `option` with `aria-selected`; a check (`Checkbox.Indicator`, circle) at the row start; a press anywhere on the row toggles it — the parts inside take no presses meanwhile; `data-selecting`, `data-selected` on the article |
-| menu open | right click, long press, Enter / Shift+F10 / the menu key | the menu at the pointer (below the bubble from the keyboard); a bottom sheet on a phone |
+| menu open | right click, long press, Enter / Shift+F10 / the menu key | the menu against the message at the pointer (`anchorPoint`; below the bubble from the keyboard), focus returns to the message on close; a bottom sheet on a phone |
 | focused | keyboard | the focus ring around the bubble |
 
 ## Layout & spacing
@@ -355,7 +357,7 @@ The list-level settings a message reads — the group chat's author header and a
 | `R` | Opens the reaction bar (with `onReactionToggle`); arrows move between reactions, `Home` / `End` to the ends, `Enter` / `Space` pick, `Tab` closes it |
 | `L` | Puts or takes back the quick reaction (as a double tap) |
 | `Tab` | Moves to the buttons and links of a message: the reply quote, a file, the `Message.Actions` buttons in row order |
-| `Escape` | Closes the menu or the reaction bar |
+| `Escape` | Closes the menu, or the reaction bar unless `Message.Reactions closeOnEscape={false}` |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -388,7 +390,6 @@ The list-level settings a message reads — the group chat's author header and a
 | `read` | `"Прочитано"` | Name of the two-check status. |
 | `failed` | `"Не отправлено"` | Name of the failed status. |
 | `retry` | `"Повторить отправку"` | The retry button beside a failed message. |
-| `menu` | `"Действия с сообщением"` | The name of the context menu. |
 | `select` | `"Выбрать"` | The menu item that starts selection mode with the message. |
 | `reactionAdded` | `"Реакция {emoji} поставлена"` | Announced when the quick reaction (a double tap, `L`) is put. |
 | `reactionRemoved` | `"Реакция {emoji} снята"` | Announced when the quick reaction is taken back. |

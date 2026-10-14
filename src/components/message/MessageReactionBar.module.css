@@ -6,8 +6,8 @@
  *             during the exit retargets from where it is instead of restarting); the emoji pop in a
  *             quarter of the stagger step apart;
  *   hover   — the emoji itself lifts (`data-hovered`, frozen while the bar closes), not the cell;
- *   «⌄»     — the extra rows glide open and closed on one clock and curve (grid rows 0fr ↔ 1fr,
- *             `base`, ease-in-out); their emoji stay mounted and fade / scale in a short stagger
+ *   «⌄»     — the extra rows glide open and closed on one clock and curve (`Disclosure`,
+ *             `base`, standard); their emoji stay mounted and fade / scale in a short stagger
  *             both ways (in from the first, out from the last); the chevron turns;
  *   pick    — the chosen emoji pops while the bar leaves;
  *   close   — the open played back: the same clock and the same ease-in-out curve as a Sidebar
@@ -24,7 +24,6 @@
   --step: calc(var(--prime-motion-stagger) / 4);
 
   display: grid;
-  grid-template-rows: auto 0fr;
   min-width: 0;
   max-width: 95vw;
   padding: var(--prime-space-1);
@@ -41,8 +40,7 @@
   animation: none;
   transition:
     opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 @starting-style {
@@ -57,10 +55,6 @@
   transform: translateY(var(--prime-space-1)) scale(var(--prime-motion-scale-enter));
 }
 
-.bar[role="toolbar"][data-expanded] {
-  grid-template-rows: auto 1fr;
-}
-
 .row {
   display: grid;
   grid-auto-columns: var(--cell);
@@ -69,9 +63,10 @@
   gap: var(--prime-space-1);
 }
 
+/* The extra rows fold open and closed (`Disclosure`) on the bar's own clock and curve. */
 .extra {
-  min-height: 0;
-  overflow: hidden;
+  --disclosure-duration: var(--prime-motion-duration-base);
+  --disclosure-ease: var(--prime-motion-easing-standard);
 }
 
 /* The rest wraps under the row, as many per line as the row holds. */
@@ -88,8 +83,6 @@
  * done before the rows close over them.
  */
 .extra .reaction {
-  --n: 8;
-  animation: none;
   opacity: 0;
   transform: scale(var(--prime-motion-scale-pop));
   transition:
@@ -119,9 +112,6 @@
   background: none;
   color: var(--prime-color-text-secondary);
   cursor: pointer;
-  /* `backwards`: once in, the cell answers its static styles (the exit below). */
-  animation: reactionIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) backwards;
-  animation-delay: calc(var(--i, 0) * var(--step));
   transition:
     background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
     opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
@@ -183,12 +173,15 @@
   transform: rotate(180deg);
 }
 
-/* A reaction is a moment of delight (foundation §7 rule 1): a small pop, never from nothing. */
-@keyframes reactionIn {
-  from {
-    opacity: 0;
-    transform: scale(var(--prime-motion-scale-pop));
-  }
+/*
+ * A reaction is a moment of delight (foundation §7 rule 1): the quick row pops in one after
+ * another (`enterMotion.enter` from the popping scale, a step apart), never from nothing.
+ */
+.row > .reaction {
+  --enter-shift: 0;
+  --enter-scale: var(--prime-motion-scale-pop);
+
+  animation-delay: calc(var(--i, 0) * var(--step));
 }
 
 @keyframes reactionPick {
@@ -198,11 +191,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reaction,
-  .reaction[data-picked] .glyph {
-    animation: none;
-  }
-
   .glyph,
   .reaction[data-hovered] .glyph,
   .reaction:focus-visible .glyph,
