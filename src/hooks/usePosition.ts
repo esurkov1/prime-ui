@@ -54,12 +54,19 @@ function getRootFontSizePx(): number {
 }
 
 /**
- * Computed length of a CSS custom property on `:root` in px (rem/px values).
- * Falls back when there is no DOM / stylesheet (SSR, jsdom).
+ * Computed length of a CSS custom property in px (rem/px values): on `element` when given (a value
+ * a component or its tier sets on it), else on `:root`. Falls back when there is no DOM /
+ * stylesheet (SSR, jsdom).
  */
-export function readCssLengthPx(name: string, fallbackPx: number): number {
+export function readCssLengthPx(
+  name: string,
+  fallbackPx: number,
+  element?: Element | null,
+): number {
   if (typeof document === "undefined") return fallbackPx;
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const raw = getComputedStyle(element ?? document.documentElement)
+    .getPropertyValue(name)
+    .trim();
   if (!raw) return fallbackPx;
   const n = Number.parseFloat(raw);
   if (!Number.isFinite(n)) return fallbackPx;

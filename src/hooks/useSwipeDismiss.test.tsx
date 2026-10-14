@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { swipe } from "@/test/mobile";
@@ -7,34 +8,35 @@ import { useSwipeDismiss } from "./useSwipeDismiss";
 
 function Panel({
   onDismiss,
-  onProgress,
   enabled = true,
+  guard = null,
 }: {
   onDismiss: () => void;
-  onProgress?: (progress: number) => void;
   enabled?: boolean;
+  guard?: "busy" | "dirty" | null;
 }) {
-  const swipeProps = useSwipeDismiss({
-    enabled,
-    onDismiss,
-    onProgress,
-    handle: "[data-swipe-handle]",
-  });
+  const scrimRef = React.useRef<HTMLDivElement>(null);
+  const gesture = useSwipeDismiss({ enabled, guard, onDismiss, scrimRef });
   return (
-    <div
-      data-testid="panel"
-      ref={(node) => {
-        if (!node) return;
-        Object.defineProperty(node, "offsetHeight", { configurable: true, value: 400 });
-        Object.defineProperty(node, "offsetWidth", { configurable: true, value: 300 });
-      }}
-      {...swipeProps}
-    >
-      <div data-testid="handle" data-swipe-handle="" />
-      <div data-testid="body">
-        <input aria-label="Поле" />
+    <>
+      <div data-testid="scrim" ref={scrimRef} />
+      <div
+        data-testid="panel"
+        ref={(node) => {
+          if (!node) return;
+          Object.defineProperty(node, "offsetHeight", { configurable: true, value: 400 });
+          Object.defineProperty(node, "offsetWidth", { configurable: true, value: 300 });
+        }}
+        onPointerDown={gesture.onPointerDown}
+        {...gesture.panelProps}
+      >
+        {gesture.enabled ? <div data-testid="handle" data-swipe-handle="" /> : null}
+        <header data-testid="header">Заказ</header>
+        <div data-testid="body">
+          <input aria-label="Поле" />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -46,9 +48,11 @@ describe("useSwipeDismiss", () => {
     render(<Panel onDismiss={onDismiss} />);
     swipe(screen.getByTestId("handle"), origin, { x: 100, y: 260 });
     expect(onDismiss).toHaveBeenCalledTimes(1);
-    // It glides on out from the release point: the whole height, keyframe exit switched off.
+    // It glides on out from the release point: the whole height, keyframe exit switched off on
+    // the panel and on the scrim that follows it.
     const panel = screen.getByTestId("panel");
     expect(panel).toHaveAttribute("data-swipe-dismissed");
+    expect(screen.getByTestId("scrim")).toHaveAttribute("data-swipe-dismissed");
     expect(panel.style.getPropertyValue("--swipe-offset")).toBe("400px");
   });
 
@@ -60,20 +64,17 @@ describe("useSwipeDismiss", () => {
     const panel = screen.getByTestId("panel");
     expect(panel.style.getPropertyValue("--swipe-offset")).toBe("0px");
     expect(panel).not.toHaveAttribute("data-swiping");
+    expect(screen.getByTestId("scrim")).not.toHaveAttribute("data-swiping");
   });
 
-  it("reports how far out the panel is: along the drag, then 1 when it leaves or 0 back", () => {
-    const onProgress = vi.fn();
-    render(<Panel onDismiss={() => {}} onProgress={onProgress} />);
-    swipe(screen.getByTestId("handle"), origin, { x: 100, y: 300 }, { steps: 4 });
-    const values = onProgress.mock.calls.map(([progress]) => progress);
-    // 400px panel: moves of 50 · 100 · 150 · 200 (the first one is past the slop) → 0.125 … 0.5.
-    expect(values.slice(0, 4)).toEqual([0.125, 0.25, 0.375, 0.5]);
-    expect(values.at(-1)).toBe(1);
-
-    onProgress.mockClear();
+  it("fades the scrim with the drag: how far out the panel is, then 1 when it leaves or 0 back", () => {
+    render(<Panel onDismiss={() => {}} />);
+    const scrim = screen.getByTestId("scrim");
+    const progress = () => scrim.style.getPropertyValue("--swipe-progress");
     swipe(screen.getByTestId("handle"), origin, { x: 100, y: 140 });
-    expect(onProgress.mock.calls.at(-1)?.[0]).toBe(0);
+    expect(progress()).toBe("0");
+    swipe(screen.getByTestId("handle"), origin, { x: 100, y: 300 }, { steps: 4 });
+    expect(progress()).toBe("1");
   });
 
   it("closes on a quick flick from any distance past the slop", () => {
@@ -97,22 +98,48 @@ describe("useSwipeDismiss", () => {
     expect(onDismiss).not.toHaveBeenCalled();
   });
 
-  it("starts only from the handle, by touch or by mouse", () => {
+  it("starts from the handle or the header under it, by touch or by mouse", () => {
     const onDismiss = vi.fn();
     render(<Panel onDismiss={onDismiss} />);
     swipe(screen.getByTestId("body"), origin, { x: 100, y: 300 });
     expect(onDismiss).not.toHaveBeenCalled();
     swipe(screen.getByTestId("handle"), origin, { x: 100, y: 300 }, { pointerType: "mouse" });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    swipe(screen.getByTestId("header"), origin, { x: 100, y: 300 });
+    expect(onDismiss).toHaveBeenCalledTimes(2);
   });
 
-  it("never starts on a text field or while disabled", () => {
+  it("never starts on a text field", () => {
     const onDismiss = vi.fn();
-    const { rerender } = render(<Panel onDismiss={onDismiss} />);
+    render(<Panel onDismiss={onDismiss} />);
     swipe(screen.getByRole("textbox"), origin, { x: 100, y: 400 });
     expect(onDismiss).not.toHaveBeenCalled();
-    rerender(<Panel onDismiss={onDismiss} enabled={false} />);
+  });
+
+  it("has no handle and no gesture while off", () => {
+    const onDismiss = vi.fn();
+    render(<Panel onDismiss={onDismiss} enabled={false} />);
+    expect(screen.queryByTestId("handle")).toBeNull();
+    swipe(screen.getByTestId("header"), origin, { x: 100, y: 400 });
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("holds a busy panel: the handle stays, no drag starts, the panel is marked", () => {
+    const onDismiss = vi.fn();
+    render(<Panel onDismiss={onDismiss} guard="busy" />);
+    expect(screen.getByTestId("panel")).toHaveAttribute("data-swipe-disabled");
     swipe(screen.getByTestId("handle"), origin, { x: 100, y: 400 });
     expect(onDismiss).not.toHaveBeenCalled();
+    expect(screen.getByTestId("panel").style.getPropertyValue("--swipe-offset")).toBe("");
+  });
+
+  it("glides a dirty panel back and asks through onDismiss instead of leaving", () => {
+    const onDismiss = vi.fn();
+    render(<Panel onDismiss={onDismiss} guard="dirty" />);
+    swipe(screen.getByTestId("handle"), origin, { x: 100, y: 300 });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    const panel = screen.getByTestId("panel");
+    expect(panel).not.toHaveAttribute("data-swipe-dismissed");
+    expect(panel.style.getPropertyValue("--swipe-offset")).toBe("0px");
   });
 });

@@ -83,6 +83,8 @@ function FloatingChartTooltip({
     },
     triggerRef: anchorRef,
     dismiss: "none",
+    closeOnEscape: true,
+    closeOnOutsideClick: true,
     side: "right",
     align: "center",
     // Clear of the pointer's arrow, which hangs down and right of its hot spot.

@@ -8,7 +8,11 @@ import { useScrollLock } from "./useScrollLock";
 
 export type UseModalLayerOptions = {
   open: boolean;
-  /** Escape (`escape`) or a click on the scrim (`scrim`); the owner applies its `closeOn*` props. */
+  /** Escape asks the layer to close (the owner's `closeOnEscape`). */
+  closeOnEscape: boolean;
+  /** A click on the scrim asks the layer to close (the owner's `closeOnOutsideClick`). */
+  closeOnOutsideClick: boolean;
+  /** A dismiss the options allow: Escape (`escape`) or a click on the scrim (`scrim`). */
   onDismiss: (reason: DismissReason) => void;
 };
 
@@ -20,9 +24,10 @@ export type ModalLayer<T extends HTMLElement> = {
 };
 
 /**
- * The mechanics of a modal layer — Modal, Drawer, CommandMenu, the off-canvas Sidebar — in one
- * fixed order: the rest of the page becomes inert, focus moves in and Tab is trapped, document
- * scroll locks, and the layer joins the stack with scrim (`click`) dismissal. On close the page is
+ * The mechanics of a modal layer — Modal, Drawer, Sheet, ConfirmDialog, CommandMenu, MediaViewer,
+ * the off-canvas Sidebar — in one fixed order: the rest of the page becomes inert, focus moves in
+ * and Tab is trapped, document scroll locks, and the layer joins the stack with scrim (`click`)
+ * dismissal, filtered by `closeOnEscape` / `closeOnOutsideClick` before `onDismiss` hears of it. On close the page is
  * restored first, then focus returns to the opener, captured at the open transition — the control
  * that was pressed (Safari does not focus a clicked button), else the focused element; a layer a
  * pointer opened returns focus without the focus ring. Focus always returns, also after a scrim
@@ -31,12 +36,14 @@ export type ModalLayer<T extends HTMLElement> = {
  */
 export function useModalLayer<T extends HTMLElement = HTMLElement>({
   open,
+  closeOnEscape,
+  closeOnOutsideClick,
   onDismiss,
 }: UseModalLayerOptions): ModalLayer<T> {
   const ref = React.useRef<T | null>(null);
 
   // Read while rendering the open transition: before a child `autoFocus` moves focus inside.
-  const openerRef = React.useRef<Opener>({ element: null, byPointer: false });
+  const openerRef = React.useRef<Opener>({ element: null, target: null, byPointer: false });
   const wasOpenRef = React.useRef(false);
   if (open !== wasOpenRef.current) {
     wasOpenRef.current = open;
@@ -61,7 +68,14 @@ export function useModalLayer<T extends HTMLElement = HTMLElement>({
 
   useScrollLock(open);
 
-  const layer = useLayer(open, { refs: [ref], dismiss: "click", trap: true, onDismiss });
+  const layer = useLayer(open, {
+    refs: [ref],
+    dismiss: "click",
+    trap: true,
+    onDismiss: (reason) => {
+      if (reason === "escape" ? closeOnEscape : closeOnOutsideClick) onDismiss(reason);
+    },
+  });
 
   return { ref, layer };
 }

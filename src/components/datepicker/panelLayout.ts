@@ -85,36 +85,6 @@ export function useViewportWidth(enabled: boolean): number | null {
   return enabled ? width : null;
 }
 
-/** Whether the element itself can scroll in the wheel's direction. */
-function canScroll(el: HTMLElement, deltaY: number): boolean {
-  const { overflowY } = getComputedStyle(el);
-  if (overflowY !== "auto" && overflowY !== "scroll") return false;
-  if (el.scrollHeight <= el.clientHeight) return false;
-  return deltaY < 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight;
-}
-
-/**
- * The wheel over an open calendar does not scroll the page under it; scrolling areas inside (the
- * presets list) work as usual. `overscroll-behavior: contain` is not enough: it only holds while
- * the popover itself overflows, and a calendar that fits chains the wheel to the page.
- */
-export function useContainScroll(node: HTMLElement | null) {
-  React.useEffect(() => {
-    if (!node) return;
-    // The boundary is the whole popover: it scrolls itself when the calendar is taller than the viewport.
-    const boundary = node.closest<HTMLElement>('[role="dialog"]') ?? node;
-    const onWheel = (event: WheelEvent) => {
-      for (let el = event.target as HTMLElement | null; el; el = el.parentElement) {
-        if (canScroll(el, event.deltaY)) return;
-        if (el === boundary) break;
-      }
-      event.preventDefault();
-    };
-    boundary.addEventListener("wheel", onWheel, { passive: false });
-    return () => boundary.removeEventListener("wheel", onWheel);
-  }, [node]);
-}
-
 /**
  * Available width of an embedded panel: the content box of its PARENT (ResizeObserver), not the
  * panel's own width (that follows the content) — otherwise «1 or 2 months» would loop. `null` —

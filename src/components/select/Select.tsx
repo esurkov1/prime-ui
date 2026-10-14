@@ -633,6 +633,8 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     open: isOpen,
     onOpenChange: setOpen,
     triggerRef,
+    closeOnEscape: true,
+    closeOnOutsideClick: true,
     matchAnchorWidth: true,
     focusOnOpen: true,
     tabExit: "always",

@@ -5,6 +5,7 @@ import {
   computeFloatingPosition,
   DEFAULT_ALIGN,
   DEFAULT_SIDE,
+  readCssLengthPx,
 } from "./usePosition";
 
 const anchor = (left: number, width: number) =>
@@ -168,5 +169,22 @@ describe("computeFloatingPosition — sides and arrow", () => {
     });
     expect(p.side).toBe("right");
     expect(p.left).toBe(60);
+  });
+});
+
+describe("readCssLengthPx", () => {
+  it("reads a length from :root, or from the element that sets it", () => {
+    document.documentElement.style.setProperty("--test-gap", "12px");
+    const chip = document.createElement("div");
+    chip.style.setProperty("--test-gap", "0.5rem");
+    document.body.append(chip);
+    try {
+      expect(readCssLengthPx("--test-gap", 4)).toBe(12);
+      expect(readCssLengthPx("--test-gap", 4, chip)).toBe(8);
+      expect(readCssLengthPx("--test-missing", 4, chip)).toBe(4);
+    } finally {
+      chip.remove();
+      document.documentElement.style.removeProperty("--test-gap");
+    }
   });
 });

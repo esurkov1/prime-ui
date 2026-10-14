@@ -33,7 +33,20 @@ describe("floating layers on a wide viewport", () => {
     fireEvent.click(screen.getByRole("button", { name: "Действия" }));
     const menu = screen.getByRole("menu");
     expect(menu).toHaveAttribute("data-state", "open");
+    expect(menu).not.toHaveAttribute("data-sheet");
     expect(menu.parentElement?.querySelector("[data-swipe-handle]")).toBeNull();
+  });
+
+  it("carry their width mode on the surface", () => {
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>
+          <button type="button">Период</button>
+        </Popover.Trigger>
+        <Popover.Content width="content">Два месяца</Popover.Content>
+      </Popover.Root>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-width", "content");
   });
 });
 
@@ -55,6 +68,9 @@ describe("floating layers below 640px", () => {
     const sheet = sheetOf(menu);
     expect(sheet).toHaveAttribute("data-state", "open");
     expect(menu).not.toHaveAttribute("data-state");
+    // The panel stands in the sheet: its own width rules give way to the sheet's.
+    expect(menu).toHaveAttribute("data-sheet");
+    expect(menu).not.toHaveAttribute("data-width");
     expect(sheet.firstElementChild).toHaveAttribute("data-swipe-handle");
     expect(sheet.firstElementChild).toHaveAttribute("aria-hidden", "true");
     expect(sheet.previousElementSibling).toHaveAttribute("role", "presentation");
@@ -77,6 +93,22 @@ describe("floating layers below 640px", () => {
     const scrim = sheetOf(screen.getByRole("menu")).previousElementSibling as Element;
     fireEvent.pointerDown(scrim);
     await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument());
+  });
+
+  it("draws no handle and takes no swipe when an outside press does not close it", () => {
+    render(
+      <Dropdown.Root closeOnOutsideClick={false}>
+        <Dropdown.Trigger>
+          <button type="button">Действия</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Переименовать</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Действия" }));
+    expect(document.querySelector("[data-swipe-handle]")).toBeNull();
+    expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 
   it("a Select listbox picks a value inside the sheet", async () => {

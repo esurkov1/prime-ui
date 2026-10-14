@@ -275,9 +275,10 @@ function ViewerDialog({
 
   const { ref: layerRef, layer } = useModalLayer<HTMLDivElement>({
     open,
-    onDismiss: (reason) => {
-      if (reason === "escape" && closeOnEscape) setOpen(false);
-    },
+    closeOnEscape,
+    // The viewer covers the viewport: a press beside the picture is its own (handled below).
+    closeOnOutsideClick,
+    onDismiss: () => setOpen(false),
   });
   const rootRef = useMergedRefs(layerRef, ref);
   const stageRef = React.useRef<HTMLDivElement>(null);

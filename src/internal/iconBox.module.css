@@ -49,3 +49,49 @@
 .inherit.xl {
   --icon-box: var(--prime-icon-size, var(--prime-control-xl-icon));
 }
+
+/*
+ * The icon tile: a 40px filled box of a role around one glyph — the mark of a dialog header
+ * (Modal / Drawer / Sheet `Icon`) or a sign-in form. Put `.tile` on the box and the role in
+ * `data-tone` (`neutral` · `accent` · `success` · `warning` · `danger` · `info`); the glyph inside
+ * (a kit `Icon`) takes the m icon size from `--prime-icon-size`.
+ */
+.tile {
+  --prime-icon-size: var(--prime-icon-m);
+
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-space-10);
+  height: var(--prime-space-10);
+  border-radius: var(--prime-radius-l);
+  /* The fill and the glyph colour of the role travel as one pair. */
+  background: var(--icon-tile-fill, var(--prime-color-fill-muted));
+  color: var(--icon-tile-ink, var(--prime-color-text-secondary));
+}
+
+.tile[data-tone="accent"] {
+  --icon-tile-fill: var(--prime-color-accent-soft);
+  --icon-tile-ink: var(--prime-color-accent-text);
+}
+
+.tile[data-tone="success"] {
+  --icon-tile-fill: var(--prime-color-success-soft);
+  --icon-tile-ink: var(--prime-color-success-text);
+}
+
+.tile[data-tone="warning"] {
+  --icon-tile-fill: var(--prime-color-warning-soft);
+  --icon-tile-ink: var(--prime-color-warning-text);
+}
+
+.tile[data-tone="danger"] {
+  --icon-tile-fill: var(--prime-color-danger-soft);
+  --icon-tile-ink: var(--prime-color-danger-text);
+}
+
+.tile[data-tone="info"] {
+  --icon-tile-fill: var(--prime-color-info-soft);
+  --icon-tile-ink: var(--prime-color-info-text);
+}
