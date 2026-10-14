@@ -17,6 +17,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { LayerProvider } from "@/internal/overlay/layerStack";
+import palette from "@/internal/palette.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
 import { type ControlSize, type PaletteColor, stepDown, type Variant } from "@/internal/states";
@@ -650,10 +651,7 @@ function SidebarItemCount({ children, color, variant, className, ...rest }: Side
         {children}
       </Badge.Root>
       <ControlSizeProvider value="l">
-        <Badge.Dot
-          className={styles.dot}
-          style={{ color: `var(--prime-color-palette-${hue}-solid)` }}
-        />
+        <Badge.Dot className={cx(palette.hue, styles.dot)} data-color={hue} />
       </ControlSizeProvider>
     </>
   );
@@ -696,9 +694,9 @@ function AttentionDot({
   return (
     <ControlSizeProvider value="l">
       <Badge.Dot
-        className={cx(styles.dot, inline && styles.dotInline)}
+        className={cx(palette.hue, styles.dot, inline && styles.dotInline)}
+        data-color={hue}
         data-attention={shown ? "shown" : "hidden"}
-        style={{ color: `var(--prime-color-palette-${hue}-solid)` }}
       />
     </ControlSizeProvider>
   );

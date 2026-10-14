@@ -856,6 +856,7 @@
   inset-block-start: calc(50% - var(--sb-icon) / 2 - var(--prime-space-1) / 2);
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
   display: inline-flex;
+  color: var(--hue-solid);
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-layer-current);
   opacity: 0;
   scale: var(--sb-edge-scale);

@@ -974,9 +974,7 @@ describe("Sidebar attention dot on folded parents", () => {
     render(<Tree />);
     const heading = document.querySelector('[data-collapsible="true"] > button[aria-controls]');
     expect(dotIn(heading)).toHaveAttribute("data-attention", "shown");
-    expect((dotIn(heading) as HTMLElement).style.color).toBe(
-      "var(--prime-color-palette-red-solid)",
-    );
+    expect(dotIn(heading)).toHaveAttribute("data-color", "red");
 
     fireEvent.click(heading as HTMLElement);
     expect(dotIn(heading)).toHaveAttribute("data-attention", "hidden");
