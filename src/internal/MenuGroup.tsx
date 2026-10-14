@@ -4,7 +4,6 @@ import { cx } from "./cx";
 import menu from "./menu.module.css";
 
 export type MenuGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
-  /** Visible heading of the group; names it for screen readers. */
   label?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };

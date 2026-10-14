@@ -7,11 +7,8 @@ import type { PaletteColor, Tone } from "./states";
 /** The two modes of a progress indicator; the component adds its own common props. */
 export type ProgressModeProps =
   | {
-      /** Current value; clamped to `0…max`. */
       value: number;
-      /** Top of the scale. Default `100`. */
       max?: number;
-      /** Fill color. Default `accent`. */
       tone?: Tone;
       segments?: never;
       segmentGap?: never;
@@ -20,17 +17,11 @@ export type ProgressModeProps =
       formatValue?: never;
     }
   | {
-      /** Parts in order (left to right, clockwise from the top); each one's size is its share of `max`. */
       segments: ProgressSegment[];
-      /** Total capacity. Default: the sum of the segments (they fill the whole indicator). */
       max?: number;
-      /** `hairline` draws every part on its own with a gap. Default `none`. */
       segmentGap?: "none" | "hairline";
-      /** Built-in accessible strings for empty distributions. */
       labels?: Partial<ProgressSegmentsLabels>;
-      /** A legend of the parts: color · name · value · share. Default `false`. */
       legend?: boolean;
-      /** Display of a value in the legend (and in ProgressBar rows). Default: Russian digit groups. */
       formatValue?: (value: number) => string;
       value?: never;
       tone?: never;
