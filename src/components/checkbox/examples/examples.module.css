@@ -19,12 +19,13 @@
   width: min(100%, var(--prime-layout-form-width-s));
 }
 
-/* indicator.tsx: selectable tiles in a fluid grid. */
+/* indicator.tsx: selectable tiles in a fluid grid; a column holds a whole module name (a tile
+   label stays on one line), so a narrow column stacks the tiles instead of truncating them. */
 .tiles {
   display: grid;
   grid-template-columns: repeat(
       auto-fit,
-      minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr)
+      minmax(min(100%, calc(var(--prime-layout-tile-min-width) * 1.5)), 1fr)
     );
   gap: var(--prime-space-4);
   width: 100%;
