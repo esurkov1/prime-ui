@@ -280,6 +280,13 @@ export const api: ComponentApi = {
           ru: "Первая видимая колонка (с колонками выбора и раскрытия) закреплена при горизонтальной прокрутке; тень начального края падает от её конца.",
         },
         {
+          name: "stickyLastColumn",
+          type: "boolean",
+          default: "false",
+          en: "The last visible column (row actions) sticks to the end edge while scrolling sideways; the end edge shadow falls from its start edge.",
+          ru: "Последняя видимая колонка (действия со строкой) закреплена у конечного края при горизонтальной прокрутке; тень конечного края падает от её начала.",
+        },
+        {
           name: "showHeader",
           type: "boolean",
           default: "true",

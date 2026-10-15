@@ -18,9 +18,9 @@
   box-shadow: var(--prime-shadow-raised);
 }
 
-/* The grip sits closer to the edge: it is a square button with its own inner room. */
+/* The grip ends the row and sits closer to the edge: a square button with its own inner room. */
 .handleRow {
-  padding-inline-start: var(--prime-space-2);
+  padding-inline-end: var(--prime-space-2);
 }
 
 .rowText {
@@ -134,9 +134,10 @@
   text-align: end;
 }
 
+/* The grip column ends the row. */
 .grip {
   inline-size: var(--prime-space-10);
-  padding-inline-end: 0;
+  padding-inline-start: 0;
 }
 
 /* A stage's heading row: a fill marks where a new stage starts. */

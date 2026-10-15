@@ -438,6 +438,33 @@ describe("List onReorder", () => {
     expect(onOpen).not.toHaveBeenCalled();
   });
 
+  it("ends a reorderable row with its handle, after List.ItemActions; Tab: row, control, handle", async () => {
+    const user = userEvent.setup();
+    render(
+      <List.Root aria-label="Этапы" onReorder={() => {}}>
+        <List.Item value="talks">
+          <List.ItemText>Переговоры</List.ItemText>
+          <List.ItemActions>
+            <Switch.Root aria-label="Показывать на доске" />
+          </List.ItemActions>
+        </List.Item>
+        <List.Item value="contract">Договор</List.Item>
+      </List.Root>,
+    );
+    const handle = screen.getByRole("button", { name: "Переместить Переговоры" });
+    const row = handle.closest("li");
+    expect(row?.lastElementChild).toContainElement(handle);
+    expect(row?.lastElementChild).toHaveClass(styles.grip ?? "");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Переговоры" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("switch", { name: "Показывать на доске" })).toHaveFocus();
+    await user.tab();
+    expect(handle).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Договор" })).toHaveFocus();
+  });
+
   it("keeps List.ItemActions out of a link row made with asChild", () => {
     render(
       <List.Root aria-label="Этапы">

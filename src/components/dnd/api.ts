@@ -183,8 +183,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Handle",
-      en: "`ref` → `HTMLButtonElement` (`HTMLSpanElement` in a `locked` item). The grip: a ghost icon-only `xs` Button that starts the drag and takes the item's keys; busy while the item's move is saved. In a `locked` item it is a lock.",
-      ru: "Ручка: ghost-кнопка `xs` с одной иконкой, начинает перетаскивание и принимает клавиши элемента; занята, пока перенос сохраняется. В элементе с `locked` — замок.",
+      en: "`ref` → `HTMLButtonElement` (`HTMLSpanElement` in a `locked` item). The grip: a ghost icon-only `xs` Button that starts the drag and takes the item's keys; busy while saving. In a `locked` item it is a lock. Place it last in the item, after its controls.",
+      ru: "Ручка: ghost-кнопка `xs` с одной иконкой, начинает перетаскивание и принимает клавиши элемента; занята, пока перенос сохраняется. В элементе с `locked` — замок. Ставьте её последней в элементе, после его контролов.",
       props: [
         {
           name: "aria-label",

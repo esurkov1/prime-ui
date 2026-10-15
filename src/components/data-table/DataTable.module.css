@@ -197,6 +197,11 @@
   display: none;
 }
 
+/* With a sticky last column the end shadow falls from that column's start edge instead. */
+.root[data-sticky-last-column="true"] .frame::after {
+  display: none;
+}
+
 .table {
   /* Control one tier down: the tallest single-row content (Button, Select, Input in a cell). */
   --dt-cell-control: var(--field-h);
@@ -685,7 +690,7 @@
  * Tab) covers every other cell, so the whole row is the link's hit area — a sticky cell included.
  * Controls inside the cells stand above it; a custom widget joins them with `data-row-click-ignore`.
  */
-.row[data-link="true"] > .cell:not(.firstColumnSticky, .stickyLead) {
+.row[data-link="true"] > .cell:not(.firstColumnSticky, .lastColumnSticky, .stickyLead) {
   position: relative;
 }
 
@@ -889,7 +894,57 @@ tbody + tbody > .groupRow > .groupCell {
   z-index: var(--dt-z-sticky-header);
 }
 
-/* Sticky head and first column: the leading head cells stick to both edges. */
+/* ---------- Sticky last column ---------- */
+
+/* The mirror of the first column: the last visible column (row actions) sticks to the end edge. */
+.lastColumnSticky {
+  position: sticky;
+  inset-inline-end: 0;
+  z-index: var(--dt-z-sticky-first-column);
+  box-shadow: inset var(--prime-border-width) 0 0 var(--dt-divider-color);
+}
+
+.root:dir(rtl) .lastColumnSticky {
+  box-shadow: inset calc(var(--prime-border-width) * -1) 0 0 var(--dt-divider-color);
+}
+
+.headCell.lastColumnSticky {
+  z-index: var(--dt-z-sticky-header);
+  box-shadow:
+    inset var(--prime-border-width) 0 0 var(--dt-divider-color),
+    var(--sticky-bleed, 0 0 0 0 transparent);
+}
+
+.root:dir(rtl) .headCell.lastColumnSticky {
+  box-shadow:
+    inset calc(var(--prime-border-width) * -1) 0 0 var(--dt-divider-color),
+    var(--sticky-bleed, 0 0 0 0 transparent);
+}
+
+/* End edge cue of a sticky last column: a shadow from its start edge over the columns under it. */
+.lastColumnSticky::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 100%;
+  width: var(--dt-edge-depth);
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(var(--dt-edge-dir), transparent, var(--dt-edge-shadow));
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-overflow-end="true"] .lastColumnSticky::before {
+  opacity: 1;
+}
+
+/* The sticky column draws its own edge; its column divider would double it. */
+.cell.lastColumnSticky,
+.headCell.lastColumnSticky {
+  border-inline-start-width: 0;
+}
+
+/* Sticky head and a sticky column: the corner head cells stick to both edges. */
 .cornerCellSticky {
   z-index: var(--dt-z-sticky-corner);
 }

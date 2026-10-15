@@ -247,8 +247,9 @@
   gap: var(--prime-space-1);
 }
 
-/* The grip sits before the row element, centred on the row; a spinner stands in while saving. The
-   row's radius shapes the carried copy and the gap it leaves like the row itself. */
+/* The grip sits at the row's end, after the row element and its controls, centred on the row; a
+   spinner stands in while saving. The row's radius shapes the carried copy and the gap it leaves
+   like the row itself. */
 .sortableRow {
   align-items: center;
   gap: var(--prime-space-1);

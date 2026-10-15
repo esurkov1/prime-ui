@@ -69,7 +69,7 @@
   --prime-color-accent-soft: var(--prime-ref-color-cobalt-100);
   --prime-color-accent-soft-hover: var(--prime-ref-color-cobalt-200);
   --prime-color-accent-text: var(--prime-ref-color-cobalt-700);
-  --prime-color-bg-edge-shadow: color-mix(in srgb, var(--prime-ref-color-gray-925) 14%, transparent);
+  --prime-color-bg-edge-shadow: color-mix(in srgb, var(--prime-ref-color-gray-925) 8%, transparent);
   --prime-color-bg-glass: color-mix(in srgb, var(--prime-ref-color-white) 72%, transparent);
   --prime-color-bg-glass-edge: color-mix(in srgb, var(--prime-ref-color-white) 85%, transparent);
   --prime-color-bg-glass-solid: var(--prime-color-layer-floating-bg);

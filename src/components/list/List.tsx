@@ -425,8 +425,9 @@ function ListItem({
     );
   }
 
-  // A reorderable row: the grip beside the row element (a button cannot hold a button); Dnd makes
-  // the grip busy while the owner saves this row's move.
+  // A reorderable row: the grip after the row element and its controls, at the row's end (a button
+  // cannot hold a button), so Tab reaches the row before its grip; Dnd makes the grip busy while the
+  // owner saves this row's move.
   const label = formatLabel(reorder.handleLabel, { label: itemLabel({ asChild, children }) });
   return (
     <Dnd.SortableItem
@@ -435,10 +436,10 @@ function ListItem({
       disabled={disabled}
       className={cx(rowClass, styles.sortableRow)}
     >
+      {element}
       <span className={cx(fieldTierClass, styles.grip)} data-size="xs">
         <Dnd.Handle aria-label={label.trim()} disabled={disabled} />
       </span>
-      {element}
     </Dnd.SortableItem>
   );
 }

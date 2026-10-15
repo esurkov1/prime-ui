@@ -1,7 +1,7 @@
 /*
  * FieldList — an editable list of records of one shape (foundation §1 rule 3: proximity, no lines).
  * One grid track list for the heading row and every row (`--fl-columns`, set per row so a row
- * carried by Dnd keeps its tracks): [lead: handle or lock] [the columns] [end: remove]. The column
+ * carried by Dnd keeps its tracks): [the columns] [end: remove] [grip: handle or lock]. The column
  * headings stand once above the rows; the fields inside carry them as hidden labels (`fieldCell`).
  * In a narrow container (`prime-field-list`, < 30rem) the heading row goes, every row stacks its
  * fields into one column and each field shows its label (FieldFrame). The totals row
@@ -24,7 +24,7 @@
 /*
  * Tracks, from the field tier of the row (`fieldTierClass` + `data-size` on it); FieldList.tsx
  * lists them per column. The row's field height and label line are kept here, resolved on the row,
- * for the lead box, which carries the `xs` tier of its own.
+ * for the grip box, which carries the `xs` tier of its own.
  */
 .row {
   --fl-end: var(--field-h);
@@ -72,7 +72,7 @@
 }
 
 /* Handle, lock and remove sit on the middle of the first line of fields, not of a grown row. */
-.lead,
+.grip,
 .end {
   display: flex;
   align-items: center;
@@ -80,8 +80,9 @@
   height: var(--fl-row-h);
 }
 
-/* The lead box is one `xs` control wide (its own tier): the handle, the lock or nothing. */
-.lead {
+/* The grip box ends the row, one `xs` control wide (its own tier): the handle, the lock or
+   nothing, so every row ends on the same line. */
+.grip {
   inline-size: var(--field-h);
 }
 
@@ -130,18 +131,12 @@
   min-width: 0;
 }
 
-/* The add button lines up with the first column of fields, past the lead column (an `xs` box:
-   the indented add row carries the `xs` tier). */
-.addIndented {
-  padding-inline-start: calc(var(--field-h) + var(--prime-space-3));
-}
-
 .limit {
   color: var(--prime-color-text-muted);
 }
 
 /*
- * Narrow container: no heading row; a row is [lead] [its fields in one column] [remove], rows a
+ * Narrow container: no heading row; a row is [its fields in one column] [remove] [grip], rows a
  * group apart so each record reads as one block.
  */
 /* The width FieldFrame shows a cell field's own label at (`FieldFrame.module.css`). */
@@ -155,15 +150,15 @@
   }
 
   .row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
   }
 
-  .row:not(:has(> .lead)) {
+  .row:not(:has(> .grip)) {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  /* The handle and the remove button stand on the line of the first field's label. */
-  .lead,
+  /* The remove button and the handle stand on the line of the first field's label. */
+  .grip,
   .end {
     height: var(--fl-label-lh);
   }
@@ -173,10 +168,6 @@
     flex-direction: column;
     gap: var(--prime-space-4);
     min-width: 0;
-  }
-
-  .addIndented {
-    padding-inline-start: 0;
   }
 
   /* Stacked totals: a line per total, its column name at the start and the value at the end. */

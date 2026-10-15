@@ -135,6 +135,21 @@ describe("DataTable", () => {
     );
   });
 
+  it("sticks the last visible column: head and body cells, the end corner with a sticky head", () => {
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} stickyHeader stickyLastColumn />);
+    const root = screen.getByText("Name").closest(`.${styles.root}`);
+    expect(root).toHaveAttribute("data-sticky-last-column", "true");
+    const heads = screen.getAllByRole("columnheader");
+    const last = heads[heads.length - 1] as HTMLElement;
+    expect(last).toHaveClass(styles.lastColumnSticky as string, styles.cornerCellSticky as string);
+    expect(heads[0]).not.toHaveClass(styles.lastColumnSticky as string);
+    for (const row of screen.getAllByRole("row").slice(1)) {
+      const cells = within(row).getAllByRole("cell");
+      expect(cells[cells.length - 1]).toHaveClass(styles.lastColumnSticky as string);
+      expect(cells[0]).not.toHaveClass(styles.lastColumnSticky as string);
+    }
+  });
+
   it("passes table size to Badge and Kbd without explicit size", () => {
     type ChipRow = { id: number };
     const chipColumns: DataTableColumn<ChipRow>[] = [
@@ -1076,6 +1091,20 @@ describe("DataTable hidden columns", () => {
     );
   });
 
+  it("a hidden last column passes the sticky end edge to the last visible one", () => {
+    const columns = ORDER_COLUMNS.map((column) => ({ ...column, hideable: true }));
+    render(
+      <DataTable rows={ORDERS} columns={columns} hiddenColumns={["manager"]} stickyLastColumn />,
+    );
+    expect(screen.getByRole("columnheader", { name: /Сумма/ })).toHaveClass(
+      styles.lastColumnSticky as string,
+    );
+    expect(screen.getByText("120").closest("td")).toHaveClass(styles.lastColumnSticky as string);
+    expect(screen.getByText("ИП Козлов").closest("td")).not.toHaveClass(
+      styles.lastColumnSticky as string,
+    );
+  });
+
   it("hidden columns leave skeleton rows and the colSpan of state rows", () => {
     const { container, rerender } = render(
       <DataTable rows={[]} columns={ORDER_COLUMNS} hiddenColumns={["client"]} loading />,
@@ -1201,6 +1230,19 @@ describe("DataTable edge cue", () => {
     expect(cssValue(column, "opacity")).toBe("1");
     // Pseudo-elements never take layout space.
     expect(cssValue(cssRule(CSS, ".frame::before, .frame::after"), "position")).toBe("absolute");
+  });
+
+  it("CSS: a sticky last column carries the end shadow from its start edge, logical in RTL", () => {
+    const frame = cssRule(CSS, '.root[data-sticky-last-column="true"] .frame::after');
+    expect(cssValue(frame, "display")).toBe("none");
+    const shadow = cssRule(CSS, ".lastColumnSticky::before");
+    expect(cssValue(shadow, "position")).toBe("absolute");
+    expect(cssValue(shadow, "inset-inline-end")).toBe("100%");
+    const shown = cssRule(CSS, '.root[data-overflow-end="true"] .lastColumnSticky::before');
+    expect(cssValue(shown, "opacity")).toBe("1");
+    const column = cssRule(CSS, ".lastColumnSticky");
+    expect(cssValue(column, "position")).toBe("sticky");
+    expect(cssValue(column, "inset-inline-end")).toBe("0");
   });
 
   it("the sticky head is the shared sticky surface (it lets go on a short screen)", () => {

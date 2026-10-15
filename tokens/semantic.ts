@@ -68,7 +68,7 @@ export const semanticTokens = {
       inverse: "{color.gray.925}",
       scrim: "color-mix(in srgb, {color.gray.925} 44%, transparent)",
       /** Soft shade over an edge that hides scrolled content (DataTable columns). */
-      edgeShadow: "color-mix(in srgb, {color.gray.925} 14%, transparent)",
+      edgeShadow: "color-mix(in srgb, {color.gray.925} 8%, transparent)",
       /**
        * Translucent glass over content (floating BottomNav), always with a strong backdrop blur
        * (`--prime-glass-saturation` lifts the colors under it): dense, as the iOS tab bar — the

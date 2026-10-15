@@ -37,7 +37,6 @@ export default function DndHandleExample() {
         }}
         renderItem={(channel) => (
           <Dnd.SortableItem id={channel.id} className={styles.handleRow}>
-            <Dnd.Handle />
             <Typography as="span" variant="body-m" className={styles.rowText}>
               {channel.title}
             </Typography>
@@ -50,6 +49,7 @@ export default function DndHandleExample() {
                 )
               }
             />
+            <Dnd.Handle />
           </Dnd.SortableItem>
         )}
       />

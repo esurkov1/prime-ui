@@ -34,7 +34,7 @@ export const darkThemeOverrides = {
       inverse: "{color.gray.100}",
       scrim: "color-mix(in srgb, {color.black} 60%, transparent)",
       /** Darker than the scrim's share: a shade on a 900 surface needs more ink to read. */
-      edgeShadow: "color-mix(in srgb, {color.black} 50%, transparent)",
+      edgeShadow: "color-mix(in srgb, {color.black} 28%, transparent)",
       glass: "color-mix(in srgb, {color.gray.875} 76%, transparent)",
       glassEdge: "color-mix(in srgb, {color.white} 28%, transparent)",
     },

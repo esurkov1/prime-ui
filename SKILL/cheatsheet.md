@@ -120,6 +120,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A list row with controls of its own (a Switch, a ⋯ menu): `List.ItemActions` inside `List.Item`, a stage colour as `Badge.Dot color` in `List.ItemIcon` — not a control inside the row's button, not a row rebuilt as a `div`.
 - Rows people order by hand: `onReorder(id, beforeId)` (apply it with `moveBefore`, return the save's Promise) — not a Dnd list rebuilt next to the table.
 - A short list of records people order by hand (stages, priorities) is `<List.Root onReorder>` with `List.Item value` — not up / down buttons or a hand-made `Dnd.Sortable`.
+- The grip ends its row: a `Dnd.Handle` is the last child of its item, after the row's own controls, and a locked row's lock takes the same place (List, FieldList and Kanban place theirs there) — not before the row's text.
 - Groups that fold: pass `defaultCollapsedGroups={[]}` (or the controlled `collapsedGroups` + `onCollapsedGroupsChange`) — not your own button in `renderGroupHeader` or filtering `rows`. One heatmap over several columns: the same `scale: { min, max }` on each.
 - A trend in a table row is `<Sparkline layout="compact">` in the column's `cell` (a column `width`, series built once, not inline, the same `min` / `max` on every row when rows compare by size); the number itself goes in its own column. A missing day is `value: null`, never `0`.
 - Properties of one record: `<DescriptionList.Root>` of `DescriptionList.Item` — not a hand-made grid of label / value text, not a one-row DataTable.

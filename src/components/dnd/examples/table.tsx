@@ -51,9 +51,6 @@ export default function DndTableExample() {
         </caption>
         <thead>
           <tr>
-            <th scope="col" className={styles.grip}>
-              <VisuallyHidden>Порядок</VisuallyHidden>
-            </th>
             <th scope="col" className={styles.cell}>
               <Typography as="span" variant="caption" tone="muted">
                 Работа
@@ -63,6 +60,9 @@ export default function DndTableExample() {
               <Typography as="span" variant="caption" tone="muted">
                 Часы
               </Typography>
+            </th>
+            <th scope="col" className={styles.grip}>
+              <VisuallyHidden>Порядок</VisuallyHidden>
             </th>
           </tr>
         </thead>
@@ -90,9 +90,6 @@ export default function DndTableExample() {
             }
             renderItem={(line) => (
               <Dnd.SortableItem id={line.id}>
-                <td className={styles.grip}>
-                  <Dnd.Handle />
-                </td>
                 <td className={styles.cell}>
                   <Typography as="span" variant="body-m">
                     {line.title}
@@ -102,6 +99,9 @@ export default function DndTableExample() {
                   <Typography as="span" variant="body-m">
                     {line.hours}
                   </Typography>
+                </td>
+                <td className={styles.grip}>
+                  <Dnd.Handle />
                 </td>
               </Dnd.SortableItem>
             )}

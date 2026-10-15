@@ -76,15 +76,15 @@ export const api: ComponentApi = {
         {
           name: "getLocked",
           type: "(item: T) => boolean",
-          en: "Pinned rows: a lock in the lead column, no remove button, they hold their place while others move.",
-          ru: "Закреплённые строки: замок в ведущем столбце, без кнопки удаления, держат место при перестановке.",
+          en: "Pinned rows: a lock in the grip column at the row's end, no remove button, they hold their place while others move.",
+          ru: "Закреплённые строки: замок в столбце ручки в конце строки, без кнопки удаления, держат место при перестановке.",
         },
         {
           name: "reorderable",
           type: "boolean",
           default: "false",
-          en: "Rows move by a leading handle: drag, a touch hold, Alt + ↑ / ↓.",
-          ru: "Строки переносятся за ведущую ручку: перетаскивание, удержание, Alt + ↑ / ↓.",
+          en: "Rows move by a handle at the row's end, after the remove button: drag, a touch hold, Alt + ↑ / ↓.",
+          ru: "Строки переносятся за ручку в конце строки, после кнопки удаления: перетаскивание, удержание, Alt + ↑ / ↓.",
         },
         {
           name: "min",
@@ -187,8 +187,8 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
-        en: "Moves through the fields of a row, then to its remove button and on.",
-        ru: "Переводит фокус по полям строки, затем к её кнопке удаления и дальше.",
+        en: "Moves through the fields of a row, then to its remove button, its handle and on.",
+        ru: "Переводит фокус по полям строки, затем к её кнопке удаления, ручке и дальше.",
       },
       {
         keys: "Enter · Space",

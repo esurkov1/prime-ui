@@ -58,6 +58,8 @@ export type RowShared<Row> = {
   selectable: boolean;
   expandEnabled: boolean;
   stickyFirstColumn: boolean;
+  /** The last visible column sticks to the end edge (row actions). */
+  stickyLastColumn: boolean;
   striped: boolean;
   totalColumns: number;
   /**
@@ -253,12 +255,14 @@ function DataTableRowImpl<Row>({
         ) : null}
         {columns.map((column, columnIndex) => {
           const isFirstColumn = columnIndex === 0;
+          const isLastColumn = columnIndex === columns.length - 1;
           return (
             <td
               key={column.id}
               className={cx(
                 styles.cell,
                 shared.stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
+                shared.stickyLastColumn && isLastColumn && styles.lastColumnSticky,
                 enter,
               )}
               style={columnSizeStyle(column)}

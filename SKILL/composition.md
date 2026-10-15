@@ -458,7 +458,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - `SmartFilter.Root` wraps the page: `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`; export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. The table itself has no `toolbar`.
 - A status is a `Badge` with one `tone` per meaning across the product (`STATUS` is one map); the text carries the meaning, the tone repeats it.
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
-- Row actions are a `Dropdown` behind an `action.more` icon of size `s`: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
+- Row actions are a `Dropdown` behind an `action.more` icon of size `s` in the last column (`hideHeader`), pinned to the end edge with `stickyLastColumn` so they stay in reach while the columns scroll: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
 - Empty after a filter is the table's `empty` with `EmptyPage size="s"` and a «Сбросить фильтры» action; the header and the filters stay in place.
 
 ### Detail page

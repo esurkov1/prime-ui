@@ -112,8 +112,8 @@ export type FieldListProps<T extends object> = Omit<FieldRootDomProps, "onChange
 const track = (name: `--fl-${string}`) => `var(${name})`;
 
 /**
- * Track of each width. The lead track (`auto`) fits its `xs` box, the end track the remove button;
- * every row and the heading row share the same list (`--fl-columns`).
+ * Track of each width. The end track fits the remove button, the grip track after it (`auto`) its
+ * `xs` box; every row and the heading row share the same list (`--fl-columns`).
  */
 const TRACKS: Record<FieldListColumnWidth, string> = {
   fill: "minmax(0, 1fr)",
@@ -156,13 +156,16 @@ function takeNext<V>(_current: V, next: V): V {
 
 const FOCUSABLE = "input, textarea, select, button, [tabindex]:not([tabindex='-1'])";
 
-/** The tier of the lead column: the handle and the lock are `xs` controls on every row tier. */
-const LEAD_TIER: ControlSize = "xs";
+/** The tier of the grip column: the handle and the lock are `xs` controls on every row tier. */
+const GRIP_TIER: ControlSize = "xs";
 
-/** The lead cell of a row (handle or lock) or of the heading row (empty): one `xs` box wide. */
-function LeadBox({ children }: { children?: React.ReactNode }) {
+/**
+ * The last cell of a row (handle or lock, after the remove button) or of the heading and totals
+ * rows (empty): one `xs` box wide, so every row ends on the same line.
+ */
+function GripBox({ children }: { children?: React.ReactNode }) {
   return (
-    <span className={cx(fieldTierClass, styles.lead)} data-size={LEAD_TIER}>
+    <span className={cx(fieldTierClass, styles.grip)} data-size={GRIP_TIER}>
       {children}
     </span>
   );
@@ -246,11 +249,11 @@ export function FieldList<T extends object>({
   // Where focus goes once the list re-renders: the new row's first field, or the neighbour's remove.
   const focusNext = React.useRef<{ id: string | null; part: "first" | "remove" } | null>(null);
 
-  const lead = reorderable || (getLocked !== undefined && items.some(getLocked));
+  const grip = reorderable || (getLocked !== undefined && items.some(getLocked));
   const template = [
-    lead ? "auto" : null,
     ...columns.map((column) => TRACKS[column.width ?? "fill"]),
     track("--fl-end"),
+    grip ? "auto" : null,
   ]
     .filter(Boolean)
     .join(" ");
@@ -328,18 +331,6 @@ export function FieldList<T extends object>({
       );
     const content = (
       <>
-        {lead ? (
-          <LeadBox>
-            {reorderable ? (
-              <Dnd.Handle
-                aria-label={formatLabel(labels.reorder, { row: name })}
-                disabled={disabled}
-              />
-            ) : locked ? (
-              <DndLock aria-label={labels.locked} />
-            ) : null}
-          </LeadBox>
-        ) : null}
         <div className={styles.cells} data-fl-cells="">
           {cells.map((cell, column) => {
             const heading = columns[column];
@@ -372,6 +363,20 @@ export function FieldList<T extends object>({
             </Button.Root>
           )}
         </span>
+        {/* The grip ends the row, after the remove button: Tab reaches the fields and the remove
+            button first; a pinned row's lock takes the same box. */}
+        {grip ? (
+          <GripBox>
+            {reorderable ? (
+              <Dnd.Handle
+                aria-label={formatLabel(labels.reorder, { row: name })}
+                disabled={disabled}
+              />
+            ) : locked ? (
+              <DndLock aria-label={labels.locked} />
+            ) : null}
+          </GripBox>
+        ) : null}
       </>
     );
     const rowProps = {
@@ -428,7 +433,6 @@ export function FieldList<T extends object>({
               data-size={size}
               aria-hidden="true"
             >
-              {lead ? <LeadBox /> : null}
               <div className={styles.cells}>
                 {columns.map((column, index) => (
                   <Label.Root
@@ -444,6 +448,7 @@ export function FieldList<T extends object>({
                 ))}
               </div>
               <span />
+              {grip ? <GripBox /> : null}
             </div>
           ) : null}
           {reorderable ? (
@@ -490,7 +495,6 @@ export function FieldList<T extends object>({
               style={{ "--fl-columns": template } as React.CSSProperties}
               data-size={size}
             >
-              {lead ? <LeadBox /> : null}
               <div className={styles.cells}>
                 {totalCells.map((total, column) => {
                   const heading = columns[column];
@@ -522,16 +526,14 @@ export function FieldList<T extends object>({
                   );
                 })}
               </div>
-              {/* The end column stays as wide as a row's remove button, so the totals end where
-                  the fields do. */}
+              {/* The end and grip columns stay as wide as a row's remove button and grip, so the
+                  totals end where the fields do. */}
               <span className={cx(styles.end, styles.totalsEnd)} />
+              {grip ? <GripBox /> : null}
             </div>
           ) : null}
           {createItem ? (
-            <div
-              className={cx(styles.add, lead && cx(fieldTierClass, styles.addIndented))}
-              data-size={lead ? LEAD_TIER : undefined}
-            >
+            <div className={styles.add}>
               <Button.Root
                 ref={addRef}
                 variant="soft"

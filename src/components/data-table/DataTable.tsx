@@ -120,6 +120,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   showHeader?: boolean;
   stickyHeader?: boolean;
   stickyFirstColumn?: boolean;
+  stickyLastColumn?: boolean;
   getRowKey?: (row: Row, index: number) => React.Key;
   getRowLabel?: (row: Row) => string;
   getRowHref?: (row: Row) => string;
@@ -218,6 +219,7 @@ export function DataTable<Row>({
   showHeader = true,
   stickyHeader = false,
   stickyFirstColumn = false,
+  stickyLastColumn = false,
   getRowKey,
   getRowHref,
   onRowClick,
@@ -687,6 +689,7 @@ export function DataTable<Row>({
       selectable,
       expandEnabled,
       stickyFirstColumn,
+      stickyLastColumn,
       striped,
       totalColumns,
       openRow,
@@ -707,6 +710,7 @@ export function DataTable<Row>({
       selectable,
       expandEnabled,
       stickyFirstColumn,
+      stickyLastColumn,
       striped,
       totalColumns,
       openRow,
@@ -850,6 +854,7 @@ export function DataTable<Row>({
               "column-dividers": columnDividers ? undefined : "false",
               "sticky-header": stickyHeader,
               "sticky-first-column": stickyFirstColumn,
+              "sticky-last-column": stickyLastColumn,
               "table-width": columns.some((c) => c.grow) ? "grow" : fullWidth ? "fill" : "auto",
               "highlight-row": highlightRowOnHover,
               "highlight-column": highlightColumnOnHover,
@@ -904,6 +909,7 @@ export function DataTable<Row>({
                       sort={sortState}
                       onSort={handleSort}
                       stickyFirstColumn={stickyFirstColumn}
+                      stickyLastColumn={stickyLastColumn}
                       stickyHeader={stickyHeader}
                       stickyCorner={stickyHeader && stickyFirstColumn}
                       expandEnabled={expandEnabled}

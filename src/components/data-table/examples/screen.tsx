@@ -320,6 +320,7 @@ export default function DataTableScreenExample() {
             getRowLabel={(row) => `Счёт ${row.id}`}
             pageSize={6}
             stickyFirstColumn
+            stickyLastColumn
             defaultSort={{ columnId: "due", order: "desc" }}
             empty={
               <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">

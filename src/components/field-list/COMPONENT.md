@@ -28,7 +28,7 @@ import { FieldList, type FieldListColumn } from "prime-ui-kit";
 FieldList                    field frame: label · the list · hint / error
 ├─ heading row               the column headings, once (aria-hidden; each field carries its heading as its label)
 ├─ <ol>                      the rows (Dnd.Sortable with `reorderable`)
-│  └─ <li> row               [lead: handle | lock] [a cell per column] [end: remove]
+│  └─ <li> row               [a cell per column] [end: remove] [grip: handle | lock]
 │     └─ cell                one kit field without `label`, named by its column heading
 ├─ totals row                `renderTotals`: a group «Итого», a total per column on the same tracks
 └─ add row                   Button «addLabel» (+ `labels.maxReached` at `max`)
@@ -54,8 +54,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `createItem` | `() => T` | — | A new empty item; with it the add button shows under the rows and focus goes to the new row's first field. |
 | `addLabel` | `string` | — | Text of the add button: what is added («Добавить позицию»). |
 | `getLabel` | `(item: T) => string` | — | The row's own text (its title field) for the remove button, the handle and drag announcements; else the row number. |
-| `getLocked` | `(item: T) => boolean` | — | Pinned rows: a lock in the lead column, no remove button, they hold their place while others move. |
-| `reorderable` | `boolean` | `false` | Rows move by a leading handle: drag, a touch hold, Alt + ↑ / ↓. |
+| `getLocked` | `(item: T) => boolean` | — | Pinned rows: a lock in the grip column at the row's end, no remove button, they hold their place while others move. |
+| `reorderable` | `boolean` | `false` | Rows move by a handle at the row's end, after the remove button: drag, a touch hold, Alt + ↑ / ↓. |
 | `min` | `number` | `0` | The fewest rows: at this count the remove buttons are disabled. |
 | `max` | `number` | — | The most rows: at this count the add button is disabled with `labels.maxReached` beside it. |
 | `label` | `ReactNode` | — | Heading of the list; names the `<ol>`. Omit it inside a `Fieldset` whose legend names the list. |
@@ -82,7 +82,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `reorderable` | a grip before every row; Alt + ↑ / ↓ on it | the order of the records matters (a pricing page, a checklist) | `false` |
+| `reorderable` | a grip at the end of every row, after the remove button; Alt + ↑ / ↓ on it | the order of the records matters (a pricing page, a checklist) | `false` |
 | `getLocked` | a lock where the grip is, no remove button; the row holds its place | a base value, system records a person cannot drop | — |
 | `createItem` | the add button under the rows, aligned with the first column | the person grows the list | — |
 | `min` · `max` | remove buttons off at `min`; the add button off with «Не больше {max}» at `max` | the record count is bounded | `0` · — |
@@ -100,7 +100,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | empty | `value` with no items | no heading row; only the add button (with `createItem`) |
 | at min | `value.length <= min` | remove buttons `disabled` |
 | at max | `value.length >= max` | add button `disabled`, `labels.maxReached` beside it |
-| pinned row | `getLocked(item)` | `data-locked="true"` on the `<li>`; a lock, no remove button |
+| pinned row | `getLocked(item)` | `data-locked="true"` on the `<li>`; a lock in the grip box at the row's end, no remove button (its place stays empty) |
 | invalid | `error` (the list), a field's own `error` | the list's message under the add row; a field's under the field in its row |
 | disabled | `disabled` (or a disabled Fieldset) | `data-disabled="true"` on the frame; fields, handles and buttons disabled through the kit's disabled context |
 | stacked | container narrower than 30rem | heading row hidden, each row's fields in one column with their labels shown; each total on its own line after its column name |
@@ -109,8 +109,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 ## Layout & spacing
 - Rows 12 apart (`--prime-space-3`); columns 12 apart; the heading row sits at the tier's label gap above the first row.
-- Every row and the heading row share one track list: `[lead] [columns] [end]`; the lead is one `xs` control wide (the grip or the lock), the end fits a remove button of the tier.
-- The handle, the lock and the remove button stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
+- Every row, the heading row and the totals row share one track list: `[columns] [end] [grip]`; the end fits a remove button of the tier, the grip (with `reorderable` or a pinned row) is one `xs` control wide (the handle or the lock) and ends the row on the inline-end side (on the left in RTL).
+- The remove button, the handle and the lock stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
 - The totals row stands 12 under the last row over a faint line, 12 more above its totals; a total's text starts where its column's field text does.
 - The add button lines up with the first column of fields, 12 under the last row.
 - Under 30rem of its own width (a container query): rows stack, fields 16 apart inside a row, rows 24 apart.
@@ -122,7 +122,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 | Key | Action |
 |---|---|
-| `Tab` | Moves through the fields of a row, then to its remove button and on. |
+| `Tab` | Moves through the fields of a row, then to its remove button, its handle and on. |
 | `Enter` · `Space` | On the add button adds a row and focuses its first field; on a remove button removes the row and focuses the next row's remove button. |
 | `Alt + ↑` · `Alt + ↓` | With `reorderable`, moves the row up or down (from its handle). |
 

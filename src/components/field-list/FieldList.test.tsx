@@ -237,6 +237,41 @@ describe("FieldList", () => {
     expect(services[1]).toHaveFocus();
   });
 
+  it("ends a reorderable row with its handle: Tab reaches the fields, the remove button, then the handle", async () => {
+    const user = userEvent.setup();
+    render(<Lines reorderable />);
+    const [first] = Array.from(rowsOf());
+    expect(first?.lastElementChild).toContainElement(
+      screen.getByRole("button", { name: "Переместить «Внедрение»" }),
+    );
+    const prices = screen.getAllByRole("textbox", { name: "Цена" });
+    (prices[0] as HTMLElement).focus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Удалить «Внедрение»" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Переместить «Внедрение»" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getAllByRole("textbox", { name: "Услуга" })[1]).toHaveFocus();
+  });
+
+  it("puts a pinned row's lock in the same end box as the other rows' handles", () => {
+    render(
+      <Lines
+        reorderable
+        initial={[{ ...LINES[0], pinned: true } as Line, LINES[1] as Line]}
+        getLocked={(line) => line.pinned ?? false}
+      />,
+    );
+    const [pinned, free] = Array.from(rowsOf());
+    expect(pinned?.lastElementChild).toContainElement(
+      screen.getByRole("img", { name: "Закреплено" }),
+    );
+    expect(free?.lastElementChild).toContainElement(
+      screen.getByRole("button", { name: "Переместить «Обучение»" }),
+    );
+    expect(pinned?.lastElementChild?.className).toBe(free?.lastElementChild?.className);
+  });
+
   it("Space on the add button adds a row; Space on a remove button removes its row", async () => {
     const user = userEvent.setup();
     render(<Lines />);

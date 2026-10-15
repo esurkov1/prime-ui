@@ -28,7 +28,7 @@ import { List } from "prime-ui-kit";
 ```
 List.Root                   <ul aria-label>; size (else the host tier) → row tier; onReorder → Dnd.Sortable <ul>
 └─ List.Item                <li> with a full-width <button> | <a href> | asChild element; current, disabled
-   │                         value; with onReorder: Dnd.Handle (busy while saving) before the row element
+   │                         value; with onReorder: Dnd.Handle (busy while saving) at the row's end, after its actions
    ├─ List.ItemIcon         leading Avatar.Root / Icon / Badge.Dot (aria-hidden); after the text — a trailing glyph
    ├─ List.ItemText         primary line, truncates
    ├─ List.ItemDescription  second line, muted, truncates
@@ -47,7 +47,7 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Row tier: height, text, icon and avatar size; counts take one tier down. Without it the tier of its host, else `m`. |
-| `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — | Rows reorder by a leading handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back. |
+| `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — | Rows reorder by an end handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back. |
 | `labels` | `Partial<ListLabels>` | — | Built-in strings, see Labels. |
 | `aria-label` | `string` | — | Name of the list for screen readers («Обращения»), when no visible heading names it. |
 | `children` | `ReactNode` | — | `List.Item`s. |
@@ -146,7 +146,7 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 | current | `current` | `aria-current="true"` (button) or `"page"` (link); `fill-muted-hover` fill, primary text |
 | focus-visible | keyboard | the focus ring inside the row edge |
 | disabled | `disabled` | `disabled` on a button; `aria-disabled="true"`, no `href` on a link, `tabindex="-1"` on an `asChild` element; `data-disabled="true"`; disabled text; in a reorderable list the handle is disabled and the row holds its place |
-| reorderable | `onReorder` | `data-reorderable="true"` on the root (a `Dnd.Sortable` `<ul>`); each `<li>` is a sortable item (`data-dnd-item` = `value`) with a leading `Dnd.Handle`; drag by the handle (a touch hold on touch), Alt + ↑ / ↓ from the handle or the row; a lifted row leaves a dashed gap in the row's radius, its neighbours glide, the copy (handle and row, in the row's padding and radius) follows the pointer and sets down in its new place without a jump |
+| reorderable | `onReorder` | `data-reorderable="true"` on the root (a `Dnd.Sortable` `<ul>`); each `<li>` is a sortable item (`data-dnd-item` = `value`) with a `Dnd.Handle` at its end; drag by the handle (a touch hold on touch), Alt + ↑ / ↓ from the handle or the row; a lifted row leaves a dashed gap in the row's radius, its neighbours glide, the copy (handle and row, in the row's padding and radius) follows the pointer and sets down in its new place without a jump |
 | saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, the handle is busy (Dnd: a spinner in the disabled grip), the row content dims to 0.6 (`--prime-motion-fade-fast` both ways); a rejection glides the row back |
 | own controls | `List.ItemActions` in the item | the row element and the controls stand in one frame that takes the hover, press and current fills for both; the element itself stays clear |
 | rows come and go | the data adds or takes out a `List.Item` (`value`, else its key) | a new row rises in once (`enterMotion`), a removed one closes up in place (`listPresence`); the first render stays still |
@@ -159,7 +159,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - Row: leading icon · body (text over description) · trail. Beside two lines the trail stacks — meta on top, count below; beside one line they sit in a row.
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
-- Reorderable (`onReorder`): an `xs` handle box sits before each row, 4px from it; the row keeps its own padding and fill.
+- Reorderable (`onReorder`): an `xs` handle box ends each row, 4px after the row element and its `List.ItemActions` (inline-end: on the left in RTL); the row keeps its own padding and fill, so every row's handle stands on one line.
 - `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's end as from its top and bottom.
 - A colour dot in `List.ItemIcon` is the large `Badge.Dot` (8px) centred in an icon-wide box, so the text lines up with the rows that carry icons.
 
@@ -182,7 +182,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.
 - Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.
 - `List.ItemActions` stand beside the row element, never inside it: the row's name stays its text, and Tab goes from the row to its controls.
-- With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.
+- With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row, its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

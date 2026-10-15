@@ -30,7 +30,7 @@ Dnd.Root                         session owner: overlay (portal), live region, l
 ├─ Dnd.Sortable                  list container and drop target; renders items in the drawn order
 │  ├─ header                     optional content before the items that never moves (a group's heading row)
 │  ├─ Dnd.SortableItem           one item (li in ul/ol, div otherwise); the gap is drawn before it
-│  │  └─ Dnd.Handle              optional grip: a ghost icon-only Button (with `handle` on the list); a lock in a `locked` item; busy while the item's move is saved
+│  │  └─ Dnd.Handle              optional grip, last in the item: a ghost icon-only Button (with `handle` on the list); a lock in a `locked` item; busy while the item's move is saved
 │  ├─ empty                      the `empty` content while the list has no items
 │  └─ children                   optional content after the items that never moves (an add tile)
 ├─ Dnd.Draggable                 an item to carry elsewhere; stays in place, faded, until the drop
@@ -85,7 +85,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes. |
 
 ### Dnd.Handle
-`ref` → `HTMLButtonElement` (`HTMLSpanElement` in a `locked` item). The grip: a ghost icon-only `xs` Button that starts the drag and takes the item's keys; busy while the item's move is saved. In a `locked` item it is a lock.
+`ref` → `HTMLButtonElement` (`HTMLSpanElement` in a `locked` item). The grip: a ghost icon-only `xs` Button that starts the drag and takes the item's keys; busy while saving. In a `locked` item it is a lock. Place it last in the item, after its controls.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -201,6 +201,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 ## Layout & spacing
 - The distance between items is `--prime-space-2`; a host sets `--dnd-sortable-gap` on the list for another one.
 - A grid (`axis="grid"`) is `display: grid`: the host sets the tracks (`grid-template-columns`) and the cells' size; the gap takes a cell, and a carried item resizes to the cell it would land in.
+- A `Dnd.Handle` ends its item: the last child, after the item's own controls (a switch, a remove button), at the inline end (on the left in RTL); a `locked` item's lock takes the same place, so the grips of every row stand on one line. In a table it is the last cell.
 - The reason chip stands `--prime-tooltip-offset` under the carried copy, start-aligned, at most `--prime-tooltip-max-width` wide.
 - The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a radius on its own class (the gap and the clone's fill take it) and keep the row's look within its ancestors up to the nearest surface (`data-depth`) — the clone flies inside empty copies (`display: contents`) of exactly those, so their variables and selectors still apply. A table row flies in a one-row copy of its table inside them.
 - A scrollable ancestor under the pointer auto-scrolls within 64 px of its edge (a `ScrollContainer` strip works).

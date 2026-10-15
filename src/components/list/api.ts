@@ -18,8 +18,8 @@ export const api: ComponentApi = {
         {
           name: "onReorder",
           type: "(id: string, beforeId: string | null) => void | Promise<void>",
-          en: "Rows reorder by a leading handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back.",
-          ru: "Перестановка за ведущую ручку (перетаскивание, удержание, Alt + ↑ / ↓): строка `id` (`value`) встаёт перед `beforeId` (`null` — в конец). Применяйте через `moveBefore`; промис держит строку занятой, отказ возвращает её.",
+          en: "Rows reorder by an end handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back.",
+          ru: "Перестановка за ручку в конце (перетаскивание, удержание, Alt + ↑ / ↓): строка `id` (`value`) встаёт перед `beforeId` (`null` — в конец). Применяйте через `moveBefore`; промис держит строку занятой, отказ возвращает её.",
         },
         {
           name: "labels",
@@ -263,8 +263,8 @@ export const api: ComponentApi = {
         ru: "`List.ItemActions` стоят рядом с элементом строки, не внутри: имя строки — её текст, Tab ведёт от строки к её контролам.",
       },
       {
-        en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",
-        ru: "С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`.",
+        en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row, its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",
+        ru: "С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`, последней в строке: Tab ведёт к строке, её `List.ItemActions`, затем к ручке; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`.",
       },
     ],
   },

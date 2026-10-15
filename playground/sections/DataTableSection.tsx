@@ -88,6 +88,12 @@ export const page: ComponentPageConfig = {
         "Продажи по регионам в окне 280 px: шапка и колонка регионов остаются на месте при прокрутке в обе стороны — `stickyHeader`, `stickyFirstColumn`, `scrollHeight`.",
     },
     {
+      scenario: "actions-column",
+      title: "Колонка действий",
+      description:
+        "Заказы шире таблицы: номер заказа остаётся в начале, меню ⋯ — в конце строки, а колонки между ними прокручиваются вбок — `stickyFirstColumn`, `stickyLastColumn`.",
+    },
+    {
       scenario: "row-link",
       title: "Строка-ссылка",
       description:

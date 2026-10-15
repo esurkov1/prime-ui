@@ -21,6 +21,8 @@ type HeadProps<Row> = {
   sort: DataTableSortState;
   onSort: (columnId: string) => void;
   stickyFirstColumn: boolean;
+  /** The last visible column sticks to the end edge (with `stickyHeader`: the end corner). */
+  stickyLastColumn: boolean;
   /** The head sticks to the top of the scroller. */
   stickyHeader: boolean;
   /** Sticky head and first column: the leading head cells stick to both edges. */
@@ -45,6 +47,7 @@ export function Head<Row>({
   sort,
   onSort,
   stickyFirstColumn,
+  stickyLastColumn,
   stickyHeader,
   stickyCorner,
   expandEnabled,
@@ -79,6 +82,7 @@ export function Head<Row>({
         {columns.map((column, columnIndex) => {
           const order = column.sortable && sort?.columnId === column.id ? sort.order : null;
           const isFirstColumn = columnIndex === 0;
+          const isLastColumn = columnIndex === columns.length - 1;
           const described = column.description !== undefined && !column.hideHeader;
           const descriptionId = `${idPrefix}-${columnIndex}-description`;
           // A plain header with its named glyph is named by its text alone.
@@ -102,6 +106,8 @@ export function Head<Row>({
                 stickyHeader && stickySurfaceClass,
                 stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
                 stickyCorner && isFirstColumn && styles.cornerCellSticky,
+                stickyLastColumn && isLastColumn && styles.lastColumnSticky,
+                stickyHeader && stickyLastColumn && isLastColumn && styles.cornerCellSticky,
               )}
               style={columnSizeStyle(column)}
               data-align={column.headerAlign ?? "start"}

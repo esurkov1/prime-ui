@@ -40,7 +40,6 @@ export default function DndLockedExample() {
             aria-labelledby={`${uid}-${section.id}`}
             aria-describedby={`${uid}-${section.id}-note`}
           >
-            <Dnd.Handle aria-label={`Переместить раздел «${section.title}»`} />
             <span className={styles.rowText}>
               <Typography as="span" variant="body-m" id={`${uid}-${section.id}`}>
                 {section.title}
@@ -49,6 +48,7 @@ export default function DndLockedExample() {
                 {section.description}
               </Typography>
             </span>
+            <Dnd.Handle aria-label={`Переместить раздел «${section.title}»`} />
           </Dnd.SortableItem>
         )}
       />
