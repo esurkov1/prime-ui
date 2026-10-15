@@ -46,3 +46,9 @@ platform/
 
 # Editor and script backups
 *.bak
+
+# Screenshots and captures from checks: never in the repository root
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
