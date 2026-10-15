@@ -57,8 +57,8 @@ ExampleFrame               frame: toolbar + the pane (a region swap between prev
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `default` | single block centered in the stage | one component | yes |
-| `stack` | centered column, gap 16, children capped at the stack measure (`10 × --prime-space-16`) so `width: 100%` blocks stay centered; a child with `fullWidth` or a table stretches | several blocks one under another | |
-| `stack-narrow` | column, children capped at `7 × --prime-space-16` and centered, full width unless a child sets its own (a cascade-layer default, so a fit-content SegmentedControl keeps hugging its segments) | forms and narrow columns | |
+| `stack` | centered column, gap 16, children capped at the stack measure (`10 × --prime-space-16`) so `width: 100%` blocks stay centered; a child with `fullWidth` or a table stretches, never past the stage | several blocks one under another | |
+| `stack-narrow` | column, children capped at `7 × --prime-space-16` and centered, full width unless a child sets its own (a cascade-layer default, so a fit-content SegmentedControl keeps hugging its segments); a child with a table may take the stage | forms and narrow columns | |
 | `full` | column, gap 16, every child takes the whole stage width | page structure: app shells, page regions | |
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
 | `matrix` | centered grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns (up to 12) line up across rows, are never narrower than their content and grow to 320 / 160 / 128px for 1 / 2 / 3+ columns, so width-less specimens (Slider, `width: 100%` blocks) get a real cell; centered vertically too; when the grid is wider than the stage (a phone frame) each row wraps its cells, centered (`data-matrix-wrap` on the stage), and a one-column matrix keeps its cells at the one-column measure (or the stage, when narrower) | variant, size and state matrices | |

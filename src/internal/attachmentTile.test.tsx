@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Dnd } from "@/components/dnd/Dnd";
 import type { UploadItem } from "@/hooks/useUploadQueue";
-import { cssRule, cssValue } from "@/test/css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { AttachmentTile } from "./attachmentTile";
 import pill from "./mediaPill.module.css";
@@ -236,5 +236,17 @@ describe("AttachmentTile", () => {
     expect(cssValue(cssRule("src/internal/attachmentTile.module.css", ".strip > *"), "flex")).toBe(
       "none",
     );
+  });
+
+  it("a strip-sized tile gives the band's line to the name, not to the size", () => {
+    const strip = cssValue(
+      cssRule("src/internal/attachmentTile.module.css", ".strip > *"),
+      "inline-size",
+    );
+    expect(strip).toBe("var(--prime-space-24)");
+    const rule = cssRules("src/internal/attachmentTile.module.css").find(
+      (item) => item.selector === ".meta" && item.parents.some((parent) => parent.includes("7rem")),
+    );
+    expect(rule && cssValue(rule, "display")).toBe("none");
   });
 });

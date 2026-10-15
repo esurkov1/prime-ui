@@ -131,15 +131,23 @@
   color: var(--prime-color-text-disabled);
 }
 
-/* The invisible row that measures chip widths. */
+/* The invisible row that measures chip widths, clipped to the field: with many tags it is wider
+   than the field and would otherwise widen the scroll area of every scroller around it. */
+.measureClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .measure {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
   display: flex;
   gap: var(--prime-space-1);
-  visibility: hidden;
-  pointer-events: none;
+  width: max-content;
   white-space: nowrap;
 }
 

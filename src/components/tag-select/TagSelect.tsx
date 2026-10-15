@@ -977,22 +977,26 @@ const MeasureRow = React.memo(function MeasureRow({
   ref,
 }: MeasureRowProps) {
   return (
-    <div ref={ref} className={styles.measure} aria-hidden inert>
-      {chips.map((chip) => (
-        <Badge.Root
-          key={chip.value}
-          color={chip.color}
-          disabled={disabled}
-          className={styles.chip}
-          labels={{ remove: formatLabel(removeLabel, { label: chip.label }) }}
-          onRemove={noop}
-        >
-          <span className={styles.chipLabel}>{chip.label}</span>
+    // The clip keeps the row (wider than the field with many tags) out of the scroll width of
+    // every scroller around the field; the row itself keeps its full width to measure.
+    <div className={styles.measureClip} aria-hidden inert>
+      <div ref={ref} className={styles.measure}>
+        {chips.map((chip) => (
+          <Badge.Root
+            key={chip.value}
+            color={chip.color}
+            disabled={disabled}
+            className={styles.chip}
+            labels={{ remove: formatLabel(removeLabel, { label: chip.label }) }}
+            onRemove={noop}
+          >
+            <span className={styles.chipLabel}>{chip.label}</span>
+          </Badge.Root>
+        ))}
+        <Badge.Root color="gray" className={styles.chipMore}>
+          +{Math.max(chips.length, 9)}
         </Badge.Root>
-      ))}
-      <Badge.Root color="gray" className={styles.chipMore}>
-        +{Math.max(chips.length, 9)}
-      </Badge.Root>
+      </div>
     </div>
   );
 });

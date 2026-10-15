@@ -70,9 +70,12 @@
   transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
+/* The field spans the frame under its start-aligned label, whatever `align-items` a host gives the
+   frame (a centred column would centre the field away from its label). */
 .body {
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   gap: var(--field-hint-gap);
   min-width: 0;
 }

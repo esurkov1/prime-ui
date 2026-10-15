@@ -21,3 +21,9 @@
   width: calc(var(--prime-space-20) * 4);
   max-width: 100%;
 }
+
+/* inline-panel.tsx: a booking card of a page column, room for two months; narrower, one. */
+.booking {
+  width: calc(var(--prime-space-20) * 8);
+  max-width: 100%;
+}
