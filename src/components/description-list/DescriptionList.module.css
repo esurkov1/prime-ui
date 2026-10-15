@@ -9,7 +9,10 @@
 .root {
   --dl-row-gap: var(--prime-space-3);
 
+  /* Fill the available width: an inline-size container has no intrinsic width and would
+   * collapse to 0 inside shrink-wrapped / flex parents. */
   container-type: inline-size;
+  inline-size: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--dl-row-gap);
