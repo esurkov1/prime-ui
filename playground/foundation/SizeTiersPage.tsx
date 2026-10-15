@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/checkbox/Checkbox";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Input } from "@/components/input/Input";
 import { Kbd } from "@/components/kbd/Kbd";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Select } from "@/components/select/Select";
 import { Typography } from "@/components/typography/Typography";
@@ -104,10 +105,15 @@ function TierRow({ t }: { t: SizeTier }) {
 
 function TierLiveRows() {
   return (
-    <Panel className={s.tierPanel}>
-      {SIZE_TIERS.map((t) => (
-        <TierRow key={t} t={t} />
-      ))}
+    <Panel>
+      {/* Each tier stays one line: a narrow page scrolls the rows instead of wrapping them. */}
+      <ScrollContainer axis="horizontal">
+        <div className={s.tierRows}>
+          {SIZE_TIERS.map((t) => (
+            <TierRow key={t} t={t} />
+          ))}
+        </div>
+      </ScrollContainer>
     </Panel>
   );
 }
