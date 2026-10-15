@@ -586,6 +586,15 @@
   white-space: nowrap;
 }
 
+/* `renderRow` content keeps the one-line rule: every block inside (a name over a role) shrinks with
+   the column and ends with an ellipsis, as the plain label does. Zero specificity: the content's
+   own classes win. */
+.rowLabel :where(*) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .track {
   position: relative;
   /* Drags and drawing on the axis never select text. */
