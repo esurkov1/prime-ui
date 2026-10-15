@@ -98,7 +98,7 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `stickyHeader` | `boolean` | `false` | The head sticks while the body scrolls (with `scrollHeight`); on screens lower than 480px it scrolls with the rows. |
 | `stickyFirstColumn` | `boolean` | `false` | The first visible column (with the selection and toggle columns) sticks while scrolling sideways; the start edge shadow falls from its end edge. |
 | `showHeader` | `boolean` | `true` | Render `<thead>`. |
-| `fullWidth` | `boolean` | `true` | The table spans its container; `false` sizes it by its content. |
+| `fullWidth` | `boolean` | `true` | The table spans its container; `false` sizes the table and its surface by its content (up to the container's width, then it scrolls). |
 | `rowDividers` | `boolean` | `true` | Hairlines between rows. |
 | `columnDividers` | `boolean` | `true` | Hairlines between content columns. |
 | `striped` | `boolean` | `false` | Every second row one opaque step off the table fill. |

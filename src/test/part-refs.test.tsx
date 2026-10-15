@@ -23,6 +23,7 @@ import type * as colorPickerEntry from "@/color-picker";
 import {
   Badge,
   Banner,
+  Breadcrumb,
   Button,
   Card,
   ChartFrame,
@@ -330,6 +331,17 @@ const CASES: Case[] = [
           <Tabs.Item value="a">Заказы</Tabs.Item>
         </Tabs.List>
       </Tabs.Root>
+    ),
+  ],
+  [
+    "Breadcrumb.Root",
+    "NAV",
+    (ref) => (
+      <Breadcrumb.Root ref={ref} data-testid="part">
+        <Breadcrumb.Item href="#crm">CRM</Breadcrumb.Item>
+        <Breadcrumb.Item href="#clients">Клиенты</Breadcrumb.Item>
+        <Breadcrumb.Item current>ООО «Гранит»</Breadcrumb.Item>
+      </Breadcrumb.Root>
     ),
   ],
   [

@@ -765,7 +765,10 @@ describe("Tabs — width and collapse", () => {
     expect(cssValue(item, "flex")).toBe("0 1 auto");
     expect(cssValue(item, "min-width")).toBe("max-content");
     const tab = cssRule(CSS, `${h} .tab`);
-    expect(cssValue(tab, "min-width")).toBe("var(--tabs-item-min)");
+    // `--tabs-peek` widens it on a scrolling list whose end edge would cut only a tab's empty side.
+    expect(cssValue(tab, "min-width")).toBe(
+      "calc(var(--tabs-item-min) * (1 + var(--tabs-peek, 0)))",
+    );
     expect(cssValue(tab, "max-width")).toBe("var(--tabs-item-max)");
     expect(cssValue(cssRule(CSS, `${h}[data-full-width="true"] .item`), "flex")).toBe("1 1 0");
   });

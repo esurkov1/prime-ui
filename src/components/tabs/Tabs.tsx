@@ -8,6 +8,7 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
@@ -31,6 +32,7 @@ import {
   setFlag,
 } from "@/internal/selectionIndicator";
 import { type ControlSize, compactTier, type PaletteColor } from "@/internal/states";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 import { type AsyncHandler, isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./Tabs.module.css";
@@ -243,6 +245,37 @@ function fitCollapse(list: HTMLElement): TabsCollapse {
   return levels[levels.length - 1];
 }
 
+/**
+ * A list that scrolls shows that more tabs follow (foundation §9): the tab cut by the end edge must
+ * be cut through its content — a label fading out at the edge — not through its empty side, where
+ * the fade has nothing to show. When it is not, the tabs held at `--tabs-item-min` widen
+ * (`--tabs-peek`, 2% at a time, up to 30%) until the edge cuts a label. Measured at rest, from the
+ * list's start; a list in a right-to-left page keeps the plain minimum.
+ */
+function peekNextTab(list: HTMLElement) {
+  if (itemsFit(list) || getComputedStyle(list).direction === "rtl") return;
+  const items = itemsOf(list);
+  const edge = list.clientWidth;
+  const fade = readCssLengthPx("--scroll-fade-depth", TOKEN_DEFAULTS["--prime-space-8"], list);
+  /** Whether the edge cuts a tab's content: it starts clear of the fade and reaches into it. */
+  const cutsContent = () => {
+    const at = items.findIndex((item) => item.offsetLeft + item.offsetWidth > edge + 0.5);
+    const tab = at >= 0 ? tabOf(items[at]) : null;
+    if (!tab) return true;
+    const content = (
+      tab.querySelector<HTMLElement>(`.${styles.content}`) ?? tab
+    ).getBoundingClientRect();
+    const origin = list.getBoundingClientRect().left - list.scrollLeft;
+    return content.left - origin < edge - fade / 4 && content.right - origin > edge - fade;
+  };
+  if (cutsContent()) return;
+  for (let step = 1; step <= 15; step += 1) {
+    list.style.setProperty("--tabs-peek", String(step / 50));
+    if (cutsContent()) return;
+  }
+  list.style.removeProperty("--tabs-peek");
+}
+
 /** The item box of the active tab: what the folder covers and the list reveals. */
 const activeBox = (list: HTMLElement, activeValue: string) =>
   itemsOf(list).find((item) => tabOf(item)?.dataset.value === activeValue) ?? null;
@@ -311,8 +344,10 @@ function useListLayout(
       const list = listRef.current;
       const folder = folderRef.current;
       if (!list || !folder) return;
+      if (horizontal) list.style.removeProperty("--tabs-peek");
       const level = horizontal ? fitCollapse(list) : "full";
       list.dataset.collapse = level;
+      if (horizontal) peekNextTab(list);
       setCollapse(level);
       setColumn(placeFolder(list, folder, activeValue, animate));
     },

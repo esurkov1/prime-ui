@@ -653,7 +653,8 @@ button.reply:focus-visible {
  * A bot's inline keyboard (`Message.Actions`): rows of buttons under the bubble, on the chat's own
  * surface, at the message's width. The column is as wide as the wider of the bubble and the
  * keyboard (up to the cap); the bubble then takes that width, so they line up. Buttons share a row
- * equally (`flex: 1 1 0`); a row too narrow for their labels wraps them.
+ * equally (`flex: 1 1 0`); a row too narrow for their labels wraps them: a button never shrinks
+ * below its label (`fit-content`), so the row breaks instead of the labels running into each other.
  */
 .actions {
   display: flex;
@@ -665,6 +666,7 @@ button.reply:focus-visible {
 
 .actions > * {
   flex: 1 1 0;
+  min-inline-size: fit-content;
 }
 
 .column[data-actions] > .bubble {

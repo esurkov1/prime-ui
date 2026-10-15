@@ -32,7 +32,7 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Breadcrumb.Root
-`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and, on narrow containers, collapses the middle levels into a «…» menu button that lists them.
+`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and, when the whole path does not fit its width uncut, collapses the middle levels into a «…» menu button that lists them.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -85,8 +85,8 @@ Use links for every ancestor and `current` on the last item; `s` above a `headin
 |---|---|---|
 | current | `current` | `aria-current="page"` on the text span, or on the link when the item has `href` |
 | hover / focus-visible on links | pointer / keyboard | text → primary; focus ring from LinkButton |
-| truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24` (192; `--prime-space-24 + --prime-space-6`, 120, when its container is below 30rem — its own for 3+ levels, the nearest one above for 1–2); the last item shrinks last |
-| auto-collapse | 3+ levels and a container `< 30rem` | `data-collapsible="true"`; middle levels are `display: none` and replaced by «… ›»: a ghost menu button (`Dropdown.Trigger`, named by `labels.ellipsis`) whose menu lists them — links stay links, a level without `href` is a disabled row |
+| truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24` (192); the last item shrinks last |
+| auto-collapse | 3+ levels whose whole path does not fit the width uncut (measured on every resize) | `data-collapsible="true"`, `data-collapsed="true"`; middle levels are `display: none` and replaced by «… ›»: a ghost menu button (`Dropdown.Trigger`, named by `labels.ellipsis`) whose menu lists them — links stay links, a level without `href` is a disabled row |
 | collapse menu open | a press, `Enter` or `ArrowDown` on the «…» | `aria-expanded="true"` on the button; a `role="menu"` panel at the tier size |
 
 Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).

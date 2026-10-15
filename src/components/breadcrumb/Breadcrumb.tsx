@@ -4,6 +4,8 @@ import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
+import { useResizeEffect } from "@/hooks/useElementSize";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -39,7 +41,7 @@ export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-/** From this many levels the middle ones collapse into a «…» menu on narrow containers. */
+/** From this many levels the middle ones collapse into a «…» menu when the path does not fit. */
 const COLLAPSIBLE_MIN_ITEMS = 3;
 
 /**
@@ -61,13 +63,48 @@ function Separator() {
   );
 }
 
+/**
+ * Whether the levels at their own width (`data-measure`: none shrinks; a level past its maximum
+ * width is cut by design) end past the list.
+ */
+function pathOverflows(nav: HTMLElement, list: HTMLElement): boolean {
+  nav.setAttribute("data-measure", "true");
+  let end = 0;
+  for (const item of list.querySelectorAll<HTMLElement>(`:scope > .${styles.item}`)) {
+    end = Math.max(end, item.offsetLeft + item.offsetWidth);
+  }
+  nav.removeAttribute("data-measure");
+  return end > list.clientWidth + 0.5;
+}
+
+/**
+ * Folds the middle levels (`data-collapsed`) only when the whole path does not fit its width
+ * uncut: measured with every level in place, before paint and on every resize. Written to the DOM;
+ * nothing re-renders.
+ */
+function useCollapse(navRef: React.RefObject<HTMLElement | null>, collapsible: boolean) {
+  const fit = React.useCallback(() => {
+    const nav = navRef.current;
+    const list = nav?.firstElementChild;
+    if (!nav || !(list instanceof HTMLElement)) return;
+    nav.removeAttribute("data-collapsed");
+    if (collapsible && pathOverflows(nav, list)) nav.setAttribute("data-collapsed", "true");
+  }, [navRef, collapsible]);
+  // Every render: a level added, removed or renamed changes what fits.
+  React.useLayoutEffect(fit);
+  useResizeEffect(navRef, fit);
+}
+
 function BreadcrumbRoot({
   children,
   className,
   size: sizeProp,
   labels: labelsProp,
+  ref,
   ...rest
 }: BreadcrumbRootProps) {
+  const navRef = React.useRef<HTMLElement>(null);
+  const mergedRef = useMergedRefs(navRef, ref);
   const tier = useHostTier(sizeProp);
   const labels = useLabels(BREADCRUMB_LABELS, labelsProp);
   const contextValue = React.useMemo(() => ({ size: tier.size, labels }), [tier.size, labels]);
@@ -83,6 +120,7 @@ function BreadcrumbRoot({
     </FirstLevelContext.Provider>
   ));
   const collapsible = items.length >= COLLAPSIBLE_MIN_ITEMS;
+  useCollapse(navRef, collapsible);
 
   return (
     <BreadcrumbContext.Provider value={contextValue}>
@@ -90,6 +128,7 @@ function BreadcrumbRoot({
         <nav
           aria-label={labels.nav}
           {...rest}
+          ref={mergedRef}
           className={cx(fieldTierClass, styles.root, className)}
           {...toDataAttributes({ size: tier.size, collapsible })}
         >
