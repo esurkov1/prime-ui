@@ -9,7 +9,8 @@
  * - Snap: if less than half a step would be left after a move, the color lands on the edge, so the
  *   card on the light page is pure white.
  * - Controls (field, chip, track, neutral button) step from their host: darker in light, lighter in
- *   dark, with the same reflect. The selected segment is two steps lighter than its track.
+ *   dark, with the same reflect. The selected segment is lighter than its track: two steps in light
+ *   (where it lands on white), four in dark, where only lightness separates it from the track.
  * - Every color keeps the hue and chroma of the page, so Graphite's cool bias survives on every layer.
  */
 import { primitiveTokens } from "./primitives";
@@ -27,6 +28,8 @@ type LayerTheme = {
   hi: number;
   /** Direction of control fills from their host: −1 darker, +1 lighter. */
   control: 1 | -1;
+  /** Steps from a track up to its selected segment (thumb). */
+  selected: number;
 };
 
 export const LIGHT_LAYERS: LayerTheme = {
@@ -34,6 +37,7 @@ export const LIGHT_LAYERS: LayerTheme = {
   lo: 0.06,
   hi: 1,
   control: -1,
+  selected: 2,
 };
 
 export const DARK_LAYERS: LayerTheme = {
@@ -41,6 +45,7 @@ export const DARK_LAYERS: LayerTheme = {
   lo: 0.06,
   hi: 0.95,
   control: 1,
+  selected: 4,
 };
 
 type Lab = [number, number, number];
@@ -117,7 +122,7 @@ function colorsAt(theme: LayerTheme, L: number): LayerColors {
     bg: paint(theme, L),
     fill: paint(theme, fill),
     fillHover: paint(theme, move(theme, L, theme.control, 2)),
-    selected: paint(theme, move(theme, fill, 1, 2, false)),
+    selected: paint(theme, move(theme, fill, 1, theme.selected, false)),
   };
 }
 
