@@ -367,9 +367,15 @@
   }
 }
 
+/*
+ * Spacing demo. A wide panel names every strip beside the form. A narrow one has no room beside it
+ * — a name over the strip would cover the form — so each strip shows its kind's number in a gutter
+ * at the form's end and the legend under the form names the kinds.
+ */
 .proximityPanel {
   display: grid;
   gap: var(--prime-space-4);
+  container: spacing-demo / inline-size;
 }
 
 .proximity {
@@ -388,27 +394,71 @@
   flex-shrink: 0;
 }
 
-.gapLabel {
+.gapLabel,
+.gapMarker {
   position: absolute;
   inset-block-start: 50%;
-  inset-inline-start: calc(100% + var(--prime-space-3));
   translate: 0 -50%;
   white-space: nowrap;
   opacity: 0;
+}
+
+.gapLabel {
+  inset-inline-start: calc(100% + var(--prime-space-3));
+}
+
+.gapMarker {
+  display: none;
+  inset-inline-end: calc(-1 * var(--prime-space-6));
+  width: var(--prime-space-4);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .proximity[data-show-gaps] .gap {
   background: color-mix(in srgb, var(--prime-color-accent-default) 18%, transparent);
 }
 
-.proximity[data-show-gaps] .gapLabel {
+.proximity[data-show-gaps] :is(.gapLabel, .gapMarker) {
   opacity: 1;
 }
 
-@media (max-width: 768px) {
+.gapLegend {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gapLegend > li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+}
+
+.gapLegendMarker {
+  width: var(--prime-space-4);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Form (27.5rem) + the longest name beside it no longer fit. */
+@container spacing-demo (max-width: 47.99rem) {
+  .proximity {
+    padding-inline-end: var(--prime-space-6);
+  }
+
   .gapLabel {
-    inset-inline-start: auto;
-    inset-inline-end: 0;
+    display: none;
+  }
+
+  .gapMarker {
+    display: block;
+  }
+
+  .gapLegend {
+    display: grid;
+    gap: var(--prime-space-1);
   }
 }
 

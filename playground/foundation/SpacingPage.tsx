@@ -115,11 +115,33 @@ function RulesTable() {
 
 /* --- Live example: spacers are real elements so they can be highlighted ------- */
 
-function Gap({ varName, label }: { varName: string; label: string }) {
+/** The kinds of gap the demo form shows, in legend order; a kind keeps its number on every strip. */
+const GAP_KINDS = {
+  heading: { label: "заголовок → группа", varName: toVarName("space.4") },
+  label: { label: "подпись → поле", varName: "--prime-control-m-label-gap" },
+  hint: { label: "поле → подсказка", varName: "--prime-control-m-hint-gap" },
+  field: { label: "поле → поле", varName: toVarName("space.5") },
+  group: { label: "группа → группа", varName: toVarName("space.8") },
+  section: { label: "секция → секция", varName: toVarName("space.12") },
+} as const;
+type GapKind = keyof typeof GAP_KINDS;
+const GAP_ORDER = Object.keys(GAP_KINDS) as GapKind[];
+
+const gapName = (kind: GapKind) =>
+  `${GAP_KINDS[kind].label} · ${GAP_KINDS[kind].varName.replace("--prime-", "")}`;
+
+/**
+ * A spacer as a real element. A wide panel names it beside the form; a narrow one has no room
+ * there, so the strip carries only its number in a gutter and the legend under the form names it.
+ */
+function Gap({ kind }: { kind: GapKind }) {
   return (
-    <div className={s.gap} style={{ height: `var(${varName})` }} data-gap-label={label} aria-hidden>
+    <div className={s.gap} style={{ height: `var(${GAP_KINDS[kind].varName})` }} aria-hidden>
+      <Typography as="span" variant="caption" tone="accent" className={s.gapMarker}>
+        {GAP_ORDER.indexOf(kind) + 1}
+      </Typography>
       <Typography as="span" variant="caption" tone="accent" className={s.gapLabel}>
-        {label} · {varName.replace("--prime-", "")}
+        {gapName(kind)}
       </Typography>
     </div>
   );
@@ -131,7 +153,7 @@ function DemoField({ label, hint, value }: { label: string; hint?: string; value
   return (
     <div className={s.fakeFieldGroup}>
       <Label.Root htmlFor={id}>{label}</Label.Root>
-      <Gap varName="--prime-control-m-label-gap" label="подпись → поле" />
+      <Gap kind="label" />
       <Input.Root id={id}>
         <Input.Wrapper>
           <Input.Field defaultValue={value ?? ""} />
@@ -139,7 +161,7 @@ function DemoField({ label, hint, value }: { label: string; hint?: string; value
       </Input.Root>
       {hint ? (
         <>
-          <Gap varName="--prime-control-m-hint-gap" label="поле → подсказка" />
+          <Gap kind="hint" />
           <Hint.Root>{hint}</Hint.Root>
         </>
       ) : null}
@@ -158,25 +180,39 @@ function ProximityDemo() {
         <Typography as="h3" variant="title-m">
           Профиль
         </Typography>
-        <Gap varName={toVarName("space.4")} label="заголовок → группа" />
+        <Gap kind="heading" />
         <DemoField label="Имя" value="Анна" />
-        <Gap varName={toVarName("space.5")} label="поле → поле" />
+        <Gap kind="field" />
         <DemoField
           label="Email"
           value="anna@example.com"
           hint="На этот адрес придёт подтверждение"
         />
-        <Gap varName={toVarName("space.8")} label="группа → группа" />
+        <Gap kind="group" />
         <DemoField label="Компания" value="ООО «Ромашка»" />
-        <Gap varName={toVarName("space.5")} label="поле → поле" />
+        <Gap kind="field" />
         <DemoField label="Должность" />
-        <Gap varName={toVarName("space.12")} label="секция → секция" />
+        <Gap kind="section" />
         <Typography as="h3" variant="title-m">
           Уведомления
         </Typography>
-        <Gap varName={toVarName("space.4")} label="заголовок → группа" />
+        <Gap kind="heading" />
         <DemoField label="Частота писем" value="Раз в неделю" />
       </div>
+      {show ? (
+        <ol className={s.gapLegend}>
+          {GAP_ORDER.map((kind, index) => (
+            <li key={kind}>
+              <Typography as="span" variant="caption" tone="accent" className={s.gapLegendMarker}>
+                {index + 1}
+              </Typography>
+              <Typography as="span" variant="caption" tone="secondary">
+                {gapName(kind)}
+              </Typography>
+            </li>
+          ))}
+        </ol>
+      ) : null}
     </Panel>
   );
 }
