@@ -166,9 +166,16 @@
   align-items: center;
 }
 
+/*
+ * Each part takes only its own width and only when it is there: the actions stand at the end
+ * (the heading takes the free room between), a missing title or path leaves room, never makes
+ * another part grow. When the row runs short the title gives way first (down to 6rem), then the
+ * path, then the actions fold into «⋯».
+ */
 .header[data-place="bar"] .titleBlock {
-  flex: 0 1 auto;
+  flex: 0 9999 auto;
   gap: var(--prime-space-0);
+  min-width: min(100%, var(--prime-space-24));
 }
 
 .header[data-place="bar"] .path {
@@ -356,9 +363,12 @@
   min-width: 0;
 }
 
-/* Wide: one line that never wraps, Chips under it. When room runs short the Tools give way first,
-   down to 12rem, so the Sections keep their items and counts whole; only then the Sections shrink
-   and scroll inside their switcher. */
+/* Wide: one line that never wraps, Chips under it. Only the Tools (the search) stretch: the
+   Sections and the View keep their content width beside them — tabs as wide as their labels, as
+   in Linear — and the Actions stand at the end; a missing slot leaves free room, it never makes
+   another one grow. When room runs short the Tools give way first, down to 12rem, so the Sections
+   keep their items and counts whole; only then the Sections shrink and scroll inside their
+   switcher. */
 @container prime-page-tools (min-width: 56rem) {
   .toolbarLayout {
     flex-direction: column;
@@ -383,14 +393,14 @@
     min-width: calc(var(--prime-space-24) * 2);
   }
 
-  .toolbarSections {
+  .toolbarSections,
+  .toolbarBar:not(:has(> .toolbarTools)) > .toolbarSections {
     order: 2;
     flex: 0 1 auto;
   }
 
-  /* Without Tools the Sections are the first and stretchy item. */
-  .toolbarBar:not(:has(> .toolbarTools)) > .toolbarSections {
-    flex: 1 1 auto;
+  .toolbarSections > * {
+    flex: 0 1 auto;
   }
 
   .toolbarView,

@@ -78,8 +78,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Title",
-      en: "`ref` → `HTMLHeadingElement`. The page's `<h1>`, one per page: title-s in the top bar (truncates), heading-m in the flow (wraps). A flow title is what a `collapse` top bar repeats.",
-      ru: "`<h1>` страницы, один на страницу: title-s в верхней полосе (обрезается), heading-m в потоке (переносится). Заголовок в потоке повторяет полоса с `collapse`.",
+      en: "`ref` → `HTMLHeadingElement`. The page's `<h1>`, one per page: title-m in the top bar (truncates), heading-m in the flow (wraps). A flow title is what a `collapse` top bar repeats.",
+      ru: "`<h1>` страницы, один на страницу: title-m в верхней полосе (обрезается), heading-m в потоке (переносится). Заголовок в потоке повторяет полоса с `collapse`.",
       props: [
         {
           name: "…rest",

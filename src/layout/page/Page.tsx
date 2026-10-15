@@ -299,7 +299,7 @@ function TitleEcho({ separator }: { separator: boolean }) {
     >
       {separator ? <Divider orientation="vertical" inset /> : null}
       <div className={styles.titleBlock}>
-        <span className={cx(textRole.titleS, styles.barTitle)}>{title}</span>
+        <span className={cx(textRole.titleM, styles.barTitle)}>{title}</span>
         {description == null ? null : (
           <span className={cx(textRole.caption, styles.barDescription)}>{description}</span>
         )}
@@ -364,7 +364,7 @@ export type PageTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
 };
 
 /**
- * The page's `<h1>`: title-s in the top bar (it truncates), heading-m in the flow. A flow title
+ * The page's `<h1>`: title-m in the top bar (it truncates), heading-m in the flow. A flow title
  * is what a `collapse` top bar repeats once it scrolls away.
  */
 function PageTitle({ className, children, ref, ...rest }: PageTitleProps) {
@@ -386,7 +386,7 @@ function PageTitle({ className, children, ref, ...rest }: PageTitleProps) {
       {...rest}
       ref={mergedRef}
       className={cx(
-        place === "bar" ? textRole.titleS : textRole.headingM,
+        place === "bar" ? textRole.titleM : textRole.headingM,
         place === "bar" ? styles.barTitle : styles.title,
         className,
       )}

@@ -37,7 +37,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 │  │                               (+ the menu button while the Sidebar is off-canvas)
 │  ├─ Page.Header                  compact title row
 │  │  ├─ Breadcrumb.Root           the path; the header draws the separator after it
-│  │  ├─ Page.Title                <h1>, title-s, truncates
+│  │  ├─ Page.Title                <h1>, title-m, truncates
 │  │  ├─ Page.Description          <p>, muted caption, truncates
 │  │  └─ Page.Actions              one line; trailing secondary Buttons fold into «⋯»
 │  └─ Page.Toolbar                 tools row, 12 under the title row
@@ -93,7 +93,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Page.Title
-`ref` → `HTMLHeadingElement`. The page's `<h1>`, one per page: title-s in the top bar (truncates), heading-m in the flow (wraps). A flow title is what a `collapse` top bar repeats.
+`ref` → `HTMLHeadingElement`. The page's `<h1>`, one per page: title-m in the top bar (truncates), heading-m in the flow (wraps). A flow title is what a `collapse` top bar repeats.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -231,7 +231,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 ### Place of Page.Header
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| in `Page.TopBar` | one line as high as the Sidebar brand row: path · separator · title-s over a caption line, actions folding into «⋯» | work screens: lists, boards, chats, records | |
+| in `Page.TopBar` | one line as high as the Sidebar brand row: path · separator · title-m over a caption line, actions folding into «⋯» | work screens: lists, boards, chats, records | |
 | in the flow | the large document header: path over a heading-m title, body-m description, actions wrapping under it | document pages and overviews | |
 
 The size follows the place; the consumer passes nothing. One `Page.Title` (`<h1>`) per page, in one of the two places.
@@ -291,6 +291,7 @@ The size follows the place; the consumer passes nothing. One `Page.Title` (`<h1>
 - `Page.TopBar` steps out of the gutter to the panel's edges and keeps the gutter inside; padding 12 above (or the top safe-area inset) and below; the page's top air goes under it. Title row → toolbar row 12. The title row is as high as the Sidebar brand row (control m + 8), so the two read as one line.
 - Header → Body 24; blocks inside Body 24; a `Page.Section` 40 from its neighbours (the body's 24 + 16); tile → tile in a Grid 16 on both axes; section heading → content 16, heading → description 4; flow Title → Description 8; buttons in Actions 8; heading → Actions 24 side by side, 16 once they wrap below.
 - In the bar the title and its description truncate; actions keep one line and fold their trailing secondary Buttons into «⋯» once the title would get less than 9rem (measured, not by breakpoints).
+- Every part takes only its own width and only when it is there. In the bar the actions stand at the end and the heading takes the room between; without a title the path and the actions keep their places. When the row runs short the title truncates first (down to 6rem), then the path collapses, then secondary actions fold into «⋯». In a wide toolbar only the search stretches: Sections and View keep their content width, the Actions stand at the end, and a missing slot leaves free room rather than making another grow.
 - The toolbar lays itself out from its own width (container `prime-page-tools`), the grid from its own (`prime-grid`), the split from its own (`prime-split`) — never from the window.
 - `fill` needs a main with a height: `AppShell.Root fillViewport`. The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `Page.Split`.
 - Each pane of a split is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there. The detail pane on a wide split shows a short hint while nothing is chosen; a newly chosen record cross-fades in.
