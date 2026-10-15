@@ -211,6 +211,16 @@
   line-height: var(--dt-text-line-height);
 }
 
+/* `fullWidth={false}`: the surface hugs the table instead of spanning the container (up to its
+   width, then the table scrolls inside). An inline-size container has no content width, so this
+   root is no container: its width is the table's, and the visible-width parts (`100cqi`) are
+   clamped to it by their `max-width`. */
+.root[data-table-width="auto"] {
+  container-type: normal;
+  width: fit-content;
+  max-width: 100%;
+}
+
 .root[data-table-width="fill"] .table {
   width: 100%;
   min-width: max-content;

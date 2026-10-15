@@ -290,8 +290,8 @@ export const api: ComponentApi = {
           name: "fullWidth",
           type: "boolean",
           default: "true",
-          en: "The table spans its container; `false` sizes it by its content.",
-          ru: "Таблица на всю ширину контейнера; `false` — по содержимому.",
+          en: "The table spans its container; `false` sizes the table and its surface by its content (up to the container's width, then it scrolls).",
+          ru: "Таблица на всю ширину контейнера; `false` — таблица и её поверхность по содержимому (не шире контейнера, дальше прокрутка).",
         },
         {
           name: "rowDividers",
