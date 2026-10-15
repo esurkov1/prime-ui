@@ -70,7 +70,9 @@
   color: var(--prime-color-accent-default);
 }
 
+/* Disabled: the thumb goes quiet with the track (in dark a bright thumb would read as enabled). */
 .root[data-disabled="true"] .thumb {
+  background: var(--prime-color-control-thumb-disabled);
   box-shadow: none;
 }
 

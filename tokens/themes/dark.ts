@@ -103,6 +103,10 @@ export const darkThemeOverrides = {
     },
     control: {
       thumb: "{color.gray.100}",
+      thumbDisabled: "{color.gray.600}",
+    },
+    skeleton: {
+      fill: "color-mix(in srgb, {color.gray.100} 10%, transparent)",
     },
     /** A light chip over the dark UI: inverse like in light, so it reads over any layer. */
     tooltip: {

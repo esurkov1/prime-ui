@@ -32,6 +32,7 @@
   --prime-color-chart-scale-5: var(--prime-ref-color-cobalt-200);
   --prime-color-chart-scale-fg: var(--prime-ref-color-gray-950);
   --prime-color-control-thumb: var(--prime-ref-color-gray-100);
+  --prime-color-control-thumb-disabled: var(--prime-ref-color-gray-600);
   --prime-color-danger-border: var(--prime-ref-color-red-400);
   --prime-color-danger-hover: var(--prime-ref-color-red-500);
   --prime-color-danger-soft: color-mix(in srgb, var(--prime-ref-color-red-500) 16%, transparent);
@@ -128,6 +129,7 @@
   --prime-color-palette-yellow-soft: color-mix(in srgb, var(--prime-ref-color-yellow-500) 16%, transparent);
   --prime-color-palette-yellow-solid-fg: var(--prime-ref-color-gray-950);
   --prime-color-palette-yellow-text: var(--prime-ref-color-yellow-300);
+  --prime-color-skeleton-fill: color-mix(in srgb, var(--prime-ref-color-gray-100) 10%, transparent);
   --prime-color-success-default: var(--prime-ref-color-green-400);
   --prime-color-success-fg: var(--prime-ref-color-gray-950);
   --prime-color-success-hover: var(--prime-ref-color-green-300);

@@ -8,9 +8,9 @@
  * the placeholder stands still at full opacity.
  */
 .root {
-  /* One step above the surface's control fill, so a placeholder reads on every layer and theme
+  /* A wash over whatever layer the placeholder sits on, set per theme so it reads on every layer
      even at the low point of its pulse. */
-  --sk-fill: var(--prime-color-fill-muted-hover);
+  --sk-fill: var(--prime-color-skeleton-fill);
   --sk-avatar: var(--prime-avatar-m);
 
   display: block;
