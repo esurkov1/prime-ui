@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { HintTone } from "@/components/hint/Hint";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -76,6 +77,7 @@ export type TextareaRootProps = Omit<
     label?: React.ReactNode;
     optional?: boolean;
     hint?: React.ReactNode;
+    hintTone?: HintTone;
     error?: React.ReactNode;
     counter?: React.ReactNode;
     reserveSupportRow?: boolean;
@@ -103,6 +105,7 @@ function TextareaRoot({
   required,
   optional = false,
   hint,
+  hintTone,
   error,
   counter,
   reserveSupportRow = false,
@@ -289,6 +292,7 @@ function TextareaRoot({
           optional={optional}
           disabled={disabled}
           hint={hint}
+          hintTone={hintTone}
           error={error}
           counter={counter}
           reserveSupportRow={reserveSupportRow}

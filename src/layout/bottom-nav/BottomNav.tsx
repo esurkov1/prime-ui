@@ -10,6 +10,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
+import { leaveGuardCapture } from "@/internal/leaveGuard";
 import press from "@/internal/press.module.css";
 import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import {
@@ -290,6 +291,7 @@ function BottomNavItem({
     ...rest,
     disabled,
     className: cx(styles.item, press.pressHost, floating && touchTargetRowClass, className),
+    onClickCapture: leaveGuardCapture(rest.onClickCapture),
     "aria-current": current ? ("page" as const) : rest["aria-current"],
     ...toDataAttributes({ disabled: disabled || undefined }),
   };

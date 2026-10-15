@@ -11,12 +11,15 @@
 - Values with a fixed prefix/suffix (`https://`, domain, `₽`, `%`).
 - Inline editing in a record card: each field saves itself (`onCommit`) on blur and Enter.
 - A value with actions beside it: copy, write, open a profile (`Input.CopyButton`, `Input.Action`); a password with a show toggle (`Input.RevealButton`).
+- Free text with suggestions (a combobox): a place, a city, a tag the team typed before — `suggestions`; any other text stays allowed.
+- A picker and a text as one field (an icon and a name, a channel and an address): a `Select` inside `Input.Wrapper` is the box's start segment.
+- A time of day: `Input.Field type="time"` — the browser's hour and minute segments (arrows step them, `step`, `min`, `max`), a wheel on phones, and no calendar to open.
 - As the reference field: Select, Datepicker, TagSelect and Textarea follow the same label / field / support-row contract.
 
 ## When not to use
 - Multi-line text → use [Textarea](../textarea/COMPONENT.md).
 - One-time codes split into cells → use [DigitInput](../digit-input/COMPONENT.md).
-- Choosing from a fixed list → use [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md).
+- Choosing from a fixed list, where the value must be one of it → use [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md); `suggestions` only help typing free text.
 - Dates → use [Datepicker](../datepicker/COMPONENT.md).
 - A standalone label or message without an Input field → use [Label](../label/COMPONENT.md) / [Hint](../hint/COMPONENT.md).
 - Global search across the app in a dialog → use [CommandMenu](../command-menu/COMPONENT.md).
@@ -33,14 +36,16 @@ Input.Root            label row, field body, support row; provides size / invali
    ├─ Input.Affix          tinted section flush with the edge (start | end)
    ├─ Input.Icon           decorative icon (start | end)
    ├─ Input.InlineAffix    muted text next to the value (start | end)
-   ├─ Input.Field          native <input>
+   ├─ Select.Root          optional start segment: an icon-only picker in the box (no frame)
+   ├─ Input.Field          native <input>; a combobox with `suggestions`
    ├─ Input.ClearButton    clear segment (kit-rendered)
    ├─ Input.CopyButton     copy segment; the glyph morphs into a check (kit-rendered)
    ├─ Input.RevealButton   show / hide a password segment, aria-pressed (kit-rendered)
    └─ Input.Action         the consumer's named icon action with a tooltip (button or asChild link)
+listbox               `suggestions`: a floating list under the box, as wide as it
 Input.Counter         goes into Input.Root `counter` (support row, right side)
 ```
-The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · commit status (`onCommit`) · end icon · segments · end affix. The segments (`ClearButton`, `CopyButton`, `RevealButton`, `Action`) keep their JSX order among themselves and sit edge to edge, full field height, flush with the end edge. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
+The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · commit status (`onCommit`) · end icon · segments · end affix. The segments (`ClearButton`, `CopyButton`, `RevealButton`, `Action`) keep their JSX order among themselves and sit edge to edge, full field height, flush with the end edge. A `Select` segment comes first, flush with the start edge. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
 
 ## API
 
@@ -56,6 +61,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `required` | `boolean` | `false` | Red `*` after the label (`aria-hidden`) and native `required` on `Input.Field`. |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
@@ -65,6 +71,9 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `strength` | `boolean` | `false` | A password strength meter for new-password fields: a stepped `ProgressBar` under the field and the level word (weak … hard) in the support row. Follows the value of `Input.Field`. |
 | `getStrength` | `(value: string) => 0 \| 1 \| 2 \| 3 \| 4` | `getPasswordStrength` | Replaces the kit's estimate of `strength`. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check. |
 | `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with a changed value on blur and Enter; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through `error`. |
+| `suggestions` | `readonly string[]` | — | Suggestions for free text (a combobox): a list under the box shows those containing the text; a pick goes into the field as typing would. Any text stays allowed; a value from a list only is `Select`. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the `suggestions` list; the text and the focus stay in the field. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press outside the field and the `suggestions` list closes the list. |
 | `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
@@ -83,7 +92,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onValueChange` | `(value: string) => void` | — | Called with the new string; native `onChange` still fires first. |
-| `aria-describedby` | `string` | — | Merged with the hint/error ids from the root. |
+| `aria-describedby` | `string` | — | Merged with the affix and hint/error ids from the root. |
 | `required` | `boolean` | — | Overrides the root's `required` for the native input. |
 | `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size" \| "id">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
 
@@ -97,21 +106,23 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### Input.Affix
-`ref` → `HTMLDivElement`. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.
+`ref` → `HTMLDivElement`. Tinted section flush with the edge (`aria-hidden`, its text describes the input); the wrapper drops its padding there.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"start" \| "end"` | — (required) | Edge the section sits on. |
 | `children` | `ReactNode` | — (required) | Static text: protocol, domain, country code. |
+| `aria-label` | `string` | — | What a screen reader says instead of the text in the input's description. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the `<div>`. |
 
 ### Input.InlineAffix
-`ref` → `HTMLSpanElement`. Muted unit next to the value (`aria-hidden`).
+`ref` → `HTMLSpanElement`. Muted unit next to the value (`aria-hidden`, its text describes the input) — the one place of the unit.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"start" \| "end"` | — (required) | Side of the value. |
 | `children` | `ReactNode` | — (required) | Short unit: `₽`, `%`, `кг`. |
+| `aria-label` | `string` | — | The unit in words for a screen reader («рублей»), said instead of the sign in the input's description. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### Input.ClearButton
@@ -181,6 +192,8 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 |---|---|---|---|
 | `focusRing` | `false`: no focus ring; the field still switches to the focus fill, caret visible | A single search field where focus is obvious | `true` |
 | `reserveSupportRow` | Empty support row of hint height under the field | Fields validated on the fly; neighbouring fields in one grid row | `false` |
+| `closeOnOutsideClick` | `false`: a press beside the field keeps the `suggestions` list open | The person copies the value from elsewhere on the page | `true` |
+| `closeOnEscape` | `false`: Escape leaves the `suggestions` list open | Rare: the list closes only by a pick, Tab or blur | `true` |
 | `required` / `optional` | Red `*` / muted «необязательно» after the label | Mark the minority: required when most are optional, optional when most are required | `false` |
 
 **Combinations**
@@ -202,6 +215,8 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | read-only | native `readOnly` on `Input.Field` | no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
 | counter over limit | `current > max` | `data-invalid="true"` on `Input.Counter`; the current count rolls its digits to each new value |
+| suggesting | `suggestions` + typing, ↓ / ↑ or a click in the field | `role="combobox"`, `aria-expanded="true"` and `aria-controls` on the input; the list fades in under the box (the floating panel's motion) with the matching part of each suggestion marked; the highlight is a fill (`data-highlighted`, `aria-selected`) named by `aria-activedescendant`; closes on a pick, Escape, Tab, blur or a press outside |
+| select segment | a `Select` inside `Input.Wrapper` | `data-field-segment` on the select root, `data-segment="true"` on its trigger: a tinted section (`fill-subtle`) flush with the start edge, a stronger fill on hover and while open, its own inset focus ring; the box's ring stays for the text |
 | strength | `strength` + the value of `Input.Field` | a stepped `ProgressBar` (4 cells, `aria-label` = `labels.strength`) under the field fills one cell after another, weak · easy · medium · hard, toned danger → warning → accent → success; the level word at the end of the support row flows in letter by letter and is announced (`aria-live`); the support row is reserved |
 | saving | `onCommit` returned a pending Promise | `aria-busy="true"` on the input; a `Spinner` at the end of the field (`data-commit="pending"`); the field stays editable and focusable, neighbours are untouched; a live region says `labels.saving` |
 | saved | the Promise resolved (or `onCommit` returned nothing) | the spinner cross-fades into a success check (`data-commit="saved"`) that fades out after a moment; the live region says `labels.saved` |
@@ -214,6 +229,8 @@ Size: `data-size` on root and wrapper. Slots: `data-side="start" | "end"`. Segme
 Inline save (`onCommit`): the value at focus is the committed one. Blur and Enter commit a changed value (an unchanged one never fires); Escape puts the committed value back through the field's own `onChange`, so a controlled owner receives it, and is consumed — it does not also close the drawer around the field. Return a Promise for a server save: pending shows a spinner, reject restores the value, resolve shows the check.
 
 Strength estimate (`strength`, replaced by `getStrength`): every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. The meter follows `Input.Field` controlled or not.
+
+Suggestions (`suggestions`): the list shows the suggestions that contain the typed text (case-insensitive), and nothing when the text already is the only match. A pick writes the suggestion into the input the way typing does, so `onValueChange` (and `onCommit` on blur) receive it; the text is never restricted to the list.
 
 Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontrolled: `defaultValue`. Both are native input props.
 
@@ -234,6 +251,10 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | `Tab` | Focuses the field, then the segments at its end (clear, copy, reveal, actions). |
 | `Enter` · `Space` | On a segment: runs its action (the clear button returns focus to the field). |
 | `Enter` | With `onCommit`: saves a changed value; focus stays in the field. |
+| `↓` · `↑` | With `suggestions`: opens the list on the first (last) suggestion; in the open list moves the highlight, wrapping. Focus stays in the field. |
+| `Alt + ↓` | With `suggestions`: opens the list without highlighting. |
+| `Enter` | With `suggestions`: puts the highlighted suggestion into the field and closes the list; with no highlight the typed text stays. |
+| `Escape` | With `suggestions`: closes the open list, the text stays; a dialog around the field stays open. |
 | `Escape` | With `onCommit`: puts the committed value back. |
 
 ### ARIA
@@ -241,7 +262,9 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 
 - `label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.
 - Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.
-- `Input.Icon`, `Input.Affix`, `Input.InlineAffix` are `aria-hidden`: put the meaning in the label (e.g. "Сумма, ₽").
+- `Input.Icon` is decorative (`aria-hidden`). `Input.Affix` and `Input.InlineAffix` are `aria-hidden` in the reading order but describe the input (`aria-describedby`, before the hint): the unit is heard with the field, so the label never repeats it. An `aria-label` on the affix is said instead of its text («рублей» for `₽`).
+- `suggestions` make the input a `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` on the open `listbox`, which the label names); the highlight is `aria-activedescendant`, so focus never leaves the field.
+- A `Select` inside `Input.Wrapper` is the box's start segment: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).
 - `Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.
 - `Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.
 - `Input.RevealButton` is a toggle: a constant name `labels.reveal`, `aria-pressed` and `aria-controls` on the input; a pointer press keeps the focus in the field.
@@ -276,11 +299,15 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [states.tsx](examples/states.tsx) | A default field next to a disabled, a read-only and an invalid one with no message — `disabled`, `readOnly`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the value is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A decorative icon at either end of the value — `Input.Icon`, `side`. |
-| [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value — `Input.Affix`, `Input.InlineAffix`. |
+| [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value, heard as a word by a screen reader — `Input.Affix`, `Input.InlineAffix`, `aria-label`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
 | [password-strength.tsx](examples/password-strength.tsx) | A new password with a show toggle and a meter that fills step by step and names the level beside the hint, and a service password measured by the company's own rule — `Input.RevealButton`, `strength`, `getStrength`. |
 | [edge-actions.tsx](examples/edge-actions.tsx) | Actions at the field's end: a mail link with a tooltip beside copying the value, and a profile link on a read-only field — `Input.Action`, `Input.CopyButton`. |
 | [inline-edit.tsx](examples/inline-edit.tsx) | Record card fields that save on blur and Enter, revert on Escape and show the server's refusal — `onCommit`, `error`. |
+| [suggestions.tsx](examples/suggestions.tsx) | Where a returned order is kept: free text with the places already used as suggestions — `suggestions`. |
+| [with-select.tsx](examples/with-select.tsx) | A menu section's icon and name as one field: an icon-only Select is the box's start segment — `Input.Wrapper`, `Select.Root`, `aria-label`. |
+| [time.tsx](examples/time.tsx) | A call slot as a time of day: the browser's hour and minute segments, arrows step them, working hours only — `type`, `step`, `min`, `max`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A delivery city whose suggestions stay open on a press beside the field while the address is copied from a letter; Escape still closes them — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |
 | [in-form.tsx](examples/in-form.tsx) | Company details form: required fields checked on submit, each error leaves as its field is fixed and a saved form turns the button green; neighbours keep their bottoms aligned — `required`, `error`, `reserveSupportRow`. |
 
@@ -294,8 +321,11 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `tone="danger"` / `error` as a boolean → use `invalid` or an `error` message.
 - A `Button` placed next to the field for «copy» or «call» → `Input.CopyButton` / `Input.Action` inside `Input.Wrapper`.
 - Hand-written blur / Enter / Escape handlers and a `disabled` field while saving → `onCommit` returning the save Promise; the field stays editable.
+- `<datalist>` with `list` on `Input.Field` → `suggestions` on `Input.Root`: the kit's list, keyboard and ARIA in both themes.
+- A Select and an Input side by side for one value (an icon + a name) → the Select inside `Input.Wrapper`, named by its `aria-label`.
+- A text field with a hand-made time mask, or a Datepicker for a time of day → `Input.Field type="time"`.
 - Returning `false` from `onCommit` to refuse → reject the Promise (throw) and set `error`.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments), [VisuallyHidden](../visually-hidden/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md) (the `suggestions` list)
 - **See also:** [Textarea](../textarea/COMPONENT.md), [Select](../select/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md) — fields with the same contract

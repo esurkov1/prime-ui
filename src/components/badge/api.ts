@@ -105,6 +105,26 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Badge.Group",
+      en: "`ref` → `HTMLDivElement`. A row of badges as one value (the tags of a record): it wraps onto more lines, the badges a chip gap apart.",
+      ru: "Ряд бейджей как одно значение (теги записи): переносится на новые строки, бейджи на шаг друг от друга.",
+      props: [
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          defaultNote: { en: "the host tier, one step down", ru: "ярус контейнера на шаг ниже" },
+          en: "Tier of every badge in the group; a badge's own `size` wins. Small tiers stand closer.",
+          ru: "Ярус всех бейджей группы; собственный `size` бейджа важнее. Малые ярусы стоят теснее.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: '`children` (the `Badge.Root`s), `className`, `aria-label` (a named group is `role="group"`) and the other div attributes.',
+          ru: '`children` (`Badge.Root`), `className`, `aria-label` (названная группа — `role="group"`) и остальные атрибуты div.',
+        },
+      ],
+    },
+    {
       name: "Badge.Icon",
       en: "`ref` → `HTMLSpanElement`. A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.",
       ru: "`<span>` с иконкой размера яруса. Первой или последней — становится сегментом во всю высоту у края.",

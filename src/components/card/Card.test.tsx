@@ -169,4 +169,46 @@ describe("Card", () => {
     );
     expect(cssValue(rule, "white-space")).toBe("normal");
   });
+
+  it("loading holds a Skeleton in the value, delta and meta, then fades the data in", () => {
+    const tile = (loading: boolean) => (
+      <Card.Root variant="stat-trend" loading={loading} data-testid="kpi">
+        <Card.Label>Выручка</Card.Label>
+        <Card.Value data-testid="value">4,2 млн ₽</Card.Value>
+        <Card.Delta tone="success" data-testid="delta">
+          +18%
+        </Card.Delta>
+        <Card.Meta data-testid="meta">Сделок 186</Card.Meta>
+      </Card.Root>
+    );
+    const { rerender } = render(tile(true));
+    expect(screen.getByTestId("kpi")).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByText("Выручка")).toBeInTheDocument();
+    for (const id of ["value", "delta", "meta"]) {
+      const part = screen.getByTestId(id);
+      expect(part).toHaveAttribute("data-loading", "true");
+      expect(part.querySelector('[aria-hidden="true"][data-shape]')).not.toBeNull();
+    }
+    expect(screen.queryByText("4,2 млн ₽")).toBeNull();
+
+    rerender(tile(false));
+    expect(screen.getByTestId("kpi")).not.toHaveAttribute("aria-busy");
+    const value = screen.getByTestId("value");
+    expect(value).toHaveTextContent("4,2 млн ₽");
+    expect(value).not.toHaveAttribute("data-loading");
+    // The data enters with the region swap's fade-in.
+    expect(value.className).toMatch(/swapIn/);
+    expect(screen.getByTestId("delta")).toHaveTextContent("+18%");
+    expect(screen.getByTestId("meta")).toHaveTextContent("Сделок 186");
+  });
+
+  it("a card that never loads keeps its parts as they are", () => {
+    render(
+      <Card.Root variant="stat-trend" data-testid="kpi">
+        <Card.Value data-testid="value">99,95%</Card.Value>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("kpi")).not.toHaveAttribute("aria-busy");
+    expect(screen.getByTestId("value").className).not.toMatch(/swapIn/);
+  });
 });

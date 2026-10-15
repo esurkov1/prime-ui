@@ -115,9 +115,9 @@ export const api: ComponentApi = {
         },
         {
           name: "renderColumnMeta",
-          type: "(column: KanbanColumn) => ReactNode",
-          en: "The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). Like `description`, it describes the column's list.",
-          ru: "Строка меты под названием и описанием колонки: цифры этапа («12 сделок · 4,8 млн ₽»). Как и `description`, описывает список колонки.",
+          type: "(column: KanbanColumn) => ReactNode | readonly ReactNode[]",
+          en: "The meta under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»); an array is a line per entry, in order. Describes the column's list.",
+          ru: "Мета под названием и описанием колонки: цифры этапа («12 сделок · 4,8 млн ₽»); массив — строка на элемент, по порядку. Описывает список колонки.",
         },
         {
           name: "canDrop",
@@ -208,8 +208,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemBadges",
-      en: "`ref` → `HTMLDivElement`. A wrapping row of `Badge`s: labels, priority.",
-      ru: "Строка `Badge` с переносом: метки, приоритет.",
+      en: "`ref` → `HTMLDivElement`. A wrapping row of `Badge`s (a `Badge.Group`): labels, priority.",
+      ru: "Строка `Badge` с переносом (`Badge.Group`): метки, приоритет.",
       props: [
         {
           name: "…rest",

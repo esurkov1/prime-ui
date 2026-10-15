@@ -5,22 +5,25 @@ import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
-
 import {
+  DialogActions,
   DialogBody,
   DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogIcon,
+  DialogMeta,
   DialogPanel,
   type DialogRootOptions,
   DialogRootProvider,
+  DialogSection,
   DialogTitle,
   DialogTrigger,
   useDialogGuard,
   useDialogRoot,
 } from "./DialogParts";
+import styles from "./DialogParts.module.css";
 
 type DialogKind = React.ComponentProps<typeof DialogPanel>["kind"];
 
@@ -144,5 +147,56 @@ describe("DialogParts", () => {
       />,
     );
     expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "l");
+  });
+
+  it("names a body section by its h3 heading and puts its Actions at the end of the heading row", () => {
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader>
+            <DialogTitle>Анна Соколова</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <DialogSection label="Открытые сделки" description="2 сделки на 1 620 000 ₽">
+              <DialogActions>
+                <Button.Root>Сделка</Button.Root>
+              </DialogActions>
+              <p>Поставка серверов</p>
+            </DialogSection>
+          </DialogBody>
+        </DialogPanel>
+      </Root>,
+    );
+    const section = screen.getByRole("region", { name: "Открытые сделки" });
+    expect(screen.getByRole("heading", { level: 3, name: "Открытые сделки" })).toBeInTheDocument();
+    expect(screen.getByText("2 сделки на 1 620 000 ₽").tagName).toBe("P");
+    const action = screen.getByRole("button", { name: "Сделка" });
+    expect(action.closest(`.${styles.sectionHeader}`)).not.toBeNull();
+    expect(action.closest(`.${styles.actions}`)).toHaveAttribute("data-size", "s");
+    expect(screen.getByText("Поставка серверов").parentElement).toBe(section);
+  });
+
+  it("keeps the footer buttons one row beside a Meta, so the status wraps above them first", () => {
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogFooter data-testid="footer">
+            <DialogMeta>Есть несохранённые изменения</DialogMeta>
+            <Button.Root>Отмена</Button.Root>
+            <Button.Root>Черновик</Button.Root>
+            <Button.Root>Сохранить</Button.Root>
+          </DialogFooter>
+        </DialogPanel>
+      </Root>,
+    );
+    const footer = screen.getByTestId("footer");
+    const [meta, row] = Array.from(footer.children);
+    expect(meta).toHaveTextContent("Есть несохранённые изменения");
+    expect(row).toHaveClass(styles.footerActions);
+    expect(Array.from(row.children).map((button) => button.textContent)).toEqual([
+      "Отмена",
+      "Черновик",
+      "Сохранить",
+    ]);
   });
 });

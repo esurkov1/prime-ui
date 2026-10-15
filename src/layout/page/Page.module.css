@@ -510,8 +510,9 @@
  * board. Columns follow the grid's own width (container query, the numbers are written out — a
  * custom property cannot stand in a container condition): narrow — every cell takes the row; from
  * 30rem — small cells (KPI, span 1–3) pair up; from 40rem — spans 5–6 take half the row too, a third
- * stays a third, wide cells the whole row; from 64rem — every cell its own span. `dense` lets a
- * small cell fill a hole left by a wide one.
+ * stays a third, wide cells the whole row, and a wide cell written next to a narrow one (`data-pair`,
+ * set by the grid in TSX) takes 2/3 beside its 1/3; from 64rem — every cell its own span. `dense`
+ * lets a small cell fill a hole left by a wide one.
  */
 .grid {
   container: prime-grid / inline-size;
@@ -541,8 +542,13 @@
     grid-column: span 6;
   }
 
-  .cell[data-span="4"] {
+  .cell[data-span="4"],
+  .cell[data-pair="narrow"] {
     grid-column: span 4;
+  }
+
+  .cell[data-pair="wide"] {
+    grid-column: span 8;
   }
 
   .cell[data-rows="2"] {
@@ -679,4 +685,11 @@
   .backButton {
     display: none;
   }
+}
+
+/* The line of data while it loads: a short text bar inside the line, so the line keeps its height. */
+.descriptionSkeleton {
+  inline-size: calc(var(--prime-space-24) * 1.5);
+  max-inline-size: 100%;
+  vertical-align: middle;
 }

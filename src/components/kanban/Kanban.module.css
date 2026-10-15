@@ -169,17 +169,24 @@
   white-space: nowrap;
 }
 
-/* The stage's figures (`renderColumnMeta`): a caption row under the description, tabular digits. */
+/* The stage's figures (`renderColumnMeta`): caption lines under the description, in order,
+   tabular digits; each line a row of its own parts. */
 .meta {
   display: flex;
+  flex-direction: column;
   grid-column: 1 / -1;
+  min-width: 0;
+  margin-block-start: var(--prime-space-1);
+  color: var(--prime-color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.metaLine {
+  display: flex;
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
-  margin-block-start: var(--prime-space-1);
   overflow: hidden;
-  color: var(--prime-color-text-secondary);
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -361,13 +368,6 @@
 /* The title and its meta line read as one block. */
 .itemTitle + .itemDescription {
   margin-block-start: calc(var(--prime-space-1) - var(--prime-space-2));
-}
-
-.itemBadges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-space-1);
-  min-width: 0;
 }
 
 /* Counts at the start; the last child, unless a count, at the end (the assignee). At least as tall

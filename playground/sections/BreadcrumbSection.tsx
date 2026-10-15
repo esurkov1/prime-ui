@@ -43,6 +43,12 @@ export const page: ComponentPageConfig = {
       description:
         "Намеренно пропущенные уровни как «…», скрытый текст которого называет их скринридеру — `Breadcrumb.Ellipsis`, `labels`.",
     },
+    {
+      scenario: "router",
+      title: "Ссылки роутера",
+      description:
+        "Ссылки роутера как уровни выше: путь переходит без перезагрузки; рендерите внутри роутера — `asChild`, `current`.",
+    },
   ],
   api,
 };

@@ -2,6 +2,15 @@ import type { ApiPart, ApiProp, LabelDocs } from "../../scripts/docs/componentAp
 import type { FieldCopyLabels } from "./FieldAction";
 import type { FieldCommitLabels } from "./FieldCommit";
 
+/** `hintTone` of every field: the status the hint carries (`Hint` `tone`). */
+export const FIELD_HINT_TONE_PROP: ApiProp = {
+  name: "hintTone",
+  type: '"neutral" | "success" | "warning" | "danger"',
+  default: '"neutral"',
+  en: "Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint.",
+  ru: "Цвет статуса у `hint` («Осталось 12 дней» в `warning`). Статус несут слова, цвет его повторяет; `error` заменяет подсказку вместе с тоном. Ошибка проверки — это `error`, а не подсказка `danger`.",
+};
+
 /**
  * Field props of a framed group control (SegmentedControl, ButtonGroup): the group element is
  * named by the label and described by the hint or error. `control` names it (`radiogroup`).
@@ -34,6 +43,7 @@ export function fieldGroupProps(control: string, labelsType: string): ApiProp[] 
       en: `Help text under the control (\`aria-describedby\`). Hidden while \`error\` is shown.`,
       ru: "Подсказка под контролом (`aria-describedby`); скрывается, пока показан `error`.",
     },
+    FIELD_HINT_TONE_PROP,
     {
       name: "error",
       type: "ReactNode",

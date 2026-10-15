@@ -27,6 +27,7 @@ import { iconBoxStyles } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
+import { splitParts } from "@/internal/parts";
 import sheetStyles from "@/internal/sheet.module.css";
 import { Slot, type SlotPartProps } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
@@ -611,6 +612,49 @@ export function DialogBody({ className, ...rest }: DialogBodyProps) {
 }
 DialogBody.displayName = "Dialog.Body";
 
+// ─── Section (inside the body) ───────────────────────────────────────────────
+
+export type DialogSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
+  label: React.ReactNode;
+  description?: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
+};
+
+/**
+ * A titled group of the dialog body — what `Page.Section` is to a page: an `<h3>` (title-s, one
+ * level under the dialog's `<h2>` title) with an optional description and the dialog's `Actions`
+ * at the end of the heading row, then the content 16 below. Sections stand further apart than the
+ * plain blocks of the body.
+ */
+export function DialogSection({
+  label,
+  description,
+  className,
+  children,
+  ...rest
+}: DialogSectionProps) {
+  useDialogShell("Section");
+  const headingId = React.useId();
+  const { parts: actions, rest: content } = splitParts(children, DialogActions);
+  return (
+    <section aria-labelledby={headingId} {...rest} className={cx(styles.section, className)}>
+      <div className={styles.sectionHeader}>
+        <div className={styles.sectionHeading}>
+          <h3 id={headingId} className={cx(textRole.titleS, styles.sectionTitle)}>
+            {label}
+          </h3>
+          {description ? (
+            <p className={cx(textRole.bodyS, styles.sectionDescription)}>{description}</p>
+          ) : null}
+        </div>
+        {actions}
+      </div>
+      {content}
+    </section>
+  );
+}
+DialogSection.displayName = "Dialog.Section";
+
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 export type DialogFooterProps = React.HTMLAttributes<HTMLElement> & {
@@ -618,15 +662,29 @@ export type DialogFooterProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-/** Actions in DOM order, primary last. Stacks full width when the dialog is narrower than 360px. */
-export function DialogFooter({ layout, className, ...rest }: DialogFooterProps) {
+/**
+ * Actions in DOM order, primary last. Stacks full width when the dialog is narrower than 360px.
+ * With a `Meta` the buttons move as one row: when the line runs short the status text goes above
+ * them first, so the buttons never split over two lines while there is room for them in one.
+ */
+export function DialogFooter({ layout, className, children, ...rest }: DialogFooterProps) {
   const { footerLayout } = useDialogShell("Footer");
+  const { parts: meta, rest: actions } = splitParts(children, DialogMeta);
   return (
     <footer
       className={cx(hairline.top, styles.footer, className)}
       data-layout={layout ?? footerLayout}
       {...rest}
-    />
+    >
+      {meta.length > 0 ? (
+        <>
+          {meta}
+          <div className={styles.footerActions}>{actions}</div>
+        </>
+      ) : (
+        children
+      )}
+    </footer>
   );
 }
 DialogFooter.displayName = "Dialog.Footer";

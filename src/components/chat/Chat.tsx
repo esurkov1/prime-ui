@@ -417,7 +417,7 @@ export type ChatMessagesProps<T = unknown> = Omit<
   unread?: string;
   groupWindow?: number;
   now?: Date;
-  formatDate?: (date: Date, now: Date) => string;
+  formatDate?: (date: Date, now: Date, timeZone?: string) => string;
 };
 
 type Built = {
@@ -441,6 +441,7 @@ function useItemRows<T>(
     | "unread"
     | "groupWindow"
     | "now"
+    | "timeZone"
     | "formatDate"
   >,
   /** The text of the «unread» band (`labels.unread`). */
@@ -461,6 +462,7 @@ function useItemRows<T>(
     isService: props.isService,
     groupWindow: props.groupWindow,
     now: props.now,
+    timeZone: props.timeZone,
     formatDate: props.formatDate,
   } satisfies GroupMessagesOptions<T>);
   const next = new Map<string, Built>();
@@ -574,6 +576,7 @@ function ChatMessages<T>({
   unread,
   groupWindow,
   now,
+  timeZone,
   formatDate,
   children,
   "aria-label": ariaLabel,
@@ -592,6 +595,7 @@ function ChatMessages<T>({
       unread,
       groupWindow,
       now,
+      timeZone,
       formatDate,
     },
     chat.labels.unread,
@@ -638,6 +642,7 @@ function ChatMessages<T>({
                 ariaLabelledBy ?? (ariaLabel || !chat.hasTitle ? undefined : chat.titleId)
               }
               group={group}
+              timeZone={timeZone}
               jumpTo={chat.jumpTo}
               highlight={chat.search ?? ""}
               onMatchesChange={chat.setMatches}

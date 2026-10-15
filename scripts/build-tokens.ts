@@ -171,6 +171,7 @@ const darkOnly = Object.fromEntries(
  */
 const JS_DEFAULTS = [
   "gallery.maxSize",
+  "message.sticker",
   "message.videoNoteBox",
   "motion.duration.base",
   "motion.duration.fast",

@@ -47,6 +47,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 |---|---|---|---|
 | `variant` | `"panel" \| "mini" \| "stat-trend" \| "split" \| "cta" \| "list" \| "cover"` | `"panel"` | Structural template: titled block with zones (`panel`), KPI tiles, a call to action, a list or a cover tile. |
 | `flat` | `boolean` | `false` | No raised shadow: a flat tile for dense grids. |
+| `loading` | `boolean` | `false` | The KPI is loading: `Card.Value`, `Card.Delta` and `Card.Meta` show a Skeleton in their own geometry and the root sets `aria-busy`; the data fades in when it arrives. Labels and titles stay. |
 | `asChild` | `boolean` | `false` | The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring. Nothing interactive may sit inside it. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
@@ -154,6 +155,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `flat` | same fill, no shadow | dense grids of tiles | `false` |
+| `loading` | `Card.Value`, `Card.Delta` and `Card.Meta` hold a Skeleton in their own geometry (the value a bar one line of its role high); the data fades in under the same element | a KPI waits for its report | `false` |
 | `asChild` | the card is the link or button it wraps: lifts on hover (raised → overlay shadow), presses, focus ring | the whole tile opens its details | `false` |
 
 ## States
@@ -161,6 +163,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 |---|---|---|
 | template | `variant` | `data-variant` |
 | flat | `flat` | `data-flat` |
+| loading | `loading` | `aria-busy` on the root; `data-loading` on `Card.Value`, `Card.Delta`, `Card.Meta`, each holding a `Skeleton`; on `false` the data fades in (`useSwapIn`, foundation §1 rule 7) |
 | depth | nesting: one above the nearest surface (the page and the AppShell panel are 0) | `data-depth` (`1`–`4`, `floating-1`/`floating-2` inside a floating layer); the fill is `--prime-color-layer-current`, the shadow only at depth 1 |
 | card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem (a header control under its description), the `stat-trend` value changes at 20rem / 36rem |
 | hover | `asChild`, a fine pointer | the fill stays (a whole surface never changes its fill, foundation §8); the shadow lifts to `--prime-shadow-overlay` over `fast` |
@@ -195,6 +198,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 - `Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.
 - `Card.Title` renders `<h3>`; directly under the page title pass `as="h2"`.
 - Decorative icons in `Card.Icon` and cover images in `Card.Media` get `aria-hidden`; controls in `Card.Header` need their own names.
+- A `loading` card sets `aria-busy` on its root; the Skeletons are decorative (`aria-hidden`).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -211,6 +215,7 @@ No `labels`.
 | [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
+| [states.tsx](examples/states.tsx) | A KPI tile while its report loads next to the loaded one, in the `stat-trend` and `mini` templates — `loading`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem — `variant`. |
 | [screen.tsx](examples/screen.tsx) | A dashboard: the title and a line of data in the page flow, the period switch and the report in the top bar that keeps the title once it scrolls away; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `collapse`, `Page.Grid`. |
 
@@ -225,7 +230,8 @@ No `labels`.
 - A clickable `<div>` card with `onClick` → `asChild` with a real `<a href>` (Cmd-click, a new tab) or a `<button>`.
 - Buttons or links inside an `asChild` card → nested interactive elements; move them out of the card.
 - The reference figures written into `Card.Delta` or `Card.Label` → `Card.Meta`.
+- Skeletons placed by hand inside `Card.Value` → `Card.Root loading`; keep the parts mounted while loading so each holds its place.
 
 ## Related
-- **Built from:** —
+- **Built from:** [Skeleton](../skeleton/COMPONENT.md)
 - **See also:** [Page](../../layout/page/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Sparkline](../sparkline/COMPONENT.md) (a trend with its total inside a `panel`), [ChartFrame](../chart-frame/COMPONENT.md) (a full chart with legend and states)

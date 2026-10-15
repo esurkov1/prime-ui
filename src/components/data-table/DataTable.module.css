@@ -311,6 +311,29 @@
   text-overflow: ellipsis;
 }
 
+/* The header text and, for a column with a `description`, its info glyph right after it. */
+.headTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.headCell[data-align="end"] .headTitle {
+  justify-content: flex-end;
+}
+
+.headCell[data-align="center"] .headTitle {
+  justify-content: center;
+}
+
+/* The kit Icon takes the tier icon size from the table's ControlSizeProvider; quiet as the sort
+   arrows, it is chrome beside the header. */
+.headInfo {
+  flex-shrink: 0;
+  color: var(--prime-color-text-muted);
+}
+
 .sortButton {
   display: flex;
   align-items: center;

@@ -27,6 +27,7 @@ export type {
   PageDescriptionProps,
   PageDetailProps,
   PageGridProps,
+  PageGuardProps,
   PageHeaderProps,
   PageHeadingProps,
   PageLabels,

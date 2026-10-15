@@ -37,7 +37,7 @@ export const page: ComponentPageConfig = {
       scenario: "long-content",
       title: "Длинное содержимое",
       description:
-        "Длинное тело прокручивается само, шапка и подвал остаются на месте; главная кнопка закрывает окно и срабатывает по Enter — `Modal.Body`, `Modal.Confirm`.",
+        "Длинное тело из разделов с заголовками прокручивается само, шапка и подвал остаются на месте; главная кнопка закрывает окно и срабатывает по Enter — `Modal.Body`, `Modal.Section`, `Modal.Confirm`.",
     },
     {
       scenario: "custom-container",

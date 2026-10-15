@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { COLOR_SWATCHES_LABELS } from "./ColorSwatches";
 
 export const api: ComponentApi = {
@@ -79,6 +80,7 @@ export const api: ComponentApi = {
           en: "Help text under the swatches. Hidden while `error` is shown.",
           ru: "Подсказка под образцами; скрывается, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

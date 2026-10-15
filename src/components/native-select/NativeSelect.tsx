@@ -46,6 +46,7 @@ export function NativeSelect({
   required = false,
   optional,
   hint,
+  hintTone,
   error,
   invalid,
   focusRing,
@@ -78,6 +79,7 @@ export function NativeSelect({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}

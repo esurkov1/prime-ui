@@ -1,0 +1,61 @@
+/*
+ * Message.Sticker — a square box of `--prime-message-sticker`, within the row. The picture (or the
+ * consumer's player) fills it, contained, on no backing; the message's meta pill sits over its
+ * bottom-end corner (the root is its positioned box). The placeholder, the image and the fallback
+ * share one cell: while loading the Skeleton covers the box, then fades out over the picture
+ * (`fade-base`) and leaves the paint (`visibility`, after the fade).
+ */
+
+.root {
+  position: relative;
+  display: grid;
+  grid-template-areas: "sticker";
+  place-items: center;
+  inline-size: min(var(--prime-message-sticker), 85cqi);
+  aspect-ratio: 1;
+}
+
+.root > * {
+  grid-area: sticker;
+}
+
+.content {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  opacity: 1;
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
+}
+
+.content > * {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.root[data-status="loading"] .content,
+.root[data-status="error"] .content {
+  opacity: 0;
+}
+
+.placeholder {
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    visibility var(--prime-motion-instant) linear var(--prime-motion-fade-base);
+}
+
+.root[data-status="loading"] .placeholder {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
+}
+
+.fallback {
+  padding: var(--prime-space-2);
+  color: var(--prime-color-text-muted);
+  overflow-wrap: anywhere;
+}

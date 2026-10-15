@@ -12,6 +12,8 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
+import { leaveGuardCapture } from "@/internal/leaveGuard";
+import { slotChild } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Breadcrumb.module.css";
@@ -199,14 +201,20 @@ function CollapseMenu({ levels }: { levels: React.ReactNode[] }) {
         </Dropdown.Trigger>
         <Dropdown.Content size={size} align="start">
           {entries.map((level, index) => {
-            const { href, children, "aria-label": name } = level.props;
-            return href ? (
-              <Dropdown.Item key={level.key ?? index} asChild>
-                <a href={href} aria-label={name}>
-                  {children}
-                </a>
-              </Dropdown.Item>
-            ) : (
+            const { href, asChild, children, "aria-label": name } = level.props;
+            if (asChild || href) {
+              return (
+                <Dropdown.Item
+                  key={level.key ?? index}
+                  asChild
+                  aria-label={name}
+                  onClickCapture={leaveGuardCapture()}
+                >
+                  {asChild ? slotChild(children, "Breadcrumb.Item") : <a href={href}>{children}</a>}
+                </Dropdown.Item>
+              );
+            }
+            return (
               <Dropdown.Item key={level.key ?? index} disabled aria-label={name}>
                 {children}
               </Dropdown.Item>
@@ -220,32 +228,49 @@ function CollapseMenu({ levels }: { levels: React.ReactNode[] }) {
 
 export type BreadcrumbItemProps = Omit<React.LiHTMLAttributes<HTMLLIElement>, "aria-label"> & {
   href?: string;
+  asChild?: boolean;
   current?: boolean;
   "aria-label"?: string;
   ref?: React.Ref<HTMLLIElement>;
 };
 
+/**
+ * One level of the path in its `<li>`: a link (`href`, or the consumer's router link with
+ * `asChild`) for a previous level, plain text for the current one. A press on the link goes
+ * through `Page.Guard` (`leaveGuardCapture`).
+ */
 function BreadcrumbItem({
   href,
+  asChild = false,
   current,
   children,
   className,
   "aria-label": ariaLabel,
+  onClickCapture,
   ...rest
 }: BreadcrumbItemProps) {
   const { size } = React.useContext(BreadcrumbContext);
+  const link = {
+    size,
+    tone: "muted" as const,
+    "aria-label": ariaLabel,
+    "aria-current": current ? ("page" as const) : undefined,
+  };
   return (
-    <li {...rest} className={cx(styles.item, className)}>
+    <li
+      {...rest}
+      className={cx(styles.item, className)}
+      onClickCapture={leaveGuardCapture(onClickCapture)}
+    >
       <Separator />
-      {href ? (
+      {asChild ? (
+        // A previous level as the consumer's element (a router link), with the same look.
+        <LinkButton {...link} asChild>
+          {slotChild(children, "Breadcrumb.Item")}
+        </LinkButton>
+      ) : href ? (
         // A previous level: the kit link in the muted trail tone (primary on hover and focus).
-        <LinkButton
-          href={href}
-          size={size}
-          tone="muted"
-          aria-label={ariaLabel}
-          aria-current={current ? "page" : undefined}
-        >
+        <LinkButton {...link} href={href}>
           {children}
         </LinkButton>
       ) : (

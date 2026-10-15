@@ -106,6 +106,37 @@ describe("Chat: the conversation assembled", () => {
     expect(article("m4")).toHaveAttribute("aria-setsize", "4");
   });
 
+  it("reads the days, the runs and the message times in timeZone", () => {
+    const utc = (day: number, hour: number) => new Date(Date.UTC(2026, 9, day, hour, 0));
+    const items: Item[] = [
+      { id: "z1", from: "anna", at: utc(7, 12), text: "Машина вышла" },
+      { id: "z2", from: "anna", at: utc(7, 15), text: "Водитель на месте" },
+    ];
+    render(
+      <Chat.Root>
+        <Chat.Messages
+          aria-label="Переписка"
+          items={items}
+          getKey={(item) => item.id}
+          getAuthor={(item) => item.from}
+          getDate={(item) => item.at}
+          renderMessage={(item) => (
+            <Message.Root time={item.at}>
+              <Message.Text>{item.text}</Message.Text>
+            </Message.Root>
+          )}
+          now={utc(8, 3)}
+          timeZone="Asia/Vladivostok"
+        />
+      </Chat.Root>,
+    );
+    const log = screen.getByRole("log", { name: "Переписка" });
+    expect(within(log).getByText("Вчера")).toBeInTheDocument();
+    expect(within(log).getByText("Сегодня")).toBeInTheDocument();
+    expect(article("z1")).toHaveAttribute("data-position", "single");
+    expect(article("z2").querySelector("[data-message-meta] time")).toHaveTextContent("01:00");
+  });
+
   it("takes the text of the unread band from Chat.Root labels", () => {
     render(<Thread labels={{ unread: "Новые" }} />);
     expect(screen.getByText("Новые")).toBeInTheDocument();

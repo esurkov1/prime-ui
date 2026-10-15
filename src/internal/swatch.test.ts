@@ -2,7 +2,7 @@ import { renderHook } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { useBalancedColumns, useSwatchOptions } from "./swatch";
+import { parseHexColor, useBalancedColumns, useSwatchOptions } from "./swatch";
 
 /** The check-mark contrast `useSwatchOptions` picks for each color. */
 function contrastOf(...values: string[]) {
@@ -105,5 +105,19 @@ describe("useBalancedColumns", () => {
 
   it("sets no columns before a swatch is measured", () => {
     expect(columnsAt(5, 0)).toBeUndefined();
+  });
+});
+
+describe("parseHexColor", () => {
+  it("reads 3 and 6 digit hex with or without #, as lowercase #rrggbb", () => {
+    expect(parseHexColor("#12A594")).toBe("#12a594");
+    expect(parseHexColor(" 12a594 ")).toBe("#12a594");
+    expect(parseHexColor("#F0a")).toBe("#ff00aa");
+  });
+
+  it("is null for anything else", () => {
+    for (const text of ["", "#12a59", "red", "#12a594ff", "rgb(0 0 0)"]) {
+      expect(parseHexColor(text)).toBeNull();
+    }
   });
 });

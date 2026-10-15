@@ -214,8 +214,8 @@ export const api: ComponentApi = {
         ru: "Фокус не уходит вместе с уведомлением: карточка, которая уходит с фокусом, передаёт его передней открытой карточке стопки, иначе — туда, откуда фокус пришёл.",
       },
       {
-        en: "A toast is a non-modal live region, not a layer of the overlay stack: Escape and a press elsewhere belong to the page and to the topmost open layer, so a toast takes no `closeOnEscape` / `closeOnOutsideClick` — it leaves by its timer, the close button, a swipe or `dismiss()`.",
-        ru: "Уведомление — немодальная live-область, а не слой оверлеев: Escape и нажатие мимо принадлежат странице и верхнему открытому слою, поэтому у него нет `closeOnEscape` / `closeOnOutsideClick` — оно уходит по таймеру, крестику, свайпу или `dismiss()`.",
+        en: "A toast is a non-modal live region, not a layer of the overlay stack: Escape and a press elsewhere belong to the page and to the topmost open layer, so a toast takes no `closeOnEscape` / `closeOnOutsideClick` — it leaves by its timer, the close button, a swipe or `dismiss()`. The toasts stay usable above an open Modal or Drawer, and a press on a toast is outside no layer: it never closes the dialog below.",
+        ru: "Уведомление — немодальная live-область, а не слой оверлеев: Escape и нажатие мимо принадлежат странице и верхнему открытому слою, поэтому у него нет `closeOnEscape` / `closeOnOutsideClick` — оно уходит по таймеру, крестику, свайпу или `dismiss()`. Над открытым Modal или Drawer уведомления остаются доступны, а нажатие на уведомление не считается нажатием мимо слоя: диалог под ним не закрывается.",
       },
       {
         en: "Do not keep the only copy of important information in a toast with a timer — use `persistent` or a Banner.",

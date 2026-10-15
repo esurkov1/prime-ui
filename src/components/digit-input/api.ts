@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { DIGIT_INPUT_LABELS } from "./DigitInput";
 
 export const api: ComponentApi = {
@@ -46,6 +47,7 @@ export const api: ComponentApi = {
           en: "Help text under the cells. Hidden while `error` is shown.",
           ru: "Подсказка под ячейками; скрывается, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

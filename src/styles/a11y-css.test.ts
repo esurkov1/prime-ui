@@ -3,12 +3,14 @@
  * styled only from `data-*` and ARIA): a component that sets `data-pressed`, `aria-pressed` or
  * `aria-current` has a CSS selector for it (in its own stylesheets or the internal ones it uses),
  * and a list styled `list-style: none` keeps its list semantics with `role="list"` (WebKit drops
- * them otherwise).
+ * them otherwise). Text a pseudo-element draws (`content: "…"`, `attr()`) is drawing only: it
+ * carries empty alternative text (`/ ""`) or is hidden, so it never joins an accessible name (the
+ * 0–9 strip of a rolling counter read inside a tab's name).
  */
 import path from "node:path";
 
 import { read, walk } from "../test/contract-utils";
-import { cssRules } from "../test/css";
+import { cssRules, moduleCssFiles } from "../test/css";
 
 const STATES = ["data-pressed", "aria-pressed", "aria-current"];
 
@@ -65,5 +67,20 @@ describe("a11y state in CSS", () => {
     }
     expect(Object.keys(SHOWN_BY_CONTENT).filter((key) => !shown.has(key))).toEqual([]);
     expect(offenders, "a11y-css").toEqual([]);
+  });
+
+  it("text drawn by a pseudo-element stays out of the accessible name", () => {
+    const offenders = moduleCssFiles().flatMap((file) =>
+      cssRules(file)
+        .filter((rule) => /::?(before|after)\b/.test(rule.selector))
+        .filter((rule) => !rule.decls.some((d) => d.prop === "visibility" && d.value === "hidden"))
+        .flatMap((rule) =>
+          rule.decls
+            .filter((d) => d.prop === "content" && /"[^"]+"|attr\(/.test(d.value))
+            .filter((d) => !/\/\s*""\s*$/.test(d.value))
+            .map((d) => `${file}:${d.line} ${rule.selector}`),
+        ),
+    );
+    expect(offenders, "pseudo-element text").toEqual([]);
   });
 });

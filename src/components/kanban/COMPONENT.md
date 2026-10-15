@@ -35,13 +35,13 @@ Kanban.Root                          board: horizontal strip of columns, its own
    └─ <li> column (from `columns`)   no well with a header plate (`plain`) or a header line (`line`), or a `fill-muted` well (`well`)
       ├─ header                      title (`columnTitleAs`, h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
       │  ├─ description              muted line under the title (`column.description`)
-      │  └─ meta                     the stage's figures (`renderColumnMeta(column)`)
+      │  └─ meta                     the stage's figures (`renderColumnMeta(column)`), a line per array entry
       └─ <ul> (Dnd.Sortable)         own vertical scroll; Skeleton cards while loading; EmptyPage (Dnd `empty`) when empty
          └─ Kanban.Item              <li> card from renderItem(item); with getItemHref an <a> covers it
             ├─ Kanban.ItemHeader     optional top row over a faint hairline: key · priority (or a full-width Thumbnail cover)
             ├─ Kanban.ItemTitle      title, up to three lines
             ├─ Kanban.ItemDescription  muted meta line: id, due date
-            ├─ Kanban.ItemBadges     wrapping row of Badge
+            ├─ Kanban.ItemBadges     wrapping row of Badge (a Badge.Group)
             └─ Kanban.ItemFooter     row: Kanban.ItemCount … at the start, the assignee at the end
                └─ Kanban.ItemCount   icon + number
 ```
@@ -72,7 +72,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `onItemOpen` | `(item: T, event: KanbanItemOpenEvent) => void` | — | Opens a card in place (a Drawer): a click, Enter or Space; never from a control inside it or after a drag. With `getItemHref` it gets plain clicks: `event.preventDefault()` routes in the app. |
 | `columnTitleAs` | `"h2" \| "h3" \| "h4"` | `"h3"` | Heading level of the column titles in the page outline; the look does not change. |
 | `renderColumnActions` | `(column: KanbanColumn) => ReactNode` | — | Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier. |
-| `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). Like `description`, it describes the column's list. |
+| `renderColumnMeta` | `(column: KanbanColumn) => ReactNode \| readonly ReactNode[]` | — | The meta under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»); an array is a line per entry, in order. Describes the column's list. |
 | `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). The column turns `danger` before the release. |
 | `variant` | `"plain" \| "line" \| "well"` | `"plain"` | No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues). |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
@@ -103,7 +103,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Kanban.ItemBadges
-`ref` → `HTMLDivElement`. A wrapping row of `Badge`s: labels, priority.
+`ref` → `HTMLDivElement`. A wrapping row of `Badge`s (a `Badge.Group`): labels, priority.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -138,7 +138,7 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 |---|---|---|---|
 | `limit` (column) | count reads `count / limit`, orange when full; a full column refuses cards from others with the reason `labels.full` | a WIP limit per status | — |
 | `description` (column) | a muted caption line under the column title, one line with an ellipsis | the column's rule or meaning («Ответить в течение дня») | — |
-| `renderColumnMeta` | a caption line in tabular digits under the description | the stage's figures («2 сделки · 576 000 ₽») | — |
+| `renderColumnMeta` | caption lines in tabular digits under the description: one, or a line per entry of an array, in order | the stage's figures («2 сделки · 576 000 ₽», «Средний чек 288 000 ₽») | — |
 | `color` (column) | the count Badge in the stage's hue (soft) | telling stages apart, matching their color elsewhere; the title still names the column | — |
 | `locked` (column) | a lock where the grip would be; the column holds its place, no column moves past it | system stages: the first «Новые», the last «Закрыто» | — |
 | `reorderableColumns` | a ghost grip at the end of every column header, after the actions; the column is carried by it | the user arranges the stages | `false` |
@@ -228,7 +228,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [structure.tsx](examples/structure.tsx) | Cards take only the parts they need: a title alone, a meta line, labels, a footer with counts and an assignee — `Kanban.ItemTitle`, `Kanban.ItemDescription`, `Kanban.ItemBadges`, `Kanban.ItemFooter`, `Kanban.ItemCount`. |
 | [cards.tsx](examples/cards.tsx) | Three kinds of cards on one board: a plain note, a ticket with a header row of key and priority, a design task with a cover — `Kanban.ItemHeader`, `Thumbnail`, `Kanban.ItemFooter`. |
 | [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule, its columns drawn as wells so each reads as a bounded queue: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`, `variant`. |
-| [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
+| [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures in two lines under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
 | [saving.tsx](examples/saving.tsx) | Every move is saved on the server: the card waits busy in its new place, and an invoice the server refuses to close glides back to its column — `onValueChange`. |
 | [item-link.tsx](examples/item-link.tsx) | Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemOpen`. |
 | [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. |

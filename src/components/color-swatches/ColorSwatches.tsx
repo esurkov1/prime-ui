@@ -131,6 +131,7 @@ function SwatchGrid({
   required,
   optional,
   hint,
+  hintTone,
   error,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
@@ -190,6 +191,7 @@ function SwatchGrid({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}

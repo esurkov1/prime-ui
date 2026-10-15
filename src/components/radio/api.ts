@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { RADIO_GROUP_LABELS } from "./Radio";
 
 export const api: ComponentApi = {
@@ -65,6 +66,7 @@ export const api: ComponentApi = {
           en: "Help text under the options. Hidden while `error` is shown.",
           ru: "Подсказка под вариантами; скрывается, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",
@@ -142,6 +144,7 @@ export const api: ComponentApi = {
           en: "Description under the option text, linked through `aria-describedby`.",
           ru: "Описание под текстом варианта, связано через `aria-describedby`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "disabled",
           type: "boolean",

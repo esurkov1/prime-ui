@@ -15,7 +15,7 @@ export default function SegmentedControlInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Input.Root label="Сумма, ₽" required>
+      <Input.Root label="Сумма" required>
         <Input.Wrapper>
           <Input.Field name="amount" inputMode="decimal" defaultValue="12 400" />
           <Input.InlineAffix side="end">₽</Input.InlineAffix>

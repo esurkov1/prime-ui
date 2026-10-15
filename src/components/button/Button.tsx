@@ -45,7 +45,7 @@ type ButtonShapeProps =
     };
 
 /**
- * A `<button>` runs the long-action modes; with `asChild` the child (a link) owns its content, so
+ * A `<button>` runs the long-action modes; with `asChild` the child (a link) owns its element, so
  * it takes none of them.
  */
 type ButtonElementProps =
@@ -271,6 +271,13 @@ function ButtonRoot({
   };
 
   if (asChild) {
+    // The child's text becomes the label part as in a `<button>`, so a host that folds buttons to
+    // their icon (`data-button-label="icon"`) folds a link too.
+    const child = slotChild(children, "Button.Root");
+    const labelled =
+      child.props.children == null
+        ? child
+        : React.cloneElement(child, { children: morphLabels(child.props.children) });
     return (
       <ControlSizeProvider value={size}>
         <InteractiveElement
@@ -284,7 +291,7 @@ function ButtonRoot({
           onClick={handleClick as React.MouseEventHandler<HTMLElement>}
           {...dataAttrs}
         >
-          {slotChild(children, "Button.Root")}
+          {labelled}
         </InteractiveElement>
       </ControlSizeProvider>
     );

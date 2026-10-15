@@ -81,6 +81,8 @@ export type DataTableLabels = {
   expandGroup: string;
   /** `aria-label` of the toggle of an expanded group; `{group}` is the group key. */
   collapseGroup: string;
+  /** Name of the info glyph of a column with a `description` (the tooltip holds the text). */
+  columnInfo: string;
 };
 
 export const DATA_TABLE_LABELS: DataTableLabels = {
@@ -100,6 +102,7 @@ export const DATA_TABLE_LABELS: DataTableLabels = {
   reorderSorted: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
   expandGroup: "Развернуть группу {group}",
   collapseGroup: "Свернуть группу {group}",
+  columnInfo: "Пояснение",
 };
 
 export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
@@ -904,6 +907,7 @@ export function DataTable<Row>({
                       stickyHeader={stickyHeader}
                       stickyCorner={stickyHeader && stickyFirstColumn}
                       expandEnabled={expandEnabled}
+                      infoLabel={labels.columnInfo}
                       reorderable={reorder.enabled}
                       selectAll={
                         selectable

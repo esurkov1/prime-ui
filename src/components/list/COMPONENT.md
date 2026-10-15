@@ -9,6 +9,7 @@
 - The list side of a list + detail screen (`Page.Split` → `Page.List`): tickets, letters, invoices worked through one by one; the open one is `current`.
 - A short column of records that each open something — a page (`href`, `asChild` with a router link) or a detail pane (`onClick`).
 - A short list the team puts in order (funnel stages, queues, priorities) — `onReorder`, a `value` per item.
+- Rows with controls of their own beside the row that opens the record (a stage shown on the board, a ⋯ menu) — `List.ItemActions`.
 
 ## When not to use
 - App sections → use [Sidebar](../../layout/sidebar/COMPONENT.md) (wide) and [BottomNav](../../layout/bottom-nav/COMPONENT.md) (phone).
@@ -28,11 +29,12 @@ import { List } from "prime-ui-kit";
 List.Root                   <ul aria-label>; size (else the host tier) → row tier; onReorder → Dnd.Sortable <ul>
 └─ List.Item                <li> with a full-width <button> | <a href> | asChild element; current, disabled
    │                         value; with onReorder: Dnd.Handle (busy while saving) before the row element
-   ├─ List.ItemIcon         leading Avatar.Root / Icon (aria-hidden); after the text — a trailing glyph
+   ├─ List.ItemIcon         leading Avatar.Root / Icon / Badge.Dot (aria-hidden); after the text — a trailing glyph
    ├─ List.ItemText         primary line, truncates
    ├─ List.ItemDescription  second line, muted, truncates
    ├─ List.ItemMeta         trailing small text (time, date, amount)
-   └─ List.ItemCount        trailing Badge, one tier down
+   ├─ List.ItemCount        trailing Badge, one tier down
+   └─ List.ItemActions      the row's own controls (Switch, Dropdown): beside the row element, one tier down
 ```
 
 ## API
@@ -64,15 +66,15 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | Renders the single child (a router link) as the row; its children are the content. |
 | `disabled` | `boolean` | `false` | Muted and out of the Tab order: a disabled button, or `aria-disabled` and no navigation on a link. |
-| `children` | `ReactNode` | — | `List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`; loose text becomes the text line. |
+| `children` | `ReactNode` | — | `List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions`; loose text becomes the text line. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and native attributes of the row element (`target`, `rel` on a link). |
 
 ### List.ItemIcon
-`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), or an `Icon`. After the text it is a trailing glyph.
+`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), an `Icon` or a colour `Badge.Dot` in an icon-wide box. After the text it is a trailing glyph.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | An `Avatar.Root` or an `Icon`. |
+| `children` | `ReactNode` | — (required) | An `Avatar.Root`, an `Icon`, or a `Badge.Dot` with `color` (a stage, a project): the large dot. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other `span` attributes. |
 
 ### List.ItemText
@@ -104,6 +106,13 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Badge hue; a hue for what needs attention (unread). |
 | `children` | `ReactNode` | — (required) | The number or a short status. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other `span` attributes. |
+
+### List.ItemActions
+`ref` → `HTMLDivElement`. The row's own controls (a `Switch`, a `Dropdown` with its icon `Button`) at its end, beside the row element and never inside it, one tier below the row.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the controls, each named on its own), `className` and the other `div` attributes. |
 
 ## Variants
 
@@ -139,6 +148,7 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 | disabled | `disabled` | `disabled` on a button; `aria-disabled="true"`, no `href` on a link, `tabindex="-1"` on an `asChild` element; `data-disabled="true"`; disabled text; in a reorderable list the handle is disabled and the row holds its place |
 | reorderable | `onReorder` | `data-reorderable="true"` on the root (a `Dnd.Sortable` `<ul>`); each `<li>` is a sortable item (`data-dnd-item` = `value`) with a leading `Dnd.Handle`; drag by the handle (a touch hold on touch), Alt + ↑ / ↓ from the handle or the row; a lifted row leaves a dashed gap in the row's radius, its neighbours glide, the copy (handle and row, in the row's padding and radius) follows the pointer and sets down in its new place without a jump |
 | saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, the handle is busy (Dnd: a spinner in the disabled grip), the row content dims to 0.6 (`--prime-motion-fade-fast` both ways); a rejection glides the row back |
+| own controls | `List.ItemActions` in the item | the row element and the controls stand in one frame that takes the hover, press and current fills for both; the element itself stays clear |
 | rows come and go | the data adds or takes out a `List.Item` (`value`, else its key) | a new row rises in once (`enterMotion`), a removed one closes up in place (`listPresence`); the first render stays still |
 
 Root attributes: `data-size`, `role="list"` (the list style reset would drop the list semantics in WebKit). The fill changes on `background-color` with `--prime-motion-fade-xfast` both ways (a fade: reduced motion keeps it).
@@ -150,6 +160,8 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
 - Reorderable (`onReorder`): an `xs` handle box sits before each row, 4px from it; the row keeps its own padding and fill.
+- `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's end as from its top and bottom.
+- A colour dot in `List.ItemIcon` is the large `Badge.Dot` (8px) centred in an icon-wide box, so the text lines up with the rows that carry icons.
 
 ## Accessibility
 
@@ -169,6 +181,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - The open record: `aria-current="true"` on a button (a selection inside the screen), `aria-current="page"` on a link (`href`, `asChild`) — the link points at the current URL. A router link may set it itself.
 - The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.
 - Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.
+- `List.ItemActions` stand beside the row element, never inside it: the row's name stays its text, and Tab goes from the row to its controls.
 - With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.
 
 ### Labels
@@ -184,10 +197,11 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 | [overview.tsx](examples/overview.tsx) | A support ticket queue with the client, the last update and the open count; a click opens a ticket and makes it the current row — `current`, `onClick`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: row height, text, icon and count follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | The open record, a regular row and an unavailable one — `current`, `disabled`. |
-| [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients and icons of queues; an avatar takes the row tier — `List.ItemIcon`. |
+| [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients, icons of queues and colour dots of projects; an avatar takes the row tier, a dot stands in an icon-wide box — `List.ItemIcon`, `Badge.Dot`. |
 | [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. |
 | [as-link.tsx](examples/as-link.tsx) | Rows as links to the invoice pages: a plain link, or your router link through the slot — `href`, `asChild`. |
 | [reorder.tsx](examples/reorder.tsx) | Funnel stages in the team's order: a stage moves by its handle or Alt+arrows and is saved on the server — `onReorder`, `value`. |
+| [row-controls.tsx](examples/row-controls.tsx) | Funnel stages with their own controls: a colour dot names the stage's hue, a switch shows it on the board and a menu edits it, all beside the row that opens the stage — `List.ItemActions`, `Badge.Dot`. |
 
 ## Mistakes
 - Rows hand-drawn from `Button.Root variant="ghost"` with a `soft` current → `List.Item current`.
@@ -197,7 +211,9 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - A long list without a scroller → wrap it in `ScrollContainer` inside the pane.
 - Up / down buttons on rows or a hand-made `Dnd.Sortable` of rows to order them → `List.Root onReorder` with a `value` on every item.
 - `onReorder` that rolls the order back itself on an error → return the promise; a rejection moves the row back.
+- A Switch or a menu button put inside a row, or a row rebuilt as a `div` to hold one → `List.ItemActions` beside the row element.
+- A hollow `Icon` circle or a hand-drawn dot as a stage colour → `Badge.Dot color` in `List.ItemIcon`.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`), [Avatar](../avatar/COMPONENT.md) (`List.ItemIcon` gives an avatar the row tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`; `Badge.Dot` in `List.ItemIcon`), [Avatar](../avatar/COMPONENT.md) (`List.ItemIcon` gives an avatar the row tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`)
 - **See also:** [Page](../../layout/page/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md)

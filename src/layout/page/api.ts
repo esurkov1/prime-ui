@@ -111,6 +111,13 @@ export const api: ComponentApi = {
       ru: "Строка контекста с данными (период, количество): приглушённый caption под всей строкой заголовка с обрезкой в полосе, вторичный body-m с переносом (не шире колонки для чтения) в потоке.",
       props: [
         {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "Its data is loading: a Skeleton keeps the line's place, so the title never moves; the data then fades in. Sets `aria-busy`.",
+          ru: "Данные строки загружаются: Skeleton держит её место, заголовок не сдвигается; затем данные проявляются. Ставит `aria-busy`.",
+        },
+        {
           name: "…rest",
           type: "HTMLAttributes<HTMLParagraphElement>",
           en: "`children`, `className` and the other paragraph attributes.",
@@ -120,8 +127,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Tools",
-      en: "`ref` → `HTMLDivElement`. The page's tools as kit controls in the order written: sections, `SmartFilter.Toolbar`, view. On a line of their own a search grows first; a `SegmentedControl.Root` is `fullWidth` unless set. Named, a `group`.",
-      ru: "Инструменты страницы — контролы кита в порядке записи: разделы, `SmartFilter.Toolbar`, вид. Своей строкой первым растёт поиск; `SegmentedControl.Root` — `fullWidth`, если не задан. С именем — `group`.",
+      en: "`ref` → `HTMLDivElement`. The page's tools in the order written: sections, `SmartFilter.Toolbar`, view. On a line of their own a search grows first, the rest share the line: a `SegmentedControl.Root` and a `Datepicker.Root` are `fullWidth` unless set. Named, a `group`.",
+      ru: "Инструменты страницы в порядке записи: разделы, `SmartFilter.Toolbar`, вид. Своей строкой первым растёт поиск, остальные делят строку: `SegmentedControl.Root` и `Datepicker.Root` — `fullWidth`, если не задан. С именем — `group`.",
       props: [divRest({ en: "`children` (kit controls)", ru: "`children` (контролы кита)" })],
     },
     {
@@ -177,8 +184,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Grid",
-      en: "`ref` → `HTMLDivElement`. The grid of the page's tiles (KPI cards, charts, panels): 12 columns, 16 apart on both axes, so its rows read as one board. A size container: cells fold by its own width (see Grid columns).",
-      ru: "Сетка плиток страницы (KPI, графики, панели): 12 колонок, 16 по обеим осям, так что её ряды читаются как одна доска. Контейнер размера: ячейки складываются по её собственной ширине.",
+      en: "`ref` → `HTMLDivElement`. The grid of the page's tiles (KPI cards, charts, panels): 12 columns, 16 apart on both axes, so its rows read as one board. A size container: cells fold by its own width, a wide cell next to a narrow one pairs up (see Grid columns).",
+      ru: "Сетка плиток страницы (KPI, графики, панели): 12 колонок, 16 по обеим осям, так что её ряды читаются как одна доска. Контейнер размера: ячейки складываются по её ширине, широкая рядом с узкой встаёт парой.",
       props: [divRest({ en: "`children` (`Page.Cell`)", ru: "`children` (`Page.Cell`)" })],
     },
     {
@@ -201,6 +208,27 @@ export const api: ComponentApi = {
           ru: 'Сколько рядов занимает ячейка от 40rem: график рядом с двумя плитками друг под другом (`ChartFrame.Plot height="fill"` заполняет высоту).',
         },
         divRest({ en: "`children` (one tile)", ru: "`children` (одна плитка)" }),
+      ],
+    },
+    {
+      name: "Page.Guard",
+      en: "No DOM, no ref. Holds the page from anywhere inside it: a press on a `Sidebar.Item`, `BottomNav.Item` or `Breadcrumb.Item` link (a router link too) stops before it navigates, and the browser asks before the tab closes. Renders only its `ConfirmDialog`.",
+      ru: "Удерживает страницу изнутри: нажатие на `Sidebar.Item`, `BottomNav.Item` или ссылку `Breadcrumb.Item` (и ссылку роутера) останавливается до перехода, а браузер спрашивает перед закрытием вкладки. Своего DOM нет, кроме `ConfirmDialog`.",
+      props: [
+        {
+          name: "busy",
+          type: "boolean",
+          default: "false",
+          en: "A request runs (a save): a press on those items does nothing until it ends; the browser asks before the tab closes.",
+          ru: "Идёт запрос (сохранение): нажатие на эти пункты ничего не делает, пока он не закончится; браузер спрашивает перед закрытием вкладки.",
+        },
+        {
+          name: "dirty",
+          type: "boolean",
+          default: "false",
+          en: "Changes are not saved: a press on those items asks «leave without saving?»; its confirm (`labels.leaveConfirm`) repeats the press, its cancel keeps the page. The browser asks before the tab closes.",
+          ru: "Изменения не сохранены: нажатие на эти пункты спрашивает «уйти без сохранения?»; кнопка действия (`labels.leaveConfirm`) повторяет нажатие, отмена оставляет страницу. Браузер спрашивает перед закрытием вкладки.",
+        },
       ],
     },
     {
@@ -272,6 +300,22 @@ export const api: ComponentApi = {
       en: "Name of `Page.BackButton`.",
       ru: "Имя `Page.BackButton`.",
     },
+    leaveTitle: {
+      en: "Title of the confirm `Page.Guard` opens when a person leaves a `dirty` page.",
+      ru: "Заголовок подтверждения, которое открывает `Page.Guard`, когда со страницы с `dirty` уходят.",
+    },
+    leaveDescription: {
+      en: "Its description.",
+      ru: "Его описание.",
+    },
+    leaveConfirm: {
+      en: "Its confirm button: leave and lose the changes.",
+      ru: "Его кнопка действия: уйти и потерять изменения.",
+    },
+    leaveCancel: {
+      en: "Its cancel button: stay on the page.",
+      ru: "Его кнопка отмены: остаться на странице.",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -301,6 +345,10 @@ export const api: ComponentApi = {
       {
         en: "`Page.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).",
         ru: "`Page.Section` — `<section>`, названный своим `<h2>` (`label`) через `aria-labelledby`; уровни заголовков: h1 (страница) → h2 (раздел) → h3 (заголовок карточки в нём).",
+      },
+      {
+        en: "`Page.Guard` holds a press made by pointer or keyboard alike (Enter on a link is a click). Its confirm is a `ConfirmDialog` (`alertdialog`): focus moves into it and, on «stay», returns to the item that was pressed.",
+        ru: "`Page.Guard` удерживает нажатие и мышью, и с клавиатуры (Enter на ссылке — это клик). Его подтверждение — `ConfirmDialog` (`alertdialog`): фокус переходит в него и после «остаться» возвращается на нажатый пункт.",
       },
       {
         en: 'Name both panes of `Page.Split` with `aria-label`: a named pane is `role="region"`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`. `Page.BackButton` is named by `labels.back` and shown only while the split shows one pane.',

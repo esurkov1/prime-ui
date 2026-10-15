@@ -81,6 +81,14 @@ export type BadgeActionProps = Omit<
   ref?: React.Ref<HTMLButtonElement>;
 };
 
+export type BadgeGroupProps = React.HTMLAttributes<HTMLDivElement> & {
+  size?: ControlSize;
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/** The `size` of the `Badge.Group` around a badge: the tier of every badge in it. */
+const GroupSizeContext = React.createContext<ControlSize | undefined>(undefined);
+
 const isText = (item: React.ReactNode): item is string | number =>
   typeof item === "string" || typeof item === "number";
 
@@ -135,7 +143,8 @@ function BadgeRoot({
   ref,
   ...rest
 }: BadgeRootProps) {
-  const { size, tier } = useChipTier(sizeProp);
+  const groupSize = React.useContext(GroupSizeContext);
+  const { size, tier } = useChipTier(sizeProp ?? groupSize);
   const disabled = useInheritedDisabled(disabledProp);
   // A status tone takes its own role colors; `neutral` is the gray hue, as is no hue at all.
   const hue: PaletteColor | undefined =
@@ -346,4 +355,32 @@ function BadgeAction({
 
 BadgeAction.displayName = "Badge.Action";
 
-export const Badge = { Root: BadgeRoot, Icon: BadgeIcon, Dot: BadgeDot, Action: BadgeAction };
+/**
+ * A row of badges as one value (the tags of a record, the stages a deal went through): the badges
+ * wrap onto more lines, a chip gap apart. `size` sets the tier of every badge in it; without it the
+ * badges follow the host, as a lone badge does.
+ */
+function BadgeGroup({ size, className, ...rest }: BadgeGroupProps) {
+  const { tier } = useChipTier(size);
+  return (
+    <GroupSizeContext value={size}>
+      <div
+        {...rest}
+        // A named group is a `group` for assistive tech; an unnamed one is plain layout.
+        role={namedRole(rest, "group")}
+        className={cx(styles.group, className)}
+        data-tier={tier}
+      />
+    </GroupSizeContext>
+  );
+}
+
+BadgeGroup.displayName = "Badge.Group";
+
+export const Badge = {
+  Root: BadgeRoot,
+  Group: BadgeGroup,
+  Icon: BadgeIcon,
+  Dot: BadgeDot,
+  Action: BadgeAction,
+};

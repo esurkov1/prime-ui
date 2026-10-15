@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Spinner } from "@/components/spinner/Spinner";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -143,7 +144,7 @@ export type KanbanRootProps<T> = Omit<
   onItemOpen?: (item: T, event: KanbanItemOpenEvent) => void;
   columnTitleAs?: KanbanColumnTitleAs;
   renderColumnActions?: (column: KanbanColumn) => React.ReactNode;
-  renderColumnMeta?: (column: KanbanColumn) => React.ReactNode;
+  renderColumnMeta?: (column: KanbanColumn) => React.ReactNode | readonly React.ReactNode[];
   canDrop?: (id: string, columnId: string) => boolean | string;
   variant?: KanbanVariant;
   loading?: boolean;
@@ -157,6 +158,14 @@ export type KanbanRootProps<T> = Omit<
  * keyboard (Alt + arrows, Dnd's linked lists). Its `Dnd.Root` joins a drag session already above
  * it.
  */
+/** Below this width (rem) a column takes most of the board and the columns snap. */
+const NARROW_REM = 40;
+
+const rootFontSize = () =>
+  typeof document === "undefined"
+    ? 16
+    : Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+
 function KanbanRoot<T>(props: KanbanRootProps<T>) {
   return (
     <Dnd.Root>
@@ -234,6 +243,12 @@ function KanbanBoard<T>({
   const announce = useDragAnnouncer();
   const [board, setBoard] = React.useState<HTMLDivElement | null>(null);
   const rootRef = useMergedRefs(setBoard, ref);
+  // Columns snap only on a narrow board, where one takes 85% of it (the CSS container step,
+  // 40rem). A wide board scrolls freely: its last columns cannot align to the start, so snapping
+  // would pull every scroll near the end back to it.
+  const boardRef = React.useMemo(() => ({ current: board }), [board]);
+  const boardSize = useElementSize(boardRef);
+  const narrow = boardSize !== null && boardSize.width < NARROW_REM * rootFontSize();
   // A refused card move glides back: every card that moved glides from where it stood.
   const { capture: glideCards } = useFlipList({
     container: board,
@@ -382,7 +397,7 @@ function KanbanBoard<T>({
         {/* The strip always spans the board: hosts that size blocks by content stretch it. */}
         <ScrollContainer
           axis="horizontal"
-          snap="mandatory"
+          snap={narrow ? "mandatory" : false}
           className={styles.scroller}
           data-full-width="true"
         >
@@ -440,7 +455,7 @@ type KanbanColumnViewProps<T> = {
   onReorder: (id: string, beforeId: string | null) => void | Promise<void>;
   renderItem: (item: T) => React.ReactNode;
   actions: React.ReactNode;
-  meta: React.ReactNode;
+  meta: React.ReactNode | readonly React.ReactNode[];
   reorderable: boolean;
   loading: boolean;
   disabled: boolean;
@@ -475,7 +490,11 @@ function KanbanColumnView<T>({
     column.limit === undefined
       ? formatLabel(labels.count, { count })
       : formatLabel(labels.countLimit, { count, limit: column.limit });
-  const showMeta = hasContent(meta);
+  // An array is a line per entry, in order, under the description; anything else is one line.
+  const metaLines = (Array.isArray(meta) ? (meta as readonly React.ReactNode[]) : [meta]).filter(
+    hasContent,
+  );
+  const showMeta = metaLines.length > 0;
   const describedBy =
     [column.description ? descriptionId : null, showMeta ? metaId : null]
       .filter(Boolean)
@@ -526,7 +545,12 @@ function KanbanColumnView<T>({
           ) : null}
           {showMeta ? (
             <div id={metaId} className={cx(textRole.caption, styles.meta)}>
-              {meta}
+              {metaLines.map((line, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: a line is its place
+                <span key={index} className={styles.metaLine}>
+                  {line}
+                </span>
+              ))}
             </div>
           ) : null}
         </div>
@@ -737,9 +761,9 @@ export type KanbanItemBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** A wrapping row of `Badge`s: labels, priority. */
-function KanbanItemBadges({ className, ...rest }: KanbanItemBadgesProps) {
-  return <div className={cx(styles.itemBadges, className)} {...rest} />;
+/** A wrapping row of `Badge`s: labels, priority (a `Badge.Group`). */
+function KanbanItemBadges(props: KanbanItemBadgesProps) {
+  return <Badge.Group {...props} />;
 }
 KanbanItemBadges.displayName = "Kanban.ItemBadges";
 

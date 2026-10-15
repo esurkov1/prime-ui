@@ -4,7 +4,8 @@
  * carried by Dnd keeps its tracks): [lead: handle or lock] [the columns] [end: remove]. The column
  * headings stand once above the rows; the fields inside carry them as hidden labels (`fieldCell`).
  * In a narrow container (`prime-field-list`, < 30rem) the heading row goes, every row stacks its
- * fields into one column and each field shows its label (FieldFrame).
+ * fields into one column and each field shows its label (FieldFrame). The totals row
+ * (`renderTotals`) stands under the rows on the same tracks.
  */
 /* A size container cannot take its width from its content: the list fills its column. */
 .root {
@@ -28,6 +29,7 @@
 .row {
   --fl-end: var(--field-h);
   --fl-compact: calc(var(--field-h) * 2);
+  --fl-xs: var(--prime-space-24);
   --fl-s: calc(var(--prime-space-24) + var(--prime-space-12));
   --fl-m: calc(var(--prime-space-24) * 2);
   --fl-row-h: var(--field-h);
@@ -81,6 +83,43 @@
 /* The lead box is one `xs` control wide (its own tier): the handle, the lock or nothing. */
 .lead {
   inline-size: var(--field-h);
+}
+
+/*
+ * Totals (`renderTotals`): over a faint line under the last row, each total on the line of a field
+ * of its column, its text where the field's text starts; the first cell without a total names the
+ * row («Итого»).
+ */
+.totals {
+  padding-block-start: var(--prime-space-3);
+}
+
+.total {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-height: var(--fl-row-h);
+  padding-inline: var(--field-px);
+  color: var(--prime-color-text-primary);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  font-variant-numeric: tabular-nums;
+}
+
+.totalsEnd {
+  inline-size: var(--fl-end);
+}
+
+.totalsLabel {
+  color: var(--prime-color-text-muted);
+}
+
+.totalValue {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: var(--prime-font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .add {
@@ -138,5 +177,27 @@
 
   .addIndented {
     padding-inline-start: 0;
+  }
+
+  /* Stacked totals: a line per total, its column name at the start and the value at the end. */
+  .total {
+    justify-content: space-between;
+    min-height: auto;
+    padding-inline: 0;
+  }
+
+  .total[data-empty] {
+    display: none;
+  }
+
+  .totals .totalName {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    color: var(--prime-color-text-secondary);
+    white-space: normal;
   }
 }

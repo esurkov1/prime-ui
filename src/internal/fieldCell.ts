@@ -5,7 +5,7 @@ import * as React from "react";
  * a framed field without a `label` of its own takes it as its label (and keeps its own `label`, if
  * any), so every field in a row has a name without a visible label per row. The column heading
  * shows the name once above the rows; the field's label is read, not shown, until the list stacks
- * its rows into blocks in a narrow container (the `prime-field-list` container FieldList sets),
+ * its rows into blocks in a narrow container (the size container of the FieldList body),
  * where each field shows it.
  */
 export type FieldCell = {

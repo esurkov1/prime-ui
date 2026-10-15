@@ -22,6 +22,17 @@ describe("Hint", () => {
     expect(screen.getByText("Invalid")).toHaveAttribute("data-invalid", "true");
   });
 
+  it("sets data-tone for a status tone and none for neutral", () => {
+    render(
+      <>
+        <Hint.Root tone="warning">Осталось 12 д.</Hint.Root>
+        <Hint.Root tone="neutral">Обычная</Hint.Root>
+      </>,
+    );
+    expect(screen.getByText("Осталось 12 д.")).toHaveAttribute("data-tone", "warning");
+    expect(screen.getByText("Обычная")).not.toHaveAttribute("data-tone");
+  });
+
   it("sets data-disabled when disabled", () => {
     render(<Hint.Root disabled>Inactive</Hint.Root>);
     expect(screen.getByText("Inactive")).toHaveAttribute("data-disabled", "true");

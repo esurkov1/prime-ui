@@ -3,6 +3,7 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
+import { InputSegmentContext } from "@/components/input/Input";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Spinner } from "@/components/spinner/Spinner";
@@ -142,6 +143,7 @@ function SelectRoot(props: SelectRootProps) {
     required = false,
     optional,
     hint,
+    hintTone,
     error,
     invalid,
     focusRing,
@@ -172,6 +174,7 @@ function SelectRoot(props: SelectRootProps) {
     value: _value,
     defaultValue: _defaultValue,
     onValueChange: _onValueChange,
+    "aria-label": ariaLabel,
     ...rest
   } = props;
   const multiple = props.multiple === true;
@@ -225,6 +228,12 @@ function SelectRoot(props: SelectRootProps) {
     onChange: onSearchChange,
   });
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  // Inside `Input.Wrapper` the select is the field's start segment: no frame of its own.
+  const inSegment = React.useContext(InputSegmentContext);
+  const segment = React.useMemo(
+    () => (inSegment ? { label: ariaLabel } : null),
+    [inSegment, ariaLabel],
+  );
 
   // Closing (also from outside, through `open`) resets the search.
   const wasOpenRef = React.useRef(isOpen);
@@ -287,6 +296,7 @@ function SelectRoot(props: SelectRootProps) {
       describedBy: ids.describedBy,
       triggerRef,
       labels,
+      segment,
     }),
     [
       size,
@@ -319,23 +329,12 @@ function SelectRoot(props: SelectRootProps) {
       query,
       setQuery,
       labels,
+      segment,
     ],
   );
 
-  return tier.provide(
-    <FieldFrame
-      {...rest}
-      size={size}
-      ids={ids}
-      label={label}
-      required={required}
-      optional={optional}
-      hint={hint}
-      error={error}
-      disabled={disabled}
-      optionalLabel={labels.optional}
-      className={className}
-    >
+  const body = (
+    <>
       <SelectProvider value={context}>{children}</SelectProvider>
       {name
         ? (selected.length > 0 || multiple ? selected : [""]).map((item) => (
@@ -343,6 +342,39 @@ function SelectRoot(props: SelectRootProps) {
           ))
         : null}
       <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
+    </>
+  );
+
+  if (segment) {
+    return tier.provide(
+      <div
+        {...rest}
+        className={cx(styles.segment, className)}
+        data-field-segment=""
+        data-size={size}
+      >
+        {body}
+      </div>,
+    );
+  }
+
+  return tier.provide(
+    <FieldFrame
+      {...rest}
+      aria-label={ariaLabel}
+      size={size}
+      ids={ids}
+      label={label}
+      required={required}
+      optional={optional}
+      hint={hint}
+      hintTone={hintTone}
+      error={error}
+      disabled={disabled}
+      optionalLabel={labels.optional}
+      className={className}
+    >
+      {body}
     </FieldFrame>,
   );
 }
@@ -386,8 +418,18 @@ function SelectTrigger({
     selected,
     clear,
     labels,
+    registry,
+    segment,
   } = useSelectContext();
   const mergedRef = useMergedRefs(triggerRef, ref);
+  // A segment is named by the root's `aria-label` with the picked value after it.
+  useListboxView(registry);
+  const valueText = selected.map(registry.labelOf).join(", ");
+  const segmentName = segment?.label
+    ? valueText
+      ? `${segment.label}: ${valueText}`
+      : segment.label
+    : undefined;
   // Only a `Select.TriggerIcon`, no `Select.Value`: a compact trigger (the glyph and the chevron)
   // for a dense row; the value is still spoken from a hidden `Select.Value`.
   const parts = React.Children.toArray(children);
@@ -414,8 +456,12 @@ function SelectTrigger({
       aria-required={required || undefined}
       aria-describedby={[ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined}
       aria-busy={busy || undefined}
+      aria-label={segmentName ?? rest["aria-label"]}
       disabled={disabled}
-      className={cx(fieldTriggerClass, styles.trigger, className)}
+      className={cx(
+        segment ? styles.segmentTrigger : cx(fieldTriggerClass, styles.trigger),
+        className,
+      )}
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) toggle.onClick();
@@ -441,6 +487,7 @@ function SelectTrigger({
         disabled: disabled || undefined,
         "focus-ring": focusRing,
         "icon-only": iconOnly || undefined,
+        segment: segment ? true : undefined,
       })}
     >
       <span className={styles.triggerMain}>

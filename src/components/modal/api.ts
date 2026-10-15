@@ -60,12 +60,16 @@ export const api: ComponentApi = {
         ...dialogContentAriaProps,
       ],
     },
-    ...dialogParts("Modal", {
-      note: {
-        en: '`"fill"` for `xs` `s` `m`, `"end"` for `l` `xl`',
-        ru: '`"fill"` для `xs` `s` `m`, `"end"` для `l` `xl`',
+    ...dialogParts(
+      "Modal",
+      {
+        note: {
+          en: '`"fill"` for `xs` `s` `m`, `"end"` for `l` `xl`',
+          ru: '`"fill"` для `xs` `s` `m`, `"end"` для `l` `xl`',
+        },
       },
-    }),
+      { section: true },
+    ),
     dialogSlotsPart("Modal", "Modal.Trigger · Modal.Close · Modal.Confirm"),
   ],
   labels: dialogLabels,

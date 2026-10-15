@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { TAG_SELECT_LABELS } from "./TagSelect";
 
 export const api: ComponentApi = {
@@ -111,6 +112,7 @@ export const api: ComponentApi = {
           en: "Support text under the field; linked by `aria-describedby`.",
           ru: "Подсказка под полем; связана через `aria-describedby`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

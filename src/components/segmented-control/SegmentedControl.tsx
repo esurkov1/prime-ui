@@ -144,6 +144,7 @@ function SegmentedControlRoot({
   required = false,
   optional = false,
   hint,
+  hintTone,
   error,
   invalid,
   reserveSupportRow = false,
@@ -273,6 +274,7 @@ function SegmentedControlRoot({
         required={required}
         optional={optional}
         hint={hint}
+        hintTone={hintTone}
         error={error}
         disabled={disabled}
         reserveSupportRow={reserveSupportRow}

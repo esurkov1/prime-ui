@@ -193,6 +193,16 @@ export function SwatchChip({ value, className, ...rest }: SwatchChipProps) {
   );
 }
 
+/**
+ * A typed hex color as `#rrggbb` (lowercase): `#` optional, 3 or 6 digits, spaces around ignored;
+ * `null` for anything else.
+ */
+export function parseHexColor(text: string): string | null {
+  const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(text.trim())?.[1]?.toLowerCase();
+  if (!hex) return null;
+  return `#${hex.length === 3 ? [...hex].map((c) => c + c).join("") : hex}`;
+}
+
 /** Case- and space-insensitive color comparison; `null` means "no color". */
 export function sameColor(a: string | null, b: string | null): boolean {
   return (a ?? "").trim().toLowerCase() === (b ?? "").trim().toLowerCase();

@@ -1,10 +1,12 @@
 import * as React from "react";
 
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import press from "@/internal/press.module.css";
+import { useSwapIn } from "@/internal/RegionSwap";
 import { Slot, slotChild } from "@/internal/slot";
 import type { Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
@@ -21,6 +23,7 @@ export type CardVariant = "panel" | "mini" | "stat-trend" | "split" | "cta" | "l
 export type CardRootProps = DivProps & {
   variant?: CardVariant;
   flat?: boolean;
+  loading?: boolean;
   asChild?: boolean;
 };
 
@@ -28,6 +31,23 @@ export type CardRootProps = DivProps & {
 const VariantContext = React.createContext<CardVariant | null>(null);
 /** Whether a part sits in `Card.Header` (a header-row value is a step smaller). */
 const HeaderContext = React.createContext(false);
+/** The card's data is loading: the value, delta and meta show Skeletons in their geometry. */
+const LoadingContext = React.createContext(false);
+
+/**
+ * A data part of a KPI (value, delta, meta) while the card loads: a Skeleton in the part's own
+ * element, then the data fades in under the same element (`useSwapIn`, foundation §1 rule 7).
+ */
+function useLoadingPart(placeholder: React.ReactNode, children: React.ReactNode) {
+  const loading = React.useContext(LoadingContext);
+  const swap = useSwapIn(loading ? "loading" : "data");
+  return {
+    key: swap.key,
+    className: swap.className,
+    "data-loading": loading || undefined,
+    children: loading ? placeholder : children,
+  };
+}
 
 /** `panel` and `list` are the zoned templates: their zones are parted by faint hairlines. */
 function useZoned(): boolean {
@@ -38,6 +58,7 @@ function useZoned(): boolean {
 function CardRoot({
   variant = "panel",
   flat = false,
+  loading = false,
   asChild = false,
   className,
   children,
@@ -47,11 +68,14 @@ function CardRoot({
   const content = (inner: React.ReactNode) => (
     <VariantContext.Provider value={variant}>
       <HeaderContext.Provider value={false}>
-        <SurfaceDepthProvider value={depth}>{inner}</SurfaceDepthProvider>
+        <LoadingContext.Provider value={loading}>
+          <SurfaceDepthProvider value={depth}>{inner}</SurfaceDepthProvider>
+        </LoadingContext.Provider>
       </HeaderContext.Provider>
     </VariantContext.Provider>
   );
   const rootProps = {
+    "aria-busy": loading || undefined,
     ...rest,
     className: cx(styles.root, asChild && press.press, className),
     "data-depth": depth,
@@ -159,7 +183,7 @@ CardLabel.displayName = "Card.Label";
 
 export type CardValueProps = SpanProps;
 
-function CardValue({ className, ...rest }: CardValueProps) {
+function CardValue({ className, children, ...rest }: CardValueProps) {
   const variant = React.useContext(VariantContext);
   const inHeader = React.useContext(HeaderContext);
   // `stat-trend`: the value is the tile's headline (a step smaller beside a lead in the header
@@ -167,8 +191,19 @@ function CardValue({ className, ...rest }: CardValueProps) {
   const role =
     variant !== "stat-trend" ? textRole.titleL : inHeader ? textRole.headingM : textRole.headingL;
   const headline = variant === "stat-trend" && !inHeader;
+  const part = useLoadingPart(
+    <Skeleton shape="block" className={styles.valueSkeleton} />,
+    children,
+  );
   return (
-    <span className={cx(role, styles.value, headline && styles.headline, className)} {...rest} />
+    <span
+      key={part.key}
+      {...rest}
+      className={cx(role, styles.value, headline && styles.headline, part.className, className)}
+      data-loading={part["data-loading"]}
+    >
+      {part.children}
+    </span>
   );
 }
 CardValue.displayName = "Card.Value";
@@ -177,14 +212,19 @@ export type CardDeltaProps = SpanProps & {
   tone?: Extract<Tone, "neutral" | "success" | "warning" | "danger">;
 };
 
-function CardDelta({ className, tone = "neutral", ...rest }: CardDeltaProps) {
+function CardDelta({ className, tone = "neutral", children, ...rest }: CardDeltaProps) {
+  const part = useLoadingPart(<Skeleton size="s" className={styles.deltaSkeleton} />, children);
   // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
   return (
     <span
+      key={part.key}
       {...rest}
-      className={cx(textRole.bodyS, styles.delta, textTone.tone, className)}
+      className={cx(textRole.bodyS, styles.delta, textTone.tone, part.className, className)}
       data-tone={tone}
-    />
+      data-loading={part["data-loading"]}
+    >
+      {part.children}
+    </span>
   );
 }
 CardDelta.displayName = "Card.Delta";
@@ -195,8 +235,18 @@ export type CardMetaProps = SpanProps;
  * The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; it sits at the
  * bottom of the tile, so tiles in a row line their meta up.
  */
-function CardMeta({ className, ...rest }: CardMetaProps) {
-  return <span className={cx(textRole.caption, styles.meta, className)} {...rest} />;
+function CardMeta({ className, children, ...rest }: CardMetaProps) {
+  const part = useLoadingPart(<Skeleton size="xs" className={styles.metaSkeleton} />, children);
+  return (
+    <span
+      key={part.key}
+      {...rest}
+      className={cx(textRole.caption, styles.meta, part.className, className)}
+      data-loading={part["data-loading"]}
+    >
+      {part.children}
+    </span>
+  );
 }
 CardMeta.displayName = "Card.Meta";
 

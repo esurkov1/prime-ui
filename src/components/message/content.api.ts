@@ -189,6 +189,39 @@ export const contentParts: ApiPart[] = [
       },
     ],
   },
+  {
+    name: "Message.Sticker",
+    en: '`ref` → `HTMLDivElement` (`role="img"`). A sticker: a square picture with no bubble, the meta on a pill over its corner; a `Skeleton` holds the box until it is ready.',
+    ru: "Стикер: квадратная картинка без пузыря, время на плашке в углу; пока он не готов, место держит `Skeleton`.",
+    props: [
+      {
+        name: "aria-label",
+        type: "string",
+        required: true,
+        en: "The sticker's name («Стикер «Класс»», or its emoji); shown in its box when `src` fails.",
+        ru: "Имя стикера («Стикер «Класс»» или его эмодзи); показывается в рамке, если `src` не загрузился.",
+      },
+      {
+        name: "src",
+        type: "string",
+        en: "A still or animated picture (webp, gif, apng), decoded before it shows. Without it the children are the sticker.",
+        ru: "Статичная или анимированная картинка (webp, gif, apng), показывается после декодирования. Без неё стикер — дети.",
+      },
+      {
+        name: "loading",
+        type: "boolean",
+        default: "false",
+        en: "Your player in the children is not ready yet: the `Skeleton` stays over the box.",
+        ru: "Ваш плеер в детях ещё не готов: `Skeleton` остаётся поверх рамки.",
+      },
+      {
+        name: "…rest",
+        type: 'Omit<HTMLAttributes<HTMLDivElement>, "role" | "aria-label">',
+        en: "`children` — your player for a Lottie (.tgs) or a video sticker, sized to the box; `className`.",
+        ru: "`children` — ваш плеер для Lottie (.tgs) или видеостикера, по размеру рамки; `className`.",
+      },
+    ],
+  },
 ];
 
 /** The label rows of the content parts, each on the part whose `labels` prop takes it. */

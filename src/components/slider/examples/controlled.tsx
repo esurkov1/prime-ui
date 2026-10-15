@@ -24,7 +24,7 @@ export default function SliderControlledExample() {
             type="number"
             min={0}
             max={MAX_DISCOUNT}
-            aria-label="Скидка для клиента, %"
+            aria-label="Скидка для клиента"
             value={discount}
             onValueChange={(text) => {
               const next = Number(text);

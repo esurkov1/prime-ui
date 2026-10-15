@@ -34,7 +34,7 @@ LoginForm.Root                      width cap; a Card inside: card fill, radius,
    │  └─ LoginForm.Actions          primary button + ghost back action
    └─ LoginForm.Footer              «Нет аккаунта? <LinkButton>»
 ```
-Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, dividers, banners and links are the regular kit components; LoginForm owns only the layout and the rhythm.
+Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, dividers and links are the regular kit components; LoginForm owns only the layout and the rhythm.
 
 ## API
 
@@ -149,8 +149,8 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `flat` | card fill, no shadow | inside a Modal or any other surface | `false` |
 
 **Combinations**
-- Recommended: one `size` on Root only (fields and buttons follow it); `hint` / `error` on fields for validation; a danger [Banner](../banner/COMPONENT.md) at the top of `Form` for server errors.
-- Avoid: more than one primary button; provider buttons in `solid` (they compete with the submit); a Card around LoginForm.
+- Recommended: one `size` on Root only (fields and buttons follow it); `hint` / `error` on fields for validation; a refused sign-in as `invalid` on the fields it concerns plus a [VisuallyHidden](../visually-hidden/COMPONENT.md) live region with the reason.
+- Avoid: a [Banner](../banner/COMPONENT.md) in the form; more than one primary button; provider buttons in `solid` (they compete with the submit); a Card around LoginForm.
 
 ## States
 LoginForm has no state of its own. Compose them:
@@ -159,7 +159,7 @@ LoginForm has no state of its own. Compose them:
 |---|---|---|
 | submitting | `loading` on the submit Button; the fields in a `Fieldset disabled`, the submit Button outside it | `aria-busy` on the button; native `disabled` on the `<fieldset>`, the fields in their disabled look |
 | field error | `error` / `invalid` on `Input.Root`, `error` on `DigitInput` | `aria-invalid`, the error under the field |
-| server error | `Banner.Root tone="danger" role="alert"` as the first child of `LoginForm.Form` | `role="alert"` |
+| refused sign-in | `invalid` on the fields it concerns (they shake once); `VisuallyHidden live="assertive"`, mounted from the start in `LoginForm.Form`, gets the reason | `aria-invalid` on the fields; `role="alert"` on the hidden region |
 
 Root carries `data-size`, `data-align` and `data-flat`.
 
@@ -185,7 +185,7 @@ Root carries `data-size`, `data-align` and `data-flat`.
 - The logo is decorative; with an `aria-label` it is the product mark image (`role="img"`).
 - Give `LoginForm.Form` an `aria-label` (or `aria-labelledby` pointing to the title id) so the form is a landmark.
 - Fields use `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) so password managers and OTP autofill work.
-- Server errors in a Banner need `role="alert"`; field errors come from the fields (`aria-invalid`, described by the error).
+- Field errors come from the fields (`aria-invalid`, described by the error). A refused sign-in has no Banner: the fields it concerns take `invalid` and an always-mounted `VisuallyHidden live="assertive"` says why.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -202,16 +202,17 @@ No `labels`.
 | [forgot-password.tsx](examples/forgot-password.tsx) | Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. |
 | [reset-password.tsx](examples/reset-password.tsx) | A new password after the e-mail link: a strength meter on the first field and a mismatch error under the second one — `strength`, `error`. |
 | [verification-code.tsx](examples/verification-code.tsx) | The second step with a one-time code: a rejected code shows its error under the cells, resend is a quiet action — `DigitInput`, `LoginForm.Actions`. |
-| [states.tsx](examples/states.tsx) | The submit cycle: the button is busy while the request runs, a failed request shows a danger Banner and marks the password — `loading`, `invalid`. |
+| [states.tsx](examples/states.tsx) | The submit cycle: the button is busy while the request runs, a refused sign-in marks both fields, which shake once, and a hidden live region says why — `loading`, `invalid`, `VisuallyHidden`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width — `LoginForm.Form`. |
 
 ## Mistakes
 - A separate block of your own for provider buttons → put them in `LoginForm.Actions`.
 - `disabled` on every field while the request runs → one [Fieldset](../fieldset/COMPONENT.md) `disabled` around the fields; keep the submit Button outside it so it shows `loading`.
+- A danger Banner above the fields for a refused sign-in → `invalid` on the fields and the reason in a `VisuallyHidden live="assertive"`; a sign-in or sign-up form has no banners.
 - A placeholder instead of a field label → pass `label` to the field.
 - A Card around LoginForm → the root already is the card; use `flat` inside another surface.
 - Repeating the card `size` on every field and button → set it once on Root; fields and buttons follow it.
 
 ## Related
 - **Built from:** [Card](../card/COMPONENT.md) (the surface), [Typography](../typography/COMPONENT.md) (`Title`, `Description`, `Footer`), the icon tile (`iconBox` `.tile`, the `start` logo)
-- **See also:** [Input](../input/COMPONENT.md), [Fieldset](../fieldset/COMPONENT.md) (disables the fields while signing in), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [Banner](../banner/COMPONENT.md), [Modal](../modal/COMPONENT.md)
+- **See also:** [Input](../input/COMPONENT.md), [Fieldset](../fieldset/COMPONENT.md) (disables the fields while signing in), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md), [Modal](../modal/COMPONENT.md)

@@ -106,11 +106,18 @@ export const api: ComponentApi = {
           ru: "«Сейчас» для времени строк. По умолчанию — момент отрисовки.",
         },
         {
+          name: "timeZone",
+          type: "string",
+          defaultNote: { en: "the browser's zone", ru: "пояс браузера" },
+          en: "The IANA zone the times of the rows are read in (`\"Asia/Vladivostok\"`): a profile's zone, not the browser's.",
+          ru: 'Пояс IANA, в котором читается время строк (`"Asia/Vladivostok"`): пояс профиля, а не браузера.',
+        },
+        {
           name: "formatTime",
-          type: "(date: Date, now: Date) => string",
+          type: "(date: Date, now: Date, timeZone?: string) => string",
           default: "formatChatTime",
-          en: "Display of a row's `Date` time: «14:32» today, «пн» this week, «12 мар», «12.03.2025».",
-          ru: "Вид времени строки из `Date`: «14:32» сегодня, «пн» на неделе, «12 мар», «12.03.2025».",
+          en: "Display of a row's `Date` time: «14:32» today, «пн» this week, «12 мар», «12.03.2025»; gets the `timeZone`.",
+          ru: "Вид времени строки из `Date`: «14:32» сегодня, «пн» на неделе, «12 мар», «12.03.2025»; получает `timeZone`.",
         },
         {
           name: "labels",
@@ -128,7 +135,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ChatList.Item",
-      en: "`ref` → `HTMLElement` (the `<button>` or `<a>`, not the `<li>`). A dialog: a `List.Item` row with the avatar, the name and the time over the preview and the counts. Its key and `current` come from the root.",
+      en: "`ref` → `HTMLElement` (the `<button>`, `<a>` or `asChild` element, not the `<li>`). A dialog: a `List.Item` row with the avatar, the name and the time over the preview and the counts. Its key and `current` come from the root.",
       ru: "Диалог: строка `List.Item` — аватар, имя и время над превью и счётчиками. Ключ и `current` задаёт корень.",
       props: [
         {
@@ -209,10 +216,17 @@ export const api: ComponentApi = {
           ru: "Отношение ссылки `<a>` (только с `href`).",
         },
         {
+          name: "asChild",
+          type: "boolean",
+          default: "false",
+          en: "The one child element (a router `Link`) is the row; the parts go inside it.",
+          ru: "Строкой становится единственный дочерний элемент (`Link` роутера); части кладутся внутрь него.",
+        },
+        {
           name: "children",
           type: "ReactNode",
-          en: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu`.",
-          ru: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu`.",
+          en: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu` — inside the child element with `asChild`.",
+          ru: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu` — внутри дочернего элемента при `asChild`.",
         },
         {
           name: "…rest",
@@ -401,8 +415,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, or a link with `href`.",
-        ru: "Список — `<ul>` с именем «Диалоги» (`labels.list`); каждая строка — `<li>` с кнопкой или ссылкой при `href`.",
+        en: "The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, a link with `href`, or your link with `asChild`.",
+        ru: "Список — `<ul>` с именем «Диалоги» (`labels.list`); каждая строка — `<li>` с кнопкой, ссылкой при `href` или вашей ссылкой при `asChild`.",
       },
       {
         en: 'The open dialog is `aria-current="true"` on a button, `"page"` on a link. Selection does not follow the focus: arrows only move it (a dialog may load a conversation); Enter, Space and a click open.',

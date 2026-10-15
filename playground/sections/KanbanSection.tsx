@@ -60,7 +60,7 @@ export const page: ComponentPageConfig = {
       scenario: "columns",
       title: "Колонки",
       description:
-        "Воронка продаж: этапы переставляются за ручку в шапке, первый и последний закреплены; у этапа цвет на счётчике, правило и цифры под названием, а в поповере его можно переименовать, перекрасить и удалить; порядок хранит страница — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`.",
+        "Воронка продаж: этапы переставляются за ручку в шапке, первый и последний закреплены; у этапа цвет на счётчике, правило и цифры в две строки под названием, а в поповере его можно переименовать, перекрасить и удалить; порядок хранит страница — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`.",
     },
     {
       scenario: "saving",

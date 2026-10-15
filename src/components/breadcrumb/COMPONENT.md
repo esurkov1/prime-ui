@@ -23,7 +23,7 @@ import { Breadcrumb } from "prime-ui-kit";
 ## Anatomy
 ```
 Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels; auto-collapse into a «…» menu
-├─ Breadcrumb.Item        <li>: a link (href → LinkButton), text, or the current page (current)
+├─ Breadcrumb.Item        <li>: a link (href → LinkButton, or a router link with asChild), text, or the current page (current)
 └─ Breadcrumb.Ellipsis    <li> with «…» for levels skipped on purpose
 ```
 
@@ -42,14 +42,15 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other `nav` attributes; an `aria-label` here overrides `labels.nav`. |
 
 ### Breadcrumb.Item
-`ref` → `HTMLLIElement`. `<li>`: a muted `LinkButton` (`href`), plain text, or the current page (`current`).
+`ref` → `HTMLLIElement`. `<li>`: a muted `LinkButton` (`href`, or the consumer's router link with `asChild`), plain text, or the current page (`current`). A press on the link goes through `Page.Guard`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `href` | `string` | — | Renders a link; without it the item is text. |
+| `href` | `string` | — | Renders a link; without it (and without `asChild`) the item is text. |
+| `asChild` | `boolean` | `false` | The single child (a router `Link`) is the level's link with the same look; its own text is the level. In the «…» menu of a folded path it is the menu item. |
 | `current` | `boolean` | — | Current page: `aria-current="page"` (on the link when `href` is set), primary text, medium weight. Usually the last item, without `href`. |
 | `aria-label` | `string` | — | Name of a link without visible text (e.g. a home icon); set on the link, not the `li`. |
-| `children` | `ReactNode` | — | Text or an `Icon`. A string also becomes the `title` of a text item (full text when truncated). |
+| `children` | `ReactNode` | — | Text or an `Icon`; with `asChild` one element. A string also becomes the `title` of a text item (full text when truncated). |
 | `…rest` | `Omit<LiHTMLAttributes<HTMLLIElement>, "aria-label">` | — | `className` and the other `li` attributes. |
 
 ### Breadcrumb.Ellipsis
@@ -77,6 +78,7 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 | text (no `href`, no `current`) | muted text | a level without its own page | yes |
 | current (`current`) | primary text, medium weight | the last item — this page | |
 | icon link (`href` + `aria-label`, `Icon` child) | icon at the tier icon size | a «home» root | |
+| router link (`asChild`, one `Link` child) | the same muted link, the consumer's element | an app with a client router: the path moves without a reload | |
 
 Use links for every ancestor and `current` on the last item; `s` above a `heading-m` page title. Avoid `href` on the current item and two `current` items.
 
@@ -89,6 +91,7 @@ Use links for every ancestor and `current` on the last item; `s` above a `headin
 | auto-collapse | 2+ levels whose whole path does not fit the width uncut (measured on every resize) | `data-collapsible="true"`, `data-collapsed="true"`; middle levels are `display: none` and replaced by «… ›»: a ghost menu button (`Dropdown.Trigger`, named by `labels.ellipsis`) whose menu lists them — links stay links, a level without `href` is a disabled row |
 | deep collapse | the path folded as above still does not fit | `data-collapsed="deep"`; the first level folds too: «…» › current page, the menu lists every level before it |
 | collapse menu open | a press, `Enter` or `ArrowDown` on the «…» | `aria-expanded="true"` on the button; a `role="menu"` panel at the tier size |
+| held | a `Page.Guard` that is `busy` or `dirty` on the page | a press on a level's link (in the path or the «…» menu) stops before it navigates; `dirty` asks first, then repeats it |
 
 Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`), `data-collapsed` (`"true"` / `"deep"`).
 
@@ -133,12 +136,14 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`), `data-c
 | [with-icon.tsx](examples/with-icon.tsx) | The root level as a home icon; a link without text is named for screen readers — `aria-label`. |
 | [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into a «…» menu that lists them — `Breadcrumb.Item`, `current`. |
 | [ellipsis.tsx](examples/ellipsis.tsx) | Levels skipped on purpose shown as «…» whose hidden text names them for screen readers — `Breadcrumb.Ellipsis`, `labels`. |
+| [router.tsx](examples/router.tsx) | Router links as the levels above: the path moves without a reload; render it inside a router — `asChild`, `current`. |
 
 ## Mistakes
 - Separators by hand between items → the root draws the chevrons.
 - `<Breadcrumb.Item href="…" current>` → the current page has no `href`.
 - Breadcrumb inside a flex row collapsing to zero width → give it `flex: 1 1 auto; min-width: 0`.
 - Home icon link without `aria-label` → add `aria-label="Главная"`.
+- `href` + `onClick` with `preventDefault()` and `navigate()` for a router → `asChild` with the router's `Link`.
 
 ## Related
 - **Built from:** [LinkButton](../link-button/COMPONENT.md) (`tone="muted"`), [Button](../button/COMPONENT.md) and [Dropdown](../dropdown/COMPONENT.md) (the collapse menu), Icon (`nav.chevronRight`), [VisuallyHidden](../visually-hidden/COMPONENT.md)

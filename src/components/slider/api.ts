@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { SLIDER_LABELS } from "./Slider";
 
 export const api: ComponentApi = {
@@ -111,6 +112,7 @@ export const api: ComponentApi = {
           en: "Help text under the track (`aria-describedby`). Hidden while `error` is shown.",
           ru: "Подсказка под дорожкой (`aria-describedby`); скрывается, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

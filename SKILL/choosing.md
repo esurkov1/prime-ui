@@ -10,7 +10,7 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
 | type a value (text, number, code, file, photos), group the fields of a form, edit a list of records of one shape | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint, Fieldset, FieldList |
 | pick from options, toggle, set a range, filter, a date or a color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorField, ColorPicker, ColorSwatches |
-| see data: status labels, people, objects, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, Accordion, Sparkline, ChartFrame |
+| see data: status labels, people, objects, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, RichText, Accordion, Sparkline, ChartFrame |
 | hold a conversation: pick a dialog, read and send chat messages of every kind | Messages — Chat, ChatList, Message, Gallery, VoicePlayer, VideoNote, Composer |
 | learn what happened, how far along it is, or watch a region load and change state; say it to a screen reader | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage, VisuallyHidden |
 | move between places: app sections, panels of a screen, the records of a list, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, List, Stepper, Sidebar, BottomNav |
@@ -46,12 +46,15 @@ contacts, specs, prices by period) → FieldList: one row per record, the headin
 | one of many (> 5) or a long list; icons, descriptions, search, groups | Select (`Select.Content searchable`) |
 | one record out of thousands for a form field (a client, a contract), searched on the server | Select with `search` / `onSearchChange`, `filter={false}`, `loading`, `hasMore` + `onLoadMore` — never a read-only field that opens a CommandMenu |
 | one value from a plain text list on a mobile-first form, posted with the form (`name`) | NativeSelect — the OS picker opens on phones |
+| free text the team often repeats (a place, a city), any other text allowed | Input with `suggestions` — never a `<datalist>`, never a Select |
+| a pick that belongs to a text (an icon before a name) | Select with only `Select.TriggerIcon` inside `Input.Wrapper`, named by `aria-label` |
 | several of many, shown as tags, with search / creation | TagSelect (`Select.Root multiple` when tags are not needed) |
 | narrowing a list or table by several fields, with search and show / hide | SmartFilter |
 | an approximate number in a range | Slider (exact number → Input) |
 | a date or a period | Datepicker |
+| a time of day without a date | Input with `Input.Field type="time"` (a date with a time → Datepicker `withTime`) |
 | a color from a fixed palette in a form or dialog | ColorSwatches (inline grid, default choice) |
-| a compact color next to a field or in a list row | ColorPresets (trigger + popover palette) |
+| a compact color next to a field or in a list row | ColorPresets (trigger + popover palette; `allowCustom` when any hex is valid too) |
 | any color as a field of a form (swatch + hex, picker in a popover) | ColorField |
 | any color in a panel of its own (hex, eyedropper, channels) | ColorPicker |
 
@@ -92,7 +95,11 @@ comment, a report) → `Gallery`; one picture of an object → `Thumbnail`. A vi
 `Message.Media` or `Thumbnail.Video`, not VideoNote. «Печатает…» → `Chat.Root typing` (or
 `Message.Typing`), never a text row; a jump to a message → `Message.Reply target`, `Chat.Pinned` or
 `Chat.Root jumpTo`, never `scrollIntoView`; search inside a chat → `Chat.Search`. Files, photos,
-places and contacts sent in a chat → the `Message` parts, not FileUpload rows or Cards.
+places and contacts sent in a chat → the `Message` parts, not FileUpload rows or Cards; a sticker →
+`Message.Sticker` (a Lottie or video sticker is your player inside it). A message shown outside a
+chat (a bot's welcome message in its settings) → `Message.Root preview`; its formatted text alone →
+`RichText`, never `dangerouslySetInnerHTML`. Times and date separators in a profile's zone →
+`timeZone` on `Chat.Messages` and `ChatList.Root`.
 
 **Status and loading.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
 ProgressBar `segments` (categories wear `color`, meanings wear `tone`; `legend` for color · name ·

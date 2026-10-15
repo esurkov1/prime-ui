@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { Drawer } from "@/components/drawer/Drawer";
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { type MotionHarness, withMotion } from "@/test/motion";
 
@@ -539,6 +540,29 @@ describe("Notification", () => {
       fireEvent.pointerUp(el, { pointerId: 2, clientX: 200, clientY: 0 });
       expect(screen.getByText("Swipe me")).toBeInTheDocument();
     });
+  });
+});
+
+describe("Notification over an open drawer", () => {
+  it("a press on a toast is no outside press: the drawer stays open", async () => {
+    render(
+      <NotificationProvider>
+        <Drawer.Root defaultOpen>
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title>Сделка № 214</Drawer.Title>
+            </Drawer.Header>
+            <Drawer.Body>
+              <NotificationHarness />
+            </Drawer.Body>
+          </Drawer.Content>
+        </Drawer.Root>
+      </NotificationProvider>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "push persistent" }));
+    const toast = await screen.findByRole("alert");
+    await userEvent.click(within(toast).getByRole("button", { name: "Закрыть уведомление" }));
+    expect(screen.getByRole("dialog", { name: "Сделка № 214" })).toBeInTheDocument();
   });
 });
 

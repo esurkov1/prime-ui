@@ -53,6 +53,7 @@ function ButtonGroupRoot({
   required = false,
   optional = false,
   hint,
+  hintTone,
   error,
   invalid,
   reserveSupportRow = false,
@@ -82,6 +83,7 @@ function ButtonGroupRoot({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       reserveSupportRow={reserveSupportRow}
       optionalLabel={labels.optional}

@@ -128,8 +128,11 @@ describe("Timeline", () => {
         </Timeline.Group>
       </Timeline.Root>,
     );
-    expect(screen.getByText("Default").parentElement).toHaveAttribute("data-color", "blue");
-    const toned = screen.getByText("Toned").parentElement;
+    expect(screen.getByText("Default").closest(`.${styles.row}`)).toHaveAttribute(
+      "data-color",
+      "blue",
+    );
+    const toned = screen.getByText("Toned").closest(`.${styles.row}`);
     expect(toned).toHaveAttribute("data-tone", "danger");
     expect(toned).not.toHaveAttribute("data-color");
   });
@@ -196,7 +199,7 @@ describe("Timeline", () => {
       </Timeline.Root>,
     );
     expect(screen.getByRole("button")).toHaveClass(press.press);
-    expect(screen.getByText("Static row").parentElement).not.toHaveClass(press.press);
+    expect(screen.getByText("Static row").closest(`.${styles.row}`)).not.toHaveClass(press.press);
   });
 
   it("asChild needs one element child", () => {
@@ -249,6 +252,31 @@ describe("Timeline", () => {
     expect(meta).toHaveClass(styles.valueMeta);
     expect(meta.parentElement).toHaveClass(styles.value);
     expect(meta.parentElement).toHaveTextContent("900 ฿ТО");
+  });
+
+  it("stacks several meta lines under the title in one text column, the value beside it", () => {
+    render(
+      <Timeline.Root>
+        <Timeline.Group>
+          <Timeline.Item>
+            <Timeline.ItemTitle>Сделка изменена</Timeline.ItemTitle>
+            <Timeline.ItemMeta>Сумма: 90 000 → 120 000 ₽</Timeline.ItemMeta>
+            <Timeline.ItemMeta>Этап: Переговоры → Договор</Timeline.ItemMeta>
+            <Timeline.ItemValue>120 000 ₽</Timeline.ItemValue>
+          </Timeline.Item>
+        </Timeline.Group>
+      </Timeline.Root>,
+    );
+    const title = screen.getByText("Сделка изменена");
+    const first = screen.getByText("Сумма: 90 000 → 120 000 ₽");
+    const second = screen.getByText("Этап: Переговоры → Договор");
+    const text = title.parentElement;
+    expect(text).toHaveClass(styles.text);
+    expect(first.parentElement).toBe(text);
+    expect(second.parentElement).toBe(text);
+    expect(first.nextElementSibling).toBe(second);
+    const value = screen.getByText("120 000 ₽");
+    expect(value.parentElement).toBe(text?.parentElement);
   });
 
   it("gap is a list item between events with a hollow dot, caption, trailing and tone", () => {

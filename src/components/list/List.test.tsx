@@ -4,7 +4,9 @@ import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
+import { Badge } from "@/components/badge/Badge";
 import { moveBefore } from "@/components/dnd/useSortableList";
+import { Switch } from "@/components/switch/Switch";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { cssRule, cssValue } from "@/test/css";
@@ -402,5 +404,80 @@ describe("List onReorder", () => {
   it("CSS: a sortable row has the row radius (the carried copy and its gap take it)", () => {
     const row = cssRule("src/components/list/List.module.css", ".sortableRow");
     expect(cssValue(row, "border-radius")).toBe("var(--field-radius)");
+  });
+
+  it("puts List.ItemActions beside the row element, one tier down, inside the row's fills", async () => {
+    const user = userEvent.setup();
+    const onOpen = vi.fn();
+    const onVisible = vi.fn();
+    render(
+      <List.Root aria-label="Этапы">
+        <List.Item current onClick={onOpen}>
+          <List.ItemText>Переговоры</List.ItemText>
+          <List.ItemActions data-testid="actions">
+            <Switch.Root aria-label="Показывать на доске" onCheckedChange={onVisible} />
+          </List.ItemActions>
+        </List.Item>
+      </List.Root>,
+    );
+    const row = screen.getByRole("button", { name: "Переговоры" });
+    const actions = screen.getByTestId("actions");
+    // The controls are no part of the row button: its name stays its text.
+    expect(row).not.toContainElement(actions);
+    expect(row.parentElement).toHaveClass(styles.frame);
+    expect(actions.parentElement).toBe(row.parentElement);
+    const toggle = screen.getByRole("switch", { name: "Показывать на доске" });
+    expect(toggle.closest("[data-size]")).toHaveAttribute("data-size", "s");
+    // Tab goes from the row to its control; Space toggles it without opening the row.
+    await user.tab();
+    expect(row).toHaveFocus();
+    await user.tab();
+    expect(toggle).toHaveFocus();
+    await user.keyboard(" ");
+    expect(onVisible).toHaveBeenCalledWith(true);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
+  it("keeps List.ItemActions out of a link row made with asChild", () => {
+    render(
+      <List.Root aria-label="Этапы">
+        <List.Item asChild>
+          <a href="/stages/new">
+            <List.ItemText>Новые</List.ItemText>
+            <List.ItemActions>
+              <button type="button">Ещё</button>
+            </List.ItemActions>
+          </a>
+        </List.Item>
+      </List.Root>,
+    );
+    const link = screen.getByRole("link", { name: "Новые" });
+    expect(link).not.toContainElement(screen.getByRole("button", { name: "Ещё" }));
+  });
+
+  it("stands a colour dot in an icon-wide box, as the large dot", () => {
+    const { container } = render(
+      <List.Root aria-label="Воронки">
+        <List.Item>
+          <List.ItemIcon>
+            <Badge.Dot color="green" />
+          </List.ItemIcon>
+          Продажи
+        </List.Item>
+      </List.Root>,
+    );
+    const box = container.querySelector(`.${styles.icon}`);
+    expect(box).toHaveAttribute("data-mark", "dot");
+    expect(box?.firstElementChild).toHaveAttribute("data-size", "l");
+    expect(box?.firstElementChild).toHaveAttribute("data-color", "green");
+    expect(
+      cssValue(
+        cssRule(
+          "src/components/list/List.module.css",
+          '.icon[data-mark="dot"], .icon[data-edge="end"]',
+        ),
+        "width",
+      ),
+    ).toBe("var(--field-icon)");
   });
 });

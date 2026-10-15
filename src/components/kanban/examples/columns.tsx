@@ -1,4 +1,4 @@
-/** A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. */
+/** A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures in two lines under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. */
 import {
   Button,
   ColorSwatches,
@@ -89,7 +89,9 @@ export default function KanbanColumnsExample() {
       DEALS.filter((deal) => deal.id === id),
     );
     const sum = deals.reduce((total, deal) => total + deal.amount, 0);
-    return `${deals.length} ${dealsWord(deals.length)} · ${RUBLES.format(sum)}`;
+    const lines = [`${deals.length} ${dealsWord(deals.length)} · ${RUBLES.format(sum)}`];
+    if (deals.length > 0) lines.push(`Средний чек ${RUBLES.format(sum / deals.length)}`);
+    return lines;
   };
 
   return (

@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogIcon,
   DialogMeta,
+  DialogSection,
   DialogTitle,
   DialogTrigger,
 } from "@/internal/overlay/DialogParts";
@@ -25,6 +26,7 @@ export type {
   DialogHeaderProps as ModalHeaderProps,
   DialogIconProps as ModalIconProps,
   DialogMetaProps as ModalMetaProps,
+  DialogSectionProps as ModalSectionProps,
   DialogTitleProps as ModalTitleProps,
   DialogTriggerProps as ModalTriggerProps,
 } from "@/internal/overlay/DialogParts";
@@ -45,6 +47,7 @@ export const Modal = {
   Description: DialogDescription,
   Actions: DialogActions,
   Body: DialogBody,
+  Section: DialogSection,
   Footer: DialogFooter,
   Meta: DialogMeta,
   Close: DialogClose,

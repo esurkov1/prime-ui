@@ -1,8 +1,9 @@
 import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Dnd, DndLock, moveBefore } from "@/components/dnd/Dnd";
+import type { HintTone } from "@/components/hint/Hint";
 import { Label } from "@/components/label/Label";
+import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
@@ -14,12 +15,15 @@ import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/Fi
 import { type FieldCell, FieldCellContext } from "@/internal/fieldCell";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import hairline from "@/internal/hairline.module.css";
+import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { useListPresence } from "@/internal/listPresence";
 import { usePartPresence } from "@/internal/partPresence";
 import type { ControlSize } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./FieldList.module.css";
 
@@ -38,6 +42,8 @@ export type FieldListLabels = {
   locked: string;
   /** Text beside the disabled add button once the list holds `max` rows; `{max}` is the limit. */
   maxReached: string;
+  /** Name of the totals row (`renderTotals`), shown in its first cell when that has no total. */
+  totals: string;
 };
 
 export const FIELD_LIST_LABELS: FieldListLabels = {
@@ -47,17 +53,19 @@ export const FIELD_LIST_LABELS: FieldListLabels = {
   namedRow: "«{label}»",
   locked: "Закреплена",
   maxReached: "Не больше {max}",
+  totals: "Итого",
 };
 
 /** Width of a column: the same track in the heading row and in every row. */
-export type FieldListColumnWidth = "fill" | "compact" | "s" | "m";
+export type FieldListColumnWidth = "fill" | "compact" | "xs" | "s" | "m";
 
 export type FieldListColumn = {
   /** Column heading, shown once above the rows; it names the field of this column in every row. */
   label: string;
   /**
    * `fill` (default) shares the free width; `compact` fits an icon-only control (an icon Select,
-   * a swatch button, a checkbox); `s` a short value (a quantity, a code); `m` an amount or a date.
+   * a swatch button, a checkbox); `xs` a number of a few digits (a share, a percent); `s` a short
+   * value (a quantity, a code); `m` an amount or a date.
    */
   width?: FieldListColumnWidth;
   /** A red `*` after the heading (decorative): every field of the column is required. */
@@ -77,10 +85,11 @@ export type FieldListRow<T> = {
 export type FieldListProps<T extends object> = Omit<FieldRootDomProps, "onChange"> & {
   value?: readonly T[];
   defaultValue?: readonly T[];
-  onValueChange?: (value: T[]) => void;
+  onValueChange?: (value: T[]) => void | Promise<void>;
   getId: (item: T) => string;
   columns: readonly FieldListColumn[];
   renderItem: (item: T, row: FieldListRow<T>) => React.ReactNode;
+  renderTotals?: (items: readonly T[]) => React.ReactNode;
   createItem?: () => T;
   addLabel?: string;
   getLabel?: (item: T) => string;
@@ -90,6 +99,7 @@ export type FieldListProps<T extends object> = Omit<FieldRootDomProps, "onChange
   max?: number;
   label?: React.ReactNode;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   error?: React.ReactNode;
   disabled?: boolean;
   size?: ControlSize;
@@ -108,6 +118,7 @@ const track = (name: `--fl-${string}`) => `var(${name})`;
 const TRACKS: Record<FieldListColumnWidth, string> = {
   fill: "minmax(0, 1fr)",
   compact: track("--fl-compact"),
+  xs: track("--fl-xs"),
   s: track("--fl-s"),
   m: track("--fl-m"),
 };
@@ -119,6 +130,28 @@ function cellsOf(node: React.ReactNode): React.ReactNode[] {
       ? cellsOf(child.props.children)
       : [child],
   );
+}
+
+/**
+ * The totals of a row of columns: one node per column in order, `null` where a column has none, a
+ * fragment opened (`React.Children` keeps the empty places, so the totals stay under their columns).
+ */
+function totalsOf(node: React.ReactNode): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  React.Children.forEach(node, (child) => {
+    if (
+      React.isValidElement<{ children?: React.ReactNode }>(child) &&
+      child.type === React.Fragment
+    )
+      out.push(...totalsOf(child.props.children));
+    else out.push(child);
+  });
+  return out;
+}
+
+/** The last change wins: the list a pending `onValueChange` was called with. */
+function takeNext<V>(_current: V, next: V): V {
+  return next;
 }
 
 const FOCUSABLE = "input, textarea, select, button, [tabindex]:not([tabindex='-1'])";
@@ -150,6 +183,7 @@ export function FieldList<T extends object>({
   getId,
   columns,
   renderItem,
+  renderTotals,
   createItem,
   addLabel,
   getLabel,
@@ -159,6 +193,7 @@ export function FieldList<T extends object>({
   max,
   label,
   hint,
+  hintTone,
   error,
   disabled: disabledProp = false,
   size: sizeProp,
@@ -173,11 +208,28 @@ export function FieldList<T extends object>({
   const size = tier.size;
   const disabled = useInheritedDisabled(disabledProp);
   const labels = useLabels(FIELD_LIST_LABELS, labelsProp);
-  const [items, setItems] = useControllableState<readonly T[]>({
+  const [stored, setStored] = useControllableState<readonly T[]>({
     value: valueProp,
     defaultValue: defaultValue ?? [],
-    onChange: onValueChange as ((next: readonly T[]) => void) | undefined,
   });
+  // A list the owner is still saving (a promise from `onValueChange`) is drawn ahead of its answer;
+  // on a rejection the rows show the owner's list again.
+  const changes = usePendingChanges<readonly T[], readonly T[]>(stored, takeNext);
+  const items = changes.shown;
+  const busy = changes.pending.length > 0;
+  // Read synchronously: two edits in one handler chain on each other.
+  const latest = React.useRef(items);
+  latest.current = items;
+  const setItems = (edit: (current: readonly T[]) => T[]) => {
+    const next = edit(latest.current);
+    latest.current = next;
+    const outcome = onValueChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    changes.track(next, outcome, { onResolve: () => setStored(next) });
+  };
   const ids = useFieldFrame(undefined, { label, hint, error });
   // The list is named by the visible label, else by the consumer's `aria-labelledby` / `aria-label`,
   // and described by the list's hint and error, which speak for every row.
@@ -185,6 +237,7 @@ export function FieldList<T extends object>({
     "aria-labelledby": ids.labelledBy ?? ariaLabelledBy,
     "aria-label": ids.labelledBy || ariaLabelledBy ? undefined : ariaLabel,
     "aria-describedby": ids.describedBy,
+    "aria-busy": busy || undefined,
   };
   const addRef = React.useRef<HTMLButtonElement>(null);
   const rows = React.useRef(new Map<string, HTMLElement>());
@@ -205,6 +258,13 @@ export function FieldList<T extends object>({
   // The heading row comes with the first row and leaves with the last one.
   const hasHead = items.length > 0 && !single;
   const head = usePartPresence<HTMLDivElement>({ present: hasHead, axis: "block" });
+  const totalCells = renderTotals && items.length > 0 ? totalsOf(renderTotals(items)) : null;
+  if (totalCells && totalCells.length !== columns.length)
+    throw new Error(
+      `FieldList: renderTotals returns ${totalCells.length} cells for ${columns.length} columns`,
+    );
+  // The totals come with the first row and leave with the last one, as the headings do.
+  const totals = usePartPresence<HTMLDivElement>({ present: totalCells !== null, axis: "block" });
   const atMax = max !== undefined && items.length >= max;
   const atMin = items.length <= min;
 
@@ -351,6 +411,7 @@ export function FieldList<T extends object>({
         ids={ids}
         label={label}
         hint={hint}
+        hintTone={hintTone}
         error={error}
         disabled={disabled}
         optionalLabel=""
@@ -413,6 +474,59 @@ export function FieldList<T extends object>({
               {items.map(renderRow)}
             </ol>
           )}
+          {totalCells ? (
+            // biome-ignore lint/a11y/useSemanticElements: a row of figures, not a form fieldset
+            <div
+              ref={totals.ref}
+              role="group"
+              aria-label={labels.totals}
+              className={cx(
+                fieldTierClass,
+                styles.row,
+                styles.totals,
+                hairline.top,
+                totals.className,
+              )}
+              style={{ "--fl-columns": template } as React.CSSProperties}
+              data-size={size}
+            >
+              {lead ? <LeadBox /> : null}
+              <div className={styles.cells}>
+                {totalCells.map((total, column) => {
+                  const heading = columns[column];
+                  const shown = hasContent(total);
+                  return (
+                    <div
+                      // biome-ignore lint/suspicious/noArrayIndexKey: a total is its column
+                      key={column}
+                      className={cx(styles.cell, styles.total)}
+                      data-width={heading?.width ?? "fill"}
+                      data-empty={(!shown && column > 0) || undefined}
+                    >
+                      {shown ? (
+                        <>
+                          {/* Read on wide rows, where the heading names the column; shown once
+                              the rows stack. */}
+                          <span className={cx(visuallyHiddenClass, styles.totalName)}>
+                            {heading?.label}
+                          </span>
+                          <span className={styles.totalValue}>{total}</span>
+                        </>
+                      ) : column === 0 ? (
+                        // The group's name says it to screen readers.
+                        <span className={styles.totalsLabel} aria-hidden="true">
+                          {labels.totals}
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+              {/* The end column stays as wide as a row's remove button, so the totals end where
+                  the fields do. */}
+              <span className={cx(styles.end, styles.totalsEnd)} />
+            </div>
+          ) : null}
           {createItem ? (
             <div
               className={cx(styles.add, lead && cx(fieldTierClass, styles.addIndented))}

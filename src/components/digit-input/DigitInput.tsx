@@ -95,6 +95,7 @@ export function DigitInput({
   required,
   optional,
   hint,
+  hintTone,
   error,
   id,
   "aria-describedby": ariaDescribedBy,
@@ -236,6 +237,7 @@ export function DigitInput({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={shownError}
       disabled={disabled}
       optionalLabel={labels.optional}

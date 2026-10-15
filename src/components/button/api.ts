@@ -129,8 +129,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Label and `Button.Icon`. Only `Button.Icon` children → a square icon-only button that needs `aria-label`. A changed label morphs letter by letter. With `asChild`, the one child element.",
-          ru: "Подпись и `Button.Icon`. Только `Button.Icon` — квадратная кнопка, ей нужен `aria-label`. Новая подпись перетекает по буквам. С `asChild` — единственный дочерний элемент.",
+          en: "Label and `Button.Icon`. Only `Button.Icon` children → a square icon-only button that needs `aria-label`. A changed label morphs letter by letter. With `asChild`, the one child element; its text is the label too.",
+          ru: "Подпись и `Button.Icon`. Только `Button.Icon` — квадратная кнопка, ей нужен `aria-label`. Новая подпись перетекает по буквам. С `asChild` — единственный дочерний элемент; его текст — тоже подпись.",
         },
         {
           name: "aria-label",

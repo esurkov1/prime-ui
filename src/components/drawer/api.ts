@@ -38,7 +38,7 @@ export const api: ComponentApi = {
         ...dialogContentAriaProps,
       ],
     },
-    ...dialogParts("Drawer", { value: '"end"' }),
+    ...dialogParts("Drawer", { value: '"end"' }, { section: true }),
     dialogSlotsPart("Drawer", "Drawer.Trigger · Drawer.Close"),
   ],
   labels: dialogLabels,

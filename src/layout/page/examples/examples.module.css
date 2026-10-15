@@ -77,6 +77,13 @@
   padding: var(--prime-space-2) var(--prime-space-4);
 }
 
+/* guard.tsx: the fields of the form, one column of the form width. */
+.fields {
+  display: grid;
+  gap: var(--prime-space-4);
+  max-width: var(--prime-layout-form-width-m);
+}
+
 /* actions-collapse.tsx: a tablet-width page column (600px). */
 .tablet {
   width: 100%;

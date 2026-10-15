@@ -6,7 +6,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { hasContent } from "@/internal/hasContent";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import palette from "@/internal/palette.module.css";
-import { isPart } from "@/internal/parts";
+import { isPart, splitParts } from "@/internal/parts";
 import press from "@/internal/press.module.css";
 import { slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
@@ -163,20 +163,25 @@ function TimelineItem({
     }),
   };
   const dot = <span className={styles.dot} aria-hidden="true" />;
+  // The title and every meta line stack in one text column, so several `ItemMeta` lines never
+  // share a grid cell; the value keeps its own column.
+  const content = (parts: React.ReactNode) => {
+    const { parts: value, rest: text } = splitParts(parts, TimelineItemValue);
+    return (
+      <>
+        {dot}
+        <span className={styles.text}>{text}</span>
+        {value}
+      </>
+    );
+  };
 
   let row: React.ReactNode;
   if (asChild) {
     const child = slotChild(children, "Timeline.Item");
     row = (
       <InteractiveElement {...rowProps} element="slot" onClick={onClick}>
-        {React.cloneElement(
-          child,
-          undefined,
-          <>
-            {dot}
-            {child.props.children}
-          </>,
-        )}
+        {React.cloneElement(child, undefined, content(child.props.children))}
       </InteractiveElement>
     );
   } else if (href) {
@@ -190,22 +195,19 @@ function TimelineItem({
         download={download}
         onClick={onClick}
       >
-        {dot}
-        {children}
+        {content(children)}
       </InteractiveElement>
     );
   } else if (onClick) {
     row = (
       <InteractiveElement {...rowProps} element="button" onClick={onClick}>
-        {dot}
-        {children}
+        {content(children)}
       </InteractiveElement>
     );
   } else {
     row = (
       <InteractiveElement {...rowProps} element="static">
-        {dot}
-        {children}
+        {content(children)}
       </InteractiveElement>
     );
   }
@@ -245,7 +247,7 @@ export type TimelineItemMetaProps = SpanPartProps;
 
 /**
  * Secondary line of an event, muted, tabular numbers: under the title (date and relative time;
- * emphasize a part with `<strong>`), or inside `Timeline.ItemValue` the value's second line
+ * emphasize a part with `<strong>`; several lines stack under the title), or inside `Timeline.ItemValue` the value's second line
  * (category, unit), right-aligned under it.
  */
 function TimelineItemMeta({ children, className, ...rest }: TimelineItemMetaProps) {

@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { HintTone } from "@/components/hint/Hint";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
@@ -29,6 +30,7 @@ import {
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
+import { createStore, optionDomId, useStoreSlice } from "@/internal/listbox";
 import { MorphText } from "@/internal/MorphText";
 import { usePartPresence } from "@/internal/partPresence";
 import type { ControlSize, Tone } from "@/internal/states";
@@ -36,6 +38,11 @@ import textTone from "@/internal/textTone.module.css";
 
 import { ProgressBar } from "../progress-bar/ProgressBar";
 import styles from "./Input.module.css";
+import {
+  InputSuggestionList,
+  type InputSuggestions,
+  useInputSuggestions,
+} from "./inputSuggestions";
 import { getPasswordStrength, type PasswordStrength } from "./passwordStrength";
 
 export type InputLabels = {
@@ -100,6 +107,10 @@ type InputContextValue = {
   /** `Input.Field` attaches it; `Input.ClearButton` returns focus through it. */
   inputRef: React.RefObject<HTMLInputElement | null>;
   describedBy: string | undefined;
+  /** The ids of the affixes: their text describes the input. */
+  affixIds: string | undefined;
+  /** An affix registers its id while mounted. */
+  addAffix: (affixId: string) => () => void;
   labels: InputLabels;
   /** `Input.Field` reports its value here when the root shows a `strength` meter. */
   reportValue: ((value: string) => void) | null;
@@ -113,9 +124,20 @@ type InputContextValue = {
   selectionRef: React.RefObject<[number, number] | null>;
   /** The root has rendered once: a part mounted after that arrived (it enters). */
   mountedRef: React.RefObject<boolean>;
+  /** `suggestions`: the field is a combobox with a list under the box. */
+  suggest: InputSuggestions | null;
 };
 
 const [InputProvider, useInputContext] = createComponentContext<InputContextValue>("Input");
+
+/**
+ * Inside `Input.Wrapper`: a Select there drops its own frame and draws its trigger as the box's
+ * start segment, so the pick and the text read as one field.
+ */
+export const InputSegmentContext = React.createContext(false);
+
+/** The highlight of a field without suggestions: never set. */
+const NO_HIGHLIGHT = createStore<string | undefined>(undefined);
 
 // ---- InputRoot ----
 
@@ -127,6 +149,7 @@ export type InputRootProps = FieldRootDomProps &
     required?: boolean;
     optional?: boolean;
     hint?: React.ReactNode;
+    hintTone?: HintTone;
     error?: React.ReactNode;
     counter?: React.ReactNode;
     reserveSupportRow?: boolean;
@@ -134,6 +157,9 @@ export type InputRootProps = FieldRootDomProps &
     strength?: boolean;
     getStrength?: (value: string) => PasswordStrength;
     onCommit?: FieldCommitHandler;
+    suggestions?: readonly string[];
+    closeOnEscape?: boolean;
+    closeOnOutsideClick?: boolean;
     labels?: Partial<InputLabels>;
     children: React.ReactNode;
   };
@@ -146,6 +172,7 @@ function InputRoot({
   required = false,
   optional = false,
   hint,
+  hintTone,
   error,
   counter,
   reserveSupportRow = false,
@@ -153,6 +180,9 @@ function InputRoot({
   strength = false,
   getStrength = getPasswordStrength,
   onCommit,
+  suggestions,
+  closeOnEscape = true,
+  closeOnOutsideClick = true,
   labels: labelsProp,
   children,
   className,
@@ -165,6 +195,13 @@ function InputRoot({
   const labels = useLabels(INPUT_LABELS, labelsProp);
   const { invalid: isInvalid, controlId: inputId, describedBy, required: isRequired } = ids;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const suggest = useInputSuggestions(
+    suggestions,
+    inputRef,
+    `${ids.controlId}-suggestions`,
+    ids.labelledBy,
+    { closeOnEscape, closeOnOutsideClick },
+  );
   const commit = useFieldCommit(inputRef, onCommit);
   const hasCommit = onCommit !== undefined;
   const [revealed, setRevealed] = React.useState(false);
@@ -173,6 +210,12 @@ function InputRoot({
   React.useEffect(() => {
     mountedRef.current = true;
   }, []);
+  const [affixes, setAffixes] = React.useState<string[]>([]);
+  const addAffix = React.useCallback((affixId: string) => {
+    setAffixes((current) => [...current, affixId]);
+    return () => setAffixes((current) => current.filter((item) => item !== affixId));
+  }, []);
+  const affixIds = affixes.join(" ") || undefined;
 
   const contextValue = React.useMemo(
     () => ({
@@ -183,6 +226,8 @@ function InputRoot({
       inputId,
       inputRef,
       describedBy,
+      affixIds,
+      addAffix,
       labels,
       reportValue: strength ? setStrengthValue : null,
       commit,
@@ -191,6 +236,7 @@ function InputRoot({
       setRevealed,
       selectionRef,
       mountedRef,
+      suggest,
     }),
     [
       size,
@@ -199,11 +245,14 @@ function InputRoot({
       isRequired,
       inputId,
       describedBy,
+      affixIds,
+      addAffix,
       labels,
       strength,
       commit,
       hasCommit,
       revealed,
+      suggest,
     ],
   );
   const level = strength ? getStrength(strengthValue) : 0;
@@ -224,6 +273,7 @@ function InputRoot({
           required={required}
           optional={optional}
           hint={hint}
+          hintTone={hintTone}
           error={error}
           counter={
             strength ? (
@@ -275,12 +325,15 @@ export type InputWrapperProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
-  const { size, invalid, focusRing, commit, hasCommit, labels } = useInputContext();
+function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) {
+  const { size, invalid, focusRing, commit, hasCommit, labels, suggest } = useInputContext();
+  // The box anchors the suggestion list (as wide as the box).
+  const setRefs = useMergedRefs(suggest?.anchorRef, ref);
 
   return (
     <div
       {...rest}
+      ref={setRefs}
       className={cx(fieldSurfaceClass, styles.wrapper, className)}
       {...toDataAttributes({
         size,
@@ -288,10 +341,12 @@ function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
         "focus-ring": focusRing,
       })}
     >
-      {children}
+      {/* A Select among the children becomes the box's start segment. */}
+      <InputSegmentContext value>{children}</InputSegmentContext>
       {hasCommit ? (
         <FieldCommitStatus state={commit.state} labels={labels} className={styles.status} />
       ) : null}
+      {suggest ? <InputSuggestionList suggest={suggest} size={size} /> : null}
     </div>
   );
 }
@@ -316,6 +371,7 @@ function InputField({
   onFocus,
   onBlur,
   onKeyDown,
+  onClick,
   ref,
   ...rest
 }: InputFieldProps) {
@@ -325,13 +381,16 @@ function InputField({
     invalid,
     required: requiredCtx,
     describedBy,
+    affixIds,
     reportValue,
     commit,
     hasCommit,
     revealed,
     selectionRef,
+    suggest,
   } = useInputContext();
   const setRefs = useMergedRefs(inputRef, ref);
+  const highlighted = useStoreSlice(suggest?.highlight ?? NO_HIGHLIGHT, (value) => value);
   const disabled = useInheritedDisabled(disabledProp);
 
   const fieldType = type === "password" && revealed ? "text" : type;
@@ -354,7 +413,8 @@ function InputField({
     else if (inputRef.current) reportValue(inputRef.current.value);
   }, [reportValue, controlled, inputRef]);
 
-  const resolvedDescribedBy = [ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined;
+  const resolvedDescribedBy =
+    [ariaDescribedBy, affixIds, describedBy].filter(Boolean).join(" ") || undefined;
 
   return (
     <input
@@ -368,10 +428,28 @@ function InputField({
       required={required ?? (requiredCtx || undefined)}
       type={fieldType}
       aria-busy={commit.state === "pending" || undefined}
+      {...(suggest
+        ? {
+            role: "combobox",
+            autoComplete: "off",
+            "aria-autocomplete": "list" as const,
+            "aria-expanded": suggest.shown,
+            "aria-controls": suggest.shown ? suggest.listboxId : undefined,
+            "aria-activedescendant":
+              suggest.shown && highlighted !== undefined
+                ? optionDomId(suggest.listboxId, highlighted)
+                : undefined,
+          }
+        : null)}
       onChange={(event) => {
         onChange?.(event);
         onValueChange?.(event.target.value);
         reportValue?.(event.target.value);
+        suggest?.onInput(event.target.value);
+      }}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) suggest?.onClick();
       }}
       onFocus={(event) => {
         onFocus?.(event);
@@ -379,10 +457,13 @@ function InputField({
       }}
       onBlur={(event) => {
         onBlur?.(event);
+        suggest?.onBlur();
         if (hasCommit) commit.commit();
       }}
       onKeyDown={(event) => {
         onKeyDown?.(event);
+        // The suggestion list takes its keys first: an Enter that picks is no commit.
+        suggest?.onKeyDown(event);
         if (!hasCommit || event.defaultPrevented || event.nativeEvent.isComposing) return;
         if (event.key === "Enter") commit.commit();
         // A reverted Escape is consumed: it does not also close the drawer the field sits in.
@@ -423,10 +504,51 @@ export type InputAffixProps = Omit<React.HTMLAttributes<HTMLDivElement>, "childr
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function InputAffix({ side, children, className, ...rest }: InputAffixProps) {
+/**
+ * An affix is drawing in the reading order (`aria-hidden`) yet its text describes the input: it
+ * joins the input's `aria-describedby`, so a screen reader hears the unit or the prefix with the
+ * field. An `aria-label` on the affix replaces its text there («рублей» for `₽`): a generic
+ * element takes no name of its own, so the words go into a `hidden` node the input points at.
+ */
+function useAffixDescription(
+  id: string | undefined,
+  spokenText: string | undefined,
+): { id: string | undefined; spoken: React.ReactNode } {
+  const { addAffix } = useInputContext();
+  const generated = React.useId();
+  const target = spokenText ? generated : (id ?? generated);
+  React.useLayoutEffect(() => addAffix(target), [addAffix, target]);
+  return spokenText
+    ? {
+        id,
+        spoken: (
+          <span id={generated} hidden>
+            {spokenText}
+          </span>
+        ),
+      }
+    : { id: target, spoken: null };
+}
+
+function InputAffix({
+  side,
+  children,
+  className,
+  id,
+  "aria-label": spokenText,
+  ...rest
+}: InputAffixProps) {
+  const description = useAffixDescription(id, spokenText);
   return (
-    <div {...rest} className={cx(styles.affix, className)} data-side={side} aria-hidden="true">
+    <div
+      {...rest}
+      id={description.id}
+      className={cx(styles.affix, className)}
+      data-side={side}
+      aria-hidden="true"
+    >
       {children}
+      {description.spoken}
     </div>
   );
 }
@@ -440,15 +562,25 @@ export type InputInlineAffixProps = Omit<React.HTMLAttributes<HTMLSpanElement>, 
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-function InputInlineAffix({ side, children, className, ...rest }: InputInlineAffixProps) {
+function InputInlineAffix({
+  side,
+  children,
+  className,
+  id,
+  "aria-label": spokenText,
+  ...rest
+}: InputInlineAffixProps) {
+  const description = useAffixDescription(id, spokenText);
   return (
     <span
       {...rest}
+      id={description.id}
       className={cx(styles.inlineAffix, className)}
       data-side={side}
       aria-hidden="true"
     >
       {children}
+      {description.spoken}
     </span>
   );
 }

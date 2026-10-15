@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { HintTone } from "@/components/hint/Hint";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -41,6 +42,7 @@ export type CheckboxRootProps = Omit<
   indeterminate?: boolean;
   invalid?: boolean;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   error?: React.ReactNode;
   size?: ControlSize;
   shape?: CheckboxShape;
@@ -59,6 +61,7 @@ function CheckboxRoot({
   indeterminate = false,
   invalid,
   hint,
+  hintTone,
   error,
   size: sizeProp,
   shape = "square",
@@ -102,6 +105,7 @@ function CheckboxRoot({
       optional={optional}
       optionalLabel={labels.optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       className={cx(styles.root, className)}
       control={

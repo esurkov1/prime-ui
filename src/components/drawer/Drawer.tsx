@@ -13,6 +13,7 @@ import {
   DialogMeta,
   DialogPanel,
   DialogRootProvider,
+  DialogSection,
   DialogTitle,
   DialogTrigger,
   useDialogRoot,
@@ -31,6 +32,7 @@ export type {
   DialogHeaderProps as DrawerHeaderProps,
   DialogIconProps as DrawerIconProps,
   DialogMetaProps as DrawerMetaProps,
+  DialogSectionProps as DrawerSectionProps,
   DialogTitleProps as DrawerTitleProps,
   DialogTriggerProps as DrawerTriggerProps,
 } from "@/internal/overlay/DialogParts";
@@ -97,6 +99,7 @@ export const Drawer = {
   Description: DialogDescription,
   Actions: DialogActions,
   Body: DialogBody,
+  Section: DialogSection,
   Footer: DialogFooter,
   Meta: DialogMeta,
   Close: DialogClose,

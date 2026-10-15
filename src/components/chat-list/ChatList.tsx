@@ -30,6 +30,7 @@ import { useLongPress } from "@/internal/longPress";
 import { usePartPresence } from "@/internal/partPresence";
 import { flattenChildren, isPart } from "@/internal/parts";
 import { rovingIndex } from "@/internal/rovingFocus";
+import { slotChild } from "@/internal/slot";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { useFlipList } from "@/internal/useFlipList";
 
@@ -131,7 +132,8 @@ type ChatListContextValue = {
   size: ControlSize;
   query: string;
   now: Date;
-  formatTime: (date: Date, now: Date) => string;
+  timeZone: string | undefined;
+  formatTime: (date: Date, now: Date, timeZone?: string) => string;
   value: string | null;
   /** The row that holds the list's one Tab stop. */
   tabKey: string | null;
@@ -269,18 +271,21 @@ type ChatListItemOwnProps = {
   pinned?: boolean;
   typing?: boolean | string;
   draft?: string;
+  asChild?: boolean;
   children?: React.ReactNode;
 };
 
 export type ChatListItemProps = ChatListItemOwnProps &
-  Omit<ListItemProps, keyof ChatListItemOwnProps | "value" | "current" | "asChild" | "disabled">;
+  Omit<ListItemProps, keyof ChatListItemOwnProps | "value" | "current" | "disabled">;
 
 /**
- * A dialog: a `List.Item` row (a button, or a link with `href`) with the avatar, the name and the
- * time on the first line, the preview and the counts on the second. Its key and `current` come
- * from `ChatList.Root`.
+ * A dialog: a `List.Item` row (a button, a link with `href`, or the consumer's element with
+ * `asChild` — a router link, its children the parts) with the avatar, the name and the time on
+ * the first line, the preview and the counts on the second. Its key and `current` come from
+ * `ChatList.Root`.
  */
 function ChatListItem({
+  asChild = false,
   time,
   status,
   unread = 0,
@@ -305,7 +310,8 @@ function ChatListItem({
   const [list, row] = useChatList("ChatList.Item");
   const { key } = row;
   const { labels, query } = list;
-  const parts = partsOf(children);
+  const child = asChild ? slotChild(children, "ChatList.Item") : null;
+  const parts = partsOf(child ? child.props.children : children);
   const hasMenu = parts.menu !== null;
 
   /** The row's `<li>`: what the window measures and what closes up when the row leaves. */
@@ -343,7 +349,7 @@ function ChatListItem({
   const pinPart = usePartPresence<HTMLSpanElement>({ present: pin, axis: "inline" });
   const textProps = parts.text?.props;
   const title = (
-    <List.ItemText {...textProps} className={cx(styles.title, textProps?.className)}>
+    <List.ItemText key="title" {...textProps} className={cx(styles.title, textProps?.className)}>
       <span className={styles.name}>{highlightChildren(textProps?.children, query)}</span>
       {parts.glyphs.map((glyph, index) => {
         const { children: glyphChildren, className: glyphClass, ...glyphRest } = glyph.props;
@@ -366,10 +372,10 @@ function ChatListItem({
     </List.ItemText>
   );
 
-  const formatted = time instanceof Date ? list.formatTime(time, list.now) : time;
+  const formatted = time instanceof Date ? list.formatTime(time, list.now, list.timeZone) : time;
   const meta =
     formatted || status ? (
-      <List.ItemMeta className={styles.meta}>
+      <List.ItemMeta key="meta" className={styles.meta}>
         {status ? (
           <span
             className={styles.status}
@@ -436,6 +442,7 @@ function ChatListItem({
   }
   const secondLine = hasSecondLine ? (
     <List.ItemDescription
+      key="description"
       ref={descProps?.ref}
       className={cx(styles.preview, descProps?.className)}
       data-shown={shown}
@@ -464,7 +471,7 @@ function ChatListItem({
   // Beside two lines the cell stays even when empty: a count that goes closes up in place.
   const badges =
     count || mention || pin || hasSecondLine ? (
-      <List.ItemMeta className={styles.badges}>
+      <List.ItemMeta key="badges" className={styles.badges}>
         {mention ? (
           <span ref={mentionPart.ref} className={cx(styles.pop, mentionPart.className)}>
             <Badge.Root color="blue" variant="solid" className={styles.mention} aria-hidden="true">
@@ -497,10 +504,18 @@ function ChatListItem({
 
   const avatarProps = parts.avatar?.props;
   const menuAt = list.menu?.key === key ? list.menu.point : null;
+  const content = [
+    avatarProps ? <List.ItemIcon key="avatar" {...avatarProps} /> : null,
+    title,
+    secondLine,
+    meta,
+    badges,
+  ];
 
   const item = (
     <List.Item
       {...rest}
+      asChild={asChild}
       ref={mergedRef}
       current={list.value === key}
       tabIndex={list.tabKey === key ? 0 : -1}
@@ -559,11 +574,10 @@ function ChatListItem({
         longPress.handlers.onPointerCancel();
       }}
     >
-      {avatarProps ? <List.ItemIcon {...avatarProps} /> : null}
-      {title}
-      {secondLine}
-      {meta}
-      {badges}
+      {
+        // With `asChild` the consumer's element (a router link) is the row, the parts its content.
+        child ? React.cloneElement(child, undefined, ...content) : content
+      }
     </List.Item>
   );
   if (!parts.menu) return item;
@@ -611,7 +625,8 @@ export type ChatListRootProps<T = unknown> = Omit<
   empty?: React.ReactNode;
   size?: ControlSize;
   now?: Date;
-  formatTime?: (date: Date, now: Date) => string;
+  timeZone?: string;
+  formatTime?: (date: Date, now: Date, timeZone?: string) => string;
   labels?: Partial<ChatListLabels>;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -638,6 +653,7 @@ function ChatListRoot<T>({
   empty,
   size: sizeProp,
   now: nowProp,
+  timeZone,
   formatTime = formatChatTime,
   labels: labelsProp,
   className,
@@ -821,6 +837,7 @@ function ChatListRoot<T>({
     size,
     query,
     now,
+    timeZone,
     formatTime,
     value,
     tabKey,

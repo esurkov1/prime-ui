@@ -66,7 +66,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `labels` | `Partial<ButtonLabels>` | — | Built-in strings, see Labels. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element (a link) instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`; `progress` and `holdToConfirm` need a `<button>`. |
 | `disabled` | `boolean` | — | Disabled state; `loading` also disables. With `asChild` the child leaves the Tab order and a link loses its `href`. |
-| `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → a square icon-only button that needs `aria-label`. A changed label morphs letter by letter. With `asChild`, the one child element. |
+| `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → a square icon-only button that needs `aria-label`. A changed label morphs letter by letter. With `asChild`, the one child element; its text is the label too. |
 | `aria-label` | `string` | — | The name of a button without a visible label; required with `shape="circle"`. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size" \| "aria-pressed">` | — | `onClick`, `type` (`"button"` by default, not passed on with `asChild`), `className`, `aria-*`, `data-*` and the other button attributes. |
 

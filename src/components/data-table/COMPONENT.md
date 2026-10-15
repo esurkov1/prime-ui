@@ -143,6 +143,7 @@ One column of `columns`: data, not a part.
 | `align` | `"start" \| "center" \| "end"` | `"start"` (`"end"` with `numeric`) | Cell alignment; heads do not follow it. |
 | `headerAlign` | `"start" \| "center" \| "end"` | `"start"` | Head alignment; the sort icon stays at the end edge. |
 | `hideHeader` | `boolean` | `false` | `header` names the column for assistive tech only (an action column): the head cell looks empty. |
+| `description` | `string` | — | What the column means: an info glyph after the header opens it as a tooltip; the header cell is described by it (`aria-describedby`). |
 | `numeric` | `boolean` | — | Tabular figures, no wrapping, end alignment unless `align` is set. |
 | `truncate` | `boolean` | — | One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |
 | `grow` | `boolean` | — | Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping. |
@@ -229,6 +230,7 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | `fullWidth` | spans the container; `false` = content width | `false` for short lookup tables in wide layouts | `true` |
 | column `numeric` | tabular figures, end-aligned, no wrap | numbers, money | — |
 | column `truncate` | one line with an ellipsis and a `title` | long names in narrow columns | — |
+| column `description` | an info glyph after the header; its tooltip holds the text, the header cell is described by it | a header that needs a word more («Маржа», an event type) | — |
 | column `scale` | each cell shaded by its value on the five-step chart scale, the value kept in the cell | a heatmap: counts by person × month, load by day | — |
 
 `scale: true` gives each column its own range (its minimum to maximum over all rows), so the same value can take different shades in two columns. Several columns that read as one heatmap (one column per month) share a scale when each gets the same fixed `{ min, max }` — both ends, since an open end is still the column's own: `scale: { min: 0, max: 25 }` on every month column ([heatmap.tsx](examples/heatmap.tsx)).
@@ -308,6 +310,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - A row handle is a button named by `labels.reorderRow` with `aria-keyshortcuts`; a pick-up, a drop and a keyboard move are announced in a polite live region («Договор: позиция 2 из 6»). While its move is saved the row is `aria-busy`; while the table is sorted the handles are disabled and a tooltip gives `labels.reorderSorted`.
 - The expand toggle is a button with `aria-expanded`, `aria-controls` (detail row or sub-rows) and `labels.expand` / `labels.collapse`.
 - A group toggle (collapsible groups) is a button in the group header with `aria-expanded`, `aria-controls` (the group's rows, while open; not on reorderable rows, which carry no id) and `labels.expandGroup` / `labels.collapseGroup` with `{group}`.
+- A column `description` describes its header cell (`aria-describedby`); its tooltip opens from the sort button, or from the info glyph (a tab stop named `labels.columnInfo`) on a plain header.
 - Loading sets `aria-busy` and a `labels.loading` status; the error is `role="alert"`; the default empty state is `role="status"`.
 
 ### Labels
@@ -331,13 +334,14 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | `reorderSorted` | `"Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки"` | Tooltip of the disabled handles while the table is sorted by a column. |
 | `expandGroup` | `"Развернуть группу {group}"` | Name of the toggle of a collapsed group; `{group}` is the group key. |
 | `collapseGroup` | `"Свернуть группу {group}"` | Name of the toggle of an expanded group; `{group}` is the group key. |
+| `columnInfo` | `"Пояснение"` | Name of the info glyph of a column with a `description`; the tooltip holds the text. |
 
 ## Examples
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Recent orders: sortable columns, a status Badge, numeric sums and five rows per page — `columns`, `getRowKey`, `pageSize`. |
 | [sizes.tsx](examples/sizes.tsx) | Every density: rows from 36 to 52 px, the head at the control height of the tier — `size`. |
-| [numeric.tsx](examples/numeric.tsx) | An inventory report: number columns align to the end in tabular figures, a long name stays on one line with a title, formatted cells sort by their raw number and article numbers in natural order — `numeric`, `truncate`, `maxWidth`, `sortAccessor`, `sortComparator`. |
+| [numeric.tsx](examples/numeric.tsx) | An inventory report: number columns align to the end in tabular figures, a long name stays on one line with a title, formatted cells sort by their raw number article numbers in natural order and a header that needs a word more explains itself in a tooltip — `numeric`, `truncate`, `maxWidth`, `sortAccessor`, `sortComparator`, `description`. |
 | [heatmap.tsx](examples/heatmap.tsx) | Deals closed per manager and month as a heatmap: each count shades its cell on the chart scale and stays readable in it — `scale`, `numeric`. |
 | [trend.tsx](examples/trend.tsx) | Clients with revenue by month as a compact Sparkline in a cell of each row, next to the half-year total — `cell`, `width`. |
 | [content-width.tsx](examples/content-width.tsx) | A short lookup table sized by its content with a centered column, and a `grow` column that takes the free width and wraps — `fullWidth`, `align`, `grow`. |
@@ -363,6 +367,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 ## Mistakes
 - No `getRowKey` with `selectable`, expansion or sorting → selection follows positions, not records.
 - Numbers in a plain column → set `numeric` (alignment and tabular figures).
+- An explanation squeezed into the header text, or a hand-made icon with a Tooltip inside `header` → `description`.
 - A custom «Ничего не найдено» row inside `rows` → use `empty`.
 - A spinner instead of rows → use `loading` (the skeleton keeps the head and the layout).
 - Wrapping the table in a Card for a border → the table is already a bounded block.
@@ -388,5 +393,5 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - A new search that keeps the current page → set `page` to 1 together with the search.
 
 ## Related
-- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (`DataTable.ColumnsMenu`), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`), [Tooltip](../tooltip/COMPONENT.md) (handle hint), Icon (sort arrows, the expand chevron, the `DataTable.ColumnsMenu` trigger); `useVirtualRows` (the window of a long body)
+- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (`DataTable.ColumnsMenu`), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`), [Tooltip](../tooltip/COMPONENT.md) (handle hint, a column `description`), Icon (sort arrows, the info glyph of a column `description`, the expand chevron, the `DataTable.ColumnsMenu` trigger); `useVirtualRows` (the window of a long body)
 - **See also:** [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"` in a cell), [SmartFilter](../smart-filter/COMPONENT.md), [Page](../../layout/page/COMPONENT.md) (`Page.Tools`, `Page.Chips`), [Gantt](../gantt/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)

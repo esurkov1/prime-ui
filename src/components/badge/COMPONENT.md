@@ -12,6 +12,7 @@
 - A selected value, keyword or applied filter the user can remove (`onRemove`).
 - Values in a filter panel that toggle on press and hide with a hover action (the `pressed` triad, `Badge.Action`).
 - A short code as a square tile (a file format «PDF») — `shape="square"`.
+- Several badges as one value (the tags of a client, a record's labels) — `Badge.Group`: it wraps and keeps one gap.
 
 ## When not to use
 - A multi-select field with chips → use [TagSelect](../tag-select/COMPONENT.md) (it renders badges itself).
@@ -33,6 +34,8 @@ Badge.Root          <span>: fill, tier dimensions
 │                   (a toggle <button> with the pressed triad; a <span> with a trailing segment; none when read-only)
 ├─ Badge.Action     optional end segment revealed on hover / focus (always shown on touch screens)
 └─ remove segment   with onRemove: full height, the whole end is the hit area (Icon action.close)
+
+Badge.Group         <div>: a wrapping row of Badge.Root, one value; `size` sets every badge's tier
 ```
 
 ## API
@@ -59,6 +62,14 @@ Badge.Root          <span>: fill, tier dimensions
 | `labels` | `Partial<BadgeLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "onClick" \| "color">` | — | `aria-label` (an icon-only badge named by it is an image) and the other span attributes; no `onClick` — a pressable chip is the toggle. |
+
+### Badge.Group
+`ref` → `HTMLDivElement`. A row of badges as one value (the tags of a record): it wraps onto more lines, the badges a chip gap apart.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | the host tier, one step down | Tier of every badge in the group; a badge's own `size` wins. Small tiers stand closer. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the `Badge.Root`s), `className`, `aria-label` (a named group is `role="group"`) and the other div attributes. |
 
 ### Badge.Icon
 `ref` → `HTMLSpanElement`. A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.
@@ -163,7 +174,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - `Badge.Dot` is 6px, 8px from `l`; alone it takes the tier of the surrounding control; `color` paints it in the solid step of that hue.
 - The root never clips: the text ellipsizes in its own box, so the segments' touch areas reach past the chip.
 - `Badge.Action` room is reserved, so revealing it never changes the badge width.
-- Several badges in a row: `gap: var(--prime-space-2)`.
+- Several badges in a row: `Badge.Group` — it wraps, badges 8 apart (4 at the `xs` and `s` tiers).
 - In a list row the badge is the trailing column; the title column gets `min-width: 0` and an ellipsis.
 
 ## Accessibility
@@ -206,6 +217,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | [server-tags.tsx](examples/server-tags.tsx) | Order tags removed on the server: a badge waits dimmed with a spinner, leaves once the server agrees and stays with an announcement when it refuses — `onRemove`, `labels`. |
 | [filter-values.tsx](examples/filter-values.tsx) | Filter values as toggles with a hide action that slides in without changing the width — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`. |
 | [square.tsx](examples/square.tsx) | File formats as square tiles of text, large enough for three letters; the hue sorts them by kind — `shape`, `size`, `color`. |
+| [tag-row.tsx](examples/tag-row.tsx) | The tags of a client as one value: the row wraps in a narrow column and keeps one gap between badges — `Badge.Group`, `size`. |
 | [controlled.tsx](examples/controlled.tsx) | Delivery cities as toggle chips whose state the screen owns: the summary counts the chosen ones — `pressed`, `onPressedChange`. |
 
 ## Mistakes
@@ -217,6 +229,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - Several removable badges with the default «Удалить» → pass `labels.remove` with the badge text.
 - A colored badge with no text → keep a word; color alone is not a signal.
 - An explicit `size` inside a control → drop it; the badge takes the tier one step down.
+- A row of badges in a hand-made flex wrapper with its own gap → `Badge.Group`.
 - `onRemove` together with `Badge.Action` → one end segment per badge.
 - Removing the badge from your list first and putting it back when the request fails → return the request's promise and remove it after it succeeds; the badge waits meanwhile.
 

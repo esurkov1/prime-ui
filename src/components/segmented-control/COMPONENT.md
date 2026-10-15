@@ -53,6 +53,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | `required` | `boolean` | `false` | Red `*` after the label and `aria-required` on the `radiogroup`. |
 | `optional` | `boolean` | `false` | Muted marker after the label (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the control (`aria-describedby`). Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger inset ring, `aria-invalid` and `data-invalid` on the `radiogroup`; the control shakes once when an error arrives. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row, so an appearing error does not shift the layout. |

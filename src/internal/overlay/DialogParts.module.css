@@ -211,6 +211,60 @@
   padding-block-end: var(--prime-space-6);
 }
 
+/* ─── Section (inside the body) ──────────────────────────────────────────── */
+
+/*
+ * A titled group of the body: heading row, content 16 below. Sections stand 16 further apart than
+ * the plain blocks of the body (32 in all), so the air shows where a new topic starts.
+ */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.section:not(:first-child),
+.section + * {
+  margin-block-start: var(--prime-space-4);
+}
+
+/* The heading and the dialog's `Actions` (tier s) at its end, centred on the title's first line. */
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.sectionHeader > .actions {
+  min-height: var(--field-h);
+  margin-block: calc((var(--prime-text-title-s-line-height) - var(--field-h)) / 2);
+  margin-inline-start: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap-style: balance;
+}
+
+.sectionDescription {
+  margin: 0;
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 
 .footer {
@@ -245,9 +299,11 @@
 }
 
 /*
- * A status line at the start (`Meta`): it takes the free room, the buttons keep their width at the
- * end, whatever the layout. On a phone and in a narrow dialog the stack below wins: the line on
- * top, full-width buttons under it.
+ * A status line at the start (`Meta`): it takes the free room, the buttons (one row in TSX,
+ * `.footerActions`) keep their width at the end, whatever the layout. When the line runs short the
+ * row moves under the text as a whole — the text goes above the buttons first, the buttons never
+ * split while they fit in one line. On a phone and in a narrow dialog the stack below wins: the
+ * line on top, full-width buttons under it.
  */
 /* The actions read their width from the footer: a class-less target after `:has()` would make its
    invalidation whole-subtree page-wide. */
@@ -260,6 +316,18 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--prime-space-2);
+}
+
+/* The buttons beside a `Meta`: one row at the end; it wraps only when it is wider than the footer. */
+.footerActions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin-inline-start: auto;
 }
 
 /* Body-s muted (the text role is joined in TSX). */
@@ -290,8 +358,14 @@
     gap: var(--prime-space-2);
   }
 
-  .footer[data-layout] > * {
+  .footer[data-layout] > *,
+  .footerActions > * {
     width: 100%;
+  }
+
+  .footerActions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -303,7 +377,13 @@
     gap: var(--prime-space-2);
   }
 
-  .footer[data-layout] > * {
+  .footer[data-layout] > *,
+  .footerActions > * {
     width: 100%;
+  }
+
+  .footerActions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

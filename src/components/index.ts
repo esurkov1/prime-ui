@@ -29,6 +29,7 @@ export { Avatar } from "./avatar/Avatar";
 export type {
   BadgeActionProps,
   BadgeDotProps,
+  BadgeGroupProps,
   BadgeIconProps,
   BadgeLabels,
   BadgeRootProps,
@@ -384,6 +385,7 @@ export { Label } from "./label/Label";
 export type { LinkButtonProps } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
 export type {
+  ListItemActionsProps,
   ListItemCountProps,
   ListItemDescriptionProps,
   ListItemIconProps,
@@ -446,6 +448,7 @@ export type {
 } from "./message/MessageCards";
 export type { MessageFileLabels, MessageFileProps } from "./message/MessageFile";
 export type { MessageMediaProps } from "./message/MessageMedia";
+export type { MessageStickerProps } from "./message/MessageSticker";
 export type {
   ModalActionsProps,
   ModalBodyProps,
@@ -461,6 +464,7 @@ export type {
   ModalMetaProps,
   ModalPlacement,
   ModalRootProps,
+  ModalSectionProps,
   ModalTitleProps,
   ModalTriggerProps,
 } from "./modal/Modal";
@@ -511,6 +515,8 @@ export type {
   RadioRootProps,
 } from "./radio/Radio";
 export { Radio } from "./radio/Radio";
+export type { RichTextLabels, RichTextProps } from "./rich-text/RichText";
+export { RichText } from "./rich-text/RichText";
 export type {
   ScrollContainerAxis,
   ScrollContainerEdges,

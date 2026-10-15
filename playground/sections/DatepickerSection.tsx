@@ -63,6 +63,12 @@ export const page: ComponentPageConfig = {
         "Окно доставки на портале партнёра на английском: названия месяцев и дней из локали date-fns, неделя с воскресенья, системные тексты переведены — `locale`, `weekStartsOn`, `labels`.",
     },
     {
+      scenario: "deadline",
+      title: "Срок со статусом",
+      description:
+        "Срок страховки: подсказка считает оставшиеся дни и берёт тон статуса — `hint`, `hintTone`.",
+    },
+    {
       slot: "dismiss",
       description:
         "Период смены с подвалом: календарь хранит черновик при нажатии рядом и закрывается по Escape, «Сбросить» или «Применить» — `closeOnOutsideClick`, `closeOnEscape`.",

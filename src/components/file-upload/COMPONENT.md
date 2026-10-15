@@ -120,6 +120,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `required` | `boolean` | — | Red `*` after the label and native `required` on the input. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message under the field (a rejected file, too few files); implies `invalid`. |
 | `invalid` | `boolean` | — | Danger line and icon of the zone, `aria-invalid` on the input. A non-empty `error` implies it. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the drop zone and the add tile (`data-focus-ring="false"`); focus, keyboard and ARIA stay. The picker Button keeps its ring. |

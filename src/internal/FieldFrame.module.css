@@ -21,9 +21,11 @@
  * A field in a FieldList cell (`fieldCell`): its label is the column heading, read but not shown
  * while the heading row is on screen (the sr-only class is joined in TSX). When the list stacks its
  * rows into blocks in a narrow container (under 30rem), the heading row goes and each field shows
- * its label. `prime-field-list` is the container FieldList sets, with the same query.
+ * its label. The query names no container: a container name is local to its CSS Module (the
+ * bundle scopes it), and the nearest size container of a cell label is the FieldList body, which
+ * runs the same query (FieldList draws no container between its body and a cell field).
  */
-@container prime-field-list (width < 30rem) {
+@container (width < 30rem) {
   .label.cellLabel {
     position: static;
     width: auto;

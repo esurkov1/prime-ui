@@ -66,6 +66,7 @@ checks.
 - [ ] Fields show `hint` and `error`; only the minority is marked `required` or `optional` ([forms](api-contract.md#forms)).
 - [ ] Every data block has its loading, empty and error states ([feedback](composition.md#9-feedback)).
 - [ ] Every region swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
+- [ ] A `Page.Description` that waits for data stays mounted with `loading`, so the title in the bar never jumps ([screen states](composition.md#screen-states)).
 - [ ] While a form saves, its submit is `loading` and its fields sit in a `Fieldset disabled` ([forms](api-contract.md#forms)).
 - [ ] A save that stays says «Сохранено» on its button, one that goes away notifies, a failure always shows ([feedback](composition.md#9-feedback)).
 - [ ] Overlays stay mounted and are driven by `open` only ([motion mistakes](motion.md#6-mistakes)).

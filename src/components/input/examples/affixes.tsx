@@ -1,4 +1,4 @@
-/** A fixed prefix and suffix flush with the edges and a unit next to the value — `Input.Affix`, `Input.InlineAffix`. */
+/** A fixed prefix and suffix flush with the edges and a unit next to the value, heard as a word by a screen reader — `Input.Affix`, `Input.InlineAffix`, `aria-label`. */
 import { Input } from "prime-ui-kit";
 
 export default function InputAffixesExample() {
@@ -14,7 +14,9 @@ export default function InputAffixesExample() {
       <Input.Root label="Сумма платежа">
         <Input.Wrapper>
           <Input.Field placeholder="0,00" inputMode="decimal" />
-          <Input.InlineAffix side="end">₽</Input.InlineAffix>
+          <Input.InlineAffix side="end" aria-label="рублей">
+            ₽
+          </Input.InlineAffix>
         </Input.Wrapper>
       </Input.Root>
     </>

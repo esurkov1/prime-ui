@@ -1,5 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
-import { FIELD_OPTIONAL_LABEL_DOCS } from "../../internal/field.api";
+import { FIELD_HINT_TONE_PROP, FIELD_OPTIONAL_LABEL_DOCS } from "../../internal/field.api";
 import { CHECKBOX_LABELS } from "./Checkbox";
 
 export const api: ComponentApi = {
@@ -68,6 +68,7 @@ export const api: ComponentApi = {
           en: "Help text under the label text. Hidden while `error` is shown.",
           ru: "Подсказка под текстом; скрывается, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

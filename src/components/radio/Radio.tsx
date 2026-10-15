@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { HintTone } from "@/components/hint/Hint";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import {
@@ -53,6 +54,7 @@ export type RadioGroupProps = Omit<FieldRootDomProps, "dir"> & {
   required?: boolean;
   optional?: boolean;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   error?: React.ReactNode;
   invalid?: boolean;
   orientation?: "vertical" | "horizontal";
@@ -77,6 +79,7 @@ function RadioGroup({
   required = false,
   optional = false,
   hint,
+  hintTone,
   error,
   invalid,
   orientation = "vertical",
@@ -122,6 +125,7 @@ function RadioGroup({
           required={required}
           optional={optional}
           hint={hint}
+          hintTone={hintTone}
           error={error}
           disabled={disabled}
           optionalLabel={labels.optional}
@@ -157,6 +161,7 @@ export type RadioRootProps = Omit<
 > & {
   value: string;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLInputElement>;
 };
@@ -165,6 +170,7 @@ function RadioRoot({
   id,
   value,
   hint,
+  hintTone,
   disabled: disabledProp = false,
   className,
   "aria-describedby": ariaDescribedBy,
@@ -185,6 +191,7 @@ function RadioRoot({
       disabled={disabled}
       groupOption
       hint={hint}
+      hintTone={hintTone}
       className={cx(styles.root, className)}
       control={
         <>

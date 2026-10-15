@@ -7,7 +7,7 @@
 
 ## When to use
 - `ColorPicker` — any color is allowed and the picker parts are laid out by hand: an inline panel, a design tool, a hex field with a custom trigger.
-- `ColorPresets` — a color from a fixed palette with an optional «no color»: label, project or calendar colors, one trigger per row.
+- `ColorPresets` — a color from a fixed palette with an optional «no color»: label, project or calendar colors, one trigger per row. With `allowCustom` the palette is a shortcut, not a limit: any hex is typed under it (a spec color on a site, a brand color in a dense list row).
 - `parseColor` — turning a CSS string into a `Color` for a controlled `ColorPicker`.
 
 ## When not to use
@@ -49,6 +49,7 @@ ColorPresets.Root                value, open, presets (no DOM)
 ├─ ColorPresets.Trigger          slot around one element
 │  └─ ColorPresets.SwatchButton  square swatch button (or your Button with ColorPresets.Swatch)
 └─ ColorPresets.Content          popover with the swatch grid (listbox)
+   └─ Input                      hex field with the typed color's chip (`allowCustom`)
 ```
 Helpers: `parseColor(value)` (throws on invalid input; back to text with `color.toString("hex" | "hexa" | "css")`), `COLOR_PRESETS` (16 colors: step 500 and step 700 of eight hues), types `ColorPickerColorValue`, `ColorValueFormat`, `ColorPreset`.
 
@@ -86,6 +87,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 |---|---|---|---|
 | `label` | `ReactNode` | — | Field label; defaults to `labels.hex`. |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
 | `children` | `ReactNode` | — | End segments of the field box after the value: `ColorPicker.SwatchButton` (in a `Popover.Trigger`), so the hex and its swatch read as one field. |
@@ -164,7 +166,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches `{ value, label }`; the label names the swatch. |
-| `label · hint · error · invalid · required · optional · disabled · size · id · labels · aria-label · aria-labelledby · aria-describedby` | `ColorSwatchesProps` | — | As on `ColorSwatches`. |
+| `label · hint · hintTone · error · invalid · required · optional · disabled · size · id · labels · aria-label · aria-labelledby · aria-describedby` | `ColorSwatchesProps` | — | As on `ColorSwatches`. |
 | `…rest` | `Omit<ColorSwatchesProps, "value" \| "defaultValue" \| "onValueChange" \| "allowEmpty" \| "name">` | — | `className` and the other attributes of the field frame. |
 
 ### ColorPicker.EyeDropperButton
@@ -194,6 +196,7 @@ No DOM and no ref, except a field frame in a FieldList cell (the column heading 
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`. |
 | `disabled` | `boolean` | `false` | The trigger is disabled and does not open the panel. A disabled `Fieldset` around it sets it too. |
 | `allowEmpty` | `boolean` | `false` | Adds the «no color» swatch after the presets (value `null`). |
+| `allowCustom` | `boolean` | `false` | Any color beyond the palette: a hex field under the swatches (`labels.custom`) shows the typed color, Enter picks it as `#rrggbb`; invalid text gets `labels.customInvalid`. |
 | `closeOnSelect` | `boolean` | `true` | Close the panel after a pick (focus returns to the trigger). |
 | `labels` | `Partial<ColorPresetsLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | `ColorPresets.Trigger` and `ColorPresets.Content`. |
@@ -260,6 +263,7 @@ No `variant` / `tone` / `color`.
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `allowEmpty` (ColorPresets) | checkerboard «Без цвета» swatch at the end | the color is optional | `false` |
+| `allowCustom` (ColorPresets) | a «Свой цвет» hex field under the swatches, its chip showing the typed color | any color is valid, the palette only speeds the common ones | `false` |
 | `closeOnSelect={false}` (ColorPresets) | panel stays open after a pick | trying several colors in a row | `true` |
 | `closeOnOutsideClick={false}` (ColorPresets) | a press beside the panel keeps it open | comparing presets with the page | `true` |
 | `closeOnEscape={false}` (ColorPresets) | Escape leaves the panel open | the panel closes only by a pick or the trigger | `true` |
@@ -280,6 +284,7 @@ No `variant` / `tone` / `color`.
 | eyedropper unsupported | no `window.EyeDropper` | button `disabled`, `aria-hidden` |
 | selected swatch | the color | `data-state="checked"`; a check mark that contrasts with the color draws in — no ring, the check is the selection |
 | ColorPresets open | `open` / click / ArrowDown · ArrowUp on the trigger | popover `data-state`; focus on the selected swatch |
+| ColorPresets custom color | `allowCustom` + a value that is no preset, or Enter in the hex field | no swatch is checked; the hex field holds the value; the trigger is named «`labels.trigger`: #rrggbb»; invalid text on Enter shows `labels.customInvalid` as the field's error (the error drops in, the field shakes once) |
 | ColorPresets empty | value `null` | the trigger shows the checkerboard fill and is named «`labels.trigger`: `labels.empty`» |
 
 There is no `disabled` on `ColorPicker.Root` — disable parts individually. Controlled: `value` + `onValueChange` (both components), `open` + `onOpenChange` (ColorPresets). Uncontrolled: `defaultValue`, `defaultOpen`.
@@ -301,8 +306,8 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `ArrowLeft` · `ArrowRight` · `ArrowUp` · `ArrowDown` | Move the area thumb or a slider; in the ColorPresets grid, move between swatches. |
 | `PageUp` · `PageDown` | Larger steps on the area and the sliders. |
 | `Home` · `End` | Slider ends; the first / last swatch in the ColorPresets grid. |
-| `Enter` · `Space` | Commit a field; pick the focused preset swatch and close. |
-| `Tab` | Moves through the parts; inside the ColorPresets grid returns to the trigger and closes. |
+| `Enter` · `Space` | Commit a field; pick the focused preset swatch and close. In the ColorPresets hex field (`allowCustom`) Enter picks the typed color. |
+| `Tab` | Moves through the parts; inside the ColorPresets grid returns to the trigger and closes. With `allowCustom` Tab goes from the grid to the hex field; past it the panel closes and focus goes on from the trigger. |
 | `Escape` | Closes the ColorPresets panel. |
 
 ### ARIA
@@ -355,6 +360,8 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `trigger` | `"Цвет"` | ColorPresets trigger name prefix: «<trigger>: <color name>»; in a FieldList cell the column heading. |
 | `list` | `"Цвета"` | ColorPresets swatch list name when `Content` has no `label`. |
 | `empty` | `"Без цвета"` | ColorPresets «no color» swatch and the trigger name for an empty value. |
+| `custom` | `"Свой цвет"` | Label of the ColorPresets hex field (`allowCustom`). |
+| `customInvalid` | `"Введите цвет в формате #RRGGBB"` | Error of the ColorPresets hex field when Enter finds no hex color. |
 
 ## Examples
 | Example | Shows |
@@ -366,12 +373,14 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | [panel.tsx](examples/panel.tsx) | The full raised panel and its part order: format, area, hue and alpha sliders, channels, brand swatches — `ColorPicker.Panel`, `surface`, `ColorPicker.Swatches`. |
 | [formats.tsx](examples/formats.tsx) | The channel strip in each value format; three pickers edit one color — `defaultFormat`, `ColorPicker.ChannelStrip`. |
 | [presets.tsx](examples/presets.tsx) | A quick color from the palette: a square trigger with «no color» and a Button trigger whose grid of four columns stays open after a pick — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`, `columns`, `closeOnSelect`. |
+| [presets-custom.tsx](examples/presets-custom.tsx) | A spec's color on the site: the brand palette one click away and any hex typed under it — `ColorPresets`, `allowCustom`. |
 | [presets-sizes.tsx](examples/presets-sizes.tsx) | The preset trigger in every size, a square of the control height next to an input of the same tier — `ColorPresets`, `size`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the color and its format: brand swatches and the channels edit it, the format stays as picked, a button resets both — `value`, `onValueChange`, `format`, `onFormatChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent opens the preset palette from its own button and keeps the chosen color — `open`, `onOpenChange`, `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Theme settings: the color goes with the form, a too light color shakes in an error on save that leaves once the color changes — `value`, `error`. |
 
 ## Mistakes
+- A ColorPresets palette padded with dozens of colors so that «any» color fits, or a ColorField beside it for the rest → `allowCustom`: the palette stays short, any hex is typed under it.
 - Trigger in one `ColorPicker.Root` and panel in another → they will not share the color; wrap both in one Root.
 - `isDisabled` on Area / Slider → use `disabled`.
 - `onChange` on `ColorPicker.Root` → use `onValueChange`.
@@ -383,5 +392,5 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 - `<ColorPresets.Trigger />` with no child → put `ColorPresets.SwatchButton` (or your Button) inside it.
 
 ## Related
-- **Built from:** [Input](../input/COMPONENT.md) (`HexInput`; its field action segment for `SwatchButton`), [Tooltip](../tooltip/COMPONENT.md) (`SwatchButton`), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (the `HexInput` label, hint and error), [Select](../select/COMPONENT.md) (`FormatSelect`), [Button](../button/COMPONENT.md) (`EyeDropperButton`), [ColorSwatches](../color-swatches/COMPONENT.md) (`Swatches`), [Popover](../popover/COMPONENT.md) (`ColorPresets.Root`, `ColorPresets.Content`), `Icon` (pipette), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Input](../input/COMPONENT.md) (`HexInput`; its field action segment for `SwatchButton`; the hex field of `ColorPresets allowCustom`), [Tooltip](../tooltip/COMPONENT.md) (`SwatchButton`), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (the `HexInput` label, hint and error), [Select](../select/COMPONENT.md) (`FormatSelect`), [Button](../button/COMPONENT.md) (`EyeDropperButton`), [ColorSwatches](../color-swatches/COMPONENT.md) (`Swatches`), [Popover](../popover/COMPONENT.md) (`ColorPresets.Root`, `ColorPresets.Content`), `Icon` (pipette), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ColorField](../color-field/COMPONENT.md), [ColorSwatches](../color-swatches/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md)

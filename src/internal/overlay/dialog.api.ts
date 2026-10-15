@@ -126,7 +126,41 @@ export const dialogContentAriaProps: ApiProp[] = [
 /** The default of the footer `layout`: one value, or one per width tier (Modal). */
 type FooterDefault = { value: string } | { note: ApiText };
 
-export function dialogParts(name: DialogName, footerDefault: FooterDefault): ApiPart[] {
+/** `Section`: a titled group of the body (Modal, Drawer; a Sheet holds one short task). */
+function dialogSectionPart(name: DialogName): ApiPart {
+  return {
+    name: `${name}.Section`,
+    en: `\`ref\` → \`HTMLElement\`. A titled \`<section>\` of the body: an \`<h3>\` (title-s, under the \`<h2>\` title), an optional description, a \`${name}.Actions\` at the end of the heading row; the content 16 below, sections 32 apart. Fields group in a \`Fieldset\`.`,
+    ru: `\`<section>\` тела с заголовком: \`<h3>\` (title-s, под заголовком \`<h2>\`), необязательное описание, \`${name}.Actions\` в конце строки заголовка; содержимое на 16 ниже, секции в 32 друг от друга. Поля группирует \`Fieldset\`.`,
+    props: [
+      {
+        name: "label",
+        type: "ReactNode",
+        required: true,
+        en: "The heading of the section; it names the `<section>`.",
+        ru: "Заголовок секции; он же имя `<section>`.",
+      },
+      {
+        name: "description",
+        type: "ReactNode",
+        en: "One line of context under the heading (body-s).",
+        ru: "Строка контекста под заголовком (body-s).",
+      },
+      {
+        name: "…rest",
+        type: 'Omit<HTMLAttributes<HTMLElement>, "title">',
+        en: `\`children\` (the content and an optional \`${name}.Actions\`), \`className\` and the other attributes of the \`<section>\`.`,
+        ru: `\`children\` (содержимое и необязательный \`${name}.Actions\`), \`className\` и остальные атрибуты \`<section>\`.`,
+      },
+    ],
+  };
+}
+
+export function dialogParts(
+  name: DialogName,
+  footerDefault: FooterDefault,
+  { section = false }: { section?: boolean } = {},
+): ApiPart[] {
   return [
     {
       name: `${name}.Header`,
@@ -156,8 +190,8 @@ export function dialogParts(name: DialogName, footerDefault: FooterDefault): Api
     },
     {
       name: `${name}.Actions`,
-      en: "`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`.",
-      ru: "Ряд контролов в конце шапки перед крестиком: статус Badge, меню ⋯ Dropdown, кнопка-иконка; контролы внутри — яруса `s`.",
+      en: `\`ref\` → \`HTMLDivElement\`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button${section ? `; or at the end of a \`${name}.Section\` heading` : ""}. Controls inside take tier \`s\`.`,
+      ru: `Ряд контролов в конце шапки перед крестиком: статус Badge, меню ⋯ Dropdown, кнопка-иконка${section ? `; или в конце заголовка \`${name}.Section\`` : ""}; контролы внутри — яруса \`s\`.`,
       props: [
         {
           name: "…rest",
@@ -220,6 +254,7 @@ export function dialogParts(name: DialogName, footerDefault: FooterDefault): Api
         },
       ],
     },
+    ...(section ? [dialogSectionPart(name)] : []),
     {
       name: `${name}.Footer`,
       en: "`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.",

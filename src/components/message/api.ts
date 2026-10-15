@@ -39,11 +39,21 @@ export const api: ComponentApi = {
           ru: "Когда отправлено: `Date` выводится через `formatTime` (и попадает в `<time dateTime>`) или готовый текст.",
         },
         {
+          name: "timeZone",
+          type: "string",
+          defaultNote: {
+            en: "the list's `timeZone`, else the browser's zone",
+            ru: "`timeZone` списка, иначе пояс браузера",
+          },
+          en: "The IANA zone the time is read in (`\"Asia/Vladivostok\"`): a profile's zone, not the browser's.",
+          ru: 'Пояс IANA, в котором читается время (`"Asia/Vladivostok"`): пояс профиля, а не браузера.',
+        },
+        {
           name: "formatTime",
-          type: "(date: Date) => string",
+          type: "(date: Date, timeZone?: string) => string",
           defaultNote: { en: "«09:05»", ru: "«09:05»" },
-          en: "Display of a `Date` time.",
-          ru: "Показ времени из `Date`.",
+          en: "Display of a `Date` time; gets the `timeZone` in force.",
+          ru: "Показ времени из `Date`; получает действующий `timeZone`.",
         },
         {
           name: "edited",
@@ -57,6 +67,13 @@ export const api: ComponentApi = {
           type: '"sending" | "sent" | "read" | "failed"',
           en: "Delivery of an outgoing message: a clock, one check, two checks (accent), or a danger mark; the glyphs cross-fade from one state to the next. Named for assistive tech by `labels`.",
           ru: "Доставка исходящего: часы, одна галочка, две (акцентом) или знак ошибки; значки плавно сменяют друг друга. Для скринридера названы через `labels`.",
+        },
+        {
+          name: "preview",
+          type: "boolean",
+          default: "false",
+          en: "A picture of the message outside a chat (a bot's settings): no menu, reactions, retry or row focus, `Message.Actions` inert; links and players still work.",
+          ru: "Образ сообщения вне чата (настройки бота): без меню, реакций, повтора и фокуса строки, `Message.Actions` неактивны; ссылки и плееры работают.",
         },
         {
           name: "onRetry",

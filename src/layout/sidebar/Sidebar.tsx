@@ -24,6 +24,7 @@ import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
+import { leaveGuardCapture } from "@/internal/leaveGuard";
 import { nodeText } from "@/internal/nodeText";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
@@ -980,6 +981,7 @@ function SidebarItem({
     disabled,
     className: cx(styles.item, touchTargetRowClass, press.press, className),
     onClick: handleClick,
+    onClickCapture: leaveGuardCapture(rest.onClickCapture),
     "aria-current": current ? ("page" as const) : rest["aria-current"],
     ...toDataAttributes({
       state: current ? "active" : undefined,
@@ -1479,6 +1481,7 @@ function SidebarBrand({
   const shared = {
     ...rest,
     className: cx(styles.brand, className),
+    onClickCapture: leaveGuardCapture(rest.onClickCapture),
     onClick: (event: React.MouseEvent<HTMLElement>) => {
       onClick?.(event);
       if (!event.defaultPrevented && offCanvas) setOpen(false);

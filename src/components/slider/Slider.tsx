@@ -82,6 +82,7 @@ export function Slider({
   required,
   optional,
   hint,
+  hintTone,
   error,
   showValue = false,
   formatValue,
@@ -180,6 +181,7 @@ export function Slider({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}

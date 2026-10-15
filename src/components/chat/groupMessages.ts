@@ -1,4 +1,5 @@
 import type { MessagePosition } from "@/components/message/types";
+import { daysBetween, zonedParts } from "@/internal/formatClock";
 
 /**
  * Pure helpers for a conversation: a flat array of messages → the rows of a chat with date
@@ -10,7 +11,7 @@ export type MessageListEntry<T> =
   | {
       type: "date";
       key: string;
-      /** The start of the day (local time). */
+      /** The start of the day (in `timeZone`, else local time). */
       date: Date;
       /** «Сегодня», «Вчера», «12 марта», «12 марта 2025». */
       label: string;
@@ -42,8 +43,13 @@ export type GroupMessagesOptions<T> = {
   groupWindow?: number;
   /** «Today» for the date labels. Default: now. */
   now?: Date;
+  /**
+   * The zone the days are read in (an IANA name, `"Asia/Vladivostok"`): where a day starts and what
+   * «today» is. Default: the browser's zone.
+   */
+  timeZone?: string;
   /** The label of a date separator. Default `formatMessageDate`. */
-  formatDate?: (date: Date, now: Date) => string;
+  formatDate?: (date: Date, now: Date, timeZone?: string) => string;
 };
 
 const MONTHS = [
@@ -61,25 +67,39 @@ const MONTHS = [
   "декабря",
 ];
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+/** The moment of the zone's clock as if it were UTC: the zone's offset is this minus the moment. */
+function wallClock(ms: number, timeZone: string): number {
+  const p = zonedParts(new Date(ms), timeZone);
+  return Date.UTC(p.year, p.month, p.day, p.hours, p.minutes);
 }
 
-function dayKey(date: Date): string {
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+/** The moment the day of `date` starts in `timeZone`, or in the browser's zone. */
+function startOfDay(date: Date, timeZone?: string): Date {
+  if (!timeZone) return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const { year, month, day } = zonedParts(date, timeZone);
+  const midnight = Date.UTC(year, month, day);
+  // The offset at the guess, then at the moment it gives: right across a daylight-saving switch.
+  const first = midnight - (wallClock(midnight, timeZone) - midnight);
+  return new Date(midnight - (wallClock(first, timeZone) - first));
 }
 
-/** «Сегодня», «Вчера», «12 марта» this year, «12 марта 2025» another year. */
-export function formatMessageDate(date: Date, now: Date = new Date()): string {
-  const day = startOfDay(date).getTime();
-  const today = startOfDay(now).getTime();
-  if (day === today) return "Сегодня";
-  // Round: a day across a daylight-saving switch is 23 or 25 hours long.
-  if (Math.round((today - day) / DAY_MS) === 1) return "Вчера";
-  const label = `${date.getDate()} ${MONTHS[date.getMonth()]}`;
-  return date.getFullYear() === now.getFullYear() ? label : `${label} ${date.getFullYear()}`;
+function dayKey(date: Date, timeZone?: string): string {
+  const { year, month, day } = zonedParts(date, timeZone);
+  return `${year}-${month + 1}-${day}`;
+}
+
+/**
+ * «Сегодня», «Вчера», «12 марта» this year, «12 марта 2025» another year; days are read in
+ * `timeZone`, or the browser's zone.
+ */
+export function formatMessageDate(date: Date, now: Date = new Date(), timeZone?: string): string {
+  const day = zonedParts(date, timeZone);
+  const today = zonedParts(now, timeZone);
+  const days = daysBetween(day, today);
+  if (days === 0) return "Сегодня";
+  if (days === 1) return "Вчера";
+  const label = `${day.day} ${MONTHS[day.month]}`;
+  return day.year === today.year ? label : `${label} ${day.year}`;
 }
 
 /**
@@ -98,6 +118,7 @@ export function groupMessages<T>(
     isService = () => false,
     groupWindow = 5,
     now = new Date(),
+    timeZone,
     formatDate = formatMessageDate,
   } = options;
   const windowMs = groupWindow * 60 * 1000;
@@ -111,19 +132,19 @@ export function groupMessages<T>(
     if (getAuthor(a) !== getAuthor(b)) return false;
     const da = getDate(a);
     const db = getDate(b);
-    if (dayKey(da) !== dayKey(db)) return false;
+    if (dayKey(da, timeZone) !== dayKey(db, timeZone)) return false;
     return Math.abs(db.getTime() - da.getTime()) <= windowMs;
   };
 
   items.forEach((item, index) => {
     const date = getDate(item);
-    const day = dayKey(date);
+    const day = dayKey(date, timeZone);
     if (day !== lastDay) {
       entries.push({
         type: "date",
         key: `date-${day}`,
-        date: startOfDay(date),
-        label: formatDate(date, now),
+        date: startOfDay(date, timeZone),
+        label: formatDate(date, now, timeZone),
       });
       lastDay = day;
     }

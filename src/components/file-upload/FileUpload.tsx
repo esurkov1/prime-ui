@@ -1130,6 +1130,7 @@ function FileUploadField({
   required,
   optional,
   hint,
+  hintTone,
   error,
   id,
   focusRing,
@@ -1366,6 +1367,7 @@ function FileUploadField({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}

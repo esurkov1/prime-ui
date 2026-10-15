@@ -367,6 +367,7 @@
   --prime-message-padding-x: var(--prime-ref-space-3);
   --prime-message-padding-y: var(--prime-ref-space-2);
   --prime-message-radius: var(--prime-ref-radius-14);
+  --prime-message-sticker: 10rem;
   --prime-message-tail-height: var(--prime-ref-space-4);
   --prime-message-tail-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 16' preserveAspectRatio='none'%3E%3Cpath d='M8 0C8 7 6.5 12.5 0.6 15.3C0.2 15.5 0.3 16 0.8 16H8Z'/%3E%3C/svg%3E");
   --prime-message-tail-width: var(--prime-ref-space-2);

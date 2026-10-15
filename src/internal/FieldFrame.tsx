@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Hint } from "@/components/hint/Hint";
+import { Hint, type HintTone } from "@/components/hint/Hint";
 import { Label } from "@/components/label/Label";
 import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { usePresence } from "@/hooks/usePresence";
@@ -22,6 +22,7 @@ export type FieldFrameProps = {
   required?: boolean;
   optional?: boolean;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   error?: React.ReactNode;
 };
 
@@ -231,6 +232,7 @@ export function FieldSupport({
   ids,
   size,
   hint,
+  hintTone,
   error,
   leaving,
   disabled,
@@ -241,6 +243,7 @@ export function FieldSupport({
   ids: FieldIds;
   size: ControlSize;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   error?: React.ReactNode;
   /** The error leaving the slot: the frame's `useLeavingError`. */
   leaving: FieldLeavingError | null;
@@ -272,7 +275,13 @@ export function FieldSupport({
     );
   } else if (ids.showHint) {
     text = (
-      <Hint.Root id={ids.hintId} size={size} disabled={disabled} className={textClassName}>
+      <Hint.Root
+        id={ids.hintId}
+        size={size}
+        tone={hintTone}
+        disabled={disabled}
+        className={textClassName}
+      >
         {hint}
       </Hint.Root>
     );
@@ -323,6 +332,7 @@ export function FieldFrame({
   required,
   optional,
   hint,
+  hintTone,
   error,
   disabled,
   optionalLabel,
@@ -397,6 +407,7 @@ export function FieldFrame({
             ids={ids}
             size={size}
             hint={hint}
+            hintTone={hintTone}
             error={error}
             leaving={leaving}
             disabled={disabled}

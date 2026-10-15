@@ -7,6 +7,7 @@
  */
 export const TOKEN_DEFAULTS = {
   "--prime-gallery-max-size": 360,
+  "--prime-message-sticker": 160,
   "--prime-message-video-note-box": 268,
   "--prime-motion-duration-base": 380,
   "--prime-motion-duration-fast": 230,

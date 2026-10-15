@@ -100,6 +100,8 @@ export type MessageListContextValue = {
   reactionOptions: readonly MessageReactionOption[] | null;
   /** The reader: joins a reaction's avatars at once when they put it. */
   reader: MessageUser | undefined;
+  /** The zone a message reads its time in; `undefined` — the browser's zone. */
+  timeZone: string | undefined;
   /** Says `text` in the list's polite live region. */
   announce: (text: string) => void;
 };
@@ -122,6 +124,7 @@ const MessageListContext = React.createContext<MessageListContextValue>({
   quickReaction: DEFAULT_QUICK_REACTION,
   reactionOptions: null,
   reader: undefined,
+  timeZone: undefined,
   announce: () => {},
 });
 MessageListContext.displayName = "MessageListContext";

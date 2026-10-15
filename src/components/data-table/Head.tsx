@@ -1,4 +1,7 @@
+import * as React from "react";
+
 import { Checkbox } from "@/components/checkbox/Checkbox";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
@@ -23,6 +26,8 @@ type HeadProps<Row> = {
   /** Sticky head and first column: the leading head cells stick to both edges. */
   stickyCorner: boolean;
   expandEnabled: boolean;
+  /** Name of the info glyph of a column with a `description`. */
+  infoLabel: string;
   /** A leading column of row handles (`onReorder`). */
   reorderable?: boolean;
   selectAll?: {
@@ -43,9 +48,11 @@ export function Head<Row>({
   stickyHeader,
   stickyCorner,
   expandEnabled,
+  infoLabel,
   reorderable = false,
   selectAll,
 }: HeadProps<Row>) {
+  const idPrefix = React.useId();
   const lead = cx(
     styles.headCell,
     stickyHeader && stickySurfaceClass,
@@ -72,6 +79,20 @@ export function Head<Row>({
         {columns.map((column, columnIndex) => {
           const order = column.sortable && sort?.columnId === column.id ? sort.order : null;
           const isFirstColumn = columnIndex === 0;
+          const described = column.description !== undefined && !column.hideHeader;
+          const descriptionId = `${idPrefix}-${columnIndex}-description`;
+          // A plain header with its named glyph is named by its text alone.
+          const labelId =
+            described && !column.sortable ? `${idPrefix}-${columnIndex}-label` : undefined;
+          // The info glyph after the label: the tooltip's trigger on a plain header (a tab stop of
+          // its own); a sort button carries the tooltip itself (no control inside a button).
+          const info = described ? (
+            <Icon
+              name="status.info"
+              className={styles.headInfo}
+              label={column.sortable ? undefined : infoLabel}
+            />
+          ) : null;
           return (
             <th
               key={column.id}
@@ -88,27 +109,63 @@ export function Head<Row>({
               aria-sort={column.sortable ? (order ? ARIA_SORT[order] : "none") : undefined}
               data-first-column={isFirstColumn ? "true" : undefined}
               data-column-id={column.id}
+              aria-labelledby={labelId}
+              aria-describedby={described ? descriptionId : undefined}
               onClick={column.sortable ? () => onSort(column.id) : undefined}
             >
               {column.sortable ? (
-                // A full-cell button: the head cell draws its inset focus ring (see CSS).
-                <button type="button" className={styles.sortButton}>
-                  <span className={styles.headLabel}>{column.header}</span>
-                  <Icon
-                    name={order ? SORT_ICON[order] : "sort.none"}
-                    className={styles.sortIcon}
-                    strokeWidth={2}
-                  />
-                </button>
+                <WithDescription description={described ? column.description : undefined}>
+                  {/* A full-cell button: the head cell draws its inset focus ring (see CSS). */}
+                  <button type="button" className={styles.sortButton}>
+                    <span className={styles.headTitle}>
+                      <span className={styles.headLabel}>{column.header}</span>
+                      {info}
+                    </span>
+                    <Icon
+                      name={order ? SORT_ICON[order] : "sort.none"}
+                      className={styles.sortIcon}
+                      strokeWidth={2}
+                    />
+                  </button>
+                </WithDescription>
               ) : column.hideHeader ? (
                 <VisuallyHidden>{column.header}</VisuallyHidden>
               ) : (
-                <span className={styles.headLabel}>{column.header}</span>
+                <span className={styles.headTitle}>
+                  <span id={labelId} className={styles.headLabel}>
+                    {column.header}
+                  </span>
+                  {info ? (
+                    <WithDescription description={column.description}>{info}</WithDescription>
+                  ) : null}
+                </span>
               )}
+              {described ? (
+                <span id={descriptionId} hidden>
+                  {column.description}
+                </span>
+              ) : null}
             </th>
           );
         })}
       </tr>
     </thead>
+  );
+}
+
+/** The column's `description` as the tooltip of its trigger (the sort button or the info glyph). */
+function WithDescription({
+  description,
+  children,
+}: {
+  description: string | undefined;
+  children: React.ReactElement;
+}) {
+  if (description === undefined) return children;
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger>{children}</Tooltip.Trigger>
+      <Tooltip.Content>{description}</Tooltip.Content>
+    </Tooltip.Root>
   );
 }

@@ -286,11 +286,18 @@ export const api: ComponentApi = {
           ru: "«Сегодня» для дат.",
         },
         {
+          name: "timeZone",
+          type: "string",
+          defaultNote: { en: "the browser's zone", ru: "пояс браузера" },
+          en: "The IANA zone of the date separators, the runs and every message time (`\"Asia/Vladivostok\"`): a profile's zone, not the browser's.",
+          ru: 'Пояс IANA для разделителей дат, серий и времени каждого сообщения (`"Asia/Vladivostok"`): пояс профиля, а не браузера.',
+        },
+        {
           name: "formatDate",
-          type: "(date: Date, now: Date) => string",
+          type: "(date: Date, now: Date, timeZone?: string) => string",
           default: "formatMessageDate",
-          en: "The label of a date.",
-          ru: "Подпись даты.",
+          en: "The label of a date; gets the `timeZone`.",
+          ru: "Подпись даты; получает `timeZone`.",
         },
         {
           name: "loading",

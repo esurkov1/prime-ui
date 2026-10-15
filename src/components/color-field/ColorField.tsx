@@ -113,6 +113,7 @@ export function ColorField({
   required = false,
   optional,
   hint,
+  hintTone,
   error,
   className,
   "aria-label": ariaLabel,
@@ -167,6 +168,7 @@ export function ColorField({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}

@@ -1,5 +1,5 @@
-/** A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details — `Drawer.Icon`, `Avatar.Root`. */
-import { Avatar, Button, DescriptionList, Drawer } from "prime-ui-kit";
+/** A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details in titled sections, one with its own action — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`. */
+import { Avatar, Button, DescriptionList, Drawer, Icon } from "prime-ui-kit";
 
 const CLIENT = {
   name: "Анна Соколова",
@@ -9,6 +9,11 @@ const CLIENT = {
   email: "a.sokolova@sev-veter.ru",
   manager: "Игорь Лебедев",
 };
+
+const DEALS = [
+  { id: "D-2041", title: "Поставка серверов", amount: "1 240 000 ₽" },
+  { id: "D-2057", title: "Сервисный контракт на год", amount: "380 000 ₽" },
+];
 
 export default function DrawerClientCardExample() {
   return (
@@ -29,12 +34,31 @@ export default function DrawerClientCardExample() {
           <Drawer.Description>{CLIENT.company}</Drawer.Description>
         </Drawer.Header>
         <Drawer.Body>
-          <DescriptionList.Root>
-            <DescriptionList.Item label="Должность">{CLIENT.role}</DescriptionList.Item>
-            <DescriptionList.Item label="Телефон">{CLIENT.phone}</DescriptionList.Item>
-            <DescriptionList.Item label="Почта">{CLIENT.email}</DescriptionList.Item>
-            <DescriptionList.Item label="Менеджер">{CLIENT.manager}</DescriptionList.Item>
-          </DescriptionList.Root>
+          <Drawer.Section label="Контакт">
+            <DescriptionList.Root>
+              <DescriptionList.Item label="Должность">{CLIENT.role}</DescriptionList.Item>
+              <DescriptionList.Item label="Телефон">{CLIENT.phone}</DescriptionList.Item>
+              <DescriptionList.Item label="Почта">{CLIENT.email}</DescriptionList.Item>
+              <DescriptionList.Item label="Менеджер">{CLIENT.manager}</DescriptionList.Item>
+            </DescriptionList.Root>
+          </Drawer.Section>
+          <Drawer.Section label="Открытые сделки" description="2 сделки на 1 620 000 ₽">
+            <Drawer.Actions>
+              <Button.Root variant="ghost" tone="neutral">
+                <Button.Icon>
+                  <Icon name="action.add" />
+                </Button.Icon>
+                Сделка
+              </Button.Root>
+            </Drawer.Actions>
+            <DescriptionList.Root>
+              {DEALS.map((deal) => (
+                <DescriptionList.Item key={deal.id} label={deal.title}>
+                  {deal.amount}
+                </DescriptionList.Item>
+              ))}
+            </DescriptionList.Root>
+          </Drawer.Section>
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>

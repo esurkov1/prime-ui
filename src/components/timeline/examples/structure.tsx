@@ -1,4 +1,4 @@
-/** A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`. */
+/** A service history with intervals between events, a caption on the right of a gap, two meta lines under a repair and a second value line — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`. */
 import { Timeline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -36,6 +36,7 @@ export default function TimelineStructureExample() {
           <Timeline.ItemMeta>
             <strong>07.06.26</strong> · 12 100 км
           </Timeline.ItemMeta>
+          <Timeline.ItemMeta>Мастер Олег Смирнов · гарантия 6 месяцев</Timeline.ItemMeta>
           <Timeline.ItemValue>
             2 800 ₽<Timeline.ItemMeta>Ремонт</Timeline.ItemMeta>
           </Timeline.ItemValue>

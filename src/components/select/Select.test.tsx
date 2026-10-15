@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
+import { Input } from "@/components/input/Input";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { cssRule, cssValue } from "@/test/css";
@@ -1480,5 +1481,56 @@ describe("Select.Action", () => {
     expect(onCreate).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(screen.getByRole("combobox")).toHaveTextContent("Клиент");
+  });
+});
+
+const SEGMENT_ICONS = [
+  { value: "star", label: "Звезда" },
+  { value: "bolt", label: "Молния" },
+];
+
+function BadgeField() {
+  return (
+    <Input.Root label="Текст плашки">
+      <Input.Wrapper>
+        <Select.Root aria-label="Иконка плашки" defaultValue="star">
+          <Select.Trigger>
+            <Select.TriggerIcon>★</Select.TriggerIcon>
+          </Select.Trigger>
+          <Select.Content>
+            {SEGMENT_ICONS.map((icon) => (
+              <Select.Item key={icon.value} value={icon.value}>
+                {icon.label}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root>
+        <Input.Field defaultValue="Хит сезона" />
+      </Input.Wrapper>
+    </Input.Root>
+  );
+}
+
+describe("Select inside Input.Wrapper", () => {
+  it("a Select inside Input.Wrapper is the box's start segment with no frame of its own", () => {
+    render(<BadgeField />);
+    const trigger = screen.getByRole("combobox", { name: "Иконка плашки: Звезда" });
+    expect(trigger).toHaveAttribute("data-segment", "true");
+    const segment = trigger.closest("[data-field-segment]");
+    expect(segment?.parentElement).toBe(
+      screen.getByRole("textbox", { name: "Текст плашки" }).parentElement,
+    );
+    // The field's label names the input only; the segment brings no label of its own.
+    expect(screen.getAllByText("Текст плашки")).toHaveLength(1);
+  });
+
+  it("the segment opens its list from the keyboard and names the new value", () => {
+    render(<BadgeField />);
+    const trigger = screen.getByRole("combobox", { name: "Иконка плашки: Звезда" });
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(screen.getByRole("option", { name: "Молния" }));
+    expect(screen.getByRole("combobox", { name: "Иконка плашки: Молния" })).toBeInTheDocument();
   });
 });

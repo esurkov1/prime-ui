@@ -78,4 +78,25 @@ describe("groupMessages", () => {
     const entries = groupMessages([{ id: "m1", author: "a", at: at(8, 9, 0) }], options);
     expect(entries.map((entry) => entry.key)).toEqual(["date-2026-10-8", "m1"]);
   });
+
+  it("reads the days in timeZone: a late UTC evening is the next morning in Vladivostok", () => {
+    const utc = (day: number, hour: number) => new Date(Date.UTC(2026, 9, day, hour, 0));
+    const items = [
+      { id: "1", author: "anna", at: utc(7, 12) },
+      { id: "2", author: "anna", at: utc(7, 15) },
+    ];
+    const zoned = { ...options, now: utc(8, 3) };
+    const inUtc = groupMessages(items, { ...zoned, timeZone: "UTC" });
+    expect(inUtc.filter((entry) => entry.type === "date").map((entry) => entry.label)).toEqual([
+      "Вчера",
+    ]);
+    const inVladivostok = groupMessages(items, { ...zoned, timeZone: "Asia/Vladivostok" });
+    expect(
+      inVladivostok.map((entry) => (entry.type === "date" ? entry.label : entry.position)),
+    ).toEqual(["Вчера", "single", "Сегодня", "single"]);
+    const today = inVladivostok[2];
+    // The day starts at midnight of the zone: 14:00 UTC the day before.
+    expect(today.type === "date" && today.date.toISOString()).toBe("2026-10-07T14:00:00.000Z");
+    expect(formatMessageTime(utc(7, 15), "Asia/Vladivostok")).toBe("01:00");
+  });
 });

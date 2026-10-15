@@ -38,7 +38,7 @@ export const page: ComponentPageConfig = {
       scenario: "affixes",
       title: "Аффиксы",
       description:
-        "Постоянные префикс и суффикс у краёв и единица рядом со значением — `Input.Affix`, `Input.InlineAffix`.",
+        "Постоянные префикс и суффикс у краёв и единица рядом со значением, которую скринридер слышит словом, — `Input.Affix`, `Input.InlineAffix`, `aria-label`.",
     },
     {
       scenario: "without-focus-ring",
@@ -62,6 +62,29 @@ export const page: ComponentPageConfig = {
       title: "Правка на месте",
       description:
         "Поля карточки записи сохраняются при выходе из поля и по Enter, Escape отменяет правку, отказ сервера показан ошибкой — `onCommit`, `error`.",
+    },
+    {
+      scenario: "suggestions",
+      title: "Ввод с подсказками",
+      description:
+        "Где хранится возврат: свободный текст, а прошлые места предлагаются списком под полем — `suggestions`.",
+    },
+    {
+      scenario: "with-select",
+      title: "Выбор внутри поля",
+      description:
+        "Иконка и название раздела одним полем: селект только с иконкой — начальный сегмент поля — `Input.Wrapper`, `Select.Root`, `aria-label`.",
+    },
+    {
+      scenario: "time",
+      title: "Время суток",
+      description:
+        "Время звонка: сегменты часов и минут браузера, стрелки меняют их, только рабочие часы — `type`, `step`, `min`, `max`.",
+    },
+    {
+      slot: "dismiss",
+      description:
+        "Город доставки: подсказки остаются открытыми при нажатии рядом, пока адрес копируют из письма, а Escape их закрывает — `closeOnOutsideClick`, `closeOnEscape`.",
     },
     {
       slot: "controlled",

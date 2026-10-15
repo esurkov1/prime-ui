@@ -1,5 +1,5 @@
-/** The submit cycle: the button is busy while the request runs, a failed request shows a danger Banner and marks the password — `loading`, `invalid`. */
-import { Banner, Button, Fieldset, Icon, Input, LoginForm } from "prime-ui-kit";
+/** The submit cycle: the button is busy while the request runs, a refused sign-in marks both fields, which shake once, and a hidden live region says why — `loading`, `invalid`, `VisuallyHidden`. */
+import { Button, Fieldset, Icon, Input, LoginForm, VisuallyHidden } from "prime-ui-kit";
 import * as React from "react";
 
 export default function LoginFormStatesExample() {
@@ -30,20 +30,18 @@ export default function LoginFormStatesExample() {
             }, 1200);
           }}
         >
-          {failed ? (
-            <Banner.Root tone="danger" role="alert">
-              <Banner.Content>
-                <Banner.Icon>
-                  <Icon name="status.danger" />
-                </Banner.Icon>
-                <Banner.Title>Неверный email или пароль</Banner.Title>
-              </Banner.Content>
-            </Banner.Root>
-          ) : null}
+          <VisuallyHidden live="assertive">
+            {failed ? "Неверный email или пароль" : ""}
+          </VisuallyHidden>
           <Fieldset disabled={pending}>
-            <Input.Root label="Email" required>
+            <Input.Root label="Email" required invalid={failed}>
               <Input.Wrapper>
-                <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
+                <Input.Field
+                  type="email"
+                  autoComplete="email"
+                  placeholder="name@company.ru"
+                  onValueChange={() => setFailed(false)}
+                />
               </Input.Wrapper>
             </Input.Root>
             <Input.Root label="Пароль" required invalid={failed}>

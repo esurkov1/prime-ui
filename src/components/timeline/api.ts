@@ -140,8 +140,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Timeline.ItemTitle · Timeline.ItemMeta",
-      en: "`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps) and the muted secondary line with tabular numbers — under the title the date (emphasize a part with `<strong>`), inside `Timeline.ItemValue` the value's second line.",
-      ru: "Строки `<span>`: событие (medium, акцент на выделенной строке, переносится) и приглушённая вторая строка с табличными цифрами — под заголовком дата (часть выделяет `<strong>`), внутри `Timeline.ItemValue` вторая строка значения.",
+      en: "`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, wraps) and the muted secondary line, tabular — under the title the date (`<strong>` emphasizes a part; several `Timeline.ItemMeta` stack), inside `Timeline.ItemValue` the value's second line.",
+      ru: "Строки `<span>`: событие (medium, переносится) и приглушённая вторая строка, табличные цифры — под заголовком дата (`<strong>` выделяет часть; несколько `Timeline.ItemMeta` встают столбиком), внутри `Timeline.ItemValue` вторая строка значения.",
       props: textProps("The text of the line.", "Текст строки."),
     },
     {

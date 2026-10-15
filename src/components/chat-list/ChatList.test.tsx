@@ -323,4 +323,85 @@ describe("formatChatTime", () => {
     expect(formatChatTime(new Date(2026, 9, 7, 12, 0), now)).toBe("7 окт");
     expect(formatChatTime(new Date(2025, 2, 12, 12, 0), now)).toBe("12.03.2025");
   });
+
+  it("reads today, the weekday and the clock in timeZone", () => {
+    const now = new Date(Date.UTC(2026, 9, 15, 4, 0));
+    const lateEvening = new Date(Date.UTC(2026, 9, 14, 14, 30));
+    expect(formatChatTime(lateEvening, now, "Europe/Moscow")).toBe("ср");
+    expect(formatChatTime(lateEvening, now, "Asia/Vladivostok")).toBe("00:30");
+  });
+});
+
+/** A router link as a router draws it: the owner's `onClick` first, then its own navigation. */
+function RouterLink({
+  to,
+  navigate,
+  onClick,
+  ...rest
+}: React.AnchorHTMLAttributes<HTMLAnchorElement> & { to: string; navigate: (to: string) => void }) {
+  return (
+    <a
+      {...rest}
+      href={to}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+        event.preventDefault();
+        navigate(to);
+      }}
+    />
+  );
+}
+
+describe("ChatList.Item asChild", () => {
+  it("renders the consumer's element as the row with the parts inside it", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    const navigate = vi.fn();
+    render(
+      <ChatList.Root
+        items={DIALOGS}
+        getKey={(item) => item.id}
+        onValueChange={onValueChange}
+        renderItem={(item) => (
+          <ChatList.Item asChild unread={item.unread}>
+            <RouterLink to={`/chats/${item.id}`} navigate={navigate}>
+              <ChatList.ItemText>{item.name}</ChatList.ItemText>
+              <ChatList.ItemDescription>{item.preview}</ChatList.ItemDescription>
+            </RouterLink>
+          </ChatList.Item>
+        )}
+      />,
+    );
+    const row = screen.getByRole("link", { name: /ООО «Вектор»/ });
+    expect(row).toHaveAttribute("href", "/chats/vector");
+    expect(within(row).getByText("Счёт не выгружается")).toBeInTheDocument();
+    await user.click(row);
+    expect(onValueChange).toHaveBeenCalledWith("vector");
+    expect(navigate).toHaveBeenCalledWith("/chats/vector");
+    expect(row).toHaveAttribute("aria-current", "page");
+    // Enter on the focused link opens it the same way.
+    const next = screen.getByRole("link", { name: /ООО «Гранит»/ });
+    next.focus();
+    await user.keyboard("{Enter}");
+    expect(navigate).toHaveBeenLastCalledWith("/chats/granit");
+  });
+
+  it("shows the row times in the root's timeZone", () => {
+    const sent = new Date(Date.UTC(2026, 9, 14, 23, 30));
+    render(
+      <ChatList.Root
+        items={DIALOGS.slice(0, 1)}
+        getKey={(item) => item.id}
+        now={new Date(Date.UTC(2026, 9, 15, 2, 0))}
+        timeZone="Asia/Vladivostok"
+        renderItem={(item) => (
+          <ChatList.Item time={sent}>
+            <ChatList.ItemText>{item.name}</ChatList.ItemText>
+          </ChatList.Item>
+        )}
+      />,
+    );
+    expect(screen.getByText("09:30")).toHaveAttribute("datetime", sent.toISOString());
+  });
 });

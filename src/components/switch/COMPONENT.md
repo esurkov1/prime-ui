@@ -46,6 +46,7 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 | `optional` | `boolean` | `false` | Muted `labels.optional` after the label text; the field may stay off. |
 | `labels` | `Partial<SwitchLabels>` | — | Built-in strings, see Labels. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the off track and `aria-invalid`. A non-empty `error` implies it. |
 | `disabled` | `boolean` | `false` | No toggling; muted track (on = `accent-soft`), dimmed text and hint. |

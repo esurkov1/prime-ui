@@ -204,6 +204,7 @@ export function TagSelect({
   required = false,
   optional,
   hint,
+  hintTone,
   error,
   id: idProp,
   labels: labelsProp,
@@ -656,6 +657,7 @@ export function TagSelect({
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}

@@ -25,8 +25,10 @@
   );
 }
 
+/* The strip is drawing only: its empty alternative text (`/ ""`) keeps it out of the accessible
+ * name, so a counter inside a tab or a button reads «12», not «0 1 2 … 9». */
 .digit::before {
-  content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9";
+  content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9" / "";
   position: absolute;
   inset-block-start: 0;
   inset-inline: 0;

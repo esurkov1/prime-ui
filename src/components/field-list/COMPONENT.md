@@ -30,6 +30,7 @@ FieldList                    field frame: label · the list · hint / error
 ├─ <ol>                      the rows (Dnd.Sortable with `reorderable`)
 │  └─ <li> row               [lead: handle | lock] [a cell per column] [end: remove]
 │     └─ cell                one kit field without `label`, named by its column heading
+├─ totals row                `renderTotals`: a group «Итого», a total per column on the same tracks
 └─ add row                   Button «addLabel» (+ `labels.maxReached` at `max`)
 ```
 A leaf: rows come from `value` through `renderItem`, which returns one element per column (a fragment). Every framed kit field (Input, Select, Datepicker, NativeSelect, ColorField…) in a cell takes its column heading as its label: read by screen readers, not shown while the heading row is on screen, shown above the field once the rows stack in a narrow container. `ColorPresets` takes it as the name of its trigger.
@@ -43,12 +44,13 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `columns` | `readonly FieldListColumn[]` | — (required) | The columns in cell order: `label` (the heading; it names the field of the column in every row), `width` (`fill` \| `compact` \| `s` \| `m`), `required` (a `*` after the heading). |
+| `columns` | `readonly FieldListColumn[]` | — (required) | The columns in cell order: `label` (the heading; it names the field of the column in every row), `width` (`fill` \| `compact` \| `xs` \| `s` \| `m`), `required` (a `*` after the heading). |
 | `renderItem` | `(item: T, row: FieldListRow<T>) => ReactNode` | — (required) | The cells of a row, one element per column (a fragment): kit fields without `label`. `row` has `index`, `update(patch)` and `remove()`. |
+| `renderTotals` | `(items: readonly T[]) => ReactNode` | — | The totals row under the rows: one node per column (a fragment), `null` where a column has none. The first cell without a total reads `labels.totals`, the row's group name. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id of an item: the row key and the drag id. |
 | `value` | `readonly T[]` | — | The rows (controlled). |
 | `defaultValue` | `readonly T[]` | `[]` | The first rows (uncontrolled). |
-| `onValueChange` | `(value: T[]) => void` | — | The new list after an edit (`row.update`), an added, removed or moved row. |
+| `onValueChange` | `(value: T[]) => void \| Promise<void>` | — | The new list after an edit (`row.update`), an add, a remove or a move. Return the save's promise: the new list shows while it is pending, the owner's again on a reject (say why with `error`). |
 | `createItem` | `() => T` | — | A new empty item; with it the add button shows under the rows and focus goes to the new row's first field. |
 | `addLabel` | `string` | — | Text of the add button: what is added («Добавить позицию»). |
 | `getLabel` | `(item: T) => string` | — | The row's own text (its title field) for the remove button, the handle and drag announcements; else the row number. |
@@ -59,6 +61,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `label` | `ReactNode` | — | Heading of the list; names the `<ol>`. Omit it inside a `Fieldset` whose legend names the list. |
 | `aria-label` | `string` | — | Name of the `<ol>` when no visible `label` names it (a section heading above the list). |
 | `hint` | `ReactNode` | — | Help text under the list; hidden while `error` shows. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | A problem of the list as a whole («Добавьте хотя бы одну позицию»); a field's own error goes on that field. |
 | `disabled` | `boolean` | `false` | Disables every field, handle and button; a disabled `Fieldset` around it sets it too. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the headings, buttons and the kit fields that read the host tier. Without it the host tier, else `m`. |
@@ -72,6 +75,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 |---|---|---|---|
 | `fill` | shares the free width with the other `fill` columns | names, descriptions, any text | yes |
 | `compact` | two control heights wide | an icon-only `Select`, a `ColorPresets` swatch, a checkbox | |
+| `xs` | 96 px | a number of a few digits: a share, a percent, a count | |
 | `s` | 144 px | a quantity, a code, a number of days | |
 | `m` | 192 px | an amount with its unit, a date, a phone | |
 
@@ -82,6 +86,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `getLocked` | a lock where the grip is, no remove button; the row holds its place | a base value, system records a person cannot drop | — |
 | `createItem` | the add button under the rows, aligned with the first column | the person grows the list | — |
 | `min` · `max` | remove buttons off at `min`; the add button off with «Не больше {max}» at `max` | the record count is bounded | `0` · — |
+| `renderTotals` | a row of totals under the rows over a faint line, each on its column; «Итого» in the first cell without a total | the rows add up (shares, amounts, hours) | — |
 
 **Combinations**
 - Recommended: `label` on the list (or a `Fieldset` legend around it), one heading per column, a `getLabel` from the title field, an `addLabel` that says what is added.
@@ -98,13 +103,15 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | pinned row | `getLocked(item)` | `data-locked="true"` on the `<li>`; a lock, no remove button |
 | invalid | `error` (the list), a field's own `error` | the list's message under the add row; a field's under the field in its row |
 | disabled | `disabled` (or a disabled Fieldset) | `data-disabled="true"` on the frame; fields, handles and buttons disabled through the kit's disabled context |
-| stacked | container narrower than 30rem | heading row hidden, each row's fields in one column with their labels shown |
+| stacked | container narrower than 30rem | heading row hidden, each row's fields in one column with their labels shown; each total on its own line after its column name |
+| saving | a promise from `onValueChange` | the rows show the new list, `aria-busy="true"` on the `<ol>`; a reject brings the owner's list back |
 | rows come and go | the add button, a remove button, a new `value` | a row the data adds rises in once (`enterMotion`), a removed one closes up in place and the rows below glide up (`listPresence`); the heading row rises in with the first row and closes up with the last (`partPresence`); the first render stays still |
 
 ## Layout & spacing
 - Rows 12 apart (`--prime-space-3`); columns 12 apart; the heading row sits at the tier's label gap above the first row.
 - Every row and the heading row share one track list: `[lead] [columns] [end]`; the lead is one `xs` control wide (the grip or the lock), the end fits a remove button of the tier.
 - The handle, the lock and the remove button stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
+- The totals row stands 12 under the last row over a faint line, 12 more above its totals; a total's text starts where its column's field text does.
 - The add button lines up with the first column of fields, 12 under the last row.
 - Under 30rem of its own width (a container query): rows stack, fields 16 apart inside a row, rows 24 apart.
 
@@ -126,6 +133,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.
 - The `<ol>` is described by the list's `hint` and `error` (`aria-describedby`), which speak for every row.
 - In a narrow container the heading row goes and each field's label shows above it.
+- The totals row (`renderTotals`) is a `group` named by `labels.totals`; each total is read after its column heading.
 - The remove button is «Удалить {row}», the handle «Переместить {row}»: the row's name from `getLabel`, else its number.
 - A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is Dnd's lock (an image named «Закреплена»).
 
@@ -140,6 +148,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `namedRow` | `"«{label}»"` | Name of a row with `getLabel` text; `{label}` is that text. |
 | `locked` | `"Закреплена"` | Spoken name of the lock of a pinned row in a list without `reorderable`. |
 | `maxReached` | `"Не больше {max}"` | Text beside the disabled add button once the list holds `max` rows. |
+| `totals` | `"Итого"` | Name of the totals row (`renderTotals`), shown in its first cell when that has no total. |
 
 ## Examples
 | Example | Shows |
@@ -151,6 +160,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [base-row.tsx](examples/base-row.tsx) | A plan price and its changes by month in one table: the base price is the first, pinned row, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `width`. |
 | [limits.tsx](examples/limits.tsx) | Recipients of invoice reminders, from one to three: the last row cannot be removed and the add button says why it is off once the list is full — `min`, `max`, `hint`. |
 | [errors.tsx](examples/errors.tsx) | Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field; a `*` after a heading marks a required column — `error`, `required`. |
+| [totals.tsx](examples/totals.tsx) | A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts — `renderTotals`, `width`. |
+| [saving.tsx](examples/saving.tsx) | Removing a recipient is saved on the server: the row leaves at once and comes back with the reason if the server refuses — `onValueChange`, `error`. |
 | [states.tsx](examples/states.tsx) | The same list editable and disabled while the request saves it: fields, handles and buttons turn off together — `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the lines: it sums them under the list and puts the saved lines back on reset — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | The invoice lines in a 320 px column: the headings give way, each row stacks its fields with their own labels and rows stand a group apart — `columns`. |
@@ -165,6 +176,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A hint that explains what the lock already shows («Первые три всегда первыми») → no hint; the lock says it.
 - `aria-label` written on every field in a cell → none: the column heading names the field.
 - A grip, a remove button and an add button drawn by hand around a `.map()` of fields → FieldList.
+- A total under the list typed by hand in a line of text, or a DataTable of fields to get a totals row → `renderTotals`.
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Label](../label/COMPONENT.md) (headings), the field frame (label, [Hint](../hint/COMPONENT.md) for the hint and error), [VisuallyHidden](../visually-hidden/COMPONENT.md)

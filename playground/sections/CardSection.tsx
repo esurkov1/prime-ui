@@ -58,6 +58,11 @@ export const page: ComponentPageConfig = {
       description: "Плоская плитка без тени рядом с обычной — для плотных сеток — `flat`.",
     },
     {
+      slot: "states",
+      description:
+        "Плитка KPI, пока грузится отчёт, рядом с загруженной — в шаблонах `stat-trend` и `mini` — `loading`.",
+    },
+    {
       slot: "narrow",
       description:
         "Карточка — контейнер размера: split складывает ячейки уже 22rem, а значение тренда уменьшается уже 20rem — `variant`.",

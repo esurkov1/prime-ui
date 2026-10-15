@@ -124,6 +124,23 @@ describe("layer stack", () => {
     expect(onDismiss.mock.calls).toEqual([["Счёт", "scrim"]]);
   });
 
+  it("a press in a live region (the toast viewport) is outside no layer", () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <div data-prime-live-region="">
+          <button type="button">Закрыть уведомление</button>
+        </div>
+        <Layer name="Сделка" dismiss="click" onDismiss={onDismiss} />
+        <Layer name="Меню" onDismiss={onDismiss} />
+      </>,
+    );
+    const toastButton = screen.getByRole("button", { name: "Закрыть уведомление" });
+    fireEvent.pointerDown(toastButton);
+    fireEvent.click(toastButton);
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
   it("a passive layer takes no presses but gets Escape first", async () => {
     const onDismiss = vi.fn();
     render(

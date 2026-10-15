@@ -1,5 +1,5 @@
 import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
-import { FIELD_REQUIRED_LABEL_DOCS } from "../../internal/field.api";
+import { FIELD_HINT_TONE_PROP, FIELD_REQUIRED_LABEL_DOCS } from "../../internal/field.api";
 import { DATEPICKER_LABELS } from "./DatepickerPanel";
 
 /** The value of both parts: the mode and the value triad. */
@@ -191,6 +191,7 @@ export const api: ComponentApi = {
           en: "Support text under the field (`aria-describedby`).",
           ru: "Подсказка под полем (`aria-describedby`).",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

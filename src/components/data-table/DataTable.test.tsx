@@ -899,6 +899,45 @@ describe("DataTable CSS contract", () => {
     );
   });
 
+  it("a column description describes its header and opens from the info glyph or the sort button", async () => {
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        rows={rows.slice(0, 2)}
+        columns={[
+          { id: "name", header: "Name", accessor: "name", description: "Имя клиента в CRM" },
+          {
+            id: "score",
+            header: "Score",
+            accessor: "score",
+            sortable: true,
+            description: "Баллы за квартал",
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAccessibleDescription(
+      "Имя клиента в CRM",
+    );
+    expect(screen.getByRole("columnheader", { name: "Score" })).toHaveAccessibleDescription(
+      "Баллы за квартал",
+    );
+    // A plain header: the glyph is a tab stop of its own, named by labels.columnInfo.
+    await user.tab();
+    expect(screen.getByRole("img", { name: "Пояснение" })).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Имя клиента в CRM");
+    // A sortable header: the sort button carries the tooltip; the glyph inside it is decorative.
+    await user.tab();
+    const sort = screen.getByRole("button", { name: "Score" });
+    expect(sort).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Баллы за квартал");
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("columnheader", { name: "Score" })).toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
+  });
+
   it('paging="none" renders every row without a footer', () => {
     const { container } = render(
       <DataTable rows={rows} columns={columns} paging="none" pageSize={2} />,

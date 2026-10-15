@@ -3,7 +3,7 @@ import * as React from "react";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Dnd } from "@/components/dnd/Dnd";
-import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -13,9 +13,9 @@ import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
 import { nodeText } from "@/internal/nodeText";
-import { flattenChildren, isPart } from "@/internal/parts";
+import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { slotChild } from "@/internal/slot";
-import type { ControlSize, PaletteColor } from "@/internal/states";
+import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./List.module.css";
@@ -154,8 +154,9 @@ export type ListItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "chi
 };
 
 /**
- * The leading picture of a row: an avatar of the row tier, or an icon. After the text it is a
- * quiet trailing glyph. Decorative: the text names the row.
+ * The leading picture of a row: an avatar of the row tier, an icon, or a colour dot
+ * (`Badge.Dot color`) in a box as wide as an icon, so the rows' text lines up. After the text it is
+ * a quiet trailing glyph. Decorative: the text names the row.
  */
 function ListItemIcon({ className, children, ...rest }: ListItemIconProps) {
   const size = useControlSize(undefined);
@@ -165,9 +166,16 @@ function ListItemIcon({ className, children, ...rest }: ListItemIconProps) {
       ? React.cloneElement(child, { size })
       : child,
   );
+  const dot = React.Children.toArray(children).some((child) => isPart(child, Badge.Dot));
   return (
-    <span {...rest} className={cx(styles.icon, className)} aria-hidden="true">
-      {sized}
+    <span
+      {...rest}
+      className={cx(styles.icon, className)}
+      data-mark={dot ? "dot" : undefined}
+      aria-hidden="true"
+    >
+      {/* A dot standing for an icon takes the large dot, as the Sidebar's marks do. */}
+      {dot ? <ControlSizeProvider value="l">{sized}</ControlSizeProvider> : sized}
     </span>
   );
 }
@@ -217,6 +225,25 @@ function ListItemCount({ color = "gray", className, ...rest }: ListItemCountProp
   return <Badge.Root {...rest} color={color} className={cx(styles.count, className)} />;
 }
 ListItemCount.displayName = "List.ItemCount";
+
+export type ListItemActionsProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * The row's own controls (a Switch, a Dropdown with its icon Button, an icon Button): at the end of
+ * the row, beside its button or link and never inside it, one tier below the row. The row's fills
+ * cover them.
+ */
+function ListItemActions({ className, ...rest }: ListItemActionsProps) {
+  const size = useControlSize(undefined);
+  return (
+    <ControlSizeProvider value={stepDown(size)}>
+      <div {...rest} className={cx(styles.actions, className)} />
+    </ControlSizeProvider>
+  );
+}
+ListItemActions.displayName = "List.ItemActions";
 
 /** Words apart in the accessible name; a flex container renders no space. */
 function spaced(nodes: React.ReactNode[]): React.ReactNode[] {
@@ -343,6 +370,12 @@ function ListItem({
     rowRef as React.RefObject<HTMLElement | null>,
   );
   const link = href !== undefined || asChild;
+  // The row's own controls leave the row element for the row (a button cannot hold a control).
+  const slotted = asChild ? slotChild(children, "List.Item") : null;
+  const { parts: actions, rest: content } = splitParts(
+    slotted ? slotted.props.children : children,
+    ListItemActions,
+  );
   const shared = {
     ...rest,
     ref,
@@ -355,23 +388,31 @@ function ListItem({
 
   let element: React.ReactElement;
   if (asChild) {
-    const child = slotChild(children, "List.Item");
     element = (
       <InteractiveElement {...shared} element="slot">
-        {React.cloneElement(child, undefined, splitItemChildren(child.props.children))}
+        {React.cloneElement(slotted as React.ReactElement, undefined, splitItemChildren(content))}
       </InteractiveElement>
     );
   } else if (href !== undefined) {
     element = (
       <InteractiveElement {...shared} element="link" href={href} target={target} rel={rel}>
-        {splitItemChildren(children)}
+        {splitItemChildren(content)}
       </InteractiveElement>
     );
   } else {
     element = (
       <InteractiveElement {...shared} element="button" type={type ?? "button"}>
-        {splitItemChildren(children)}
+        {splitItemChildren(content)}
       </InteractiveElement>
+    );
+  }
+  if (actions.length > 0) {
+    // The frame draws the row's fills under the element and its controls alike.
+    element = (
+      <div className={styles.frame}>
+        {element}
+        {actions}
+      </div>
     );
   }
 
@@ -413,4 +454,5 @@ export const List = {
   ItemDescription: ListItemDescription,
   ItemMeta: ListItemMeta,
   ItemCount: ListItemCount,
+  ItemActions: ListItemActions,
 };

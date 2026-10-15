@@ -118,8 +118,8 @@ export function PeriodFilter() {
 - Checkbox, Switch and Radio: [choice controls](#choice-controls) below.
 - `required` → red `*` after the label + native `required`. `optional` → muted «необязательно».
 - Placeholder is an example (`name@company.ru`), never the label.
-- Units and prefixes in affixes are hidden from screen readers — put the meaning into the label or hint
-  too («Бюджет, ₽», «Адрес: prime.app/p/…»).
+- `Input.Affix` and `Input.InlineAffix` describe the input for screen readers (`aria-describedby`),
+  so the label never repeats a unit or a prefix ([a unit lives in one place](ux.md#3-label-economy)).
 - Mark the minority: when most fields are required, mark only the optional ones (`optional`); when most
   are optional, mark the required ones; on a tie mark the required ones. Validate in code either way.
 - Show `error` after the user leaves the field or on submit, not while typing the first character.
@@ -249,7 +249,8 @@ place (a `Banner` for the page; for a region `EmptyPage tone="danger"` — it an
   фильтры»), and the same action keeps the same variant in the header, toolbars and menus. If «Отмена»
   would clash with the action itself («Отменить заказ»), use an unambiguous label («Не отменять»).
 - A control that navigates is a link: `LinkButton href`, `Button.Root asChild` with `<a>` / router
-  `Link`, `Sidebar.Item href` or `asChild`. Never `onClick={() => location.assign(…)}`.
+  `Link`, `Sidebar.Item` / `Breadcrumb.Item` `href` or `asChild`. Never
+  `onClick={() => location.assign(…)}`.
 
 ## Destructive actions
 
@@ -291,7 +292,10 @@ export function DeleteProject({ onDelete }: { onDelete: () => Promise<void> }) {
 
 Leaving a form with unsaved changes is the same contract: `Modal.Guard` / `Drawer.Guard` inside the
 content with `dirty` (any dismiss asks «Не сохранять изменения?») and `busy` (nothing closes it while
-it saves).
+it saves). A form that is the whole page takes `Page.Guard` (`dirty`, `busy`) inside the page: it
+holds a press on `Sidebar.Item`, `BottomNav.Item` and `Breadcrumb.Item` links — router links
+included — and the browser's own close or reload; never a `beforeunload` or a ConfirmDialog on a
+crumb of your own.
 
 ## Providers and helpers
 

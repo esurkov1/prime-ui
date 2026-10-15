@@ -1,4 +1,5 @@
 import type * as React from "react";
+import type { HintTone } from "@/components/hint/Hint";
 
 import { Spinner } from "@/components/spinner/Spinner";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -37,6 +38,7 @@ export type SwitchRootProps = Omit<
   loading?: boolean;
   invalid?: boolean;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   error?: React.ReactNode;
   size?: ControlSize;
   optional?: boolean;
@@ -53,6 +55,7 @@ function SwitchRoot({
   loading = false,
   invalid,
   hint,
+  hintTone,
   error,
   size: sizeProp,
   optional = false,
@@ -99,6 +102,7 @@ function SwitchRoot({
       optional={optional}
       optionalLabel={labels.optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       className={cx(styles.root, className)}
       control={

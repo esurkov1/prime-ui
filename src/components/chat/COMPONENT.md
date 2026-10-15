@@ -81,6 +81,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 - `renderMessage` may be an inline function: an item renders again only when it or its place changes, so whatever a row shows lives in its item (an edit, a reaction, a pin). Another message (a reply's original) comes from `entry.find(key)`.
 - `onRead` reports an incoming message once at least half of it, or half the view, has been on screen while the page is visible (`IntersectionObserver`); batched per frame, each `value` once per mount.
 - One sound at a time on the page: a `VoicePlayer`, a `VideoNote` and a video in `Message.Media` pause each other; nothing to wire.
+- Times in a profile's zone: `timeZone` (an IANA name) on `Chat.Messages` moves the date separators, the runs and every message's time to it; without it they follow the browser.
 
 ## API
 
@@ -174,7 +175,8 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `unread` | `string` | — | The key of the first unread item: the «Непрочитанные сообщения» band stands above it. |
 | `groupWindow` | `number` | `5` | Messages of one author further apart than this many minutes start a new run. |
 | `now` | `Date` | today | «Today» for the dates. |
-| `formatDate` | `(date: Date, now: Date) => string` | `formatMessageDate` | The label of a date. |
+| `timeZone` | `string` | the browser's zone | The IANA zone of the date separators, the runs and every message time (`"Asia/Vladivostok"`): a profile's zone, not the browser's. |
+| `formatDate` | `(date: Date, now: Date, timeZone?: string) => string` | `formatMessageDate` | The label of a date; gets the `timeZone`. |
 | `loading` | `boolean` | `false` | The first load: bubble-shaped `Skeleton`s on both sides stand in the list's place (`aria-busy`, `labels.loading` announced), then cross-fade into the messages; none of them counts as new. |
 | `hasOlder` | `boolean` | `false` | Older history exists: a bubble-shaped placeholder stands above the first message and `onLoadOlder` runs when the reader reaches the top. |
 | `onLoadOlder` | `() => void \| Promise<void>` | — | Load older messages and prepend them (while `hasOlder`); the reader's place is kept. |
@@ -334,6 +336,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | [reactions.tsx](examples/reactions.tsx) | A team's own reactions for approvals: a double tap or `L` puts the approval mark, a long press or `R` opens the team's set, and a chip toggles them back — `quickReaction`, `reactionOptions`, `onReactionToggle`. |
 | [live.tsx](examples/live.tsx) | A live support chat: the client types — the header and the end of the list say so — then answers; new messages enter at the end, read receipts come from what is on screen, and scrolled up the round button counts what arrived — `typing`, `onNewMessage`, `onRead`. |
 | [search.tsx](examples/search.tsx) | Search and pinned messages: the search bar marks every match in the texts and transcripts, counts them and steps between them while the others step back; a pinned message's press jumps to it and blinks it — `Chat.SearchButton`, `Chat.Search`, `defaultSearch`, `Chat.Pinned`. |
+| [time-zone.tsx](examples/time-zone.tsx) | The conversation in the zone of the manager's profile, not the browser's: the date separators, the runs and every time follow it — `timeZone`, `items`, `renderMessage`. |
 | [states.tsx](examples/states.tsx) | The first load of a conversation: bubble-shaped placeholders on both sides stand in the list's place, then cross-fade into the messages — `loading`. |
 | [controlled.tsx](examples/controlled.tsx) | Selection mode owned by the screen: the Select item of a message's menu starts it, a check stands beside every message, a press toggles one while the others step back, the bar counts and acts, Escape leaves — `selected`, `onSelectedChange`, `Chat.SelectionBar`. |
 | [narrow.tsx](examples/narrow.tsx) | At phone width the header keeps its actions and lets the title ellipsize, bubbles take up to 85% of the chat, long links wrap and an album keeps its layout — `Chat.Root`, `Chat.Header`, `Chat.Messages`, `Chat.Footer`. |

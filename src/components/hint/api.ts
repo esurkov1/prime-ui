@@ -15,6 +15,13 @@ export const api: ComponentApi = {
           ru: "Ярус поля над подсказкой: 12/16 для xs–m, 13/20 для l и xl. Без него — ярус хоста, иначе `m`.",
         },
         {
+          name: "tone",
+          type: '"neutral" | "success" | "warning" | "danger"',
+          default: '"neutral"',
+          en: "Status color of the text (a deadline that nears, a check that passed). The words carry the status, the color repeats it; `invalid` and `disabled` take over the color.",
+          ru: "Цвет статуса у текста (срок подходит, проверка пройдена). Статус несут слова, цвет его повторяет; `invalid` и `disabled` перекрывают цвет.",
+        },
+        {
           name: "invalid",
           type: "boolean",
           default: "false",

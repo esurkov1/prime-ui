@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import type * as React from "react";
+import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cssRule, cssValue } from "@/test/css";
@@ -25,6 +26,43 @@ describe("Breadcrumb", () => {
       </Breadcrumb.Root>,
     );
     expect(screen.getByRole("link", { name: "Docs" })).toHaveAttribute("href", "/docs");
+  });
+
+  it("asChild: the consumer's link is the level, with the muted link look and its own handler", async () => {
+    const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault());
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item asChild>
+          <a href="/clients" onClick={onClick}>
+            Клиенты
+          </a>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item current>Север</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    const link = screen.getByRole("link", { name: "Клиенты" });
+    expect(link).toHaveAttribute("href", "/clients");
+    expect(link).toHaveAttribute("data-tone", "muted");
+    link.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("asChild: in the «…» menu the consumer's link is the menu item", async () => {
+    const user = userEvent.setup();
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item asChild>
+          <a href="/orders">Orders</a>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item current>Order</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    await user.click(screen.getByRole("button", { name: "Скрытые разделы" }));
+    const item = within(screen.getByRole("menu")).getByRole("menuitem", { name: "Orders" });
+    expect(item.tagName).toBe("A");
+    expect(item).toHaveAttribute("href", "/orders");
   });
 
   it("Item with href passes aria-label for icon-only links", () => {

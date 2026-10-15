@@ -22,6 +22,13 @@ export const api: ComponentApi = {
           ru: "Без тени: плоская плитка для плотных сеток.",
         },
         {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "The KPI is loading: `Card.Value`, `Card.Delta` and `Card.Meta` show a Skeleton in their own geometry and the root sets `aria-busy`; the data fades in when it arrives. Labels and titles stay.",
+          ru: "Метрика загружается: `Card.Value`, `Card.Delta` и `Card.Meta` показывают Skeleton в своей геометрии, корень ставит `aria-busy`; данные проявляются, когда приходят. Подписи и заголовки остаются.",
+        },
+        {
           name: "asChild",
           type: "boolean",
           default: "false",
@@ -225,6 +232,10 @@ export const api: ComponentApi = {
       {
         en: "Decorative icons in `Card.Icon` and cover images in `Card.Media` get `aria-hidden`; controls in `Card.Header` need their own names.",
         ru: "Декоративные иконки в `Card.Icon` и обложки в `Card.Media` — `aria-hidden`; контролам в `Card.Header` нужны свои имена.",
+      },
+      {
+        en: "A `loading` card sets `aria-busy` on its root; the Skeletons are decorative (`aria-hidden`).",
+        ru: "Карточка с `loading` ставит `aria-busy` на корень; Skeleton декоративны (`aria-hidden`).",
       },
     ],
   },

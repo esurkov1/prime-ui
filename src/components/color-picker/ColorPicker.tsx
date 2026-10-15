@@ -16,12 +16,12 @@ import {
   parseColor,
   useLocale,
 } from "react-aria-components";
-
 import { Button } from "@/components/button/Button";
 import {
   ColorSwatches,
   type ColorSwatchesColorProps,
 } from "@/components/color-swatches/ColorSwatches";
+import type { HintTone } from "@/components/hint/Hint";
 import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -103,6 +103,7 @@ export type ColorPickerHexInputProps = FieldRootDomProps &
   FieldFocusRingProps & {
     label?: React.ReactNode;
     hint?: React.ReactNode;
+    hintTone?: HintTone;
     error?: React.ReactNode;
     children?: React.ReactNode;
   };
@@ -516,7 +517,15 @@ function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
   );
 }
 
-function HexInput({ label, hint, error, focusRing, children, ...rest }: ColorPickerHexInputProps) {
+function HexInput({
+  label,
+  hint,
+  hintTone,
+  error,
+  focusRing,
+  children,
+  ...rest
+}: ColorPickerHexInputProps) {
   const { labels } = useColorPickerContext();
   const { inputRef, text, setText, commit } = useColorDraft(toHexText, parseHex);
 
@@ -525,6 +534,7 @@ function HexInput({ label, hint, error, focusRing, children, ...rest }: ColorPic
       {...rest}
       label={label ?? labels.hex}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       focusRing={focusRing}
     >

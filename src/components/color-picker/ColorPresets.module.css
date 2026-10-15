@@ -28,3 +28,8 @@
 .grid {
   outline: none;
 }
+
+/* The hex field under the swatches (`allowCustom`): a step of air apart from the grid. */
+.custom {
+  margin-block-start: var(--prime-space-1);
+}

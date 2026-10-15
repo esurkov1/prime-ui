@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { LIVE_REGION_ATTR } from "@/hooks/useInertSiblings";
+
 import { getFocusable } from "./focus";
 
 /**
@@ -49,6 +51,15 @@ function isAncestor(ancestor: LayerEntry, entry: LayerEntry): boolean {
 
 function contains(entry: LayerEntry, target: Node | null): boolean {
   return target !== null && entry.refs.some((ref) => ref.current?.contains(target));
+}
+
+/**
+ * A press in a live region (the toast viewport) is outside no layer: the region stays usable above
+ * a modal layer (`useInertSiblings`), so closing a toast or taking its action keeps the drawer open.
+ */
+function inLiveRegion(target: Node): boolean {
+  const element = target instanceof Element ? target : target.parentElement;
+  return element?.closest(`[${LIVE_REGION_ATTR}]`) != null;
 }
 
 /** Topmost layer that takes part in presses and Tab. */
@@ -102,7 +113,7 @@ function onPointerDown(event: PointerEvent) {
   pendingClick = null;
   const top = topInteractive();
   const target = event.target instanceof Node ? event.target : null;
-  if (!top || !target || contains(top, target)) return;
+  if (!top || !target || contains(top, target) || inLiveRegion(target)) return;
   if (top.dismiss === "click") pendingClick = top;
   else top.onDismiss("outside");
 }

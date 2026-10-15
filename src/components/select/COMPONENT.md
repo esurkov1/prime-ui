@@ -11,12 +11,13 @@
 - A value out of thousands of records searched on the server (`search`, `onSearchChange`, `filter={false}`, `hasMore` + `onLoadMore`).
 - A few values from a short list shown as comma-separated text (`multiple`).
 - Options that need a picture, an avatar, a second line, a badge or a trailing value (rich options).
+- A pick that belongs to a text field (an icon before a name): put the Select inside `Input.Wrapper` — it becomes the box's start segment, named by its `aria-label`.
 
 ## When not to use
 - 2–5 options that should all be visible → use [Radio](../radio/COMPONENT.md) or [SegmentedControl](../segmented-control/COMPONENT.md).
 - The OS picker on a mobile-first form → use [NativeSelect](../native-select/COMPONENT.md).
 - Many values shown as removable tags, or creating new values → use [TagSelect](../tag-select/COMPONENT.md).
-- Free text → use [Input](../input/COMPONENT.md).
+- Free text, even with suggestions → use [Input](../input/COMPONENT.md) (`suggestions`).
 - A menu of actions (not a value) → use [Dropdown](../dropdown/COMPONENT.md).
 - Global search / command palette → use [CommandMenu](../command-menu/COMPONENT.md).
 - Dates → use [Datepicker](../datepicker/COMPONENT.md).
@@ -60,7 +61,7 @@ an icon) goes inside `Select.ItemMeta`.
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Select.Root
-`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query.
+`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query. Inside `Input.Wrapper` it is the box's start segment instead: no frame, the trigger named by `aria-label` and the value.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -75,6 +76,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `closeOnOutsideClick` | `boolean` | `true` | A press outside the list and its trigger closes it; focus follows the pointer. |
 | `label` | `ReactNode` | — | Field label above; names the trigger. |
 | `hint` | `ReactNode` | — | Support text under the field; linked by `aria-describedby`. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message; replaces the hint and implies `invalid`. |
 | `required` | `boolean` | `false` | Red `*` after the label and `aria-required` on the trigger. |
 | `optional` | `boolean` | — | Muted `labels.optional` after the label. |
@@ -224,6 +226,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | searching | typing in the search | panel `data-searching="true"`; groups without matches and separators hide; the match in an option's title, description and plain text is a `<mark>` in `accent-text` (not in the trigger); the query clears when the list closes (`onSearchChange("")`) |
 | nothing to show | no option matches (and not loading) | a compact EmptyPage with `role="status"`: `labels.empty`, plus `labels.emptyHint` while a query is typed; a `Select.Action` stays under it, highlighted |
 | sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it |
+| segment | inside `Input.Wrapper` | no frame (label, hint, error, support row): the root is `data-field-segment`, the trigger `data-segment="true"` — a tinted section flush with the box's start edge, a stronger fill on hover and while open, an inset focus ring; named «`aria-label`: value» |
 | option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is a fill only |
 
 ## Layout & spacing
@@ -350,8 +353,9 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 - `<ClientAvatar />` or `<RoleBadge />` (your own component) inside an item → the item reads parts by element type and puts an unknown component in the text column; call the helper as a function (`{clientAvatar(client)}`) so `Avatar.Root` / `Badge.Root` is the direct child.
 - A custom trailing element (a Kbd, an icon with a price) as a bare child → wrap it in `Select.ItemMeta`.
 - A «Новый клиент» row faked as a `Select.Item` with a sentinel value, or a button under the field → use `Select.Action`: never filtered, reached by the arrows, never a value.
+- An icon-only Select set beside an Input for one value (an icon + a name) → put it inside `Input.Wrapper` with an `aria-label`; `label`, `hint` and `error` belong to the Input there.
 - Saving the choice in `onValueChange` and resetting the value by hand on failure → return the promise; the Select shows the value, waits and rolls back by itself.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (list), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in `multiple`), [Spinner](../spinner/COMPONENT.md) (`loading` and saving in the trigger), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [EmptyPage](../empty-page/COMPONENT.md) (empty state, load error), [Button](../button/COMPONENT.md) (retry), [Divider](../divider/COMPONENT.md) (`Separator`), [Thumbnail](../thumbnail/COMPONENT.md) and [Avatar](../avatar/COMPONENT.md) (row media), [Badge](../badge/COMPONENT.md) (row badge), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading and save-failure announcements), `Icon` (chevron, clear, check, search, retry), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (list), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in `multiple`), [Spinner](../spinner/COMPONENT.md) (`loading` and saving in the trigger), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [EmptyPage](../empty-page/COMPONENT.md) (empty state, load error), [Button](../button/COMPONENT.md) (retry), [Divider](../divider/COMPONENT.md) (`Separator`), [Thumbnail](../thumbnail/COMPONENT.md) and [Avatar](../avatar/COMPONENT.md) (row media), [Badge](../badge/COMPONENT.md) (row badge), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading and save-failure announcements), `Icon` (chevron, clear, check, search, retry), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame), [Input](../input/COMPONENT.md) (the start segment of `Input.Wrapper`)
 - **See also:** [NativeSelect](../native-select/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

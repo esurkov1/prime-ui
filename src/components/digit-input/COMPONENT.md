@@ -42,6 +42,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | `required` | `boolean` | — | Red `*` after the label and native `required` on every cell. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the cells. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | — | Danger ring and danger digits on every cell, `aria-invalid`. A non-empty `error` implies it. |
 | `success` | `boolean` | `false` | The code was accepted (after the server checked it): the cells turn success one after another. Ignored while invalid. Say it in words too (`hint`). |

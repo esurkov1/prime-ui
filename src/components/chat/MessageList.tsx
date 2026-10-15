@@ -88,6 +88,7 @@ export type MessageListProps = React.HTMLAttributes<HTMLDivElement> & {
   quickReaction?: string | false;
   reactionOptions?: readonly MessageReactionOption[];
   reader?: MessageUser;
+  timeZone?: string;
   onNewMessage?: (value: string, details: { direction: MessageDirection }) => void;
   onRead?: (values: string[]) => void;
   /**
@@ -248,6 +249,7 @@ export function MessageList({
   quickReaction = DEFAULT_QUICK_REACTION,
   reactionOptions,
   reader,
+  timeZone,
   onNewMessage,
   onRead,
   jumpTo,
@@ -699,6 +701,7 @@ export function MessageList({
       quickReaction,
       reactionOptions: reactionOptions ?? null,
       reader,
+      timeZone,
       announce,
     }),
     [
@@ -716,6 +719,7 @@ export function MessageList({
       quickReaction,
       reactionOptions,
       reader,
+      timeZone,
       announce,
     ],
   );

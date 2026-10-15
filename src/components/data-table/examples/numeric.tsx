@@ -1,4 +1,4 @@
-/** An inventory report: number columns align to the end in tabular figures, a long name stays on one line with a title, formatted cells sort by their raw number and article numbers in natural order — `numeric`, `truncate`, `maxWidth`, `sortAccessor`, `sortComparator`. */
+/** An inventory report: number columns align to the end in tabular figures, a long name stays on one line with a title, formatted cells sort by their raw number article numbers in natural order and a header that needs a word more explains itself in a tooltip — `numeric`, `truncate`, `maxWidth`, `sortAccessor`, `sortComparator`, `description`. */
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
 
 type Sku = {
@@ -57,10 +57,17 @@ const COLUMNS: DataTableColumn<Sku>[] = [
     cell: (row) => INT.format(row.stock),
   },
   { id: "price", header: "Цена, ₽", numeric: true, cell: (row) => INT.format(row.price) },
-  { id: "sold", header: "Продано", numeric: true, cell: (row) => INT.format(row.sold) },
+  {
+    id: "sold",
+    header: "Продано",
+    description: "Штук за последние 30 дней, без возвратов",
+    numeric: true,
+    cell: (row) => INT.format(row.sold),
+  },
   {
     id: "margin",
     header: "Маржа",
+    description: "Доля прибыли в цене после закупки и доставки",
     numeric: true,
     sortable: true,
     sortAccessor: (row) => row.margin,

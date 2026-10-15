@@ -1,4 +1,5 @@
 import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { BUTTON_LABELS } from "../button/Button";
 import { COLOR_SWATCHES_LABELS } from "../color-swatches/ColorSwatches";
 import { COLOR_PICKER_LABELS } from "./ColorPicker";
@@ -122,6 +123,7 @@ export const api: ComponentApi = {
           en: "Help text under the field. Hidden while `error` is shown.",
           ru: "Подсказка под полем; скрывается при `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",
@@ -283,7 +285,7 @@ export const api: ComponentApi = {
           ru: "Образцы `{ value, label }`; label — имя образца.",
         },
         {
-          name: "label · hint · error · invalid · required · optional · disabled · size · id · labels · aria-label · aria-labelledby · aria-describedby",
+          name: "label · hint · hintTone · error · invalid · required · optional · disabled · size · id · labels · aria-label · aria-labelledby · aria-describedby",
           type: "ColorSwatchesProps",
           en: "As on `ColorSwatches`.",
           ru: "Как у `ColorSwatches`.",
@@ -411,6 +413,13 @@ export const api: ComponentApi = {
           default: "false",
           en: "Adds the «no color» swatch after the presets (value `null`).",
           ru: "Добавляет образец «без цвета» (значение `null`).",
+        },
+        {
+          name: "allowCustom",
+          type: "boolean",
+          default: "false",
+          en: "Any color beyond the palette: a hex field under the swatches (`labels.custom`) shows the typed color, Enter picks it as `#rrggbb`; invalid text gets `labels.customInvalid`.",
+          ru: "Любой цвет помимо палитры: поле hex под образцами (`labels.custom`) показывает введённый цвет, Enter выбирает его как `#rrggbb`; неверный текст — `labels.customInvalid`.",
         },
         {
           name: "closeOnSelect",
@@ -547,6 +556,16 @@ export const api: ComponentApi = {
         ru: "Образец «без цвета» ColorPresets и имя триггера без значения.",
         part: "ColorPresets.Root",
       },
+      custom: {
+        en: "Label of the ColorPresets hex field (`allowCustom`).",
+        ru: "Подпись поля hex у ColorPresets (`allowCustom`).",
+        part: "ColorPresets.Root",
+      },
+      customInvalid: {
+        en: "Error of the ColorPresets hex field when Enter finds no hex color.",
+        ru: "Ошибка поля hex у ColorPresets, если по Enter в нём нет цвета.",
+        part: "ColorPresets.Root",
+      },
     }),
     ...labelRows(COLOR_SWATCHES_LABELS, {
       group: {
@@ -597,13 +616,13 @@ export const api: ComponentApi = {
       },
       {
         keys: "Enter · Space",
-        en: "Commit a field; pick the focused preset swatch and close.",
-        ru: "Применяет поле; выбирает образец пресета и закрывает панель.",
+        en: "Commit a field; pick the focused preset swatch and close. In the ColorPresets hex field (`allowCustom`) Enter picks the typed color.",
+        ru: "Применяет поле; выбирает образец пресета и закрывает панель. В поле hex у ColorPresets (`allowCustom`) Enter выбирает введённый цвет.",
       },
       {
         keys: "Tab",
-        en: "Moves through the parts; inside the ColorPresets grid returns to the trigger and closes.",
-        ru: "Ходит по частям; из сетки ColorPresets возвращает на триггер и закрывает.",
+        en: "Moves through the parts; inside the ColorPresets grid returns to the trigger and closes. With `allowCustom` Tab goes from the grid to the hex field; past it the panel closes and focus goes on from the trigger.",
+        ru: "Ходит по частям; из сетки ColorPresets возвращает на триггер и закрывает. С `allowCustom` Tab ведёт из сетки в поле hex; за ним панель закрывается, а фокус идёт дальше от триггера.",
       },
       {
         keys: "Escape",

@@ -12,7 +12,7 @@
 
 ## When not to use
 - The color comes from a short fixed palette and the choice should be visible at once → use [ColorSwatches](../color-swatches/COMPONENT.md).
-- A compact color next to a field or in a dense list row → use [ColorPresets](../color-picker/COMPONENT.md) (square trigger + palette).
+- A compact color next to a field or in a dense list row → use [ColorPresets](../color-picker/COMPONENT.md) (square trigger + palette; `allowCustom` adds a hex field for any other color).
 - The picker panel itself is the screen (a design tool, an inline editor) → compose [ColorPicker](../color-picker/COMPONENT.md) parts.
 - A plain text field for a hex code → use [Input](../input/COMPONENT.md).
 
@@ -55,6 +55,7 @@ ColorField                       field frame: label · field button · hint | er
 | `required` | `boolean` | `false` | Red `*` after the label; the field button is described by `labels.required` (a button takes no `aria-required`). |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. A non-empty `error` implies it. |
 | `disabled` | `boolean` | `false` | Disables the field: it shows the color and does not open. |

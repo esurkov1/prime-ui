@@ -5,12 +5,14 @@
  * - every local custom property a module declares is read somewhere;
  * - no `* 1` factor in a `calc()`;
  * - no declaration a later one of the same rule overrides (a fallback pair for an older value,
- *   like `100vh` before `100dvh`, is not an override: the values differ in kind).
+ *   like `100vh` before `100dvh`, is not an override: the values differ in kind);
+ * - a named `@container` query names a container its own module declares: the bundle scopes a
+ *   container name to its module, so a name from another module never matches there.
  */
 import path from "node:path";
 
 import { read, walk } from "../test/contract-utils";
-import { cssRules, moduleCssFiles } from "../test/css";
+import { cssAtRules, cssRules, moduleCssFiles } from "../test/css";
 
 const sources = walk("src", /\.tsx?$/).filter((file) => !/\.test\.tsx?$/.test(file));
 
@@ -70,5 +72,27 @@ describe("CSS Modules", () => {
       }
     }
     expect(offenders, "css-modules").toEqual([]);
+  });
+
+  it("a named container query names a container of its own module", () => {
+    const offenders: string[] = [];
+    for (const file of moduleCssFiles()) {
+      const declared = new Set<string>();
+      for (const rule of cssRules(file)) {
+        for (const decl of rule.decls) {
+          if (decl.prop === "container-name")
+            for (const n of decl.value.split(/\s+/)) declared.add(n);
+          if (decl.prop === "container" && decl.value.includes("/"))
+            for (const n of decl.value.split("/")[0].trim().split(/\s+/)) declared.add(n);
+        }
+      }
+      for (const at of cssAtRules(file)) {
+        if (at.name !== "container") continue;
+        const name = at.params.match(/^([A-Za-z_-][\w-]*)\s*\(/)?.[1];
+        if (name && name !== "not" && !declared.has(name))
+          offenders.push(`${file}:${at.line}: @container ${name} is declared in another module`);
+      }
+    }
+    expect(offenders, "container-names").toEqual([]);
   });
 });

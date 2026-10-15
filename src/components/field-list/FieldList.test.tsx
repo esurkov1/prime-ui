@@ -335,4 +335,114 @@ describe("FieldList", () => {
     expect(trigger).toHaveTextContent("Пользователи");
     expect(screen.getByRole("button", { name: "Цвет: Зелёный" })).toBeInTheDocument();
   });
+
+  it("keeps a removed row out while a promise from onValueChange saves it, and brings it back on a rejection", async () => {
+    const user = userEvent.setup();
+    let reject: () => void = () => {};
+    const onValueChange = vi.fn(
+      () =>
+        new Promise<void>((_, fail) => {
+          reject = () => fail(new Error("offline"));
+        }),
+    );
+    render(<Lines value={LINES} onValueChange={onValueChange} />);
+    await user.click(screen.getByRole("button", { name: "Удалить «Внедрение»" }));
+    expect(onValueChange).toHaveBeenLastCalledWith([LINES[1]]);
+    expect(rowsOf()).toHaveLength(1);
+    expect(screen.getByRole("list", { name: "Позиции счёта" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await act(async () => reject());
+    expect(rowsOf()).toHaveLength(2);
+    expect(screen.getByRole("list", { name: "Позиции счёта" })).not.toHaveAttribute("aria-busy");
+  });
+
+  it("keeps an uncontrolled edit once its promise resolves", async () => {
+    const user = userEvent.setup();
+    let resolve: () => void = () => {};
+    render(
+      <FieldList
+        aria-label="Позиции"
+        columns={COLUMNS}
+        defaultValue={LINES}
+        getId={(line) => line.id}
+        getLabel={(line) => line.service}
+        onValueChange={() =>
+          new Promise<void>((done) => {
+            resolve = done;
+          })
+        }
+        renderItem={() => (
+          <>
+            <span>a</span>
+            <span>b</span>
+          </>
+        )}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Удалить «Внедрение»" }));
+    await act(async () => resolve());
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  });
+
+  it("draws a totals group under the rows: a total per column, the first empty cell names it", () => {
+    render(
+      <Lines
+        renderTotals={(items) => (
+          <>
+            {null}
+            {`${items.reduce((sum, line) => sum + Number(line.price), 0)} ₽`}
+          </>
+        )}
+      />,
+    );
+    const totals = screen.getByRole("group", { name: "Итого" });
+    expect(totals).toHaveTextContent("Итого");
+    // The column name is read before the value; the visible «Итого» is the group's name already.
+    expect(totals).toHaveTextContent("Цена195000 ₽");
+    expect(screen.getByText("Итого")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("draws no totals for an empty list and throws on a totals count other than the columns", () => {
+    const { unmount } = render(
+      <Lines
+        initial={[]}
+        renderTotals={() => (
+          <>
+            {null}
+            {null}
+          </>
+        )}
+      />,
+    );
+    expect(screen.queryByRole("group", { name: "Итого" })).toBeNull();
+    unmount();
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<Lines renderTotals={() => "1"} />)).toThrow(
+      /renderTotals returns 1 cells for 2 columns/,
+    );
+    error.mockRestore();
+  });
+
+  it("sizes an xs column on its own track", () => {
+    render(
+      <FieldList
+        aria-label="Доли"
+        columns={[{ label: "Участник" }, { label: "Доля", width: "xs" }]}
+        defaultValue={[{ id: "a" }]}
+        getId={(item) => item.id}
+        renderItem={() => (
+          <>
+            <span>Анна</span>
+            <span>50</span>
+          </>
+        )}
+      />,
+    );
+    const row = screen.getByRole("listitem");
+    expect(row.style.getPropertyValue("--fl-columns")).toBe(
+      "minmax(0, 1fr) var(--fl-xs) var(--fl-end)",
+    );
+  });
 });

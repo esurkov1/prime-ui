@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 78 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 79 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -249,6 +249,7 @@ accessibility, examples and common mistakes.
 | [**Gantt**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gantt/COMPONENT.md) | A resource or project schedule: rows of people, rooms, vehicles or tasks with bars on a day / week / month axis, edited by pointer and keyboard. |
 | [**Timeline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/timeline/COMPONENT.md) | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. |
 | [**CodeBlock**](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) | A static TypeScript / TSX snippet with syntax highlighting, on a filled panel or bare inside a host. |
+| [**RichText**](https://github.com/esurkov1/prime-ui/blob/main/src/components/rich-text/COMPONENT.md) | Text in the chat's Markdown subset outside a message — a bot's welcome text, a template, a comment — rendered as elements, never as HTML. |
 | [**Accordion**](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) | Collapsible sections: FAQ, settings groups, checkout steps. |
 | [**Sparkline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sparkline/COMPONENT.md) | A small chart — a smooth line over a fading area, a bare line or bars — with its headline: the value at rest, its change and its date; any point can be scrubbed. |
 | [**ChartFrame**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chart-frame/COMPONENT.md) | A dashboard panel around any chart — Recharts, ECharts, visx, Chart.js or a hand-drawn SVG — with the title, a headline value, a measured plot area, a series legend, a tooltip body and a data table for screen readers. |

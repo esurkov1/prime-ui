@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
 import {
@@ -21,6 +22,7 @@ import type { ControlSize } from "@/internal/states";
 import {
   COLOR_PRESETS,
   type ColorPreset,
+  parseHexColor,
   SwatchChip,
   SwatchContent,
   SwatchFill,
@@ -46,12 +48,18 @@ export type ColorPresetsLabels = {
   list: string;
   /** The "no color" swatch (`allowEmpty`) and the trigger name for an empty value. */
   empty: string;
+  /** Label of the hex field under the swatches (`allowCustom`). */
+  custom: string;
+  /** Error of the hex field when Enter finds no hex color in it. */
+  customInvalid: string;
 };
 
 export const COLOR_PRESETS_LABELS: ColorPresetsLabels = {
   trigger: "Цвет",
   list: "Цвета",
   empty: "Без цвета",
+  custom: "Свой цвет",
+  customInvalid: "Введите цвет в формате #RRGGBB",
 };
 
 type Ctx = {
@@ -63,6 +71,7 @@ type Ctx = {
   columns: number;
   size: ControlSize;
   disabled: boolean;
+  allowCustom: boolean;
   labels: ColorPresetsLabels;
   triggerRef: React.RefObject<HTMLElement | null>;
   /** In a FieldList cell: the trigger id the cell label points at. */
@@ -85,6 +94,7 @@ export type ColorPresetsRootProps = {
   size?: ControlSize;
   disabled?: boolean;
   allowEmpty?: boolean;
+  allowCustom?: boolean;
   closeOnSelect?: boolean;
   labels?: Partial<ColorPresetsLabels>;
   children: React.ReactNode;
@@ -104,6 +114,7 @@ function ColorPresetsRoot({
   size: sizeProp,
   disabled: disabledProp,
   allowEmpty = false,
+  allowCustom = false,
   closeOnSelect = true,
   labels: labelsProp,
   children,
@@ -170,11 +181,24 @@ function ColorPresetsRoot({
       columns,
       size,
       disabled,
+      allowCustom,
       labels,
       triggerRef,
       triggerId,
     }),
-    [value, select, close, options, selectedLabel, columns, size, disabled, labels, triggerId],
+    [
+      value,
+      select,
+      close,
+      options,
+      selectedLabel,
+      columns,
+      size,
+      disabled,
+      allowCustom,
+      labels,
+      triggerId,
+    ],
   );
 
   const popover = (
@@ -294,7 +318,7 @@ function Content({
 Content.displayName = "ColorPresets.Content";
 
 function SwatchList({ label }: { label?: React.ReactNode }) {
-  const { value, select, close, options, columns, size, labels, triggerRef } =
+  const { value, select, close, options, columns, size, labels, triggerRef, allowCustom } =
     useColorPresetsContext();
   const labelId = React.useId();
   // The grid is `columns` wide while the panel has room; narrower (a 320px screen, touch-size
@@ -313,7 +337,8 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
   }, [grid.focus, initial]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Tab") {
+    // With the hex field Tab moves between the swatches and the field; the panel's edges close it.
+    if (event.key === "Tab" && !allowCustom) {
       // Leave like a native select: focus goes back to the trigger, then Tab moves on from it.
       triggerRef.current?.focus({ preventScroll: true });
       close();
@@ -380,7 +405,48 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
           );
         })}
       </div>
+      {allowCustom ? <CustomColorField /> : null}
     </div>
+  );
+}
+
+/**
+ * Any color beyond the palette (`allowCustom`): a hex field under the swatches; its chip shows the
+ * typed color once it reads as one, Enter picks it (an invalid text gets `labels.customInvalid`).
+ */
+function CustomColorField() {
+  const { value, select, options, labels } = useColorPresetsContext();
+  // A value that is no preset is the field's text when the panel opens.
+  const [draft, setDraft] = React.useState(() =>
+    value != null && !options.some((o) => sameColor(o.value, value)) ? value : "",
+  );
+  const [error, setError] = React.useState<string>();
+  const typed = parseHexColor(draft);
+
+  return (
+    <Input.Root label={labels.custom} error={error} className={styles.custom}>
+      <Input.Wrapper>
+        <Input.Icon side="start">
+          <SwatchChip value={typed ?? value} />
+        </Input.Icon>
+        <Input.Field
+          value={draft}
+          placeholder="#12A594"
+          autoComplete="off"
+          spellCheck={false}
+          onValueChange={(next) => {
+            setDraft(next);
+            setError(undefined);
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter") return;
+            event.preventDefault();
+            if (typed) select(typed);
+            else setError(labels.customInvalid);
+          }}
+        />
+      </Input.Wrapper>
+    </Input.Root>
   );
 }
 

@@ -3,6 +3,7 @@ import {
   UPLOAD_QUEUE_OPTIONS_TYPE,
   USE_UPLOAD_QUEUE_FUNCTION,
 } from "../../hooks/useUploadQueue.api";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { FILE_UPLOAD_LABELS } from "./FileUpload";
 
 const FILE_TYPE = "readonly FileUploadFile[]";
@@ -110,6 +111,7 @@ export const api: ComponentApi = {
           en: "Help text under the field. Hidden while `error` is shown.",
           ru: "Подсказка под полем; скрывается при `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

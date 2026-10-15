@@ -1,0 +1,8 @@
+/*
+ * RichText — the chat's Markdown subset as a block of its host's type: the paragraphs, quotes and
+ * code of `internal/richText`, wrapping anywhere, so a long address never widens the host.
+ */
+
+.root {
+  min-inline-size: 0;
+}

@@ -23,3 +23,10 @@
   align-items: center;
   gap: var(--prime-space-2);
 }
+
+/* tag-row.tsx: a 320 px column, narrow enough for the row of badges to wrap. */
+.column {
+  display: grid;
+  gap: var(--prime-space-6);
+  inline-size: min(100%, calc(var(--prime-space-20) * 4));
+}

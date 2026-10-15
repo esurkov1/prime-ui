@@ -41,6 +41,7 @@ NativeSelect          field frame: label row · control · support row
 |---|---|---|---|
 | `label` | `ReactNode` | — | Field label above; a `<label htmlFor>` of the select. |
 | `hint` | `ReactNode` | — | Support text under the field; linked by `aria-describedby`. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message; replaces the hint and implies `invalid`. |
 | `required` | `boolean` | `false` | Red `*` after the label and native `required`. |
 | `optional` | `boolean` | — | Muted `labels.optional` after the label. |

@@ -1,4 +1,4 @@
-/** Dialogs with their own address: every row is a link the router opens, the time reads as how long ago, and the list is named for its queue — `href`, `formatTime`, `labels`. */
+/** Dialogs with their own address: every row is a link to the ticket's page, the time reads as how long ago, and the list is named for its queue — `href`, `formatTime`, `labels`. */
 import { Avatar, Card, ChatList, hueOf } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

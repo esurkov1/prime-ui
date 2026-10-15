@@ -12,7 +12,7 @@
 - An annual day and month without a year (`yearless`).
 
 ## When not to use
-- Time of day only → use [Input](../input/COMPONENT.md) with a time mask.
+- Time of day only → use [Input](../input/COMPONENT.md) with `Input.Field type="time"`: the time is typed in hour and minute segments, there is no day to pick (a date with a time is `withTime`).
 - A choice between a few fixed periods («7 дней», «30 дней») → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Select](../select/COMPONENT.md).
 - A free-text date the user types → use [Input](../input/COMPONENT.md).
 
@@ -63,6 +63,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier (height 28 · 32 · 36 · 40 · 48) and panel tier (day cell 24 · 28 · 32 · 36 · 40). Without it the tier of its host, else `m`. |
 | `label` | `ReactNode` | — | Field label; part of the button's accessible name together with the value. |
 | `hint` | `ReactNode` | — | Support text under the field (`aria-describedby`). |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in place of the hint; implies `invalid`. |
 | `required` | `boolean` | `false` | Red `*` after the label; the field button is described by `labels.required` (a button takes no `aria-required`). |
 | `optional` | `boolean` | — | Muted `labels.optional` after the label. |
@@ -241,6 +242,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 | [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in a card: the card is its container, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
 | [yearless.tsx](examples/yearless.tsx) | An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. |
 | [locale.tsx](examples/locale.tsx) | A delivery window on a partner portal in English: month and weekday names from the date-fns locale, the week from Sunday and the system texts translated — `locale`, `weekStartsOn`, `labels`. |
+| [deadline.tsx](examples/deadline.tsx) | A document's expiry date whose hint counts the days left and takes the status tone — `hint`, `hintTone`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A shift period with a footer: the calendar keeps the draft on a press beside it and closes by Escape, Reset or Apply — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | A report filter owns the period: quick buttons set it from outside, the field shows it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the panel: a reminder button opens the calendar from code, a picked day closes it — `open`, `onOpenChange`. |

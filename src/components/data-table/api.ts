@@ -508,6 +508,12 @@ export const api: ComponentApi = {
           ru: "`header` называет колонку только для вспомогательных технологий (колонка действий): ячейка заголовка выглядит пустой.",
         },
         {
+          name: "description",
+          type: "string",
+          en: "What the column means: an info glyph after the header opens it as a tooltip; the header cell is described by it (`aria-describedby`).",
+          ru: "Что значит колонка: значок после заголовка открывает её подсказкой; ячейка заголовка описана ею (`aria-describedby`).",
+        },
+        {
           name: "numeric",
           type: "boolean",
           en: "Tabular figures, no wrapping, end alignment unless `align` is set.",
@@ -609,6 +615,10 @@ export const api: ComponentApi = {
       en: "Name of the toggle of an expanded group; `{group}` is the group key.",
       ru: "Имя переключателя развёрнутой группы; `{group}` — ключ группы.",
     },
+    columnInfo: {
+      en: "Name of the info glyph of a column with a `description`; the tooltip holds the text.",
+      ru: "Имя значка колонки с `description`; текст — в подсказке.",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -683,6 +693,10 @@ export const api: ComponentApi = {
       {
         en: "A group toggle (collapsible groups) is a button in the group header with `aria-expanded`, `aria-controls` (the group's rows, while open; not on reorderable rows, which carry no id) and `labels.expandGroup` / `labels.collapseGroup` with `{group}`.",
         ru: "Переключатель группы (сворачиваемые группы) — кнопка в заголовке группы с `aria-expanded`, `aria-controls` (строки открытой группы) и `labels.expandGroup` / `labels.collapseGroup` с `{group}`.",
+      },
+      {
+        en: "A column `description` describes its header cell (`aria-describedby`); its tooltip opens from the sort button, or from the info glyph (a tab stop named `labels.columnInfo`) on a plain header.",
+        ru: "`description` колонки описывает ячейку заголовка (`aria-describedby`); подсказка открывается с кнопки сортировки или со значка (фокусируемый, имя `labels.columnInfo`) у обычного заголовка.",
       },
       {
         en: 'Loading sets `aria-busy` and a `labels.loading` status; the error is `role="alert"`; the default empty state is `role="status"`.',

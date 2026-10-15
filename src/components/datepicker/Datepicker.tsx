@@ -147,6 +147,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
     required = false,
     optional,
     hint,
+    hintTone,
     error,
     className,
     "aria-label": ariaLabel,
@@ -181,6 +182,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
       required={required}
       optional={optional}
       hint={hint}
+      hintTone={hintTone}
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}

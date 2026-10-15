@@ -1167,3 +1167,123 @@ describe("Message shells and layout contract", () => {
     expect(cssValue(rule(".meta"), "user-select")).toBe("none");
   });
 });
+
+describe("Message.Root preview", () => {
+  it("is a picture of the message: no menu, reactions, retry or row focus, the keyboard inert", async () => {
+    const onReactionToggle = vi.fn();
+    const onRetry = vi.fn();
+    render(
+      <Message.Root
+        preview
+        direction="outgoing"
+        time="09:30"
+        status="failed"
+        onRetry={onRetry}
+        onReactionToggle={onReactionToggle}
+      >
+        <Message.Text>{"**Здравствуйте!** [Счета](https://prime.app/billing)"}</Message.Text>
+        <Message.Reactions items={[{ emoji: "+1", count: 2 }]} />
+        <Message.Actions data-testid="keyboard">
+          <Button.Root variant="soft" tone="neutral">
+            Статус заказа
+          </Button.Root>
+        </Message.Actions>
+        <Message.Menu>
+          <Dropdown.Item>Ответить</Dropdown.Item>
+        </Message.Menu>
+      </Message.Root>,
+    );
+    const article = screen.getByRole("article");
+    expect(article).toHaveAttribute("data-preview");
+    expect(article).not.toHaveAttribute("tabindex");
+    expect(screen.getByTestId("keyboard")).toHaveAttribute("inert");
+    expect(screen.queryByRole("button", { name: "Повторить отправку" })).toBeNull();
+    expect(screen.getByRole("button", { name: "+1: 2" })).toBeDisabled();
+    fireEvent.contextMenu(screen.getByText("Здравствуйте!"), { clientX: 10, clientY: 10 });
+    fireEvent.doubleClick(screen.getByText("Здравствуйте!"));
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onReactionToggle).not.toHaveBeenCalled();
+    // Its content still works.
+    expect(screen.getByRole("link", { name: "Счета" })).toHaveAttribute(
+      "href",
+      "https://prime.app/billing",
+    );
+  });
+});
+
+describe("Message time zone", () => {
+  const sent = new Date(Date.UTC(2026, 9, 14, 23, 30));
+
+  it("passes the zone in force to formatTime", () => {
+    const formatTime = vi.fn((date: Date, timeZone?: string) => `${timeZone}:${date.getTime()}`);
+    render(
+      <MessageList aria-label="Переписка" timeZone="Asia/Vladivostok">
+        <Message.Root value="a" time={sent} formatTime={formatTime}>
+          <Message.Text>Текст</Message.Text>
+        </Message.Root>
+      </MessageList>,
+    );
+    expect(formatTime).toHaveBeenCalledWith(sent, "Asia/Vladivostok");
+  });
+
+  it("shows the time of the list's zone, and its own zone over it", () => {
+    render(
+      <MessageList aria-label="Переписка" timeZone="Asia/Vladivostok">
+        <Message.Root value="list" time={sent}>
+          <Message.Text>По поясу списка</Message.Text>
+        </Message.Root>
+        <Message.Root value="own" time={sent} timeZone="Europe/Moscow">
+          <Message.Text>По своему поясу</Message.Text>
+        </Message.Root>
+      </MessageList>,
+    );
+    const times = screen
+      .getAllByRole("article")
+      .map((article) => article.querySelector("[data-message-meta] time")?.textContent);
+    expect(times).toEqual(["09:30", "02:30"]);
+  });
+});
+
+describe("Message.Sticker", () => {
+  it("is the media shell itself: a named picture with the meta over it, a Skeleton until decoded", () => {
+    render(
+      <Message.Root time="10:43">
+        <Message.Sticker src="/stickers/ok.webp" aria-label="Стикер «Класс»" />
+      </Message.Root>,
+    );
+    const sticker = screen.getByRole("img", { name: "Стикер «Класс»" });
+    const bubble = sticker.closest("[data-message-bubble]");
+    expect(bubble).toHaveAttribute("data-shell", "media");
+    expect(bubble).not.toHaveAttribute("data-tail");
+    expect(sticker).toHaveAttribute("data-status", "loading");
+    expect(sticker).toHaveAttribute("aria-busy", "true");
+    expect(sticker.querySelector("[data-message-meta]")).not.toBeNull();
+    const image = sticker.querySelector("img") as HTMLImageElement;
+    expect(image).toHaveAttribute("alt", "");
+    fireEvent.error(image);
+    expect(sticker).toHaveAttribute("data-status", "error");
+    expect(sticker).toHaveTextContent("Стикер «Класс»");
+  });
+
+  it("holds the Skeleton over your player while loading, then shows it", () => {
+    const { rerender } = render(
+      <Message.Root time="10:44">
+        <Message.Sticker aria-label="Видеостикер" loading>
+          <span data-testid="player" />
+        </Message.Sticker>
+      </Message.Root>,
+    );
+    const sticker = screen.getByRole("img", { name: "Видеостикер" });
+    expect(sticker).toHaveAttribute("data-status", "loading");
+    expect(screen.getByTestId("player")).toBeInTheDocument();
+    rerender(
+      <Message.Root time="10:44">
+        <Message.Sticker aria-label="Видеостикер">
+          <span data-testid="player" />
+        </Message.Sticker>
+      </Message.Root>,
+    );
+    expect(sticker).toHaveAttribute("data-status", "ready");
+    expect(sticker).not.toHaveAttribute("aria-busy");
+  });
+});

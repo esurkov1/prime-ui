@@ -48,7 +48,7 @@ export const page: ComponentPageConfig = {
       scenario: "client-card",
       title: "Аватар в шапке",
       description:
-        "Карточка клиента из списка: аватар контакта стоит в шапке вместо плашки с иконкой, ниже — реквизиты — `Drawer.Icon`, `Avatar.Root`.",
+        "Карточка клиента из списка: аватар контакта стоит в шапке вместо плашки с иконкой, ниже — реквизиты в разделах с заголовками, у одного своё действие — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`.",
     },
     {
       scenario: "guard",

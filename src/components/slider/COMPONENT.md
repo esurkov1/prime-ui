@@ -59,6 +59,7 @@ Slider                 field frame (FieldFrame): className, ref, rest
 | `required` | `boolean` | — | Red `*` after the label (`aria-hidden`); a range always has a value, so there is no native `required`. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the track (`aria-describedby`). Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | — | `aria-invalid` on the range input, a danger fill (over any `tone`) and a danger focus ring on the thumb. A non-empty `error` implies it. |
 | `showValue` | `boolean` | `false` | Shows the current value at the end of the label row (tabular numbers, `aria-hidden` — the input announces it). |

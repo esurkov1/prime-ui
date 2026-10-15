@@ -37,14 +37,21 @@ export const api: ComponentApi = {
     },
     {
       name: "Breadcrumb.Item",
-      en: "`ref` → `HTMLLIElement`. `<li>`: a muted `LinkButton` (`href`), plain text, or the current page (`current`).",
-      ru: "`<li>`: приглушённая ссылка `LinkButton` (`href`), текст или текущая страница (`current`).",
+      en: "`ref` → `HTMLLIElement`. `<li>`: a muted `LinkButton` (`href`, or the consumer's router link with `asChild`), plain text, or the current page (`current`). A press on the link goes through `Page.Guard`.",
+      ru: "`<li>`: приглушённая ссылка `LinkButton` (`href` или ссылка роутера с `asChild`), текст или текущая страница (`current`). Нажатие на ссылку проходит через `Page.Guard`.",
       props: [
         {
           name: "href",
           type: "string",
-          en: "Renders a link; without it the item is text.",
-          ru: "Делает уровень ссылкой; без него — текст.",
+          en: "Renders a link; without it (and without `asChild`) the item is text.",
+          ru: "Делает уровень ссылкой; без него (и без `asChild`) — текст.",
+        },
+        {
+          name: "asChild",
+          type: "boolean",
+          default: "false",
+          en: "The single child (a router `Link`) is the level's link with the same look; its own text is the level. In the «…» menu of a folded path it is the menu item.",
+          ru: "Единственный дочерний элемент (`Link` роутера) становится ссылкой уровня с тем же видом; его текст — уровень. В меню «…» свёрнутого пути он — пункт меню.",
         },
         {
           name: "current",
@@ -61,8 +68,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Text or an `Icon`. A string also becomes the `title` of a text item (full text when truncated).",
-          ru: "Текст или `Icon`. Строка становится `title` текстового уровня (полный текст при обрезке).",
+          en: "Text or an `Icon`; with `asChild` one element. A string also becomes the `title` of a text item (full text when truncated).",
+          ru: "Текст или `Icon`; с `asChild` — один элемент. Строка становится `title` текстового уровня (полный текст при обрезке).",
         },
         {
           name: "…rest",

@@ -60,7 +60,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Цикл отправки: кнопка занята, пока идёт запрос, ошибка сервера — красный Banner и отмеченный пароль — `loading`, `invalid`.",
+        "Цикл отправки: кнопка занята, пока идёт запрос, отказ во входе отмечает оба поля, они вздрагивают, а скрытая live-область называет причину — `loading`, `invalid`, `VisuallyHidden`.",
     },
     {
       slot: "narrow",

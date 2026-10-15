@@ -28,7 +28,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 ├─ ScrollContainer            the list's own scroller; onReachEnd → onLoadMore while hasMore
 │  └─ Crossfade               loading (placeholder List rows) ⇄ empty (EmptyPage compact) ⇄ the list
 │     └─ List.Root <ul>       aria-label «Диалоги»; spacer <li aria-hidden> stand for rows out of view
-│        └─ ChatList.Item     List.Item <li> + <button> | <a href>; current from value; one Tab stop
+│        └─ ChatList.Item     List.Item <li> + <button> | <a href> | your element (asChild); current from value; one Tab stop
 │           ├─ ChatList.ItemIcon         before the name: avatar slot (aria-hidden); after it: a glyph
 │           ├─ ChatList.ItemText         the name; muted glyph after it
 │           ├─ ChatList.ItemDescription  author · media word · text — cross-fades with draft and «печатает…»
@@ -62,12 +62,13 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `empty` | `ReactNode` | — | The empty state without a search (an `EmptyPage` with an action). Default: «Нет диалогов». |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Row tier: height, text, avatar, glyphs and the search field. Without it the tier of the host. |
 | `now` | `Date` | — | «Now» for the times of the rows. Default: the moment of the render. |
-| `formatTime` | `(date: Date, now: Date) => string` | `formatChatTime` | Display of a row's `Date` time: «14:32» today, «пн» this week, «12 мар», «12.03.2025». |
+| `timeZone` | `string` | the browser's zone | The IANA zone the times of the rows are read in (`"Asia/Vladivostok"`): a profile's zone, not the browser's. |
+| `formatTime` | `(date: Date, now: Date, timeZone?: string) => string` | `formatChatTime` | Display of a row's `Date` time: «14:32» today, «пн» this week, «12 мар», «12.03.2025»; gets the `timeZone`. |
 | `labels` | `Partial<ChatListLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other `div` attributes of the column. |
 
 ### ChatList.Item
-`ref` → `HTMLElement` (the `<button>` or `<a>`, not the `<li>`). A dialog: a `List.Item` row with the avatar, the name and the time over the preview and the counts. Its key and `current` come from the root.
+`ref` → `HTMLElement` (the `<button>`, `<a>` or `asChild` element, not the `<li>`). A dialog: a `List.Item` row with the avatar, the name and the time over the preview and the counts. Its key and `current` come from the root.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -83,7 +84,8 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `href` | `string` | — | Renders an `<a>` instead of a `<button>` (a dialog with its own URL). |
 | `target` | `string` | — | Where the `<a>` opens (`href` only). |
 | `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
-| `children` | `ReactNode` | — | `ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu`. |
+| `asChild` | `boolean` | `false` | The one child element (a router `Link`) is the row; the parts go inside it. |
+| `children` | `ReactNode` | — | `ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu` — inside the child element with `asChild`. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and the native attributes of the row element. |
 
 ### ChatList.ItemIcon
@@ -150,6 +152,7 @@ The search field takes the tier too; counts are one tier down (the Badge's own r
 | `muted` | a muted glyph after the name; the count soft gray | notifications are off | `false` |
 | `mention` | a solid «@» before the count | the reader is mentioned | `false` |
 | `pinned` | a pin under the time while nothing is unread | pinned by the reader — order pinned first in `items` | `false` |
+| `asChild` | the same row, rendered as your one child element with the parts inside it | a router's `Link` opens the dialog without a reload | `false` |
 | `status` | ✓ / ✓✓ in the accent / clock / failure mark before the time | the reader wrote the last message | — |
 
 ## States
@@ -195,7 +198,7 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, or a link with `href`.
+- The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, a link with `href`, or your link with `asChild`.
 - The open dialog is `aria-current="true"` on a button, `"page"` on a link. Selection does not follow the focus: arrows only move it (a dialog may load a conversation); Enter, Space and a click open.
 - The row is named by its content: the name, glyphs with a `label` («Без звука», a verified mark), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.
 - While the other side types, the preview is `aria-hidden` and «печатает…» is read; a draft reads «Черновик: …».
@@ -243,7 +246,8 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 | [search.tsx](examples/search.tsx) | The search field filters dialogs by name and by the last message, marks the match in both, says how many were found and shows a quiet state when none match — `defaultSearch`, `onSearchChange`. |
 | [live.tsx](examples/live.tsx) | A live inbox: a client types, then writes — the preview turns into the typing line and back, the count rolls up and the dialog glides to the top; opening it clears the count — `typing`, `unread`, `items`. |
 | [long-list.tsx](examples/long-list.tsx) | A sales inbox of a thousand dialogs: only the rows around the view render, arrows walk through all of them, and the next page loads as the end comes near — `hasMore`, `onLoadMore`. |
-| [links.tsx](examples/links.tsx) | Dialogs with their own address: every row is a link the router opens, the time reads as how long ago, and the list is named for its queue — `href`, `formatTime`, `labels`. |
+| [links.tsx](examples/links.tsx) | Dialogs with their own address: every row is a link to the ticket's page, the time reads as how long ago, and the list is named for its queue — `href`, `formatTime`, `labels`. |
+| [router.tsx](examples/router.tsx) | Router links as the dialogs, the times in the zone of the operator's profile; render it inside a router — `asChild`, `timeZone`. |
 | [states.tsx](examples/states.tsx) | Loading and empty: placeholder rows in the rows' geometry cross-fade into the dialogs; a new workspace without dialogs shows its own empty state with an action — `loading`, `empty`. |
 | [controlled.tsx](examples/controlled.tsx) | The open dialog lives in the screen: a row opens it beside the list, and a next-unread button opens the next one from outside — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | At phone width long names and previews truncate while the time and counts stay whole; a pane squeezed under 240px keeps only the names and the counts — `ChatList.Root`, `search`. |
@@ -256,6 +260,8 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 - An `Avatar.Root size="s"` to fit the row → leave `size` out; the slot sizes the avatar to the tier.
 - A «⋯» button nested inside the row for the menu → `ChatList.ItemMenu`: it opens on right click, a long press and Shift+F10.
 - Deleting from the menu without a question → open a `ConfirmDialog` from the menu item.
+- `href` with an `onClick` that calls `preventDefault()` and the router's `navigate` → `asChild` with the router's `Link`, the parts inside it.
+- Times shifted by hand to a profile's zone before `time` → `timeZone` on the root: «сегодня», the weekday and the clock are read in it.
 
 ## Related
 - **Built from:** [List](../list/COMPONENT.md) (rows, current fill, focus, touch height), [Input](../input/COMPONENT.md) (search), [ScrollContainer](../scroll-container/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md) (counts), [Dropdown](../dropdown/COMPONENT.md) (row menu), [VisuallyHidden](../visually-hidden/COMPONENT.md), `useFlipList` (the glide of a new order)

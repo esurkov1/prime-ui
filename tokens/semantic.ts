@@ -838,6 +838,8 @@ export const semanticTokens = {
     videoNote: "14.5rem",
     /** The box of a sent round video message (`VideoNote`): its diameter, at most the row. */
     videoNoteBox: "16.75rem",
+    /** The square box of a sticker (`Message.Sticker`), at most the row. */
+    sticker: "10rem",
     /**
      * A message changing size (a reaction row, a transcript that opens): the bubble's box, its
      * parts and the messages around glide in one calm stroke, between `fast` and `base`; zeroed

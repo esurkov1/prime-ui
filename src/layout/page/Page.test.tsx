@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
 import { Button } from "@/components/button/Button";
 import { Crossfade } from "@/components/crossfade/Crossfade";
+import { Datepicker } from "@/components/datepicker/Datepicker";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Icon } from "@/icons";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -312,6 +313,20 @@ describe("Page.Tools", () => {
       "true",
     );
     expect(screen.getByRole("radiogroup", { name: "Вид" })).not.toHaveAttribute("data-full-width");
+  });
+
+  it("gives a Datepicker fullWidth, so on a line of its own its field fills the tool", () => {
+    render(
+      <Page.Tools>
+        <Datepicker.Root mode="range" aria-label="Период" />
+        <Datepicker.Root mode="single" aria-label="Дата" fullWidth={false} />
+      </Page.Tools>,
+    );
+    expect(screen.getByRole("button", { name: /Период/ })).toHaveAttribute(
+      "data-full-width",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: /Дата/ })).not.toHaveAttribute("data-full-width");
   });
 
   it("chips take no line while empty", () => {
@@ -756,6 +771,40 @@ describe("Page body", () => {
     expect(screen.getByTestId("chart")).toHaveAttribute("data-rows", "2");
   });
 
+  it("Grid: a wide cell next to a narrow one forms a 2/3 + 1/3 pair; others stay alone", () => {
+    render(
+      <Page.Grid>
+        <Page.Cell data-testid="kpi" span={3} />
+        <Page.Cell data-testid="chart" span={8} rows={2} />
+        <Page.Cell data-testid="side" span={4} />
+        <Page.Cell data-testid="next" span={4} />
+        <>
+          <Page.Cell data-testid="third" span={5} />
+          <Page.Cell data-testid="wide" span={7} />
+        </>
+        <Page.Cell data-testid="full" />
+        <Page.Cell data-testid="after-full" span={4} />
+      </Page.Grid>,
+    );
+    expect(screen.getByTestId("kpi")).not.toHaveAttribute("data-pair");
+    expect(screen.getByTestId("chart")).toHaveAttribute("data-pair", "wide");
+    expect(screen.getByTestId("side")).toHaveAttribute("data-pair", "narrow");
+    expect(screen.getByTestId("next")).not.toHaveAttribute("data-pair");
+    expect(screen.getByTestId("third")).toHaveAttribute("data-pair", "narrow");
+    expect(screen.getByTestId("wide")).toHaveAttribute("data-pair", "wide");
+    expect(screen.getByTestId("full")).not.toHaveAttribute("data-pair");
+    expect(screen.getByTestId("after-full")).not.toHaveAttribute("data-pair");
+  });
+
+  it("CSS: on a mid-width grid a pair takes 8 + 4 and the grid keeps the dense flow", () => {
+    expect(cssValue(cssRule(CSS, ".grid"), "grid-auto-flow")).toBe("row dense");
+    const mid = ["@container prime-grid (min-width: 40rem)"];
+    expect(cssValue(cssRule(CSS, '.cell[data-pair="wide"]', mid), "grid-column")).toBe("span 8");
+    expect(
+      cssValue(cssRule(CSS, '.cell[data-span="4"], .cell[data-pair="narrow"]', mid), "grid-column"),
+    ).toBe("span 4");
+  });
+
   it("Cell: a Crossfade child fills the cell unless it sets fill", () => {
     render(
       <Page.Grid>
@@ -802,6 +851,124 @@ describe("Page body", () => {
       </Page.Root>,
     );
     expect(container.firstChild).toHaveAttribute("data-fill", "true");
+  });
+});
+
+describe("Page.Guard", () => {
+  /** A router link: it navigates in its own onClick unless the event is default-prevented. */
+  function RouterLink({
+    to,
+    navigate,
+    onClick,
+    ...rest
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+    to: string;
+    navigate: (to: string) => void;
+  }) {
+    return (
+      <a
+        {...rest}
+        href={to}
+        onClick={(event) => {
+          onClick?.(event);
+          if (event.defaultPrevented) return;
+          event.preventDefault();
+          navigate(to);
+        }}
+      />
+    );
+  }
+
+  function GuardedPage({
+    dirty = false,
+    busy = false,
+    navigate,
+  }: {
+    dirty?: boolean;
+    busy?: boolean;
+    navigate: (to: string) => void;
+  }) {
+    return (
+      <AppShell.Root>
+        <AppShell.Nav>
+          <Sidebar.Root>
+            <Sidebar.Item asChild>
+              <RouterLink to="/orders" navigate={navigate}>
+                Заказы
+              </RouterLink>
+            </Sidebar.Item>
+          </Sidebar.Root>
+        </AppShell.Nav>
+        <AppShell.Main>
+          <Page.Root>
+            <Page.Guard dirty={dirty} busy={busy} />
+            <Page.TopBar>
+              <Page.Heading>
+                <Breadcrumb.Root>
+                  <Breadcrumb.Item asChild>
+                    <RouterLink to="/clients" navigate={navigate}>
+                      Клиенты
+                    </RouterLink>
+                  </Breadcrumb.Item>
+                </Breadcrumb.Root>
+                <Page.Title>ООО «Север»</Page.Title>
+              </Page.Heading>
+            </Page.TopBar>
+          </Page.Root>
+        </AppShell.Main>
+      </AppShell.Root>
+    );
+  }
+
+  it("a clean page lets the navigation through", async () => {
+    const navigate = vi.fn();
+    render(<GuardedPage navigate={navigate} />);
+    await userEvent.click(screen.getByRole("link", { name: "Заказы" }));
+    expect(navigate).toHaveBeenCalledWith("/orders");
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("dirty: a Sidebar item asks; «Остаться» keeps the page and returns focus", async () => {
+    const navigate = vi.fn();
+    render(<GuardedPage dirty navigate={navigate} />);
+    const item = screen.getByRole("link", { name: "Заказы" });
+    item.focus();
+    await userEvent.keyboard("{Enter}");
+    const confirm = await screen.findByRole("alertdialog", { name: "Уйти без сохранения?" });
+    expect(navigate).not.toHaveBeenCalled();
+    await userEvent.click(within(confirm).getByRole("button", { name: "Остаться" }));
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(navigate).not.toHaveBeenCalled();
+    await waitFor(() => expect(item).toHaveFocus());
+  });
+
+  it("dirty: a Breadcrumb router link asks; «Уйти» repeats the navigation once", async () => {
+    const navigate = vi.fn();
+    render(<GuardedPage dirty navigate={navigate} />);
+    await userEvent.click(screen.getByRole("link", { name: "Клиенты" }));
+    const confirm = await screen.findByRole("alertdialog");
+    await userEvent.click(within(confirm).getByRole("button", { name: "Уйти" }));
+    await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
+    expect(navigate).toHaveBeenCalledWith("/clients");
+  });
+
+  it("busy: the navigation does nothing and nothing asks", async () => {
+    const navigate = vi.fn();
+    render(<GuardedPage busy navigate={navigate} />);
+    await userEvent.click(screen.getByRole("link", { name: "Заказы" }));
+    expect(navigate).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("asks the browser before the tab closes while dirty", () => {
+    const { rerender } = render(<GuardedPage navigate={vi.fn()} />);
+    const clean = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(clean);
+    expect(clean.defaultPrevented).toBe(false);
+    rerender(<GuardedPage dirty navigate={vi.fn()} />);
+    const dirty = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(dirty);
+    expect(dirty.defaultPrevented).toBe(true);
   });
 });
 
@@ -888,5 +1055,30 @@ describe("Page.Split", () => {
   it("panes throw outside a split", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Page.BackButton />)).toThrow(/inside `Page.Split`/);
+  });
+});
+
+describe("Page.Description loading", () => {
+  it("keeps the line in place while its data loads, then shows the data", () => {
+    const view = (loading: boolean) => (
+      <Page.Root>
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Заказы</Page.Title>
+            <Page.Description loading={loading} data-testid="line">
+              128 в работе
+            </Page.Description>
+          </Page.Heading>
+        </Page.TopBar>
+      </Page.Root>
+    );
+    const { rerender } = render(view(true));
+    const line = screen.getByTestId("line");
+    expect(line).toHaveAttribute("aria-busy", "true");
+    expect(line).not.toHaveTextContent("128 в работе");
+    expect(line.querySelector("[aria-hidden='true']")).not.toBeNull();
+    rerender(view(false));
+    expect(screen.getByTestId("line")).toHaveTextContent("128 в работе");
+    expect(screen.getByTestId("line")).not.toHaveAttribute("aria-busy");
   });
 });

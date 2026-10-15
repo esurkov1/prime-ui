@@ -106,8 +106,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`; loose text becomes the text line.",
-          ru: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`; просто текст становится основной строкой.",
+          en: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions`; loose text becomes the text line.",
+          ru: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions`; просто текст становится основной строкой.",
         },
         {
           name: "…rest",
@@ -119,15 +119,15 @@ export const api: ComponentApi = {
     },
     {
       name: "List.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), or an `Icon`. After the text it is a trailing glyph.",
-      ru: "Ведущий слот `aria-hidden`: `Avatar.Root` (без своего `size` берёт ярус строки) или `Icon`. После текста — замыкающий значок.",
+      en: "`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), an `Icon` or a colour `Badge.Dot` in an icon-wide box. After the text it is a trailing glyph.",
+      ru: "Ведущий слот `aria-hidden`: `Avatar.Root` (без своего `size` берёт ярус строки), `Icon` или цветная `Badge.Dot` в рамке шириной с иконку. После текста — замыкающий значок.",
       props: [
         {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "An `Avatar.Root` or an `Icon`.",
-          ru: "`Avatar.Root` или `Icon`.",
+          en: "An `Avatar.Root`, an `Icon`, or a `Badge.Dot` with `color` (a stage, a project): the large dot.",
+          ru: "`Avatar.Root`, `Icon` или `Badge.Dot` с `color` (этап, проект): крупная точка.",
         },
         {
           name: "…rest",
@@ -203,6 +203,19 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "List.ItemActions",
+      en: "`ref` → `HTMLDivElement`. The row's own controls (a `Switch`, a `Dropdown` with its icon `Button`) at its end, beside the row element and never inside it, one tier below the row.",
+      ru: "Собственные контролы строки (`Switch`, `Dropdown` с иконочной `Button`) в её конце — рядом с элементом строки, не внутри него, на ярус меньше строки.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (the controls, each named on its own), `className` and the other `div` attributes.",
+          ru: "`children` (контролы, у каждого своё имя), `className` и остальные атрибуты `div`.",
+        },
+      ],
+    },
   ],
   labels: labelRows(LIST_LABELS, {
     reorderItem: {
@@ -244,6 +257,10 @@ export const api: ComponentApi = {
       {
         en: "Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.",
         ru: "Стрелки не переводят между строками: строки — обычные остановки Tab, как в Sidebar.",
+      },
+      {
+        en: "`List.ItemActions` stand beside the row element, never inside it: the row's name stays its text, and Tab goes from the row to its controls.",
+        ru: "`List.ItemActions` стоят рядом с элементом строки, не внутри: имя строки — её текст, Tab ведёт от строки к её контролам.",
       },
       {
         en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",

@@ -60,6 +60,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `onOptionDelete` | `(value: string) => void \| Promise<void>` | — | Enables «Удалить» in the row menu; the value also leaves the selection. A returned Promise defers it: resolve deletes, reject keeps everything (e.g. after a confirmation). |
 | `label` | `ReactNode` | — | Field label above; names the input. |
 | `hint` | `ReactNode` | — | Support text under the field; linked by `aria-describedby`. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message; replaces the hint and implies `invalid`. |
 | `required` | `boolean` | `false` | Red `*` after the label and `aria-required` on the input. |
 | `optional` | `boolean` | — | Muted `labels.optional` after the label. |

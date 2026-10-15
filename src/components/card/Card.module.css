@@ -210,6 +210,26 @@
   padding-top: var(--prime-space-1);
 }
 
+/*
+ * Loading (`Card.Root loading`): the value, delta and meta keep their element and show a Skeleton
+ * in its geometry — the value a bar one line of its own text role high (`1lh`, so it follows the
+ * headline's container steps), the delta and the meta a text line of their tier.
+ */
+.valueSkeleton {
+  width: calc(var(--prime-space-24) * 1.25);
+  height: 1lh;
+  min-height: 0;
+  border-radius: var(--prime-radius-s);
+}
+
+.deltaSkeleton {
+  width: calc(var(--prime-space-24) * 1.5);
+}
+
+.metaSkeleton {
+  width: calc(var(--prime-space-24) * 2);
+}
+
 /* In a KPI cluster (`mini`, a `split` cell) it sits in the text column under the value. */
 .root[data-variant="mini"] > .meta,
 .root[data-variant="split"] > .body > * > .meta {

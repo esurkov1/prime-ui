@@ -65,6 +65,7 @@ import {
   MessageText,
 } from "./MessageParts";
 import { DEFAULT_REACTION_OPTIONS, ReactionBar } from "./MessageReactionBar";
+import { MessageSticker } from "./MessageSticker";
 import { MessageTyping } from "./MessageTyping";
 import type { MessageDirection, MessagePosition } from "./types";
 
@@ -399,9 +400,11 @@ export type MessageRootProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> &
   direction?: MessageDirection;
   position?: MessagePosition;
   time?: Date | string;
-  formatTime?: (date: Date) => string;
+  timeZone?: string;
+  formatTime?: (date: Date, timeZone?: string) => string;
   edited?: boolean;
   status?: MessageStatus;
+  preview?: boolean;
   onRetry?: AsyncHandler;
   onReactionToggle?: AsyncHandler<[emoji: string], unknown>;
   labels?: Partial<MessageLabels>;
@@ -420,15 +423,19 @@ const isInteractive = (target: EventTarget | null) =>
  * reactions row, a transcript) is a disclosure that glides in layout. The row is a `role="article"`
  * named «{author}, {time}» (an `option` in selection mode); right click, a long press, Enter or
  * Shift+F10 open `Message.Menu` where the pointer is; a double tap puts the chat's quick reaction.
+ * A `preview` is the same message as a picture of itself: no menu, reactions, retry or row focus,
+ * its inline keyboard inert; its content (links, players, spoilers) still works.
  */
 function MessageRoot({
   value: valueProp,
   direction = "incoming",
   position = "single",
   time: timeProp,
+  timeZone: timeZoneProp,
   formatTime = formatMessageTime,
   edited = false,
   status,
+  preview = false,
   onRetry,
   onReactionToggle,
   labels: labelsProp,
@@ -532,7 +539,7 @@ function MessageRoot({
     toggleReaction,
   } = useOptimisticReactions(
     reactions ? (reactions.props as MessageReactionsProps).items : NO_REACTIONS,
-    onReactionToggle,
+    preview ? undefined : onReactionToggle,
   );
   const hasReactions = ownReactions.length > 0;
   const canQuickReact = toggleReaction !== null && list.quickReaction !== false;
@@ -556,7 +563,10 @@ function MessageRoot({
   // A returned promise shows `sending` until it settles; a rejection leaves the message failed.
   const { pending: retrying, run: retry } = usePendingAction(onRetry);
   const shownStatus: MessageStatus | undefined = retrying ? "sending" : status;
-  const time = timeProp instanceof Date ? formatTime(timeProp) : (timeProp ?? null);
+  const time =
+    timeProp instanceof Date
+      ? formatTime(timeProp, timeZoneProp ?? list.timeZone)
+      : (timeProp ?? null);
   const dateTime = timeProp instanceof Date ? timeProp.toISOString() : undefined;
   const hasMeta = time !== null || edited || shownStatus !== undefined;
   const editedLabel = labels.edited;
@@ -650,7 +660,8 @@ function MessageRoot({
   // messages keeps no closed menu per row (its floating layer, media query and listeners).
   const [menuMounted, setMenuMounted] = React.useState(false);
   const [anchor, setAnchor] = React.useState({ x: 0, y: 0 });
-  const hasMenu = menu !== undefined && !selecting;
+  const withMenu = menu !== undefined && !preview;
+  const hasMenu = withMenu && !selecting;
 
   const openMenuAt = (clientX: number, clientY: number) => {
     const rect = rootRef.current?.getBoundingClientRect();
@@ -778,7 +789,11 @@ function MessageRoot({
         {tail ? <span className={styles.bubbleTail} data-depth={depth} aria-hidden="true" /> : null}
       </SurfaceDepthProvider>
       {shell === "bubble" ? null : reactionsPart}
-      {actions}
+      {preview
+        ? actions.map((row) =>
+            React.cloneElement(row as React.ReactElement<MessageActionsProps>, { inert: true }),
+          )
+        : actions}
       {/* First the hug, then the morph: the morph's new layout is the hugged one. */}
       <BubbleHug bubble={bubbleRef} />
       <MorphSnapshot morph={morph} />
@@ -789,7 +804,7 @@ function MessageRoot({
     // biome-ignore lint/a11y/useAriaPropsSupportedByRole: an article becomes an option in selection mode
     <article
       ref={mergedRef}
-      tabIndex={-1}
+      tabIndex={preview ? undefined : -1}
       {...rest}
       style={style}
       role={selecting ? "option" : undefined}
@@ -808,6 +823,7 @@ function MessageRoot({
         selecting: selecting || undefined,
         selected: selected || undefined,
         failed: shownStatus === "failed" || undefined,
+        preview: preview || undefined,
       })}
       onContextMenu={(event) => {
         onContextMenu?.(event);
@@ -911,7 +927,7 @@ function MessageRoot({
       {gutter ? (
         <div className={cx(styles.gutter, statusLoop.blink)}>{showAvatar ? avatar : null}</div>
       ) : null}
-      {status === "failed" && onRetry ? (
+      {status === "failed" && onRetry && !preview ? (
         <span className={cx(styles.retry, statusLoop.blink)} data-morph-item="">
           <Button.Root
             variant="ghost"
@@ -952,7 +968,7 @@ function MessageRoot({
 
   return (
     <MessageRootProvider value={rootContext}>
-      {menu !== undefined ? (
+      {withMenu ? (
         // The menu opens against the message at the point pressed; focus returns to the message.
         // Wrapped whenever the message has a menu, so selection mode never remounts the message.
         <Dropdown.Root
@@ -1001,6 +1017,7 @@ export const Message = {
   Location: MessageLocation,
   Contact: MessageContact,
   LinkPreview: MessageLinkPreview,
+  Sticker: MessageSticker,
   Reactions: MessageReactions,
   Actions: MessageActions,
   Menu: MessageMenu,

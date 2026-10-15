@@ -49,6 +49,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `required` | `boolean` | — | Red `*` after the label and `aria-required` on the group. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the swatches. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | — | Danger inner edge on every swatch and `aria-invalid`. A non-empty `error` implies it. |
 | `disabled` | `boolean` | `false` | Disables every swatch (grey, half transparent). |

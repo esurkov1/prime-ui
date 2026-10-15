@@ -251,3 +251,72 @@
 :is(.trigger:disabled, .item[data-disabled="true"]) :is(.itemDescription, .itemMeta) {
   color: var(--prime-color-text-disabled);
 }
+
+/* ─── Segment (inside `Input.Wrapper`) ───────────────────────────────────────
+ * The select is the field's start section: a tinted segment flush with the box's start edge and
+ * as high as the box (the `Input.Affix` fill), its trigger the glyph and the chevron. The box
+ * clips the corners; focus on the segment draws its own inset ring (the box rings only its text).
+ */
+.segment {
+  display: flex;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.segmentTrigger {
+  --prime-icon-size: var(--field-icon);
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--field-gap);
+  min-width: 0;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--field-px) var(--field-gap);
+  border: 0;
+  border-radius: 0;
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  text-align: start;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .segmentTrigger:hover:not(:disabled, [aria-disabled="true"]) {
+    background: var(--prime-color-fill-subtle-active);
+  }
+}
+
+.segmentTrigger:active:not(:disabled),
+.segmentTrigger[data-state="open"]:not(:disabled) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.segmentTrigger:focus-visible:not(:where([data-focus-ring="false"], [data-focus-ring="false"] *)) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.segmentTrigger:disabled {
+  background: transparent;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.segmentTrigger .triggerMain {
+  flex: 0 0 auto;
+}
+
+.segmentTrigger:disabled :is(.triggerIcon, .chevron) {
+  color: var(--prime-color-text-disabled);
+}
+
+.segmentTrigger[data-state="open"] .chevron > svg {
+  transform: rotate(180deg);
+}

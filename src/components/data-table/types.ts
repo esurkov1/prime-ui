@@ -32,6 +32,11 @@ export type DataTableColumn<Row> = {
    * empty, the `<th>` keeps `header` as its name.
    */
   hideHeader?: boolean;
+  /**
+   * What the column means, for a header that cannot say it all: an info glyph after the header
+   * opens it as a tooltip, and the header cell is described by it (`aria-describedby`).
+   */
+  description?: string;
   width?: string;
   minWidth?: string;
   maxWidth?: string;

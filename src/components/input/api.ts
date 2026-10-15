@@ -2,6 +2,7 @@ import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/doc
 import {
   FIELD_COMMIT_LABEL_DOCS,
   FIELD_COPY_LABEL_DOCS,
+  FIELD_HINT_TONE_PROP,
   fieldActionPart,
   fieldCommitProp,
   fieldCopyPart,
@@ -56,6 +57,7 @@ export const api: ComponentApi = {
           en: "Help text under the field. Hidden while `error` is shown.",
           ru: "Подсказка под полем; скрывается, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",
@@ -111,6 +113,26 @@ export const api: ComponentApi = {
         },
         fieldCommitProp({ en: "Enter", ru: "Enter" }),
         {
+          name: "suggestions",
+          type: "readonly string[]",
+          en: "Suggestions for free text (a combobox): a list under the box shows those containing the text; a pick goes into the field as typing would. Any text stays allowed; a value from a list only is `Select`.",
+          ru: "Подсказки для свободного ввода (комбобокс): список под полем показывает содержащие текст; выбор вставляется, как ввод. Подходит любой текст; значение только из списка — `Select`.",
+        },
+        {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the `suggestions` list; the text and the focus stay in the field.",
+          ru: "Escape закрывает список `suggestions`; текст и фокус остаются в поле.",
+        },
+        {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "true",
+          en: "A press outside the field and the `suggestions` list closes the list.",
+          ru: "Нажатие вне поля и списка `suggestions` закрывает список.",
+        },
+        {
           name: "labels",
           type: "Partial<InputLabels>",
           en: "Built-in strings, see Labels.",
@@ -165,8 +187,8 @@ export const api: ComponentApi = {
         {
           name: "aria-describedby",
           type: "string",
-          en: "Merged with the hint/error ids from the root.",
-          ru: "Добавляется к id подсказки и ошибки из контекста.",
+          en: "Merged with the affix and hint/error ids from the root.",
+          ru: "Добавляется к id префиксов, единиц, подсказки и ошибки из контекста.",
         },
         {
           name: "required",
@@ -205,8 +227,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Input.Affix",
-      en: "`ref` → `HTMLDivElement`. Tinted section flush with the edge (`aria-hidden`); the wrapper drops its padding there.",
-      ru: "Секция с подложкой вплотную к краю (`aria-hidden`); обёртка убирает там свой отступ.",
+      en: "`ref` → `HTMLDivElement`. Tinted section flush with the edge (`aria-hidden`, its text describes the input); the wrapper drops its padding there.",
+      ru: "Секция с подложкой вплотную к краю (`aria-hidden`, её текст описывает поле); обёртка убирает там свой отступ.",
       props: [
         side("Edge the section sits on.", "Край, к которому прилегает секция с подложкой."),
         {
@@ -215,6 +237,12 @@ export const api: ComponentApi = {
           required: true,
           en: "Static text: protocol, domain, country code.",
           ru: "Постоянный текст: протокол, домен, код страны.",
+        },
+        {
+          name: "aria-label",
+          type: "string",
+          en: "What a screen reader says instead of the text in the input's description.",
+          ru: "Что скринридер произносит вместо текста в описании поля.",
         },
         {
           name: "…rest",
@@ -226,8 +254,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Input.InlineAffix",
-      en: "`ref` → `HTMLSpanElement`. Muted unit next to the value (`aria-hidden`).",
-      ru: "Приглушённая единица рядом со значением (`aria-hidden`).",
+      en: "`ref` → `HTMLSpanElement`. Muted unit next to the value (`aria-hidden`, its text describes the input) — the one place of the unit.",
+      ru: "Приглушённая единица рядом со значением (`aria-hidden`, её текст описывает поле) — единственное место единицы.",
       props: [
         side("Side of the value.", "Сторона значения."),
         {
@@ -236,6 +264,12 @@ export const api: ComponentApi = {
           required: true,
           en: "Short unit: `₽`, `%`, `кг`.",
           ru: "Короткая единица: `₽`, `%`, `кг`.",
+        },
+        {
+          name: "aria-label",
+          type: "string",
+          en: "The unit in words for a screen reader («рублей»), said instead of the sign in the input's description.",
+          ru: "Единица словами для скринридера («рублей») — звучит вместо знака в описании поля.",
         },
         {
           name: "…rest",
@@ -356,6 +390,26 @@ export const api: ComponentApi = {
         ru: "С `onCommit`: сохраняет изменённое значение, фокус остаётся в поле.",
       },
       {
+        keys: "↓ · ↑",
+        en: "With `suggestions`: opens the list on the first (last) suggestion; in the open list moves the highlight, wrapping. Focus stays in the field.",
+        ru: "С `suggestions`: открывает список на первой (последней) подсказке; в открытом списке двигает подсветку по кругу. Фокус остаётся в поле.",
+      },
+      {
+        keys: "Alt + ↓",
+        en: "With `suggestions`: opens the list without highlighting.",
+        ru: "С `suggestions`: открывает список без подсветки.",
+      },
+      {
+        keys: "Enter",
+        en: "With `suggestions`: puts the highlighted suggestion into the field and closes the list; with no highlight the typed text stays.",
+        ru: "С `suggestions`: вставляет подсвеченную подсказку в поле и закрывает список; без подсветки остаётся введённый текст.",
+      },
+      {
+        keys: "Escape",
+        en: "With `suggestions`: closes the open list, the text stays; a dialog around the field stays open.",
+        ru: "С `suggestions`: закрывает открытый список, текст остаётся; диалог вокруг поля не закрывается.",
+      },
+      {
         keys: "Escape",
         en: "With `onCommit`: puts the committed value back.",
         ru: "С `onCommit`: возвращает сохранённое значение.",
@@ -371,8 +425,16 @@ export const api: ComponentApi = {
         ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`.',
       },
       {
-        en: '`Input.Icon`, `Input.Affix`, `Input.InlineAffix` are `aria-hidden`: put the meaning in the label (e.g. "Сумма, ₽").',
-        ru: "`Input.Icon`, `Input.Affix`, `Input.InlineAffix` скрыты (`aria-hidden`): смысл единицы или префикса дублируйте в подписи.",
+        en: "`Input.Icon` is decorative (`aria-hidden`). `Input.Affix` and `Input.InlineAffix` are `aria-hidden` in the reading order but describe the input (`aria-describedby`, before the hint): the unit is heard with the field, so the label never repeats it. An `aria-label` on the affix is said instead of its text («рублей» for `₽`).",
+        ru: "`Input.Icon` декоративна (`aria-hidden`). `Input.Affix` и `Input.InlineAffix` скрыты в порядке чтения (`aria-hidden`), но описывают поле (`aria-describedby`, перед подсказкой): единицу слышно вместе с полем, поэтому подпись её не повторяет. `aria-label` на префиксе или единице произносится вместо текста («рублей» для `₽`).",
+      },
+      {
+        en: '`suggestions` make the input a `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` on the open `listbox`, which the label names); the highlight is `aria-activedescendant`, so focus never leaves the field.',
+        ru: '`suggestions` делают поле `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` на открытый `listbox`, названный подписью); подсветка — `aria-activedescendant`, фокус не уходит из поля.',
+      },
+      {
+        en: "A `Select` inside `Input.Wrapper` is the box's start segment: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).",
+        ru: "`Select` внутри `Input.Wrapper` — начальный сегмент поля: его триггер назван `aria-label` корня селекта и выбранным значением («Иконка: Звезда»).",
       },
       {
         en: "`Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.",

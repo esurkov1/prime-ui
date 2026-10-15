@@ -434,3 +434,18 @@
     transform: none;
   }
 }
+
+/* ─── Group ─────────────────────────────────────────────────────────────── */
+
+/* A row of badges as one value: it wraps, the badges a step apart; small badges sit closer. */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.group:is([data-tier="xs"], [data-tier="s"]) {
+  gap: var(--prime-space-1);
+}

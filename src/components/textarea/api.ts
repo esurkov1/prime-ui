@@ -2,6 +2,7 @@ import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi
 import {
   FIELD_COMMIT_LABEL_DOCS,
   FIELD_COPY_LABEL_DOCS,
+  FIELD_HINT_TONE_PROP,
   fieldActionPart,
   fieldCommitProp,
   fieldCopyPart,
@@ -48,6 +49,7 @@ export const api: ComponentApi = {
           en: "Help text under the field. Hidden while `error` is shown.",
           ru: "Подсказка под полем; скрывается, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

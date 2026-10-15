@@ -113,7 +113,9 @@
   color: var(--prime-color-text-muted);
 }
 
-/* A trailing glyph stays quiet: the icon size, never an avatar. */
+/* A colour dot (`Badge.Dot`) stands in an icon-wide box, so its row's text lines up with the
+   rows that carry icons. A trailing glyph stays quiet: the icon size, never an avatar. */
+.icon[data-mark="dot"],
 .icon[data-edge="end"] {
   width: var(--field-icon);
   height: var(--field-icon);
@@ -186,6 +188,56 @@
 .count {
   flex: none;
   font-variant-numeric: tabular-nums;
+}
+
+/* --- Own controls (`List.ItemActions`) ------------------------------------------- */
+
+/* The frame holds the row element and its controls and draws the row's fills for both: hover over
+   the whole row, the press of the element, the current row. The element itself stays clear. */
+.frame {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  border-radius: var(--field-radius);
+  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+.frame > .item,
+.frame > .item[aria-current],
+.frame > .item:active {
+  background: transparent;
+}
+
+@media (hover: hover) {
+  .frame > .item:hover {
+    background: transparent;
+  }
+
+  .frame:hover:not(:has(> .item[data-disabled="true"])) {
+    background: var(--prime-color-fill-subtle);
+  }
+
+  .frame:hover > .item:not([data-disabled="true"]) {
+    color: var(--prime-color-text-primary);
+  }
+}
+
+.frame:has(> .item:active:not([data-disabled="true"], :disabled)) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.frame:has(> .item[aria-current="true"], > .item[aria-current="page"]) {
+  background: var(--prime-color-fill-muted-hover);
+}
+
+/* The controls, one tier below the row, as far from the row's end as from its top and bottom. */
+.actions {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-1);
+  padding-inline-end: calc((var(--field-h) - var(--field-step-h)) / 2);
 }
 
 /* --- Reorder (`onReorder`) ------------------------------------------------------- */

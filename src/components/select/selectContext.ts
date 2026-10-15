@@ -63,6 +63,11 @@ export type SelectContextValue = {
   describedBy: string | undefined;
   triggerRef: React.RefObject<HTMLButtonElement | null>;
   labels: SelectLabels;
+  /**
+   * The select is the start segment of a field box (`Input.Wrapper`): its trigger is a segment
+   * named by the root's `aria-label` and the picked value.
+   */
+  segment: { label: string | undefined } | null;
 };
 
 export const [SelectProvider, useSelectContext] =

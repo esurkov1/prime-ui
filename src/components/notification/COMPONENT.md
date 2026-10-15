@@ -156,7 +156,7 @@ Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard
 - Each stack is an `<ol>` named by the region label of its position; each card is an `<article>`: `role="status"` + `aria-live="polite"`, or `role="alert"` + `aria-live="assertive"` for `warning` / `danger`.
 - The icon and the countdown are `aria-hidden`; the close button is named by `labels.close`.
 - Focus never leaves with a toast: a card that goes while it holds focus hands it to the front card still open in its stack, else back to where focus came from.
-- A toast is a non-modal live region, not a layer of the overlay stack: Escape and a press elsewhere belong to the page and to the topmost open layer, so a toast takes no `closeOnEscape` / `closeOnOutsideClick` — it leaves by its timer, the close button, a swipe or `dismiss()`.
+- A toast is a non-modal live region, not a layer of the overlay stack: Escape and a press elsewhere belong to the page and to the topmost open layer, so a toast takes no `closeOnEscape` / `closeOnOutsideClick` — it leaves by its timer, the close button, a swipe or `dismiss()`. The toasts stay usable above an open Modal or Drawer, and a press on a toast is outside no layer: it never closes the dialog below.
 - Do not keep the only copy of important information in a toast with a timer — use `persistent` or a Banner.
 
 ### Labels

@@ -150,6 +150,28 @@ describe("Button asChild", () => {
     expect(link).toHaveAttribute("href", "/path");
   });
 
+  it("wraps the link's text in the label part, so a host can fold it to its icon", () => {
+    render(
+      <div data-button-label="icon">
+        <Button.Root asChild>
+          <a href="/export">
+            <Button.Icon>
+              <svg />
+            </Button.Icon>
+            Экспорт
+          </a>
+        </Button.Root>
+      </div>,
+    );
+    const link = screen.getByRole("link", { name: "Экспорт" });
+    expect(link).toHaveAttribute("data-leading-icon", "true");
+    // The fold hides the element children beside the icon: no bare text node stays painted.
+    const bare = [...link.childNodes].filter((node) => node.nodeType === Node.TEXT_NODE);
+    expect(bare).toEqual([]);
+    expect(link.lastElementChild).toHaveTextContent("Экспорт");
+    expect(link.lastElementChild).not.toHaveClass(styles.icon);
+  });
+
   it("merges Button className onto the child", () => {
     const { container } = render(
       <Button.Root asChild className="extra">

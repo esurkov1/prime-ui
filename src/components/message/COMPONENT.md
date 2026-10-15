@@ -8,7 +8,8 @@
 ## When to use
 - A message of any kind: text with formatting, a reply, a forwarded message, reactions, photos and albums (`Message.Media`, a `Gallery`), a round video message (`VideoNote` inside), a voice message (`VoicePlayer` inside), a file, a location, a contact, a link preview.
 - The rows of a conversation in [Chat](../chat/COMPONENT.md) (`Chat.Messages`): the list, dates, search, selection and jumps live there; the message is one row.
-- A message on its own: a quoted reply in a ticket, the last message in a card, a preview of what will be sent.
+- A message on its own: a quoted reply in a ticket, the last message in a card, a preview of what will be sent (`preview` — a bot's welcome message on its settings page).
+- A sticker (`Message.Sticker`): a webp or gif by `src`, or your own Lottie / video player as children.
 - «Печатает…» (`Message.Typing`) as the last row of a list.
 
 ## When not to use
@@ -17,6 +18,7 @@
 - A feed of events with a time axis (an order history, an audit log) → [Timeline](../timeline/COMPONENT.md).
 - One system message on a page (saved, failed) → [Banner](../banner/COMPONENT.md) or a [Notification](../notification/COMPONENT.md).
 - Photos outside a message → [Gallery](../gallery/COMPONENT.md); a recording outside a chat → [VoicePlayer](../voice-player/COMPONENT.md).
+- Formatted text outside a message, with no bubble → [RichText](../rich-text/COMPONENT.md).
 
 ## Import
 ```tsx
@@ -35,7 +37,8 @@ Message.Root                      role="article" row «{author}, {time}» (an op
 │  ├─ Message.Forwarded           «Переслано от …»
 │  ├─ Message.Reply               quote of the answered message (button with target / onClick)
 │  ├─ content                     Message.Text · Message.Media (+ caption Text) · VoicePlayer · Message.File ·
-│  │                              Message.Location · Message.Contact · Message.LinkPreview · VideoNote
+│  │                              Message.Location · Message.Contact · Message.LinkPreview · VideoNote ·
+│  │                              Message.Sticker
 │  │                              (a voice message or a circle may open its transcript under it)
 │  ├─ Message.Reactions           a row held closed in every message; chips closing a bubble
 │  │                              (under a picture or a circle), the meta's spacer at its end
@@ -52,9 +55,9 @@ The part that ends a bubble closes its last line with the meta's spacer — an i
 
 In a list (`Chat.Messages`) a message reads the list through `internal/messageList`: its place in a run (`position`) and the chat's kind decide the author's header (first of a run in a group chat) and the avatar (last of a run); the list registers it for new-message entry and read receipts, selects it, jumps to it and holds its size changes still. On its own a message given an author or an avatar does the same by its `position`: the header on `single` / `first`, the avatar (and the gutter) on `single` / `last`.
 
-Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md) the message shapes (the messenger album layout from the items' ratios, every box final before load, the shared transfer disk over a tile, the meta overlay; an album's gaps stand on the incoming surface in both directions). `VideoNote` and `VoicePlayer` are components of their own that declare themselves parts (the round shell, and a fill bubble) and carry the same transfer props as `Message.File`. `Message.File` — a round format tile (or the preview) that is also its one action (download, cancel inside the progress ring, retry), the name, and the size line under it ending with the spacer. `Message.Location` — the map edge to edge with an accent pin (breathing when `live`), the place and the address ending with the spacer. `Message.Text` renders the Markdown subset the Composer writes — **bold**, _italic_, ~~strike~~, `code`, fenced code, Markdown links, bare URLs, `> ` quotes — as elements; links take only http(s), mailto and tel addresses (anything else stays text) and open in a new tab. `Message.Menu` holds the `Dropdown.Item`s you write (Ответить, Скопировать, Закрепить, Переслать, Пожаловаться, Удалить with `tone="danger"`); in a chat with a selection the kit appends a separator and «Выбрать».
+Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md) the message shapes (the messenger album layout from the items' ratios, every box final before load, the shared transfer disk over a tile, the meta overlay; an album's gaps stand on the incoming surface in both directions). `VideoNote` and `VoicePlayer` are components of their own that declare themselves parts (the round shell, and a fill bubble) and carry the same transfer props as `Message.File`. `Message.File` — a round format tile (or the preview) that is also its one action (download, cancel inside the progress ring, retry), the name, and the size line under it ending with the spacer. `Message.Location` — the map edge to edge with an accent pin (breathing when `live`), the place and the address ending with the spacer. `Message.Sticker` — a square picture with no bubble (`media` shell, the meta on its pill): the kit draws a webp, gif or apng from `src`; a Lottie (.tgs) or video sticker is your player as children (the kit has no runtime dependencies), with `loading` while it prepares. `Message.Text` renders the Markdown subset the Composer writes — **bold**, _italic_, ~~strike~~, `code`, fenced code, Markdown links, bare URLs, `> ` quotes — as elements; links take only http(s), mailto and tel addresses (anything else stays text) and open in a new tab. `Message.Menu` holds the `Dropdown.Item`s you write (Ответить, Скопировать, Закрепить, Переслать, Пожаловаться, Удалить with `tone="danger"`); in a chat with a selection the kit appends a separator and «Выбрать».
 
-`formatMessageTime(date)` gives «09:05», the default `formatTime`. `hueOf(id)` gives a palette hue stable per id for `Message.Author color` and the author's `Avatar`.
+`formatMessageTime(date, timeZone?)` gives «09:05», the default `formatTime`; the time is read in `timeZone`, else the list's (`Chat.Messages timeZone`), else the browser's zone. `hueOf(id)` gives a palette hue stable per id for `Message.Author color` and the author's `Avatar`.
 
 ## API
 
@@ -68,9 +71,11 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `direction` | `"incoming" \| "outgoing"` | `"incoming"` | `incoming` — on the start side, a surface one step off the chat; `outgoing` — on the end side, in the accent hue (`--prime-color-message-outgoing-*`), everything inside recolors with it. |
 | `position` | `"single" \| "first" \| "middle" \| "last"` | `"single"` | The place in a run of one author (`Chat.Messages items` sets it): `single` and `last` end a run with the tail (and a group chat's avatar); `single` and `first` show the author's header. |
 | `time` | `Date \| string` | — | When it was sent: a `Date` shown with `formatTime` (and put in `<time dateTime>`), or the text to show. |
-| `formatTime` | `(date: Date) => string` | «09:05» | Display of a `Date` time. |
+| `timeZone` | `string` | the list's `timeZone`, else the browser's zone | The IANA zone the time is read in (`"Asia/Vladivostok"`): a profile's zone, not the browser's. |
+| `formatTime` | `(date: Date, timeZone?: string) => string` | «09:05» | Display of a `Date` time; gets the `timeZone` in force. |
 | `edited` | `boolean` | `false` | The text was edited: `labels.edited` before the time. |
 | `status` | `"sending" \| "sent" \| "read" \| "failed"` | — | Delivery of an outgoing message: a clock, one check, two checks (accent), or a danger mark; the glyphs cross-fade from one state to the next. Named for assistive tech by `labels`. |
+| `preview` | `boolean` | `false` | A picture of the message outside a chat (a bot's settings): no menu, reactions, retry or row focus, `Message.Actions` inert; links and players still work. |
 | `onRetry` | `() => void \| Promise<void>` | — | Sends a failed message again: a ghost danger button beside the bubble. A returned promise shows `sending` until it settles; a rejection leaves it failed. |
 | `onReactionToggle` | `(emoji: string) => void \| Promise<unknown>` | — | Puts or takes back the reader's reaction (a chip, a double tap, `L`, the reaction bar). Shown at once; a returned promise keeps it pending, a rejection drops it back. Without it reactions are read-only. |
 | `value` | `string` | — | The message id for selection, jumps, read receipts, search, pins and `Message.Reply target` (`Chat.Messages items` sets the item's key). Keep it when the server confirms a sent message. |
@@ -206,6 +211,16 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `image` | `string` | — | The page's picture, full width under the text. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `className` and the other attributes of the link. |
 
+### Message.Sticker
+`ref` → `HTMLDivElement` (`role="img"`). A sticker: a square picture with no bubble, the meta on a pill over its corner; a `Skeleton` holds the box until it is ready.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `aria-label` | `string` | — (required) | The sticker's name («Стикер «Класс»», or its emoji); shown in its box when `src` fails. |
+| `src` | `string` | — | A still or animated picture (webp, gif, apng), decoded before it shows. Without it the children are the sticker. |
+| `loading` | `boolean` | `false` | Your player in the children is not ready yet: the `Skeleton` stays over the box. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role" \| "aria-label">` | — | `children` — your player for a Lottie (.tgs) or a video sticker, sized to the box; `className`. |
+
 ### Message.Reactions
 `ref` → `HTMLDivElement`. Reaction chips at the bottom of a bubble, or under a picture or a circle: a `role="group"` of toggle chips — the emoji, then who reacted (`users`) or the count. A press goes to `Message.Root onReactionToggle`.
 
@@ -250,7 +265,7 @@ Decided by the content parts, not a prop (`data-shell` on the bubble): a circle 
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `bubble` | fill (surface or accent), padding, the meta in the bottom-end corner over the last line's reserve | text, voice, file, contact, location, link preview, a picture **with** a caption | yes |
-| `media` | the picture itself, clipped to the radius — no backing, no padding; the meta on a dark pill over its bottom-end corner; reactions in a row of their own **under** it, on the message's side (chips in their own fill); an album's gaps show the incoming surface in both directions, never the outgoing fill | a photo, a video or an album **without** a caption | |
+| `media` | the picture itself, clipped to the radius — no backing, no padding; the meta on a dark pill over its bottom-end corner; reactions in a row of their own **under** it, on the message's side (chips in their own fill); an album's gaps show the incoming surface in both directions, never the outgoing fill | a photo, a video or an album **without** a caption; a sticker | |
 | `round` | `VideoNote`: a circle standing on the chat — no backing in either direction; the duration and the meta float on their own pills over its bottom; reactions under it as for `media` | a round video message | |
 
 With a caption a picture sits at the top of a normal bubble, edge to edge, and its reactions stay inside it, under the caption. The row of reactions is held closed in every message and opens with the first reaction (see States).
@@ -294,6 +309,8 @@ The fill moves between the two in a color transition (`fast`, both ways); the av
 | Prop | Effect |
 |---|---|
 | `edited` | «изменено» before the time |
+| `preview` | a picture of the message outside a chat: no menu, reaction bar, reactions toggle, retry or row focus; `Message.Actions` rows `inert` (seen, never pressed); links, players and spoilers still work |
+| `Message.Sticker loading` | the Skeleton stays over the sticker's box while your player prepares |
 | `Message.Location live` | a breathing pin and a «Трансляция» badge |
 | `Message.Text plain` | a string without Markdown |
 | `Message.Typing open` | the typing bubble shows; off, it leaves closing its height |
@@ -313,6 +330,8 @@ The list-level settings a message reads — the group chat's author header and a
 | retrying | `onRetry` returns a promise | `sending` ticks and a `loading` retry button until it settles |
 | inline keyboard | `Message.Actions` children | `data-actions` on the message column: the rows under the bubble, the bubble at least as wide as them, no tail |
 | failed | `status="failed"` | `data-failed` on the row; danger mark, retry button |
+| preview | `preview` | `data-preview` on the row, no `tabindex`; `inert` on every `Message.Actions` row |
+| sticker loading | `Message.Sticker` until its `src` is decoded, or while `loading` | `data-status="loading"`, `aria-busy`: a `Skeleton` covers the box, then fades out over the picture (`fade-base`); a `src` that fails shows the sticker's name, `data-status="error"` |
 | reaction toggled | a chip, a double tap, `L`, the reaction bar | the chip changes in place (never remounts) in the same frame: the fill is a color transition (`fast`); a reactor who joins fades and scales in from 0.9 while the stack widens (its width follows its circles), one who leaves the reverse; a count that only changes value rolls its digits and the chip does not move — its width follows the number of digits (tabular) and moves (`fast`) only when that changes; the reader (`Chat.Messages reader`) joins or leaves the avatar stack; while a returned promise runs `aria-busy`, `data-pending` — update `items` before it resolves; a rejection drops it back. Without `onReactionToggle` the chips are read-only and there is no reaction bar |
 | size change | a reaction row that opens or closes, a chip that comes or goes, a transcript, an edit, an upload state | one stroke (`bubbleMorph`, `--prime-message-morph-duration` 300 ms): the new layout is laid out at once, in the same frame, and the bubble's visible box glides from the old rectangle to the new one — width and height together, one `clip-path: inset(… round …)` animation on the compositor, the fill a layer under the content that reaches over both boxes. Every part that moved (the text, the meta, the cards, the chips, the tail, the retry) glides from where it was by a `transform` on the same clock; a part that came fades (a chip also scales from 0.9) in where it stands once the box has room for it; a part that went fades out where it stood, out of flow. A change mid-flight retargets from what is on screen; a commit that moves nothing touches nothing. The meta and the tail stay put on a reaction: the message grows upward, the chat scrolling by the change in the same frame while the rows above glide as one block on the same clock (the rows below never move). A disclosed block (a transcript) fades over the whole stroke while the box opens or closes over it. The text glides straight with the bubble's top-start corner, keeping its padding all the way. Nothing travels across text: a meta that stays while text passes through its place dips — it fades out at the same spot before the text reaches it and back once the text has left — and a meta that changes line (a transcript's last line ↔ the player row) cross-fades — out at its old place in the first 40 % of the stroke, in at its new place in the last 40 %. Easing `standard`. Reduced motion: instant (the scroll still keeps the view) |
 | new reaction | an emoji not on the message yet (the reader's or anyone's) | part of the size change: its room is there at once and the chip fades and scales in from 0.9 where it stands, on the bubble's clock, once the parts moving away have left its place. Never on the first render of a message: opening a chat or loading history plays nothing |
@@ -337,7 +356,7 @@ The list-level settings a message reads — the group chat's author header and a
 - **The author's header** (a group chat, the first of a run): one line `body-s` — the name semibold in the author's hue, an `xs` icon, the tag muted after them; the name ellipsizes first, then the tag. The bubble hugs the whole line, so a long name or tag widens it up to its cap. Over a picture or a circle without a caption it stands on the media pill at `space-2` from the top-start corner, in the pill's colors.
 - **A bubble hugs its text** (`bubbleHug`): a bubble of text — text, author, reply, forwarded, reactions — is as wide as its widest laid-out line plus the padding, never the width its lines wrapped in, and never wider than the cap; the meta's room counts on the last line only, where it sits, the reactions row as one line of chips with the meta after them, and the author's header at its full width (`data-message-fit="row"`, an ellipsized name counted whole). Quote and code blocks stretch to the bubble's width; long code lines wrap. Plain wrapping, never `pretty`. The width is measured once per text and row width — cleared, measured and written in one pass in the commit that changed the text, before paint, so a size change's morph runs to the hugged width — and cached by both: a row the window renders again takes its width with nothing measured. Row widths come from one shared `ResizeObserver`, batched per frame; hover, the menu, the reaction bar and selection never measure; a morph reads boxes only, never the hug width; fonts that finish loading measure once more. A bubble with any other part (a card, a player, a picture) keeps the width its parts give it.
 - No minimum width beyond the corners: «Ок 10:16» is a compact pill — the text, the meta on the same line and the padding. With reactions the meta moves to the end of the row's last line and the text gives its room back.
-- Fixed kinds stay one width: a file, a contact and a location are `--prime-message-card-width` (16rem, at most 75% of the chat), a voice message is the player's width, a round video is the VideoNote circle (268, at most the row), a link preview the media width (360) or what the row allows.
+- Fixed kinds stay one width: a file, a contact and a location are `--prime-message-card-width` (16rem, at most 75% of the chat), a voice message is the player's width, a round video is the VideoNote circle (268, at most the row), a sticker the square `--prime-message-sticker` (160, at most 85% of the row), a link preview the media width (360) or what the row allows.
 - Embedded blocks (a link preview, a reply quote, a forwarded header, the cards) span the bubble's content width; long unbreakable text (URLs) wraps instead of widening the bubble.
 - Pictures follow the album layout of their Gallery, at most `--prime-gallery-max-size` (360) wide and tall and within 85% of the row; a bubble with a picture or a card is exactly that part's width and a caption wraps under it.
 - A file's name stands on one line without the extension its format tile shows; the full name is its tooltip and the download label. The tile downloads by an `href` link, or with `transfer="remote"` through `onDownload` in the app.
@@ -488,6 +507,8 @@ The list-level settings a message reads — the group chat's author header and a
 | [contact.tsx](examples/contact.tsx) | A shared contact: initials or a photo, name and phone, with the actions to write or save — `Message.Contact`, `phone`. |
 | [link-preview.tsx](examples/link-preview.tsx) | A message with a link and the card of the page under it: site, title, description and picture — `Message.LinkPreview`, `site`, `image`. |
 | [bot-actions.tsx](examples/bot-actions.tsx) | A bot's message with an inline keyboard: rows of buttons under the bubble at its width, sharing each row equally, one of them a link — `Message.Actions`, `asChild`. |
+| [sticker.tsx](examples/sticker.tsx) | Stickers in a conversation: a picture by its address and a video sticker in your own player, no bubble, the time on a pill over the corner — `Message.Sticker`, `src`, `loading`. |
+| [preview.tsx](examples/preview.tsx) | A bot's welcome message as its settings page shows it: the same bubble with its keyboard, nothing in it pressed or opened, the time in the zone of the profile — `preview`, `timeZone`. |
 | [narrow.tsx](examples/narrow.tsx) | At phone width bubbles take up to 85% of the chat, long words and links wrap inside, an album keeps its rows — `Message.Root`, `Message.Media`. |
 
 ## Mistakes
@@ -513,5 +534,5 @@ The list-level settings a message reads — the group chat's author header and a
 - A bot's buttons placed inside `Message.Text`, or a row of buttons of your own under a message → `Message.Actions` with `Button.Root` children: one row per part, at the message's width.
 
 ## Related
-- **Built from:** [Dropdown](../dropdown/COMPONENT.md) (`Message.Menu`), [ScrollContainer](../scroll-container/COMPONENT.md) (the floating panel of the reaction bar), [Gallery](../gallery/COMPONENT.md) (`Message.Media`), [Avatar](../avatar/COMPONENT.md) (`Avatar.Group` + `Avatar.Overflow` in reaction chips), [Badge](../badge/COMPONENT.md) (the «Трансляция» mark of a live location), [Thumbnail](../thumbnail/COMPONENT.md) (the map, the link preview picture, a file's preview), [Button](../button/COMPONENT.md) (retry, the transfer disk, `shape="circle"`, the buttons of `Message.Actions`), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in selection mode), [Spinner](../spinner/COMPONENT.md) (pending transfers and transcripts), Icon (status ticks, file glyphs, `action.forward`, `action.refresh`); `internal/messagePart` (the contract of content parts), `internal/messageList` (the contract with a chat's list), `internal/palette` (`hueOf`), `internal/Disclosure` (the reactions row, transcripts), `bubbleMorph` (every size change as one stroke), `bubbleHug` (a bubble of text as wide as its widest line), `internal/transferDisk` (the transfer of a file), `internal/mediaPill` (the meta, the author's pill), `internal/HighlightMatch` (search marks), `internal/richText` (Markdown), [VisuallyHidden](../visually-hidden/COMPONENT.md)
-- **See also:** [Chat](../chat/COMPONENT.md) — the conversation the messages stand in; [Gallery](../gallery/COMPONENT.md) — the album of `Message.Media`; [VideoNote](../video-note/COMPONENT.md) — the round video message; [VoicePlayer](../voice-player/COMPONENT.md) — the content of a voice message; [Composer](../composer/COMPONENT.md) — the input under the list; [Timeline](../timeline/COMPONENT.md)
+- **Built from:** [Dropdown](../dropdown/COMPONENT.md) (`Message.Menu`), [ScrollContainer](../scroll-container/COMPONENT.md) (the floating panel of the reaction bar), [Gallery](../gallery/COMPONENT.md) (`Message.Media`), [Avatar](../avatar/COMPONENT.md) (`Avatar.Group` + `Avatar.Overflow` in reaction chips), [Badge](../badge/COMPONENT.md) (the «Трансляция» mark of a live location), [Thumbnail](../thumbnail/COMPONENT.md) (the map, the link preview picture, a file's preview), [Button](../button/COMPONENT.md) (retry, the transfer disk, `shape="circle"`, the buttons of `Message.Actions`), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in selection mode), [Spinner](../spinner/COMPONENT.md) (pending transfers and transcripts), [Skeleton](../skeleton/COMPONENT.md) (a sticker while it loads), Icon (status ticks, file glyphs, `action.forward`, `action.refresh`); `internal/messagePart` (the contract of content parts), `internal/messageList` (the contract with a chat's list), `internal/palette` (`hueOf`), `internal/Disclosure` (the reactions row, transcripts), `bubbleMorph` (every size change as one stroke), `bubbleHug` (a bubble of text as wide as its widest line), `internal/transferDisk` (the transfer of a file), `internal/mediaPill` (the meta, the author's pill), `internal/HighlightMatch` (search marks), `internal/richText` (Markdown), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **See also:** [Chat](../chat/COMPONENT.md) — the conversation the messages stand in; [Gallery](../gallery/COMPONENT.md) — the album of `Message.Media`; [VideoNote](../video-note/COMPONENT.md) — the round video message; [VoicePlayer](../voice-player/COMPONENT.md) — the content of a voice message; [Composer](../composer/COMPONENT.md) — the input under the list; [RichText](../rich-text/COMPONENT.md) — the text of `Message.Text` outside a message; [Timeline](../timeline/COMPONENT.md)

@@ -50,6 +50,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `optional` | `boolean` | `false` | Muted `labels.optional` after the label text; the field may stay off. |
 | `labels` | `Partial<CheckboxLabels>` | — | Built-in strings, see Labels. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
+| `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it. |
 | `disabled` | `boolean` | `false` | Disabled fill, dimmed label and hint, no toggling. |

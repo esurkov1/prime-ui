@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { HintTone } from "@/components/hint/Hint";
 
 import { LabelMarks } from "@/components/label/Label";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -70,6 +71,7 @@ type ChoiceFieldProps = {
    */
   groupOption?: boolean;
   hint?: React.ReactNode;
+  hintTone?: HintTone;
   error?: React.ReactNode;
   /** The native input (with `choiceInputClass`) followed by its aria-hidden visual. */
   control: React.ReactNode;
@@ -89,6 +91,7 @@ export function ChoiceField({
   optionalLabel = "",
   groupOption = false,
   hint,
+  hintTone,
   error,
   control,
   className,
@@ -129,6 +132,7 @@ export function ChoiceField({
           ids={ids}
           size={size}
           hint={hint}
+          hintTone={hintTone}
           error={error}
           leaving={leaving}
           disabled={disabled}

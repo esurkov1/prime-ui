@@ -482,3 +482,33 @@ describe("Badge async onRemove", () => {
     expect(screen.queryByText("Москва")).toBeNull();
   });
 });
+
+describe("Badge.Group", () => {
+  it("wraps a row of badges and gives each the group's tier; a badge's own size wins", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Badge.Group ref={ref} size="s" aria-label="Теги" className="tags">
+        <Badge.Root>ЭДО</Badge.Root>
+        <Badge.Root size="l">Москва</Badge.Root>
+      </Badge.Group>,
+    );
+    expect(ref.current).toHaveClass("tags", styles.group);
+    expect(ref.current).toHaveAttribute("data-tier", "s");
+    expect(screen.getByRole("group", { name: "Теги" })).toBe(ref.current);
+    expect(screen.getByText("ЭДО")).toHaveAttribute("data-tier", "s");
+    expect(screen.getByText("Москва")).toHaveAttribute("data-tier", "l");
+    expect(cssValue(cssRule(CSS, ".group"), "flex-wrap")).toBe("wrap");
+  });
+
+  it("without a size the badges follow the host one tier down, as a lone badge does", () => {
+    render(
+      <ControlSizeProvider value="l">
+        <Badge.Group data-testid="group">
+          <Badge.Root>ЭДО</Badge.Root>
+        </Badge.Group>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByTestId("group")).toHaveAttribute("data-tier", "m");
+    expect(screen.getByText("ЭДО")).toHaveAttribute("data-tier", "m");
+  });
+});

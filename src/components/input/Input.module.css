@@ -34,6 +34,16 @@
   padding-inline-end: 0;
 }
 
+/* A Select inside the box is its start segment (`InputSegmentContext`), flush with the edge. */
+.wrapper:has(> [data-field-segment]) {
+  padding-inline-start: 0;
+}
+
+/* Before a start icon or affix: the segment is the box's first section. */
+.wrapper > [data-field-segment] {
+  order: -2;
+}
+
 .wrapper:has(> input:read-only:not(:disabled)) {
   cursor: default;
 }
@@ -80,7 +90,8 @@
   cursor: not-allowed;
 }
 
-.field[type="number"] {
+/* Digits that change in place (a count, a time of day) keep their width. */
+.field:is([type="number"], [type="time"]) {
   font-variant-numeric: tabular-nums;
 }
 

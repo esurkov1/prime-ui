@@ -6,12 +6,17 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldHintTextClass, fieldTierClass } from "@/internal/fieldClasses";
-import type { ControlSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
+import textTone from "@/internal/textTone.module.css";
 
 import styles from "./Hint.module.css";
 
+/** The status a hint's words carry (a deadline that nears, a check that passed). */
+export type HintTone = Extract<Tone, "neutral" | "success" | "warning" | "danger">;
+
 export type HintRootProps = React.HTMLAttributes<HTMLParagraphElement> & {
   size?: ControlSize;
+  tone?: HintTone;
   invalid?: boolean;
   disabled?: boolean;
   ref?: React.Ref<HTMLParagraphElement>;
@@ -20,6 +25,7 @@ export type HintRootProps = React.HTMLAttributes<HTMLParagraphElement> & {
 function HintRoot({
   className,
   size: sizeProp,
+  tone = "neutral",
   invalid,
   disabled: disabledProp,
   children,
@@ -27,6 +33,7 @@ function HintRoot({
 }: HintRootProps) {
   const tier = useHostTier(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
+  const shownTone = tone === "neutral" || invalid || disabled ? undefined : tone;
   return tier.provide(
     <p
       {...rest}
@@ -35,10 +42,13 @@ function HintRoot({
         fieldHintTextClass,
         styles.root,
         invalid && enterMotion.enter,
+        // A status color (`textTone`); an error or a disabled control takes over the color.
+        shownTone && textTone.tone,
         className,
       )}
       {...toDataAttributes({
         size: tier.size,
+        tone: shownTone,
         invalid: invalid || undefined,
         disabled: disabled || undefined,
       })}

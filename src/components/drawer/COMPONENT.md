@@ -35,6 +35,7 @@ Drawer.Root                    state and dismiss policy (no DOM)
    │  ├─ Drawer.Description    <p>
    │  └─ Drawer.Actions        row of tier-s controls before the close button
    ├─ Drawer.Body              the only scrolling zone (ScrollContainer)
+   │  └─ Drawer.Section        <section>: <h3> label, description, Drawer.Actions at the heading's end
    └─ Drawer.Footer            always: Close or Cancel + the main action, primary last
       ├─ Drawer.Meta           <p>, muted status at the start
       └─ Drawer.Close          clones its child; closes on click
@@ -80,7 +81,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Drawer.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button; or at the end of a `Drawer.Section` heading. Controls inside take tier `s`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -108,6 +109,15 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
+
+### Drawer.Section
+`ref` → `HTMLElement`. A titled `<section>` of the body: an `<h3>` (title-s, under the `<h2>` title), an optional description, a `Drawer.Actions` at the end of the heading row; the content 16 below, sections 32 apart. Fields group in a `Fieldset`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `ReactNode` | — (required) | The heading of the section; it names the `<section>`. |
+| `description` | `ReactNode` | — | One line of context under the heading (body-s). |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content and an optional `Drawer.Actions`), `className` and the other attributes of the `<section>`. |
 
 ### Drawer.Footer
 `ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.
@@ -189,6 +199,8 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Full viewport height; only the body scrolls, with its own side padding.
 - Tabs in the header: a `Tabs.List` inside `Drawer.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.
+- Titled groups of the body (a record's contacts, its deals, its history): `Drawer.Section label` — an `<h3>` under the drawer's `<h2>` title, an optional `description`, a `Drawer.Actions` at the end of its heading row; content 16 below, sections 32 apart. A group of fields is a `Fieldset`; a page section is `Page.Section`.
+- With a `Drawer.Meta` the buttons stay one row: when the footer runs short the status goes above them first.
 
 ## Accessibility
 
@@ -229,7 +241,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
 | [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters, rounded only on the edge facing the page — `side`. |
 | [header-actions.tsx](examples/header-actions.tsx) | A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller — `Drawer.Actions`. |
-| [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details — `Drawer.Icon`, `Avatar.Root`. |
+| [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details in titled sections, one with its own action — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`. |
 | [guard.tsx](examples/guard.tsx) | A form that holds the drawer from inside: after an edit Escape, the scrim and Cancel ask before discarding, the footer says so, and saving locks every way out — `Drawer.Guard`, `Drawer.Meta`. |
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Drawer.Body`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
@@ -241,6 +253,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - A drawer without `Drawer.Footer` → add one: «Закрыть» for details, «Отмена» + the submit button for a form. The header × alone is not the end of the panel.
 - Save or Cancel buttons at the end of the body, or in the header → they go in `Drawer.Footer`, which stays in place while the body scrolls.
 - A delete confirmation in a Drawer → use ConfirmDialog.
+- A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Drawer.Section label` with `Drawer.Actions`.
 - Busy or unsaved state lifted out of the form into Root props → put `Drawer.Guard` next to the form, inside Content.
 - Clearing the record together with `open` and rendering a skeleton for «no record» → not needed: the panel keeps its last content while it slides out.
 - A Badge or a menu as a custom child of the header text column → put them in `Drawer.Actions`.

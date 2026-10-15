@@ -24,6 +24,10 @@ export const page: ComponentPageConfig = {
         "Подсказка под календарём без своей подсказки, связанная с ним через `id` и `aria-describedby` — `id`.",
     },
     {
+      slot: "variants",
+      description: "Подсказки со статусом: его несут слова, цвет повторяет — `tone`.",
+    },
+    {
       slot: "sizes",
       description: "Все ярусы, по одному на ярус поля: 12/16 для xs–m, 13/20 для l и xl — `size`.",
     },

@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -242,5 +243,42 @@ describe("ColorPresets", () => {
   it("outside a FieldList cell renders no label", () => {
     const { container } = render(<Picker defaultValue="#5068F5" />);
     expect(container.querySelector("label")).toBeNull();
+  });
+
+  it("allowCustom: a hex field picks any color with Enter; invalid text gets an error", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Picker allowCustom onValueChange={onValueChange} />);
+    open();
+    const field = screen.getByRole("textbox", { name: "Свой цвет" });
+    await user.click(field);
+    await user.keyboard("12a59{Enter}");
+    expect(screen.getByText("Введите цвет в формате #RRGGBB")).toBeInTheDocument();
+    expect(onValueChange).not.toHaveBeenCalled();
+    await user.keyboard("4{Enter}");
+    expect(onValueChange).toHaveBeenCalledWith("#12a594");
+    expect(screen.queryByRole("listbox")).toBeNull();
+    expect(screen.getByRole("button", { name: "Цвет: #12a594" })).toHaveFocus();
+  });
+
+  it("allowCustom: a value beyond the palette fills the field; Tab walks grid → field → on", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Picker allowCustom defaultValue="#0a7e6e" />
+      </>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Цвет: #0a7e6e" }));
+    expect(screen.getByRole("textbox", { name: "Свой цвет" })).toHaveValue("#0a7e6e");
+    expect(
+      screen.getAllByRole("option").every((o) => o.getAttribute("aria-selected") === "false"),
+    ).toBe(true);
+    screen.getAllByRole("option")[0]?.focus();
+    await user.tab();
+    expect(screen.getByRole("textbox", { name: "Свой цвет" })).toHaveFocus();
+    // Past the field the panel closes; focus is back on the trigger, Tab goes on from it.
+    fireEvent.keyDown(screen.getByRole("textbox", { name: "Свой цвет" }), { key: "Tab" });
+    expect(screen.queryByRole("listbox")).toBeNull();
+    expect(screen.getByRole("button", { name: "Цвет: #0a7e6e" })).toHaveFocus();
   });
 });

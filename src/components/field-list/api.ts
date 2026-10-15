@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { FIELD_LIST_LABELS } from "./FieldList";
 
 export const api: ComponentApi = {
@@ -12,8 +13,8 @@ export const api: ComponentApi = {
           name: "columns",
           type: "readonly FieldListColumn[]",
           required: true,
-          en: "The columns in cell order: `label` (the heading; it names the field of the column in every row), `width` (`fill` | `compact` | `s` | `m`), `required` (a `*` after the heading).",
-          ru: "Столбцы в порядке ячеек: `label` (заголовок; он же имя поля столбца в каждой строке), `width` (`fill` | `compact` | `s` | `m`), `required` (`*` после заголовка).",
+          en: "The columns in cell order: `label` (the heading; it names the field of the column in every row), `width` (`fill` | `compact` | `xs` | `s` | `m`), `required` (a `*` after the heading).",
+          ru: "Столбцы в порядке ячеек: `label` (заголовок; он же имя поля столбца в каждой строке), `width` (`fill` | `compact` | `xs` | `s` | `m`), `required` (`*` после заголовка).",
         },
         {
           name: "renderItem",
@@ -21,6 +22,12 @@ export const api: ComponentApi = {
           required: true,
           en: "The cells of a row, one element per column (a fragment): kit fields without `label`. `row` has `index`, `update(patch)` and `remove()`.",
           ru: "Ячейки строки, по элементу на столбец (фрагмент): поля кита без `label`. `row` — `index`, `update(patch)` и `remove()`.",
+        },
+        {
+          name: "renderTotals",
+          type: "(items: readonly T[]) => ReactNode",
+          en: "The totals row under the rows: one node per column (a fragment), `null` where a column has none. The first cell without a total reads `labels.totals`, the row's group name.",
+          ru: "Строка итогов под строками: по узлу на столбец (фрагмент), `null` — у столбца нет итога. Первая ячейка без итога — `labels.totals`, имя группы строки.",
         },
         {
           name: "getId",
@@ -44,9 +51,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onValueChange",
-          type: "(value: T[]) => void",
-          en: "The new list after an edit (`row.update`), an added, removed or moved row.",
-          ru: "Новый список после правки (`row.update`), добавления, удаления или переноса строки.",
+          type: "(value: T[]) => void | Promise<void>",
+          en: "The new list after an edit (`row.update`), an add, a remove or a move. Return the save's promise: the new list shows while it is pending, the owner's again on a reject (say why with `error`).",
+          ru: "Новый список после правки (`row.update`), добавления, удаления или переноса. Верните промис сохранения: пока он идёт, виден новый список, при reject — снова список владельца (причина — в `error`).",
         },
         {
           name: "createItem",
@@ -110,6 +117,7 @@ export const api: ComponentApi = {
           en: "Help text under the list; hidden while `error` shows.",
           ru: "Подсказка под списком; скрыта, пока показан `error`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",
@@ -170,6 +178,10 @@ export const api: ComponentApi = {
       en: "Text beside the disabled add button once the list holds `max` rows.",
       ru: "Текст у выключенной кнопки добавления, когда строк уже `max`.",
     },
+    totals: {
+      en: "Name of the totals row (`renderTotals`), shown in its first cell when that has no total.",
+      ru: "Имя строки итогов (`renderTotals`), видно в её первой ячейке, если там нет итога.",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -205,6 +217,10 @@ export const api: ComponentApi = {
       {
         en: "In a narrow container the heading row goes and each field's label shows above it.",
         ru: "В узком контейнере заголовки уходят, и подпись каждого поля показывается над ним.",
+      },
+      {
+        en: "The totals row (`renderTotals`) is a `group` named by `labels.totals`; each total is read after its column heading.",
+        ru: "Строка итогов (`renderTotals`) — `group` с именем `labels.totals`; каждый итог читается после заголовка своего столбца.",
       },
       {
         en: "The remove button is «Удалить {row}», the handle «Переместить {row}»: the row's name from `getLabel`, else its number.",

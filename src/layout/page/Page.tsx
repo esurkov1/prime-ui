@@ -2,13 +2,16 @@ import * as React from "react";
 
 import { Breadcrumb, type BreadcrumbRootProps } from "@/components/breadcrumb/Breadcrumb";
 import { Button, type ButtonRootProps } from "@/components/button/Button";
+import { ConfirmDialog } from "@/components/confirm-dialog/ConfirmDialog";
 import { Crossfade, type CrossfadeProps } from "@/components/crossfade/Crossfade";
+import { Datepicker, type DatepickerRootProps } from "@/components/datepicker/Datepicker";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Input } from "@/components/input/Input";
 import {
   SegmentedControl,
   type SegmentedControlRootProps,
 } from "@/components/segmented-control/SegmentedControl";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { SmartFilter } from "@/components/smart-filter/SmartFilter";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -29,9 +32,11 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { iconLayout } from "@/internal/iconLayout";
 import { useLabels } from "@/internal/labels";
+import { useLeaveGuard } from "@/internal/leaveGuard";
 import { namedRole } from "@/internal/namedRole";
 import { nodeText } from "@/internal/nodeText";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
+import { useSwapIn } from "@/internal/RegionSwap";
 import { stickySurfaceClass } from "@/internal/sticky";
 import textRole from "@/internal/textRole.module.css";
 import { useAppShellNav } from "@/layout/app-shell/AppShell";
@@ -47,12 +52,24 @@ export type PageLabels = {
   more: string;
   /** Name of `Page.BackButton` (back from the detail to the list on a narrow split). */
   back: string;
+  /** Title of the confirm `Page.Guard` opens when a person leaves a `dirty` page. */
+  leaveTitle: string;
+  /** Its description. */
+  leaveDescription: string;
+  /** Its confirm button: leave and lose the changes. */
+  leaveConfirm: string;
+  /** Its cancel button: stay on the page. */
+  leaveCancel: string;
 };
 
 export const PAGE_LABELS: PageLabels = {
   menu: "Открыть меню",
   more: "Ещё действия",
   back: "Назад к списку",
+  leaveTitle: "Уйти без сохранения?",
+  leaveDescription: "Изменения на странице пропадут.",
+  leaveConfirm: "Уйти",
+  leaveCancel: "Остаться",
 };
 
 /** The title of the page as written in the flow: what the top bar repeats once it scrolls away. */
@@ -606,29 +623,36 @@ function PageTitle({ className, children, ref, ...rest }: PageTitleProps) {
 PageTitle.displayName = "Page.Title";
 
 export type PageDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & {
+  loading?: boolean;
   ref?: React.Ref<HTMLParagraphElement>;
 };
 
 /** One line of context that carries data (a period, a count): truncates in the bar, wraps in the flow. */
-function PageDescription({ className, children, ...rest }: PageDescriptionProps) {
+function PageDescription({ loading = false, className, children, ...rest }: PageDescriptionProps) {
   const place = React.useContext(PlaceContext);
   const page = React.useContext(PageContext);
   const store = place === "flow" ? page?.heading : undefined;
+  // The line keeps its place while its data loads (a Skeleton in it), so the title beside it never
+  // moves when the data arrives; the data then fades in under the same element.
+  const swap = useSwapIn(loading ? "loading" : "data");
   React.useLayoutEffect(() => {
-    store?.set({ description: children });
+    store?.set({ description: loading ? null : children });
   });
   React.useLayoutEffect(() => () => store?.set({ description: null }), [store]);
 
   return (
     <p
       {...rest}
+      key={swap.key}
+      aria-busy={loading || undefined}
       className={cx(
         place === "bar" ? textRole.caption : textRole.bodyM,
         place === "bar" ? styles.barDescription : styles.description,
+        swap.className,
         className,
       )}
     >
-      {children}
+      {loading ? <Skeleton size="xs" className={styles.descriptionSkeleton} /> : children}
     </p>
   );
 }
@@ -843,9 +867,10 @@ export type PageToolsProps = DivProps;
 /**
  * The page's tools — sections, search and filter, view — as kit controls in the order written.
  * On the bar's first line each keeps its natural width; on a line of their own they fill it:
- * a search (`SmartFilter.Toolbar`, `Input.Root`) takes the room first, switchers share the rest
- * (a `SegmentedControl.Root` is `fullWidth` unless set), and they wrap when one line is not
- * enough. Named (`aria-label`), it is a `group`.
+ * a search (`SmartFilter.Toolbar`, `Input.Root`) takes the room first, switchers and fields share
+ * the rest (a `SegmentedControl.Root` and a `Datepicker.Root` are `fullWidth` unless set; a Select
+ * trigger fills by itself), and they wrap when one line is not enough. Named (`aria-label`), it is
+ * a `group`.
  */
 function PageTools({ className, children, ref, ...rest }: PageToolsProps) {
   return (
@@ -857,11 +882,15 @@ function PageTools({ className, children, ref, ...rest }: PageToolsProps) {
     >
       {flattenChildren(children).map((item, index) => {
         const grow = isPart(item, SmartFilter.Toolbar) || isPart(item, Input.Root);
-        const tool =
-          isPart<SegmentedControlRootProps>(item, SegmentedControl.Root) &&
-          item.props.fullWidth === undefined
-            ? React.cloneElement(item, { fullWidth: true })
-            : item;
+        const fills =
+          (isPart<SegmentedControlRootProps>(item, SegmentedControl.Root) ||
+            isPart<DatepickerRootProps>(item, Datepicker.Root)) &&
+          item.props.fullWidth === undefined;
+        const tool = fills
+          ? React.cloneElement(item as React.ReactElement<{ fullWidth?: boolean }>, {
+              fullWidth: true,
+            })
+          : item;
         return (
           <div
             key={keyOf(item, index)}
@@ -953,12 +982,47 @@ PageSection.displayName = "Page.Section";
 
 export type PageGridProps = DivProps;
 
+/** Where a cell stands in a wide + narrow pair: 2/3 or 1/3 of a mid-width grid. */
+type CellPair = "wide" | "narrow";
+
+const pairRole = (node: React.ReactNode): CellPair | undefined => {
+  if (!isPart<PageCellProps>(node, PageCell)) return undefined;
+  const span = node.props.span ?? 12;
+  if (span >= 7 && span <= 11) return "wide";
+  if (span === 4 || span === 5) return "narrow";
+  return undefined;
+};
+
 /**
  * The grid of the page's tiles (KPI cards, charts, panels): 12 columns, one gap on both axes.
- * Columns follow the grid's own width, so tiles fold on a narrow panel by themselves.
+ * Columns follow the grid's own width, so tiles fold on a narrow panel by themselves. A wide cell
+ * (span 7–11) written next to a narrow one (span 4–5) forms a pair that a mid-width grid lays out as
+ * 2/3 + 1/3, so the row keeps no hole.
  */
-function PageGrid({ className, ...rest }: PageGridProps) {
-  return <div {...rest} className={cx(styles.grid, className)} />;
+function PageGrid({ className, children, ...rest }: PageGridProps) {
+  const items = flattenChildren(children);
+  const pairs = new Map<number, CellPair>();
+  for (let index = 0; index < items.length - 1; index += 1) {
+    const role = pairRole(items[index]);
+    const next = pairRole(items[index + 1]);
+    if (role && next && role !== next) {
+      pairs.set(index, role);
+      pairs.set(index + 1, next);
+      index += 1;
+    }
+  }
+  return (
+    <div {...rest} className={cx(styles.grid, className)}>
+      {items.map((item, index) => {
+        const pair = pairs.get(index);
+        return pair && React.isValidElement(item)
+          ? React.cloneElement(item as React.ReactElement<DivProps & { "data-pair"?: CellPair }>, {
+              "data-pair": pair,
+            })
+          : item;
+      })}
+    </div>
+  );
 }
 PageGrid.displayName = "Page.Grid";
 
@@ -992,6 +1056,51 @@ function PageCell({ span = 12, rows = 1, className, children, ...rest }: PageCel
   );
 }
 PageCell.displayName = "Page.Cell";
+
+// ─── Guard ───────────────────────────────────────────────────────────────────
+
+export type PageGuardProps = {
+  busy?: boolean;
+  dirty?: boolean;
+};
+
+/**
+ * Holds the page from where its form state lives: put it anywhere inside the page. While it holds,
+ * a press on a `Sidebar.Item`, a `BottomNav.Item` or a `Breadcrumb.Item` link stops before it
+ * navigates — `busy` holds it, `dirty` asks «leave without saving?» and replays the press once the
+ * person agrees — and the browser asks before the tab closes or reloads. Renders only the confirm.
+ */
+function PageGuard({ busy = false, dirty = false }: PageGuardProps) {
+  const labels = usePageLabels();
+  const [leave, setLeave] = React.useState<(() => void) | null>(null);
+  const confirmed = React.useRef<(() => void) | null>(null);
+  useLeaveGuard({ busy, dirty }, (next) => setLeave(() => next));
+
+  // The navigation replays once the confirm has closed and given the page back (no longer inert).
+  React.useEffect(() => {
+    if (leave || !confirmed.current) return;
+    const next = confirmed.current;
+    confirmed.current = null;
+    next();
+  }, [leave]);
+
+  return (
+    <ConfirmDialog.Root
+      open={leave !== null}
+      onOpenChange={(open) => {
+        if (!open) setLeave(null);
+      }}
+      title={labels.leaveTitle}
+      description={labels.leaveDescription}
+      confirmLabel={labels.leaveConfirm}
+      labels={{ cancel: labels.leaveCancel }}
+      onConfirm={() => {
+        confirmed.current = leave;
+      }}
+    />
+  );
+}
+PageGuard.displayName = "Page.Guard";
 
 // ─── List + detail ───────────────────────────────────────────────────────────
 
@@ -1192,6 +1301,7 @@ export const Page = {
   Section: PageSection,
   Grid: PageGrid,
   Cell: PageCell,
+  Guard: PageGuard,
   Split: PageSplit,
   List: PageList,
   Detail: PageDetail,

@@ -181,6 +181,38 @@ describe("Input composable API", () => {
   });
 
   describe("InlineAffix sub-component", () => {
+    it("the unit describes the input; an aria-label on it is what is heard", () => {
+      const { rerender } = render(
+        <Input.Root label="Бюджет" hint="Без НДС">
+          <Input.Wrapper>
+            <Input.Field inputMode="decimal" />
+            <Input.InlineAffix side="end">₽</Input.InlineAffix>
+          </Input.Wrapper>
+        </Input.Root>,
+      );
+      const field = screen.getByRole("textbox", { name: "Бюджет" });
+      expect(field).toHaveAccessibleDescription("₽ Без НДС");
+      rerender(
+        <Input.Root label="Бюджет" hint="Без НДС">
+          <Input.Wrapper>
+            <Input.Field inputMode="decimal" />
+            <Input.InlineAffix side="end" aria-label="рублей">
+              ₽
+            </Input.InlineAffix>
+          </Input.Wrapper>
+        </Input.Root>,
+      );
+      expect(field).toHaveAccessibleDescription("рублей Без НДС");
+      rerender(
+        <Input.Root label="Бюджет" hint="Без НДС">
+          <Input.Wrapper>
+            <Input.Field inputMode="decimal" />
+          </Input.Wrapper>
+        </Input.Root>,
+      );
+      expect(field).toHaveAccessibleDescription("Без НДС");
+    });
+
     it("renders start inline affix", () => {
       render(
         <Input.Root>
@@ -920,5 +952,130 @@ describe("Input inside a disabled Fieldset", () => {
       </DisabledProvider>,
     );
     expect(screen.getByLabelText("Название проекта")).toBeDisabled();
+  });
+});
+
+describe("Input suggestions", () => {
+  const LOCATIONS = ["Дома (Чалонг)", "Офис (Раваи)", "Сервис (Чалонг)"];
+
+  function Suggested({ onValue }: { onValue?: (value: string) => void }) {
+    const [value, setValue] = React.useState("");
+    return (
+      <Input.Root label="Где стоит" suggestions={LOCATIONS}>
+        <Input.Wrapper>
+          <Input.Field
+            value={value}
+            onValueChange={(next) => {
+              setValue(next);
+              onValue?.(next);
+            }}
+          />
+        </Input.Wrapper>
+      </Input.Root>
+    );
+  }
+
+  it("is a combobox that lists the suggestions containing the typed text", async () => {
+    const user = userEvent.setup();
+    render(<Suggested />);
+    const field = screen.getByRole("combobox", { name: "Где стоит" });
+    expect(field).toHaveAttribute("aria-expanded", "false");
+    expect(field).toHaveAttribute("aria-autocomplete", "list");
+    await user.type(field, "чалонг");
+    expect(field).toHaveAttribute("aria-expanded", "true");
+    const listbox = screen.getByRole("listbox", { name: "Где стоит" });
+    expect(field).toHaveAttribute("aria-controls", listbox.id);
+    expect(screen.getAllByRole("option").map((option) => option.textContent)).toEqual([
+      "Дома (Чалонг)",
+      "Сервис (Чалонг)",
+    ]);
+  });
+
+  it("the arrows move the highlight, Enter puts it into the field as typing would", async () => {
+    const user = userEvent.setup();
+    const onValue = vi.fn();
+    render(<Suggested onValue={onValue} />);
+    const field = screen.getByRole("combobox");
+    field.focus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getAllByRole("option")).toHaveLength(3);
+    expect(field).toHaveAttribute("aria-activedescendant", screen.getAllByRole("option")[0]?.id);
+    await user.keyboard("{ArrowDown}");
+    const second = screen.getAllByRole("option")[1];
+    expect(second).toHaveAttribute("aria-selected", "true");
+    expect(field).toHaveAttribute("aria-activedescendant", second?.id);
+    await user.keyboard("{ArrowUp}{ArrowUp}");
+    expect(screen.getAllByRole("option")[2]).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{Enter}");
+    expect(field).toHaveValue("Сервис (Чалонг)");
+    expect(onValue).toHaveBeenLastCalledWith("Сервис (Чалонг)");
+    expect(field).toHaveAttribute("aria-expanded", "false");
+    expect(field).toHaveFocus();
+  });
+
+  it("Alt + ArrowDown opens the list without a highlight", async () => {
+    const user = userEvent.setup();
+    render(<Suggested />);
+    const field = screen.getByRole("combobox");
+    field.focus();
+    await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    expect(field).toHaveAttribute("aria-expanded", "true");
+    expect(field).not.toHaveAttribute("aria-activedescendant");
+    await user.keyboard("{Enter}");
+    expect(field).toHaveValue("");
+    expect(field).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("Escape closes the list and keeps the typed text; free text stays the value", async () => {
+    const user = userEvent.setup();
+    render(<Suggested />);
+    const field = screen.getByRole("combobox");
+    await user.type(field, "Офис");
+    expect(field).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard("{Escape}");
+    expect(field).toHaveAttribute("aria-expanded", "false");
+    expect(field).toHaveValue("Офис");
+    await user.type(field, " на складе");
+    expect(field).toHaveValue("Офис на складе");
+    expect(field).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("a press on an option picks it and keeps the focus in the field", async () => {
+    const user = userEvent.setup();
+    render(<Suggested />);
+    const field = screen.getByRole("combobox");
+    await user.type(field, "ра");
+    await user.click(screen.getByRole("option", { name: "Офис (Раваи)" }));
+    expect(field).toHaveValue("Офис (Раваи)");
+    expect(field).toHaveFocus();
+    expect(field).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("Tab closes the list and moves on", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Suggested />
+        <button type="button">Дальше</button>
+      </>,
+    );
+    const field = screen.getByRole("combobox");
+    await user.type(field, "о");
+    expect(field).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard("{Tab}");
+    expect(screen.getByRole("button", { name: "Дальше" })).toHaveFocus();
+    expect(field).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("a field without suggestions is a plain textbox", () => {
+    render(
+      <Input.Root label="Имя">
+        <Input.Wrapper>
+          <Input.Field />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByRole("textbox", { name: "Имя" });
+    expect(field).not.toHaveAttribute("aria-expanded");
   });
 });

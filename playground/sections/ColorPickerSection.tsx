@@ -56,6 +56,12 @@ export const page: ComponentPageConfig = {
         "Быстрый цвет из палитры: квадратный триггер с «без цвета» и триггер-кнопка, чья сетка в четыре колонки остаётся открытой после выбора — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`, `columns`, `closeOnSelect`.",
     },
     {
+      scenario: "presets-custom",
+      title: "Пресеты и свой цвет",
+      description:
+        "Цвет характеристики на сайте: палитра бренда в один клик и любой hex, введённый под ней — `ColorPresets`, `allowCustom`.",
+    },
+    {
       scenario: "presets-sizes",
       title: "Размеры пресетов",
       description:

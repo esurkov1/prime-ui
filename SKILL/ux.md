@@ -55,8 +55,10 @@ Every word on screen must carry something the person does not see already.
   list already counts. The list label names the rows.
 - **No label that repeats its heading.** A field «Цена» inside the section «Цена» needs no label of
   its own beyond what the section says; a group of one field is the field.
-- **A unit lives in one place.** In the field (`Input.InlineAffix`) or in the heading, never both.
-  Prefer the field: the unit stays beside the number when the row stacks.
+- **A unit lives in one place.** In the field (`Input.InlineAffix`) or in the heading, never both;
+  never in the field's own label («Бюджет», not «Бюджет, ₽»). Prefer the field: the unit stays
+  beside the number when the row stacks, and a screen reader hears it with the field (the affix
+  describes the input; `aria-label="рублей"` on it when the sign reads badly).
 - **No text that explains the layout.** «Двигатель, места и скорость всегда первыми» — the lock on
   those rows says it. A hint says what the person cannot see (a format, a consequence, a limit).
 - **One name per thing.** The same action, entity and status keep one word on the whole screen
@@ -97,7 +99,7 @@ Pick the lightest step that keeps the person safe ([choosing.md](choosing.md) ha
 | One standalone action that is easy to redo by hand | `Button.Root holdToConfirm` |
 | Irreversible loss of work, or an outward action that cannot be called back once it leaves the product (an invoice or a message sent to a client, a payment) | `ConfirmDialog` that names the thing and the consequence |
 | Bulk destructive | `ConfirmDialog` that names the count («Удалить 12 счетов?») |
-| Leaving a form with changes | `Modal.Guard` / `Drawer.Guard dirty` |
+| Leaving a form with changes | `Modal.Guard` / `Drawer.Guard dirty`; a form that is the page — `Page.Guard dirty` |
 
 A confirm on every action trains people to click through it; the one that mattered is then missed.
 Which button starts each step and how the confirm behaves:

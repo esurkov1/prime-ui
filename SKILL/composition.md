@@ -211,6 +211,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | section heading without a card | `Page.Section label` (an `h2` in `title-m`) |
 | card / panel title | `Card.Title as="h2"` (under the page title) |
 | heading of a group of fields | `Fieldset label` (`title-s` in the `<legend>`) |
+| section heading inside a Drawer or a Modal | `Drawer.Section label` / `Modal.Section label` (an `h3` in `title-s`, `Drawer.Actions` at its end) |
 | other group heading inside a card | `Typography as="h3" variant="title-s"` |
 | body text, cells | `body-m` |
 | lead under a heading | `body-m` + `tone="secondary"` |
@@ -519,6 +520,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The top bar carries the page: `Page.Title` with a `Page.Description` line of data — the accounts and the date of the statement the screen stands on; there is no second header in the flow.
 - An error that concerns the whole page is a `Banner tone="danger"` as the first block of `Page.Body` with a «Повторить» action; the action's result is a `Notification`.
 - A region's error is in the region's place: `loadError` on the `DataTable` (the table head stays), not a pop-up.
+- The page's line of data that waits for a load (`Page.Description` with counts or sums) stays mounted with `loading` — mounting it after the load moves the title in the bar.
 - Table loading is `loading` + `loadingRows` (a skeleton of rows); card loading is a `Skeleton` in the shape of its rows and `aria-busy` on the card, and the block's height does not change. The state change is smooth: the card's region is in `Crossfade state={status}`, the table body changes by itself.
 - Stale data beats emptiness: the balances are shown as of the previous date, and that is said on the right in `Card.Header`.
 - Empty on the first run is `EmptyPage size="s"` inside the panel: an icon with `tone="accent"`, what it is and why, one action. An empty filter result is the table's `empty`.

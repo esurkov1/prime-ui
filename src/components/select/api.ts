@@ -1,4 +1,5 @@
 import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_HINT_TONE_PROP } from "../../internal/field.api";
 import { SELECT_LABELS } from "./Select";
 
 const spanRest: ApiProp = {
@@ -12,8 +13,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Select.Root",
-      en: "`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query.",
-      ru: "Рамка поля (строка подписи · контрол · строка поддержки); хранит значение, открытие и поисковый запрос.",
+      en: "`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query. Inside `Input.Wrapper` it is the box's start segment instead: no frame, the trigger named by `aria-label` and the value.",
+      ru: "Рамка поля (строка подписи · контрол · строка поддержки); хранит значение, открытие и поисковый запрос. Внутри `Input.Wrapper` — начальный сегмент поля: без рамки, триггер назван `aria-label` и значением.",
       props: [
         {
           name: "value",
@@ -85,6 +86,7 @@ export const api: ComponentApi = {
           en: "Support text under the field; linked by `aria-describedby`.",
           ru: "Подсказка под полем; связана через `aria-describedby`.",
         },
+        FIELD_HINT_TONE_PROP,
         {
           name: "error",
           type: "ReactNode",

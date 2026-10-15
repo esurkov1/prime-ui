@@ -734,6 +734,17 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "Input.Wrapper",
+    "DIV",
+    (ref) => (
+      <Input.Root label="Склад" suggestions={["Склад на Лесной"]}>
+        <Input.Wrapper ref={ref} data-testid="part">
+          <Input.Field />
+        </Input.Wrapper>
+      </Input.Root>
+    ),
+  ],
+  [
     "Input.Field",
     "INPUT",
     (ref) => (

@@ -1,6 +1,7 @@
 /*
  * Timeline — Graphite. Activity feed: labelled `ol` groups of rows.
- * Row grid: dot column · text (title over meta) · value (centered on the row, right-aligned).
+ * Row grid: dot column · text (the title over its meta lines, stacked in one column) · value
+ * (centered on the row, right-aligned).
  * The 2px `border-subtle` line is drawn per `li` around the dot and spans the first to the last dot.
  * The row under the pointer or with keyboard focus: `fill-subtle-active` pill (radius l), accent
  * title and dot; interactive rows add an inset focus ring. Below 20rem of root width the value moves
@@ -185,11 +186,8 @@
   box-sizing: border-box;
   display: grid;
   grid-template-columns: var(--tl-dot-col) minmax(0, 1fr) auto;
-  grid-template-areas:
-    "dot title value"
-    "dot meta value";
-  grid-template-rows: auto auto;
-  align-content: center;
+  grid-template-areas: "dot text value";
+  align-items: center;
   column-gap: var(--tl-gap);
   width: 100%;
   min-width: 0;
@@ -281,8 +279,15 @@
 
 /* ---------- Text ---------- */
 
+/* The title and its meta lines, one under another (`Timeline.ItemMeta` may repeat). */
+.text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .title {
-  grid-area: title;
   min-width: 0;
   color: var(--tl-title-color, var(--prime-color-text-primary));
   font-weight: var(--prime-font-weight-medium);
@@ -291,7 +296,6 @@
 }
 
 .meta {
-  grid-area: meta;
   min-width: 0;
   color: var(--prime-color-text-muted);
   font-size: var(--tl-meta-size);
@@ -402,10 +406,8 @@
   .row {
     grid-template-columns: var(--tl-dot-col) minmax(0, 1fr);
     grid-template-areas:
-      "dot title"
-      "dot meta"
+      "dot text"
       "dot value";
-    grid-template-rows: auto auto auto;
   }
 
   .value {

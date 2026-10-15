@@ -34,6 +34,7 @@ Modal.Root                    state and dismiss policy (no DOM)
     │   ├── Modal.Description <p>, describes the dialog
     │   └── Modal.Actions     row of tier-s controls before the close button
     ├── Modal.Body            the only scrolling zone
+    │   └── Modal.Section     <section>: <h3> label, description, Modal.Actions at the heading's end
     └── Modal.Footer          actions, primary last
         ├── Modal.Meta        <p>, muted status at the start
         ├── Modal.Close       clones its child; closes on click
@@ -83,7 +84,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Modal.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button; or at the end of a `Modal.Section` heading. Controls inside take tier `s`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -111,6 +112,15 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
+
+### Modal.Section
+`ref` → `HTMLElement`. A titled `<section>` of the body: an `<h3>` (title-s, under the `<h2>` title), an optional description, a `Modal.Actions` at the end of the heading row; the content 16 below, sections 32 apart. Fields group in a `Fieldset`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `ReactNode` | — (required) | The heading of the section; it names the `<section>`. |
+| `description` | `ReactNode` | — | One line of context under the heading (body-s). |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content and an optional `Modal.Actions`), `className` and the other attributes of the `<section>`. |
 
 ### Modal.Footer
 `ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.
@@ -168,7 +178,7 @@ Below 640px of viewport a centred dialog of every size becomes a full-width bott
 | `fill` | Equal-width buttons in one row, gap 12 | Narrow dialogs with two actions | for `xs`, `s`, `m` |
 | `end` | Auto-width buttons at the end, gap 8 | Wide dialogs | for `l`, `xl` |
 
-With a `Modal.Meta` the footer is a row in any layout: the status takes the free room at the start, the buttons keep their width at the end. On phones (viewport below 640px, where the dialog is a bottom sheet) and in a dialog narrower than 360px, actions stack full width in DOM order (primary last), the status above them.
+With a `Modal.Meta` the footer is a row in any layout: the status takes the free room at the start, the buttons keep their width at the end and stay one row — when the footer runs short the status goes above them first. On phones (viewport below 640px, where the dialog is a bottom sheet) and in a dialog narrower than 360px, actions stack full width in DOM order (primary last), the status above them.
 
 ### tone (Icon)
 | Value | Looks like | Use when | Default |
@@ -221,6 +231,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
 - Tabs in the header: a `Tabs.List` inside `Modal.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside take the floating layer's fill; a card inside is the next layer (`floating-1`), a flat tile. Group fields with a 20 gap.
+- Titled groups of a long body: `Modal.Section label` — an `<h3>` under the dialog's `<h2>` title, an optional `description`, a `Modal.Actions` at the end of its heading row; content 16 below, sections 32 apart. A group of fields is a `Fieldset`.
 - Narrow viewport (< 640px), `placement="center"`: the shared bottom-sheet surface (`src/internal/sheet.module.css`) — full width, rounded top, a grab handle strip on top while it swipes, up to the sheet top gap high, the bottom safe-area inset below the content.
 - `placement="top"`: the dialog hangs from a line 12% of the viewport down (between `--prime-modal-viewport-padding` and `--prime-space-24`) and grows downward.
 
@@ -262,7 +273,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 | [overview.tsx](examples/overview.tsx) | A trigger opens a dialog with a title, a field and two actions; Enter presses the confirm — `Modal.Trigger`, `Modal.Confirm`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a header with a status before the close button and a footer with no body between them — `Modal.Icon`, `Modal.Actions`, `Modal.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every width; xs, s and m fill the footer with equal buttons, l and xl align them to the end — `size`. |
-| [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place; the primary closes the dialog and is the Enter target — `Modal.Body`, `Modal.Confirm`. |
+| [long-content.tsx](examples/long-content.tsx) | A long body in titled sections scrolls on its own while the header and the footer stay in place; the primary closes the dialog and is the Enter target — `Modal.Body`, `Modal.Section`, `Modal.Confirm`. |
 | [custom-container.tsx](examples/custom-container.tsx) | The dialog portals into a given node instead of the document body — `container`. |
 | [guard.tsx](examples/guard.tsx) | An edit form that holds the dialog: changes make any dismiss ask first and show a note in the footer, the submit button saves the form, and while saving nothing closes it — `Modal.Guard`, `Modal.Meta`. |
 | [enter-key.tsx](examples/enter-key.tsx) | Enter in a dialog: handing a workspace over takes a click, never Enter in its field; in the tags dialog Enter adds the typed tag instead of closing — `confirmOnEnter`, `onEnterConfirm`. |
@@ -274,6 +285,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - A destructive confirm built as a Modal → use ConfirmDialog. A destructive step that needs input (type the name to delete) stays a Modal with `closeOnOutsideClick={false}`.
 - Primary action not in `Modal.Confirm` → Enter does nothing; wrap it. In a form, the `type="submit"` button is the primary and stays outside `Modal.Confirm`: Enter in a field submits the form.
 - Primary action first in the footer → put it last (DOM order is the visual order).
+- A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Modal.Section label` with `Modal.Actions`.
 - Busy or unsaved state lifted out of the form into Root props → put `Modal.Guard` next to the form, inside Content.
 - `key` or a conditional around `Modal.Root` to reset a form → the dialog unmounts at once, without its exit; keep the Root mounted and drive `open`.
 - Scrolling wrapper inside Modal.Body → Body already scrolls.
