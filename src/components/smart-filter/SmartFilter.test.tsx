@@ -521,3 +521,43 @@ describe("SmartFilter range, single and grouped fields", () => {
     expect(screen.getByRole("textbox", { name: "Сумма, от" })).toBeInTheDocument();
   });
 });
+
+describe("SmartFilter.Toolbar compact button", () => {
+  function renderAt(width: number, value: SmartFilterValue = {}) {
+    const spy = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return this.dataset.slot === "smart-filter-toolbar" ? width : 0;
+    });
+    const offset = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+    const result = render(
+      <SmartFilter.Root fields={FIELDS} defaultValue={value}>
+        <SmartFilter.Toolbar />
+      </SmartFilter.Root>,
+    );
+    spy.mockRestore();
+    offset.mockRestore();
+    return result;
+  }
+
+  it("keeps the label while the search has room beside the button", () => {
+    renderAt(600);
+    const button = screen.getByRole("button", { name: "Фильтр" });
+    expect(button).toHaveTextContent("Фильтр");
+    expect(button).not.toHaveAttribute("aria-label");
+  });
+
+  it("shows only the icon in a narrow toolbar, named by its label", () => {
+    renderAt(200);
+    const button = screen.getByRole("button", { name: "Фильтр" });
+    expect(button).toHaveAttribute("aria-label", "Фильтр");
+    expect(button).toHaveAttribute("data-icon-only", "true");
+  });
+
+  it("keeps the count beside the icon while filters apply", () => {
+    renderAt(200, { service: { include: ["billing"], exclude: [] } });
+    const button = screen.getByRole("button", { name: /Фильтр/ });
+    expect(button).not.toHaveAttribute("aria-label");
+    expect(button).toHaveTextContent("1");
+  });
+});

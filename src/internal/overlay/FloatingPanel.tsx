@@ -29,7 +29,7 @@ export function SheetHandle({ swipe }: { swipe: Pick<SwipeDismiss, "enabled"> })
 }
 
 /** How wide an anchored panel is (`data-width` on the floating surface). */
-export type FloatingWidth = "auto" | "trigger" | "content";
+export type FloatingWidth = "auto" | "trigger" | "min-trigger" | "content";
 
 /**
  * The panel is a `<div>`; `E` is the element type its consumer holds it as (a menu, a listbox:

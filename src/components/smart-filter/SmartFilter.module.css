@@ -15,6 +15,11 @@
   min-width: 0;
 }
 
+/* With the button down to its icon the two never part: the search gives its width instead. */
+.toolbar[data-compact="true"] {
+  flex-wrap: nowrap;
+}
+
 /* The filter button alone: the toolbar hugs it, so the panel opens at its own width. */
 .toolbar[data-searchable="false"] {
   align-self: flex-start;
@@ -45,8 +50,9 @@
   margin-inline-start: auto;
 }
 
-/* A field: its name in a 6rem column beside its values; a row narrower than 24rem stacks the name
-   over the values (intrinsic wrap: the values keep at least 17rem beside the name). */
+/* A field: its name in a 6rem column beside its values — a longer name takes its own width, never
+   breaking inside a word; a row too narrow for both stacks the name over the values (intrinsic
+   wrap: the values keep at least 17rem beside the name). */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -56,8 +62,9 @@
 }
 
 .row > :first-child {
-  flex: 0 0 var(--prime-space-24);
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: var(--prime-space-24);
+  overflow-wrap: normal;
 }
 
 .row > :last-child {

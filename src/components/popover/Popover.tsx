@@ -174,7 +174,7 @@ function PopoverContent({
     triggerRef,
     side,
     align,
-    matchAnchorWidth: width === "trigger",
+    matchAnchorWidth: width === "trigger" || width === "min-trigger",
     closeOnEscape,
     closeOnOutsideClick,
     focusOnOpen: initialFocus ?? !anchoredRef.current,

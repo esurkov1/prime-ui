@@ -12,7 +12,9 @@ import { Popover } from "@/components/popover/Popover";
 import { Typography } from "@/components/typography/Typography";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -306,18 +308,61 @@ export type SmartFilterToolbarProps = Omit<React.HTMLAttributes<HTMLDivElement>,
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function SmartFilterToolbar({ searchable = true, className, ...rest }: SmartFilterToolbarProps) {
+/**
+ * Whether the filter button beside the search shows only its icon (and the count): when the
+ * toolbar is narrower than the search's least width plus the labelled button, so the search keeps
+ * its row instead of wrapping under the button. The labelled width is read while it shows.
+ */
+function useCompactFilter(
+  enabled: boolean,
+  toolbarRef: React.RefObject<HTMLDivElement | null>,
+  buttonRef: React.RefObject<HTMLButtonElement | null>,
+): boolean {
+  const [compact, setCompact] = React.useState(false);
+  const labelled = React.useRef(0);
+  const current = React.useRef(compact);
+  current.current = compact;
+
+  const fit = React.useCallback(() => {
+    const toolbar = toolbarRef.current;
+    if (!enabled || !toolbar) {
+      setCompact(false);
+      return;
+    }
+    if (!current.current && buttonRef.current) labelled.current = buttonRef.current.offsetWidth;
+    const gap = Number.parseFloat(getComputedStyle(toolbar).columnGap) || 0;
+    const search = readCssLengthPx("--prime-space-24", 96) * 1.5;
+    setCompact(toolbar.clientWidth < search + gap + labelled.current);
+  }, [enabled, toolbarRef, buttonRef]);
+
+  React.useLayoutEffect(fit);
+  useResizeEffect(toolbarRef, fit);
+  return compact;
+}
+
+function SmartFilterToolbar({
+  searchable = true,
+  className,
+  ref,
+  ...rest
+}: SmartFilterToolbarProps) {
   const { fields, total, open, setOpen, search, setSearch, labels, size } = useSmartFilter();
   const hasFilters = fields.length > 0;
+  const toolbarRef = React.useRef<HTMLDivElement>(null);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const mergedRef = useMergedRefs(toolbarRef, ref);
+  const compact = useCompactFilter(searchable && hasFilters, toolbarRef, buttonRef);
 
   return (
     <>
       <Popover.Anchor>
         <div
           {...rest}
+          ref={mergedRef}
           className={cx(styles.toolbar, className)}
           data-slot="smart-filter-toolbar"
           data-searchable={searchable ? undefined : "false"}
+          data-compact={compact ? "true" : undefined}
         >
           {searchable && (
             <Input.Root
@@ -347,10 +392,12 @@ function SmartFilterToolbar({ searchable = true, className, ...rest }: SmartFilt
           )}
           {hasFilters && (
             <Button.Root
+              ref={buttonRef}
               variant="soft"
               tone="neutral"
               size={size}
               className={styles.filterButton}
+              aria-label={compact && total === 0 ? labels.filter : undefined}
               aria-expanded={open}
               aria-haspopup="dialog"
               onClick={() => setOpen(!open)}
@@ -358,14 +405,20 @@ function SmartFilterToolbar({ searchable = true, className, ...rest }: SmartFilt
               <Button.Icon>
                 <Icon name="action.filter" />
               </Button.Icon>
-              {labels.filter}
+              {compact ? (
+                total > 0 ? (
+                  <VisuallyHidden>{labels.filter}</VisuallyHidden>
+                ) : null
+              ) : (
+                labels.filter
+              )}
               {total > 0 && <Badge.Root color="blue">{total}</Badge.Root>}
             </Button.Root>
           )}
         </div>
       </Popover.Anchor>
       {hasFilters && (
-        <Popover.Content width={searchable ? "trigger" : "auto"} flush size={size}>
+        <Popover.Content width={searchable ? "min-trigger" : "auto"} flush size={size}>
           <Panel searchable={searchable} />
         </Popover.Content>
       )}

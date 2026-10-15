@@ -98,10 +98,10 @@ export const api: ComponentApi = {
         },
         {
           name: "width",
-          type: '"auto" | "trigger" | "content"',
+          type: '"auto" | "trigger" | "min-trigger" | "content"',
           default: '"auto"',
-          en: "`auto`: by content, from the panel minimum to twice that. `trigger`: exactly the trigger's width, below the minimum too. `content`: what the content needs, within the viewport. A sheet is full width.",
-          ru: "`auto` — по содержимому, от минимума панели до двойного. `trigger` — ровно по триггеру, даже уже минимума. `content` — сколько нужно содержимому, в пределах экрана. Шторка — на всю ширину.",
+          en: "`auto`: by content, panel minimum to twice that. `trigger`: exactly the trigger. `min-trigger`: `auto`, never narrower than the trigger. `content`: what the content needs. A sheet is full width.",
+          ru: "`auto` — по содержимому, от минимума до двойного. `trigger` — ровно по триггеру. `min-trigger` — как `auto`, но не уже триггера. `content` — сколько нужно содержимому. Шторка — на всю ширину.",
         },
         {
           name: "trapFocus",

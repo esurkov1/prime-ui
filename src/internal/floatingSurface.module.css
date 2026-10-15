@@ -2,7 +2,7 @@
  * The one look of every anchored panel (Popover, Dropdown, Select, TagSelect): the floating layer
  * of the ladder (`data-depth="floating"`, foundation §4), `--prime-panel-radius`, overlay shadow,
  * no border. Width follows the content between the panel minimum (or the anchor width,
- * `--float-min-w`) and twice the minimum, never wider than the viewport (`--float-max-w`);
+ * `--float-min-w`, written for `trigger` and `min-trigger`) and twice the minimum, never wider than the viewport (`--float-max-w`);
  * `usePosition` writes the `--float-*` variables. A host that needs another width says so through
  * `data-width` (FloatingPanel `width`), never by overriding these rules; a host with an exact width
  * of its own sets `--floating-width`.

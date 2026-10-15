@@ -274,6 +274,15 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "SmartFilter.Toolbar",
+    "DIV",
+    (ref) => (
+      <SmartFilter.Root fields={[{ key: "city", label: "Город", options: [] }]}>
+        <SmartFilter.Toolbar ref={ref} data-testid="part" />
+      </SmartFilter.Root>
+    ),
+  ],
+  [
     "Page.Title",
     "H1",
     (ref) => (
