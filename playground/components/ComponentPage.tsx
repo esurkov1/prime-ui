@@ -136,9 +136,22 @@ function ExampleBlock({ page, example }: { page: ComponentPageConfig; example: C
  * API → accessibility. A section is only a `ComponentPageConfig`.
  */
 export function ComponentPage({ page }: { page: ComponentPageConfig }) {
-  const { api } = page;
   return (
     <DocPage title={page.title} description={renderInlineCode(page.description)}>
+      <ComponentPageBlocks page={page} />
+    </DocPage>
+  );
+}
+
+/**
+ * The blocks of a component page without its shell: examples, API, accessibility. A page that
+ * hosts a component's docs inside its own article (Foundations → Typography) renders these, so the
+ * document keeps one top bar and one h1.
+ */
+export function ComponentPageBlocks({ page }: { page: ComponentPageConfig }) {
+  const { api } = page;
+  return (
+    <>
       {page.examples.map((example) => (
         <ExampleBlock key={exampleFile(example)} page={page} example={example} />
       ))}
@@ -193,6 +206,6 @@ export function ComponentPage({ page }: { page: ComponentPageConfig }) {
           </React.Fragment>
         ))}
       </DocBlock>
-    </DocPage>
+    </>
   );
 }

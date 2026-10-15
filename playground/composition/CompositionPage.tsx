@@ -21,7 +21,16 @@ const cell = (text: string, tone?: "secondary") => (
 
 const COLUMNS: DataTableColumn<Row>[] = [
   { id: "what", header: "Между", minWidth: "14rem", cell: (row) => cell(row.what) },
-  { id: "value", header: "px", numeric: true, cell: (row) => cell(row.value) },
+  // A short numeric column: the header stands over the end-aligned values, and the column is no
+  // wider than they are, so it stays in view beside «Между» on a phone.
+  {
+    id: "value",
+    header: "px",
+    numeric: true,
+    headerAlign: "end",
+    width: "5rem",
+    cell: (row) => cell(row.value),
+  },
   {
     id: "how",
     header: "Как",
@@ -45,8 +54,8 @@ const RHYTHM: Row[] = [
   { what: "основная колонка → боковая", value: "24", how: "`--prime-space-6`" },
   {
     what: "верхняя полоса страницы → первый блок",
-    value: "12 + 24 (32 от 1024)",
-    how: "нижний воздух полосы + верхний воздух `Page.Root`",
+    value: "12 + 24",
+    how: "нижний воздух полосы + верхний воздух `Page.Root` (32 от 1024 px)",
   },
   { what: "заголовок страницы в потоке → содержимое", value: "24", how: "даёт `Page.Root`" },
   { what: "блок → блок страницы", value: "24", how: "даёт `Page.Body`" },
