@@ -26,13 +26,13 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Other state | `x` / `defaultX` / `onXChange(x)` | Badge `pressed`; Button `pressed`; ChartFrame `hiddenSeries`; Chat `selected`, `search`; ChatList `search`; ColorPicker `format`; CommandMenu `search`; Composer `recordMode`; DataTable `hiddenColumns`, `page`, `sort`, `selected`, `expanded`, `collapsedGroups`; ExampleFrame `viewport`, `colorScheme`; Gallery `index`; Gantt `scale`; Kanban `columnOrder`; MediaViewer `index`; Message.Media `index`; Select `search`; SmartFilter `search`; VideoNote `playing`, `transcriptExpanded`; VoicePlayer `rate`, `playing`, `transcriptExpanded`; Sidebar `mode`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Dropdown.CheckboxItem, Switch, Thumbnail. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | ColorPresets, CommandMenu, ConfirmDialog, Datepicker, Drawer, Dropdown, Gallery, MediaViewer, Message.Media, Modal, Popover, Select, Sheet, TagSelect, Tooltip, Page.Split, Sidebar, Sidebar.Group, Sidebar.Sub. |
-| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay that opens a layer: the dialogs, the floating panels, the panels of Select, TagSelect, Datepicker and ColorPresets, the off-canvas Sidebar and the reaction bar of a message. `ConfirmDialog` takes both with `closeOnOutsideClick` default `false` (Escape is held while `onConfirm` runs). Tooltip and Notification take neither. A form holds closing with `Modal.Guard` / `Drawer.Guard` / `Sheet.Guard`. |
+| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay that opens a layer: the dialogs, the floating panels, the panels of Select, TagSelect, Datepicker and ColorPresets, the `suggestions` list of Input, the off-canvas Sidebar and the reaction bar of a message. `ConfirmDialog` takes both with `closeOnOutsideClick` default `false` (Escape is held while `onConfirm` runs). Tooltip and Notification take neither. A form holds closing with `Modal.Guard` / `Drawer.Guard` / `Sheet.Guard`. |
 | Selection mode | `multiple` | One vs many (Select, Accordion) — never `type`. `mode` only for structurally different values (Datepicker `single \| range`). |
 | Status words | `selected`, `current`, `pressed` | `current` marks a navigation location (`Sidebar.Item`, `Breadcrumb.Item`) and sets `aria-current`; `pressed` a toggle button. |
 | Flags | `disabled`, `readOnly`, `required`, `optional`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing` (default `true`) | Fields only; `false` only where focus is obvious otherwise. |
 | System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults; values as `{token}` templates. Visible content goes in children or props. |
-| Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `Skeleton`, `Crossfade`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Sparkline`, `Pagination`, `DataTable`, `Gantt`, `Fieldset`, `VisuallyHidden`, `ColorField`, `ExampleFrame`, `VoicePlayer`, `VideoNote`, `ScrollContainer`, `Gallery`, `MediaViewer`. This is the one list; other files link here. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`). |
+| Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `Skeleton`, `Crossfade`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Sparkline`, `Pagination`, `DataTable`, `Gantt`, `Fieldset`, `VisuallyHidden`, `ColorField`, `ExampleFrame`, `VoicePlayer`, `VideoNote`, `ScrollContainer`, `Gallery`, `MediaViewer`, `RichText`. This is the one list; other files link here. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`, `Badge.Group`). |
 | Slots | `X.Trigger`, `X.Close`, `X.Confirm`, `X.Anchor` | Your own button inside, exactly one element child; the slot renders no element and takes no `className` — style the child. A trigger the kit draws itself (`Select.Trigger`, `Accordion.Trigger`) is a real part with `className`. |
 | Icons in parts | `X.Icon`, `X.ItemIcon` | `Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`, `Dropdown.ItemIcon`… — never an `icon` prop on a component. Only data arrays (`notify()`, `options`) carry `icon: ReactNode`. |
 | DOM state | `data-size`, `data-variant`, `data-tone`, `data-color`, `data-invalid`, `data-disabled`, `data-loading`, `data-state` | Style your wrappers from these, not from class names of kit internals. |
@@ -85,7 +85,7 @@ export function PeriodFilter() {
   resolving. The async events: Input / Textarea `onCommit`, ConfirmDialog `onConfirm`,
   `EmptyPage.RetryButton` and CommandMenu `onRetry`, Button `onConfirm` (`holdToConfirm`), Slider
   `onCommit`, DigitInput `onComplete`, Tabs `onRemove`, Switch `onCheckedChange`, Badge `onRemove`,
-  FileUpload `onValueChange`, TagSelect `onCreate` / `onOptionUpdate` / `onOptionDelete`, DataTable
+  FileUpload and FieldList `onValueChange`, TagSelect `onCreate` / `onOptionUpdate` / `onOptionDelete`, DataTable
   and Dnd `onReorder`, Kanban `onValueChange` / `onColumnOrderChange`, Gantt `onBarChange` /
   `onBarCreate`, Composer `onSend` / `onSendVoice` / `onSendVideoNote`, `Message.Root`
   `onReactionToggle` and `onRetry`, the `onRetry` / `onCancel` of `Message.File`, the
@@ -118,6 +118,9 @@ export function PeriodFilter() {
 - Checkbox, Switch and Radio: [choice controls](#choice-controls) below.
 - `required` → red `*` after the label + native `required`. `optional` → muted «необязательно».
 - Placeholder is an example (`name@company.ru`), never the label.
+- `hintTone` (`success` · `warning` · `danger`) colors the `hint` of a field by the status of its
+  value («Осталось 12 дней» in `warning`); a lone `Hint.Root` takes `tone`. The words carry the
+  status and the color only repeats it; a validation problem is `error`, which replaces the hint.
 - `Input.Affix` and `Input.InlineAffix` describe the input for screen readers (`aria-describedby`),
   so the label never repeats a unit or a prefix ([a unit lives in one place](ux.md#3-label-economy)).
 - Mark the minority: when most fields are required, mark only the optional ones (`optional`); when most
@@ -249,7 +252,7 @@ place (a `Banner` for the page; for a region `EmptyPage tone="danger"` — it an
   фильтры»), and the same action keeps the same variant in the header, toolbars and menus. If «Отмена»
   would clash with the action itself («Отменить заказ»), use an unambiguous label («Не отменять»).
 - A control that navigates is a link: `LinkButton href`, `Button.Root asChild` with `<a>` / router
-  `Link`, `Sidebar.Item` / `Breadcrumb.Item` `href` or `asChild`. Never
+  `Link`, `Sidebar.Item` / `Breadcrumb.Item` / `List.Item` / `ChatList.Item` `href` or `asChild`. Never
   `onClick={() => location.assign(…)}`.
 
 ## Destructive actions

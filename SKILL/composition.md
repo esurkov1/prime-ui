@@ -57,9 +57,10 @@ Never two titles; never no `<h1>`. A bar whose page shows no title still holds a
 ```
 AppShell.Root                      once per app (layouts.md#app-frame-once-per-app)
 ├─ AppShell.Nav → Sidebar          navigation rail, one layer above the page
-└─ AppShell.Main                   gutters + top air (24, 32 from 1024px); the page renders here
+└─ AppShell.Main                   gutters, top air (24, 32 from 1024px), bottom air 64; the page renders here
    └─ SmartFilter.Root             a filtered page only: the filter's state, no DOM, around the page
       └─ Page.Root                 the page you deliver
+         ├─ Page.Guard             a page that edits a record: holds leaving it (busy, dirty); no DOM
          ├─ Page.TopBar            sticky; led by the menu button while the Sidebar is off-canvas
          │  ├─ Page.Heading        the path › the title on one line, the line of data under it
          │  │  ├─ Breadcrumb.Root  only on a nested record: the levels above this page
@@ -68,7 +69,7 @@ AppShell.Root                      once per app (layouts.md#app-frame-once-per-a
          │  ├─ Page.Tools          sections, search and filter, view — kit controls in reading order
          │  ├─ Page.Actions        every button of the page, each with an icon; the primary last
          │  └─ Page.Chips          SmartFilter.Chips: a line under everything, gone while empty
-         └─ Page.Body              blocks 24 apart, starting at main's top air
+         └─ Page.Body              blocks 24 apart, the first 24 under the bar's controls
             ├─ Page.Grid           every tile of the screen, 16 on both axes
             │  └─ Page.Cell        span (of 12), rows; the tile fills it
             └─ Page.Section        a new topic: h2 label (+ Page.Actions), 40 from its neighbours
@@ -84,7 +85,7 @@ Document page or overview: the title in the flow
   `NotificationProvider` and `AppShell` live at the app root.
 - `Page.Root` for app pages (full panel width); `Page.Root maxWidth="wide"` for settings,
   `maxWidth="readable"` for one narrow column of text or fields.
-- No outer padding, no margins: `AppShell.Main` hands the page its gutters and top air, `Page` has
+- No outer padding, no margins: `AppShell.Main` hands the page its gutters and its top and bottom air, `Page` has
   block → block 24, section → section 40, tile → tile 16 (and header → body 24). Your CSS lays out
   only the inside of a block.
 
@@ -195,6 +196,7 @@ Every gap is a `--prime-space-N` token (N × 4px) set as `gap` on the parent. Cl
 | block → block on a page | 24 | `Page.Body` |
 | group → group in a form | 32 | `--prime-space-8` |
 | section → section (a new topic with an `h2`) | 40 | `Page.Section` |
+| the page's last block → the panel's bottom edge | 64; a `Page.Root fill` page the side gutter | `AppShell.Main` (beside the Sidebar rail too) |
 
 A screen with one gap everywhere reads as a list of unrelated things. Use at least three levels: inside
 an item, between items, between blocks. The tiles of one screen are one board: put them all in one
@@ -271,6 +273,9 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - One value in several units is one row of fields under one heading, each unit in its field's
   `Input.InlineAffix`; a base value with overrides is one `FieldList` with the base pinned first.
   The shape of the data decides the layout: [ux.md](ux.md#2-the-shape-of-the-data-decides-the-layout).
+- Rows that add up (shares of a bonus, hours, amounts) carry their sums under them in the same list:
+  `FieldList renderTotals`, a short number in a `width: "xs"` column. Return the save's promise from
+  its `onValueChange` when each edit saves at once.
 - Fields 20 apart; related short fields side by side in an
   [intrinsic grid](responsive.md#intrinsic-grids) with `align-items: start`
   (`reserveSupportRow` on Input / Textarea keeps neighbours aligned); groups 32 apart, each a
@@ -324,6 +329,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | a form saved and still on screen | the submit button's text: «Сохранено» |
 | a state of the page or a section that persists (sync failed, trial ends, read-only) | `Banner` as the first block of `Page.Body` (or inside the Card it concerns) |
 | a problem with one field | the field's `error` |
+| a refused sign-in | `invalid` on the fields it concerns and the reason in an always-mounted `VisuallyHidden live="assertive"` — no Banner on a sign-in or sign-up form ([LoginForm](../src/components/login-form/COMPONENT.md)) |
 | a region failed to load | the region shows it in place: DataTable `loadError`, or `EmptyPage tone="danger"` with `EmptyPage.RetryButton` |
 | a region is loading | DataTable `loading`; otherwise a `Skeleton` in the geometry of the content + `aria-busy` on the region; `Spinner` only when there is no shape to hold |
 | a region changes state (loading → data → empty → error, another record) | its content in `Crossfade state={status}` — always, so the change flows instead of flipping |
@@ -353,6 +359,12 @@ Every overlay closes on Escape and on a press outside unless you turn it off
 ([the Dismiss row](api-contract.md#shared-vocabulary-exported-types)); a form in a Modal or Drawer holds
 closing with `Modal.Guard` / `Drawer.Guard` (`busy` while a request runs, `dirty` for unsaved
 changes) instead.
+
+A toast is no layer of that stack: `notify()` from inside a Drawer leaves it open, and a press on
+the toast closes nothing below it. Titled groups of a dialog's body (a client's contacts, its deals)
+are `Drawer.Section` / `Modal.Section` with their own `Drawer.Actions` / `Modal.Actions`, not a
+hand-made heading row; a footer's `Drawer.Meta` / `Modal.Meta` goes above the buttons by itself when
+the footer runs short.
 
 ## 11. Narrow screens
 

@@ -251,6 +251,11 @@ The same for one value in several units — one heading, the fields in a row, th
 | bars of dates drawn by hand, or a DataTable of start / end dates | `Gantt` |
 | a hand-made `<span>` hidden with CSS for screen readers | `<VisuallyHidden>` |
 | a `div` with `overflow: auto` | `ScrollContainer` (`edges`, `scrollbar="hidden"`, `snap`) |
+| `scroll-snap-type` on a strip of cards | `ScrollContainer snap` (`"mandatory"` only where each child fills most of the view) |
+| a flex row of Badges with its own gap | `Badge.Group` |
+| a Switch or a ⋯ button inside a list row, or the row rebuilt as a `div` to hold them | `List.ItemActions` beside the row's element |
+| a heading row (`Typography as="h3"` + buttons) over a group in a Drawer or a Modal | `Drawer.Section label` / `Modal.Section label` with `Drawer.Actions` / `Modal.Actions` |
+| Markdown turned into HTML (`dangerouslySetInnerHTML`, a Markdown library) | `RichText` |
 | an `<img>` with your own radius and loading box | `Thumbnail.Root` / `Avatar.Root` |
 | a lightbox, or a Modal with an `<img>` | `Gallery` (opens `MediaViewer` itself) or `MediaViewer` |
 | a `position: fixed` bottom tab bar | `BottomNav` in `AppShell.Footer` |

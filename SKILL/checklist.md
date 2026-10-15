@@ -20,6 +20,7 @@ checks.
 - [ ] Buttons say the verb and the object, errors say how to fix it, empty states offer the next step ([words](ux.md#4-words)).
 - [ ] Money, numbers and dates go through `Intl` with `ru-RU`, in Russian typography ([words](ux.md#4-words)).
 - [ ] The friction of every action matches the cost of a mistake ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
+- [ ] A form in a dialog holds its dismiss with `Modal.Guard` / `Drawer.Guard`, a form that is the page with `Page.Guard` ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
 - [ ] A disabled control says why when the reason is off screen; an action without permission is hidden ([nothing to guess](ux.md#6-nothing-to-guess)).
 - [ ] A request a value starts — a simulated one too — is cancelled when the value changes again ([nothing to guess](ux.md#6-nothing-to-guess)).
 - [ ] Tabs, filters, search, page and the open record are in the URL ([nothing to guess](ux.md#6-nothing-to-guess)).
@@ -67,6 +68,7 @@ checks.
 - [ ] Every data block has its loading, empty and error states ([feedback](composition.md#9-feedback)).
 - [ ] Every region swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
 - [ ] A `Page.Description` that waits for data stays mounted with `loading`, so the title in the bar never jumps ([screen states](composition.md#screen-states)).
+- [ ] A KPI tile that waits for its figure is `Card.Root loading`, its parts mounted ([inside a category](choosing.md#2-inside-a-category)).
 - [ ] While a form saves, its submit is `loading` and its fields sit in a `Fieldset disabled` ([forms](api-contract.md#forms)).
 - [ ] A save that stays says «Сохранено» on its button, one that goes away notifies, a failure always shows ([feedback](composition.md#9-feedback)).
 - [ ] Overlays stay mounted and are driven by `open` only ([motion mistakes](motion.md#6-mistakes)).
@@ -83,4 +85,6 @@ checks.
 - [ ] Every action is reachable by Tab in reading order and works with Enter / Space ([interaction](responsive.md#interaction-and-accessibility)).
 - [ ] Every field has a label (visible, or `aria-label` for a toolbar search) ([forms](api-contract.md#forms)).
 - [ ] Meaning is never colour alone ([tone and color](foundations.md#6-tone-and-color)).
+- [ ] A toned hint says its status in words; a validation problem is `error`, never a `danger` hint ([forms](api-contract.md#forms)).
+- [ ] A refused sign-in marks its fields `invalid` and says why in a hidden live region, with no Banner ([feedback](composition.md#9-feedback)).
 - [ ] Custom `labels` replace the default Russian strings where they do not fit ([system strings](api-contract.md#shared-vocabulary-exported-types)).

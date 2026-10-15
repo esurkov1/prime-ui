@@ -33,7 +33,8 @@ Input with `Input.InlineAffix`. Search and filters above a list or table → Sma
 field outside a list (a picker, a settings section, a panel) → Input with `Input.Icon` + `type="search"`
 and `aria-label`. Several fields of a form under one heading → Fieldset (`label`, `disabled` while the
 form saves). Several records of the same fields that a person adds, edits and removes (invoice lines,
-contacts, specs, prices by period) → FieldList: one row per record, the headings once.
+contacts, specs, prices by period) → FieldList: one row per record, the headings once; their sums
+under them → its `renderTotals`.
 
 **Selection.**
 
@@ -59,11 +60,14 @@ contacts, specs, prices by period) → FieldList: one row per record, the headin
 | any color in a panel of its own (hex, eyedropper, channels) | ColorPicker |
 
 **Data.** Status, count, removable value or applied filter → Badge (`tone` for a status, `color` for a
-category, `onRemove` to remove, `pressed` / `onPressedChange` to toggle). Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
+category, `onRemove` to remove, `pressed` / `onPressedChange` to toggle); several badges as one value
+(a client's tags) → `Badge.Group`. Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
 `ratio` — never a round Avatar for things. Keyboard shortcut → Kbd. One block of related
 numbers/content → Card (pick the template; a whole tile that opens its details → `Card.Root asChild`
 with a link). Read-only properties of one record («label — value») → DescriptionList, never a
-hand-made grid of text pairs. Rows with columns, sorting, selection → DataTable.
+hand-made grid of text pairs. Rows with columns, sorting, selection → DataTable (a header that
+needs explaining → the column's `description`). A KPI tile waiting for its figure →
+`Card.Root loading`, never Skeletons inside its parts.
 Items that flow through statuses and are moved by hand → Kanban (a single list to reorder, or items
 dropped onto folders or assignees → Dnd directly). Its look: `plain` (default; `line` for a quieter header over a line) when the board is
 the page's main region or sits in a Card / Drawer — headers and cards stand on the host, one level of
@@ -72,7 +76,7 @@ columns, a dense board of narrow columns). Never your own box around a column.
 Records with a start and an end compared across time — who is busy when, a project plan with
 phases and milestones → Gantt (never a DataTable of dates or hand-drawn bars); moved and resized by
 hand through `onBarChange`.
-Chronological events → Timeline; a conversation between people (support, a team chat) → Message —
+Chronological events → Timeline (two facts under an event → two `Timeline.ItemMeta`, they stack); a conversation between people (support, a team chat) → Message —
 never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A number with its trend over days or weeks (revenue, orders, sign-ups) → Sparkline: the latest value, its change and a line you can scrub; values with a sign by period → Sparkline `variant="bars"`; against a plan → `reference`; missing days → `value: null`; a chart with axes or several series → ChartFrame around a chart library or your own SVG (the panel, legend, tooltip, states and the screen-reader table come from the kit, the colors from `series` / `chartColors` — never status tones); values to read, sort or compare row by row → DataTable, not a chart.
 
 **Messages.** A whole conversation → `Chat`: `Chat.Root` with `Chat.Header` (avatar, `Chat.Title`,
@@ -99,7 +103,7 @@ places and contacts sent in a chat → the `Message` parts, not FileUpload rows 
 `Message.Sticker` (a Lottie or video sticker is your player inside it). A message shown outside a
 chat (a bot's welcome message in its settings) → `Message.Root preview`; its formatted text alone →
 `RichText`, never `dangerouslySetInnerHTML`. Times and date separators in a profile's zone →
-`timeZone` on `Chat.Messages` and `ChatList.Root`.
+`timeZone` on `Chat.Messages`, `ChatList.Root` and a lone `Message.Root`.
 
 **Status and loading.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
 ProgressBar `segments` (categories wear `color`, meanings wear `tone`; `legend` for color · name ·
@@ -118,7 +122,8 @@ loading, data, empty and error, or showing one record at a time → its content 
 **Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu. Menus,
 selects, pickers and Modal turn into bottom sheets below 640px by themselves — never build your own.
 A photo, a scan or a video opened full screen from its thumbnail (a Gallery tile, a Thumbnail button)
-→ MediaViewer, never a Modal with an `<img>`.
+→ MediaViewer, never a Modal with an `<img>`. A titled block inside a Drawer or a Modal (a client's
+contacts, its deals) → `Drawer.Section` / `Modal.Section`.
 
 **Phone navigation.** App navigation is Sidebar on a wide screen and `BottomNav` in `AppShell.Footer`
 on a phone for 2–6 main sections (the shell hides it by itself while the Sidebar rail is on screen;
@@ -136,8 +141,9 @@ active filters (`Page.Chips`) — [the top bar](composition.md#the-top-bar). A d
 page (settings, a long form, help) or an overview has its large title in the flow (`Page.Header`
 outside the bar), with an optional `Page.TopBar collapse` that repeats it once it scrolls away. A record opened from a table: its own page → DataTable `getRowHref`; in place →
 `onRowClick` + Drawer; a list worked through record by record → `Page.Split` with a `List` of
-the records (tickets, letters, invoices; `current` on the open one) or a `ChatList` of the
-conversations. Sections of a long rail → `Sidebar.Group collapsible`; a section with sub-pages →
+the records (tickets, letters, invoices; `current` on the open one; a row's own Switch or menu in
+`List.ItemActions`) or a `ChatList` of the conversations. A record edited on a page of its own →
+`Page.Guard` holds leaving it with unsaved changes. Sections of a long rail → `Sidebar.Group collapsible`; a section with sub-pages →
 `Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a `Dropdown.Trigger` at the bottom of
 `Sidebar.Footer`.
 
@@ -153,7 +159,7 @@ conversations. Sections of a long rail → `Sidebar.Group collapsible`; a sectio
 | Select / Dropdown / CommandMenu / TagSelect | Select picks a **value** for a field (form data). Dropdown runs **actions** (Edit, Duplicate, Delete). CommandMenu searches commands and pages across the app (locally or on the server) — it is not a field. TagSelect picks **several values** as tags. |
 | SmartFilter / SegmentedControl / Select | Search and filters over a list → SmartFilter (`fields={[]}` for a search alone), even with one field. A switch of what the same data shows (sections with counts, a period, a view) → SegmentedControl, or a Select when the options are many. |
 | Badge / Button | A badge labels or holds a value (status, filter, keyword): `onRemove` drops it, `pressed` toggles it. A command (save, open, go) is always a Button. |
-| Banner / Notification / Hint | Banner: persistent message in the page flow about a page/section state (sync failed, trial ends). Notification: transient toast about the result of an action (saved, failed). Hint / `error`: help or validation text under one field. |
+| Banner / Notification / Hint | Banner: persistent message in the page flow about a page/section state (sync failed, trial ends). Notification: transient toast about the result of an action (saved, failed). Hint / `error`: help or validation text under one field; a status of its value (a deadline that nears) → `hintTone` on the field, `tone` on a lone Hint. |
 | ProgressBar / ProgressCircle / Spinner | ProgressBar: a share with width to spare and words beside it (an upload row, an import, a quota line). ProgressCircle: a share on the data scale (24–80) where width is short or a ring reads better (a KPI goal, a ring breakdown, a named import card); `value={null}` while the share is unknown, `spin` while a share grows, an icon in the centre. Spinner: an anonymous «busy» on the icon scale inside a control or a status line, no share, no name of its own. A ring you can press (cancel, retry, download a transfer) → Button `shape="circle"` with `progress`, not any of the three. |
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
 | Checkbox / Switch / Radio | Checkbox: choice submitted later with a button, can be multiple. Switch: on/off that applies at once (no Save button). Radio: one of several, submitted later. A privacy toggle inside a create form that is submitted → Checkbox. |
@@ -170,7 +176,7 @@ conversations. Sections of a long rail → `Sidebar.Group collapsible`; a sectio
 | Gantt / Timeline / Kanban / DataTable | Gantt: records with a start and an end compared across time (who is busy when, a plan with phases and milestones), moved, stretched and drawn by hand (`onBarChange`, `onBarCreate`). Timeline: a history of events at points in time, read top to bottom. Kanban: work items moved between statuses, time does not matter. DataTable: many records compared by many attributes, sorted, filtered and selected — dates are only columns. |
 | DescriptionList / DataTable / Card | DescriptionList: the properties of **one** record as «label — value» pairs (requisites, deal terms, a summary before a confirm). DataTable: **many** records with the same properties. Card: the bounded block they sit in, or one headline number (`mini`, `stat-trend`) — a DescriptionList inside a `Card.Body`, never a Card per property. |
 | ConfirmDialog / Modal / `holdToConfirm` / undo | Which of them an action deserves is its cost: [ux.md → friction](ux.md#5-friction-matches-the-cost-of-a-mistake). ConfirmDialog only asks a question (`onConfirm` returns the request; pending, failure and dismiss rules are built in); a form, a choice or more than a sentence of content → Modal; never a Modal hand-built as a confirm. |
-| Composer / Textarea | Composer: the message input of a conversation — Enter sends, attachments, a reply or edit bar, voice and round video. Textarea: long text saved with a form (a description, a comment field) by its submit button. |
+| Composer / Textarea / RichText | Composer: the message input of a conversation — Enter sends, attachments, a reply or edit bar, voice and round video. Textarea: long text saved with a form (a description, a comment field) by its submit button; `formatting` when the text keeps the chat's Markdown. RichText: that Markdown shown, read-only, outside a message (a template, a bot's welcome text). |
 | Chat / Message / Gallery | Chat: a conversation — the header, search, pinned, the one message list (dates, runs, selection, jumps, read receipts, typing) and the Composer in its footer; a list without the rest is `Chat.Root` with `Chat.Messages`. Message: one message and its content parts — a row of that list, or a bubble on its own (a quoted reply in a ticket). Gallery: an album of photos and videos laid out by their ratios — `Message.Media` in a message, `Gallery` anywhere else (a post, a comment, a report). |
 | Message / Timeline / Notification | Message: what people say to each other in a conversation, in bubbles. Timeline: what happened to a record (status changes, an audit log). Notification: the result of the user's own action, for a few seconds. A chat event («Анна добавила Олега») is `Chat.Service`, not a Notification. |
 | FileUpload list / grid / gallery / strip | One component, four shapes. **List** (`layout="list"`, the default, with the drop zone): documents of a form, where the name matters; rows do not reorder. **Cards** (`trigger="tile"` `layout="grid"`): mixed photos and documents whose order matters (an inspection report). **Gallery** (`trigger="tile"` `layout="grid"` `cover` `accept="image/*"`): the photos of one object (a listing, a product); the first is the cover and dragging a photo first makes it the cover — no «make cover» button. **Strip** (`trigger="button"` + `FileUpload.Queue layout="strip"`): a paperclip and one scrolling row of tiles above a message field; the Composer already is this. Files on a server are `value` + `onValueChange` (return a promise to save); uploads are `queue` from `useUploadQueue`. One picture of a person is the avatar zone, not a gallery. |

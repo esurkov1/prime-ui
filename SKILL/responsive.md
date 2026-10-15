@@ -48,7 +48,8 @@ A layout inside a page needs no breakpoint: it takes its columns from the room i
 
 - The tiles of a page (KPI cards, charts, panels) are one `Page.Grid` with a
   `Page.Cell span` per tile: it folds by its own width (below 30rem every tile takes the row,
-  then small tiles pair up, from 64rem each its span).
+  then small tiles pair up, from 64rem each its span). Write a wide tile (`span` 7–11) next to a
+  narrow one (4–5): between 40 and 64rem the two pair up as 2/3 + 1/3, so an 8 + 4 row keeps no hole.
 - A grid inside one block (thumbnails, short fields of one record) is the block's own
   `grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr))`
   — `auto-fill`, so a lone item keeps its column width instead of stretching across the row.
@@ -61,9 +62,9 @@ Use these as they are; never wrap them in your own breakpoints.
 
 | Need | Built in |
 |---|---|
-| app frame | `AppShell.Main` hands the page its gutters 16 → 24 → 32 and top air 24 → 32; `Page.TopBar` un-sticks on screens lower than 480px and respects the top safe area; in the bar the title and its line of data truncate |
+| app frame | `AppShell.Main` hands the page its gutters 16 → 24 → 32, top air 24 → 32 and bottom air 64 (the gutter under a `fill` page; above a floating BottomNav it keeps the capsule's room); `Page.TopBar` un-sticks on screens lower than 480px and respects the top safe area |
 | app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by the menu button `Page.TopBar` draws by itself while the Sidebar is off-canvas; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
-| page top bar | `Page.TopBar` lays out its groups from their natural widths: one line while they fit, then the tools on a line of their own, then icon-only buttons, then «⋯», and the heading truncates last ([below](#the-pages-top-bar--pagetopbar)). `Page.Header` in the flow: actions wrap under the title |
+| page top bar | `Page.TopBar` lays out its groups from their natural widths: one line while they fit, then the tools on a line of their own, then icon-only buttons, then «⋯», and the heading gives last ([below](#the-pages-top-bar--pagetopbar)). `Page.Header` in the flow: actions wrap under the title |
 | switchers | [Switchers](#switchers) never wrap or truncate: they scroll inside themselves |
 | tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn`, `DataTable.ColumnsMenu` for a column chooser, the toolbar stacks below a 30rem table, sticky head off on short screens |
 | floating layers | Popover (opened from a Trigger), Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet — scrim, grab handle, swipe down to close, page scroll locked; Tooltip and TagSelect stay anchored |
@@ -85,12 +86,16 @@ in this order, and nothing ever overflows:
 
 1. **One line** — `Page.Heading`, `Page.Tools` and `Page.Actions` side by side while they fit.
 2. **Tools below** — the tools take a line of their own under the first one and fill its width: a
-   search (`SmartFilter.Toolbar`, `Input.Root`) grows first, the switchers share the rest and wrap
-   when one line is not enough. The actions stay on the first line beside the heading at every width.
+   search (`SmartFilter.Toolbar`, `Input.Root`) grows first, the switchers and a period
+   (`Datepicker.Root`) share the rest and wrap when one line is not enough. Beside a search that
+   would get too little room the SmartFilter button shows only its icon and count, on the same row.
+   The actions stay on the first line beside the heading at every width.
 3. **Icons** — every Button with an icon shows only the icon, the secondary ones first, then the
    primary; its label stays its accessible name and becomes its tooltip.
 4. **«⋯»** — the secondary Buttons fold into a menu (`labels.more`); the primary always stays.
-5. **The heading truncates** — only after every button step: the path levels first, then the title.
+5. **The heading gives** — only after every button step: the middle levels of the path fold into
+   «…»; a heading with a path that still does not fit stacks (the path on its own line over the
+   title, the title and its description wrapping), so no level is cut to a fragment; a heading without a path truncates.
 
 `Page.Chips` is always a line of its own under everything, gone while no filter is set. The heading
 keeps its natural width: the bar sizes the title, so there is nothing to tune.
@@ -182,7 +187,7 @@ export function OrdersPage() {
   inside takes that tier.
 - A Button without an icon keeps its label at every step and leaves the bar less room before it
   folds: give each one a `Button.Icon`.
-- A SegmentedControl in `Page.Tools` needs no `fullWidth`: the bar sets it.
+- A SegmentedControl or a Datepicker in `Page.Tools` needs no `fullWidth`: the bar sets it.
 - The primary action is on screen at every width — as its icon at the narrowest; it never folds and
   never disappears.
 - Section totals go into `SegmentedControl.Count`, not into stat cards above the table.

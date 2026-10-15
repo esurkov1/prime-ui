@@ -5,10 +5,12 @@ The app is navigation and the page: `AppShell.Root` with the Sidebar in `AppShel
 app's; everything inside Main is the page's — a screen renders one `Page.Root` with its own top
 (`Page.TopBar`: the page title and the page's tools, [composition.md](composition.md#1-page-skeleton))
 and its body in `Page.Body`.
-`AppShell.Main` hands the page its gutters and top air and `Page` spaces it — blocks 24, a titled
+`AppShell.Main` hands the page its gutters and its edge air and `Page` spaces it — blocks 24, a titled
 `Page.Section` 40, tiles in a `Page.Grid` 16 on both axes — so your code adds **no outer padding and no margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
-The page's top air is part of the frame — 24, then 32 from 1024px: the page's first block
-starts there; never cancel it with a negative margin or a padding override.
+The edge air is part of the frame. On top: 24, then 32 from 1024px, where a page without a bar
+starts; under a `Page.TopBar` the body starts 24 below the bar's controls. At the bottom: a long
+page keeps a 64 scroll tail, a `Page.Root fill` page only the side gutter, beside the Sidebar rail
+as well. Never cancel it with a negative margin or a padding override.
 
 The page recipes are whole, working screens — the `screen.tsx` example of their main component
 ([the list](composition.md#screens)): start from the closest one and keep its skeleton. The rules behind them are in [composition.md](composition.md).
