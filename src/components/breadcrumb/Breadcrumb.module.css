@@ -1,8 +1,8 @@
 /*
  * Breadcrumb — Graphite.
  * Previous segments muted, current page primary/medium. Each segment truncates with ellipsis;
- * on narrow containers the middle segments collapse into a «…» menu button (named by
- * `labels.ellipsis`) that lists them.
+ * when the whole path does not fit its width uncut, the middle segments collapse into a «…» menu
+ * button (named by `labels.ellipsis`) that lists them.
  */
 
 /* Text of the tier from the one tier table (`fieldTierClass` on the root). */
@@ -23,7 +23,7 @@
 
 /* A path that can collapse is a size container: it fills the available width (an inline-size
  * container has no intrinsic width and would shrink to 0 in a flex row) and folds its middle
- * levels by that width. */
+ * levels when they do not fit that width. */
 .root[data-collapsible="true"] {
   container-type: inline-size;
   inline-size: 100%;
@@ -111,18 +111,19 @@
   display: none;
 }
 
-@container (max-width: 30rem) {
-  .list {
-    --bc-item-max: calc(var(--prime-space-24) + var(--prime-space-6));
-  }
+/* `data-measure`: set by the root only while it measures, within one frame — every level at its own
+ * width (up to `--bc-item-max`), so the root sees whether the whole path fits uncut. */
+.root[data-measure="true"] .item {
+  flex-shrink: 0;
+}
 
-  .root[data-collapsible="true"] .autoCollapse {
-    display: inline-flex;
-  }
+/* `data-collapsed`: the whole path does not fit uncut (measured by the root), so the middle levels
+ * fold. They (after the first and the auto «…», before the last) leave the layout and the tab
+ * order; the «…» menu lists them, so they stay reachable. */
+.root[data-collapsed="true"] .autoCollapse {
+  display: inline-flex;
+}
 
-  /* The middle levels (after the first and the auto «…», before the last) leave the layout and
-   * the tab order; the «…» menu lists them, so they stay reachable. */
-  .root[data-collapsible="true"] .item:nth-child(n + 3):not(:last-child) {
-    display: none;
-  }
+.root[data-collapsed="true"] .item:nth-child(n + 3):not(:last-child) {
+  display: none;
 }

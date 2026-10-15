@@ -201,10 +201,35 @@ describe("Breadcrumb", () => {
   it("CSS: collapsed middle levels are display: none (never focusable while invisible)", () => {
     const rule = cssRule(
       "src/components/breadcrumb/Breadcrumb.module.css",
-      '.root[data-collapsible="true"] .item:nth-child(n + 3):not(:last-child)',
-      ["@container (max-width: 30rem)"],
+      '.root[data-collapsed="true"] .item:nth-child(n + 3):not(:last-child)',
     );
     expect(cssValue(rule, "display")).toBe("none");
+  });
+
+  it("collapses only when the whole path does not fit its width uncut", () => {
+    // A fresh element each time, so a rerender renders (and measures) again.
+    const trail = () => (
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/clients">Clients</Breadcrumb.Item>
+        <Breadcrumb.Item current>Granit</Breadcrumb.Item>
+      </Breadcrumb.Root>
+    );
+    const { rerender } = render(trail());
+    const nav = screen.getByRole("navigation");
+    const list = screen.getByRole("list");
+    // jsdom has no layout: three levels of 80px in a row, the list's width stubbed.
+    screen.getAllByRole("listitem").forEach((item, index) => {
+      Object.defineProperty(item, "offsetLeft", { configurable: true, value: index * 80 });
+      Object.defineProperty(item, "offsetWidth", { configurable: true, value: 80 });
+    });
+    Object.defineProperty(list, "clientWidth", { configurable: true, value: 400 });
+    rerender(trail());
+    expect(nav).not.toHaveAttribute("data-collapsed");
+
+    Object.defineProperty(list, "clientWidth", { configurable: true, value: 200 });
+    rerender(trail());
+    expect(nav).toHaveAttribute("data-collapsed", "true");
   });
 
   it("the separator takes the trail's placeholder colour, the links the muted tone", () => {
@@ -255,7 +280,7 @@ describe("Breadcrumb", () => {
     );
     await user.tab();
     expect(screen.getByRole("link", { name: "Home" })).toHaveFocus();
-    // The auto «…» (CSS shows it only in a narrow container; jsdom applies no stylesheet).
+    // The auto «…» (CSS shows it only on a collapsed path; jsdom applies no stylesheet).
     await user.tab();
     expect(screen.getByRole("button", { name: "Скрытые разделы" })).toHaveFocus();
     await user.tab();
