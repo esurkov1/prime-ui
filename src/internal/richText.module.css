@@ -75,26 +75,42 @@
 }
 
 /*
- * A spoiler: until pressed, a wash over transparent text — the words cannot be read, selected or
- * copied, only the length of the run shows. Pressed, the same element turns into plain text: the
- * wash and the text cross-fade on the fade clock (`base`), which reduced motion keeps.
+ * A spoiler: until pressed, a glass plate over transparent text — the words cannot be read,
+ * selected or copied, only the length of the run shows — with a soft highlight sweeping across it
+ * (`statusLoop` `.glint`, still under reduced motion). Pressed, the plate goes and the words fade
+ * in (`enterMotion` `.enterFade`).
  */
 .spoiler {
+  /* The light of the glass plate; only a masked run shows it. */
+  --spoiler-light: transparent;
+
   border-radius: var(--prime-radius-xs);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   outline: none;
+  /* One period of light and back across the whole plate; the loop shifts it by exactly a period. */
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent calc(var(--loop-glint) - 100%),
+    var(--spoiler-light) calc(var(--loop-glint) - 50%),
+    transparent var(--loop-glint)
+  );
   transition:
-    color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
-    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .spoiler[data-state="masked"] {
+  --spoiler-light: color-mix(
+    in srgb,
+    var(--prime-color-bg-glass-edge) var(--prime-tint-heavy),
+    transparent
+  );
+
   color: transparent;
   background-color: var(--prime-color-fill-strong);
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .spoiler[data-state="masked"] * {

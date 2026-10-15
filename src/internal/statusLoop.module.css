@@ -14,6 +14,10 @@
  *             while its parent carries `data-blink="a"` or `"b"` — flipped on every call, so a
  *             repeated call restarts it; a parent that is entering (`data-enter`) waits. Its clock
  *             is zero under reduced motion
+ *   .glint    a soft light flows across the element, start to end, without a seam: something
+ *             hidden waits to be shown (a masked spoiler). It moves `--loop-glint` by one period
+ *             (0% → 100%); the host paints a repeating gradient of that period that reads it. Its clock is a movement clock, zero (still)
+ *             under reduced motion
  */
 
 .breathe {
@@ -124,5 +128,21 @@
   .pulse::after {
     animation: none;
     opacity: 0;
+  }
+}
+
+@property --loop-glint {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.glint {
+  animation: statusGlint calc(var(--prime-motion-duration-slow) * 6) linear infinite;
+}
+
+@keyframes statusGlint {
+  to {
+    --loop-glint: 100%;
   }
 }

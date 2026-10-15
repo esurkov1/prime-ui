@@ -1,7 +1,10 @@
 import * as React from "react";
 
+import { cx } from "./cx";
+import enterMotion from "./enterMotion.module.css";
 import { HighlightMatch } from "./HighlightMatch";
 import styles from "./richText.module.css";
+import statusLoop from "./statusLoop.module.css";
 
 /*
  * The Markdown subset the formatting toolbar writes (`internal/textFormatting`), rendered as React
@@ -212,7 +215,12 @@ function Spoiler({
   }, [revealed]);
   if (revealed) {
     return (
-      <span ref={textRef} className={styles.spoiler} data-state="revealed" tabIndex={-1}>
+      <span
+        ref={textRef}
+        className={cx(styles.spoiler, enterMotion.enterFade)}
+        data-state="revealed"
+        tabIndex={-1}
+      >
         {renderInline(nodes, highlight, labels)}
       </span>
     );
@@ -226,7 +234,7 @@ function Spoiler({
     <span
       role="button"
       tabIndex={0}
-      className={styles.spoiler}
+      className={cx(styles.spoiler, statusLoop.glint)}
       data-state="masked"
       aria-label={labels.spoiler}
       onClick={reveal}

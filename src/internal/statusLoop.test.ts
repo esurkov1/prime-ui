@@ -17,7 +17,12 @@ describe("statusLoop", () => {
       "statusWave",
       "statusBlinkA",
       "statusBlinkB",
+      "statusGlint",
     ]);
+  });
+
+  it("glints on a movement clock, so reduced motion stills it", () => {
+    expect(cssValue(cssRule(CSS, ".glint"), "animation")).toContain("--prime-motion-duration-slow");
   });
 
   it("breathes on the slow clock, so reduced motion stills it", () => {
