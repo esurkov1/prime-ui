@@ -274,9 +274,13 @@ export function requiredSlots(kind: PageKind, root: ApiPart | undefined): SlotRe
   return [...required.values()];
 }
 
-/** The preview layouts a kind's pages use: what a component-specific scenario may pick. */
+/**
+ * What a component-specific scenario may pick: the preview layouts of its kind's slots, plus `full`
+ * on every kind — a scenario that shows page structure (a Banner strip across a page) needs the
+ * whole stage whatever the kind.
+ */
 export function kindLayouts(kind: PageKind): ExampleFramePreviewLayout[] {
-  return [...new Set(KIND_SLOTS[kind].map((entry) => entry.layout))];
+  return [...new Set([...KIND_SLOTS[kind].map((entry) => entry.layout), "full" as const])];
 }
 
 export function slotLayout(kind: PageKind, slot: SlotId | null): ExampleFramePreviewLayout {

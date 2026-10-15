@@ -21,12 +21,11 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Поле цвета: hex-значение и кнопка-образец, открывающая панель — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`.",
+        "Поле цвета: hex-значение и сегмент-образец в его конце, открывающий панель — `ColorPicker.HexInput`, `ColorPicker.SwatchButton`.",
     },
     {
       slot: "sizes",
-      description:
-        "Каждый ярус пикера: hex-поле и кнопка-образец внутри берут его у корня — `size`.",
+      description: "Каждый ярус пикера: hex-поле и его сегмент-образец берут его у корня — `size`.",
     },
     {
       slot: "states",

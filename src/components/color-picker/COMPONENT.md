@@ -31,7 +31,8 @@ in `prime-ui-kit/bundle.css`. `ColorPresets` stays in the main entry and needs n
 ```
 ColorPicker.Root                 shared Color + value format (no DOM)
 ├─ ColorPicker.HexInput          kit Input bound to the hex of the current color
-├─ ColorPicker.TriggerSwatch     square of the current color for a trigger button
+│  └─ ColorPicker.SwatchButton   end segment of the field box: the current color, opens a panel
+├─ ColorPicker.TriggerSwatch     square of the current color for your own trigger button
 └─ ColorPicker.Panel             vertical stack, optional raised surface
    ├─ ColorPicker.FormatSelect   kit Select: HSL / RGB / Hex
    ├─ ColorPicker.Area           2D area (4:3)
@@ -87,7 +88,15 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
+| `children` | `ReactNode` | — | End segments of the field box after the value: `ColorPicker.SwatchButton` (in a `Popover.Trigger`), so the hex and its swatch read as one field. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
+
+### ColorPicker.SwatchButton
+`ref` → `HTMLButtonElement`. The current color as a button segment at the end of `HexInput`: full field height, named `labels.palette`, with a tooltip. Wrap it in `Popover.Trigger` to open the panel.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-label" \| "children">` | — | `className`, `disabled`, `onClick` and the other attributes of the `<button>`. |
 
 ### ColorPicker.TriggerSwatch
 `ref` → `HTMLSpanElement`. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.
@@ -245,7 +254,7 @@ No `variant` / `tone` / `color`.
 | `l` | 40px, 28px swatches | spacious forms | |
 | `xl` | 48px, 32px swatches | touch-first screens | |
 
-**Sizes:** `ColorPresets.SwatchButton` is a square of the control height, so it lines up with an Input of the same size; HexInput + a square soft `Button.Root` of the same `size` with `TriggerSwatch` inside `Button.Icon` match too. Area, sliders and the channel strip have no size axis (always tier `m`).
+**Sizes:** `ColorPresets.SwatchButton` is a square of the control height, so it lines up with an Input of the same size; `ColorPicker.SwatchButton` is a segment inside HexInput, so it takes the field's tier with it. Area, sliders and the channel strip have no size axis (always tier `m`).
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -277,7 +286,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 
 ## Layout & spacing
 - Panel width comes from the layout: a popover or a column wide enough for the area and four channel fields.
-- Field + trigger row: a small gap, `align-items: flex-end` so the trigger aligns with the field box under a label.
+- Hex field + palette trigger: `ColorPicker.SwatchButton` as a child of `HexInput` — one field box, the swatch a full-height segment at its end; no row of your own.
 - Panel parts gap: 12px (`--prime-space-3`) from `ColorPicker.Panel`.
 - ColorPresets.Content `align="auto"`: a trigger near the end of the screen lines up the panel's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
 - ColorPresets grid: one row for up to 8 presets (+ «no color»), else rows of 8 (`columns` overrides); a panel narrower than the row wraps the swatches into balanced rows (16 → 8 + 8, never 14 + 2). On a coarse pointer every swatch grows to the 44 px touch target and the grid wraps into more rows, so it still fits a 320px panel; the arrow keys walk the rows on screen.
@@ -300,7 +309,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - Area and sliders are React Aria primitives with their own `role="slider"` names.
-- `TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (`ColorPresets.Trigger` names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).
+- `SwatchButton` is a button named `labels.palette` with a tooltip. `TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (`ColorPresets.Trigger` names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).
 - `ColorPicker.Swatches` is a `role="radiogroup"` (ColorSwatches): name it with `label` or `aria-label`.
 - The ColorPresets grid is `role="listbox"` with `role="option"` swatches (roving tabindex), named by the Content `label` or `labels.list`.
 - Channel fields are named by `labels` (`hue`, `red`…); HexInput by its label (`labels.hex` by default).
@@ -315,6 +324,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `format` | `"Формат значений цвета"` | Name of `ColorPicker.FormatSelect`. |
 | `eyeDropper` | `"Пипетка"` | Name of `ColorPicker.EyeDropperButton`. |
 | `hex` | `"Hex"` | Hex field of `ChannelStrip` and the default `HexInput` label. |
+| `palette` | `"Открыть палитру"` | Name and tooltip of `ColorPicker.SwatchButton`. |
 | `hue` | `"Оттенок, градусы"` | Hue channel field. |
 | `saturation` | `"Насыщенность, проценты"` | Saturation channel field. |
 | `lightness` | `"Яркость, проценты"` | Lightness channel field. |
@@ -349,8 +359,8 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A color field: a hex value and a swatch button that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`. |
-| [sizes.tsx](examples/sizes.tsx) | Every tier of the picker: the hex field and a swatch button inside take it from the root — `size`. |
+| [overview.tsx](examples/overview.tsx) | A color field: a hex value and a swatch segment at its end that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.SwatchButton`. |
+| [sizes.tsx](examples/sizes.tsx) | Every tier of the picker: the hex field and its swatch segment take it from the root — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled area, hue slider and preset trigger keep showing the color but take no input — `disabled`. |
 | [validation.tsx](examples/validation.tsx) | A button color checked live: a too light color shakes in an error that leaves once the color is darker; a hint under the other field, invalid text reverts on blur — `hint`, `error`. |
 | [panel.tsx](examples/panel.tsx) | The full raised panel and its part order: format, area, hue and alpha sliders, channels, brand swatches — `ColorPicker.Panel`, `surface`, `ColorPicker.Swatches`. |
@@ -369,8 +379,9 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 - `surface="raised"` inside a Popover → use the default `none`.
 - Expecting `ColorPresets` to return a `Color` → it returns the preset string (or `null`).
 - `<ColorPresets.Trigger onKeyDown={…}>` or `className` on the Trigger → it is a slot with no props of its own; put them on the child element.
+- A hex field and a separate swatch `Button` side by side in your own row → put `ColorPicker.SwatchButton` inside `HexInput`.
 - `<ColorPresets.Trigger />` with no child → put `ColorPresets.SwatchButton` (or your Button) inside it.
 
 ## Related
-- **Built from:** [Input](../input/COMPONENT.md) (`HexInput`), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (the `HexInput` label, hint and error), [Select](../select/COMPONENT.md) (`FormatSelect`), [Button](../button/COMPONENT.md) (`EyeDropperButton`), [ColorSwatches](../color-swatches/COMPONENT.md) (`Swatches`), [Popover](../popover/COMPONENT.md) (`ColorPresets.Root`, `ColorPresets.Content`), `Icon` (pipette), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Input](../input/COMPONENT.md) (`HexInput`; its field action segment for `SwatchButton`), [Tooltip](../tooltip/COMPONENT.md) (`SwatchButton`), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (the `HexInput` label, hint and error), [Select](../select/COMPONENT.md) (`FormatSelect`), [Button](../button/COMPONENT.md) (`EyeDropperButton`), [ColorSwatches](../color-swatches/COMPONENT.md) (`Swatches`), [Popover](../popover/COMPONENT.md) (`ColorPresets.Root`, `ColorPresets.Content`), `Icon` (pipette), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ColorField](../color-field/COMPONENT.md), [ColorSwatches](../color-swatches/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md)

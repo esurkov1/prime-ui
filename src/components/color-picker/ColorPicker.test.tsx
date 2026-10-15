@@ -4,6 +4,8 @@ import type * as React from "react";
 import { I18nProvider } from "react-aria-components";
 import { describe, expect, it, vi } from "vitest";
 
+import { Popover } from "@/components/popover/Popover";
+
 import { ColorPicker } from "./ColorPicker";
 
 function withLocale(node: React.ReactNode) {
@@ -114,6 +116,39 @@ describe("ColorPicker", () => {
     expect(el?.querySelector("svg")).toBeTruthy();
     expect(el?.querySelector("rect")).toBeTruthy();
     expect(el?.querySelector("rect")).toHaveAttribute("fill");
+  });
+
+  it("SwatchButton — сегмент в рамке HexInput, открывает поповер с клавиатуры", async () => {
+    const user = userEvent.setup();
+    render(
+      withLocale(
+        <ColorPicker.Root defaultValue="#336699" labels={{ palette: "Палитра" }}>
+          <ColorPicker.HexInput label="Цвет">
+            <Popover.Root>
+              <Popover.Trigger>
+                <ColorPicker.SwatchButton />
+              </Popover.Trigger>
+              <Popover.Content>
+                <ColorPicker.Panel>панель</ColorPicker.Panel>
+              </Popover.Content>
+            </Popover.Root>
+          </ColorPicker.HexInput>
+        </ColorPicker.Root>,
+      ),
+    );
+
+    const input = screen.getByRole("textbox", { name: "Цвет" });
+    const button = screen.getByRole("button", { name: "Палитра" });
+    // One field box: the button sits in the input's wrapper, after the value.
+    expect(button.parentElement).toBe(input.parentElement);
+    expect(button.querySelector('span[aria-hidden="true"] rect')).toHaveAttribute("fill");
+
+    await user.click(input);
+    await user.tab();
+    expect(button).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
   it("ChannelStrip рендерит каналы формата из defaultFormat с именами из labels", () => {

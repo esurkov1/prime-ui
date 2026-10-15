@@ -1,5 +1,5 @@
-/** A color field: a hex value and a swatch button that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`. */
-import { Button, Popover } from "prime-ui-kit";
+/** A color field: a hex value and a swatch segment at its end that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.SwatchButton`. */
+import { Popover } from "prime-ui-kit";
 import { ColorPicker } from "prime-ui-kit/color-picker";
 
 import styles from "./examples.module.css";
@@ -7,15 +7,10 @@ import styles from "./examples.module.css";
 export default function ColorPickerOverviewExample() {
   return (
     <ColorPicker.Root defaultValue="#5b5bd6">
-      <div className={styles.fieldRow}>
-        <ColorPicker.HexInput label="Акцентный цвет" />
+      <ColorPicker.HexInput label="Акцентный цвет" className={styles.field}>
         <Popover.Root>
           <Popover.Trigger>
-            <Button.Root variant="soft" tone="neutral" aria-label="Открыть палитру">
-              <Button.Icon>
-                <ColorPicker.TriggerSwatch />
-              </Button.Icon>
-            </Button.Root>
+            <ColorPicker.SwatchButton />
           </Popover.Trigger>
           <Popover.Content>
             <ColorPicker.Panel className={styles.panel}>
@@ -31,7 +26,7 @@ export default function ColorPickerOverviewExample() {
             </ColorPicker.Panel>
           </Popover.Content>
         </Popover.Root>
-      </div>
+      </ColorPicker.HexInput>
     </ColorPicker.Root>
   );
 }

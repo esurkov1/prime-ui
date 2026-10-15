@@ -210,6 +210,11 @@
   }
 }
 
+/* ---- SwatchButton: the color chip at the field icon size, not a step under it like a glyph ---- */
+.swatchButton {
+  --prime-icon-size: var(--field-icon);
+}
+
 /* ---- Standalone eyedropper: square, same height as a field ---- */
 .eyeDropperSquare {
   flex-shrink: 0;

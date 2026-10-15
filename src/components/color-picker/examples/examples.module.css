@@ -9,11 +9,8 @@
   max-width: 100%;
 }
 
-/* Hex field + swatch button of the same tier, bottom-aligned with the field box. */
-.fieldRow {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--prime-space-2);
+/* overview.tsx: the hex field with its swatch segment at a field's width. */
+.field {
   width: var(--prime-layout-min-width);
   max-width: 100%;
 }

@@ -130,10 +130,29 @@ export const api: ComponentApi = {
         },
         focusRing,
         {
+          name: "children",
+          type: "ReactNode",
+          en: "End segments of the field box after the value: `ColorPicker.SwatchButton` (in a `Popover.Trigger`), so the hex and its swatch read as one field.",
+          ru: "Сегменты в конце поля после значения: `ColorPicker.SwatchButton` (в `Popover.Trigger`) — hex и образец читаются одним полем.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
           en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
           ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
+      ],
+    },
+    {
+      name: "ColorPicker.SwatchButton",
+      en: "`ref` → `HTMLButtonElement`. The current color as a button segment at the end of `HexInput`: full field height, named `labels.palette`, with a tooltip. Wrap it in `Popover.Trigger` to open the panel.",
+      ru: "Текущий цвет как кнопка-сегмент в конце `HexInput`: во всю высоту поля, имя `labels.palette`, с подсказкой. Оберните в `Popover.Trigger`, чтобы открыть панель.",
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-label" | "children">',
+          en: "`className`, `disabled`, `onClick` and the other attributes of the `<button>`.",
+          ru: "`className`, `disabled`, `onClick` и остальные атрибуты `<button>`.",
         },
       ],
     },
@@ -500,6 +519,10 @@ export const api: ComponentApi = {
         en: "Hex field of `ChannelStrip` and the default `HexInput` label.",
         ru: "Hex-поле `ChannelStrip` и подпись `HexInput` по умолчанию.",
       },
+      palette: {
+        en: "Name and tooltip of `ColorPicker.SwatchButton`.",
+        ru: "Имя и подсказка `ColorPicker.SwatchButton`.",
+      },
       hue: { en: "Hue channel field.", ru: "Поле оттенка." },
       saturation: { en: "Saturation channel field.", ru: "Поле насыщенности." },
       lightness: { en: "Lightness channel field.", ru: "Поле яркости." },
@@ -594,8 +617,8 @@ export const api: ComponentApi = {
         ru: 'Область и ползунки — примитивы React Aria со своими именами `role="slider"`.',
       },
       {
-        en: "`TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (`ColorPresets.Trigger` names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).",
-        ru: "`TriggerSwatch` и `ColorPresets.Swatch` скрыты (`aria-hidden`) — дайте кнопке-триггеру `aria-label`; `ColorPresets.Trigger` называет свой элемент «`labels.trigger`: <цвет>», если у него нет своего `aria-label`.",
+        en: "`SwatchButton` is a button named `labels.palette` with a tooltip. `TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (`ColorPresets.Trigger` names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).",
+        ru: "`SwatchButton` — кнопка с именем `labels.palette` и подсказкой. `TriggerSwatch` и `ColorPresets.Swatch` скрыты (`aria-hidden`) — дайте кнопке-триггеру `aria-label`; `ColorPresets.Trigger` называет свой элемент «`labels.trigger`: <цвет>», если у него нет своего `aria-label`.",
       },
       {
         en: '`ColorPicker.Swatches` is a `role="radiogroup"` (ColorSwatches): name it with `label` or `aria-label`.',
