@@ -8,9 +8,7 @@
   inline-size: min(100%, var(--prime-layout-form-width-m));
 }
 
-/* controlled.tsx: the list of findings beside the photos. */
+/* controlled.tsx: the column of the list of findings beside the photos. */
 .findings {
-  display: grid;
-  gap: var(--prime-space-2);
   inline-size: min(100%, var(--prime-layout-form-width-s));
 }

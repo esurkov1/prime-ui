@@ -1,5 +1,5 @@
 /** The parent owns the page: a finding opens its photo, and paging in the viewer moves the mark along the list — `index`, `onIndexChange`. */
-import { Button, MediaViewer, type MediaViewerItem } from "prime-ui-kit";
+import { List, MediaViewer, type MediaViewerItem } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -26,21 +26,21 @@ export default function MediaViewerControlledExample() {
   return (
     <>
       <div className={styles.findings}>
-        {FINDINGS.map(([id, title], at) => (
-          <Button.Root
-            key={id}
-            variant={at === index ? "soft" : "ghost"}
-            tone="neutral"
-            fullWidth
-            aria-current={at === index ? "true" : undefined}
-            onClick={() => {
-              setIndex(at);
-              setOpen(true);
-            }}
-          >
-            {title}
-          </Button.Root>
-        ))}
+        <List.Root aria-label="Замечания проверки">
+          {FINDINGS.map(([id, title], at) => (
+            <List.Item
+              key={id}
+              value={id}
+              current={at === index}
+              onClick={() => {
+                setIndex(at);
+                setOpen(true);
+              }}
+            >
+              <List.ItemText>{title}</List.ItemText>
+            </List.Item>
+          ))}
+        </List.Root>
       </div>
       <MediaViewer
         items={PHOTOS}
