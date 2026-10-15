@@ -1,10 +1,19 @@
 /* Layout of the Hint scenarios: semantic tokens only. */
 
-/* overview.tsx, hint-or-error.tsx: control → support row at the m-tier hint gap. */
+/* hint-or-error.tsx: control → support row at the m-tier hint gap. */
 .field {
   display: grid;
   justify-items: start;
   gap: var(--prime-control-m-hint-gap);
+}
+
+/* overview.tsx: the same pair in a 320 px column — an embedded calendar measures its container
+   for its month, so the column gives it one. */
+.calendarField {
+  display: grid;
+  justify-items: start;
+  gap: var(--prime-control-m-hint-gap);
+  width: min(100%, calc(var(--prime-space-20) * 4));
 }
 
 .actions {

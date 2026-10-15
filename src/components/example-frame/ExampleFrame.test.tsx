@@ -222,16 +222,20 @@ describe("ExampleFrame", () => {
     expect(icon).toHaveAttribute("data-copy-state", "copied");
   });
 
-  it("stretches a preview block only by a zero-specificity width, so an example's own width wins", () => {
+  // A layer, not only zero specificity: `:where()` ties with a component's own zero-specificity
+  // width (SegmentedControl's fit-content frame) and the load order would pick the winner.
+  it("widens a preview block only by a layered zero-specificity width, so a block's own width wins", () => {
     const rules = cssRules("src/components/example-frame/ExampleFrame.module.css").filter(
       (rule) =>
-        rule.selector.includes("[data-preview-stretch]") &&
-        rule.decls.some((decl) => decl.prop === "width"),
+        rule.decls.some((decl) => decl.prop === "width" && decl.value === "100%") &&
+        (rule.selector.includes("[data-preview-stretch]") ||
+          rule.selector.includes('[data-preview-layout="stack-narrow"]) > *')),
     );
-    expect(rules.length).toBeGreaterThan(0);
+    expect(rules).toHaveLength(3);
     for (const rule of rules) {
+      expect(rule.parents).toEqual(["@layer prime-example-defaults"]);
       for (const part of rule.selector.split(",")) {
-        expect(part.trim()).toMatch(/^:where\(.+\) > :where\(.+\)$/);
+        expect(part.trim()).toMatch(/^:where\(.+\) > (:where\(.+\)|\*)$/);
       }
     }
   });

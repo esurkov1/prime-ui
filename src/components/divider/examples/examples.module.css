@@ -18,9 +18,12 @@
   gap: var(--prime-space-4);
 }
 
-/* vertical.tsx: the toolbar row the vertical lines stand in. */
+/* vertical.tsx: the toolbar row the vertical lines stand in; on a phone narrower than the row it
+   wraps rather than squeezing the buttons under their labels. */
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: var(--prime-space-2);
 }

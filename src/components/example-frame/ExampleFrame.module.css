@@ -129,10 +129,17 @@
   color: var(--prime-color-text-primary);
 }
 
-/* The stack-narrow column width is a default only: a block with its own width (a fit-content SegmentedControl,
-   DigitInput cells) keeps it and stays centered instead of stretching its track. */
-:where(.previewInner[data-preview-layout="stack-narrow"]) > * {
-  width: 100%;
+/*
+ * The stack-narrow column width is a default only: a block with its own width (a fit-content
+ * SegmentedControl, DigitInput cells) keeps it and stays centered instead of stretching its track.
+ * The stage's width defaults live in a cascade layer: zero specificity alone ties with a
+ * component's own zero-specificity width (`:where(.field) { width: fit-content }`) and the load
+ * order would pick the winner; any unlayered rule beats a layered one.
+ */
+@layer prime-example-defaults {
+  :where(.previewInner[data-preview-layout="stack-narrow"]) > * {
+    width: 100%;
+  }
 }
 
 /*
@@ -153,10 +160,12 @@
   margin-inline: auto;
 }
 
-/* The width is a zero-specificity default: a block with its own width (an example's 320 px
-   column, a form's measure) keeps it and stays centered. */
-:where(.previewInner) > :where([data-preview-stretch]) {
-  width: 100%;
+/* The width is a layered, zero-specificity default: a block with its own width (an example's
+   320 px column, a form's measure) keeps it and stays centered. */
+@layer prime-example-defaults {
+  :where(.previewInner) > :where([data-preview-stretch]) {
+    width: 100%;
+  }
 }
 
 /* Preview layouts: no wrapper divs needed in snippets. */
@@ -231,9 +240,12 @@
   justify-content: center;
 }
 
+/* A wrapped row is as wide as the stage (its cells centre inside it), so every row measures its
+   cells against the same width. */
 .previewInner[data-preview-layout="matrix"][data-matrix-wrap] > * {
   display: flex;
   flex-wrap: wrap;
+  align-self: stretch;
   align-items: flex-end;
   justify-content: center;
   gap: var(--prime-space-5) var(--prime-space-6);
@@ -251,6 +263,14 @@
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
+}
+
+/* A one-column matrix (one field per row) keeps its cell measure when it wraps: each cell is as
+   wide as `--matrix-cell` or the row, whichever is narrower, so fields without an intrinsic width
+   (a Textarea) line up in one column instead of each taking its own content's width. With more
+   columns the factor is 0 and wrapped cells stay as compact as their specimens. */
+.previewInner[data-preview-layout="matrix"][data-matrix-wrap] > * > * {
+  min-width: min(100%, calc(var(--matrix-cell) * max(0, 2 - var(--matrix-columns))));
 }
 
 /*
@@ -284,9 +304,11 @@
 }
 
 /* Full width is a default only: a block with its own width (a 320 px phone column around a
-   DataTable or a Datepicker panel) keeps it and stays centered. */
-:where(.previewInner[data-preview-layout="stack"]) > :where([data-preview-stretch]) {
-  width: 100%;
+   DataTable) keeps it and stays centered. */
+@layer prime-example-defaults {
+  :where(.previewInner[data-preview-layout="stack"]) > :where([data-preview-stretch]) {
+    width: 100%;
+  }
 }
 
 /*

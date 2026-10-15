@@ -1,8 +1,17 @@
 /* Layout of the Label scenarios: semantic tokens only. */
 
-/* overview.tsx, structure.tsx: a label above what it names, at the m-tier label gap. */
+/* structure.tsx: a label above what it names, at the m-tier label gap. */
 .field {
   display: grid;
   justify-items: start;
   gap: var(--prime-control-m-label-gap);
+}
+
+/* overview.tsx: the same pair in a 320 px column — an embedded calendar measures its container
+   for its month, so the column gives it one. */
+.calendarField {
+  display: grid;
+  justify-items: start;
+  gap: var(--prime-control-m-label-gap);
+  width: min(100%, calc(var(--prime-space-20) * 4));
 }
