@@ -42,11 +42,26 @@
   --dt-divider-width: var(--prime-border-width);
   --dt-column-divider-width: var(--prime-border-width);
 
-  --dt-z-sticky-first-column: var(--prime-z-raised);
-  /* A sticky group header rides over the sticky first column, under the head. */
-  --dt-z-sticky-group: var(--prime-z-above);
-  --dt-z-sticky-header: var(--prime-z-top);
-  --dt-z-sticky-corner: var(--prime-z-cover);
+  /*
+   * The stacking ladder of the table, bottom to top. Every cell is a stacking context of its own
+   * (`isolation`), so nothing a cell holds — a control's `position` and `z-index`, the transform of
+   * a press or a thumb, a focus ring — stacks outside it: a scrolled cell and its content stand on
+   * the base, under every pinned cell.
+   *   base    every cell that scrolls (body, head, group, detail, state)
+   *   column  a body cell pinned to an edge: the lead cells and the first column, the last
+   *           column and the chooser's trailing cell
+   *   group   a sticky group header, over the pinned columns
+   *   head    a sticky head cell, over the body
+   *   corner  a head cell pinned to a column edge: over the head cells passing under it
+   * In the head a pinned cell reads `--dt-z-column` too: `.head` lifts it to the head rung, a
+   * corner cell to the corner rung, so no selector has to outweigh another.
+   */
+  --dt-z-column: var(--prime-z-raised);
+  --dt-z-group: var(--prime-z-above);
+  --dt-z-head: var(--prime-z-top);
+  --dt-z-corner: var(--prime-z-cover);
+  /* The frame's edge shadows over the viewport (the frame's own stacking context). */
+  --dt-z-edge: var(--prime-z-raised);
 
   /* Edge cue: a soft shadow over the edge that hides columns, tuned per theme. */
   --dt-edge-depth: var(--prime-space-4);
@@ -170,7 +185,7 @@
   content: "";
   position: absolute;
   inset-block: 0;
-  z-index: var(--prime-z-raised);
+  z-index: var(--dt-z-edge);
   width: var(--dt-edge-depth);
   pointer-events: none;
   opacity: 0;
@@ -302,10 +317,17 @@
   border-inline-start: var(--dt-column-divider-width) solid var(--dt-divider-color);
 }
 
+/* The head row: a cell pinned to a column edge stands on the head rung, over the cells of the
+   head that scroll under it (the ladder on `.root`). */
+.head {
+  --dt-z-column: var(--dt-z-head);
+}
+
 /* The sticky head: `stickySurfaceClass` (joined in TSX) sticks it and lets it go on a short
-   screen; here only its stacking. */
-.root[data-sticky-header="true"] .headCell {
-  z-index: var(--dt-z-sticky-header);
+   screen; here only its stacking. A head cell pinned to a column edge takes the corner instead
+   (`.cornerCellSticky`), so this class goes only on the cells that scroll sideways. */
+.headSticky {
+  z-index: var(--dt-z-head);
 }
 
 /* A block, so a plain head and a sort button centre their text on the same line (an inline-block
@@ -421,6 +443,17 @@
 .row {
   --dt-cell-bg: var(--dt-surface);
   --dt-wash: transparent;
+}
+
+/* The base rung of the ladder (on `.root`): every cell keeps what it holds inside it. A control in
+   a scrolled cell never rises over a pinned cell or the head, whatever its own stacking; a focus
+   ring stays inside the cell padding (`--dt-pad-y` and `--dt-pad-x` hold it at every size). */
+.cell,
+.headCell,
+.groupCell,
+.detailCell,
+.stateCell {
+  isolation: isolate;
 }
 
 .cell {
@@ -818,7 +851,7 @@ tbody + tbody > .groupRow > .groupCell {
 .groupCell[data-sticky="true"] {
   position: sticky;
   top: 0;
-  z-index: var(--dt-z-sticky-group);
+  z-index: var(--dt-z-group);
 }
 
 .root[data-sticky-header="true"] .groupCell[data-sticky="true"] {
@@ -830,7 +863,7 @@ tbody + tbody > .groupRow > .groupCell {
 .firstColumnSticky {
   position: sticky;
   inset-inline-start: var(--dt-lead, 0);
-  z-index: var(--dt-z-sticky-first-column);
+  z-index: var(--dt-z-column);
   box-shadow: inset calc(var(--prime-border-width) * -1) 0 0 var(--dt-divider-color);
 }
 
@@ -874,15 +907,11 @@ tbody + tbody > .groupRow > .groupCell {
   border-inline-start-width: 0;
 }
 
-.headCell.firstColumnSticky {
-  z-index: var(--dt-z-sticky-header);
-}
-
 /* Leading utility cells stick together with the first content column. */
 .stickyLead {
   position: sticky;
   inset-inline-start: 0;
-  z-index: var(--dt-z-sticky-first-column);
+  z-index: var(--dt-z-column);
 }
 
 .root[data-selectable="true"] .toggleCell.stickyLead {
@@ -893,17 +922,13 @@ tbody + tbody > .groupRow > .groupCell {
   inset-inline-start: var(--dt-handle-w);
 }
 
-.headCell.stickyLead {
-  z-index: var(--dt-z-sticky-header);
-}
-
 /* ---------- Sticky last column ---------- */
 
 /* The mirror of the first column: the last visible column (row actions) sticks to the end edge. */
 .lastColumnSticky {
   position: sticky;
   inset-inline-end: 0;
-  z-index: var(--dt-z-sticky-first-column);
+  z-index: var(--dt-z-column);
   box-shadow: inset var(--prime-border-width) 0 0 var(--dt-divider-color);
 }
 
@@ -912,7 +937,6 @@ tbody + tbody > .groupRow > .groupCell {
 }
 
 .headCell.lastColumnSticky {
-  z-index: var(--dt-z-sticky-header);
   box-shadow:
     inset var(--prime-border-width) 0 0 var(--dt-divider-color),
     var(--sticky-bleed, 0 0 0 0 transparent);
@@ -977,20 +1001,18 @@ tbody + tbody > .groupRow > .groupCell {
 .menuCellSticky {
   position: sticky;
   inset-inline-end: 0;
-  z-index: var(--dt-z-sticky-first-column);
-}
-
-.headCell.menuCellSticky {
-  z-index: var(--dt-z-sticky-header);
+  z-index: var(--dt-z-column);
 }
 
 .root[data-menu-cell="true"] .lastColumnSticky {
   inset-inline-end: var(--dt-menu-w);
 }
 
-/* Sticky head and a sticky column: the corner head cells stick to both edges. */
+/* Sticky head and a sticky column: the corner head cells stick to both edges. Each keeps the
+   `z-index` of its column class and lifts the rung that class reads, so the corner wins by the
+   ladder, never by the weight of a selector. */
 .cornerCellSticky {
-  z-index: var(--dt-z-sticky-corner);
+  --dt-z-column: var(--dt-z-corner);
 }
 
 /* ---------- States: skeleton, empty, error ---------- */

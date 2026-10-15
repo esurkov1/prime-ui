@@ -25,8 +25,6 @@ type HeadProps<Row> = {
   stickyLastColumn: boolean;
   /** The head sticks to the top of the scroller. */
   stickyHeader: boolean;
-  /** Sticky head and first column: the leading head cells stick to both edges. */
-  stickyCorner: boolean;
   expandEnabled: boolean;
   /** Name of the info glyph of a column with a `description`. */
   infoLabel: string;
@@ -53,7 +51,6 @@ export function Head<Row>({
   stickyFirstColumn,
   stickyLastColumn,
   stickyHeader,
-  stickyCorner,
   expandEnabled,
   infoLabel,
   reorderable = false,
@@ -62,14 +59,17 @@ export function Head<Row>({
   selectAll,
 }: HeadProps<Row>) {
   const idPrefix = React.useId();
-  const lead = cx(
-    styles.headCell,
-    stickyHeader && stickySurfaceClass,
-    stickyFirstColumn && styles.stickyLead,
-    stickyCorner && styles.cornerCellSticky,
-  );
+  // One rung of the stacking ladder per head cell (DataTable.module.css): under a sticky head a
+  // cell pinned to a column edge is a corner, every other cell stands on the sticky head's rung.
+  const headCell = (pinned: boolean) =>
+    cx(
+      styles.headCell,
+      stickyHeader && stickySurfaceClass,
+      stickyHeader && (pinned ? styles.cornerCellSticky : styles.headSticky),
+    );
+  const lead = cx(headCell(stickyFirstColumn), stickyFirstColumn && styles.stickyLead);
   return (
-    <thead>
+    <thead className={styles.head}>
       <tr>
         {reorderable ? <td className={cx(lead, styles.handleCell)} /> : null}
         {selectAll ? (
@@ -114,12 +114,11 @@ export function Head<Row>({
               key={column.id}
               scope="col"
               className={cx(
-                styles.headCell,
-                stickyHeader && stickySurfaceClass,
+                headCell(
+                  (stickyFirstColumn && isFirstColumn) || (stickyLastColumn && isLastColumn),
+                ),
                 stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
-                stickyCorner && isFirstColumn && styles.cornerCellSticky,
                 stickyLastColumn && isLastColumn && styles.lastColumnSticky,
-                stickyHeader && stickyLastColumn && isLastColumn && styles.cornerCellSticky,
               )}
               style={columnSizeStyle(column)}
               data-align={column.headerAlign ?? "start"}
@@ -172,11 +171,9 @@ export function Head<Row>({
         {menuCell && columnsMenu != null ? (
           <td
             className={cx(
-              styles.headCell,
+              headCell(stickyLastColumn),
               styles.menuCell,
-              stickyHeader && stickySurfaceClass,
               stickyLastColumn && styles.menuCellSticky,
-              stickyHeader && stickyLastColumn && styles.cornerCellSticky,
             )}
           >
             <span className={styles.headMenu}>{columnsMenu}</span>

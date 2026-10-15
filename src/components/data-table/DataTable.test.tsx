@@ -10,6 +10,8 @@ import rowLink from "@/internal/rowLink.module.css";
 import { stickySurfaceClass } from "@/internal/sticky";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { cssRule, cssRules, cssValue } from "@/test/css";
+import { primitiveTokens } from "../../../tokens/primitives";
+import { semanticTokens } from "../../../tokens/semantic";
 
 import { DataTable, type DataTableColumn } from "./DataTable";
 import styles from "./DataTable.module.css";
@@ -1977,5 +1979,136 @@ describe("DataTable async load more", () => {
     reach();
     expect(onLoadMore).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();
+  });
+});
+
+describe("DataTable stacking ladder", () => {
+  const zStep = (token: string) => {
+    const ref = /^var\(--prime-z-(\w+)\)$/.exec(token)?.[1] as keyof typeof semanticTokens.z;
+    const step = /^\{zIndex\.(\w+)\}$/.exec(semanticTokens.z[ref])?.[1];
+    return Number(primitiveTokens.zIndex[step as keyof typeof primitiveTokens.zIndex]);
+  };
+
+  it("CSS: the rungs are local names over the kit's z scale, rising column → group → head → corner", () => {
+    const root = cssRule(CSS, ".root");
+    const rungs = ["--dt-z-column", "--dt-z-group", "--dt-z-head", "--dt-z-corner"].map((name) =>
+      zStep(cssValue(root, name)),
+    );
+    expect(rungs.every((value) => Number.isFinite(value) && value > 0)).toBe(true);
+    expect([...rungs].sort((a, b) => a - b)).toEqual(rungs);
+    expect(new Set(rungs).size).toBe(rungs.length);
+    // Every z-index of the table reads a rung: no token or number straight in a rule.
+    const zValues = cssRules(CSS).flatMap((rule) =>
+      rule.decls.filter((decl) => decl.prop === "z-index").map((decl) => decl.value),
+    );
+    expect(zValues.length).toBeGreaterThan(0);
+    for (const value of zValues) expect(value).toMatch(/^var\(--dt-z-[a-z]+\)$/);
+  });
+
+  it("CSS: every cell is a stacking context, so a control in a scrolled cell stays under pinned cells", () => {
+    expect(
+      cssValue(cssRule(CSS, ".cell, .headCell, .groupCell, .detailCell, .stateCell"), "isolation"),
+    ).toBe("isolate");
+    for (const pinned of [
+      ".firstColumnSticky",
+      ".stickyLead",
+      ".lastColumnSticky",
+      ".menuCellSticky",
+    ]) {
+      expect(cssValue(cssRule(CSS, pinned), "position")).toBe("sticky");
+      expect(cssValue(cssRule(CSS, pinned), "z-index")).toBe("var(--dt-z-column)");
+    }
+    expect(cssValue(cssRule(CSS, '.groupCell[data-sticky="true"]'), "z-index")).toBe(
+      "var(--dt-z-group)",
+    );
+    expect(cssValue(cssRule(CSS, ".headSticky"), "z-index")).toBe("var(--dt-z-head)");
+  });
+
+  it("CSS: a corner wins by its rung, never by selector weight", () => {
+    // The head lifts its pinned cells to the head rung, a corner to the corner rung: both through
+    // the variable the column classes read, so no compound selector sets a z-index.
+    expect(cssValue(cssRule(CSS, ".head"), "--dt-z-column")).toBe("var(--dt-z-head)");
+    const corner = cssRule(CSS, ".cornerCellSticky");
+    expect(cssValue(corner, "--dt-z-column")).toBe("var(--dt-z-corner)");
+    expect(corner.decls.some((decl) => decl.prop === "z-index")).toBe(false);
+    const weighty = cssRules(CSS).filter(
+      (rule) =>
+        rule.decls.some((decl) => decl.prop === "z-index") &&
+        rule.selector.split(",").some((part) => (part.match(/\.[a-zA-Z]/g) ?? []).length > 1),
+    );
+    expect(weighty.map((rule) => rule.selector)).toEqual([]);
+  });
+
+  it("puts each head cell on one rung: pinned cells are corners under a sticky head, the rest sticky head", () => {
+    const three: DataTableColumn<Row>[] = [
+      ...columns,
+      { id: "note", header: "Note", accessor: () => "—" },
+    ];
+    const { rerender } = render(
+      <DataTable
+        rows={rows.slice(0, 2)}
+        columns={three}
+        paging="none"
+        selectable
+        stickyHeader
+        stickyFirstColumn
+        stickyLastColumn
+        columnsMenu
+      />,
+    );
+    const head = document.querySelector("thead") as HTMLElement;
+    expect(head).toHaveClass(styles.head as string);
+    const cells = [...(head.querySelector("tr") as HTMLTableRowElement).cells];
+    const [select, first, middle, last, chooser] = cells;
+    for (const pinned of [select, first, last, chooser]) {
+      expect(pinned).toHaveClass(styles.cornerCellSticky as string);
+      expect(pinned).not.toHaveClass(styles.headSticky as string);
+    }
+    expect(middle).toHaveClass(styles.headSticky as string);
+    expect(middle).not.toHaveClass(styles.cornerCellSticky as string);
+
+    rerender(
+      <DataTable
+        rows={rows.slice(0, 2)}
+        columns={three}
+        paging="none"
+        selectable
+        stickyFirstColumn
+        stickyLastColumn
+        columnsMenu
+      />,
+    );
+    for (const cell of (document.querySelector("thead tr") as HTMLTableRowElement).cells) {
+      expect(cell).not.toHaveClass(styles.cornerCellSticky as string);
+      expect(cell).not.toHaveClass(styles.headSticky as string);
+    }
+  });
+
+  it("truncates the last head label inside its own cell, before the chooser's cell", () => {
+    render(
+      <DataTable
+        rows={rows.slice(0, 2)}
+        columns={columns}
+        paging="none"
+        stickyLastColumn
+        columnsMenu
+      />,
+    );
+    const last = screen.getByRole("columnheader", { name: /Score/ });
+    const chooser = screen.getByRole("button", { name: /Колонки/ });
+    expect(last.contains(chooser)).toBe(false);
+    expect(last.nextElementSibling?.contains(chooser)).toBe(true);
+    const label = cssRule(CSS, ".headLabel");
+    expect(cssValue(label, "overflow")).toBe("hidden");
+    expect(cssValue(label, "text-overflow")).toBe("ellipsis");
+    expect(cssValue(label, "min-width")).toBe("0");
+    expect(cssValue(cssRule(CSS, ".headTitle"), "min-width")).toBe("0");
+    expect(cssValue(cssRule(CSS, ".sortButton"), "min-width")).toBe("0");
+    // The pinned last column stands exactly the chooser cell's width off the end edge.
+    const menu = cssRule(CSS, ".menuCell");
+    for (const prop of ["width", "min-width", "max-width"]) {
+      expect(cssValue(menu, prop)).toBe("var(--dt-menu-w)");
+    }
+    expect(cssValue(menu, "box-sizing")).toBe("border-box");
   });
 });

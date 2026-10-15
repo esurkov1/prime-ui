@@ -918,7 +918,6 @@ export function DataTable<Row>({
                       stickyFirstColumn={stickyFirstColumn}
                       stickyLastColumn={stickyLastColumn}
                       stickyHeader={stickyHeader}
-                      stickyCorner={stickyHeader && stickyFirstColumn}
                       expandEnabled={expandEnabled}
                       infoLabel={labels.columnInfo}
                       reorderable={reorder.enabled}

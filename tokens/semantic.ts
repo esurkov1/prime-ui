@@ -543,7 +543,7 @@ export const semanticTokens = {
    * `above`, `top`, `cover` and `front` for each part laid over the last: a hover wash or a handle
    * is `raised`; the marks over a picture (play, duration, check) are `top`; a control spread over
    * those marks is `cover`; a transfer in front of a whole tile is `front`. A component with sticky
-   * parts names them from the same steps (DataTable: first column, group row, header, corner).
+   * parts names them from the same steps (DataTable: pinned columns, group row, head, corner).
    */
   z: {
     below: "{zIndex.below}",
