@@ -48,6 +48,24 @@ describe("focus ring guard", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("sets an inset offset on the focus rule, where it outranks the global ring", () => {
+    // `:where(button):focus-visible` (globals.css) has the specificity of one class and loads
+    // later: an inset offset on a plain `.item` loses to it and the ring is drawn outside (clipped
+    // by a scroller). A resting ring (`outline: … transparent` with the inset offset) needs the
+    // offset on a `:focus-visible` / `:focus-within` rule too.
+    const offenders: string[] = [];
+    for (const file of files) {
+      const inset = blocks(readFileSync(file, "utf8")).filter(({ body }) =>
+        /outline-offset:\s*var\(--prime-focus-offset-inset\)/.test(body),
+      );
+      const resting = inset.some(({ body }) => /outline:[^;]*transparent/.test(body));
+      if (resting && !inset.some(({ selector }) => /:focus/.test(selector))) {
+        offenders.push(path.relative(root, file));
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
   it("draws the ring inside fields", () => {
     // The shared field surface owns the inset ring; every field box uses it (a TSX class:
     // `fieldSurfaceClass`, or `fieldTriggerClass` which includes it) or draws its own inset ring.

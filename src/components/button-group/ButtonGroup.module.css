@@ -96,19 +96,23 @@
 /* Press (foundation §7 rule 6) is the shared `internal/press`, joined in TSX: a scale only, so a
    pressed segment keeps its fill (compact for icon-only segments; disabled never scales). */
 
-/* The focus ring: outside the segment in a column, inside it in a row — the row scrolls (clips). */
+/* The focus ring: inside the segment in a row — the row scrolls (clips) — outside it in a column.
+   The offset sits on `:focus-visible` so it outranks the global ring (`:where(button):focus-visible`
+   has the same specificity as `.item` and loads later). */
 .item {
   outline: var(--prime-focus-width) solid transparent;
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-.root[data-orientation="vertical"] > .item {
-  outline-offset: var(--prime-focus-offset);
-}
-
 .item:focus-visible {
   z-index: var(--prime-z-raised);
   outline-color: var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.root[data-orientation="vertical"] > .item,
+.root[data-orientation="vertical"] > .item:focus-visible {
+  outline-offset: var(--prime-focus-offset);
 }
 
 .item[aria-pressed="true"] {
