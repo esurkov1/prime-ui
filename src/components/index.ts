@@ -208,7 +208,6 @@ export type { CrossfadeProps } from "./crossfade/Crossfade";
 export { Crossfade } from "./crossfade/Crossfade";
 export type {
   DataTableColumn,
-  DataTableColumnsMenuProps,
   DataTableGroup,
   DataTableLabels,
   DataTableOrder,

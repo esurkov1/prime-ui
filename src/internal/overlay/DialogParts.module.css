@@ -66,6 +66,20 @@
   padding: var(--prime-space-6) var(--dialog-padding) var(--prime-space-5);
 }
 
+/*
+ * With `Actions` the title keeps 12rem (or the whole row, if narrower). When the row cannot give it
+ * that (a status and a ⋯ beside the × on a phone), the header measures an overflow and moves the
+ * actions under the text (`data-actions-below`, set in TSX): the title never folds into a column
+ * of letters.
+ */
+.header:has(> .actions):not([data-actions-below]) {
+  grid-template-columns:
+    [icon] auto
+    [text] minmax(min(calc(var(--prime-space-24) * 2), 100%), 1fr)
+    [actions] auto
+    [close] auto;
+}
+
 /* Title, description and any custom text sit in the text column. */
 .header > :not(.icon, .actions, .close) {
   grid-column: text;
@@ -148,6 +162,13 @@
   overflow-wrap: anywhere;
 }
 
+/* The line's place while its data loads. */
+.descriptionSkeleton {
+  inline-size: calc(var(--prime-space-24) * 1.5);
+  max-inline-size: 100%;
+  vertical-align: middle;
+}
+
 /*
  * A row of controls at the end of the header, before the close button (tier s, joined in TSX: the
  * close button's height `--field-h`). With a description it hangs from the top, centered on the
@@ -167,6 +188,20 @@
 .header[data-has-description="true"] > .actions {
   min-height: var(--field-h);
   margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
+}
+
+/* Beside the title the row never gives (a Badge would truncate): the title's minimum decides. */
+.header:not([data-actions-below]) > .actions {
+  min-width: max-content;
+}
+
+/* Under the text: the last row of the text column, after the description (placed last by `order`). */
+.header[data-actions-below] > .actions {
+  grid-row: auto;
+  grid-column: text / close;
+  order: 1;
+  flex-wrap: wrap;
+  margin: var(--prime-space-2) 0 0;
 }
 
 /*
@@ -229,6 +264,13 @@
   margin-block-start: var(--prime-space-4);
 }
 
+/* In plain flow (a `Tabs.Panel`, a wrapper div: `data-flow`, set in TSX) there is no gap to add to:
+   the section keeps the whole 32 itself. */
+.section[data-flow="block"]:not(:first-child),
+.section[data-flow="block"] + * {
+  margin-block-start: var(--prime-space-8);
+}
+
 /* The heading and the dialog's `Actions` (tier s) at its end, centred on the title's first line. */
 .sectionHeader {
   display: flex;
@@ -279,15 +321,20 @@
   padding-block-start: var(--prime-space-6);
 }
 
-/* Equal-width actions in one row. */
+/*
+ * Equal-width actions in one row. A button never gets narrower than its label: when the row cannot
+ * hold them all (three actions in a small dialog), the last ones wrap to a row of their own and
+ * share it, each row still filling the width.
+ */
 .footer[data-layout="fill"] {
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--prime-space-3);
 }
 
-.footer[data-layout="fill"] > * {
-  width: var(--dialog-footer-action-width, 100%);
+.footer[data-layout="fill"] > :not(.meta, .footerActions) {
+  flex: 1 1 0;
+  min-width: max-content;
 }
 
 /* Auto-width actions, right-aligned. */
@@ -305,11 +352,7 @@
  * split while they fit in one line. On a phone and in a narrow dialog the stack below wins: the
  * line on top, full-width buttons under it.
  */
-/* The actions read their width from the footer: a class-less target after `:has()` would make its
-   invalidation whole-subtree page-wide. */
 .footer[data-layout]:where(:has(> .meta)) {
-  --dialog-footer-action-width: auto;
-
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -363,6 +406,11 @@
     width: 100%;
   }
 
+  .footer[data-layout="fill"] > :not(.meta, .footerActions) {
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+
   .footerActions {
     flex-direction: column;
     align-items: stretch;
@@ -380,6 +428,11 @@
   .footer[data-layout] > *,
   .footerActions > * {
     width: 100%;
+  }
+
+  .footer[data-layout="fill"] > :not(.meta, .footerActions) {
+    flex: 0 0 auto;
+    min-width: 0;
   }
 
   .footerActions {

@@ -42,6 +42,14 @@
   min-height: 0;
 }
 
+/* Placeholder columns of a board loading before its columns arrive (`loadingColumns`). */
+.placeholders {
+  display: flex;
+  flex: 1 0 auto;
+  gap: var(--kanban-gap);
+  min-height: 0;
+}
+
 /* Positioned: the visually hidden count stays inside the column instead of the page. */
 .column {
   position: relative;
@@ -403,6 +411,13 @@
 /* Loading: cards of the same geometry, no hover, no drag. */
 .skeleton {
   pointer-events: none;
+}
+
+/* A placeholder column's title: one title line high. */
+.skeletonTitle {
+  inline-size: var(--prime-space-24);
+  block-size: var(--prime-text-title-m-line-height);
+  min-block-size: 0;
 }
 
 .skeletonBadge {

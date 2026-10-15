@@ -86,7 +86,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A work screen (a list, a board, a chat, a record) titles itself in `<Page.TopBar>`: `<Page.Heading>` with `<Page.Title>` + `<Page.Description>` carrying a line of data («128 в работе · 6 ждут оплаты») — not a sentence about the page.
 - The bar holds only its four groups: `<Page.Heading>`, `<Page.Tools aria-label>` (sections, `<SmartFilter.Toolbar />`, the view — in reading order), `<Page.Actions>`, `<Page.Chips>` (`<SmartFilter.Chips />`) — not a hand-made flex row of title, tabs, search and buttons ([the top bar](composition.md#the-top-bar)).
 - A nested record: `<Breadcrumb.Root>` first in `<Page.Heading>`, then `<Page.Title>` with the record's name — the path ends in the title on one line; not a title row under the path, not a breadcrumb in the body. With a router each crumb is `<Breadcrumb.Item asChild>` around its `Link`.
-- A line of data that loads after the page opens: `<Page.Description loading={!summary}>` from the first render — not a Description mounted when the data arrives, which moves the title.
+- A line of data that loads after the page opens: `<Page.Description loading={!summary}>` from the first render (`Drawer.Description` / `Modal.Description` alike) — not a Description mounted when the data arrives, which moves the title, nor a `Skeleton` placed in it by hand.
 - A page that edits a record: `<Page.Guard dirty={changed} busy={saving} />` inside `Page.Root` — the Sidebar, BottomNav and path links ask before the changes are lost; not your own `beforeunload` or a confirm wired to each link.
 - Every button of the page goes into one `<Page.Actions>`, secondary first, the primary last, each with a `<Button.Icon>` beside its label — not buttons split between two places, not a button with only text.
 - A filtered page: `<SmartFilter.Root>` wraps `<Page.Root>` — it draws nothing; not `SmartFilter.Root` inside the bar.
@@ -97,6 +97,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 - `Card.Root` only for a bounded block with its own title: a KPI tile (`variant="stat-trend"`), a settings panel (`variant="panel"`), side facts — not around a whole section, a form field or a page.
 - Never a `DataTable` inside a Card — the table is already a filled block; a card in a card only sparingly ([the rule](foundations.md#card-in-a-card)).
+- A titled panel (a settings section, a group of a long form) is `<Card.Root>` with `<Card.Header>` (`<Card.Title as="h2">`, `<Card.Description>`) stacked in the flow — never a heading column beside its panel ([a titled block](composition.md#4-surfaces)).
 - Section without a card: `<Page.Section label="…">` + the content (a link or button beside the heading in `Page.Actions`) — not a hand-made `<section>` + `Typography as="h2"` + own gap.
 - The tiles of a screen (KPI cards, charts, panels): one `<Page.Grid>` with a `<Page.Cell span>` per tile — not a grid per row (the rows would stand 24 apart instead of 16). A chart beside a panel is an 8 and a 4 written next to each other — the grid pairs them at mid widths; not 6 + 6 to dodge a hole.
 - A KPI tile whose figure loads: `<Card.Root variant="stat-trend" loading>` with its parts mounted — not Skeletons placed in `Card.Value` by hand.
@@ -108,6 +109,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 ## Tables
 
 - A list page is a `<DataTable columns rows getRowKey>` under the page's `<SmartFilter.Root fields value onValueChange>` with `<SmartFilter.Toolbar />` in its `Page.Tools` and `<SmartFilter.Chips />` in its `Page.Chips` ([where the filters go](composition.md#where-the-filters-go)); filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
+- The column chooser is `<DataTable columnsMenu>` in the header row; `toolbar` only for several controls of the table itself (bulk actions, a section table's own search and filters) ([controls of a table](composition.md#controls-of-a-table)) — never a toolbar for one button.
 - Search over a table or a list page is always SmartFilter, even with no filter fields yet (`fields={[]}` is a plain search that grows into filters). A search `Input` only outside a filtered list: inside a picker, a settings section, a panel.
 - Paging is built in: `paging="pages"` (default) with `pageSize`, `paging="infinite"` for feeds, `paging="none"` for short lists — not a separate `<Pagination>` under a DataTable.
 - Long lists are virtualized inside the kit: pass the whole array to `DataTable` (with `scrollHeight` or `paging="infinite"`; over 100 rows — grouped, `onReorder` and `renderExpanded` bodies render every row, keep those short or paged), `TagSelect options`, `Chat.Messages items`, `Gantt rows` — never slice it by hand, never wrap a kit list in react-window / react-virtual or your own windowing. Big remote data is still paged or loaded on scroll by the server (`source="server"`, `onLoadMore`).
@@ -120,6 +122,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A list row with controls of its own (a Switch, a ⋯ menu): `List.ItemActions` inside `List.Item`, a stage colour as `Badge.Dot color` in `List.ItemIcon` — not a control inside the row's button, not a row rebuilt as a `div`.
 - Rows people order by hand: `onReorder(id, beforeId)` (apply it with `moveBefore`, return the save's Promise) — not a Dnd list rebuilt next to the table.
 - A short list of records people order by hand (stages, priorities) is `<List.Root onReorder>` with `List.Item value` — not up / down buttons or a hand-made `Dnd.Sortable`.
+- A toggle in a reorderable row leads it (`List.ItemActions side="start"`) and a plain settings row ends with it ([list rows](composition.md#list-rows)) — never a Switch between the label and the grip.
 - The grip ends its row: a `Dnd.Handle` is the last child of its item, after the row's own controls, and a locked row's lock takes the same place (List, FieldList and Kanban place theirs there) — not before the row's text.
 - Groups that fold: pass `defaultCollapsedGroups={[]}` (or the controlled `collapsedGroups` + `onCollapsedGroupsChange`) — not your own button in `renderGroupHeader` or filtering `rows`. One heatmap over several columns: the same `scale: { min, max }` on each.
 - A trend in a table row is `<Sparkline layout="compact">` in the column's `cell` (a column `width`, series built once, not inline, the same `min` / `max` on every row when rows compare by size); the number itself goes in its own column. A missing day is `value: null`, never `0`.
@@ -161,7 +164,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A destructive confirm is `<ConfirmDialog.Root title description confirmLabel onConfirm={remove}>` with a `ConfirmDialog.Trigger` — not a Modal assembled as a confirm with your own pending state; a reversible delete offers «Отменить» in the notification instead.
 - Overlays close smoothly only if they stay mounted: render the `Root` always and drive visibility with `open` alone — never `{open && <Drawer.Root>}`, never a changing `key` on the Root. The kit keeps the last content on screen while the exit plays.
 - Placement of a menu, popover, select or picker: leave the defaults — `side="bottom"`, `align="auto"`: it opens below the trigger, lines up with the trigger edge that has the room (a «⋯» at the end of a row grows toward the start) and flips to the top by itself. Never write `side` or `align` to restate that; set `align` only when the panel must line up with one edge of a block whatever room there is. A Popover under a wide anchor that must never be narrower than it: `<Popover.Content width="min-trigger">`.
-- While a request runs: `<Modal.Guard busy={saving} />` inside the content (`Drawer.Guard`, `Sheet.Guard` alike) — Escape, a press outside, × and `Close` are held, × and `Close` disabled; add `dirty` to ask before unsaved changes are lost. Not `closeOnEscape={false}` or `showClose={false}` by hand.
+- While a request runs: `<Modal.Guard busy={saving} />` inside the content (`Drawer.Guard`, `Sheet.Guard` alike) — Escape, a press outside, × and `Close` are held, × and `Close` disabled; add `dirty` to ask before unsaved changes are lost; both also hold the browser's tab close. Not `closeOnEscape={false}` or `showClose={false}` by hand, not your own `beforeunload`.
 
 ## Motion — it comes with the components
 
@@ -205,7 +208,7 @@ Full rules: [responsive.md](responsive.md).
 
 - Rearrange, never hide: every desktop function is on the phone, in another place or a menu — not `display: none` below a breakpoint.
 - Breakpoints only in [their scope](responsive.md#breakpoints); inside a page — [intrinsic grids](responsive.md#intrinsic-grids) and container queries.
-- A wide table scrolls inside itself; offer `DataTable.ColumnsMenu` in its `toolbar` — never drop columns by breakpoint, never hand-build the chooser.
+- A wide table scrolls inside itself; offer the column chooser with `columnsMenu` — never drop columns by breakpoint, never hand-build the chooser.
 - A row that opens a record page is `getRowHref` (a real link: ⌘-click, new tab), a row that opens a drawer is `onRowClick` — never `navigate()` in `onRowClick`, never your own `event.target` checks for buttons in the row.
 - A list + detail screen is `Page.Split` (`Page.List`, `Page.Detail`) in a `Page.Root fill` page, its records a `List` (`current` on the open one) — never ghost Buttons with a soft current; a full-height table is `scrollHeight="fill"` — never a height computed from `100vh`.
 - App sections on phones: `BottomNav` in `AppShell.Footer` — not in Main, not `position: fixed`, no own media query: the shell hides the footer while the Sidebar rail is on screen; a short task from the bottom edge: `Sheet` — Select, Dropdown, Popover and Modal become sheets below 640 by themselves.

@@ -177,7 +177,15 @@ const initials = (name: string) =>
     .toUpperCase();
 
 const COLUMNS: DataTableColumn<Invoice>[] = [
-  { id: "id", header: "Счёт", accessor: "id", sortable: true, numeric: true, align: "start" },
+  {
+    id: "id",
+    header: "Счёт",
+    accessor: "id",
+    sortable: true,
+    numeric: true,
+    align: "start",
+    hideable: false,
+  },
   {
     id: "client",
     header: "Клиент",
@@ -230,6 +238,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
     id: "actions",
     header: "Действия",
     hideHeader: true,
+    hideable: false,
     width: "3.5rem",
     align: "end",
     cell: (row) => (
@@ -321,6 +330,7 @@ export default function DataTableScreenExample() {
             pageSize={6}
             stickyFirstColumn
             stickyLastColumn
+            columnsMenu
             defaultSort={{ columnId: "due", order: "desc" }}
             empty={
               <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">

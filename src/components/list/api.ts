@@ -205,9 +205,16 @@ export const api: ComponentApi = {
     },
     {
       name: "List.ItemActions",
-      en: "`ref` → `HTMLDivElement`. The row's own controls (a `Switch`, a `Dropdown` with its icon `Button`) at its end, beside the row element and never inside it, one tier below the row.",
-      ru: "Собственные контролы строки (`Switch`, `Dropdown` с иконочной `Button`) в её конце — рядом с элементом строки, не внутри него, на ярус меньше строки.",
+      en: "`ref` → `HTMLDivElement`. The row's own controls (a `Switch`, a `Dropdown` with its icon `Button`) at its end or its start, beside the row element and never inside it, one tier below the row.",
+      ru: "Собственные контролы строки (`Switch`, `Dropdown` с иконочной `Button`) в её конце или начале — рядом с элементом строки, не внутри него, на ярус меньше строки.",
       props: [
+        {
+          name: "side",
+          type: '"start" | "end"',
+          default: '"end"',
+          en: '`"end"` after the row element: a plain settings row, label first. `"start"` before it, in the DOM too: the on / off of a reorderable row reads first and the grip keeps the end.',
+          ru: '`"end"` — после элемента строки: обычная строка настроек, сначала подпись. `"start"` — перед ним, и в DOM тоже: вкл / выкл переставляемой строки читается первым, а конец остаётся за ручкой.',
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
@@ -259,12 +266,12 @@ export const api: ComponentApi = {
         ru: "Стрелки не переводят между строками: строки — обычные остановки Tab, как в Sidebar.",
       },
       {
-        en: "`List.ItemActions` stand beside the row element, never inside it: the row's name stays its text, and Tab goes from the row to its controls.",
-        ru: "`List.ItemActions` стоят рядом с элементом строки, не внутри: имя строки — её текст, Tab ведёт от строки к её контролам.",
+        en: '`List.ItemActions` stand beside the row element, never inside it: the row\'s name stays its text. Tab follows the row as it reads: the `side="start"` controls, the row, the `side="end"` controls.',
+        ru: '`List.ItemActions` стоят рядом с элементом строки, не внутри: имя строки — её текст. Tab идёт, как строка читается: контролы `side="start"`, строка, контролы `side="end"`.',
       },
       {
-        en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row, its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",
-        ru: "С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`, последней в строке: Tab ведёт к строке, её `List.ItemActions`, затем к ручке; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`.",
+        en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row with its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",
+        ru: "С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`, последней в строке: Tab ведёт к строке с её `List.ItemActions`, затем к ручке; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`.",
       },
     ],
   },

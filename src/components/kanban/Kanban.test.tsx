@@ -299,6 +299,25 @@ describe("Kanban", () => {
     expect(screen.getByTestId("card-a")).toBeInTheDocument();
   });
 
+  it("loading before the columns arrive: placeholder columns, then the columns", () => {
+    const { rerender } = render(<Board loading columns={[]} loadingColumns={4} />);
+    const board = screen.getByLabelText("Доска");
+    expect(board).toHaveAttribute("aria-busy", "true");
+    // The strip of placeholder columns is hidden from assistive tech and holds no column list.
+    const strip = board.querySelector('[aria-hidden="true"]');
+    expect(strip?.children).toHaveLength(4);
+    expect(board.querySelector("ul")).toBeNull();
+    expect(screen.queryByRole("heading")).toBeNull();
+    rerender(<Board />);
+    expect(screen.getAllByRole("heading")).toHaveLength(COLUMNS.length);
+    expect(screen.getByTestId("card-a")).toBeInTheDocument();
+  });
+
+  it("draws the real columns while loading once they are there", () => {
+    render(<Board loading loadingColumns={4} />);
+    expect(screen.getAllByRole("heading")).toHaveLength(COLUMNS.length);
+  });
+
   it("uses custom labels", () => {
     render(<Board labels={{ empty: "Пусто", count: "{count} шт." }} />);
     expect(screen.getByText("Пусто")).toBeInTheDocument();

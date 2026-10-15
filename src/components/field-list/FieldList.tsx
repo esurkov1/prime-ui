@@ -1,16 +1,19 @@
 import * as React from "react";
 import { Button } from "@/components/button/Button";
-import { Dnd, DndLock, moveBefore } from "@/components/dnd/Dnd";
+import { Dnd, moveBefore } from "@/components/dnd/Dnd";
 import type { HintTone } from "@/components/hint/Hint";
 import { Label } from "@/components/label/Label";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useResizeEffect } from "@/hooks/useElementSize";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { DisabledProvider, useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { FieldActionButton } from "@/internal/FieldAction";
 import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/FieldFrame";
 import { type FieldCell, FieldCellContext } from "@/internal/fieldCell";
 import { fieldTierClass } from "@/internal/fieldClasses";
@@ -38,8 +41,8 @@ export type FieldListLabels = {
   row: string;
   /** Name of a row with `getLabel` text; `{label}` is that text. */
   namedRow: string;
-  /** Spoken name of the lock on a `getLocked` row of a list without `reorderable`. */
-  locked: string;
+  /** Why the remove button of a `getLocked` row is off: its tooltip and description. */
+  lockedReason: string;
   /** Text beside the disabled add button once the list holds `max` rows; `{max}` is the limit. */
   maxReached: string;
   /** Name of the totals row (`renderTotals`), shown in its first cell when that has no total. */
@@ -51,7 +54,7 @@ export const FIELD_LIST_LABELS: FieldListLabels = {
   reorder: "Переместить {row}",
   row: "строку {index}",
   namedRow: "«{label}»",
-  locked: "Закреплена",
+  lockedReason: "Закреплённую строку нельзя удалить",
   maxReached: "Не больше {max}",
   totals: "Итого",
 };
@@ -63,8 +66,8 @@ export type FieldListColumn = {
   /** Column heading, shown once above the rows; it names the field of this column in every row. */
   label: string;
   /**
-   * `fill` (default) shares the free width; `compact` fits an icon-only control (an icon Select,
-   * a swatch button, a checkbox); `xs` a number of a few digits (a share, a percent); `s` a short
+   * `fill` (default) shares the free width; `compact` is as wide as its widest control or heading
+   * (an icon Select, a swatch button, a checkbox); `xs` a number of a few digits (a share, a percent); `s` a short
    * value (a quantity, a code); `m` an amount or a date.
    */
   width?: FieldListColumnWidth;
@@ -115,13 +118,19 @@ const track = (name: `--fl-${string}`) => `var(${name})`;
  * Track of each width. The end track fits the remove button, the grip track after it (`auto`) its
  * `xs` box; every row and the heading row share the same list (`--fl-columns`).
  */
-const TRACKS: Record<FieldListColumnWidth, string> = {
+const TRACKS: Record<Exclude<FieldListColumnWidth, "compact">, string> = {
   fill: "minmax(0, 1fr)",
-  compact: track("--fl-compact"),
   xs: track("--fl-xs"),
   s: track("--fl-s"),
   m: track("--fl-m"),
 };
+
+/**
+ * A compact column is as wide as the widest of its cells (the control, the heading, the total),
+ * measured on the body (`--fl-compact-<column>`), so the gap after it is the column gap like every
+ * other; before the first measure each row sizes it by its own content.
+ */
+const compactTrack = (column: number) => `var(--fl-compact-${column}, max-content)`;
 
 /** The cells of a row: the top-level elements of what `renderItem` returned, fragments opened. */
 function cellsOf(node: React.ReactNode): React.ReactNode[] {
@@ -147,6 +156,20 @@ function totalsOf(node: React.ReactNode): React.ReactNode[] {
     else out.push(child);
   });
   return out;
+}
+
+/** The text box of a cell's field: an input that holds text, or a textarea. */
+const TEXT_BOX = "input:not([type='checkbox'], [type='radio'], [type='hidden']), textarea";
+
+/**
+ * Whether the field in a cell ends its text at the end edge (a number with its unit after it, as
+ * `Input` sets it): the total of that column then ends there too.
+ */
+function endsText(cell: Element | undefined): boolean {
+  const box = cell?.querySelector(TEXT_BOX);
+  if (!box) return false;
+  const { textAlign, direction } = getComputedStyle(box);
+  return textAlign === "end" || textAlign === (direction === "rtl" ? "left" : "right");
 }
 
 /** The last change wins: the list a pending `onValueChange` was called with. */
@@ -249,15 +272,29 @@ export function FieldList<T extends object>({
   // Where focus goes once the list re-renders: the new row's first field, or the neighbour's remove.
   const focusNext = React.useRef<{ id: string | null; part: "first" | "remove" } | null>(null);
 
-  const grip = reorderable || (getLocked !== undefined && items.some(getLocked));
+  const grip = reorderable;
+  const single = columns.length === 1;
+  // A one-column list puts each row's remove inside its field (`fieldCell`); a field that holds no
+  // action (found after the first layout) sends it back to a column of its own.
+  const [removeOutside, setRemoveOutside] = React.useState(false);
+  const removeInField = single && !removeOutside;
   const template = [
-    ...columns.map((column) => TRACKS[column.width ?? "fill"]),
-    track("--fl-end"),
+    ...columns.map((column, index) =>
+      column.width === "compact" ? compactTrack(index) : TRACKS[column.width ?? "fill"],
+    ),
+    removeInField ? null : track("--fl-end"),
     grip ? "auto" : null,
   ]
     .filter(Boolean)
     .join(" ");
-  const single = columns.length === 1;
+  // The stacked row (narrow container): the fields in one column, then the same end slots.
+  const stackedTemplate = ["minmax(0, 1fr)", removeInField ? null : "auto", grip ? "auto" : null]
+    .filter(Boolean)
+    .join(" ");
+  const trackStyle = {
+    "--fl-columns": template,
+    "--fl-stacked": stackedTemplate,
+  } as React.CSSProperties;
   // The heading row comes with the first row and leaves with the last one.
   const hasHead = items.length > 0 && !single;
   const head = usePartPresence<HTMLDivElement>({ present: hasHead, axis: "block" });
@@ -268,8 +305,46 @@ export function FieldList<T extends object>({
     );
   // The totals come with the first row and leave with the last one, as the headings do.
   const totals = usePartPresence<HTMLDivElement>({ present: totalCells !== null, axis: "block" });
+  // A total stands where its column's field puts its text: read from the first row's fields after
+  // every render (the fields are the consumer's), one flag per column ("1" ends at the end edge).
+  const bodyRef = React.useRef<HTMLDivElement>(null);
+  const [endColumns, setEndColumns] = React.useState("");
+  React.useLayoutEffect(() => {
+    if (!totalCells) return;
+    const cells = bodyRef.current?.querySelector("[data-fl-cells]")?.children;
+    setEndColumns(columns.map((_, column) => (endsText(cells?.[column]) ? "1" : "0")).join(""));
+  });
   const atMax = max !== undefined && items.length >= max;
   const atMin = items.length <= min;
+
+  const compactColumns = columns.flatMap((column, index) =>
+    column.width === "compact" ? [index] : [],
+  );
+  const measureCompact = () => {
+    const body = bodyRef.current;
+    if (!body) return;
+    const rowsOfCells = body.querySelectorAll(`.${styles.cells}`);
+    for (const column of compactColumns) {
+      let width = 0;
+      for (const cells of rowsOfCells) {
+        const cell = cells.children[column];
+        if (cell) width = Math.max(width, cell.getBoundingClientRect().width);
+      }
+      body.style.setProperty(`--fl-compact-${column}`, width > 0 ? `${width}px` : null);
+    }
+  };
+  React.useLayoutEffect(measureCompact);
+  // The container crossing the stacking width, or a font arriving, changes the cells' widths.
+  useResizeEffect(bodyRef, measureCompact, { enabled: compactColumns.length > 0 });
+
+  React.useLayoutEffect(() => {
+    if (!removeInField) return;
+    for (const row of rows.current.values())
+      if (!row.querySelector("[data-fl-cells] [data-fl-remove]")) {
+        setRemoveOutside(true);
+        return;
+      }
+  });
 
   React.useLayoutEffect(() => {
     const target = focusNext.current;
@@ -329,16 +404,65 @@ export function FieldList<T extends object>({
       throw new Error(
         `FieldList: row "${id}" renders ${cells.length} cells for ${columns.length} columns`,
       );
+    // Every row has the same slots: a pinned row's remove is there, off, and says why.
+    const removeName = formatLabel(labels.remove, { row: name });
+    const reason = locked && !disabled ? labels.lockedReason : null;
+    const removeOff = disabled || atMin || locked;
+    const removeButton = removeInField ? (
+      // A segment at the field's end. A pinned row's stays a focusable `aria-disabled` segment, so
+      // its reason tooltip has a trigger and the segment stays the box's last child.
+      <FieldActionButton
+        label={removeName}
+        tooltip={reason === null}
+        disabled={removeOff && !reason}
+        aria-disabled={reason ? true : undefined}
+        onClick={reason ? undefined : () => remove(id)}
+        data-fl-remove=""
+      >
+        <Icon name="action.remove" />
+      </FieldActionButton>
+    ) : (
+      <Button.Root
+        variant="ghost"
+        tone="neutral"
+        aria-label={removeName}
+        disabled={removeOff}
+        onClick={() => remove(id)}
+        data-fl-remove=""
+      >
+        <Button.Icon>
+          <Icon name="action.remove" />
+        </Button.Icon>
+      </Button.Root>
+    );
+    const removeControl = reason ? (
+      <Tooltip.Root>
+        <Tooltip.Trigger>{removeButton}</Tooltip.Trigger>
+        <Tooltip.Content>{reason}</Tooltip.Content>
+      </Tooltip.Root>
+    ) : (
+      removeButton
+    );
     const content = (
       <>
         <div className={styles.cells} data-fl-cells="">
           {cells.map((cell, column) => {
             const heading = columns[column];
+            const required = Boolean(heading?.required);
             return (
               <FieldCellContext
                 // biome-ignore lint/suspicious/noArrayIndexKey: a cell is its column
                 key={column}
-                value={cellValue(heading?.label ?? "", single, Boolean(heading?.required))}
+                value={
+                  removeInField
+                    ? {
+                        label: heading?.label ?? "",
+                        hidden: "always",
+                        required,
+                        action: removeControl,
+                      }
+                    : cellValue(heading?.label ?? "", single, required)
+                }
               >
                 <div className={styles.cell} data-width={heading?.width ?? "fill"}>
                   {cell}
@@ -347,34 +471,15 @@ export function FieldList<T extends object>({
             );
           })}
         </div>
-        <span className={styles.end}>
-          {locked ? null : (
-            <Button.Root
-              variant="ghost"
-              tone="neutral"
-              aria-label={formatLabel(labels.remove, { row: name })}
-              disabled={disabled || atMin}
-              onClick={() => remove(id)}
-              data-fl-remove=""
-            >
-              <Button.Icon>
-                <Icon name="action.remove" />
-              </Button.Icon>
-            </Button.Root>
-          )}
-        </span>
+        {removeInField ? null : <span className={styles.end}>{removeControl}</span>}
         {/* The grip ends the row, after the remove button: Tab reaches the fields and the remove
-            button first; a pinned row's lock takes the same box. */}
+            button first; a pinned row's handle turns into Dnd's lock in the same box. */}
         {grip ? (
           <GripBox>
-            {reorderable ? (
-              <Dnd.Handle
-                aria-label={formatLabel(labels.reorder, { row: name })}
-                disabled={disabled}
-              />
-            ) : locked ? (
-              <DndLock aria-label={labels.locked} />
-            ) : null}
+            <Dnd.Handle
+              aria-label={formatLabel(labels.reorder, { row: name })}
+              disabled={disabled}
+            />
           </GripBox>
         ) : null}
       </>
@@ -392,9 +497,10 @@ export function FieldList<T extends object>({
       },
       // An added row rises in once: the class stays until the list changes again.
       className: cx(fieldTierClass, styles.row, presence.entering.has(id) && enterMotion.enter),
-      style: { "--fl-columns": template } as React.CSSProperties,
+      style: trackStyle,
       "data-size": size,
       "data-locked": locked || undefined,
+      "data-single": single || undefined,
     };
     return reorderable ? (
       <Dnd.SortableItem key={id} id={id} locked={locked} {...rowProps}>
@@ -424,12 +530,12 @@ export function FieldList<T extends object>({
         className={cx(styles.root, className)}
         {...toDataAttributes({ disabled: disabled || undefined })}
       >
-        <div className={styles.body}>
+        <div ref={bodyRef} className={styles.body}>
           {hasHead ? (
             <div
               ref={head.ref}
               className={cx(fieldTierClass, styles.row, styles.head, head.className)}
-              style={{ "--fl-columns": template } as React.CSSProperties}
+              style={trackStyle}
               data-size={size}
               aria-hidden="true"
             >
@@ -442,6 +548,8 @@ export function FieldList<T extends object>({
                     required={column.required}
                     disabled={disabled}
                     secondary
+                    className={styles.heading}
+                    data-width={column.width ?? "fill"}
                   >
                     {column.label}
                   </Label.Root>
@@ -492,7 +600,7 @@ export function FieldList<T extends object>({
                 hairline.top,
                 totals.className,
               )}
-              style={{ "--fl-columns": template } as React.CSSProperties}
+              style={trackStyle}
               data-size={size}
             >
               <div className={styles.cells}>
@@ -506,6 +614,7 @@ export function FieldList<T extends object>({
                       className={cx(styles.cell, styles.total)}
                       data-width={heading?.width ?? "fill"}
                       data-empty={(!shown && column > 0) || undefined}
+                      data-align={endColumns[column] === "1" ? "end" : undefined}
                     >
                       {shown ? (
                         <>
@@ -528,7 +637,7 @@ export function FieldList<T extends object>({
               </div>
               {/* The end and grip columns stay as wide as a row's remove button and grip, so the
                   totals end where the fields do. */}
-              <span className={cx(styles.end, styles.totalsEnd)} />
+              {removeInField ? null : <span className={cx(styles.end, styles.totalsEnd)} />}
               {grip ? <GripBox /> : null}
             </div>
           ) : null}

@@ -32,6 +32,10 @@ type HeadProps<Row> = {
   infoLabel: string;
   /** A leading column of row handles (`onReorder`). */
   reorderable?: boolean;
+  /** The column chooser trigger (`columnsMenu`), or null. */
+  columnsMenu: React.ReactNode;
+  /** The chooser stands in a cell of its own at the end; else in the row-actions head cell. */
+  menuCell: boolean;
   selectAll?: {
     checked: boolean;
     indeterminate: boolean;
@@ -53,6 +57,8 @@ export function Head<Row>({
   expandEnabled,
   infoLabel,
   reorderable = false,
+  columnsMenu,
+  menuCell,
   selectAll,
 }: HeadProps<Row>) {
   const idPrefix = React.useId();
@@ -85,9 +91,15 @@ export function Head<Row>({
           const isLastColumn = columnIndex === columns.length - 1;
           const described = column.description !== undefined && !column.hideHeader;
           const descriptionId = `${idPrefix}-${columnIndex}-description`;
-          // A plain header with its named glyph is named by its text alone.
+          // The row-actions head cell holds the column chooser beside its hidden name.
+          const menuHere =
+            columnsMenu != null && !menuCell && isLastColumn && column.hideHeader === true;
+          // A plain header with its named glyph, or the actions head with the chooser, is named by
+          // its text alone.
           const labelId =
-            described && !column.sortable ? `${idPrefix}-${columnIndex}-label` : undefined;
+            (described && !column.sortable) || menuHere
+              ? `${idPrefix}-${columnIndex}-label`
+              : undefined;
           // The info glyph after the label: the tooltip's trigger on a plain header (a tab stop of
           // its own); a sort button carries the tooltip itself (no control inside a button).
           const info = described ? (
@@ -135,7 +147,10 @@ export function Head<Row>({
                   </button>
                 </WithDescription>
               ) : column.hideHeader ? (
-                <VisuallyHidden>{column.header}</VisuallyHidden>
+                <>
+                  <VisuallyHidden id={labelId}>{column.header}</VisuallyHidden>
+                  {menuHere ? <span className={styles.headMenu}>{columnsMenu}</span> : null}
+                </>
               ) : (
                 <span className={styles.headTitle}>
                   <span id={labelId} className={styles.headLabel}>
@@ -154,6 +169,19 @@ export function Head<Row>({
             </th>
           );
         })}
+        {menuCell && columnsMenu != null ? (
+          <td
+            className={cx(
+              styles.headCell,
+              styles.menuCell,
+              stickyHeader && stickySurfaceClass,
+              stickyLastColumn && styles.menuCellSticky,
+              stickyHeader && stickyLastColumn && styles.cornerCellSticky,
+            )}
+          >
+            <span className={styles.headMenu}>{columnsMenu}</span>
+          </td>
+        ) : null}
       </tr>
     </thead>
   );

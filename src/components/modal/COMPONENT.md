@@ -84,7 +84,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Modal.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button; or at the end of a `Modal.Section` heading. Controls inside take tier `s`.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown; under the title when it would get less than 12rem; or at the end of a `Modal.Section` heading. Controls inside take tier `s`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -99,12 +99,20 @@ No DOM, no ref. State and dismiss policy.
 | `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
-### Modal.Title · Modal.Description
-`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog.
+### Modal.Title
+`ref` → `HTMLHeadingElement`. `<h2>` (title-m); its id names the dialog.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement \| HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+
+### Modal.Description
+`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `loading` | `boolean` | `false` | Its data loads: a `Skeleton` holds the line's place and `aria-busy` is set, so the header never moves; the data fades in. |
+| `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Modal.Body
 `ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
@@ -114,7 +122,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
 
 ### Modal.Section
-`ref` → `HTMLElement`. A titled `<section>` of the body: an `<h3>` (title-s, under the `<h2>` title), an optional description, a `Modal.Actions` at the end of the heading row; the content 16 below, sections 32 apart. Fields group in a `Fieldset`.
+`ref` → `HTMLElement`. A titled `<section>` of the body: an `<h3>` (title-s, under the `<h2>` title), an optional description, a `Modal.Actions` at the end of the heading row; the content 16 below, sections 32 apart, in any wrapper. Fields group in a `Fieldset`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -127,7 +135,7 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `layout` | `"fill" \| "end"` | `"fill"` for `xs` `s` `m`, `"end"` for `l` `xl` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
+| `layout` | `"fill" \| "end"` | `"fill"` for `xs` `s` `m`, `"end"` for `l` `xl` | `fill`: equal-width buttons in one row, wrapping rather than cutting a label; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className`, `children` and the other attributes of the `<footer>`. |
 
 ### Modal.Meta
@@ -138,7 +146,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `className`, `children` and the other attributes of the `<p>`. |
 
 ### Modal.Guard
-No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. Closing from code is never held.
+No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. While `busy` or `dirty` the browser also asks before the tab closes or reloads. Closing from code is never held.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -175,7 +183,7 @@ Below 640px of viewport a centred dialog of every size becomes a full-width bott
 ### layout (Footer)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `fill` | Equal-width buttons in one row, gap 12 | Narrow dialogs with two actions | for `xs`, `s`, `m` |
+| `fill` | Equal-width buttons in one row, gap 12; never narrower than their labels — when they do not fit, the last ones wrap to a row of their own | Narrow dialogs with two actions | for `xs`, `s`, `m` |
 | `end` | Auto-width buttons at the end, gap 8 | Wide dialogs | for `l`, `xl` |
 
 With a `Modal.Meta` the footer is a row in any layout: the status takes the free room at the start, the buttons keep their width at the end and stay one row — when the footer runs short the status goes above them first. On phones (viewport below 640px, where the dialog is a bottom sheet) and in a dialog narrower than 360px, actions stack full width in DOM order (primary last), the status above them.
@@ -218,6 +226,9 @@ Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by
 | closing | `open` turns false | the dialog keeps showing the children it had open while the exit motion plays |
 | busy | `Modal.Guard busy` | Escape, the scrim, a swipe, the close button and `Modal.Close` do nothing; the close button and the `Close` child are `disabled` in place |
 | dirty | `Modal.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); its confirm closes the dialog; a swipe past the threshold glides back and asks the same |
+| leaving the tab | `Modal.Guard busy` or `dirty` | the browser asks before the tab closes or reloads (`beforeunload`), as with `Page.Guard` |
+| description loading | `Modal.Description loading` | a `Skeleton` holds the line, `aria-busy` on the `<p>`; the data fades in under the same element |
+| actions below | the title would get less than 12rem beside `Modal.Actions` | `data-actions-below` on the header: the actions move under the title and the description |
 | sheet | a centred dialog on a phone viewport | `data-sheet` on the dialog: the bottom-sheet surface, the grab handle while it swipes |
 | swiping | as a phone sheet, a drag down from the handle or the header (with `closeOnOutsideClick`; without it there is no handle and no swipe) | `data-swiping` and `--swipe-offset` on the dialog while the pointer drags it; past 30% of its height or on a flick it closes, otherwise it glides back; a busy `Modal.Guard` sets `data-swipe-disabled` and the handle takes no drag |
 | placement | `placement` on Content | `data-placement` on the dialog |
@@ -231,7 +242,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
 - Tabs in the header: a `Tabs.List` inside `Modal.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside take the floating layer's fill; a card inside is the next layer (`floating-1`), a flat tile. Group fields with a 20 gap.
-- Titled groups of a long body: `Modal.Section label` — an `<h3>` under the dialog's `<h2>` title, an optional `description`, a `Modal.Actions` at the end of its heading row; content 16 below, sections 32 apart. A group of fields is a `Fieldset`.
+- Titled groups of a long body: `Modal.Section label` — an `<h3>` under the dialog's `<h2>` title, an optional `description`, a `Modal.Actions` at the end of its heading row; content 16 below, sections 32 apart — directly in the body, in a `Tabs.Panel` or in a form, with no spacing wrapper of your own. A group of fields is a `Fieldset`.
 - Narrow viewport (< 640px), `placement="center"`: the shared bottom-sheet surface (`src/internal/sheet.module.css`) — full width, rounded top, a grab handle strip on top while it swipes, up to the sheet top gap high, the bottom safe-area inset below the content.
 - `placement="top"`: the dialog hangs from a line 12% of the viewport down (between `--prime-modal-viewport-padding` and `--prime-space-24`) and grows downward.
 
@@ -285,6 +296,8 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - A destructive confirm built as a Modal → use ConfirmDialog. A destructive step that needs input (type the name to delete) stays a Modal with `closeOnOutsideClick={false}`.
 - Primary action not in `Modal.Confirm` → Enter does nothing; wrap it. In a form, the `type="submit"` button is the primary and stays outside `Modal.Confirm`: Enter in a field submits the form.
 - Primary action first in the footer → put it last (DOM order is the visual order).
+- «Удалить» as a third footer button of an edit dialog → the footer is the dialog's answer (Cancel + the primary); deleting the record goes to the last `tone="danger"` item of a ⋯ `Dropdown` in `Modal.Actions`, confirmed by a ConfirmDialog.
+- A wrapper with its own gap around `Modal.Section`s inside a `Tabs.Panel` or a form → not needed: sections keep 32 between them in any wrapper.
 - A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Modal.Section label` with `Modal.Actions`.
 - Busy or unsaved state lifted out of the form into Root props → put `Modal.Guard` next to the form, inside Content.
 - `key` or a conditional around `Modal.Root` to reset a form → the dialog unmounts at once, without its exit; keep the Root mounted and drive `open`.
@@ -292,5 +305,5 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Long multi-section forms in a modal → use Drawer.
 
 ## Related
-- **Built from:** the dialog shared with Drawer and Sheet (`internal/overlay/DialogParts`, `internal/overlay/ModalDialog`), [Button](../button/COMPONENT.md) (header close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Modal.Icon`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Drawer and Sheet (`internal/overlay/DialogParts`, `internal/overlay/ModalDialog`), [Button](../button/COMPONENT.md) (header close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Modal.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Modal.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm built on Modal `s`), [Drawer](../drawer/COMPONENT.md) (the same header, body, footer and `Guard` at the edge), [Popover](../popover/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md)

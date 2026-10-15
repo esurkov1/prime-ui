@@ -48,10 +48,12 @@ const [SegmentedControlProvider, useSegmentedControlContext] =
   createComponentContext<SegmentedControlContextValue>("SegmentedControl");
 
 /**
- * How much of each segment the row shows: `full` everything; `icon` only icons (when the row does
+ * How much of each segment the row shows: `full` everything at the tier's padding; `compact`
+ * everything with tighter segment padding (a row a few pixels too wide keeps its last segment whole
+ * instead of scrolling it under the edge fade); `icon` only icons (when even the compact row does
  * not fit and every segment has one) — the label stays for screen readers and in a tooltip.
  */
-type SegmentedControlCollapse = "full" | "icon";
+type SegmentedControlCollapse = "full" | "compact" | "icon";
 
 const CollapseContext = React.createContext<SegmentedControlCollapse>("full");
 
@@ -67,16 +69,19 @@ function syncThumbColor(thumb: HTMLElement, active: HTMLElement | null) {
 }
 
 /**
- * The widest level at which the row fits its viewport: icons alone go only when every segment has
- * one. The level is applied to the DOM and measured in place, so React re-renders only when it
- * changes.
+ * The widest level at which the row fits its viewport: full, then compact; icons alone go only when
+ * every segment has one — otherwise the compact row scrolls. The level is applied to the DOM and
+ * measured in place, so React re-renders only when it changes.
  */
 function fitCollapse(viewport: HTMLElement, list: HTMLElement): SegmentedControlCollapse {
-  list.dataset.collapse = "full";
-  const fits = list.scrollWidth <= viewport.clientWidth + 0.5;
+  const fits = (level: SegmentedControlCollapse) => {
+    list.dataset.collapse = level;
+    return list.scrollWidth <= viewport.clientWidth + 0.5;
+  };
+  if (fits("full") || fits("compact")) return list.dataset.collapse as SegmentedControlCollapse;
   const items = list.querySelectorAll('[role="radio"]');
   const icons = list.querySelectorAll(`[role="radio"] > .${styles.icon}`);
-  const level = fits || items.length === 0 || icons.length < items.length ? "full" : "icon";
+  const level = items.length > 0 && icons.length === items.length ? "icon" : "compact";
   list.dataset.collapse = level;
   return level;
 }

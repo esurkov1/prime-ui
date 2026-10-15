@@ -34,7 +34,6 @@ export type {
   PageListProps,
   PageMaxWidth,
   PageRootProps,
-  PageSectionLayout,
   PageSectionProps,
   PageSplitProps,
   PageTitleProps,

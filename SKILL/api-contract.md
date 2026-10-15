@@ -295,7 +295,7 @@ export function DeleteProject({ onDelete }: { onDelete: () => Promise<void> }) {
 
 Leaving a form with unsaved changes is the same contract: `Modal.Guard` / `Drawer.Guard` inside the
 content with `dirty` (any dismiss asks «Не сохранять изменения?») and `busy` (nothing closes it while
-it saves). A form that is the whole page takes `Page.Guard` (`dirty`, `busy`) inside the page: it
+it saves); while either holds, the browser also asks before the tab closes or reloads. A form that is the whole page takes `Page.Guard` (`dirty`, `busy`) inside the page: it
 holds a press on `Sidebar.Item`, `BottomNav.Item` and `Breadcrumb.Item` links — router links
 included — and the browser's own close or reload; never a `beforeunload` or a ConfirmDialog on a
 crumb of your own.

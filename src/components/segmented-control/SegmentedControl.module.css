@@ -6,9 +6,9 @@
  * in `--prime-color-control-selected` — white in light, a lighter step above the track in dark —
  * with its own faint ring; it slides between segments. Segment radius = track radius − padding.
  * Two-line segments (with `SegmentedControl.Description`) grow the track to their content.
- * Narrow containers: segments never wrap (`internal/SwitcherScroller`); when every segment has an
- * icon they drop their titles (`data-collapse="icon"`), and what still does not fit scrolls with
- * edge fades. `fullWidth` stretches the group: single-line segments tend to equal widths but never
+ * Narrow containers: segments never wrap (`internal/SwitcherScroller`); first they tighten their
+ * padding (`data-collapse="compact"`), then, when every segment has an icon, they drop their titles
+ * (`data-collapse="icon"`), and what still does not fit scrolls with edge fades. `fullWidth` stretches the group: single-line segments tend to equal widths but never
  * get narrower than their label (the row scrolls instead), two-line segments grow from their content
  * width.
  */
@@ -301,6 +301,12 @@
   width: var(--seg-icon);
   height: var(--seg-icon);
   line-height: 0;
+}
+
+/* Compact: a row slightly wider than its container tightens the single-line segments' padding by
+   one step before it scrolls, so a short overflow never hides the last segment under the fade. */
+.list[data-collapse="compact"] .item:not([data-icon-only="true"], [data-two-line="true"]) {
+  padding-inline: calc(var(--seg-item-pad-x) - var(--prime-space-1));
 }
 
 /* Collapsed to icons: the title leaves the row (Label renders a VisuallyHidden copy and the item a

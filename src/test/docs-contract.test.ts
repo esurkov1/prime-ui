@@ -249,6 +249,30 @@ function keyDownThenClick(file: string, source: string): string[] {
 const FRAMED_FIELDS =
   /<(Input\.Root|Textarea\.Root|Select\.Root|NativeSelect|TagSelect|Datepicker\.Root|DigitInput|ColorField|Slider|FileUpload\.Root|SegmentedControl\.Root|ButtonGroup\.Root|ColorSwatches|Radio\.Group)\b/;
 
+/** The controls a DataTable `toolbar` may hold (SKILL/composition.md, controls of a table). */
+const TABLE_TOOLBAR_CONTROL =
+  /<(Button\.Root|LinkButton|Input\.Root|Select\.Root|NativeSelect|TagSelect|SegmentedControl\.Root|ButtonGroup\.Root|Datepicker\.Root|Switch\.Root|Checkbox\.Root|Dropdown\.Root|Popover\.Root|SmartFilter\.Toolbar)\b|(\.map\()/g;
+
+/** The `toolbar={…}` expressions of the DataTable elements in `body`. */
+function dataTableToolbars(body: string): string[] {
+  const found: string[] = [];
+  for (const m of body.matchAll(/\btoolbar=\{/g)) {
+    const start = m.index + m[0].length;
+    // DataTable and Gantt take a `toolbar`: the prop is the one of the nearer opening tag.
+    const before = body.slice(0, m.index);
+    if (before.lastIndexOf("<DataTable") <= before.lastIndexOf("<Gantt")) continue;
+    let depth = 1;
+    let end = start;
+    while (end < body.length && depth > 0) {
+      if (body[end] === "{") depth += 1;
+      else if (body[end] === "}") depth -= 1;
+      end += 1;
+    }
+    found.push(body.slice(start, end - 1));
+  }
+  return found;
+}
+
 /**
  * Scenarios that break the kit's own rules (CLAUDE.md §2, SKILL/ux.md), as offender ids for the
  * `example-content` guard.
@@ -284,6 +308,18 @@ function contentOffenders(dir: string, file: string, source: string): string[] {
     !/<form\b|<[A-Z]\w*\.Form\b|\bform=/.test(body)
   ) {
     offenders.push(`${file}: fields with a submit and no <form>`);
+  }
+  for (const toolbar of dataTableToolbars(body)) {
+    const controls = [...toolbar.matchAll(TABLE_TOOLBAR_CONTROL)].reduce(
+      // SmartFilter.Toolbar is a search with filters; a mapped row is several controls.
+      (sum, m) => sum + (m[1] === "SmartFilter.Toolbar" || m[1] === ".map(" ? 2 : 1),
+      0,
+    );
+    if (controls < 2) {
+      offenders.push(
+        `${file}: a DataTable toolbar with ${controls} control(s) (columnsMenu, the page)`,
+      );
+    }
   }
   for (const m of body.matchAll(
     /<([A-Z]\w*(?:\.\w+)?)\b[^>]*\bsize="(\w+)"[^>]*>([\s\S]*?)<\/\1>/g,

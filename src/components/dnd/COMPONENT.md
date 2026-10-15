@@ -201,7 +201,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 ## Layout & spacing
 - The distance between items is `--prime-space-2`; a host sets `--dnd-sortable-gap` on the list for another one.
 - A grid (`axis="grid"`) is `display: grid`: the host sets the tracks (`grid-template-columns`) and the cells' size; the gap takes a cell, and a carried item resizes to the cell it would land in.
-- A `Dnd.Handle` ends its item: the last child, after the item's own controls (a switch, a remove button), at the inline end (on the left in RTL); a `locked` item's lock takes the same place, so the grips of every row stand on one line. In a table it is the last cell.
+- A `Dnd.Handle` ends its item: the last child, after the item's own trailing controls (a remove button), at the inline end (on the left in RTL); a `locked` item's lock takes the same place, so the grips of every row stand on one line. In a table it is the last cell. An on / off switch leads the item (its first child), so its state reads first and nothing stands between the text and the grip.
 - The reason chip stands `--prime-tooltip-offset` under the carried copy, start-aligned, at most `--prime-tooltip-max-width` wide.
 - The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a radius on its own class (the gap and the clone's fill take it) and keep the row's look within its ancestors up to the nearest surface (`data-depth`) — the clone flies inside empty copies (`display: contents`) of exactly those, so their variables and selectors still apply. A table row flies in a one-row copy of its table inside them.
 - A scrollable ancestor under the pointer auto-scrolls within 64 px of its edge (a `ScrollContainer` strip works).
@@ -252,7 +252,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Project tasks reordered by dragging the whole row; one root above, the move applied with a helper — `Dnd.Root`, `Dnd.Sortable`, `onReorder`, `moveBefore`. |
-| [handle.tsx](examples/handle.tsx) | Notification channels with switches: only the grip starts a drag, and the async save can roll the order back — `handle`, `Dnd.Handle`, `onReorder`. |
+| [handle.tsx](examples/handle.tsx) | Notification channels, each switch leading its row and the grip ending it: only the grip starts a drag, and the async save can roll the order back — `handle`, `Dnd.Handle`, `onReorder`. |
 | [grid.tsx](examples/grid.tsx) | Product photos in a wrapping grid: a photo carried across rows lands in reading order, the gap takes a cell, Alt + ← / → steps it one place — `axis`. |
 | [locked.tsx](examples/locked.tsx) | Sections of a workspace menu: the home section is pinned first with a lock in place of its grip, the rest reorder around nothing past it; each row is named by its visible title — `locked`, `handle`, `aria-labelledby`. |
 | [board.tsx](examples/board.tsx) | A ticket board: columns share one kind, so a ticket lands in another column at an exact position or moves there with Alt + ← / →, an empty column says so, and a full column refuses it before the release with the reason under the ticket — `kind`, `canDrop`, `empty`, `onReorder`. |

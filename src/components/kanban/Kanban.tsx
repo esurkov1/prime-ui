@@ -13,6 +13,7 @@ import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import hairline from "@/internal/hairline.module.css";
@@ -148,6 +149,7 @@ export type KanbanRootProps<T> = Omit<
   canDrop?: (id: string, columnId: string) => boolean | string;
   variant?: KanbanVariant;
   loading?: boolean;
+  loadingColumns?: number;
   disabled?: boolean;
   labels?: Partial<KanbanLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -231,6 +233,7 @@ function KanbanBoard<T>({
   canDrop,
   variant = "plain",
   loading = false,
+  loadingColumns = 3,
   disabled = false,
   labels: labelsProp,
   className,
@@ -352,6 +355,10 @@ function KanbanBoard<T>({
   };
 
   const locked = disabled || loading;
+  // A board loading before its columns arrive draws placeholder columns (`loadingColumns`).
+  const placeholders = loading && columns.length === 0;
+  const [placeholdersShown, setPlaceholdersShown] = React.useState(placeholders);
+  if (placeholders && !placeholdersShown) setPlaceholdersShown(true);
   const latest = React.useRef({ byId, getItemHref, onItemOpen, getLabel });
   latest.current = { byId, getItemHref, onItemOpen, getLabel };
   const links = getItemHref !== undefined;
@@ -401,44 +408,95 @@ function KanbanBoard<T>({
           className={styles.scroller}
           data-full-width="true"
         >
-          <Dnd.Sortable
-            as="ul"
-            axis="x"
-            handle
-            className={styles.columns}
-            items={ordered}
-            getId={getColumnId}
-            getLabel={(column) => formatLabel(labels.column, { column: column.title })}
-            disabled={!reorderableColumns || locked}
-            onReorder={(id, beforeId) => moveColumn(id, beforeId)}
-            renderItem={(column, columnIndex) => (
-              <KanbanColumnView
-                column={column}
-                titleAs={columnTitleAs}
-                cardDepth={cardDepth}
-                cards={idsOf(column.id).flatMap((id) => {
-                  const item = byId.get(id);
-                  return item === undefined ? [] : [item];
-                })}
-                skeletons={SKELETON_CARDS[columnIndex % SKELETON_CARDS.length] ?? 1}
-                kind={kind}
-                getId={getId}
-                getLabel={getLabel}
-                accepts={(id) => accepts(column, id)}
-                onReorder={(id, beforeId) => place(id, column.id, beforeId)}
-                renderItem={renderItem}
-                actions={renderColumnActions?.(column)}
-                meta={renderColumnMeta?.(column)}
-                reorderable={reorderableColumns && !disabled}
-                loading={loading}
-                disabled={disabled}
-                labels={labels}
-              />
-            )}
-          />
+          {placeholders ? (
+            // Before the columns arrive: placeholder columns in the column geometry.
+            <div className={styles.placeholders} aria-hidden="true">
+              {Array.from({ length: loadingColumns }, (_, columnIndex) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder columns
+                <div key={columnIndex} className={styles.column}>
+                  <div className={cx(styles.header, hairline.bottom)}>
+                    <Skeleton shape="block" className={styles.skeletonTitle} />
+                  </div>
+                  <div className={styles.body}>
+                    <SkeletonCards
+                      count={SKELETON_CARDS[columnIndex % SKELETON_CARDS.length] ?? 1}
+                      cardDepth={cardDepth}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Dnd.Sortable
+              as="ul"
+              axis="x"
+              handle
+              // The columns that replace the placeholders fade in where they stood.
+              className={cx(styles.columns, placeholdersShown && enterMotion.enterFade)}
+              items={ordered}
+              getId={getColumnId}
+              getLabel={(column) => formatLabel(labels.column, { column: column.title })}
+              disabled={!reorderableColumns || locked}
+              onReorder={(id, beforeId) => moveColumn(id, beforeId)}
+              renderItem={(column, columnIndex) => (
+                <KanbanColumnView
+                  column={column}
+                  titleAs={columnTitleAs}
+                  cardDepth={cardDepth}
+                  cards={idsOf(column.id).flatMap((id) => {
+                    const item = byId.get(id);
+                    return item === undefined ? [] : [item];
+                  })}
+                  skeletons={SKELETON_CARDS[columnIndex % SKELETON_CARDS.length] ?? 1}
+                  kind={kind}
+                  getId={getId}
+                  getLabel={getLabel}
+                  accepts={(id) => accepts(column, id)}
+                  onReorder={(id, beforeId) => place(id, column.id, beforeId)}
+                  renderItem={renderItem}
+                  actions={renderColumnActions?.(column)}
+                  meta={renderColumnMeta?.(column)}
+                  reorderable={reorderableColumns && !disabled}
+                  loading={loading}
+                  disabled={disabled}
+                  labels={labels}
+                />
+              )}
+            />
+          )}
         </ScrollContainer>
       </div>
     </BoardContext>
+  );
+}
+
+/** Placeholder cards in the card geometry: a loading column, or a placeholder column. */
+function SkeletonCards({
+  count,
+  cardDepth,
+}: {
+  count: number;
+  cardDepth: SurfaceDepth | undefined;
+}) {
+  return (
+    <div className={styles.list}>
+      {Array.from({ length: count }, (_, index) => (
+        <div
+          // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder cards
+          key={index}
+          className={cx(styles.item, styles.skeleton)}
+          data-depth={cardDepth}
+          data-surface={cardDepth !== undefined || undefined}
+          aria-hidden="true"
+        >
+          <Skeleton lines={2} />
+          <div className={styles.footer}>
+            <Skeleton shape="block" className={styles.skeletonBadge} />
+            <Skeleton shape="circle" size="s" />
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -558,24 +616,7 @@ function KanbanColumnView<T>({
       <ScrollContainer className={styles.body}>
         <Crossfade state={loading ? "loading" : "ready"} className={styles.swap}>
           {loading ? (
-            <div className={styles.list}>
-              {Array.from({ length: skeletons }, (_, index) => (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder cards
-                  key={index}
-                  className={cx(styles.item, styles.skeleton)}
-                  data-depth={cardDepth}
-                  data-surface={cardDepth !== undefined || undefined}
-                  aria-hidden="true"
-                >
-                  <Skeleton lines={2} />
-                  <div className={styles.footer}>
-                    <Skeleton shape="block" className={styles.skeletonBadge} />
-                    <Skeleton shape="circle" size="s" />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <SkeletonCards count={skeletons} cardDepth={cardDepth} />
           ) : (
             <div className={styles.drop}>
               <Dnd.Sortable

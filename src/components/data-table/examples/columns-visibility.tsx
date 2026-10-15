@@ -1,8 +1,6 @@
-/** Orders with the column chooser in the toolbar; the choice outlives a reload in local storage, the order number always stays — `DataTable.ColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. */
-import { Badge, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
+/** Orders with the column chooser at the end of the header row; the choice outlives a reload in local storage, the order number always stays — `columnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. */
+import { Badge, DataTable, type DataTableColumn } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 type Status = "paid" | "shipped" | "waiting";
 type Order = {
@@ -138,14 +136,7 @@ export default function DataTableColumnsVisibilityExample() {
       rows={ORDERS}
       getRowKey={(row) => row.id}
       stickyFirstColumn
-      toolbar={
-        <div className={styles.toolbar}>
-          <Typography as="span" variant="body-s" tone="secondary">
-            Заказы за неделю: {ORDERS.length}
-          </Typography>
-          <DataTable.ColumnsMenu />
-        </div>
-      }
+      columnsMenu
     />
   );
 }

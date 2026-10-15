@@ -1,4 +1,4 @@
-/** Specs of a plan on one line each: an icon picker and a color swatch take compact columns, the first three specs are pinned with a lock and the rest reorder below them — `getLocked`, `width`, `reorderable`. */
+/** Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them — `getLocked`, `width`, `reorderable`. */
 import {
   ColorPresets,
   FieldList,
@@ -21,9 +21,9 @@ type Spec = {
 
 const COLUMNS: FieldListColumn[] = [
   { label: "Иконка", width: "compact" },
+  { label: "Цвет", width: "compact" },
   { label: "Параметр" },
   { label: "Значение" },
-  { label: "Цвет", width: "compact" },
 ];
 
 const ICONS: { name: IconName; label: string }[] = [
@@ -107,6 +107,15 @@ export default function FieldListLockedExample() {
               ))}
             </Select.Content>
           </Select.Root>
+          <ColorPresets.Root
+            value={spec.color}
+            onValueChange={(color) => row.update({ color: color ?? spec.color })}
+          >
+            <ColorPresets.Trigger>
+              <ColorPresets.SwatchButton />
+            </ColorPresets.Trigger>
+            <ColorPresets.Content />
+          </ColorPresets.Root>
           <Input.Root>
             <Input.Wrapper>
               <Input.Field
@@ -123,15 +132,6 @@ export default function FieldListLockedExample() {
               />
             </Input.Wrapper>
           </Input.Root>
-          <ColorPresets.Root
-            value={spec.color}
-            onValueChange={(color) => row.update({ color: color ?? spec.color })}
-          >
-            <ColorPresets.Trigger>
-              <ColorPresets.SwatchButton />
-            </ColorPresets.Trigger>
-            <ColorPresets.Content />
-          </ColorPresets.Root>
         </>
       )}
     />

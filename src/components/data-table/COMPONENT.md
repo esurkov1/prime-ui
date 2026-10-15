@@ -7,14 +7,14 @@
 
 ## When to use
 - Lists of records with several attributes to compare: orders, invoices, users, campaigns.
-- Data that needs sorting, paging, bulk selection or a filter toolbar.
+- Data that needs sorting, paging or bulk selection.
 - Thousands of records the server sorts and pages (`source="server"` + `rowCount`): the table shows the one page the server returned.
 - Rows that open a record: a page (`getRowHref`, a real link) or a drawer in place (`onRowClick`).
 - Rows grouped by a key with a header and totals per group (`getRowGroup`).
 - Records whose order is data the user sets: pipeline stages, a price list, priorities (`onReorder`).
 - Hierarchical rows (`getRowChildren`) or rows with a detail panel (`renderExpanded`).
 - Wide numeric reports with a sticky head and first column.
-- Wide records on narrow screens: let people choose the columns (`DataTable.ColumnsMenu`) instead of dropping them.
+- Wide records on narrow screens: let people choose the columns (`columnsMenu`) instead of dropping them.
 - A log or a register that takes the rest of the page height (`scrollHeight="fill"`).
 
 ## When not to use
@@ -30,22 +30,22 @@
 ```tsx
 import { DataTable, type DataTableColumn } from "prime-ui-kit";
 ```
-Exported types: `DataTableColumn<Row>`, `DataTableProps<Row>`, `DataTableSortState`, `DataTableOrder`, `DataTableGroup<Row>`, `DataTableRowClickEvent`, `DataTableColumnsMenuProps`, `DataTableLabels`.
+Exported types: `DataTableColumn<Row>`, `DataTableProps<Row>`, `DataTableSortState`, `DataTableOrder`, `DataTableGroup<Row>`, `DataTableRowClickEvent`, `DataTableLabels`.
 
 ## Anatomy
 ```
 DataTable                           card-fill block, radius 12, clips its content
-├── toolbar                         optional panel above the table (search, filters, bulk actions)
-│   └── DataTable.ColumnsMenu       the column chooser: a Button and a Dropdown of check items
+├── toolbar                         optional panel for several table controls (bulk actions, own search + filters)
 ├── scroll viewport                 ScrollContainer, both axes, in a frame that holds the edge shadows
 │   └── table
-│       ├── thead                   [handle] [select all] [toggle] head cells; sortable heads hold a button
+│       ├── thead                   [handle] [select all] [toggle] head cells [column chooser]; sortable heads hold a button
+│       │                           columnsMenu: an icon Button + Dropdown in the row-actions head cell, else a trailing cell
 │       └── tbody                   rows · sub-rows · detail rows · skeleton / empty / error row
 │           (one per group)         with getRowGroup: a <th scope="rowgroup"> header row, then its rows
 │                                   with onReorder: a Dnd.Sortable tbody, each row led by a Dnd.Handle
 └── footer                          range «Показано 1–5 из 23» · Pagination · infinite-scroll status
 ```
-Columns are data (`DataTableColumn<Row>[]`), not child parts. The one part, `DataTable.ColumnsMenu`, goes into `toolbar` and reads the table it sits in.
+Columns are data (`DataTableColumn<Row>[]`), not child parts; the table has no parts. The column chooser is the `columnsMenu` flag: it lives in the header row, never in `toolbar`.
 
 ## API
 
@@ -57,9 +57,10 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `columns` | `DataTableColumn<Row>[]` | — (required) | Column definitions, see `DataTableColumn<Row>`. |
-| `hiddenColumns` | `string[]` | — | Ids of columns that are not rendered, controlled. A column with `hideable: false` stays. `DataTable.ColumnsMenu` in `toolbar` changes it. |
+| `hiddenColumns` | `string[]` | — | Ids of columns that are not rendered, controlled. A column with `hideable: false` stays. The column chooser (`columnsMenu`) changes it. |
 | `defaultHiddenColumns` | `string[]` | `[]` | Initially hidden column ids, uncontrolled. |
-| `onHiddenColumnsChange` | `(hiddenColumns: string[]) => void` | — | The hidden ids changed (`DataTable.ColumnsMenu`). The kit stores nothing: keep the list (local storage, the user's settings) and pass it back to restore the choice. |
+| `onHiddenColumnsChange` | `(hiddenColumns: string[]) => void` | — | The hidden ids changed (`columnsMenu`). The kit stores nothing: keep the list (local storage, the user's settings) and pass it back to restore the choice. |
+| `columnsMenu` | `boolean` | `false` | The column chooser at the end of the header row: in the head cell of a trailing row-actions column (`hideHeader`), else in a cell of its own; sticks with `stickyLastColumn`. Needs `showHeader`. |
 | `rows` | `Row[]` | — (required) | Data; sorted in memory when a sort is set. With `source="server"` — the page (or the loaded batches) as the server returned it. |
 | `source` | `"client" \| "server"` | `"client"` | Who sorts and pages the rows. `client`: the table sorts `rows` and slices pages. `server`: `rows` is one page, already sorted; `sort` / `page` changes are the request, `rowCount` drives Pagination. |
 | `rowCount` | `number` | `rows.length` | Total rows on the server (`source="server"`): the page count and «Показано {from}–{to} из {total}». |
@@ -78,7 +79,7 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `loadingRows` | `number` | `min(pageSize, 5)` | Number of skeleton rows. |
 | `empty` | `ReactNode` | `labels.empty` | Empty-state content: a string goes into a compact EmptyPage, a node (e.g. a full `EmptyPage`) is rendered as is. |
 | `loadError` | `ReactNode` | — | Load error: replaces the body with the message in `role="alert"`. |
-| `toolbar` | `ReactNode` | — | Panel above the table (search, filters, bulk actions); stacks below 30rem of table width. |
+| `toolbar` | `ReactNode` | — | Panel above the table for several controls of the table itself (bulk actions on the selected rows, a table-local search with filters); stacks below 30rem of table width. |
 | `selectable` | `boolean` | `false` | Leading checkbox column with «select all», Shift range, press-and-drag and Space. |
 | `selected` | `Key[]` | — | Selected row ids, controlled. |
 | `defaultSelected` | `Key[]` | `[]` | Initially selected ids, uncontrolled. |
@@ -118,15 +119,6 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `className` | `string` | — | Class on the root `<div>`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other attributes of the root `<div>`. |
 
-### DataTable.ColumnsMenu
-`ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in: a Button opening a Dropdown with a check item per column. Writes the table's hidden columns; throws outside a DataTable `toolbar`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Side of the trigger the menu opens on. |
-| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment to the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it. |
-| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children">` | — | `className`, `aria-label` and the other attributes of the trigger button. |
-
 ### Types
 
 #### `DataTableColumn<Row>`
@@ -148,7 +140,7 @@ One column of `columns`: data, not a part.
 | `numeric` | `boolean` | — | Tabular figures, no wrapping, end alignment unless `align` is set. |
 | `truncate` | `boolean` | — | One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |
 | `grow` | `boolean` | — | Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping. |
-| `hideable` | `boolean` | `true` | The column can be hidden through `hiddenColumns` and `DataTable.ColumnsMenu`; `false` for the key column that names the row. |
+| `hideable` | `boolean` | `true` | The column can be hidden through `hiddenColumns` and `columnsMenu`; `false` for the key column that names the row and for the row-actions column. |
 | `scale` | `boolean \| { min?: number; max?: number }` | — | Heatmap: each cell is shaded by its numeric value on the five-step chart scale. `true` spans the column's minimum to maximum over all rows; `{ min, max }` fixes either end. |
 | `width · minWidth · maxWidth` | `string` | — | CSS sizes of the column (`"14rem"`). |
 
@@ -227,7 +219,8 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | `stickyLastColumn` | the last visible column sticks to the end edge, opaque in the row's fill (hover, zebra, selected, expanded), with a hairline on its start edge | a row actions column (⋯ menu, an icon Button) of a table wider than its container | `false` |
 | `stickyGroupHeaders` | group header rows stick under the head while their rows scroll | long grouped tables in a `scrollHeight` window | `false` |
 | `collapsedGroups` · `defaultCollapsedGroups` · `onCollapsedGroupsChange` | any of the three makes groups fold: a chevron toggle leads each group header, a collapsed group shows its header alone | long grouped tables where people work one group at a time; `defaultCollapsedGroups={[]}` starts with every group open | off |
-| column `hideable` | `false`: the column stays even when listed in `hiddenColumns`; checked and disabled in `DataTable.ColumnsMenu` | the key column that names the row | `true` |
+| `columnsMenu` | an icon-only ghost Button (`view.columns`) at the end of the header row: in the head cell of a trailing row-actions column (`hideHeader`), else in a narrow cell of its own; it opens the column chooser | every table with more columns than a narrow screen holds; the default home of the chooser | `false` |
+| column `hideable` | `false`: the column stays even when listed in `hiddenColumns`; checked and disabled in the column chooser | the key column that names the row, the row-actions column | `true` |
 | `showHeader` | head row shown | off only for self-explanatory key/value tables | `true` |
 | `fullWidth` | spans the container; `false` = content width | `false` for short lookup tables in wide layouts | `true` |
 | column `numeric` | tabular figures, end-aligned, no wrap | numbers, money | — |
@@ -252,7 +245,7 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | new rows | rows new in `rows` (by `getRowKey`) | `data-animate`: top-level cells drop in from above (`enterMotion`) |
 | sub-rows and detail panels | an expand / a collapse | both fold open and shut through the kit's Disclosure (`0fr ↔ 1fr`, the fade and a short slide on the same `base` clock; a detail opens on the enter curve); the row height and padding live inside the fold, so nothing is left to jump. Sub-rows: `data-fold` on the row (`open` · `closed`), every cell's content a Disclosure; a collapsed row's sub-rows stay mounted until the fold ends. Detail row: `data-state`; it unmounts after the close |
 | overflowing sideways | the table is wider than its viewport | `data-overflow-start` (scrolled from the start) and `data-overflow-end` (more to the end) on the root: a soft shadow over that edge, from the end edge of the sticky first column for the start and from the start edge of the sticky last column for the end; fades in and out over `fast` |
-| hidden columns | `hiddenColumns` / `defaultHiddenColumns`, `DataTable.ColumnsMenu` | the listed columns (except `hideable: false`) are not rendered in the head, rows, skeleton or state rows; widths are measured again; a sort by a hidden column keeps the row order |
+| hidden columns | `hiddenColumns` / `defaultHiddenColumns`, `columnsMenu` | the listed columns (except `hideable: false`) are not rendered in the head, rows, skeleton or state rows; widths are measured again; a sort by a hidden column keeps the row order |
 | opening rows | `getRowHref` / `onRowClick`, `isRowClickable` | `data-clickable` (pointer, pressed wash) on rows that open; link rows: `data-link`, an `<a data-row-link>` in every content cell; in-place rows: `tabindex="0"`. Focus (the link, or the row) rings the whole row with the hover wash |
 | grouped | `getRowGroup` | one `<tbody>` per group run on screen, opened by a `<th scope="rowgroup">` row one ladder step off the table; `data-sticky` on it with `stickyGroupHeaders` |
 | collapsed group | `collapsedGroups` / `defaultCollapsedGroups` | `data-collapsed` on the group header row, its toggle `aria-expanded="false"` with the chevron at rest; the group's `<tbody>` holds the header alone, its rows only lay out the column widths in the hidden measuring body. Its rows fold away and back like sub-rows (`data-fold`, `base`), whether a toggle or the owner changed the keys. «Select all» still takes the rows of collapsed groups; paging still counts them |
@@ -263,25 +256,26 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | filling the parent | `scrollHeight="fill"` | `data-scroll-height="fill"` on the root; the viewport takes the free height |
 | state swap | the body moves between loading, rows, empty and error | the body fades in over `base` (opacity only, the same swap motion as [Crossfade](../crossfade/COMPONENT.md)); the head stays still; nothing moves on the first render |
 
-Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data-sticky-header`, `data-sticky-first-column`, `data-sticky-last-column`, `data-table-width` (`fill` · `auto` · `grow`), `data-highlight-row`, `data-highlight-column`, `data-striped`, `data-loading`, `data-reorderable`, `data-selectable`, `data-expandable`, `data-dragging` (while drag-selecting), `data-overflow-start` · `data-overflow-end` (edges that hide columns), `data-scroll-height` (`fill`). Sorting and paging swap rows instantly; everything is still under `prefers-reduced-motion`.
+Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data-sticky-header`, `data-sticky-first-column`, `data-sticky-last-column`, `data-menu-cell` (the column chooser in a trailing cell of its own), `data-table-width` (`fill` · `auto` · `grow`), `data-highlight-row`, `data-highlight-column`, `data-striped`, `data-loading`, `data-reorderable`, `data-selectable`, `data-expandable`, `data-dragging` (while drag-selecting), `data-overflow-start` · `data-overflow-end` (edges that hide columns), `data-scroll-height` (`fill`). Sorting and paging swap rows instantly; everything is still under `prefers-reduced-motion`.
 
 ## Layout & spacing
 - The root is a layer of the surface ladder (`data-depth`, one above its host): it fills its container on `--prime-color-layer-current`, radius 12, and clips full-bleed head and rows; zebra rows and the sticky column are one ladder step off it, the head two. On a card or in a modal it is the next layer by itself — never wrap it in a Card.
+- `toolbar` holds several controls of the table itself: bulk actions on the selected rows, or the search and filters of a table that is not the page's main region (a section of a record, a Drawer). One control never gets a bar: the column chooser is `columnsMenu` in the header row; the page's search, filters, period, view, figures and actions go to its top bar (`Page.Tools`, `Page.Actions`, `Page.Description`).
 - Toolbar padding `--prime-space-3` × cell padding, items `gap: --prime-space-2`; below 30rem of table width toolbar and footer stack.
 - The footer has a hairline on top: range on the left, Pagination on the right. The range shows only with more than one page or with infinite scroll.
 - Columns scroll sideways inside the table, never the page; pin the identifying column with `stickyFirstColumn` and the row actions column with `stickyLastColumn` (it pins the last visible column, so hiding it pins the one before). A 320 px column holds the table without breaking it.
 - While columns are hidden past an edge, that edge shows a `--prime-space-4` shadow (`--prime-color-bg-edge-shadow`) over the content; it takes no space and follows RTL. With `stickyFirstColumn` the start shadow falls from the pinned column's end edge; with `stickyLastColumn` the end shadow falls from the pinned column's start edge. With `stickyHeader` the pinned head cells hold both corners.
-- Fewer columns, less scrolling: put `DataTable.ColumnsMenu` in `toolbar` (the key column `hideable: false`). The kit stores nothing: keep `onHiddenColumnsChange`'s list where the app keeps settings and pass it back as `hiddenColumns`. Never hide columns silently by width.
-- `DataTable.ColumnsMenu` is an outline neutral Button one tier below the table (the `view.columns` icon, `labels.columns`); its Dropdown lists every column and ends with `labels.showAllColumns`. A `hideable: false` column stays checked and disabled, and the last visible column cannot be hidden. With `align="auto"` a trigger near the end of the screen lines up the panel's end edge and the panel grows toward the start, and the other way near the start.
+- Fewer columns, less scrolling: turn on `columnsMenu` (the key column and the row-actions column `hideable: false`). The kit stores nothing: keep `onHiddenColumnsChange`'s list where the app keeps settings and pass it back as `hiddenColumns`. Never hide columns silently by width.
+- The column chooser is an icon-only ghost neutral Button one tier below the table (the `view.columns` icon; `labels.columns` is its name and its Tooltip) at the end of the header row. With a trailing row-actions column (the last visible column has `hideHeader`) it stands in that column's head cell, lined up with the ⋯ buttons under it; otherwise it takes a narrow trailing cell (the trigger plus the end padding, no column divider) that every row repeats empty. With `stickyLastColumn` it sticks: in the actions head cell with that column, or its own cell at the end edge with the last column pinned right before it. Its Dropdown opens below, lined up with the trigger's end edge, lists every column and ends with `labels.showAllColumns`; a `hideable: false` column stays checked and disabled, and the last visible column cannot be hidden.
 - Row height per `size` is public: `--prime-table-row-height-xs` · `-s` · `-m` · `-l` · `-xl` (36 · 36 · 44 · 52 · 52). A placeholder outside the table that stands in its geometry (a heatmap, a matrix skeleton) uses the same token.
 - A row that opens keeps controls out of its key cell (that cell is the link); controls in other cells stand above the row's link. Mark a custom widget with `data-row-click-ignore`.
 - Group headers: the name at the start, totals at the end (`renderGroupHeader` returns both, the kit lays them out across the visible width), head-tier text in `text-secondary`, row height = the head height. With collapsible groups the chevron toggle (the expand toggle's ghost Button) leads the header at the cell padding.
 - The empty and error content stands in a sticky box of the visible width: a wide table centres it in the viewport, and it stays there while the table scrolls sideways.
 - A trend per row: a compact [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"`) in a cell fits the row height; its pointer and keys never open the row.
-- Long data needs no slicing: past 100 rows a body in a bounded viewport (`scrollHeight`, `"fill"`, `paging="infinite"`) renders only the rows around the view; spacer rows keep the scrollbar exact, the focused row stays rendered, rows carry `aria-rowindex` and the table `aria-rowcount`. Grouped (`getRowGroup`), reorderable (`onReorder`) and `renderExpanded` bodies, and a table the page scrolls, render every row. The browser's find-in-page sees only rendered rows: give a long table a search in `toolbar`.
+- Long data needs no slicing: past 100 rows a body in a bounded viewport (`scrollHeight`, `"fill"`, `paging="infinite"`) renders only the rows around the view; spacer rows keep the scrollbar exact, the focused row stays rendered, rows carry `aria-rowindex` and the table `aria-rowcount`. Grouped (`getRowGroup`), reorderable (`onReorder`) and `renderExpanded` bodies, and a table the page scrolls, render every row. The browser's find-in-page sees only rendered rows: give a long table a search (the page's `SmartFilter`).
 - `scrollHeight="fill"` needs a parent with a height: a flex or grid column with `min-height: 0`, `Page.Root fill` in an `AppShell.Root fillViewport`, or a sized pane.
 - The sticky head stops sticking on screens lower than 480px (landscape phones), so it never takes a large share of the height.
-- Cell content: text, two-line text (title + `caption`), an Avatar with text, a Badge, or a control one tier down (`s` in an `m` table). Toolbar controls use `s` in an `m` table.
+- Cell content: text, two-line text (title + `caption`), an Avatar with text, a Badge, or a control one tier down (`s` in an `m` table). Toolbar controls and the column chooser use `s` in an `m` table.
 - Column widths: `width` / `minWidth` / `maxWidth` strings; never size cells with custom CSS.
 - Sub-rows indent by `--dt-indent` per level (avatar of the tier + gap); override it on the root for other leading content.
 
@@ -292,7 +286,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 
 | Key | Action |
 |---|---|
-| `Tab` | Moves through the toolbar (`DataTable.ColumnsMenu`), sort buttons, row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination. |
+| `Tab` | Moves through the toolbar, sort buttons, the column chooser (`columnsMenu`), row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination. |
 | `Enter` · `Space` | Sorts by the column, toggles the row or the group, or opens the focused row (`onRowClick`); Enter on a row link follows it. |
 | `Space` | Toggles the focused row checkbox. |
 | `Shift + Space` | Selects the range from the last toggled row. |
@@ -306,7 +300,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - A link row has one link for assistive tech: the `<a>` in the key cell, named by its text. Its copies over the other cells are `aria-hidden` and `tabindex="-1"`, so the pointer can use the whole row. An in-place row is focusable itself (`tabindex="0"`) and reads as its cells. Either way the focused row shows a ring around all its cells.
 - A row never opens from a control inside it (links, buttons, fields, `label`, `summary`, ARIA widgets, `data-row-click-ignore`), from a text selection, or from a React event that bubbled out of a portal (a ⋯ menu item).
 - A group header is a `<th scope="rowgroup">` across every column, first in its own `<tbody>`.
-- `DataTable.ColumnsMenu` is a menu button: `menuitemcheckbox` items with `aria-checked`; the key column is `aria-disabled`.
+- The column chooser (`columnsMenu`) is a menu button named by `labels.columns` (its tooltip says the same): `menuitemcheckbox` items with `aria-checked`; the key column is `aria-disabled`. In the row-actions head cell the column keeps its own name (`aria-labelledby`); its own trailing cell is a `<td>`.
 - Row checkboxes are named by `labels.selectRow` with `{label}` from `getRowLabel` (pass it so the names are unique); the head checkbox by `labels.selectAll`, `indeterminate` on a partial selection.
 - After a selection change a polite live region announces `labels.selectedCount`; selected rows carry `aria-selected`.
 - A row handle is a button named by `labels.reorderRow` with `aria-keyshortcuts`; a pick-up, a drop and a keyboard move are announced in a polite live region («Договор: позиция 2 из 6»). While its move is saved the row is `aria-busy`; while the table is sorted the handles are disabled and a tooltip gives `labels.reorderSorted`.
@@ -330,8 +324,8 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | `selectedCount` | `"Выбрано: {count}"` | Polite announcement after the selection changes. |
 | `expand` | `"Развернуть строку {label}"` | Name of the toggle of a collapsed row. |
 | `collapse` | `"Свернуть строку {label}"` | Name of the toggle of an expanded row. |
-| `columns` | `"Колонки"` | Text of the `DataTable.ColumnsMenu` trigger; `{shown}` and `{total}` are column counts. |
-| `showAllColumns` | `"Показать все"` | The `DataTable.ColumnsMenu` item that shows every column again. |
+| `columns` | `"Колонки"` | Name and tooltip of the column chooser trigger (`columnsMenu`); `{shown}` and `{total}` are column counts. |
+| `showAllColumns` | `"Показать все"` | The column chooser item that shows every column again. |
 | `reorderRow` | `"Переместить строку {label}"` | `aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`. |
 | `reorderSorted` | `"Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки"` | Tooltip of the disabled handles while the table is sorted by a column. |
 | `expandGroup` | `"Развернуть группу {group}"` | Name of the toggle of a collapsed group; `{group}` is the group key. |
@@ -348,23 +342,23 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [trend.tsx](examples/trend.tsx) | Clients with revenue by month as a compact Sparkline in a cell of each row, next to the half-year total — `cell`, `width`. |
 | [content-width.tsx](examples/content-width.tsx) | A short lookup table sized by its content with a centered column, and a `grow` column that takes the free width and wraps — `fullWidth`, `align`, `grow`. |
 | [appearance.tsx](examples/appearance.tsx) | Row styling: zebra rows without lines, a column wash under the pointer, a headless key/value list — `striped`, `rowDividers`, `highlightColumnOnHover`, `columnDividers`, `showHeader`. |
-| [toolbar.tsx](examples/toolbar.tsx) | A campaign list with search, a status filter and export above the table; the empty text when nothing matches — `toolbar`, `empty`. |
+| [toolbar.tsx](examples/toolbar.tsx) | A campaign table with its own search and status filter above it — two table-scoped controls; the empty text when nothing matches — `toolbar`, `empty`. |
 | [selection.tsx](examples/selection.tsx) | Team members with checkboxes: Shift+click range, press-and-drag, «select all» and bulk actions in the toolbar — `selectable`, `selected`, `onSelectedChange`, `getRowLabel`. |
 | [nested-rows.tsx](examples/nested-rows.tsx) | Partners with their expense lines: sub-rows indented under the parent's name, a chevron toggle, together with selection and sorting — `getRowChildren`, `expanded`, `onExpandedChange`. |
 | [detail-panel.tsx](examples/detail-panel.tsx) | Order details in a full-width row under an expanded order, aligned with the first content column; a cancelled order has nothing to show and gets no toggle — `renderExpanded`, `defaultExpanded`, `isRowExpandable`. |
 | [sticky.tsx](examples/sticky.tsx) | Monthly sales by region in a 280 px window: the head and the region column stay while scrolling both ways — `stickyHeader`, `stickyFirstColumn`, `scrollHeight`. |
-| [actions-column.tsx](examples/actions-column.tsx) | Orders wider than the table: the order number stays at the start and the ⋯ row actions at the end while the columns between scroll sideways — `stickyFirstColumn`, `stickyLastColumn`. |
+| [actions-column.tsx](examples/actions-column.tsx) | Orders wider than the table: the order number stays at the start, the ⋯ row actions at the end with the column chooser in their header cell, and the columns between scroll sideways — `stickyFirstColumn`, `stickyLastColumn`, `columnsMenu`. |
 | [row-link.tsx](examples/row-link.tsx) | Invoices whose rows are links: ⌘-click or a middle click opens a new tab, a plain click routes inside the app, the totals row and the ⋯ menu never open a row — `getRowHref`, `onRowClick`, `isRowClickable`. |
 | [row-open.tsx](examples/row-open.tsx) | Deals that open in a side panel: a click, or Enter and Space on the focused row; the panel keeps the last deal while it slides away — `onRowClick`. |
 | [reorder.tsx](examples/reorder.tsx) | Pipeline stages put in order by the handle or Alt + ↑ / ↓; each move is saved with a spinner in its handle, and sorting by a column turns the handles off — `onReorder`, `getRowLabel`. |
 | [groups.tsx](examples/groups.tsx) | Payments grouped by month with the month's total in its header row; headers stay on top while their rows scroll, a past month folds away — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`, `defaultCollapsedGroups`. |
-| [columns-visibility.tsx](examples/columns-visibility.tsx) | Orders with the column chooser in the toolbar; the choice outlives a reload in local storage, the order number always stays — `DataTable.ColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. |
+| [columns-visibility.tsx](examples/columns-visibility.tsx) | Orders with the column chooser at the end of the header row; the choice outlives a reload in local storage, the order number always stays — `columnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. |
 | [infinite-scroll.tsx](examples/infinite-scroll.tsx) | An audit log that reveals loaded rows in batches and then asks the server for more — `paging`, `infiniteBatchSize`, `hasMore`, `loadingMore`, `onLoadMore`. |
 | [server.tsx](examples/server.tsx) | A CRM deal list the server sorts, pages and searches; a new search returns to page 1 — `source`, `rowCount`, `sort`, `page`, `loading`. |
 | [fill-height.tsx](examples/fill-height.tsx) | An audit log that fills the height of its panel and loads older entries while scrolling; the status shows while the request is pending — `scrollHeight`, `paging`, `onLoadMore`. |
 | [states.tsx](examples/states.tsx) | Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `loadError`. |
 | [controlled.tsx](examples/controlled.tsx) | Sort, page and the column choice owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`, `hiddenColumns`, `onHiddenColumnsChange`. |
-| [narrow.tsx](examples/narrow.tsx) | A 320 px support queue: columns scroll inside the table with the first one pinned, the toolbar and footer reflow and the pager turns compact — `stickyFirstColumn`, `size`. |
+| [narrow.tsx](examples/narrow.tsx) | A 320 px support queue: columns scroll inside the table with the first one pinned, the column chooser stays at the end of the header row, the footer reflows and the pager turns compact — `stickyFirstColumn`, `columnsMenu`, `size`. |
 | [screen.tsx](examples/screen.tsx) | A list page: the title, a line of figures, search, filters and the one primary action in its top bar, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. |
 
 ## Mistakes
@@ -379,8 +373,10 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - Applying the new order before the server answers and undoing it by hand → return the request's promise from `onReorder` and apply after it resolves: the table keeps the row in place meanwhile and moves it back on a rejection.
 - A long table in a `scrollHeight` window without `stickyHeader` → the head scrolls away.
 - `paging="none"` for hundreds of rows → use `pages` or `infinite`.
-- Dropping columns below a breakpoint → people lose data without knowing it; offer `DataTable.ColumnsMenu`.
-- A hand-built column chooser from Dropdown items → `DataTable.ColumnsMenu` (key column, last visible column, «Показать все» built in).
+- Dropping columns below a breakpoint → people lose data without knowing it; turn on `columnsMenu`.
+- A hand-built column chooser from Dropdown items → `columnsMenu` (key column, last visible column, «Показать все» built in).
+- A toolbar with one button (the column chooser, «Экспорт», «Создать») → a whole bar above the table for one control; the chooser is `columnsMenu` in the header row, the page's actions go to `Page.Actions`.
+- The page's search, filters, period, view or figures in `toolbar` → they belong to the page's top bar (`Page.Tools`, `Page.Actions`, `Page.Description`); `toolbar` keeps several controls of the table itself (bulk actions, the search and filters of a table in a section or a Drawer).
 - Letting the key column be hidden → set `hideable: false` on it, so every row keeps its name.
 - Wrapping the table in an `overflow-x` box of your own → it already scrolls inside and shows the edge shadows.
 - A row actions column that scrolls out of view in a wide table, or a hand-made `position: sticky` on it → make it the last column and set `stickyLastColumn`.
@@ -397,5 +393,5 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - A new search that keeps the current page → set `page` to 1 together with the search.
 
 ## Related
-- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (`DataTable.ColumnsMenu`), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`), [Tooltip](../tooltip/COMPONENT.md) (handle hint, a column `description`), Icon (sort arrows, the info glyph of a column `description`, the expand chevron, the `DataTable.ColumnsMenu` trigger); `useVirtualRows` (the window of a long body)
+- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (the column chooser), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`), [Tooltip](../tooltip/COMPONENT.md) (handle hint, a column `description`, the column chooser), Icon (sort arrows, the info glyph of a column `description`, the expand chevron, the column chooser trigger); `useVirtualRows` (the window of a long body)
 - **See also:** [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"` in a cell), [SmartFilter](../smart-filter/COMPONENT.md), [Page](../../layout/page/COMPONENT.md) (`Page.Tools`, `Page.Chips`), [Gantt](../gantt/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)

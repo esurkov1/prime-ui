@@ -292,6 +292,29 @@ The same for one value in several units — one heading, the fields in a row, th
 />
 ```
 
+A bar above the table for a single button — the column chooser, an export — wastes a row and splits
+the page's actions ([controls of a table](composition.md#controls-of-a-table)):
+
+```tsx partial
+// bad — a toolbar that holds one control
+<DataTable columns={columns} rows={orders} toolbar={<Button.Root>Колонки</Button.Root>} />
+```
+
+```tsx good
+// good — the chooser sits in the header row; the page's own actions live in its top bar
+// declare: const orders: { id: string; client: string; total: number }[]
+<DataTable
+  columns={[
+    { id: "id", header: "Заказ", accessor: "id", hideable: false },
+    { id: "client", header: "Клиент", accessor: "client" },
+    { id: "total", header: "Сумма", accessor: "total", numeric: true },
+  ]}
+  rows={orders}
+  getRowKey={(row) => row.id}
+  columnsMenu
+/>
+```
+
 ## 7b. A top bar out of its groups
 
 The bar lays itself out only from its four groups ([the top bar](composition.md#the-top-bar)); a

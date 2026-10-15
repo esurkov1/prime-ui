@@ -322,10 +322,13 @@
 }
 
 /* One action of the bar: measured whole, folded into «⋯» with `hidden`. */
+/* One action of the bar; a component that renders several controls keeps the actions' gap
+   between them. */
 .actionItem {
   display: flex;
   flex: none;
   align-items: center;
+  gap: var(--prime-space-2);
 }
 
 .actionItem[hidden] {
@@ -460,32 +463,6 @@
   flex-direction: column;
   gap: var(--prime-space-4);
   min-width: 0;
-}
-
-/*
- * `aside`: ~16rem of heading column beside the content; the column drops above once the content
- * would get narrower than 30rem (intrinsic wrap, no breakpoint).
- */
-.section[data-layout="aside"] {
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--prime-space-4) var(--prime-space-10);
-}
-
-.section[data-layout="aside"] > .sectionHeader {
-  flex: 1 1 calc(var(--prime-space-16) * 4);
-  flex-direction: column;
-  align-items: stretch;
-}
-
-/* In the column the heading's row basis would turn into a height: it takes its own height only. */
-.section[data-layout="aside"] > .sectionHeader > .sectionHeading {
-  flex: none;
-}
-
-.section[data-layout="aside"] > .sectionContent {
-  flex: 999 1 calc(var(--prime-space-24) * 5);
 }
 
 .sectionTitle {

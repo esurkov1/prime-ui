@@ -574,15 +574,41 @@ describe("SegmentedControl — narrow row", () => {
     }
   });
 
-  it("keeps the titles and scrolls when a segment has no icon", () => {
+  it("keeps the titles and scrolls the compact row when a segment has no icon", () => {
     const spies = mockOverflow();
     try {
       renderViews(false);
       const list = screen.getByRole("radio", { name: "Доска" }).parentElement as HTMLElement;
-      expect(list).toHaveAttribute("data-collapse", "full");
+      expect(list).toHaveAttribute("data-collapse", "compact");
     } finally {
       for (const spy of spies) spy.mockRestore();
     }
+  });
+
+  it("tightens the segments before it scrolls or drops a title when that is enough", () => {
+    // The compact row is 8px narrower: it fits the 150px viewport the full row overflows.
+    const spies = [
+      vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        return this.dataset.collapse === "compact" ? 148 : 156;
+      }),
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(150),
+    ];
+    try {
+      renderViews(true);
+      const list = screen.getByRole("radio", { name: "Доска" }).parentElement as HTMLElement;
+      expect(list).toHaveAttribute("data-collapse", "compact");
+      expect(screen.getByText("Доска")).not.toHaveAttribute("aria-hidden");
+    } finally {
+      for (const spy of spies) spy.mockRestore();
+    }
+    expect(
+      value(
+        '.list[data-collapse="compact"] .item:not([data-icon-only="true"], [data-two-line="true"])',
+        "padding-inline",
+      ),
+    ).toBe("calc(var(--seg-item-pad-x) - var(--prime-space-1))");
   });
 
   it("keeps the titles while the row fits", () => {

@@ -1,4 +1,4 @@
-/** A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller — `Drawer.Actions`. */
+/** A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller; on a phone, where the title has no room beside them, they move under it — `Drawer.Actions`. */
 import { Badge, Button, DescriptionList, Drawer, Dropdown, Icon } from "prime-ui-kit";
 
 const DEAL = {

@@ -15,9 +15,9 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 |---|---|---|---|
 | [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, SmartFilter search and filters, export and one primary action in the page's top bar; statuses, row menu, pages, filtered empty state |
 | [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | a nested record: the path ending in the title, status and due date and the record's actions by weight in the top bar; main column + side column of Cards, Timeline |
-| [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, heading column + panel per section, form with its own save, Switches that apply at once, danger zone with a confirm |
+| [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, a card with its own header per section, form with its own save, Switches that apply at once, danger zone with a confirm |
 | [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts, search and the Drawer trigger in the top bar; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
-| [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title and a line of description in `Page.Heading`, «Сохранить тариф» in `Page.Actions`, both in a `Page.Header` in the flow; a plan card edited in aside sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
+| [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title and a line of description in `Page.Heading`, «Сохранить тариф» in `Page.Actions`, both in a `Page.Header` in the flow; a plan card edited in card sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
 | [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | the large title + a line of data in the flow, period switch and report in a collapsing `Page.TopBar`; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
 | [Screen states](#screen-states) | crossfade | [screen.tsx](../src/components/crossfade/examples/screen.tsx) | title + the statement date in `Page.TopBar`, page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
 | [Messenger](#messenger) | chat | [screen.tsx](../src/components/chat/examples/screen.tsx) | title + the unread count in `Page.TopBar`; a full-height Page.Split of a `ChatList` with its search (live last message, ticks, unread counts, «печатает…») and a `Chat`: `Chat.Header` with the back button, avatar, title, the status that turns into «печатает…» (`typing`) and the search button, `Chat.Search`, `Chat.Messages` from `items` + `renderMessage` (dates, runs and the unread band from the data, history loaded above with `hasOlder` / `onLoadOlder`, a first load in skeletons), text, a photo, a file and sent voice, reply and edit from the menu through `Composer.Context messageId` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Chat.Root typing`), unread counts from `onNewMessage` and `onRead`, the Composer with attachments in `Chat.Footer` |
@@ -234,6 +234,39 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - **Card when** the block stands alone and has its own title: a KPI tile, a settings panel, facts in a
   side column, a chart. **No card when** the block is the only thing in its region: a section heading
   and the content are enough.
+- **A titled block stands in the flow, its heading inside it.** A panel with a title and a line of
+  description (a settings section, a group of a long form) is a `Card.Root` whose `Card.Header`
+  holds `Card.Title as="h2"` and `Card.Description`; the cards stack 24 apart. Never a heading column
+  beside its panel: it takes a third of the width from the fields and breaks the reading line.
+
+```tsx partial
+// bad — the heading in a column on the left, the panel on the right
+<div className={styles.headingColumnAndPanel}>
+  <div>
+    <Typography as="h2" variant="title-m">Компания</Typography>
+    <Typography tone="secondary">Попадают в счета и акты.</Typography>
+  </div>
+  <Card.Root variant="panel">…</Card.Root>
+</div>
+```
+
+```tsx good
+// good — the card carries its own heading, stacked in the flow
+<Card.Root variant="panel">
+  <Card.Header>
+    <Card.Title as="h2">Компания</Card.Title>
+    <Card.Description>Попадают в счета и акты.</Card.Description>
+  </Card.Header>
+  <Card.Body>
+    <Input.Root label="Название">
+      <Input.Wrapper>
+        <Input.Field name="name" />
+      </Input.Wrapper>
+    </Input.Root>
+  </Card.Body>
+</Card.Root>
+```
+
 - `DataTable` is already a filled block — never inside a Card; a card in a card only as
   [the next layer, sparingly](foundations.md#card-in-a-card). No borders around blocks; `Divider`
   only inside a block (list rows, a form and its footer).
@@ -257,6 +290,9 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   table cell.
 - Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a work screen, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; bulk actions in the table toolbar.
+- A dialog footer is the dialog's answer: Cancel and the primary. Deleting the record the dialog
+  edits is not a third footer button: it is the last `tone="danger"` item of a ⋯ `Dropdown` in
+  `Modal.Actions` / `Drawer.Actions`, confirmed by a `ConfirmDialog`.
 - An empty state's action replaces the header's primary, it does not duplicate it.
 - Destructive: `tone="danger"`; a standalone trigger is `outline`, in a menu it is the last item, the
   confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
@@ -268,13 +304,17 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - Labels above every field (`label`), placeholder is an example value, help in `hint`, problems in
   `error` — after blur or on submit. Mark the minority (`required` or `optional`).
 - Records of one shape that a person adds, edits and removes are a `FieldList`: one row per record,
-  the column headings once above the rows, small attributes (an icon, a color) in `compact`
+  the column headings once above the rows, small attributes (an icon, then its color) in `compact`
   columns. Never a label in every row, never numbered labels, never one record split over lines.
+  FieldList draws every row's actions itself — the remove inside the field of a one-column list, a
+  pinned row's remove off with its reason (`labels.lockedReason`) — so never add your own.
 - One value in several units is one row of fields under one heading, each unit in its field's
   `Input.InlineAffix`; a base value with overrides is one `FieldList` with the base pinned first.
   The shape of the data decides the layout: [ux.md](ux.md#2-the-shape-of-the-data-decides-the-layout).
 - Rows that add up (shares of a bonus, hours, amounts) carry their sums under them in the same list:
-  `FieldList renderTotals`, a short number in a `width: "xs"` column. Return the save's promise from
+  `FieldList renderTotals`, a short number in a `width: "xs"` column. A number with its unit
+  (`inputMode="decimal"` and an end `Input.InlineAffix`) ends at the field's end, and its column's
+  total follows it there by itself. Return the save's promise from
   its `onValueChange` when each edit saves at once.
 - Fields 20 apart; related short fields side by side in an
   [intrinsic grid](responsive.md#intrinsic-grids) with `align-items: start`
@@ -300,9 +340,18 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   `SmartFilter.Toolbar` in the bar's `Page.Tools`, `SmartFilter.Chips` in its `Page.Chips`
   ([the list page](#list-page)).
   A search alone is the same SmartFilter with `fields={[]}`.
-- The DataTable `toolbar` keeps the table's own tools: `DataTable.ColumnsMenu`, a bulk bar of the
-  selected rows. Search and filters go there only when the table is not the page's main region (a
-  table in a section of a record, in a Drawer).
+
+### Controls of a table
+
+- The column chooser is part of the table: `columnsMenu` puts it at the end of the header row — in
+  the head cell of a trailing row-actions column (`hideHeader`), else in a narrow cell of its own —
+  and it sticks with `stickyLastColumn`. Give the key column and the actions column `hideable: false`.
+- The DataTable `toolbar` holds several controls of the table itself: a bulk bar of the selected
+  rows, or the search and filters of a table that is not the page's main region (a table in a
+  section of a record, in a Drawer).
+- One control never gets a bar of its own. A lone «Экспорт» or «Создать» is the page's
+  (`Page.Actions`); the period, the view switch, the search and filters of the page go to
+  `Page.Tools`; a count or a total of the list is data in `Page.Description`.
 
 ### Tables
 
@@ -320,6 +369,15 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   for a failed load. The head and toolbar stay.
 - Phones: the table scrolls inside itself, `stickyFirstColumn` keeps the key column; never let the page
   scroll sideways. Short lists of objects can be `Card variant="list"` instead of a table.
+
+### List rows
+
+- A row's own controls stand beside its element in `List.ItemActions`, one tier below the row.
+- A plain settings row reads label first and ends with its toggle (the platform convention).
+- A row people reorder leads with its toggle — `<List.ItemActions side="start">`, or the Switch as the
+  first child of a `Dnd.SortableItem` — so the on / off state reads first, like a checkbox, and the
+  grip keeps the end edge ([reorder.tsx](../src/components/list/examples/reorder.tsx)).
+- Never a toggle between the label and the grip: «Почта … [Switch] [grip]» reads as two handles.
 
 ## 9. Feedback
 
@@ -478,7 +536,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [page/examples/screen.tsx](../src/layout/page/examples/screen.tsx)
 
 - A document page: `Page.Root maxWidth="wide"`, the large `Page.Title` with a sentence of `Page.Description` in the `Page.Heading` of a `Page.Header` in the flow, and a `Page.TopBar collapse` whose `Page.Heading` holds only the path and repeats the title once it scrolls away.
-- A section is `Page.Section layout="aside"`: a heading column (`label` + a line of `description`) and a `Card variant="panel"` panel; sections are 40 px apart; on a narrow screen the column moves above the panel by itself (flex-wrap, no breakpoints).
+- A section is a `Card variant="panel"` with its own `Card.Header` (`Card.Title as="h2"` + a line of `Card.Description`), the cards stacked in the flow ([a titled block](#4-surfaces)).
 - The form wraps the whole `Card.Root` in `<form noValidate>`; the buttons are in `Card.Footer`: «Отменить изменения» `ghost` + `neutral`, then the primary «Сохранить». While the request runs — `loading` on the button, and one `Fieldset disabled` turns the fields off; the form stays on screen, so success is the button text «Сохранено» for two seconds, without a notification.
 - Fields are 20 px apart; two short related fields side by side while there is width, with `align-items: start` and `reserveSupportRow`, so an error does not shift the neighbour.
 - An error comes through the field's `error` after submit, not while typing; a format hint goes in `hint`.
@@ -502,10 +560,10 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [field-list/examples/screen.tsx](../src/components/field-list/examples/screen.tsx)
 
-- A record editor is a document page — a long form read top to bottom in aside sections, like Settings — so its title stands in the flow: `Page.Header` with the title and one line of description in `Page.Heading` and the primary action in `Page.Actions`; no second title anywhere.
+- A record editor is a document page — a long form read top to bottom in card sections, like Settings — so its title stands in the flow: `Page.Header` with the title and one line of description in `Page.Heading` and the primary action in `Page.Actions`; no second title anywhere.
 - The shape of the data decides the layout: records a person adds and removes are a `FieldList`, one row per record; the column headings stand once above the rows, and the fields in the cells take them as their labels.
 - No label in every row and no numbered one («Преимущество 1»): a one-column list has no headings at all — its section names it ([reorder.tsx](../src/components/field-list/examples/reorder.tsx)).
-- Small attributes of a record go in compact columns of its row: the icon is a `Select` with only `Select.TriggerIcon`, the color `ColorPresets`; the first specs are pinned (`getLocked`) — the lock says so itself, without explanatory text.
+- Small attributes of a record go in compact columns of its row, the color right after the icon it paints: the icon is a `Select` with only `Select.TriggerIcon`, the color `ColorPresets`; the first specs are pinned (`getLocked`) — the lock and the remove that is off say so themselves, without explanatory text.
 - The base price and its changes are one list: the base row is pinned first and shows when it applies, the changes are rows with a month and a price; the ruble sign is in the field (`Input.InlineAffix`), not in every heading.
 - One value in three currencies is three fields in one row under one group heading, each with its own name for screen readers and the currency inside the field.
 - The lists live in the page state, the name and description fields in the `<form>` of the first section; the primary «Сохранить тариф» in `Page.Actions` is tied to it through `form={formId}` and saves everything. While the request runs the fields and the lists are off (`Fieldset disabled`, `disabled`), afterwards «Сохранено» on the button.
@@ -566,7 +624,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The placement of deals is `value` as `{ [stage]: id[] }`; `onValueChange` returns the request's promise and applies `value` only after the answer; a server refusal returns the card to its place.
 - Stage totals are in `renderColumnMeta` («2 сделки · 3 575 000 ₽»), the stage color is the column's `color`.
 - A deal opens through `onItemOpen` of `Kanban.Root` (click, Enter, Space; never after a drag) in a `Drawer` with a `DescriptionList`; no `onClick` / `onKeyDown` of your own on the card; a deal with its own page — `getItemHref`. The stage change is available in the panel too — dragging is not the only way; `Drawer.Guard busy` holds the panel while saving.
-- The first load is `loading` on `Kanban` and `DataTable`: skeletons in the geometry of cards and rows.
+- The first load is `loading` on `Kanban` and `DataTable`: skeletons in the geometry of cards and rows. Stages that come from the server too: `loading` with empty `columns` draws `loadingColumns` placeholder columns — never a board skeleton of your own beside the `Kanban`.
 
 ### App frame
 

@@ -34,7 +34,8 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
    ├─ List.ItemDescription  second line, muted, truncates
    ├─ List.ItemMeta         trailing small text (time, date, amount)
    ├─ List.ItemCount        trailing Badge, one tier down
-   └─ List.ItemActions      the row's own controls (Switch, Dropdown): beside the row element, one tier down
+   └─ List.ItemActions      the row's own controls (Switch, Dropdown): beside the row element, one tier down;
+                             side="end" after it, side="start" before it (a reorderable row's toggle)
 ```
 
 ## API
@@ -108,10 +109,11 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other `span` attributes. |
 
 ### List.ItemActions
-`ref` → `HTMLDivElement`. The row's own controls (a `Switch`, a `Dropdown` with its icon `Button`) at its end, beside the row element and never inside it, one tier below the row.
+`ref` → `HTMLDivElement`. The row's own controls (a `Switch`, a `Dropdown` with its icon `Button`) at its end or its start, beside the row element and never inside it, one tier below the row.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `side` | `"start" \| "end"` | `"end"` | `"end"` after the row element: a plain settings row, label first. `"start"` before it, in the DOM too: the on / off of a reorderable row reads first and the grip keeps the end. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the controls, each named on its own), `className` and the other `div` attributes. |
 
 ## Variants
@@ -137,6 +139,12 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 ### List.ItemCount color
 `gray` (default) for a plain number; a hue for what needs attention (`blue` for unread). Any palette hue.
 
+### List.ItemActions side
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `end` | the controls after the row's text and trail | a plain row: the label first, the toggle or ⋯ menu at the end | yes |
+| `start` | the controls before the row's icon and text, first in the DOM and the Tab order | a reorderable row's on / off: the state reads first, the grip keeps the end edge | |
+
 ## States
 | State | Driven by | DOM |
 |---|---|---|
@@ -148,7 +156,7 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 | disabled | `disabled` | `disabled` on a button; `aria-disabled="true"`, no `href` on a link, `tabindex="-1"` on an `asChild` element; `data-disabled="true"`; disabled text; in a reorderable list the handle is disabled and the row holds its place |
 | reorderable | `onReorder` | `data-reorderable="true"` on the root (a `Dnd.Sortable` `<ul>`); each `<li>` is a sortable item (`data-dnd-item` = `value`) with a `Dnd.Handle` at its end; drag by the handle (a touch hold on touch), Alt + ↑ / ↓ from the handle or the row; a lifted row leaves a dashed gap in the row's radius, its neighbours glide, the copy (handle and row, in the row's padding and radius) follows the pointer and sets down in its new place without a jump |
 | saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, the handle is busy (Dnd: a spinner in the disabled grip), the row content dims to 0.6 (`--prime-motion-fade-fast` both ways); a rejection glides the row back |
-| own controls | `List.ItemActions` in the item | the row element and the controls stand in one frame that takes the hover, press and current fills for both; the element itself stays clear |
+| own controls | `List.ItemActions` in the item | the row element and the controls stand in one frame that takes the hover, press and current fills for both; the element itself stays clear; `side="start"` controls come before the element in the frame, `data-side` on the actions |
 | rows come and go | the data adds or takes out a `List.Item` (`value`, else its key) | a new row rises in once (`enterMotion`), a removed one closes up in place (`listPresence`); the first render stays still |
 
 Root attributes: `data-size`, `role="list"` (the list style reset would drop the list semantics in WebKit). The fill changes on `background-color` with `--prime-motion-fade-xfast` both ways (a fade: reduced motion keeps it).
@@ -160,7 +168,8 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
 - Reorderable (`onReorder`): an `xs` handle box ends each row, 4px after the row element and its `List.ItemActions` (inline-end: on the left in RTL); the row keeps its own padding and fill, so every row's handle stands on one line.
-- `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's end as from its top and bottom.
+- `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's edge as from its top and bottom — the end edge, or the start edge with `side="start"`, where the row's own padding then parts the controls from its icon or text.
+- One toggle place per row: a plain row ends with its toggle (label first); a reorderable row leads with it (`side="start"`) and ends with the grip — never a toggle between the label and the grip.
 - A colour dot in `List.ItemIcon` is the large `Badge.Dot` (8px) centred in an icon-wide box, so the text lines up with the rows that carry icons.
 
 ## Accessibility
@@ -181,8 +190,8 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - The open record: `aria-current="true"` on a button (a selection inside the screen), `aria-current="page"` on a link (`href`, `asChild`) — the link points at the current URL. A router link may set it itself.
 - The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.
 - Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.
-- `List.ItemActions` stand beside the row element, never inside it: the row's name stays its text, and Tab goes from the row to its controls.
-- With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row, its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.
+- `List.ItemActions` stand beside the row element, never inside it: the row's name stays its text. Tab follows the row as it reads: the `side="start"` controls, the row, the `side="end"` controls.
+- With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row with its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -200,7 +209,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 | [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients, icons of queues and colour dots of projects; an avatar takes the row tier, a dot stands in an icon-wide box — `List.ItemIcon`, `Badge.Dot`. |
 | [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. |
 | [as-link.tsx](examples/as-link.tsx) | Rows as links to the invoice pages: a plain link, or your router link through the slot — `href`, `asChild`. |
-| [reorder.tsx](examples/reorder.tsx) | Funnel stages in the team's order: a stage moves by its handle or Alt+arrows and is saved on the server — `onReorder`, `value`. |
+| [reorder.tsx](examples/reorder.tsx) | Funnel stages in the team's order: a stage moves by its handle or Alt+arrows and is saved on the server; its switch leads the row, the grip ends it — `onReorder`, `value`, `side`. |
 | [row-controls.tsx](examples/row-controls.tsx) | Funnel stages with their own controls: a colour dot names the stage's hue, a switch shows it on the board and a menu edits it, all beside the row that opens the stage — `List.ItemActions`, `Badge.Dot`. |
 
 ## Mistakes
@@ -212,6 +221,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - Up / down buttons on rows or a hand-made `Dnd.Sortable` of rows to order them → `List.Root onReorder` with a `value` on every item.
 - `onReorder` that rolls the order back itself on an error → return the promise; a rejection moves the row back.
 - A Switch or a menu button put inside a row, or a row rebuilt as a `div` to hold one → `List.ItemActions` beside the row element.
+- A Switch at the end of a reorderable row, between its label and the grip → `List.ItemActions side="start"`; the grip keeps the end.
 - A hollow `Icon` circle or a hand-drawn dot as a stage colour → `Badge.Dot color` in `List.ItemIcon`.
 
 ## Related

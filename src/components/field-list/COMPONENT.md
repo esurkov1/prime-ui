@@ -8,7 +8,7 @@
 ## When to use
 - A form part where a person adds, edits and removes several records of the same fields: invoice lines, contacts of a client, specs of a plan, recipients.
 - A base value with overrides (a price and its changes by month): the base is the first row, pinned with `getLocked`, each override is a row.
-- A list of short texts in the order a person sets (selling points, checklist items): one column, `reorderable`.
+- A list of short texts in the order a person sets (selling points, checklist items): one column, `reorderable`; each row's remove button is the last segment of its field.
 - Small attributes of a record beside its text (an icon, a color): `width="compact"` columns with an icon-only `Select` (`Select.TriggerIcon` and no `Select.Value`) and a `ColorPresets` swatch.
 
 ## When not to use
@@ -30,10 +30,11 @@ FieldList                    field frame: label · the list · hint / error
 ├─ <ol>                      the rows (Dnd.Sortable with `reorderable`)
 │  └─ <li> row               [a cell per column] [end: remove] [grip: handle | lock]
 │     └─ cell                one kit field without `label`, named by its column heading
+│                            (one column: no end slot, the remove is the field's last segment)
 ├─ totals row                `renderTotals`: a group «Итого», a total per column on the same tracks
 └─ add row                   Button «addLabel» (+ `labels.maxReached` at `max`)
 ```
-A leaf: rows come from `value` through `renderItem`, which returns one element per column (a fragment). Every framed kit field (Input, Select, Datepicker, NativeSelect, ColorField…) in a cell takes its column heading as its label: read by screen readers, not shown while the heading row is on screen, shown above the field once the rows stack in a narrow container. `ColorPresets` takes it as the name of its trigger.
+A leaf: rows come from `value` through `renderItem`, which returns one element per column (a fragment). Every framed kit field (Input, Select, Datepicker, NativeSelect, ColorField…) in a cell takes its column heading as its label: read by screen readers, not shown while the heading row is on screen, shown above the field once the rows stack in a narrow container. `ColorPresets` takes it as the name of its trigger. In a one-column list the row's remove button goes into the field as its last action segment (`Input.Wrapper`, `Textarea`, the same segment as `Input.Action`); a field without an action edge (a `Select`) keeps it in the end slot.
 
 ## API
 
@@ -45,8 +46,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `columns` | `readonly FieldListColumn[]` | — (required) | The columns in cell order: `label` (the heading; it names the field of the column in every row), `width` (`fill` \| `compact` \| `xs` \| `s` \| `m`), `required` (a `*` after the heading). |
-| `renderItem` | `(item: T, row: FieldListRow<T>) => ReactNode` | — (required) | The cells of a row, one element per column (a fragment): kit fields without `label`. `row` has `index`, `update(patch)` and `remove()`. |
-| `renderTotals` | `(items: readonly T[]) => ReactNode` | — | The totals row under the rows: one node per column (a fragment), `null` where a column has none. The first cell without a total reads `labels.totals`, the row's group name. |
+| `renderItem` | `(item: T, row: FieldListRow<T>) => ReactNode` | — (required) | The cells of a row, one element per column (a fragment): kit fields without `label`. `row` has `index`, `update(patch)` and `remove()`. In one column the remove is the field's last segment. |
+| `renderTotals` | `(items: readonly T[]) => ReactNode` | — | The totals row under the rows: one node per column (a fragment), `null` where none; each aligned as its column's field text. The first cell without a total reads `labels.totals`. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id of an item: the row key and the drag id. |
 | `value` | `readonly T[]` | — | The rows (controlled). |
 | `defaultValue` | `readonly T[]` | `[]` | The first rows (uncontrolled). |
@@ -54,7 +55,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `createItem` | `() => T` | — | A new empty item; with it the add button shows under the rows and focus goes to the new row's first field. |
 | `addLabel` | `string` | — | Text of the add button: what is added («Добавить позицию»). |
 | `getLabel` | `(item: T) => string` | — | The row's own text (its title field) for the remove button, the handle and drag announcements; else the row number. |
-| `getLocked` | `(item: T) => boolean` | — | Pinned rows: a lock in the grip column at the row's end, no remove button, they hold their place while others move. |
+| `getLocked` | `(item: T) => boolean` | — | Pinned rows: the remove button stays in its place, off, its tooltip says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it while others move. |
 | `reorderable` | `boolean` | `false` | Rows move by a handle at the row's end, after the remove button: drag, a touch hold, Alt + ↑ / ↓. |
 | `min` | `number` | `0` | The fewest rows: at this count the remove buttons are disabled. |
 | `max` | `number` | — | The most rows: at this count the add button is disabled with `labels.maxReached` beside it. |
@@ -74,7 +75,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `fill` | shares the free width with the other `fill` columns | names, descriptions, any text | yes |
-| `compact` | two control heights wide | an icon-only `Select`, a `ColorPresets` swatch, a checkbox | |
+| `compact` | as wide as the widest of its controls, heading and total — the gap after it is the column gap like every other | an icon-only `Select`, a `ColorPresets` swatch, a checkbox | |
 | `xs` | 96 px | a number of a few digits: a share, a percent, a count | |
 | `s` | 144 px | a quantity, a code, a number of days | |
 | `m` | 192 px | an amount with its unit, a date, a phone | |
@@ -83,10 +84,10 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `reorderable` | a grip at the end of every row, after the remove button; Alt + ↑ / ↓ on it | the order of the records matters (a pricing page, a checklist) | `false` |
-| `getLocked` | a lock where the grip is, no remove button; the row holds its place | a base value, system records a person cannot drop | — |
+| `getLocked` | the remove button in its place, off, with a tooltip saying why (`labels.lockedReason`); with `reorderable` a lock where the grip is and the row holds its place | a base value, system records a person cannot drop | — |
 | `createItem` | the add button under the rows, aligned with the first column | the person grows the list | — |
 | `min` · `max` | remove buttons off at `min`; the add button off with «Не больше {max}» at `max` | the record count is bounded | `0` · — |
-| `renderTotals` | a row of totals under the rows over a faint line, each on its column; «Итого» in the first cell without a total | the rows add up (shares, amounts, hours) | — |
+| `renderTotals` | a row of totals under the rows over a faint line, each on its column, aligned as the column's field text; «Итого» in the first cell without a total | the rows add up (shares, amounts, hours) | — |
 
 **Combinations**
 - Recommended: `label` on the list (or a `Fieldset` legend around it), one heading per column, a `getLabel` from the title field, an `addLabel` that says what is added.
@@ -100,7 +101,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | empty | `value` with no items | no heading row; only the add button (with `createItem`) |
 | at min | `value.length <= min` | remove buttons `disabled` |
 | at max | `value.length >= max` | add button `disabled`, `labels.maxReached` beside it |
-| pinned row | `getLocked(item)` | `data-locked="true"` on the `<li>`; a lock in the grip box at the row's end, no remove button (its place stays empty) |
+| pinned row | `getLocked(item)` | `data-locked="true"` on the `<li>`; the remove button stays in its slot, off (`disabled` in the end slot behind a focusable Tooltip host, `aria-disabled="true"` as a field segment), its tooltip `labels.lockedReason`; with `reorderable` Dnd's lock in the grip box |
 | invalid | `error` (the list), a field's own `error` | the list's message under the add row; a field's under the field in its row |
 | disabled | `disabled` (or a disabled Fieldset) | `data-disabled="true"` on the frame; fields, handles and buttons disabled through the kit's disabled context |
 | stacked | container narrower than 30rem | heading row hidden, each row's fields in one column with their labels shown; each total on its own line after its column name |
@@ -109,9 +110,10 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 ## Layout & spacing
 - Rows 12 apart (`--prime-space-3`); columns 12 apart; the heading row sits at the tier's label gap above the first row.
-- Every row, the heading row and the totals row share one track list: `[columns] [end] [grip]`; the end fits a remove button of the tier, the grip (with `reorderable` or a pinned row) is one `xs` control wide (the handle or the lock) and ends the row on the inline-end side (on the left in RTL).
+- Every row, the heading row and the totals row share one track list: `[columns] [end] [grip]`; the end fits a remove button of the tier, the grip (with `reorderable`) is one `xs` control wide (the handle or the lock) and ends the row on the inline-end side (on the left in RTL). Every row fills the same slots: a pinned row shows its remove off, never a hole. A one-column list has no end track: the remove is inside the field.
+- A `compact` column is measured: its track is the widest of its controls, its heading and its total, so the gaps between columns are all 12.
 - The remove button, the handle and the lock stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
-- The totals row stands 12 under the last row over a faint line, 12 more above its totals; a total's text starts where its column's field text does.
+- The totals row stands 12 under the last row over a faint line, 12 more above its totals; a total's text sits where its column's field text does: at the start, or at the end for a field that ends its number there (an `Input` with `inputMode="decimal"` and an end `Input.InlineAffix`). Stacked, every total ends its line.
 - The add button lines up with the first column of fields, 12 under the last row.
 - Under 30rem of its own width (a container query): rows stack, fields 16 apart inside a row, rows 24 apart.
 
@@ -122,7 +124,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 | Key | Action |
 |---|---|
-| `Tab` | Moves through the fields of a row, then to its remove button, its handle and on. |
+| `Tab` | Moves through the fields of a row, then to its remove button (inside the field in a one-column list), its handle and on; a pinned row's remove takes focus to show why it is off. |
 | `Enter` · `Space` | On the add button adds a row and focuses its first field; on a remove button removes the row and focuses the next row's remove button. |
 | `Alt + ↑` · `Alt + ↓` | With `reorderable`, moves the row up or down (from its handle). |
 
@@ -135,7 +137,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - In a narrow container the heading row goes and each field's label shows above it.
 - The totals row (`renderTotals`) is a `group` named by `labels.totals`; each total is read after its column heading.
 - The remove button is «Удалить {row}», the handle «Переместить {row}»: the row's name from `getLabel`, else its number.
-- A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is Dnd's lock (an image named «Закреплена»).
+- A pinned row keeps its remove button: `aria-disabled`, described by `labels.lockedReason` (a tooltip on hover and focus); with `reorderable` Dnd's lock stands in place of the handle.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -146,7 +148,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `reorder` | `"Переместить {row}"` | `aria-label` of a row's handle (`reorderable`); `{row}` is the row's name. |
 | `row` | `"строку {index}"` | Name of a row without `getLabel` text; `{index}` counts from 1. |
 | `namedRow` | `"«{label}»"` | Name of a row with `getLabel` text; `{label}` is that text. |
-| `locked` | `"Закреплена"` | Spoken name of the lock of a pinned row in a list without `reorderable`. |
+| `lockedReason` | `"Закреплённую строку нельзя удалить"` | Why the remove button of a pinned row (`getLocked`) is off: its tooltip and description. |
 | `maxReached` | `"Не больше {max}"` | Text beside the disabled add button once the list holds `max` rows. |
 | `totals` | `"Итого"` | Name of the totals row (`renderTotals`), shown in its first cell when that has no total. |
 
@@ -155,17 +157,17 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Lines of an invoice: the column headings stand once above the rows, each row has a remove button and the add button sits under them — `columns`, `renderItem`, `createItem`, `addLabel`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier: the headings, the fields, the handle and the buttons follow the list's size — `size`. |
-| [reorder.tsx](examples/reorder.tsx) | Selling points of a plan in the order of the pricing page: a one-column list has no headings and no numbers, a point moves by its handle or Alt+arrows — `reorderable`, `getLabel`. |
-| [locked.tsx](examples/locked.tsx) | Specs of a plan on one line each: an icon picker and a color swatch take compact columns, the first three specs are pinned with a lock and the rest reorder below them — `getLocked`, `width`, `reorderable`. |
-| [base-row.tsx](examples/base-row.tsx) | A plan price and its changes by month in one table: the base price is the first, pinned row, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `width`. |
+| [reorder.tsx](examples/reorder.tsx) | Selling points of a plan in the order of the pricing page: a one-column list has no headings and no numbers, the remove button is the last segment of each field, a point moves by its handle or Alt+arrows — `reorderable`, `getLabel`. |
+| [locked.tsx](examples/locked.tsx) | Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them — `getLocked`, `width`, `reorderable`. |
+| [base-row.tsx](examples/base-row.tsx) | A plan price and its changes by month in one table: the base price is the first, pinned row whose remove button is off and says why, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `labels`, `width`. |
 | [limits.tsx](examples/limits.tsx) | Recipients of invoice reminders, from one to three: the last row cannot be removed and the add button says why it is off once the list is full — `min`, `max`, `hint`. |
 | [errors.tsx](examples/errors.tsx) | Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field; a `*` after a heading marks a required column — `error`, `required`. |
-| [totals.tsx](examples/totals.tsx) | A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts — `renderTotals`, `width`. |
+| [totals.tsx](examples/totals.tsx) | A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts, each ending where its fields end their numbers — `renderTotals`, `width`. |
 | [saving.tsx](examples/saving.tsx) | Removing a recipient is saved on the server: the row leaves at once and comes back with the reason if the server refuses — `onValueChange`, `error`. |
 | [states.tsx](examples/states.tsx) | The same list editable and disabled while the request saves it: fields, handles and buttons turn off together — `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the lines: it sums them under the list and puts the saved lines back on reset — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | The invoice lines in a 320 px column: the headings give way, each row stacks its fields with their own labels and rows stand a group apart — `columns`. |
-| [screen.tsx](examples/screen.tsx) | A record editor as a document page, a long form whose title, description and save stand in the content header: a plan's name, its specs and prices in one form; repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. |
+| [screen.tsx](examples/screen.tsx) | A record editor as a document page, a long form whose title, description and save stand in the content header and whose blocks are titled cards one under another: a plan's name, its specs and prices; repeating records as FieldList rows with the headings once, an icon and its color side by side, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. |
 
 ## Mistakes
 - A `label` above every field of every row («Иконка», «Параметр», «Значение» four times) → a FieldList: the headings stand once, the fields take them as hidden labels.
@@ -173,11 +175,13 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - One record split over two lines of half-width fields → one row; small attributes go to `compact` columns (icon-only `Select`, `ColorPresets`).
 - A base value as a separate field above its overrides, in another geometry → the first row, pinned with `getLocked`.
 - The unit in every heading («Цена, ₽ / день») and again in the field → the unit once, in `Input.InlineAffix`.
-- A hint that explains what the lock already shows («Первые три всегда первыми») → no hint; the lock says it.
+- A hint that explains what the lock already shows («Первые три всегда первыми») → no hint; the lock and the remove button's reason say it.
+- A pinned row with an empty place where the others have a remove button → none to fix by hand: FieldList draws it off with `labels.lockedReason`; say the domain reason there («Базовую цену нельзя удалить»).
+- A one-field row with a remove button in a column beside the field → FieldList puts it inside the field; no `Input.Action` of your own for it.
 - `aria-label` written on every field in a cell → none: the column heading names the field.
 - A grip, a remove button and an add button drawn by hand around a `.map()` of fields → FieldList.
 - A total under the list typed by hand in a line of text, or a DataTable of fields to get a totals row → `renderTotals`.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Label](../label/COMPONENT.md) (headings), the field frame (label, [Hint](../hint/COMPONENT.md) for the hint and error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Label](../label/COMPONENT.md) (headings), [Tooltip](../tooltip/COMPONENT.md) (why a pinned row's remove is off), the field action segment (the remove inside the field of a one-column list), the field frame (label, [Hint](../hint/COMPONENT.md) for the hint and error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md) (icon-only trigger), [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`), [Fieldset](../fieldset/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

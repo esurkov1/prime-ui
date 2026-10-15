@@ -118,6 +118,31 @@
         "There is exactly one Page.Title (the h1) and no size prop, className or CSS that sizes the title",
         "The screen adds no media queries, ResizeObserver or own «⋯» menu for the bar — narrowing is left to Page.TopBar"
       ]
+    },
+    {
+      "id": 10,
+      "prompt": "Сделай блок настроек «Каналы уведомлений»: Почта, Push-уведомления, Slack, SMS. Каждый канал включается и выключается сразу, а порядок каналов (приоритет доставки) команда меняет перетаскиванием. Рядом — блок «Общие» с переключателями «Звук» и «Сводка по понедельникам», их порядок не меняется.",
+      "expected_output": "The channels are a List.Root with onReorder (List.Item value per channel), each row leading with its Switch in List.ItemActions side=\"start\" and ending with the grip the list draws; the general settings are plain rows with the label first and the Switch at the end (or Switch.Root with Switch.Label in a Fieldset), no grip.",
+      "files": [],
+      "expectations": [
+        "The reorderable channel rows put the Switch first — List.ItemActions side=\"start\" (or the Switch as the first child of a Dnd.SortableItem) — and the grip last",
+        "No reorderable row has a Switch between its label and the grip",
+        "The general settings rows have no grip and their Switch stays after the label (a trailing toggle) or is a Switch.Root with its Switch.Label",
+        "Each Switch of a channel row is named by its channel (aria-label or a label) and returns the save's Promise or sets the state at once — no Save button"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Сделай страницу «Заказы»: таблица заказов с колонками Заказ, Клиент, Менеджер, Город, Статус, Дата, Сумма и меню ⋯ в конце строки. Колонок много, поэтому пользователь должен сам выбирать, какие видеть; выбор сохраняется между визитами.",
+      "expected_output": "One Page.Root with its Page.TopBar (Page.Title «Заказы»); a DataTable with columnsMenu, hiddenColumns kept with onHiddenColumnsChange in local storage, the key column «Заказ» and the actions column hideable: false, the actions column last with hideHeader and stickyLastColumn — the chooser sits in that column's head cell. The DataTable has no toolbar.",
+      "files": [],
+      "expectations": [
+        "The column chooser is the DataTable columnsMenu prop — it stands in the table's header row, not in a toolbar, Page.Actions or a hand-built Dropdown of checkboxes",
+        "The DataTable has no toolbar prop at all: no bar above the table holds a single control",
+        "hiddenColumns and onHiddenColumnsChange keep the choice (local storage or the user's settings) and pass it back",
+        "The «Заказ» column and the ⋯ actions column are hideable: false; the actions column is last, with hideHeader, and the table sets stickyLastColumn",
+        "No count, export or other control is added in a bar above the table; anything of the page sits in its Page.TopBar"
+      ]
     }
   ]
 }

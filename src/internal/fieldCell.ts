@@ -18,6 +18,12 @@ export type FieldCell = {
   hidden: "wide" | "always";
   /** The column is required: the field in the cell is required too (`useFieldFrame`). */
   required: boolean;
+  /**
+   * The row's action the field holds at its end: a one-column list puts each row's remove button
+   * inside its field. A text field (`Input.Wrapper`, `Textarea`) renders it as its last action
+   * segment; a list whose field holds none keeps the remove in a column of its own.
+   */
+  action?: React.ReactNode;
 };
 
 export const FieldCellContext = React.createContext<FieldCell | null>(null);

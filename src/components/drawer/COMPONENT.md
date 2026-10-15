@@ -81,7 +81,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Drawer.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button; or at the end of a `Drawer.Section` heading. Controls inside take tier `s`.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown; under the title when it would get less than 12rem; or at the end of a `Drawer.Section` heading. Controls inside take tier `s`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -96,12 +96,20 @@ No DOM, no ref. State and dismiss policy.
 | `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
-### Drawer.Title · Drawer.Description
-`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog.
+### Drawer.Title
+`ref` → `HTMLHeadingElement`. `<h2>` (title-m); its id names the dialog.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement \| HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+
+### Drawer.Description
+`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `loading` | `boolean` | `false` | Its data loads: a `Skeleton` holds the line's place and `aria-busy` is set, so the header never moves; the data fades in. |
+| `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Drawer.Body
 `ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
@@ -111,7 +119,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
 
 ### Drawer.Section
-`ref` → `HTMLElement`. A titled `<section>` of the body: an `<h3>` (title-s, under the `<h2>` title), an optional description, a `Drawer.Actions` at the end of the heading row; the content 16 below, sections 32 apart. Fields group in a `Fieldset`.
+`ref` → `HTMLElement`. A titled `<section>` of the body: an `<h3>` (title-s, under the `<h2>` title), an optional description, a `Drawer.Actions` at the end of the heading row; the content 16 below, sections 32 apart, in any wrapper. Fields group in a `Fieldset`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -124,7 +132,7 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
+| `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row, wrapping rather than cutting a label; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className`, `children` and the other attributes of the `<footer>`. |
 
 ### Drawer.Meta
@@ -135,7 +143,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `className`, `children` and the other attributes of the `<p>`. |
 
 ### Drawer.Guard
-No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. Closing from code is never held.
+No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. While `busy` or `dirty` the browser also asks before the tab closes or reloads. Closing from code is never held.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -186,6 +194,9 @@ Below 640px of viewport every size is full width and loses its corners.
 | closing | `open` turns false | the panel keeps showing the children it had open while it slides out |
 | busy | `Drawer.Guard busy` | Escape, the scrim, the close button and `Drawer.Close` do nothing; the close button and the `Close` child are `disabled` in place |
 | dirty | `Drawer.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); its confirm closes the drawer |
+| leaving the tab | `Drawer.Guard busy` or `dirty` | the browser asks before the tab closes or reloads (`beforeunload`), as with `Page.Guard` |
+| description loading | `Drawer.Description loading` | a `Skeleton` holds the line, `aria-busy` on the `<p>`; the data fades in under the same element |
+| actions below | the title would get less than 12rem beside `Drawer.Actions` | `data-actions-below` on the header: the actions move under the title and the description |
 
 Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. The drawer has no touch gestures: it is not dragged or swiped away — it closes by its buttons, Escape and the scrim, with the same slide-out.
 
@@ -199,8 +210,10 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Full viewport height; only the body scrolls, with its own side padding.
 - Tabs in the header: a `Tabs.List` inside `Drawer.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.
-- Titled groups of the body (a record's contacts, its deals, its history): `Drawer.Section label` — an `<h3>` under the drawer's `<h2>` title, an optional `description`, a `Drawer.Actions` at the end of its heading row; content 16 below, sections 32 apart. A group of fields is a `Fieldset`; a page section is `Page.Section`.
+- Titled groups of the body (a record's contacts, its deals, its history): `Drawer.Section label` — an `<h3>` under the drawer's `<h2>` title, an optional `description`, a `Drawer.Actions` at the end of its heading row; content 16 below, sections 32 apart — directly in the body, in a `Tabs.Panel` or in a form, with no spacing wrapper of your own. A group of fields is a `Fieldset`; a page section is `Page.Section`.
 - With a `Drawer.Meta` the buttons stay one row: when the footer runs short the status goes above them first.
+- `Drawer.Actions` keep their place beside the title while it has 12rem; on a phone, where a status and a ⋯ beside the × would fold the title into letters, they move under it by themselves.
+- A record whose data is still loading: the title from the list row, `Drawer.Description loading` and a `Skeleton` body in the data's geometry under a `Crossfade` — not a skeleton of your own in the header.
 
 ## Accessibility
 
@@ -240,8 +253,9 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile in the header and one full-width action in the footer — `Drawer.Icon`, `Drawer.Footer`, `layout`. |
 | [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
 | [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters, rounded only on the edge facing the page — `side`. |
-| [header-actions.tsx](examples/header-actions.tsx) | A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller — `Drawer.Actions`. |
+| [header-actions.tsx](examples/header-actions.tsx) | A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller; on a phone, where the title has no room beside them, they move under it — `Drawer.Actions`. |
 | [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details in titled sections, one with its own action — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`. |
+| [loading.tsx](examples/loading.tsx) | A record card that opens before its data arrives: the title comes from the list row, the line under it and the body hold their place in skeletons, then the data fades in — `Drawer.Description`, `loading`. |
 | [guard.tsx](examples/guard.tsx) | A form that holds the drawer from inside: after an edit Escape, the scrim and Cancel ask before discarding, the footer says so, and saving locks every way out — `Drawer.Guard`, `Drawer.Meta`. |
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Drawer.Body`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
@@ -254,6 +268,8 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Save or Cancel buttons at the end of the body, or in the header → they go in `Drawer.Footer`, which stays in place while the body scrolls.
 - A delete confirmation in a Drawer → use ConfirmDialog.
 - A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Drawer.Section label` with `Drawer.Actions`.
+- A wrapper with its own gap around `Drawer.Section`s inside a `Tabs.Panel` or a form → not needed: sections keep 32 between them in any wrapper.
+- A `Skeleton` placed by hand in `Drawer.Description` while the record loads → `Drawer.Description loading`.
 - Busy or unsaved state lifted out of the form into Root props → put `Drawer.Guard` next to the form, inside Content.
 - Clearing the record together with `open` and rendering a skeleton for «no record» → not needed: the panel keeps its last content while it slides out.
 - A Badge or a menu as a custom child of the header text column → put them in `Drawer.Actions`.
@@ -263,5 +279,5 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Padding on a wrapper inside Body → Body already pads and scrolls.
 
 ## Related
-- **Built from:** the dialog shared with Modal and Sheet (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Drawer.Icon`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Sheet (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Drawer.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Drawer.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Modal](../modal/COMPONENT.md) (the same header, body, footer and `Guard` in the centre), [Sheet](../sheet/COMPONENT.md) (the same parts raised from the bottom edge for a short task), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm), [Sidebar](../../layout/sidebar/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Avatar](../avatar/COMPONENT.md) (a person's picture in `Drawer.Icon`)

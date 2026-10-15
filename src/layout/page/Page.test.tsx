@@ -752,13 +752,6 @@ describe("Page body", () => {
     expect(screen.getByText("Таблица").parentElement).not.toContainElement(link);
   });
 
-  it("Section: layout aside sets data-layout; stack sets nothing", () => {
-    const { rerender } = render(<Page.Section label="Компания" layout="aside" />);
-    expect(screen.getByRole("region")).toHaveAttribute("data-layout", "aside");
-    rerender(<Page.Section label="Компания" />);
-    expect(screen.getByRole("region")).not.toHaveAttribute("data-layout");
-  });
-
   it("Cell: span defaults to the full row; rows only when more than one", () => {
     render(
       <Page.Grid>

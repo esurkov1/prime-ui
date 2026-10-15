@@ -1,4 +1,4 @@
-/** A record editor as a document page, a long form whose title, description and save stand in the content header: a plan's name, its specs and prices in one form; repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. */
+/** A record editor as a document page, a long form whose title, description and save stand in the content header and whose blocks are titled cards one under another: a plan's name, its specs and prices; repeating records as FieldList rows with the headings once, an icon and its color side by side, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. */
 import {
   Button,
   Card,
@@ -29,9 +29,9 @@ type Period = { id: string; from: string; price: string; base?: boolean };
 
 const SPEC_COLUMNS: FieldListColumn[] = [
   { label: "Иконка", width: "compact" },
+  { label: "Цвет", width: "compact" },
   { label: "Параметр" },
   { label: "Значение" },
-  { label: "Цвет", width: "compact" },
 ];
 
 const SPEC_ICONS: { name: IconName; label: string }[] = [
@@ -97,6 +97,7 @@ const SAVED_MS = 2000;
 
 export default function FieldListScreenExample() {
   const formId = React.useId();
+  const specsTitleId = React.useId();
   const [specs, setSpecs] = React.useState(SPECS);
   const [periods, setPeriods] = React.useState(PERIODS);
   const [nameError, setNameError] = React.useState<string>();
@@ -134,182 +135,187 @@ export default function FieldListScreenExample() {
         </Page.Actions>
       </Page.Header>
       <Page.Body>
-        <Page.Section layout="aside" label="Основное">
-          <form id={formId} noValidate onSubmit={save}>
-            <Card.Root variant="panel">
-              <Card.Body>
-                <Fieldset disabled={saving} aria-label="Основное">
-                  <Input.Root label="Название" error={nameError}>
+        <form id={formId} noValidate onSubmit={save}>
+          <Card.Root variant="panel">
+            <Card.Header>
+              <Card.Title as="h2">Основное</Card.Title>
+            </Card.Header>
+            <Card.Body>
+              <Fieldset disabled={saving} aria-label="Основное">
+                <Input.Root label="Название" error={nameError}>
+                  <Input.Wrapper>
+                    <Input.Field name="name" defaultValue="Команда" />
+                  </Input.Wrapper>
+                </Input.Root>
+                <Textarea.Root
+                  name="summary"
+                  label="Описание"
+                  optional
+                  rows={2}
+                  defaultValue="Для отделов до 50 человек: задачи, документы и отчёты в одном месте."
+                />
+              </Fieldset>
+            </Card.Body>
+          </Card.Root>
+        </form>
+        <Card.Root variant="panel">
+          <Card.Header>
+            <Card.Title as="h2" id={specsTitleId}>
+              Характеристики
+            </Card.Title>
+            <Card.Description>Первые три закреплены: их видно в карточке тарифа.</Card.Description>
+          </Card.Header>
+          <Card.Body>
+            <FieldList
+              aria-labelledby={specsTitleId}
+              disabled={saving}
+              columns={SPEC_COLUMNS}
+              reorderable
+              value={specs}
+              onValueChange={setSpecs}
+              getId={(spec) => spec.id}
+              getLabel={(spec) => spec.name}
+              getLocked={(spec) => spec.pinned ?? false}
+              createItem={(): Spec => ({
+                id: crypto.randomUUID(),
+                icon: "object.globe",
+                name: "",
+                value: "",
+                color: "#14b8a6",
+              })}
+              addLabel="Добавить характеристику"
+              renderItem={(spec, row) => (
+                <>
+                  <Select.Root
+                    value={spec.icon}
+                    onValueChange={(icon) => row.update({ icon: icon as IconName })}
+                  >
+                    <Select.Trigger>
+                      <Select.TriggerIcon>
+                        <Icon name={spec.icon} />
+                      </Select.TriggerIcon>
+                    </Select.Trigger>
+                    <Select.Content>
+                      {SPEC_ICONS.map((icon) => (
+                        <Select.Item key={icon.name} value={icon.name}>
+                          <Select.ItemIcon>
+                            <Icon name={icon.name} />
+                          </Select.ItemIcon>
+                          {icon.label}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
+                  <ColorPresets.Root
+                    value={spec.color}
+                    onValueChange={(color) => row.update({ color: color ?? spec.color })}
+                  >
+                    <ColorPresets.Trigger>
+                      <ColorPresets.SwatchButton />
+                    </ColorPresets.Trigger>
+                    <ColorPresets.Content />
+                  </ColorPresets.Root>
+                  <Input.Root>
                     <Input.Wrapper>
-                      <Input.Field name="name" defaultValue="Команда" />
+                      <Input.Field
+                        value={spec.name}
+                        onChange={(event) => row.update({ name: event.target.value })}
+                      />
                     </Input.Wrapper>
                   </Input.Root>
-                  <Textarea.Root
-                    name="summary"
-                    label="Описание"
-                    optional
-                    rows={2}
-                    defaultValue="Для отделов до 50 человек: задачи, документы и отчёты в одном месте."
-                  />
-                </Fieldset>
-              </Card.Body>
-            </Card.Root>
-          </form>
-        </Page.Section>
-
-        <Page.Section layout="aside" label="Характеристики">
-          <Card.Root variant="panel">
-            <Card.Body>
+                  <Input.Root>
+                    <Input.Wrapper>
+                      <Input.Field
+                        value={spec.value}
+                        onChange={(event) => row.update({ value: event.target.value })}
+                      />
+                    </Input.Wrapper>
+                  </Input.Root>
+                </>
+              )}
+            />
+          </Card.Body>
+        </Card.Root>
+        <Card.Root variant="panel">
+          <Card.Header>
+            <Card.Title as="h2">Стоимость</Card.Title>
+          </Card.Header>
+          <Card.Body className={styles.groups}>
+            <Fieldset label="За месяц" disabled={saving}>
               <FieldList
-                aria-label="Характеристики"
-                disabled={saving}
-                columns={SPEC_COLUMNS}
-                reorderable
-                value={specs}
-                onValueChange={setSpecs}
-                getId={(spec) => spec.id}
-                getLabel={(spec) => spec.name}
-                getLocked={(spec) => spec.pinned ?? false}
-                createItem={(): Spec => ({
-                  id: crypto.randomUUID(),
-                  icon: "object.globe",
-                  name: "",
-                  value: "",
-                  color: "#14b8a6",
-                })}
-                addLabel="Добавить характеристику"
-                renderItem={(spec, row) => (
+                columns={PRICE_COLUMNS}
+                value={periods}
+                onValueChange={setPeriods}
+                getId={(period) => period.id}
+                getLocked={(period) => period.base ?? false}
+                labels={{ lockedReason: "Базовую цену нельзя удалить" }}
+                createItem={() => ({ id: crypto.randomUUID(), from: "", price: "" })}
+                addLabel="Добавить изменение цены"
+                renderItem={(period, row) => (
                   <>
-                    <Select.Root
-                      value={spec.icon}
-                      onValueChange={(icon) => row.update({ icon: icon as IconName })}
-                    >
-                      <Select.Trigger>
-                        <Select.TriggerIcon>
-                          <Icon name={spec.icon} />
-                        </Select.TriggerIcon>
-                      </Select.Trigger>
-                      <Select.Content>
-                        {SPEC_ICONS.map((icon) => (
-                          <Select.Item key={icon.name} value={icon.name}>
-                            <Select.ItemIcon>
-                              <Icon name={icon.name} />
-                            </Select.ItemIcon>
-                            {icon.label}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Root>
+                    {period.base ? (
+                      <Input.Root>
+                        <Input.Wrapper>
+                          <Input.Field value="Всегда, если нет изменений" readOnly />
+                        </Input.Wrapper>
+                      </Input.Root>
+                    ) : (
+                      <Select.Root
+                        value={period.from}
+                        onValueChange={(from) => row.update({ from })}
+                        placeholder="Выберите месяц"
+                      >
+                        <Select.Trigger>
+                          <Select.Value />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {MONTHS.map((month) => (
+                            <Select.Item key={month.value} value={month.value}>
+                              {month.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                    )}
                     <Input.Root>
                       <Input.Wrapper>
                         <Input.Field
-                          value={spec.name}
-                          onChange={(event) => row.update({ name: event.target.value })}
+                          value={period.price}
+                          inputMode="decimal"
+                          placeholder="0"
+                          onChange={(event) => row.update({ price: event.target.value })}
                         />
+                        <Input.InlineAffix side="end">₽</Input.InlineAffix>
                       </Input.Wrapper>
                     </Input.Root>
-                    <Input.Root>
-                      <Input.Wrapper>
-                        <Input.Field
-                          value={spec.value}
-                          onChange={(event) => row.update({ value: event.target.value })}
-                        />
-                      </Input.Wrapper>
-                    </Input.Root>
-                    <ColorPresets.Root
-                      value={spec.color}
-                      onValueChange={(color) => row.update({ color: color ?? spec.color })}
-                    >
-                      <ColorPresets.Trigger>
-                        <ColorPresets.SwatchButton />
-                      </ColorPresets.Trigger>
-                      <ColorPresets.Content />
-                    </ColorPresets.Root>
                   </>
                 )}
               />
-            </Card.Body>
-          </Card.Root>
-        </Page.Section>
-
-        <Page.Section layout="aside" label="Стоимость">
-          <Card.Root variant="panel">
-            <Card.Body className={styles.groups}>
-              <Fieldset label="За месяц" disabled={saving}>
-                <FieldList
-                  columns={PRICE_COLUMNS}
-                  value={periods}
-                  onValueChange={setPeriods}
-                  getId={(period) => period.id}
-                  getLocked={(period) => period.base ?? false}
-                  createItem={() => ({ id: crypto.randomUUID(), from: "", price: "" })}
-                  addLabel="Добавить изменение цены"
-                  renderItem={(period, row) => (
-                    <>
-                      {period.base ? (
-                        <Input.Root>
-                          <Input.Wrapper>
-                            <Input.Field value="Всегда, если нет изменений" readOnly />
-                          </Input.Wrapper>
-                        </Input.Root>
-                      ) : (
-                        <Select.Root
-                          value={period.from}
-                          onValueChange={(from) => row.update({ from })}
-                          placeholder="Выберите месяц"
-                        >
-                          <Select.Trigger>
-                            <Select.Value />
-                          </Select.Trigger>
-                          <Select.Content>
-                            {MONTHS.map((month) => (
-                              <Select.Item key={month.value} value={month.value}>
-                                {month.label}
-                              </Select.Item>
-                            ))}
-                          </Select.Content>
-                        </Select.Root>
-                      )}
-                      <Input.Root>
-                        <Input.Wrapper>
-                          <Input.Field
-                            value={period.price}
-                            inputMode="decimal"
-                            placeholder="0"
-                            onChange={(event) => row.update({ price: event.target.value })}
-                          />
-                          <Input.InlineAffix side="end">₽</Input.InlineAffix>
-                        </Input.Wrapper>
-                      </Input.Root>
-                    </>
-                  )}
-                />
-              </Fieldset>
-              <Fieldset
-                label="Подключение"
-                description="Разовый платёж; пустая валюта не выставляется."
-                disabled={saving}
-              >
-                <div className={styles.currencies}>
-                  {SETUP_FEE.map((fee) => (
-                    <Input.Root key={fee.name}>
-                      <Input.Wrapper>
-                        <Input.Field
-                          name={fee.name}
-                          aria-label={fee.label}
-                          inputMode="decimal"
-                          placeholder="0"
-                          defaultValue={fee.value}
-                        />
-                        <Input.InlineAffix side="end">{fee.currency}</Input.InlineAffix>
-                      </Input.Wrapper>
-                    </Input.Root>
-                  ))}
-                </div>
-              </Fieldset>
-            </Card.Body>
-          </Card.Root>
-        </Page.Section>
+            </Fieldset>
+            <Fieldset
+              label="Подключение"
+              description="Разовый платёж; пустая валюта не выставляется."
+              disabled={saving}
+            >
+              <div className={styles.currencies}>
+                {SETUP_FEE.map((fee) => (
+                  <Input.Root key={fee.name}>
+                    <Input.Wrapper>
+                      <Input.Field
+                        name={fee.name}
+                        aria-label={fee.label}
+                        inputMode="decimal"
+                        placeholder="0"
+                        defaultValue={fee.value}
+                      />
+                      <Input.InlineAffix side="end">{fee.currency}</Input.InlineAffix>
+                    </Input.Wrapper>
+                  </Input.Root>
+                ))}
+              </div>
+            </Fieldset>
+          </Card.Body>
+        </Card.Root>
       </Page.Body>
     </Page.Root>
   );

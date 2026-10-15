@@ -1,7 +1,9 @@
 /*
  * FieldList — an editable list of records of one shape (foundation §1 rule 3: proximity, no lines).
  * One grid track list for the heading row and every row (`--fl-columns`, set per row so a row
- * carried by Dnd keeps its tracks): [the columns] [end: remove] [grip: handle or lock]. The column
+ * carried by Dnd keeps its tracks): [the columns] [end: remove] [grip: handle or lock]. Every row
+ * has the same slots: a pinned row's remove stands there, off. A one-column list has no end track:
+ * its remove is the last segment of the field (`fieldCell`). The column
  * headings stand once above the rows; the fields inside carry them as hidden labels (`fieldCell`).
  * In a narrow container (`prime-field-list`, < 30rem) the heading row goes, every row stacks its
  * fields into one column and each field shows its label (FieldFrame). The totals row
@@ -28,7 +30,6 @@
  */
 .row {
   --fl-end: var(--field-h);
-  --fl-compact: calc(var(--field-h) * 2);
   --fl-xs: var(--prime-space-24);
   --fl-s: calc(var(--prime-space-24) + var(--prime-space-12));
   --fl-m: calc(var(--prime-space-24) * 2);
@@ -66,9 +67,17 @@
   min-width: 0;
 }
 
-/* A compact cell holds a control as wide as its content (an icon Select, a swatch). */
+/*
+ * A compact cell holds a control as wide as its content (an icon Select, a swatch); the cell and
+ * its heading keep their own width, which FieldList.tsx measures into the column's track.
+ */
 .cell[data-width="compact"] {
   display: flex;
+  width: max-content;
+}
+
+.heading[data-width="compact"] {
+  width: max-content;
 }
 
 /* Handle, lock and remove sit on the middle of the first line of fields, not of a grown row. */
@@ -88,8 +97,8 @@
 
 /*
  * Totals (`renderTotals`): over a faint line under the last row, each total on the line of a field
- * of its column, its text where the field's text starts; the first cell without a total names the
- * row («Итого»).
+ * of its column, its text where the field's text sits (the start, or the end for a field that ends
+ * its number there); the first cell without a total names the row («Итого»).
  */
 .totals {
   padding-block-start: var(--prime-space-3);
@@ -105,6 +114,11 @@
   font-size: var(--field-text);
   line-height: var(--field-lh);
   font-variant-numeric: tabular-nums;
+}
+
+/* The column's field ends its text at the end edge (a number with its unit): so does the total. */
+.total[data-align="end"] {
+  justify-content: flex-end;
 }
 
 .totalsEnd {
@@ -149,17 +163,18 @@
     gap: var(--prime-space-6);
   }
 
+  /* A one-column row stays one field: nothing stacks, the rows keep the wide gap. */
+  .rows:has(> [data-single]) {
+    gap: var(--prime-space-3);
+  }
+
   .row {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: var(--fl-stacked);
   }
 
-  .row:not(:has(> .grip)) {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  /* The remove button and the handle stand on the line of the first field's label. */
-  .grip,
-  .end {
+  /* The remove button and the handle stand on the line of the first field's label; a one-column
+     row shows no label, so they stay on the middle of its field. */
+  .row:not([data-single]) > :is(.grip, .end) {
     height: var(--fl-label-lh);
   }
 
@@ -170,8 +185,9 @@
     min-width: 0;
   }
 
-  /* Stacked totals: a line per total, its column name at the start and the value at the end. */
-  .total {
+  /* Stacked totals: a line per total, its column name at the start and the value at the end
+     (whatever the alignment of the wide row). */
+  .totals .total {
     justify-content: space-between;
     min-height: auto;
     padding-inline: 0;

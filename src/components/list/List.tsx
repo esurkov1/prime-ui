@@ -227,19 +227,21 @@ function ListItemCount({ color = "gray", className, ...rest }: ListItemCountProp
 ListItemCount.displayName = "List.ItemCount";
 
 export type ListItemActionsProps = React.HTMLAttributes<HTMLDivElement> & {
+  side?: "start" | "end";
   ref?: React.Ref<HTMLDivElement>;
 };
 
 /**
- * The row's own controls (a Switch, a Dropdown with its icon Button, an icon Button): at the end of
- * the row, beside its button or link and never inside it, one tier below the row. The row's fills
+ * The row's own controls (a Switch, a Dropdown with its icon Button, an icon Button): beside its
+ * button or link and never inside it, one tier below the row — at its end, or leading it with
+ * `side="start"` (the on / off of a reorderable row, whose end edge is the grip's). The row's fills
  * cover them.
  */
-function ListItemActions({ className, ...rest }: ListItemActionsProps) {
+function ListItemActions({ side = "end", className, ...rest }: ListItemActionsProps) {
   const size = useControlSize(undefined);
   return (
     <ControlSizeProvider value={stepDown(size)}>
-      <div {...rest} className={cx(styles.actions, className)} />
+      <div {...rest} className={cx(styles.actions, className)} data-side={side} />
     </ControlSizeProvider>
   );
 }
@@ -372,7 +374,7 @@ function ListItem({
   const link = href !== undefined || asChild;
   // The row's own controls leave the row element for the row (a button cannot hold a control).
   const slotted = asChild ? slotChild(children, "List.Item") : null;
-  const { parts: actions, rest: content } = splitParts(
+  const { parts: actions, rest: content } = splitParts<ListItemActionsProps>(
     slotted ? slotted.props.children : children,
     ListItemActions,
   );
@@ -407,11 +409,15 @@ function ListItem({
     );
   }
   if (actions.length > 0) {
-    // The frame draws the row's fills under the element and its controls alike.
+    // The frame draws the row's fills under the element and its controls alike. Leading controls
+    // stand before the element in the DOM too, so Tab meets them in the order the row reads.
+    const leading = actions.filter((part) => part.props.side === "start");
+    const trailing = actions.filter((part) => part.props.side !== "start");
     element = (
       <div className={styles.frame}>
+        {leading}
         {element}
-        {actions}
+        {trailing}
       </div>
     );
   }

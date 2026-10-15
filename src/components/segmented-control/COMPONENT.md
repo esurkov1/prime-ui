@@ -158,14 +158,15 @@ Colour all items or none; do not give an item and its Count the same hue; prefer
 | optional | `optional` | a muted `labels.optional` marker after the label |
 | support row reserved | `reserveSupportRow` | the support row stays rendered while empty, so an error arriving shifts nothing |
 | focus-visible | keyboard | focus ring inside the segment |
-| collapsed | row wider than the container and every segment has an icon | row `data-collapse="icon"`: titles, counts and descriptions leave the row, segments turn square; a `VisuallyHidden` copy of the title names each segment and a `Tooltip` shows it |
+| compact | row wider than the container at the tier's padding | row `data-collapse="compact"`: single-line segments tighten their padding by one step, so a row a few pixels too wide keeps its last segment and count whole; if it still does not fit (and not every segment has an icon) it scrolls |
+| collapsed | even the compact row does not fit and every segment has an icon | row `data-collapse="icon"`: titles, counts and descriptions leave the row, segments turn square; a `VisuallyHidden` copy of the title names each segment and a `Tooltip` shows it |
 | overflow | row still wider than the container | root `data-overflow-start` / `data-overflow-end`: edge fades in the track color |
 
 Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb (the shared selection indicator) glides (`emphasized` + `base`, `data-animate`) only into a user's choice (click, arrows); a value set from outside and layout changes snap it; it stays still under `prefers-reduced-motion`. It sits inside the segment track, which clips it, so moving the selection never changes the row's scroll area. When the row scrolls, the selected segment is kept in view on mount and on every value change: only the row scrolls, never the page, and the scroll glides only after a user's choice.
 
 ## Layout & spacing
 - In a form it is a field: label → track `label-gap`, track → support row `hint-gap`, field → field `--prime-space-5` like every field.
-- Width is content-based by default; the row is a switcher (foundation §9): segments never wrap or truncate. In a narrow container segments with icons drop their titles first, then the row scrolls horizontally with fading edges.
+- Width is content-based by default; the row is a switcher (foundation §9): segments never wrap or truncate. In a narrow container the segments first tighten their padding, then segments with icons drop their titles, then the row scrolls horizontally with fading edges.
 - Without `size` the control takes the tier of its host (a toolbar, a form), else `m`.
 - On a coarse pointer each segment's hit area grows to the 44 px touch target in height; the track keeps its tier height.
 - In a toolbar: gap `--prime-space-3` between controls; keep every control at one size.

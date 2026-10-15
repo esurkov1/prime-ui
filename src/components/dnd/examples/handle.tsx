@@ -1,4 +1,4 @@
-/** Notification channels with switches: only the grip starts a drag, and the async save can roll the order back — `handle`, `Dnd.Handle`, `onReorder`. */
+/** Notification channels, each switch leading its row and the grip ending it: only the grip starts a drag, and the async save can roll the order back — `handle`, `Dnd.Handle`, `onReorder`. */
 import { Dnd, moveBefore, Switch, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -37,9 +37,6 @@ export default function DndHandleExample() {
         }}
         renderItem={(channel) => (
           <Dnd.SortableItem id={channel.id} className={styles.handleRow}>
-            <Typography as="span" variant="body-m" className={styles.rowText}>
-              {channel.title}
-            </Typography>
             <Switch.Root
               aria-label={channel.title}
               checked={channel.enabled}
@@ -49,6 +46,9 @@ export default function DndHandleExample() {
                 )
               }
             />
+            <Typography as="span" variant="body-m" className={styles.rowText}>
+              {channel.title}
+            </Typography>
             <Dnd.Handle />
           </Dnd.SortableItem>
         )}

@@ -1,4 +1,4 @@
-/** Orders wider than the table: the order number stays at the start and the ⋯ row actions at the end while the columns between scroll sideways — `stickyFirstColumn`, `stickyLastColumn`. */
+/** Orders wider than the table: the order number stays at the start, the ⋯ row actions at the end with the column chooser in their header cell, and the columns between scroll sideways — `stickyFirstColumn`, `stickyLastColumn`, `columnsMenu`. */
 import { Badge, Button, DataTable, type DataTableColumn, Dropdown, Icon } from "prime-ui-kit";
 
 type Order = {
@@ -85,7 +85,7 @@ const RUB = new Intl.NumberFormat("ru-RU", {
 });
 
 const COLUMNS: DataTableColumn<Order>[] = [
-  { id: "id", header: "Заказ", accessor: "id" },
+  { id: "id", header: "Заказ", accessor: "id", hideable: false },
   { id: "client", header: "Клиент", accessor: "client", minWidth: "14rem" },
   { id: "manager", header: "Менеджер", accessor: "manager", minWidth: "10rem" },
   { id: "city", header: "Город", accessor: "city", minWidth: "10rem" },
@@ -111,6 +111,7 @@ const COLUMNS: DataTableColumn<Order>[] = [
     id: "actions",
     header: "Действия",
     hideHeader: true,
+    hideable: false,
     align: "end",
     cell: (row) => (
       <Dropdown.Root>
@@ -147,6 +148,7 @@ export default function DataTableActionsColumnExample() {
       paging="none"
       stickyFirstColumn
       stickyLastColumn
+      columnsMenu
     />
   );
 }

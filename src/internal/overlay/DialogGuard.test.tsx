@@ -114,6 +114,23 @@ describe.each(DIALOGS)("$name.Guard", ({ Dialog, swipes }) => {
     await waitFor(() => expect(opener).toHaveFocus());
   });
 
+  it("busy or dirty: the browser asks before the tab closes; a clean form lets it go", () => {
+    const unload = () => {
+      const event = new Event("beforeunload", { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    const { rerender, unmount } = render(<Guarded />);
+    open();
+    expect(unload()).toBe(false);
+    rerender(<Guarded dirty />);
+    expect(unload()).toBe(true);
+    rerender(<Guarded busy />);
+    expect(unload()).toBe(true);
+    unmount();
+    expect(unload()).toBe(false);
+  });
+
   it("takes the confirm texts from the Root labels", async () => {
     render(<Guarded dirty labels={{ discardTitle: "Закрыть без сохранения?" }} />);
     open();

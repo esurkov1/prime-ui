@@ -208,6 +208,8 @@
   --dt-pad-y: calc((var(--dt-row-height) - var(--dt-cell-control)) / 2);
   --dt-toggle-w: var(--dt-toggle);
   --dt-handle-w: calc(var(--dt-grip) + var(--dt-pad-x));
+  /* The trailing cell of the column chooser (`columnsMenu`): its trigger + the end padding. */
+  --dt-menu-w: calc(var(--dt-cell-control) + var(--dt-pad-x));
 
   width: max-content;
   border-collapse: separate;
@@ -690,7 +692,8 @@
  * Tab) covers every other cell, so the whole row is the link's hit area — a sticky cell included.
  * Controls inside the cells stand above it; a custom widget joins them with `data-row-click-ignore`.
  */
-.row[data-link="true"] > .cell:not(.firstColumnSticky, .lastColumnSticky, .stickyLead) {
+.row[data-link="true"]
+> .cell:not(.firstColumnSticky, .lastColumnSticky, .menuCellSticky, .stickyLead) {
   position: relative;
 }
 
@@ -942,6 +945,47 @@ tbody + tbody > .groupRow > .groupCell {
 .cell.lastColumnSticky,
 .headCell.lastColumnSticky {
   border-inline-start-width: 0;
+}
+
+/* ---------- Column chooser ---------- */
+
+/* `columnsMenu`: the trigger at the inline end of the head, in the row-actions head cell or in a
+   trailing cell of its own. */
+.headMenu {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* The trailing cell: the trigger plus the end padding. The last content cell's padding is the gap
+   before it, so it reads as part of that column's block: no column divider. */
+.menuCell {
+  box-sizing: border-box;
+  width: var(--dt-menu-w);
+  min-width: var(--dt-menu-w);
+  max-width: var(--dt-menu-w);
+  padding-inline: 0 var(--dt-pad-x);
+  line-height: 0;
+}
+
+.cell + .menuCell,
+.headCell + .menuCell {
+  border-inline-start-width: 0;
+}
+
+/* With `stickyLastColumn` the trailing cell sticks to the end edge and the last column right
+   before it. */
+.menuCellSticky {
+  position: sticky;
+  inset-inline-end: 0;
+  z-index: var(--dt-z-sticky-first-column);
+}
+
+.headCell.menuCellSticky {
+  z-index: var(--dt-z-sticky-header);
+}
+
+.root[data-menu-cell="true"] .lastColumnSticky {
+  inset-inline-end: var(--dt-menu-w);
 }
 
 /* Sticky head and a sticky column: the corner head cells stick to both edges. */

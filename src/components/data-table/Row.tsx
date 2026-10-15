@@ -60,6 +60,8 @@ export type RowShared<Row> = {
   stickyFirstColumn: boolean;
   /** The last visible column sticks to the end edge (row actions). */
   stickyLastColumn: boolean;
+  /** A trailing cell under the head's column chooser (`columnsMenu` with no row-actions column). */
+  menuCell: boolean;
   striped: boolean;
   totalColumns: number;
   /**
@@ -299,6 +301,27 @@ function DataTableRowImpl<Row>({
             </td>
           );
         })}
+        {shared.menuCell ? (
+          <td
+            className={cx(
+              styles.cell,
+              styles.menuCell,
+              shared.stickyLastColumn && styles.menuCellSticky,
+              enter,
+            )}
+          >
+            {href === undefined ? null : (
+              // biome-ignore lint/a11y/useAnchorContent: a pointer-only duplicate of the key cell's named link, hidden from AT and Tab
+              <a
+                href={href}
+                tabIndex={-1}
+                aria-hidden="true"
+                className={styles.cellLink}
+                data-row-link=""
+              />
+            )}
+          </td>
+        ) : null}
       </RowElement>
       {hasDetail ? (
         <tr
@@ -387,6 +410,8 @@ type MeasureBodyProps<Row> = {
   expandEnabled: boolean;
   /** A leading column of row handles (`onReorder`). */
   reorderable: boolean;
+  /** A trailing cell under the head's column chooser. */
+  menuCell: boolean;
 };
 
 /**
@@ -399,6 +424,7 @@ export function MeasureBody<Row>({
   selectable,
   expandEnabled,
   reorderable,
+  menuCell,
 }: MeasureBodyProps<Row>) {
   return (
     <tbody className={styles.measureBody} aria-hidden="true" inert>
@@ -424,6 +450,7 @@ export function MeasureBody<Row>({
               {renderCell(row, column, false)}
             </td>
           ))}
+          {menuCell ? <td className={cx(styles.cell, styles.menuCell)} /> : null}
         </tr>
       ))}
     </tbody>

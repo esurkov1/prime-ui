@@ -1,4 +1,4 @@
-/** A plan price and its changes by month in one table: the base price is the first, pinned row, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `width`. */
+/** A plan price and its changes by month in one table: the base price is the first, pinned row whose remove button is off and says why, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `labels`, `width`. */
 import { FieldList, type FieldListColumn, Input, Select } from "prime-ui-kit";
 import * as React from "react";
 
@@ -30,6 +30,7 @@ export default function FieldListBaseRowExample() {
       onValueChange={setPeriods}
       getId={(period) => period.id}
       getLocked={(period) => period.base ?? false}
+      labels={{ lockedReason: "Базовую цену нельзя удалить" }}
       createItem={() => ({ id: crypto.randomUUID(), from: "", price: "" })}
       addLabel="Добавить изменение цены"
       renderItem={(period, row) => (

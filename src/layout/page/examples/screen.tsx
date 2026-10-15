@@ -1,4 +1,4 @@
-/** A settings page as a document: the path in the top bar that repeats the title once it scrolls away, the large title in the flow, sections with a heading column and a panel, a form saved by its own button, switches that apply at once and a danger zone with a confirm — `collapse`, `layout`, `maxWidth`. */
+/** A settings page as a document: the path in the top bar that repeats the title once it scrolls away, the large title in the flow, each section a card with its own heading, a form saved by its own button, switches that apply at once and a danger zone with a confirm — `collapse`, `maxWidth`, `Card.Header`. */
 import {
   Breadcrumb,
   Button,
@@ -88,118 +88,107 @@ export default function PageScreenExample() {
         </Page.Heading>
       </Page.Header>
       <Page.Body>
-        <Page.Section
-          layout="aside"
-          label="Компания"
-          description="Попадают в счета, акты и письма клиентам."
-        >
-          <form noValidate onSubmit={save} onReset={() => setInnError(undefined)}>
-            <Card.Root variant="panel">
-              <Card.Body>
-                <Fieldset disabled={saving}>
-                  <Input.Root label="Название">
+        <form noValidate onSubmit={save} onReset={() => setInnError(undefined)}>
+          <Card.Root variant="panel">
+            <Card.Header>
+              <Card.Title as="h2">Компания</Card.Title>
+              <Card.Description>Попадают в счета, акты и письма клиентам.</Card.Description>
+            </Card.Header>
+            <Card.Body>
+              <Fieldset disabled={saving}>
+                <Input.Root label="Название">
+                  <Input.Wrapper>
+                    <Input.Field name="name" defaultValue="ООО «Прайм Софт»" />
+                  </Input.Wrapper>
+                </Input.Root>
+                <div className={styles.pair}>
+                  <Input.Root label="ИНН" error={innError} hint="10 или 12 цифр" reserveSupportRow>
                     <Input.Wrapper>
-                      <Input.Field name="name" defaultValue="ООО «Прайм Софт»" />
+                      <Input.Field name="inn" inputMode="numeric" defaultValue="7704512908" />
                     </Input.Wrapper>
                   </Input.Root>
-                  <div className={styles.pair}>
-                    <Input.Root
-                      label="ИНН"
-                      error={innError}
-                      hint="10 или 12 цифр"
-                      reserveSupportRow
-                    >
-                      <Input.Wrapper>
-                        <Input.Field name="inn" inputMode="numeric" defaultValue="7704512908" />
-                      </Input.Wrapper>
-                    </Input.Root>
-                    <Select.Root label="Часовой пояс" defaultValue="Europe/Moscow">
-                      <Select.Trigger>
-                        <Select.Value />
-                      </Select.Trigger>
-                      <Select.Content searchable>
-                        {TIMEZONES.map((zone) => (
-                          <Select.Item key={zone.value} value={zone.value}>
-                            {zone.label}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Root>
-                  </div>
-                  <Textarea.Root
-                    name="address"
-                    label="Юридический адрес"
-                    optional
-                    rows={2}
-                    defaultValue="125009, Москва, ул. Тверская, д. 7, офис 412"
-                  />
-                </Fieldset>
-              </Card.Body>
-              <Card.Footer>
-                <Button.Root type="reset" variant="ghost" tone="neutral" disabled={saving}>
-                  Отменить изменения
-                </Button.Root>
-                <Button.Root type="submit" loading={saving}>
-                  {saved ? "Сохранено" : "Сохранить"}
-                </Button.Root>
-              </Card.Footer>
-            </Card.Root>
-          </form>
-        </Page.Section>
-
-        <Page.Section
-          layout="aside"
-          label="Уведомления"
-          description="Включаются сразу, без сохранения."
-        >
-          <Card.Root variant="panel">
-            <Card.Body>
-              <Fieldset aria-label="Уведомления">
-                {ALERTS.map((alert) => (
-                  <Switch.Root
-                    key={alert.name}
-                    name={alert.name}
-                    defaultChecked={alert.defaultChecked}
-                    hint={alert.hint}
-                  >
-                    <Switch.Label>{alert.label}</Switch.Label>
-                  </Switch.Root>
-                ))}
+                  <Select.Root label="Часовой пояс" defaultValue="Europe/Moscow">
+                    <Select.Trigger>
+                      <Select.Value />
+                    </Select.Trigger>
+                    <Select.Content searchable>
+                      {TIMEZONES.map((zone) => (
+                        <Select.Item key={zone.value} value={zone.value}>
+                          {zone.label}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+                <Textarea.Root
+                  name="address"
+                  label="Юридический адрес"
+                  optional
+                  rows={2}
+                  defaultValue="125009, Москва, ул. Тверская, д. 7, офис 412"
+                />
               </Fieldset>
             </Card.Body>
+            <Card.Footer>
+              <Button.Root type="reset" variant="ghost" tone="neutral" disabled={saving}>
+                Отменить изменения
+              </Button.Root>
+              <Button.Root type="submit" loading={saving}>
+                {saved ? "Сохранено" : "Сохранить"}
+              </Button.Root>
+            </Card.Footer>
           </Card.Root>
-        </Page.Section>
+        </form>
 
-        <Page.Section
-          layout="aside"
-          label="Рабочее пространство"
-          description="Действия, которые нельзя отменить."
-        >
-          <Card.Root variant="panel">
-            <Card.Body>
-              <div className={styles.danger}>
-                <div className={styles.dangerText}>
-                  <Typography variant="title-s">Удалить пространство</Typography>
-                  <Typography variant="body-s" tone="secondary">
-                    Счета, клиенты и история будут удалены для всех участников.
-                  </Typography>
-                </div>
-                <ConfirmDialog.Root
-                  title="Удалить «Прайм Софт»?"
-                  description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
-                  confirmLabel="Удалить пространство"
-                  onConfirm={removeWorkspace}
+        <Card.Root variant="panel">
+          <Card.Header>
+            <Card.Title as="h2">Уведомления</Card.Title>
+            <Card.Description>Включаются сразу, без сохранения.</Card.Description>
+          </Card.Header>
+          <Card.Body>
+            <Fieldset aria-label="Уведомления">
+              {ALERTS.map((alert) => (
+                <Switch.Root
+                  key={alert.name}
+                  name={alert.name}
+                  defaultChecked={alert.defaultChecked}
+                  hint={alert.hint}
                 >
-                  <ConfirmDialog.Trigger>
-                    <Button.Root variant="outline" tone="danger">
-                      Удалить
-                    </Button.Root>
-                  </ConfirmDialog.Trigger>
-                </ConfirmDialog.Root>
+                  <Switch.Label>{alert.label}</Switch.Label>
+                </Switch.Root>
+              ))}
+            </Fieldset>
+          </Card.Body>
+        </Card.Root>
+
+        <Card.Root variant="panel">
+          <Card.Header>
+            <Card.Title as="h2">Рабочее пространство</Card.Title>
+            <Card.Description>Действия, которые нельзя отменить.</Card.Description>
+          </Card.Header>
+          <Card.Body>
+            <div className={styles.danger}>
+              <div className={styles.dangerText}>
+                <Typography variant="title-s">Удалить пространство</Typography>
+                <Typography variant="body-s" tone="secondary">
+                  Счета, клиенты и история будут удалены для всех участников.
+                </Typography>
               </div>
-            </Card.Body>
-          </Card.Root>
-        </Page.Section>
+              <ConfirmDialog.Root
+                title="Удалить «Прайм Софт»?"
+                description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
+                confirmLabel="Удалить пространство"
+                onConfirm={removeWorkspace}
+              >
+                <ConfirmDialog.Trigger>
+                  <Button.Root variant="outline" tone="danger">
+                    Удалить
+                  </Button.Root>
+                </ConfirmDialog.Trigger>
+              </ConfirmDialog.Root>
+            </div>
+          </Card.Body>
+        </Card.Root>
       </Page.Body>
     </Page.Root>
   );

@@ -1,41 +1,36 @@
-import * as React from "react";
-
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Icon } from "@/icons";
 import { formatLabel } from "@/internal/formatLabel";
-import { stepDown } from "@/internal/states";
+import { type ControlSize, stepDown } from "@/internal/states";
 
-import { DataTableColumnsContext } from "./context";
+import type { DataTableLabels } from "./DataTable";
+import type { DataTableColumn } from "./types";
 
-export type DataTableColumnsMenuProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "type" | "children"
-> & {
-  side?: PositionSide;
-  align?: PositionAlign;
-  /** The trigger button. */
-  ref?: React.Ref<HTMLButtonElement>;
+type ColumnsMenuProps = {
+  /** Every column, hidden ones included, in table order. */
+  columns: DataTableColumn<never>[];
+  hidden: ReadonlySet<string>;
+  setHidden: (hidden: string[]) => void;
+  labels: DataTableLabels;
+  size: ControlSize;
 };
 
 /**
- * The column chooser of the table it sits in (put it into `toolbar`): a trigger button and a menu
- * with a check item per column and «Показать все». Writes the table's `hiddenColumns`; a column
- * with `hideable: false` stays checked and disabled, and the last visible column cannot be hidden.
+ * The column chooser of the table (`columnsMenu`), drawn in its header row: an icon-only ghost
+ * Button one tier below the table, named and tipped by `labels.columns`, opening a Dropdown with a
+ * check item per column and «Показать все». A column with `hideable: false` stays checked and
+ * disabled, and the last visible column cannot be hidden.
  */
-export function DataTableColumnsMenu({ side, align, ...rest }: DataTableColumnsMenuProps) {
-  const context = React.useContext(DataTableColumnsContext);
-  if (context === null) {
-    throw new Error("DataTable.ColumnsMenu must be rendered inside the DataTable toolbar");
-  }
-  const { columns, hidden, setHidden, labels, size } = context;
-  const isShown = (column: (typeof columns)[number]) =>
+export function ColumnsMenu({ columns, hidden, setHidden, labels, size }: ColumnsMenuProps) {
+  const isShown = (column: DataTableColumn<never>) =>
     column.hideable === false || !hidden.has(column.id);
   const shown = columns.filter(isShown).length;
   const hiddenIds = columns.filter((column) => !isShown(column)).map((column) => column.id);
-  // Toolbar controls sit one tier below the table (an `m` table → `s`).
+  // A control in the head sits one tier below the table, like the controls in its cells.
   const tier = stepDown(size);
+  const name = formatLabel(labels.columns, { shown, total: columns.length });
 
   const setShown = (id: string, visible: boolean) => {
     const next = [...hidden].filter((item) => item !== id);
@@ -44,15 +39,19 @@ export function DataTableColumnsMenu({ side, align, ...rest }: DataTableColumnsM
 
   return (
     <Dropdown.Root>
-      <Dropdown.Trigger>
-        <Button.Root {...rest} variant="outline" tone="neutral" size={tier}>
-          <Button.Icon>
-            <Icon name="view.columns" />
-          </Button.Icon>
-          {formatLabel(labels.columns, { shown, total: columns.length })}
-        </Button.Root>
-      </Dropdown.Trigger>
-      <Dropdown.Content side={side} align={align} size={tier}>
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <Dropdown.Trigger>
+            <Button.Root variant="ghost" tone="neutral" size={tier} aria-label={name}>
+              <Button.Icon>
+                <Icon name="view.columns" />
+              </Button.Icon>
+            </Button.Root>
+          </Dropdown.Trigger>
+        </Tooltip.Trigger>
+        <Tooltip.Content>{name}</Tooltip.Content>
+      </Tooltip.Root>
+      <Dropdown.Content side="bottom" align="end" size={tier}>
         {columns.map((column) => {
           const visible = isShown(column);
           return (
@@ -74,4 +73,3 @@ export function DataTableColumnsMenu({ side, align, ...rest }: DataTableColumnsM
     </Dropdown.Root>
   );
 }
-DataTableColumnsMenu.displayName = "DataTable.ColumnsMenu";

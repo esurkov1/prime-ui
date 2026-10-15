@@ -1,5 +1,5 @@
-/** A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading, a heading column beside a panel — `Page.Section`, `label`, `description`, `Page.Actions`, `layout`. */
-import { Card, DataTable, type DataTableColumn, LinkButton, Page, Typography } from "prime-ui-kit";
+/** A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading — `Page.Section`, `label`, `description`, `Page.Actions`. */
+import { Card, DataTable, type DataTableColumn, LinkButton, Page } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -54,19 +54,6 @@ export default function PageSectionsExample() {
             <LinkButton href="#invoices">Все счета</LinkButton>
           </Page.Actions>
           <DataTable columns={COLUMNS} rows={INVOICES} getRowKey={(row) => row.id} paging="none" />
-        </Page.Section>
-        <Page.Section
-          layout="aside"
-          label="Реквизиты в счетах"
-          description="Попадают в каждый новый счёт."
-        >
-          <Card.Root variant="panel">
-            <Card.Body>
-              <Typography variant="body-m" tone="secondary">
-                ООО «Прайм Софт», ИНН 7701234567, р/с в Т-Банке.
-              </Typography>
-            </Card.Body>
-          </Card.Root>
         </Page.Section>
       </Page.Body>
     </div>

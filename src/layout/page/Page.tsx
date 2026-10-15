@@ -927,13 +927,9 @@ function PageBody({ className, ...rest }: PageBodyProps) {
 }
 PageBody.displayName = "Page.Body";
 
-/** Where the heading of a section stands: over its content or in a column beside it. */
-export type PageSectionLayout = "stack" | "aside";
-
 export type PageSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
   label: React.ReactNode;
   description?: React.ReactNode;
-  layout?: PageSectionLayout;
   ref?: React.Ref<HTMLElement>;
 };
 
@@ -942,24 +938,12 @@ export type PageSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> 
  * at its end) over its content. Sections stand further apart than the plain blocks of the body,
  * so the air shows where a new topic starts.
  */
-function PageSection({
-  label,
-  description,
-  layout = "stack",
-  className,
-  children,
-  ...rest
-}: PageSectionProps) {
+function PageSection({ label, description, className, children, ...rest }: PageSectionProps) {
   const headingId = React.useId();
   const { parts: actions, rest: content } = splitParts(children, PageActions);
 
   return (
-    <section
-      aria-labelledby={headingId}
-      {...rest}
-      className={cx(styles.section, className)}
-      {...toDataAttributes({ layout: layout === "aside" ? "aside" : undefined })}
-    >
+    <section aria-labelledby={headingId} {...rest} className={cx(styles.section, className)}>
       <div
         className={styles.sectionHeader}
         data-has-actions={actions.length > 0 ? "true" : undefined}

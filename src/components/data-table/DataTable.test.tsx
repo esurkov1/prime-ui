@@ -1440,7 +1440,7 @@ describe("DataTable columns menu", () => {
         columns={ORDER_COLUMNS}
         defaultHiddenColumns={["city"]}
         onHiddenColumnsChange={onHiddenColumnsChange}
-        toolbar={<DataTable.ColumnsMenu />}
+        columnsMenu
       />,
     );
     expect(screen.queryByRole("columnheader", { name: "Город" })).toBeNull();
@@ -1470,7 +1470,7 @@ describe("DataTable columns menu", () => {
         columns={columns}
         hiddenColumns={["client", "city"]}
         labels={{ columns: "Колонки: {shown} из {total}" }}
-        toolbar={<DataTable.ColumnsMenu />}
+        columnsMenu
       />,
     );
     await user.click(screen.getByRole("button", { name: "Колонки: 1 из 3" }));
@@ -1479,9 +1479,11 @@ describe("DataTable columns menu", () => {
 
   it("works from the keyboard: the menu opens on Enter, Space toggles a column", async () => {
     const user = userEvent.setup();
-    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} toolbar={<DataTable.ColumnsMenu />} />);
+    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} columnsMenu />);
     await user.tab();
-    expect(screen.getByRole("button", { name: "Колонки" })).toHaveFocus();
+    const trigger = screen.getByRole("button", { name: "Колонки" });
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-haspopup", "menu");
     await user.keyboard("{Enter}");
     // The key column is disabled: focus starts on the first column that can be hidden.
     expect(screen.getByRole("menuitemcheckbox", { name: "Клиент" })).toHaveFocus();
@@ -1489,10 +1491,54 @@ describe("DataTable columns menu", () => {
     expect(screen.queryByRole("columnheader", { name: "Клиент" })).toBeNull();
   });
 
-  it("throws outside a table", () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(() => render(<DataTable.ColumnsMenu />)).toThrow(/inside the DataTable toolbar/);
-    vi.restoreAllMocks();
+  it("stands in a trailing cell of its own at the end of the head; every row gets the cell", () => {
+    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} columnsMenu />);
+    const [head, row] = screen.getAllByRole("row");
+    const headCells = within(head as HTMLElement).getAllByRole("cell");
+    expect(headCells).toHaveLength(1);
+    const menuCell = headCells[0] as HTMLElement;
+    expect(menuCell.tagName).toBe("TD");
+    expect(menuCell).toBe((head as HTMLElement).lastElementChild);
+    expect(within(menuCell).getByRole("button", { name: "Колонки" })).toBeInTheDocument();
+    expect((row as HTMLTableRowElement).cells).toHaveLength(ORDER_COLUMNS.length + 1);
+    expect((row as HTMLTableRowElement).lastElementChild).toHaveClass(styles.menuCell as string);
+    expect(screen.getByRole("table").querySelectorAll("col")).toHaveLength(
+      ORDER_COLUMNS.length + 1,
+    );
+  });
+
+  it("sits in the head cell of a row-actions column, which keeps its own name; no extra cell", () => {
+    const columns: DataTableColumn<Order>[] = [
+      ...ORDER_COLUMNS,
+      { id: "actions", header: "Действия", hideHeader: true, hideable: false, cell: () => "⋯" },
+    ];
+    render(<DataTable rows={ORDERS} columns={columns} columnsMenu stickyLastColumn />);
+    const actions = screen.getByRole("columnheader", { name: "Действия" });
+    expect(within(actions).getByRole("button", { name: "Колонки" })).toBeInTheDocument();
+    expect(actions).toHaveClass(styles.lastColumnSticky as string);
+    const [head, row] = screen.getAllByRole("row");
+    expect(within(head as HTMLElement).queryAllByRole("cell")).toHaveLength(0);
+    expect((row as HTMLTableRowElement).cells).toHaveLength(columns.length);
+  });
+
+  it("sticks with stickyLastColumn: the trailing cell at the end edge, the last column before it", () => {
+    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} columnsMenu stickyLastColumn />);
+    const [head, row] = screen.getAllByRole("row");
+    expect((head as HTMLElement).lastElementChild).toHaveClass(styles.menuCellSticky as string);
+    expect((row as HTMLElement).lastElementChild).toHaveClass(styles.menuCellSticky as string);
+    expect(screen.getByRole("columnheader", { name: "Город" })).toHaveClass(
+      styles.lastColumnSticky as string,
+    );
+    const lastBeforeMenu = cssRule(CSS, '.root[data-menu-cell="true"] .lastColumnSticky');
+    expect(cssValue(lastBeforeMenu, "inset-inline-end")).toBe("var(--dt-menu-w)");
+  });
+
+  it("follows the head: no chooser without showHeader", () => {
+    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} columnsMenu showHeader={false} />);
+    expect(screen.queryByRole("button", { name: "Колонки" })).toBeNull();
+    expect((screen.getAllByRole("row")[0] as HTMLTableRowElement).cells).toHaveLength(
+      ORDER_COLUMNS.length,
+    );
   });
 });
 

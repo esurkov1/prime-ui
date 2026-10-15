@@ -18,8 +18,8 @@ export const api: ComponentApi = {
         {
           name: "hiddenColumns",
           type: "string[]",
-          en: "Ids of columns that are not rendered, controlled. A column with `hideable: false` stays. `DataTable.ColumnsMenu` in `toolbar` changes it.",
-          ru: "Id колонок, которые не выводятся, управляемо. Колонка с `hideable: false` остаётся. Меняет его `DataTable.ColumnsMenu` в `toolbar`.",
+          en: "Ids of columns that are not rendered, controlled. A column with `hideable: false` stays. The column chooser (`columnsMenu`) changes it.",
+          ru: "Id колонок, которые не выводятся, управляемо. Колонка с `hideable: false` остаётся. Меняет его выбор колонок (`columnsMenu`).",
         },
         {
           name: "defaultHiddenColumns",
@@ -31,8 +31,15 @@ export const api: ComponentApi = {
         {
           name: "onHiddenColumnsChange",
           type: "(hiddenColumns: string[]) => void",
-          en: "The hidden ids changed (`DataTable.ColumnsMenu`). The kit stores nothing: keep the list (local storage, the user's settings) and pass it back to restore the choice.",
-          ru: "Скрытые колонки изменились (`DataTable.ColumnsMenu`). Кит ничего не хранит: сохраните список (local storage, настройки пользователя) и передайте обратно, чтобы вернуть выбор.",
+          en: "The hidden ids changed (`columnsMenu`). The kit stores nothing: keep the list (local storage, the user's settings) and pass it back to restore the choice.",
+          ru: "Скрытые колонки изменились (`columnsMenu`). Кит ничего не хранит: сохраните список (local storage, настройки пользователя) и передайте обратно, чтобы вернуть выбор.",
+        },
+        {
+          name: "columnsMenu",
+          type: "boolean",
+          default: "false",
+          en: "The column chooser at the end of the header row: in the head cell of a trailing row-actions column (`hideHeader`), else in a cell of its own; sticks with `stickyLastColumn`. Needs `showHeader`.",
+          ru: "Выбор колонок в конце строки заголовков: в заголовке последней колонки действий (`hideHeader`), иначе в своей ячейке; закрепляется со `stickyLastColumn`. Нужен `showHeader`.",
         },
         {
           name: "rows",
@@ -156,8 +163,8 @@ export const api: ComponentApi = {
         {
           name: "toolbar",
           type: "ReactNode",
-          en: "Panel above the table (search, filters, bulk actions); stacks below 30rem of table width.",
-          ru: "Панель над таблицей (поиск, фильтры, массовые действия); уже 30rem — в столбик.",
+          en: "Panel above the table for several controls of the table itself (bulk actions on the selected rows, a table-local search with filters); stacks below 30rem of table width.",
+          ru: "Панель над таблицей для нескольких контролов самой таблицы (массовые действия с выбранными строками, свой поиск с фильтрами); уже 30rem — в столбик.",
         },
         {
           name: "selectable",
@@ -412,33 +419,6 @@ export const api: ComponentApi = {
         },
       ],
     },
-    {
-      name: "DataTable.ColumnsMenu",
-      en: "`ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in: a Button opening a Dropdown with a check item per column. Writes the table's hidden columns; throws outside a DataTable `toolbar`.",
-      ru: "Выбор колонок той таблицы, в которой стоит: кнопка открывает Dropdown с пунктом-флажком на каждую колонку. Меняет скрытые колонки таблицы; вне `toolbar` DataTable бросает ошибку.",
-      props: [
-        {
-          name: "side",
-          type: '"top" | "right" | "bottom" | "left"',
-          default: '"bottom"',
-          en: "Side of the trigger the menu opens on.",
-          ru: "Сторона кнопки, с которой открывается меню.",
-        },
-        {
-          name: "align",
-          type: '"auto" | "start" | "center" | "end"',
-          default: '"auto"',
-          en: "Alignment to the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it.",
-          ru: "Выравнивание по кнопке. `auto` выравнивает панель по тому краю кнопки, за которым больше места; `start`, `center` или `end` задают край явно.",
-        },
-        {
-          name: "…rest",
-          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children">',
-          en: "`className`, `aria-label` and the other attributes of the trigger button.",
-          ru: "`className`, `aria-label` и остальные атрибуты кнопки.",
-        },
-      ],
-    },
   ],
   types: [
     {
@@ -542,8 +522,8 @@ export const api: ComponentApi = {
           name: "hideable",
           type: "boolean",
           default: "true",
-          en: "The column can be hidden through `hiddenColumns` and `DataTable.ColumnsMenu`; `false` for the key column that names the row.",
-          ru: "Колонку можно скрыть через `hiddenColumns` и `DataTable.ColumnsMenu`; `false` — для ключевой колонки, которая называет строку.",
+          en: "The column can be hidden through `hiddenColumns` and `columnsMenu`; `false` for the key column that names the row and for the row-actions column.",
+          ru: "Колонку можно скрыть через `hiddenColumns` и `columnsMenu`; `false` — для ключевой колонки, которая называет строку, и для колонки действий.",
         },
         {
           name: "scale",
@@ -599,12 +579,12 @@ export const api: ComponentApi = {
       ru: "Имя переключателя раскрытой строки.",
     },
     columns: {
-      en: "Text of the `DataTable.ColumnsMenu` trigger; `{shown}` and `{total}` are column counts.",
-      ru: "Текст кнопки `DataTable.ColumnsMenu`; `{shown}` и `{total}` — число колонок.",
+      en: "Name and tooltip of the column chooser trigger (`columnsMenu`); `{shown}` and `{total}` are column counts.",
+      ru: "Имя и подсказка кнопки выбора колонок (`columnsMenu`); `{shown}` и `{total}` — число колонок.",
     },
     showAllColumns: {
-      en: "The `DataTable.ColumnsMenu` item that shows every column again.",
-      ru: "Пункт `DataTable.ColumnsMenu`, который возвращает все колонки.",
+      en: "The column chooser item that shows every column again.",
+      ru: "Пункт выбора колонок, который возвращает все колонки.",
     },
     reorderRow: {
       en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`.",
@@ -631,8 +611,8 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
-        en: "Moves through the toolbar (`DataTable.ColumnsMenu`), sort buttons, row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination.",
-        ru: "Переходит по панели (`DataTable.ColumnsMenu`), кнопкам сортировки, ручкам строк, флажкам, переключателям раскрытия, ссылкам строк, строкам, которые открываются на месте, и Pagination.",
+        en: "Moves through the toolbar, sort buttons, the column chooser (`columnsMenu`), row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination.",
+        ru: "Переходит по панели, кнопкам сортировки, выбору колонок (`columnsMenu`), ручкам строк, флажкам, переключателям раскрытия, ссылкам строк, строкам, которые открываются на месте, и Pagination.",
       },
       {
         keys: "Enter · Space",
@@ -678,8 +658,8 @@ export const api: ComponentApi = {
         ru: 'Заголовок группы — `<th scope="rowgroup">` во всю ширину, первым в своём `<tbody>`.',
       },
       {
-        en: "`DataTable.ColumnsMenu` is a menu button: `menuitemcheckbox` items with `aria-checked`; the key column is `aria-disabled`.",
-        ru: "`DataTable.ColumnsMenu` — Dropdown: пункты `menuitemcheckbox` с `aria-checked`; ключевая колонка выключена (`aria-disabled`).",
+        en: "The column chooser (`columnsMenu`) is a menu button named by `labels.columns` (its tooltip says the same): `menuitemcheckbox` items with `aria-checked`; the key column is `aria-disabled`. In the row-actions head cell the column keeps its own name (`aria-labelledby`); its own trailing cell is a `<td>`.",
+        ru: "Выбор колонок (`columnsMenu`) — кнопка меню с именем `labels.columns` (подсказка повторяет его): пункты `menuitemcheckbox` с `aria-checked`; ключевая колонка выключена (`aria-disabled`). В заголовке колонки действий колонка сохраняет своё имя (`aria-labelledby`); собственная ячейка в конце — `<td>`.",
       },
       {
         en: "Row checkboxes are named by `labels.selectRow` with `{label}` from `getRowLabel` (pass it so the names are unique); the head checkbox by `labels.selectAll`, `indeterminate` on a partial selection.",

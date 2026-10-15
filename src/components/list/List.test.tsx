@@ -465,6 +465,60 @@ describe("List onReorder", () => {
     expect(screen.getByRole("button", { name: "Договор" })).toHaveFocus();
   });
 
+  it("leads a reorderable row with side=start controls; DOM and Tab: control, row, end controls, handle", async () => {
+    const user = userEvent.setup();
+    render(
+      <List.Root aria-label="Этапы" onReorder={() => {}}>
+        <List.Item value="talks">
+          <List.ItemActions side="start" data-testid="leading">
+            <Switch.Root aria-label="Показывать на доске" />
+          </List.ItemActions>
+          <List.ItemText>Переговоры</List.ItemText>
+          <List.ItemActions data-testid="trailing">
+            <button type="button">Ещё</button>
+          </List.ItemActions>
+        </List.Item>
+        <List.Item value="contract">Договор</List.Item>
+      </List.Root>,
+    );
+    const row = screen.getByRole("button", { name: "Переговоры" });
+    const toggle = screen.getByRole("switch", { name: "Показывать на доске" });
+    const more = screen.getByRole("button", { name: "Ещё" });
+    const handle = screen.getByRole("button", { name: "Переместить Переговоры" });
+    const leading = screen.getByTestId("leading");
+    const trailing = screen.getByTestId("trailing");
+    // One frame, in reading order: the leading controls, the row element, the trailing controls.
+    const frame = row.parentElement;
+    expect(frame).toHaveClass(styles.frame);
+    expect(Array.from(frame?.children ?? [])).toEqual([leading, row, trailing]);
+    expect(leading).toHaveAttribute("data-side", "start");
+    expect(trailing).toHaveAttribute("data-side", "end");
+    expect(row).not.toContainElement(toggle);
+    // The grip keeps the row's end.
+    expect(handle.closest("li")?.lastElementChild).toContainElement(handle);
+    // One tier below the row, as far from the row's start as from its top and bottom.
+    expect(toggle.closest("[data-size]")).toHaveAttribute("data-size", "s");
+    const start = cssRule("src/components/list/List.module.css", '.actions[data-side="start"]');
+    expect(cssValue(start, "padding-inline")).toBe(
+      "calc((var(--field-h) - var(--field-step-h)) / 2) var(--prime-space-0)",
+    );
+    await user.tab();
+    expect(toggle).toHaveFocus();
+    await user.tab();
+    expect(row).toHaveFocus();
+    await user.tab();
+    expect(more).toHaveFocus();
+    await user.tab();
+    expect(handle).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Договор" })).toHaveFocus();
+    await user.tab({ shift: true });
+    await user.tab({ shift: true });
+    await user.tab({ shift: true });
+    await user.tab({ shift: true });
+    expect(toggle).toHaveFocus();
+  });
+
   it("keeps List.ItemActions out of a link row made with asChild", () => {
     render(
       <List.Root aria-label="Этапы">

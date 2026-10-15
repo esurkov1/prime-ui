@@ -140,6 +140,13 @@ export const api: ComponentApi = {
           ru: "Колонки показывают скелетоны в форме карточек; по окончании карточки проявляются плавной сменой.",
         },
         {
+          name: "loadingColumns",
+          type: "number",
+          default: "3",
+          en: "Placeholder columns a `loading` board draws while `columns` is empty (the stages are still loading); the columns fade in where they stood.",
+          ru: "Сколько колонок-заглушек рисует доска в `loading`, пока `columns` пуст (этапы ещё грузятся); колонки проявляются на их месте.",
+        },
+        {
           name: "disabled",
           type: "boolean",
           default: "false",

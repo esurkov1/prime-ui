@@ -61,7 +61,7 @@ export const page: ComponentPageConfig = {
       scenario: "toolbar",
       title: "Панель над таблицей",
       description:
-        "Кампании с поиском, фильтром статуса и экспортом над таблицей; текст, когда ничего не найдено — `toolbar`, `empty`.",
+        "Таблица кампаний со своим поиском и фильтром статуса над ней — два контрола самой таблицы; текст, когда ничего не найдено — `toolbar`, `empty`.",
     },
     {
       scenario: "selection",
@@ -91,7 +91,7 @@ export const page: ComponentPageConfig = {
       scenario: "actions-column",
       title: "Колонка действий",
       description:
-        "Заказы шире таблицы: номер заказа остаётся в начале, меню ⋯ — в конце строки, а колонки между ними прокручиваются вбок — `stickyFirstColumn`, `stickyLastColumn`.",
+        "Заказы шире таблицы: номер заказа остаётся в начале, меню ⋯ — в конце строки, выбор колонок — в заголовке их колонки, а колонки между ними прокручиваются вбок — `stickyFirstColumn`, `stickyLastColumn`, `columnsMenu`.",
     },
     {
       scenario: "row-link",
@@ -121,7 +121,7 @@ export const page: ComponentPageConfig = {
       scenario: "columns-visibility",
       title: "Выбор колонок",
       description:
-        "Заказы с выбором колонок на панели; выбор переживает перезагрузку в local storage, номер заказа остаётся всегда — `DataTable.ColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`.",
+        "Заказы с выбором колонок в конце строки заголовков; выбор переживает перезагрузку в local storage, номер заказа остаётся всегда — `columnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`.",
     },
     {
       scenario: "infinite-scroll",
@@ -154,7 +154,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "narrow",
       description:
-        "Очередь поддержки шириной 320 px: колонки прокручиваются внутри, первая закреплена, панель и подвал перестраиваются, пагинация становится компактной — `stickyFirstColumn`, `size`.",
+        "Очередь поддержки шириной 320 px: колонки прокручиваются внутри, первая закреплена, выбор колонок остаётся в конце строки заголовков, подвал перестраивается, пагинация становится компактной — `stickyFirstColumn`, `columnsMenu`, `size`.",
     },
     {
       slot: "screen",

@@ -12,7 +12,7 @@
 - A nested record: a `Breadcrumb` path in `Page.Heading`; in the bar the title reads as its last level.
 - A text page held to a reading measure (`maxWidth="readable"`), a wide dashboard capped at the content width (`maxWidth="wide"`).
 - The tiles of a dashboard — KPI cards, charts, panels — as one board (`Page.Grid` + `Page.Cell`).
-- A new topic of the page with its own heading and a link or button beside it (`Page.Section`); a settings page with a heading column beside each panel (`layout="aside"`).
+- A new topic of the page with its own heading and a link or button beside it (`Page.Section`, the heading over its content).
 - A page whose body takes the rest of the panel's height — a log table, a board, a chat (`fill`).
 - Mail, a messenger, a ticket queue: a list and the chosen record side by side, one at a time on a narrow panel (`Page.Split`).
 - A form that is the whole page (a record's editor, settings with one save): `Page.Guard dirty busy` holds leaving it through the navigation, the path and the browser.
@@ -20,7 +20,7 @@
 ## When not to use
 - The app frame (navigation rail, scrolling main, phone footer) → use [AppShell](../app-shell/COMPONENT.md); there is no global app header — a bar belongs to its page.
 - A search across the whole app → a page of its own or a [CommandMenu](../../components/command-menu/COMPONENT.md); the top bar carries only what its page needs.
-- A bounded block inside the page → use [Card](../../components/card/COMPONENT.md).
+- A bounded block inside the page, a titled panel of a settings page included → use [Card](../../components/card/COMPONENT.md) with its own `Card.Header`.
 - An empty / error / not-found page → use [EmptyPage](../../components/empty-page/COMPONENT.md).
 - A heading inside a card → `Card.Title`; text headings inside prose → use [Typography](../../components/typography/COMPONENT.md).
 - A grid inside one block (thumbnails, fields, bars in a panel) → the block's own CSS grid; `Page.Grid` places the page's tiles.
@@ -155,7 +155,6 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | The visible heading (`h2`); it also names the section. |
 | `description` | `ReactNode` | — | One line of context under the heading, in secondary body-s. |
-| `layout` | `"stack" \| "aside"` | `"stack"` | `stack` — the heading over the content; `aside` — a ~16rem heading column beside it (a settings page), above it once the content would get narrower than 30rem. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content; `Page.Actions` goes to the heading row), `className` and the other section attributes. |
 
 ### Page.Grid
@@ -239,12 +238,6 @@ The size follows the place; the consumer passes nothing, and there are no title 
 | `dirty` (Guard) | nothing until a person leaves: a press on the navigation or the path asks «leave without saving?» | a form that is the page has unsaved changes | `false` |
 | `busy` (Guard) | nothing until a person leaves: a press on the navigation or the path does nothing | the page's save request runs | `false` |
 
-### layout (Section)
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| `stack` | the heading row over the content, 16 apart | a topic of a dashboard, a list or a detail page | ✓ |
-| `aside` | a ~16rem heading column beside the content, above it once the content would get < 30rem | a settings page: a heading column beside each panel | |
-
 ### Top bar plan
 One plan, chosen from the natural widths of the groups (`data-plan` on the bar's row). The bar takes the first step whose first line fits:
 
@@ -288,7 +281,6 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 | folded buttons | plan `fold` | the secondary Buttons' wrappers `hidden`; a «⋯» Dropdown in their place, their `menuitem`s inside |
 | heading place | inside TopBar or in the flow | `data-place="bar" \| "flow"` on Heading |
 | with actions | `Page.Actions` child | `data-has-actions="true"` on Header / the section heading row |
-| section heading column | `layout="aside"` on Section | `data-layout="aside"` on Section (absent for `stack`) |
 | tile span | `span` / `rows` on Cell | `data-span="1"…"12"` (always), `data-rows="2"…"4"` (absent for 1) |
 | tile pair | a `span` 7–11 Cell next to a `span` 4–5 Cell in the Grid | `data-pair="wide" \| "narrow"` on both Cells (set by the Grid) |
 | held | `Page.Guard` `busy` or `dirty` | a press on a `Sidebar.Item`, `Sidebar.Brand`, `BottomNav.Item` or `Breadcrumb.Item` link is stopped (capture phase, before the item's and the router link's handlers); `dirty` opens the `ConfirmDialog` and its confirm repeats the press once the dialog has closed (its texts are the `leave*` keys of `labels` on `Page.Root`); a `beforeunload` listener while either is on. A press that opens a new tab (a modifier key, a middle click, `target="_blank"`) and navigation from code are never held |
@@ -349,12 +341,12 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 | [collapse.tsx](examples/collapse.tsx) | An overview whose large title scrolls away under the top bar: the bar repeats it with its line of data and keeps the period and the page's buttons in reach — `collapse`. |
 | [tools.tsx](examples/tools.tsx) | The orders page's tools in its top bar: sections with counts, search and filter, the period, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. |
 | [actions-collapse.tsx](examples/actions-collapse.tsx) | The buttons of an invoices page on a tablet-wide column: the line runs short, so the secondary buttons show only their icons with the label as the name and the tooltip, the primary keeps its label — `Page.Actions`, `Button.Icon`. |
-| [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading, a heading column beside a panel — `Page.Section`, `label`, `description`, `Page.Actions`, `layout`. |
+| [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading — `Page.Section`, `label`, `description`, `Page.Actions`. |
 | [grid.tsx](examples/grid.tsx) | A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `Page.Grid`, `Page.Cell`, `span`, `rows`. |
 | [list-detail.tsx](examples/list-detail.tsx) | A ticket queue as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one; the chosen ticket cross-fades in — `Page.Split`, `Page.List`, `Page.Detail`, `Page.BackButton`, `fill`. |
 | [guard.tsx](examples/guard.tsx) | A client's card edited on its own page: after an edit a press on the navigation or the path asks before the changes are lost, and while it saves nothing leaves — `Page.Guard`, `dirty`, `busy`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone the top bar leads with the menu button that opens the navigation by itself, the primary button gives way to its icon and the secondary ones fold into «⋯» — `offCanvas`, `Page.Actions`. |
-| [screen.tsx](examples/screen.tsx) | A settings page as a document: the path in the top bar that repeats the title once it scrolls away, the large title in the flow, sections with a heading column and a panel, a form saved by its own button, switches that apply at once and a danger zone with a confirm — `collapse`, `layout`, `maxWidth`. |
+| [screen.tsx](examples/screen.tsx) | A settings page as a document: the path in the top bar that repeats the title once it scrolls away, the large title in the flow, each section a card with its own heading, a form saved by its own button, switches that apply at once and a danger zone with a confirm — `collapse`, `maxWidth`, `Card.Header`. |
 
 ## Mistakes
 - `{ready ? <Page.Description>…</Page.Description> : null}` → the line appears after the load and the title jumps; keep it mounted with `loading` until the data comes.
@@ -371,6 +363,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - Hiding buttons with media queries on a phone → `Page.Actions` in the bar collapses and folds them by measured width.
 - Wrapping a group of the bar or `Page.Title` in your own component → the bar and the heading find their parts among their direct children.
 - A hand-made `<section>` + `Typography as="h2"` + own gap CSS → `Page.Section label`.
+- A heading column beside a panel (the section's title and description on the left, its card on the right) → it wastes the width and breaks the reading line; a titled block is a `Card.Root` with its own `Card.Header` (`Card.Title as="h2"`, `Card.Description`) stacked in the flow.
 - Each row of cards in its own grid → put every tile of the screen in one `Page.Grid`.
 - Computing a height from `100vh` minus the bar for a full-height table or chat → `Page.Root fill` and a filling child.
 - A list + detail built with window media queries → `Page.Split` follows its own width.

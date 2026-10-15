@@ -31,6 +31,7 @@ import {
 ## Anatomy
 ```
 Kanban.Root                          board: horizontal strip of columns, its own Dnd.Root if none above
+├─ placeholder columns               while `loading` and `columns` is empty: `loadingColumns` columns of Skeleton title and cards
 └─ <ul> (Dnd.Sortable, axis x)       the columns in `columnOrder`
    └─ <li> column (from `columns`)   no well with a header plate (`plain`) or a header line (`line`), or a `fill-muted` well (`well`)
       ├─ header                      title (`columnTitleAs`, h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
@@ -76,6 +77,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). The column turns `danger` before the release. |
 | `variant` | `"plain" \| "line" \| "well"` | `"plain"` | No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues). |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
+| `loadingColumns` | `number` | `3` | Placeholder columns a `loading` board draws while `columns` is empty (the stages are still loading); the columns fade in where they stood. |
 | `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; `onItemOpen` and `getItemHref` still open cards. |
 | `labels` | `Partial<KanbanLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue">` | — | `className` (the board height), `aria-label` and the other div attributes. |
@@ -144,6 +146,7 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 | `reorderableColumns` | a ghost grip at the end of every column header, after the actions; the column is carried by it | the user arranges the stages | `false` |
 | `canDrop` | the column turns `danger` under a refused card; a string reason is spoken and shown under the carried card; a keyboard move is announced as refused | workflow rules (a blocked ticket cannot be closed) | — |
 | `loading` | skeleton cards in the card geometry, no counts | the first load or a refresh | `false` |
+| `loadingColumns` | placeholder columns (a Skeleton title, Skeleton cards) while `loading` and `columns` is empty | the stages themselves come from the server | `3` |
 | `disabled` | cards do not drag, Alt + arrows do nothing | read-only boards, no permission | `false` |
 
 ## States
@@ -158,12 +161,13 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 | full | count ≥ `limit` | `data-full` on the column, orange count `count / limit` |
 | empty | no cards | a compact `EmptyPage` in Dnd's dashed drop slot at the top (`fill-strong` dashed line, no fill): «Нет карточек» and the hint «Перетащите сюда карточку»; a `disabled` board shows the text alone; the whole column stays a drop area |
 | loading | `loading` | `aria-busy` and `data-loading` on the root; `Skeleton` cards; `Crossfade` swaps them for the cards |
+| loading, no columns yet | `loading` with empty `columns` | an `aria-hidden` row of `loadingColumns` placeholder columns; the columns fade in where they stood (`enterMotion`) |
 | disabled | `disabled` / `Kanban.Item disabled` | `data-disabled` on the root / card; no `aria-roledescription`, no shortcuts, no column grips |
 | saving | `onValueChange` / `onColumnOrderChange` returned a pending promise | the card (column) stays in its new place with `aria-busy` and `data-pending`; a card's content quiets to 0.6 under a centred `Spinner`, a column's heading quiets and its grip is busy (Dnd); it does not move again until the answer |
 | opens | `onItemOpen` / `getItemHref` | `data-clickable` (in place) or `data-link` (a link over the card, its focus ring drawn on the card); a card that opens lifts on hover on a read-only board too |
 | refused save | the promise rejected | the card glides back to its old column and place (every card it pushed aside glides too), a column glides back in the strip; `labels.moveFailed` / `labels.columnMoveFailed` is announced |
 
-Motion: the hover lift (shadow, the card rises above its neighbours) and the empty slot fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing); a saving card or column quiets (`fast`, both ways) and its spinner fades in by itself; a refused save glides back (`base`, the list's FLIP glide), never jumps. Under `prefers-reduced-motion` all of it is off.
+Motion: the hover lift (shadow, the card rises above its neighbours) and the empty slot fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`, the columns that replace placeholder columns fade in; drag motion is Dnd's (lift, gap, glide, landing); a saving card or column quiets (`fast`, both ways) and its spinner fades in by itself; a refused save glides back (`base`, the list's FLIP glide), never jumps. Under `prefers-reduced-motion` all of it is off.
 
 A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps the move from happening. A controlled owner applies the new `value` (or `columnOrder`) once the request succeeds — in the promise chain, before the returned promise resolves — never before the answer.
 
@@ -231,7 +235,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures in two lines under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
 | [saving.tsx](examples/saving.tsx) | Every move is saved on the server: the card waits busy in its new place, and an invoice the server refuses to close glides back to its column — `onValueChange`. |
 | [item-link.tsx](examples/item-link.tsx) | Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemOpen`. |
-| [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. |
+| [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry, and placeholder columns before the columns arrive; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `loadingColumns`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The placement lives in the parent: every move arrives with its source, target and position to save, and a button resets the board — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page — `Kanban.Root`, `columns`. |
 | [screen.tsx](examples/screen.tsx) | A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in its top bar, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. |

@@ -90,15 +90,29 @@ export function useLeaveGuard(
     entry.released = false;
   }, [entry, busy, dirty]);
 
+  useUnloadGuard(busy || dirty, () => entry.released);
+}
+
+/**
+ * While `hold` is true the browser asks before the tab closes or reloads (`beforeunload`): a page
+ * guard, and a dialog guard (`Modal.Guard`, `Drawer.Guard`, `Sheet.Guard`) whose form is not saved.
+ * `released` lets a leave the person already agreed to go without a second prompt.
+ */
+export function useUnloadGuard(hold: boolean, released?: () => boolean): void {
+  const releasedRef = React.useRef(released);
+  React.useLayoutEffect(() => {
+    releasedRef.current = released;
+  });
+
   React.useEffect(() => {
-    if (!busy && !dirty) return;
+    if (!hold) return;
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (entry.released) return;
+      if (releasedRef.current?.()) return;
       event.preventDefault();
       // Older engines show the prompt only when `returnValue` is set.
       event.returnValue = true;
     };
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [entry, busy, dirty]);
+  }, [hold]);
 }

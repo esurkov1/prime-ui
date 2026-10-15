@@ -66,7 +66,7 @@ Use these as they are; never wrap them in your own breakpoints.
 | app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by the menu button `Page.TopBar` draws by itself while the Sidebar is off-canvas; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
 | page top bar | `Page.TopBar` lays out its groups from their natural widths: one line while they fit, then the tools on a line of their own, then icon-only buttons, then «⋯», and the heading gives last ([below](#the-pages-top-bar--pagetopbar)). `Page.Header` in the flow: actions wrap under the title |
 | switchers | [Switchers](#switchers) never wrap or truncate: they scroll inside themselves |
-| tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn` and `stickyLastColumn` (row actions), `DataTable.ColumnsMenu` for a column chooser, the toolbar stacks below a 30rem table, sticky head off on short screens |
+| tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn` and `stickyLastColumn` (row actions), `columnsMenu` for a column chooser in the header row, the toolbar stacks below a 30rem table, sticky head off on short screens |
 | floating layers | Popover (opened from a Trigger), Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet — scrim, grab handle, swipe down to close, page scroll locked; Tooltip and TagSelect stay anchored |
 | dialogs | Modal is a bottom sheet with a handle below 640 (swipe down closes it while `closeOnOutsideClick` allows); footer actions stack on phones and in a dialog narrower than 360px; `Sheet` is a bottom sheet for a short task at every width (centred at 560 on a tablet or desktop) and closes with a swipe down from its handle or header; a Drawer has no swipe — buttons, Escape and the scrim close it |
 | date picking | Datepicker shows two months and side presets only when they fit; otherwise one month and presets above |
@@ -204,8 +204,10 @@ export function OrdersPage() {
 - Every switcher — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — scrolls inside
   itself when its items do not fit: never a second line, never a truncated item. Its hidden edges
   fade, a vertical mouse wheel scrolls it sideways, touch pans it, the current item is scrolled into
-  view, and the indicator moves only after a person's choice. A SegmentedControl whose items all have
-  icons collapses to icons (each named by its tooltip) before it scrolls.
+  view, and the indicator moves only after a person's choice. A SegmentedControl first tightens its
+  segments' padding, and one whose items all have icons then collapses to icons (each named by its
+  tooltip) before it scrolls. On a 320px phone two sections with counts fit a line of their own;
+  more, or long labels, scroll — keep the section a person needs first at the start.
 - Your duty as its host: give the switcher a bounded width. A flex or grid child that holds one sets
   `min-width: 0`, otherwise the switcher grows the row instead of scrolling
   ([foundation §9](../docs/foundation.md#9-layout-and-responsiveness)).
@@ -223,8 +225,8 @@ export function OrdersPage() {
 
 ## Components on narrow widths — what you still decide
 
-**Tables.** Let DataTable scroll inside itself; offer a column chooser (`DataTable.ColumnsMenu` in
-`toolbar`; the key column `hideable: false`); `stickyFirstColumn` for the name. On phones a table / cards switch in `Page.Tools` is fine — silently dropping columns
+**Tables.** Let DataTable scroll inside itself; offer a column chooser (`columnsMenu`, in the header
+row; the key column `hideable: false`); `stickyFirstColumn` for the name. On phones a table / cards switch in `Page.Tools` is fine — silently dropping columns
 by breakpoint is not. Never ask to rotate the phone.
 
 **Card grids.** [Intrinsic grids](#intrinsic-grids), never a breakpoint. Tiles of a row share one

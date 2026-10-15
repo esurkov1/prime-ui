@@ -1,4 +1,4 @@
-/** A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts — `renderTotals`, `width`. */
+/** A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts, each ending where its fields end their numbers — `renderTotals`, `width`. */
 import { FieldList, type FieldListColumn, Input } from "prime-ui-kit";
 import * as React from "react";
 
@@ -18,11 +18,7 @@ const SHARES: Share[] = [
   { id: "kotova", member: "Ирина Котова", percent: "20" },
 ];
 
-const RUB = new Intl.NumberFormat("ru-RU", {
-  style: "currency",
-  currency: "RUB",
-  maximumFractionDigits: 0,
-});
+const AMOUNT = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 
 const percentOf = (share: Share) => Number(share.percent.replace(",", ".")) || 0;
 
@@ -62,7 +58,12 @@ export default function FieldListTotalsExample() {
           </Input.Root>
           <Input.Root>
             <Input.Wrapper>
-              <Input.Field value={RUB.format((BONUS * percentOf(share)) / 100)} readOnly />
+              <Input.Field
+                value={AMOUNT.format((BONUS * percentOf(share)) / 100)}
+                inputMode="decimal"
+                readOnly
+              />
+              <Input.InlineAffix side="end">₽</Input.InlineAffix>
             </Input.Wrapper>
           </Input.Root>
         </>
@@ -73,7 +74,7 @@ export default function FieldListTotalsExample() {
           <>
             {null}
             {`${percent} %`}
-            {RUB.format((BONUS * percent) / 100)}
+            {`${AMOUNT.format((BONUS * percent) / 100)} ₽`}
           </>
         );
       }}

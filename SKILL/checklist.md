@@ -11,6 +11,8 @@ checks.
 - [ ] Every button of the page is in one `Page.Actions`, the primary last, each with a `Button.Icon` ([the top bar](composition.md#the-top-bar)).
 - [ ] `SmartFilter.Root` wraps `Page.Root`; its toolbar is in `Page.Tools`, its chips in `Page.Chips` ([the top bar](composition.md#the-top-bar)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
+- [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
+- [ ] The column chooser is `columnsMenu` in the table's header row; a DataTable `toolbar` holds two or more table controls or does not exist ([controls of a table](composition.md#controls-of-a-table)).
 
 ## UX ([ux.md](ux.md))
 - [ ] I wrote the five-line brief before the JSX ([brief](ux.md#1-brief-before-code)).
@@ -35,6 +37,7 @@ checks.
 ## Sizes and alignment
 - [ ] Default size `m`; a tier changes for a whole region, never for one control ([the host tier](api-contract.md#size-and-the-host-tier)).
 - [ ] Every row of controls uses one size and its heights line up ([density](composition.md#5-density-and-size)).
+- [ ] A reorderable row's toggle leads it and the grip ends it; a plain settings row ends with its toggle ([list rows](composition.md#list-rows)).
 - [ ] Controls in table cells are one tier below the table; no CSS sets row or cell heights ([size axis](foundations.md#3-size-axis)).
 - [ ] Icon-only buttons are square (round only for media and transfers) and named ([icons](api-contract.md#icons)).
 
@@ -59,6 +62,7 @@ checks.
 
 ## Hierarchy
 - [ ] One primary action per area, last in its row; the rest `soft` / `ghost` / `outline` neutral ([actions](composition.md#6-actions)).
+- [ ] A dialog footer holds Cancel and the primary only; deleting the edited record is the last item of the header ⋯ menu ([actions](composition.md#6-actions)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 
 ## States

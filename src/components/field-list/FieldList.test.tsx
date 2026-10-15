@@ -22,6 +22,45 @@ const LINES: Line[] = [
 
 let created = 0;
 
+type Point = { id: string; text: string };
+
+const POINTS: Point[] = [
+  { id: "storage", text: "200 ГБ" },
+  { id: "api", text: "API" },
+];
+
+/** A one-column list: each row's remove sits inside its field. */
+function Points({
+  onChange,
+  ...rest
+}: Partial<FieldListProps<Point>> & { onChange?: (points: Point[]) => void }) {
+  const [points, setPoints] = React.useState(POINTS);
+  return (
+    <FieldList
+      label="Преимущества"
+      columns={[{ label: "Преимущество" }]}
+      value={points}
+      onValueChange={(next) => {
+        setPoints(next);
+        onChange?.(next);
+      }}
+      getId={(point) => point.id}
+      getLabel={(point) => point.text}
+      renderItem={(point, row) => (
+        <Input.Root>
+          <Input.Wrapper>
+            <Input.Field
+              value={point.text}
+              onChange={(event) => row.update({ text: event.target.value })}
+            />
+          </Input.Wrapper>
+        </Input.Root>
+      )}
+      {...rest}
+    />
+  );
+}
+
 function Lines({
   onChange,
   initial = LINES,
@@ -188,16 +227,32 @@ describe("FieldList", () => {
     expect(screen.getByText("Не больше 2")).toBeInTheDocument();
   });
 
-  it("pins a locked row: a named lock, no remove button", () => {
+  it("keeps a pinned row's remove in its slot, off, and says why on focus", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
     render(
       <Lines
         initial={[{ ...LINES[0], pinned: true } as Line, LINES[1] as Line]}
         getLocked={(line) => line.pinned ?? false}
+        labels={{ lockedReason: "Базовую строку нельзя удалить" }}
+        onChange={onChange}
       />,
     );
-    expect(screen.getByRole("img", { name: "Закреплена" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Удалить «Внедрение»" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Удалить «Обучение»" })).toBeInTheDocument();
+    // No lock column without `reorderable`: every row has the same slots, the pinned one's is off.
+    expect(screen.queryByRole("img")).toBeNull();
+    const [pinned, free] = Array.from(rowsOf());
+    expect(pinned?.children).toHaveLength(free?.children.length ?? -1);
+    const off = screen.getByRole("button", { name: "Удалить «Внедрение»" });
+    expect(off).toHaveAttribute("aria-disabled", "true");
+    expect(pinned?.lastElementChild).toContainElement(off);
+    (screen.getAllByRole("textbox", { name: "Цена" })[0] as HTMLElement).focus();
+    await user.tab();
+    expect(off).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Базовую строку нельзя удалить");
+    expect(off).toHaveAttribute("aria-describedby", screen.getByRole("tooltip").id);
+    await user.keyboard("{Enter} ");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(rowsOf()).toHaveLength(2);
   });
 
   it("moves a row with Alt+↓ on its handle when reorderable", async () => {
@@ -270,6 +325,77 @@ describe("FieldList", () => {
       screen.getByRole("button", { name: "Переместить «Обучение»" }),
     );
     expect(pinned?.lastElementChild?.className).toBe(free?.lastElementChild?.className);
+    // The remove slot before the grip holds the pinned row's remove too, off.
+    expect(pinned?.children[1]).toContainElement(
+      screen.getByRole("button", { name: "Удалить «Внедрение»" }),
+    );
+    expect(screen.getByRole("button", { name: "Удалить «Внедрение»" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("puts a one-column row's remove inside its field: Tab reaches it, Enter removes the row", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Points onChange={onChange} />);
+    const row = screen.getAllByRole("listitem")[0] as HTMLElement;
+    const remove = screen.getByRole("button", { name: "Удалить «200 ГБ»" });
+    // The remove is the field box's last segment; the row has no end slot of its own.
+    expect(remove).toHaveAttribute("data-field-action");
+    expect(remove.parentElement).toBe(
+      (screen.getAllByRole("textbox")[0] as HTMLElement).parentElement,
+    );
+    expect(row.style.getPropertyValue("--fl-columns")).toBe("minmax(0, 1fr)");
+    (screen.getAllByRole("textbox")[0] as HTMLElement).focus();
+    await user.tab();
+    expect(remove).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onChange).toHaveBeenLastCalledWith([POINTS[1]]);
+    expect(screen.getByRole("button", { name: "Удалить «API»" })).toHaveFocus();
+  });
+
+  it("keeps a pinned one-column row's remove in its field, off, with its reason", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Points onChange={onChange} getLocked={(point) => point.id === "storage"} />);
+    const off = screen.getByRole("button", { name: "Удалить «200 ГБ»" });
+    expect(off).toHaveAttribute("aria-disabled", "true");
+    expect(off).toHaveAttribute("data-field-action");
+    (screen.getAllByRole("textbox")[0] as HTMLElement).focus();
+    await user.tab();
+    expect(off).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent(
+      "Закреплённую строку нельзя удалить",
+    );
+    await user.keyboard("{Enter}");
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("keeps the remove in an end slot for a one-column field without an action edge", () => {
+    render(
+      <FieldList
+        aria-label="Этапы"
+        columns={[{ label: "Этап" }]}
+        defaultValue={[{ id: "a", stage: "draft" }]}
+        getId={(item) => item.id}
+        renderItem={(item) => (
+          <Select.Root defaultValue={item.stage}>
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Item value="draft">Черновик</Select.Item>
+            </Select.Content>
+          </Select.Root>
+        )}
+      />,
+    );
+    const row = screen.getByRole("listitem");
+    expect(row.style.getPropertyValue("--fl-columns")).toBe("minmax(0, 1fr) var(--fl-end)");
+    expect(row.children[1]).toContainElement(
+      screen.getByRole("button", { name: "Удалить строку 1" }),
+    );
   });
 
   it("Space on the add button adds a row; Space on a remove button removes its row", async () => {
@@ -439,6 +565,41 @@ describe("FieldList", () => {
     expect(screen.getByText("Итого")).toHaveAttribute("aria-hidden", "true");
   });
 
+  it("ends a total at the end edge where its column's field ends its text", () => {
+    render(
+      <FieldList
+        aria-label="Позиции"
+        columns={COLUMNS}
+        defaultValue={LINES}
+        getId={(line) => line.id}
+        renderItem={(line) => (
+          <>
+            <Input.Root>
+              <Input.Wrapper>
+                <Input.Field defaultValue={line.service} />
+              </Input.Wrapper>
+            </Input.Root>
+            <Input.Root>
+              <Input.Wrapper>
+                {/* The stylesheet is not loaded here: the field's end alignment is set in place. */}
+                <Input.Field defaultValue={line.price} style={{ textAlign: "end" }} />
+              </Input.Wrapper>
+            </Input.Root>
+          </>
+        )}
+        renderTotals={() => (
+          <>
+            {"2 позиции"}
+            {"195000 ₽"}
+          </>
+        )}
+      />,
+    );
+    const totals = screen.getByRole("group", { name: "Итого" });
+    expect(totals.querySelector("[data-align='end']")).toHaveTextContent("195000 ₽");
+    expect(screen.getByText("2 позиции").parentElement).not.toHaveAttribute("data-align");
+  });
+
   it("draws no totals for an empty list and throws on a totals count other than the columns", () => {
     const { unmount } = render(
       <Lines
@@ -458,6 +619,43 @@ describe("FieldList", () => {
       /renderTotals returns 1 cells for 2 columns/,
     );
     error.mockRestore();
+  });
+
+  it("sizes a compact column by its widest cell, so every gap is the column gap", () => {
+    const widths: Record<string, number> = { control: 36, heading: 30 };
+    const rect = vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: Element,
+    ) {
+      const kind =
+        this.getAttribute("data-width") === "compact"
+          ? this.tagName === "LABEL"
+            ? "heading"
+            : "control"
+          : null;
+      return { width: kind ? (widths[kind] ?? 0) : 0 } as DOMRect;
+    });
+    const { container } = render(
+      <FieldList
+        aria-label="Цвета"
+        columns={[{ label: "Цвет", width: "compact" }, { label: "Параметр" }]}
+        defaultValue={[{ id: "a" }]}
+        getId={(item) => item.id}
+        renderItem={() => (
+          <>
+            <span>●</span>
+            <span>Хранилище</span>
+          </>
+        )}
+      />,
+    );
+    const row = screen.getByRole("listitem");
+    expect(row.style.getPropertyValue("--fl-columns")).toBe(
+      "var(--fl-compact-0, max-content) minmax(0, 1fr) var(--fl-end)",
+    );
+    const body = row.closest("ol")?.parentElement as HTMLElement;
+    expect(body.style.getPropertyValue("--fl-compact-0")).toBe("36px");
+    expect(container.querySelector("label[data-width='compact']")).not.toBeNull();
+    rect.mockRestore();
   });
 
   it("sizes an xs column on its own track", () => {

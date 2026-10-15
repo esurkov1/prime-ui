@@ -1,7 +1,6 @@
-/** A campaign list with search, a status filter and export above the table; the empty text when nothing matches — `toolbar`, `empty`. */
+/** A campaign table with its own search and status filter above it — two table-scoped controls; the empty text when nothing matches — `toolbar`, `empty`. */
 import {
   Badge,
-  Button,
   DataTable,
   type DataTableColumn,
   Icon,
@@ -87,36 +86,31 @@ export default function DataTableToolbarExample() {
       pageSize={5}
       empty="Ничего не найдено — измените запрос или фильтр"
       toolbar={
-        <div className={styles.toolbar}>
-          <div className={styles.filters}>
-            <Input.Root size="s" className={styles.search}>
-              <Input.Wrapper>
-                <Input.Icon side="start">
-                  <Icon name="action.search" />
-                </Input.Icon>
-                <Input.Field
-                  type="search"
-                  placeholder="Поиск кампаний"
-                  aria-label="Поиск кампаний"
-                  value={query}
-                  onValueChange={setQuery}
-                />
-              </Input.Wrapper>
-            </Input.Root>
-            <SegmentedControl.Root
-              size="s"
-              aria-label="Статус"
-              value={status}
-              onValueChange={setStatus}
-            >
-              <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
-              <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
-              <SegmentedControl.Item value="paused">На паузе</SegmentedControl.Item>
-            </SegmentedControl.Root>
-          </div>
-          <Button.Root variant="outline" tone="neutral" size="s">
-            Экспорт
-          </Button.Root>
+        <div className={styles.filters}>
+          <Input.Root size="s" className={styles.search}>
+            <Input.Wrapper>
+              <Input.Icon side="start">
+                <Icon name="action.search" />
+              </Input.Icon>
+              <Input.Field
+                type="search"
+                placeholder="Поиск кампаний"
+                aria-label="Поиск кампаний"
+                value={query}
+                onValueChange={setQuery}
+              />
+            </Input.Wrapper>
+          </Input.Root>
+          <SegmentedControl.Root
+            size="s"
+            aria-label="Статус"
+            value={status}
+            onValueChange={setStatus}
+          >
+            <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
+            <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
+            <SegmentedControl.Item value="paused">На паузе</SegmentedControl.Item>
+          </SegmentedControl.Root>
         </div>
       }
     />

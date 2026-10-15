@@ -9,8 +9,10 @@ import * as React from "react";
 import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { COMPACT_QUERY } from "@/hooks/breakpoints";
+import { useResizeEffect } from "@/hooks/useElementSize";
 import { useEnterConfirm } from "@/hooks/useEnterConfirm";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -28,6 +30,7 @@ import { useLabels } from "@/internal/labels";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { splitParts } from "@/internal/parts";
+import { useSwapIn } from "@/internal/RegionSwap";
 import sheetStyles from "@/internal/sheet.module.css";
 import { Slot, type SlotPartProps } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
@@ -518,17 +521,36 @@ export function DialogTitle({ className, ...rest }: DialogTitleProps) {
 DialogTitle.displayName = "Dialog.Title";
 
 export type DialogDescriptionProps = Omit<React.HTMLAttributes<HTMLParagraphElement>, "id"> & {
+  loading?: boolean;
   ref?: React.Ref<HTMLParagraphElement>;
 };
 
-export function DialogDescription({ className, ...rest }: DialogDescriptionProps) {
+/**
+ * The line under the title. While its data loads (`loading`) it keeps its place with a Skeleton, so
+ * the header never moves when the data arrives; the data then fades in under the same element.
+ */
+export function DialogDescription({
+  loading = false,
+  className,
+  children,
+  ...rest
+}: DialogDescriptionProps) {
   const { descriptionId, registerDescription } = useDialogShell("Description");
+  const swap = useSwapIn(loading ? "loading" : "data");
   React.useLayoutEffect(() => {
     registerDescription(true);
     return () => registerDescription(false);
   }, [registerDescription]);
   return (
-    <p id={descriptionId} className={cx(textRole.bodyS, styles.description, className)} {...rest} />
+    <p
+      {...rest}
+      key={swap.key}
+      id={descriptionId}
+      aria-busy={loading || undefined}
+      className={cx(textRole.bodyS, styles.description, swap.className, className)}
+    >
+      {loading ? <Skeleton size="xs" className={styles.descriptionSkeleton} /> : children}
+    </p>
   );
 }
 DialogDescription.displayName = "Dialog.Description";
@@ -541,19 +563,40 @@ export type DialogHeaderProps = React.HTMLAttributes<HTMLElement> & {
 };
 
 /**
+ * Places the header's `Actions`: beside the title while the title keeps its minimum width (the grid
+ * track of `.header:has(> .actions)`), under the title and the description when it would not — the
+ * header then overflows its box. The trial runs on the DOM, between two layouts of one frame.
+ */
+function placeHeaderActions(header: HTMLElement): void {
+  header.removeAttribute("data-actions-below");
+  if (!header.querySelector(`:scope > .${styles.actions}`)) return;
+  if (header.scrollWidth > header.clientWidth + 1) header.setAttribute("data-actions-below", "");
+}
+
+/**
  * `[Icon] [Title + Description] [Actions] [close]` in one row. Layout is a CSS grid, so child
- * order does not matter; text children stack in the text column.
+ * order does not matter; text children stack in the text column. When the row is too narrow for
+ * the title beside the actions (a phone), the actions move under the text.
  */
 export function DialogHeader({
   showClose = true,
   className,
   children,
+  ref,
   ...rest
 }: DialogHeaderProps) {
   const { onClose, closeLabel, busy, hasDescription } = useDialogShell("Header");
+  const headerRef = React.useRef<HTMLElement>(null);
+  const mergedRef = useMergedRefs(headerRef, ref);
+  const place = React.useCallback(() => {
+    if (headerRef.current) placeHeaderActions(headerRef.current);
+  }, []);
+  React.useLayoutEffect(place);
+  useResizeEffect(headerRef, place, { children: true });
 
   return (
     <header
+      ref={mergedRef}
       className={cx(hairline.bottom, styles.header, className)}
       data-has-description={hasDescription ? "true" : undefined}
       {...rest}
@@ -621,6 +664,17 @@ export type DialogSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"
 };
 
 /**
+ * How the parent of a section lays out its blocks: `gap` — a flex or grid column with its own gap
+ * (the body, a form with the body's rhythm), so the section adds only its extra air; `block` —
+ * plain flow (a `Tabs.Panel`, a wrapper div), so the section keeps the whole distance itself.
+ */
+function flowOf(parent: HTMLElement): "gap" | "block" {
+  const { display, rowGap } = getComputedStyle(parent);
+  const gapped = /flex|grid/.test(display) && Number.parseFloat(rowGap) > 0;
+  return gapped ? "gap" : "block";
+}
+
+/**
  * A titled group of the dialog body — what `Page.Section` is to a page: an `<h3>` (title-s, one
  * level under the dialog's `<h2>` title) with an optional description and the dialog's `Actions`
  * at the end of the heading row, then the content 16 below. Sections stand further apart than the
@@ -631,13 +685,25 @@ export function DialogSection({
   description,
   className,
   children,
+  ref,
   ...rest
 }: DialogSectionProps) {
   useDialogShell("Section");
   const headingId = React.useId();
+  const sectionRef = React.useRef<HTMLElement>(null);
+  const mergedRef = useMergedRefs(sectionRef, ref);
+  React.useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (section?.parentElement) section.dataset.flow = flowOf(section.parentElement);
+  });
   const { parts: actions, rest: content } = splitParts(children, DialogActions);
   return (
-    <section aria-labelledby={headingId} {...rest} className={cx(styles.section, className)}>
+    <section
+      aria-labelledby={headingId}
+      {...rest}
+      ref={mergedRef}
+      className={cx(styles.section, className)}
+    >
       <div className={styles.sectionHeader}>
         <div className={styles.sectionHeading}>
           <h3 id={headingId} className={cx(textRole.titleS, styles.sectionTitle)}>

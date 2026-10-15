@@ -2,8 +2,6 @@
 import { Button, DataTable, type DataTableColumn, Dropdown, Icon, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
-
 type Invoice = { id: string; client: string; due: string; amount: number; total?: boolean };
 
 const INVOICES: Invoice[] = [
@@ -77,25 +75,23 @@ export default function DataTableRowLinkExample() {
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      rows={ROWS}
-      getRowKey={(row) => row.id}
-      paging="none"
-      getRowHref={(row) => `/invoices/${row.id}`}
-      isRowClickable={(row) => !row.total}
-      onRowClick={(row, _index, event) => {
-        // A client-side router goes here (navigate(href)); the page itself never reloads.
-        event.preventDefault();
-        setStatus(`Открыт ${row.id} · ${row.client}`);
-      }}
-      toolbar={
-        <div className={styles.toolbar}>
-          <Typography as="span" variant="body-s" tone="secondary" aria-live="polite">
-            {status}
-          </Typography>
-        </div>
-      }
-    />
+    <>
+      <DataTable
+        columns={columns}
+        rows={ROWS}
+        getRowKey={(row) => row.id}
+        paging="none"
+        getRowHref={(row) => `/invoices/${row.id}`}
+        isRowClickable={(row) => !row.total}
+        onRowClick={(row, _index, event) => {
+          // A client-side router goes here (navigate(href)); the page itself never reloads.
+          event.preventDefault();
+          setStatus(`Открыт ${row.id} · ${row.client}`);
+        }}
+      />
+      <Typography as="span" variant="body-s" tone="secondary" aria-live="polite">
+        {status}
+      </Typography>
+    </>
   );
 }

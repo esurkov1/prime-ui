@@ -20,14 +20,14 @@ export const api: ComponentApi = {
           name: "renderItem",
           type: "(item: T, row: FieldListRow<T>) => ReactNode",
           required: true,
-          en: "The cells of a row, one element per column (a fragment): kit fields without `label`. `row` has `index`, `update(patch)` and `remove()`.",
-          ru: "Ячейки строки, по элементу на столбец (фрагмент): поля кита без `label`. `row` — `index`, `update(patch)` и `remove()`.",
+          en: "The cells of a row, one element per column (a fragment): kit fields without `label`. `row` has `index`, `update(patch)` and `remove()`. In one column the remove is the field's last segment.",
+          ru: "Ячейки строки, по элементу на столбец (фрагмент): поля кита без `label`. `row` — `index`, `update(patch)` и `remove()`. В одном столбце кнопка удаления — последний сегмент поля.",
         },
         {
           name: "renderTotals",
           type: "(items: readonly T[]) => ReactNode",
-          en: "The totals row under the rows: one node per column (a fragment), `null` where a column has none. The first cell without a total reads `labels.totals`, the row's group name.",
-          ru: "Строка итогов под строками: по узлу на столбец (фрагмент), `null` — у столбца нет итога. Первая ячейка без итога — `labels.totals`, имя группы строки.",
+          en: "The totals row under the rows: one node per column (a fragment), `null` where none; each aligned as its column's field text. The first cell without a total reads `labels.totals`.",
+          ru: "Строка итогов под строками: по узлу на столбец (фрагмент), `null` — итога нет; каждый выровнен как текст поля своего столбца. Первая ячейка без итога — `labels.totals`.",
         },
         {
           name: "getId",
@@ -76,8 +76,8 @@ export const api: ComponentApi = {
         {
           name: "getLocked",
           type: "(item: T) => boolean",
-          en: "Pinned rows: a lock in the grip column at the row's end, no remove button, they hold their place while others move.",
-          ru: "Закреплённые строки: замок в столбце ручки в конце строки, без кнопки удаления, держат место при перестановке.",
+          en: "Pinned rows: the remove button stays in its place, off, its tooltip says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it while others move.",
+          ru: "Закреплённые строки: кнопка удаления на своём месте, выключена, подсказка объясняет почему (`labels.lockedReason`); с `reorderable` на месте ручки — замок, и строка держит место при перестановке.",
         },
         {
           name: "reorderable",
@@ -170,9 +170,9 @@ export const api: ComponentApi = {
       en: "Name of a row with `getLabel` text; `{label}` is that text.",
       ru: "Имя строки с текстом `getLabel`; `{label}` — этот текст.",
     },
-    locked: {
-      en: "Spoken name of the lock of a pinned row in a list without `reorderable`.",
-      ru: "Имя замка закреплённой строки в списке без `reorderable`.",
+    lockedReason: {
+      en: "Why the remove button of a pinned row (`getLocked`) is off: its tooltip and description.",
+      ru: "Почему кнопка удаления закреплённой строки (`getLocked`) выключена: её подсказка и описание.",
     },
     maxReached: {
       en: "Text beside the disabled add button once the list holds `max` rows.",
@@ -187,8 +187,8 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
-        en: "Moves through the fields of a row, then to its remove button, its handle and on.",
-        ru: "Переводит фокус по полям строки, затем к её кнопке удаления, ручке и дальше.",
+        en: "Moves through the fields of a row, then to its remove button (inside the field in a one-column list), its handle and on; a pinned row's remove takes focus to show why it is off.",
+        ru: "Переводит фокус по полям строки, затем к её кнопке удаления (в списке из одного столбца — внутри поля), ручке и дальше; выключенная кнопка закреплённой строки принимает фокус, чтобы показать причину.",
       },
       {
         keys: "Enter · Space",
@@ -227,8 +227,8 @@ export const api: ComponentApi = {
         ru: "Кнопка удаления — «Удалить {row}», ручка — «Переместить {row}»: имя строки из `getLabel` или её номер.",
       },
       {
-        en: "A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is Dnd's lock (an image named «Закреплена»).",
-        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; без `reorderable` замок — замок Dnd (изображение с именем «Закреплена»).",
+        en: "A pinned row keeps its remove button: `aria-disabled`, described by `labels.lockedReason` (a tooltip on hover and focus); with `reorderable` Dnd's lock stands in place of the handle.",
+        ru: "У закреплённой строки кнопка удаления остаётся: `aria-disabled`, описана `labels.lockedReason` (подсказка при наведении и фокусе); с `reorderable` на месте ручки — замок Dnd.",
       },
     ],
   },

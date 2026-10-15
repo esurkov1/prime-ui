@@ -176,6 +176,91 @@ describe("DialogParts", () => {
     expect(screen.getByText("Поставка серверов").parentElement).toBe(section);
   });
 
+  it("moves the header Actions under the title when the row has no room for the title beside them", () => {
+    // The header overflows (the title's 12rem minimum beside the actions) until the actions go below.
+    const scrollWidth = vi
+      .spyOn(HTMLElement.prototype, "scrollWidth", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.tagName === "HEADER" && !this.hasAttribute("data-actions-below") ? 420 : 343;
+      });
+    const clientWidth = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(343);
+    const { rerender } = render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader data-testid="header">
+            <DialogTitle>Заказ №1042</DialogTitle>
+            <DialogActions>
+              <Button.Root>Ещё</Button.Root>
+            </DialogActions>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    expect(screen.getByTestId("header")).toHaveAttribute("data-actions-below");
+
+    // A wide row keeps them beside the title.
+    clientWidth.mockReturnValue(640);
+    scrollWidth.mockReturnValue(640);
+    rerender(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader data-testid="header">
+            <DialogTitle>Заказ №1042</DialogTitle>
+            <DialogActions>
+              <Button.Root>Ещё</Button.Root>
+            </DialogActions>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    expect(screen.getByTestId("header")).not.toHaveAttribute("data-actions-below");
+    scrollWidth.mockRestore();
+    clientWidth.mockRestore();
+  });
+
+  it("keeps 32 between sections in plain flow (a tab panel), 16 more than a gapped column gives", () => {
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogBody>
+            <div role="tabpanel" aria-label="Профиль">
+              <DialogSection label="Контакты">Телефон</DialogSection>
+              <DialogSection label="Сделки">Две открытые</DialogSection>
+            </div>
+            <div data-testid="column" style={{ display: "flex", rowGap: "16px" }}>
+              <DialogSection label="Оплата">Карта</DialogSection>
+            </div>
+          </DialogBody>
+        </DialogPanel>
+      </Root>,
+    );
+    expect(screen.getByRole("region", { name: "Сделки" })).toHaveAttribute("data-flow", "block");
+    expect(screen.getByRole("region", { name: "Оплата" })).toHaveAttribute("data-flow", "gap");
+  });
+
+  it("holds the description's place with a Skeleton while it loads, then shows the data", () => {
+    function Header({ loading }: { loading: boolean }) {
+      return (
+        <Root defaultOpen>
+          <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+            <DialogHeader>
+              <DialogTitle>Велосипед</DialogTitle>
+              <DialogDescription loading={loading}>Тур 2, на линии</DialogDescription>
+            </DialogHeader>
+          </DialogPanel>
+        </Root>
+      );
+    }
+    const { rerender } = render(<Header loading />);
+    const dialog = screen.getByRole("dialog");
+    const busy = dialog.querySelector("[aria-busy='true']");
+    expect(busy?.tagName).toBe("P");
+    expect(screen.queryByText("Тур 2, на линии")).toBeNull();
+    rerender(<Header loading={false} />);
+    expect(dialog).toHaveAccessibleDescription("Тур 2, на линии");
+    expect(dialog.querySelector("[aria-busy]")).toBeNull();
+  });
+
   it("keeps the footer buttons one row beside a Meta, so the status wraps above them first", () => {
     render(
       <Root defaultOpen>

@@ -155,7 +155,7 @@ shows only icons); none on the children of a sub-list.
   page's title and tools are in its `Page.TopBar`, its blocks go into `Page.Body`
   ([the page skeleton](composition.md#1-page-skeleton)).
 - Document pages — settings and long forms: `Page.Root maxWidth="wide"` with `Page.Header` in the
-  flow (the page's h1) and a `Page.Section layout="aside"` (heading column + panel) per section
+  flow (the page's h1) and a `Card.Root` with its own `Card.Header` per section
   ([the settings page](../src/layout/page/examples/screen.tsx)), or `maxWidth="readable"` for a single
   narrow column of fields.
 - Long reading text (terms, help): `Page.Root maxWidth="readable"` with `Page.Header` in the flow.

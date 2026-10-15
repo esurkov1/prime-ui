@@ -1,5 +1,5 @@
-/** A 320 px support queue: columns scroll inside the table with the first one pinned, the toolbar and footer reflow and the pager turns compact — `stickyFirstColumn`, `size`. */
-import { Badge, Button, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
+/** A 320 px support queue: columns scroll inside the table with the first one pinned, the column chooser stays at the end of the header row, the footer reflows and the pager turns compact — `stickyFirstColumn`, `columnsMenu`, `size`. */
+import { Badge, DataTable, type DataTableColumn } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -15,7 +15,7 @@ const TICKETS: Ticket[] = Array.from({ length: 36 }, (_, i) => ({
 }));
 
 const COLUMNS: DataTableColumn<Ticket>[] = [
-  { id: "id", header: "Тикет", accessor: "id" },
+  { id: "id", header: "Тикет", accessor: "id", hideable: false },
   { id: "subject", header: "Тема", accessor: "subject", truncate: true, maxWidth: "10rem" },
   {
     id: "priority",
@@ -39,15 +39,8 @@ export default function DataTableNarrowExample() {
         rows={TICKETS}
         getRowKey={(row) => row.id}
         stickyFirstColumn
+        columnsMenu
         pageSize={5}
-        toolbar={
-          <div className={styles.toolbar}>
-            <Typography as="span" variant="body-s" tone="secondary">
-              Открытые: {TICKETS.length}
-            </Typography>
-            <Button.Root size="xs">Новый тикет</Button.Root>
-          </div>
-        }
       />
     </div>
   );

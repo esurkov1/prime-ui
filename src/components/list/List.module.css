@@ -231,13 +231,18 @@
   background: var(--prime-color-fill-muted-hover);
 }
 
-/* The controls, one tier below the row, as far from the row's end as from its top and bottom. */
+/* The controls, one tier below the row, as far from the row's edge as from its top and bottom:
+   the end edge, or the start edge for controls that lead the row (`side="start"`). */
 .actions {
   display: inline-flex;
   flex: none;
   align-items: center;
   gap: var(--prime-space-1);
   padding-inline-end: calc((var(--field-h) - var(--field-step-h)) / 2);
+}
+
+.actions[data-side="start"] {
+  padding-inline: calc((var(--field-h) - var(--field-step-h)) / 2) var(--prime-space-0);
 }
 
 /* --- Reorder (`onReorder`) ------------------------------------------------------- */

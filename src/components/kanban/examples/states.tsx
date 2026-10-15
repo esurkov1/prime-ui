@@ -1,4 +1,4 @@
-/** Loading draws skeleton cards in the card geometry; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. */
+/** Loading draws skeleton cards in the card geometry, and placeholder columns before the columns arrive; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `loadingColumns`, `disabled`. */
 import { Badge, Kanban, Typography } from "prime-ui-kit";
 
 type Order = { id: string; title: string; total: string; closed?: boolean };
@@ -24,9 +24,10 @@ const PLACEMENT = {
 };
 
 const STATES = [
-  { caption: "loading", loading: true, disabled: false },
-  { caption: "Kanban.Item disabled", loading: false, disabled: false },
-  { caption: "disabled", loading: false, disabled: true },
+  { caption: "loading · columns=[]", columns: [], loading: true, disabled: false },
+  { caption: "loading", columns: COLUMNS, loading: true, disabled: false },
+  { caption: "Kanban.Item disabled", columns: COLUMNS, loading: false, disabled: false },
+  { caption: "disabled", columns: COLUMNS, loading: false, disabled: true },
 ];
 
 export default function KanbanStatesExample() {
@@ -35,7 +36,8 @@ export default function KanbanStatesExample() {
       <div>
         <Kanban.Root
           aria-label={`Заказы склада: ${state.caption}`}
-          columns={COLUMNS}
+          columns={state.columns}
+          loadingColumns={COLUMNS.length}
           items={ORDERS}
           getId={(order) => order.id}
           getLabel={(order) => order.id}

@@ -17,8 +17,7 @@ import { exitTimeoutMs } from "@/internal/motionTiming";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import { DataTableColumnsMenu } from "./ColumnsMenu";
-import { DataTableColumnsContext, type DataTableColumnsContextValue } from "./context";
+import { ColumnsMenu } from "./ColumnsMenu";
 import styles from "./DataTable.module.css";
 import { Footer } from "./Footer";
 import { Head } from "./Head";
@@ -38,7 +37,6 @@ import { useFrozenColumns } from "./useFrozenColumns";
 import { useInfiniteRows } from "./useInfiniteRows";
 import { useRowSelection } from "./useRowSelection";
 
-export type { DataTableColumnsMenuProps } from "./ColumnsMenu";
 export type {
   DataTableColumn,
   DataTableGroup,
@@ -69,9 +67,9 @@ export type DataTableLabels = {
   expand: string;
   /** `aria-label` of the expand toggle of an expanded row. */
   collapse: string;
-  /** Text of the `DataTable.ColumnsMenu` trigger; `{shown}` and `{total}` are column counts. */
+  /** Name and tooltip of the column chooser (`columnsMenu`); `{shown}` and `{total}` are counts. */
   columns: string;
-  /** The `DataTable.ColumnsMenu` item that shows every column again. */
+  /** The column chooser item that shows every column again. */
   showAllColumns: string;
   /** `aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`. */
   reorderRow: string;
@@ -112,6 +110,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   hiddenColumns?: string[];
   defaultHiddenColumns?: string[];
   onHiddenColumnsChange?: (hiddenColumns: string[]) => void;
+  columnsMenu?: boolean;
   rows: Row[];
   source?: "client" | "server";
   rowCount?: number;
@@ -211,6 +210,7 @@ export function DataTable<Row>({
   hiddenColumns,
   defaultHiddenColumns = EMPTY_IDS,
   onHiddenColumnsChange,
+  columnsMenu = false,
   rows,
   source = "client",
   rowCount,
@@ -579,8 +579,16 @@ export function DataTable<Row>({
      table, so the body remounts under its state key and fades in; the first render, sorting and
      paging stay still (same state). A replaced server page (`rowArrival.batch`) swaps the same way. */
   const { key: bodyKey, className: swapClass } = useSwapIn(`${bodyState}-${rowArrival.batch}`);
+  // The column chooser lives in the head: in the header cell of a trailing row-actions column (the
+  // last visible column with `hideHeader`), else in a narrow cell of its own at the inline end.
+  const menuInHead = columnsMenu && showHeader;
+  const menuCell = menuInHead && columns.at(-1)?.hideHeader !== true;
   const totalColumns =
-    columns.length + (reorder.enabled ? 1 : 0) + (selectable ? 1 : 0) + (expandEnabled ? 1 : 0);
+    columns.length +
+    (reorder.enabled ? 1 : 0) +
+    (selectable ? 1 : 0) +
+    (expandEnabled ? 1 : 0) +
+    (menuCell ? 1 : 0);
   const fillHeight = scrollHeight === "fill";
   const maxHeight = fillHeight
     ? undefined
@@ -690,6 +698,7 @@ export function DataTable<Row>({
       expandEnabled,
       stickyFirstColumn,
       stickyLastColumn,
+      menuCell,
       striped,
       totalColumns,
       openRow,
@@ -711,6 +720,7 @@ export function DataTable<Row>({
       expandEnabled,
       stickyFirstColumn,
       stickyLastColumn,
+      menuCell,
       striped,
       totalColumns,
       openRow,
@@ -730,16 +740,15 @@ export function DataTable<Row>({
     infinite &&
     (infiniteRows.hasInternalMore || infiniteRows.loading || infiniteRows.canRequestMore);
 
-  const columnsMenu = React.useMemo<DataTableColumnsContextValue>(
-    () => ({
-      columns: allColumns as DataTableColumn<never>[],
-      hidden: hiddenSet,
-      setHidden: setHiddenIds,
-      labels,
-      size,
-    }),
-    [allColumns, hiddenSet, setHiddenIds, labels, size],
-  );
+  const columnsMenuTrigger = menuInHead ? (
+    <ColumnsMenu
+      columns={allColumns as DataTableColumn<never>[]}
+      hidden={hiddenSet}
+      setHidden={setHiddenIds}
+      labels={labels}
+      size={size}
+    />
+  ) : null;
 
   const rowOpens = Boolean(getRowHref || onRowClick);
   const renderRow = (item: FlatRow<Row>, index: number, inWindow = false) => {
@@ -855,6 +864,7 @@ export function DataTable<Row>({
               "sticky-header": stickyHeader,
               "sticky-first-column": stickyFirstColumn,
               "sticky-last-column": stickyLastColumn,
+              "menu-cell": menuCell || undefined,
               "table-width": columns.some((c) => c.grow) ? "grow" : fullWidth ? "fill" : "auto",
               "highlight-row": highlightRowOnHover,
               "highlight-column": highlightColumnOnHover,
@@ -869,11 +879,7 @@ export function DataTable<Row>({
               "scroll-height": fillHeight ? "fill" : undefined,
             })}
           >
-            {toolbar != null ? (
-              <DataTableColumnsContext value={columnsMenu}>
-                <div className={styles.toolbar}>{toolbar}</div>
-              </DataTableColumnsContext>
-            ) : null}
+            {toolbar != null ? <div className={styles.toolbar}>{toolbar}</div> : null}
 
             {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
             <div className={cx(fieldTierClass, styles.frame)} data-size={compactTier(size)}>
@@ -901,6 +907,7 @@ export function DataTable<Row>({
                     {columns.map((column) => (
                       <col key={column.id} data-grow={column.grow ? "true" : undefined} />
                     ))}
+                    {menuCell ? <col /> : null}
                   </colgroup>
                   {showHeader ? (
                     <Head
@@ -915,6 +922,8 @@ export function DataTable<Row>({
                       expandEnabled={expandEnabled}
                       infoLabel={labels.columnInfo}
                       reorderable={reorder.enabled}
+                      columnsMenu={columnsMenuTrigger}
+                      menuCell={menuCell}
                       selectAll={
                         selectable
                           ? {
@@ -971,6 +980,7 @@ export function DataTable<Row>({
                           selectable={selectable}
                           expandEnabled={expandEnabled}
                           reorderable={reorder.enabled}
+                          menuCell={menuCell}
                           loadError={loadError}
                           empty={empty}
                           emptyLabel={labels.empty}
@@ -990,6 +1000,7 @@ export function DataTable<Row>({
                       selectable={selectable}
                       expandEnabled={expandEnabled}
                       reorderable={reorder.enabled}
+                      menuCell={menuCell}
                     />
                   ) : null}
                 </table>
@@ -1039,6 +1050,3 @@ export function DataTable<Row>({
     </ReorderRoot>
   );
 }
-
-/** The column chooser of the table it sits in; place it into `toolbar`. */
-DataTable.ColumnsMenu = DataTableColumnsMenu;

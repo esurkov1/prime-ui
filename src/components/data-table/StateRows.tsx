@@ -18,6 +18,8 @@ type StateRowsProps<Row> = {
   expandEnabled: boolean;
   /** A leading column of row handles (`onReorder`). */
   reorderable?: boolean;
+  /** A trailing cell under the head's column chooser. */
+  menuCell: boolean;
   loadError: React.ReactNode;
   empty: React.ReactNode;
   emptyLabel: string;
@@ -37,6 +39,7 @@ export function StateRows<Row>({
   selectable,
   expandEnabled,
   reorderable = false,
+  menuCell,
   loadError,
   empty,
   emptyLabel,
@@ -94,6 +97,7 @@ export function StateRows<Row>({
           <Skeleton className={styles.skeleton} />
         </td>
       ))}
+      {menuCell ? <td className={cx(styles.cell, styles.menuCell)} /> : null}
     </tr>
   ));
 }

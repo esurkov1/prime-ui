@@ -52,7 +52,7 @@ export default function DataTableControlledExample() {
       columns={COLUMNS}
       rows={ORDERS}
       getRowKey={(row) => row.id}
-      toolbar={<DataTable.ColumnsMenu />}
+      columnsMenu
       hiddenColumns={hiddenColumns}
       onHiddenColumnsChange={setHiddenColumns}
       sort={sort}

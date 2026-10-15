@@ -77,7 +77,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Sheet.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown; under the title when it would get less than 12rem. Controls inside take tier `s`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -92,12 +92,20 @@ No DOM, no ref. State and dismiss policy.
 | `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
-### Sheet.Title · Sheet.Description
-`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog.
+### Sheet.Title
+`ref` → `HTMLHeadingElement`. `<h2>` (title-m); its id names the dialog.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement \| HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+
+### Sheet.Description
+`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `loading` | `boolean` | `false` | Its data loads: a `Skeleton` holds the line's place and `aria-busy` is set, so the header never moves; the data fades in. |
+| `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Sheet.Body
 `ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
@@ -111,7 +119,7 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
+| `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row, wrapping rather than cutting a label; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className`, `children` and the other attributes of the `<footer>`. |
 
 ### Sheet.Meta
@@ -122,7 +130,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `className`, `children` and the other attributes of the `<p>`. |
 
 ### Sheet.Guard
-No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. Closing from code is never held.
+No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. While `busy` or `dirty` the browser also asks before the tab closes or reloads. Closing from code is never held.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -165,6 +173,9 @@ Sheet has no `variant`, `side` or `size`: it always rises from the bottom edge, 
 | closing | `open` turns false | the panel keeps showing the children it had open while it slides down |
 | busy | `Sheet.Guard busy` | Escape, the scrim, a swipe, the close button and `Sheet.Close` do nothing; the close button and the `Close` child are `disabled` in place; the handle stays, `data-swipe-disabled` on the panel (no grab cursor) |
 | dirty | `Sheet.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); a swipe past the threshold glides back and asks the same |
+| leaving the tab | `Sheet.Guard busy` or `dirty` | the browser asks before the tab closes or reloads (`beforeunload`), as with `Page.Guard` |
+| description loading | `Sheet.Description loading` | a `Skeleton` holds the line, `aria-busy` on the `<p>`; the data fades in under the same element |
+| actions below | the title would get less than 12rem beside `Sheet.Actions` | `data-actions-below` on the header: the actions move under the title and the description |
 
 Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. A swipe down moves the sheet with the pointer; on release it closes past 30% of its height or on a quick flick and glides the rest of the way out, otherwise it glides back — both over `base` on the `emphasized` (iOS sheet) curve. A pull upward meets growing resistance and stops at 24; the sheet's fill continues that far below the screen edge. The scrim thins as the sheet goes down. The drag starts from the handle or the header, never from the body, so its content scrolls and its controls work as usual.
 
@@ -237,5 +248,5 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - `closeOnOutsideClick={false}` and `closeOnEscape={false}` with no header × and no `Sheet.Close` → nothing closes it; keep a button that answers.
 
 ## Related
-- **Built from:** the dialog shared with Modal and Drawer (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Sheet.Icon`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Drawer (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Sheet.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Sheet.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Drawer](../drawer/COMPONENT.md) (the same parts as a side panel), [Modal](../modal/COMPONENT.md) (the same parts in the centre), [Datepicker](../datepicker/COMPONENT.md) (`Datepicker.Panel` in a sheet), [Dropdown](../dropdown/COMPONENT.md)

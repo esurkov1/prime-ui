@@ -130,8 +130,8 @@ type FooterDefault = { value: string } | { note: ApiText };
 function dialogSectionPart(name: DialogName): ApiPart {
   return {
     name: `${name}.Section`,
-    en: `\`ref\` → \`HTMLElement\`. A titled \`<section>\` of the body: an \`<h3>\` (title-s, under the \`<h2>\` title), an optional description, a \`${name}.Actions\` at the end of the heading row; the content 16 below, sections 32 apart. Fields group in a \`Fieldset\`.`,
-    ru: `\`<section>\` тела с заголовком: \`<h3>\` (title-s, под заголовком \`<h2>\`), необязательное описание, \`${name}.Actions\` в конце строки заголовка; содержимое на 16 ниже, секции в 32 друг от друга. Поля группирует \`Fieldset\`.`,
+    en: `\`ref\` → \`HTMLElement\`. A titled \`<section>\` of the body: an \`<h3>\` (title-s, under the \`<h2>\` title), an optional description, a \`${name}.Actions\` at the end of the heading row; the content 16 below, sections 32 apart, in any wrapper. Fields group in a \`Fieldset\`.`,
+    ru: `\`<section>\` тела с заголовком: \`<h3>\` (title-s, под заголовком \`<h2>\`), необязательное описание, \`${name}.Actions\` в конце строки заголовка; содержимое на 16 ниже, секции в 32 друг от друга в любой обёртке. Поля группирует \`Fieldset\`.`,
     props: [
       {
         name: "label",
@@ -190,8 +190,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Actions`,
-      en: `\`ref\` → \`HTMLDivElement\`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button${section ? `; or at the end of a \`${name}.Section\` heading` : ""}. Controls inside take tier \`s\`.`,
-      ru: `Ряд контролов в конце шапки перед крестиком: статус Badge, меню ⋯ Dropdown, кнопка-иконка${section ? `; или в конце заголовка \`${name}.Section\`` : ""}; контролы внутри — яруса \`s\`.`,
+      en: `\`ref\` → \`HTMLDivElement\`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown; under the title when it would get less than 12rem${section ? `; or at the end of a \`${name}.Section\` heading` : ""}. Controls inside take tier \`s\`.`,
+      ru: `Ряд контролов в конце шапки перед крестиком: статус Badge, меню ⋯ Dropdown; под заголовком, если ему осталось бы меньше 12rem${section ? `; или в конце заголовка \`${name}.Section\`` : ""}; контролы внутри — яруса \`s\`.`,
       props: [
         {
           name: "…rest",
@@ -229,13 +229,33 @@ export function dialogParts(
       ],
     },
     {
-      name: `${name}.Title · ${name}.Description`,
-      en: "`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog.",
-      ru: "`<h2>` (title-m) / `<p>` (body-s, приглушённый); их id дают диалогу имя и описание.",
+      name: `${name}.Title`,
+      en: "`ref` → `HTMLHeadingElement`. `<h2>` (title-m); its id names the dialog.",
+      ru: "`<h2>` (title-m); его id даёт диалогу имя.",
       props: [
         {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLHeadingElement | HTMLParagraphElement>, "id">',
+          type: 'Omit<HTMLAttributes<HTMLHeadingElement>, "id">',
+          en: "`className`, `children` and the other attributes except `id` (the dialog owns it).",
+          ru: "`className`, `children` и остальные атрибуты, кроме `id` (его задаёт диалог).",
+        },
+      ],
+    },
+    {
+      name: `${name}.Description`,
+      en: "`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog.",
+      ru: "`<p>` (body-s, приглушённый) под заголовком; его id даёт диалогу описание.",
+      props: [
+        {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "Its data loads: a `Skeleton` holds the line's place and `aria-busy` is set, so the header never moves; the data fades in.",
+          ru: "Данные строки загружаются: `Skeleton` держит её место и ставит `aria-busy`, шапка не сдвигается; данные проявляются.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLParagraphElement>, "id">',
           en: "`className`, `children` and the other attributes except `id` (the dialog owns it).",
           ru: "`className`, `children` и остальные атрибуты, кроме `id` (его задаёт диалог).",
         },
@@ -266,8 +286,8 @@ export function dialogParts(
           ...("value" in footerDefault
             ? { default: footerDefault.value }
             : { defaultNote: footerDefault.note }),
-          en: "`fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px.",
-          ru: "`fill` — кнопки равной ширины в ряд; `end` — по содержимому у края. На телефоне (уже 640 px) и в диалоге уже 360 px — столбиком.",
+          en: "`fill`: equal-width buttons in one row, wrapping rather than cutting a label; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px.",
+          ru: "`fill` — кнопки равной ширины в ряд, переносятся, а не режут подпись; `end` — по содержимому у края. На телефоне (уже 640 px) и в диалоге уже 360 px — столбиком.",
         },
         {
           name: "…rest",
@@ -292,8 +312,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Guard`,
-      en: "No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. Closing from code is never held.",
-      ru: "Удерживает окно изнутри Content, где живёт состояние формы; своего DOM нет, кроме встроенного подтверждения. Закрытие кодом не удерживается.",
+      en: "No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. While `busy` or `dirty` the browser also asks before the tab closes or reloads. Closing from code is never held.",
+      ru: "Удерживает окно изнутри Content, где живёт состояние формы; своего DOM нет, кроме встроенного подтверждения. Пока `busy` или `dirty`, браузер тоже спрашивает перед закрытием или перезагрузкой вкладки. Закрытие кодом не удерживается.",
       props: [
         {
           name: "busy",
