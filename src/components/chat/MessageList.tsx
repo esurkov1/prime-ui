@@ -425,6 +425,7 @@ export function MessageList({
     }),
     [],
   );
+  useDatePush(innerRef, scrollerRef);
   const keys = React.useMemo(() => shape.map((row) => row.key), [shape]);
   const getKey = React.useCallback((index: number) => keys[index] ?? index, [keys]);
   const estimateSize = React.useCallback(
@@ -842,6 +843,52 @@ export function MessageList({
       </ChromeContext.Provider>
     </MessageListProvider>
   );
+}
+
+const DATE_ROW = `.${styles.separator}:not(.${styles.service})`;
+
+/**
+ * Two dates never pile up at the top: the rows are flat siblings, so each sticky date would stay
+ * stuck under the next one. As the next day's date reaches the stuck one, it pushes it up and out
+ * of the scroller, as messengers do — a scroll-linked shift of the stuck pill (`translate`) by how
+ * far the two rows overlap, written once per frame the scroller moves or the list resizes.
+ */
+function useDatePush(
+  container: React.RefObject<HTMLElement | null>,
+  scroller: React.RefObject<HTMLElement | null>,
+) {
+  React.useEffect(() => {
+    const list = container.current;
+    const view = scroller.current;
+    if (!list || !view) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const dates = list.querySelectorAll<HTMLElement>(DATE_ROW);
+      dates.forEach((row, index) => {
+        const pill = row.firstElementChild as HTMLElement | null;
+        if (!pill) return;
+        const next = dates[index + 1];
+        const overlap = next
+          ? row.getBoundingClientRect().bottom - next.getBoundingClientRect().top
+          : 0;
+        const value = overlap > 0 ? `0 ${-overlap}px` : "";
+        if (pill.style.translate !== value) pill.style.translate = value;
+      });
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    view.addEventListener("scroll", schedule, { passive: true });
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    observer?.observe(list);
+    return () => {
+      cancelAnimationFrame(frame);
+      view.removeEventListener("scroll", schedule);
+      observer?.disconnect();
+    };
+  }, [container, scroller]);
 }
 
 /**

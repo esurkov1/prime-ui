@@ -2,6 +2,7 @@ import type * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { defineRowKind } from "@/internal/messageList";
+import { nextSurfaceDepth, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Chat.module.css";
 
@@ -9,11 +10,18 @@ export type ChatSeparatorProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** A date between messages («Сегодня», «12 марта»): a small pill that sticks while its day scrolls. */
+/**
+ * A date between messages («Сегодня», «12 марта»): a small pill that sticks while its day scrolls.
+ * An incoming bubble stands one step off the list's host, the pill one step above the bubble, so the
+ * two never share a fill while the bubbles pass under it.
+ */
 export function ChatSeparator({ className, children, ...rest }: ChatSeparatorProps) {
+  const depth = nextSurfaceDepth(useNestedSurfaceDepth());
   return (
     <div className={cx(styles.separator, className)} data-scroll-skip="" {...rest}>
-      <span className={styles.pill}>{children}</span>
+      <span className={styles.pill} data-depth={depth}>
+        {children}
+      </span>
     </div>
   );
 }

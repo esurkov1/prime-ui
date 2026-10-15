@@ -193,7 +193,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` — the actions (`Button.Root size="s"`: Переслать, Удалить), `className`. |
 
 ### Chat.Separator
-`ref` → `HTMLDivElement`. A date between messages (`items` add them for you) («Сегодня», «12 марта» — `formatMessageDate`): a pill in the middle that stays at the top while its day scrolls.
+`ref` → `HTMLDivElement`. A date between messages (`items` add them for you) («Сегодня», «12 марта» — `formatMessageDate`): a pill a step above the bubbles that stays at the top while its day scrolls, until the next date pushes it out.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -308,7 +308,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `newMessages` | `"Новых сообщений: {count}. К последним сообщениям"` | The name of that button while new messages wait below. |
 | `typing` | `"печатает…"` | The status line of the header while the other side types. |
 | `search` | `"Поиск по переписке"` | The search button and the name of the search field. |
-| `searchPlaceholder` | `"Поиск по сообщениям"` | The placeholder of the search field. |
+| `searchPlaceholder` | `"Поиск"` | The placeholder of the search field. |
 | `matches` | `"{index} из {count}"` | The place of the current match, counted from the newest. |
 | `noMatches` | `"Нет совпадений"` | The search found nothing. |
 | `previousMatch` | `"Предыдущее совпадение"` | The button that goes to the older match. |

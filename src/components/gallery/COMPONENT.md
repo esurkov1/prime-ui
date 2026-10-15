@@ -97,6 +97,7 @@ Decided by the items, not a prop: the number of items and their ratios.
 - Tiles are `--prime-gallery-gap` (2px) apart; the gaps are the gallery's own background, transparent by default (a host may paint it: a message paints the incoming surface).
 - The outer corners are rounded (`--prime-radius-l`). A host that shapes and clips it itself (a message) passes `maxSize`: the gallery takes that length as its cap instead of its host's width and draws no radius of its own.
 - At any width the album keeps its layout: tiles scale with the gallery, never rearrange.
+- A video tile shorter than 6.5rem (a small tile of a phone album) has no room for the centred play mark under the length pill: it shows the length alone, so the two marks never collide.
 
 ## Accessibility
 
