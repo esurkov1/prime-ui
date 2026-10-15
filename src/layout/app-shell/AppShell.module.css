@@ -14,7 +14,7 @@
  */
 .root {
   --shell-top: var(--prime-space-6);
-  --shell-rail-end: initial;
+  --shell-floating-scale: 1;
   --shell-footer-display: initial;
 
   box-sizing: border-box;
@@ -101,7 +101,6 @@
   --shell-fill-end: initial;
   --page-gutter: var(--prime-layout-gutter);
   --page-top: var(--shell-top);
-  --shell-end: var(--shell-floating-end, var(--shell-fill-end, var(--prime-space-16)));
 
   box-sizing: border-box;
   display: flex;
@@ -110,8 +109,12 @@
   min-width: 0;
   min-height: 0;
   margin: 0;
-  /* The bottom air: the rail on screen › a floating BottomNav › a fill page › the default. */
-  padding-block-end: var(--shell-rail-end, var(--shell-end));
+  /* The bottom air: a fill page's gutter or the default tail, and never less than the room a
+     floating BottomNav on screen needs. */
+  padding-block-end: max(
+    var(--shell-fill-end, var(--prime-space-16)),
+    var(--shell-floating-end, var(--prime-space-0))
+  );
 }
 
 /* The page gutter belongs to the shell's page: a frame nested in the page (an example, a preview)
@@ -134,20 +137,23 @@
 
 .panel:has(> .footer > [data-floating="true"]) {
   --shell-floating-end: calc(
-    var(--prime-space-16) +
-    var(--prime-bottom-nav-floating-height) +
-    env(safe-area-inset-bottom, var(--prime-space-0))
+    (
+      var(--prime-space-16) +
+      var(--prime-bottom-nav-floating-height) +
+      env(safe-area-inset-bottom, var(--prime-space-0))
+    ) * var(--shell-floating-scale)
   );
 }
 
 /*
  * The navigation column is on screen (a Sidebar rail, not an off-canvas panel): it navigates, so
- * the footer with the phone bar leaves and main drops the room it kept for the capsule. Without a
+ * the footer with the phone bar leaves and main drops the room it kept for the capsule (its scale
+ * goes to 0), so a fill page keeps its gutter-deep bottom air beside the rail. Without a
  * column, or while the Sidebar is off-canvas (`offCanvas="auto"` below 768px, `"always"`; the
  * shell sets `data-off-canvas` from the navigation the Sidebar publishes), the bar stays at any
  * width — navigation is never left behind a hidden bar.
  */
 .root[data-nav="true"]:not([data-off-canvas]) {
-  --shell-rail-end: var(--prime-space-16);
+  --shell-floating-scale: 0;
   --shell-footer-display: none;
 }

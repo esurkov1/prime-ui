@@ -126,8 +126,8 @@ The navigation of the nearest `AppShell.Root` for a trigger outside the rail (a 
 
 ## Layout & spacing
 - Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (the Sidebar rail is layer 1, the panel the page: white rail beside a gray page in light, a rail one step lighter than the near-black page in dark).
-- Main hands the page its edge air: `--page-gutter` is the page gutter `--prime-layout-gutter` — `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px; `--page-top` is `--prime-space-6` (24) → `--prime-space-8` (32) from 1024px. `Page.Root` pads itself with them (its top bar steps out to the panel's edges). Main itself pads only the bottom: `--prime-space-16`. Inside Main the page gutter is the small one again, so a frame nested in the page starts from its own gutter, not the shell's.
-- A page that fills the panel height (`Page.Root fill`): Main's bottom padding drops to the side gutter, so no long scroll tail stays under it.
+- Main hands the page its edge air: `--page-gutter` is the page gutter `--prime-layout-gutter` — `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px; `--page-top` is `--prime-space-6` (24) → `--prime-space-8` (32) from 1024px. `Page.Root` pads itself with them (its top bar steps out to the panel's edges). Main itself pads only the bottom: `--prime-space-16`, the scroll tail of a long page. Inside Main the page gutter is the small one again, so a frame nested in the page starts from its own gutter, not the shell's.
+- A page that fills the panel height (`Page.Root fill`): Main's bottom padding drops to the side gutter, so no long scroll tail stays under it — beside the Sidebar rail too.
 - Main scrolls with `overscroll-behavior: contain`, so its scroll never chains to the document.
 - Nav column: sticky at the top, viewport high, `z-index: --prime-z-sticky` (above the panel, so the compact Sidebar toggle can ride the rail edge); with `fillViewport` it fills the shell height instead.
 - Footer: no padding of its own (BottomNav keeps the bottom safe-area inset), sticky at the bottom, `z-index: --prime-z-sticky`.

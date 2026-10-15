@@ -190,7 +190,7 @@ Every gap is a `--prime-space-N` token (N × 4px) set as `gap` on the parent. Cl
 | tile → tile, both axes (KPI, charts, panels) | 16 | `Page.Grid` |
 | field → field, switch → switch | 20 | `--prime-space-5` |
 | main column → side column | 24 | `--prime-space-6` |
-| top bar → the page's first block | 12 + 24, 12 + 32 from 1024px | the bar's bottom air + the page's top air from `AppShell.Main` |
+| top bar → the page's first block | 24 under the bar's controls | the rhythm's header → body; the bar's own bottom padding is part of it |
 | flow header → body (a document page) | 24 | `Page.Header` |
 | block → block on a page | 24 | `Page.Body` |
 | group → group in a form | 32 | `--prime-space-8` |

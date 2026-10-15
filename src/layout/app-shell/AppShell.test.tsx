@@ -41,7 +41,15 @@ describe("AppShell", () => {
     const main = cssRule("src/layout/app-shell/AppShell.module.css", ".main");
     expect(cssValue(main, "--page-gutter")).toBe("var(--prime-layout-gutter)");
     expect(cssValue(main, "--page-top")).toBe("var(--shell-top)");
-    expect(cssValue(main, "padding-block-end")).toBe("var(--shell-rail-end, var(--shell-end))");
+    expect(cssValue(main, "padding-block-end").replace(/\s+/g, " ")).toBe(
+      "max( var(--shell-fill-end, var(--prime-space-16)), var(--shell-floating-end, var(--prime-space-0)) )",
+    );
+    // With the rail on screen the floating capsule's room scales to 0: a fill page keeps its gutter.
+    const rail = cssRule(
+      "src/layout/app-shell/AppShell.module.css",
+      '.root[data-nav="true"]:not([data-off-canvas])',
+    );
+    expect(cssValue(rail, "--shell-floating-scale")).toBe("0");
   });
 
   it("Template composes nav, main and footer", () => {

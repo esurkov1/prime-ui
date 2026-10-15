@@ -47,7 +47,9 @@
 /*
  * The strip at the page's top edge: edge to edge across the panel (it steps out of the page
  * gutter and keeps it inside), on the page's own fill with no divider (depth from fill), the top
- * safe-area inset kept. The page's top air moves under it.
+ * safe-area inset kept. What follows it starts 24 under its controls — the rhythm's header → body
+ * (foundation §1.3): its own bottom padding is part of that step, so it pulls the page's 24 gap
+ * up by as much.
  */
 .root:has(> .topBar:first-child) {
   padding-block-start: var(--prime-space-0);
@@ -61,7 +63,7 @@
   gap: var(--prime-space-2);
   min-width: 0;
   margin-inline: calc(var(--page-inset) * -1);
-  margin-block-end: max(var(--prime-space-0), calc(var(--page-air) - var(--prime-space-6)));
+  margin-block-end: calc(var(--prime-space-3) * -1);
   padding-block: max(var(--prime-space-3), env(safe-area-inset-top, var(--prime-space-0)))
     var(--prime-space-3);
   padding-inline: var(--page-inset);
