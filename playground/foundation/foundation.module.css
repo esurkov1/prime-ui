@@ -195,15 +195,20 @@
   min-width: 0;
 }
 
+.rampScroller {
+  border-radius: var(--prime-radius-m);
+}
+
+/* A step is never narrower than its hex: a long ramp on a narrow page scrolls instead. */
 .rampSteps {
   display: grid;
+  width: max-content;
+  min-width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
-  grid-auto-columns: minmax(var(--prime-space-10), 1fr);
+  grid-auto-columns: minmax(max-content, 1fr);
   grid-auto-flow: column;
-  overflow-x: auto;
-  border-radius: var(--prime-radius-m);
 }
 
 .rampStep {
@@ -224,9 +229,6 @@
   font-family: var(--prime-font-family-mono);
   font-weight: var(--prime-font-weight-regular);
   opacity: 0.72;
-  /* The 23-step gray ramp is narrower than a hex: clip it instead of spilling into the next step. */
-  overflow: hidden;
-  text-overflow: clip;
   white-space: nowrap;
 }
 
@@ -834,15 +836,18 @@
  * Rows of real kit controls; these classes only lay them out.
  */
 
-.tierPanel {
+.tierRows {
   display: grid;
+  width: max-content;
+  min-width: 100%;
+  /* Room for the focus ring of the controls at the scroller's edges. */
+  padding: var(--prime-space-1);
   gap: var(--prime-space-4);
-  overflow-x: auto;
 }
 
 .tierRow {
   display: grid;
-  grid-template-columns: var(--prime-space-16) minmax(0, 1fr);
+  grid-template-columns: var(--prime-space-16) auto;
   align-items: center;
   gap: var(--prime-space-4);
 }
@@ -853,14 +858,13 @@
 
 .tierItems {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--prime-space-2);
 }
 
 .tierInput {
-  flex: 0 1 calc(var(--prime-space-24) * 2);
-  min-width: 0;
+  flex: none;
+  width: calc(var(--prime-space-24) * 2);
 }
 
 .tierCell {

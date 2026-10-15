@@ -48,8 +48,9 @@ export const darkThemeOverrides = {
     text: {
       primary: "{color.gray.100}",
       secondary: "{color.gray.300}",
-      muted: "{color.gray.400}",
-      placeholder: "{color.gray.400}",
+      /** gray.350: AA on every layer, its fill and the fill's hover (a hovered field, row, chip). */
+      muted: "{color.gray.350}",
+      placeholder: "{color.gray.350}",
       disabled: "{color.gray.600}",
       inverse: "{color.gray.925}",
     },

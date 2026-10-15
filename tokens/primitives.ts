@@ -15,6 +15,8 @@ export const primitiveTokens = {
       100: "#e8eaee",
       150: "#e0e3e8",
       300: "#b9bec8",
+      /** Dark muted text: AA on the hovered fill of the deepest layer. */
+      350: "#a1a8b6",
       400: "#949bab",
       500: "#636a79",
       600: "#575e6d",

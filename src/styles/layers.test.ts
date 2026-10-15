@@ -64,14 +64,21 @@ describe("surface ladder", () => {
     }
   });
 
-  it("keeps muted text at AA on every layer and every fill", () => {
+  // A hovered row, chip or field keeps its muted text and placeholder readable too.
+  it("keeps muted and placeholder text at AA on every layer, its fill and the fill's hover", () => {
     for (const [theme, text] of [
-      ["light", primitiveColor(semanticTokens.color.text.muted)],
-      ["dark", primitiveColor(darkThemeOverrides.color.text.muted)],
+      ["light", semanticTokens.color.text],
+      ["dark", darkThemeOverrides.color.text],
     ] as const) {
-      for (const layer of surfaceLadder(theme)) {
-        expect(contrast(text, layer.bg)).toBeGreaterThanOrEqual(4.5);
-        expect(contrast(text, layer.fill)).toBeGreaterThanOrEqual(4.5);
+      for (const role of ["muted", "placeholder"] as const) {
+        const ink = primitiveColor(text[role]);
+        for (const layer of surfaceLadder(theme)) {
+          for (const surface of [layer.bg, layer.fill, layer.fillHover]) {
+            expect(contrast(ink, surface), `${theme} ${role} on ${surface}`).toBeGreaterThanOrEqual(
+              4.5,
+            );
+          }
+        }
       }
     }
   });

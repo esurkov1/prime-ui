@@ -5,6 +5,7 @@ import { Button } from "@/components/button/Button";
 import { Card } from "@/components/card/Card";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Input } from "@/components/input/Input";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Typography } from "@/components/typography/Typography";
 import type { PaletteColor } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
@@ -32,6 +33,8 @@ import {
 const GROUP_NOTES: Record<string, string> = {
   bg: "Особые фоны: инверсия, подложка модалки, тень края таблицы, стекло нижней навигации.",
   fill: "Прозрачные заливки состояний: hover строк и ghost-кнопок, треки чекбокса и switch. Ложатся на любой фон.",
+  inkOnLight:
+    "Тёмная метка на светлом цвете, который не поверхность темы: галочка на светлом образце, текст на жёлтой заливке. Одно значение в обеих темах.",
   text: "Текст по важности. Disabled — единственная пара, которой не нужен AA.",
   border: "Только разделители. Контролы обходятся без обводки: control прозрачен.",
   accent: "Главное действие, выбор, ссылки, активная вкладка, отмеченные контролы.",
@@ -189,7 +192,8 @@ const CONTEXT_COLUMNS: DataTableColumn<ContextVar>[] = [
   { id: "meaning", header: "Что это", accessor: "meaning" },
 ];
 
-function Swatch({ path }: { path: string }) {
+/** `label`: the leaf's key inside its group (`primary`, `subtleActive`; a lone role — its name). */
+function Swatch({ path, label }: { path: string; label: string }) {
   const theme = useDocumentTheme();
   const varName = toVarName(path);
   // Read the value on the chip itself: panels switch the field context, the page does not.
@@ -214,7 +218,7 @@ function Swatch({ path }: { path: string }) {
       />
       <figcaption className={s.swatchCaption}>
         <Typography as="span" variant="body-s" weight="medium">
-          {path.split(".").slice(2).join(".")}
+          {label}
         </Typography>
         <TokenName>{varName}</TokenName>
         <Typography as="span" variant="caption" tone="muted" className={s.numeric}>
@@ -243,7 +247,7 @@ function RoleGroups() {
           </div>
           <div className={s.swatchGrid}>
             {semanticLeaves(`color.${group}`).map((leaf) => (
-              <Swatch key={leaf.path} path={leaf.path} />
+              <Swatch key={leaf.path} path={leaf.path} label={leaf.key} />
             ))}
           </div>
         </Panel>
@@ -332,19 +336,21 @@ function PrimitiveRamps() {
           <Typography as="span" variant="body-s" weight="medium" className={s.rampName}>
             {ramp.hue}
           </Typography>
-          <ul className={s.rampSteps} aria-label={`Шкала ${ramp.hue}`}>
-            {ramp.steps.map(({ step, hex }) => (
-              <li
-                key={step}
-                className={s.rampStep}
-                style={{ background: hex, color: inkFor(hex) }}
-                title={`--prime-ref-color-${ramp.hue}-${step} · ${hex}`}
-              >
-                <span>{step}</span>
-                <span className={s.rampHex}>{hex.slice(1)}</span>
-              </li>
-            ))}
-          </ul>
+          <ScrollContainer axis="horizontal" className={s.rampScroller}>
+            <ul className={s.rampSteps} aria-label={`Шкала ${ramp.hue}`}>
+              {ramp.steps.map(({ step, hex }) => (
+                <li
+                  key={step}
+                  className={s.rampStep}
+                  style={{ background: hex, color: inkFor(hex) }}
+                  title={`--prime-ref-color-${ramp.hue}-${step} · ${hex}`}
+                >
+                  <span>{step}</span>
+                  <span className={s.rampHex}>{hex.slice(1)}</span>
+                </li>
+              ))}
+            </ul>
+          </ScrollContainer>
         </div>
       ))}
     </Panel>

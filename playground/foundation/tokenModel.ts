@@ -28,10 +28,11 @@ function getAt(tree: TokenTree, path: string): string | TokenTree | undefined {
   return node;
 }
 
-/** Leaf entries under a semantic path, in declaration order. */
+/** Leaf entries under a semantic path, in declaration order; a leaf path is its own one entry. */
 export function semanticLeaves(path: string): { key: string; path: string; value: string }[] {
   const node = getAt(semanticTokens as unknown as TokenTree, path);
-  if (node === undefined || typeof node === "string") return [];
+  if (node === undefined) return [];
+  if (typeof node === "string") return [{ key: path.split(".").at(-1) ?? path, path, value: node }];
   return Object.entries(node).flatMap(([key, value]) =>
     typeof value === "string"
       ? [{ key, path: `${path}.${key}`, value }]
