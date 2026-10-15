@@ -12,19 +12,23 @@ const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
 
 export default function SparklineStatesExample() {
   return (
-    <div>
+    <>
       <div>
-        <Sparkline data={REVENUE} label="Выручка" formatValue={formatRubles} />
-        <Typography as="span" variant="caption" tone="muted">
-          data
-        </Typography>
+        <div>
+          <Sparkline data={REVENUE} label="Выручка" formatValue={formatRubles} />
+          <Typography as="span" variant="caption" tone="muted">
+            data
+          </Typography>
+        </div>
       </div>
       <div>
-        <Sparkline data={[]} label="Выручка" loading />
-        <Typography as="span" variant="caption" tone="muted">
-          loading
-        </Typography>
+        <div>
+          <Sparkline data={[]} label="Выручка" loading />
+          <Typography as="span" variant="caption" tone="muted">
+            loading
+          </Typography>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

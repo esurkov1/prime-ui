@@ -1,5 +1,7 @@
 /** The same month of active users as a smooth curve, straight segments and steps — `curve`. */
-import { Sparkline, type SparklinePoint, Typography } from "prime-ui-kit";
+import { Card, Sparkline, type SparklinePoint } from "prime-ui-kit";
+
+import styles from "./examples.module.css";
 
 const USERS: SparklinePoint[] = [
   { label: "сен, 1 нед.", value: 1240 },
@@ -10,19 +12,22 @@ const USERS: SparklinePoint[] = [
   { label: "окт, 2 нед.", value: 1840 },
 ];
 
-const CURVES = ["smooth", "linear", "step"] as const;
+const CURVES = [
+  { curve: "smooth", title: "Плавная кривая" },
+  { curve: "linear", title: "Прямые отрезки" },
+  { curve: "step", title: "Ступени" },
+] as const;
 
 export default function SparklineCurveExample() {
   return (
-    <div>
-      {CURVES.map((curve) => (
-        <div key={curve}>
-          <Sparkline data={USERS} label="Активные пользователи" curve={curve} />
-          <Typography as="span" variant="caption" tone="muted">
-            {curve}
-          </Typography>
-        </div>
+    <>
+      {CURVES.map(({ curve, title }) => (
+        <Card.Root key={curve} className={styles.card}>
+          <Card.Body>
+            <Sparkline data={USERS} label={title} curve={curve} />
+          </Card.Body>
+        </Card.Root>
       ))}
-    </div>
+    </>
   );
 }
