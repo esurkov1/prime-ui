@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Breadcrumb, type BreadcrumbRootProps } from "@/components/breadcrumb/Breadcrumb";
 import { Button, type ButtonRootProps } from "@/components/button/Button";
+import { Crossfade, type CrossfadeProps } from "@/components/crossfade/Crossfade";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Input } from "@/components/input/Input";
 import {
@@ -971,14 +972,23 @@ export type PageCellProps = DivProps & {
   rows?: PageCellRows;
 };
 
-/** One tile place in `Page.Grid`; its child (a Card, a ChartFrame) fills it. */
-function PageCell({ span = 12, rows = 1, className, ...rest }: PageCellProps) {
+/**
+ * One tile place in `Page.Grid`; its child (a Card, a ChartFrame) fills it. A `Crossfade` child
+ * fills it too (`fill` unless set), so a tile that swaps its states keeps the row's height.
+ */
+function PageCell({ span = 12, rows = 1, className, children, ...rest }: PageCellProps) {
   return (
     <div
       {...rest}
       className={cx(styles.cell, className)}
       {...toDataAttributes({ span, rows: rows === 1 ? undefined : rows })}
-    />
+    >
+      {React.Children.map(children, (child) =>
+        isPart<CrossfadeProps>(child, Crossfade) && child.props.fill === undefined
+          ? React.cloneElement(child, { fill: true })
+          : child,
+      )}
+    </div>
   );
 }
 PageCell.displayName = "Page.Cell";

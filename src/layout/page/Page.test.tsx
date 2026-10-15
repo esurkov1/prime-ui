@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
 import { Button } from "@/components/button/Button";
+import { Crossfade } from "@/components/crossfade/Crossfade";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Icon } from "@/icons";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -753,6 +754,25 @@ describe("Page body", () => {
     expect(screen.getByTestId("full")).toHaveAttribute("data-span", "12");
     expect(screen.getByTestId("full")).not.toHaveAttribute("data-rows");
     expect(screen.getByTestId("chart")).toHaveAttribute("data-rows", "2");
+  });
+
+  it("Cell: a Crossfade child fills the cell unless it sets fill", () => {
+    render(
+      <Page.Grid>
+        <Page.Cell>
+          <Crossfade state="ready" data-testid="filled">
+            <span>Выручка</span>
+          </Crossfade>
+        </Page.Cell>
+        <Page.Cell>
+          <Crossfade state="ready" fill={false} data-testid="natural">
+            <span>Счета</span>
+          </Crossfade>
+        </Page.Cell>
+      </Page.Grid>,
+    );
+    expect(screen.getByTestId("filled")).toHaveAttribute("data-fill", "true");
+    expect(screen.getByTestId("natural")).not.toHaveAttribute("data-fill");
   });
 
   it("CSS: blocks 24 apart, a section 40 from its neighbours, tiles 16 on both axes", () => {

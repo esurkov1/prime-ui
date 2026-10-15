@@ -162,7 +162,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Page.Cell`), `className` and the other div attributes. |
 
 ### Page.Cell
-`ref` → `HTMLDivElement`. One tile place in `Page.Grid`; its child (a Card, a ChartFrame) stretches to it, so the tiles of a row share one height.
+`ref` → `HTMLDivElement`. One tile place in `Page.Grid`; its child (a Card, a ChartFrame) stretches to it, so the tiles of a row share one height; a `Crossfade` child gets `fill` unless it sets it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -349,5 +349,5 @@ The actions stay on the first line beside the heading at every step; `Page.Chips
 - A list + detail built with window media queries → `Page.Split` follows its own width.
 
 ## Related
-- **Built from:** [AppShell](../app-shell/COMPONENT.md) (the navigation the menu button opens), [Breadcrumb](../../components/breadcrumb/COMPONENT.md) (the path the heading places), [Button](../../components/button/COMPONENT.md) (the menu button, «⋯», `Page.BackButton`; the icon-only label hook), [Dropdown](../../components/dropdown/COMPONENT.md) (folded buttons), [Tooltip](../../components/tooltip/COMPONENT.md) (the label of an icon-only button), [SegmentedControl](../../components/segmented-control/COMPONENT.md) (`fullWidth` in `Page.Tools`), [SmartFilter](../../components/smart-filter/COMPONENT.md) and [Input](../../components/input/COMPONENT.md) (the search that grows first in `Page.Tools`), Icon (`nav.menu`, `nav.chevronRight`, `action.more`, `nav.chevronLeft`)
+- **Built from:** [AppShell](../app-shell/COMPONENT.md) (the navigation the menu button opens), [Breadcrumb](../../components/breadcrumb/COMPONENT.md) (the path the heading places), [Button](../../components/button/COMPONENT.md) (the menu button, «⋯», `Page.BackButton`; the icon-only label hook), [Dropdown](../../components/dropdown/COMPONENT.md) (folded buttons), [Tooltip](../../components/tooltip/COMPONENT.md) (the label of an icon-only button), [SegmentedControl](../../components/segmented-control/COMPONENT.md) (`fullWidth` in `Page.Tools`), [SmartFilter](../../components/smart-filter/COMPONENT.md) and [Input](../../components/input/COMPONENT.md) (the search that grows first in `Page.Tools`), [Crossfade](../../components/crossfade/COMPONENT.md) (a `Page.Cell` child gets `fill`), Icon (`nav.menu`, `nav.chevronRight`, `action.more`, `nav.chevronLeft`)
 - **See also:** [Sidebar](../sidebar/COMPONENT.md), [BottomNav](../bottom-nav/COMPONENT.md), [Select](../../components/select/COMPONENT.md), [Card](../../components/card/COMPONENT.md), [ChartFrame](../../components/chart-frame/COMPONENT.md), [List](../../components/list/COMPONENT.md), [EmptyPage](../../components/empty-page/COMPONENT.md), [Drawer](../../components/drawer/COMPONENT.md), [VisuallyHidden](../../components/visually-hidden/COMPONENT.md)

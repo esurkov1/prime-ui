@@ -18,8 +18,8 @@ export const api: ComponentApi = {
           name: "fill",
           type: "boolean",
           default: "false",
-          en: "The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it; the height never glides.",
-          ru: "Область занимает высоту родителя (элемент flex или grid, блок с высотой), каждое состояние растягивается по ней; высота не анимируется.",
+          en: "The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it; the height never glides. A `Crossfade` that is the child of a `Page.Cell` fills it unless `fill` is set.",
+          ru: "Область занимает высоту родителя (элемент flex или grid, блок с высотой), каждое состояние растягивается по ней; высота не анимируется. `Crossfade` — ребёнок `Page.Cell` — заполняет ячейку, если `fill` не задан.",
         },
         {
           name: "children",

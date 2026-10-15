@@ -45,7 +45,7 @@ Crossfade          <div>; holds the region's height while it changes
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `state` | `string \| number` | — (required) | Key of what the region shows: `"loading"`, `"ready"`, `"empty"`, `"error"` or a record id. A new value cross-fades the old content into the new one; the same value updates in place. |
-| `fill` | `boolean` | `false` | The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it; the height never glides. |
+| `fill` | `boolean` | `false` | The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it; the height never glides. A `Crossfade` that is the child of a `Page.Cell` fills it unless `fill` is set. |
 | `children` | `ReactNode` | — | Content of the current `state`. Nothing (`null`, `false`) leaves no box once the old state has faded: no gap in a grid or a flex column. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-busy`, `aria-live`, `role` and the other div attributes. |
 

@@ -183,8 +183,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Cell",
-      en: "`ref` → `HTMLDivElement`. One tile place in `Page.Grid`; its child (a Card, a ChartFrame) stretches to it, so the tiles of a row share one height.",
-      ru: "Место одной плитки в `Page.Grid`; её ребёнок (Card, ChartFrame) растягивается на неё, так что плитки ряда одной высоты.",
+      en: "`ref` → `HTMLDivElement`. One tile place in `Page.Grid`; its child (a Card, a ChartFrame) stretches to it, so the tiles of a row share one height; a `Crossfade` child gets `fill` unless it sets it.",
+      ru: "Место одной плитки в `Page.Grid`; её ребёнок (Card, ChartFrame) растягивается на неё, так что плитки ряда одной высоты; ребёнок `Crossfade` получает `fill`, если не задал его сам.",
       props: [
         {
           name: "span",
