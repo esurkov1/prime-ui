@@ -28,7 +28,7 @@ export default function ButtonHoldToConfirmExample() {
       <Button.Icon>
         <Icon name="action.delete" />
       </Button.Icon>
-      Удерживайте, чтобы удалить проект
+      Удержите, чтобы удалить
     </Button.Root>
   );
 }

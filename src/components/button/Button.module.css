@@ -26,6 +26,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--field-gap);
+  /* A button never gets narrower than its label: in a crowded flex row it keeps its width and the
+     row wraps, scrolls or gives elsewhere (`fullWidth` gives, below). */
+  flex-shrink: 0;
   height: var(--btn-h);
   min-width: var(--btn-h);
   max-width: 100%;
@@ -107,6 +110,7 @@
 
 .root[data-full-width="true"] {
   display: flex;
+  flex-shrink: 1;
   width: 100%;
   min-width: 0;
 }
