@@ -32,7 +32,7 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Breadcrumb.Root
-`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and, when the whole path does not fit its width uncut, collapses the middle levels into a «…» menu button that lists them.
+`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and folds levels that do not fit into a «…» menu button that lists them: the middle ones, then the first one too.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -85,14 +85,15 @@ Use links for every ancestor and `current` on the last item; `s` above a `headin
 |---|---|---|
 | current | `current` | `aria-current="page"` on the text span, or on the link when the item has `href` |
 | hover / focus-visible on links | pointer / keyboard | text → primary; focus ring from LinkButton |
-| truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24` (192); the last item shrinks last |
-| auto-collapse | 3+ levels whose whole path does not fit the width uncut (measured on every resize) | `data-collapsible="true"`, `data-collapsed="true"`; middle levels are `display: none` and replaced by «… ›»: a ghost menu button (`Dropdown.Trigger`, named by `labels.ellipsis`) whose menu lists them — links stay links, a level without `href` is a disabled row |
+| truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24` (192); the current page shrinks at half the rate of the others |
+| auto-collapse | 2+ levels whose whole path does not fit the width uncut (measured on every resize) | `data-collapsible="true"`, `data-collapsed="true"`; middle levels are `display: none` and replaced by «… ›»: a ghost menu button (`Dropdown.Trigger`, named by `labels.ellipsis`) whose menu lists them — links stay links, a level without `href` is a disabled row |
+| deep collapse | the path folded as above still does not fit | `data-collapsed="deep"`; the first level folds too: «…» › current page, the menu lists every level before it |
 | collapse menu open | a press, `Enter` or `ArrowDown` on the «…» | `aria-expanded="true"` on the button; a `role="menu"` panel at the tier size |
 
-Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
+Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`), `data-collapsed` (`"true"` / `"deep"`).
 
 ## Layout & spacing
-- A path of 1–2 levels takes its content width (at most the row), so in a flex row — the `Page.Heading` line of a top bar, before the chevron it draws and the title — what follows stands right after it. A path of 3+ levels is a size container (`container-type: inline-size`, `inline-size: 100%`) that folds its middle levels by its own width: inside a flex row give it `flex: 1 1 auto; min-width: 0`.
+- A single level takes its content width (at most the row). A path of 2+ levels fills the row (`inline-size: 100%`) and folds by that width, so a wider row unfolds it again; its intrinsic width stays the whole path, so a host that measures natural widths (the `Page.TopBar` plan) reads it uncut. Inside a flex row give it a box that takes the room it may use (`flex: 1 1 auto; min-width: 0`).
 - In a `Page.Heading` the path up holds the list a record belongs to (1–2 levels); the record itself is the `Page.Title` (in a top bar the path's last level, after the chevron), not the breadcrumb's `current` item.
 - Above a page title: `gap: var(--prime-space-2)` between the trail and the title row.
 - The list never wraps. Chevrons sit inside each level after the first, in the placeholder text color, at the tier icon size.
@@ -113,7 +114,7 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
 - `nav` landmark with `aria-label` from `labels.nav`; an ordered list.
 - The current page has `aria-current="page"`; the chevrons are `aria-hidden` spans inside the levels, so every list item is a level.
-- Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» is a menu button (`aria-haspopup="menu"`) named by `labels.ellipsis`, and its menu lists them as links.
+- Collapsed levels leave the layout and the tab order (no invisible focus stops); the automatic «…» is a menu button (`aria-haspopup="menu"`) named by `labels.ellipsis`, and its menu lists them as links.
 - Icon-only links need `aria-label` on the Item.
 
 ### Labels

@@ -8,7 +8,8 @@
  * - `below` — the tools move to a line of their own under the heading and the actions;
  * - `icons-secondary` — the secondary buttons show only their icons;
  * - `icons` — the primary button too;
- * - `fold` — the secondary buttons fold into «⋯». Past it the heading truncates.
+ * - `fold` — the secondary buttons fold into «⋯» (only when that is narrower than their icons).
+ *   Past it the heading truncates.
  */
 export type BarPlan = "one" | "below" | "icons-secondary" | "icons" | "fold";
 
@@ -58,7 +59,7 @@ function actionsWidth(widths: BarWidths, step: ActionStep): number {
   return sum(folds ? [...parts, more] : parts, actionGap);
 }
 
-/** The first plan whose first line fits `available`; `fold` when none does. */
+/** The first plan whose first line fits `available`; the narrowest of `icons` and `fold` when none does. */
 export function planBar(widths: BarWidths, available: number): BarPlan {
   const { heading, tools, gap } = widths;
   const fits = (actions: number, withTools = false) =>
@@ -66,6 +67,8 @@ export function planBar(widths: BarWidths, available: number): BarPlan {
   if (fits(actionsWidth(widths, "full"), true)) return "one";
   if (fits(actionsWidth(widths, "full"))) return "below";
   if (fits(actionsWidth(widths, "icons-secondary"))) return "icons-secondary";
-  if (fits(actionsWidth(widths, "icons"))) return "icons";
-  return "fold";
+  const icons = actionsWidth(widths, "icons");
+  if (fits(icons)) return "icons";
+  // «⋯» in place of a single icon button saves nothing: the button keeps its icon.
+  return actionsWidth(widths, "fold") < icons ? "fold" : "icons";
 }

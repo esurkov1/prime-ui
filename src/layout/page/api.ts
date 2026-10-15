@@ -59,8 +59,8 @@ export const api: ComponentApi = {
           name: "collapse",
           type: "boolean",
           default: "false",
-          en: "Once the flow `Page.Title` scrolls out under the bar, the bar repeats it (with its description) as the last level of its heading; it leaves when the title returns.",
-          ru: "Когда `Page.Title` в потоке уходит под полосу, полоса повторяет его (с описанием) последним уровнем своего заголовка; уходит, когда заголовок возвращается.",
+          en: "Once the flow `Page.Title` scrolls out under the bar, the bar repeats it as the last level of its heading (of its `Breadcrumb` path, which folds for it); it leaves when the title returns.",
+          ru: "Когда `Page.Title` в потоке уходит под полосу, полоса повторяет его последним уровнем заголовка (своего пути `Breadcrumb`, который ради него сворачивается); уходит, когда заголовок возвращается.",
         },
         {
           name: "…rest",

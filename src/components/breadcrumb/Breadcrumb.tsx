@@ -28,11 +28,16 @@ export const BREADCRUMB_LABELS: BreadcrumbLabels = {
   ellipsis: "Скрытые разделы",
 };
 
-type BreadcrumbContextValue = { size: ControlSize; labels: BreadcrumbLabels };
+type BreadcrumbContextValue = {
+  size: ControlSize;
+  labels: BreadcrumbLabels;
+  navRef: React.RefObject<HTMLElement | null>;
+};
 
 const BreadcrumbContext = React.createContext<BreadcrumbContextValue>({
   size: "m",
   labels: BREADCRUMB_LABELS,
+  navRef: { current: null },
 });
 
 export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
@@ -41,8 +46,8 @@ export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-/** From this many levels the middle ones collapse into a «…» menu when the path does not fit. */
-const COLLAPSIBLE_MIN_ITEMS = 3;
+/** From this many levels the path folds into a «…» menu when it does not fit. */
+const COLLAPSIBLE_MIN_ITEMS = 2;
 
 /**
  * Whether a level is the first one. Root tells each level its place, so the chevron is rendered
@@ -78,8 +83,10 @@ function pathOverflows(nav: HTMLElement, list: HTMLElement): boolean {
 }
 
 /**
- * Folds the middle levels (`data-collapsed`) only when the whole path does not fit its width
- * uncut: measured with every level in place, before paint and on every resize. Written to the DOM;
+ * Folds the path only as far as it has to, so the current page keeps its room: nothing while the
+ * whole path fits uncut; the middle levels (`data-collapsed="true"`) while the first level, «…»
+ * and the current one fit; the first level too (`"deep"`: «…» › current) when they do not.
+ * Measured with the levels in place, before paint and on every resize. Written to the DOM;
  * nothing re-renders.
  */
 function useCollapse(navRef: React.RefObject<HTMLElement | null>, collapsible: boolean) {
@@ -88,7 +95,9 @@ function useCollapse(navRef: React.RefObject<HTMLElement | null>, collapsible: b
     const list = nav?.firstElementChild;
     if (!nav || !(list instanceof HTMLElement)) return;
     nav.removeAttribute("data-collapsed");
-    if (collapsible && pathOverflows(nav, list)) nav.setAttribute("data-collapsed", "true");
+    if (!collapsible || !pathOverflows(nav, list)) return;
+    nav.setAttribute("data-collapsed", "true");
+    if (pathOverflows(nav, list)) nav.setAttribute("data-collapsed", "deep");
   }, [navRef, collapsible]);
   // Every render: a level added, removed or renamed changes what fits.
   React.useLayoutEffect(fit);
@@ -107,7 +116,10 @@ function BreadcrumbRoot({
   const mergedRef = useMergedRefs(navRef, ref);
   const tier = useHostTier(sizeProp);
   const labels = useLabels(BREADCRUMB_LABELS, labelsProp);
-  const contextValue = React.useMemo(() => ({ size: tier.size, labels }), [tier.size, labels]);
+  const contextValue = React.useMemo(
+    () => ({ size: tier.size, labels, navRef }),
+    [tier.size, labels],
+  );
 
   const levels = React.Children.toArray(children);
   // Each level learns whether it is the first; keys stay the children's own.
@@ -137,19 +149,19 @@ function BreadcrumbRoot({
             role="list"
             className={styles.list}
           >
-            {collapsible ? (
-              <>
-                {items[0]}
-                {/* Shown only on narrow widths (container query) in place of the middle levels,
-                    which are then `display: none`: a menu of those levels keeps them reachable. */}
-                <FirstLevelContext.Provider value={false}>
-                  <CollapseMenu levels={levels.slice(1, -1)} />
-                </FirstLevelContext.Provider>
-                {items.slice(1)}
-              </>
-            ) : (
-              items
-            )}
+            {/* One flat keyed list, so a level keeps its element when the path becomes
+                collapsible (a level added before it). */}
+            {collapsible
+              ? [
+                  items[0],
+                  /* Shown only while the path is folded (`data-collapsed`), in place of the
+                     levels that are then `display: none`: a menu of them keeps them reachable. */
+                  <FirstLevelContext.Provider key="auto-collapse" value={false}>
+                    <CollapseMenu levels={levels.slice(0, -1)} />
+                  </FirstLevelContext.Provider>,
+                  ...items.slice(1),
+                ]
+              : items}
           </ol>
         </nav>,
       )}
@@ -159,19 +171,27 @@ function BreadcrumbRoot({
 BreadcrumbRoot.displayName = "Breadcrumb.Root";
 
 /**
- * The «…» of a collapsed path: a menu button whose items are the hidden middle levels — a link
- * level stays a link, a level without one is a disabled row.
+ * The «…» of a collapsed path: a menu button whose items are the hidden levels — the middle ones,
+ * and the first one too while the path is folded deep — a link level stays a link, a level without
+ * one is a disabled row. Which levels are hidden is read from the root as the menu opens.
  */
 function CollapseMenu({ levels }: { levels: React.ReactNode[] }) {
-  const { size, labels } = React.useContext(BreadcrumbContext);
-  const entries = levels.filter(
-    (level): level is React.ReactElement<BreadcrumbItemProps> =>
-      React.isValidElement(level) && level.type === BreadcrumbItem,
-  );
+  const { size, labels, navRef } = React.useContext(BreadcrumbContext);
+  const [deep, setDeep] = React.useState(false);
+  const entries = levels
+    .filter(
+      (level): level is React.ReactElement<BreadcrumbItemProps> =>
+        React.isValidElement(level) && level.type === BreadcrumbItem,
+    )
+    .slice(deep ? 0 : 1);
   return (
     <li className={cx(styles.item, styles.ellipsis, styles.autoCollapse)}>
       <Separator />
-      <Dropdown.Root>
+      <Dropdown.Root
+        onOpenChange={(open) => {
+          if (open) setDeep(navRef.current?.getAttribute("data-collapsed") === "deep");
+        }}
+      >
         <Dropdown.Trigger>
           <Button.Root variant="ghost" tone="neutral" density="inline" aria-label={labels.ellipsis}>
             …

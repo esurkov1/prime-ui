@@ -1,8 +1,8 @@
 /*
  * Breadcrumb — Graphite.
  * Previous segments muted, current page primary/medium. Each segment truncates with ellipsis;
- * when the whole path does not fit its width uncut, the middle segments collapse into a «…» menu
- * button (named by `labels.ellipsis`) that lists them.
+ * when the whole path does not fit its width uncut, the middle segments (then the first one too)
+ * collapse into a «…» menu button (named by `labels.ellipsis`) that lists them.
  */
 
 /* Text of the tier from the one tier table (`fieldTierClass` on the root). */
@@ -21,11 +21,11 @@
   line-height: var(--bc-line-height);
 }
 
-/* A path that can collapse is a size container: it fills the available width (an inline-size
- * container has no intrinsic width and would shrink to 0 in a flex row) and folds its middle
- * levels when they do not fit that width. */
+/* A path that can collapse fills the available width, so a wider row lets it unfold again (its
+ * resize is what re-measures), and folds its middle levels when they do not fit that width. Its
+ * own content stays its intrinsic width: a host that measures its natural size (the Page top bar)
+ * reads the whole path. */
 .root[data-collapsible="true"] {
-  container-type: inline-size;
   inline-size: 100%;
 }
 
@@ -58,16 +58,18 @@
 
 .item {
   display: inline-flex;
-  flex: 0 1 auto;
+  flex: 0 2 auto;
   align-items: center;
   gap: var(--bc-gap);
   min-width: 0;
   max-width: var(--bc-item-max);
 }
 
-/* Current page keeps priority: it shrinks last. */
+/* Current page keeps priority: it shrinks at half the rate of the others. Factors stay at 1 and
+ * above: a sum under 1 (the current page alone left to shrink) would absorb only that share of the
+ * overflow, and the rest would spill out of the path. */
 .item:last-child {
-  flex-shrink: 0.5;
+  flex-shrink: 1;
 }
 
 .item > :not(.separator) {
@@ -120,10 +122,17 @@
 /* `data-collapsed`: the whole path does not fit uncut (measured by the root), so the middle levels
  * fold. They (after the first and the auto «…», before the last) leave the layout and the tab
  * order; the «…» menu lists them, so they stay reachable. */
-.root[data-collapsed="true"] .autoCollapse {
+.root[data-collapsed] .autoCollapse {
   display: inline-flex;
 }
 
-.root[data-collapsed="true"] .item:nth-child(n + 3):not(:last-child) {
+.root[data-collapsed] .item:nth-child(n + 3):not(:last-child) {
+  display: none;
+}
+
+/* `data-collapsed="deep"`: even folded the path does not fit, so the first level folds too and the
+ * current page takes the room: «…» › current. The «…» then opens the path, without a chevron. */
+.root[data-collapsed="deep"] .item:first-child,
+.root[data-collapsed="deep"] .autoCollapse > .separator {
   display: none;
 }

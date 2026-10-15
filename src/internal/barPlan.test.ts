@@ -43,9 +43,24 @@ describe("planBar", () => {
         { role: "primary", full: 140, icon: null },
       ],
     };
-    // Nothing can give: the actions keep 50 + 8 + 140 at every step.
+    // Nothing can give: the actions keep 50 + 8 + 140 at every step, and nothing folds.
     expect(planBar(widths, 300 + 16 + 198)).toBe("one");
-    expect(planBar(widths, 300 + 16 + 197)).toBe("fold");
+    expect(planBar(widths, 300 + 16 + 197)).toBe("icons");
+  });
+
+  it("keeps a single secondary button as its icon: «⋯» in its place saves nothing", () => {
+    const widths: BarWidths = {
+      ...WIDTHS,
+      tools: 0,
+      actions: [
+        { role: "secondary", full: 120, icon: 32 },
+        { role: "other", full: 72, icon: null },
+      ],
+    };
+    // Icons: 32 + 8 + 72 = 112; folded: «⋯» + 8 + 72 = 112 — no narrower, so the icon stays.
+    expect(planBar(widths, 300 + 16 + 112)).toBe("icons-secondary");
+    expect(planBar(widths, 300 + 16 + 111)).toBe("icons");
+    expect(planBar(widths, 200)).toBe("icons");
   });
 
   it("counts no gap for a missing part", () => {

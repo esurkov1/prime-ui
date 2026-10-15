@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
+import { Breadcrumb, type BreadcrumbRootProps } from "@/components/breadcrumb/Breadcrumb";
 import { Button, type ButtonRootProps } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Input } from "@/components/input/Input";
@@ -13,6 +13,7 @@ import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { type BarAction, type BarPlan, type BarWidths, planBar } from "@/internal/barPlan";
 import { createComponentContext } from "@/internal/context";
@@ -228,8 +229,13 @@ const widthOf = (node: Element | null) =>
 function measureBar(row: HTMLElement): BarWidths {
   const gap = px(getComputedStyle(row).columnGap);
   const iconed = Array.from(row.querySelectorAll<HTMLElement>("[data-button-label]"));
+  // A folded path (Breadcrumb `data-collapsed`) is measured whole: its folding is the last step.
+  const folded = Array.from(row.querySelectorAll<HTMLElement>("[data-collapsed]")).map(
+    (node) => [node, node.getAttribute("data-collapsed") as string] as const,
+  );
   row.dataset.measure = "true";
   for (const node of iconed) node.removeAttribute("data-button-label");
+  for (const [node] of folded) node.removeAttribute("data-collapsed");
 
   const actionsNode = row.querySelector<HTMLElement>(`:scope > .${styles.actions}`);
   const items = Array.from(
@@ -250,6 +256,7 @@ function measureBar(row: HTMLElement): BarWidths {
   };
 
   for (const node of iconed) node.setAttribute("data-button-label", "icon");
+  for (const [node, value] of folded) node.setAttribute("data-collapsed", value);
   delete row.dataset.measure;
   return widths;
 }
@@ -393,12 +400,10 @@ function PathSeparator() {
 }
 
 /**
- * The flow title repeated in the bar's heading: a visual echo (`aria-hidden`, `inert`) — the
- * heading itself is the `<h1>` in the flow. It rises in while the title is out of view. After a
- * path it continues the path's line (› title) and leaves the description out, so the sticky bar
- * keeps its height as the echo comes and goes.
+ * The flow title repeated in a bar heading without a path: a visual echo (`aria-hidden`, `inert`)
+ * — the heading itself is the `<h1>` in the flow. It rises in while the title is out of view.
  */
-function TitleEcho({ separator }: { separator: boolean }) {
+function TitleEcho() {
   const page = React.useContext(PageContext);
   const { collapsed } = React.useContext(BarContext);
   const { title, description } = useHeading(page?.heading);
@@ -410,14 +415,44 @@ function TitleEcho({ separator }: { separator: boolean }) {
       className={styles.echo}
       {...toDataAttributes({ visible: collapsed || undefined })}
     >
-      <div className={styles.headingLine}>
-        {separator ? <PathSeparator /> : null}
-        <span className={cx(textRole.titleM, styles.barTitle)}>{title}</span>
-      </div>
-      {description == null || separator ? null : (
+      <span className={cx(textRole.titleM, styles.barTitle)}>{title}</span>
+      {description == null ? null : (
         <span className={cx(textRole.caption, styles.barDescription)}>{description}</span>
       )}
     </div>
+  );
+}
+
+/**
+ * The bar's path with the flow title as its last level while that title is out of view: the
+ * title joins the Breadcrumb itself, so a path short of width folds its middle levels into «…»
+ * (the Breadcrumb's own collapse) and the title stays readable, instead of every level being cut.
+ * The level is a visual echo (`aria-hidden`, `inert`): the heading is the `<h1>` in the flow, the
+ * path's own current level stays what assistive tech reads. It rises in and sinks out.
+ */
+function PathEcho({ path }: { path: React.ReactNode }) {
+  const page = React.useContext(PageContext);
+  const { collapsed } = React.useContext(BarContext);
+  const { title } = useHeading(page?.heading);
+  const presence = usePresence(collapsed && title != null, { exitDuration: "fast" });
+  // The title it showed stays while it sinks out.
+  const shown = React.useRef(title);
+  if (title != null) shown.current = title;
+  if (!presence.mounted || !React.isValidElement<BreadcrumbRootProps>(path)) return path;
+  return React.cloneElement(
+    path,
+    undefined,
+    ...React.Children.toArray(path.props.children),
+    <Breadcrumb.Item
+      key="page-title-echo"
+      current
+      aria-hidden="true"
+      inert
+      className={presence.state === "open" ? enterMotion.enter : enterMotion.exit}
+      onAnimationEnd={presence.onExitEnd}
+    >
+      {shown.current}
+    </Breadcrumb.Item>,
   );
 }
 
@@ -481,13 +516,25 @@ function PageHeading({ className, children, ...rest }: PageHeadingProps) {
   return (
     <div {...rest} className={cx(styles.heading, className)} data-place="bar">
       <div className={styles.headingLine}>
-        {hasPath ? <div className={styles.path}>{path}</div> : null}
+        {hasPath ? (
+          <div className={styles.path} data-fill={titles.length === 0 ? "true" : undefined}>
+            {echo
+              ? path.map((item, index) =>
+                  index === path.length - 1 ? (
+                    <PathEcho key={keyOf(item, index)} path={item} />
+                  ) : (
+                    item
+                  ),
+                )
+              : path}
+          </div>
+        ) : null}
         {hasPath && titles.length > 0 ? <PathSeparator /> : null}
         {titles}
         {other}
       </div>
       {descriptions}
-      {echo ? <TitleEcho separator={hasPath} /> : null}
+      {echo && !hasPath ? <TitleEcho /> : null}
     </div>
   );
 }

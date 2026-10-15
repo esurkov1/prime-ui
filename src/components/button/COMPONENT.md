@@ -144,6 +144,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 |---|---|---|---|
 | `fullWidth` | button fills the row | narrow forms, cards, mobile footers | off |
 | icon-only (children are only `Button.Icon`) | square, width = height | toolbars; needs `aria-label` | — |
+| icon only by the host (`data-button-label="icon"` on a wrapper, the `Page.TopBar` plan) | a Button with an icon and a label shows only its icon, square; the label and anything else beside the icon (a `Kbd` hint) stay transparent over it, the label as the name | a host short of width | — |
 | `pressed` / `defaultPressed` | on: accent soft fill and accent text over any variant; off: the variant's own look | a single toggle (favourite, pin, «show archived») | — (not a toggle) |
 | `current` | the selected look, `aria-current="page"` | the current page of a set (page numbers) | off |
 

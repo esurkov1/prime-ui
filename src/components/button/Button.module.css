@@ -71,8 +71,9 @@
 /*
  * A host short of width (the page's top bar) marks a wrapper `data-button-label="icon"`: a button
  * with an icon and a label inside it shows only its icon, square like an icon-only button. The
- * label stays in the DOM, laid over the button and transparent, so it remains the button's
- * accessible name.
+ * label and anything else beside the icon (a `Kbd` hint) stay in the DOM, laid over the button and
+ * transparent, so the label remains the button's accessible name and nothing spills out of the
+ * square.
  */
 :where([data-button-label="icon"])
   .root:is([data-leading-icon="true"], [data-trailing-icon="true"]) {
@@ -82,7 +83,7 @@
 
 :where([data-button-label="icon"])
   .root:is([data-leading-icon="true"], [data-trailing-icon="true"])
-  .label {
+  > :not(.icon, .spinner, .fillTrack, .ring) {
   position: absolute;
   inset: 0;
   overflow: hidden;
