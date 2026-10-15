@@ -5,8 +5,11 @@ checks.
 
 ## Composition
 - [ ] The screen starts from the closest working screen and keeps its skeleton ([screens](composition.md#screens)).
-- [ ] One `Page.Title` per page: a work screen titles itself in its `Page.TopBar`, a document page or an overview in a `Page.Header` in the flow ([page skeleton](composition.md#1-page-skeleton)).
-- [ ] The top bar holds only this page's title, buttons and tools — no app-wide header or global search ([page skeleton](composition.md#1-page-skeleton)).
+- [ ] One `Page.Title` per page, always an `<h1>`: a work screen titles itself in the `Page.Heading` of its `Page.TopBar`, a document page or an overview in a `Page.Header` in the flow ([page skeleton](composition.md#1-page-skeleton)).
+- [ ] The top bar holds only this page's groups — `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — no app-wide header or global search ([the top bar](composition.md#the-top-bar)).
+- [ ] A nested record's path ends in its title on one line inside `Page.Heading`; no title row under the path ([the top bar](composition.md#the-top-bar)).
+- [ ] Every button of the page is in one `Page.Actions`, the primary last, each with a `Button.Icon` ([the top bar](composition.md#the-top-bar)).
+- [ ] `SmartFilter.Root` wraps `Page.Root`; its toolbar is in `Page.Tools`, its chips in `Page.Chips` ([the top bar](composition.md#the-top-bar)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 
 ## UX ([ux.md](ux.md))
@@ -72,7 +75,8 @@ checks.
 
 ## Themes and widths
 - [ ] The screen passes the responsive checklist in both themes ([responsive](responsive.md#checklist-before-handing-a-screen-over)).
-- [ ] On a phone the Sidebar opens from the menu button the header draws; the page title stays in the header ([app frame](layouts.md#app-frame-once-per-app)).
+- [ ] On a phone the Sidebar opens from the menu button the top bar draws; the page title stays in the bar ([app frame](layouts.md#app-frame-once-per-app)).
+- [ ] At every width the bar fits: tools on their own line, then icon-only buttons, then «⋯», the primary always on screen ([the page's top bar](responsive.md#the-pages-top-bar--pagetopbar)).
 
 ## Keyboard and a11y
 - [ ] Every action is reachable by Tab in reading order and works with Enter / Space ([interaction](responsive.md#interaction-and-accessibility)).

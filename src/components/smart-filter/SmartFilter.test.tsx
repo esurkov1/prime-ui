@@ -264,14 +264,14 @@ describe("SmartFilter", () => {
   });
 
   it("takes the host tier without its own size", () => {
-    const { container } = render(
+    render(
       <ControlSizeProvider value="l">
         <SmartFilter.Root fields={FIELDS}>
           <SmartFilter.Toolbar />
         </SmartFilter.Root>
       </ControlSizeProvider>,
     );
-    expect(container.firstElementChild).toHaveAttribute("data-size", "l");
+    expect(screen.getByRole("button", { name: /Фильтр/ })).toHaveAttribute("data-size", "l");
   });
 
   it("the chips row rises in when the first filter applies", () => {

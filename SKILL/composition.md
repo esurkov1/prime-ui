@@ -14,17 +14,17 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 | Screen | Main component | File | Shows |
 |---|---|---|---|
 | [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, SmartFilter search and filters, export and one primary action in the page's top bar; statuses, row menu, pages, filtered empty state |
-| [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | a nested record: Breadcrumb, the title with status and due date and the record's actions by weight in the top bar; main column + side column of Cards, Timeline |
+| [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | a nested record: the path ending in the title, status and due date and the record's actions by weight in the top bar; main column + side column of Cards, Timeline |
 | [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, heading column + panel per section, form with its own save, Switches that apply at once, danger zone with a confirm |
 | [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts, search and the Drawer trigger in the top bar; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
-| [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title, a line of description and «Сохранить тариф» in `Page.Header` in the flow; a plan card edited in aside sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
+| [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title and a line of description in `Page.Heading`, «Сохранить тариф» in `Page.Actions`, both in a `Page.Header` in the flow; a plan card edited in aside sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
 | [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | the large title + a line of data in the flow, period switch and report in a collapsing `Page.TopBar`; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
 | [Screen states](#screen-states) | crossfade | [screen.tsx](../src/components/crossfade/examples/screen.tsx) | title + the statement date in `Page.TopBar`, page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
 | [Messenger](#messenger) | chat | [screen.tsx](../src/components/chat/examples/screen.tsx) | title + the unread count in `Page.TopBar`; a full-height Page.Split of a `ChatList` with its search (live last message, ticks, unread counts, «печатает…») and a `Chat`: `Chat.Header` with the back button, avatar, title, the status that turns into «печатает…» (`typing`) and the search button, `Chat.Search`, `Chat.Messages` from `items` + `renderMessage` (dates, runs and the unread band from the data, history loaded above with `hasOlder` / `onLoadOlder`, a first load in skeletons), text, a photo, a file and sent voice, reply and edit from the menu through `Composer.Context messageId` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Chat.Root typing`), unread counts from `onNewMessage` and `onRead`, the Composer with attachments in `Chat.Footer` |
-| [Sales pipeline board](#sales-pipeline-board) | kanban | [screen.tsx](../src/components/kanban/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the open deals and their sum) and carries a `Page.Toolbar` with SmartFilter search, a board / list SegmentedControl and the one primary action; Crossfade between a `plain` Kanban (stages without wells, deal cards on the page) and a DataTable of the same deals, column totals in `renderColumnMeta`, moves saved through an `onValueChange` promise that the server can refuse, the deal in a Drawer with a DescriptionList and stage actions, skeleton first load |
+| [Sales pipeline board](#sales-pipeline-board) | kanban | [screen.tsx](../src/components/kanban/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the open deals and their sum) with SmartFilter search and a board / list SegmentedControl in `Page.Tools` and the one primary action in `Page.Actions`; Crossfade between a `plain` Kanban (stages without wells, deal cards on the page) and a DataTable of the same deals, column totals in `renderColumnMeta`, moves saved through an `onValueChange` promise that the server can refuse, the deal in a Drawer with a DescriptionList and stage actions, skeleton first load |
 | [App frame](#app-frame) | app-shell | [screen.tsx](../src/layout/app-shell/examples/screen.tsx) | Sidebar rail on a wide screen, floating BottomNav in `AppShell.Footer` on a phone («Ещё» opens the Sidebar panel), a `Page.TopBar` with the menu button and the page title (`h1`) with a line of data, counts on items, a home page that cross-fades between sections |
-| [Media library](#media-library) | file-upload | [screen.tsx](../src/components/file-upload/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the object) and carries a `Page.Toolbar` with sections and counts, search (`SmartFilter` with `fields={[]}`), order and «Загрузить»; uploads through `useUploadQueue` in `FileUpload` tiles (`trigger="tile"`, `layout="grid"`) with progress, a failure and retry, a done file moving into the library; a grid of `Thumbnail` / `Thumbnail.Video` tiles that open `MediaViewer` out of the tile (`getOrigin`, `thumbnails`, `renderActions`) or, in selection mode, are picked (`checked`) for bulk download and a `ConfirmDialog` delete; a Skeleton first load and a filtered `EmptyPage` in a `Crossfade` |
-| [Resource schedule](#resource-schedule) | gantt | [screen.tsx](../src/components/gantt/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the people shown) and carries a `Page.Toolbar` with search, role / client filters, team sections and «Назначить» over a full-height `Gantt` (`scrollHeight="fill"`); people with avatars, client hues, lanes for overlaps, locked absences and milestones; moves saved through an async `onBarChange` or refused and glided back, new work drawn with `onBarCreate` and named in a Modal (cancel fades the ghost), `onItemOpen` details in a Drawer with a `DescriptionList` and a confirmed removal, `loading` and filtered `empty` |
+| [Media library](#media-library) | file-upload | [screen.tsx](../src/components/file-upload/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the object) with sections and counts, search (`SmartFilter` with `fields={[]}`) and order in `Page.Tools` and «Загрузить» in `Page.Actions`; uploads through `useUploadQueue` in `FileUpload` tiles (`trigger="tile"`, `layout="grid"`) with progress, a failure and retry, a done file moving into the library; a grid of `Thumbnail` / `Thumbnail.Video` tiles that open `MediaViewer` out of the tile (`getOrigin`, `thumbnails`, `renderActions`) or, in selection mode, are picked (`checked`) for bulk download and a `ConfirmDialog` delete; a Skeleton first load and a filtered `EmptyPage` in a `Crossfade` |
+| [Resource schedule](#resource-schedule) | gantt | [screen.tsx](../src/components/gantt/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the people shown) with search, role / client filters and team sections in `Page.Tools` and «Назначить» in `Page.Actions` over a full-height `Gantt` (`scrollHeight="fill"`); people with avatars, client hues, lanes for overlaps, locked absences and milestones; moves saved through an async `onBarChange` or refused and glided back, new work drawn with `onBarCreate` and named in a Modal (cancel fades the ghost), `onItemOpen` details in a Drawer with a `DescriptionList` and a confirmed removal, `loading` and filtered `empty` |
 
 Pick the closest one, rename the domain, keep the skeleton. Change structure only when the task needs
 it, and then by the rules below.
@@ -33,47 +33,50 @@ it, and then by the rules below.
 
 **The app is navigation and the page.** `AppShell` holds the Sidebar and `AppShell.Main`; there is no
 app-wide header and no global search. Everything at the top belongs to the page: one `Page.Root` with
-its `Page.TopBar` (sticky), its `Page.Header` and its `Page.Body`.
+its `Page.TopBar` (sticky) and its `Page.Body`, plus a `Page.Header` in the flow on a document page.
 
-**One title per page.** `Page.Title` is the page's only `<h1>`, a `Page.Description` beside it is one
+**One title per page.** `Page.Title` is the page's only `<h1>`, a `Page.Description` with it is one
 line that carries data («Среда, 14 октября · 3 задачи», «Отправлен · оплатить до 14 октября»), and a
-nested record puts the path up (a `Breadcrumb.Root` first in `Page.Header`) before it. Where the
-header stands follows the kind of page; its size follows the place:
+nested record puts the path up (a `Breadcrumb.Root` before the title) — all three inside
+`Page.Heading`, the title group. Where the heading stands follows the kind of page; its size follows
+the place:
 
-- **Work screens** — a list, a board, a chat, a schedule, a record: `Page.Header` and `Page.Toolbar`
-  inside `Page.TopBar`. The compact title row holds the title, its line of data and the page's own
-  buttons in `Page.Actions` (trailing secondary ones fold into «⋯» when the row runs short); the
-  toolbar under it holds the page's own search and filters, sections, the view and the primary action.
-- **Document pages** — settings, a long form, an article or help text: `Page.Header` in the flow, the
-  large title with one sentence of `Page.Description` and the page's save action in `Page.Actions`;
-  optionally a `Page.TopBar collapse` with the path, which repeats the title once it scrolls away.
-- **Overviews** — dashboards: `Page.TopBar collapse` whose `Page.Header` holds only the page's
-  actions (the period, a report), and the titled `Page.Header` in the flow.
+- **Work screens** — a list, a board, a chat, a schedule, a record: `Page.Heading` stands in
+  `Page.TopBar` beside the page's tools and buttons ([the top bar](#the-top-bar)); there is no header
+  in the flow.
+- **Document pages** — settings, a long form, an article or help text: `Page.Header` in the flow
+  holds `Page.Heading` (the large title with one sentence of `Page.Description`) and the page's save
+  action in `Page.Actions`; optionally a `Page.TopBar collapse` with only the path in its
+  `Page.Heading`, which repeats the title once it scrolls away.
+- **Overviews** — dashboards: a `Page.TopBar collapse` with the page's tools (the period) in
+  `Page.Tools` and its buttons (a report) in `Page.Actions`, and the titled `Page.Header` in the flow.
 
-Never two titles; never no `<h1>`.
+Never two titles; never no `<h1>`. A bar whose page shows no title still holds a `Page.Title` — inside
+`VisuallyHidden` — unless a flow `Page.Header` has one.
 
 ```
 AppShell.Root                      once per app (layouts.md#app-frame-once-per-app)
 ├─ AppShell.Nav → Sidebar          navigation rail, one layer above the page
 └─ AppShell.Main                   gutters + top air (24, 32 from 1024px); the page renders here
-   └─ Page.Root                    the page you deliver
-      ├─ Page.TopBar               sticky; led by the menu button while the Sidebar is off-canvas
-      │  ├─ Page.Header            compact title row: only what this page needs
-      │  │  ├─ Breadcrumb.Root     only on a nested record: the path up
-      │  │  ├─ Page.Title          the one h1
-      │  │  ├─ Page.Description    a line of data
-      │  │  └─ Page.Actions        the page's own buttons (export, a more menu)
-      │  └─ Page.Toolbar           second row: search and filter, sections, view,
-      │                            the primary action; Chips under them
-      └─ Page.Body                 blocks 24 apart, starting at main's top air
-         ├─ Page.Grid              every tile of the screen, 16 on both axes
-         │  └─ Page.Cell           span (of 12), rows; the tile fills it
-         └─ Page.Section           a new topic: h2 label (+ Page.Actions), 40 from its neighbours
+   └─ SmartFilter.Root             a filtered page only: the filter's state, no DOM, around the page
+      └─ Page.Root                 the page you deliver
+         ├─ Page.TopBar            sticky; led by the menu button while the Sidebar is off-canvas
+         │  ├─ Page.Heading        the path › the title on one line, the line of data under it
+         │  │  ├─ Breadcrumb.Root  only on a nested record: the levels above this page
+         │  │  ├─ Page.Title       the one h1, the path's last level
+         │  │  └─ Page.Description a line of data
+         │  ├─ Page.Tools          sections, search and filter, view — kit controls in reading order
+         │  ├─ Page.Actions        every button of the page, each with an icon; the primary last
+         │  └─ Page.Chips          SmartFilter.Chips: a line under everything, gone while empty
+         └─ Page.Body              blocks 24 apart, starting at main's top air
+            ├─ Page.Grid           every tile of the screen, 16 on both axes
+            │  └─ Page.Cell        span (of 12), rows; the tile fills it
+            └─ Page.Section        a new topic: h2 label (+ Page.Actions), 40 from its neighbours
 
 Document page or overview: the title in the flow
    └─ Page.Root maxWidth="wide" | "readable"
-      ├─ Page.TopBar collapse      the path or the page's actions; repeats the title once it scrolls away
-      ├─ Page.Header               the one h1, a sentence of description, the page's save action; 24 above the body
+      ├─ Page.TopBar collapse      the path (an overview: its tools and buttons); repeats the title once it scrolls away
+      ├─ Page.Header               Page.Heading (the one h1, a sentence of description) + Page.Actions; 24 above the body
       └─ Page.Body
 ```
 
@@ -85,72 +88,91 @@ Document page or overview: the title in the flow
   block → block 24, section → section 40, tile → tile 16 (and header → body 24). Your CSS lays out
   only the inside of a block.
 
+### The top bar
+
+`Page.TopBar` holds up to four groups and nothing else. Write them in reading order; the DOM and Tab
+order is Heading, Tools, Actions, Chips whatever the JSX order.
+
+- **`Page.Heading`** — the path ends in the title: `Breadcrumb.Root` with the levels above this page,
+  then `Page.Title` with its name, on one line (the heading draws the chevron between them), and
+  `Page.Description` under the whole line. The title is never a row of its own under the path, and
+  the path never repeats the title as its last item.
+- **`Page.Tools`** — the page's own tools as kit controls, in the order a person reads them: sections
+  (a `SegmentedControl` with counts), search and filter (`SmartFilter.Toolbar`), the view or the
+  period. Named with `aria-label`; no buttons and no wrappers inside.
+- **`Page.Actions`** — the one place for the page's buttons: secondary ones (`soft` + `neutral`)
+  first, the primary (`solid`) last. Every Button carries a `Button.Icon` beside its label: the bar
+  shows it as the icon alone when the line runs short.
+- **`Page.Chips`** — `SmartFilter.Chips`: the active filters.
+- `SmartFilter.Root` draws nothing and its toolbar and chips stand in two groups, so it wraps
+  `Page.Root` (or whatever holds both) — never a group of the bar.
+- The bar gives the title its natural size and decides the rest by width:
+  [the page's top bar](responsive.md#the-pages-top-bar--pagetopbar). The classic mistakes, bad →
+  good: [anti-slop.md](anti-slop.md#7b-a-top-bar-out-of-its-groups).
+
 ```tsx
 import {
+  Breadcrumb,
   Button,
-  Dropdown,
   Icon,
   Page,
+  SegmentedControl,
   SmartFilter,
   type SmartFilterField,
   type SmartFilterValue,
 } from "prime-ui-kit";
+import type { ReactNode } from "react";
 
-type OrdersTopBarProps = {
+type DealsPageProps = {
   fields: SmartFilterField[];
   filter: SmartFilterValue;
   onFilterChange: (value: SmartFilterValue) => void;
-  search: string;
-  onSearchChange: (search: string) => void;
+  view: string;
+  onViewChange: (view: string) => void;
+  children: ReactNode;
 };
 
-export function OrdersTopBar({ fields, filter, onFilterChange, search, onSearchChange }: OrdersTopBarProps) {
+export function DealsPage({ fields, filter, onFilterChange, view, onViewChange, children }: DealsPageProps) {
   return (
-    <Page.TopBar>
-      <Page.Header>
-        <Page.Title>Заказы</Page.Title>
-        <Page.Description>128 в работе · 6 ждут оплаты</Page.Description>
-        <Page.Actions>
-          <Dropdown.Root>
-            <Dropdown.Trigger>
-              <Button.Root variant="soft" tone="neutral" aria-label="Другие действия">
-                <Button.Icon>
-                  <Icon name="action.more" />
-                </Button.Icon>
-              </Button.Root>
-            </Dropdown.Trigger>
-            <Dropdown.Content>
-              <Dropdown.Item>Настроить колонки</Dropdown.Item>
-              <Dropdown.Item>Импорт из CSV</Dropdown.Item>
-            </Dropdown.Content>
-          </Dropdown.Root>
-        </Page.Actions>
-      </Page.Header>
-      <SmartFilter.Root
-        fields={fields}
-        value={filter}
-        onValueChange={onFilterChange}
-        search={search}
-        onSearchChange={onSearchChange}
-      >
-        <Page.Toolbar aria-label="Заказы">
-          <Page.ToolbarTools>
+    <SmartFilter.Root fields={fields} value={filter} onValueChange={onFilterChange}>
+      <Page.Root>
+        <Page.TopBar>
+          <Page.Heading>
+            <Breadcrumb.Root>
+              <Breadcrumb.Item href="/clients">Клиенты</Breadcrumb.Item>
+              <Breadcrumb.Item href="/clients/north">ООО «Север»</Breadcrumb.Item>
+            </Breadcrumb.Root>
+            <Page.Title>Сделки</Page.Title>
+            <Page.Description>7 в работе · 6,5 млн ₽</Page.Description>
+          </Page.Heading>
+          <Page.Tools aria-label="Сделки">
             <SmartFilter.Toolbar />
-          </Page.ToolbarTools>
-          <Page.ToolbarActions>
+            <SegmentedControl.Root value={view} onValueChange={onViewChange} aria-label="Вид">
+              <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
+              <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
+            </SegmentedControl.Root>
+          </Page.Tools>
+          <Page.Actions>
+            <Button.Root variant="soft" tone="neutral">
+              <Button.Icon>
+                <Icon name="action.download" />
+              </Button.Icon>
+              Экспорт
+            </Button.Root>
             <Button.Root>
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              Создать заказ
+              Новая сделка
             </Button.Root>
-          </Page.ToolbarActions>
-          <Page.ToolbarChips>
+          </Page.Actions>
+          <Page.Chips>
             <SmartFilter.Chips />
-          </Page.ToolbarChips>
-        </Page.Toolbar>
-      </SmartFilter.Root>
-    </Page.TopBar>
+          </Page.Chips>
+        </Page.TopBar>
+        <Page.Body>{children}</Page.Body>
+      </Page.Root>
+    </SmartFilter.Root>
   );
 }
 ```
@@ -185,7 +207,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 | Text | Use |
 |---|---|
-| page title | `Page.Title` (the only `h1`): `title-s` in the top bar, `heading-m` in the flow |
+| page title | `Page.Title` (the only `h1`): `title-m` in the top bar, `heading-m` in the flow |
 | section heading without a card | `Page.Section label` (an `h2` in `title-m`) |
 | card / panel title | `Card.Title as="h2"` (under the page title) |
 | heading of a group of fields | `Fieldset label` (`title-s` in the `<legend>`) |
@@ -230,7 +252,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   `neutral` in Modal / Drawer footers. Rare actions: a `Dropdown` behind an `action.more` icon button —
   `soft` + `neutral` in a header row (it has a shape beside the other buttons), `ghost` size `s` in a
   table cell.
-- Placement: the page's primary action in `Page.ToolbarActions` of the top bar's `Page.Toolbar` (or last in `Page.Actions` when the page has no toolbar), its other buttons in `Page.Actions` of `Page.Header`; card actions in `Card.Footer`; dialog actions in
+- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a work screen, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; bulk actions in the table toolbar.
 - An empty state's action replaces the header's primary, it does not duplicate it.
 - Destructive: `tone="danger"`; a standalone trigger is `outline`, in a menu it is the last item, the
@@ -268,9 +290,9 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 ### Where the filters go
 
-- The page's tools — its search and filters, sections, the view, the primary action — are the
-  page's: `SmartFilter.Root` around a `Page.Toolbar` in `Page.TopBar`, `SmartFilter.Toolbar`
-  in `Page.ToolbarTools`, `SmartFilter.Chips` in `Page.ToolbarChips` ([the list page](#list-page)).
+- The page's search and filters are the page's: `SmartFilter.Root` around `Page.Root`,
+  `SmartFilter.Toolbar` in the bar's `Page.Tools`, `SmartFilter.Chips` in its `Page.Chips`
+  ([the list page](#list-page)).
   A search alone is the same SmartFilter with `fields={[]}`.
 - The DataTable `toolbar` keeps the table's own tools: `DataTable.ColumnsMenu`, a bulk bar of the
   selected rows. Search and filters go there only when the table is not the page's main region (a
@@ -335,7 +357,7 @@ changes) instead.
 
 - Layouts are [intrinsic](responsive.md#intrinsic-grids) — no breakpoints needed, and they work in
   any container; a media query only in [the breakpoints' scope](responsive.md#breakpoints).
-- From 320px: the page's tools wrap under the page title ([the page's tools](responsive.md#the-pages-tools--pagetoolbar)), side columns drop below the main one,
+- From 320px: the page's tools take a line under the page title ([the page's top bar](responsive.md#the-pages-top-bar--pagetopbar)), side columns drop below the main one,
   pairs of fields stack, tables scroll inside themselves, dialogs stack their footers (built in).
 - Rearrange, never hide: every function of the desktop screen is on the phone — in another place or a
   menu. App sections on phones: `BottomNav` in `AppShell.Footer`; a short task from the bottom
@@ -420,7 +442,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [data-table/examples/screen.tsx](../src/components/data-table/examples/screen.tsx)
 
 - A work screen titles itself in its `Page.TopBar`: `Page.Title` is the only heading, its `Page.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; there is no second header in the flow.
-- The tools are `SmartFilter.Root` around a `Page.Toolbar`, the bar's second row: `SmartFilter.Toolbar` in `Page.ToolbarTools`, `SmartFilter.Chips` in `Page.ToolbarChips`, export (an icon-only `soft` + `neutral` button) and the one primary action (`solid`, last) in `Page.ToolbarActions`. The table itself has no `toolbar`.
+- `SmartFilter.Root` wraps the page: `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`; export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. The table itself has no `toolbar`.
 - A status is a `Badge` with one `tone` per meaning across the product (`STATUS` is one map); the text carries the meaning, the tone repeats it.
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s`: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
@@ -430,9 +452,9 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [description-list/examples/screen.tsx](../src/components/description-list/examples/screen.tsx)
 
-- A nested record titles itself in its `Page.TopBar`: `Page.Header` holds the path up (`Breadcrumb.Root` with the list, «Счета»; the header draws the separator) and `Page.Title` with the record's name; there is no second header in the flow. Top-level pages have no breadcrumb.
+- A nested record titles itself in its `Page.TopBar`: `Page.Heading` holds the path up (`Breadcrumb.Root` with the list, «Счета») ending in `Page.Title` with the record's name on the same line; there is no second header in the flow. Top-level pages have no breadcrumb.
 - The status is words next to the fact that matters now, in `Page.Description` («Отправлен · оплатить до 14 октября»), not a separate plate.
-- The record's actions are `Page.Actions` at the end of the title row, by weight: one primary (`solid`, last), the secondary `soft` + `tone="neutral"`; when the row runs short the trailing secondary ones fold into «⋯» by themselves, the primary stays. Rare and destructive ones live in a `Dropdown` behind an `action.more` icon (also `soft`, so the button has a shape beside its neighbours); voiding is `tone="danger"` at the bottom of the menu.
+- The record's actions are the bar's `Page.Actions`, by weight: one primary (`solid`, last), the secondary `soft` + `tone="neutral"`, each with an icon beside its label. Rare and destructive ones live in a `Dropdown` behind an `action.more` icon (also `soft`, so the button has a shape beside its neighbours); voiding is `tone="danger"` at the bottom of the menu.
 - Columns are a CSS module on flex-wrap without breakpoints: the main one grows, the side one holds ~18rem and drops below when the main one runs out of room.
 - A section without a frame is `Page.Section label`: an h2 heading 16 px above the table; `Card variant="panel"` only for standalone blocks of the side column. A table is already a filled block — never put it in a card.
 - «Label → value» pairs about the client are `DescriptionList.Root orientation="vertical"` with `DescriptionList.Item label`; amounts are tabular figures, the total is larger (`title-m`) and ends where the «Сумма» column ends (the table cell inset).
@@ -442,7 +464,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [page/examples/screen.tsx](../src/layout/page/examples/screen.tsx)
 
-- A document page: `Page.Root maxWidth="wide"`, the large `Page.Title` with a sentence of `Page.Description` in a `Page.Header` in the flow, and a `Page.TopBar collapse` that holds the path and repeats the title once it scrolls away.
+- A document page: `Page.Root maxWidth="wide"`, the large `Page.Title` with a sentence of `Page.Description` in the `Page.Heading` of a `Page.Header` in the flow, and a `Page.TopBar collapse` whose `Page.Heading` holds only the path and repeats the title once it scrolls away.
 - A section is `Page.Section layout="aside"`: a heading column (`label` + a line of `description`) and a `Card variant="panel"` panel; sections are 40 px apart; on a narrow screen the column moves above the panel by itself (flex-wrap, no breakpoints).
 - The form wraps the whole `Card.Root` in `<form noValidate>`; the buttons are in `Card.Footer`: «Отменить изменения» `ghost` + `neutral`, then the primary «Сохранить». While the request runs — `loading` on the button, and one `Fieldset disabled` turns the fields off; the form stays on screen, so success is the button text «Сохранено» for two seconds, without a notification.
 - Fields are 20 px apart; two short related fields side by side while there is width, with `align-items: start` and `reserveSupportRow`, so an error does not shift the neighbour.
@@ -454,8 +476,8 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [drawer/examples/screen.tsx](../src/components/drawer/examples/screen.tsx)
 
-- A work screen titles itself in its `Page.TopBar`: `Page.Title` with the counts in `Page.Description`, the search (`SmartFilter` with `fields={[]}`) in `Page.ToolbarTools`; there is no second header in the flow.
-- The opening button is the page's primary action in `Page.ToolbarActions`; `Drawer.Trigger` wraps it as a slot.
+- A work screen titles itself in its `Page.TopBar`: `Page.Title` with the counts in `Page.Description`, the search (`SmartFilter` with `fields={[]}`) in `Page.Tools`; there is no second header in the flow.
+- The opening button is the page's primary action in `Page.Actions`; `Drawer.Trigger` wraps it as a slot.
 - The form is tied to the footer button through `form={formId}`: `Drawer.Footer` is outside the `<form>`, and submitting still works, by Enter too.
 - Groups are a `Fieldset` without a frame with a `title-s` heading 16 px above the fields; 32 px of air between groups, no dividers. `Fieldset disabled` turns all the fields off while the request runs.
 - Validation on submit: errors in each field's `error`, focus on the first invalid field; mark the minority: required fields are the majority, so `optional` stands only on the optional ones.
@@ -467,7 +489,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [field-list/examples/screen.tsx](../src/components/field-list/examples/screen.tsx)
 
-- A record editor is a document page — a long form read top to bottom in aside sections, like Settings — so its title stands in the flow: `Page.Header` with the title, one line of description and the primary action in `Page.Actions`; no second title anywhere.
+- A record editor is a document page — a long form read top to bottom in aside sections, like Settings — so its title stands in the flow: `Page.Header` with the title and one line of description in `Page.Heading` and the primary action in `Page.Actions`; no second title anywhere.
 - The shape of the data decides the layout: records a person adds and removes are a `FieldList`, one row per record; the column headings stand once above the rows, and the fields in the cells take them as their labels.
 - No label in every row and no numbered one («Преимущество 1»): a one-column list has no headings at all — its section names it ([reorder.tsx](../src/components/field-list/examples/reorder.tsx)).
 - Small attributes of a record go in compact columns of its row: the icon is a `Select` with only `Select.TriggerIcon`, the color `ColorPresets`; the first specs are pinned (`getLocked`) — the lock says so itself, without explanatory text.
@@ -479,8 +501,8 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [card/examples/screen.tsx](../src/components/card/examples/screen.tsx)
 
-- An overview: the large `Page.Title` «Обзор» with a `Page.Description` line of data (what and as of when) in a `Page.Header` in the flow; a `Page.TopBar collapse` above it keeps the page's actions in reach and repeats the title once it scrolls away; the body starts with the tiles.
-- The period is a `SegmentedControl` and the report a `soft` + `neutral` button, both in the bar's `Page.Actions`: the period changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
+- An overview: the large `Page.Title` «Обзор» with a `Page.Description` line of data (what and as of when) in a `Page.Header` in the flow; a `Page.TopBar collapse` above it keeps the page's tools and buttons in reach and repeats the title once it scrolls away; the body starts with the tiles.
+- The period is a `SegmentedControl` in the bar's `Page.Tools` and the report a `soft` + `neutral` button with an icon in its `Page.Actions`: the period changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
 - Every tile of the screen is one `Page.Grid`: KPI `Card variant="stat-trend"` in `Page.Cell span={3}`, 16 px on both axes; `Card.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
 - Another period — other values: each KPI tile is wrapped in `Crossfade state={period}` and flows instead of blinking.
 - A trend over days is a `Sparkline` in a `Card` in a full-width cell: the last value, the change and a line you can scrub with a finger; a new series appears by itself.
@@ -524,7 +546,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [kanban/examples/screen.tsx](../src/components/kanban/examples/screen.tsx)
 
 - The page titles itself in its top bar: `Page.Title` with a `Page.Description` that carries data («7 сделок в работе · 6 461 750 ₽», counted over the filtered deals).
-- Search, filters, the view switch and the one primary action «Новая сделка» are one `Page.Toolbar` inside `SmartFilter.Root`, the bar's second row.
+- Search, filters and the view switch are the bar's `Page.Tools`, the one primary action «Новая сделка» its `Page.Actions`, the active filters its `Page.Chips`; `SmartFilter.Root` wraps the page.
 - The board and the list are the same data: `Kanban` and `DataTable` replace each other through `Crossfade`, the filter is `matchesSmartFilter`.
 - The board is the main area of the page, so its `variant` is the default, `plain`: stages without wells, headers and deal cards stand right on the page — one level of nesting, no frames of your own around the columns.
 - The placement of deals is `value` as `{ [stage]: id[] }`; `onValueChange` returns the request's promise and applies `value` only after the answer; a server refusal returns the card to its place.
@@ -549,7 +571,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [file-upload/examples/screen.tsx](../src/components/file-upload/examples/screen.tsx)
 
 - A work screen titles itself in its top bar: `Page.Title` «Медиатека» with a `Page.Description` naming the object.
-- Sections, search, order and «Загрузить» are one `Page.Toolbar` in `Page.TopBar`: search is a `SmartFilter.Toolbar` with `fields={[]}`, sections a `SegmentedControl` with `SegmentedControl.Count`.
+- Sections, search and order are the bar's `Page.Tools`, «Загрузить» its `Page.Actions`: search is a `SmartFilter.Toolbar` with `fields={[]}`, sections a `SegmentedControl` with `SegmentedControl.Count`.
 - Uploads are `useUploadQueue` + `FileUpload.Root trigger="tile" layout="grid"`: progress, «В очереди», the failure reason and retry are built in, the add tile is also the drop zone; «Загрузить» opens the same picker (`picker.current?.open()`).
 - A finished file leaves the queue for the library: its address is `item.result` of the server's answer, not the queue's `preview`.
 - The library grid is a CSS grid of `Thumbnail` with `fullWidth` and one `ratio`; a video is `Thumbnail.Video`, which draws the duration and the play mark itself. `Gallery` does not fit here: it is an album of up to 10.
@@ -564,7 +586,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - The page titles itself in its top bar: `Page.Title` with a `Page.Description` that carries data («Сотрудников: 9 из 9»).
 - A `fill` page: `Gantt scrollHeight="fill"` takes the free height — the header and the first column stick inside the chart, the page never scrolls sideways.
-- The panel is a `Page.Toolbar` inside `SmartFilter.Root`, the bar's second row: search and the role and client filter first, teams a `SegmentedControl` with counts in `Page.ToolbarSections`, the primary action «Назначить» in `Page.ToolbarActions`, the active filters `SmartFilter.Chips` right under the search. Zoom and «Сегодня» are built into `Gantt` — never add your own.
+- `SmartFilter.Root` wraps the page: search with the role and client filter and teams (a `SegmentedControl` with counts) in `Page.Tools`, the primary action «Назначить» in `Page.Actions`, the active filters `SmartFilter.Chips` in `Page.Chips`. Zoom and «Сегодня» are built into `Gantt` — never add your own.
 - A row is a person: `renderRowAvatar` with an `Avatar`, `renderRow` with the name and role; on a narrow chart the column keeps only the avatar. Overlapping works lay themselves out in lanes, an absence is a `readOnly` bar, a milestone has `start` equal to `end`.
 - `onBarChange` returns a promise and changes the data only after the service answers: while it runs the bar is busy; a refusal (work on an absence) is `notify` and `throw`, and the bar returns to its previous dates by itself.
 - `onBarCreate`: a range drawn on an empty place holds a busy draft while a `Modal` with `Modal.Guard busy` asks for the name and the client; saving adds the bar and resolves the promise, cancel rejects it — the draft dissolves. Work over an absence is refused at once.

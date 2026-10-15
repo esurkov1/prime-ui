@@ -146,7 +146,7 @@ A chart color does one job, and the job picks the colors:
 | `title-m` | 16/24 600 | page section heading (`Page.Section` draws it), modal title |
 | `title-l` | 18/24 600 | large block title |
 | `heading-s` | 20/28 600 | page sub-heading |
-| `heading-m` | 24/32 600 | the page title in the flow (`Page.Title` of a document page or an overview); in `Page.TopBar` the same `Page.Title` is `title-s` |
+| `heading-m` | 24/32 600 | the page title in the flow (`Page.Title` of a document page or an overview); in `Page.TopBar` the same `Page.Title` is `title-m` |
 | `heading-l` | 30/36 600 | marketing / auth title |
 | `display-*` | 36–60 | hero numbers only |
 | `code` | 13/20 mono | identifiers, inline code |
@@ -174,7 +174,7 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
   the [breakpoints and their scope](responsive.md#breakpoints), the
   [intrinsic grids](responsive.md#intrinsic-grids), what the kit adapts by itself and touch.
 - Flex children with text: `min-width: 0` + ellipsis or `overflow-wrap: anywhere`.
-- Sticky parts come from the kit: `Page.TopBar` (with its `Page.Toolbar`), the
+- Sticky parts come from the kit: `Page.TopBar` (with all its groups), the
   DataTable head and `stickyFirstColumn`, the Gantt header and first column — each sticks inside its
   own scroller, and the top ones let go on screens lower than 480px. Never a `position: sticky` bar of your own.
 

@@ -11,6 +11,8 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
+import styles from "./examples.module.css";
+
 type Stage = "new" | "talks" | "won" | "lost";
 type Deal = { id: number; client: string; manager: string; stage: Stage; amount: number };
 type DealsRequest = {
@@ -172,8 +174,10 @@ export default function DataTableServerExample() {
           search={search}
           onSearchChange={changeSearch}
         >
-          <SmartFilter.Toolbar />
-          <SmartFilter.Chips />
+          <div className={styles.filterColumn}>
+            <SmartFilter.Toolbar />
+            <SmartFilter.Chips />
+          </div>
         </SmartFilter.Root>
       }
     />

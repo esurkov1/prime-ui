@@ -1,6 +1,8 @@
 /** An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and marks the match in accent — `finite`, `icon`, `collapsedLimit`. */
 import { Icon, SmartFilter, type SmartFilterField } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 const SERVICES = [
   "access-policy",
   "billing",
@@ -41,13 +43,15 @@ const FIELDS: SmartFilterField[] = [
 
 export default function SmartFilterManyValuesExample() {
   return (
-    <SmartFilter.Root
-      fields={FIELDS}
-      collapsedLimit={8}
-      defaultValue={{ service: { include: [], exclude: ["events"] } }}
-    >
-      <SmartFilter.Toolbar />
-      <SmartFilter.Chips />
-    </SmartFilter.Root>
+    <div className={styles.stack}>
+      <SmartFilter.Root
+        fields={FIELDS}
+        collapsedLimit={8}
+        defaultValue={{ service: { include: [], exclude: ["events"] } }}
+      >
+        <SmartFilter.Toolbar />
+        <SmartFilter.Chips />
+      </SmartFilter.Root>
+    </div>
   );
 }

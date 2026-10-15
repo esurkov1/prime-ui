@@ -11,6 +11,15 @@
   min-width: 0;
 }
 
+/* A SmartFilter in the toolbar: the search and filter row over the applied filters. */
+.filterColumn {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
 .filters {
   display: flex;
   flex: 1 1 auto;

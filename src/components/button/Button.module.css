@@ -68,6 +68,28 @@
   padding-inline: 0;
 }
 
+/*
+ * A host short of width (the page's top bar) marks a wrapper `data-button-label="icon"`: a button
+ * with an icon and a label inside it shows only its icon, square like an icon-only button. The
+ * label stays in the DOM, laid over the button and transparent, so it remains the button's
+ * accessible name.
+ */
+:where([data-button-label="icon"])
+  .root:is([data-leading-icon="true"], [data-trailing-icon="true"]) {
+  width: var(--btn-h);
+  padding-inline: 0;
+}
+
+:where([data-button-label="icon"])
+  .root:is([data-leading-icon="true"], [data-trailing-icon="true"])
+  .label {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* A circle: the disk itself is the control — width = height of the tier, full radius. The focus
    ring (outline) follows the radius; the touch area follows the circle below, the press is the
    compact one. */

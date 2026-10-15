@@ -12,7 +12,7 @@
 ## When not to use
 - More than six destinations or nested sections → use [Sidebar](../sidebar/COMPONENT.md) (off-canvas on a phone), put the rest under «Ещё».
 - Switching views inside one page → use [Tabs](../../components/tabs/COMPONENT.md) or [SegmentedControl](../../components/segmented-control/COMPONENT.md).
-- Several actions (create, filter, export) → use [Button](../../components/button/COMPONENT.md) in the page's top bar ([Page](../page/COMPONENT.md): `Page.Actions`, `Page.ToolbarActions`); the bar holds at most one main action (`BottomNav.Action`).
+- Several actions (create, filter, export) → use [Button](../../components/button/COMPONENT.md) in the page's top bar ([Page](../page/COMPONENT.md): `Page.Actions`); the bar holds at most one main action (`BottomNav.Action`).
 
 ## Import
 ```tsx

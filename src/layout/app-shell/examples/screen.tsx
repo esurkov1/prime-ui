@@ -189,14 +189,14 @@ export default function AppShellScreenExample() {
         {/* On a phone the bar leads with the menu button that opens the Sidebar by itself. */}
         <Page.TopBar>
           {/* Every page titles itself here: the only h1 and a line of data under it. */}
-          <Page.Header>
+          <Page.Heading>
             <Page.Title>{section.label}</Page.Title>
             <Page.Description>
               {current === "today"
                 ? `Среда, 14 октября · открытых задач: ${openTasks}`
                 : PAGES[current].description}
             </Page.Description>
-          </Page.Header>
+          </Page.Heading>
         </Page.TopBar>
         {/* Another section is another page: it cross-fades instead of flipping. */}
         <Crossfade state={current}>

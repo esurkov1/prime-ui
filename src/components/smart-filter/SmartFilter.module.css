@@ -2,13 +2,6 @@
  * SmartFilter is assembled from kit parts (Button, Badge, Input, Popover, Divider, Typography,
  * Kbd, EmptyPage); this file only lays them out.
  */
-.root {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-  width: 100%;
-  min-width: 0;
-}
 
 /*
  * Filter button + search on one row of controls. The search grows from 9rem; when less than that

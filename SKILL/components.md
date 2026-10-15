@@ -150,7 +150,7 @@ The frame and structure of a screen: app shell, the page (its top bar, header, t
 | Component | Purpose | Docs |
 |---|---|---|
 | AppShell | The app frame — navigation and the page: a content panel that is the page itself and a navigation rail one layer above it. | [COMPONENT.md](../src/layout/app-shell/COMPONENT.md) · [examples](../src/layout/app-shell/examples/) |
-| Page | The page inside the app frame: everything at the top belongs to it — a top bar with the title, actions and tools, the large document title in the flow — then sections, the tile grid and the list + detail layout. | [COMPONENT.md](../src/layout/page/COMPONENT.md) · [examples](../src/layout/page/examples/) |
+| Page | The page inside the app frame: everything at the top belongs to it — a top bar with the title, tools and buttons, the large document title in the flow — then sections, the tile grid and the list + detail layout. | [COMPONENT.md](../src/layout/page/COMPONENT.md) · [examples](../src/layout/page/examples/) |
 | Divider | A hairline separator inside one surface, horizontal or vertical, with or without a label. | [COMPONENT.md](../src/components/divider/COMPONENT.md) · [examples](../src/components/divider/examples/) |
 | ScrollContainer | The kit's one scroll region: a thin scrollbar, soft edges wherever content is hidden, and correct shrinking inside flex and grid parents. | [COMPONENT.md](../src/components/scroll-container/COMPONENT.md) · [examples](../src/components/scroll-container/examples/) |
 | LoginForm | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. | [COMPONENT.md](../src/components/login-form/COMPONENT.md) · [examples](../src/components/login-form/examples/) |

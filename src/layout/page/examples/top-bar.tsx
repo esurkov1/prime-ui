@@ -1,39 +1,86 @@
-/** A nested record in the top bar: the path, the record as the page title with its line of data, its actions at the end, the page's tools as the second row — `Page.TopBar`, `Page.Toolbar`. */
-import { Breadcrumb, Button, Icon, Page, SegmentedControl, Select } from "prime-ui-kit";
+/** A nested record in the top bar: the path ending in the title, a line of data, the page's tools, its buttons and the active filters — `Page.TopBar`, `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips`. */
+import {
+  Breadcrumb,
+  Button,
+  Icon,
+  Page,
+  SegmentedControl,
+  SmartFilter,
+  type SmartFilterField,
+  type SmartFilterValue,
+} from "prime-ui-kit";
 import * as React from "react";
 
 const SECTIONS = [
-  { value: "deals", label: "Сделки" },
-  { value: "contacts", label: "Контакты" },
-  { value: "documents", label: "Документы" },
+  { value: "all", label: "Все" },
+  { value: "mine", label: "Мои" },
+  { value: "overdue", label: "Просрочены" },
 ];
 
-const PERIODS = [
-  { value: "month", label: "Октябрь" },
-  { value: "quarter", label: "IV квартал" },
-  { value: "year", label: "2026 год" },
+const VIEWS = [
+  { value: "board", label: "Доска" },
+  { value: "list", label: "Список" },
+];
+
+const FIELDS: SmartFilterField[] = [
+  {
+    key: "owner",
+    label: "Ответственный",
+    options: [
+      { value: "anna", label: "Анна К." },
+      { value: "ivan", label: "Иван П." },
+    ],
+  },
 ];
 
 export default function PageTopBarExample() {
-  const [section, setSection] = React.useState("deals");
-  const [period, setPeriod] = React.useState("month");
+  const [section, setSection] = React.useState("all");
+  const [view, setView] = React.useState("board");
+  const [filter, setFilter] = React.useState<SmartFilterValue>({
+    owner: { include: ["anna"], exclude: [] },
+  });
 
   return (
-    <Page.Root>
-      <Page.TopBar sticky={false}>
-        <Page.Header>
-          <Breadcrumb.Root>
-            <Breadcrumb.Item href="#crm">CRM</Breadcrumb.Item>
-            <Breadcrumb.Item href="#clients">Клиенты</Breadcrumb.Item>
-          </Breadcrumb.Root>
-          <Page.Title>ООО «Север»</Page.Title>
-          <Page.Description>Клиент с 2021 года · 4 сделки</Page.Description>
+    <SmartFilter.Root fields={FIELDS} value={filter} onValueChange={setFilter}>
+      <Page.Root>
+        <Page.TopBar sticky={false}>
+          <Page.Heading>
+            <Breadcrumb.Root>
+              <Breadcrumb.Item href="#clients">Клиенты</Breadcrumb.Item>
+              <Breadcrumb.Item href="#north">ООО «Север»</Breadcrumb.Item>
+            </Breadcrumb.Root>
+            <Page.Title>Сделка № 2026-418</Page.Title>
+            <Page.Description>7 в работе · 6,5 млн ₽ · обновлено 9:40</Page.Description>
+          </Page.Heading>
+          <Page.Tools aria-label="Сделка № 2026-418">
+            <SegmentedControl.Root value={section} onValueChange={setSection} aria-label="Раздел">
+              {SECTIONS.map((item) => (
+                <SegmentedControl.Item key={item.value} value={item.value}>
+                  {item.label}
+                </SegmentedControl.Item>
+              ))}
+            </SegmentedControl.Root>
+            <SmartFilter.Toolbar />
+            <SegmentedControl.Root value={view} onValueChange={setView} aria-label="Вид">
+              {VIEWS.map((item) => (
+                <SegmentedControl.Item key={item.value} value={item.value}>
+                  {item.label}
+                </SegmentedControl.Item>
+              ))}
+            </SegmentedControl.Root>
+          </Page.Tools>
           <Page.Actions>
             <Button.Root variant="soft" tone="neutral">
               <Button.Icon>
-                <Icon name="action.send" />
+                <Icon name="action.forward" />
               </Button.Icon>
-              Написать
+              Поделиться
+            </Button.Root>
+            <Button.Root variant="soft" tone="neutral">
+              <Button.Icon>
+                <Icon name="action.download" />
+              </Button.Icon>
+              Экспорт
             </Button.Root>
             <Button.Root>
               <Button.Icon>
@@ -42,41 +89,11 @@ export default function PageTopBarExample() {
               Новая сделка
             </Button.Root>
           </Page.Actions>
-        </Page.Header>
-        <Page.Toolbar aria-label="ООО «Север»">
-          <Page.ToolbarSections>
-            <SegmentedControl.Root
-              fullWidth
-              value={section}
-              onValueChange={setSection}
-              aria-label="Раздел"
-            >
-              {SECTIONS.map((item) => (
-                <SegmentedControl.Item key={item.value} value={item.value}>
-                  {item.label}
-                </SegmentedControl.Item>
-              ))}
-            </SegmentedControl.Root>
-          </Page.ToolbarSections>
-          <Page.ToolbarView>
-            <Select.Root value={period} onValueChange={setPeriod}>
-              <Select.Trigger aria-label="Период">
-                <Select.TriggerIcon>
-                  <Icon name="field.calendar" />
-                </Select.TriggerIcon>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content>
-                {PERIODS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          </Page.ToolbarView>
-        </Page.Toolbar>
-      </Page.TopBar>
-    </Page.Root>
+          <Page.Chips>
+            <SmartFilter.Chips />
+          </Page.Chips>
+        </Page.TopBar>
+      </Page.Root>
+    </SmartFilter.Root>
   );
 }

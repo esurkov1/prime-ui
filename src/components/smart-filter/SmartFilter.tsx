@@ -226,10 +226,7 @@ const [SmartFilterProvider, useSmartFilter] = createComponentContext<Ctx>("Smart
 // Root
 // ---------------------------------------------------------------------------------------------
 
-export type SmartFilterRootProps = Omit<
-  React.HTMLAttributes<HTMLDivElement>,
-  "children" | "defaultValue" | "onChange"
-> & {
+export type SmartFilterRootProps = {
   fields: readonly SmartFilterField[];
   value?: SmartFilterValue;
   defaultValue?: SmartFilterValue;
@@ -241,7 +238,6 @@ export type SmartFilterRootProps = Omit<
   collapsedLimit?: number;
   labels?: Partial<SmartFilterLabels>;
   children: React.ReactNode;
-  ref?: React.Ref<HTMLDivElement>;
 };
 
 const EMPTY_VALUE: SmartFilterValue = {};
@@ -257,10 +253,7 @@ function SmartFilterRoot({
   size: sizeProp,
   collapsedLimit = 12,
   labels,
-  className,
   children,
-  ref,
-  ...rest
 }: SmartFilterRootProps) {
   const { size, provide } = useHostTier(sizeProp);
   const mergedLabels = useLabels(SMART_FILTER_LABELS, labels);
@@ -297,9 +290,7 @@ function SmartFilterRoot({
   return provide(
     <SmartFilterProvider value={context}>
       <Popover.Root open={open} onOpenChange={setOpen}>
-        <div {...rest} ref={ref} className={cx(styles.root, className)} data-size={size}>
-          {children}
-        </div>
+        {children}
       </Popover.Root>
     </SmartFilterProvider>,
   );

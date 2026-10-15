@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "SmartFilter.Root",
-      en: "`ref` → `HTMLDivElement`. A `<div>` (flex column) with the state and the context; sets `data-size`.",
-      ru: "`<div>` (колонка) с состоянием и контекстом; ставит `data-size`.",
+      en: "No DOM, no ref. The value, the search and the panel state shared by its parts; the host places the parts.",
+      ru: "Значение, поиск и состояние панели, общие для частей; своего DOM нет, части расставляет контейнер.",
       props: [
         {
           name: "fields",
@@ -77,14 +77,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "`SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside.",
-          ru: "`SmartFilter.Toolbar` и `SmartFilter.Chips` в любом месте внутри.",
-        },
-        {
-          name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onChange">',
-          en: "`className` and the other div attributes.",
-          ru: "`className` и остальные атрибуты div.",
+          en: "`SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside — in a page bar the Root wraps `Page.Root`.",
+          ru: "`SmartFilter.Toolbar` и `SmartFilter.Chips` в любом месте внутри — в полосе страницы Root оборачивает `Page.Root`.",
         },
       ],
     },

@@ -38,18 +38,18 @@ export default function AppShellOverviewExample() {
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>
-              <Page.Header>
+              <Page.Heading>
                 <Page.Title>Обзор</Page.Title>
                 <Page.Description>Октябрь · 37 сделок в работе</Page.Description>
-                <Page.Actions>
-                  <Button.Root>
-                    <Button.Icon>
-                      <Icon name="action.add" />
-                    </Button.Icon>
-                    Новая сделка
-                  </Button.Root>
-                </Page.Actions>
-              </Page.Header>
+              </Page.Heading>
+              <Page.Actions>
+                <Button.Root>
+                  <Button.Icon>
+                    <Icon name="action.add" />
+                  </Button.Icon>
+                  Новая сделка
+                </Button.Root>
+              </Page.Actions>
             </Page.TopBar>
             <Page.Body>
               <Typography variant="body-m" tone="secondary">

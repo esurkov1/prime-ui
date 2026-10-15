@@ -82,10 +82,10 @@
     {
       "id": 7,
       "prompt": "Сделай страницу поиска клиентов: поле поиска, под ним таблица результатов. Сервера пока нет — сымитируй запрос задержкой в полсекунды.",
-      "expected_output": "SmartFilter with fields={[]} in the page's Page.Toolbar, a DataTable with loading; the simulated request is cancelled when the query changes, so a slow answer never replaces a newer one.",
+      "expected_output": "SmartFilter with fields={[]} around the page, its toolbar in Page.Tools of the page's Page.TopBar, a DataTable with loading; the simulated request is cancelled when the query changes, so a slow answer never replaces a newer one.",
       "files": [],
       "expectations": [
-        "The search is a SmartFilter (fields={[]}) in the page's Page.Toolbar inside Page.TopBar, not a bare Input above the table",
+        "The search is a SmartFilter (fields={[]}): SmartFilter.Root wraps Page.Root and SmartFilter.Toolbar stands in Page.Tools inside Page.TopBar, not a bare Input above the table",
         "The simulated request (setTimeout) is cleared, or its answer dropped, when the query changes again — in the effect's cleanup or through an AbortController",
         "While a request runs the table keeps its rows with loading, and an empty result offers to reset the search"
       ]
@@ -97,9 +97,26 @@
       "files": [],
       "expectations": [
         "The frame holds no open / onOpenChange state for the Sidebar and no hand-made menu button with aria-expanded or onClick",
-        "The «Сделки» page renders its own Page.Root with Page.Title in Page.Header inside Page.TopBar; the frame has no header of its own",
+        "The «Сделки» page renders its own Page.Root with Page.Title in Page.Heading inside Page.TopBar; the frame has no header of its own",
         "Every Sidebar.Item is a link (href or asChild) with a Sidebar.ItemIcon, and current marks the open page",
-        "«Новая сделка» is the page's one primary action in its top bar (Page.ToolbarActions or Page.Actions)"
+        "«Новая сделка» is the page's one primary action in its top bar (Page.Actions of Page.TopBar), with a Button.Icon beside its label"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Сделай страницу сделки клиента ООО «Север»: путь Клиенты → ООО «Север» → Сделка № 2026-418, под заголовком строка «7 в работе · 6,5 млн ₽». Нужны разделы (Все / Мои / Просрочены), поиск с фильтром по ответственному, переключатель Доска / Список, кнопки «Поделиться», «Экспорт» и главная «Новая сделка», активные фильтры чипами. На узком экране ничего не должно вылезать.",
+      "expected_output": "SmartFilter.Root wraps Page.Root; Page.TopBar holds Page.Heading (Breadcrumb.Root with Клиенты and ООО «Север», then Page.Title «Сделка № 2026-418», Page.Description with the figures), Page.Tools (the sections SegmentedControl, SmartFilter.Toolbar, the view SegmentedControl), one Page.Actions with all three buttons, each with a Button.Icon, the primary last, and Page.Chips with SmartFilter.Chips; no width code of its own.",
+      "files": [],
+      "expectations": [
+        "The path ends in the title: Breadcrumb.Root lists only Клиенты and ООО «Север», and Page.Title «Сделка № 2026-418» follows it inside the same Page.Heading — no title on a separate row, no breadcrumb item repeating the title",
+        "Page.Description under the title carries the figures «7 в работе · 6,5 млн ₽»",
+        "The sections, SmartFilter.Toolbar and the view switch stand in one Page.Tools with an aria-label, in reading order; no fullWidth written on the SegmentedControls",
+        "«Поделиться», «Экспорт» and «Новая сделка» are all in one Page.Actions — no button in Page.Heading or Page.Tools; the secondary ones are soft + neutral, «Новая сделка» is the solid one and last",
+        "Every button in Page.Actions has a Button.Icon beside its text label",
+        "SmartFilter.Chips stands in Page.Chips",
+        "SmartFilter.Root wraps Page.Root (outside Page.TopBar), not a group inside the bar",
+        "There is exactly one Page.Title (the h1) and no size prop, className or CSS that sizes the title",
+        "The screen adds no media queries, ResizeObserver or own «⋯» menu for the bar — narrowing is left to Page.TopBar"
       ]
     }
   ]

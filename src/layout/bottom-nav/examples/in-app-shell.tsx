@@ -19,9 +19,9 @@ export default function BottomNavInAppShellExample() {
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>
-              <Page.Header>
+              <Page.Heading>
                 <Page.Title>Заказы</Page.Title>
-              </Page.Header>
+              </Page.Heading>
             </Page.TopBar>
             <Page.Body>
               {ORDERS.map((order) => (

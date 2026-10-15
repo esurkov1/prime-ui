@@ -79,10 +79,13 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 ## Page title and header
 
 - The app is navigation and the page: everything at the top belongs to the page's `<Page.Root>` — not an app-wide header, a global search or notifications above every page.
-- A work screen (a list, a board, a chat, a record) titles itself in `<Page.TopBar>`: `<Page.Header>` with `<Page.Title>` + `<Page.Description>` carrying a line of data («128 в работе · 6 ждут оплаты») — not a sentence about the page.
-- The page's tools — its own search and filter, sections, the view, the primary action — are a `<Page.Toolbar>` beside `<Page.Header>` in `<Page.TopBar>`; the page's other buttons in `<Page.Actions>` of the header, where trailing secondary ones fold into «⋯» by themselves.
-- A nested record: `<Breadcrumb.Root>` first in `<Page.Header>`, then `<Page.Title>` with the record's name — the header draws the separator; not a breadcrumb in the body.
-- A document page (settings, a long form, help) and an overview (a dashboard) put `<Page.Header>` in the flow — the large title — with an optional `<Page.TopBar collapse>` above it that repeats the title once it scrolls away. One `<Page.Title>` per page — never two titles, never no `<h1>`.
+- A work screen (a list, a board, a chat, a record) titles itself in `<Page.TopBar>`: `<Page.Heading>` with `<Page.Title>` + `<Page.Description>` carrying a line of data («128 в работе · 6 ждут оплаты») — not a sentence about the page.
+- The bar holds only its four groups: `<Page.Heading>`, `<Page.Tools aria-label>` (sections, `<SmartFilter.Toolbar />`, the view — in reading order), `<Page.Actions>`, `<Page.Chips>` (`<SmartFilter.Chips />`) — not a hand-made flex row of title, tabs, search and buttons ([the top bar](composition.md#the-top-bar)).
+- A nested record: `<Breadcrumb.Root>` first in `<Page.Heading>`, then `<Page.Title>` with the record's name — the path ends in the title on one line; not a title row under the path, not a breadcrumb in the body.
+- Every button of the page goes into one `<Page.Actions>`, secondary first, the primary last, each with a `<Button.Icon>` beside its label — not buttons split between two places, not a button with only text.
+- A filtered page: `<SmartFilter.Root>` wraps `<Page.Root>` — it draws nothing; not `SmartFilter.Root` inside the bar.
+- No size knob on the title: the bar sizes the heading and gives way by width itself ([the five steps](responsive.md#the-pages-top-bar--pagetopbar)).
+- A document page (settings, a long form, help) and an overview (a dashboard) put `<Page.Header>` with its `<Page.Heading>` in the flow — the large title — with an optional `<Page.TopBar collapse>` above it that repeats the title once it scrolls away. One `<Page.Title>` per page — never two titles, never no `<h1>`.
 
 ## Cards and surfaces
 
@@ -96,7 +99,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Tables
 
-- A list page is a `<DataTable columns rows getRowKey>` under the page's `<SmartFilter.Root fields value onValueChange>` with `<SmartFilter.Toolbar />` + `<SmartFilter.Chips />` in its `Page.Toolbar` ([where the filters go](composition.md#where-the-filters-go)); filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
+- A list page is a `<DataTable columns rows getRowKey>` under the page's `<SmartFilter.Root fields value onValueChange>` with `<SmartFilter.Toolbar />` in its `Page.Tools` and `<SmartFilter.Chips />` in its `Page.Chips` ([where the filters go](composition.md#where-the-filters-go)); filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
 - Search over a table or a list page is always SmartFilter, even with no filter fields yet (`fields={[]}` is a plain search that grows into filters). A search `Input` only outside a filtered list: inside a picker, a settings section, a panel.
 - Paging is built in: `paging="pages"` (default) with `pageSize`, `paging="infinite"` for feeds, `paging="none"` for short lists — not a separate `<Pagination>` under a DataTable.
 - Long lists are virtualized inside the kit: pass the whole array to `DataTable` (with `scrollHeight` or `paging="infinite"`; over 100 rows — grouped, `onReorder` and `renderExpanded` bodies render every row, keep those short or paged), `TagSelect options`, `Chat.Messages items`, `Gantt rows` — never slice it by hand, never wrap a kit list in react-window / react-virtual or your own windowing. Big remote data is still paged or loaded on scroll by the server (`source="server"`, `onLoadMore`).
@@ -184,7 +187,6 @@ State change is continuous in the whole kit: every region that changes what it s
 
 Full rules: [responsive.md](responsive.md).
 
-- The page's tools are `<Page.Toolbar>` with `Page.ToolbarTools` (`SmartFilter.Toolbar`), `Page.ToolbarSections` (a `fullWidth` SegmentedControl), `Page.ToolbarView`, `Page.ToolbarActions`, `Page.ToolbarChips` — it orders and wraps them itself ([the page's tools](responsive.md#the-pages-tools--pagetoolbar)); not a hand-made flex row of tabs, search and buttons.
 - Rearrange, never hide: every desktop function is on the phone, in another place or a menu — not `display: none` below a breakpoint.
 - Breakpoints only in [their scope](responsive.md#breakpoints); inside a page — [intrinsic grids](responsive.md#intrinsic-grids) and container queries.
 - A wide table scrolls inside itself; offer `DataTable.ColumnsMenu` in its `toolbar` — never drop columns by breakpoint, never hand-build the chooser.
@@ -193,7 +195,7 @@ Full rules: [responsive.md](responsive.md).
 - App sections on phones: `BottomNav` in `AppShell.Footer` — not in Main, not `position: fixed`, no own media query: the shell hides the footer while the Sidebar rail is on screen; a short task from the bottom edge: `Sheet` — Select, Dropdown, Popover and Modal become sheets below 640 by themselves.
 - Your hover styles inside `@media (hover: hover)`; nothing hover-only. Do not wrap kit fields to raise their text for iOS — they keep 16px on touch already.
 - A long form saves through the panel action with a count («Сохранить 3 изменения») — not a sticky bar at the bottom of a phone.
-- Sticky comes from the kit (`Page.TopBar` with its `Page.Toolbar`, the DataTable head, `stickyFirstColumn`, the Gantt header) — not your own `position: sticky` bar.
+- Sticky comes from the kit (`Page.TopBar`, the DataTable head, `stickyFirstColumn`, the Gantt header) — not your own `position: sticky` bar.
 
 ## Spacing and values
 
@@ -242,7 +244,9 @@ export function ProfilePage() {
   return (
     <Page.Root maxWidth="readable">
       <Page.Header>
-        <Page.Title>Профиль</Page.Title>
+        <Page.Heading>
+          <Page.Title>Профиль</Page.Title>
+        </Page.Heading>
       </Page.Header>
       <Page.Body>
         <form className={styles.form} noValidate onSubmit={(event) => event.preventDefault()}>

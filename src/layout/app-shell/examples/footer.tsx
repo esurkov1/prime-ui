@@ -28,9 +28,9 @@ export default function AppShellFooterExample() {
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>
-              <Page.Header>
+              <Page.Heading>
                 <Page.Title>Счета</Page.Title>
-              </Page.Header>
+              </Page.Heading>
             </Page.TopBar>
             <Page.Body>
               {INVOICES.map((invoice) => (

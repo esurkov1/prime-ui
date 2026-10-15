@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
 import { Button } from "@/components/button/Button";
+import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
+import { Icon } from "@/icons";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { cssRule, cssRules, cssValue } from "@/test/css";
 
@@ -28,13 +30,25 @@ function PhoneShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Each element follows the one before it in the document. */
+function expectInOrder(elements: HTMLElement[]) {
+  for (let i = 1; i < elements.length; i++) {
+    expect(
+      (elements[i - 1] as HTMLElement).compareDocumentPosition(elements[i] as HTMLElement) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  }
+}
+
 describe("Page", () => {
   it("renders the title as the one h1, the description and the body", () => {
     render(
       <Page.Root>
         <Page.Header>
-          <Page.Title>Заказы</Page.Title>
-          <Page.Description>128 в работе</Page.Description>
+          <Page.Heading>
+            <Page.Title>Заказы</Page.Title>
+            <Page.Description>128 в работе</Page.Description>
+          </Page.Heading>
         </Page.Header>
         <Page.Body>
           <span>Контент</span>
@@ -58,48 +72,95 @@ describe("Page", () => {
     expect(screen.getByRole("region", { name: "Заказы" })).toBeInTheDocument();
   });
 
-  it("the header follows its place: compact in the bar, the document header in the flow", () => {
+  it("the heading follows its place: in the bar, or in the flow under Page.Header", () => {
     render(
       <Page.Root>
         <Page.TopBar>
-          <Page.Header data-testid="bar">
-            <Page.Actions>
-              <button type="button">Экспорт</button>
-            </Page.Actions>
-          </Page.Header>
+          <Page.Heading data-testid="bar">
+            <Breadcrumb.Root>
+              <Breadcrumb.Item href="#settings">Настройки</Breadcrumb.Item>
+            </Breadcrumb.Root>
+          </Page.Heading>
         </Page.TopBar>
-        <Page.Header data-testid="flow">
-          <Page.Title>Настройки</Page.Title>
+        <Page.Header data-testid="header">
+          <Page.Heading data-testid="flow">
+            <Page.Title>Уведомления</Page.Title>
+          </Page.Heading>
         </Page.Header>
       </Page.Root>,
     );
     expect(screen.getByTestId("bar")).toHaveAttribute("data-place", "bar");
     expect(screen.getByTestId("flow")).toHaveAttribute("data-place", "flow");
-    expect(screen.getByTestId("flow")).not.toHaveAttribute("data-has-actions");
-    expect(screen.getByTestId("bar")).toHaveAttribute("data-has-actions", "true");
+    expect(screen.getByTestId("header").closest("header")).toBeNull();
+    expect(screen.getByTestId("header")).not.toHaveAttribute("data-has-actions");
   });
 
-  it("header: the path first, then a separator and the title in the bar; actions at the end", () => {
+  it("Header in the flow: the heading, then its actions, whatever the JSX order", () => {
+    render(
+      <Page.Header data-testid="header">
+        <Page.Actions>
+          <Button.Root>Сохранить</Button.Root>
+        </Page.Actions>
+        <Page.Heading>
+          <Page.Title>Уведомления</Page.Title>
+        </Page.Heading>
+      </Page.Header>,
+    );
+    const header = screen.getByTestId("header");
+    expect(header).toHaveAttribute("data-has-actions", "true");
+    expectInOrder([
+      screen.getByRole("heading", { level: 1 }),
+      screen.getByRole("button", { name: "Сохранить" }),
+    ]);
+  });
+
+  it("in the bar the title is the path's last level: path › title with one chevron", () => {
     render(
       <Page.TopBar>
-        <Page.Header data-testid="header">
-          <Page.Actions>
-            <button type="button">Написать</button>
-          </Page.Actions>
+        <Page.Heading data-testid="heading">
           <Page.Title>ООО «Север»</Page.Title>
+          <Page.Description>7 сделок</Page.Description>
           <Breadcrumb.Root>
             <Breadcrumb.Item href="#clients">Клиенты</Breadcrumb.Item>
           </Breadcrumb.Root>
-        </Page.Header>
+        </Page.Heading>
       </Page.TopBar>,
     );
-    const header = screen.getByTestId("header");
-    const [heading, actions] = Array.from(header.children);
+    const heading = screen.getByTestId("heading");
+    const line = heading.firstElementChild as HTMLElement;
     const path = screen.getByRole("navigation");
-    expect(heading?.firstElementChild).toContainElement(path);
-    expect(heading?.querySelector('[role="separator"]')).not.toBeNull();
-    expect(heading).toContainElement(screen.getByRole("heading", { level: 1 }));
-    expect(actions).toContainElement(screen.getByRole("button", { name: "Написать" }));
+    const title = screen.getByRole("heading", { level: 1 });
+    expect(line).toContainElement(path);
+    expect(line).toContainElement(title);
+    expectInOrder([path, title]);
+    const chevrons = line.querySelectorAll(':scope > [aria-hidden="true"]');
+    expect(chevrons).toHaveLength(1);
+    expectInOrder([path, chevrons[0] as HTMLElement, title]);
+    // The description stands under the whole line.
+    expect(line).not.toContainElement(screen.getByText("7 сделок"));
+    expect(heading.lastElementChild).toBe(screen.getByText("7 сделок"));
+  });
+
+  it("no chevron without a path, or without a title", () => {
+    const { container, rerender } = render(
+      <Page.TopBar>
+        <Page.Heading>
+          <Page.Title>Заказы</Page.Title>
+        </Page.Heading>
+      </Page.TopBar>,
+    );
+    const chevron = () => container.querySelector('[data-place="bar"] [aria-hidden="true"]');
+    expect(chevron()).toBeNull();
+    rerender(
+      <Page.TopBar>
+        <Page.Heading>
+          <Breadcrumb.Root>
+            <Breadcrumb.Item href="#settings">Настройки</Breadcrumb.Item>
+          </Breadcrumb.Root>
+        </Page.Heading>
+      </Page.TopBar>,
+    );
+    expect(chevron()).toBeNull();
   });
 
   it("the top bar is a sticky <header> in main", () => {
@@ -121,9 +182,9 @@ describe("Page", () => {
       <PhoneShell>
         <Page.Root>
           <Page.TopBar>
-            <Page.Header>
+            <Page.Heading>
               <Page.Title>Заказы</Page.Title>
-            </Page.Header>
+            </Page.Heading>
           </Page.TopBar>
         </Page.Root>
       </PhoneShell>,
@@ -173,22 +234,34 @@ describe("Page", () => {
     expect(screen.queryByRole("button", { name: "Открыть меню" })).not.toBeInTheDocument();
   });
 
-  it("Tab follows the reading order: menu, the title row's actions, then the toolbar", async () => {
+  it("renders the groups as Heading, Tools, Actions, Chips whatever the JSX order", () => {
+    render(
+      <Page.TopBar>
+        <Page.Chips data-testid="chips">Фильтры</Page.Chips>
+        <Page.Actions data-testid="actions" />
+        <Page.Tools data-testid="tools" />
+        <Page.Heading data-testid="heading">
+          <Page.Title>Сделки</Page.Title>
+        </Page.Heading>
+      </Page.TopBar>,
+    );
+    expectInOrder(["heading", "tools", "actions", "chips"].map((id) => screen.getByTestId(id)));
+  });
+
+  it("Tab follows the reading order: menu, tools, then the page's buttons", async () => {
     render(
       <PhoneShell>
         <Page.Root>
           <Page.TopBar>
-            <Page.Header>
+            <Page.Actions>
+              <Button.Root>Создать</Button.Root>
+            </Page.Actions>
+            <Page.Tools>
+              <button type="button">Период</button>
+            </Page.Tools>
+            <Page.Heading>
               <Page.Title>Сделки</Page.Title>
-              <Page.Actions>
-                <Button.Root>Создать</Button.Root>
-              </Page.Actions>
-            </Page.Header>
-            <Page.Toolbar>
-              <Page.ToolbarView>
-                <button type="button">Период</button>
-              </Page.ToolbarView>
-            </Page.Toolbar>
+            </Page.Heading>
           </Page.TopBar>
         </Page.Root>
       </PhoneShell>,
@@ -196,9 +269,52 @@ describe("Page", () => {
     // The closed panel before it is `inert` (jsdom does not skip inert content).
     screen.getByRole("button", { name: "Открыть меню" }).focus();
     await userEvent.tab();
-    expect(screen.getByRole("button", { name: "Создать" })).toHaveFocus();
-    await userEvent.tab();
     expect(screen.getByRole("button", { name: "Период" })).toHaveFocus();
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Создать" })).toHaveFocus();
+  });
+});
+
+describe("Page.Tools", () => {
+  it("wraps each control in its own cell and is a group when named", () => {
+    const { rerender, container } = render(
+      <Page.Tools aria-label="Заказы">
+        <button type="button">Фильтр</button>
+        <button type="button">Период</button>
+      </Page.Tools>,
+    );
+    const group = screen.getByRole("group", { name: "Заказы" });
+    expect(group.children).toHaveLength(2);
+    for (const cell of Array.from(group.children)) {
+      expect(cell.children).toHaveLength(1);
+      expect(cell.firstElementChild?.tagName).toBe("BUTTON");
+    }
+    rerender(<Page.Tools />);
+    expect(container.firstElementChild).not.toHaveAttribute("role");
+  });
+
+  it("gives a SegmentedControl fullWidth; an explicit fullWidth={false} keeps it", () => {
+    render(
+      <Page.Tools>
+        <SegmentedControl.Root defaultValue="all" aria-label="Раздел">
+          <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
+          <SegmentedControl.Item value="mine">Мои</SegmentedControl.Item>
+        </SegmentedControl.Root>
+        <SegmentedControl.Root defaultValue="board" fullWidth={false} aria-label="Вид">
+          <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
+          <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
+        </SegmentedControl.Root>
+      </Page.Tools>,
+    );
+    expect(screen.getByRole("radiogroup", { name: "Раздел" })).toHaveAttribute(
+      "data-full-width",
+      "true",
+    );
+    expect(screen.getByRole("radiogroup", { name: "Вид" })).not.toHaveAttribute("data-full-width");
+  });
+
+  it("chips take no line while empty", () => {
+    expect(cssValue(cssRule(CSS, ".chips:empty"), "display")).toBe("none");
   });
 });
 
@@ -245,15 +361,15 @@ describe("Page.TopBar collapse", () => {
     return (
       <Page.Root>
         <Page.TopBar collapse data-testid="bar">
-          <Page.Header>
-            <Page.Actions>
-              <button type="button">Отчёт</button>
-            </Page.Actions>
-          </Page.Header>
+          <Page.Actions>
+            <button type="button">Отчёт</button>
+          </Page.Actions>
         </Page.TopBar>
         <Page.Header>
-          <Page.Title>Продажи</Page.Title>
-          <Page.Description>На 14 октября</Page.Description>
+          <Page.Heading>
+            <Page.Title>Продажи</Page.Title>
+            <Page.Description>На 14 октября</Page.Description>
+          </Page.Heading>
         </Page.Header>
       </Page.Root>
     );
@@ -281,19 +397,40 @@ describe("Page.TopBar collapse", () => {
     expect(echo).toHaveAttribute("data-visible", "true");
   });
 
-  it("a bar without a header gets a title row of its own for the echo", () => {
+  it("a bar without a heading gets one of its own for the echo; after a path it takes a chevron", () => {
     stubObserver();
-    const { container } = render(
+    const { container, rerender } = render(
       <Page.Root>
         <Page.TopBar collapse>
-          <Page.Toolbar />
+          <Page.Tools />
         </Page.TopBar>
         <Page.Header>
-          <Page.Title>Продажи</Page.Title>
+          <Page.Heading>
+            <Page.Title>Продажи</Page.Title>
+          </Page.Heading>
         </Page.Header>
       </Page.Root>,
     );
     expect(container.querySelectorAll('[data-place="bar"]')).toHaveLength(1);
+    const echo = () => container.querySelector('[aria-hidden="true"][inert]') as HTMLElement;
+    expect(echo().querySelector('[aria-hidden="true"]')).toBeNull();
+    rerender(
+      <Page.Root>
+        <Page.TopBar collapse>
+          <Page.Heading>
+            <Breadcrumb.Root>
+              <Breadcrumb.Item href="#workspace">Прайм Софт</Breadcrumb.Item>
+            </Breadcrumb.Root>
+          </Page.Heading>
+        </Page.TopBar>
+        <Page.Header>
+          <Page.Heading>
+            <Page.Title>Продажи</Page.Title>
+          </Page.Heading>
+        </Page.Header>
+      </Page.Root>,
+    );
+    expect(echo().querySelectorAll(':scope > * > [aria-hidden="true"]')).toHaveLength(1);
   });
 
   it("CSS: the echo moves on the movement clock and fades on the fade clock", () => {
@@ -303,60 +440,172 @@ describe("Page.TopBar collapse", () => {
   });
 });
 
-describe("Page.Actions in the bar", () => {
-  const WIDTH = 100;
+describe("Page.TopBar plan", () => {
+  /** Natural widths jsdom cannot lay out: the heading, the tools and each button by its label. */
+  const HEADING = 200;
+  const TOOLS = 300;
+  const BUTTONS: Record<string, number> = { Экспорт: 100, Печать: 100, "Новый заказ": 120 };
+  const SQUARE = 40;
+  let available = 2000;
+  let resize: (() => void)[] = [];
 
-  /** jsdom has no layout: every action is 100 wide, the header as wide as `header`. */
-  function layout(header: number) {
-    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (
+  function layout(width: number) {
+    available = width;
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
       this: HTMLElement,
     ) {
-      return this.dataset.key !== undefined ? WIDTH : 0;
+      const testId = this.dataset.testid;
+      const width =
+        testId === "heading"
+          ? HEADING
+          : testId === "tools"
+            ? TOOLS
+            : this.dataset.role
+              ? (BUTTONS[this.textContent ?? ""] ?? 0)
+              : 0;
+      return { width, height: SQUARE } as DOMRect;
+    });
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return this.dataset.role ? SQUARE : 0;
     });
     vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (
       this: HTMLElement,
     ) {
-      return this.getAttribute("data-place") === "bar" ? header : 0;
+      return this.firstElementChild?.hasAttribute("data-plan") ? available : 0;
+    });
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize.push(callback);
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+  }
+
+  /** The bar's room changes: the plan is re-chosen from the widths it measured. */
+  function resizeTo(width: number) {
+    available = width;
+    act(() => {
+      for (const callback of resize) callback();
     });
   }
 
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    resize = [];
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
 
   function Bar({ onExport }: { onExport?: () => void }) {
     return (
       <Page.TopBar>
-        <Page.Header>
+        <Page.Heading data-testid="heading">
           <Page.Title>Заказы</Page.Title>
-          <Page.Actions>
-            <Button.Root variant="soft" tone="neutral" onClick={onExport}>
-              Экспорт
-            </Button.Root>
-            <Button.Root variant="soft" tone="neutral">
-              Печать
-            </Button.Root>
-            <Button.Root>Новый заказ</Button.Root>
-          </Page.Actions>
-        </Page.Header>
+        </Page.Heading>
+        <Page.Tools data-testid="tools">
+          <button type="button">Период</button>
+        </Page.Tools>
+        <Page.Actions>
+          <Button.Root variant="soft" tone="neutral" onClick={onExport}>
+            <Button.Icon>
+              <Icon name="action.download" />
+            </Button.Icon>
+            Экспорт
+          </Button.Root>
+          <Button.Root variant="soft" tone="neutral">
+            <Button.Icon>
+              <Icon name="action.refresh" />
+            </Button.Icon>
+            Печать
+          </Button.Root>
+          <Button.Root>
+            <Button.Icon>
+              <Icon name="action.add" />
+            </Button.Icon>
+            Новый заказ
+          </Button.Root>
+        </Page.Actions>
       </Page.TopBar>
     );
   }
 
-  it("all actions stay while the row has room", () => {
+  const plan = (container: HTMLElement) =>
+    container.querySelector("[data-plan]")?.getAttribute("data-plan");
+  /** The wrapper of a bar button: where the bar marks it icon-only or folds it. */
+  const cell = (name: string) =>
+    screen.getByRole("button", { name, hidden: true }).closest("[data-role]") as HTMLElement;
+
+  it("steps one → below → icons-secondary → icons → fold as the room shrinks", () => {
+    // Full: 100 + 100 + 120; icons of the secondary: 40 + 40 + 120; all icons: 120; fold: 80.
+    layout(1000);
+    const { container } = render(<Bar />);
+    expect(plan(container)).toBe("one");
+    resizeTo(600);
+    expect(plan(container)).toBe("below");
+    resizeTo(450);
+    expect(plan(container)).toBe("icons-secondary");
+    resizeTo(350);
+    expect(plan(container)).toBe("icons");
+    resizeTo(250);
+    expect(plan(container)).toBe("fold");
+    resizeTo(1000);
+    expect(plan(container)).toBe("one");
+  });
+
+  it("collapses the secondary buttons first, then the primary; each keeps its name", () => {
+    layout(450);
+    const { container } = render(<Bar />);
+    expect(plan(container)).toBe("icons-secondary");
+    expect(cell("Экспорт")).toHaveAttribute("data-button-label", "icon");
+    expect(cell("Печать")).toHaveAttribute("data-button-label", "icon");
+    expect(cell("Новый заказ")).not.toHaveAttribute("data-button-label");
+    resizeTo(350);
+    expect(cell("Новый заказ")).toHaveAttribute("data-button-label", "icon");
+    for (const name of ["Экспорт", "Печать", "Новый заказ"]) {
+      expect(screen.getByRole("button", { name })).toBeVisible();
+    }
+  });
+
+  it("a button without an icon keeps its label; anything else is never touched", () => {
+    layout(10);
+    render(
+      <Page.TopBar>
+        <Page.Actions>
+          <a href="#help">Справка</a>
+          <Button.Root>Создать</Button.Root>
+        </Page.Actions>
+      </Page.TopBar>,
+    );
+    expect(cell("Создать")).not.toHaveAttribute("data-button-label");
+    expect(screen.getByRole("link", { name: "Справка" }).parentElement).toHaveAttribute(
+      "data-role",
+      "other",
+    );
+    expect(screen.queryByRole("button", { name: "Ещё действия" })).not.toBeInTheDocument();
+  });
+
+  it("all buttons stay while the row has room", () => {
     layout(2000);
     render(<Bar />);
     expect(screen.queryByRole("button", { name: "Ещё действия" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Экспорт" })).toBeVisible();
   });
 
-  it("trailing secondary actions fold into «⋯»; the primary stays; the menu runs their click", async () => {
+  it("fold: the secondary buttons go into «⋯» (Enter opens it), the primary stays; the menu runs their click", async () => {
     const user = userEvent.setup();
     const onExport = vi.fn();
-    // Room for the title (144) and two actions: the primary and «⋯».
-    layout(144 + 12 + 100 + 8 + 40);
+    layout(250);
     render(<Bar onExport={onExport} />);
     const more = screen.getByRole("button", { name: "Ещё действия" });
     expect(screen.getByRole("button", { name: "Новый заказ" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Экспорт" })).not.toBeInTheDocument();
+    expect(cell("Экспорт")).toHaveAttribute("hidden");
     more.focus();
     await user.keyboard("{Enter}");
     const items = screen.getAllByRole("menuitem");
@@ -365,70 +614,58 @@ describe("Page.Actions in the bar", () => {
     expect(onExport).toHaveBeenCalledTimes(1);
   });
 
-  it("in the flow actions never fold", () => {
+  it("Space opens «⋯» too; labels rename it", async () => {
+    const user = userEvent.setup();
+    layout(250);
+    render(
+      <Page.Root labels={{ more: "Действия" }}>
+        <Bar />
+      </Page.Root>,
+    );
+    const more = screen.getByRole("button", { name: "Действия" });
+    more.focus();
+    await user.keyboard(" ");
+    expect(screen.getAllByRole("menuitem")).toHaveLength(2);
+  });
+
+  it("the primary never folds, however short the row", () => {
+    layout(0);
+    render(<Bar />);
+    expect(screen.getByRole("button", { name: "Новый заказ" })).toBeVisible();
+    expect(cell("Новый заказ")).not.toHaveAttribute("hidden");
+  });
+
+  it("in the flow actions never collapse or fold", () => {
     layout(10);
     render(
       <Page.Header>
         <Page.Actions>
-          <Button.Root variant="soft">Экспорт</Button.Root>
+          <Button.Root variant="soft">
+            <Button.Icon>
+              <Icon name="action.download" />
+            </Button.Icon>
+            Экспорт
+          </Button.Root>
           <Button.Root>Создать</Button.Root>
         </Page.Actions>
       </Page.Header>,
     );
     expect(screen.queryByRole("button", { name: "Ещё действия" })).not.toBeInTheDocument();
-  });
-});
-
-describe("Page.Toolbar", () => {
-  it("renders the slots in the reading order whatever the JSX order", () => {
-    render(
-      <Page.Toolbar>
-        <Page.ToolbarChips data-testid="chips">Фильтры</Page.ToolbarChips>
-        <Page.ToolbarActions data-testid="actions" />
-        <Page.ToolbarView data-testid="view" />
-        <Page.ToolbarTools data-testid="tools" />
-        <Page.ToolbarSections data-testid="sections" />
-      </Page.Toolbar>,
+    expect(screen.getByRole("button", { name: "Экспорт" }).closest("[data-button-label]")).toBe(
+      null,
     );
-    const ids = ["tools", "sections", "view", "actions", "chips"].map((id) =>
-      screen.getByTestId(id),
+  });
+
+  it("CSS: the plan places the groups; only the heading's column gives", () => {
+    expect(cssValue(cssRule(CSS, ".row"), "grid-template-columns")).toBe(
+      "minmax(0, 1fr) auto auto",
     );
-    for (let i = 1; i < ids.length; i++) {
-      expect(
-        (ids[i - 1] as HTMLElement).compareDocumentPosition(ids[i] as HTMLElement) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    }
-  });
-
-  it("is a group when named, a plain div otherwise", () => {
-    const { rerender, container } = render(<Page.Toolbar aria-label="Заказы" />);
-    expect(screen.getByRole("group", { name: "Заказы" })).toBeInTheDocument();
-    rerender(<Page.Toolbar />);
-    expect(container.firstElementChild).not.toHaveAttribute("role");
-  });
-
-  it("puts the chips row under the bar, whatever its place in JSX", () => {
-    const { container } = render(
-      <Page.Toolbar>
-        <Page.ToolbarChips data-testid="chips" />
-        <Page.ToolbarTools data-testid="tools" />
-      </Page.Toolbar>,
+    expect(cssValue(cssRule(CSS, '.row:not([data-plan="one"]) > .tools'), "grid-area")).toBe(
+      "2 / 1 / 3 / -1",
     );
-    const layout = container.firstElementChild?.firstElementChild as HTMLElement;
-    const bar = layout.firstElementChild as HTMLElement;
-    expect(bar).toContainElement(screen.getByTestId("tools"));
-    expect(bar).not.toContainElement(screen.getByTestId("chips"));
-    expect(layout.lastElementChild).toBe(screen.getByTestId("chips"));
-  });
-
-  it("CSS: one row from 56rem of its own width", () => {
-    expect(cssValue(cssRule(CSS, ".toolbar"), "container")).toBe("prime-page-tools / inline-size");
-    expect(
-      cssRules(CSS).some(
-        (rule) => rule.parents[0] === "@container prime-page-tools (min-width: 56rem)",
-      ),
-    ).toBe(true);
+    expect(cssRules(CSS).some((rule) => rule.selector === '.row:not([data-plan="one"])')).toBe(
+      true,
+    );
   });
 });
 

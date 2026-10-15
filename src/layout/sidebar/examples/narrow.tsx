@@ -46,9 +46,9 @@ export default function SidebarNarrowExample() {
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>
-              <Page.Header>
+              <Page.Heading>
                 <Page.Title>Сделки</Page.Title>
-              </Page.Header>
+              </Page.Heading>
             </Page.TopBar>
           </Page.Root>
         </AppShell.Main>

@@ -98,10 +98,10 @@ export function OrdersPage() {
   return (
     <Page.Root>
       <Page.TopBar>
-        <Page.Header>
+        <Page.Heading>
           <Page.Title>Заказы</Page.Title>
           <Page.Description>128 в работе · 6 ждут оплаты</Page.Description>
-        </Page.Header>
+        </Page.Heading>
       </Page.TopBar>
       <Page.Body>{/* the page's blocks */}</Page.Body>
     </Page.Root>
@@ -109,15 +109,9 @@ export function OrdersPage() {
 }
 ```
 
-Where `Page.Header` stands follows the kind of page; its size follows the place, and there is one
-`Page.Title` (the `<h1>`) per page:
-
-- **Work screens** (a list, a board, a chat, a schedule): `Page.Header` and `Page.Toolbar` inside
-  `Page.TopBar` — the compact title row and the tools under it, sticky.
-- **Document pages** (settings, a long form, help): `Page.Header` in the flow — the large title — and,
-  optionally, `Page.TopBar collapse` with the path, which repeats the title once it scrolls away.
-- **Overviews** (dashboards): `Page.TopBar collapse` with the page's actions in its `Page.Header`, and
-  the titled `Page.Header` in the flow.
+What stands in the bar — the path ending in the title, the tools, every button, the active filters —
+is [the top bar](composition.md#the-top-bar); where the title stands on a document page or an
+overview is [the page skeleton](composition.md#1-page-skeleton).
 
 With React Router the frame's `children` is `<Outlet />` and every item is `Sidebar.Item asChild`
 around a `NavLink` ([the router example](../src/layout/sidebar/examples/router.tsx)). The same frame
@@ -133,58 +127,6 @@ Next.js App Router: the package is marked `"use client"`, but a server component
 (`<Button.Root>`) or pass it callbacks. Put the frame and every screen in a file that starts with
 `"use client"` and render them from `app/layout.tsx` and the pages; import `bundle.css` in the root
 layout and put `data-theme` on `<html>` there.
-
-A nested record page puts the path before its title in the header — a `Breadcrumb.Root` (the list
-it belongs to) as the first child of `Page.Header`, then `Page.Title` with the record's name and its
-status as `Page.Description`; the header draws the separator itself
-([the detail page](../src/components/description-list/examples/screen.tsx)).
-
-### The page's tools in the top bar
-
-The page's tools — its own search and filters, sections, the period or view, the primary action —
-go into `Page.Toolbar`, a sibling of `Page.Header` inside `Page.TopBar`: the bar's second row, full
-width, sticky with it. The toolbar lays itself out from that width ([the toolbar layout](../src/layout/page/COMPONENT.md#toolbar-layout)),
-so the tools wrap under the title instead of squeezing it. `Page.Actions` keeps the page's
-other buttons (export, a more menu) in the title row; trailing secondary buttons fold into «⋯» when
-the row runs short.
-
-```tsx
-import { Button, Icon, Page, SegmentedControl } from "prime-ui-kit";
-
-type DealsTopBarProps = { view: string; onViewChange: (view: string) => void };
-
-export function DealsTopBar({ view, onViewChange }: DealsTopBarProps) {
-  return (
-    <Page.TopBar>
-      <Page.Header>
-        <Page.Title>Сделки</Page.Title>
-        <Page.Description>7 сделок в работе · 6 461 750 ₽</Page.Description>
-      </Page.Header>
-      <Page.Toolbar aria-label="Сделки">
-        <Page.ToolbarSections>
-          <SegmentedControl.Root
-            fullWidth
-            value={view}
-            onValueChange={onViewChange}
-            aria-label="Вид"
-          >
-            <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
-            <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
-          </SegmentedControl.Root>
-        </Page.ToolbarSections>
-        <Page.ToolbarActions>
-          <Button.Root>
-            <Button.Icon>
-              <Icon name="action.add" />
-            </Button.Icon>
-            Новая сделка
-          </Button.Root>
-        </Page.ToolbarActions>
-      </Page.Toolbar>
-    </Page.TopBar>
-  );
-}
-```
 
 ## Navigation structure (the sidebar's content)
 

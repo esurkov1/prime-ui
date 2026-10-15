@@ -439,279 +439,270 @@ export default function GanttScreenExample() {
   const detail = selected?.bar;
 
   return (
-    <Page.Root fill>
-      {/* A work screen titles itself in its top bar: the only h1 and the page's tools. */}
-
-      <Page.TopBar>
-        <Page.Header>
-          <Page.Title>Загрузка команды</Page.Title>
-          <Page.Description>
-            {loading ? "Загружаем график…" : `Сотрудников: ${rows.length} из ${people.length}`}
-          </Page.Description>
-        </Page.Header>
-        <SmartFilter.Root
-          fields={FIELDS}
-          value={filter}
-          onValueChange={setFilter}
-          search={search}
-          onSearchChange={setSearch}
-        >
-          <Page.Toolbar aria-label="Загрузка команды">
-            <Page.ToolbarTools>
-              <SmartFilter.Toolbar />
-            </Page.ToolbarTools>
-            <Page.ToolbarSections>
-              <SegmentedControl.Root
-                fullWidth
-                value={team}
-                onValueChange={setTeam}
-                aria-label="Команда"
-              >
-                <SegmentedControl.Item value="all">
-                  Все<SegmentedControl.Count>{people.length}</SegmentedControl.Count>
+    <SmartFilter.Root
+      fields={FIELDS}
+      value={filter}
+      onValueChange={setFilter}
+      search={search}
+      onSearchChange={setSearch}
+    >
+      <Page.Root fill>
+        {/* A work screen titles itself in its top bar: the only h1, the teams, the search and the
+          filters, the one primary action. */}
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Загрузка команды</Page.Title>
+            <Page.Description>
+              {loading ? "Загружаем график…" : `Сотрудников: ${rows.length} из ${people.length}`}
+            </Page.Description>
+          </Page.Heading>
+          <Page.Tools aria-label="Загрузка команды">
+            <SegmentedControl.Root value={team} onValueChange={setTeam} aria-label="Команда">
+              <SegmentedControl.Item value="all">
+                Все<SegmentedControl.Count>{people.length}</SegmentedControl.Count>
+              </SegmentedControl.Item>
+              {TEAMS.map((item) => (
+                <SegmentedControl.Item key={item.value} value={item.value}>
+                  {item.label}
+                  <SegmentedControl.Count>
+                    {people.filter((person) => person.team === item.value).length}
+                  </SegmentedControl.Count>
                 </SegmentedControl.Item>
-                {TEAMS.map((item) => (
-                  <SegmentedControl.Item key={item.value} value={item.value}>
-                    {item.label}
-                    <SegmentedControl.Count>
-                      {people.filter((person) => person.team === item.value).length}
-                    </SegmentedControl.Count>
-                  </SegmentedControl.Item>
-                ))}
-              </SegmentedControl.Root>
-            </Page.ToolbarSections>
-            <Page.ToolbarActions>
-              <Button.Root
-                onClick={() => {
-                  setErrors({});
-                  setDraft({ personId: null, dates: null });
-                }}
-              >
-                <Button.Icon>
-                  <Icon name="action.add" />
-                </Button.Icon>
-                Назначить
-              </Button.Root>
-            </Page.ToolbarActions>
-            <Page.ToolbarChips>
-              <SmartFilter.Chips />
-            </Page.ToolbarChips>
-          </Page.Toolbar>
-        </SmartFilter.Root>
-      </Page.TopBar>
-      <Page.Body>
-        <Gantt<Person, Assignment>
-          aria-label="Загрузка команды внедрения"
-          className={styles.chart}
-          defaultScale="day"
-          scrollHeight="fill"
-          loading={loading}
-          rows={loading ? [] : rows}
-          getRowKey={(person) => person.id}
-          getRowLabel={(person) => person.name}
-          getRowBars={(person) => person.bars}
-          renderRowAvatar={(person) => (
-            <Avatar.Root color={person.color}>
-              <Avatar.Fallback>{person.initials}</Avatar.Fallback>
-            </Avatar.Root>
-          )}
-          renderRow={(person) => (
-            <span className={styles.person}>
-              <Typography as="span" variant="body-m">
-                {person.name}
-              </Typography>
-              <Typography as="span" variant="caption" tone="muted">
-                {person.role}
-              </Typography>
-            </span>
-          )}
-          onBarChange={moveBar}
-          onBarCreate={startCreate}
-          onItemOpen={(bar, row) => {
-            setSelected({ bar, person: findPerson(row.id) });
-            setDetailOpen(true);
-          }}
-          renderBarTooltip={(bar) => (bar.client ? CLIENTS[bar.client].name : KIND[bar.kind])}
-          toolbar={
-            <>
-              {/* The legend of client hues: the bar's hue repeats its client, the tooltip names it. */}
-              {(Object.keys(CLIENTS) as ClientId[]).map((client) => (
-                <Badge.Root key={client} color={CLIENTS[client].color}>
-                  <Badge.Dot />
-                  {CLIENTS[client].name}
-                </Badge.Root>
               ))}
-            </>
-          }
-          empty={
-            <EmptyPage.Root size="s" role="status" aria-labelledby="schedule-empty">
-              <EmptyPage.Icon>
-                <Icon name="action.search" />
-              </EmptyPage.Icon>
-              <EmptyPage.Title as="p" id="schedule-empty">
-                Никого не нашли
-              </EmptyPage.Title>
-              <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
-              <EmptyPage.Actions>
-                <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
-                  Сбросить фильтры
-                </Button.Root>
-              </EmptyPage.Actions>
-            </EmptyPage.Root>
-          }
-        />
+            </SegmentedControl.Root>
+            <SmartFilter.Toolbar />
+          </Page.Tools>
+          <Page.Actions>
+            <Button.Root
+              onClick={() => {
+                setErrors({});
+                setDraft({ personId: null, dates: null });
+              }}
+            >
+              <Button.Icon>
+                <Icon name="action.add" />
+              </Button.Icon>
+              Назначить
+            </Button.Root>
+          </Page.Actions>
+          <Page.Chips>
+            <SmartFilter.Chips />
+          </Page.Chips>
+        </Page.TopBar>
+        <Page.Body>
+          <Gantt<Person, Assignment>
+            aria-label="Загрузка команды внедрения"
+            className={styles.chart}
+            defaultScale="day"
+            scrollHeight="fill"
+            loading={loading}
+            rows={loading ? [] : rows}
+            getRowKey={(person) => person.id}
+            getRowLabel={(person) => person.name}
+            getRowBars={(person) => person.bars}
+            renderRowAvatar={(person) => (
+              <Avatar.Root color={person.color}>
+                <Avatar.Fallback>{person.initials}</Avatar.Fallback>
+              </Avatar.Root>
+            )}
+            renderRow={(person) => (
+              <span className={styles.person}>
+                <Typography as="span" variant="body-m">
+                  {person.name}
+                </Typography>
+                <Typography as="span" variant="caption" tone="muted">
+                  {person.role}
+                </Typography>
+              </span>
+            )}
+            onBarChange={moveBar}
+            onBarCreate={startCreate}
+            onItemOpen={(bar, row) => {
+              setSelected({ bar, person: findPerson(row.id) });
+              setDetailOpen(true);
+            }}
+            renderBarTooltip={(bar) => (bar.client ? CLIENTS[bar.client].name : KIND[bar.kind])}
+            toolbar={
+              <>
+                {/* The legend of client hues: the bar's hue repeats its client, the tooltip names it. */}
+                {(Object.keys(CLIENTS) as ClientId[]).map((client) => (
+                  <Badge.Root key={client} color={CLIENTS[client].color}>
+                    <Badge.Dot />
+                    {CLIENTS[client].name}
+                  </Badge.Root>
+                ))}
+              </>
+            }
+            empty={
+              <EmptyPage.Root size="s" role="status" aria-labelledby="schedule-empty">
+                <EmptyPage.Icon>
+                  <Icon name="action.search" />
+                </EmptyPage.Icon>
+                <EmptyPage.Title as="p" id="schedule-empty">
+                  Никого не нашли
+                </EmptyPage.Title>
+                <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
+                <EmptyPage.Actions>
+                  <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
+                    Сбросить фильтры
+                  </Button.Root>
+                </EmptyPage.Actions>
+              </EmptyPage.Root>
+            }
+          />
 
-        <Modal.Root open={draft !== null} onOpenChange={closeDraft}>
-          <Modal.Content size="s">
-            <Modal.Header>
-              <Modal.Title>Новая задача</Modal.Title>
-              <Modal.Description>
-                {draftPerson && draft?.dates
-                  ? `${draftPerson.name} · ${formatPeriod(draft.dates)}`
-                  : "Сотрудник увидит задачу в своём графике."}
-              </Modal.Description>
-            </Modal.Header>
-            <Modal.Body>
-              <Modal.Guard busy={saving} />
-              <form id={formId} noValidate onSubmit={submit}>
-                <Fieldset aria-label="Задача" disabled={saving}>
-                  <Input.Root id={`${formId}-title`} label="Задача" required error={errors.title}>
-                    <Input.Wrapper>
-                      <Input.Field name="title" placeholder="Обучение пользователей" autoFocus />
-                    </Input.Wrapper>
-                  </Input.Root>
-                  <Select.Root
-                    name="client"
-                    label="Клиент"
-                    required
-                    placeholder="Выберите клиента"
-                    error={errors.client}
-                    id={`${formId}-client`}
-                  >
-                    <Select.Trigger>
-                      <Select.Value />
-                    </Select.Trigger>
-                    <Select.Content>
-                      {(Object.keys(CLIENTS) as ClientId[]).map((value) => (
-                        <Select.Item key={value} value={value}>
-                          {CLIENTS[value].name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                  {draft?.personId ? null : (
-                    <>
-                      <Select.Root
-                        name="person"
-                        label="Сотрудник"
-                        required
-                        placeholder="Выберите сотрудника"
-                        error={errors.person}
-                        id={`${formId}-person`}
-                      >
-                        <Select.Trigger>
-                          <Select.Value />
-                        </Select.Trigger>
-                        <Select.Content searchable>
-                          {people.map((person) => (
-                            <Select.Item key={person.id} value={person.id} keywords={person.role}>
-                              {person.name}
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Root>
-                      <Datepicker.Root
-                        mode="range"
-                        name="period"
-                        label="Период"
-                        required
-                        fullWidth
-                        placeholder="Начало и конец работ"
-                        error={errors.period}
-                        id={`${formId}-period`}
-                      />
-                    </>
-                  )}
-                </Fieldset>
-              </form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Modal.Close>
-                <Button.Root variant="outline" tone="neutral">
-                  Отмена
-                </Button.Root>
-              </Modal.Close>
-              <Button.Root type="submit" form={formId} loading={saving}>
-                Назначить
-              </Button.Root>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Root>
-
-        <Drawer.Root open={detailOpen} onOpenChange={setDetailOpen}>
-          <Drawer.Content size="s">
-            <Drawer.Header>
-              <Drawer.Title>{detail?.label}</Drawer.Title>
-              <Drawer.Description>{detail ? KIND[detail.kind] : null}</Drawer.Description>
-            </Drawer.Header>
-            <Drawer.Body>
-              {selected && detail ? (
-                <DescriptionList.Root orientation="vertical">
-                  <DescriptionList.Item label="Сотрудник">
-                    {selected.person.name} · {selected.person.role}
-                  </DescriptionList.Item>
-                  <DescriptionList.Item label="Клиент">
-                    {detail.client ? (
-                      <Badge.Root color={CLIENTS[detail.client].color}>
-                        {CLIENTS[detail.client].name}
-                      </Badge.Root>
-                    ) : (
-                      "Без клиента"
+          <Modal.Root open={draft !== null} onOpenChange={closeDraft}>
+            <Modal.Content size="s">
+              <Modal.Header>
+                <Modal.Title>Новая задача</Modal.Title>
+                <Modal.Description>
+                  {draftPerson && draft?.dates
+                    ? `${draftPerson.name} · ${formatPeriod(draft.dates)}`
+                    : "Сотрудник увидит задачу в своём графике."}
+                </Modal.Description>
+              </Modal.Header>
+              <Modal.Body>
+                <Modal.Guard busy={saving} />
+                <form id={formId} noValidate onSubmit={submit}>
+                  <Fieldset aria-label="Задача" disabled={saving}>
+                    <Input.Root id={`${formId}-title`} label="Задача" required error={errors.title}>
+                      <Input.Wrapper>
+                        <Input.Field name="title" placeholder="Обучение пользователей" autoFocus />
+                      </Input.Wrapper>
+                    </Input.Root>
+                    <Select.Root
+                      name="client"
+                      label="Клиент"
+                      required
+                      placeholder="Выберите клиента"
+                      error={errors.client}
+                      id={`${formId}-client`}
+                    >
+                      <Select.Trigger>
+                        <Select.Value />
+                      </Select.Trigger>
+                      <Select.Content>
+                        {(Object.keys(CLIENTS) as ClientId[]).map((value) => (
+                          <Select.Item key={value} value={value}>
+                            {CLIENTS[value].name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                    {draft?.personId ? null : (
+                      <>
+                        <Select.Root
+                          name="person"
+                          label="Сотрудник"
+                          required
+                          placeholder="Выберите сотрудника"
+                          error={errors.person}
+                          id={`${formId}-person`}
+                        >
+                          <Select.Trigger>
+                            <Select.Value />
+                          </Select.Trigger>
+                          <Select.Content searchable>
+                            {people.map((person) => (
+                              <Select.Item key={person.id} value={person.id} keywords={person.role}>
+                                {person.name}
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Root>
+                        <Datepicker.Root
+                          mode="range"
+                          name="period"
+                          label="Период"
+                          required
+                          fullWidth
+                          placeholder="Начало и конец работ"
+                          error={errors.period}
+                          id={`${formId}-period`}
+                        />
+                      </>
                     )}
-                  </DescriptionList.Item>
-                  <DescriptionList.Item label={detail.kind === "milestone" ? "Дата" : "Период"}>
-                    {formatPeriod(detail)}
-                    {detail.kind === "milestone" ? null : ` · ${lengthInDays(detail)} дн.`}
-                  </DescriptionList.Item>
-                  {detail.progress === undefined ? null : (
-                    <DescriptionList.Item label="Выполнено">
-                      <ProgressBar
-                        value={Math.round(detail.progress * 100)}
-                        showValue
-                        aria-label="Выполнено"
-                      />
-                    </DescriptionList.Item>
-                  )}
-                </DescriptionList.Root>
-              ) : null}
-            </Drawer.Body>
-            <Drawer.Footer>
-              <Drawer.Close>
-                <Button.Root variant="outline" tone="neutral">
-                  Закрыть
+                  </Fieldset>
+                </form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Modal.Close>
+                  <Button.Root variant="outline" tone="neutral">
+                    Отмена
+                  </Button.Root>
+                </Modal.Close>
+                <Button.Root type="submit" form={formId} loading={saving}>
+                  Назначить
                 </Button.Root>
-              </Drawer.Close>
-              {detail && !detail.readOnly ? (
-                <ConfirmDialog.Root
-                  title={`Снять задачу «${detail.label}»?`}
-                  description={`${selected?.person.name} освободится на эти дни. Задачу можно будет назначить заново.`}
-                  confirmLabel="Снять задачу"
-                  onConfirm={removeSelected}
-                >
-                  <ConfirmDialog.Trigger>
-                    <Button.Root variant="soft" tone="danger">
-                      <Button.Icon>
-                        <Icon name="action.delete" />
-                      </Button.Icon>
-                      Снять задачу
-                    </Button.Root>
-                  </ConfirmDialog.Trigger>
-                </ConfirmDialog.Root>
-              ) : null}
-            </Drawer.Footer>
-          </Drawer.Content>
-        </Drawer.Root>
-      </Page.Body>
-    </Page.Root>
+              </Modal.Footer>
+            </Modal.Content>
+          </Modal.Root>
+
+          <Drawer.Root open={detailOpen} onOpenChange={setDetailOpen}>
+            <Drawer.Content size="s">
+              <Drawer.Header>
+                <Drawer.Title>{detail?.label}</Drawer.Title>
+                <Drawer.Description>{detail ? KIND[detail.kind] : null}</Drawer.Description>
+              </Drawer.Header>
+              <Drawer.Body>
+                {selected && detail ? (
+                  <DescriptionList.Root orientation="vertical">
+                    <DescriptionList.Item label="Сотрудник">
+                      {selected.person.name} · {selected.person.role}
+                    </DescriptionList.Item>
+                    <DescriptionList.Item label="Клиент">
+                      {detail.client ? (
+                        <Badge.Root color={CLIENTS[detail.client].color}>
+                          {CLIENTS[detail.client].name}
+                        </Badge.Root>
+                      ) : (
+                        "Без клиента"
+                      )}
+                    </DescriptionList.Item>
+                    <DescriptionList.Item label={detail.kind === "milestone" ? "Дата" : "Период"}>
+                      {formatPeriod(detail)}
+                      {detail.kind === "milestone" ? null : ` · ${lengthInDays(detail)} дн.`}
+                    </DescriptionList.Item>
+                    {detail.progress === undefined ? null : (
+                      <DescriptionList.Item label="Выполнено">
+                        <ProgressBar
+                          value={Math.round(detail.progress * 100)}
+                          showValue
+                          aria-label="Выполнено"
+                        />
+                      </DescriptionList.Item>
+                    )}
+                  </DescriptionList.Root>
+                ) : null}
+              </Drawer.Body>
+              <Drawer.Footer>
+                <Drawer.Close>
+                  <Button.Root variant="outline" tone="neutral">
+                    Закрыть
+                  </Button.Root>
+                </Drawer.Close>
+                {detail && !detail.readOnly ? (
+                  <ConfirmDialog.Root
+                    title={`Снять задачу «${detail.label}»?`}
+                    description={`${selected?.person.name} освободится на эти дни. Задачу можно будет назначить заново.`}
+                    confirmLabel="Снять задачу"
+                    onConfirm={removeSelected}
+                  >
+                    <ConfirmDialog.Trigger>
+                      <Button.Root variant="soft" tone="danger">
+                        <Button.Icon>
+                          <Icon name="action.delete" />
+                        </Button.Icon>
+                        Снять задачу
+                      </Button.Root>
+                    </ConfirmDialog.Trigger>
+                  </ConfirmDialog.Root>
+                ) : null}
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer.Root>
+        </Page.Body>
+      </Page.Root>
+    </SmartFilter.Root>
   );
 }

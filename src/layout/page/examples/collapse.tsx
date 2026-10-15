@@ -1,4 +1,4 @@
-/** An overview whose large title scrolls away under the top bar: the bar repeats it with its line of data and keeps the page's actions in reach — `collapse`. */
+/** An overview whose large title scrolls away under the top bar: the bar repeats it with its line of data and keeps the period and the page's buttons in reach — `collapse`. */
 import { AppShell, Button, Card, Icon, Page, SegmentedControl, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -25,28 +25,26 @@ export default function PageCollapseExample() {
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar collapse>
-              <Page.Header>
-                <Page.Actions>
-                  <SegmentedControl.Root
-                    value={period}
-                    onValueChange={setPeriod}
-                    aria-label="Период"
-                  >
-                    <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
-                    <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
-                  </SegmentedControl.Root>
-                  <Button.Root variant="soft" tone="neutral">
-                    <Button.Icon>
-                      <Icon name="action.download" />
-                    </Button.Icon>
-                    Отчёт
-                  </Button.Root>
-                </Page.Actions>
-              </Page.Header>
+              <Page.Tools aria-label="Продажи">
+                <SegmentedControl.Root value={period} onValueChange={setPeriod} aria-label="Период">
+                  <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+                  <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+                </SegmentedControl.Root>
+              </Page.Tools>
+              <Page.Actions>
+                <Button.Root variant="soft" tone="neutral">
+                  <Button.Icon>
+                    <Icon name="action.download" />
+                  </Button.Icon>
+                  Отчёт
+                </Button.Root>
+              </Page.Actions>
             </Page.TopBar>
             <Page.Header>
-              <Page.Title>Продажи</Page.Title>
-              <Page.Description>Интернет-магазин · на 14 октября, 9:40</Page.Description>
+              <Page.Heading>
+                <Page.Title>Продажи</Page.Title>
+                <Page.Description>Интернет-магазин · на 14 октября, 9:40</Page.Description>
+              </Page.Heading>
             </Page.Header>
             <Page.Body>
               {WEEKS.map((week) => (

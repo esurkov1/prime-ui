@@ -128,9 +128,9 @@ describe("AppShell", () => {
           <AppShellBoundary>
             <Page.Root>
               <Page.TopBar>
-                <Page.Header>
+                <Page.Heading>
                   <Page.Title>Превью</Page.Title>
-                </Page.Header>
+                </Page.Heading>
               </Page.TopBar>
             </Page.Root>
           </AppShellBoundary>

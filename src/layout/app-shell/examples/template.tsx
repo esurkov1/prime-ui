@@ -53,10 +53,10 @@ export default function AppShellTemplateExample() {
       >
         <Page.Root>
           <Page.TopBar>
-            <Page.Header>
+            <Page.Heading>
               <Page.Title>{page.label}</Page.Title>
               <Page.Description>{page.text}</Page.Description>
-            </Page.Header>
+            </Page.Heading>
           </Page.TopBar>
           <Page.Body>
             <Typography variant="body-m" tone="secondary">

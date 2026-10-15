@@ -48,8 +48,8 @@ region, `Skeleton` while it loads).
    icon names.
 7. **States and motion** — [motion.md](motion.md): every region loads, empties and fails without
    flipping; what the kit animates by itself and when to move your own elements.
-8. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page's tools are
-   `Page.Toolbar`, nothing is hidden on phones, touch follows `(hover)` / `(pointer)`.
+8. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page's top bar
+   gives way by width itself, nothing is hidden on phones, touch follows `(hover)` / `(pointer)`.
 9. **Check** — [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md), then look at the screen
    in a browser ([ux.md](ux.md#9-look-at-it-before-handing-it-over)). Fix every «no», then hand
    over.
@@ -81,7 +81,7 @@ project under `node_modules/prime-ui-kit/src/`.
 | [foundations.md](foundations.md) | grid, proximity scale, sizes, surfaces, type, tone and color |
 | [api-contract.md](api-contract.md) | writing JSX — prop names, sizes and host tiers, controlled state, forms, helpers, icons |
 | [motion.md](motion.md) | every screen — loading / empty / error that flow, what the kit animates, when to move, recipes |
-| [responsive.md](responsive.md) | every screen — 320px and up, the page's tools (`Page.Toolbar`), touch |
+| [responsive.md](responsive.md) | every screen — 320px and up, the page's top bar (`Page.TopBar`), touch |
 | [anti-slop.md](anti-slop.md) | before and after writing — what makes a screen look generated |
 | [checklist.md](checklist.md) | before handing the screen over |
 
@@ -123,7 +123,7 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 7. Labels above fields, always — once per column for records in rows (`FieldList`), never numbered
    («Пункт 1»), never repeating their heading. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
-   the page title is `Page.Title`, one per page: in `Page.TopBar` on a work screen, in the flow
+   the page title is `Page.Title`, one per page: in the `Page.Heading` of `Page.TopBar` on a work screen, in the flow
    on a document page or an overview). No custom font sizes.
 9. Overlays (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select,
    MediaViewer) come from the kit — never hand-made — and stay mounted: drive them with `open`,

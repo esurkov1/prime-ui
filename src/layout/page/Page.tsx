@@ -2,19 +2,27 @@ import * as React from "react";
 
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
 import { Button, type ButtonRootProps } from "@/components/button/Button";
-import { Divider } from "@/components/divider/Divider";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Input } from "@/components/input/Input";
+import {
+  SegmentedControl,
+  type SegmentedControlRootProps,
+} from "@/components/segmented-control/SegmentedControl";
+import { SmartFilter } from "@/components/smart-filter/SmartFilter";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { readCssLengthPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
+import { type BarAction, type BarPlan, type BarWidths, planBar } from "@/internal/barPlan";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { iconLayout } from "@/internal/iconLayout";
 import { useLabels } from "@/internal/labels";
 import { namedRole } from "@/internal/namedRole";
+import { nodeText } from "@/internal/nodeText";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { stickySurfaceClass } from "@/internal/sticky";
 import textRole from "@/internal/textRole.module.css";
@@ -100,9 +108,13 @@ type Place = "flow" | "bar";
 
 const PlaceContext = React.createContext<Place>("flow");
 
-type BarContextValue = { collapse: boolean; collapsed: boolean };
+type BarContextValue = { collapse: boolean; collapsed: boolean; plan: BarPlan };
 
-const BarContext = React.createContext<BarContextValue>({ collapse: false, collapsed: false });
+const BarContext = React.createContext<BarContextValue>({
+  collapse: false,
+  collapsed: false,
+  plan: "one",
+});
 
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
@@ -204,6 +216,80 @@ function useCollapsed(
   return enabled && collapsed;
 }
 
+const px = (value: string) => Number.parseFloat(value) || 0;
+const widthOf = (node: Element | null) =>
+  node ? Math.ceil(node.getBoundingClientRect().width) : 0;
+
+/**
+ * The natural widths of the bar's groups. The row is switched to its measuring layout for the
+ * read — every group at its natural width on one line, every action whole and labelled — and
+ * back, inside one layout effect, so the measuring layout is never painted.
+ */
+function measureBar(row: HTMLElement): BarWidths {
+  const gap = px(getComputedStyle(row).columnGap);
+  const iconed = Array.from(row.querySelectorAll<HTMLElement>("[data-button-label]"));
+  row.dataset.measure = "true";
+  for (const node of iconed) node.removeAttribute("data-button-label");
+
+  const actionsNode = row.querySelector<HTMLElement>(`:scope > .${styles.actions}`);
+  const items = Array.from(
+    actionsNode?.querySelectorAll<HTMLElement>(`:scope > .${styles.actionItem}[data-role]`) ?? [],
+  );
+  const square = Math.max(0, ...items.map((item) => item.offsetHeight));
+  const widths: BarWidths = {
+    heading: widthOf(row.querySelector(`:scope > .${styles.heading}`)),
+    tools: widthOf(row.querySelector(`:scope > .${styles.tools}`)),
+    actions: items.map((item) => ({
+      role: item.dataset.role as BarAction["role"],
+      full: widthOf(item),
+      icon: item.dataset.iconable === "true" ? square : null,
+    })),
+    more: square,
+    gap,
+    actionGap: actionsNode ? px(getComputedStyle(actionsNode).columnGap) : 0,
+  };
+
+  for (const node of iconed) node.setAttribute("data-button-label", "icon");
+  delete row.dataset.measure;
+  return widths;
+}
+
+/**
+ * The bar's plan: measured at natural widths after every render (a changed heading, tool or
+ * action re-measures), re-chosen from those widths alone when the bar resizes, and re-measured
+ * once web fonts load.
+ */
+function useBarPlan(
+  rowRef: React.RefObject<HTMLDivElement | null>,
+  rowsRef: React.RefObject<HTMLDivElement | null>,
+): BarPlan {
+  const [plan, setPlan] = React.useState<BarPlan>("one");
+  const widths = React.useRef<BarWidths | null>(null);
+
+  const decide = React.useCallback(() => {
+    const rows = rowsRef.current;
+    if (!widths.current || !rows) return;
+    const next = planBar(widths.current, rows.clientWidth);
+    setPlan((current) => (current === next ? current : next));
+  }, [rowsRef]);
+
+  const measure = React.useCallback(() => {
+    if (!rowRef.current) return;
+    widths.current = measureBar(rowRef.current);
+    decide();
+  }, [rowRef, decide]);
+
+  React.useLayoutEffect(measure);
+  useResizeEffect(rowsRef, decide);
+  React.useEffect(() => {
+    const fonts = typeof document === "undefined" ? undefined : document.fonts;
+    fonts?.addEventListener?.("loadingdone", measure);
+    return () => fonts?.removeEventListener?.("loadingdone", measure);
+  }, [measure]);
+
+  return plan;
+}
+
 export type PageTopBarProps = React.HTMLAttributes<HTMLElement> & {
   sticky?: boolean;
   collapse?: boolean;
@@ -211,11 +297,13 @@ export type PageTopBarProps = React.HTMLAttributes<HTMLElement> & {
 };
 
 /**
- * The page's strip at its top edge, across the panel: a `Page.Header` (the title row) and / or a
- * `Page.Toolbar` (the row of the page's tools under it). Sticky inside the scroller of the page;
- * while the shell's Sidebar is off-canvas it starts with the menu button that opens it. With
- * `collapse` it repeats the flow `Page.Title` (and its description) once that title scrolls out
- * under the bar.
+ * The page's strip at its top edge, across the panel. Up to four groups in one grid —
+ * `Page.Heading`, `Page.Tools`, `Page.Actions` on the first line, `Page.Chips` under them — laid
+ * out by one plan chosen from their natural widths (`planBar`): one line while everything fits;
+ * then the tools take a line of their own; then the buttons give way to their icons, secondary
+ * first, and fold into «⋯»; only then does the heading truncate. Sticky inside the scroller of
+ * the page; while the shell's Sidebar is off-canvas it starts with the menu button. With
+ * `collapse` it repeats the flow `Page.Title` once that title scrolls out under the bar.
  */
 function PageTopBar({
   sticky = true,
@@ -228,12 +316,17 @@ function PageTopBar({
   const page = React.useContext(PageContext);
   const nav = useAppShellNav();
   const barRef = React.useRef<HTMLElement>(null);
+  const rowsRef = React.useRef<HTMLDivElement>(null);
+  const rowRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(barRef, ref);
   const collapsed = useCollapsed(collapse, barRef, page?.heading);
-  const bar = React.useMemo(() => ({ collapse, collapsed }), [collapse, collapsed]);
-  const rows = flattenChildren(children);
-  // The title repeats in the bar's title row: a bar without one gets a row of its own for it.
-  const titleRow = collapse && !rows.some((row) => isPart(row, PageHeader));
+  const plan = useBarPlan(rowRef, rowsRef);
+  const bar = React.useMemo(() => ({ collapse, collapsed, plan }), [collapse, collapsed, plan]);
+
+  const items = flattenChildren(children);
+  const of = (Part: React.ElementType) => items.filter((item) => isPart(item, Part));
+  const headings = of(PageHeading);
+  const other = items.filter((item) => !BAR_ORDER.some((Part) => isPart(item, Part)));
 
   return (
     <PlaceContext.Provider value="bar">
@@ -248,9 +341,15 @@ function PageTopBar({
           })}
         >
           {nav?.offCanvas ? <MenuButton /> : null}
-          <div className={styles.rows}>
-            {titleRow ? <PageHeader /> : null}
-            {rows}
+          <div ref={rowsRef} className={styles.rows}>
+            <div ref={rowRef} className={styles.row} data-plan={plan}>
+              {/* The title repeats in the bar's heading: a bar without one gets it for the echo. */}
+              {headings.length === 0 && collapse ? <PageHeading /> : headings}
+              {of(PageTools)}
+              {of(PageActions)}
+              {of(PageChips)}
+              {other}
+            </div>
           </div>
         </header>
       </BarContext.Provider>
@@ -282,8 +381,22 @@ function MenuButton() {
 }
 
 /**
- * The flow title repeated in the bar's title row: a visual echo (`aria-hidden`, `inert`) — the
- * heading itself is the `<h1>` in the flow. It rises in while the title is out of view.
+ * The chevron between the path and the title. The title is the page's `<h1>`, outside the path's
+ * `<nav>`, so the Breadcrumb cannot draw it: the same glyph and colour, decorative.
+ */
+function PathSeparator() {
+  return (
+    <span aria-hidden="true" className={styles.pathSeparator}>
+      <Icon name="nav.chevronRight" />
+    </span>
+  );
+}
+
+/**
+ * The flow title repeated in the bar's heading: a visual echo (`aria-hidden`, `inert`) — the
+ * heading itself is the `<h1>` in the flow. It rises in while the title is out of view. After a
+ * path it continues the path's line (› title) and leaves the description out, so the sticky bar
+ * keeps its height as the echo comes and goes.
  */
 function TitleEcho({ separator }: { separator: boolean }) {
   const page = React.useContext(PageContext);
@@ -297,75 +410,96 @@ function TitleEcho({ separator }: { separator: boolean }) {
       className={styles.echo}
       {...toDataAttributes({ visible: collapsed || undefined })}
     >
-      {separator ? <Divider orientation="vertical" inset /> : null}
-      <div className={styles.titleBlock}>
+      <div className={styles.headingLine}>
+        {separator ? <PathSeparator /> : null}
         <span className={cx(textRole.titleM, styles.barTitle)}>{title}</span>
-        {description == null ? null : (
-          <span className={cx(textRole.caption, styles.barDescription)}>{description}</span>
-        )}
       </div>
+      {description == null || separator ? null : (
+        <span className={cx(textRole.caption, styles.barDescription)}>{description}</span>
+      )}
     </div>
   );
 }
 
-// ─── Header ──────────────────────────────────────────────────────────────────
+// ─── Header and heading ──────────────────────────────────────────────────────
 
 export type PageHeaderProps = DivProps;
 
 /**
- * The title block and the page's actions in one row: an optional `Breadcrumb` path, `Page.Title`,
- * `Page.Description`, then `Page.Actions` at the end. In `Page.TopBar` it is compact — the path,
- * a separator and the title on one line, actions folding into «⋯»; in the page flow it is the
- * large document header — the path over the title, actions wrapping under it on a narrow column.
+ * The document header in the page flow (settings, long forms, overviews): a `Page.Heading` and
+ * its `Page.Actions` in one row; the actions wrap under the heading on a narrow column. In a
+ * `Page.TopBar` the same parts stand directly in the bar.
  */
 function PageHeader({ className, children, ...rest }: PageHeaderProps) {
-  const place = React.useContext(PlaceContext);
-  const { collapse } = React.useContext(BarContext);
-  const items = flattenChildren(children);
-  const actions = items.filter((item) => isPart(item, PageActions));
-  const path = items.filter((item) => isPart(item, Breadcrumb.Root));
-  const heading = items.filter(
-    (item) => !isPart(item, PageActions) && !isPart(item, Breadcrumb.Root),
-  );
-  const hasTitle = heading.some((item) => isPart(item, PageTitle));
-  const hasPath = path.length > 0;
-
-  let title: React.ReactNode = null;
-  if (place === "bar" && collapse && !hasTitle) {
-    title = <TitleEcho separator={hasPath} />;
-  } else if (heading.length > 0) {
-    title = (
-      <>
-        {place === "bar" && hasPath ? <Divider orientation="vertical" inset /> : null}
-        <div className={styles.titleBlock}>{heading}</div>
-      </>
-    );
-  }
-
+  const { parts: actions, rest: heading } = splitParts(children, PageActions);
   return (
     <div
       {...rest}
       className={cx(styles.header, className)}
-      data-place={place}
       data-has-actions={actions.length > 0 ? "true" : undefined}
     >
-      <div className={styles.heading}>
-        {hasPath ? <div className={styles.path}>{path}</div> : null}
-        {title}
-      </div>
+      {heading}
       {actions}
     </div>
   );
 }
 PageHeader.displayName = "Page.Header";
 
+export type PageHeadingProps = DivProps;
+
+/**
+ * The title group: an optional `Breadcrumb` path, `Page.Title`, `Page.Description`. In the bar
+ * the title is the path's last level — the path, a chevron and the title on one line, the
+ * description under the whole line, both truncating; in the flow the path stands over a large
+ * title and the description wraps.
+ */
+function PageHeading({ className, children, ...rest }: PageHeadingProps) {
+  const place = React.useContext(PlaceContext);
+  const { collapse } = React.useContext(BarContext);
+  const items = flattenChildren(children);
+  const path = items.filter((item) => isPart(item, Breadcrumb.Root));
+  const titles = items.filter((item) => isPart(item, PageTitle));
+  const descriptions = items.filter((item) => isPart(item, PageDescription));
+  const other = items.filter(
+    (item) =>
+      !isPart(item, Breadcrumb.Root) && !isPart(item, PageTitle) && !isPart(item, PageDescription),
+  );
+  const hasPath = path.length > 0;
+
+  if (place === "flow") {
+    return (
+      <div {...rest} className={cx(styles.heading, className)} data-place="flow">
+        {hasPath ? <div className={styles.path}>{path}</div> : null}
+        {titles}
+        {descriptions}
+        {other}
+      </div>
+    );
+  }
+
+  const echo = titles.length === 0 && collapse;
+  return (
+    <div {...rest} className={cx(styles.heading, className)} data-place="bar">
+      <div className={styles.headingLine}>
+        {hasPath ? <div className={styles.path}>{path}</div> : null}
+        {hasPath && titles.length > 0 ? <PathSeparator /> : null}
+        {titles}
+        {other}
+      </div>
+      {descriptions}
+      {echo ? <TitleEcho separator={hasPath} /> : null}
+    </div>
+  );
+}
+PageHeading.displayName = "Page.Heading";
+
 export type PageTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
   ref?: React.Ref<HTMLHeadingElement>;
 };
 
 /**
- * The page's `<h1>`: title-m in the top bar (it truncates), heading-m in the flow. A flow title
- * is what a `collapse` top bar repeats once it scrolls away.
+ * The page's `<h1>`: the last level of the path in the top bar (it truncates), a large title in
+ * the flow. A flow title is what a `collapse` top bar repeats once it scrolls away.
  */
 function PageTitle({ className, children, ref, ...rest }: PageTitleProps) {
   const place = React.useContext(PlaceContext);
@@ -431,10 +565,11 @@ PageDescription.displayName = "Page.Description";
 export type PageActionsProps = DivProps;
 
 /**
- * The page's buttons at the end of a header (or of a `Page.Section` heading). In the flow they
- * wrap under the title on a narrow column; in the top bar they keep one line and, when it runs out
- * of width, the trailing secondary Buttons fold into a «⋯» menu — the first solid Button (the
- * primary action) and anything that is not a `Button.Root` stay.
+ * The page's buttons: at the end of a `Page.Header` or a `Page.Section` heading in the flow (they
+ * wrap under it on a narrow column), on the first line of a `Page.TopBar` at every width. In the
+ * bar, when the line runs short, Buttons with an icon show only it — the secondary ones first,
+ * then the primary (the first solid Button) — with their label as name and tooltip; then the
+ * secondary Buttons fold into a «⋯» menu. Anything that is not a `Button.Root` stays as it is.
  */
 function PageActions(props: PageActionsProps) {
   const place = React.useContext(PlaceContext);
@@ -450,10 +585,27 @@ const isButton = (node: React.ReactNode): node is React.ReactElement<ButtonRootP
 const keyOf = (node: React.ReactNode, index: number) =>
   React.isValidElement(node) && node.key != null ? String(node.key) : `#${index}`;
 
-const sameSet = (a: ReadonlySet<string>, b: ReadonlySet<string>) =>
-  a.size === b.size && [...a].every((key) => b.has(key));
+/** The content of a Button as written: its own children, or its child's with `asChild`. */
+function buttonContent(button: React.ReactElement<ButtonRootProps>): React.ReactNode {
+  const props = button.props;
+  return props.asChild
+    ? (props.children as React.ReactElement<{ children?: React.ReactNode }>).props.children
+    : props.children;
+}
 
-const NONE: ReadonlySet<string> = new Set();
+/** A Button that shows a label beside an icon: it can give way to the icon alone. */
+function isIconable(button: React.ReactElement<ButtonRootProps>): boolean {
+  const layout = iconLayout(buttonContent(button), Button.Icon);
+  return layout.leadingIcon || layout.trailingIcon;
+}
+
+/** The label of a Button: its `aria-label`, else the text of its content without the icons. */
+function buttonLabel(button: React.ReactElement<ButtonRootProps>): string {
+  const label = button.props["aria-label"];
+  if (label) return label;
+  const { rest } = splitParts(buttonContent(button), Button.Icon);
+  return nodeText(rest).trim();
+}
 
 /** A folded Button as a menu item: its icon, its name, its click, its disabled state and tone. */
 function menuItem(button: React.ReactElement<ButtonRootProps>, key: string) {
@@ -462,7 +614,7 @@ function menuItem(button: React.ReactElement<ButtonRootProps>, key: string) {
     ? (props.children as React.ReactElement<{ children?: React.ReactNode }>)
     : null;
   const { parts: icons, rest: text } = splitParts<{ children?: React.ReactNode }>(
-    own ? own.props.children : props.children,
+    buttonContent(button),
     Button.Icon,
   );
   const icon = icons[0]?.props.children;
@@ -485,67 +637,80 @@ function menuItem(button: React.ReactElement<ButtonRootProps>, key: string) {
   );
 }
 
-function BarActions({ className, children, ref, ...rest }: PageActionsProps) {
-  const labels = usePageLabels();
-  const nodeRef = React.useRef<HTMLDivElement>(null);
-  const headerRef = React.useRef<HTMLElement | null>(null);
-  const mergedRef = useMergedRefs(nodeRef, ref);
-  const [folded, setFolded] = React.useState<ReadonlySet<string>>(NONE);
-  const widths = React.useRef(new Map<string, number>());
+/**
+ * The first Button inside an action that is not one itself: the Button of a trigger slot
+ * (`Drawer.Trigger`, `Modal.Trigger`) written as the action. Searched depth-first through element
+ * children, so the trigger comes before the layer's content.
+ */
+function nestedButton(node: React.ReactNode): React.ReactElement<ButtonRootProps> | null {
+  for (const child of flattenChildren(node)) {
+    if (isButton(child)) return child;
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) continue;
+    const found = nestedButton(child.props.children);
+    if (found) return found;
+  }
+  return null;
+}
 
+/** `node` with its Button `target` replaced by `wrap(target)`, the rest of the tree as is. */
+function replaceButton(
+  node: React.ReactNode,
+  target: React.ReactElement,
+  wrap: (button: React.ReactElement) => React.ReactElement,
+): React.ReactNode {
+  if (node === target) return wrap(target);
+  if (!React.isValidElement<{ children?: React.ReactNode }>(node)) return node;
+  const { children } = node.props;
+  if (children === undefined) return node;
+  const next = React.Children.map(children, (child) => replaceButton(child, target, wrap));
+  return React.cloneElement(node, undefined, ...(next ?? []));
+}
+
+type IconTooltipProps = {
+  shown: boolean;
+  label: string;
+  children: React.ReactElement;
+} & Record<string, unknown>;
+
+/**
+ * The tooltip of a Button that shows only its icon. Always mounted, open only while the label is
+ * hidden, so the Button keeps its place in the tree (and its state, and focus) across plans. The
+ * props a trigger slot clones onto it (handlers, `ref`, ARIA) pass on to the Button.
+ */
+function IconTooltip({ shown, label, children, ...slotProps }: IconTooltipProps) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <Tooltip.Root open={shown && open} onOpenChange={setOpen}>
+      <Tooltip.Trigger>{React.cloneElement(children, slotProps)}</Tooltip.Trigger>
+      <Tooltip.Content>{label}</Tooltip.Content>
+    </Tooltip.Root>
+  );
+}
+
+function BarActions({ className, children, ...rest }: PageActionsProps) {
+  const labels = usePageLabels();
+  const { plan } = React.useContext(BarContext);
   const items = flattenChildren(children);
   const keys = items.map(keyOf);
-  const primary = items.findIndex(
-    (item) => isButton(item) && (item.props.variant ?? "solid") === "solid",
+  // The Button of each action: the action itself, or the Button of a trigger slot written as it.
+  const buttons = items.map((item) => (isButton(item) ? item : nestedButton(item)));
+  const primary = buttons.findIndex(
+    (button) => button !== null && (button.props.variant ?? "solid") === "solid",
   );
-  const movable = items.map((item, index) => isButton(item) && index !== primary);
-  const latest = React.useRef({ keys, movable });
-  latest.current = { keys, movable };
+  // Only a plain Button folds into «⋯» (a trigger's layer cannot open from a menu item); a trigger
+  // that is not the primary keeps its place and its label.
+  const roleOf = (item: React.ReactNode, index: number): BarAction["role"] =>
+    index === primary ? "primary" : isButton(item) ? "secondary" : "other";
+  const folded = (item: React.ReactNode, index: number) =>
+    plan === "fold" && roleOf(item, index) === "secondary";
+  const iconOnly = (item: React.ReactNode, index: number) => {
+    const role = roleOf(item, index);
+    if (role === "other") return false;
+    if (plan === "icons" || plan === "fold") return true;
+    return plan === "icons-secondary" && role === "secondary";
+  };
+  const firstFolded = items.findIndex(folded);
 
-  const fit = React.useCallback(() => {
-    const node = nodeRef.current;
-    const header = node?.parentElement;
-    if (!node || !header) return;
-    for (const child of Array.from(node.children) as HTMLElement[]) {
-      const key = child.dataset.key;
-      if (key !== undefined && !child.hidden) widths.current.set(key, child.offsetWidth);
-    }
-    const { keys: all, movable: canMove } = latest.current;
-    const gap = Number.parseFloat(getComputedStyle(node).columnGap) || 0;
-    const headerStyle = getComputedStyle(header);
-    const inner =
-      header.clientWidth -
-      (Number.parseFloat(headerStyle.paddingInlineStart) || 0) -
-      (Number.parseFloat(headerStyle.paddingInlineEnd) || 0);
-    // The title keeps at least this much before an action folds; below it the title truncates.
-    const keep = readCssLengthPx("--prime-space-24", 96) * 1.5;
-    const room = inner - (Number.parseFloat(headerStyle.columnGap) || 0) - keep;
-    const width = (list: string[]) =>
-      list.reduce((sum, key) => sum + (widths.current.get(key) ?? 0), 0) +
-      gap * Math.max(list.length - 1, 0);
-
-    const next = new Set<string>();
-    if (width(all) > room) {
-      const more = readCssLengthPx("--prime-control-m-height", 32) + gap;
-      for (let index = all.length - 1; index >= 0; index--) {
-        const key = all[index] as string;
-        if (!canMove[index] || !widths.current.has(key)) continue;
-        next.add(key);
-        if (width(all.filter((key) => !next.has(key))) + more <= room) break;
-      }
-    }
-    setFolded((prev) => (sameSet(prev, next) ? prev : next));
-  }, []);
-
-  React.useLayoutEffect(() => {
-    headerRef.current = nodeRef.current?.parentElement ?? null;
-  });
-  // Measure after every render: a new or changed action shows first and is measured in place.
-  React.useLayoutEffect(fit);
-  useResizeEffect(headerRef, fit);
-  useResizeEffect(nodeRef, fit, { children: true });
-
-  const firstFolded = keys.findIndex((key) => folded.has(key));
   const more =
     firstFolded >= 0 ? (
       <div key="more" className={styles.actionItem}>
@@ -559,9 +724,7 @@ function BarActions({ className, children, ref, ...rest }: PageActionsProps) {
           </Dropdown.Trigger>
           <Dropdown.Content align="end">
             {items.map((item, index) =>
-              folded.has(keys[index] as string) && isButton(item)
-                ? menuItem(item, keys[index] as string)
-                : null,
+              folded(item, index) && isButton(item) ? menuItem(item, keys[index] as string) : null,
             )}
           </Dropdown.Content>
         </Dropdown.Root>
@@ -569,14 +732,28 @@ function BarActions({ className, children, ref, ...rest }: PageActionsProps) {
     ) : null;
 
   return (
-    <div {...rest} ref={mergedRef} className={cx(styles.actions, className)}>
+    <div {...rest} className={cx(styles.actions, className)}>
       {items.map((item, index) => {
         const key = keys[index] as string;
+        const button = buttons[index] ?? null;
+        const iconable = button !== null && roleOf(item, index) !== "other" && isIconable(button);
+        const compact = iconable && iconOnly(item, index);
+        const tooltip = (target: React.ReactElement) => (
+          <IconTooltip shown={compact} label={button ? buttonLabel(button) : ""}>
+            {target}
+          </IconTooltip>
+        );
         return (
           <React.Fragment key={key}>
             {index === firstFolded ? more : null}
-            <div className={styles.actionItem} data-key={key} hidden={folded.has(key)}>
-              {item}
+            <div
+              className={styles.actionItem}
+              data-role={roleOf(item, index)}
+              data-iconable={iconable ? "true" : undefined}
+              data-button-label={compact ? "icon" : undefined}
+              hidden={folded(item, index)}
+            >
+              {iconable && button ? replaceButton(item, button, tooltip) : item}
             </div>
           </React.Fragment>
         );
@@ -585,89 +762,57 @@ function BarActions({ className, children, ref, ...rest }: PageActionsProps) {
   );
 }
 
-// ─── Toolbar ─────────────────────────────────────────────────────────────────
+// ─── Tools and chips ─────────────────────────────────────────────────────────
 
 export type PageToolsProps = DivProps;
 
 /**
- * The page's tools: search and filter, sections, view options and the primary action, with the
- * active filters under the top row. It lays itself out from its own width — one row when wide,
- * stacked rows when narrow. Parts may be left out; whatever the JSX order, the DOM (and Tab) order
- * is Tools, Sections, View, Actions, Chips. Named (`aria-label`), it is a `group`.
+ * The page's tools — sections, search and filter, view — as kit controls in the order written.
+ * On the bar's first line each keeps its natural width; on a line of their own they fill it:
+ * a search (`SmartFilter.Toolbar`, `Input.Root`) takes the room first, switchers share the rest
+ * (a `SegmentedControl.Root` is `fullWidth` unless set), and they wrap when one line is not
+ * enough. Named (`aria-label`), it is a `group`.
  */
 function PageTools({ className, children, ref, ...rest }: PageToolsProps) {
-  const items = flattenChildren(children);
-  const of = (Part: React.ElementType) => items.filter((child) => isPart(child, Part));
-  const other = items.filter(
-    (child) => !TOOLBAR_ORDER.some((Part) => isPart(child, Part)) && !isPart(child, PageToolsChips),
-  );
-
   return (
     <div
       {...rest}
       ref={ref}
       role={namedRole(rest, "group")}
-      className={cx(styles.toolbar, className)}
+      className={cx(styles.tools, className)}
     >
-      <div className={styles.toolbarLayout}>
-        <div className={styles.toolbarBar}>
-          {TOOLBAR_ORDER.flatMap(of)}
-          {other}
-        </div>
-        {of(PageToolsChips)}
-      </div>
+      {flattenChildren(children).map((item, index) => {
+        const grow = isPart(item, SmartFilter.Toolbar) || isPart(item, Input.Root);
+        const tool =
+          isPart<SegmentedControlRootProps>(item, SegmentedControl.Root) &&
+          item.props.fullWidth === undefined
+            ? React.cloneElement(item, { fullWidth: true })
+            : item;
+        return (
+          <div
+            key={keyOf(item, index)}
+            className={styles.tool}
+            data-grow={grow ? "true" : undefined}
+          >
+            {tool}
+          </div>
+        );
+      })}
     </div>
   );
 }
-PageTools.displayName = "Page.Toolbar";
+PageTools.displayName = "Page.Tools";
 
-export type PageToolsToolsProps = DivProps;
+export type PageChipsProps = DivProps;
 
-/** Search and filter button (`SmartFilter.Toolbar`): the first slot and the stretchy one. */
-function PageToolsTools({ className, ...rest }: PageToolsToolsProps) {
-  return <div {...rest} className={cx(styles.toolbarTools, className)} />;
+/** Active filters (`SmartFilter.Chips`) on a line of their own under the bar; gone while empty. */
+function PageChips({ className, ...rest }: PageChipsProps) {
+  return <div {...rest} className={cx(styles.chips, className)} />;
 }
-PageToolsTools.displayName = "Page.ToolbarTools";
+PageChips.displayName = "Page.Chips";
 
-export type PageToolsSectionsProps = DivProps;
-
-/** Sections of the page — a `fullWidth` SegmentedControl; after the Tools when wide, a full row when narrow. */
-function PageToolsSections({ className, ...rest }: PageToolsSectionsProps) {
-  return <div {...rest} className={cx(styles.toolbarSections, className)} />;
-}
-PageToolsSections.displayName = "Page.ToolbarSections";
-
-export type PageToolsViewProps = DivProps;
-
-/** How the data is shown: period, table / cards, columns. Its own full row when narrow. */
-function PageToolsView({ className, ...rest }: PageToolsViewProps) {
-  return <div {...rest} className={cx(styles.toolbarView, className)} />;
-}
-PageToolsView.displayName = "Page.ToolbarView";
-
-export type PageToolsActionsProps = DivProps;
-
-/** The primary action of the page: the top row's end at every width. */
-function PageToolsActions({ className, ...rest }: PageToolsActionsProps) {
-  return <div {...rest} className={cx(styles.toolbarActions, className)} />;
-}
-PageToolsActions.displayName = "Page.ToolbarActions";
-
-export type PageToolsChipsProps = DivProps;
-
-/** Active filters (`SmartFilter.Chips`) in their own row under the top row; gone while empty. */
-function PageToolsChips({ className, ...rest }: PageToolsChipsProps) {
-  return <div {...rest} className={cx(styles.toolbarChips, className)} />;
-}
-PageToolsChips.displayName = "Page.ToolbarChips";
-
-/** The DOM and Tab order of the toolbar's slots: the reading order of the wide layout. */
-const TOOLBAR_ORDER: React.ElementType[] = [
-  PageToolsTools,
-  PageToolsSections,
-  PageToolsView,
-  PageToolsActions,
-];
+/** The groups of the bar in their DOM (and Tab) order: the reading order of one line. */
+const BAR_ORDER: React.ElementType[] = [PageHeading, PageTools, PageActions, PageChips];
 
 // ─── Body, sections, grid ────────────────────────────────────────────────────
 
@@ -954,15 +1099,12 @@ export const Page = {
   Root: PageRoot,
   TopBar: PageTopBar,
   Header: PageHeader,
+  Heading: PageHeading,
   Title: PageTitle,
   Description: PageDescription,
   Actions: PageActions,
-  Toolbar: PageTools,
-  ToolbarTools: PageToolsTools,
-  ToolbarSections: PageToolsSections,
-  ToolbarView: PageToolsView,
-  ToolbarActions: PageToolsActions,
-  ToolbarChips: PageToolsChips,
+  Tools: PageTools,
+  Chips: PageChips,
   Body: PageBody,
   Section: PageSection,
   Grid: PageGrid,

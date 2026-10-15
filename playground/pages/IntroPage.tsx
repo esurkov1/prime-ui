@@ -18,11 +18,13 @@ export default function IntroPage() {
     <Page.Root>
       <PlaygroundTopBar />
       <Page.Header>
-        <Page.Title>Prime UI</Page.Title>
-        <Page.Description>
-          Библиотека React-компонентов для рабочих интерфейсов: формы, таблицы, панели, оверлеи. Это
-          живая документация. В ней есть примеры, код и API каждого компонента.
-        </Page.Description>
+        <Page.Heading>
+          <Page.Title>Prime UI</Page.Title>
+          <Page.Description>
+            Библиотека React-компонентов для рабочих интерфейсов: формы, таблицы, панели, оверлеи.
+            Это живая документация. В ней есть примеры, код и API каждого компонента.
+          </Page.Description>
+        </Page.Heading>
       </Page.Header>
       <Page.Body>
         <Page.Section label="Как устроена система">

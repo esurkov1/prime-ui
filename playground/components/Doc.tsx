@@ -24,8 +24,10 @@ export function DocPage({
     <Page.Root>
       <PlaygroundTopBar />
       <Page.Header>
-        <Page.Title>{title}</Page.Title>
-        <Page.Description>{description}</Page.Description>
+        <Page.Heading>
+          <Page.Title>{title}</Page.Title>
+          <Page.Description>{description}</Page.Description>
+        </Page.Heading>
       </Page.Header>
       <Page.Body>{children}</Page.Body>
     </Page.Root>

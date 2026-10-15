@@ -126,161 +126,150 @@ export default function DrawerScreenExample() {
   const people = clients.filter((client) => client.kind === "person").length;
 
   return (
-    <Page.Root>
-      {/* A work screen titles itself in its top bar: the only h1, the counts under it, search and the
-          one primary action — the Drawer trigger — in the toolbar row. */}
-
-      <Page.TopBar>
-        <Page.Header>
-          <Page.Title>Клиенты</Page.Title>
-          <Page.Description>
-            {plural(clients.length, CLIENT_WORDS)} ·{" "}
-            {plural(clients.length - people, COMPANY_WORDS)} и {people} ИП
-          </Page.Description>
-        </Page.Header>
-        <SmartFilter.Root fields={[]} search={search} onSearchChange={setSearch}>
-          <Page.Toolbar aria-label="Клиенты">
-            <Page.ToolbarTools>
-              <SmartFilter.Toolbar />
-            </Page.ToolbarTools>
-            <Page.ToolbarActions>
-              <Drawer.Root open={open} onOpenChange={changeOpen}>
-                <Drawer.Trigger>
-                  <Button.Root>
-                    <Button.Icon>
-                      <Icon name="action.add" />
-                    </Button.Icon>
-                    Новый клиент
-                  </Button.Root>
-                </Drawer.Trigger>
-                <Drawer.Content>
-                  <Drawer.Header>
-                    <Drawer.Title>Новый клиент</Drawer.Title>
-                    <Drawer.Description>
-                      Появится в списке и в выборе клиента при выставлении счёта.
-                    </Drawer.Description>
-                  </Drawer.Header>
-                  <Drawer.Body>
-                    <Drawer.Guard busy={saving} dirty={dirty} />
-                    <form
-                      id={formId}
-                      className={styles.form}
-                      noValidate
-                      onSubmit={submit}
-                      onChange={() => setDirty(true)}
-                    >
-                      <Fieldset label="Реквизиты" disabled={saving}>
-                        <Radio.Group
-                          name="kind"
-                          label="Тип клиента"
-                          defaultValue="company"
-                          orientation="horizontal"
-                        >
-                          <Radio.Root value="company">
-                            <Radio.Label>Компания</Radio.Label>
-                          </Radio.Root>
-                          <Radio.Root value="person">
-                            <Radio.Label>ИП</Radio.Label>
-                          </Radio.Root>
-                        </Radio.Group>
-                        <Input.Root label="Название" error={errors.name}>
+    <SmartFilter.Root fields={[]} search={search} onSearchChange={setSearch}>
+      <Page.Root>
+        {/* A work screen titles itself in its top bar: the only h1, the counts under it, the search
+          and the one primary action — the Drawer trigger. */}
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Клиенты</Page.Title>
+            <Page.Description>
+              {plural(clients.length, CLIENT_WORDS)} ·{" "}
+              {plural(clients.length - people, COMPANY_WORDS)} и {people} ИП
+            </Page.Description>
+          </Page.Heading>
+          <Page.Tools aria-label="Клиенты">
+            <SmartFilter.Toolbar />
+          </Page.Tools>
+          <Page.Actions>
+            <Drawer.Root open={open} onOpenChange={changeOpen}>
+              <Drawer.Trigger>
+                <Button.Root>
+                  <Button.Icon>
+                    <Icon name="action.add" />
+                  </Button.Icon>
+                  Новый клиент
+                </Button.Root>
+              </Drawer.Trigger>
+              <Drawer.Content>
+                <Drawer.Header>
+                  <Drawer.Title>Новый клиент</Drawer.Title>
+                  <Drawer.Description>
+                    Появится в списке и в выборе клиента при выставлении счёта.
+                  </Drawer.Description>
+                </Drawer.Header>
+                <Drawer.Body>
+                  <Drawer.Guard busy={saving} dirty={dirty} />
+                  <form
+                    id={formId}
+                    className={styles.form}
+                    noValidate
+                    onSubmit={submit}
+                    onChange={() => setDirty(true)}
+                  >
+                    <Fieldset label="Реквизиты" disabled={saving}>
+                      <Radio.Group
+                        name="kind"
+                        label="Тип клиента"
+                        defaultValue="company"
+                        orientation="horizontal"
+                      >
+                        <Radio.Root value="company">
+                          <Radio.Label>Компания</Radio.Label>
+                        </Radio.Root>
+                        <Radio.Root value="person">
+                          <Radio.Label>ИП</Radio.Label>
+                        </Radio.Root>
+                      </Radio.Group>
+                      <Input.Root label="Название" error={errors.name}>
+                        <Input.Wrapper>
+                          <Input.Field
+                            name="name"
+                            placeholder="ООО «Ромашка»"
+                            autoComplete="organization"
+                          />
+                        </Input.Wrapper>
+                      </Input.Root>
+                      <div className={styles.pair}>
+                        <Input.Root label="ИНН" error={errors.inn} reserveSupportRow>
                           <Input.Wrapper>
-                            <Input.Field
-                              name="name"
-                              placeholder="ООО «Ромашка»"
-                              autoComplete="organization"
-                            />
+                            <Input.Field name="inn" inputMode="numeric" placeholder="7704512908" />
                           </Input.Wrapper>
                         </Input.Root>
-                        <div className={styles.pair}>
-                          <Input.Root label="ИНН" error={errors.inn} reserveSupportRow>
-                            <Input.Wrapper>
-                              <Input.Field
-                                name="inn"
-                                inputMode="numeric"
-                                placeholder="7704512908"
-                              />
-                            </Input.Wrapper>
-                          </Input.Root>
-                          <Input.Root label="КПП" optional reserveSupportRow>
-                            <Input.Wrapper>
-                              <Input.Field name="kpp" inputMode="numeric" placeholder="770401001" />
-                            </Input.Wrapper>
-                          </Input.Root>
-                        </div>
-                      </Fieldset>
-                      <Fieldset label="Контакты" disabled={saving}>
-                        <Input.Root
-                          label="Почта для счетов"
-                          error={errors.email}
-                          hint="На неё уйдут счета и акты"
-                        >
+                        <Input.Root label="КПП" optional reserveSupportRow>
                           <Input.Wrapper>
-                            <Input.Icon side="start">
-                              <Icon name="field.email" />
-                            </Input.Icon>
-                            <Input.Field
-                              name="email"
-                              type="email"
-                              placeholder="billing@company.ru"
-                            />
+                            <Input.Field name="kpp" inputMode="numeric" placeholder="770401001" />
                           </Input.Wrapper>
                         </Input.Root>
-                        <Select.Root
-                          label="Менеджер"
-                          value={manager}
-                          onValueChange={(next) => {
-                            setManager(next);
-                            setDirty(true);
-                          }}
-                        >
-                          <Select.Trigger>
-                            <Select.Value />
-                          </Select.Trigger>
-                          <Select.Content>
-                            {MANAGERS.map((name) => (
-                              <Select.Item key={name} value={name}>
-                                {name}
-                              </Select.Item>
-                            ))}
-                          </Select.Content>
-                        </Select.Root>
-                        <Textarea.Root name="note" label="Комментарий" optional rows={2} />
-                        <Checkbox.Root
-                          name="invite"
-                          defaultChecked
-                          hint="Клиент увидит свои счета и акты онлайн"
-                        >
-                          <Checkbox.Label>Пригласить в личный кабинет</Checkbox.Label>
-                        </Checkbox.Root>
-                      </Fieldset>
-                    </form>
-                  </Drawer.Body>
-                  <Drawer.Footer>
-                    <Drawer.Close>
-                      <Button.Root variant="outline" tone="neutral">
-                        Отмена
-                      </Button.Root>
-                    </Drawer.Close>
-                    <Button.Root type="submit" form={formId} loading={saving}>
-                      Добавить клиента
+                      </div>
+                    </Fieldset>
+                    <Fieldset label="Контакты" disabled={saving}>
+                      <Input.Root
+                        label="Почта для счетов"
+                        error={errors.email}
+                        hint="На неё уйдут счета и акты"
+                      >
+                        <Input.Wrapper>
+                          <Input.Icon side="start">
+                            <Icon name="field.email" />
+                          </Input.Icon>
+                          <Input.Field name="email" type="email" placeholder="billing@company.ru" />
+                        </Input.Wrapper>
+                      </Input.Root>
+                      <Select.Root
+                        label="Менеджер"
+                        value={manager}
+                        onValueChange={(next) => {
+                          setManager(next);
+                          setDirty(true);
+                        }}
+                      >
+                        <Select.Trigger>
+                          <Select.Value />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {MANAGERS.map((name) => (
+                            <Select.Item key={name} value={name}>
+                              {name}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                      <Textarea.Root name="note" label="Комментарий" optional rows={2} />
+                      <Checkbox.Root
+                        name="invite"
+                        defaultChecked
+                        hint="Клиент увидит свои счета и акты онлайн"
+                      >
+                        <Checkbox.Label>Пригласить в личный кабинет</Checkbox.Label>
+                      </Checkbox.Root>
+                    </Fieldset>
+                  </form>
+                </Drawer.Body>
+                <Drawer.Footer>
+                  <Drawer.Close>
+                    <Button.Root variant="outline" tone="neutral">
+                      Отмена
                     </Button.Root>
-                  </Drawer.Footer>
-                </Drawer.Content>
-              </Drawer.Root>
-            </Page.ToolbarActions>
-          </Page.Toolbar>
-        </SmartFilter.Root>
-      </Page.TopBar>
-      <Page.Body>
-        <DataTable
-          columns={COLUMNS}
-          rows={shown}
-          getRowKey={(row) => row.id}
-          paging="none"
-          empty="Клиентов не найдено"
-        />
-      </Page.Body>
-    </Page.Root>
+                  </Drawer.Close>
+                  <Button.Root type="submit" form={formId} loading={saving}>
+                    Добавить клиента
+                  </Button.Root>
+                </Drawer.Footer>
+              </Drawer.Content>
+            </Drawer.Root>
+          </Page.Actions>
+        </Page.TopBar>
+        <Page.Body>
+          <DataTable
+            columns={COLUMNS}
+            rows={shown}
+            getRowKey={(row) => row.id}
+            paging="none"
+            empty="Клиентов не найдено"
+          />
+        </Page.Body>
+      </Page.Root>
+    </SmartFilter.Root>
   );
 }

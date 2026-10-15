@@ -77,36 +77,41 @@ export default function DescriptionListScreenExample() {
           only h1 with its status and due date under it, the record's actions at the end. */}
 
       <Page.TopBar>
-        <Page.Header>
+        <Page.Heading>
           <Breadcrumb.Root>
             <Breadcrumb.Item href="#invoices">Счета</Breadcrumb.Item>
           </Breadcrumb.Root>
           <Page.Title>Счёт № 2026-0418</Page.Title>
           <Page.Description>Отправлен · оплатить до 14 октября</Page.Description>
-          {/* By weight: the primary action stays; when the row runs short the soft ones fold
-              into «⋯» from the end. */}
-          <Page.Actions>
-            <Button.Root variant="soft" tone="neutral">
-              <Button.Icon>
-                <Icon name="action.copy" />
-              </Button.Icon>
-              Дублировать
-            </Button.Root>
-            <Button.Root variant="soft" tone="neutral">
-              <Button.Icon>
-                <Icon name="action.download" />
-              </Button.Icon>
-              Скачать PDF
-            </Button.Root>
-            <Button.Root variant="soft" tone="neutral">
-              <Button.Icon>
-                <Icon name="action.send" />
-              </Button.Icon>
-              Напомнить
-            </Button.Root>
-            <Button.Root>Отметить оплату</Button.Root>
-          </Page.Actions>
-        </Page.Header>
+        </Page.Heading>
+        {/* By weight: when the row runs short the soft actions show only their icons, then fold
+            into «⋯»; the primary action stays. */}
+        <Page.Actions>
+          <Button.Root variant="soft" tone="neutral">
+            <Button.Icon>
+              <Icon name="action.copy" />
+            </Button.Icon>
+            Дублировать
+          </Button.Root>
+          <Button.Root variant="soft" tone="neutral">
+            <Button.Icon>
+              <Icon name="action.download" />
+            </Button.Icon>
+            Скачать PDF
+          </Button.Root>
+          <Button.Root variant="soft" tone="neutral">
+            <Button.Icon>
+              <Icon name="action.send" />
+            </Button.Icon>
+            Напомнить
+          </Button.Root>
+          <Button.Root>
+            <Button.Icon>
+              <Icon name="action.check" />
+            </Button.Icon>
+            Отметить оплату
+          </Button.Root>
+        </Page.Actions>
       </Page.TopBar>
       <Page.Body>
         <div className={styles.columns}>

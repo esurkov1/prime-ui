@@ -242,7 +242,7 @@ The same for one value in several units — one heading, the fields in a row, th
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |
 | a hand-built spinner, shimmer, grey placeholder box or «Loading…» text | `loading` on Button / Select / DataTable; a region: `Skeleton` of its content inside `Crossfade`; no shape to hold: `Spinner` |
 | `{loading ? <Spinner /> : <List />}` — a state that flips | `<Crossfade state={status}>` around the region, `Skeleton` while loading |
-| a search Input + a row of filter Selects above a table | `SmartFilter` in the page's `Page.Toolbar` ([where the filters go](composition.md#where-the-filters-go)) |
+| a search Input + a row of filter Selects above a table | `SmartFilter` in the page's top bar: its toolbar in `Page.Tools`, its chips in `Page.Chips` ([where the filters go](composition.md#where-the-filters-go)) |
 | a grid of «label: value» text pairs for one record | `DescriptionList.Root` + `DescriptionList.Item` |
 | a Modal hand-built as «Удалить?» with your own pending flag | `ConfirmDialog.Root` with an async `onConfirm` |
 | a `<fieldset>` reset by hand, or `disabled` on every field while saving | `<Fieldset label disabled={saving}>` |
@@ -285,6 +285,102 @@ The same for one value in several units — one heading, the fields in a row, th
   rows={projects}
   getRowKey={(row) => row.id}
 />
+```
+
+## 7b. A top bar out of its groups
+
+The bar lays itself out only from its four groups ([the top bar](composition.md#the-top-bar)); a
+bar assembled any other way cannot give way on a narrow panel.
+
+The title as a row of its own under the path:
+
+```tsx partial
+// bad — the path, then the title on a second line; the path repeats the title
+<Page.Heading>
+  <Breadcrumb.Root>
+    <Breadcrumb.Item href="/invoices">Счета</Breadcrumb.Item>
+    <Breadcrumb.Item current>Счёт № 1042</Breadcrumb.Item>
+  </Breadcrumb.Root>
+</Page.Heading>
+<Typography as="h1" variant="heading-m">Счёт № 1042</Typography>
+```
+
+```tsx good
+// good — the path ends in the title: the levels above, then Page.Title, on one line
+<Page.TopBar>
+  <Page.Heading>
+    <Breadcrumb.Root>
+      <Breadcrumb.Item href="/invoices">Счета</Breadcrumb.Item>
+    </Breadcrumb.Root>
+    <Page.Title>Счёт № 1042</Page.Title>
+    <Page.Description>Отправлен · оплатить до 14 октября</Page.Description>
+  </Page.Heading>
+</Page.TopBar>
+```
+
+Buttons in two places, buttons with only text:
+
+```tsx partial
+// bad — export beside the title, the primary among the tools; no icons, so nothing can collapse
+<Page.Heading>
+  <Page.Title>Заказы</Page.Title>
+  <Button.Root variant="soft" tone="neutral">Экспорт</Button.Root>
+</Page.Heading>
+<Page.Tools aria-label="Заказы">
+  <SmartFilter.Toolbar />
+  <Button.Root>Новый заказ</Button.Root>
+</Page.Tools>
+```
+
+```tsx good
+// good — every button in one Page.Actions, each with an icon, the primary last
+<Page.Actions>
+  <Button.Root variant="soft" tone="neutral">
+    <Button.Icon>
+      <Icon name="action.download" />
+    </Button.Icon>
+    Экспорт
+  </Button.Root>
+  <Button.Root>
+    <Button.Icon>
+      <Icon name="action.add" />
+    </Button.Icon>
+    Новый заказ
+  </Button.Root>
+</Page.Actions>
+```
+
+`SmartFilter.Root` inside the bar:
+
+```tsx partial
+// bad — the filter's state wraps one group, its chips land outside it
+<Page.TopBar>
+  <SmartFilter.Root fields={FIELDS}>
+    <Page.Tools aria-label="Заказы">
+      <SmartFilter.Toolbar />
+    </Page.Tools>
+  </SmartFilter.Root>
+</Page.TopBar>
+```
+
+```tsx good
+// good — SmartFilter.Root draws nothing and wraps the page; toolbar and chips sit in their groups
+// declare: const FIELDS: Parameters<typeof SmartFilter.Root>[0]["fields"]
+<SmartFilter.Root fields={FIELDS}>
+  <Page.Root>
+    <Page.TopBar>
+      <Page.Heading>
+        <Page.Title>Заказы</Page.Title>
+      </Page.Heading>
+      <Page.Tools aria-label="Заказы">
+        <SmartFilter.Toolbar />
+      </Page.Tools>
+      <Page.Chips>
+        <SmartFilter.Chips />
+      </Page.Chips>
+    </Page.TopBar>
+  </Page.Root>
+</SmartFilter.Root>
 ```
 
 ## 8. Decoration and filler

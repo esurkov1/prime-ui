@@ -74,22 +74,113 @@
   z-index: var(--prime-z-sticky);
 }
 
-/* Centred on the title row: (row − control) / 2. */
+/* Centred on the first line: (line − control) / 2. */
 .menuButton {
   flex: none;
   margin-block-start: var(--prime-space-1);
 }
 
-/* The title row, then the toolbar row 12 under it. */
+/* The room of the groups: its width (never their content's) is what the plan is chosen for. */
 .rows {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: var(--prime-space-3);
+  position: relative;
+  flex: 1 1 0;
   min-width: 0;
 }
 
-/* ─── Header ───────────────────────────────────────────────────────────────── */
+/*
+ * The groups in one grid, placed by the plan (`planBar`, chosen in TSX from natural widths):
+ *
+ *   one:    [ Heading ——— 1fr ——— ][ Tools ][ Actions ]
+ *           [ Chips ……………………………………………………………… ]
+ *   below and every later step:
+ *           [ Heading ——— 1fr ——— ][ Actions ]
+ *           [ Tools ——— the whole line ——— ]
+ *           [ Chips ……………………………………………………………… ]
+ *
+ * Only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width,
+ * so nothing overflows and the actions never leave the first line. The first line is as high as
+ * the Sidebar brand row (control height + 8), so the brand and the title share a line. A missing
+ * group takes no track; the chips take a line only while they hold something.
+ */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-rows: minmax(calc(var(--prime-control-m-height) + var(--prime-space-2)), auto);
+  align-items: center;
+  gap: var(--prime-space-3) var(--prime-space-4);
+  min-width: 0;
+}
+
+.row > .heading {
+  grid-area: 1 / 1;
+}
+
+.row > .tools {
+  grid-area: 1 / 2;
+}
+
+.row:not(:has(> .heading)) > .tools {
+  grid-column: 1 / 3;
+}
+
+.row > .actions {
+  grid-area: 1 / 3;
+  justify-self: end;
+  flex-wrap: nowrap;
+}
+
+.row > .chips {
+  grid-column: 1 / -1;
+}
+
+.row:not([data-plan="one"]) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.row:not([data-plan="one"]) > .tools {
+  grid-area: 2 / 1 / 3 / -1;
+}
+
+.row:not([data-plan="one"]) > .actions {
+  grid-column: 2;
+}
+
+/*
+ * The measuring layout (set and cleared inside one layout effect, never painted): every group on
+ * one line at its natural width, every action whole and labelled, no chips and no hidden echo.
+ */
+.row[data-measure="true"] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: flex;
+  width: max-content;
+  visibility: hidden;
+}
+
+.row[data-measure="true"] > * {
+  flex: none;
+}
+
+.row[data-measure="true"] > .tools {
+  flex-wrap: nowrap;
+}
+
+.row[data-measure="true"] .tool {
+  flex: none;
+}
+
+.row[data-measure="true"] .actionItem[hidden] {
+  display: flex;
+}
+
+.row[data-measure="true"] .actionItem:not([data-role]),
+.row[data-measure="true"] > .chips,
+.row[data-measure="true"] .echo:not([data-visible="true"]) {
+  display: none;
+}
+
+/* ─── Header and heading ───────────────────────────────────────────────────── */
 
 /*
  * In the flow: heading and actions share a row while the heading keeps at least half a reading
@@ -106,17 +197,13 @@
 
 .heading {
   display: flex;
-  flex: 1 1 calc(var(--prime-layout-reading-max-width) / 2);
   flex-direction: column;
   gap: var(--prime-space-2);
   min-width: 0;
 }
 
-.titleBlock {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  min-width: 0;
+.header > .heading {
+  flex: 1 1 calc(var(--prime-layout-reading-max-width) / 2);
 }
 
 .path {
@@ -149,42 +236,35 @@
 }
 
 /*
- * In the bar: one line as high as the Sidebar brand row (control height + 8), so the brand and the
- * title share a line across the two planes — the path, a separator, the title over its line of
- * data (both truncate), the actions at the end on one line.
+ * In the bar: the title is the path's last level — the path, a chevron and the title on one line,
+ * the description under the whole line. When the line runs short the path gives first (its levels
+ * truncate), then the title, down to a few letters.
  */
-.header[data-place="bar"] {
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--prime-space-3);
-  min-height: calc(var(--prime-control-m-height) + var(--prime-space-2));
-}
-
-.header[data-place="bar"] > .heading {
-  flex: 1 1 auto;
-  flex-direction: row;
-  align-items: center;
-}
-
-/*
- * Each part takes only its own width and only when it is there: the actions stand at the end
- * (the heading takes the free room between), a missing title or path leaves room, never makes
- * another part grow. When the row runs short the title gives way first (down to 6rem), then the
- * path, then the actions fold into «⋯».
- */
-.header[data-place="bar"] .titleBlock {
-  flex: 0 9999 auto;
+.heading[data-place="bar"] {
   gap: var(--prime-space-0);
-  min-width: min(100%, var(--prime-space-24));
 }
 
-.header[data-place="bar"] .path {
-  flex: 0 1 auto;
+.headingLine {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  min-width: 0;
 }
 
-.header[data-place="bar"] > .actions {
+.heading[data-place="bar"] .path {
+  flex: 0 1000 auto;
+  min-width: var(--prime-space-6);
+}
+
+.pathSeparator {
+  display: inline-flex;
   flex: none;
-  flex-wrap: nowrap;
+  color: var(--prime-color-text-placeholder);
+}
+
+.heading[data-place="bar"] .barTitle {
+  flex: 0 1 auto;
+  min-width: min(100%, var(--prime-space-16));
 }
 
 .barTitle,
@@ -209,7 +289,6 @@
   display: flex;
   flex: none;
   align-items: center;
-  gap: var(--prime-space-2);
 }
 
 .actionItem[hidden] {
@@ -223,10 +302,7 @@
  */
 .echo {
   display: flex;
-  /* Basis 0: the echo takes the room the path and the actions leave, never theirs. */
-  flex: 1 1 0;
-  align-items: center;
-  gap: var(--prime-space-2);
+  flex-direction: column;
   min-width: 0;
   visibility: hidden;
   opacity: 0;
@@ -237,9 +313,23 @@
     visibility var(--prime-motion-instant) linear var(--prime-motion-fade-fast);
 }
 
-.echo[data-visible="true"] {
-  /* In view it keeps room for a few letters of the title: the path gives way first. */
+/* After a path the echo continues its line. Basis 0: it takes the room the path leaves, never
+   the path's; in view it keeps room for a few letters of the title. */
+.heading[data-place="bar"]:has(> .echo) {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.heading[data-place="bar"] > .echo {
+  flex: 1 1 0;
+}
+
+.heading[data-place="bar"] > .echo[data-visible="true"] {
   min-width: var(--prime-space-24);
+}
+
+.echo[data-visible="true"] {
   visibility: visible;
   opacity: 1;
   transform: none;
@@ -249,175 +339,56 @@
     visibility var(--prime-motion-instant) linear;
 }
 
-/* ─── Toolbar ──────────────────────────────────────────────────────────────── */
+/* ─── Tools and chips ──────────────────────────────────────────────────────── */
 
 /*
- * The page's tools (foundation §9). Every slot has a fixed place, chosen by the toolbar's own
- * width (container query), never by the window. Search and filter come first, so the active
- * filters (Chips) sit under the top row:
- *
- *   narrow (< 56rem):  [ Tools ——— stretches ——— ][ Actions ]
- *                      [ Chips ……………………………………………………… ]
- *                      [ Sections ——— full row ——— ]
- *                      [ View ——— full row ——— ]
- *   phone (the Tools would get less than 18rem beside the Actions):
- *                      [ Tools ——— full row ——— ]
- *                      [ Actions ——— full row ——— ]
- *                      [ Chips ] [ Sections ] [ View ] as above
- *   wide (≥ 56rem):    [ Tools ——— stretches ——— ][ Sections ][ View ][ Actions ]
- *                      [ Chips ……………………………………………………… ]
- *
- * Narrow is one wrapping flex line of real rows only — a missing slot or an empty Chips row makes
- * no row, so every row is the same 12 apart. Without Tools the Sections take their place beside the
- * Actions; without both, the View does. The Tools keep at least 18rem (a 9rem search and the
- * filter button on one line): when the Actions leave less, they wrap to their own row under the
- * Tools and stretch across it, so the search is never squeezed (an icon-only action still fits
- * beside them). Wide is one line that never wraps. Slots move only visually (`order`); the DOM —
- * and the Tab order — is the wide layout's reading order (Tools, Sections, View, Actions, Chips),
- * set by the toolbar. All controls share the toolbar tier, so rows stay level.
+ * The tools as written. On the first line each keeps its natural width. On a line of their own
+ * they fill it: a search grows first (a share 999 times the others), switchers share the rest,
+ * and a control that does not fit wraps to the next line, which fills the same way. A switcher
+ * narrower than its content scrolls inside itself, so nothing overflows a phone.
  */
-.toolbar {
-  container: prime-page-tools / inline-size;
-  min-width: 0;
-}
-
-.toolbarLayout {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-3);
-  min-width: 0;
-}
-
-.toolbarBar {
-  display: contents;
-}
-
-.toolbarSections,
-.toolbarTools,
-.toolbarView,
-.toolbarActions {
+.tools {
   display: flex;
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
 }
 
-/* The first row's stretchy slot — the Tools, else the Sections, else the View: takes nearly all
-   the free room, never less than 18rem beside the Actions. */
-.toolbarTools,
-.toolbarBar:not(:has(> .toolbarTools)) > .toolbarSections,
-.toolbarBar:not(:has(> .toolbarTools, > .toolbarSections)) > .toolbarView {
-  order: 1;
-  flex: 999 1 calc(var(--prime-space-24) * 3);
-}
-
-/* Beside the Tools it keeps its content width (its share of the free room is a thousandth); wrapped
-   under them it takes the row and its buttons share it. */
-.toolbarActions {
-  order: 2;
-  flex: 1 0 auto;
-  justify-content: flex-end;
-}
-
-.toolbarActions > * {
-  flex: 1 1 auto;
-}
-
-/* The only slot of the toolbar: content width at the row's end. */
-.toolbarBar:not(:has(> .toolbarTools, > .toolbarSections, > .toolbarView)) > .toolbarActions {
+.tool {
+  display: flex;
   flex: none;
-  margin-inline-start: auto;
-}
-
-.toolbarChips {
-  order: 3;
-  flex: 1 1 100%;
+  align-items: center;
   min-width: 0;
 }
 
-.toolbarSections {
-  order: 4;
-  flex: 1 1 100%;
-}
-
-.toolbarView {
-  order: 5;
-  flex: 1 1 100%;
-}
-
-.toolbarChips:empty {
-  display: none;
-}
-
-.toolbarTools > *,
-.toolbarSections > * {
+.tool > * {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-/* The View's controls share its row equally; a control narrower than its content gives way (its
-   own content scrolls or truncates), so the row never overflows a phone. */
-.toolbarView > * {
-  flex: 1 1 0;
+.row:not([data-plan="one"]) > .tools,
+.tools:not(.row > .tools) {
+  flex-wrap: wrap;
+}
+
+.row:not([data-plan="one"]) > .tools > .tool,
+.tools:not(.row > .tools) > .tool {
+  flex: 1 1 auto;
+}
+
+.row:not([data-plan="one"]) > .tools > .tool[data-grow="true"],
+.tools:not(.row > .tools) > .tool[data-grow="true"] {
+  flex: 999 1 calc(var(--prime-space-24) * 2);
+  min-width: min(100%, calc(var(--prime-space-24) * 2));
+}
+
+.chips {
+  display: flex;
   min-width: 0;
 }
 
-/* Wide: one line that never wraps, Chips under it. Only the Tools (the search) stretch: the
-   Sections and the View keep their content width beside them — tabs as wide as their labels, as
-   in Linear — and the Actions stand at the end; a missing slot leaves free room, it never makes
-   another one grow. When room runs short the Tools give way first, down to 12rem, so the Sections
-   keep their items and counts whole; only then the Sections shrink and scroll inside their
-   switcher. */
-@container prime-page-tools (min-width: 56rem) {
-  .toolbarLayout {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-  }
-
-  .toolbarChips {
-    flex: none;
-  }
-
-  .toolbarBar {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: var(--prime-space-3);
-    min-width: 0;
-  }
-
-  .toolbarTools {
-    flex: 1 999 calc(var(--prime-space-24) * 3);
-    min-width: calc(var(--prime-space-24) * 2);
-  }
-
-  .toolbarSections,
-  .toolbarBar:not(:has(> .toolbarTools)) > .toolbarSections {
-    order: 2;
-    flex: 0 1 auto;
-  }
-
-  .toolbarSections > * {
-    flex: 0 1 auto;
-  }
-
-  .toolbarView,
-  .toolbarBar:not(:has(> .toolbarTools, > .toolbarSections)) > .toolbarView {
-    order: 3;
-    flex: none;
-  }
-
-  .toolbarView > * {
-    flex: none;
-  }
-
-  .toolbarActions {
-    order: 4;
-    flex: none;
-    margin-inline-start: auto;
-  }
+.chips:empty {
+  display: none;
 }
 
 /* ─── Body and sections ────────────────────────────────────────────────────── */

@@ -1,4 +1,4 @@
-/** A work page in an app window: the top bar with the title, its line of data and the page's actions, the body under it — `Page.TopBar`, `Page.Header`, `Page.Actions`. */
+/** A work page in an app window: the top bar with the title, its line of data and the page's buttons, the body under it — `Page.TopBar`, `Page.Heading`, `Page.Actions`. */
 import { AppShell, Button, Card, Icon, Page, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -17,24 +17,24 @@ export default function PageOverviewExample() {
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>
-              <Page.Header>
+              <Page.Heading>
                 <Page.Title>Заказы</Page.Title>
                 <Page.Description>128 в работе · 6 ждут оплаты</Page.Description>
-                <Page.Actions>
-                  <Button.Root variant="soft" tone="neutral">
-                    <Button.Icon>
-                      <Icon name="action.download" />
-                    </Button.Icon>
-                    Экспорт
-                  </Button.Root>
-                  <Button.Root>
-                    <Button.Icon>
-                      <Icon name="action.add" />
-                    </Button.Icon>
-                    Новый заказ
-                  </Button.Root>
-                </Page.Actions>
-              </Page.Header>
+              </Page.Heading>
+              <Page.Actions>
+                <Button.Root variant="soft" tone="neutral">
+                  <Button.Icon>
+                    <Icon name="action.download" />
+                  </Button.Icon>
+                  Экспорт
+                </Button.Root>
+                <Button.Root>
+                  <Button.Icon>
+                    <Icon name="action.add" />
+                  </Button.Icon>
+                  Новый заказ
+                </Button.Root>
+              </Page.Actions>
             </Page.TopBar>
             <Page.Body>
               <Card.Root variant="list">

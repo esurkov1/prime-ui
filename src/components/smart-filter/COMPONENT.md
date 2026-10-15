@@ -13,10 +13,10 @@
 - An API that takes one value per field (`multiple: false`), a screen whose text search lives elsewhere (`searchable={false}`), values of different kinds in one field (`group`).
 
 ## When not to use
-- One field with a few options → use [SegmentedControl](../segmented-control/COMPONENT.md), [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md) in the toolbar.
+- One field with a few options → use [SegmentedControl](../segmented-control/COMPONENT.md), [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md) in the page's `Page.Tools`.
 - A search outside a table or list page (inside a picker, a settings section, a panel) → [Input](../input/COMPONENT.md) with a search icon. Over a table or list page the search is SmartFilter even with no fields yet (`fields={[]}`): it grows into filters without a rebuild.
 - Choosing values for a form field → use [TagSelect](../tag-select/COMPONENT.md).
-- One period that drives a whole dashboard → [Datepicker](../datepicker/COMPONENT.md) in the page toolbar; SmartFilter ranges filter rows of a list.
+- One period that drives a whole dashboard → [Datepicker](../datepicker/COMPONENT.md) in the page's `Page.Tools`; SmartFilter ranges filter rows of a list.
 
 ## Import
 ```tsx
@@ -30,7 +30,7 @@ import {
 
 ## Anatomy
 ```
-SmartFilter.Root                  state + context (flex column)
+SmartFilter.Root                  state + context, no DOM
 ├─ SmartFilter.Toolbar            [search Input (searchable)] [filter Button (count Badge)] — the anchor of the panel
 │  └─ panel                       flush Popover as wide as the toolbar; sections split by Dividers
 │     ├─ query row                ghost Button «Искать «text»» + Kbd ↵, while typing
@@ -41,14 +41,14 @@ SmartFilter.Root                  state + context (flex column)
 │     └─ footer                   hint · count · Reset Button
 └─ SmartFilter.Chips              applied filters as removable Badges · add / clear all Buttons
 ```
-The toolbar and the chips are separate parts so a page can put them in different places; both only need to be inside `Root`.
+The toolbar and the chips are separate parts so a page can put them in different places; both only need to be inside `Root`, which draws nothing of its own.
 
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### SmartFilter.Root
-`ref` → `HTMLDivElement`. A `<div>` (flex column) with the state and the context; sets `data-size`.
+No DOM, no ref. The value, the search and the panel state shared by its parts; the host places the parts.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -62,8 +62,7 @@ The toolbar and the chips are separate parts so a page can put them in different
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the filter button, the search, the tags and the panel. Without it the tier of its host, else `m`. |
 | `collapsedLimit` | `number` | `12` | Values of one field shown before «Ещё N» (not while searching). |
 | `labels` | `Partial<SmartFilterLabels>` | — | Built-in strings, see Labels. |
-| `children` | `ReactNode` | — (required) | `SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "onChange">` | — | `className` and the other div attributes. |
+| `children` | `ReactNode` | — (required) | `SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside — in a page bar the Root wraps `Page.Root`. |
 
 ### SmartFilter.Toolbar
 `ref` → `HTMLDivElement`. A `<div>`: the search Input first, then the filter Button (a count Badge while filters apply); the anchor of the panel, a flush Popover.
@@ -173,7 +172,7 @@ same height and type.
 - Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end. The chips row rises in with the first filter and closes up in place with the last (`partPresence`).
 - Option groups stack `--prime-space-3` apart, a caption `--prime-space-1` above each group's values. A range row holds two equal Inputs with a dash between them, centred on the field label.
 - While typing a search a range row stays only when its field name matches.
-- The root is a flex column (`--prime-space-3`): Toolbar, then Chips.
+- The root draws nothing: its host places Toolbar and Chips. In a page bar the Toolbar goes in `Page.Tools` and the Chips in `Page.Chips`, with `SmartFilter.Root` around `Page.Root`; outside a page a host stacks them (a `Card.Body`, a form column).
 
 ## Accessibility
 
@@ -244,7 +243,7 @@ same height and type.
 - A fixed field marked `finite: false` → the user can hide every value and get an empty list.
 - Filtering the list with `includes` → use `matchesSmartFilter` (empty `include` is "any", `exclude` rejects; range bounds are inclusive, dates by whole days; an item with no value passes only an empty filter).
 - Sending `include` to a server for a hidden value of a fixed field → use `resolveSmartFilterValues` («hide» becomes «all except», `[]` means no filter).
-- Putting `Chips` outside `SmartFilter.Root` → every part needs the root.
+- Putting `Chips` outside `SmartFilter.Root` → every part needs the root; when Toolbar and Chips stand in different groups of a page bar, wrap `Page.Root` in it.
 - A second row of filter buttons next to the toolbar → fields belong in `fields`.
 - An amount or a period in its own Popover beside the toolbar → a `range` / `date-range` field; it gets a chip and the count.
 - One field split in two because its values are of different kinds → one field with `group` on the options.
@@ -252,4 +251,4 @@ same height and type.
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Input](../input/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Typography](../typography/COMPONENT.md), Icon (`action.search`, `action.filter`, `action.add`, `nav.chevronDown`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
-- **See also:** [Page](../../layout/page/COMPONENT.md) (`Page.Toolbar`), [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)
+- **See also:** [Page](../../layout/page/COMPONENT.md) (`Page.Tools`, `Page.Chips`), [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

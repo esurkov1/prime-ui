@@ -77,7 +77,7 @@
   padding: var(--prime-space-2) var(--prime-space-4);
 }
 
-/* tools-without-search.tsx: a tablet-width page column (600px). */
+/* actions-collapse.tsx: a tablet-width page column (600px). */
 .tablet {
   width: 100%;
   max-width: calc(var(--prime-space-24) * 6.25);

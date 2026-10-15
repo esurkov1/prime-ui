@@ -363,278 +363,270 @@ export default function FileUploadScreenExample() {
   const totalSize = visible.reduce((sum, media) => sum + media.size, 0);
 
   return (
-    <Page.Root>
-      {/* A work screen titles itself in its top bar: the only h1, the object it belongs to and the
-          page's tools in the toolbar row. */}
-
-      <Page.TopBar>
-        <Page.Header>
-          <Page.Title>Медиатека</Page.Title>
-          <Page.Description>БЦ «Северная башня», Невский пр., 112</Page.Description>
-        </Page.Header>
-        <SmartFilter.Root
-          fields={[]}
-          search={search}
-          onSearchChange={setSearch}
-          labels={{ searchPlaceholder: "Поиск по названию" }}
-        >
-          <Page.Toolbar aria-label="Медиатека">
-            <Page.ToolbarTools>
-              <SmartFilter.Toolbar />
-            </Page.ToolbarTools>
-            <Page.ToolbarSections>
-              <SegmentedControl.Root
-                fullWidth
-                value={section}
-                onValueChange={(value) => setSection(value as Section)}
-                aria-label="Раздел"
-              >
-                {SECTIONS.map((item) => (
-                  <SegmentedControl.Item key={item.value} value={item.value}>
+    <SmartFilter.Root
+      fields={[]}
+      search={search}
+      onSearchChange={setSearch}
+      labels={{ searchPlaceholder: "Поиск по названию" }}
+    >
+      <Page.Root>
+        {/* A work screen titles itself in its top bar: the only h1, the object it belongs to, the
+          page's tools — sections, search, order — and the upload. */}
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Медиатека</Page.Title>
+            <Page.Description>БЦ «Северная башня», Невский пр., 112</Page.Description>
+          </Page.Heading>
+          <Page.Tools aria-label="Медиатека">
+            <SegmentedControl.Root
+              value={section}
+              onValueChange={(value) => setSection(value as Section)}
+              aria-label="Раздел"
+            >
+              {SECTIONS.map((item) => (
+                <SegmentedControl.Item key={item.value} value={item.value}>
+                  {item.label}
+                  {loading ? null : (
+                    <SegmentedControl.Count>{count(item.value)}</SegmentedControl.Count>
+                  )}
+                </SegmentedControl.Item>
+              ))}
+            </SegmentedControl.Root>
+            <SmartFilter.Toolbar />
+            <Select.Root value={order} onValueChange={(value) => setOrder(value as Order)}>
+              <Select.Trigger aria-label="Порядок">
+                <Select.TriggerIcon>
+                  <Icon name="sort.descending" />
+                </Select.TriggerIcon>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                {ORDERS.map((item) => (
+                  <Select.Item key={item.value} value={item.value}>
                     {item.label}
-                    {loading ? null : (
-                      <SegmentedControl.Count>{count(item.value)}</SegmentedControl.Count>
-                    )}
-                  </SegmentedControl.Item>
+                  </Select.Item>
                 ))}
-              </SegmentedControl.Root>
-            </Page.ToolbarSections>
-            <Page.ToolbarView>
-              <Select.Root value={order} onValueChange={(value) => setOrder(value as Order)}>
-                <Select.Trigger aria-label="Порядок">
-                  <Select.TriggerIcon>
-                    <Icon name="sort.descending" />
-                  </Select.TriggerIcon>
-                  <Select.Value />
-                </Select.Trigger>
-                <Select.Content>
-                  {ORDERS.map((item) => (
-                    <Select.Item key={item.value} value={item.value}>
-                      {item.label}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
-            </Page.ToolbarView>
-            <Page.ToolbarActions>
-              <Button.Root onClick={() => picker.current?.open()}>
-                <Button.Icon>
-                  <Icon name="action.upload" />
-                </Button.Icon>
-                Загрузить
-              </Button.Root>
-            </Page.ToolbarActions>
-          </Page.Toolbar>
-        </SmartFilter.Root>
-      </Page.TopBar>
-      <Page.Body>
-        {/* Uploads in flight: the add tile is also the drop zone; a done file moves into the grid. */}
-        <FileUpload.Root
-          label="Новые файлы"
-          hint="Фото и видео до 200 МБ. Загруженные появятся в медиатеке первыми."
-          trigger="tile"
-          layout="grid"
-          accept="image/*,video/*"
-          multiple
-          queue={queue}
-          picker={picker}
-        />
-
-        <Page.Section
-          label="Файлы"
-          description={
-            <span aria-live="polite">
-              {selecting
-                ? `Выбрано: ${selected.size}`
-                : loading
-                  ? "Загружаем…"
-                  : `${visible.length} ${filesWord(visible.length)} · ${formatFileSize(totalSize)}`}
-            </span>
-          }
-        >
+              </Select.Content>
+            </Select.Root>
+          </Page.Tools>
           <Page.Actions>
-            <Crossfade state={selecting ? "select" : "browse"}>
-              {selecting ? (
-                <div className={styles.bar}>
-                  <Button.Root
-                    variant="soft"
-                    tone="neutral"
-                    disabled={selected.size === 0}
-                    onClick={download}
-                  >
-                    <Button.Icon>
-                      <Icon name="action.download" />
-                    </Button.Icon>
-                    Скачать
-                  </Button.Root>
-                  <ConfirmDialog.Root
-                    title={`Удалить ${selected.size} ${filesWord(selected.size)}?`}
-                    description="Файлы пропадут из карточки объекта в каталоге. Восстановить их будет нельзя."
-                    confirmLabel="Удалить"
-                    onConfirm={removeSelected}
-                  >
-                    <ConfirmDialog.Trigger>
-                      <Button.Root variant="outline" tone="danger" disabled={selected.size === 0}>
-                        <Button.Icon>
-                          <Icon name="action.delete" />
-                        </Button.Icon>
-                        Удалить
-                      </Button.Root>
-                    </ConfirmDialog.Trigger>
-                  </ConfirmDialog.Root>
-                  <Button.Root variant="ghost" tone="neutral" onClick={stopSelecting}>
-                    Отмена
-                  </Button.Root>
-                </div>
-              ) : (
-                <div className={styles.bar}>
-                  <Button.Root
-                    variant="soft"
-                    tone="neutral"
-                    disabled={loading || visible.length === 0}
-                    onClick={() => setSelecting(true)}
-                  >
-                    <Button.Icon>
-                      <Icon name="action.check" />
-                    </Button.Icon>
-                    Выбрать
-                  </Button.Root>
-                </div>
-              )}
-            </Crossfade>
+            <Button.Root onClick={() => picker.current?.open()}>
+              <Button.Icon>
+                <Icon name="action.upload" />
+              </Button.Icon>
+              Загрузить
+            </Button.Root>
           </Page.Actions>
+        </Page.TopBar>
+        <Page.Body>
+          {/* Uploads in flight: the add tile is also the drop zone; a done file moves into the grid. */}
+          <FileUpload.Root
+            label="Новые файлы"
+            hint="Фото и видео до 200 МБ. Загруженные появятся в медиатеке первыми."
+            trigger="tile"
+            layout="grid"
+            accept="image/*,video/*"
+            multiple
+            queue={queue}
+            picker={picker}
+          />
 
-          <Crossfade state={state} aria-busy={loading}>
-            {loading ? (
-              <ul className={styles.grid}>
-                {PLACEHOLDER_TILES.map((key) => (
-                  <li key={key} className={styles.tile}>
-                    <Skeleton shape="block" className={styles.picture} />
-                    <div className={styles.tileText}>
-                      <Skeleton size="s" className={styles.nameBar} />
-                      <Skeleton size="xs" className={styles.metaBar} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+          <Page.Section
+            label="Файлы"
+            description={
+              <span aria-live="polite">
+                {selecting
+                  ? `Выбрано: ${selected.size}`
+                  : loading
+                    ? "Загружаем…"
+                    : `${visible.length} ${filesWord(visible.length)} · ${formatFileSize(totalSize)}`}
+              </span>
+            }
+          >
+            <Page.Actions>
+              <Crossfade state={selecting ? "select" : "browse"}>
+                {selecting ? (
+                  <div className={styles.bar}>
+                    <Button.Root
+                      variant="soft"
+                      tone="neutral"
+                      disabled={selected.size === 0}
+                      onClick={download}
+                    >
+                      <Button.Icon>
+                        <Icon name="action.download" />
+                      </Button.Icon>
+                      Скачать
+                    </Button.Root>
+                    <ConfirmDialog.Root
+                      title={`Удалить ${selected.size} ${filesWord(selected.size)}?`}
+                      description="Файлы пропадут из карточки объекта в каталоге. Восстановить их будет нельзя."
+                      confirmLabel="Удалить"
+                      onConfirm={removeSelected}
+                    >
+                      <ConfirmDialog.Trigger>
+                        <Button.Root variant="outline" tone="danger" disabled={selected.size === 0}>
+                          <Button.Icon>
+                            <Icon name="action.delete" />
+                          </Button.Icon>
+                          Удалить
+                        </Button.Root>
+                      </ConfirmDialog.Trigger>
+                    </ConfirmDialog.Root>
+                    <Button.Root variant="ghost" tone="neutral" onClick={stopSelecting}>
+                      Отмена
+                    </Button.Root>
+                  </div>
+                ) : (
+                  <div className={styles.bar}>
+                    <Button.Root
+                      variant="soft"
+                      tone="neutral"
+                      disabled={loading || visible.length === 0}
+                      onClick={() => setSelecting(true)}
+                    >
+                      <Button.Icon>
+                        <Icon name="action.check" />
+                      </Button.Icon>
+                      Выбрать
+                    </Button.Root>
+                  </div>
+                )}
+              </Crossfade>
+            </Page.Actions>
 
-            {state.startsWith("ready") ? (
-              <ul className={styles.grid}>
-                {visible.map((media, at) => {
-                  const picture =
-                    media.kind === "video" ? (
-                      <Thumbnail.Video src={media.src} aria-label={media.name} />
-                    ) : (
-                      <Thumbnail.Image
-                        src={media.thumbnail ?? media.src}
-                        fit={media.kind === "document" ? "contain" : "cover"}
-                      />
-                    );
-                  const fallback = (
-                    <Thumbnail.Fallback>
-                      <Icon name={FALLBACK_ICON[media.kind]} />
-                    </Thumbnail.Fallback>
-                  );
-                  return (
-                    <li key={media.id} className={styles.tile}>
-                      {/* Browsing, a press opens the viewer out of the tile; selecting, it picks the file. */}
-                      {selecting ? (
-                        <Thumbnail.Root
-                          fullWidth
-                          ratio="4:3"
-                          aria-label={media.name}
-                          checked={selected.has(media.id)}
-                          onCheckedChange={(checked) => toggle(media.id, checked)}
-                        >
-                          {picture}
-                          {fallback}
-                        </Thumbnail.Root>
+            <Crossfade state={state} aria-busy={loading}>
+              {loading ? (
+                <ul className={styles.grid}>
+                  {PLACEHOLDER_TILES.map((key) => (
+                    <li key={key} className={styles.tile}>
+                      <Skeleton shape="block" className={styles.picture} />
+                      <div className={styles.tileText}>
+                        <Skeleton size="s" className={styles.nameBar} />
+                        <Skeleton size="xs" className={styles.metaBar} />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
+              {state.startsWith("ready") ? (
+                <ul className={styles.grid}>
+                  {visible.map((media, at) => {
+                    const picture =
+                      media.kind === "video" ? (
+                        <Thumbnail.Video src={media.src} aria-label={media.name} />
                       ) : (
-                        <Thumbnail.Root asChild fullWidth ratio="4:3">
-                          <button
-                            ref={(node) => {
-                              if (node) tiles.current.set(media.id, node);
-                              else tiles.current.delete(media.id);
-                            }}
-                            type="button"
-                            aria-label={`Открыть: ${media.name}`}
-                            aria-haspopup="dialog"
-                            onClick={() => openAt(at)}
+                        <Thumbnail.Image
+                          src={media.thumbnail ?? media.src}
+                          fit={media.kind === "document" ? "contain" : "cover"}
+                        />
+                      );
+                    const fallback = (
+                      <Thumbnail.Fallback>
+                        <Icon name={FALLBACK_ICON[media.kind]} />
+                      </Thumbnail.Fallback>
+                    );
+                    return (
+                      <li key={media.id} className={styles.tile}>
+                        {/* Browsing, a press opens the viewer out of the tile; selecting, it picks the file. */}
+                        {selecting ? (
+                          <Thumbnail.Root
+                            fullWidth
+                            ratio="4:3"
+                            aria-label={media.name}
+                            checked={selected.has(media.id)}
+                            onCheckedChange={(checked) => toggle(media.id, checked)}
                           >
                             {picture}
                             {fallback}
-                          </button>
-                        </Thumbnail.Root>
-                      )}
-                      <div className={styles.tileText}>
-                        <Typography as="span" variant="body-s" truncate title={media.name}>
-                          {media.name}
-                        </Typography>
-                        <Typography as="span" variant="caption" tone="muted">
-                          {formatFileSize(media.size)} · {DAY.format(new Date(media.added))}
-                        </Typography>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
+                          </Thumbnail.Root>
+                        ) : (
+                          <Thumbnail.Root asChild fullWidth ratio="4:3">
+                            <button
+                              ref={(node) => {
+                                if (node) tiles.current.set(media.id, node);
+                                else tiles.current.delete(media.id);
+                              }}
+                              type="button"
+                              aria-label={`Открыть: ${media.name}`}
+                              aria-haspopup="dialog"
+                              onClick={() => openAt(at)}
+                            >
+                              {picture}
+                              {fallback}
+                            </button>
+                          </Thumbnail.Root>
+                        )}
+                        <div className={styles.tileText}>
+                          <Typography as="span" variant="body-s" truncate title={media.name}>
+                            {media.name}
+                          </Typography>
+                          <Typography as="span" variant="caption" tone="muted">
+                            {formatFileSize(media.size)} · {DAY.format(new Date(media.added))}
+                          </Typography>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : null}
 
-            {state === "nothing" ? (
-              <EmptyPage.Root size="s" role="status" aria-labelledby="media-nothing">
-                <EmptyPage.Icon>
-                  <Icon name="action.search" />
-                </EmptyPage.Icon>
-                <EmptyPage.Title as="h3" id="media-nothing">
-                  Ничего не найдено
-                </EmptyPage.Title>
-                <EmptyPage.Description>
-                  В этом разделе нет файлов с таким названием.
-                </EmptyPage.Description>
-                <EmptyPage.Actions>
-                  <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
-                    Показать все файлы
-                  </Button.Root>
-                </EmptyPage.Actions>
-              </EmptyPage.Root>
-            ) : null}
+              {state === "nothing" ? (
+                <EmptyPage.Root size="s" role="status" aria-labelledby="media-nothing">
+                  <EmptyPage.Icon>
+                    <Icon name="action.search" />
+                  </EmptyPage.Icon>
+                  <EmptyPage.Title as="h3" id="media-nothing">
+                    Ничего не найдено
+                  </EmptyPage.Title>
+                  <EmptyPage.Description>
+                    В этом разделе нет файлов с таким названием.
+                  </EmptyPage.Description>
+                  <EmptyPage.Actions>
+                    <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
+                      Показать все файлы
+                    </Button.Root>
+                  </EmptyPage.Actions>
+                </EmptyPage.Root>
+              ) : null}
 
-            {state === "empty" ? (
-              <EmptyPage.Root size="s" aria-labelledby="media-empty">
-                <EmptyPage.Icon tone="accent">
-                  <Icon name="object.image" />
-                </EmptyPage.Icon>
-                <EmptyPage.Title as="h3" id="media-empty">
-                  Файлов пока нет
-                </EmptyPage.Title>
-                <EmptyPage.Description>
-                  Перетащите фото и видео объекта в поле выше или нажмите «Загрузить».
-                </EmptyPage.Description>
-              </EmptyPage.Root>
-            ) : null}
-          </Crossfade>
-        </Page.Section>
+              {state === "empty" ? (
+                <EmptyPage.Root size="s" aria-labelledby="media-empty">
+                  <EmptyPage.Icon tone="accent">
+                    <Icon name="object.image" />
+                  </EmptyPage.Icon>
+                  <EmptyPage.Title as="h3" id="media-empty">
+                    Файлов пока нет
+                  </EmptyPage.Title>
+                  <EmptyPage.Description>
+                    Перетащите фото и видео объекта в поле выше или нажмите «Загрузить».
+                  </EmptyPage.Description>
+                </EmptyPage.Root>
+              ) : null}
+            </Crossfade>
+          </Page.Section>
 
-        <MediaViewer
-          items={viewerItems}
-          open={open}
-          onOpenChange={setOpen}
-          index={index}
-          onIndexChange={setIndex}
-          getOrigin={(at) => tiles.current.get(visible[at]?.id ?? "") ?? null}
-          thumbnails
-          renderActions={(item) => (
-            <Button.Root shape="circle" variant="shade" aria-label="Скачать файл" asChild>
-              <a href={item.src} download>
-                <Button.Icon>
-                  <Icon name="action.download" />
-                </Button.Icon>
-              </a>
-            </Button.Root>
-          )}
-        />
-      </Page.Body>
-    </Page.Root>
+          <MediaViewer
+            items={viewerItems}
+            open={open}
+            onOpenChange={setOpen}
+            index={index}
+            onIndexChange={setIndex}
+            getOrigin={(at) => tiles.current.get(visible[at]?.id ?? "") ?? null}
+            thumbnails
+            renderActions={(item) => (
+              <Button.Root shape="circle" variant="shade" aria-label="Скачать файл" asChild>
+                <a href={item.src} download>
+                  <Button.Icon>
+                    <Icon name="action.download" />
+                  </Button.Icon>
+                </a>
+              </Button.Root>
+            )}
+          />
+        </Page.Body>
+      </Page.Root>
+    </SmartFilter.Root>
   );
 }

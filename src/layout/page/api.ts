@@ -38,15 +38,15 @@ export const api: ComponentApi = {
           ru: "Системные строки всех частей, см. «Доступность».",
         },
         divRest({
-          en: "`children` (TopBar, Header, Body)",
-          ru: "`children` (TopBar, Header, Body)",
+          en: "`children` (`Page.TopBar`, `Page.Header`, `Page.Body`)",
+          ru: "`children` (`Page.TopBar`, `Page.Header`, `Page.Body`)",
         }),
       ],
     },
     {
       name: "Page.TopBar",
-      en: "`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge across the panel: `Page.Header` and / or `Page.Toolbar` 12 under it. Starts with the menu button while the shell's Sidebar is off-canvas.",
-      ru: "Полоса у верхнего края страницы во всю ширину панели: `Page.Header` и / или `Page.Toolbar` через 12 под ним. Начинается с кнопки меню, пока Sidebar каркаса выезжающий.",
+      en: "`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one plan from their natural widths — one line, tools below, icon-only buttons, «⋯», then a truncated heading.",
+      ru: "Полоса у верхнего края страницы: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` в этом порядке DOM; их раскладывает один план по естественной ширине — одна строка, инструменты ниже, кнопки-иконки, «⋯», затем обрезка заголовка.",
       props: [
         {
           name: "sticky",
@@ -59,27 +59,43 @@ export const api: ComponentApi = {
           name: "collapse",
           type: "boolean",
           default: "false",
-          en: "Once the flow `Page.Title` scrolls out under the bar, the bar repeats it (with its description) in its title row; it leaves when the title returns.",
-          ru: "Когда `Page.Title` в потоке уходит под полосу, полоса повторяет его (с описанием) в своей строке заголовка; уходит, когда заголовок возвращается.",
+          en: "Once the flow `Page.Title` scrolls out under the bar, the bar repeats it (with its description) as the last level of its heading; it leaves when the title returns.",
+          ru: "Когда `Page.Title` в потоке уходит под полосу, полоса повторяет его (с описанием) последним уровнем своего заголовка; уходит, когда заголовок возвращается.",
         },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
-          en: "`children` (Header, Toolbar — direct children), `className` and the other attributes.",
-          ru: "`children` (Header, Toolbar — прямые дети), `className` и остальные атрибуты.",
+          en: "`children` (`Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — direct children), `className` and the other attributes.",
+          ru: "`children` (`Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — прямые дети), `className` и остальные атрибуты.",
         },
       ],
     },
     {
       name: "Page.Header",
-      en: "`ref` → `HTMLDivElement`. An optional `Breadcrumb.Root` path, `Page.Title`, `Page.Description` and `Page.Actions` in one row (direct children). Compact in `Page.TopBar`, the large document header in the flow.",
-      ru: "Необязательный путь `Breadcrumb.Root`, `Page.Title`, `Page.Description` и `Page.Actions` в одном ряду (прямые дети). Компактный в `Page.TopBar`, большой заголовок документа в потоке.",
-      props: [divRest({ en: "`children`", ru: "`children`" })],
+      en: "`ref` → `HTMLDivElement`. The document header in the page flow (settings, long forms, overviews): a `Page.Heading` and its `Page.Actions` in one row; the actions wrap under it on a narrow column.",
+      ru: "Заголовок документа в потоке страницы (настройки, длинные формы, обзоры): `Page.Heading` и его `Page.Actions` в одном ряду; на узкой колонке действия переносятся под него.",
+      props: [
+        divRest({
+          en: "`children` (`Page.Heading`, `Page.Actions`)",
+          ru: "`children` (`Page.Heading`, `Page.Actions`)",
+        }),
+      ],
+    },
+    {
+      name: "Page.Heading",
+      en: "`ref` → `HTMLDivElement`. The title group: a `Breadcrumb.Root` path, `Page.Title`, `Page.Description`. In the bar the title is the path's last level (path › title on one line, both truncate); in the flow the path stands over a large title.",
+      ru: "Группа заголовка: путь `Breadcrumb.Root`, `Page.Title`, `Page.Description`. В полосе заголовок — последний уровень пути (путь › заголовок в одну строку, оба обрезаются); в потоке путь стоит над большим заголовком.",
+      props: [
+        divRest({
+          en: "`children` (`Breadcrumb.Root`, `Page.Title`, `Page.Description`)",
+          ru: "`children` (`Breadcrumb.Root`, `Page.Title`, `Page.Description`)",
+        }),
+      ],
     },
     {
       name: "Page.Title",
-      en: "`ref` → `HTMLHeadingElement`. The page's `<h1>`, one per page: title-m in the top bar (truncates), heading-m in the flow (wraps). A flow title is what a `collapse` top bar repeats.",
-      ru: "`<h1>` страницы, один на страницу: title-m в верхней полосе (обрезается), heading-m в потоке (переносится). Заголовок в потоке повторяет полоса с `collapse`.",
+      en: "`ref` → `HTMLHeadingElement`. The page's `<h1>`, one per page: the path's last level in the bar (title-m, truncates), a large title in the flow (heading-m, wraps). A flow title is what a `collapse` bar repeats.",
+      ru: "`<h1>` страницы, один на страницу: последний уровень пути в полосе (title-m, обрезается), большой заголовок в потоке (heading-m, переносится). Заголовок в потоке повторяет полоса с `collapse`.",
       props: [
         {
           name: "…rest",
@@ -91,8 +107,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Description",
-      en: "`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): muted caption that truncates in the top bar, secondary body-m that wraps (up to the reading measure) in the flow.",
-      ru: "Строка контекста с данными (период, количество): приглушённый caption с обрезкой в верхней полосе, вторичный body-m с переносом (не шире колонки для чтения) в потоке.",
+      en: "`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): a muted caption under the whole heading line that truncates in the bar, secondary body-m that wraps (up to the reading measure) in the flow.",
+      ru: "Строка контекста с данными (период, количество): приглушённый caption под всей строкой заголовка с обрезкой в полосе, вторичный body-m с переносом (не шире колонки для чтения) в потоке.",
       props: [
         {
           name: "…rest",
@@ -103,45 +119,21 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Page.Tools",
+      en: "`ref` → `HTMLDivElement`. The page's tools as kit controls in the order written: sections, `SmartFilter.Toolbar`, view. On a line of their own a search grows first; a `SegmentedControl.Root` is `fullWidth` unless set. Named, a `group`.",
+      ru: "Инструменты страницы — контролы кита в порядке записи: разделы, `SmartFilter.Toolbar`, вид. Своей строкой первым растёт поиск; `SegmentedControl.Root` — `fullWidth`, если не задан. С именем — `group`.",
+      props: [divRest({ en: "`children` (kit controls)", ru: "`children` (контролы кита)" })],
+    },
+    {
       name: "Page.Actions",
-      en: "`ref` → `HTMLDivElement`. The page's buttons at the end of a header or a section heading. In the flow they wrap; in the top bar trailing secondary `Button.Root`s fold into «⋯» by measured width, the primary stays.",
-      ru: "Кнопки страницы в конце заголовка или заголовка раздела. В потоке переносятся; в верхней полосе последние второстепенные `Button.Root` по измеренной ширине уходят в «⋯», главная остаётся.",
+      en: "`ref` → `HTMLDivElement`. All the page's buttons. In the flow they wrap; in the bar a `Button.Root` with a `Button.Icon` gives way to its icon (secondary first, then the primary), then the secondary ones fold into «⋯».",
+      ru: "Все кнопки страницы. В потоке переносятся; в полосе `Button.Root` с `Button.Icon` уступает до иконки (сначала второстепенные, затем главная), затем второстепенные сворачиваются в «⋯».",
       props: [divRest({ en: "`children` (Buttons)", ru: "`children` (кнопки)" })],
     },
     {
-      name: "Page.Toolbar",
-      en: "`ref` → `HTMLDivElement`. The page's tools: one row from 56rem of its own width, stacked rows below. DOM and Tab order: Tools, Sections, View, Actions, Chips. Named, a `group`.",
-      ru: "Инструменты страницы: одна строка от 56rem своей ширины, уже — строки друг под другом. Порядок в DOM и Tab: Tools, Sections, View, Actions, Chips. С именем — `group`.",
-      props: [divRest(CHILDREN)],
-    },
-    {
-      name: "Page.ToolbarTools",
-      en: "`ref` → `HTMLDivElement`. Search and filter button (`SmartFilter.Toolbar`): always the first slot and the stretchy one; it gives way first when the row runs short.",
-      ru: "Поиск и кнопка фильтра (`SmartFilter.Toolbar`): всегда первый слот и резиновый; уступает место первым, когда строке тесно.",
-      props: [divRest(CHILDREN)],
-    },
-    {
-      name: "Page.ToolbarSections",
-      en: "`ref` → `HTMLDivElement`. Sections of the page — a `fullWidth` SegmentedControl with counts; scrolls inside when it does not fit.",
-      ru: "Разделы страницы — SegmentedControl с `fullWidth` и счётчиками; не помещается — прокрутка внутри.",
-      props: [divRest(CHILDREN)],
-    },
-    {
-      name: "Page.ToolbarView",
-      en: "`ref` → `HTMLDivElement`. How the data is shown: period, table / cards, columns. Sized by content when wide; its own full row when narrow, its controls sharing it equally.",
-      ru: "Как показаны данные: период, таблица / карточки, колонки. Широко — по содержимому; узко — своя строка во всю ширину, контролы делят её поровну.",
-      props: [divRest(CHILDREN)],
-    },
-    {
-      name: "Page.ToolbarActions",
-      en: "`ref` → `HTMLDivElement`. The primary action of the toolbar: at the end of the top row; on a phone, when the search would get less than 18rem beside it, its own full row right under the search.",
-      ru: "Главное действие панели: в конце верхней строки; на телефоне, когда поиску рядом осталось бы меньше 18rem, — своя строка во всю ширину прямо под поиском.",
-      props: [divRest(CHILDREN)],
-    },
-    {
-      name: "Page.ToolbarChips",
-      en: "`ref` → `HTMLDivElement`. Active filters (`SmartFilter.Chips`) in their own row under the top row; the row takes no space while it is empty.",
-      ru: "Активные фильтры (`SmartFilter.Chips`) отдельной строкой под верхней строкой; пока пусто, строка не занимает места.",
+      name: "Page.Chips",
+      en: "`ref` → `HTMLDivElement`. Active filters (`SmartFilter.Chips`) on a line of their own under everything in the bar; it takes no space while empty.",
+      ru: "Активные фильтры (`SmartFilter.Chips`) своей строкой под всем в полосе; пока пусто, места не занимает.",
       props: [divRest(CHILDREN)],
     },
     {
@@ -273,8 +265,8 @@ export const api: ComponentApi = {
       ru: "Имя кнопки меню, которую рисует `Page.TopBar`, пока Sidebar каркаса выезжающий.",
     },
     more: {
-      en: "Name of the «⋯» button the top bar's `Page.Actions` fold into.",
-      ru: "Имя кнопки «⋯», в которую сворачиваются `Page.Actions` верхней полосы.",
+      en: "Name of the «⋯» button the secondary Buttons of the top bar's `Page.Actions` fold into.",
+      ru: "Имя кнопки «⋯», в которую сворачиваются второстепенные кнопки `Page.Actions` верхней полосы.",
     },
     back: {
       en: "Name of `Page.BackButton`.",
@@ -299,12 +291,12 @@ export const api: ComponentApi = {
         ru: "`Page.Title` — `<h1>` страницы, один на страницу, в полосе или в потоке. Повтор заголовка в полосе с `collapse` — `aria-hidden` и `inert`: заголовок читается один раз.",
       },
       {
-        en: "The menu button carries `aria-expanded` and `aria-controls` → the Sidebar's `<nav>`. Folded actions are `display: none` in the bar and `menuitem`s in the «⋯» menu, named by the Button's `aria-label` or its text; their `onClick` runs from the menu.",
-        ru: "Кнопка меню несёт `aria-expanded` и `aria-controls` на `<nav>` Sidebar. Свёрнутые действия в полосе — `display: none`, в меню «⋯» — `menuitem` с именем из `aria-label` кнопки или её текста; их `onClick` срабатывает из меню.",
+        en: "The menu button carries `aria-expanded` and `aria-controls` → the Sidebar's `<nav>`. A Button that shows only its icon keeps its label as its accessible name; its tooltip repeats it. Folded Buttons are `hidden` in the bar and `menuitem`s in the «⋯» menu (named by `labels.more`), named by the Button's `aria-label` or its text, disabled with it; their `onClick` runs from the menu.",
+        ru: "Кнопка меню несёт `aria-expanded` и `aria-controls` на `<nav>` Sidebar. Кнопка, показывающая только иконку, сохраняет подпись как доступное имя; подсказка её повторяет. Свёрнутые кнопки в полосе — `hidden`, в меню «⋯» (имя из `labels.more`) — `menuitem` с именем из `aria-label` кнопки или её текста, недоступные вместе с ней; их `onClick` срабатывает из меню.",
       },
       {
-        en: "`Page.Toolbar` renders the slots in the wide layout's reading order — Tools, Sections, View, Actions, Chips — whatever the JSX order; the narrow layout moves them only visually (`order`). Named, it is a `group`.",
-        ru: "`Page.Toolbar` выводит слоты в порядке чтения широкой раскладки — инструменты, разделы, вид, действие, чипы — независимо от JSX; узкая раскладка двигает их только визуально (`order`). С именем — `group`.",
+        en: "`Page.TopBar` renders its groups in reading order — `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — whatever the JSX order; the plan moves them only visually. A named `Page.Tools` is a `group`. The chevron between the path and the title is decorative (`aria-hidden`): the title is the `<h1>`, outside the path's `<nav>`.",
+        ru: "`Page.TopBar` выводит группы в порядке чтения — `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — независимо от JSX; план двигает их только визуально. Названный `Page.Tools` — `group`. Шеврон между путём и заголовком декоративный (`aria-hidden`): заголовок — `<h1>` вне `<nav>` пути.",
       },
       {
         en: "`Page.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).",

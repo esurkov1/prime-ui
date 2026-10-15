@@ -73,17 +73,19 @@ export default function PageScreenExample() {
   return (
     <Page.Root maxWidth="wide">
       <Page.TopBar collapse>
-        <Page.Header>
+        <Page.Heading>
           <Breadcrumb.Root>
             <Breadcrumb.Item href="#workspace">Прайм Софт</Breadcrumb.Item>
           </Breadcrumb.Root>
-        </Page.Header>
+        </Page.Heading>
       </Page.TopBar>
       <Page.Header>
-        <Page.Title>Настройки</Page.Title>
-        <Page.Description>
-          Реквизиты компании, уведомления и управление рабочим пространством.
-        </Page.Description>
+        <Page.Heading>
+          <Page.Title>Настройки</Page.Title>
+          <Page.Description>
+            Реквизиты компании, уведомления и управление рабочим пространством.
+          </Page.Description>
+        </Page.Heading>
       </Page.Header>
       <Page.Body>
         <Page.Section

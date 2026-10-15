@@ -160,29 +160,31 @@ export default function CardScreenExample() {
       {/* An overview: the large title in the flow; the bar keeps the period and the report in
           reach and repeats the title once it scrolls away. */}
       <Page.TopBar collapse>
-        <Page.Header>
-          <Page.Actions>
-            <SegmentedControl.Root
-              aria-label="Период"
-              value={period}
-              onValueChange={(next) => setPeriod(next as Period)}
-            >
-              <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
-              <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
-              <SegmentedControl.Item value="quarter">Квартал</SegmentedControl.Item>
-            </SegmentedControl.Root>
-            <Button.Root variant="soft" tone="neutral">
-              <Button.Icon>
-                <Icon name="action.download" />
-              </Button.Icon>
-              Отчёт
-            </Button.Root>
-          </Page.Actions>
-        </Page.Header>
+        <Page.Tools>
+          <SegmentedControl.Root
+            aria-label="Период"
+            value={period}
+            onValueChange={(next) => setPeriod(next as Period)}
+          >
+            <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+            <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+            <SegmentedControl.Item value="quarter">Квартал</SegmentedControl.Item>
+          </SegmentedControl.Root>
+        </Page.Tools>
+        <Page.Actions>
+          <Button.Root variant="soft" tone="neutral">
+            <Button.Icon>
+              <Icon name="action.download" />
+            </Button.Icon>
+            Отчёт
+          </Button.Root>
+        </Page.Actions>
       </Page.TopBar>
       <Page.Header>
-        <Page.Title>Обзор</Page.Title>
-        <Page.Description>Продажи и оплаты · на 8 октября, 9:40</Page.Description>
+        <Page.Heading>
+          <Page.Title>Обзор</Page.Title>
+          <Page.Description>Продажи и оплаты · на 8 октября, 9:40</Page.Description>
+        </Page.Heading>
       </Page.Header>
       <Page.Body>
         {/* One board: every tile of the screen in one grid, 16 apart on both axes. */}

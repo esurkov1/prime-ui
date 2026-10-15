@@ -276,72 +276,70 @@ export default function DataTableScreenExample() {
   };
 
   return (
-    <Page.Root>
-      {/* A work screen titles itself in its top bar: the only h1, a line of figures under it, and the
-          page's tools — search, filters, export, the one primary action — in the toolbar row. */}
-
-      <Page.TopBar>
-        <Page.Header>
-          <Page.Title>Счета</Page.Title>
-          <Page.Description>{SUMMARY}</Page.Description>
-        </Page.Header>
-        <SmartFilter.Root
-          fields={FIELDS}
-          value={filter}
-          onValueChange={setFilter}
-          search={search}
-          onSearchChange={setSearch}
-        >
-          <Page.Toolbar aria-label="Счета">
-            <Page.ToolbarTools>
-              <SmartFilter.Toolbar />
-            </Page.ToolbarTools>
-            <Page.ToolbarActions>
-              <Button.Root variant="soft" tone="neutral" aria-label="Экспорт в Excel">
-                <Button.Icon>
-                  <Icon name="action.download" />
-                </Button.Icon>
-              </Button.Root>
-              <Button.Root>
-                <Button.Icon>
-                  <Icon name="action.add" />
-                </Button.Icon>
-                Новый счёт
-              </Button.Root>
-            </Page.ToolbarActions>
-            <Page.ToolbarChips>
-              <SmartFilter.Chips />
-            </Page.ToolbarChips>
-          </Page.Toolbar>
-        </SmartFilter.Root>
-      </Page.TopBar>
-      <Page.Body>
-        <DataTable
-          columns={COLUMNS}
-          rows={rows}
-          getRowKey={(row) => row.id}
-          getRowLabel={(row) => `Счёт ${row.id}`}
-          pageSize={6}
-          stickyFirstColumn
-          defaultSort={{ columnId: "due", order: "desc" }}
-          empty={
-            <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">
-              <EmptyPage.Icon>
-                <Icon name="action.search" />
-              </EmptyPage.Icon>
-              <EmptyPage.Title as="p" id="invoices-empty">
-                Счетов не найдено
-              </EmptyPage.Title>
-              <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
-              <EmptyPage.Actions>
-                <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
-                  Сбросить фильтры
-                </Button.Root>
-              </EmptyPage.Actions>
-            </EmptyPage.Root>
-          }
-        />
-      </Page.Body>
-    </Page.Root>
+    <SmartFilter.Root
+      fields={FIELDS}
+      value={filter}
+      onValueChange={setFilter}
+      search={search}
+      onSearchChange={setSearch}
+    >
+      <Page.Root>
+        {/* A work screen titles itself in its top bar: the only h1, a line of figures under it, the
+            page's search and filters, then export and the one primary action. */}
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Счета</Page.Title>
+            <Page.Description>{SUMMARY}</Page.Description>
+          </Page.Heading>
+          <Page.Tools aria-label="Счета">
+            <SmartFilter.Toolbar />
+          </Page.Tools>
+          <Page.Actions>
+            <Button.Root variant="soft" tone="neutral">
+              <Button.Icon>
+                <Icon name="action.download" />
+              </Button.Icon>
+              Экспорт
+            </Button.Root>
+            <Button.Root>
+              <Button.Icon>
+                <Icon name="action.add" />
+              </Button.Icon>
+              Новый счёт
+            </Button.Root>
+          </Page.Actions>
+          <Page.Chips>
+            <SmartFilter.Chips />
+          </Page.Chips>
+        </Page.TopBar>
+        <Page.Body>
+          <DataTable
+            columns={COLUMNS}
+            rows={rows}
+            getRowKey={(row) => row.id}
+            getRowLabel={(row) => `Счёт ${row.id}`}
+            pageSize={6}
+            stickyFirstColumn
+            defaultSort={{ columnId: "due", order: "desc" }}
+            empty={
+              <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">
+                <EmptyPage.Icon>
+                  <Icon name="action.search" />
+                </EmptyPage.Icon>
+                <EmptyPage.Title as="p" id="invoices-empty">
+                  Счетов не найдено
+                </EmptyPage.Title>
+                <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
+                <EmptyPage.Actions>
+                  <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
+                    Сбросить фильтры
+                  </Button.Root>
+                </EmptyPage.Actions>
+              </EmptyPage.Root>
+            }
+          />
+        </Page.Body>
+      </Page.Root>
+    </SmartFilter.Root>
   );
 }

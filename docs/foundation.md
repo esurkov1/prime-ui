@@ -488,7 +488,7 @@ Components carry no motion code of their own for these layers.
 - Every screen works from 320 to 2560px and at 400% zoom without losing a function: narrow first,
   break by content, rearrange instead of hiding, fluid by default.
 - Components adapt with container queries (`container-type: inline-size`) where their own width
-  matters (Card, Page.Toolbar, DataTable toolbar, Modal footer, Datepicker months, Tabs, Stepper,
+  matters (Card, DataTable toolbar, Modal footer, Datepicker months, Tabs, Stepper,
   ChatList, FieldList, the field frame). Container thresholds are written in `rem`
   (`@container (max-width: 30rem)`) — the one place a raw length is allowed (§2).
 - Viewport width queries (`@media (max-width | min-width)`) are allowed for exactly four things:
@@ -511,17 +511,20 @@ Components carry no motion code of their own for these layers.
   one shared scroller. They never wrap: they scroll inside themselves,
   stretched items tend to equal width and never shrink below their label, the selection indicator
   moves only after a person's choice. Host duty: a switcher's host gives it a bounded width — a flex
-  or grid child that holds a switcher sets `min-width: 0` (the Page.ToolbarView slot does), otherwise
+  or grid child that holds a switcher sets `min-width: 0` (each tool of Page.Tools does), otherwise
   the switcher grows the row instead of scrolling.
 - Scroll overflow is always visible: a cut-off item, an edge fade or an edge shadow (`useEdgeOverflow`).
 - Sticky headers (Page.TopBar, the DataTable head, the Gantt head) stop sticking on screens lower than
   480px: `@media (max-height: 479px)`, the one height query, lives in `src/internal/sticky`. Overlays
   respect safe-area insets.
-- The page panel is `Page.Toolbar`, the page's tools row in `Page.TopBar`. Its rows follow the
-  row model in `src/layout/page/COMPONENT.md` (Toolbar layout): one row from a 56rem
-  container; below it Tools + Actions, then Chips, then Sections and View on full rows; on a phone,
-  when the Tools would get less than 18rem beside the Actions, the Actions take their own row under
-  them. The primary action is always at the end of the top row it shares with the Tools.
+- The page's top bar (`Page.TopBar`) holds four groups — Page.Heading (the path ending in the
+  title), Page.Tools, Page.Actions (every button of the page), Page.Chips — and lays them out by one
+  plan chosen from their natural widths (`src/internal/barPlan`), in five steps: one line while
+  everything fits; then the tools on a line of their own that they fill (a search grows first) while
+  the actions stay beside the heading; then Buttons with an icon show only it, the secondary first,
+  then the primary; then the secondary Buttons fold into «⋯» and the primary stays; only then does the
+  heading truncate, the path before the title. Nothing overflows; the chips are a line of their own
+  under everything. The heading keeps its natural width — the title has no size prop.
 - Field affixes (units like `%`, `°`, `₽`, prefixes like `https://`) are flex items in the field row next to the value,
   separated by the tier `gap`; never absolutely positioned, never sized with a fixed width. A numeric value with a unit
   is one group: value (tabular-nums) + unit, aligned the same way in every field of a row. Field widths come from the

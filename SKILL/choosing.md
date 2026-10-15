@@ -124,8 +124,8 @@ compact (the default for a branded rail); `Sidebar.Toggle` (`variant="item"`) in
 the rail has no brand header. On phones the off-canvas Sidebar opens from the menu button the
 page's `Page.TopBar` draws by itself; a trigger of your own reads `useAppShellNav()`. There is no
 app-wide header: the bar at the top of the panel is the page's `Page.TopBar` — on a work screen the
-page title (`Page.Title` + a line of data in `Page.Header`), the page's own buttons and its tools
-(`Page.Toolbar`) — [where the tools and filters go](composition.md#where-the-filters-go). A document
+title group (`Page.Heading`), the page's tools (`Page.Tools`), its buttons (`Page.Actions`) and the
+active filters (`Page.Chips`) — [the top bar](composition.md#the-top-bar). A document
 page (settings, a long form, help) or an overview has its large title in the flow (`Page.Header`
 outside the bar), with an optional `Page.TopBar collapse` that repeats it once it scrolls away. A record opened from a table: its own page → DataTable `getRowHref`; in place →
 `onRowClick` + Drawer; a list worked through record by record → `Page.Split` with a `List` of

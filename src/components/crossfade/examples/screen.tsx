@@ -72,12 +72,12 @@ export default function CrossfadeScreenExample() {
           the last statement — it moves on once the statement arrives. */}
 
       <Page.TopBar>
-        <Page.Header>
+        <Page.Heading>
           <Page.Title>Сверка с банком</Page.Title>
           <Page.Description>
             2 счёта · выписка на {status === "ready" ? "7" : "6"} октября
           </Page.Description>
-        </Page.Header>
+        </Page.Heading>
       </Page.TopBar>
       <Page.Body>
         {/* The page banner and the panels are one block: the banner, with the 40 below it, comes and

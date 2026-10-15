@@ -1,4 +1,4 @@
-/** On a phone the top bar leads with the menu button that opens the navigation by itself, the title and its line of data truncate and the secondary actions fold into «⋯» — `offCanvas`, `Page.Actions`. */
+/** On a phone the top bar leads with the menu button that opens the navigation by itself, the primary button gives way to its icon and the secondary ones fold into «⋯» — `offCanvas`, `Page.Actions`. */
 import { AppShell, Button, Icon, Page, Sidebar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -35,29 +35,30 @@ export default function PageNarrowExample() {
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>
-              <Page.Header>
+              <Page.Heading>
                 <Page.Title>Заказы покупателей</Page.Title>
                 <Page.Description>128 в работе · 6 ждут оплаты · 2 возврата</Page.Description>
-                <Page.Actions>
-                  <Button.Root variant="soft" tone="neutral">
-                    <Button.Icon>
-                      <Icon name="action.download" />
-                    </Button.Icon>
-                    Экспорт
-                  </Button.Root>
-                  <Button.Root variant="soft" tone="neutral">
-                    <Button.Icon>
-                      <Icon name="action.refresh" />
-                    </Button.Icon>
-                    Обновить
-                  </Button.Root>
-                  <Button.Root aria-label="Новый заказ">
-                    <Button.Icon>
-                      <Icon name="action.add" />
-                    </Button.Icon>
-                  </Button.Root>
-                </Page.Actions>
-              </Page.Header>
+              </Page.Heading>
+              <Page.Actions>
+                <Button.Root variant="soft" tone="neutral">
+                  <Button.Icon>
+                    <Icon name="action.download" />
+                  </Button.Icon>
+                  Экспорт
+                </Button.Root>
+                <Button.Root variant="soft" tone="neutral">
+                  <Button.Icon>
+                    <Icon name="action.refresh" />
+                  </Button.Icon>
+                  Обновить
+                </Button.Root>
+                <Button.Root>
+                  <Button.Icon>
+                    <Icon name="action.add" />
+                  </Button.Icon>
+                  Новый заказ
+                </Button.Root>
+              </Page.Actions>
             </Page.TopBar>
             <Page.Body>
               {ORDERS.map((order) => (

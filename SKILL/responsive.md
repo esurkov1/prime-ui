@@ -63,8 +63,7 @@ Use these as they are; never wrap them in your own breakpoints.
 |---|---|
 | app frame | `AppShell.Main` hands the page its gutters 16 → 24 → 32 and top air 24 → 32; `Page.TopBar` un-sticks on screens lower than 480px and respects the top safe area; in the bar the title and its line of data truncate |
 | app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by the menu button `Page.TopBar` draws by itself while the Sidebar is off-canvas; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
-| page tools | `Page.Toolbar` — search and filter first, one row when wide, stacked rows when narrow, the primary action on its own row when the search would get less than 18rem beside it ([below](#the-pages-tools--pagetoolbar)) |
-| page header | `Page.Header` in `Page.TopBar`: one line, trailing secondary buttons of `Page.Actions` fold into «⋯» by measured width, the primary stays; the page's tools (`Page.Toolbar`) are the bar's second row. `Page.Header` in the flow: actions wrap under the title |
+| page top bar | `Page.TopBar` lays out its groups from their natural widths: one line while they fit, then the tools on a line of their own, then icon-only buttons, then «⋯», and the heading truncates last ([below](#the-pages-top-bar--pagetopbar)). `Page.Header` in the flow: actions wrap under the title |
 | switchers | [Switchers](#switchers) never wrap or truncate: they scroll inside themselves |
 | tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn`, `DataTable.ColumnsMenu` for a column chooser, the toolbar stacks below a 30rem table, sticky head off on short screens |
 | floating layers | Popover (opened from a Trigger), Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet — scrim, grab handle, swipe down to close, page scroll locked; Tooltip and TagSelect stay anchored |
@@ -78,20 +77,23 @@ Use these as they are; never wrap them in your own breakpoints.
 | codes | DigitInput cells 36–64px, `fullWidth` cells share a phone column |
 | touch | hover effects only under `(hover: hover)`; under `(pointer: coarse)` small controls get a 44px hit area; nothing is hover-only |
 
-## The page's tools — `Page.Toolbar`
+## The page's top bar — `Page.TopBar`
 
-One strip at the top of the page — on an app page, the second row of `Page.TopBar`, under the
-`Page.Header` — holds up to five slots. It renders them in one fixed order whatever the JSX order
-(that is also the Tab order) and lays them out from its own width; how each slot moves at every
-width is in [Page COMPONENT.md → Toolbar layout](../src/layout/page/COMPONENT.md#toolbar-layout).
+The bar holds up to four groups ([what goes in each](composition.md#the-top-bar)) and lays them out
+by one plan chosen from their natural widths. As the width runs out it gives way in five steps, always
+in this order, and nothing ever overflows:
 
-| Slot | Holds |
-|---|---|
-| `Page.ToolbarTools` | search + filter button: `SmartFilter.Toolbar` |
-| `Page.ToolbarSections` | sections of the page: a `fullWidth` SegmentedControl with counts |
-| `Page.ToolbarView` | period, table / cards, columns |
-| `Page.ToolbarActions` | the primary action («Создать», «Сохранить 3 изменения») |
-| `Page.ToolbarChips` | active filters: `SmartFilter.Chips` |
+1. **One line** — `Page.Heading`, `Page.Tools` and `Page.Actions` side by side while they fit.
+2. **Tools below** — the tools take a line of their own under the first one and fill its width: a
+   search (`SmartFilter.Toolbar`, `Input.Root`) grows first, the switchers share the rest and wrap
+   when one line is not enough. The actions stay on the first line beside the heading at every width.
+3. **Icons** — every Button with an icon shows only the icon, the secondary ones first, then the
+   primary; its label stays its accessible name and becomes its tooltip.
+4. **«⋯»** — the secondary Buttons fold into a menu (`labels.more`); the primary always stays.
+5. **The heading truncates** — only after every button step: the path levels first, then the title.
+
+`Page.Chips` is always a line of its own under everything, gone while no filter is set. The heading
+keeps its natural width: the bar sizes the title, so there is nothing to tune.
 
 ```tsx
 import {
@@ -110,7 +112,7 @@ const FIELDS: SmartFilterField[] = [
   { key: "city", label: "Город", options: [{ value: "msk", label: "Москва" }] },
 ];
 
-export function OrdersPanel() {
+export function OrdersPage() {
   const [section, setSection] = useState("all");
   const [period, setPeriod] = useState("30d");
   const [filter, setFilter] = useState<SmartFilterValue>({});
@@ -124,63 +126,75 @@ export function OrdersPanel() {
       search={search}
       onSearchChange={setSearch}
     >
-      <Page.Toolbar aria-label="Заказы">
-        <Page.ToolbarTools>
-          <SmartFilter.Toolbar />
-        </Page.ToolbarTools>
-        <Page.ToolbarSections>
-          <SegmentedControl.Root fullWidth value={section} onValueChange={setSection} aria-label="Раздел">
-            <SegmentedControl.Item value="all">
-              Все<SegmentedControl.Count>128</SegmentedControl.Count>
-            </SegmentedControl.Item>
-            <SegmentedControl.Item value="active">
-              В работе<SegmentedControl.Count>12</SegmentedControl.Count>
-            </SegmentedControl.Item>
-          </SegmentedControl.Root>
-        </Page.ToolbarSections>
-        <Page.ToolbarView>
-          <Select.Root value={period} onValueChange={setPeriod}>
-            <Select.Trigger aria-label="Период">
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="7d">7 дней</Select.Item>
-              <Select.Item value="30d">30 дней</Select.Item>
-            </Select.Content>
-          </Select.Root>
-        </Page.ToolbarView>
-        <Page.ToolbarActions>
-          <Button.Root>
-            <Button.Icon>
-              <Icon name="action.add" />
-            </Button.Icon>
-            Новый заказ
-          </Button.Root>
-        </Page.ToolbarActions>
-        <Page.ToolbarChips>
-          <SmartFilter.Chips />
-        </Page.ToolbarChips>
-      </Page.Toolbar>
+      <Page.Root>
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Заказы</Page.Title>
+            <Page.Description>128 в работе · 6 ждут оплаты</Page.Description>
+          </Page.Heading>
+          <Page.Tools aria-label="Заказы">
+            <SegmentedControl.Root value={section} onValueChange={setSection} aria-label="Раздел">
+              <SegmentedControl.Item value="all">
+                Все<SegmentedControl.Count>128</SegmentedControl.Count>
+              </SegmentedControl.Item>
+              <SegmentedControl.Item value="active">
+                В работе<SegmentedControl.Count>12</SegmentedControl.Count>
+              </SegmentedControl.Item>
+            </SegmentedControl.Root>
+            <SmartFilter.Toolbar />
+            <Select.Root value={period} onValueChange={setPeriod}>
+              <Select.Trigger aria-label="Период">
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="7d">7 дней</Select.Item>
+                <Select.Item value="30d">30 дней</Select.Item>
+              </Select.Content>
+            </Select.Root>
+          </Page.Tools>
+          <Page.Actions>
+            <Button.Root variant="soft" tone="neutral">
+              <Button.Icon>
+                <Icon name="action.download" />
+              </Button.Icon>
+              Экспорт
+            </Button.Root>
+            <Button.Root>
+              <Button.Icon>
+                <Icon name="action.add" />
+              </Button.Icon>
+              Новый заказ
+            </Button.Root>
+          </Page.Actions>
+          <Page.Chips>
+            <SmartFilter.Chips />
+          </Page.Chips>
+        </Page.TopBar>
+        <Page.Body>{/* the orders table */}</Page.Body>
+      </Page.Root>
     </SmartFilter.Root>
   );
 }
 ```
 
-- One tier for the whole panel (default `m`): never `size` on one control inside — wrapped rows must
-  stay level. A denser page wraps the toolbar in `<ControlSizeProvider value="s">`; every kit control
+- One tier for the whole bar (default `m`): never `size` on one control inside — wrapped lines must
+  stay level. A denser page wraps the bar in `<ControlSizeProvider value="s">`; every kit control
   inside takes that tier.
-- The primary action is always there: on a phone it may take its own row or become icon-only with
-  `aria-label`; it never disappears.
+- A Button without an icon keeps its label at every step and leaves the bar less room before it
+  folds: give each one a `Button.Icon`.
+- A SegmentedControl in `Page.Tools` needs no `fullWidth`: the bar sets it.
+- The primary action is on screen at every width — as its icon at the narrowest; it never folds and
+  never disappears.
 - Section totals go into `SegmentedControl.Count`, not into stat cards above the table.
-- A long form saves through the panel's action with a count («Сохранить 3 изменения»), never a sticky
-  bar at the bottom of a phone screen.
-- Do not duplicate search: if the panel has one, the list below filters by it.
+- A long form saves through the bar's primary action with a count («Сохранить 3 изменения»), never a
+  sticky bar at the bottom of a phone screen.
+- Do not duplicate search: if the bar has one, the list below filters by it.
 
 ## Switchers
 
-- **Three width modes:** by content (`fullWidth` off), full width (`fullWidth`), full width only when
-  narrow (a `fullWidth` SegmentedControl inside `Page.ToolbarSections` — the toolbar decides).
-- Sections of a page → SegmentedControl in `Page.ToolbarSections`; panels inside a card or a section →
+- **Three width modes:** by content (`fullWidth` off), full width (`fullWidth`), full width only on
+  a line of its own (a SegmentedControl in `Page.Tools` — the bar decides).
+- Sections of a page → SegmentedControl in `Page.Tools`; panels inside a card or a section →
   Tabs (the folder look belongs to its panel).
 - Every switcher — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — scrolls inside
   itself when its items do not fit: never a second line, never a truncated item. Its hidden edges
@@ -205,7 +219,7 @@ export function OrdersPanel() {
 ## Components on narrow widths — what you still decide
 
 **Tables.** Let DataTable scroll inside itself; offer a column chooser (`DataTable.ColumnsMenu` in
-`toolbar`; the key column `hideable: false`); `stickyFirstColumn` for the name. On phones a table / cards switch in `Page.ToolbarView` is fine — silently dropping columns
+`toolbar`; the key column `hideable: false`); `stickyFirstColumn` for the name. On phones a table / cards switch in `Page.Tools` is fine — silently dropping columns
 by breakpoint is not. Never ask to rotate the phone.
 
 **Card grids.** [Intrinsic grids](#intrinsic-grids), never a breakpoint. Tiles of a row share one
@@ -257,7 +271,7 @@ Target CLS ≤ 0.1: nothing moves while loading or when a filter changes.
 Drag the window through 320, 390, 768, 1024, 1280 and 1920px — continuously, not only at these points.
 
 - [ ] No horizontal page scroll at any width (tables and switchers scroll inside themselves).
-- [ ] The primary action is on screen at every width — never hidden ([the page's tools](#the-pages-tools--pagetoolbar)).
+- [ ] The primary action is on screen at every width — never hidden ([the page's top bar](#the-pages-top-bar--pagetopbar)).
 - [ ] Every item alone in its row stretches; items of stretched switchers are equal.
 - [ ] All controls in a row share one height; no «staircase» after a wrap.
 - [ ] Text never overlaps and is cut only at its own block's edge; cut text has a tooltip or `title`.

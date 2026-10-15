@@ -123,8 +123,10 @@ export default function FieldListScreenExample() {
   return (
     <Page.Root maxWidth="wide" aria-labelledby="plan-title">
       <Page.Header>
-        <Page.Title id="plan-title">Тариф «Команда»</Page.Title>
-        <Page.Description>Так тариф выглядит на странице цен и в счетах.</Page.Description>
+        <Page.Heading>
+          <Page.Title id="plan-title">Тариф «Команда»</Page.Title>
+          <Page.Description>Так тариф выглядит на странице цен и в счетах.</Page.Description>
+        </Page.Heading>
         <Page.Actions>
           <Button.Root type="submit" form={formId} loading={saving}>
             {saved ? "Сохранено" : "Сохранить тариф"}

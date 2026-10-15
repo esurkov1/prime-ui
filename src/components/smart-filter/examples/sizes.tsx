@@ -1,5 +1,5 @@
 /** Every size tier: the filter button, the search, the tags and the panel follow one tier — `size`. */
-import { SmartFilter, type SmartFilterField, Typography } from "prime-ui-kit";
+import { Card, SmartFilter, type SmartFilterField, Typography } from "prime-ui-kit";
 
 const FIELDS: SmartFilterField[] = [
   {
@@ -18,8 +18,12 @@ export default function SmartFilterSizesExample() {
       {SIZES.map((size) => (
         <div key={size}>
           <SmartFilter.Root fields={FIELDS} size={size} defaultValue={ONLY_GET}>
-            <SmartFilter.Toolbar />
-            <SmartFilter.Chips />
+            <Card.Root>
+              <Card.Body>
+                <SmartFilter.Toolbar />
+                <SmartFilter.Chips />
+              </Card.Body>
+            </Card.Root>
           </SmartFilter.Root>
           <Typography as="span" variant="caption" tone="muted">
             {size}

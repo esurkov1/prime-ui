@@ -279,9 +279,11 @@ const CASES: Case[] = [
     (ref) => (
       <Page.Root>
         <Page.Header>
-          <Page.Title ref={ref} data-testid="part">
-            Заказы
-          </Page.Title>
+          <Page.Heading>
+            <Page.Title ref={ref} data-testid="part">
+              Заказы
+            </Page.Title>
+          </Page.Heading>
         </Page.Header>
       </Page.Root>
     ),
@@ -291,9 +293,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <Page.TopBar>
-        <Page.Header>
-          <Page.Actions ref={ref} data-testid="part" />
-        </Page.Header>
+        <Page.Actions ref={ref} data-testid="part" />
       </Page.TopBar>
     ),
   ],
@@ -841,28 +841,6 @@ const CASES: Case[] = [
     ),
   ],
   ["Composer.Root", "FORM", (ref) => <Composer.Root ref={ref} data-testid="part" />],
-  [
-    "SmartFilter.Root",
-    "DIV",
-    (ref) => (
-      <SmartFilter.Root
-        ref={ref}
-        data-testid="part"
-        fields={[
-          {
-            key: "status",
-            label: "Статус",
-            options: [
-              { value: "new", label: "Новый" },
-              { value: "paid", label: "Оплачен" },
-            ],
-          },
-        ]}
-      >
-        <SmartFilter.Toolbar />
-      </SmartFilter.Root>
-    ),
-  ],
   [
     "SmartFilter.Chips",
     "DIV",

@@ -575,10 +575,10 @@ export default function ChatScreenExample() {
     <Page.Root fill>
       {/* A work screen titles itself in its top bar: the only h1 and one line of data. */}
       <Page.TopBar>
-        <Page.Header>
+        <Page.Heading>
           <Page.Title>Поддержка</Page.Title>
           <Page.Description>{unreadLabel(unreadTotal)}</Page.Description>
-        </Page.Header>
+        </Page.Heading>
       </Page.TopBar>
       <Page.Body>
         <Page.Split

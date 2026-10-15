@@ -140,7 +140,11 @@ function morphLabels(children: React.ReactNode): React.ReactNode[] {
   let run: string | null = null;
   const flush = () => {
     if (run !== null && run !== "") {
-      out.push(<MorphText key={`label-${out.length}`}>{run}</MorphText>);
+      out.push(
+        <MorphText key={`label-${out.length}`} className={styles.label}>
+          {run}
+        </MorphText>,
+      );
     }
     run = null;
   };

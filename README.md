@@ -138,9 +138,9 @@ export function App() {
     >
       <Page.Root>
         <Page.TopBar>
-          <Page.Header>
+          <Page.Heading>
             <Page.Title>Новый клиент</Page.Title>
-          </Page.Header>
+          </Page.Heading>
         </Page.TopBar>
         <Page.Body>
           <Input.Root label="Рабочая почта" required hint="Отправим на неё приглашение">
@@ -311,7 +311,7 @@ accessibility, examples and common mistakes.
 | Component | What it is for |
 |---|---|
 | [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame — navigation and the page: a content panel that is the page itself and a navigation rail one layer above it. |
-| [**Page**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/page/COMPONENT.md) | The page inside the app frame: everything at the top belongs to it — a top bar with the title, actions and tools, the large document title in the flow — then sections, the tile grid and the list + detail layout. |
+| [**Page**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/page/COMPONENT.md) | The page inside the app frame: everything at the top belongs to it — a top bar with the title, tools and buttons, the large document title in the flow — then sections, the tile grid and the list + detail layout. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator inside one surface, horizontal or vertical, with or without a label. |
 | [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | The kit's one scroll region: a thin scrollbar, soft edges wherever content is hidden, and correct shrinking inside flex and grid parents. |
 | [**LoginForm**](https://github.com/esurkov1/prime-ui/blob/main/src/components/login-form/COMPONENT.md) | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. |

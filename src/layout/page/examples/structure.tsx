@@ -1,4 +1,4 @@
-/** A document page in the flow: the path over the large title, its line of data and the page's actions, then the body with a section — `Page.Header`, `Page.Description`, `Page.Section`. */
+/** A document page in the flow: the path over the large title, its line of data and the page's buttons beside them, then the body with a section — `Page.Header`, `Page.Heading`, `Page.Description`, `Page.Section`. */
 import { Breadcrumb, Button, Card, Page, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -8,11 +8,15 @@ export default function PageStructureExample() {
     <div className={styles.main}>
       <Page.Root>
         <Page.Header>
-          <Breadcrumb.Root>
-            <Breadcrumb.Item href="#settings">Настройки</Breadcrumb.Item>
-          </Breadcrumb.Root>
-          <Page.Title>Уведомления</Page.Title>
-          <Page.Description>Письма и сообщения, которые получает команда продаж.</Page.Description>
+          <Page.Heading>
+            <Breadcrumb.Root>
+              <Breadcrumb.Item href="#settings">Настройки</Breadcrumb.Item>
+            </Breadcrumb.Root>
+            <Page.Title>Уведомления</Page.Title>
+            <Page.Description>
+              Письма и сообщения, которые получает команда продаж.
+            </Page.Description>
+          </Page.Heading>
           <Page.Actions>
             <Button.Root variant="soft" tone="neutral">
               Сбросить
