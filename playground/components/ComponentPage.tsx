@@ -138,7 +138,7 @@ function ExampleBlock({ page, example }: { page: ComponentPageConfig; example: C
 export function ComponentPage({ page }: { page: ComponentPageConfig }) {
   const { api } = page;
   return (
-    <DocPage title={page.title} description={renderInlineCode(page.description)} measure="full">
+    <DocPage title={page.title} description={renderInlineCode(page.description)}>
       {page.examples.map((example) => (
         <ExampleBlock key={exampleFile(example)} page={page} example={example} />
       ))}

@@ -12,7 +12,7 @@
 - A vertical break between groups of buttons in a toolbar row; `inset` makes it one text line tall (a header).
 
 ## When not to use
-- To separate cards or panels from each other → use fill and spacing ([Card](../card/COMPONENT.md), [PageContent](../page-content/COMPONENT.md) sections), never a line.
+- To separate cards or panels from each other → use fill and spacing ([Card](../card/COMPONENT.md), [Page](../../layout/page/COMPONENT.md) sections), never a line.
 - Separators inside a dropdown menu → `Dropdown.Separator` ([Dropdown](../dropdown/COMPONENT.md)).
 - Row lines of a table → [DataTable](../data-table/COMPONENT.md) draws them itself.
 
@@ -124,4 +124,4 @@ No `labels`.
 
 ## Related
 - **Built from:** `internal/fieldClasses` (the tier table), `internal/textRole` (the label type), `internal/hasContent`
-- **See also:** [Dropdown](../dropdown/COMPONENT.md) (`Dropdown.Separator`), [Select](../select/COMPONENT.md) (`Select.Separator`), [Accordion](../accordion/COMPONENT.md), [Card](../card/COMPONENT.md), [PageContent](../page-content/COMPONENT.md)
+- **See also:** [Dropdown](../dropdown/COMPONENT.md) (`Dropdown.Separator`), [Select](../select/COMPONENT.md) (`Select.Separator`), [Accordion](../accordion/COMPONENT.md), [Card](../card/COMPONENT.md), [Page](../../layout/page/COMPONENT.md)

@@ -1,5 +1,5 @@
 /** A phone app without a Sidebar: the bar in the footer stays at the bottom while main scrolls under it — `AppShell.Footer`. */
-import { AppHeader, AppShell, BottomNav, Icon, PageContent, Typography } from "prime-ui-kit";
+import { AppShell, BottomNav, Icon, Page, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -25,21 +25,21 @@ export default function AppShellFooterExample() {
   return (
     <div className={styles.phone}>
       <AppShell.Root fillViewport className={styles.shell}>
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.Title>Счета</AppHeader.Title>
-          </AppHeader.Start>
-        </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Root as="section">
-            <PageContent.Body>
+          <Page.Root>
+            <Page.TopBar>
+              <Page.Header>
+                <Page.Title>Счета</Page.Title>
+              </Page.Header>
+            </Page.TopBar>
+            <Page.Body>
               {INVOICES.map((invoice) => (
                 <Typography key={invoice} variant="body-m">
                   {invoice}
                 </Typography>
               ))}
-            </PageContent.Body>
-          </PageContent.Root>
+            </Page.Body>
+          </Page.Root>
         </AppShell.Main>
         <AppShell.Footer>
           <BottomNav.Root>

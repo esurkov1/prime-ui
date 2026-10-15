@@ -240,7 +240,7 @@ cards `--prime-card-radius` (12); floating panels `--prime-panel-radius` (12) wi
 Elevation: `--prime-shadow-raised` (a card on the page, barely there; `--prime-layer-shadow`) · `--prime-shadow-overlay` (menus, popovers,
 tooltips, datepicker) · `--prime-shadow-modal` (modal, drawer, sheet).
 Z-index: `--prime-z-*` only, never a number. Two groups:
-- Page level: a sticky surface (AppHeader, a DataTable head, the Gantt head) on `--prime-z-sticky`;
+- Page level: a sticky surface (Page.TopBar, a DataTable head, the Gantt head) on `--prime-z-sticky`;
   every overlay shares `--prime-z-overlay` and portals to `<body>` when it opens, so the open order is
   the stacking order; toasts sit above on `--prime-z-toast`.
 - Local steps, for stacking parts inside one component that makes its own stacking context:
@@ -488,11 +488,11 @@ Components carry no motion code of their own for these layers.
 - Every screen works from 320 to 2560px and at 400% zoom without losing a function: narrow first,
   break by content, rearrange instead of hiding, fluid by default.
 - Components adapt with container queries (`container-type: inline-size`) where their own width
-  matters (Card, PageToolbar, DataTable toolbar, Modal footer, Datepicker months, Tabs, Stepper,
+  matters (Card, Page.Toolbar, DataTable toolbar, Modal footer, Datepicker months, Tabs, Stepper,
   ChatList, FieldList, the field frame). Container thresholds are written in `rem`
   (`@container (max-width: 30rem)`) — the one place a raw length is allowed (§2).
 - Viewport width queries (`@media (max-width | min-width)`) are allowed for exactly four things:
-  - the app shell (AppShell, AppHeader);
+  - the app shell (AppShell);
   - the overlay form below 640: Modal and its dialog parts, Drawer, Popover actions, Datepicker
     months, the Notification zone, `overlayMotion`;
   - touch text: editable field text at 16px under `(pointer: coarse), (max-width: 639px)`
@@ -511,14 +511,14 @@ Components carry no motion code of their own for these layers.
   one shared scroller. They never wrap: they scroll inside themselves,
   stretched items tend to equal width and never shrink below their label, the selection indicator
   moves only after a person's choice. Host duty: a switcher's host gives it a bounded width — a flex
-  or grid child that holds a switcher sets `min-width: 0` (the PageToolbar View slot does), otherwise
+  or grid child that holds a switcher sets `min-width: 0` (the Page.ToolbarView slot does), otherwise
   the switcher grows the row instead of scrolling.
 - Scroll overflow is always visible: a cut-off item, an edge fade or an edge shadow (`useEdgeOverflow`).
-- Sticky headers (AppHeader, the DataTable head, the Gantt head) stop sticking on screens lower than
+- Sticky headers (Page.TopBar, the DataTable head, the Gantt head) stop sticking on screens lower than
   480px: `@media (max-height: 479px)`, the one height query, lives in `src/internal/sticky`. Overlays
   respect safe-area insets.
-- The page panel is `PageToolbar`, the page's tools row in `AppHeader.Tools`. Its rows follow the
-  row model in `src/components/page-toolbar/COMPONENT.md` (Layout by width): one row from a 56rem
+- The page panel is `Page.Toolbar`, the page's tools row in `Page.TopBar`. Its rows follow the
+  row model in `src/layout/page/COMPONENT.md` (Toolbar layout): one row from a 56rem
   container; below it Tools + Actions, then Chips, then Sections and View on full rows; on a phone,
   when the Tools would get less than 18rem beside the Actions, the Actions take their own row under
   them. The primary action is always at the end of the top row it shares with the Tools.

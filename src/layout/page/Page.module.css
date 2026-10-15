@@ -1,0 +1,680 @@
+/*
+ * Page — the page column inside `AppShell.Main` (foundation §1.3 rhythm): header → body 24, block →
+ * block inside the body 24, a titled section 40 from its neighbours, tile → tile 16 on both axes.
+ *
+ * The host hands the page its edge air through two custom properties: `--page-gutter` (the side
+ * gutter) and `--page-top` (the air above the page and under its top bar). `AppShell.Main` sets
+ * them to the shell's gutters; outside a host they are unset and the page brings no air. The page
+ * resets both for what it holds, so a page nested inside (an example) starts clean.
+ */
+
+.root {
+  --page-inset: var(--page-gutter, var(--prime-space-0));
+  --page-air: var(--page-top, var(--prime-space-0));
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-6);
+  width: 100%;
+  min-width: 0;
+  padding-block-start: var(--page-air);
+  padding-inline: var(--page-inset);
+}
+
+.root > * {
+  --page-gutter: initial;
+  --page-top: initial;
+}
+
+/* The cap centres everything but the top bar, which runs the width of the panel. */
+.root[data-max-width] > :not(.topBar) {
+  box-sizing: border-box;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.root[data-max-width="readable"] > :not(.topBar) {
+  max-width: var(--prime-layout-reading-max-width);
+}
+
+.root[data-max-width="wide"] > :not(.topBar) {
+  max-width: var(--prime-layout-content-max-width);
+}
+
+/* ─── Top bar ──────────────────────────────────────────────────────────────── */
+
+/*
+ * The strip at the page's top edge: edge to edge across the panel (it steps out of the page
+ * gutter and keeps it inside), on the page's own fill with no divider (depth from fill), the top
+ * safe-area inset kept. The page's top air moves under it.
+ */
+.root:has(> .topBar:first-child) {
+  padding-block-start: var(--prime-space-0);
+}
+
+.topBar {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin-inline: calc(var(--page-inset) * -1);
+  margin-block-end: max(var(--prime-space-0), calc(var(--page-air) - var(--prime-space-6)));
+  padding-block: max(var(--prime-space-3), env(safe-area-inset-top, var(--prime-space-0)))
+    var(--prime-space-3);
+  padding-inline: var(--page-inset);
+  background: var(--prime-color-layer-current);
+  color: var(--prime-color-text-primary);
+}
+
+/* Sticks through `stickySurfaceClass` (joined in TSX), above the page that scrolls under it. */
+.topBar[data-sticky="true"] {
+  z-index: var(--prime-z-sticky);
+}
+
+/* Centred on the title row: (row − control) / 2. */
+.menuButton {
+  flex: none;
+  margin-block-start: var(--prime-space-1);
+}
+
+/* The title row, then the toolbar row 12 under it. */
+.rows {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────────── */
+
+/*
+ * In the flow: heading and actions share a row while the heading keeps at least half a reading
+ * measure; otherwise actions wrap under it (intrinsic wrap, no breakpoint needed).
+ */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--prime-space-4) var(--prime-space-6);
+  min-width: 0;
+}
+
+.heading {
+  display: flex;
+  flex: 1 1 calc(var(--prime-layout-reading-max-width) / 2);
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.path {
+  display: flex;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap-style: balance;
+}
+
+.description {
+  margin: 0;
+  max-width: var(--prime-layout-reading-max-width);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
+  text-wrap-style: pretty;
+}
+
+/*
+ * In the bar: one line as high as the Sidebar brand row (control height + 8), so the brand and the
+ * title share a line across the two planes — the path, a separator, the title over its line of
+ * data (both truncate), the actions at the end on one line.
+ */
+.header[data-place="bar"] {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-height: calc(var(--prime-control-m-height) + var(--prime-space-2));
+}
+
+.header[data-place="bar"] > .heading {
+  flex: 1 1 auto;
+  flex-direction: row;
+  align-items: center;
+}
+
+.header[data-place="bar"] .titleBlock {
+  flex: 0 1 auto;
+  gap: var(--prime-space-0);
+}
+
+.header[data-place="bar"] .path {
+  flex: 0 1 auto;
+}
+
+.header[data-place="bar"] > .actions {
+  flex: none;
+  flex-wrap: nowrap;
+}
+
+.barTitle,
+.barDescription {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.barTitle {
+  margin: 0;
+  color: var(--prime-color-text-primary);
+}
+
+.barDescription {
+  margin: 0;
+  color: var(--prime-color-text-muted);
+}
+
+/* One action of the bar: measured whole, folded into «⋯» with `hidden`. */
+.actionItem {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.actionItem[hidden] {
+  display: none;
+}
+
+/*
+ * The flow title repeated in the bar: rises in once the title scrolls away, sinks out when it
+ * returns (transform on the movement clock, opacity on the fade clock — reduced motion keeps
+ * the fade).
+ */
+.echo {
+  display: flex;
+  /* Basis 0: the echo takes the room the path and the actions leave, never theirs. */
+  flex: 1 1 0;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(var(--prime-space-1));
+  transition:
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    visibility var(--prime-motion-instant) linear var(--prime-motion-fade-fast);
+}
+
+.echo[data-visible="true"] {
+  /* In view it keeps room for a few letters of the title: the path gives way first. */
+  min-width: var(--prime-space-24);
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-enter),
+    visibility var(--prime-motion-instant) linear;
+}
+
+/* ─── Toolbar ──────────────────────────────────────────────────────────────── */
+
+/*
+ * The page's tools (foundation §9). Every slot has a fixed place, chosen by the toolbar's own
+ * width (container query), never by the window. Search and filter come first, so the active
+ * filters (Chips) sit under the top row:
+ *
+ *   narrow (< 56rem):  [ Tools ——— stretches ——— ][ Actions ]
+ *                      [ Chips ……………………………………………………… ]
+ *                      [ Sections ——— full row ——— ]
+ *                      [ View ——— full row ——— ]
+ *   phone (the Tools would get less than 18rem beside the Actions):
+ *                      [ Tools ——— full row ——— ]
+ *                      [ Actions ——— full row ——— ]
+ *                      [ Chips ] [ Sections ] [ View ] as above
+ *   wide (≥ 56rem):    [ Tools ——— stretches ——— ][ Sections ][ View ][ Actions ]
+ *                      [ Chips ……………………………………………………… ]
+ *
+ * Narrow is one wrapping flex line of real rows only — a missing slot or an empty Chips row makes
+ * no row, so every row is the same 12 apart. Without Tools the Sections take their place beside the
+ * Actions; without both, the View does. The Tools keep at least 18rem (a 9rem search and the
+ * filter button on one line): when the Actions leave less, they wrap to their own row under the
+ * Tools and stretch across it, so the search is never squeezed (an icon-only action still fits
+ * beside them). Wide is one line that never wraps. Slots move only visually (`order`); the DOM —
+ * and the Tab order — is the wide layout's reading order (Tools, Sections, View, Actions, Chips),
+ * set by the toolbar. All controls share the toolbar tier, so rows stay level.
+ */
+.toolbar {
+  container: prime-page-tools / inline-size;
+  min-width: 0;
+}
+
+.toolbarLayout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.toolbarBar {
+  display: contents;
+}
+
+.toolbarSections,
+.toolbarTools,
+.toolbarView,
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* The first row's stretchy slot — the Tools, else the Sections, else the View: takes nearly all
+   the free room, never less than 18rem beside the Actions. */
+.toolbarTools,
+.toolbarBar:not(:has(> .toolbarTools)) > .toolbarSections,
+.toolbarBar:not(:has(> .toolbarTools, > .toolbarSections)) > .toolbarView {
+  order: 1;
+  flex: 999 1 calc(var(--prime-space-24) * 3);
+}
+
+/* Beside the Tools it keeps its content width (its share of the free room is a thousandth); wrapped
+   under them it takes the row and its buttons share it. */
+.toolbarActions {
+  order: 2;
+  flex: 1 0 auto;
+  justify-content: flex-end;
+}
+
+.toolbarActions > * {
+  flex: 1 1 auto;
+}
+
+/* The only slot of the toolbar: content width at the row's end. */
+.toolbarBar:not(:has(> .toolbarTools, > .toolbarSections, > .toolbarView)) > .toolbarActions {
+  flex: none;
+  margin-inline-start: auto;
+}
+
+.toolbarChips {
+  order: 3;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.toolbarSections {
+  order: 4;
+  flex: 1 1 100%;
+}
+
+.toolbarView {
+  order: 5;
+  flex: 1 1 100%;
+}
+
+.toolbarChips:empty {
+  display: none;
+}
+
+.toolbarTools > *,
+.toolbarSections > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The View's controls share its row equally; a control narrower than its content gives way (its
+   own content scrolls or truncates), so the row never overflows a phone. */
+.toolbarView > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Wide: one line that never wraps, Chips under it. When room runs short the Tools give way first,
+   down to 12rem, so the Sections keep their items and counts whole; only then the Sections shrink
+   and scroll inside their switcher. */
+@container prime-page-tools (min-width: 56rem) {
+  .toolbarLayout {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .toolbarChips {
+    flex: none;
+  }
+
+  .toolbarBar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--prime-space-3);
+    min-width: 0;
+  }
+
+  .toolbarTools {
+    flex: 1 999 calc(var(--prime-space-24) * 3);
+    min-width: calc(var(--prime-space-24) * 2);
+  }
+
+  .toolbarSections {
+    order: 2;
+    flex: 0 1 auto;
+  }
+
+  /* Without Tools the Sections are the first and stretchy item. */
+  .toolbarBar:not(:has(> .toolbarTools)) > .toolbarSections {
+    flex: 1 1 auto;
+  }
+
+  .toolbarView,
+  .toolbarBar:not(:has(> .toolbarTools, > .toolbarSections)) > .toolbarView {
+    order: 3;
+    flex: none;
+  }
+
+  .toolbarView > * {
+    flex: none;
+  }
+
+  .toolbarActions {
+    order: 4;
+    flex: none;
+    margin-inline-start: auto;
+  }
+}
+
+/* ─── Body and sections ────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-6);
+  min-width: 0;
+}
+
+/*
+ * A titled section: heading → content 16. A new topic stands 40 from its neighbours — the body's 24
+ * plus 16 on the side of a section (the body is a flex column, so margins add and never collapse).
+ */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.body > .section:not(:first-child),
+.body > .section + * {
+  margin-block-start: var(--prime-space-4);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  min-width: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  flex: 1 1 calc(var(--prime-layout-reading-max-width) / 2);
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+/* The content of a section: its blocks 16 apart (a table and its totals, a panel and its note). */
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+/*
+ * `aside`: ~16rem of heading column beside the content; the column drops above once the content
+ * would get narrower than 30rem (intrinsic wrap, no breakpoint).
+ */
+.section[data-layout="aside"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--prime-space-4) var(--prime-space-10);
+}
+
+.section[data-layout="aside"] > .sectionHeader {
+  flex: 1 1 calc(var(--prime-space-16) * 4);
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* In the column the heading's row basis would turn into a height: it takes its own height only. */
+.section[data-layout="aside"] > .sectionHeader > .sectionHeading {
+  flex: none;
+}
+
+.section[data-layout="aside"] > .sectionContent {
+  flex: 999 1 calc(var(--prime-space-24) * 5);
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap-style: balance;
+}
+
+.sectionDescription {
+  margin: 0;
+  max-width: var(--prime-layout-reading-max-width);
+  color: var(--prime-color-text-secondary);
+  overflow-wrap: anywhere;
+  text-wrap-style: pretty;
+}
+
+/* ─── Grid ─────────────────────────────────────────────────────────────────── */
+
+/*
+ * Tiles: one 12-column grid with one gap on both axes, so the rows of a dashboard read as one
+ * board. Columns follow the grid's own width (container query, the numbers are written out — a
+ * custom property cannot stand in a container condition): narrow — every cell takes the row; from
+ * 30rem — small cells (KPI, span 1–3) pair up; from 40rem — spans 5–6 take half the row too, a third
+ * stays a third, wide cells the whole row; from 64rem — every cell its own span. `dense` lets a
+ * small cell fill a hole left by a wide one.
+ */
+.grid {
+  container: prime-grid / inline-size;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-flow: row dense;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+/* The child (a Card, a ChartFrame) stretches to the cell, so the tiles of a row share one height. */
+.cell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-column: span 12;
+  min-width: 0;
+}
+
+@container prime-grid (min-width: 30rem) {
+  .cell:is([data-span="1"], [data-span="2"], [data-span="3"]) {
+    grid-column: span 6;
+  }
+}
+
+@container prime-grid (min-width: 40rem) {
+  .cell:is([data-span="5"], [data-span="6"]) {
+    grid-column: span 6;
+  }
+
+  .cell[data-span="4"] {
+    grid-column: span 4;
+  }
+
+  .cell[data-rows="2"] {
+    grid-row: span 2;
+  }
+
+  .cell[data-rows="3"] {
+    grid-row: span 3;
+  }
+
+  .cell[data-rows="4"] {
+    grid-row: span 4;
+  }
+}
+
+@container prime-grid (min-width: 64rem) {
+  .cell[data-span="1"] {
+    grid-column: span 1;
+  }
+
+  .cell[data-span="2"] {
+    grid-column: span 2;
+  }
+
+  .cell[data-span="3"] {
+    grid-column: span 3;
+  }
+
+  .cell[data-span="5"] {
+    grid-column: span 5;
+  }
+
+  .cell[data-span="7"] {
+    grid-column: span 7;
+  }
+
+  .cell[data-span="8"] {
+    grid-column: span 8;
+  }
+
+  .cell[data-span="9"] {
+    grid-column: span 9;
+  }
+
+  .cell[data-span="10"] {
+    grid-column: span 10;
+  }
+
+  .cell[data-span="11"] {
+    grid-column: span 11;
+  }
+}
+
+/*
+ * `fill`: the page takes the height of the panel's main (`AppShell.Root fillViewport`) and the
+ * body takes what the header leaves. A filling child inside (DataTable `scrollHeight="fill"`,
+ * Crossfade `fill`, Page.Split) takes the body's free height.
+ */
+.root[data-fill="true"] {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.root[data-fill="true"] > .body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ─── List + detail ────────────────────────────────────────────────────────── */
+
+/*
+ * Wide (from 48rem of its own width): the list in a 20rem column (16rem at least), the detail
+ * beside it. Narrow: one pane at a time — the list, or the open detail; the pane that comes into
+ * view enters (`enterMotion`, base). Each pane is a column that gives its last child the free
+ * height, so a card with its own ScrollContainer fills the pane.
+ */
+.split {
+  container: prime-split / inline-size;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The grid of panes inside the container (a container never queries itself). */
+.panes {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--prime-space-6);
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  /* A landing point for focus when the panes swap, not a control: no ring. */
+  outline: none;
+}
+
+.pane > :last-child {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.split:not([data-open="true"]) > .panes > .detail,
+.split[data-open="true"] > .panes > .list {
+  display: none;
+}
+
+@container prime-split (min-width: 48rem) {
+  .panes {
+    grid-template-columns:
+      minmax(calc(var(--prime-space-16) * 4), calc(var(--prime-space-20) * 4))
+      minmax(0, 1fr);
+  }
+
+  .panes > .pane {
+    animation: none;
+  }
+
+  .split:not([data-open="true"]) > .panes > .detail,
+  .split[data-open="true"] > .panes > .list {
+    display: flex;
+  }
+
+  /* Both panes are on screen: there is nothing to go back to. */
+  .backButton {
+    display: none;
+  }
+}

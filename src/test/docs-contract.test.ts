@@ -6,7 +6,7 @@
  * its own `screen.module.css` and renders a page with one h1.
  *
  * Each guard asserts no offender, named by the guard's id; a deliberate exception is a named
- * allowlist entry with its reason (`DOMAIN_GLYPHS`, `DOCUMENT_SCREENS`, `PAINTED_EXAMPLES`), and a
+ * allowlist entry with its reason (`DOMAIN_GLYPHS`, `PAINTED_EXAMPLES`), and a
  * test fails once an entry no longer applies.
  */
 import fs from "node:fs";
@@ -117,15 +117,6 @@ const ACCESSIBILITY_HEADINGS = ["### Keyboard", "### ARIA", "### Labels"];
  * does not carry. Every entry needs a reason; a glyph the registry has never belongs here.
  */
 const DOMAIN_GLYPHS: Record<string, string> = {};
-
-/**
- * Screens that are document pages (settings, a long form): the only ones whose title is
- * `PageContent.Header` in main. Every other screen titles itself in its `AppHeader`.
- */
-const DOCUMENT_SCREENS: Record<string, string> = {
-  "page-content": "the settings page of an account: a document with titled sections",
-  "field-list": "an order form: a document of fields edited in place",
-};
 
 /**
  * Components whose examples paint their items: the component draws no item look, its API leaves
@@ -597,14 +588,6 @@ describe("docs contract", () => {
     expect(missing, "main symbol not exported from a package entry").toEqual([]);
   });
 
-  it("keeps DOCUMENT_SCREENS to screens that have a content header", () => {
-    for (const dir of Object.keys(DOCUMENT_SCREENS)) {
-      const rel = dirs.find((item) => item.dir === dir)?.rel;
-      expect(rel, dir).toBeDefined();
-      expect(read(`${rel}/examples/screen.tsx`), dir).toContain("<PageContent.Header");
-    }
-  });
-
   it("keeps PAINTED_EXAMPLES to components whose examples paint", () => {
     for (const dir of Object.keys(PAINTED_EXAMPLES)) {
       const rel = dirs.find((item) => item.dir === dir)?.rel;
@@ -736,21 +719,16 @@ describe("docs contract", () => {
     it.runIf(screenModule)("the screen titles itself in one place", () => {
       const file = `${rel}/examples/screen.tsx`;
       const source = read(file);
-      // An app page titles itself in its header; only a document page keeps a content header.
+      // One page, one title: a screen writes exactly one Page.Title (in its top bar or in the
+      // flow) and no other h1.
       expect(
-        source.includes("<AppHeader.Title") && source.includes("<PageContent.Title"),
-        `${file}: AppHeader.Title and PageContent.Title — two titles`,
+        source.split("<Page.Title").length - 1,
+        `${file}: Page.Title written ${source.split("<Page.Title").length - 1} times — one title per screen`,
+      ).toBe(1);
+      expect(
+        /<h1\b|as="h1"/.test(source),
+        `${file}: an h1 outside Page.Title — the page title is Page.Title`,
       ).toBe(false);
-      expect(
-        !source.includes("<PageContent.Header") || dir in DOCUMENT_SCREENS,
-        `${file}: PageContent.Header on a screen that is not a document page (DOCUMENT_SCREENS)`,
-      ).toBe(true);
-      for (const title of ["<AppHeader.Title", "<PageContent.Title"]) {
-        expect(
-          source.split(title).length - 1,
-          `${file}: ${title.slice(1)} written more than once — one title per screen`,
-        ).toBeLessThanOrEqual(1);
-      }
     });
 
     describe("page standard", () => {

@@ -193,7 +193,7 @@ on screen.
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | a number / a CSS length | the viewport grows with the rows up to that height, then scrolls | a table inside a card or a dashboard block | 360 with `paging="infinite"`, else none |
-| `"fill"` | the table takes the height of its flex / grid parent (or a sized block); toolbar and footer keep theirs, the rows scroll | a log or a register that takes the rest of the page (`PageContent.Root fill`), a pane | |
+| `"fill"` | the table takes the height of its flex / grid parent (or a sized block); toolbar and footer keep theirs, the rows scroll | a log or a register that takes the rest of the page (`Page.Root fill`), a pane | |
 
 ### Opening a row
 | Value | Looks like | Use when | Default |
@@ -275,7 +275,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - The empty and error content stands in a sticky box of the visible width: a wide table centres it in the viewport, and it stays there while the table scrolls sideways.
 - A trend per row: a compact [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"`) in a cell fits the row height; its pointer and keys never open the row.
 - Long data needs no slicing: past 100 rows a body in a bounded viewport (`scrollHeight`, `"fill"`, `paging="infinite"`) renders only the rows around the view; spacer rows keep the scrollbar exact, the focused row stays rendered, rows carry `aria-rowindex` and the table `aria-rowcount`. Grouped (`getRowGroup`), reorderable (`onReorder`) and `renderExpanded` bodies, and a table the page scrolls, render every row. The browser's find-in-page sees only rendered rows: give a long table a search in `toolbar`.
-- `scrollHeight="fill"` needs a parent with a height: a flex or grid column with `min-height: 0`, `PageContent.Root fill` in an `AppShell.Root fillViewport`, or a sized pane.
+- `scrollHeight="fill"` needs a parent with a height: a flex or grid column with `min-height: 0`, `Page.Root fill` in an `AppShell.Root fillViewport`, or a sized pane.
 - The sticky head stops sticking on screens lower than 480px (landscape phones), so it never takes a large share of the height.
 - Cell content: text, two-line text (title + `caption`), an Avatar with text, a Badge, or a control one tier down (`s` in an `m` table). Toolbar controls use `s` in an `m` table.
 - Column widths: `width` / `minWidth` / `maxWidth` strings; never size cells with custom CSS.
@@ -358,7 +358,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [states.tsx](examples/states.tsx) | Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `loadError`. |
 | [controlled.tsx](examples/controlled.tsx) | Sort, page and the column choice owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`, `hiddenColumns`, `onHiddenColumnsChange`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320 px support queue: columns scroll inside the table with the first one pinned, the toolbar and footer reflow and the pager turns compact — `stickyFirstColumn`, `size`. |
-| [screen.tsx](examples/screen.tsx) | A list page: the title, a line of figures, search, filters and the one primary action in the app header, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. |
+| [screen.tsx](examples/screen.tsx) | A list page: the title, a line of figures, search, filters and the one primary action in its top bar, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. |
 
 ## Mistakes
 - No `getRowKey` with `selectable`, expansion or sorting → selection follows positions, not records.
@@ -389,4 +389,4 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 
 ## Related
 - **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (`DataTable.ColumnsMenu`), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`), [Tooltip](../tooltip/COMPONENT.md) (handle hint), Icon (sort arrows, the expand chevron, the `DataTable.ColumnsMenu` trigger); `useVirtualRows` (the window of a long body)
-- **See also:** [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"` in a cell), [SmartFilter](../smart-filter/COMPONENT.md), [PageToolbar](../page-toolbar/COMPONENT.md), [Gantt](../gantt/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)
+- **See also:** [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"` in a cell), [SmartFilter](../smart-filter/COMPONENT.md), [Page](../../layout/page/COMPONENT.md) (`Page.Toolbar`), [Gantt](../gantt/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)

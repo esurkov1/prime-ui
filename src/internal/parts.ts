@@ -26,7 +26,7 @@ export function flattenChildren(nodes: React.ReactNode, prefix = ""): React.Reac
 
 /**
  * Splits the direct children into the elements of the given part types and the rest, each in the
- * written order (`PageToolbar.Chips` under the bar, `Badge.Action` at the end of the badge).
+ * written order (`Page.ToolbarChips` under the toolbar row, `Badge.Action` at the end of the badge).
  */
 export function splitParts<P = unknown>(
   children: React.ReactNode,

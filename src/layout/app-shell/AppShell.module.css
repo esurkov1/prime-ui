@@ -2,9 +2,8 @@
  * App shell: two full-height planes edge to edge — the content plane is the page itself (layer 0 of
  * the surface ladder: gray in light, near black in dark) and the navigation column beside it is a
  * surface one layer above (Sidebar sets its own `data-depth`). No inset, radius, shadow or border:
- * the boundary is the fill change. Gutters inside the content plane are the page gutter
- * `--prime-layout-gutter` (16 → 24 from 640px → 32 from 1024px, globals.css); top air 24 → 32 from
- * 1024px.
+ * the boundary is the fill change. Main hands the page the page gutter `--prime-layout-gutter`
+ * (16 → 24 from 640px → 32 from 1024px, globals.css) and the top air 24 → 32 from 1024px.
  */
 
 /*
@@ -32,7 +31,9 @@
   grid-template-columns: auto minmax(0, 1fr);
 }
 
-.root[data-fill-viewport="true"] {
+/* `:where()`: the viewport height is a default a host's own class may override (a shell inside an
+   app window of a fixed height). */
+.root:where([data-fill-viewport="true"]) {
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
@@ -44,8 +45,8 @@
   }
 }
 
-/* Above the panel: the compact Sidebar toggle rides the rail edge, half over the panel and its
-   sticky header. */
+/* Above the panel: the compact Sidebar toggle rides the rail edge, half over the panel and the
+   page's sticky top bar. */
 .nav {
   position: sticky;
   top: 0;
@@ -66,7 +67,7 @@
 .panel {
   --shell-floating-end: initial;
 
-  /* Its sticky header and footer stack inside the panel, under the nav column. */
+  /* The page's sticky top bar and the footer stack inside the panel, under the nav column. */
   isolation: isolate;
   box-sizing: border-box;
   display: flex;
@@ -92,11 +93,15 @@
 }
 
 /*
- * Percent padding resolves against the panel width, so `contained` centers content without a
- * wrapper element.
+ * Main hands the page its edge air: the page gutter and the top air go to `Page.Root` (which
+ * steps its top bar out to the panel's edges and puts the air under it), so main itself pads only
+ * the bottom.
  */
 .main {
   --shell-fill-end: initial;
+  --page-gutter: var(--prime-layout-gutter);
+  --page-top: var(--shell-top);
+  --shell-end: var(--shell-floating-end, var(--shell-fill-end, var(--prime-space-16)));
 
   box-sizing: border-box;
   display: flex;
@@ -106,30 +111,19 @@
   min-height: 0;
   margin: 0;
   /* The bottom air: the rail on screen › a floating BottomNav › a fill page › the default. */
-  padding-block: var(--shell-top)
-    var(--shell-rail-end, var(--shell-floating-end, var(--shell-fill-end, var(--prime-space-16))));
-  /* Default: the whole panel, only the page gutters. */
-  padding-inline: var(--prime-layout-gutter);
+  padding-block-end: var(--shell-rail-end, var(--shell-end));
 }
 
-/* The page gutter belongs to the shell's own zones (main and the header row): a frame nested in
-   the page (an example, a preview) starts from the small gutter instead of the viewport's. */
+/* The page gutter belongs to the shell's page: a frame nested in the page (an example, a preview)
+   starts from the small gutter instead of the viewport's. */
 .main > * {
   --prime-layout-gutter: var(--prime-layout-gutter-s);
 }
 
-/* A page that fills the panel's height (`PageContent.Root fill`): no long scroll tail under it,
-   the bottom air matches the side gutters. */
+/* A page that fills the panel's height (`Page.Root fill`): no long scroll tail under it, the
+   bottom air matches the side gutters. */
 .main:has(> [data-fill="true"]) {
   --shell-fill-end: var(--prime-layout-gutter);
-}
-
-/* Long-read pages: a centered column up to the content max width. */
-.main[data-content-width="contained"] {
-  padding-inline: max(
-    var(--prime-layout-gutter),
-    calc((100% - var(--prime-layout-content-max-width)) / 2)
-  );
 }
 
 /* A floating BottomNav overlays the page: the footer takes no height, the capsule rises from its

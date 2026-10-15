@@ -1,18 +1,4 @@
 export type {
-  AppHeaderActionsProps,
-  AppHeaderDescriptionProps,
-  AppHeaderIconProps,
-  AppHeaderLabels,
-  AppHeaderMenuButtonProps,
-  AppHeaderRootProps,
-  AppHeaderSeparatorProps,
-  AppHeaderStartProps,
-  AppHeaderTitleProps,
-  AppHeaderToolsProps,
-} from "./app-header/AppHeader";
-export { AppHeader } from "./app-header/AppHeader";
-export type {
-  AppShellContentWidth,
   AppShellFooterProps,
   AppShellMainProps,
   AppShellNavProps,
@@ -30,6 +16,34 @@ export type {
   BottomNavRootProps,
 } from "./bottom-nav/BottomNav";
 export { BottomNav } from "./bottom-nav/BottomNav";
+export type {
+  PageActionsProps,
+  PageBackButtonProps,
+  PageBodyProps,
+  PageCellProps,
+  PageCellRows,
+  PageCellSpan,
+  PageDescriptionProps,
+  PageDetailProps,
+  PageGridProps,
+  PageHeaderProps,
+  PageLabels,
+  PageListProps,
+  PageMaxWidth,
+  PageRootProps,
+  PageSectionLayout,
+  PageSectionProps,
+  PageSplitProps,
+  PageTitleProps,
+  PageToolsActionsProps,
+  PageToolsChipsProps,
+  PageToolsProps,
+  PageToolsSectionsProps,
+  PageToolsToolsProps,
+  PageToolsViewProps,
+  PageTopBarProps,
+} from "./page/Page";
+export { Page } from "./page/Page";
 export type {
   SidebarAccountProps,
   SidebarBrandLogoProps,

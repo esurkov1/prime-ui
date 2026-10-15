@@ -252,4 +252,4 @@ same height and type.
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Input](../input/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Typography](../typography/COMPONENT.md), Icon (`action.search`, `action.filter`, `action.add`, `nav.chevronDown`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
-- **See also:** [PageToolbar](../page-toolbar/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)
+- **See also:** [Page](../../layout/page/COMPONENT.md) (`Page.Toolbar`), [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

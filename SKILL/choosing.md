@@ -15,7 +15,7 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | learn what happened, how far along it is, or watch a region load and change state; say it to a screen reader | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage, VisuallyHidden |
 | move between places: app sections, panels of a screen, the records of a list, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, List, Stepper, Sidebar, BottomNav |
 | see something on top of the page, or a photo or video full screen | Overlays — Tooltip, Popover, Dropdown, Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer |
-| get the app frame and the structure of a page, or a whole ready-made screen block (sign-in, sign-up, password reset, code) | Page — AppShell, AppHeader, PageContent, PageToolbar, Divider, ScrollContainer, LoginForm |
+| get the app frame and the structure of a page, or a whole ready-made screen block (sign-in, sign-up, password reset, code) | Page — AppShell, Page, Divider, ScrollContainer, LoginForm |
 | drag things by hand | Interaction — Dnd (a status board: Kanban in Data display) |
 | style text | Foundations — Typography |
 
@@ -122,12 +122,13 @@ Drawer menu.
 `Sidebar.Header` — at the header's end while expanded, a small round button on the rail's edge while
 compact (the default for a branded rail); `Sidebar.Toggle` (`variant="item"`) in `Sidebar.Footer` when
 the rail has no brand header. On phones the off-canvas Sidebar opens from the menu button the
-`AppHeader` draws by itself; a trigger of your own reads `useAppShellNav()`. The bar at the top of the
-panel is the page's `AppHeader`: the page title (`AppHeader.Title` + a line of data), the page's own
-buttons and its tools — [where the tools and filters go](composition.md#where-the-filters-go). Only a
-document page (settings, a long form, help) has its title in main, `PageContent.Header`, and no title
-in the header. A record opened from a table: its own page → DataTable `getRowHref`; in place →
-`onRowClick` + Drawer; a list worked through record by record → `PageContent.Split` with a `List` of
+page's `Page.TopBar` draws by itself; a trigger of your own reads `useAppShellNav()`. There is no
+app-wide header: the bar at the top of the panel is the page's `Page.TopBar` — on a work screen the
+page title (`Page.Title` + a line of data in `Page.Header`), the page's own buttons and its tools
+(`Page.Toolbar`) — [where the tools and filters go](composition.md#where-the-filters-go). A document
+page (settings, a long form, help) or an overview has its large title in the flow (`Page.Header`
+outside the bar), with an optional `Page.TopBar collapse` that repeats it once it scrolls away. A record opened from a table: its own page → DataTable `getRowHref`; in place →
+`onRowClick` + Drawer; a list worked through record by record → `Page.Split` with a `List` of
 the records (tickets, letters, invoices; `current` on the open one) or a `ChatList` of the
 conversations. Sections of a long rail → `Sidebar.Group collapsible`; a section with sub-pages →
 `Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a `Dropdown.Trigger` at the bottom of
@@ -152,7 +153,7 @@ conversations. Sections of a long rail → `Sidebar.Group collapsible`; a sectio
 | Gallery / MediaViewer / Thumbnail | Thumbnail: one picture or video of an object in a list, card or picker (selectable with `checked`). Gallery: an album of 1–10 photos and videos laid out by their ratios; it opens MediaViewer itself. MediaViewer: the full-screen viewer on its own, opened from your own thumbnails or a button (`getOrigin` for the zoom out of the tile). A grid of many images to browse → a CSS grid of Thumbnails, not a Gallery. |
 | Sparkline / ChartFrame | Sparkline: one series as a headline number with its change and a small line or bars you can scrub (`variant="bars"` for signed values). ChartFrame: a panel around a real chart (axes, several series, legend, tooltip, states) drawn by a library or your SVG. Rows to compare → DataTable. |
 | VoicePlayer / VideoNote | The same player props (`src`, `duration`, `playing`, transcript, `transfer`). VoicePlayer: audio, a waveform seek slider and a playback rate. VideoNote: a round face-to-camera video with a `poster`; alone in `Message.Root` it is the message. A video with controls → `Thumbnail.Video` / `Message.Media`. |
-| Card / plain section / Grid | Card for a bounded block of related content that stands out (metric, settings panel, side facts). A page section that is the only thing in its region needs no card: `PageContent.Section label` and the content. Several tiles of one screen → one `PageContent.Grid` with a `PageContent.Cell span` each; a grid inside one block (thumbnails, fields) is the block's own CSS. Never wrap a single field, a DataTable or a whole page in a Card. |
+| Card / plain section / Grid | Card for a bounded block of related content that stands out (metric, settings panel, side facts). A page section that is the only thing in its region needs no card: `Page.Section label` and the content. Several tiles of one screen → one `Page.Grid` with a `Page.Cell span` each; a grid inside one block (thumbnails, fields) is the block's own CSS. Never wrap a single field, a DataTable or a whole page in a Card. |
 | EmptyPage / empty DataTable | Empty table (no rows yet or nothing matches the filter): the DataTable `empty` prop — headers and toolbar stay. Whole page or region with no data at all (first run): EmptyPage with one action. |
 | Accordion / Tabs | Accordion when the user may need several sections open or reads them in order (FAQ, settings groups). Tabs when sections are alternatives viewed one at a time. |
 | Divider / gap | Divider inside a block between rows or a form and its footer. Between blocks and groups use air (`gap`), not lines. |

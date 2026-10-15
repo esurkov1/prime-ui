@@ -1,5 +1,5 @@
-/* Media library: a work screen — the app header carries the title and the tools; this module lays
-   out the library block only, the page rhythm comes from PageContent. */
+/* Media library: a work screen — the page top bar carries the title and the tools; this module lays
+   out the library block only, the page rhythm comes from Page. */
 
 .bar {
   display: flex;

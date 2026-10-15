@@ -7,7 +7,7 @@
 
 ## When to use
 - Secondary actions of a card, row or document behind a «⋯» or labelled button.
-- An account / user menu in the app header.
+- An account / user menu behind the Sidebar account row (`Sidebar.Account`).
 - A short list of commands (export formats, move to project) where picking one runs an action.
 
 ## When not to use

@@ -1,6 +1,5 @@
-/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone whose More item opens the Sidebar, the AppHeader with the menu button it draws by itself, the page title with a line of data, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`, `useAppShellNav`. */
+/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone whose More item opens the Sidebar, the page top bar with the menu button it draws by itself, the page title with a line of data, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`, `useAppShellNav`. */
 import {
-  AppHeader,
   AppShell,
   BottomNav,
   Card,
@@ -8,7 +7,7 @@ import {
   Crossfade,
   Icon,
   type IconName,
-  PageContent,
+  Page,
   Sidebar,
   Typography,
   useAppShellNav,
@@ -168,22 +167,6 @@ export default function AppShellScreenExample() {
           <Sidebar.Footer>{MORE.map(sidebarItem)}</Sidebar.Footer>
         </Sidebar.Root>
       }
-      header={
-        <AppHeader.Root>
-          {/* On a phone the header leads with the menu button that opens the Sidebar by itself. */}
-          <AppHeader.Start>
-            {/* Every page titles itself here: the only h1 and a line of data under it. */}
-            <AppHeader.Title>
-              {section.label}
-              <AppHeader.Description>
-                {current === "today"
-                  ? `Среда, 14 октября · открытых задач: ${openTasks}`
-                  : PAGES[current].description}
-              </AppHeader.Description>
-            </AppHeader.Title>
-          </AppHeader.Start>
-        </AppHeader.Root>
-      }
       footer={
         <BottomNav.Root floating>
           {MAIN.map((item) => (
@@ -202,23 +185,35 @@ export default function AppShellScreenExample() {
         </BottomNav.Root>
       }
     >
-      {/* Another section is another page: it cross-fades instead of flipping. */}
-      <Crossfade state={current}>
-        <PageContent.Root as="section">
-          <PageContent.Body>
+      <Page.Root>
+        {/* On a phone the bar leads with the menu button that opens the Sidebar by itself. */}
+        <Page.TopBar>
+          {/* Every page titles itself here: the only h1 and a line of data under it. */}
+          <Page.Header>
+            <Page.Title>{section.label}</Page.Title>
+            <Page.Description>
+              {current === "today"
+                ? `Среда, 14 октября · открытых задач: ${openTasks}`
+                : PAGES[current].description}
+            </Page.Description>
+          </Page.Header>
+        </Page.TopBar>
+        {/* Another section is another page: it cross-fades instead of flipping. */}
+        <Crossfade state={current}>
+          <Page.Body>
             {current === "today" ? (
               <>
-                <PageContent.Grid>
+                <Page.Grid>
                   {KPIS.map((kpi) => (
-                    <PageContent.Cell key={kpi.label} span={4}>
+                    <Page.Cell key={kpi.label} span={4}>
                       <Card.Root variant="stat-trend">
                         <Card.Label>{kpi.label}</Card.Label>
                         <Card.Value>{kpi.value}</Card.Value>
                         <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
                       </Card.Root>
-                    </PageContent.Cell>
+                    </Page.Cell>
                   ))}
-                </PageContent.Grid>
+                </Page.Grid>
                 <Card.Root variant="list">
                   <Card.Header>
                     <Card.Title as="h2">Задачи на сегодня</Card.Title>
@@ -260,9 +255,9 @@ export default function AppShellScreenExample() {
                 </Card.List>
               </Card.Root>
             )}
-          </PageContent.Body>
-        </PageContent.Root>
-      </Crossfade>
+          </Page.Body>
+        </Crossfade>
+      </Page.Root>
     </AppShell.Template>
   );
 }

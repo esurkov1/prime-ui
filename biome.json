@@ -13,7 +13,8 @@
       "bin/*.js",
       "tokens/**/*.ts",
       "vitest.config.ts",
-      "tsconfig.dts.json"
+      "tsconfig.dts.json",
+      "!!**/.claude"
     ]
   },
   "linter": {

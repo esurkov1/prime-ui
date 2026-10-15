@@ -62,7 +62,7 @@ export const PLAYGROUND_NAV_CATEGORIES = [
     label: "Страница",
     en: "Page",
     summary:
-      "The frame and structure of a screen: app shell, app header, page column, page panel, separators, scroll regions, and ready-made screen blocks (sign-in).",
+      "The frame and structure of a screen: app shell, the page (its top bar, header, tools, sections, grid, list and detail), separators, scroll regions, and ready-made screen blocks (sign-in).",
   },
   {
     id: "interaction",

@@ -12,7 +12,7 @@
   --bc-gap: var(--prime-space-1);
   --bc-item-max: calc(var(--prime-space-24) * 2);
 
-  /* Its own content width at most the row (a flex row — the AppHeader start — keeps room for what
+  /* Its own content width at most the row (a flex row — the Page header row — keeps room for what
    * follows the path); the segments truncate. */
   min-width: 0;
   max-inline-size: 100%;

@@ -4,8 +4,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * The page rhythm lives in PageContent: the tiles of a screen are one `PageContent.Grid` (one gap on
- * both axes), a new topic is a `PageContent.Section`. A screen example that draws its own auto-fit
+ * The page rhythm lives in Page: the tiles of a screen are one `Page.Grid` (one gap on both
+ * axes), a new topic is a `Page.Section`. A screen example that draws its own auto-fit
  * grid of tiles or its own `<section>` + heading brings back rows 24 apart and a rhythm of its own. A
  * grid inside one block (fields, thumbnails) is listed below with the reason.
  */
@@ -15,7 +15,7 @@ const root = process.cwd();
 const ALLOWED_GRIDS: Record<string, string> = {
   "src/components/drawer/examples/screen.module.css":
     "short related fields side by side inside one form",
-  "src/components/page-content/examples/screen.module.css":
+  "src/layout/page/examples/screen.module.css":
     "short related fields side by side inside one panel",
   "src/components/file-upload/examples/screen.module.css":
     "thumbnail tiles inside the library section, not page tiles",
@@ -59,7 +59,7 @@ describe("page grid and sections in screens", () => {
     }
   });
 
-  it("no hand-made <section>: a topic of the page is PageContent.Section", () => {
+  it("no hand-made <section>: a topic of the page is Page.Section", () => {
     const offenders = screens(".tsx").filter((file) => /<section\b/.test(read(file)));
     expect(offenders).toEqual([]);
   });

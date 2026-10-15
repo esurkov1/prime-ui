@@ -14,7 +14,6 @@ const ALLOWED: Record<string, string> = {
   "src/components/progress-circle/ProgressCircle.module.css": "its own svg drawing",
   "src/components/sparkline/Sparkline.module.css": "its own svg chart",
   "src/components/chart-frame/ChartFrame.module.css": "the plot text of the consumer's svg chart",
-  "src/layout/app-header/AppHeader.module.css": "the bare-svg logo slot",
   "src/components/select/Select.module.css": "the chevron only turns (transform)",
   "src/components/tag-select/TagSelect.module.css": "the chevron only turns (transform)",
 };

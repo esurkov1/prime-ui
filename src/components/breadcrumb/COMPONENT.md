@@ -92,8 +92,8 @@ Use links for every ancestor and `current` on the last item; `s` above a `headin
 Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
 ## Layout & spacing
-- A path of 1–2 levels takes its content width (at most the row), so in a flex row — the `AppHeader` start, before `AppHeader.Separator` and the title — what follows stands right after it. A path of 3+ levels is a size container (`container-type: inline-size`, `inline-size: 100%`) that folds its middle levels by its own width: inside a flex row give it `flex: 1 1 auto; min-width: 0`.
-- In an `AppHeader` the path up holds the list a record belongs to (1–2 levels); the record itself is the `AppHeader.Title` after the separator, not the breadcrumb's `current` item.
+- A path of 1–2 levels takes its content width (at most the row), so in a flex row — the `Page.Header` row, before the separator it draws and the title — what follows stands right after it. A path of 3+ levels is a size container (`container-type: inline-size`, `inline-size: 100%`) that folds its middle levels by its own width: inside a flex row give it `flex: 1 1 auto; min-width: 0`.
+- In a `Page.Header` the path up holds the list a record belongs to (1–2 levels); the record itself is the `Page.Title` after the separator, not the breadcrumb's `current` item.
 - Above a page title: `gap: var(--prime-space-2)` between the trail and the title row.
 - The list never wraps. Chevrons sit inside each level after the first, in the placeholder text color, at the tier icon size.
 
@@ -141,4 +141,4 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
 ## Related
 - **Built from:** [LinkButton](../link-button/COMPONENT.md) (`tone="muted"`), [Button](../button/COMPONENT.md) and [Dropdown](../dropdown/COMPONENT.md) (the collapse menu), Icon (`nav.chevronRight`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
-- **See also:** [Tabs](../tabs/COMPONENT.md), [PageContent](../page-content/COMPONENT.md), [Stepper](../stepper/COMPONENT.md)
+- **See also:** [Tabs](../tabs/COMPONENT.md), [Page](../../layout/page/COMPONENT.md), [Stepper](../stepper/COMPONENT.md)

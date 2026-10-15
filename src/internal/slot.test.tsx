@@ -2,14 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import {
-  type OutletStore,
-  Slot,
-  slotChild,
-  useMovedToOutlet,
-  useOutletEntries,
-  useOutletStore,
-} from "./slot";
+import { Slot, slotChild } from "./slot";
 
 describe("Slot", () => {
   it("chains handlers, the child's first", () => {
@@ -114,90 +107,5 @@ describe("slotChild", () => {
     expect(() => slotChild("Счёт", "Card.Root")).toThrow(
       "[prime-ui-kit] Card.Root asChild needs a single element child.",
     );
-  });
-});
-
-describe("outlet", () => {
-  const StoreContext = React.createContext<OutletStore | null>(null);
-
-  function Outlet() {
-    const store = React.useContext(StoreContext);
-    const entries = useOutletEntries(store as OutletStore);
-    return (
-      <div data-testid="outlet">
-        {entries.map(({ id, node }) => (
-          <React.Fragment key={id}>{node}</React.Fragment>
-        ))}
-      </div>
-    );
-  }
-
-  function Part({ label }: { label: string }) {
-    const node = <span>{label}</span>;
-    const moved = useMovedToOutlet(React.useContext(StoreContext), node);
-    return moved ? null : node;
-  }
-
-  function Host({ children }: { children: React.ReactNode }) {
-    const store = useOutletStore();
-    return (
-      <StoreContext.Provider value={store}>
-        <Outlet />
-        <div data-testid="body">{children}</div>
-      </StoreContext.Provider>
-    );
-  }
-
-  it("moves a part into the outlet, follows its updates and drops it on unmount", () => {
-    const { rerender } = render(
-      <Host>
-        <Part label="Сделки" />
-      </Host>,
-    );
-    expect(screen.getByTestId("outlet")).toHaveTextContent("Сделки");
-    expect(screen.getByTestId("body")).toBeEmptyDOMElement();
-
-    rerender(
-      <Host>
-        <Part label="Клиенты" />
-      </Host>,
-    );
-    expect(screen.getByTestId("outlet")).toHaveTextContent("Клиенты");
-
-    rerender(<Host>{null}</Host>);
-    expect(screen.getByTestId("outlet")).toBeEmptyDOMElement();
-  });
-
-  it("keeps the arrival order: a part that updates stays in its place", () => {
-    function Pair({ second }: { second: string }) {
-      return (
-        <>
-          <Part label="A" />
-          <Part label={second} />
-        </>
-      );
-    }
-    const { rerender } = render(
-      <Host>
-        <Pair second="B" />
-      </Host>,
-    );
-    rerender(
-      <Host>
-        <Pair second="C" />
-      </Host>,
-    );
-    expect(screen.getByTestId("outlet")).toHaveTextContent("AC");
-  });
-
-  it("stays in place without a store", () => {
-    render(
-      <StoreContext.Provider value={null}>
-        <div data-testid="body">
-          <Part label="Сделки" />
-        </div>
-      </StoreContext.Provider>,
-    );
-    expect(screen.getByTestId("body")).toHaveTextContent("Сделки");
   });
 });

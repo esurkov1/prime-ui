@@ -78,24 +78,25 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Page title and header
 
-- An app page titles itself in its header: `<AppHeader.Title>` + `<AppHeader.Description>` with a line of data («128 в работе · 6 ждут оплаты») — not a `PageContent.Header` in main and not a sentence about the page.
-- The page's tools — its own search and filter, sections, the view, the primary action — are a `<PageToolbar.Root>` in `<AppHeader.Tools>`; the page's other buttons in `<AppHeader.Actions>` — not a global search, notifications or app-wide buttons: the header row is per page.
-- A nested record: `Breadcrumb` + `<AppHeader.Separator />` + `<AppHeader.Title>` with the record's name — not a breadcrumb in main.
-- A document page (settings, a long form, help) is the only one with `<PageContent.Header>` + `PageContent.Title` in main, and then its header has no title — never two titles, never no `<h1>`.
+- The app is navigation and the page: everything at the top belongs to the page's `<Page.Root>` — not an app-wide header, a global search or notifications above every page.
+- A work screen (a list, a board, a chat, a record) titles itself in `<Page.TopBar>`: `<Page.Header>` with `<Page.Title>` + `<Page.Description>` carrying a line of data («128 в работе · 6 ждут оплаты») — not a sentence about the page.
+- The page's tools — its own search and filter, sections, the view, the primary action — are a `<Page.Toolbar>` beside `<Page.Header>` in `<Page.TopBar>`; the page's other buttons in `<Page.Actions>` of the header, where trailing secondary ones fold into «⋯» by themselves.
+- A nested record: `<Breadcrumb.Root>` first in `<Page.Header>`, then `<Page.Title>` with the record's name — the header draws the separator; not a breadcrumb in the body.
+- A document page (settings, a long form, help) and an overview (a dashboard) put `<Page.Header>` in the flow — the large title — with an optional `<Page.TopBar collapse>` above it that repeats the title once it scrolls away. One `<Page.Title>` per page — never two titles, never no `<h1>`.
 
 ## Cards and surfaces
 
 - `Card.Root` only for a bounded block with its own title: a KPI tile (`variant="stat-trend"`), a settings panel (`variant="panel"`), side facts — not around a whole section, a form field or a page.
 - Never a `DataTable` inside a Card — the table is already a filled block; a card in a card only sparingly ([the rule](foundations.md#card-in-a-card)).
-- Section without a card: `<PageContent.Section label="…">` + the content (a link or button beside the heading in `PageContent.Actions`) — not a hand-made `<section>` + `Typography as="h2"` + own gap.
-- The tiles of a screen (KPI cards, charts, panels): one `<PageContent.Grid>` with a `<PageContent.Cell span>` per tile — not a grid per row (the rows would stand 24 apart instead of 16).
+- Section without a card: `<Page.Section label="…">` + the content (a link or button beside the heading in `Page.Actions`) — not a hand-made `<section>` + `Typography as="h2"` + own gap.
+- The tiles of a screen (KPI cards, charts, panels): one `<Page.Grid>` with a `<Page.Cell span>` per tile — not a grid per row (the rows would stand 24 apart instead of 16).
 - Depth from fill, not lines: no borders around blocks; `<Divider />` only inside a block.
 - Every scroll region is a `ScrollContainer` — never `overflow: auto` on a `div`: its hidden edges fade by themselves (`edges="shadow"` on a filled surface, `"none"` only for a page column), `scrollbar="hidden"` on strips, `snap` on strips of cards, `lock` to hold a list still, `anchor="end"` for a log. Kit components already scroll through it; do not wrap them again.
 - Tabs are a bar, not a container: `Tabs.Root` stands in the host's padding and the panel content goes straight into `Tabs.Panel` — never a Card or a padded `div` around the tabs or inside a panel. In a Modal / Drawer, `Tabs.Root` wraps `X.Header` + `X.Body` and `Tabs.List` goes last into the header — not a tab strip at the top of the body.
 
 ## Tables
 
-- A list page is a `<DataTable columns rows getRowKey>` under the page's `<SmartFilter.Root fields value onValueChange>` with `<SmartFilter.Toolbar />` + `<SmartFilter.Chips />` in its `PageToolbar` ([where the filters go](composition.md#where-the-filters-go)); filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
+- A list page is a `<DataTable columns rows getRowKey>` under the page's `<SmartFilter.Root fields value onValueChange>` with `<SmartFilter.Toolbar />` + `<SmartFilter.Chips />` in its `Page.Toolbar` ([where the filters go](composition.md#where-the-filters-go)); filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
 - Search over a table or a list page is always SmartFilter, even with no filter fields yet (`fields={[]}` is a plain search that grows into filters). A search `Input` only outside a filtered list: inside a picker, a settings section, a panel.
 - Paging is built in: `paging="pages"` (default) with `pageSize`, `paging="infinite"` for feeds, `paging="none"` for short lists — not a separate `<Pagination>` under a DataTable.
 - Long lists are virtualized inside the kit: pass the whole array to `DataTable` (with `scrollHeight` or `paging="infinite"`; over 100 rows — grouped, `onReorder` and `renderExpanded` bodies render every row, keep those short or paged), `TagSelect options`, `Chat.Messages items`, `Gantt rows` — never slice it by hand, never wrap a kit list in react-window / react-virtual or your own windowing. Big remote data is still paged or loaded on scroll by the server (`source="server"`, `onLoadMore`).
@@ -167,12 +168,12 @@ State change is continuous in the whole kit: every region that changes what it s
 - Refreshing data already on screen: keep it, set `aria-busy` — not back to a skeleton on every refetch.
 - Table states in place: `loading` (+ `loadingRows`), `empty`, `loadError` on `DataTable` — the head and toolbar stay.
 - First run of a page or region: `EmptyPage.Root` + `EmptyPage.Icon` + `EmptyPage.Title` + `EmptyPage.Description` + `EmptyPage.Actions` with one action — not «Здесь пока ничего нет».
-- Page-level persistent problem: `<Banner.Root tone="danger">` first in `PageContent.Body`; the result of an action: `useNotifications().notify({ tone, title })`.
+- Page-level persistent problem: `<Banner.Root tone="danger">` first in `Page.Body`; the result of an action: `useNotifications().notify({ tone, title })`.
 
 ## Sidebar
 
 - Brand header: `Sidebar.Header` > `Sidebar.Brand href description` (with `Sidebar.BrandLogo`) + `<Sidebar.Toggle variant="header" />` — not a Toggle in the footer when the rail has a brand.
-- Off-canvas: `offCanvas="auto"` (default, below 768px), `"always"` for navigation behind a menu at any width, `"never"` for a rail that always stays; the AppHeader draws the menu button that opens it — no menu state of your own; another trigger reads `useAppShellNav()`.
+- Off-canvas: `offCanvas="auto"` (default, below 768px), `"always"` for navigation behind a menu at any width, `"never"` for a rail that always stays; the page's `Page.TopBar` draws the menu button that opens it — no menu state of your own; another trigger reads `useAppShellNav()`.
 - Every item is a link (`href` or `asChild` with the router `NavLink`; `current` marks the page), with a `Sidebar.ItemIcon` on the [top-level items and sub-list parents](layouts.md#sidebar-icons).
 - The signed-in user: `Sidebar.Account` inside `Dropdown.Trigger` at the end of `Sidebar.Footer`.
 - Structure: everyday places on top without a label, categories as `Sidebar.Group label collapsible` (one short word, 3–7 items), views of one section as `Sidebar.Sub` (one level, the parent only discloses) — not every group folded, not a sub-list inside a sub-list.
@@ -183,20 +184,20 @@ State change is continuous in the whole kit: every region that changes what it s
 
 Full rules: [responsive.md](responsive.md).
 
-- The page panel is `<PageToolbar.Root>` with `Tools` (`SmartFilter.Toolbar`), `Sections` (a `fullWidth` SegmentedControl), `View`, `Actions`, `Chips` — it orders and wraps them itself ([the page panel](responsive.md#page-panel--pagetoolbar)); not a hand-made flex row of tabs, search and buttons.
+- The page's tools are `<Page.Toolbar>` with `Page.ToolbarTools` (`SmartFilter.Toolbar`), `Page.ToolbarSections` (a `fullWidth` SegmentedControl), `Page.ToolbarView`, `Page.ToolbarActions`, `Page.ToolbarChips` — it orders and wraps them itself ([the page's tools](responsive.md#the-pages-tools--pagetoolbar)); not a hand-made flex row of tabs, search and buttons.
 - Rearrange, never hide: every desktop function is on the phone, in another place or a menu — not `display: none` below a breakpoint.
 - Breakpoints only in [their scope](responsive.md#breakpoints); inside a page — [intrinsic grids](responsive.md#intrinsic-grids) and container queries.
 - A wide table scrolls inside itself; offer `DataTable.ColumnsMenu` in its `toolbar` — never drop columns by breakpoint, never hand-build the chooser.
 - A row that opens a record page is `getRowHref` (a real link: ⌘-click, new tab), a row that opens a drawer is `onRowClick` — never `navigate()` in `onRowClick`, never your own `event.target` checks for buttons in the row.
-- A list + detail screen is `PageContent.Split` in a `PageContent.Root fill` page, its records a `List` (`current` on the open one) — never ghost Buttons with a soft current; a full-height table is `scrollHeight="fill"` — never a height computed from `100vh`.
+- A list + detail screen is `Page.Split` (`Page.List`, `Page.Detail`) in a `Page.Root fill` page, its records a `List` (`current` on the open one) — never ghost Buttons with a soft current; a full-height table is `scrollHeight="fill"` — never a height computed from `100vh`.
 - App sections on phones: `BottomNav` in `AppShell.Footer` — not in Main, not `position: fixed`, no own media query: the shell hides the footer while the Sidebar rail is on screen; a short task from the bottom edge: `Sheet` — Select, Dropdown, Popover and Modal become sheets below 640 by themselves.
 - Your hover styles inside `@media (hover: hover)`; nothing hover-only. Do not wrap kit fields to raise their text for iOS — they keep 16px on touch already.
 - A long form saves through the panel action with a count («Сохранить 3 изменения») — not a sticky bar at the bottom of a phone.
-- Sticky comes from the kit (`AppHeader` with `AppHeader.Tools`, the DataTable head, `stickyFirstColumn`, the Gantt header) — not your own `position: sticky` bar.
+- Sticky comes from the kit (`Page.TopBar` with its `Page.Toolbar`, the DataTable head, `stickyFirstColumn`, the Gantt header) — not your own `position: sticky` bar.
 
 ## Spacing and values
 
-- Gaps are `gap` on the parent with `--prime-space-N` (N × 4px): 8 in a row of buttons, 16 tile → tile, 20 field → field, 32 group → group; `PageContent` already spaces blocks 24 and sections 40 — not margins, not outer padding.
+- Gaps are `gap` on the parent with `--prime-space-N` (N × 4px): 8 in a row of buttons, 16 tile → tile, 20 field → field, 32 group → group; `Page` already spaces blocks 24 and sections 40 — not margins, not outer padding.
 - Tokens only: `var(--prime-space-4)`, `var(--prime-color-text-secondary)`, `var(--prime-radius-m)` — never raw `px` / `rem` / hex, never `--prime-ref-*`, never inline `style`.
 - Text through `Typography` roles (`title-m`, `title-s`, `body-m`, `caption`) and its `tone` — not `font-size` or `color` in CSS ([text colour](foundations.md#text-colour)).
 
@@ -231,19 +232,19 @@ applyTheme("light");
 The frame itself (providers, `AppShell` with the `Sidebar`) is built once too: copy it from
 [layouts.md](layouts.md#app-frame-once-per-app).
 
-A document page (a form) — its title is in main, its header carries none:
+A document page (a form) — its large title stands in the flow:
 
 ```tsx
-import { Button, Icon, Input, PageContent } from "prime-ui-kit";
+import { Button, Icon, Input, Page } from "prime-ui-kit";
 import styles from "./ProfilePage.module.css"; // .form { display: grid; gap: var(--prime-space-5); }
 
 export function ProfilePage() {
   return (
-    <PageContent.Root maxWidth="readable">
-      <PageContent.Header>
-        <PageContent.Title>Профиль</PageContent.Title>
-      </PageContent.Header>
-      <PageContent.Body>
+    <Page.Root maxWidth="readable">
+      <Page.Header>
+        <Page.Title>Профиль</Page.Title>
+      </Page.Header>
+      <Page.Body>
         <form className={styles.form} noValidate onSubmit={(event) => event.preventDefault()}>
           <Input.Root label="Рабочая почта" hint="На неё придут счета" required>
             <Input.Wrapper>
@@ -255,8 +256,8 @@ export function ProfilePage() {
           </Input.Root>
           <Button.Root type="submit">Сохранить</Button.Root>
         </form>
-      </PageContent.Body>
-    </PageContent.Root>
+      </Page.Body>
+    </Page.Root>
   );
 }
 ```

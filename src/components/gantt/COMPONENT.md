@@ -224,7 +224,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | [states.tsx](examples/states.tsx) | Skeleton rows in the chart's geometry while it loads, an empty period and a report you may only look at, its today line on the report day — `loading`, `empty`, `readOnly`, `today`. |
 | [controlled.tsx](examples/controlled.tsx) | The zoom owned by the page: presets in the toolbar and the built-in switch change one state — `scale`, `onScaleChange`. |
 | [narrow.tsx](examples/narrow.tsx) | At 360 px the first column keeps only the avatars, the toolbar moves to its own row and the axis scrolls under the pinned column — `renderRowAvatar`. |
-| [screen.tsx](examples/screen.tsx) | A team schedule as a work screen: the title with the people shown and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`. |
+| [screen.tsx](examples/screen.tsx) | A team schedule as a work screen: the title with the people shown and a toolbar with search, filters, team sections and the primary action in its top bar over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`. |
 
 ## Mistakes
 - Updating the rows before the request succeeds (optimistic) → the chart cannot glide back on reject; update them when `onBarChange` resolves, or before you resolve it.

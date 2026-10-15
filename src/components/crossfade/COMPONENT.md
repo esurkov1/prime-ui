@@ -79,7 +79,7 @@ Motion is opacity only, so nothing shifts under the pointer; the leaving content
 
 ## Layout & spacing
 - No padding, gap or fill of its own: it sits where the swapped content would sit (inside `Card.Body`, a page section, a panel).
-- Width follows the parent; height is the current content's height except while gliding — or, with `fill`, the parent's height (the parent needs one: a flex or grid column with a height, `PageContent.Root fill`).
+- Width follows the parent; height is the current content's height except while gliding — or, with `fill`, the parent's height (the parent needs one: a flex or grid column with a height, `Page.Root fill`).
 - An empty Crossfade has no box: an optional block above a list keeps the page rhythm whether it is there or not.
 - The loading state is a `Skeleton` with the geometry of the data it stands for (same rows, same line heights), so the swap to data changes neither layout nor height.
 
@@ -108,7 +108,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | A card region that cross-fades between loading, data, empty and error and glides to the new height — `state`. |
 | [record-switch.tsx](examples/record-switch.tsx) | A detail panel keyed by the record id: picking another client cross-fades the details of a different height — `state`. |
 | [fill.tsx](examples/fill.tsx) | A deal board that fills its panel's height while it swaps between loading and data, and a notice slot above it that takes no room while empty — `fill`, `state`. |
-| [screen.tsx](examples/screen.tsx) | Screen states: the title and the date of the statement in the app header, a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states — `state`. |
+| [screen.tsx](examples/screen.tsx) | Screen states: the title and the date of the statement in its top bar, a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states — `state`. |
 
 ## Mistakes
 - A new `state` on every data refresh (`state={Date.now()}`) → key by what the region shows, not by when it was fetched.

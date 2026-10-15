@@ -355,7 +355,7 @@ function SidebarRoot({
   const depth = useNestedSurfaceDepth();
 
   // The shell around (if any) relays the navigation to its triggers outside the rail: the
-  // AppHeader menu button, a Toggle in the header, a BottomNav «Ещё».
+  // menu button of the page's top bar, a Toggle outside the rail, a BottomNav «Ещё».
   const publishNav = useAppShellNavPublisher();
   const expanded = offCanvas ? open : mode === "expanded";
   const shellNav = React.useMemo<AppShellNavState>(

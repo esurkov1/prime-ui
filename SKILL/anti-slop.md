@@ -55,13 +55,13 @@ Text colour is not CSS: [foundations.md → Text colour](foundations.md#text-col
 ```tsx good
 // good — DataTable already is a filled block; a titled section is enough
 // declare: const payments: { id: string; client: string }[]
-<PageContent.Section label="Последние оплаты">
+<Page.Section label="Последние оплаты">
   <DataTable
     columns={[{ id: "client", header: "Клиент", accessor: "client" }]}
     rows={payments}
     getRowKey={(row) => row.id}
   />
-</PageContent.Section>
+</Page.Section>
 ```
 
 ## 3a. Hover that merges with the neighbour
@@ -225,7 +225,7 @@ The same for one value in several units — one heading, the fields in a row, th
 /* good — proximity scale */
 .form { display: grid; gap: var(--prime-space-8); }   /* group → group 32 */
 .group { display: grid; gap: var(--prime-space-5); }  /* field → field 20 */
-/* block → block 24 and section → section 40 come from PageContent.Body / PageContent.Section */
+/* block → block 24 and section → section 40 come from Page.Body / Page.Section */
 ```
 
 ## 7. `div` instead of a ready component
@@ -242,7 +242,7 @@ The same for one value in several units — one heading, the fields in a row, th
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |
 | a hand-built spinner, shimmer, grey placeholder box or «Loading…» text | `loading` on Button / Select / DataTable; a region: `Skeleton` of its content inside `Crossfade`; no shape to hold: `Spinner` |
 | `{loading ? <Spinner /> : <List />}` — a state that flips | `<Crossfade state={status}>` around the region, `Skeleton` while loading |
-| a search Input + a row of filter Selects above a table | `SmartFilter` in the page's `PageToolbar` ([where the filters go](composition.md#where-the-filters-go)) |
+| a search Input + a row of filter Selects above a table | `SmartFilter` in the page's `Page.Toolbar` ([where the filters go](composition.md#where-the-filters-go)) |
 | a grid of «label: value» text pairs for one record | `DescriptionList.Root` + `DescriptionList.Item` |
 | a Modal hand-built as «Удалить?» with your own pending flag | `ConfirmDialog.Root` with an async `onConfirm` |
 | a `<fieldset>` reset by hand, or `disabled` on every field while saving | `<Fieldset label disabled={saving}>` |
@@ -254,7 +254,7 @@ The same for one value in several units — one heading, the fields in a row, th
 | an `<img>` with your own radius and loading box | `Thumbnail.Root` / `Avatar.Root` |
 | a lightbox, or a Modal with an `<img>` | `Gallery` (opens `MediaViewer` itself) or `MediaViewer` |
 | a `position: fixed` bottom tab bar | `BottomNav` in `AppShell.Footer` |
-| a menu state and a menu button wired by hand to open the phone Sidebar | nothing: the `AppHeader` draws the menu button; another trigger reads `useAppShellNav()` ([the app frame](layouts.md#app-frame-once-per-app)) |
+| a menu state and a menu button wired by hand to open the phone Sidebar | nothing: the page's `Page.TopBar` draws the menu button; another trigger reads `useAppShellNav()` ([the app frame](layouts.md#app-frame-once-per-app)) |
 | a bottom panel built from a Drawer or a `div` | `Sheet` |
 
 ## 7a. Fighting the table

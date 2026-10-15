@@ -46,7 +46,6 @@ import {
   MediaViewer,
   Message,
   Modal,
-  PageContent,
   ScrollContainer,
   Select,
   Sheet,
@@ -58,7 +57,7 @@ import {
   VoicePlayer,
 } from "@/components";
 import type * as mainEntry from "@/index";
-import { AppShell, Sidebar } from "@/layout";
+import { AppShell, Page, Sidebar } from "@/layout";
 
 import { root, walk } from "./contract-utils";
 import type { PART_REFS } from "./part-refs.generated";
@@ -246,13 +245,56 @@ const CASES: Case[] = [
     ),
   ],
   [
-    "PageContent.Panel",
+    "Page.List",
     "DIV",
     (ref) => (
-      <PageContent.Split>
-        <PageContent.Panel kind="list" ref={ref} data-testid="part" aria-label="Обращения" />
-        <PageContent.Panel kind="detail" aria-label="Обращение" />
-      </PageContent.Split>
+      <Page.Split>
+        <Page.List ref={ref} data-testid="part" aria-label="Обращения" />
+        <Page.Detail aria-label="Обращение" />
+      </Page.Split>
+    ),
+  ],
+  [
+    "Page.Detail",
+    "DIV",
+    (ref) => (
+      <Page.Split>
+        <Page.List aria-label="Обращения" />
+        <Page.Detail ref={ref} data-testid="part" aria-label="Обращение" />
+      </Page.Split>
+    ),
+  ],
+  [
+    "Page.TopBar",
+    "HEADER",
+    (ref) => (
+      <Page.Root>
+        <Page.TopBar ref={ref} data-testid="part" collapse />
+      </Page.Root>
+    ),
+  ],
+  [
+    "Page.Title",
+    "H1",
+    (ref) => (
+      <Page.Root>
+        <Page.Header>
+          <Page.Title ref={ref} data-testid="part">
+            Заказы
+          </Page.Title>
+        </Page.Header>
+      </Page.Root>
+    ),
+  ],
+  [
+    "Page.Actions",
+    "DIV",
+    (ref) => (
+      <Page.TopBar>
+        <Page.Header>
+          <Page.Actions ref={ref} data-testid="part" />
+        </Page.Header>
+      </Page.TopBar>
     ),
   ],
   [

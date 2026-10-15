@@ -32,8 +32,8 @@ region, `Skeleton` while it loads).
    the main action, the states, the narrow screen); the shape of the data decides the layout, every
    label must carry something new, friction matches the cost of a mistake.
 2. **The app frame, once per app** — [layouts.md](layouts.md): styles, theme, providers, `AppShell`
-   with the `Sidebar`, page wrappers, auth screens. A screen you deliver renders its page: its
-   `AppHeader.Root` (title, a line of data, its tools) and its body.
+   with the `Sidebar`, page wrappers, auth screens. A screen you deliver renders its page: one
+   `Page.Root` with its top bar (title, a line of data, its tools) and its body.
 3. **Choose** — [choosing.md](choosing.md): the category by task, then the component, then the pairs
    that are easy to confuse.
 4. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
@@ -48,8 +48,8 @@ region, `Skeleton` while it loads).
    icon names.
 7. **States and motion** — [motion.md](motion.md): every region loads, empties and fails without
    flipping; what the kit animates by itself and when to move your own elements.
-8. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page panel is
-   `PageToolbar`, nothing is hidden on phones, touch follows `(hover)` / `(pointer)`.
+8. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page's tools are
+   `Page.Toolbar`, nothing is hidden on phones, touch follows `(hover)` / `(pointer)`.
 9. **Check** — [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md), then look at the screen
    in a browser ([ux.md](ux.md#9-look-at-it-before-handing-it-over)). Fix every «no», then hand
    over.
@@ -65,7 +65,7 @@ project under `node_modules/prime-ui-kit/src/`.
 |---|---|---|
 | Component reference | `reference/components/<dir>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<dir>/COMPONENT.md` |
 | Copyable scenarios | `reference/components/<dir>/examples/*.tsx` | `node_modules/prime-ui-kit/src/components/<dir>/examples/*.tsx` |
-| AppShell, Sidebar, AppHeader, BottomNav | `reference/layout/<dir>/…` | `node_modules/prime-ui-kit/src/layout/<dir>/…` |
+| AppShell, Sidebar, BottomNav, Page | `reference/layout/<dir>/…` | `node_modules/prime-ui-kit/src/layout/<dir>/…` |
 | Whole screens | `reference/<base>/<dir>/examples/screen.tsx` | `node_modules/prime-ui-kit/src/<base>/<dir>/examples/screen.tsx` |
 
 ## Files of this skill
@@ -81,7 +81,7 @@ project under `node_modules/prime-ui-kit/src/`.
 | [foundations.md](foundations.md) | grid, proximity scale, sizes, surfaces, type, tone and color |
 | [api-contract.md](api-contract.md) | writing JSX — prop names, sizes and host tiers, controlled state, forms, helpers, icons |
 | [motion.md](motion.md) | every screen — loading / empty / error that flow, what the kit animates, when to move, recipes |
-| [responsive.md](responsive.md) | every screen — 320px and up, the page panel (`PageToolbar`), touch |
+| [responsive.md](responsive.md) | every screen — 320px and up, the page's tools (`Page.Toolbar`), touch |
 | [anti-slop.md](anti-slop.md) | before and after writing — what makes a screen look generated |
 | [checklist.md](checklist.md) | before handing the screen over |
 
@@ -97,8 +97,8 @@ applyTheme("light"); // sets data-theme on <html>; "dark" for the dark theme
 ```
 
 Wrap the app in `NotificationProvider` if it shows toasts. Styles, `applyTheme`, `NotificationProvider`
-and `AppShell` belong to the app root, once. A screen component you deliver renders its page — its
-`AppHeader.Root` and its `PageContent` body — and assumes the root exists. If the project has no app
+and `AppShell` belong to the app root, once. A screen component you deliver renders its page — one
+`Page.Root` with its `Page.TopBar` and its `Page.Body` — and assumes the root exists. If the project has no app
 frame yet, also deliver it as a separate root layout from
 [layouts.md](layouts.md#app-frame-once-per-app) — never inline the frame into a page.
 
@@ -123,8 +123,8 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 7. Labels above fields, always — once per column for records in rows (`FieldList`), never numbered
    («Пункт 1»), never repeating their heading. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
-   the page title is `AppHeader.Title` in the page's header, `PageContent.Title` only on a
-   document page). No custom font sizes.
+   the page title is `Page.Title`, one per page: in `Page.TopBar` on a work screen, in the flow
+   on a document page or an overview). No custom font sizes.
 9. Overlays (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select,
    MediaViewer) come from the kit — never hand-made — and stay mounted: drive them with `open`,
    never `{open && …}`.

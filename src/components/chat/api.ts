@@ -83,8 +83,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (a `PageContent.BackButton`, an `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
-          ru: "`children` (`PageContent.BackButton`, `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
+          en: "`children` (a `Page.BackButton`, an `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
+          ru: "`children` (`Page.BackButton`, `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
         },
       ],
     },

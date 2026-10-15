@@ -1,6 +1,5 @@
-/** A list page: the title, a line of figures, search, filters and the one primary action in the app header, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. */
+/** A list page: the title, a line of figures, search, filters and the one primary action in its top bar, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. */
 import {
-  AppHeader,
   Avatar,
   Badge,
   Button,
@@ -10,8 +9,7 @@ import {
   EmptyPage,
   Icon,
   matchesSmartFilter,
-  PageContent,
-  PageToolbar,
+  Page,
   SmartFilter,
   type SmartFilterField,
   type SmartFilterValue,
@@ -278,78 +276,72 @@ export default function DataTableScreenExample() {
   };
 
   return (
-    <>
-      {/* The page lives in the app header: the only h1, a line of figures under it, and the page's
-          tools — search, filters, export, the one primary action; main has no PageContent.Header. */}
-      <AppHeader.Root>
-        <AppHeader.Start>
-          <AppHeader.Title>
-            Счета
-            <AppHeader.Description>{SUMMARY}</AppHeader.Description>
-          </AppHeader.Title>
-        </AppHeader.Start>
-        <AppHeader.Tools>
-          <SmartFilter.Root
-            fields={FIELDS}
-            value={filter}
-            onValueChange={setFilter}
-            search={search}
-            onSearchChange={setSearch}
-          >
-            <PageToolbar.Root aria-label="Счета">
-              <PageToolbar.Tools>
-                <SmartFilter.Toolbar />
-              </PageToolbar.Tools>
-              <PageToolbar.Actions>
-                <Button.Root variant="soft" tone="neutral" aria-label="Экспорт в Excel">
-                  <Button.Icon>
-                    <Icon name="action.download" />
-                  </Button.Icon>
-                </Button.Root>
-                <Button.Root>
-                  <Button.Icon>
-                    <Icon name="action.add" />
-                  </Button.Icon>
-                  Новый счёт
-                </Button.Root>
-              </PageToolbar.Actions>
-              <PageToolbar.Chips>
-                <SmartFilter.Chips />
-              </PageToolbar.Chips>
-            </PageToolbar.Root>
-          </SmartFilter.Root>
-        </AppHeader.Tools>
-      </AppHeader.Root>
+    <Page.Root>
+      {/* A work screen titles itself in its top bar: the only h1, a line of figures under it, and the
+          page's tools — search, filters, export, the one primary action — in the toolbar row. */}
 
-      <PageContent.Root>
-        <PageContent.Body>
-          <DataTable
-            columns={COLUMNS}
-            rows={rows}
-            getRowKey={(row) => row.id}
-            getRowLabel={(row) => `Счёт ${row.id}`}
-            pageSize={6}
-            stickyFirstColumn
-            defaultSort={{ columnId: "due", order: "desc" }}
-            empty={
-              <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">
-                <EmptyPage.Icon>
-                  <Icon name="action.search" />
-                </EmptyPage.Icon>
-                <EmptyPage.Title as="p" id="invoices-empty">
-                  Счетов не найдено
-                </EmptyPage.Title>
-                <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
-                <EmptyPage.Actions>
-                  <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
-                    Сбросить фильтры
-                  </Button.Root>
-                </EmptyPage.Actions>
-              </EmptyPage.Root>
-            }
-          />
-        </PageContent.Body>
-      </PageContent.Root>
-    </>
+      <Page.TopBar>
+        <Page.Header>
+          <Page.Title>Счета</Page.Title>
+          <Page.Description>{SUMMARY}</Page.Description>
+        </Page.Header>
+        <SmartFilter.Root
+          fields={FIELDS}
+          value={filter}
+          onValueChange={setFilter}
+          search={search}
+          onSearchChange={setSearch}
+        >
+          <Page.Toolbar aria-label="Счета">
+            <Page.ToolbarTools>
+              <SmartFilter.Toolbar />
+            </Page.ToolbarTools>
+            <Page.ToolbarActions>
+              <Button.Root variant="soft" tone="neutral" aria-label="Экспорт в Excel">
+                <Button.Icon>
+                  <Icon name="action.download" />
+                </Button.Icon>
+              </Button.Root>
+              <Button.Root>
+                <Button.Icon>
+                  <Icon name="action.add" />
+                </Button.Icon>
+                Новый счёт
+              </Button.Root>
+            </Page.ToolbarActions>
+            <Page.ToolbarChips>
+              <SmartFilter.Chips />
+            </Page.ToolbarChips>
+          </Page.Toolbar>
+        </SmartFilter.Root>
+      </Page.TopBar>
+      <Page.Body>
+        <DataTable
+          columns={COLUMNS}
+          rows={rows}
+          getRowKey={(row) => row.id}
+          getRowLabel={(row) => `Счёт ${row.id}`}
+          pageSize={6}
+          stickyFirstColumn
+          defaultSort={{ columnId: "due", order: "desc" }}
+          empty={
+            <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">
+              <EmptyPage.Icon>
+                <Icon name="action.search" />
+              </EmptyPage.Icon>
+              <EmptyPage.Title as="p" id="invoices-empty">
+                Счетов не найдено
+              </EmptyPage.Title>
+              <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
+              <EmptyPage.Actions>
+                <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
+                  Сбросить фильтры
+                </Button.Root>
+              </EmptyPage.Actions>
+            </EmptyPage.Root>
+          }
+        />
+      </Page.Body>
+    </Page.Root>
   );
 }

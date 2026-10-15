@@ -424,7 +424,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | [controlled.tsx](examples/controlled.tsx) | Documents of a deal in one list: the files already on the server and new uploads after them, saved on every change, and a button brings back the saved set — `value`, `onValueChange`, `queue`. |
 | [in-form.tsx](examples/in-form.tsx) | A contract upload form: submit checks the required scan, its error shakes in and leaves once a file is picked or removed — `required`, `error`, `name`, `value`. |
 | [narrow.tsx](examples/narrow.tsx) | In a phone-width column the zone text wraps, a long file name truncates, and a gallery goes three across and then two, the cover keeping two columns and the remove buttons shown without hover — `layout`, `cover`. |
-| [screen.tsx](examples/screen.tsx) | A media library of a catalog object as a work screen: the title, the object and a PageToolbar with sections, search, order and upload in the app header; uploads in FileUpload tiles through a queue; a grid of Thumbnails that open MediaViewer out of the tile or are picked for bulk download and delete; a Skeleton first load and a filtered empty state in a Crossfade — `trigger`, `layout`. |
+| [screen.tsx](examples/screen.tsx) | A media library of a catalog object as a work screen: the title, the object and a toolbar with sections, search, order and upload in its top bar; uploads in FileUpload tiles through a queue; a grid of Thumbnails that open MediaViewer out of the tile or are picked for bulk download and delete; a Skeleton first load and a filtered empty state in a Crossfade — `trigger`, `layout`. |
 
 ## Mistakes
 - A `Label` and a `Hint` placed around the zone by hand → pass `label`, `hint`, `error`.

@@ -1,6 +1,5 @@
-/** A support messenger as a work screen: the title and the unread count in the app header, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`. */
+/** A support messenger as a work screen: the title and the unread count in its top bar, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`. */
 import {
-  AppHeader,
   Avatar,
   Card,
   Chat,
@@ -16,7 +15,7 @@ import {
   Icon,
   Message,
   type MessageStatus,
-  PageContent,
+  Page,
   type UploadContext,
   useUploadQueue,
   VoicePlayer,
@@ -573,123 +572,117 @@ export default function ChatScreenExample() {
   };
 
   return (
-    <>
-      {/* A work screen: in an app this header fills the shell's `header` slot and carries the page —
-          the only h1 and one line of data; main has no PageContent.Header. */}
-      <AppHeader.Root>
-        <AppHeader.Start>
-          <AppHeader.Title>
-            Поддержка
-            <AppHeader.Description>{unreadLabel(unreadTotal)}</AppHeader.Description>
-          </AppHeader.Title>
-        </AppHeader.Start>
-      </AppHeader.Root>
+    <Page.Root fill>
+      {/* A work screen titles itself in its top bar: the only h1 and one line of data. */}
+      <Page.TopBar>
+        <Page.Header>
+          <Page.Title>Поддержка</Page.Title>
+          <Page.Description>{unreadLabel(unreadTotal)}</Page.Description>
+        </Page.Header>
+      </Page.TopBar>
+      <Page.Body>
+        <Page.Split
+          open={dialogId !== null}
+          onOpenChange={(next) => {
+            if (!next) setDialogId(null);
+          }}
+        >
+          <Page.List>
+            <Card.Root className={styles.paneCard}>
+              <ChatList.Root
+                items={foundDialogs}
+                getKey={(item) => item.id}
+                value={dialogId}
+                onValueChange={setDialogId}
+                search={dialogQuery}
+                onSearchChange={setDialogQuery}
+                now={NOW}
+                renderItem={(item) => {
+                  const last = lastOf(item);
+                  return (
+                    <ChatList.Item
+                      time={last?.sentAt ?? item.at}
+                      status={last?.from === "me" ? last.status : undefined}
+                      unread={unread[item.id] ?? 0}
+                      typing={item.id === dialogId && clientTyping}
+                    >
+                      <ChatList.ItemIcon>
+                        <Avatar.Root color={hueOf(item.id)}>
+                          <Avatar.Fallback>{item.initials}</Avatar.Fallback>
+                          {item.id === "vector" ? <Avatar.Status status="online" /> : null}
+                        </Avatar.Root>
+                      </ChatList.ItemIcon>
+                      <ChatList.ItemText>{item.name}</ChatList.ItemText>
+                      <ChatList.ItemDescription author={last?.from === "me" ? "Вы" : undefined}>
+                        {previewOf(item)}
+                      </ChatList.ItemDescription>
+                    </ChatList.Item>
+                  );
+                }}
+              />
+            </Card.Root>
+          </Page.List>
 
-      <PageContent.Root fill>
-        <PageContent.Body>
-          <PageContent.Split
-            open={dialogId !== null}
-            onOpenChange={(next) => {
-              if (!next) setDialogId(null);
-            }}
-          >
-            <PageContent.Panel kind="list">
-              <Card.Root className={styles.paneCard}>
-                <ChatList.Root
-                  items={foundDialogs}
-                  getKey={(item) => item.id}
-                  value={dialogId}
-                  onValueChange={setDialogId}
-                  search={dialogQuery}
-                  onSearchChange={setDialogQuery}
+          <Page.Detail>
+            <Card.Root className={styles.paneCard}>
+              <Chat.Root typing={clientTyping}>
+                <Chat.Header>
+                  <Page.BackButton />
+                  <Avatar.Root color={hueOf(dialog.id)}>
+                    <Avatar.Fallback>{dialog.initials}</Avatar.Fallback>
+                    {dialog.id === "vector" ? <Avatar.Status status="online" /> : null}
+                  </Avatar.Root>
+                  <Chat.Title>{dialog.name}</Chat.Title>
+                  <Chat.Description>{dialog.contact}</Chat.Description>
+                  <Chat.Actions>
+                    <Chat.SearchButton />
+                  </Chat.Actions>
+                </Chat.Header>
+                <Chat.Search />
+                <Chat.Messages
+                  loading={loadedId !== dialogId}
+                  items={messages}
+                  getKey={(message) => message.id}
+                  getAuthor={(message) => message.from}
+                  getDate={(message) => message.sentAt}
+                  renderMessage={renderMessage}
+                  unread={FIRST_UNREAD}
                   now={NOW}
-                  renderItem={(item) => {
-                    const last = lastOf(item);
-                    return (
-                      <ChatList.Item
-                        time={last?.sentAt ?? item.at}
-                        status={last?.from === "me" ? last.status : undefined}
-                        unread={unread[item.id] ?? 0}
-                        typing={item.id === dialogId && clientTyping}
-                      >
-                        <ChatList.ItemIcon>
-                          <Avatar.Root color={hueOf(item.id)}>
-                            <Avatar.Fallback>{item.initials}</Avatar.Fallback>
-                            {item.id === "vector" ? <Avatar.Status status="online" /> : null}
-                          </Avatar.Root>
-                        </ChatList.ItemIcon>
-                        <ChatList.ItemText>{item.name}</ChatList.ItemText>
-                        <ChatList.ItemDescription author={last?.from === "me" ? "Вы" : undefined}>
-                          {previewOf(item)}
-                        </ChatList.ItemDescription>
-                      </ChatList.Item>
-                    );
+                  hasOlder={hasOlder}
+                  onLoadOlder={loadOlder}
+                  onNewMessage={(_, { direction }) => {
+                    if (direction !== "incoming" || !dialogId) return;
+                    setUnread((current) => ({
+                      ...current,
+                      [dialogId]: (current[dialogId] ?? 0) + 1,
+                    }));
+                  }}
+                  onRead={(values) => {
+                    if (!dialogId) return;
+                    setUnread((current) => ({
+                      ...current,
+                      [dialogId]: Math.max(0, (current[dialogId] ?? 0) - values.length),
+                    }));
                   }}
                 />
-              </Card.Root>
-            </PageContent.Panel>
-
-            <PageContent.Panel kind="detail">
-              <Card.Root className={styles.paneCard}>
-                <Chat.Root typing={clientTyping}>
-                  <Chat.Header>
-                    <PageContent.BackButton />
-                    <Avatar.Root color={hueOf(dialog.id)}>
-                      <Avatar.Fallback>{dialog.initials}</Avatar.Fallback>
-                      {dialog.id === "vector" ? <Avatar.Status status="online" /> : null}
-                    </Avatar.Root>
-                    <Chat.Title>{dialog.name}</Chat.Title>
-                    <Chat.Description>{dialog.contact}</Chat.Description>
-                    <Chat.Actions>
-                      <Chat.SearchButton />
-                    </Chat.Actions>
-                  </Chat.Header>
-                  <Chat.Search />
-                  <Chat.Messages
-                    loading={loadedId !== dialogId}
-                    items={messages}
-                    getKey={(message) => message.id}
-                    getAuthor={(message) => message.from}
-                    getDate={(message) => message.sentAt}
-                    renderMessage={renderMessage}
-                    unread={FIRST_UNREAD}
-                    now={NOW}
-                    hasOlder={hasOlder}
-                    onLoadOlder={loadOlder}
-                    onNewMessage={(_, { direction }) => {
-                      if (direction !== "incoming" || !dialogId) return;
-                      setUnread((current) => ({
-                        ...current,
-                        [dialogId]: (current[dialogId] ?? 0) + 1,
-                      }));
-                    }}
-                    onRead={(values) => {
-                      if (!dialogId) return;
-                      setUnread((current) => ({
-                        ...current,
-                        [dialogId]: Math.max(0, (current[dialogId] ?? 0) - values.length),
-                      }));
-                    }}
+                <Chat.Footer>
+                  <ChatComposer
+                    replyTo={replyTo}
+                    replyAuthor={dialog.contactTo}
+                    editing={editing}
+                    onReplyDismiss={() => setReplyTo(null)}
+                    onEditDismiss={() => setEditing(null)}
+                    onEditLast={editLast}
+                    onPost={post}
+                    onSave={save}
+                    onActivityChange={reportActivity}
                   />
-                  <Chat.Footer>
-                    <ChatComposer
-                      replyTo={replyTo}
-                      replyAuthor={dialog.contactTo}
-                      editing={editing}
-                      onReplyDismiss={() => setReplyTo(null)}
-                      onEditDismiss={() => setEditing(null)}
-                      onEditLast={editLast}
-                      onPost={post}
-                      onSave={save}
-                      onActivityChange={reportActivity}
-                    />
-                  </Chat.Footer>
-                </Chat.Root>
-              </Card.Root>
-            </PageContent.Panel>
-          </PageContent.Split>
-        </PageContent.Body>
-      </PageContent.Root>
-    </>
+                </Chat.Footer>
+              </Chat.Root>
+            </Card.Root>
+          </Page.Detail>
+        </Page.Split>
+      </Page.Body>
+    </Page.Root>
   );
 }

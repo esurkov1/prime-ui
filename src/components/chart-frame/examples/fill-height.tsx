@@ -1,5 +1,5 @@
 /** Revenue against the plan beside two KPI tiles: the plot takes the height of the stretched grid cell, and the plan line starts hidden until the legend turns it on — `height`, `defaultHiddenSeries`. */
-import { Card, ChartFrame, type ChartFrameSeries, chartColors, PageContent } from "prime-ui-kit";
+import { Card, ChartFrame, type ChartFrameSeries, chartColors, Page } from "prime-ui-kit";
 
 const SERIES: ChartFrameSeries[] = [
   { id: "fact", label: "Факт" },
@@ -22,9 +22,9 @@ const formatMillions = (value: number) => `${value.toLocaleString("ru-RU")} мл
 
 export default function ChartFrameFillHeightExample() {
   return (
-    <PageContent.Grid>
+    <Page.Grid>
       {/* The cell spans two rows beside the tiles; `height="fill"` takes all of it. */}
-      <PageContent.Cell span={8} rows={2}>
+      <Page.Cell span={8} rows={2}>
         <ChartFrame.Root
           series={SERIES}
           defaultHiddenSeries={["plan"]}
@@ -95,23 +95,23 @@ export default function ChartFrameFillHeightExample() {
           />
           <ChartFrame.Legend />
         </ChartFrame.Root>
-      </PageContent.Cell>
+      </Page.Cell>
 
-      <PageContent.Cell span={4}>
+      <Page.Cell span={4}>
         <Card.Root variant="stat-trend">
           <Card.Label>Выполнение плана</Card.Label>
           <Card.Value>96%</Card.Value>
           <Card.Delta tone="warning">−4 п. п. за октябрь</Card.Delta>
         </Card.Root>
-      </PageContent.Cell>
+      </Page.Cell>
 
-      <PageContent.Cell span={4}>
+      <Page.Cell span={4}>
         <Card.Root variant="stat-trend">
           <Card.Label>Прогноз на год</Card.Label>
           <Card.Value>84 млн ₽</Card.Value>
           <Card.Delta>План — 86 млн ₽</Card.Delta>
         </Card.Root>
-      </PageContent.Cell>
-    </PageContent.Grid>
+      </Page.Cell>
+    </Page.Grid>
   );
 }

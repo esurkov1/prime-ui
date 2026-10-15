@@ -1,7 +1,9 @@
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { AppHeader } from "../app-header/AppHeader";
+import { cssRule, cssValue } from "@/test/css";
+
+import { Page } from "../page/Page";
 import { Sidebar } from "../sidebar/Sidebar";
 import { AppShell, AppShellBoundary, type AppShellNavState, useAppShellNav } from "./AppShell";
 
@@ -10,17 +12,16 @@ describe("AppShell", () => {
     render(
       <AppShell.Root data-testid="root">
         <AppShell.Nav>rail</AppShell.Nav>
-        <AppHeader.Root>top</AppHeader.Root>
         <AppShell.Main>body</AppShell.Main>
+        <AppShell.Footer>bar</AppShell.Footer>
       </AppShell.Root>,
     );
 
     const root = screen.getByTestId("root");
     const [nav, panel] = Array.from(root.children);
     expect(nav).toHaveTextContent("rail");
-    expect(panel).toContainElement(screen.getByRole("banner"));
     expect(panel).toContainElement(screen.getByRole("main"));
-    expect(screen.getByRole("banner").nextElementSibling).toBe(screen.getByRole("main"));
+    expect(screen.getByRole("main").nextElementSibling).toHaveTextContent("bar");
     // Two grid columns only with a navigation column (an attribute, not `:has()`).
     expect(root).toHaveAttribute("data-nav", "true");
   });
@@ -36,42 +37,22 @@ describe("AppShell", () => {
     expect(root).toHaveClass("custom");
   });
 
-  it("Main is contained by default and supports full width", () => {
-    const { rerender } = render(
-      <AppShell.Root>
-        <AppShell.Main />
-      </AppShell.Root>,
-    );
-    // Default is the full panel with gutters; `contained` is opt-in for long-read pages.
-    expect(screen.getByRole("main")).toHaveAttribute("data-content-width", "full");
-
-    rerender(
-      <AppShell.Root>
-        <AppShell.Main contentWidth="contained" />
-      </AppShell.Root>,
-    );
-    expect(screen.getByRole("main")).toHaveAttribute("data-content-width", "contained");
+  it("CSS: main hands the page its gutter and top air and pads only the bottom", () => {
+    const main = cssRule("src/layout/app-shell/AppShell.module.css", ".main");
+    expect(cssValue(main, "--page-gutter")).toBe("var(--prime-layout-gutter)");
+    expect(cssValue(main, "--page-top")).toBe("var(--shell-top)");
+    expect(cssValue(main, "padding-block-end")).toBe("var(--shell-rail-end, var(--shell-end))");
   });
 
-  it("Template composes nav, optional header and main", () => {
-    const { rerender } = render(
-      <AppShell.Template
-        nav={<span>sidebar</span>}
-        header={<AppHeader.Root>Crumbs</AppHeader.Root>}
-      >
+  it("Template composes nav, main and footer", () => {
+    render(
+      <AppShell.Template nav={<span>sidebar</span>} footer={<span>bar</span>}>
         <span>page</span>
       </AppShell.Template>,
     );
     expect(screen.getByText("sidebar")).toBeInTheDocument();
-    expect(screen.getByRole("banner")).toHaveTextContent("Crumbs");
     expect(screen.getByRole("main")).toHaveTextContent("page");
-
-    rerender(
-      <AppShell.Template nav={<span>sidebar</span>}>
-        <span>page</span>
-      </AppShell.Template>,
-    );
-    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+    expect(screen.getByText("bar")).toBeInTheDocument();
   });
 
   it("Template scrolls main to the top when scrollResetKey changes", () => {
@@ -96,35 +77,6 @@ describe("AppShell", () => {
       </AppShell.Template>,
     );
     expect(main.scrollTop).toBe(0);
-  });
-
-  it("a page's own header moves into the shell's header row and replaces the default one", () => {
-    function Page({ title }: { title?: string }) {
-      return (
-        <>
-          {title ? <AppHeader.Root>{title}</AppHeader.Root> : null}
-          <span>page</span>
-        </>
-      );
-    }
-    const { rerender } = render(
-      <AppShell.Template header={<AppHeader.Root>Обзор</AppHeader.Root>}>
-        <Page title="Сделки" />
-      </AppShell.Template>,
-    );
-    const main = screen.getByRole("main");
-    expect(screen.getAllByRole("banner")).toHaveLength(1);
-    expect(screen.getByRole("banner")).toHaveTextContent("Сделки");
-    expect(screen.getByRole("banner").nextElementSibling).toBe(main);
-    expect(main).not.toContainElement(screen.getByRole("banner"));
-
-    // The page leaves its header: the shell's own comes back.
-    rerender(
-      <AppShell.Template header={<AppHeader.Root>Обзор</AppHeader.Root>}>
-        <Page />
-      </AppShell.Template>,
-    );
-    expect(screen.getByRole("banner")).toHaveTextContent("Обзор");
   });
 
   it("relays the Sidebar's navigation: useAppShellNav and data-off-canvas", () => {
@@ -164,19 +116,28 @@ describe("AppShell", () => {
     expect(screen.getByTestId("root")).not.toHaveAttribute("data-off-canvas");
   });
 
-  it("a frame of its own (AppShellBoundary) keeps a header in place", () => {
+  it("a frame of its own (AppShellBoundary) keeps the shell's navigation out", () => {
     render(
       <AppShell.Root>
+        <AppShell.Nav>
+          <Sidebar.Root offCanvas="always">
+            <Sidebar.Item>Обзор</Sidebar.Item>
+          </Sidebar.Root>
+        </AppShell.Nav>
         <AppShell.Main>
           <AppShellBoundary>
-            <div data-testid="preview">
-              <AppHeader.Root>Превью</AppHeader.Root>
-            </div>
+            <Page.Root>
+              <Page.TopBar>
+                <Page.Header>
+                  <Page.Title>Превью</Page.Title>
+                </Page.Header>
+              </Page.TopBar>
+            </Page.Root>
           </AppShellBoundary>
         </AppShell.Main>
       </AppShell.Root>,
     );
-    expect(screen.getByTestId("preview")).toContainElement(screen.getByRole("banner"));
+    expect(screen.queryByRole("button", { name: "Открыть меню" })).not.toBeInTheDocument();
   });
 
   it("Template forwards its ref to main", () => {

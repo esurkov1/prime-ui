@@ -9,7 +9,7 @@ import {
   Icon,
   type IconName,
   Input,
-  PageContent,
+  Page,
   Select,
   Textarea,
 } from "prime-ui-kit";
@@ -121,20 +121,18 @@ export default function FieldListScreenExample() {
   };
 
   return (
-    <PageContent.Root maxWidth="wide" aria-labelledby="plan-title">
-      <PageContent.Header>
-        <PageContent.Title id="plan-title">Тариф «Команда»</PageContent.Title>
-        <PageContent.Description>
-          Так тариф выглядит на странице цен и в счетах.
-        </PageContent.Description>
-        <PageContent.Actions>
+    <Page.Root maxWidth="wide" aria-labelledby="plan-title">
+      <Page.Header>
+        <Page.Title id="plan-title">Тариф «Команда»</Page.Title>
+        <Page.Description>Так тариф выглядит на странице цен и в счетах.</Page.Description>
+        <Page.Actions>
           <Button.Root type="submit" form={formId} loading={saving}>
             {saved ? "Сохранено" : "Сохранить тариф"}
           </Button.Root>
-        </PageContent.Actions>
-      </PageContent.Header>
-      <PageContent.Body>
-        <PageContent.Section layout="aside" label="Основное">
+        </Page.Actions>
+      </Page.Header>
+      <Page.Body>
+        <Page.Section layout="aside" label="Основное">
           <form id={formId} noValidate onSubmit={save}>
             <Card.Root variant="panel">
               <Card.Body>
@@ -155,9 +153,9 @@ export default function FieldListScreenExample() {
               </Card.Body>
             </Card.Root>
           </form>
-        </PageContent.Section>
+        </Page.Section>
 
-        <PageContent.Section layout="aside" label="Характеристики">
+        <Page.Section layout="aside" label="Характеристики">
           <Card.Root variant="panel">
             <Card.Body>
               <FieldList
@@ -230,9 +228,9 @@ export default function FieldListScreenExample() {
               />
             </Card.Body>
           </Card.Root>
-        </PageContent.Section>
+        </Page.Section>
 
-        <PageContent.Section layout="aside" label="Стоимость">
+        <Page.Section layout="aside" label="Стоимость">
           <Card.Root variant="panel">
             <Card.Body className={styles.groups}>
               <Fieldset label="За месяц" disabled={saving}>
@@ -309,8 +307,8 @@ export default function FieldListScreenExample() {
               </Fieldset>
             </Card.Body>
           </Card.Root>
-        </PageContent.Section>
-      </PageContent.Body>
-    </PageContent.Root>
+        </Page.Section>
+      </Page.Body>
+    </Page.Root>
   );
 }

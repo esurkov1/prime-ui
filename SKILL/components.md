@@ -145,14 +145,12 @@ Floating layers above the page, from tooltip to modal.
 
 ## Page (`page`)
 
-The frame and structure of a screen: app shell, app header, page column, page panel, separators, scroll regions, and ready-made screen blocks (sign-in).
+The frame and structure of a screen: app shell, the page (its top bar, header, tools, sections, grid, list and detail), separators, scroll regions, and ready-made screen blocks (sign-in).
 
 | Component | Purpose | Docs |
 |---|---|---|
-| AppShell | The app frame: a content panel that is the page itself and a navigation rail one layer above it. | [COMPONENT.md](../src/layout/app-shell/COMPONENT.md) · [examples](../src/layout/app-shell/examples/) |
-| AppHeader | The page's bar at the top of the app's content panel: the page title with a line of data, the page's tools and its own buttons — only what the current page needs. | [COMPONENT.md](../src/layout/app-header/COMPONENT.md) · [examples](../src/layout/app-header/examples/) |
-| PageContent | Page structure inside the main column: title, page actions and content blocks, titled sections and the tile grid of a dashboard; a page as high as the panel and the list + detail layout. | [COMPONENT.md](../src/components/page-content/COMPONENT.md) · [examples](../src/components/page-content/examples/) |
-| PageToolbar | The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, stacked rows when narrow, search and filter always first with the active filters under the top row. | [COMPONENT.md](../src/components/page-toolbar/COMPONENT.md) · [examples](../src/components/page-toolbar/examples/) |
+| AppShell | The app frame — navigation and the page: a content panel that is the page itself and a navigation rail one layer above it. | [COMPONENT.md](../src/layout/app-shell/COMPONENT.md) · [examples](../src/layout/app-shell/examples/) |
+| Page | The page inside the app frame: everything at the top belongs to it — a top bar with the title, actions and tools, the large document title in the flow — then sections, the tile grid and the list + detail layout. | [COMPONENT.md](../src/layout/page/COMPONENT.md) · [examples](../src/layout/page/examples/) |
 | Divider | A hairline separator inside one surface, horizontal or vertical, with or without a label. | [COMPONENT.md](../src/components/divider/COMPONENT.md) · [examples](../src/components/divider/examples/) |
 | ScrollContainer | The kit's one scroll region: a thin scrollbar, soft edges wherever content is hidden, and correct shrinking inside flex and grid parents. | [COMPONENT.md](../src/components/scroll-container/COMPONENT.md) · [examples](../src/components/scroll-container/examples/) |
 | LoginForm | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. | [COMPONENT.md](../src/components/login-form/COMPONENT.md) · [examples](../src/components/login-form/examples/) |

@@ -13,7 +13,7 @@
 - A tile that is itself the way to its details — a KPI that opens its report, a project tile (`asChild` with a link or a button).
 
 ## When not to use
-- A whole page region with a title and description → [PageContent](../page-content/COMPONENT.md) sections; do not wrap every section in a card.
+- A whole page region with a title and description → [Page](../../layout/page/COMPONENT.md) sections (`Page.Section`); do not wrap every section in a card.
 - Tabular data → use [DataTable](../data-table/COMPONENT.md) (it has its own fill).
 - A message about the page state → [Banner](../banner/COMPONENT.md); nothing to show yet → [EmptyPage](../empty-page/COMPONENT.md).
 - Content that floats over the page → [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md) or [Drawer](../drawer/COMPONENT.md).
@@ -170,7 +170,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 Without `asChild` a card is static: no hover, focus or press of its own. With it: `data-interactive` on the element.
 
 ## Layout & spacing
-- Cards on a page: one `PageContent.Grid` with a `PageContent.Cell span` per card (16 on both axes, the cards of a row share one height); a grid inside one block is the block's own intrinsic `auto-fill` grid on the tile width of the layout tokens (a lone card keeps its column width), gap `--prime-space-4`.
+- Cards on a page: one `Page.Grid` with a `Page.Cell span` per card (16 on both axes, the cards of a row share one height); a grid inside one block is the block's own intrinsic `auto-fill` grid on the tile width of the layout tokens (a lone card keeps its column width), gap `--prime-space-4`.
 - Radius `--prime-card-radius`, no border. In `panel` and `list` the `Header` is a padded zone with a faint inset hairline below; in `stat-trend` it can pair a leading Badge or icon with a compact `Card.Value`.
 - Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
@@ -212,11 +212,11 @@ No `labels`.
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem — `variant`. |
-| [screen.tsx](examples/screen.tsx) | A dashboard: the title, a line of data, the period switch and the report in the app header; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `AppHeader.Tools`, `PageContent.Grid`. |
+| [screen.tsx](examples/screen.tsx) | A dashboard: the title and a line of data in the page flow, the period switch and the report in the top bar that keeps the title once it scrolls away; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `collapse`, `Page.Grid`. |
 
 ## Mistakes
 - A `<div>` with a border styled as a card → use `Card.Root`; depth comes from fill, not lines.
-- Wrapping every page section in a card → use PageContent sections.
+- Wrapping every page section in a card → use `Page.Section`.
 - `Card.Delta tone="success"` for every «+» → choose the tone by meaning.
 - Custom padding on a `panel` root → padding belongs to `Header` / `Body` / `Footer`.
 - A wrapper `<div>` around the label and the value of `mini` → put `Icon`, `Label`, `Value` straight into the root (or into a `split` cell); the template lays them out.
@@ -228,4 +228,4 @@ No `labels`.
 
 ## Related
 - **Built from:** —
-- **See also:** [PageContent](../page-content/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Sparkline](../sparkline/COMPONENT.md) (a trend with its total inside a `panel`), [ChartFrame](../chart-frame/COMPONENT.md) (a full chart with legend and states)
+- **See also:** [Page](../../layout/page/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Sparkline](../sparkline/COMPONENT.md) (a trend with its total inside a `panel`), [ChartFrame](../chart-frame/COMPONENT.md) (a full chart with legend and states)

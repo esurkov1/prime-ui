@@ -176,8 +176,8 @@ export const api: ComponentApi = {
           name: "height",
           type: 'number | "fill"',
           defaultNote: { en: "`240`, `160` under `30rem`", ru: "`240`, `160` уже `30rem`" },
-          en: "Height of the plot area in px. `fill` takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the default height at least.",
-          ru: "Высота области графика в px. `fill` занимает свободную высоту растянутой панели (`PageContent.Cell` с `rows`), но не меньше высоты по умолчанию.",
+          en: "Height of the plot area in px. `fill` takes the free height of a stretched panel (a `Page.Cell` with `rows`), the default height at least.",
+          ru: "Высота области графика в px. `fill` занимает свободную высоту растянутой панели (`Page.Cell` с `rows`), но не меньше высоты по умолчанию.",
         },
         {
           name: "renderPlot",

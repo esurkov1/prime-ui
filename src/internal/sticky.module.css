@@ -1,5 +1,5 @@
 /*
- * A sticky surface that sticks to the start edge of its scroller (`top: 0`): the AppHeader, the
+ * A sticky surface that sticks to the start edge of its scroller (`top: 0`): the top bar of a page, the
  * DataTable head, the Gantt head.
  *
  * WebKit snaps a sticky layer and the scrolled content to device pixels on their own: with a

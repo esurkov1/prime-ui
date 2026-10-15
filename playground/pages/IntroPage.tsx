@@ -1,8 +1,9 @@
 import { CodeBlock } from "@/components/code-block/CodeBlock";
 import { LinkButton } from "@/components/link-button/LinkButton";
-import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
+import { Page } from "@/layout/page/Page";
 
+import { PlaygroundTopBar } from "../components/PlaygroundChrome";
 import INSTALL_CODE from "../foundation/snippets/install.tsx?raw";
 
 const REPO = "https://github.com/esurkov1/prime-ui";
@@ -14,16 +15,17 @@ const ISSUES = `${REPO}/issues`;
 
 export default function IntroPage() {
   return (
-    <PageContent.Root as="section" aria-labelledby="playground-intro">
-      <PageContent.Header>
-        <PageContent.Title id="playground-intro">Prime UI</PageContent.Title>
-        <PageContent.Description measure="readable">
+    <Page.Root>
+      <PlaygroundTopBar />
+      <Page.Header>
+        <Page.Title>Prime UI</Page.Title>
+        <Page.Description>
           Библиотека React-компонентов для рабочих интерфейсов: формы, таблицы, панели, оверлеи. Это
           живая документация. В ней есть примеры, код и API каждого компонента.
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        <PageContent.Section label="Как устроена система">
+        </Page.Description>
+      </Page.Header>
+      <Page.Body>
+        <Page.Section label="Как устроена система">
           <ul className="introPageList">
             <li>
               <Typography as="span" variant="body-m">
@@ -62,9 +64,9 @@ export default function IntroPage() {
               </Typography>
             </li>
           </ul>
-        </PageContent.Section>
+        </Page.Section>
 
-        <PageContent.Section label="Как пользоваться">
+        <Page.Section label="Как пользоваться">
           <ul className="introPageList">
             <li>
               <Typography as="span" variant="body-m">
@@ -95,13 +97,13 @@ export default function IntroPage() {
               </Typography>
             </li>
           </ul>
-        </PageContent.Section>
+        </Page.Section>
 
-        <PageContent.Section label="Подключение">
+        <Page.Section label="Подключение">
           <CodeBlock code={INSTALL_CODE} />
-        </PageContent.Section>
+        </Page.Section>
 
-        <PageContent.Section label="Ссылки">
+        <Page.Section label="Ссылки">
           <ul className="introPageList">
             <li>
               <Typography as="span" variant="body-m">
@@ -133,8 +135,8 @@ export default function IntroPage() {
               </Typography>
             </li>
           </ul>
-        </PageContent.Section>
-      </PageContent.Body>
-    </PageContent.Root>
+        </Page.Section>
+      </Page.Body>
+    </Page.Root>
   );
 }

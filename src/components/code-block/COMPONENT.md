@@ -69,7 +69,7 @@ Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX t
 ## Layout & spacing
 - `max-width: 100%`; the block takes the column width and long lines scroll horizontally inside it (`white-space: pre`, tab size 2), with the kit's thin scrollbar.
 - Heading / text → code block: space step 2–4 (8–16px).
-- Constrain the column (PageContent `maxWidth="readable"` for docs), not the block.
+- Constrain the column (`Page.Root maxWidth="readable"` for docs), not the block.
 
 ## Accessibility
 

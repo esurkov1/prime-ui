@@ -1,13 +1,13 @@
 # Layouts — app frame, page wrappers, auth
 
-Every screen sits in one frame: `AppShell.Root` with the Sidebar in `AppShell.Nav`, a header row and
+The app is navigation and the page: `AppShell.Root` with the Sidebar in `AppShell.Nav` and
 `AppShell.Main` (the content panel is the page, the nav rail one layer above it). The frame is the
-app's; the header row and the body are the page's — a screen renders its own `AppHeader.Root` (the
-page title and the page's tools, [composition.md](composition.md#1-page-skeleton)) and its body in
-`PageContent`.
-`AppShell.Main` carries the page gutters and `PageContent` spaces the page — blocks 24, a titled
-`PageContent.Section` 40, tiles in a `PageContent.Grid` 16 on both axes — so your code adds **no outer padding and no margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
-Main's top air under the header is part of the frame — 24, then 32 from 1024px: the page's first block
+app's; everything inside Main is the page's — a screen renders one `Page.Root` with its own top
+(`Page.TopBar`: the page title and the page's tools, [composition.md](composition.md#1-page-skeleton))
+and its body in `Page.Body`.
+`AppShell.Main` hands the page its gutters and top air and `Page` spaces it — blocks 24, a titled
+`Page.Section` 40, tiles in a `Page.Grid` 16 on both axes — so your code adds **no outer padding and no margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
+The page's top air is part of the frame — 24, then 32 from 1024px: the page's first block
 starts there; never cancel it with a negative margin or a padding override.
 
 The page recipes are whole, working screens — the `screen.tsx` example of their main component
@@ -16,14 +16,13 @@ The page recipes are whole, working screens — the `screen.tsx` example of thei
 ## App frame (once per app)
 
 The frame is the root layout and nothing else: the providers, `AppShell.Root`, the Sidebar in
-`AppShell.Nav` and `AppShell.Main` around the page. It holds no header content and no menu state:
+`AppShell.Nav` and `AppShell.Main` around the page. It holds no header and no menu state:
 
-- **The header row belongs to the page.** An `AppHeader.Root` anywhere inside the shell — the page's
-  own one, rendered at the top of its body — shows in the shell's header row; the latest one on
-  screen wins, so every page brings its own. Its row is as high as the Sidebar brand row, so the brand
-  and the title read as one line. Nothing app-wide goes into it — no global search, no notifications.
+- **Everything at the top belongs to the page.** There is no app-wide header and no global search:
+  every page renders its own `Page.TopBar` with only what it needs. Its title row is as high as the
+  Sidebar brand row, so the brand and the title read as one line.
 - **The phone menu comes with the frame.** Below 768px the Sidebar becomes an off-canvas panel
-  (`offCanvas="auto"`) and the AppHeader leads with the menu button that opens it by itself — never a
+  (`offCanvas="auto"`) and `Page.TopBar` leads with the menu button that opens it by itself — never a
   menu state or a menu button wired by hand. A trigger outside the rail (a BottomNav «Ещё», your own
   button) reads the shell's navigation with `useAppShellNav()` (`open`, `setOpen`, `navId`; see
   [the app frame screen](../src/layout/app-shell/examples/screen.tsx)).
@@ -90,37 +89,39 @@ export function AppFrame({ children }: { children: ReactNode }) {
 }
 ```
 
-Every page renders its header and its body; the header shows in the frame's header row:
+Every page renders its top and its body in one `Page.Root`:
 
 ```tsx
-import { AppHeader, PageContent } from "prime-ui-kit";
+import { Page } from "prime-ui-kit";
 
 export function OrdersPage() {
   return (
-    <>
-      <AppHeader.Root>
-        <AppHeader.Start>
-          <AppHeader.Title>
-            Заказы
-            <AppHeader.Description>128 в работе · 6 ждут оплаты</AppHeader.Description>
-          </AppHeader.Title>
-        </AppHeader.Start>
-      </AppHeader.Root>
-      <PageContent.Root as="section">
-        <PageContent.Body>{/* the page's blocks */}</PageContent.Body>
-      </PageContent.Root>
-    </>
+    <Page.Root>
+      <Page.TopBar>
+        <Page.Header>
+          <Page.Title>Заказы</Page.Title>
+          <Page.Description>128 в работе · 6 ждут оплаты</Page.Description>
+        </Page.Header>
+      </Page.TopBar>
+      <Page.Body>{/* the page's blocks */}</Page.Body>
+    </Page.Root>
   );
 }
 ```
 
-A document page (settings, a long form, help) renders an `AppHeader.Root` without a title — only
-its own buttons, and on a phone the menu button the header draws — and opens its body with
-`PageContent.Header`.
+Where `Page.Header` stands follows the kind of page; its size follows the place, and there is one
+`Page.Title` (the `<h1>`) per page:
+
+- **Work screens** (a list, a board, a chat, a schedule): `Page.Header` and `Page.Toolbar` inside
+  `Page.TopBar` — the compact title row and the tools under it, sticky.
+- **Document pages** (settings, a long form, help): `Page.Header` in the flow — the large title — and,
+  optionally, `Page.TopBar collapse` with the path, which repeats the title once it scrolls away.
+- **Overviews** (dashboards): `Page.TopBar collapse` with the page's actions in its `Page.Header`, and
+  the titled `Page.Header` in the flow.
 
 With React Router the frame's `children` is `<Outlet />` and every item is `Sidebar.Item asChild`
 around a `NavLink` ([the router example](../src/layout/sidebar/examples/router.tsx)). The same frame
-as one component is `AppShell.Template` (`nav`, `footer`, the page as children); give it the
+as one component is `AppShell.Template` (`nav`, `footer`, `mainProps`, the page as children); give it the
 pathname as `scrollResetKey`, so a new page opens at the top.
 
 Phone navigation for 2–6 main sections is a `BottomNav.Root` in `AppShell.Footer` (the last child of
@@ -133,56 +134,54 @@ Next.js App Router: the package is marked `"use client"`, but a server component
 `"use client"` and render them from `app/layout.tsx` and the pages; import `bundle.css` in the root
 layout and put `data-theme` on `<html>` there.
 
-A nested record page puts the path up before its title in the header — `Breadcrumb` (the list it
-belongs to), `AppHeader.Separator`, `AppHeader.Title` with the record's name and its status as
-the description ([the detail page](../src/components/description-list/examples/screen.tsx)).
+A nested record page puts the path before its title in the header — a `Breadcrumb.Root` (the list
+it belongs to) as the first child of `Page.Header`, then `Page.Title` with the record's name and its
+status as `Page.Description`; the header draws the separator itself
+([the detail page](../src/components/description-list/examples/screen.tsx)).
 
-### The page's tools in the header
+### The page's tools in the top bar
 
 The page's tools — its own search and filters, sections, the period or view, the primary action —
-go into `AppHeader.Tools` as a `PageToolbar.Root`: the header's second row, full width, sticky with
-it. The toolbar lays itself out from that width ([the page panel](responsive.md#page-panel--pagetoolbar)),
-so the tools wrap under the title instead of squeezing it. `AppHeader.Actions` keeps the page's
-other buttons (export, a more menu) in the title row.
+go into `Page.Toolbar`, a sibling of `Page.Header` inside `Page.TopBar`: the bar's second row, full
+width, sticky with it. The toolbar lays itself out from that width ([the toolbar layout](../src/layout/page/COMPONENT.md#toolbar-layout)),
+so the tools wrap under the title instead of squeezing it. `Page.Actions` keeps the page's
+other buttons (export, a more menu) in the title row; trailing secondary buttons fold into «⋯» when
+the row runs short.
 
 ```tsx
-import { AppHeader, Button, Icon, PageToolbar, SegmentedControl } from "prime-ui-kit";
+import { Button, Icon, Page, SegmentedControl } from "prime-ui-kit";
 
-type DealsHeaderProps = { view: string; onViewChange: (view: string) => void };
+type DealsTopBarProps = { view: string; onViewChange: (view: string) => void };
 
-export function DealsHeader({ view, onViewChange }: DealsHeaderProps) {
+export function DealsTopBar({ view, onViewChange }: DealsTopBarProps) {
   return (
-    <AppHeader.Root>
-      <AppHeader.Start>
-        <AppHeader.Title>
-          Сделки
-          <AppHeader.Description>7 сделок в работе · 6 461 750 ₽</AppHeader.Description>
-        </AppHeader.Title>
-      </AppHeader.Start>
-      <AppHeader.Tools>
-        <PageToolbar.Root aria-label="Сделки">
-          <PageToolbar.Sections>
-            <SegmentedControl.Root
-              fullWidth
-              value={view}
-              onValueChange={onViewChange}
-              aria-label="Вид"
-            >
-              <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
-              <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
-            </SegmentedControl.Root>
-          </PageToolbar.Sections>
-          <PageToolbar.Actions>
-            <Button.Root>
-              <Button.Icon>
-                <Icon name="action.add" />
-              </Button.Icon>
-              Новая сделка
-            </Button.Root>
-          </PageToolbar.Actions>
-        </PageToolbar.Root>
-      </AppHeader.Tools>
-    </AppHeader.Root>
+    <Page.TopBar>
+      <Page.Header>
+        <Page.Title>Сделки</Page.Title>
+        <Page.Description>7 сделок в работе · 6 461 750 ₽</Page.Description>
+      </Page.Header>
+      <Page.Toolbar aria-label="Сделки">
+        <Page.ToolbarSections>
+          <SegmentedControl.Root
+            fullWidth
+            value={view}
+            onValueChange={onViewChange}
+            aria-label="Вид"
+          >
+            <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
+            <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
+          </SegmentedControl.Root>
+        </Page.ToolbarSections>
+        <Page.ToolbarActions>
+          <Button.Root>
+            <Button.Icon>
+              <Icon name="action.add" />
+            </Button.Icon>
+            Новая сделка
+          </Button.Root>
+        </Page.ToolbarActions>
+      </Page.Toolbar>
+    </Page.TopBar>
   );
 }
 ```
@@ -208,20 +207,20 @@ shows only icons); none on the children of a sub-list.
 
 ## Page wrapper
 
-- App pages (dashboard, list, detail, a board): `PageContent.Root as="section"` — the full width of
-  the panel; the page's title and tools are in its `AppHeader`, its blocks go into
-  `PageContent.Body` ([the page skeleton](composition.md#1-page-skeleton)).
-- Document pages — settings and long forms: `PageContent.Root maxWidth="wide"` with `PageContent.Header`
-  (the page's h1) and a `PageContent.Section layout="aside"`
-  (heading column + panel) per section ([the settings page](../src/components/page-content/examples/screen.tsx)), or `maxWidth="readable"` for a single
+- App pages (dashboard, list, detail, a board): `Page.Root` — the full width of the panel; the
+  page's title and tools are in its `Page.TopBar`, its blocks go into `Page.Body`
+  ([the page skeleton](composition.md#1-page-skeleton)).
+- Document pages — settings and long forms: `Page.Root maxWidth="wide"` with `Page.Header` in the
+  flow (the page's h1) and a `Page.Section layout="aside"` (heading column + panel) per section
+  ([the settings page](../src/layout/page/examples/screen.tsx)), or `maxWidth="readable"` for a single
   narrow column of fields.
-- Long reading text (terms, help): `PageContent.Root maxWidth="readable"` with `PageContent.Header`.
+- Long reading text (terms, help): `Page.Root maxWidth="readable"` with `Page.Header` in the flow.
 - A page as high as the panel (a log, a board, a chat): `AppShell.Root fillViewport` +
-  `PageContent.Root fill`; the body passes its free height to a filling child — DataTable
-  `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`. Never compute heights from `100vh`.
-- List + detail (mail, a messenger, a ticket queue): `PageContent.Split` with `PageContent.Panel kind="list"` and
-  `PageContent.Panel kind="detail"` in a filling page. Side by side from 48rem of the split's own width, one pane
-  at a time below it with `PageContent.BackButton` first in the detail's header; `open` is «a record
+  `Page.Root fill`; the body passes its free height to a filling child — DataTable
+  `scrollHeight="fill"`, Crossfade `fill`, `Page.Split`. Never compute heights from `100vh`.
+- List + detail (mail, a messenger, a ticket queue): `Page.Split` with `Page.List` and
+  `Page.Detail` in a filling page. Side by side from 48rem of the split's own width, one pane
+  at a time below it with `Page.BackButton` first in the detail's header; `open` is «a record
   is chosen». Each pane gives its last child the free height: a Card with its own `ScrollContainer`
   (`anchor="end"` for a thread). The records in the list pane are a `List` (`current` on the open
   one), the conversations of a messenger a `ChatList`. Details that open over a table and close

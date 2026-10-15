@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/card/Card";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { LinkButton } from "@/components/link-button/LinkButton";
-import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
+import { Page } from "@/layout/page/Page";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { renderInlineCode } from "../components/PlaygroundApiTable";
@@ -40,25 +40,25 @@ const RHYTHM: Row[] = [
   { what: "кнопки и фильтры в ряд", value: "8", how: "`--prime-space-2`" },
   { what: "строки одного элемента (имя над мета)", value: "0–4", how: "`--prime-space-1`" },
   { what: "заголовок группы → её поля", value: "16", how: "`--prime-space-4`" },
-  { what: "плитка → плитка, по обеим осям", value: "16", how: "даёт `PageContent.Grid`" },
+  { what: "плитка → плитка, по обеим осям", value: "16", how: "даёт `Page.Grid`" },
   { what: "поле → поле, переключатель → переключатель", value: "20", how: "`--prime-space-5`" },
   { what: "основная колонка → боковая", value: "24", how: "`--prime-space-6`" },
   {
-    what: "шапка приложения → первый блок страницы",
+    what: "верхняя полоса страницы → первый блок",
     value: "12 + 24 (32 от 1024)",
-    how: "нижний воздух шапки + верхний `AppShell.Main`",
+    how: "нижний воздух полосы + верхний воздух `Page.Root`",
   },
-  { what: "шапка страницы-документа → содержимое", value: "24", how: "даёт `PageContent.Header`" },
-  { what: "блок → блок страницы", value: "24", how: "даёт `PageContent.Body`" },
+  { what: "заголовок страницы в потоке → содержимое", value: "24", how: "даёт `Page.Root`" },
+  { what: "блок → блок страницы", value: "24", how: "даёт `Page.Body`" },
   { what: "группа → группа в форме", value: "32", how: "`--prime-space-8`" },
-  { what: "раздел → раздел (новая тема с h2)", value: "40", how: "даёт `PageContent.Section`" },
+  { what: "раздел → раздел (новая тема с h2)", value: "40", how: "даёт `Page.Section`" },
 ];
 
 const TYPE: Row[] = [
   {
     what: "заголовок страницы (один, `h1`)",
     value: "14",
-    how: "`AppHeader.Title` — `title-s`; на странице-документе `PageContent.Title` (24, `heading-m`)",
+    how: "`Page.Title` — в `Page.TopBar` `title-s` (14), в потоке страницы `heading-m` (24)",
   },
   {
     what: "раздел страницы без карточки",
@@ -94,22 +94,22 @@ export default function CompositionPage() {
         <DocList>
           <li>
             {renderInlineCode(
-              "Один раз на приложение — `AppShell.Root` + `Sidebar` в `AppShell.Nav`, сверху `AppHeader`, страница — в `AppShell.Main`. Шапка принадлежит странице: в её строке только то, что нужно этой странице, — заголовок, её кнопки и инструменты; глобального поиска и кнопок всего приложения в ней нет.",
+              "Приложение — это навигация и страница: один раз на приложение `AppShell.Root` + `Sidebar` в `AppShell.Nav`, страница — `Page.Root` в `AppShell.Main`. Всё, что сверху, принадлежит странице: её `Page.TopBar` несёт только то, что нужно этой странице, — заголовок, её кнопки и инструменты; глобальной шапки и глобального поиска нет.",
             )}
           </li>
           <li>
             {renderInlineCode(
-              'Один заголовок — в шапке: `AppHeader.Title` и `AppHeader.Description` со строкой данных («128 в работе · 6 ждут оплаты»), путь `Breadcrumb` перед ним у вложенной записи, инструменты страницы — `PageToolbar` в `AppHeader.Tools`. В основной области — `PageContent.Root as="section"` с `Body`, без `PageContent.Header`.',
+              "Рабочий экран (список, доска, чат) называет себя в полосе: `Page.Header` с `Page.Title` и `Page.Description` со строкой данных («128 в работе · 6 ждут оплаты») и путь `Breadcrumb` перед ним у вложенной записи, под ним — `Page.Toolbar` с инструментами страницы; дальше — `Page.Body`.",
             )}
           </li>
           <li>
             {renderInlineCode(
-              "Исключение — страница-документ (настройки, длинная форма, справка): её большой заголовок — `PageContent.Header` с `Title`, `Description` и `Actions` в основной области, а в шапке заголовка нет. Никогда два заголовка, никогда без `h1`.",
+              "Страница-документ (настройки, длинная форма, справка) и обзор ставят `Page.Header` в поток — большой заголовок; полоса с `collapse` повторяет его, когда он уходит под неё. `Page.Title` — всегда `h1`, один на страницу: никогда два заголовка, никогда без `h1`.",
             )}
           </li>
           <li>
             {renderInlineCode(
-              "Внешних отступов не добавляйте: поля даёт `AppShell.Main`, расстояния между блоками — `PageContent.Body`, между разделами — `PageContent.Section`, между плитками — `PageContent.Grid`. Ваш CSS раскладывает только внутренность блока через `gap`.",
+              "Внешних отступов не добавляйте: поля и верхний воздух даёт `Page.Root` (их передаёт `AppShell.Main`), расстояния между блоками — `Page.Body`, между разделами — `Page.Section`, между плитками — `Page.Grid`. Ваш CSS раскладывает только внутренность блока через `gap`.",
             )}
           </li>
         </DocList>
@@ -148,7 +148,7 @@ export default function CompositionPage() {
           </li>
           <li>
             {renderInlineCode(
-              "`Card` — для самостоятельного блока (метрика, панель настроек, сведения сбоку). Раздел, который и так один в своей области, — `PageContent.Section` с заголовком и содержимым без карточки. Все плитки экрана — одна `PageContent.Grid`, а не сетка на каждый ряд.",
+              "`Card` — для самостоятельного блока (метрика, панель настроек, сведения сбоку). Раздел, который и так один в своей области, — `Page.Section` с заголовком и содержимым без карточки. Все плитки экрана — одна `Page.Grid`, а не сетка на каждый ряд.",
             )}
           </li>
           <li>
@@ -163,7 +163,7 @@ export default function CompositionPage() {
         <DocList>
           <li>
             {renderInlineCode(
-              'Одно главное действие на область (`solid`, последним в ряду). Остальные — `soft` / `ghost` / `outline` с `tone="neutral"`, редкие — в `Dropdown` за `action.more` (`soft` в шапке, `ghost` размера `s` в ячейке таблицы).',
+              'Одно главное действие на область (`solid`, последним в ряду). Остальные — `soft` / `ghost` / `outline` с `tone="neutral"`, редкие — в `Dropdown` за `action.more` (`soft` в полосе страницы, `ghost` размера `s` в ячейке таблицы).',
             )}
           </li>
           <li>
@@ -240,9 +240,9 @@ export default function CompositionPage() {
           "Каждый экран — пример `screen.tsx` на странице своего главного компонента: превью и код там, указатель для агентов — `SKILL/composition.md`.",
         )}
       >
-        <PageContent.Grid>
+        <Page.Grid>
           {SCREENS.map(({ page, nav, description }) => (
-            <PageContent.Cell key={page.dir} span={4}>
+            <Page.Cell key={page.dir} span={4}>
               <Card.Root variant="cta">
                 <Card.Title>{page.title}</Card.Title>
                 <Card.Description>{renderInlineCode(description)}</Card.Description>
@@ -259,9 +259,9 @@ export default function CompositionPage() {
                   </LinkButton>
                 </Card.Footer>
               </Card.Root>
-            </PageContent.Cell>
+            </Page.Cell>
           ))}
-        </PageContent.Grid>
+        </Page.Grid>
         <Typography variant="body-m" tone="secondary">
           Те же правила для агентов —{" "}
           <LinkButton href={SKILL_COMPOSITION} rel="noopener noreferrer" target="_blank">

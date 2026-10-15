@@ -145,7 +145,6 @@ describe("touch and input", () => {
 /** Stylesheets whose viewport queries are the app shell or the overlay form (foundation §9). */
 const VIEWPORT_QUERY_FILES = new Set([
   "src/layout/app-shell/AppShell.module.css",
-  "src/layout/app-header/AppHeader.module.css",
   "src/layout/sidebar/Sidebar.module.css",
   "src/layout/bottom-nav/BottomNav.module.css",
   "src/internal/sheet.module.css",

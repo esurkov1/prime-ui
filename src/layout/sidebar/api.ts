@@ -67,8 +67,8 @@ export const api: ComponentApi = {
         {
           name: "onOpenChange",
           type: "(open: boolean) => void",
-          en: "Off-canvas open / close: Toggle, the AppHeader menu button, scrim, Escape, an activated item, leaving the narrow viewport.",
-          ru: "Открытие и закрытие панели: Toggle, кнопка меню AppHeader, подложка, Escape, нажатый пункт, выход из узкого экрана.",
+          en: "Off-canvas open / close: Toggle, the menu button of `Page.TopBar`, scrim, Escape, an activated item, leaving the narrow viewport.",
+          ru: "Открытие и закрытие панели: Toggle, кнопка меню `Page.TopBar`, подложка, Escape, нажатый пункт, выход из узкого экрана.",
         },
         {
           name: "offCanvas",
@@ -593,8 +593,8 @@ export const api: ComponentApi = {
         ru: "Выезжающая панель: декоративная подложка (нажатие на неё — нажатие снаружи, `closeOnOutsideClick`), ловушка фокуса и Escape (`closeOnEscape`); фокус возвращается к открывшей кнопке.",
       },
       {
-        en: "Toggle, the AppHeader menu button and `useAppShellNav` triggers: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.",
-        ru: "Toggle, кнопка меню AppHeader и свои кнопки через `useAppShellNav`: `aria-expanded`, `aria-controls` на `<nav>`, подпись из `labels`.",
+        en: "Toggle, the menu button of `Page.TopBar` and `useAppShellNav` triggers: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.",
+        ru: "Toggle, кнопка меню `Page.TopBar` и свои кнопки через `useAppShellNav`: `aria-expanded`, `aria-controls` на `<nav>`, подпись из `labels`.",
       },
     ],
   },

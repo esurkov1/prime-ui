@@ -34,6 +34,9 @@ const PUBLIC_HOOKS = [
   // Label's dimmed ink: a field frame dims its label over a disabled native control, which only
   // CSS sees (`:has(:disabled)`), so it cannot pass `disabled` (Label COMPONENT.md).
   /^--label-dimmed$/,
+  // The page's edge air: the host of a page (AppShell.Main, a preview stage) hands it the side
+  // gutter and the top air (Page COMPONENT.md, Layout & spacing).
+  /^--page-(gutter|top)$/,
 ];
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);

@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 80 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 78 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -117,7 +117,7 @@ components.
 ## Quick start
 
 ```tsx
-import { AppHeader, AppShell, Button, Icon, Input, PageContent, Sidebar } from "prime-ui-kit";
+import { AppShell, Button, Icon, Input, Page, Sidebar } from "prime-ui-kit";
 
 export function App() {
   return (
@@ -135,24 +135,22 @@ export function App() {
           </Sidebar.Content>
         </Sidebar.Root>
       }
-      header={
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.Title>Новый клиент</AppHeader.Title>
-          </AppHeader.Start>
-        </AppHeader.Root>
-      }
     >
-      <PageContent.Root as="section">
-        <PageContent.Body>
+      <Page.Root>
+        <Page.TopBar>
+          <Page.Header>
+            <Page.Title>Новый клиент</Page.Title>
+          </Page.Header>
+        </Page.TopBar>
+        <Page.Body>
           <Input.Root label="Рабочая почта" required hint="Отправим на неё приглашение">
             <Input.Wrapper>
               <Input.Field type="email" placeholder="name@company.ru" />
             </Input.Wrapper>
           </Input.Root>
           <Button.Root>Пригласить клиента</Button.Root>
-        </PageContent.Body>
-      </PageContent.Root>
+        </Page.Body>
+      </Page.Root>
     </AppShell.Template>
   );
 }
@@ -312,10 +310,8 @@ accessibility, examples and common mistakes.
 
 | Component | What it is for |
 |---|---|
-| [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a content panel that is the page itself and a navigation rail one layer above it. |
-| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The page's bar at the top of the app's content panel: the page title with a line of data, the page's tools and its own buttons — only what the current page needs. |
-| [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, page actions and content blocks, titled sections and the tile grid of a dashboard; a page as high as the panel and the list + detail layout. |
-| [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, stacked rows when narrow, search and filter always first with the active filters under the top row. |
+| [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame — navigation and the page: a content panel that is the page itself and a navigation rail one layer above it. |
+| [**Page**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/page/COMPONENT.md) | The page inside the app frame: everything at the top belongs to it — a top bar with the title, actions and tools, the large document title in the flow — then sections, the tile grid and the list + detail layout. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator inside one surface, horizontal or vertical, with or without a label. |
 | [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | The kit's one scroll region: a thin scrollbar, soft edges wherever content is hidden, and correct shrinking inside flex and grid parents. |
 | [**LoginForm**](https://github.com/esurkov1/prime-ui/blob/main/src/components/login-form/COMPONENT.md) | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. |
@@ -363,7 +359,7 @@ Each component folder ships with the package:
 ```
 node_modules/prime-ui-kit/src/components/<name>/COMPONENT.md   full reference
 node_modules/prime-ui-kit/src/components/<name>/examples/*.tsx one scenario per file, copyable
-node_modules/prime-ui-kit/src/layout/<name>/…                  AppShell, AppHeader, Sidebar, BottomNav
+node_modules/prime-ui-kit/src/layout/<name>/…                  AppShell, Sidebar, BottomNav, Page
 node_modules/prime-ui-kit/dist/skill/SKILL.md                  the agent skill (see below)
 ```
 

@@ -5,8 +5,8 @@ checks.
 
 ## Composition
 - [ ] The screen starts from the closest working screen and keeps its skeleton ([screens](composition.md#screens)).
-- [ ] An app page titles itself in its `AppHeader`; only a document page has `PageContent.Header` ([page skeleton](composition.md#1-page-skeleton)).
-- [ ] The header row holds only this page's title, buttons and tools — nothing app-wide ([page skeleton](composition.md#1-page-skeleton)).
+- [ ] One `Page.Title` per page: a work screen titles itself in its `Page.TopBar`, a document page or an overview in a `Page.Header` in the flow ([page skeleton](composition.md#1-page-skeleton)).
+- [ ] The top bar holds only this page's title, buttons and tools — no app-wide header or global search ([page skeleton](composition.md#1-page-skeleton)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 
 ## UX ([ux.md](ux.md))

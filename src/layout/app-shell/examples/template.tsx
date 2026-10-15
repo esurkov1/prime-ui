@@ -1,5 +1,5 @@
-/** Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template`, `scrollResetKey`. */
-import { AppHeader, AppShell, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
+/** Root, nav, main and footer in one component; main scrolls back to the top whenever the page changes — `AppShell.Template`, `scrollResetKey`. */
+import { AppShell, Icon, Page, Sidebar, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -50,24 +50,20 @@ export default function AppShellTemplateExample() {
             </Sidebar.Content>
           </Sidebar.Root>
         }
-        header={
-          <AppHeader.Root>
-            <AppHeader.Start>
-              <AppHeader.Title>
-                {page.label}
-                <AppHeader.Description>{page.text}</AppHeader.Description>
-              </AppHeader.Title>
-            </AppHeader.Start>
-          </AppHeader.Root>
-        }
       >
-        <PageContent.Root as="section">
-          <PageContent.Body>
+        <Page.Root>
+          <Page.TopBar>
+            <Page.Header>
+              <Page.Title>{page.label}</Page.Title>
+              <Page.Description>{page.text}</Page.Description>
+            </Page.Header>
+          </Page.TopBar>
+          <Page.Body>
             <Typography variant="body-m" tone="secondary">
               {page.note}
             </Typography>
-          </PageContent.Body>
-        </PageContent.Root>
+          </Page.Body>
+        </Page.Root>
       </AppShell.Template>
     </div>
   );

@@ -35,12 +35,12 @@ Things that belong together sit closer than things that do not.
 | inline controls in a row (buttons, filters) | 8 | `--prime-space-2` |
 | switch → switch in a settings list | 20 | `--prime-space-5` |
 | group → group (fieldset, form section) | 32 | `--prime-space-8` |
-| tile → tile, both axes (KPI cards, charts, panels) | 16 | `--prime-space-4` — `PageContent.Grid` already does it |
-| block → block on a page (page header → body too) | 24 | `--prime-space-6` — `PageContent` already does it |
-| section → section on a page (a new topic with an `h2`) | 40 | `PageContent.Section` already does it |
+| tile → tile, both axes (KPI cards, charts, panels) | 16 | `--prime-space-4` — `Page.Grid` already does it |
+| block → block on a page (page header → body too) | 24 | `--prime-space-6` — `Page` already does it |
+| section → section on a page (a new topic with an `h2`) | 40 | `Page.Section` already does it |
 
-`PageContent.Body` already spaces its direct blocks 24 apart, a `PageContent.Section` 40 from its
-neighbours, `PageContent.Grid` its tiles 16 on both axes, and `AppShell.Main` already carries the page
+`Page.Body` already spaces its direct blocks 24 apart, a `Page.Section` 40 from its
+neighbours, `Page.Grid` its tiles 16 on both axes, and `AppShell.Main` already hands the page its
 gutters — do not add your own outer padding.
 
 ## 3. Size axis
@@ -143,10 +143,10 @@ A chart color does one job, and the job picks the colors:
 | `body-m` | 14/20 | default text |
 | `body-l` | 16/24 | reading text |
 | `title-s` | 14/20 600 | card title, group heading inside a card or form |
-| `title-m` | 16/24 600 | page section heading (`PageContent.Section` draws it), modal title |
+| `title-m` | 16/24 600 | page section heading (`Page.Section` draws it), modal title |
 | `title-l` | 18/24 600 | large block title |
 | `heading-s` | 20/28 600 | page sub-heading |
-| `heading-m` | 24/32 600 | the title of a document page (`PageContent.Title`); an app page titles itself in `AppHeader.Title` (`title-s`) |
+| `heading-m` | 24/32 600 | the page title in the flow (`Page.Title` of a document page or an overview); in `Page.TopBar` the same `Page.Title` is `title-s` |
 | `heading-l` | 30/36 600 | marketing / auth title |
 | `display-*` | 36–60 | hero numbers only |
 | `code` | 13/20 mono | identifiers, inline code |
@@ -154,7 +154,7 @@ A chart color does one job, and the job picks the colors:
 `variant` is required on `Typography`. Weights only 400/500/600. Numbers in tables, prices, dates:
 tabular (the kit does it in DataTable `numeric` columns and `Card.Value`; your own amounts take
 `font-variant-numeric: tabular-nums`). Reading text max width `--prime-layout-reading-max-width`
-(`PageContent.Root maxWidth="readable"`).
+(`Page.Root maxWidth="readable"`).
 
 ### Text colour
 
@@ -174,7 +174,7 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
   the [breakpoints and their scope](responsive.md#breakpoints), the
   [intrinsic grids](responsive.md#intrinsic-grids), what the kit adapts by itself and touch.
 - Flex children with text: `min-width: 0` + ellipsis or `overflow-wrap: anywhere`.
-- Sticky parts come from the kit: `AppHeader` (with the `PageToolbar` in `AppHeader.Tools`), the
+- Sticky parts come from the kit: `Page.TopBar` (with its `Page.Toolbar`), the
   DataTable head and `stickyFirstColumn`, the Gantt header and first column — each sticks inside its
   own scroller, and the top ones let go on screens lower than 480px. Never a `position: sticky` bar of your own.
 

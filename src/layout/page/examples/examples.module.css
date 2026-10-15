@@ -1,0 +1,85 @@
+/* Layout of the Page scenarios. A window stands for an app panel: it only sizes and clips, the
+   page lays itself out. A plain frame stands for main's gutter. Semantic tokens only. */
+
+/* A page body without a shell: main's gutter around it. */
+.main {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--prime-layout-gutter-m);
+  container-type: inline-size;
+}
+
+/* An app window of a fixed height: the shell fills it, main scrolls inside. */
+.window {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: calc(var(--prime-space-24) * 4);
+  overflow: hidden;
+}
+
+/* collapse.tsx: a taller window, so there is a page to scroll. */
+.tall {
+  height: calc(var(--prime-space-24) * 5);
+}
+
+/* narrow.tsx: a phone-wide window (360px). */
+.phone {
+  width: min(100%, var(--prime-layout-narrow-width));
+  margin-inline: auto;
+}
+
+/* The shell fills the window frame instead of the viewport. */
+.shell {
+  height: 100%;
+}
+
+/* list-detail: main of a viewport-high shell — a column of a fixed height the page fills. */
+.fillMain {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(var(--prime-space-24) * 5);
+  padding: var(--prime-layout-gutter-m);
+}
+
+/* A pane's card: an optional header row, then the scrolling region takes the rest. */
+.paneCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.threadHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+.pane {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.tickets {
+  padding: var(--prime-space-2);
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-2) var(--prime-space-4) var(--prime-space-4);
+}
+
+.hint {
+  padding: var(--prime-space-2) var(--prime-space-4);
+}
+
+/* tools-without-search.tsx: a tablet-width page column (600px). */
+.tablet {
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 6.25);
+  margin-inline: auto;
+}

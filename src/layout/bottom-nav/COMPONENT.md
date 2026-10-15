@@ -12,7 +12,7 @@
 ## When not to use
 - More than six destinations or nested sections → use [Sidebar](../sidebar/COMPONENT.md) (off-canvas on a phone), put the rest under «Ещё».
 - Switching views inside one page → use [Tabs](../../components/tabs/COMPONENT.md) or [SegmentedControl](../../components/segmented-control/COMPONENT.md).
-- Several actions (create, filter, export) → use [Button](../../components/button/COMPONENT.md) in the page header; the bar holds at most one main action (`BottomNav.Action`).
+- Several actions (create, filter, export) → use [Button](../../components/button/COMPONENT.md) in the page's top bar ([Page](../page/COMPONENT.md): `Page.Actions`, `Page.ToolbarActions`); the bar holds at most one main action (`BottomNav.Action`).
 
 ## Import
 ```tsx
@@ -162,14 +162,14 @@ Motion: the color of the icon and the label and the flat pill change over `fast`
 | [floating.tsx](examples/floating.tsx) | A glass capsule over the page across the width: the client list scrolls under its blur, the selection glides to a tapped section, with labels or icons alone — `floating`, `iconOnly`. |
 | [floating-action.tsx](examples/floating-action.tsx) | A round action beside the glass capsule for the screen's main action, with labels or icons alone — `BottomNav.Action`, `floating`. |
 | [router.tsx](examples/router.tsx) | A router link as the item: the router marks the open section and the item shows it as current; render it inside a router — `asChild`. |
-| [in-app-shell.tsx](examples/in-app-shell.tsx) | The app frame on a phone: the AppHeader, the page and the bar in the footer, which gives way to the Sidebar rail once one is on screen — `AppShell.Footer`. |
+| [in-app-shell.tsx](examples/in-app-shell.tsx) | The app frame on a phone: the page with its top bar and the bar in the footer, which gives way to the Sidebar rail once one is on screen — `AppShell.Footer`. |
 
 ## Mistakes
 - Seven or more items → keep 2–6; the rest goes to a «Ещё» section or Sidebar.
 - Long labels («Управление заказами») → one word; a long label widens its column and the bar scrolls.
 - `iconOnly` with icons that need a caption to be understood → keep the labels.
 - A floating bar outside a positioned container → it sits at the bottom of the nearest positioned ancestor; put it in `AppShell.Footer`.
-- An action as an item («Создать» among the sections) → items navigate; put the screen's one main action in `BottomNav.Action` beside the bar, the rest in the page header.
+- An action as an item («Создать» among the sections) → items navigate; put the screen's one main action in `BottomNav.Action` beside the bar, the rest in the page's top bar.
 - `BottomNav.Action` without `aria-label` → the button has no name; it is required.
 - The bar outside `AppShell.Footer` (in Main, Root or `position: fixed` on the page) → it never leaves and shows next to the Sidebar on a desktop; put it in `AppShell.Footer` (or the Template `footer` prop).
 - Hiding the bar with your own media query → the shell already hides the footer while the Sidebar rail is on screen.

@@ -134,7 +134,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 | [vertical.tsx](examples/vertical.tsx) | Labels above their values at any width, for a side panel of a record — `orientation`. |
 | [totals.tsx](examples/totals.tsx) | The totals of an invoice: every amount at the end of its row in tabular figures, the amount due a step larger — `align`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap — `DescriptionList.Item`, `label`. |
-| [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and their totals and a side column with the client's details and the history — `align`, `orientation`. |
+| [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in its top bar, a main column with the line items and their totals and a side column with the client's details and the history — `align`, `orientation`. |
 
 ## Mistakes
 - A grid of `Typography` pairs or a two-column table for record details → `DescriptionList`: the `<dl>` semantics and the stacking come with it.

@@ -1,6 +1,5 @@
-/** A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. */
+/** A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in its top bar, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. */
 import {
-  AppHeader,
   Avatar,
   Badge,
   Button,
@@ -16,8 +15,7 @@ import {
   type KanbanColumn,
   type KanbanValue,
   matchesSmartFilter,
-  PageContent,
-  PageToolbar,
+  Page,
   type PaletteColor,
   SegmentedControl,
   SmartFilter,
@@ -359,216 +357,205 @@ export default function KanbanScreenExample() {
   const nextStage = STAGES[STAGES.findIndex((stage) => stage.id === dealStage) + 1];
 
   return (
-    <>
-      {/* A work screen: in an app this header fills the shell's `header` slot and carries the page —
-          the only h1 and the page's tools; main has no PageContent.Header. */}
-      <AppHeader.Root>
-        <AppHeader.Start>
-          <AppHeader.Title>
-            Сделки
-            <AppHeader.Description>
-              {loading ? "Загружаем воронку…" : pipeline}
-            </AppHeader.Description>
-          </AppHeader.Title>
-        </AppHeader.Start>
-        <AppHeader.Tools>
-          <SmartFilter.Root
-            fields={FIELDS}
-            value={filter}
-            onValueChange={setFilter}
-            search={search}
-            onSearchChange={setSearch}
-          >
-            <PageToolbar.Root aria-label="Сделки">
-              <PageToolbar.Tools>
-                <SmartFilter.Toolbar />
-              </PageToolbar.Tools>
-              <PageToolbar.View>
-                <SegmentedControl.Root value={view} onValueChange={setView} aria-label="Вид">
-                  <SegmentedControl.Item value="board">
-                    <SegmentedControl.Icon>
-                      <Icon name="view.columns" />
-                    </SegmentedControl.Icon>
-                    Доска
-                  </SegmentedControl.Item>
-                  <SegmentedControl.Item value="list">
-                    <SegmentedControl.Icon>
-                      <Icon name="format.list" />
-                    </SegmentedControl.Icon>
-                    Список
-                  </SegmentedControl.Item>
-                </SegmentedControl.Root>
-              </PageToolbar.View>
-              <PageToolbar.Actions>
-                <Button.Root>
-                  <Button.Icon>
-                    <Icon name="action.add" />
-                  </Button.Icon>
-                  Новая сделка
-                </Button.Root>
-              </PageToolbar.Actions>
-              <PageToolbar.Chips>
-                <SmartFilter.Chips />
-              </PageToolbar.Chips>
-            </PageToolbar.Root>
-          </SmartFilter.Root>
-        </AppHeader.Tools>
-      </AppHeader.Root>
+    <Page.Root fill>
+      {/* A work screen titles itself in its top bar: the only h1 and the page's tools. */}
 
-      <PageContent.Root fill>
-        <PageContent.Body>
-          <Crossfade state={view} fill>
-            {view === "board" ? (
-              // `plain` (the default): the board is the page's main region, so the stages are no
-              // boxes — their headers and the deal cards stand on the page, one level of nesting.
-              <Kanban.Root
-                aria-label="Воронка продаж"
-                columns={STAGES}
-                items={deals}
-                getId={(item) => item.id}
-                getLabel={(item) => item.company}
-                value={placement}
-                onValueChange={async (next, move) => {
-                  const moved = BY_ID.get(move.id);
-                  if (moved && move.from !== move.to) {
-                    try {
-                      await saveStage(moved, move.to);
-                    } catch (error) {
-                      refuse(error);
-                      throw error;
-                    }
+      <Page.TopBar>
+        <Page.Header>
+          <Page.Title>Сделки</Page.Title>
+          <Page.Description>{loading ? "Загружаем воронку…" : pipeline}</Page.Description>
+        </Page.Header>
+        <SmartFilter.Root
+          fields={FIELDS}
+          value={filter}
+          onValueChange={setFilter}
+          search={search}
+          onSearchChange={setSearch}
+        >
+          <Page.Toolbar aria-label="Сделки">
+            <Page.ToolbarTools>
+              <SmartFilter.Toolbar />
+            </Page.ToolbarTools>
+            <Page.ToolbarView>
+              <SegmentedControl.Root value={view} onValueChange={setView} aria-label="Вид">
+                <SegmentedControl.Item value="board">
+                  <SegmentedControl.Icon>
+                    <Icon name="view.columns" />
+                  </SegmentedControl.Icon>
+                  Доска
+                </SegmentedControl.Item>
+                <SegmentedControl.Item value="list">
+                  <SegmentedControl.Icon>
+                    <Icon name="format.list" />
+                  </SegmentedControl.Icon>
+                  Список
+                </SegmentedControl.Item>
+              </SegmentedControl.Root>
+            </Page.ToolbarView>
+            <Page.ToolbarActions>
+              <Button.Root>
+                <Button.Icon>
+                  <Icon name="action.add" />
+                </Button.Icon>
+                Новая сделка
+              </Button.Root>
+            </Page.ToolbarActions>
+            <Page.ToolbarChips>
+              <SmartFilter.Chips />
+            </Page.ToolbarChips>
+          </Page.Toolbar>
+        </SmartFilter.Root>
+      </Page.TopBar>
+      <Page.Body>
+        <Crossfade state={view} fill>
+          {view === "board" ? (
+            // `plain` (the default): the board is the page's main region, so the stages are no
+            // boxes — their headers and the deal cards stand on the page, one level of nesting.
+            <Kanban.Root
+              aria-label="Воронка продаж"
+              columns={STAGES}
+              items={deals}
+              getId={(item) => item.id}
+              getLabel={(item) => item.company}
+              value={placement}
+              onValueChange={async (next, move) => {
+                const moved = BY_ID.get(move.id);
+                if (moved && move.from !== move.to) {
+                  try {
+                    await saveStage(moved, move.to);
+                  } catch (error) {
+                    refuse(error);
+                    throw error;
                   }
-                  setPlacement(next);
-                }}
-                renderColumnMeta={figures}
-                loading={loading}
-                onItemOpen={(item) => openDeal(item.id)}
-                renderItem={(item) => (
-                  <Kanban.Item>
-                    <Kanban.ItemTitle>{item.company}</Kanban.ItemTitle>
-                    <Kanban.ItemDescription>
-                      {RUBLES.format(item.amount)} · до {DAY.format(new Date(item.due))}
-                    </Kanban.ItemDescription>
-                    <Kanban.ItemFooter>{ownerAvatar(item.owner)}</Kanban.ItemFooter>
-                  </Kanban.Item>
-                )}
-              />
-            ) : (
-              <DataTable
-                columns={COLUMNS}
-                rows={loading ? [] : rows}
-                loading={loading}
-                getRowKey={(row) => row.id}
-                getRowLabel={(row) => row.company}
-                onRowClick={(row) => openDeal(row.id)}
-                paging="none"
-                scrollHeight="fill"
-                stickyHeader
-                defaultSort={{ columnId: "due", order: "asc" }}
-                empty={
-                  <EmptyPage.Root size="s" role="status" aria-labelledby="deals-empty">
-                    <EmptyPage.Icon>
-                      <Icon name="action.search" />
-                    </EmptyPage.Icon>
-                    <EmptyPage.Title as="p" id="deals-empty">
-                      Сделок не найдено
-                    </EmptyPage.Title>
-                    <EmptyPage.Description>
-                      Измените запрос или сбросьте фильтры.
-                    </EmptyPage.Description>
-                    <EmptyPage.Actions>
-                      <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
-                        Сбросить фильтры
-                      </Button.Root>
-                    </EmptyPage.Actions>
-                  </EmptyPage.Root>
                 }
-              />
-            )}
-          </Crossfade>
-          <Drawer.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <Drawer.Content>
-              <Drawer.Guard busy={saving} />
-              <Drawer.Header>
-                <Drawer.Title>{deal?.company}</Drawer.Title>
-                <Drawer.Description>
-                  {deal?.id} · {STAGE_BY_ID.get(dealStage)?.title}
-                </Drawer.Description>
-              </Drawer.Header>
-              <Drawer.Body>
-                {deal ? (
-                  <DescriptionList.Root>
-                    <DescriptionList.Item label="Этап">
-                      {stageBadge(dealStage)}
-                    </DescriptionList.Item>
-                    <DescriptionList.Item label="Сумма">
-                      {RUBLES.format(deal.amount)}
-                    </DescriptionList.Item>
-                    <DescriptionList.Item label="Вероятность">
-                      {deal.probability} %
-                    </DescriptionList.Item>
-                    <DescriptionList.Item label="Срок закрытия">
-                      {DAY.format(new Date(deal.due))}
-                    </DescriptionList.Item>
-                    <DescriptionList.Item label="Ответственный">
-                      <span className={styles.owner}>
-                        {ownerAvatar(deal.owner)}
-                        {deal.owner.name}
-                      </span>
-                    </DescriptionList.Item>
-                    <DescriptionList.Item label="Контакт">{deal.contact}</DescriptionList.Item>
-                    <DescriptionList.Item label="Источник">{deal.source}</DescriptionList.Item>
-                    <DescriptionList.Item label="Договор">
-                      {deal.contract ? (
-                        <Badge.Root tone="success">Подписан</Badge.Root>
-                      ) : (
-                        <Badge.Root tone="neutral">Не подписан</Badge.Root>
-                      )}
-                    </DescriptionList.Item>
-                  </DescriptionList.Root>
-                ) : null}
-              </Drawer.Body>
-              <Drawer.Footer>
-                <Drawer.Close>
-                  <Button.Root variant="outline" tone="neutral">
-                    Закрыть
-                  </Button.Root>
-                </Drawer.Close>
-                <Dropdown.Root>
-                  <Dropdown.Trigger>
-                    <Button.Root variant="soft" tone="neutral" disabled={saving}>
-                      Сменить этап
+                setPlacement(next);
+              }}
+              renderColumnMeta={figures}
+              loading={loading}
+              onItemOpen={(item) => openDeal(item.id)}
+              renderItem={(item) => (
+                <Kanban.Item>
+                  <Kanban.ItemTitle>{item.company}</Kanban.ItemTitle>
+                  <Kanban.ItemDescription>
+                    {RUBLES.format(item.amount)} · до {DAY.format(new Date(item.due))}
+                  </Kanban.ItemDescription>
+                  <Kanban.ItemFooter>{ownerAvatar(item.owner)}</Kanban.ItemFooter>
+                </Kanban.Item>
+              )}
+            />
+          ) : (
+            <DataTable
+              columns={COLUMNS}
+              rows={loading ? [] : rows}
+              loading={loading}
+              getRowKey={(row) => row.id}
+              getRowLabel={(row) => row.company}
+              onRowClick={(row) => openDeal(row.id)}
+              paging="none"
+              scrollHeight="fill"
+              stickyHeader
+              defaultSort={{ columnId: "due", order: "asc" }}
+              empty={
+                <EmptyPage.Root size="s" role="status" aria-labelledby="deals-empty">
+                  <EmptyPage.Icon>
+                    <Icon name="action.search" />
+                  </EmptyPage.Icon>
+                  <EmptyPage.Title as="p" id="deals-empty">
+                    Сделок не найдено
+                  </EmptyPage.Title>
+                  <EmptyPage.Description>
+                    Измените запрос или сбросьте фильтры.
+                  </EmptyPage.Description>
+                  <EmptyPage.Actions>
+                    <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
+                      Сбросить фильтры
                     </Button.Root>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    {STAGES.map((stage) => (
-                      <Dropdown.Item
-                        key={stage.id}
-                        disabled={stage.id === dealStage}
-                        onSelect={() => {
-                          if (deal) void moveDeal(deal, stage.id);
-                        }}
-                      >
-                        {stage.title}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Content>
-                </Dropdown.Root>
-                {nextStage ? (
-                  <Button.Root
-                    loading={saving}
-                    onClick={() => {
-                      if (deal) void moveDeal(deal, nextStage.id);
-                    }}
-                  >
-                    В «{nextStage.title}»
+                  </EmptyPage.Actions>
+                </EmptyPage.Root>
+              }
+            />
+          )}
+        </Crossfade>
+        <Drawer.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <Drawer.Content>
+            <Drawer.Guard busy={saving} />
+            <Drawer.Header>
+              <Drawer.Title>{deal?.company}</Drawer.Title>
+              <Drawer.Description>
+                {deal?.id} · {STAGE_BY_ID.get(dealStage)?.title}
+              </Drawer.Description>
+            </Drawer.Header>
+            <Drawer.Body>
+              {deal ? (
+                <DescriptionList.Root>
+                  <DescriptionList.Item label="Этап">{stageBadge(dealStage)}</DescriptionList.Item>
+                  <DescriptionList.Item label="Сумма">
+                    {RUBLES.format(deal.amount)}
+                  </DescriptionList.Item>
+                  <DescriptionList.Item label="Вероятность">
+                    {deal.probability} %
+                  </DescriptionList.Item>
+                  <DescriptionList.Item label="Срок закрытия">
+                    {DAY.format(new Date(deal.due))}
+                  </DescriptionList.Item>
+                  <DescriptionList.Item label="Ответственный">
+                    <span className={styles.owner}>
+                      {ownerAvatar(deal.owner)}
+                      {deal.owner.name}
+                    </span>
+                  </DescriptionList.Item>
+                  <DescriptionList.Item label="Контакт">{deal.contact}</DescriptionList.Item>
+                  <DescriptionList.Item label="Источник">{deal.source}</DescriptionList.Item>
+                  <DescriptionList.Item label="Договор">
+                    {deal.contract ? (
+                      <Badge.Root tone="success">Подписан</Badge.Root>
+                    ) : (
+                      <Badge.Root tone="neutral">Не подписан</Badge.Root>
+                    )}
+                  </DescriptionList.Item>
+                </DescriptionList.Root>
+              ) : null}
+            </Drawer.Body>
+            <Drawer.Footer>
+              <Drawer.Close>
+                <Button.Root variant="outline" tone="neutral">
+                  Закрыть
+                </Button.Root>
+              </Drawer.Close>
+              <Dropdown.Root>
+                <Dropdown.Trigger>
+                  <Button.Root variant="soft" tone="neutral" disabled={saving}>
+                    Сменить этап
                   </Button.Root>
-                ) : null}
-              </Drawer.Footer>
-            </Drawer.Content>
-          </Drawer.Root>
-        </PageContent.Body>
-      </PageContent.Root>
-    </>
+                </Dropdown.Trigger>
+                <Dropdown.Content>
+                  {STAGES.map((stage) => (
+                    <Dropdown.Item
+                      key={stage.id}
+                      disabled={stage.id === dealStage}
+                      onSelect={() => {
+                        if (deal) void moveDeal(deal, stage.id);
+                      }}
+                    >
+                      {stage.title}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Content>
+              </Dropdown.Root>
+              {nextStage ? (
+                <Button.Root
+                  loading={saving}
+                  onClick={() => {
+                    if (deal) void moveDeal(deal, nextStage.id);
+                  }}
+                >
+                  В «{nextStage.title}»
+                </Button.Root>
+              ) : null}
+            </Drawer.Footer>
+          </Drawer.Content>
+        </Drawer.Root>
+      </Page.Body>
+    </Page.Root>
   );
 }

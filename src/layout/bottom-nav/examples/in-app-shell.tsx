@@ -1,13 +1,5 @@
-/** The app frame on a phone: the AppHeader, the page and the bar in the footer, which gives way to the Sidebar rail once one is on screen — `AppShell.Footer`. */
-import {
-  AppHeader,
-  AppShell,
-  BottomNav,
-  Button,
-  Icon,
-  PageContent,
-  Typography,
-} from "prime-ui-kit";
+/** The app frame on a phone: the page with its top bar and the bar in the footer, which gives way to the Sidebar rail once one is on screen — `AppShell.Footer`. */
+import { AppShell, BottomNav, Button, Icon, Page, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -24,14 +16,14 @@ export default function BottomNavInAppShellExample() {
   return (
     <div className={styles.phone}>
       <AppShell.Root fillViewport className={styles.shell}>
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.Title>Заказы</AppHeader.Title>
-          </AppHeader.Start>
-        </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Root as="section">
-            <PageContent.Body>
+          <Page.Root>
+            <Page.TopBar>
+              <Page.Header>
+                <Page.Title>Заказы</Page.Title>
+              </Page.Header>
+            </Page.TopBar>
+            <Page.Body>
               {ORDERS.map((order) => (
                 <Typography key={order} variant="body-m">
                   {order}
@@ -43,8 +35,8 @@ export default function BottomNavInAppShellExample() {
                 </Button.Icon>
                 Новый заказ
               </Button.Root>
-            </PageContent.Body>
-          </PageContent.Root>
+            </Page.Body>
+          </Page.Root>
         </AppShell.Main>
         <AppShell.Footer>
           <BottomNav.Root>

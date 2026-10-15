@@ -89,7 +89,7 @@ useSidebar()                       state hook for custom parts inside Root (useA
 | `onModeChange` | `(mode: SidebarMode) => void` | — | Called with the new mode (Toggle, `useSidebar().setMode`). |
 | `open` | `boolean` | — | Off-canvas panel on narrow viewports (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initial off-canvas state (uncontrolled). |
-| `onOpenChange` | `(open: boolean) => void` | — | Off-canvas open / close: Toggle, the AppHeader menu button, scrim, Escape, an activated item, leaving the narrow viewport. |
+| `onOpenChange` | `(open: boolean) => void` | — | Off-canvas open / close: Toggle, the menu button of `Page.TopBar`, scrim, Escape, an activated item, leaving the narrow viewport. |
 | `offCanvas` | `"auto" \| "always" \| "never"` | `"auto"` | When the rail becomes an off-canvas panel opened by `open`: `auto` — below 768px (viewport); `always` — at any width; `never` — always a rail. |
 | `closeOnOutsideClick` | `boolean` | `true` | A press on the scrim (outside the off-canvas panel) closes the panel. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the off-canvas panel. |
@@ -294,7 +294,7 @@ The rail width does not depend on `size`.
 | `closeOnEscape` (Root) | Escape closes the off-canvas panel | default; turn off with `closeOnOutsideClick` for a panel only its toggle closes | on |
 | `asChild` (ItemAction) | the row action is the consumer's link with the button look | the action opens a page or `mailto:` | off |
 
-Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand. Inside an `AppShell` the Sidebar publishes its navigation to the shell: on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) the `AppHeader` draws the menu button that opens the panel by itself, a `Sidebar.Toggle` outside the rail brings back a hidden one, and other triggers (a BottomNav «Ещё») read `useAppShellNav()`. One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
+Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand. Inside an `AppShell` the Sidebar publishes its navigation to the shell: on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) the page's `Page.TopBar` draws the menu button that opens the panel by itself, a `Sidebar.Toggle` outside the rail brings back a hidden one, and other triggers (a BottomNav «Ещё») read `useAppShellNav()`. One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
 
 ## States
 | State | Driven by | DOM |
@@ -364,7 +364,7 @@ Leaving the narrow viewport closes the off-canvas panel; activating an item (a l
 - A row action is its own button next to the item (never nested), named by `label` with a tooltip.
 - The account avatar is hidden from screen readers; the name and the muted line name the button.
 - Off-canvas: a decorative scrim (a press on it is a press outside, `closeOnOutsideClick`), focus trap and Escape (`closeOnEscape`); focus returns to the opener.
-- Toggle, the AppHeader menu button and `useAppShellNav` triggers: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.
+- Toggle, the menu button of `Page.TopBar` and `useAppShellNav` triggers: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -392,7 +392,7 @@ Leaving the narrow viewport closes the off-canvas panel; activating an item (a l
 | [dismiss.tsx](examples/dismiss.tsx) | An off-canvas panel only its own toggle closes: a press on the scrim and Escape leave it open, a picked item still closes it — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; every switch is one synchronous movement — `mode`, `onModeChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | Navigation behind a menu button at any width: the parent opens the off-canvas panel, the scrim, Escape, the header toggle or a navigation closes it — `offCanvas`, `open`, `onOpenChange`. |
-| [narrow.tsx](examples/narrow.tsx) | Below 768px the rail leaves the layout and slides in over the page from the menu button the header draws by itself; from 768px it is the rail again, and the button leaves — `AppShell`, `labels`. |
+| [narrow.tsx](examples/narrow.tsx) | Below 768px the rail leaves the layout and slides in over the page from the menu button the page top bar draws by itself; from 768px it is the rail again, and the button leaves — `AppShell`, `labels`. |
 
 ## Mistakes
 - `icon={…}` / `badge={…}` props → use the `Sidebar.ItemIcon` and `Sidebar.ItemCount` parts.

@@ -105,7 +105,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `height` | `number \| "fill"` | `240`, `160` under `30rem` | Height of the plot area in px. `fill` takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the default height at least. |
+| `height` | `number \| "fill"` | `240`, `160` under `30rem` | Height of the plot area in px. `fill` takes the free height of a stretched panel (a `Page.Cell` with `rows`), the default height at least. |
 | `renderPlot` | `(area: ChartFramePlotArea) => ReactNode` | — | Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden }` — for libraries that need explicit sizes (Chart.js, visx). |
 | `children` | `ReactNode` | — | A chart that sizes itself to its container (an SVG with a `viewBox`, `ResponsiveContainer`); it fills the area. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |

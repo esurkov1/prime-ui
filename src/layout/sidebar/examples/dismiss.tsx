@@ -1,5 +1,5 @@
 /** An off-canvas panel only its own toggle closes: a press on the scrim and Escape leave it open, a picked item still closes it — `closeOnOutsideClick`, `closeOnEscape`. */
-import { AppHeader, AppShell, Icon, Sidebar } from "prime-ui-kit";
+import { AppShell, Icon, Page, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -35,12 +35,15 @@ export default function SidebarDismissExample() {
             </Sidebar.Content>
           </Sidebar.Root>
         </AppShell.Nav>
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.Title>Сборка заказов</AppHeader.Title>
-          </AppHeader.Start>
-        </AppHeader.Root>
-        <AppShell.Main />
+        <AppShell.Main>
+          <Page.Root>
+            <Page.TopBar>
+              <Page.Header>
+                <Page.Title>Сборка заказов</Page.Title>
+              </Page.Header>
+            </Page.TopBar>
+          </Page.Root>
+        </AppShell.Main>
       </AppShell.Root>
     </div>
   );

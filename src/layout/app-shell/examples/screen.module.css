@@ -1,5 +1,5 @@
-/* App shell: the frame (Sidebar / BottomNav / AppHeader) lays itself out; this file only places the
-   home page's blocks. The rhythm comes from PageContent.Body, the tiles from PageContent.Grid. */
+/* App shell: the frame (Sidebar / BottomNav / the page's top bar) lays itself out; this file only
+   places the home page's blocks. The rhythm comes from Page.Body, the tiles from Page.Grid. */
 
 /* A list row: the text at the start, the meta (time, sum) at the end. */
 .row {

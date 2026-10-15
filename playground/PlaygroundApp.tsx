@@ -7,7 +7,7 @@ import { PlaygroundThemeProvider } from "./components/PlaygroundTheme";
 import { PlaygroundLayout } from "./PlaygroundLayout";
 import { type PageDef, PLAYGROUND_INTRO, PLAYGROUND_PAGES } from "./playgroundPages";
 
-function PageContent({ page }: { page: PageDef }) {
+function RoutedPage({ page }: { page: PageDef }) {
   if ("component" in page) return <ComponentPage page={page.component} />;
   const { Page } = page;
   return <Page />;
@@ -17,7 +17,7 @@ function PageContent({ page }: { page: PageDef }) {
 function SegmentRoute() {
   const { segment } = useParams();
   const page = PLAYGROUND_PAGES.find((entry) => entry.segment === segment && segment !== "");
-  return page ? <PageContent key={page.segment} page={page} /> : <Navigate to="/" replace />;
+  return page ? <RoutedPage key={page.segment} page={page} /> : <Navigate to="/" replace />;
 }
 
 export function PlaygroundApp() {
@@ -27,7 +27,7 @@ export function PlaygroundApp() {
         <NotificationProvider>
           <Routes>
             <Route path="/" element={<PlaygroundLayout />}>
-              <Route index element={<PageContent page={PLAYGROUND_INTRO} />} />
+              <Route index element={<RoutedPage page={PLAYGROUND_INTRO} />} />
               <Route path=":segment" element={<SegmentRoute />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>

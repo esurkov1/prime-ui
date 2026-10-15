@@ -1,5 +1,5 @@
 /* Kanban board: a work screen — the header carries the title and the tools, the page fills the app
-   panel (`AppShell.Root fillViewport` + `PageContent.Root fill`) and the board or the list takes
+   panel (`AppShell.Root fillViewport` + `Page.Root fill`) and the board or the list takes
    the free height; every column scrolls inside the board, never the page. */
 
 /* Company cell: the name over the deal id (the column's `minWidth` keeps it on its lines). */

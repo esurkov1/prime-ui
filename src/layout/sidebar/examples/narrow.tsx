@@ -1,5 +1,5 @@
-/** Below 768px the rail leaves the layout and slides in over the page from the menu button the header draws by itself; from 768px it is the rail again, and the button leaves — `AppShell`, `labels`. */
-import { AppHeader, AppShell, Icon, Sidebar } from "prime-ui-kit";
+/** Below 768px the rail leaves the layout and slides in over the page from the menu button the page top bar draws by itself; from 768px it is the rail again, and the button leaves — `AppShell`, `labels`. */
+import { AppShell, Icon, Page, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -43,12 +43,15 @@ export default function SidebarNarrowExample() {
             </Sidebar.Content>
           </Sidebar.Root>
         </AppShell.Nav>
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.Title>Сделки</AppHeader.Title>
-          </AppHeader.Start>
-        </AppHeader.Root>
-        <AppShell.Main />
+        <AppShell.Main>
+          <Page.Root>
+            <Page.TopBar>
+              <Page.Header>
+                <Page.Title>Сделки</Page.Title>
+              </Page.Header>
+            </Page.TopBar>
+          </Page.Root>
+        </AppShell.Main>
       </AppShell.Root>
     </div>
   );

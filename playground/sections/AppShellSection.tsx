@@ -8,7 +8,7 @@ export const page: ComponentPageConfig = {
     segment: "app-shell",
     label: "App Shell",
     summary: "Каркас приложения: рельс навигации и панель контента",
-    keywords: ["каркас", "оболочка", "layout", "nav", "header", "main", "footer", "fillViewport"],
+    keywords: ["каркас", "оболочка", "layout", "nav", "main", "footer", "fillViewport"],
     icon: LayoutTemplate,
     order: 1,
   },
@@ -17,18 +17,12 @@ export const page: ComponentPageConfig = {
   title: "AppShell",
   kind: "layout",
   description:
-    "Каркас приложения: колонка навигации на холсте и панель содержимого на поверхности, с местом для AppHeader и прокручиваемым main.",
+    "Каркас приложения — навигация и страница: колонка навигации на холсте, панель со страницей в прокручиваемом main и нижняя полоса телефона.",
   examples: [
     {
       slot: "overview",
       description:
-        "Каркас приложения: Sidebar в колонке навигации, заголовок страницы и её действие в AppHeader, страница в main; прокручивается только main — `fillViewport`.",
-    },
-    {
-      scenario: "contained",
-      title: "Колонка для чтения",
-      description:
-        "Оболочка без навигации, main которой — колонка по центру с ограничением для длинных текстов — `contentWidth`.",
+        "Каркас приложения: Sidebar в колонке навигации, страница в main с заголовком и действием в своей верхней полосе; прокручивается только main — `fillViewport`.",
     },
     {
       scenario: "footer",
@@ -40,12 +34,12 @@ export const page: ComponentPageConfig = {
       scenario: "template",
       title: "Шаблон",
       description:
-        "Root, навигация, шапка и main одним компонентом; main прокручивается наверх при каждой смене страницы — `AppShell.Template`, `scrollResetKey`.",
+        "Root, навигация, main и нижняя полоса одним компонентом; main прокручивается наверх при каждой смене страницы — `AppShell.Template`, `scrollResetKey`.",
     },
     {
       slot: "screen",
       description:
-        "Каркас приложения для компьютера и телефона: боковая панель на широком экране, нижняя панель разделов на телефоне, чья кнопка «Ещё» открывает боковую панель, шапка с кнопкой меню, которую она рисует сама, заголовком страницы и строкой данных и страница, которая сменяется вместе с разделом — `fillViewport`, `scrollResetKey`, `useAppShellNav`.",
+        "Каркас приложения для компьютера и телефона: боковая панель на широком экране, нижняя панель разделов на телефоне, чья кнопка «Ещё» открывает боковую панель, верхняя полоса страницы с кнопкой меню, которую она рисует сама, заголовком страницы и строкой данных и страница, которая сменяется вместе с разделом — `fillViewport`, `scrollResetKey`, `useAppShellNav`.",
     },
   ],
   api,

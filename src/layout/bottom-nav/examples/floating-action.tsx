@@ -1,14 +1,5 @@
 /** A round action beside the glass capsule for the screen's main action, with labels or icons alone — `BottomNav.Action`, `floating`. */
-import {
-  AppHeader,
-  AppShell,
-  Avatar,
-  BottomNav,
-  Icon,
-  PageContent,
-  Switch,
-  Typography,
-} from "prime-ui-kit";
+import { AppShell, Avatar, BottomNav, Icon, Page, Switch, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -37,14 +28,14 @@ export default function BottomNavFloatingActionExample() {
   return (
     <div className={styles.phone}>
       <AppShell.Root fillViewport className={styles.shell}>
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.Title>Клиенты</AppHeader.Title>
-          </AppHeader.Start>
-        </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Root as="section">
-            <PageContent.Body>
+          <Page.Root>
+            <Page.TopBar>
+              <Page.Header>
+                <Page.Title>Клиенты</Page.Title>
+              </Page.Header>
+            </Page.TopBar>
+            <Page.Body>
               <div className={styles.options}>
                 <Switch.Root checked={iconOnly} onCheckedChange={setIconOnly}>
                   <Switch.Label>Только иконки</Switch.Label>
@@ -63,8 +54,8 @@ export default function BottomNavFloatingActionExample() {
                   </div>
                 </div>
               ))}
-            </PageContent.Body>
-          </PageContent.Root>
+            </Page.Body>
+          </Page.Root>
         </AppShell.Main>
         <AppShell.Footer>
           <BottomNav.Root floating iconOnly={iconOnly}>

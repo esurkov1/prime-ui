@@ -483,38 +483,6 @@ export {
   NotificationProvider,
   useNotifications,
 } from "./notification/NotificationStore";
-export type {
-  PageContentActionsProps,
-  PageContentBackButtonProps,
-  PageContentBodyProps,
-  PageContentCellProps,
-  PageContentCellRows,
-  PageContentCellSpan,
-  PageContentDescriptionMeasure,
-  PageContentDescriptionProps,
-  PageContentGridProps,
-  PageContentHeaderProps,
-  PageContentLabels,
-  PageContentMaxWidth,
-  PageContentPanelKind,
-  PageContentPanelProps,
-  PageContentRootAs,
-  PageContentRootProps,
-  PageContentSectionLayout,
-  PageContentSectionProps,
-  PageContentSplitProps,
-  PageContentTitleProps,
-} from "./page-content/PageContent";
-export { PageContent } from "./page-content/PageContent";
-export type {
-  PageToolbarActionsProps,
-  PageToolbarChipsProps,
-  PageToolbarRootProps,
-  PageToolbarSectionsProps,
-  PageToolbarToolsProps,
-  PageToolbarViewProps,
-} from "./page-toolbar/PageToolbar";
-export { PageToolbar } from "./page-toolbar/PageToolbar";
 export type { PaginationLabels, PaginationProps } from "./pagination/Pagination";
 export { Pagination } from "./pagination/Pagination";
 export type {

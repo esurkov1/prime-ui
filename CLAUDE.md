@@ -232,7 +232,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | list items that glide to a new order | `src/internal/useFlipList` (Dnd, ChatList, Kanban) |
 | a row or a card that opens as a whole while its controls stay theirs | `src/internal/rowLink` (`opensRow`, `rowLink.module.css` `.host`) |
 | loading more at the end of a list's own scroller | `src/hooks/useLoadMore` |
-| a page panel: sections, filter + search, view, primary action, chips | `PageToolbar` |
+| a page's top: title, actions, tools (sections, filter + search, view, primary action, chips) | `Page` (`Page.TopBar`, `Page.Header`, `Page.Toolbar`) |
 | a swap between states of a region (loading / data / empty / error, another record) | `Crossfade` (public) or `src/internal/RegionSwap` inside a component (`<RegionSwap state>`; `useSwapIn(state)` where the states cannot be laid over each other: a table body, a button's text); loading state is a `Skeleton` |
 | a switcher row (Tabs, SegmentedControl, ButtonGroup, BottomNav) and its sliding indicator | `src/internal/SwitcherScroller` (the sideways scroller every switcher sits on) + `src/internal/selectionIndicator` (`placeIndicator`, `revealInScroller`) |
 | an element's size as state, or a re-layout when it resizes | `src/hooks/useElementSize` (`useElementSize`, `useResizeEffect`) |
@@ -246,7 +246,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | roving arrow-key focus | `src/internal/rovingFocus.ts` (`rovingIndex`, `gridIndex`) |
 | selection of a list by click, Shift+click and drag-paint (rows, messages) | `src/internal/useRangeSelection` (DataTable, `Chat.Messages`) |
 | a long list of rows of measured height rendered only in view | `src/hooks/useVirtualRows` (Gantt, Chat, and `rowGaps` spacers for rows in flow: DataTable body, TagSelect options) — never an own windowing |
-| a surface that sticks to the start edge of its scroller | `src/internal/sticky` (`stickySurfaceClass`, `--sticky-bg`; AppHeader, DataTable head, Gantt) |
+| a surface that sticks to the start edge of its scroller | `src/internal/sticky` (`stickySurfaceClass`, `--sticky-bg`; Page.TopBar, DataTable head, Gantt) |
 | a disabled group of controls (`Fieldset disabled`) | `src/internal/disabledContext` (`useInheritedDisabled`, `DisabledProvider`) — a control with a `disabled` prop reads it |
 | a round icon button that is the disk itself (play, download, cancel / retry on media) | `Button` `shape="circle"` (`variant="shade"` over media; `asChild` for a link); its `progress` is the ring. A disk over media that is not a control (the play mark of a video frame) — `src/internal/mediaDisk` (`MediaPlayMark`, `mediaDiskClass`), the same look |
 | a progress ring, an indeterminate turning arc | `ProgressCircle` (`value` / `null`, `spin`), `Spinner`, or the circle Button's `progress` — all drawn from `src/internal/ring` (`Ring`, `weight` `data` / `line`, `live` for a per-frame `--ring-value`); never an own ring, conic mask or turning keyframes |
@@ -357,16 +357,17 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   `SKILL/composition.md` (the screens index and a section per screen).
 - **Nothing is lost when moving**: before a capability leaves a screen, it is shown in the component's
   examples (add or extend one there in the same change).
-- **The title lives in the page's header.** Every app screen titles itself in its `AppHeader`:
-  `AppHeader.Title` (the page's `<h1>`) with an `AppHeader.Description` that carries data (a path — `Breadcrumb`
-  + `AppHeader.Separator` — before it on a nested record), the page's tools in `AppHeader.Tools` as
-  a `PageToolbar.Root` (its own search and filters, sections, view, the primary action), its other
-  buttons in `AppHeader.Actions`; main has no `PageContent.Header`. The header row belongs to the
-  page: nothing app-wide in it (no global search, no notifications). Only a document page (settings,
-  a long form, an article or help) has its big title in `PageContent.Header` in main, and then its
-  header has no title. Never two titles; never no h1. A screen renders its own `AppHeader.Root` and
-  its body (the app-shell screen renders the whole frame); the docs contract checks one h1 and that
-  only allow-listed document screens use `PageContent.Header`.
+- **The app is navigation and the page.** `AppShell` holds the Sidebar, `AppShell.Main` and the
+  phone footer; there is no app-wide header and no global search — everything at the top belongs to
+  the page. A screen renders one `Page.Root` with its own `Page.TopBar` and body (the app-shell
+  screen renders the whole frame). `Page.Title` is the page's only `<h1>`, with a
+  `Page.Description` that carries data and, on a nested record, a `Breadcrumb.Root` path before it.
+  Work screens (lists, boards, chats) put `Page.Header` + `Page.Toolbar` (the page's own search and
+  filters, sections, view, the primary action) inside `Page.TopBar`, other buttons in `Page.Actions`;
+  document pages (settings, long forms) put `Page.Header` in the flow, optionally under a
+  `Page.TopBar collapse` with a path; overviews (dashboards) put the page's actions in a
+  `Page.TopBar collapse` and the titled `Page.Header` in the flow. Never two titles; never no h1 —
+  the docs contract checks one `Page.Title` and one h1 per screen.
 
 ## 5. Playground page
 
@@ -406,8 +407,8 @@ export const page: ComponentPageConfig = {
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   ColorField, FileUpload; overlay — Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu,
   Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination, List; composite — DataTable, FieldList, Kanban,
-  Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Chat, ChatList, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
-  PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
+  Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Chat, ChatList, Message, ChartFrame; layout — AppShell, Page, Sidebar, BottomNav,
+  ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·
   `sizes` «Размеры» · `states` «Состояния» · `with-icon` «С иконкой» · `structure` «Структура» ·
   `group` «Группа» · `orientation` «Ориентация» · `placement` «Расположение» · `overflow`
@@ -418,7 +419,7 @@ export const page: ComponentPageConfig = {
   one example; no `surfaces` example (the playground's surface switch checks contrast). `screen` is
   always last: a whole working page built around the component (field, overlay, navigation, composite
   and layout kinds), full width in an app-panel stage; a screen that fills the panel's height
-  (`PageContent.Root fill`, `AppShell.Root fillViewport` at its top level) gets a viewport-high stage.
+  (`Page.Root fill`, `AppShell.Root fillViewport` at its top level) gets a viewport-high stage.
 - `KIND_SLOTS` fixes which slots a kind allows, their order, the position of component-specific
   scenarios and each slot's preview layout. Required: `overview` everywhere; `states` for controls;
   `sizes`, `states`, `validation`, `in-form` for fields; `narrow` for composites. Prop-driven
@@ -540,7 +541,7 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 |---|---|
 | `tokens/` | `primitives.ts` → `semantic.ts` (the light theme) → `themes/dark.ts` (the dark overrides); `layers.ts` (the surface ladder), `hues.ts` (the palette hues), `naming.ts`; `bun run tokens:build` generates `src/styles/{tokens,theme-light,theme-dark}.css` and `src/internal/tokenDefaults.ts` (never edit those by hand) |
 | `src/components/<dir>/` | one component: `X.tsx`, `X.module.css`, `X.test.tsx`, `api.ts`, `COMPONENT.md`, `examples/` |
-| `src/layout/` | AppShell, AppHeader, Sidebar, BottomNav (same structure) |
+| `src/layout/` | AppShell, Sidebar, BottomNav, Page (same structure) |
 | `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`, `compactTier`, the named tier mappings), contexts (`ControlSizeContext` with `useHostTier`, `AnchorRectContext`, `disabledContext` — a disabled `Fieldset`), `context` (`createComponentContext`), `parts` (parts by element type, text parts), `Portal`, `polymorphic` (the ref type of an `as` element), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`, `useOpenState`, `useAnchorName`, `useContainScroll`, `tooltipSurface`), `MenuGroup`, `FieldFrame`, `fieldCell` (a FieldList cell names the field inside by its column heading), `FieldCommit`, `FieldAction`, `ChoiceField`, `fieldClasses`, `iconLayout` (the leading / trailing icon split of Button and ButtonGroup), `swatch`, `textFormatting` + `textFormattingToolbar` (Markdown formatting of a text field: Composer, Textarea), `HighlightMatch`, `formatLabel`, `listbox` (the listbox registry, keyboard and typeahead: Select, TagSelect, CommandMenu), `rovingFocus`, `useRangeSelection` (click / Shift / drag-paint selection of a list: DataTable rows, chat messages), `edgeAutoScroll` (scrolling near an edge during a drag: `createEdgeAutoScroll`), `scrollAncestors` (the scrollable boxes around an element), `useFlipList` (list items glide to a new order: Dnd, ChatList, Kanban), `swallowNextClick` (the click that ends a drag is no press), `longPress` (`useLongPress` and the touch gesture thresholds), `rowLink` (a row or a card that opens as a whole: its controls stay theirs), `nodeText` (the plain text of a node tree), `messageList` (the contract between `Chat.Messages` and its messages: selection store, row kinds, jumps), `messagePart` (the contract between a message and its content parts), `palette` (`hueOf`, a hue stable per id), `sticky` (`stickySurfaceClass` for a block-start sticky surface, which lets go on a short screen), `selectionIndicator` (the sliding indicator of a switcher, `revealInScroller`), `SwitcherScroller` (the one row of every switcher), `richText` (the Markdown subset of a chat as React elements), `mediaPlayer` (the shared API and parts of VoicePlayer and VideoNote), `transfer` + `transferDisk` (the transfer of content, either way), `ring` (the one ring drawing: ProgressCircle, Spinner, the circle Button), `mediaDisk` (the still disk over media: a video's play mark), `glyphSwap` (a glyph cross-fade), `mediaPill` (the pill over media), `mediaSession` (one sound at a time), `audio` (Web Audio constructor, waveform length and peak scaling: the recorder, `getWaveform`), `transcript` (the transcript of a voice / video message), `readReceipts`, `usePendingChanges` (the pending state of a promise-returning handler), `leaveInPlace`, `partPresence` (an optional part enters and closes up in place), `listPresence` (keyed rows enter and close up: ChatList, List), `RegionSwap` (the region swap: Crossfade, swapping regions inside components), `motionTiming` (motion tokens for JS: durations, timeouts, WAAPI timing), `progressSegments` + `ProgressLegend` (ProgressBar / ProgressCircle segments), `fileFormat`, `fileName`, `mediaKind`, `attachmentTile` + `useNearView` (FileUpload / Gallery tiles), `Disclosure` + `disclosure` (a part that folds open and closed), `CheckMark`, `surfaceDepth` (the depth ladder), `imageSlot`, `fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`), `MorphText`, `RollingNumber`, `ChartTooltip` (the chart tooltip: ChartFrame, Sparkline), `RowAction` (the icon action beside a row: DescriptionList, Sidebar), `slot`, `cx`, `data-attributes`, `interactiveElement` (one element that renders as a button, a link or a slot), `labels` (`useLabels`: `labels` defaults with overrides), `hasContent` (whether a node draws something), `namedRole` (the role of a generic element the consumer names), `formatNumber` (the default number display), `controlValue` (`setControlValue`: write a value into a native control as typing does), `highlightTsx` (the TS / TSX tokenizer of CodeBlock), `tokenDefaults` (generated token values in JS, the defaults of `readCssLengthPx`); CSS: `overlayMotion`, `enterMotion`, `press` (press feedback), `chartTooltip`, `swapMotion`, `floatingSurface`, `sheet`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole`, `touchTarget`, `sticky`, `hairline` (the faint zone line of a surface), `statusLoop` (status loops — recording, live, typing — and the blink of a pointed element) |
 | `src/hooks/` | `useModalLayer`, `useInertSiblings`, `useScrollLock`, `usePresence`, `usePosition`, `useControllableState`, `useMergedRefs`, `useImageStatus`, `useEnterConfirm`, `useEdgeOverflow`, `useElementSize` (an element's size as state, `useResizeEffect` for a host's own re-layout), `useScrollRegion` (what a ScrollContainer lets its content ask for), `useMediaQuery`, `useSwipeDismiss`, `useVirtualRows` (rows of measured height rendered only in view: Gantt, Chat, DataTable, TagSelect), `useLoadMore` (load more at the end of a list's own scroller), `useTokenValue` (public), `useUploadQueue` (public: the upload queue of FileUpload), `useStableValue` (a value that keeps its identity while its content is equal), `useDraft` (the draft text of an input bound to a value, committed by the host), `breakpoints` (the media queries the kit reads in TypeScript), `floatingPosition` (the placement geometry of `usePosition`: side, align, flip) |
 | `src/icons/` | public `<Icon name>` registry and `createIcon`; `glyphs/` (Lucide drawings, one gesture each), `glyph.tsx` (`defineGlyph`), `glyphMotion.module.css` (gesture vocabulary), `iconPlay.ts` (when gestures play) — the only icon source for components; notices in `THIRD_PARTY_NOTICES` |
@@ -555,7 +556,7 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component, incl. the render smoke test of every screen (shared helpers in `contract-utils.ts`) |
 | `src/test/*.test.ts(x)`, `src/styles/*.test.ts` | the guards of the mechanical rules: `api-types` (api.ts against the types), `a11y-examples` (every example rendered: named roles, IDREFs, accessible names), `overlayConformance` and `field-conformance` (shared behaviour suites), `refs` (paths, `§` and `bun run` references, this map), `source-rules`, `unused-exports`, `internal-coverage` (every runtime internal has a test), `glyph-swap`, `test-hygiene`; CSS: `literals`, `tokens`, `donor-override`, `touch`, `motion-perf`, `state-motion`, `sticky`, `text-role`, `shared-css`, `a11y-css`, `icon-size`, `css-modules`, `scroll` |
 | `src/test/part-refs.test.tsx` | refs of every part listed in the generated `part-refs.generated.ts`: a typed check, runtime cases for merged or redirected refs |
-| `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `cheatsheet` (read first), `ux` (what goes on a screen: brief, data shape → layout, label economy, copy, friction), `choosing`, `components` (generated index), `composition` (screen assembly guide and the screens index), `layouts` (the app frame), `responsive` (narrow screens, touch, `PageToolbar`), `api-contract`, `foundations`, `motion`, `anti-slop`, `checklist` |
+| `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `cheatsheet` (read first), `ux` (what goes on a screen: brief, data shape → layout, label economy, copy, friction), `choosing`, `components` (generated index), `composition` (screen assembly guide and the screens index), `layouts` (the app frame), `responsive` (narrow screens, touch, `Page.Toolbar`), `api-contract`, `foundations`, `motion`, `anti-slop`, `checklist` |
 | `evals/prime-ui-kit/` | skill evals (skill-creator `evals.json`): prompts with checkable expectations for the UX bugs the skill must not repeat; `files/` holds the screens the «change an existing screen» cases start from. Not shipped |
 | `src/<base>/<dir>/examples/screen.tsx` | whole screens: the `screen` example of a component (+ `screen.module.css`), indexed with their rules in `SKILL/composition.md`; the playground shows them in `playground/components/ScreenStage.tsx` |
 | `playground/composition/CompositionPage.tsx` | the «Принципы» guidance page (in the foundations group): how a screen is assembled, links to every screen |

@@ -82,10 +82,10 @@
     {
       "id": 7,
       "prompt": "Сделай страницу поиска клиентов: поле поиска, под ним таблица результатов. Сервера пока нет — сымитируй запрос задержкой в полсекунды.",
-      "expected_output": "SmartFilter with fields={[]} in the page's PageToolbar, a DataTable with loading; the simulated request is cancelled when the query changes, so a slow answer never replaces a newer one.",
+      "expected_output": "SmartFilter with fields={[]} in the page's Page.Toolbar, a DataTable with loading; the simulated request is cancelled when the query changes, so a slow answer never replaces a newer one.",
       "files": [],
       "expectations": [
-        "The search is a SmartFilter (fields={[]}) in the page's PageToolbar in AppHeader.Tools, not a bare Input above the table",
+        "The search is a SmartFilter (fields={[]}) in the page's Page.Toolbar inside Page.TopBar, not a bare Input above the table",
         "The simulated request (setTimeout) is cleared, or its answer dropped, when the query changes again — in the effect's cleanup or through an AbortController",
         "While a request runs the table keeps its rows with loading, and an empty result offers to reset the search"
       ]
@@ -93,13 +93,13 @@
     {
       "id": 8,
       "prompt": "Собери каркас приложения на prime-ui-kit: боковая навигация (Сделки, Клиенты, Задачи, Настройки), на телефоне навигация открывается кнопкой меню, и страница «Сделки» с заголовком и кнопкой «Новая сделка».",
-      "expected_output": "A root layout with AppShell, the Sidebar in AppShell.Nav and the page in AppShell.Main; the page renders its own AppHeader.Root; no menu state and no hand-wired AppHeader.MenuButton — the header draws the menu button while the Sidebar is off-canvas.",
+      "expected_output": "A root layout with AppShell, the Sidebar in AppShell.Nav and the page in AppShell.Main; the page renders its own Page.Root with a Page.TopBar; no menu state and no hand-made menu button — Page.TopBar draws the menu button while the Sidebar is off-canvas.",
       "files": [],
       "expectations": [
-        "The frame holds no open / onOpenChange state for the Sidebar and no hand-wired AppHeader.MenuButton with aria-expanded or onClick",
-        "The «Сделки» page renders its own AppHeader.Root with AppHeader.Title; the frame has no header content of its own",
+        "The frame holds no open / onOpenChange state for the Sidebar and no hand-made menu button with aria-expanded or onClick",
+        "The «Сделки» page renders its own Page.Root with Page.Title in Page.Header inside Page.TopBar; the frame has no header of its own",
         "Every Sidebar.Item is a link (href or asChild) with a Sidebar.ItemIcon, and current marks the open page",
-        "«Новая сделка» is the page's one primary action in its header (PageToolbar.Actions or AppHeader.Actions)"
+        "«Новая сделка» is the page's one primary action in its top bar (Page.ToolbarActions or Page.Actions)"
       ]
     }
   ]

@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "AppShell.Root",
-      en: "`ref` → `HTMLDivElement`. Grid of the nav column and the content panel (the page itself); every child but `AppShell.Nav` goes into the panel. Owns the navigation its Sidebar publishes (`useAppShellNav`) and the header row an `AppHeader.Root` anywhere in it renders in.",
-      ru: "Сетка: колонка навигации и панель содержимого (сама страница); всё, кроме `AppShell.Nav`, попадает в панель. Хранит навигацию, которую публикует Sidebar (`useAppShellNav`), и строку шапки, где рендерится `AppHeader.Root` из любого места каркаса.",
+      en: "`ref` → `HTMLDivElement`. Grid of the nav column and the content panel (the page itself); every child but `AppShell.Nav` goes into the panel. Owns the navigation its Sidebar publishes (`useAppShellNav`).",
+      ru: "Сетка: колонка навигации и панель содержимого (сама страница); всё, кроме `AppShell.Nav`, попадает в панель. Хранит навигацию, которую публикует Sidebar (`useAppShellNav`).",
       props: [
         {
           name: "fillViewport",
@@ -17,8 +17,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (Nav, `AppHeader.Root`, Main, Footer), `className` and the other div attributes.",
-          ru: "`children` (Nav, `AppHeader.Root`, Main, Footer), `className` и остальные атрибуты div.",
+          en: "`children` (Nav, Main, Footer), `className` and the other div attributes.",
+          ru: "`children` (Nav, Main, Footer), `className` и остальные атрибуты div.",
         },
       ],
     },
@@ -37,16 +37,9 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Main",
-      en: "`ref` → `HTMLElement`. The `<main>` with the canonical gutters: a vertical `ScrollContainer`.",
-      ru: "`<main>` с отступами кита — вертикальный `ScrollContainer`.",
+      en: "`ref` → `HTMLElement`. The `<main>` where the page renders: a vertical `ScrollContainer` that hands `Page.Root` the gutters and top air (`--page-gutter`, `--page-top`).",
+      ru: "`<main>`, где рендерится страница: вертикальный `ScrollContainer`, который передаёт `Page.Root` поля и верхний воздух (`--page-gutter`, `--page-top`).",
       props: [
-        {
-          name: "contentWidth",
-          type: '"contained" | "full"',
-          default: '"full"',
-          en: "`full` — the whole panel with gutters; `contained` — a centred column up to `--prime-layout-content-max-width`.",
-          ru: "`full` — вся панель с отступами; `contained` — колонка по центру до `--prime-layout-content-max-width`.",
-        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
@@ -70,8 +63,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Template",
-      en: "`ref` → the `<main>`. Root + Nav + the header + Main + Footer in one; main scrolls to the top when `scrollResetKey` changes.",
-      ru: "Root, Nav, шапка, Main и Footer одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
+      en: "`ref` → the `<main>`. Root + Nav + Main + Footer in one; main scrolls to the top when `scrollResetKey` changes.",
+      ru: "Root, Nav, Main и Footer одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
       props: [
         {
           name: "fillViewport",
@@ -87,12 +80,6 @@ export const api: ComponentApi = {
           ru: "Содержимое колонки навигации; без него панель на всю ширину.",
         },
         {
-          name: "header",
-          type: "ReactNode",
-          en: "The default header row, an `AppHeader.Root`: a page that renders its own header replaces it while that page is on screen.",
-          ru: "Шапка по умолчанию — `AppHeader.Root`: страница со своей шапкой заменяет её, пока эта страница на экране.",
-        },
-        {
           name: "footer",
           type: "ReactNode",
           en: "Footer content (`BottomNav`); no footer when omitted.",
@@ -101,8 +88,8 @@ export const api: ComponentApi = {
         {
           name: "mainProps",
           type: 'Omit<AppShellMainProps, "children">',
-          en: "Props for Main (e.g. `contentWidth`).",
-          ru: "Пропсы Main (например `contentWidth`).",
+          en: "Props for Main (`id`, `tabIndex` for a skip link).",
+          ru: "Пропсы Main (`id`, `tabIndex` для ссылки пропуска).",
         },
         {
           name: "scrollResetKey",
@@ -113,8 +100,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Page content inside Main.",
-          ru: "Содержимое страницы внутри Main.",
+          en: "The page inside Main (`Page.Root`).",
+          ru: "Страница внутри Main (`Page.Root`).",
         },
         {
           name: "…rest",
@@ -183,12 +170,12 @@ export const api: ComponentApi = {
     keyboard: [],
     aria: [
       {
-        en: "Main is the `<main>` landmark; the banner comes from AppHeader (`<header>`), the navigation landmarks from Sidebar and BottomNav (`<nav>`).",
-        ru: "Main — ориентир `<main>`; шапку `<header>` даёт AppHeader, ориентиры навигации — Sidebar и BottomNav (`<nav>`).",
+        en: "Main is the `<main>` landmark; the navigation landmarks come from Sidebar and BottomNav (`<nav>`). The page's top bar is a `<header>` inside main, not a banner.",
+        ru: "Main — ориентир `<main>`; ориентиры навигации — Sidebar и BottomNav (`<nav>`). Верхняя полоса страницы — `<header>` внутри main, не ориентир banner.",
       },
       {
-        en: "One `<h1>` per page: `AppHeader.Title` on app pages, `PageContent.Title` on a document page (whose header then has no title).",
-        ru: "Один `<h1>` на странице: `AppHeader.Title` на страницах приложения, `PageContent.Title` на странице-документе (тогда в шапке нет заголовка).",
+        en: "One `<h1>` per page: its `Page.Title`, in the top bar or in the flow.",
+        ru: "Один `<h1>` на странице — её `Page.Title`, в верхней полосе или в потоке.",
       },
     ],
   },

@@ -107,7 +107,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (a `PageContent.BackButton`, an `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (a `Page.BackButton`, an `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`. |
 
 ### Chat.Title
 `ref` → `HTMLHeadingElement`. Who the chat is with, one line that ellipsizes; it also names the message list (`aria-labelledby`).
@@ -337,7 +337,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | [states.tsx](examples/states.tsx) | The first load of a conversation: bubble-shaped placeholders on both sides stand in the list's place, then cross-fade into the messages — `loading`. |
 | [controlled.tsx](examples/controlled.tsx) | Selection mode owned by the screen: the Select item of a message's menu starts it, a check stands beside every message, a press toggles one while the others step back, the bar counts and acts, Escape leaves — `selected`, `onSelectedChange`, `Chat.SelectionBar`. |
 | [narrow.tsx](examples/narrow.tsx) | At phone width the header keeps its actions and lets the title ellipsize, bubbles take up to 85% of the chat, long links wrap and an album keeps its layout — `Chat.Root`, `Chat.Header`, `Chat.Messages`, `Chat.Footer`. |
-| [screen.tsx](examples/screen.tsx) | A support messenger as a work screen: the title and the unread count in the app header, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`. |
+| [screen.tsx](examples/screen.tsx) | A support messenger as a work screen: the title and the unread count in its top bar, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`. |
 
 ## Mistakes
 - A header, a search bar and a scroller of your own around the messages → `Chat.Header`, `Chat.Search`, `Chat.Messages`: the chat wires typing, search, jumps and selection between them.

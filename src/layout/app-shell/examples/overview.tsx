@@ -1,5 +1,5 @@
-/** The app frame: Sidebar in the nav column, the page title and its action in the AppHeader, the page in main; only main scrolls — `fillViewport`. */
-import { AppHeader, AppShell, Button, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
+/** The app frame: Sidebar in the nav column, the page in main with its title and action in its top bar; only main scrolls — `fillViewport`. */
+import { AppShell, Button, Icon, Page, Sidebar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -35,30 +35,28 @@ export default function AppShellOverviewExample() {
             </Sidebar.Content>
           </Sidebar.Root>
         </AppShell.Nav>
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.Title>
-              Обзор
-              <AppHeader.Description>Октябрь · 37 сделок в работе</AppHeader.Description>
-            </AppHeader.Title>
-          </AppHeader.Start>
-          <AppHeader.Actions>
-            <Button.Root>
-              <Button.Icon>
-                <Icon name="action.add" />
-              </Button.Icon>
-              Новая сделка
-            </Button.Root>
-          </AppHeader.Actions>
-        </AppHeader.Root>
         <AppShell.Main>
-          <PageContent.Root as="section">
-            <PageContent.Body>
+          <Page.Root>
+            <Page.TopBar>
+              <Page.Header>
+                <Page.Title>Обзор</Page.Title>
+                <Page.Description>Октябрь · 37 сделок в работе</Page.Description>
+                <Page.Actions>
+                  <Button.Root>
+                    <Button.Icon>
+                      <Icon name="action.add" />
+                    </Button.Icon>
+                    Новая сделка
+                  </Button.Root>
+                </Page.Actions>
+              </Page.Header>
+            </Page.TopBar>
+            <Page.Body>
               <Typography variant="body-m" tone="secondary">
                 Выручка за месяц — 4,8 млн ₽, на 12% больше, чем в сентябре.
               </Typography>
-            </PageContent.Body>
-          </PageContent.Root>
+            </Page.Body>
+          </Page.Root>
         </AppShell.Main>
       </AppShell.Root>
     </div>

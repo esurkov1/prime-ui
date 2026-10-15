@@ -5,34 +5,34 @@
 import * as React from "react";
 
 import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
-import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
+import { Page } from "@/layout/page/Page";
 
-/** Page shell: the h1, its lead and a column of blocks. */
+import { PlaygroundTopBar } from "./PlaygroundChrome";
+
+/** Page shell: the site's top bar, the h1 with its lead in the flow and a column of blocks. */
 export function DocPage({
   title,
   description,
-  measure = "readable",
   children,
 }: {
   title: string;
   description: React.ReactNode;
-  /** `full` lets the lead run the page width (component pages). */
-  measure?: "readable" | "full";
   children: React.ReactNode;
 }) {
   return (
-    <PageContent.Root as="section">
-      <PageContent.Header>
-        <PageContent.Title>{title}</PageContent.Title>
-        <PageContent.Description measure={measure}>{description}</PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>{children}</PageContent.Body>
-    </PageContent.Root>
+    <Page.Root>
+      <PlaygroundTopBar />
+      <Page.Header>
+        <Page.Title>{title}</Page.Title>
+        <Page.Description>{description}</Page.Description>
+      </Page.Header>
+      <Page.Body>{children}</Page.Body>
+    </Page.Root>
   );
 }
 
-/** One block of a page: a `PageContent.Section` — title (h2), optional lead, content. */
+/** One block of a page: a `Page.Section` — title (h2), optional lead, content. */
 export function DocBlock({
   title,
   description,
@@ -45,9 +45,9 @@ export function DocBlock({
   id?: string;
 }) {
   return (
-    <PageContent.Section id={id} label={title} description={description}>
+    <Page.Section id={id} label={title} description={description}>
       {children}
-    </PageContent.Section>
+    </Page.Section>
   );
 }
 

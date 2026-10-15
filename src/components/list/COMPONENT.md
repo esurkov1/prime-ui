@@ -6,7 +6,7 @@
 > A selectable navigation list of rows: the master half of a list + detail screen (tickets, mail, records).
 
 ## When to use
-- The list side of a list + detail screen (`PageContent.Split` → `PageContent.Panel kind="list"`): tickets, letters, invoices worked through one by one; the open one is `current`.
+- The list side of a list + detail screen (`Page.Split` → `Page.List`): tickets, letters, invoices worked through one by one; the open one is `current`.
 - A short column of records that each open something — a page (`href`, `asChild` with a router link) or a detail pane (`onClick`).
 - A short list the team puts in order (funnel stages, queues, priorities) — `onReorder`, a `value` per item.
 
@@ -145,7 +145,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 
 ## Layout & spacing
 - The root fills its container (`width: 100%`); rows are 4px apart, each row a full-width button with the tier radius and field padding.
-- Put the list on a surface: a `Card.Root` pane in `PageContent.Panel kind="list"`, with a `ScrollContainer` around it when it is long — the list never scrolls by itself.
+- Put the list on a surface: a `Card.Root` pane in `Page.List`, with a `ScrollContainer` around it when it is long — the list never scrolls by itself.
 - Row: leading icon · body (text over description) · trail. Beside two lines the trail stacks — meta on top, count below; beside one line they sit in a row.
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
@@ -200,4 +200,4 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 
 ## Related
 - **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`), [Avatar](../avatar/COMPONENT.md) (`List.ItemIcon` gives an avatar the row tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`)
-- **See also:** [PageContent](../page-content/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md)
+- **See also:** [Page](../../layout/page/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md)

@@ -3,11 +3,17 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { StageDepthProvider } from "@/internal/surfaceDepth";
-import { cssRules } from "@/test/css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { ExampleFrame } from "./ExampleFrame";
 
 describe("ExampleFrame", () => {
+  it("CSS: the frame is a stacking context that clips, so no example paints over the page", () => {
+    const root = cssRule("src/components/example-frame/ExampleFrame.module.css", ".root");
+    expect(cssValue(root, "isolation")).toBe("isolate");
+    expect(cssValue(root, "overflow")).toBe("hidden");
+  });
+
   it("previews children at desktop width by default", () => {
     const { container } = render(
       <ExampleFrame code="<div />">

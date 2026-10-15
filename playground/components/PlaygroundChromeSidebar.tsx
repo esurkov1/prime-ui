@@ -89,7 +89,7 @@ export type PlaygroundChromeSidebarProps = {
 
 /**
  * Playground navigation built from the kit: brand header, collapsible categories, footer (search
- * lives in the AppHeader).
+ * lives in each page's top bar).
  * The rail mode and the folded categories are uncontrolled and remembered (`persistKey`), so a
  * toggle re-renders only what reads the sidebar context — never this tree or the page.
  */
