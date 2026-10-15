@@ -299,8 +299,10 @@
   border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
 }
 
+/* `--tabs-peek` (a fraction, set on a scrolling list by `peekNextTab`) widens the minimum a little, so
+   the end edge cuts a tab through its label instead of through its empty side. */
 .root[data-orientation="horizontal"] .tab {
-  min-width: var(--tabs-item-min);
+  min-width: calc(var(--tabs-item-min) * (1 + var(--tabs-peek, 0)));
   max-width: var(--tabs-item-max);
 }
 
