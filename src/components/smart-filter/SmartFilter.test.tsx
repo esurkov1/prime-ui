@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { matchIndex } from "@/internal/HighlightMatch";
-
+import { cssRule, cssValue } from "@/test/css";
 import {
   canExcludeValue,
   matchesSmartFilter,
@@ -519,5 +519,10 @@ describe("SmartFilter range, single and grouped fields", () => {
     expect(screen.queryByRole("searchbox")).toBeNull();
     openPanel();
     expect(screen.getByRole("textbox", { name: "Сумма, от" })).toBeInTheDocument();
+  });
+
+  it("CSS: the search beside the button grows from a share of its own tier", () => {
+    const rule = cssRule("src/components/smart-filter/SmartFilter.module.css", ".search");
+    expect(cssValue(rule, "flex")).toBe("1 1 calc(var(--field-h) * 3)");
   });
 });

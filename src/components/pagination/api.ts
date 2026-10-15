@@ -56,6 +56,13 @@ export const api: ComponentApi = {
           ru: "Всегда стрелки и «текущая / всего» вместо номеров. Без него навигация на всю ширину родителя и так выглядит только уже 22rem.",
         },
         {
+          name: "align",
+          type: '"start" | "center" | "end"',
+          default: '"center"',
+          en: "Where the page numbers sit in the width the nav fills: centred under a list, `end` beside a range line (the DataTable footer). The compact view keeps its arrows at the edges.",
+          ru: "Где стоят номера страниц в ширине, которую занимает навигация: по центру под списком, `end` рядом со строкой диапазона (подвал DataTable). Компактный вид держит стрелки по краям.",
+        },
+        {
           name: "labels",
           type: "Partial<PaginationLabels>",
           en: "Built-in strings, see Labels.",

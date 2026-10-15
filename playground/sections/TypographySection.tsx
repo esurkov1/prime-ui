@@ -1,6 +1,6 @@
 /**
  * The Typography component page has no route of its own: Foundations → Typography renders it under
- * the type tokens (`ComponentPage` with this config).
+ * the type tokens (`ComponentPageBlocks` with this config, inside the article).
  */
 import { api } from "@/components/typography/api";
 

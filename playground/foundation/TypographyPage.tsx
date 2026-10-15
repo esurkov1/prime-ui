@@ -3,8 +3,9 @@ import {
   type TypographyRole,
   type TypographyWeight,
 } from "@/components/typography/Typography";
-import { ComponentPage } from "../components/ComponentPage";
+import { ComponentPageBlocks } from "../components/ComponentPage";
 import { DocBlock, DocList, DocPage } from "../components/Doc";
+import { renderInlineCode } from "../components/PlaygroundApiTable";
 import { page as typographyPage } from "../sections/TypographySection";
 import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
@@ -226,7 +227,13 @@ export default function TypographyPage() {
         </DocList>
       </DocBlock>
 
-      <ComponentPage page={typographyPage} />
+      <DocBlock
+        title={`Компонент ${typographyPage.title}`}
+        description={renderInlineCode(typographyPage.description)}
+      >
+        {null}
+      </DocBlock>
+      <ComponentPageBlocks page={typographyPage} />
     </DocPage>
   );
 }

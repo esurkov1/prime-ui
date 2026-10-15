@@ -295,6 +295,30 @@
   color: var(--prime-color-text-muted);
 }
 
+/*
+ * A stacked heading (`data-heading="stack"`: even with the buttons at their narrowest the path and
+ * the title do not share the line): the path takes a line of its own over the title, the chevron
+ * leaves, and the title and the description wrap — each keeps its words instead of a cut fragment. The
+ * measuring layout always reads the heading on one line.
+ */
+.row[data-heading="stack"]:not([data-measure]) > .heading .headingLine {
+  flex-wrap: wrap;
+  row-gap: var(--prime-space-0);
+}
+
+.row[data-heading="stack"]:not([data-measure]) > .heading .path {
+  flex: 1 0 100%;
+}
+
+.row[data-heading="stack"]:not([data-measure]) > .heading .pathSeparator {
+  display: none;
+}
+
+.row[data-heading="stack"]:not([data-measure]) > .heading :is(.barTitle, .barDescription) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 /* One action of the bar: measured whole, folded into «⋯» with `hidden`. */
 .actionItem {
   display: flex;

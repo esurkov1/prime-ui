@@ -136,8 +136,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Label · Card.Value",
-      en: "`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates) and the value (tabular, sized by the template and the card width).",
-      ru: "Текст метрики: подпись (body-s, обрезается) и значение (табличные цифры, размер по шаблону и ширине карточки).",
+      en: "`ref` → `HTMLSpanElement`. Metric text: the label (body-s; truncates, wraps in a `mini` tile and a `split` cell) and the value (tabular, sized by the template and the card width).",
+      ru: "Текст метрики: подпись (body-s; обрезается, в плитке `mini` и ячейке `split` переносится) и значение (табличные цифры, размер по шаблону и ширине карточки).",
       props: [
         {
           name: "…rest",

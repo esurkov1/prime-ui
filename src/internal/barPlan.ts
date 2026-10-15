@@ -9,7 +9,10 @@
  * - `icons-secondary` — the secondary buttons show only their icons;
  * - `icons` — the primary button too;
  * - `fold` — the secondary buttons fold into «⋯» (only when that is narrower than their icons).
- *   Past it the heading truncates.
+ *
+ * Past the last step a heading with a path stacks (`stackHeading`): the path over the title, the
+ * title and the description wrapping, so no line of it is cut to a fragment. Without a path the
+ * heading truncates.
  */
 export type BarPlan = "one" | "below" | "icons-secondary" | "icons" | "fold";
 
@@ -25,6 +28,8 @@ export type BarAction = {
 export type BarWidths = {
   /** Natural width of the heading (its widest line); 0 — none. */
   heading: number;
+  /** Whether the heading starts with a path (a Breadcrumb before the title): it can stack. */
+  path: boolean;
   /** Natural width of the tools on one line; 0 — none. */
   tools: number;
   actions: BarAction[];
@@ -71,4 +76,21 @@ export function planBar(widths: BarWidths, available: number): BarPlan {
   if (fits(icons)) return "icons";
   // «⋯» in place of a single icon button saves nothing: the button keeps its icon.
   return actionsWidth(widths, "fold") < icons ? "fold" : "icons";
+}
+
+const PLAN_STEP: Record<BarPlan, ActionStep> = {
+  one: "full",
+  below: "full",
+  "icons-secondary": "icons-secondary",
+  icons: "icons",
+  fold: "fold",
+};
+
+/** Whether the heading stacks at `plan`: it has a path and its one line still does not fit. */
+export function stackHeading(widths: BarWidths, available: number, plan: BarPlan): boolean {
+  if (!widths.path) return false;
+  const tools = plan === "one" ? widths.tools : 0;
+  return (
+    sum([widths.heading, tools, actionsWidth(widths, PLAN_STEP[plan])], widths.gap) > available
+  );
 }

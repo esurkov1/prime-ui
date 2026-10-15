@@ -17,11 +17,16 @@
   font-family: var(--prime-font-family-sans);
 }
 
+/* The title and the date share a line; on a narrow head (below 20rem, a phone card) the date takes
+   a line of its own under the title, so neither is cut. The break follows the head's width only, so
+   a date that changes while scrubbing never moves it. */
 .head {
+  container-type: inline-size;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--prime-space-3);
+  gap: var(--prime-space-0) var(--prime-space-3);
   min-width: 0;
   font-size: var(--prime-text-body-s-size);
   line-height: var(--prime-text-body-s-line-height);
@@ -38,6 +43,14 @@
 .date {
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
+}
+
+@container (max-width: 20rem) {
+  .label {
+    flex-basis: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 .valueRow {

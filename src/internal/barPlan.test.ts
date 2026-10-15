@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { type BarWidths, planBar } from "./barPlan";
+import { type BarWidths, planBar, stackHeading } from "./barPlan";
 
 // Actions: full 120 + 100 + 140 + 2 gaps = 376; secondary icons 32 + 32 + 140 + 16 = 220;
 // all icons 3 × 32 + 16 = 112; folded: primary icon + «⋯» = 32 + 32 + 8 = 72.
 const WIDTHS: BarWidths = {
   heading: 300,
+  path: false,
   tools: 400,
   actions: [
     { role: "secondary", full: 120, icon: 32 },
@@ -66,5 +67,14 @@ describe("planBar", () => {
   it("counts no gap for a missing part", () => {
     const bare: BarWidths = { ...WIDTHS, heading: 0, tools: 0 };
     expect(planBar(bare, 376)).toBe("one");
+  });
+
+  it("stacks a heading with a path only past the last step", () => {
+    const withPath = { ...WIDTHS, path: true };
+    // The fold leaves 72 for the actions: the heading's line fits down to 300 + 16 + 72.
+    expect(stackHeading(withPath, 300 + 16 + 72, planBar(withPath, 300 + 16 + 72))).toBe(false);
+    expect(stackHeading(withPath, 300 + 16 + 71, planBar(withPath, 300 + 16 + 71))).toBe(true);
+    // Without a path there is nothing to stack: the heading truncates.
+    expect(stackHeading(WIDTHS, 200, planBar(WIDTHS, 200))).toBe(false);
   });
 });

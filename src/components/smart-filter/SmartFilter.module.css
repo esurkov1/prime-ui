@@ -4,8 +4,10 @@
  */
 
 /*
- * Filter button + search on one row of controls. The search grows from 9rem; when less than that
- * is left beside the button, it moves under it at full width. Every row stays one control high.
+ * Filter button + search on one row of controls. The search grows from three control heights of
+ * its tier (room for the icon and the placeholder): the minimum follows the tier like the button
+ * does, so a phone-wide row holds both at xs, s and m alike; when less than that is left beside
+ * the button, it moves under it at full width. Every row stays one control high.
  */
 .toolbar {
   display: flex;
@@ -25,7 +27,7 @@
 }
 
 .search {
-  flex: 1 1 calc(var(--prime-space-24) * 1.5);
+  flex: 1 1 calc(var(--field-h) * 3);
   min-width: 0;
 }
 

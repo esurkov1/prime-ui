@@ -44,6 +44,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 | `siblingCount` | `number` | `1` | Pages on each side of the current one before an ellipsis (when `totalPages > 2·siblingCount+5`). |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Control tier of the buttons: height 28 · 32 · 36 · 40 · 48. Without it the tier of its host, else `m`. |
 | `compact` | `boolean` | `false` | Always arrows + «current / total» instead of numbers. Without it the nav fills its parent and shows that view only below 22rem of its width. |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | Where the page numbers sit in the width the nav fills: centred under a list, `end` beside a range line (the DataTable footer). The compact view keeps its arrows at the edges. |
 | `labels` | `Partial<PaginationLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "defaultValue" \| "onChange">` | — | `className`, `data-*` and the other `<nav>` attributes; `aria-label` comes from `labels.nav`. |
 
@@ -52,8 +53,15 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ### compact
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `false` | fills the parent: arrows around page numbers right-aligned, «…» for skipped ranges; below 22rem of its width the compact view with arrows at the edges | list and table footers, anywhere the width varies | yes |
+| `false` | fills the parent: arrows around page numbers placed by `align`, «…» for skipped ranges; below 22rem of its width the compact view with arrows at the edges | list and table footers, anywhere the width varies | yes |
 | `true` | arrows around «3 / 12» (current in primary medium, total muted, tabular figures) at any width | tight toolbars, a pager that must never show numbers | |
+
+### align
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `center` | the numbers centred in the width the nav fills | a pager under a list or a grid of cards | yes |
+| `start` | the numbers at the start | a pager under left-aligned content | |
+| `end` | the numbers at the end | beside a range line in a footer (the DataTable footer passes it) | |
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -78,7 +86,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 | hover / active | pointer | `fill-subtle` / `fill-subtle-active`, primary text, press scale |
 | focus-visible | keyboard | outer focus ring of the Button |
 | disabled arrow | first / last page | native `disabled`, `text-disabled` |
-| size / compact | `size` (else the host tier), `compact` | `data-size`, `data-compact` (`"auto"` · `"compact"`) |
+| size / compact / align | `size` (else the host tier), `compact`, `align` | `data-size`, `data-compact` (`"auto"` · `"compact"`), `data-align` |
 
 ## Layout & spacing
 - In a list footer: the range text on the left, rows-per-page Select and Pagination on the right (`justify-content: space-between`), the row wraps.
@@ -120,7 +128,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 | [overview.tsx](examples/overview.tsx) | Pages of an order list: arrows, page numbers and the current page — `totalPages`, `defaultValue`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; buttons are as high as Button and Input of the same tier, 28 to 48 px — `size`. |
 | [overflow.tsx](examples/overflow.tsx) | Up to 7 pages without an ellipsis, then a window around the current page; a wider window — `siblingCount`. |
-| [controlled.tsx](examples/controlled.tsx) | A list footer owns the page: changing rows per page returns it to page 1 — `value`, `onValueChange`. |
+| [controlled.tsx](examples/controlled.tsx) | A list footer owns the page: changing rows per page returns it to page 1, the pages at the end beside the range — `value`, `onValueChange`, `align`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320 px card footer: by default the numbers give way to «current / total» on a narrow width, `compact` always shows it — `compact`. |
 
 ## Mistakes

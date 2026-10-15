@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Pagination } from "./Pagination";
 
@@ -123,6 +124,23 @@ describe("Pagination", () => {
     expect(other).not.toHaveAttribute("aria-current");
     expect(other).not.toHaveAttribute("data-current");
     expect(other).toHaveAttribute("data-variant", "ghost");
+  });
+
+  it("centres the numbers by default and moves them with align", () => {
+    const { rerender } = render(<Pagination totalPages={5} />);
+    expect(screen.getByRole("navigation")).toHaveAttribute("data-align", "center");
+    rerender(<Pagination totalPages={5} align="end" />);
+    expect(screen.getByRole("navigation")).toHaveAttribute("data-align", "end");
+    const css = "src/components/pagination/Pagination.module.css";
+    expect(cssValue(cssRule(css, '.root[data-compact="auto"] .list'), "justify-content")).toBe(
+      "center",
+    );
+    expect(
+      cssValue(
+        cssRule(css, '.root[data-compact="auto"][data-align="end"] .list'),
+        "justify-content",
+      ),
+    ).toBe("flex-end");
   });
 
   it("renders nothing when totalPages is below 1", () => {

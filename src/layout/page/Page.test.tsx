@@ -449,6 +449,31 @@ describe("Page.TopBar collapse", () => {
     expect(nav.querySelector("li:last-child")).toHaveTextContent("Прайм Софт");
   });
 
+  it("a path that already ends at the page's name (however spaced) gets no echo of it", () => {
+    stubObserver();
+    render(
+      <Page.Root>
+        <Page.TopBar collapse>
+          <Page.Heading>
+            <Breadcrumb.Root>
+              <Breadcrumb.Item href="#actions">Действия</Breadcrumb.Item>
+              <Breadcrumb.Item current>Link Button</Breadcrumb.Item>
+            </Breadcrumb.Root>
+          </Page.Heading>
+        </Page.TopBar>
+        <Page.Header>
+          <Page.Heading>
+            <Page.Title>LinkButton</Page.Title>
+          </Page.Heading>
+        </Page.Header>
+      </Page.Root>,
+    );
+    scrolled(true);
+    const nav = screen.getByRole("navigation");
+    expect(nav.querySelectorAll('[aria-hidden="true"][inert]')).toHaveLength(0);
+    expect(nav.querySelector("li:last-child")).toHaveTextContent(/^Link Button$/);
+  });
+
   it("CSS: the echo moves on the movement clock and fades on the fade clock", () => {
     const transition = cssValue(cssRule(CSS, ".echo"), "transition") ?? "";
     expect(transition).toContain("transform var(--prime-motion-duration-fast)");

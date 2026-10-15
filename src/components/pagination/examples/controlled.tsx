@@ -1,4 +1,4 @@
-/** A list footer owns the page: changing rows per page returns it to page 1 — `value`, `onValueChange`. */
+/** A list footer owns the page: changing rows per page returns it to page 1, the pages at the end beside the range — `value`, `onValueChange`, `align`. */
 import { Card, Pagination, Select, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -39,6 +39,7 @@ export default function PaginationControlledExample() {
               </Select.Content>
             </Select.Root>
             <Pagination
+              align="end"
               value={page}
               onValueChange={setPage}
               totalPages={Math.ceil(TOTAL_INVOICES / pageSize)}

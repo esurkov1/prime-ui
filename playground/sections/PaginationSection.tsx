@@ -36,7 +36,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled",
       description:
-        "Подвал списка владеет страницей: смена числа строк возвращает на первую — `value`, `onValueChange`.",
+        "Подвал списка владеет страницей: смена числа строк возвращает на первую, номера в конце рядом с диапазоном — `value`, `onValueChange`, `align`.",
     },
     {
       slot: "narrow",

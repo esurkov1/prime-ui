@@ -27,6 +27,7 @@ import { useLabels } from "@/internal/labels";
 import { nodeText } from "@/internal/nodeText";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
+import { Portal } from "@/internal/Portal";
 import press from "@/internal/press.module.css";
 import { RowAction } from "@/internal/RowAction";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -397,6 +398,44 @@ function SidebarRoot({
     [persist, mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels],
   );
 
+  const state = toDataAttributes({
+    size,
+    mode,
+    "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
+    "from-hidden": (mode !== "hidden" && previousModeRef.current === "hidden") || undefined,
+    "off-canvas": offCanvas || undefined,
+    placing: placing || undefined,
+    state: offCanvas ? (open ? "open" : "closed") : undefined,
+  });
+
+  const layerContent = (
+    <>
+      {/* A press on the scrim is a press outside the panel: the layer dismisses it
+          (`closeOnOutsideClick`). */}
+      {offCanvas && scrim.mounted ? (
+        <div
+          role="presentation"
+          className={cx(sheet.scrim, overlayMotion.scrim)}
+          data-state={scrim.state}
+          onAnimationEnd={scrim.onExitEnd}
+        />
+      ) : null}
+      <nav
+        ref={panelRef}
+        id={navId}
+        className={styles.panel}
+        aria-label={labels.navigation}
+        inert={(offCanvas && !open) || (!offCanvas && mode === "hidden") || undefined}
+      >
+        <LayerProvider value={offCanvas ? layer : null}>
+          <AnchorRectProvider value={offCanvas ? null : anchorRect}>
+            <SurfaceDepthProvider value={depth}>{tier.provide(children)}</SurfaceDepthProvider>
+          </AnchorRectProvider>
+        </LayerProvider>
+      </nav>
+    </>
+  );
+
   return (
     <SidebarProvider value={context}>
       <InSidebarContext.Provider value={true}>
@@ -405,39 +444,25 @@ function SidebarRoot({
           ref={mergedRootRef}
           className={cx(fieldTierClass, styles.root, className)}
           data-depth={depth}
-          {...toDataAttributes({
-            size,
-            mode,
-            "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
-            "from-hidden": (mode !== "hidden" && previousModeRef.current === "hidden") || undefined,
-            "off-canvas": offCanvas || undefined,
-            placing: placing || undefined,
-            state: offCanvas ? (open ? "open" : "closed") : undefined,
-          })}
+          {...state}
         >
-          {/* A press on the scrim is a press outside the panel: the layer dismisses it
-              (`closeOnOutsideClick`). */}
-          {offCanvas && scrim.mounted ? (
-            <div
-              role="presentation"
-              className={cx(sheet.scrim, overlayMotion.scrim)}
-              data-state={scrim.state}
-              onAnimationEnd={scrim.onExitEnd}
-            />
-          ) : null}
-          <nav
-            ref={panelRef}
-            id={navId}
-            className={styles.panel}
-            aria-label={labels.navigation}
-            inert={(offCanvas && !open) || (!offCanvas && mode === "hidden") || undefined}
-          >
-            <LayerProvider value={offCanvas ? layer : null}>
-              <AnchorRectProvider value={offCanvas ? null : anchorRect}>
-                <SurfaceDepthProvider value={depth}>{tier.provide(children)}</SurfaceDepthProvider>
-              </AnchorRectProvider>
-            </LayerProvider>
-          </nav>
+          {/* Off-canvas, the panel is a layer of the stack like a Modal: it goes to the body, so
+              no stacking context or transform around the rail (a shell's panel, a preview frame)
+              can hold it under the page's chrome. The host mirrors the root's classes and state
+              (`display: contents`), so the rail's tier and rules reach the panel. */}
+          {offCanvas ? (
+            <Portal>
+              <div
+                className={cx(fieldTierClass, styles.root, styles.layerHost)}
+                data-depth={depth}
+                {...state}
+              >
+                {layerContent}
+              </div>
+            </Portal>
+          ) : (
+            layerContent
+          )}
         </div>
       </InSidebarContext.Provider>
     </SidebarProvider>

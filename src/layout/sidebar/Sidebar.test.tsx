@@ -412,22 +412,25 @@ describe("Sidebar", () => {
     it("leaving the narrow viewport closes the panel and restores the rail", () => {
       const viewport = mockViewport(true);
       render(<Basic defaultOpen />);
-      const nav = screen.getByRole("navigation");
-      expect(rootOf(nav)).toHaveAttribute("data-state", "open");
+      // The panel moves between its layer in the body and the rail in place: query it anew.
+      const nav = () => screen.getByRole("navigation", { hidden: true });
+      expect(rootOf(nav())).toHaveAttribute("data-state", "open");
       viewport.set(false);
-      expect(rootOf(nav)).not.toHaveAttribute("data-off-canvas");
-      expect(rootOf(nav)).not.toHaveAttribute("data-state");
+      expect(rootOf(nav())).not.toHaveAttribute("data-off-canvas");
+      expect(rootOf(nav())).not.toHaveAttribute("data-state");
       viewport.set(true);
-      expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
+      expect(rootOf(nav())).toHaveAttribute("data-state", "closed");
     });
 
     it("a viewport crossing the breakpoint places the rail without motion for one frame", async () => {
       const viewport = mockViewport(true);
       render(<Basic />);
-      const root = rootOf(screen.getByRole("navigation", { hidden: true }));
       // Mounting is no crossing.
-      expect(root).not.toHaveAttribute("data-placing");
+      expect(rootOf(screen.getByRole("navigation", { hidden: true }))).not.toHaveAttribute(
+        "data-placing",
+      );
       viewport.set(false);
+      const root = rootOf(screen.getByRole("navigation"));
       expect(root).toHaveAttribute("data-placing", "true");
       // Two frames later (painted in place) motion is back for a person's toggle.
       await act(
@@ -449,6 +452,19 @@ describe("Sidebar", () => {
         ".root[data-placing], .root[data-placing] *, .root[data-placing] *::before, .root[data-placing] *::after",
       );
       expect(cssValue(rule, "transition")).toBe("none");
+    });
+
+    it("the off-canvas panel is a layer in the body, out of any stacking context around the rail", () => {
+      mockViewport(true);
+      const { container } = render(
+        <div style={{ isolation: "isolate" }}>
+          <Basic defaultOpen />
+        </div>,
+      );
+      const nav = screen.getByRole("navigation");
+      expect(container.contains(nav)).toBe(false);
+      expect(rootOf(nav).parentElement).toBe(document.body);
+      expect(rootOf(nav)).toHaveAttribute("data-off-canvas", "true");
     });
 
     it('offCanvas="never" never goes off-canvas', () => {
