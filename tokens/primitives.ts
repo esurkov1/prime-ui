@@ -132,9 +132,12 @@ export const primitiveTokens = {
     },
   },
 
-  /** 4px grid. Key = number of 4px steps (`4` → 16px). */
+  /**
+   * 4px grid. Key = number of 4px steps (`4` → 16px). `0` carries a unit: a unitless `0` is a
+   * number inside `calc()` / `max()`, and `calc(100% + 0)` is invalid (the declaration drops).
+   */
   space: {
-    0: "0",
+    0: "0rem",
     1: "0.25rem",
     2: "0.5rem",
     3: "0.75rem",
@@ -168,6 +171,11 @@ export const primitiveTokens = {
       /** `… Fallback`: the metric-matched local faces of the opt-in `fonts.css`. */
       sans: '"Golos Text", "Golos Text Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
       mono: '"JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+      /**
+       * Key caps: the mono faces for letters and digits, then the system UI face before the mono
+       * fallbacks — the mono faces have no ⇧ ⌥ ⌃ or ⌘, and Menlo draws them small and light.
+       */
+      key: '"JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, SFMono-Regular, system-ui, -apple-system, "Segoe UI Symbol", Menlo, Consolas, monospace',
     },
     /** Modular scale, ~1.2 in the body range, ~1.25 for headings. */
     size: {

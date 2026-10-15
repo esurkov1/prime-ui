@@ -320,6 +320,7 @@
   --prime-focus-offset-inset: -2px;
   --prime-focus-space: 4px;
   --prime-focus-width: 2px;
+  --prime-font-family-key: var(--prime-ref-font-family-key);
   --prime-font-family-mono: var(--prime-ref-font-family-mono);
   --prime-font-family-sans: var(--prime-ref-font-family-sans);
   --prime-font-tracking-normal: var(--prime-ref-font-tracking-normal);

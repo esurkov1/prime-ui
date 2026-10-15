@@ -39,7 +39,7 @@ Kbd              <kbd>; one key, its badge tier, children (text, Icon or both)
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "size">` | — | `className`, `title`, `aria-label` and the other `<kbd>` attributes. |
 
 ## Variants
-Kbd has one look: monospace text in `text-secondary` on a translucent `fill-subtle-active` wash, no border, weight 500. No `variant`, `tone` or `color`.
+Kbd has one look: monospace text (`--prime-font-family-key`: the mono faces, with ⇧ ⌥ ⌃ ⌘ from the system face so they match the letters) in `text-secondary` on a translucent `fill-subtle-active` wash, no border, weight 500. No `variant`, `tone` or `color`.
 
 ### size
 | Value | Looks like | Use when | Default |
