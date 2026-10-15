@@ -4,10 +4,8 @@
  */
 
 /*
- * Filter button + search on one row of controls. The search grows from three control heights of
- * its tier (room for the icon and the placeholder): the minimum follows the tier like the button
- * does, so a phone-wide row holds both at xs, s and m alike; when less than that is left beside
- * the button, it moves under it at full width. Every row stays one control high.
+ * Filter button + search on one row of controls. The search grows from 9rem; when less than that
+ * is left beside the button, it moves under it at full width. Every row stays one control high.
  */
 .toolbar {
   display: flex;
@@ -15,6 +13,11 @@
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
+}
+
+/* With the button down to its icon the two never part: the search gives its width instead. */
+.toolbar[data-compact="true"] {
+  flex-wrap: nowrap;
 }
 
 /* The filter button alone: the toolbar hugs it, so the panel opens at its own width. */
@@ -27,7 +30,7 @@
 }
 
 .search {
-  flex: 1 1 calc(var(--field-h) * 3);
+  flex: 1 1 calc(var(--prime-space-24) * 1.5);
   min-width: 0;
 }
 
@@ -47,8 +50,9 @@
   margin-inline-start: auto;
 }
 
-/* A field: its name in a 6rem column beside its values; a row narrower than 24rem stacks the name
-   over the values (intrinsic wrap: the values keep at least 17rem beside the name). */
+/* A field: its name in a 6rem column beside its values — a longer name takes its own width, never
+   breaking inside a word; a row too narrow for both stacks the name over the values (intrinsic
+   wrap: the values keep at least 17rem beside the name). */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -58,8 +62,9 @@
 }
 
 .row > :first-child {
-  flex: 0 0 var(--prime-space-24);
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: var(--prime-space-24);
+  overflow-wrap: normal;
 }
 
 .row > :last-child {

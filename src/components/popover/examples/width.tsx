@@ -1,4 +1,4 @@
-/** In a narrow column the panel takes the exact width of a full-width trigger and its text wraps; a table of limits takes the width it needs — `width`. */
+/** In a narrow column the panel takes the exact width of a full-width trigger and its text wraps; a short trigger opens a panel at least as wide as itself; a table of limits takes the width it needs — `width`. */
 import { Button, DescriptionList, Popover, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -21,6 +21,18 @@ export default function PopoverWidthExample() {
         <Popover.Content width="trigger">
           <Typography variant="body-s" tone="secondary">
             До 10 пользователей, 50 ГБ хранилища и приоритетная поддержка.
+          </Typography>
+        </Popover.Content>
+      </Popover.Root>
+      <Popover.Root>
+        <Popover.Trigger>
+          <Button.Root variant="soft" tone="neutral" fullWidth>
+            Что входит в поддержку
+          </Button.Root>
+        </Popover.Trigger>
+        <Popover.Content width="min-trigger">
+          <Typography variant="body-s" tone="secondary">
+            Ответ в течение 4 часов, персональный менеджер и разбор инцидентов.
           </Typography>
         </Popover.Content>
       </Popover.Root>

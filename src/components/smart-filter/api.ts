@@ -84,8 +84,8 @@ export const api: ComponentApi = {
     },
     {
       name: "SmartFilter.Toolbar",
-      en: "`ref` → `HTMLDivElement`. A `<div>`: the search Input first, then the filter Button (a count Badge while filters apply); the anchor of the panel, a flush Popover.",
-      ru: "`<div>`: сначала поле поиска, затем кнопка фильтра (Badge-счётчик при фильтрах); якорь панели — Popover без внутренних отступов.",
+      en: "`ref` → `HTMLDivElement`. A `<div>`: the search Input first, then the filter Button (a count Badge while filters apply), which shows only its icon and count when the search would get too little room; the anchor of the panel, a flush Popover.",
+      ru: "`<div>`: сначала поле поиска, затем кнопка фильтра (Badge-счётчик при фильтрах), которая оставляет только иконку и счётчик, когда поиску не хватает места; якорь панели — Popover без внутренних отступов.",
       props: [
         {
           name: "searchable",

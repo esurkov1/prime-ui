@@ -386,6 +386,22 @@ describe("Popover — overlay contract", () => {
     expect(panel.style.getPropertyValue("--float-min-w")).not.toBe("");
   });
 
+  it('width="min-trigger" keeps the panel at least as wide as the trigger', () => {
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content width="min-trigger">
+          <div>Panel content</div>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    const panel = screen.getByRole("dialog");
+    expect(panel).toHaveAttribute("data-width", "min-trigger");
+    expect(panel.style.getPropertyValue("--float-min-w")).not.toBe("");
+  });
+
   it('width="content" lets the panel take what its content needs', () => {
     render(
       <Popover.Root defaultOpen>

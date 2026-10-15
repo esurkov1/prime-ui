@@ -54,7 +54,7 @@ export const page: ComponentPageConfig = {
       scenario: "top-bar",
       title: "Верхняя полоса",
       description:
-        "Вложенная запись в верхней полосе: путь, который заканчивается заголовком, строка данных, инструменты страницы, её кнопки и активные фильтры — `Page.TopBar`, `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips`.",
+        "Вложенная запись в верхней полосе: путь, который заканчивается заголовком, строка данных, инструменты страницы и её кнопки — `Page.TopBar`, `Page.Heading`, `Page.Tools`, `Page.Actions`.",
     },
     {
       scenario: "collapse",

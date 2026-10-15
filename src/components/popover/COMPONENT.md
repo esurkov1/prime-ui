@@ -70,7 +70,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
 | `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix the edge. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the text, padding and gap; also the size context of the controls inside. |
-| `width` | `"auto" \| "trigger" \| "content"` | `"auto"` | `auto`: by content, from the panel minimum to twice that. `trigger`: exactly the trigger's width, below the minimum too. `content`: what the content needs, within the viewport. A sheet is full width. |
+| `width` | `"auto" \| "trigger" \| "min-trigger" \| "content"` | `"auto"` | `auto`: by content, panel minimum to twice that. `trigger`: exactly the trigger. `min-trigger`: `auto`, never narrower than the trigger. `content`: what the content needs. A sheet is full width. |
 | `trapFocus` | `boolean` | `false` | Tab cycles inside the panel (forms). Without it Tab past the last (Shift+Tab before the first) stop closes the panel and returns focus to the trigger. |
 | `initialFocus` | `boolean` | `true` with `Popover.Trigger`, `false` with `Popover.Anchor` | Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger. |
 | `flush` | `boolean` | `false` | No inner padding and no gap: rows and dividers reach the panel edges; the content lays out its own spacing. |
@@ -122,6 +122,7 @@ Title uses the tier text size with title weight; Description uses the tier label
 |---|---|---|---|
 | `auto` | As wide as the content, between `--prime-panel-min-width` and twice that | Most panels | yes |
 | `trigger` | Exactly as wide as the trigger, below the minimum too; text wraps | Full-width triggers in narrow columns | |
+| `min-trigger` | As `auto`, never narrower than the trigger | A panel under a wide anchor that must stay readable when the anchor is narrow ([SmartFilter](../smart-filter/COMPONENT.md)) | |
 | `content` | What the content needs, within the viewport | A wide calendar, a table of limits | |
 
 A bottom sheet is always full width, whatever `width` says.
@@ -185,7 +186,7 @@ No `labels`.
 | [structure.tsx](examples/structure.tsx) | Optional parts: a panel with plain text only, and a panel with a title, a description and actions — `Popover.Header`, `Popover.Actions`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier with a header and actions; the tier is the panel's own, set on `Popover.Content`, not taken from its trigger — `size`. |
 | [placement.tsx](examples/placement.tsx) | Every side and alignment relative to the trigger; near the viewport edge the panel flips and shifts — `side`, `align`. |
-| [width.tsx](examples/width.tsx) | In a narrow column the panel takes the exact width of a full-width trigger and its text wraps; a table of limits takes the width it needs — `width`. |
+| [width.tsx](examples/width.tsx) | In a narrow column the panel takes the exact width of a full-width trigger and its text wraps; a short trigger opens a panel at least as wide as itself; a table of limits takes the width it needs — `width`. |
 | [flush.tsx](examples/flush.tsx) | A notification list whose rows and dividers reach the panel edges; each row brings its own padding — `flush`. |
 | [from-menu.tsx](examples/from-menu.tsx) | A menu command opens a panel at the same button: the rename item shows a form anchored to the menu button and focus lands in its field, not back on that button — `Popover.Anchor`, `initialFocus`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A note being typed is not lost to a stray click: the panel closes only from its buttons, and not at all while the note is saved — `closeOnOutsideClick`, `closeOnEscape`. |
