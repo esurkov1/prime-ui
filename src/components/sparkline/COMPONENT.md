@@ -133,6 +133,7 @@ Put it in a `Card` for a dashboard tile.
 - Bars share the width equally, 4 px apart; the zero line sits where 0 falls on the scale (the bottom when every value is positive).
 - In a dashboard, wrap it in `Card.Root` + `Card.Body`; several cards go in a grid.
 - When the value row does not fit (a narrow card), the change badge wraps under the value.
+- On a head narrower than 20rem (a phone card) the date takes its own line under the title, which wraps instead of being cut; the break follows the width only, so a date that changes while scrubbing never moves it.
 - `layout="compact"` fits a DataTable row of any tier (plot and dot within an `xs` control height) and takes the cell width, at least `--prime-space-24`; give the column a `width` for an even plot per row. Put the number next to it in its own column: the compact plot shows a value only in its tooltip while scrubbed.
 - The tooltip is the kit's chart tooltip, placed like every anchored layer (`usePosition`): right of the pointer at its height, on the left only where the right has no room in the viewport — crossing the middle never moves it; from the keyboard right of the point at mid-height. Portaled, so a card or a table scroller never clips it.
 

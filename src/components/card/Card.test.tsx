@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { cssRule, cssValue } from "@/test/css";
+
 import { Card } from "./Card";
 
 describe("Card", () => {
@@ -158,5 +160,13 @@ describe("Card", () => {
     await user.keyboard("{Enter}");
     await user.keyboard(" ");
     expect(onClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("CSS: a label beside the icon of a KPI tile wraps instead of being cut", () => {
+    const rule = cssRule(
+      "src/components/card/Card.module.css",
+      '.root[data-variant="mini"] > .label, .root[data-variant="split"] > .body > * > .label',
+    );
+    expect(cssValue(rule, "white-space")).toBe("normal");
   });
 });

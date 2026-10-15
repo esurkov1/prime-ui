@@ -101,7 +101,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Label · Card.Value
-`ref` → `HTMLSpanElement`. Metric text: the label (body-s, truncates) and the value (tabular, sized by the template and the card width).
+`ref` → `HTMLSpanElement`. Metric text: the label (body-s; truncates, wraps in a `mini` tile and a `split` cell) and the value (tabular, sized by the template and the card width).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -174,7 +174,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 - Radius `--prime-card-radius`, no border. In `panel` and `list` the `Header` is a padded zone with a faint inset hairline below; in `stat-trend` it can pair a leading Badge or icon with a compact `Card.Value`.
 - Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
-- Long values wrap, labels truncate; a chart SVG needs a CSS height.
+- Long values wrap; labels truncate, except in a `mini` tile and a `split` cell, where a label beside the icon wraps instead; a chart SVG needs a CSS height.
 - In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper. A `Card.Description` in the header stacks under the title, 4 apart; the control stays at the end, centred on both lines.
 - `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up; in `mini` and a `split` cell it sits in the text column under the value.
 

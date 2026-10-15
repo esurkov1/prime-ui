@@ -173,6 +173,15 @@
   grid-row: 1 / span 2;
 }
 
+/* Beside the icon a tile keeps little width for its text: the label wraps onto a second line
+   instead of being cut, so a row of narrow tiles still names each metric in full. */
+.root[data-variant="mini"] > .label,
+.root[data-variant="split"] > .body > * > .label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
 .delta {
   display: inline-flex;
   align-items: center;

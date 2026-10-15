@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { DataTable } from "@/components/data-table/DataTable";
+import { cssRule, cssValue } from "@/test/css";
 
 import { pathsOf, scaleOf, yOf } from "./geometry";
 import { Sparkline, type SparklinePoint } from "./Sparkline";
@@ -391,5 +392,14 @@ describe("Sparkline", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(document.body.querySelector("[data-depth='floating'][data-state='open']")).toBeNull();
     expect(area).toHaveAttribute("aria-valuenow", "2");
+  });
+
+  it("CSS: on a narrow head the title takes its line and the date goes under it", () => {
+    const css = "src/components/sparkline/Sparkline.module.css";
+    expect(cssValue(cssRule(css, ".head"), "container-type")).toBe("inline-size");
+    expect(cssValue(cssRule(css, ".head"), "flex-wrap")).toBe("wrap");
+    const label = cssRule(css, ".label", ["@container (max-width: 20rem)"]);
+    expect(cssValue(label, "flex-basis")).toBe("100%");
+    expect(cssValue(label, "white-space")).toBe("normal");
   });
 });
