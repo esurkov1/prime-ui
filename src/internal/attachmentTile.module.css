@@ -151,6 +151,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* A small tile (a strip's) gives its one line to the name: beside the size or the duration the
+   name would keep a letter or two. The band is decorative; the tile's name carries the file. */
+@container (inline-size < 7rem) {
+  .meta {
+    display: none;
+  }
+}
+
 .tile[data-kind="file"] > .band {
   padding-block-start: var(--prime-space-1);
 }
