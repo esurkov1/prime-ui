@@ -68,13 +68,15 @@
   padding: var(--prime-space-1) var(--prime-space-2);
 }
 
+/* A card in a column well: the selected thumb of the well's fill (as a Kanban card), so it stands two
+   ladder steps off the column in both themes. */
 .ticket {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-1);
   padding: var(--prime-space-3) var(--prime-space-4);
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-layer-nested);
+  background: var(--prime-color-control-selected);
   box-shadow: var(--prime-shadow-raised);
 }
 
