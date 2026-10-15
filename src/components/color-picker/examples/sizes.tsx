@@ -1,37 +1,20 @@
-/** Every tier of the picker: the hex field and a swatch button inside take it from the root — `size`. */
-import { Button, Typography } from "prime-ui-kit";
+/** Every tier of the picker: the hex field and its swatch segment take it from the root — `size`. */
 import { ColorPicker } from "prime-ui-kit/color-picker";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function ColorPickerSizesExample() {
   return (
-    <>
-      <div>
-        {SIZES.map((size) => (
-          <div key={size}>
-            <ColorPicker.Root defaultValue="#0090ff" size={size}>
-              <ColorPicker.HexInput label={size} />
-            </ColorPicker.Root>
-          </div>
-        ))}
-      </div>
-      <div>
-        {SIZES.map((size) => (
-          <div key={size}>
-            <ColorPicker.Root defaultValue="#0090ff" size={size}>
-              <Button.Root variant="soft" tone="neutral" aria-label="Открыть палитру">
-                <Button.Icon>
-                  <ColorPicker.TriggerSwatch />
-                </Button.Icon>
-              </Button.Root>
-            </ColorPicker.Root>
-            <Typography as="span" variant="caption" tone="muted">
-              {size}
-            </Typography>
-          </div>
-        ))}
-      </div>
-    </>
+    <div>
+      {SIZES.map((size) => (
+        <div key={size}>
+          <ColorPicker.Root defaultValue="#0090ff" size={size}>
+            <ColorPicker.HexInput label={size}>
+              <ColorPicker.SwatchButton />
+            </ColorPicker.HexInput>
+          </ColorPicker.Root>
+        </div>
+      ))}
+    </div>
   );
 }

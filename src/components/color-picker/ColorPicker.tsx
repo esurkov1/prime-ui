@@ -31,6 +31,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
+import { FieldActionButton, type FieldActionButtonProps } from "@/internal/FieldAction";
 import type { FieldFocusRingProps, FieldRootDomProps } from "@/internal/FieldFrame";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
@@ -60,6 +61,8 @@ export type ColorPickerLabels = {
   eyeDropper: string;
   /** Hex field of `ChannelStrip` and the default `HexInput` label. */
   hex: string;
+  /** `ColorPicker.SwatchButton`: its name and tooltip. */
+  palette: string;
   hue: string;
   saturation: string;
   lightness: string;
@@ -73,6 +76,7 @@ export const COLOR_PICKER_LABELS: ColorPickerLabels = {
   format: "Формат значений цвета",
   eyeDropper: "Пипетка",
   hex: "Hex",
+  palette: "Открыть палитру",
   hue: "Оттенок, градусы",
   saturation: "Насыщенность, проценты",
   lightness: "Яркость, проценты",
@@ -99,6 +103,7 @@ export type ColorPickerHexInputProps = FieldRootDomProps &
     label?: React.ReactNode;
     hint?: React.ReactNode;
     error?: React.ReactNode;
+    children?: React.ReactNode;
   };
 
 export { parseColor };
@@ -493,7 +498,7 @@ function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
   );
 }
 
-function HexInput({ label, hint, error, focusRing, ...rest }: ColorPickerHexInputProps) {
+function HexInput({ label, hint, error, focusRing, children, ...rest }: ColorPickerHexInputProps) {
   const { labels } = useColorPickerContext();
   const { inputRef, text, setText, commit } = useColorDraft(toHexText, parseHex);
 
@@ -516,6 +521,7 @@ function HexInput({ label, hint, error, focusRing, ...rest }: ColorPickerHexInpu
           onChange={(e) => setText(e.target.value)}
           onKeyDown={onCommitKeyDown(commit)}
         />
+        {children}
       </Input.Wrapper>
     </Input.Root>
   );
@@ -596,10 +602,34 @@ function TriggerSwatch(props: ColorPickerTriggerSwatchProps) {
 }
 TriggerSwatch.displayName = "ColorPicker.TriggerSwatch";
 
+export type ColorPickerSwatchButtonProps = Omit<
+  FieldActionButtonProps,
+  "label" | "children" | "asChild"
+>;
+
+/**
+ * The current color as a button segment at the end of `HexInput` (named `labels.palette`, with a
+ * tooltip): the hex and its swatch read as one field. Wrap it in `Popover.Trigger` to open a panel.
+ */
+function SwatchButton({ className, ...rest }: ColorPickerSwatchButtonProps) {
+  const { labels } = useColorPickerContext();
+  return (
+    <FieldActionButton
+      {...rest}
+      label={labels.palette}
+      className={cx(styles.swatchButton, className)}
+    >
+      <TriggerSwatch />
+    </FieldActionButton>
+  );
+}
+SwatchButton.displayName = "ColorPicker.SwatchButton";
+
 export const ColorPicker = {
   Root: ColorPickerRoot,
   Panel,
   TriggerSwatch,
+  SwatchButton,
   FormatSelect,
   ChannelStrip,
   HexInput,

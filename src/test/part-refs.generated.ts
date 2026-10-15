@@ -84,6 +84,7 @@ export const PART_REFS = {
   "ColorPicker.Root": null,
   "ColorPicker.Panel": ["HTMLDivElement"],
   "ColorPicker.HexInput": ["HTMLDivElement"],
+  "ColorPicker.SwatchButton": ["HTMLButtonElement"],
   "ColorPicker.TriggerSwatch": ["HTMLSpanElement"],
   "ColorPicker.FormatSelect": ["HTMLDivElement"],
   "ColorPicker.ChannelStrip": ["HTMLDivElement"],

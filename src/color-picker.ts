@@ -19,6 +19,7 @@ export type {
   ColorPickerSliderMetaProps,
   ColorPickerSliderProps,
   ColorPickerSliderTrackProps,
+  ColorPickerSwatchButtonProps,
   ColorPickerSwatchesProps,
   ColorPickerThumbProps,
   ColorPickerTriggerSwatchProps,
