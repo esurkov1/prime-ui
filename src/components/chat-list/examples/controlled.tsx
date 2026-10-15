@@ -56,7 +56,7 @@ export default function ChatListControlledExample() {
   const dialog = dialogs.find((item) => item.id === dialogId);
 
   return (
-    <div className={styles.stage}>
+    <div className={styles.screen}>
       <div className={styles.bar}>
         <Button.Root
           variant="soft"
@@ -93,7 +93,7 @@ export default function ChatListControlledExample() {
         <Card.Root>
           <Card.Body>
             <Typography variant="body-m" tone={dialog ? "default" : "muted"}>
-              {dialog ? `Открыт диалог: ${dialog.name}` : "Выберите диалог слева"}
+              {dialog ? `Открыт диалог: ${dialog.name}` : "Выберите диалог в списке"}
             </Typography>
           </Card.Body>
         </Card.Root>

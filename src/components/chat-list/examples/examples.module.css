@@ -29,6 +29,14 @@
   gap: var(--prime-space-2);
 }
 
+/* controlled: a list + detail screen, as wide as the preview gives (no pane cap). */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  inline-size: 100%;
+}
+
 /* controlled: the list beside the open dialog; they stack in a narrow column. */
 .split {
   display: flex;
