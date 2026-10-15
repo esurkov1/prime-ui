@@ -14,6 +14,7 @@ import {
   ColorSliderStateContext,
   composeRenderProps,
   parseColor,
+  useLocale,
 } from "react-aria-components";
 
 import { Button } from "@/components/button/Button";
@@ -393,14 +394,29 @@ export type ColorPickerSliderProps = Omit<AriaColorSliderProps, "isDisabled"> & 
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** The channel of the slider around a `SliderMeta`, which rounds its readout by it. */
+const SliderChannelContext = React.createContext<ColorChannel | null>(null);
+
 function Slider({ className, disabled, ...props }: ColorPickerSliderProps) {
   return (
-    <AriaColorSlider
-      className={composeRenderProps(className, (c) => cx(styles.slider, c))}
-      isDisabled={useInheritedDisabled(disabled)}
-      {...props}
-    />
+    <SliderChannelContext.Provider value={props.channel}>
+      <AriaColorSlider
+        className={composeRenderProps(className, (c) => cx(styles.slider, c))}
+        isDisabled={useInheritedDisabled(disabled)}
+        {...props}
+      />
+    </SliderChannelContext.Provider>
   );
+}
+
+/**
+ * The slider readout, rounded like the channel cells: whole degrees and numbers, whole percent of
+ * alpha. React Aria formats the raw channel (a hex converted to hsl gives a hue of `151,03°`).
+ */
+function sliderValueLabel(color: Color, channel: ColorChannel, locale: string): string {
+  const raw = color.getChannelValue(channel);
+  const rounded = channel === "alpha" ? Math.round(raw * 100) / 100 : Math.round(raw);
+  return color.withChannelValue(channel, rounded).formatChannelValue(channel, locale);
 }
 
 export type ColorPickerAreaProps = Omit<AriaColorAreaProps, "isDisabled"> & {
@@ -488,11 +504,13 @@ export type ColorPickerSliderMetaProps = DivProps & {
  */
 function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
   const slider = React.useContext(ColorSliderStateContext);
+  const channel = React.useContext(SliderChannelContext);
+  const { locale } = useLocale();
   return (
     <div {...rest} className={cx(styles.sliderHeader, className)}>
       <span className={styles.sliderLabel}>{label}</span>
       <output className={styles.sliderValue} aria-live="off">
-        {slider?.getThumbValueLabel(0)}
+        {slider && channel ? sliderValueLabel(slider.value, channel, locale) : null}
       </output>
     </div>
   );

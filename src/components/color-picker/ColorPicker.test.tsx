@@ -69,6 +69,23 @@ describe("ColorPicker", () => {
     expect(onValueChange).toHaveBeenCalled();
   });
 
+  it("SliderMeta rounds the readout: a hex value shows whole degrees", () => {
+    render(
+      withLocale(
+        <ColorPicker.Root defaultValue="#30a46c">
+          <ColorPicker.Slider channel="hue" colorSpace="hsl" disabled>
+            <ColorPicker.SliderMeta label="Оттенок" />
+            <ColorPicker.SliderTrack>
+              <ColorPicker.Thumb />
+            </ColorPicker.SliderTrack>
+          </ColorPicker.Slider>
+        </ColorPicker.Root>,
+      ),
+    );
+    // #30a46c is hsl(151.03…, 55%, 41%): the readout is the rounded channel.
+    expect(screen.getByText("151°").tagName).toBe("OUTPUT");
+  });
+
   it("format, defaultFormat and onFormatChange: the owner keeps the format", () => {
     const onFormatChange = vi.fn();
     const { rerender } = render(
