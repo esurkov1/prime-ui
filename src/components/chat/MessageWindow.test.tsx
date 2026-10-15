@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Message } from "@/components/message/Message";
 import { type ScrollRegion, ScrollRegionContext } from "@/hooks/useScrollRegion";
 
+import { ChatSeparator } from "./ChatRows";
 import { MessageList } from "./MessageList";
 
 type Row = { id: string; text: string; mine?: boolean };
@@ -228,5 +229,49 @@ describe("The message list in a scroller: a window of rows", () => {
     fireEvent.click(article("m0") as HTMLElement, { detail: 1, shiftKey: true });
     const last = onSelectedChange.mock.calls.at(-1)?.[0] as string[];
     expect(last).toHaveLength(500);
+  });
+});
+
+describe("Sticky dates in a scroller", () => {
+  /** Rows' boxes by the date they hold: `Вчера` stuck at the top, `Сегодня` `next` px below. */
+  function dates(next: number) {
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const text = this.textContent;
+      const top = text === "Вчера" ? 0 : text === "Сегодня" ? next : 0;
+      return { top, bottom: top + 48, left: 0, right: 0, width: 0, height: 48 } as DOMRect;
+    });
+  }
+  const pill = (text: string) => screen.getByText(text);
+
+  it("the next day's date pushes the stuck one up and out instead of piling on it", async () => {
+    dates(20);
+    render(
+      <ScrollRegionContext.Provider value={fakeRegion()}>
+        <div data-testid="scroller" style={{ overflowY: "auto" }}>
+          <MessageList aria-label="Переписка">
+            <ChatSeparator key="d1">Вчера</ChatSeparator>
+            <Message.Root key="a" value="a">
+              <Message.Text>Инструкция по выгрузке</Message.Text>
+            </Message.Root>
+            <ChatSeparator key="d2">Сегодня</ChatSeparator>
+            <Message.Root key="b" value="b">
+              <Message.Text>Счёт выгрузился</Message.Text>
+            </Message.Root>
+          </MessageList>
+        </div>
+      </ScrollRegionContext.Provider>,
+    );
+    // The pill stands one step above the incoming bubbles (depth 1 on the page): never their fill.
+    expect(pill("Вчера")).toHaveAttribute("data-depth", "2");
+    expect(article("a")?.querySelector("[data-depth]")).toHaveAttribute("data-depth", "1");
+    // The rows overlap by 28px: the stuck date moves up by as much; the next one stays.
+    expect(pill("Вчера").style.translate).toBe("0 -28px");
+    expect(pill("Сегодня").style.translate).toBe("");
+    // Scrolled back: the days part, the stuck date is back in place.
+    dates(200);
+    await scrollTo(0);
+    expect(pill("Вчера").style.translate).toBe("");
   });
 });

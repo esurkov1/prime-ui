@@ -364,6 +364,17 @@
   pointer-events: auto;
 }
 
+/*
+ * The date floats over the messages that scroll under it, so it never wears the bubbles' fill: it
+ * stands one step above an incoming bubble on the ladder (`data-depth` two steps off the list's
+ * host, set by `Chat.Separator`) and lifts with the overlay shadow, so in both themes it reads as
+ * its own surface over a bubble and the bubble's text passes under it.
+ */
+.separator:not(.service) .pill {
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
 .service .pill {
   border-radius: var(--prime-radius-l);
   font-weight: var(--prime-font-weight-regular);

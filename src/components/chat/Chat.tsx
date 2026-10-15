@@ -44,7 +44,9 @@ export const CHAT_LABELS: ChatLabels = {
   ...MESSAGE_LIST_LABELS,
   typing: "печатает…",
   search: "Поиск по переписке",
-  searchPlaceholder: "Поиск по сообщениям",
+  // Short, as ChatList's: the field shares a narrow row with the count and two arrows (the field's
+  // name says what it searches).
+  searchPlaceholder: "Поиск",
   matches: "{index} из {count}",
   noMatches: "Нет совпадений",
   previousMatch: "Предыдущее совпадение",
