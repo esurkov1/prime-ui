@@ -301,6 +301,7 @@ Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header,
 |---|---|---|
 | mode | `mode` / `defaultMode` | Root `data-mode`, `data-panel-mode` (the last visible mode while hidden); `<nav inert>` while hidden |
 | off-canvas | `offCanvas="always"`, or `"auto"` + viewport < 768px | Root `data-off-canvas`, `data-state="open" \| "closed"`; `<nav inert>` while closed; the kit scrim (`role="presentation"`) while open; in an `AppShell` the shell Root `data-off-canvas` |
+| placing | the viewport crossed the off-canvas breakpoint (not a person's choice) | Root `data-placing` for one painted frame: the rail lands at its new width with no motion (no growing from 0, no folding rows, no sliding panel) |
 | dismiss | `closeOnOutsideClick`, `closeOnEscape` | a press on the scrim / Escape closes the open panel, or not |
 | current | `current` or a router's `aria-current` | Item `aria-current="page"`, `data-state="active"` |
 | active path | a child of a Sub (or an item of a Group) is current | SubTrigger (or the `…` row of a folded Group) `data-active-path`; a closed Sub opens, a closed Group opens off the compact rail |

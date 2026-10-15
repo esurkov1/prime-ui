@@ -85,7 +85,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `sticky` | `boolean` | `true` | Sticks to the top of the page's scroller (`AppShell.Main`); `false` — scrolls away with the page. On a screen lower than 480px it scrolls anyway. |
-| `collapse` | `boolean` | `false` | Once the flow `Page.Title` scrolls out under the bar, the bar repeats it (with its description) as the last level of its heading; it leaves when the title returns. |
+| `collapse` | `boolean` | `false` | Once the flow `Page.Title` scrolls out under the bar, the bar repeats it as the last level of its heading (of its `Breadcrumb` path, which folds for it); it leaves when the title returns. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (`Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — direct children), `className` and the other attributes. |
 
 ### Page.Header
@@ -240,7 +240,7 @@ One plan, chosen from the natural widths of the groups (`data-plan` on the bar's
 | `below` | the tools on a line of their own under the heading and the actions, filling it: a search (`SmartFilter.Toolbar`, `Input.Root`) grows first, switchers share the rest and wrap when one line is not enough | heading + tools + actions do not fit | |
 | `icons-secondary` | as `below`; secondary Buttons with a `Button.Icon` show only the icon, the label is their name and their tooltip | heading + actions still do not fit | |
 | `icons` | the primary Button gives way to its icon too | still too wide | |
-| `fold` | the secondary Buttons fold into «⋯» (`labels.more`); the primary stays | still too wide; past it the heading truncates (path levels first, then the title) | |
+| `fold` | the secondary Buttons fold into «⋯» (`labels.more`); the primary stays | still too wide, and «⋯» is narrower than their icons (a single secondary keeps its icon); past it a Breadcrumb path folds into «…», then the heading truncates (path levels first, then the title) | |
 
 The actions stay on the first line beside the heading at every step; `Page.Chips` is always a line under everything; nothing overflows. The primary is the first solid `Button.Root`; a Button without an icon keeps its label at every step; anything that is not a `Button.Root` stays as it is.
 
@@ -264,7 +264,7 @@ The actions stay on the first line beside the heading at every step; `Page.Chips
 | capped page | `maxWidth` | `data-max-width="readable" \| "wide"` on Root (absent for `full`) |
 | filling | `fill` | `data-fill="true"` on Root; `AppShell.Main` drops its long bottom air for it |
 | sticky bar | `sticky` | `data-sticky="true"` on TopBar |
-| title repeated in the bar | `collapse` and the flow title out of view | `data-collapsed="true"` on TopBar; the echo rises in (`transform` on the fast movement clock, `opacity` on the fast fade; reduced motion keeps the fade) |
+| title repeated in the bar | `collapse` and the flow title out of view | `data-collapsed="true"` on TopBar; the echo rises in (`transform` on the fast movement clock, `opacity` on the fast fade; reduced motion keeps the fade). After a `Breadcrumb` path the echo is the path's last level (an `aria-hidden`, `inert` `Breadcrumb.Item`), so the path folds its levels into «…» for it (`data-collapsed` on the Breadcrumb) and the title stays readable |
 | menu button | the shell's Sidebar is off-canvas (`useAppShellNav`) | a soft icon Button at the start of the bar, `aria-expanded` |
 | bar plan | the natural widths of the groups against the bar's width (measured after every render, re-chosen on resize and once web fonts load) | `data-plan="one" \| "below" \| "icons-secondary" \| "icons" \| "fold"` on the bar's row |
 | icon-only button | plan `icons-secondary` (secondary) or `icons` / `fold` (all) | `data-button-label="icon"` on the button's wrapper; its label hides, its tooltip opens on hover and focus |

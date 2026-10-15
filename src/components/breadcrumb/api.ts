@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Breadcrumb.Root",
-      en: "`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and, when the whole path does not fit its width uncut, collapses the middle levels into a «…» menu button that lists them.",
-      ru: "`<nav aria-label>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и, когда весь путь не помещается в ширину без обрезки, сворачивает средние уровни в кнопку «…» с меню этих уровней.",
+      en: "`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and folds levels that do not fit into a «…» menu button that lists them: the middle ones, then the first one too.",
+      ru: "`<nav aria-label>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и сворачивает не поместившиеся уровни в кнопку «…» с их меню: сначала средние, затем и первый.",
       props: [
         {
           name: "size",
@@ -121,8 +121,8 @@ export const api: ComponentApi = {
         ru: 'Текущая страница — `aria-current="page"`; шевроны и знак «…» скрыты (`aria-hidden`).',
       },
       {
-        en: 'Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» is a menu button (`aria-haspopup="menu"`) named by `labels.ellipsis`, and its menu lists them as links.',
-        ru: 'Свёрнутые средние уровни уходят из раскладки и порядка Tab (без невидимых остановок фокуса); автоматическое «…» — кнопка меню (`aria-haspopup="menu"`) с именем из `labels.ellipsis`, а её меню перечисляет эти уровни ссылками.',
+        en: 'Collapsed levels leave the layout and the tab order (no invisible focus stops); the automatic «…» is a menu button (`aria-haspopup="menu"`) named by `labels.ellipsis`, and its menu lists them as links.',
+        ru: 'Свёрнутые уровни уходят из раскладки и порядка Tab (без невидимых остановок фокуса); автоматическое «…» — кнопка меню (`aria-haspopup="menu"`) с именем из `labels.ellipsis`, а её меню перечисляет эти уровни ссылками.',
       },
       {
         en: "Icon-only links need `aria-label` on the Item.",

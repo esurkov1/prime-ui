@@ -397,9 +397,9 @@ describe("Page.TopBar collapse", () => {
     expect(echo).toHaveAttribute("data-visible", "true");
   });
 
-  it("a bar without a heading gets one of its own for the echo; after a path it takes a chevron", () => {
+  it("a bar without a heading gets one of its own for the echo", () => {
     stubObserver();
-    const { container, rerender } = render(
+    const { container } = render(
       <Page.Root>
         <Page.TopBar collapse>
           <Page.Tools />
@@ -412,9 +412,14 @@ describe("Page.TopBar collapse", () => {
       </Page.Root>,
     );
     expect(container.querySelectorAll('[data-place="bar"]')).toHaveLength(1);
-    const echo = () => container.querySelector('[aria-hidden="true"][inert]') as HTMLElement;
-    expect(echo().querySelector('[aria-hidden="true"]')).toBeNull();
-    rerender(
+    const echo = container.querySelector('[aria-hidden="true"][inert]') as HTMLElement;
+    expect(echo).toHaveTextContent("Продажи");
+    expect(echo.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
+
+  it("after a path the echo is the path's last level, so the Breadcrumb folds for it", () => {
+    stubObserver();
+    render(
       <Page.Root>
         <Page.TopBar collapse>
           <Page.Heading>
@@ -430,7 +435,18 @@ describe("Page.TopBar collapse", () => {
         </Page.Header>
       </Page.Root>,
     );
-    expect(echo().querySelectorAll(':scope > * > [aria-hidden="true"]')).toHaveLength(1);
+    const nav = screen.getByRole("navigation");
+    expect(nav).toHaveAttribute("data-collapsible", "false");
+    scrolled(true);
+    // The title joins the path: two levels, so the path can fold; the level is visual only.
+    expect(nav).toHaveAttribute("data-collapsible", "true");
+    const level = nav.querySelector("li:last-child") as HTMLElement;
+    expect(level).toHaveTextContent("Продажи");
+    expect(level).toHaveAttribute("aria-hidden", "true");
+    expect(level).toHaveAttribute("inert");
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    scrolled(false);
+    expect(nav.querySelector("li:last-child")).toHaveTextContent("Прайм Софт");
   });
 
   it("CSS: the echo moves on the movement clock and fades on the fade clock", () => {
@@ -663,9 +679,15 @@ describe("Page.TopBar plan", () => {
     expect(cssValue(cssRule(CSS, '.row:not([data-plan="one"]) > .tools'), "grid-area")).toBe(
       "2 / 1 / 3 / -1",
     );
-    expect(cssRules(CSS).some((rule) => rule.selector === '.row:not([data-plan="one"])')).toBe(
-      true,
-    );
+    // A plan past `one`, or a row without tools, has no tools track: no empty column, no gap.
+    expect(
+      cssRules(CSS).some(
+        (rule) =>
+          rule.selector.includes('.row:not([data-plan="one"])') &&
+          rule.selector.includes(".row:not(:has(> .tools))") &&
+          cssValue(rule, "grid-template-columns") === "minmax(0, 1fr) auto",
+      ),
+    ).toBe(true);
   });
 });
 

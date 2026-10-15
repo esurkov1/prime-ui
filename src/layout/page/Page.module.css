@@ -133,8 +133,13 @@
   grid-column: 1 / -1;
 }
 
-.row:not([data-plan="one"]) {
+.row:not([data-plan="one"]),
+.row:not(:has(> .tools)) {
   grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.row:not(:has(> .tools)) > .actions {
+  grid-column: 2;
 }
 
 .row:not([data-plan="one"]) > .tools {
@@ -256,6 +261,12 @@
   min-width: var(--prime-space-6);
 }
 
+/* A path that ends the line (no title after it, or the title echo inside it) takes the whole
+ * line: the Breadcrumb sees the room it has, and unfolds again once the line grows. */
+.heading[data-place="bar"] .path[data-fill="true"] {
+  flex-grow: 1;
+}
+
 .pathSeparator {
   display: inline-flex;
   flex: none;
@@ -311,22 +322,6 @@
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
     visibility var(--prime-motion-instant) linear var(--prime-motion-fade-fast);
-}
-
-/* After a path the echo continues its line. Basis 0: it takes the room the path leaves, never
-   the path's; in view it keeps room for a few letters of the title. */
-.heading[data-place="bar"]:has(> .echo) {
-  flex-direction: row;
-  align-items: center;
-  gap: var(--prime-space-1);
-}
-
-.heading[data-place="bar"] > .echo {
-  flex: 1 1 0;
-}
-
-.heading[data-place="bar"] > .echo[data-visible="true"] {
-  min-width: var(--prime-space-24);
 }
 
 .echo[data-visible="true"] {

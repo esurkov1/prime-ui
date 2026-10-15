@@ -56,12 +56,14 @@ describe("Breadcrumb", () => {
         <Breadcrumb.Item current>B</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );
+    // Two levels and, between them, the auto «…» of a folded path (hidden while it fits).
     const items = screen.getAllByRole("listitem");
-    expect(items).toHaveLength(2);
+    expect(items).toHaveLength(3);
     for (const item of items) expect(item).not.toHaveAttribute("aria-hidden");
     // The chevron is decorative, inside the level it leads to; the first level has none.
-    expect(items[0].querySelector('[aria-hidden="true"] svg')).toBeNull();
-    expect(items[1].querySelector('[aria-hidden="true"] svg')).toBeInTheDocument();
+    const [first, , second] = items;
+    expect(first.querySelector('[aria-hidden="true"] svg')).toBeNull();
+    expect(second.querySelector('[aria-hidden="true"] svg')).toBeInTheDocument();
   });
 
   it("a kept level gets its chevron when a level is inserted before it", () => {
@@ -78,7 +80,7 @@ describe("Breadcrumb", () => {
     expect(color.querySelector('[aria-hidden="true"] svg')).toBeNull();
 
     rerender(<Trail parent="Основа" />);
-    const [first, second] = screen.getAllByRole("listitem");
+    const [first, , second] = screen.getAllByRole("listitem");
     // The same element, now second: it shows the chevron.
     expect(second).toBe(color);
     expect(second.querySelector('[aria-hidden="true"] svg')).toBeInTheDocument();
@@ -201,12 +203,17 @@ describe("Breadcrumb", () => {
   it("CSS: collapsed middle levels are display: none (never focusable while invisible)", () => {
     const rule = cssRule(
       "src/components/breadcrumb/Breadcrumb.module.css",
-      '.root[data-collapsed="true"] .item:nth-child(n + 3):not(:last-child)',
+      ".root[data-collapsed] .item:nth-child(n + 3):not(:last-child)",
     );
     expect(cssValue(rule, "display")).toBe("none");
+    const deep = cssRule(
+      "src/components/breadcrumb/Breadcrumb.module.css",
+      '.root[data-collapsed="deep"] .item:first-child, .root[data-collapsed="deep"] .autoCollapse > .separator',
+    );
+    expect(cssValue(deep, "display")).toBe("none");
   });
 
-  it("collapses only when the whole path does not fit its width uncut", () => {
+  it("folds only as far as it has to: the middle levels, then the first one too", () => {
     // A fresh element each time, so a rerender renders (and measures) again.
     const trail = () => (
       <Breadcrumb.Root>
@@ -218,18 +225,50 @@ describe("Breadcrumb", () => {
     const { rerender } = render(trail());
     const nav = screen.getByRole("navigation");
     const list = screen.getByRole("list");
-    // jsdom has no layout: three levels of 80px in a row, the list's width stubbed.
-    screen.getAllByRole("listitem").forEach((item, index) => {
-      Object.defineProperty(item, "offsetLeft", { configurable: true, value: index * 80 });
-      Object.defineProperty(item, "offsetWidth", { configurable: true, value: 80 });
+    // jsdom has no layout: levels of 80px and a «…» of 20px in a row, as the fold shows them.
+    const items = screen.getAllByRole("listitem");
+    const width = (index: number) => {
+      const fold = nav.getAttribute("data-collapsed");
+      if (index === 1) return fold ? 20 : 0;
+      if (index === 2) return fold ? 0 : 80;
+      if (index === 0) return fold === "deep" ? 0 : 80;
+      return 80;
+    };
+    items.forEach((item, index) => {
+      Object.defineProperty(item, "offsetLeft", {
+        configurable: true,
+        get: () => items.slice(0, index).reduce((sum, _, i) => sum + width(i), 0),
+      });
+      Object.defineProperty(item, "offsetWidth", { configurable: true, get: () => width(index) });
     });
     Object.defineProperty(list, "clientWidth", { configurable: true, value: 400 });
     rerender(trail());
     expect(nav).not.toHaveAttribute("data-collapsed");
 
+    // 240 uncut does not fit 200; Home › … › Granit (180) does.
     Object.defineProperty(list, "clientWidth", { configurable: true, value: 200 });
     rerender(trail());
     expect(nav).toHaveAttribute("data-collapsed", "true");
+
+    // 180 does not fit 150 either: … › Granit (100).
+    Object.defineProperty(list, "clientWidth", { configurable: true, value: 150 });
+    rerender(trail());
+    expect(nav).toHaveAttribute("data-collapsed", "deep");
+  });
+
+  it("folded deep, the «…» menu lists the first level too", async () => {
+    const user = userEvent.setup();
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item current>Order</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    screen.getByRole("navigation").setAttribute("data-collapsed", "deep");
+    await user.click(screen.getByRole("button", { name: "Скрытые разделы" }));
+    const items = within(screen.getByRole("menu")).getAllByRole("menuitem");
+    expect(items.map((item) => item.textContent)).toEqual(["Home"]);
+    expect(items[0]).toHaveAttribute("href", "/");
   });
 
   it("the separator takes the trail's placeholder colour, the links the muted tone", () => {
@@ -256,10 +295,9 @@ describe("Breadcrumb", () => {
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("data-size", "s");
   });
 
-  it("does not collapse short paths", () => {
+  it("does not collapse a single level", () => {
     render(
       <Breadcrumb.Root>
-        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
         <Breadcrumb.Item current>Current</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );

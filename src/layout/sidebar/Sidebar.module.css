@@ -1232,3 +1232,16 @@
   visibility: visible;
   transition: transform var(--sb-duration) var(--sb-ease);
 }
+
+/*
+ * `data-placing`: the viewport just crossed the off-canvas breakpoint (set by the root for one
+ * painted frame). That is not a person's choice, so the rail lands in its new place at once: no
+ * width growing from 0, no rows folding, no panel sliding out.
+ */
+.root[data-placing],
+.root[data-placing] *,
+.root[data-placing] *::before,
+.root[data-placing] *::after {
+  /* biome-ignore lint/complexity/noImportantStyles: one frame without motion outranks every motion rule of the rail */
+  transition: none !important;
+}
