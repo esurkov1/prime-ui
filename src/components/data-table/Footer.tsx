@@ -19,6 +19,7 @@ export function Footer({ range, pagination, status }: FooterProps) {
       {pagination ? (
         <Pagination
           className={styles.pagination}
+          align="end"
           value={pagination.page}
           totalPages={pagination.totalPages}
           onValueChange={pagination.onPageChange}

@@ -36,7 +36,17 @@
   min-width: 0;
 }
 
+/* The numbers sit where `align` puts them in the width the nav fills: centred by default (a pager
+   under a list), at the end beside a range line (a table footer). */
 .root[data-compact="auto"] .list {
+  justify-content: center;
+}
+
+.root[data-compact="auto"][data-align="start"] .list {
+  justify-content: flex-start;
+}
+
+.root[data-compact="auto"][data-align="end"] .list {
   justify-content: flex-end;
 }
 

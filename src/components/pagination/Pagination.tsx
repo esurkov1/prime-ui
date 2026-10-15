@@ -63,6 +63,7 @@ export type PaginationProps = Omit<
   siblingCount?: number;
   size?: ControlSize;
   compact?: boolean;
+  align?: "start" | "center" | "end";
   labels?: Partial<PaginationLabels>;
 };
 
@@ -74,6 +75,7 @@ export function Pagination({
   siblingCount = 1,
   size: sizeProp,
   compact = false,
+  align = "center",
   labels: labelsProp,
   className,
   ...rest
@@ -95,7 +97,7 @@ export function Pagination({
       {...rest}
       aria-label={labels.nav}
       className={cx(fieldTierClass, styles.root, className)}
-      {...toDataAttributes({ size, compact: mode })}
+      {...toDataAttributes({ size, compact: mode, align })}
     >
       <div className={styles.list}>
         <Button.Root
