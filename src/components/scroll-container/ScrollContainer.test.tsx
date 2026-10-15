@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -222,10 +222,9 @@ describe("ScrollContainer", () => {
     expect(node).toHaveAttribute("data-snap", "mandatory");
     rerender(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
     expect(node).not.toHaveAttribute("data-snap");
-    expect(value(".horizontal[data-snap]", "scroll-snap-type")).toBe("x var(--snap-strictness)");
-    expect(value('.root[data-snap="proximity"]', "--snap-strictness")).toBe("proximity");
-    expect(value('.root[data-snap="mandatory"]', "--snap-strictness")).toBe("mandatory");
+    // The children are the rest points; the browser never snaps (no `scroll-snap-type`).
     expect(value(".root[data-snap] > *", "scroll-snap-align")).toBe("start");
+    expect(parseCss(CSS)).not.toContain("scroll-snap-type");
   });
 
   it("a named region is a region landmark; its own role wins, an unnamed one has none", () => {
@@ -239,10 +238,6 @@ describe("ScrollContainer", () => {
     expect(screen.getByRole("log", { name: "Журнал" })).toBeInTheDocument();
     rerender(<ScrollContainer data-testid="plain">items</ScrollContainer>);
     expect(screen.getByTestId("plain")).not.toHaveAttribute("role");
-  });
-
-  it("snap: a drag of a list inside the region (Dnd carrying) turns snapping off", () => {
-    expect(value(".root[data-snap]:has([data-dnd-carrying])", "scroll-snap-type")).toBe("none");
   });
 
   it("the fade depth is one public hook: the mask, the scroll padding and the measured depth", () => {
@@ -268,65 +263,254 @@ describe("ScrollContainer", () => {
   });
 
   describe("wheel on a sideways strip", () => {
-    function wheel(node: HTMLElement, init: WheelEventInit & { timeStamp?: number }) {
+    /** Event time: 10ms apart within a test (one gesture), far apart between tests. */
+    let clock = 0;
+    /** The glide's frames, run on demand. */
+    let frames: FrameRequestCallback[] = [];
+    beforeEach(() => {
+      clock += 10_000;
+      frames = [];
+      vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+        frames.push(callback);
+        return frames.length;
+      });
+      vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {
+        frames = [];
+      });
+    });
+    afterEach(() => vi.restoreAllMocks());
+
+    /** Runs the glide to its end. */
+    function settle() {
+      for (let i = 0; i < 100 && frames.length > 0; i++) {
+        const run = frames;
+        frames = [];
+        for (const callback of run) callback(performance.now() + 60_000);
+      }
+    }
+
+    /** A mouse notch (`wheelDeltaY` in whole notches) or a trackpad (−3 × its fine `deltaY`). */
+    function wheel(
+      node: HTMLElement,
+      init: WheelEventInit & { trackpad?: boolean; timeStamp?: number },
+    ) {
       const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, ...init });
+      clock += 10;
+      Object.defineProperty(event, "timeStamp", { value: init.timeStamp ?? clock });
+      const deltaY = init.deltaY ?? 0;
+      Object.defineProperty(event, "wheelDeltaY", {
+        value: init.trackpad ? -3 * deltaY : -Math.sign(deltaY) * 120,
+      });
       node.dispatchEvent(event);
       return event;
     }
 
-    it("a vertical wheel scrolls the strip sideways; a sideways wheel stays native", () => {
+    function strip(props: Partial<ScrollContainerProps> = {}) {
       render(
-        <ScrollContainer axis="horizontal" data-testid="scroll">
+        <ScrollContainer axis="horizontal" data-testid="scroll" {...props}>
           items
         </ScrollContainer>,
       );
       const node = screen.getByTestId("scroll");
       size(node, { w: 500 });
-      const scrollTo = vi.fn();
-      node.scrollTo = scrollTo as typeof node.scrollTo;
-      const down = wheel(node, { deltaY: 100 });
-      expect(down.defaultPrevented).toBe(true);
-      expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 100 }));
-      const sideways = wheel(node, { deltaX: 40, deltaY: 5 });
-      expect(sideways.defaultPrevented).toBe(false);
+      return node;
+    }
+
+    it("a mouse wheel glides the strip sideways on the kit's own frames", () => {
+      const node = strip();
+      expect(wheel(node, { deltaY: 100 }).defaultPrevented).toBe(true);
+      expect(frames.length).toBe(1);
+      settle();
+      expect(node.scrollLeft).toBe(100);
     });
 
-    it("at the edge the wheel chains to the page, and a vertical region is left alone", () => {
-      const { rerender } = render(
-        <ScrollContainer axis="horizontal" data-testid="scroll">
-          items
-        </ScrollContainer>,
-      );
-      const node = screen.getByTestId("scroll");
-      size(node, { w: 500 });
-      node.scrollTo = vi.fn() as typeof node.scrollTo;
-      expect(wheel(node, { deltaY: -100 }).defaultPrevented).toBe(false);
-      rerender(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+    it("a trackpad, a sideways wheel and Shift stay native", () => {
+      const node = strip();
+      expect(wheel(node, { deltaY: 8, trackpad: true }).defaultPrevented).toBe(false);
+      expect(wheel(node, { deltaX: 40, deltaY: 5 }).defaultPrevented).toBe(false);
+      expect(wheel(node, { deltaY: 100, shiftKey: true }).defaultPrevented).toBe(false);
+      expect(node.scrollLeft).toBe(0);
+    });
+
+    it("a trackpad gesture is left to the browser until it ends, even a notch-sized event", () => {
+      const node = strip();
+      wheel(node, { deltaY: 8, trackpad: true });
       expect(wheel(node, { deltaY: 100 }).defaultPrevented).toBe(false);
     });
 
+    it("the person takes over a glide at once: a press or a trackpad scroll stops it", () => {
+      const node = strip();
+      wheel(node, { deltaY: 100 });
+      expect(frames.length).toBe(1);
+      fireEvent.pointerDown(node);
+      expect(frames.length).toBe(0);
+      fireEvent.pointerUp(window);
+      clock += 1000;
+      wheel(node, { deltaY: 100 });
+      expect(frames.length).toBe(1);
+      wheel(node, { deltaY: 8, trackpad: true });
+      expect(frames.length).toBe(0);
+    });
+
+    it("at the edge the wheel chains to the page, and a vertical region is left alone", () => {
+      const node = strip();
+      expect(wheel(node, { deltaY: -100 }).defaultPrevented).toBe(false);
+      cleanup();
+      render(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+      const vertical = screen.getByTestId("scroll");
+      expect(wheel(vertical, { deltaY: 100 }).defaultPrevented).toBe(false);
+    });
+
     it("a page scroll passing over the strip keeps scrolling the page", () => {
-      render(
-        <ScrollContainer axis="horizontal" data-testid="scroll">
-          items
-        </ScrollContainer>,
-      );
-      const node = screen.getByTestId("scroll");
-      size(node, { w: 500 });
-      node.scrollTo = vi.fn() as typeof node.scrollTo;
+      const node = strip();
       wheel(document.body, { deltaY: 100 });
       expect(wheel(node, { deltaY: 100 }).defaultPrevented).toBe(false);
     });
 
     it("a locked strip ignores the wheel", () => {
-      render(
-        <ScrollContainer axis="horizontal" lock data-testid="scroll">
-          items
-        </ScrollContainer>,
-      );
-      const node = screen.getByTestId("scroll");
-      size(node, { w: 500 });
+      const node = strip({ lock: true });
       expect(wheel(node, { deltaY: 100 }).defaultPrevented).toBe(false);
+    });
+
+    describe("on a strip that snaps", () => {
+      /** Four 300-wide snap areas at 0 · 300 · 600 · 900 in a 400-wide view: rest points 0 · 300 · 600 · 800. */
+      function snappingStrip(snap: "mandatory" | true = "mandatory") {
+        render(
+          <ScrollContainer axis="horizontal" snap={snap} edges="none" data-testid="scroll">
+            {[0, 1, 2, 3].map((index) => (
+              <div key={index} data-testid={`area-${index}`} data-snap-area="" />
+            ))}
+          </ScrollContainer>,
+        );
+        const node = screen.getByTestId("scroll");
+        size(node, { w: 1200 }, 400);
+        node.getBoundingClientRect = () => new DOMRect(0, 0, 400, 100);
+        for (const index of [0, 1, 2, 3]) {
+          screen.getByTestId(`area-${index}`).getBoundingClientRect = () =>
+            new DOMRect(index * 300 - node.scrollLeft, 0, 300, 100);
+        }
+        // jsdom knows no `scroll-snap-align`: the areas report it here.
+        const computed = window.getComputedStyle.bind(window);
+        vi.spyOn(window, "getComputedStyle").mockImplementation((element, pseudo) => {
+          const style = computed(element, pseudo);
+          if (!(element as HTMLElement).hasAttribute("data-snap-area")) return style;
+          return new Proxy(style, {
+            get: (target, key) =>
+              key === "scrollSnapAlign" ? "start" : Reflect.get(target, key, target),
+          });
+        });
+        return node;
+      }
+
+      /** The person scrolls natively to `at`, then lets go: the scroll ends a moment later. */
+      function scrollTo(node: HTMLElement, at: number) {
+        node.scrollLeft = at;
+        fireEvent.scroll(node);
+        vi.advanceTimersByTime(200);
+        settle();
+      }
+
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+      });
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      it("once a native scroll ends, the strip glides to the nearest rest point", () => {
+        const node = snappingStrip();
+        scrollTo(node, 420);
+        expect(node.scrollLeft).toBe(300);
+        scrollTo(node, 470);
+        expect(node.scrollLeft).toBe(600);
+      });
+
+      it("nothing settles while the scroll goes on or the person holds the strip", () => {
+        const node = snappingStrip();
+        node.scrollLeft = 420;
+        fireEvent.scroll(node);
+        vi.advanceTimersByTime(60);
+        node.scrollLeft = 520;
+        fireEvent.scroll(node);
+        vi.advanceTimersByTime(60);
+        expect(frames.length, "while scrolling").toBe(0);
+        fireEvent.pointerDown(node);
+        vi.advanceTimersByTime(500);
+        expect(frames.length, "while held").toBe(0);
+        fireEvent.pointerUp(window);
+        vi.advanceTimersByTime(200);
+        settle();
+        expect(node.scrollLeft).toBe(600);
+      });
+
+      it("the person takes over a settling glide at once", () => {
+        const node = snappingStrip();
+        node.scrollLeft = 420;
+        fireEvent.scroll(node);
+        vi.advanceTimersByTime(200);
+        expect(frames.length).toBe(1);
+        wheel(node, { deltaX: 30 });
+        expect(frames.length).toBe(0);
+        expect(node.scrollLeft).toBe(420);
+      });
+
+      it("a trackpad's momentum tail that stops a glide is followed by a settle once it is quiet", () => {
+        const node = snappingStrip();
+        node.scrollLeft = 420;
+        fireEvent.scroll(node);
+        vi.advanceTimersByTime(200);
+        expect(frames.length).toBe(1);
+        // A late momentum event that moves nothing: the glide stops, no scroll follows.
+        wheel(node, { deltaX: 0.4, trackpad: true });
+        expect(frames.length).toBe(0);
+        vi.advanceTimersByTime(200);
+        settle();
+        expect(node.scrollLeft).toBe(300);
+      });
+
+      it("`snap` (proximity) settles only near a rest point", () => {
+        const node = snappingStrip(true);
+        scrollTo(node, 450);
+        expect(node.scrollLeft).toBe(450);
+        scrollTo(node, 560);
+        expect(node.scrollLeft).toBe(600);
+      });
+
+      it("every notch of a mouse wheel steps to the next rest point", () => {
+        const node = snappingStrip();
+        wheel(node, { deltaY: 100 });
+        settle();
+        expect(node.scrollLeft).toBe(300);
+        wheel(node, { deltaY: 100 });
+        wheel(node, { deltaY: 100 });
+        settle();
+        expect(node.scrollLeft).toBe(800);
+      });
+
+      it("a turn the other way goes back at once, from where the glide is heading", () => {
+        const node = snappingStrip();
+        wheel(node, { deltaY: 100 });
+        wheel(node, { deltaY: 100 });
+        // The glide is on its way to 600: the step back counts from there.
+        wheel(node, { deltaY: -100 });
+        settle();
+        expect(node.scrollLeft).toBe(300);
+      });
+
+      it("past the last rest point the wheel chains to the page", () => {
+        const node = snappingStrip();
+        expect(wheel(node, { deltaY: -100 }).defaultPrevented).toBe(false);
+      });
+
+      it("a drag of a list inside (Dnd carrying) never settles", () => {
+        const node = snappingStrip();
+        node.setAttribute("data-dnd-carrying", "");
+        const carrying = document.createElement("span");
+        carrying.setAttribute("data-dnd-carrying", "");
+        node.append(carrying);
+        scrollTo(node, 420);
+        expect(node.scrollLeft).toBe(420);
+      });
     });
   });
 });

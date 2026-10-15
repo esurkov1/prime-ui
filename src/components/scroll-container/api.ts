@@ -39,8 +39,8 @@ export const api: ComponentApi = {
           name: "snap",
           type: 'boolean | "mandatory"',
           default: "false",
-          en: 'Scrolling comes to rest on the start of a child: `true` near one (strips of tiles and cards), `"mandatory"` always on one (board columns, a carousel). A Dnd drag inside turns it off; not with `anchor="end"`.',
-          ru: 'Прокрутка останавливается на начале дочернего элемента: `true` — рядом с ним (полосы плиток), `"mandatory"` — всегда на нём (колонки доски, карусель). Перетаскивание Dnd внутри её отключает; не с `anchor="end"`.',
+          en: 'Once a scroll ends, the region glides to the start of a child: `true` near one (strips of tiles), `"mandatory"` always (board columns, a carousel). Native scrolling meanwhile; any input stops the glide.',
+          ru: 'Когда прокрутка закончилась, область доезжает до начала дочернего элемента: `true` — рядом с ним (полосы плиток), `"mandatory"` — всегда (колонки, карусель). Прокрутка нативная; любой ввод останавливает доезд.',
         },
         {
           name: "anchor",

@@ -94,36 +94,11 @@
   overflow: hidden;
 }
 
-/* `snap`: scrolling comes to rest on the start of a child (`proximity` near one, `mandatory`
-   always); a host aligns deeper items itself. */
-.vertical[data-snap] {
-  scroll-snap-type: y var(--snap-strictness);
-}
-
-.horizontal[data-snap] {
-  scroll-snap-type: x var(--snap-strictness);
-}
-
-.both[data-snap] {
-  scroll-snap-type: both var(--snap-strictness);
-}
-
-.root[data-snap="proximity"] {
-  --snap-strictness: proximity;
-}
-
-.root[data-snap="mandatory"] {
-  --snap-strictness: mandatory;
-}
-
+/* `snap`: the children are the rest points (`scroll-snap-align` marks them; a host marks deeper
+   items itself). The settling is `useScrollMotion`'s, after the scroll ends: no
+   `scroll-snap-type`, so the browser never snaps during a gesture or damps its momentum. */
 .root[data-snap] > * {
   scroll-snap-align: start;
-}
-
-/* A drag of a list inside the region (Dnd marks the lists of the carried kind) auto-scrolls it in
-   small steps near an edge: snapping would pull it back. */
-.root[data-snap]:has([data-dnd-carrying]) {
-  scroll-snap-type: none;
 }
 
 /*

@@ -44,7 +44,7 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, soft hidden edges
 | `edges` | `"fade" \| "shadow" \| "none"` | `"fade"` | Edges that hide content: `fade` dissolves them over any background; `shadow` — a soft shadow on the region's own fill (a floating panel, a code well); `none` — plain edges. |
 | `scrollbar` | `"thin" \| "hidden"` | `"thin"` | `thin` — the kit's quiet scrollbar; `hidden` — no scrollbar, keep `edges` on so the overflow stays visible. |
 | `lock` | `boolean` | `false` | The person cannot scroll the region (wheel, touch, keys, a drag's auto-scroll); code still can. Sets `data-lock`. |
-| `snap` | `boolean \| "mandatory"` | `false` | Scrolling comes to rest on the start of a child: `true` near one (strips of tiles and cards), `"mandatory"` always on one (board columns, a carousel). A Dnd drag inside turns it off; not with `anchor="end"`. |
+| `snap` | `boolean \| "mandatory"` | `false` | Once a scroll ends, the region glides to the start of a child: `true` near one (strips of tiles), `"mandatory"` always (board columns, a carousel). Native scrolling meanwhile; any input stops the glide. |
 | `anchor` | `"start" \| "end"` | `"start"` | `end` — a chat or a log: opens at the end and follows new content while the person is at the end; scrolled away, the view holds still. |
 | `onReachStart` | `() => void \| Promise<void>` | — | Fires within 120 px of the start, once per approach: load older content. A returned promise blocks repeats and sets `aria-busy`; content added above keeps the view. |
 | `onReachEnd` | `() => void \| Promise<void>` | — | The scroll position came within 120 px of the end: load the next page. Same once-per-approach and promise rules as `onReachStart`. |
@@ -93,11 +93,12 @@ Only the reader scrolling back unpins the end: content that keeps growing (an an
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `lock` | nothing the person does scrolls the region (wheel, touch, keys, a drag's edge auto-scroll); the position stays, and code may still set it | a list behind an open review, a gesture that must not move it | off |
-| `snap` | a scroll comes to rest on the start of a direct child near one (proximity); a host aligns deeper items itself | strips of tiles or cards | off |
-| `snap="mandatory"` | a scroll always comes to rest on the start of a child | board columns, a carousel of cards | off |
+| `snap` | once a scroll ends near the start of a direct child (within 30% of the view), the region glides there; a host marks deeper items with `scroll-snap-align` itself | strips of tiles or cards | off |
+| `snap="mandatory"` | once a scroll ends, the region always glides to the nearest start of a child | board columns on a phone, a carousel of cards | off |
 
 ### Wheel and auto-scroll
-- `axis="horizontal"`: a vertical mouse wheel scrolls the strip sideways while it can move, gliding to an accumulated target (instant under reduced motion). A trackpad's sideways swipe and Shift + wheel stay native; a wheel gesture that began outside the strip keeps scrolling the page; at the strip's edge the wheel chains to the page. There is no drag-to-scroll: a press-and-drag in a strip belongs to its items (reordering tiles, tabs); touch pans natively.
+- Snapping never takes over the scroll: the trackpad, touch, the scrollbar and the keys scroll natively with their momentum, and the browser does not snap (no `scroll-snap-type` — it damps a trackpad's momentum and pulls a scroll near the end back to merged rest points). Once the scroll ends — no movement for a moment, nothing held — the region glides to its rest point on the kit's own frames, and any wheel, touch, press or key stops that glide at once; it settles again when the input goes quiet. A Dnd drag inside never settles.
+- `axis="horizontal"`: a vertical mouse wheel (whole notches; a trackpad stays native) scrolls the strip sideways while it can move — by the wheel's distance, or a rest point per notch on a strip that snaps — on the kit's frames (instant under reduced motion), each notch from where the glide is heading, so a turn the other way goes back mid-glide. Shift + wheel stays native; a wheel gesture that began outside the strip keeps scrolling the page; at the strip's edge the wheel chains to the page. There is no drag-to-scroll: a press-and-drag in a strip belongs to its items (reordering tiles, tabs); touch pans natively.
 - A gesture held near an edge — a Dnd drag, a Gantt bar moved or drawn, a drag that paints a selection over table rows or messages — scrolls the region toward it, faster the closer the pointer (`src/internal/edgeAutoScroll`, one speed curve for the kit). A `lock`ed region or one whose content fits never moves.
 
 ### Edge events
@@ -116,7 +117,7 @@ Each fires once per approach — again after the position leaves the zone or the
 | edge treatment | `edges` | `data-edges="fade" \| "shadow"` (none for `none`) |
 | content hidden at an edge | scroll position (with `edges="fade"`), measured at most once per frame on scroll, on resize of the region or a child and when children are added; only the scroll axes; logical in RTL | `data-overflow-top`, `data-overflow-bottom`, `data-overflow-start`, `data-overflow-end` = `"true"`; `--edge-*` depths written only while they change (within the last fade depth of an edge, `--scroll-fade-depth`), on non-inherited properties |
 | locked | `lock` | `data-lock`, `overflow: hidden` |
-| snapping | `snap` | `data-snap="proximity" \| "mandatory"`, `scroll-snap-type: <axis> <strictness>`; `scroll-snap-align: start` on the children; off while a Dnd list inside carries an item (`data-dnd-carrying`) |
+| snapping | `snap` | `data-snap="proximity" \| "mandatory"`; `scroll-snap-align: start` on the children marks the rest points (no `scroll-snap-type`); no settling while a Dnd list inside carries an item (`data-dnd-carrying`) |
 | kit anchoring | `anchor="end"` or `onReachStart` | `data-anchor="end" \| "start"`, `overflow-anchor: none`: the kit keeps the visible entry in place (or the end, while pinned) before paint, the same in every browser |
 | pinned to the end | `anchor="end"` and the position within 4 px of the end | content changes scroll to the new end at once (high-frequency: no animation) |
 | loading at an edge | a pending promise from `onReachStart` / `onReachEnd` | `aria-busy="true"` |
@@ -176,6 +177,8 @@ No `labels`.
 - `edges="fade"` on a region that paints its own fill or shadow → the mask dissolves them; use `edges="shadow"`.
 - A hand-made edge auto-scroll loop for a drag → `createEdgeAutoScroll` from `src/internal/edgeAutoScroll`.
 - `snap` together with `anchor="end"` → snapping fights the pin to the end.
+- `scroll-snap-type` on a region or its host → `snap`: the browser's snapping damps a trackpad's momentum and pulls a scroll near the end back.
+- `snap="mandatory"` on a strip of children narrower than the view (a wide board) → their rest points merge at the end; snap only where each child fills most of the view, or use `snap`.
 - Wrapping a Modal body or Dropdown panel in another ScrollContainer → they already scroll.
 - `scrollTop = scrollHeight` in an effect after every message → `anchor="end"` (it also leaves a reader who scrolled up alone).
 - `flex-direction: column-reverse` to keep a chat at the bottom → it reverses the reading and Tab order; use `anchor="end"`.

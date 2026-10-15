@@ -9,7 +9,7 @@ import { namedRole } from "@/internal/namedRole";
 import styles from "./ScrollContainer.module.css";
 import { useFitFlag } from "./useFitFlag";
 import { type ScrollEdgeHandler, useScrollEdges } from "./useScrollEdges";
-import { useWheelToInline } from "./useWheelToInline";
+import { useScrollMotion } from "./useScrollMotion";
 
 export type ScrollContainerAxis = "vertical" | "horizontal" | "both";
 
@@ -66,7 +66,8 @@ export function ScrollContainer({
   // A region that follows its content (a chat, a feed that loads more) is always a scroller: a
   // moment of fitting content must never turn it into `overflow: hidden` under the reader.
   useFitFlag(innerRef, axis, !scroll.keepPosition && !onReachEnd);
-  useWheelToInline(innerRef, horizontal && !lock);
+  const snapMode = snap === "mandatory" ? "mandatory" : snap ? "proximity" : null;
+  useScrollMotion(innerRef, { axis, snap: snapMode, lock });
 
   return (
     <ScrollRegionContext.Provider value={scroll.region}>
@@ -90,7 +91,7 @@ export function ScrollContainer({
           "overflow-start": overflow.start || undefined,
           "overflow-end": overflow.end || undefined,
           lock: lock || undefined,
-          snap: snap === "mandatory" ? "mandatory" : snap ? "proximity" : undefined,
+          snap: snapMode ?? undefined,
           anchor: scroll.keepPosition ? anchor : undefined,
         })}
         {...rest}
