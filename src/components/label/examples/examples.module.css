@@ -1,10 +1,12 @@
 /* Layout of the Label scenarios: semantic tokens only. */
 
-/* structure.tsx: a label above what it names, at the m-tier label gap. */
+/* structure.tsx: a label above what it names, at the m-tier label gap, in a 320 px field column —
+   the fields stack centred in the stage and share one start edge, as labels of one form do. */
 .field {
   display: grid;
   justify-items: start;
   gap: var(--prime-control-m-label-gap);
+  width: min(100%, calc(var(--prime-space-20) * 4));
 }
 
 /* overview.tsx: the same pair in a 320 px column — an embedded calendar measures its container

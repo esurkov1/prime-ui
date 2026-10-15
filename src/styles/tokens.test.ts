@@ -13,6 +13,13 @@ const stylesRoot = path.resolve(process.cwd(), "src/styles");
 const read = (file: string) => readFileSync(path.join(stylesRoot, file), "utf8");
 
 describe("generated token styles", () => {
+  it("give every space step a unit, so it adds to a length inside calc()", () => {
+    // `calc(100% + var(--prime-space-0))` with a unitless 0 is invalid and drops the declaration.
+    const steps = [...read("tokens.css").matchAll(/--prime-ref-space-[\w-]+:\s*([^;]+);/g)];
+    expect(steps.length).toBeGreaterThan(0);
+    expect(steps.map((m) => m[1].trim()).filter((v) => !/[a-z%]$/.test(v))).toEqual([]);
+  });
+
   it("are generated and expose the semantic contract", () => {
     const tokensCss = read("tokens.css");
     const light = read("theme-light.css");

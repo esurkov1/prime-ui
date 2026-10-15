@@ -26,12 +26,21 @@
   }
 }
 
-/* Dropdown-level floating panel: panel padding, capped by the design height and the room. */
+/* Dropdown-level floating panel: panel padding, capped by the design height and the room. In a
+   bottom sheet the panel edge is the screen edge, so the rows stand further in (`--menu-inset`):
+   a highlighted row's fill and ring never touch the screen sides. */
 .menu {
+  --menu-inset: var(--prime-panel-padding);
+
   max-height: min(var(--prime-panel-max-height), var(--float-max-h, var(--prime-panel-max-height)));
-  padding: var(--prime-panel-padding);
+  padding-block: var(--prime-panel-padding);
+  padding-inline: var(--menu-inset);
   font-size: var(--field-text);
   line-height: var(--field-lh);
+}
+
+.menu[data-sheet] {
+  --menu-inset: var(--prime-space-2);
 }
 
 /* ─── Row ────────────────────────────────────────────────────────────────── */
@@ -206,7 +215,7 @@
  * inline padding through the Divider's own bleed contract (`--divider-bleed`).
  */
 .separator {
-  --divider-bleed: var(--prime-panel-padding);
+  --divider-bleed: var(--menu-inset, var(--prime-panel-padding));
 
   flex-shrink: 0;
   margin-block: var(--prime-panel-padding);

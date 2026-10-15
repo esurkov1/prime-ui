@@ -148,10 +148,10 @@
 .search {
   gap: var(--field-gap);
   height: var(--menu-item-h);
-  margin: calc(var(--prime-panel-padding) * -1) calc(var(--prime-panel-padding) * -1)
+  margin: calc(var(--prime-panel-padding) * -1) calc(var(--menu-inset) * -1)
     var(--prime-panel-padding);
   padding-block: var(--prime-panel-padding);
-  padding-inline: calc(var(--prime-panel-padding) + var(--prime-panel-item-padding-x));
+  padding-inline: calc(var(--menu-inset) + var(--prime-panel-item-padding-x));
   box-sizing: content-box;
 }
 
@@ -170,9 +170,9 @@
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
-  margin: var(--prime-panel-padding) calc(var(--prime-panel-padding) * -1)
+  margin: var(--prime-panel-padding) calc(var(--menu-inset) * -1)
     calc(var(--prime-panel-padding) * -1);
-  padding: var(--prime-panel-padding);
+  padding: var(--prime-panel-padding) var(--menu-inset);
   border-top: var(--prime-border-width) solid var(--prime-color-border-faint);
 }
 

@@ -277,6 +277,7 @@ export const semanticTokens = {
     family: {
       sans: "{font.family.sans}",
       mono: "{font.family.mono}",
+      key: "{font.family.key}",
     },
     weight: {
       regular: "{font.weight.regular}",

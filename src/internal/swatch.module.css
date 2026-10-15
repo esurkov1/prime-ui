@@ -23,17 +23,20 @@
  * The transparency checkerboard of the kit, from the surface's own fills: `--swatch-checker` is
  * the pattern as a background layer. `.checkerboard` defines it for a host that lays a translucent
  * color over it (the alpha track of ColorPicker); `.checker` paints "no color" with it, 4 × 4 cells
- * at any size.
+ * at any size. A color `.fill` stands on it too: an opaque color covers it, a translucent one
+ * (`#0000008C`) shows it through, so it never melts into the surface behind the swatch.
  */
 .checkerboard,
-.checker {
+.checker,
+.fill {
   --swatch-checker: repeating-conic-gradient(
     var(--prime-color-layer-current) 0deg 90deg,
     var(--prime-color-fill-strong) 90deg 180deg
   );
 }
 
-.checker {
+.checker,
+.fill {
   background: var(--swatch-checker) 0 0 / 50% 50%;
 }
 

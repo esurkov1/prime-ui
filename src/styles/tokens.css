@@ -100,6 +100,7 @@
   --prime-ref-easing-enter: cubic-bezier(0, 0, 0, 1);
   --prime-ref-easing-exit: cubic-bezier(0.23, 1, 0.32, 1);
   --prime-ref-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --prime-ref-font-family-key: "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, SFMono-Regular, system-ui, -apple-system, "Segoe UI Symbol", Menlo, Consolas, monospace;
   --prime-ref-font-family-mono: "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --prime-ref-font-family-sans: "Golos Text", "Golos Text Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --prime-ref-font-line-height-12: 0.75rem;
@@ -145,7 +146,7 @@
   --prime-ref-radius-6: 6px;
   --prime-ref-radius-8: 8px;
   --prime-ref-radius-full: 9999px;
-  --prime-ref-space-0: 0;
+  --prime-ref-space-0: 0rem;
   --prime-ref-space-1: 0.25rem;
   --prime-ref-space-10: 2.5rem;
   --prime-ref-space-12: 3rem;

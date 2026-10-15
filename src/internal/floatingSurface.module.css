@@ -74,3 +74,13 @@
   min-width: 0;
   min-height: 0;
 }
+
+/* A bottom sheet is always full width: a width the consumer gave the panel for its anchored form
+   (a `className` with a fixed measure) does not narrow it inside the sheet. Two classes outrank a
+   consumer's one. */
+.sheetPanel[data-sheet] {
+  align-self: stretch;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+}

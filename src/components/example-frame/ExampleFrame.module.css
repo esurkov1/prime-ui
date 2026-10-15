@@ -325,6 +325,14 @@
   max-width: min(100%, calc(var(--prime-space-16) * 10));
 }
 
+/* A horizontal separator between stretched blocks (an «или» line between full-width buttons)
+   spans with them: a line capped at 640 under a wider block reads as a stub. */
+.previewInner[data-preview-layout="stack"][data-stretch]
+> [role="separator"]:not([data-orientation="vertical"]) {
+  align-self: stretch;
+  max-width: 100%;
+}
+
 /* Full: a column of blocks that each take the whole stage width (app shells, page regions). */
 .previewInner[data-preview-layout="full"] {
   flex-direction: column;

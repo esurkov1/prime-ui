@@ -57,7 +57,7 @@ ExampleFrame               frame: toolbar + the pane (a region swap between prev
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `default` | single block centered in the stage | one component | yes |
-| `stack` | centered column, gap 16, children capped at the stack measure (`10 × --prime-space-16`) so `width: 100%` blocks stay centered; a child with `fullWidth` or a table stretches, never past the stage | several blocks one under another | |
+| `stack` | centered column, gap 16, children capped at the stack measure (`10 × --prime-space-16`) so `width: 100%` blocks stay centered; a child with `fullWidth` or a table stretches, never past the stage, and a horizontal separator beside it stretches with it | several blocks one under another | |
 | `stack-narrow` | column, children capped at `7 × --prime-space-16` and centered, full width unless a child sets its own (a cascade-layer default, so a fit-content SegmentedControl keeps hugging its segments); a child with a table may take the stage | forms and narrow columns | |
 | `full` | column, gap 16, every child takes the whole stage width | page structure: app shells, page regions | |
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |

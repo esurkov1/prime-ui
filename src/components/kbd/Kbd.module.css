@@ -12,7 +12,8 @@
   justify-content: center;
   background: var(--prime-color-fill-subtle-active);
   color: var(--prime-color-text-secondary);
-  font-family: var(--prime-font-family-mono);
+  /* Mono letters; modifier symbols (⇧ ⌥ ⌃ ⌘) from the system face, as large as the letters. */
+  font-family: var(--prime-font-family-key);
   line-height: 1;
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
