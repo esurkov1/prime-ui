@@ -120,8 +120,8 @@ export const api: ComponentApi = {
         {
           name: "invalid",
           type: "boolean",
-          en: "`aria-invalid` on the range input and a danger focus ring on the thumb. A non-empty `error` implies it.",
-          ru: "`aria-invalid` на input и красное кольцо фокуса у ползунка. Непустой `error` включает его.",
+          en: "`aria-invalid` on the range input, a danger fill (over any `tone`) and a danger focus ring on the thumb. A non-empty `error` implies it.",
+          ru: "`aria-invalid` на input, красная заливка (поверх любого `tone`) и красное кольцо фокуса у ползунка. Непустой `error` включает его.",
         },
         {
           name: "showValue",
