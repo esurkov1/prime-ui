@@ -98,10 +98,13 @@
  * A sliding control joins `.track` next to `.visual` (Switch). Read-only, disabled and busy take
  * no hover or press. Press is `press.pressPartCompact` under the row's
  * `press.pressHost` (joined in TSX); hosts never restyle `.visual` itself, so file order is free.
+ * A host that stands the control on its own ground (a picture) sets the inherited `--choice-bg` /
+ * `--choice-ring` of the unchecked box instead (`mediaPill.choice`).
  */
 .visual {
-  background: var(--prime-color-fill-strong);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  background: var(--choice-bg, var(--prime-color-fill-strong));
+  box-shadow: inset 0 0 0 var(--prime-border-width)
+    var(--choice-ring, var(--prime-color-border-control));
   transition:
     background-color var(--choice-bg-duration, var(--prime-motion-fade-fast))
     var(--prime-motion-easing-standard),
