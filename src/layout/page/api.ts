@@ -45,8 +45,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.TopBar",
-      en: "`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one plan from their natural widths — one line, tools below, icon-only buttons, «⋯», then a truncated heading.",
-      ru: "Полоса у верхнего края страницы: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` в этом порядке DOM; их раскладывает один план по естественной ширине — одна строка, инструменты ниже, кнопки-иконки, «⋯», затем обрезка заголовка.",
+      en: "`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one plan from their natural widths — one line, tools below, icon-only buttons, «⋯», then a stacked or truncated heading.",
+      ru: "Полоса у верхнего края страницы: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` в этом порядке DOM; их раскладывает один план по естественной ширине — одна строка, инструменты ниже, кнопки-иконки, «⋯», затем заголовок в столбик или с обрезкой.",
       props: [
         {
           name: "sticky",
@@ -59,8 +59,8 @@ export const api: ComponentApi = {
           name: "collapse",
           type: "boolean",
           default: "false",
-          en: "Once the flow `Page.Title` scrolls out under the bar, the bar repeats it as the last level of its heading (of its `Breadcrumb` path, which folds for it); it leaves when the title returns.",
-          ru: "Когда `Page.Title` в потоке уходит под полосу, полоса повторяет его последним уровнем заголовка (своего пути `Breadcrumb`, который ради него сворачивается); уходит, когда заголовок возвращается.",
+          en: "Once the flow `Page.Title` scrolls out under the bar, the bar repeats it as the last level of its heading (of its `Breadcrumb` path, which folds for it), unless the path ends at it; it leaves when the title returns.",
+          ru: "Когда `Page.Title` в потоке уходит под полосу, полоса повторяет его последним уровнем заголовка (пути `Breadcrumb`, который ради него сворачивается), если путь им не кончается; уходит, когда заголовок возвращается.",
         },
         {
           name: "…rest",

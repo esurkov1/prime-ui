@@ -15,7 +15,13 @@ import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
-import { type BarAction, type BarPlan, type BarWidths, planBar } from "@/internal/barPlan";
+import {
+  type BarAction,
+  type BarPlan,
+  type BarWidths,
+  planBar,
+  stackHeading,
+} from "@/internal/barPlan";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -244,6 +250,7 @@ function measureBar(row: HTMLElement): BarWidths {
   const square = Math.max(0, ...items.map((item) => item.offsetHeight));
   const widths: BarWidths = {
     heading: widthOf(row.querySelector(`:scope > .${styles.heading}`)),
+    path: row.querySelector(`:scope > .${styles.heading} .${styles.path}`) !== null,
     tools: widthOf(row.querySelector(`:scope > .${styles.tools}`)),
     actions: items.map((item) => ({
       role: item.dataset.role as BarAction["role"],
@@ -269,8 +276,9 @@ function measureBar(row: HTMLElement): BarWidths {
 function useBarPlan(
   rowRef: React.RefObject<HTMLDivElement | null>,
   rowsRef: React.RefObject<HTMLDivElement | null>,
-): BarPlan {
+): { plan: BarPlan; stacked: boolean } {
   const [plan, setPlan] = React.useState<BarPlan>("one");
+  const [stacked, setStacked] = React.useState(false);
   const widths = React.useRef<BarWidths | null>(null);
 
   const decide = React.useCallback(() => {
@@ -278,6 +286,7 @@ function useBarPlan(
     if (!widths.current || !rows) return;
     const next = planBar(widths.current, rows.clientWidth);
     setPlan((current) => (current === next ? current : next));
+    setStacked(stackHeading(widths.current, rows.clientWidth, next));
   }, [rowsRef]);
 
   const measure = React.useCallback(() => {
@@ -294,7 +303,7 @@ function useBarPlan(
     return () => fonts?.removeEventListener?.("loadingdone", measure);
   }, [measure]);
 
-  return plan;
+  return { plan, stacked };
 }
 
 export type PageTopBarProps = React.HTMLAttributes<HTMLElement> & {
@@ -308,7 +317,8 @@ export type PageTopBarProps = React.HTMLAttributes<HTMLElement> & {
  * `Page.Heading`, `Page.Tools`, `Page.Actions` on the first line, `Page.Chips` under them — laid
  * out by one plan chosen from their natural widths (`planBar`): one line while everything fits;
  * then the tools take a line of their own; then the buttons give way to their icons, secondary
- * first, and fold into «⋯»; only then does the heading truncate. Sticky inside the scroller of
+ * first, and fold into «⋯»; only then does a heading with a path stack (path over title), and a
+ * heading without one truncate. Sticky inside the scroller of
  * the page; while the shell's Sidebar is off-canvas it starts with the menu button. With
  * `collapse` it repeats the flow `Page.Title` once that title scrolls out under the bar.
  */
@@ -327,7 +337,7 @@ function PageTopBar({
   const rowRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(barRef, ref);
   const collapsed = useCollapsed(collapse, barRef, page?.heading);
-  const plan = useBarPlan(rowRef, rowsRef);
+  const { plan, stacked } = useBarPlan(rowRef, rowsRef);
   const bar = React.useMemo(() => ({ collapse, collapsed, plan }), [collapse, collapsed, plan]);
 
   const items = flattenChildren(children);
@@ -349,7 +359,12 @@ function PageTopBar({
         >
           {nav?.offCanvas ? <MenuButton /> : null}
           <div ref={rowsRef} className={styles.rows}>
-            <div ref={rowRef} className={styles.row} data-plan={plan}>
+            <div
+              ref={rowRef}
+              className={styles.row}
+              data-plan={plan}
+              data-heading={stacked ? "stack" : undefined}
+            >
               {/* The title repeats in the bar's heading: a bar without one gets it for the echo. */}
               {headings.length === 0 && collapse ? <PageHeading /> : headings}
               {of(PageTools)}
@@ -428,13 +443,24 @@ function TitleEcho() {
  * title joins the Breadcrumb itself, so a path short of width folds its middle levels into «…»
  * (the Breadcrumb's own collapse) and the title stays readable, instead of every level being cut.
  * The level is a visual echo (`aria-hidden`, `inert`): the heading is the `<h1>` in the flow, the
- * path's own current level stays what assistive tech reads. It rises in and sinks out.
+ * path's own current level stays what assistive tech reads. It rises in and sinks out. A path
+ * whose last level already names the page (a docs site: category › page, title = page) shows no
+ * echo, so the name never stands twice in a row.
  */
+const nameKey = (text: string) => text.replace(/\s+/g, "").toLocaleLowerCase();
+const sameName = (a: string, b: string) => nameKey(a) !== "" && nameKey(a) === nameKey(b);
+
 function PathEcho({ path }: { path: React.ReactNode }) {
   const page = React.useContext(PageContext);
   const { collapsed } = React.useContext(BarContext);
   const { title } = useHeading(page?.heading);
-  const presence = usePresence(collapsed && title != null, { exitDuration: "fast" });
+  const crumbs = React.isValidElement<BreadcrumbRootProps>(path)
+    ? React.Children.toArray(path.props.children)
+    : [];
+  // A path that already ends at the page's own name gets no second copy of it — the same words
+  // however spaced or cased («App Shell» and «AppShell» are one name).
+  const repeats = title != null && sameName(nodeText(crumbs.at(-1)), nodeText(title));
+  const presence = usePresence(collapsed && title != null && !repeats, { exitDuration: "fast" });
   // The title it showed stays while it sinks out.
   const shown = React.useRef(title);
   if (title != null) shown.current = title;
@@ -442,7 +468,7 @@ function PathEcho({ path }: { path: React.ReactNode }) {
   return React.cloneElement(
     path,
     undefined,
-    ...React.Children.toArray(path.props.children),
+    ...crumbs,
     <Breadcrumb.Item
       key="page-title-echo"
       current

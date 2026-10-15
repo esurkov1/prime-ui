@@ -80,12 +80,12 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Page.TopBar`, `Page.Header`, `Page.Body`), `className` and the other div attributes. |
 
 ### Page.TopBar
-`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one plan from their natural widths — one line, tools below, icon-only buttons, «⋯», then a truncated heading.
+`ref` → `HTMLElement` (`<header>`). The strip at the page's top edge: `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` in this DOM order, laid out by one plan from their natural widths — one line, tools below, icon-only buttons, «⋯», then a stacked or truncated heading.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `sticky` | `boolean` | `true` | Sticks to the top of the page's scroller (`AppShell.Main`); `false` — scrolls away with the page. On a screen lower than 480px it scrolls anyway. |
-| `collapse` | `boolean` | `false` | Once the flow `Page.Title` scrolls out under the bar, the bar repeats it as the last level of its heading (of its `Breadcrumb` path, which folds for it); it leaves when the title returns. |
+| `collapse` | `boolean` | `false` | Once the flow `Page.Title` scrolls out under the bar, the bar repeats it as the last level of its heading (of its `Breadcrumb` path, which folds for it), unless the path ends at it; it leaves when the title returns. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (`Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — direct children), `className` and the other attributes. |
 
 ### Page.Header
@@ -240,7 +240,7 @@ One plan, chosen from the natural widths of the groups (`data-plan` on the bar's
 | `below` | the tools on a line of their own under the heading and the actions, filling it: a search (`SmartFilter.Toolbar`, `Input.Root`) grows first, switchers share the rest and wrap when one line is not enough | heading + tools + actions do not fit | |
 | `icons-secondary` | as `below`; secondary Buttons with a `Button.Icon` show only the icon, the label is their name and their tooltip | heading + actions still do not fit | |
 | `icons` | the primary Button gives way to its icon too | still too wide | |
-| `fold` | the secondary Buttons fold into «⋯» (`labels.more`); the primary stays | still too wide, and «⋯» is narrower than their icons (a single secondary keeps its icon); past it a Breadcrumb path folds into «…», then the heading truncates (path levels first, then the title) | |
+| `fold` | the secondary Buttons fold into «⋯» (`labels.more`); the primary stays | still too wide, and «⋯» is narrower than their icons (a single secondary keeps its icon); past it a Breadcrumb path folds into «…»; if the path and the title still do not share the line, the heading stacks: the path on its own line over the title, the title and the description wrapping (`data-heading="stack"`); a heading without a path truncates | |
 
 The actions stay on the first line beside the heading at every step; `Page.Chips` is always a line under everything; nothing overflows. The primary is the first solid `Button.Root`; a Button without an icon keeps its label at every step; anything that is not a `Button.Root` stays as it is.
 
@@ -264,9 +264,9 @@ The actions stay on the first line beside the heading at every step; `Page.Chips
 | capped page | `maxWidth` | `data-max-width="readable" \| "wide"` on Root (absent for `full`) |
 | filling | `fill` | `data-fill="true"` on Root; `AppShell.Main` drops its long bottom air for it |
 | sticky bar | `sticky` | `data-sticky="true"` on TopBar |
-| title repeated in the bar | `collapse` and the flow title out of view | `data-collapsed="true"` on TopBar; the echo rises in (`transform` on the fast movement clock, `opacity` on the fast fade; reduced motion keeps the fade). After a `Breadcrumb` path the echo is the path's last level (an `aria-hidden`, `inert` `Breadcrumb.Item`), so the path folds its levels into «…» for it (`data-collapsed` on the Breadcrumb) and the title stays readable |
+| title repeated in the bar | `collapse` and the flow title out of view | `data-collapsed="true"` on TopBar; the echo rises in (`transform` on the fast movement clock, `opacity` on the fast fade; reduced motion keeps the fade). After a `Breadcrumb` path the echo is the path's last level (an `aria-hidden`, `inert` `Breadcrumb.Item`), so the path folds its levels into «…» for it (`data-collapsed` on the Breadcrumb) and the title stays readable; a path whose last level already reads as the title (the same words, however spaced or cased) gets no echo |
 | menu button | the shell's Sidebar is off-canvas (`useAppShellNav`) | a soft icon Button at the start of the bar, `aria-expanded` |
-| bar plan | the natural widths of the groups against the bar's width (measured after every render, re-chosen on resize and once web fonts load) | `data-plan="one" \| "below" \| "icons-secondary" \| "icons" \| "fold"` on the bar's row |
+| bar plan | the natural widths of the groups against the bar's width (measured after every render, re-chosen on resize and once web fonts load) | `data-plan="one" \| "below" \| "icons-secondary" \| "icons" \| "fold"` on the bar's row; `data-heading="stack"` when a heading with a path stacks past the last step |
 | icon-only button | plan `icons-secondary` (secondary) or `icons` / `fold` (all) | `data-button-label="icon"` on the button's wrapper; its label hides, its tooltip opens on hover and focus |
 | folded buttons | plan `fold` | the secondary Buttons' wrappers `hidden`; a «⋯» Dropdown in their place, their `menuitem`s inside |
 | heading place | inside TopBar or in the flow | `data-place="bar" \| "flow"` on Heading |
@@ -279,7 +279,7 @@ The actions stay on the first line beside the heading at every step; `Page.Chips
 ## Layout & spacing
 - The edge air comes from the host: `AppShell.Main` sets `--page-gutter` (the page gutter, 16 → 24 → 32) and `--page-top` (24 → 32 from 1024px); `Page.Root` pads itself with them. Outside a host the page brings no air. The page resets both for what it holds, so a page nested in it starts clean.
 - `Page.TopBar` steps out of the gutter to the panel's edges and keeps the gutter inside; padding 12 above (or the top safe-area inset) and below; the page's top air goes under it. The first line is as high as the Sidebar brand row (control m + 8), so the two read as one line. Groups 16 apart on a line, lines 12 apart; tools 8 apart; buttons 8 apart.
-- In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its natural width until every button step is taken; then the path levels truncate first, then the title, down to a few letters.
+- In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its natural width until every button step is taken; then a heading with a path stacks (the path over the title, the title and the description wrapping), so no level is cut to a fragment; a heading without a path truncates its title.
 - The plan is measured, never chosen by breakpoints: the bar lays itself out from its own width.
 - Header (flow) → Body 24; blocks inside Body 24; a `Page.Section` 40 from its neighbours (the body's 24 + 16); tile → tile in a Grid 16 on both axes; section heading → content 16, heading → description 4; flow Title → Description 8; heading → Actions 24 side by side, 16 once they wrap below.
 - The grid lays itself out from its own width (`prime-grid`), the split from its own (`prime-split`) — never from the window.
