@@ -14,7 +14,7 @@ export default function FieldsetStatesExample() {
           <Fieldset label="Сделка" disabled={state.disabled}>
             <Input.Root label="Название">
               <Input.Wrapper>
-                <Input.Field defaultValue="Годовая лицензия, 40 мест" />
+                <Input.Field defaultValue="Лицензия, 40 мест" />
               </Input.Wrapper>
             </Input.Root>
             <SegmentedControl.Root label="Тип" defaultValue="new">
