@@ -9,7 +9,8 @@
  * The icon sits on the title's first line, title and description stack in a text column capped at
  * the reading width, actions are on the right and vertically centered on the text. Below 36rem of the
  * banner's own width (container query) the actions move under the text. The close button is top-right,
- * centered on the first line.
+ * centered on the first line; it joins a wide banner's actions row and returns to the corner when the
+ * actions move under the text.
  * Spacing lives in item paddings (not grid gaps), so absent parts leave no empty gutters.
  * `placement="page"`: edge-to-edge strip without radius, content aligned to the page content column.
  */
@@ -267,5 +268,16 @@
     align-self: start;
     padding-inline-start: 0;
     padding-top: var(--prime-space-3);
+  }
+
+  /* The dismiss leaves the actions row for the corner: a row that wraps under the text would
+     otherwise leave the × alone on a line of its own. */
+  .root:has(.actions) > .close {
+    display: flex;
+    margin-inline-start: var(--bn-gap);
+  }
+
+  .actions > .actionsClose {
+    display: none;
   }
 }

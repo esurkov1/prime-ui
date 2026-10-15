@@ -97,8 +97,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Actions",
-      en: "`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.",
-      ru: "Ряд кнопок `<div>`; с `onDismiss` кнопка закрытия становится последней квадратной кнопкой ряда.",
+      en: "`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button (in the corner below 36rem).",
+      ru: "Ряд кнопок `<div>`; с `onDismiss` кнопка закрытия становится последней квадратной кнопкой ряда (уже 36rem — в углу).",
       props: [
         {
           name: "…rest",

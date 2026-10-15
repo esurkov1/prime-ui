@@ -29,8 +29,8 @@ Banner.Root                 <div>; variant, tone, size, placement
 │  ├─ Banner.Icon           one Icon on the first line (aria-hidden)
 │  ├─ Banner.Title
 │  ├─ Banner.Description
-│  └─ Banner.Actions        buttons; with onDismiss the close button is last here
-└─ close button             with onDismiss and no Actions: ghost icon Button (tone="inherit"), top-right
+│  └─ Banner.Actions        buttons; with onDismiss the close button is last here (wide banner)
+└─ close button             with onDismiss and no Actions, or Actions under the text: ghost icon Button (tone="inherit"), top-right
 ```
 
 ## API
@@ -72,7 +72,7 @@ Banner.Root                 <div>; variant, tone, size, placement
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Banner.Actions
-`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.
+`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button (in the corner below 36rem).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -115,7 +115,7 @@ Banner.Root                 <div>; variant, tone, size, placement
 |---|---|---|
 | look | `variant`, `tone`, `size`, `placement` | `data-variant`, `data-tone`, `data-size`, `data-placement` |
 | dismissible | `onDismiss` | corner ghost Button (`xs`, `s` on `l` / `xl`), or the last outline Button in `Banner.Actions` |
-| narrow | own width < 36rem (a banner with `Banner.Actions` is a size container) | actions move under the text |
+| narrow | own width < 36rem (a banner with `Banner.Actions` is a size container) | actions move under the text; the close button returns to the corner |
 
 No `open` prop: the parent mounts and unmounts the banner. A mounted banner enters (a short fade and rise); an unmounted one closes up in place, so the content below glides up instead of jumping. To swap the banner for another block in the same spot (a «restore» button), wrap both in [Crossfade](../crossfade/COMPONENT.md).
 

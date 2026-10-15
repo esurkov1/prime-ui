@@ -8,13 +8,18 @@
   min-width: 0;
 }
 
-/* page-strip.tsx: the page strip above a card with an inset banner. */
+/* page-strip.tsx: a page — the strip spans its whole width, the content below keeps the page's
+   side padding, so the strip reads wider than the card with the inset banner. */
 .sections {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-6);
   width: 100%;
   min-width: 0;
+}
+
+.pageBody {
+  padding-inline: var(--prime-layout-gutter);
 }
 
 /* narrow.tsx: a 320px column; the banner's container query moves actions under the text. */
