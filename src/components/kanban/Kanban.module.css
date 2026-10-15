@@ -101,7 +101,6 @@
   grid-template-columns: minmax(0, max-content) auto 1fr;
   align-items: center;
   column-gap: var(--prime-space-2);
-  min-block-size: var(--prime-control-m-height);
   padding-block-end: var(--prime-space-3);
   /* The title starts where the card text does: the inset plus the card padding. */
   padding-inline: calc(var(--kanban-inset) + var(--prime-space-3)) var(--kanban-inset);
@@ -111,6 +110,19 @@
 
 .header[data-reorderable] {
   grid-template-columns: minmax(0, max-content) auto 1fr auto;
+}
+
+/* The first row is as tall as the title line: the actions and the grip (controls taller than the
+   line, `--field-h` of their tier) hang over it evenly on both sides, so the padding above the
+   title reads as the padding under it. */
+.actions,
+.grip {
+  margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
+}
+
+/* line: the header starts at the column's top edge — room for the overhang of the actions `s`. */
+.root[data-variant="line"] .header {
+  padding-block-start: var(--prime-space-1);
 }
 
 .grip {

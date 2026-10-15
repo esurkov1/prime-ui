@@ -506,7 +506,11 @@ function KanbanColumnView<T>({
               <VisuallyHidden>{countText}</VisuallyHidden>
             </>
           )}
-          {actions ? <div className={styles.actions}>{actions}</div> : null}
+          {actions ? (
+            <div className={cx(fieldTierClass, styles.actions)} data-size="s">
+              {actions}
+            </div>
+          ) : null}
           {/* While the column's move is saved, the grip is busy (Dnd). */}
           {reorderable ? (
             <Dnd.Handle
