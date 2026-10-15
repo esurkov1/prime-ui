@@ -13,15 +13,15 @@ export default function ButtonOnColoredHostExample() {
         <Banner.Root key={text} variant="solid" tone={tone}>
           <Banner.Content>
             <Banner.Title>{text}</Banner.Title>
+            <Banner.Actions>
+              <Button.Root variant="soft" tone="inherit">
+                {action}
+              </Button.Root>
+              <Button.Root variant="ghost" tone="inherit">
+                {later}
+              </Button.Root>
+            </Banner.Actions>
           </Banner.Content>
-          <Banner.Actions>
-            <Button.Root variant="soft" tone="inherit">
-              {action}
-            </Button.Root>
-            <Button.Root variant="ghost" tone="inherit">
-              {later}
-            </Button.Root>
-          </Banner.Actions>
         </Banner.Root>
       ))}
     </>

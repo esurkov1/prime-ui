@@ -126,7 +126,8 @@ one lightness step, ΔL 0.03 in OKLab. `tokens/layers.ts` computes every color a
 - Every color keeps the hue and chroma of the page, so the cool Graphite bias is on every layer.
 - Controls on a layer (field, chip, neutral button, segmented track, the Tabs strip's tone) step from
   it: darker in light, lighter in dark, with the same reflect. `fillHover` is two steps. The selected
-  thumb on a track is two steps lighter than the track.
+  thumb on a track is lighter than the track: two steps in light, four in dark, where only
+  lightness sets it apart.
 - Floating layers (menus, popovers, modals, drawers, notifications) sit one step above a card and never
   reflect: white in light (their shadow carries the depth), a step lighter in dark. Two layers can
   nest inside one (`floating1`, `floating2`).

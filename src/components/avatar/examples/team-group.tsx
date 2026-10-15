@@ -28,7 +28,7 @@ const MEMBERS: { name: string; initials: string; color: PaletteColor; src?: stri
 
 export default function AvatarTeamGroupExample() {
   return (
-    <Avatar.Group size="s" aria-label="Участники проекта: 7">
+    <Avatar.Group size="l" aria-label="Участники проекта: 7">
       {MEMBERS.map((member) => (
         <Avatar.Root key={member.initials} color={member.color} aria-label={member.name}>
           {member.src ? <Avatar.Image src={member.src} /> : null}

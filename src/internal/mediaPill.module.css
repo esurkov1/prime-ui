@@ -16,6 +16,9 @@
  *   .inkValue  the light ink as `--media-ink`, for a part that paints its own states (a shade
  *           Button)
  *   .inkMuted  the muted light ink: secondary text on the shade (a time beside a seek, a size)
+ *   .choice the unchecked box of a choice mark over a picture (Thumbnail's check): the shade
+ *           fill with a light ring, legible on a light frame and on a dark one; sets the inherited
+ *           `--choice-bg` / `--choice-ring` that `ChoiceField` reads
  *   .fade   a gradient into the shade toward the block end (a band of text along a picture's
  *           bottom edge)
  */
@@ -68,6 +71,11 @@
 
 .inkMuted {
   color: var(--prime-color-media-pill-fg);
+}
+
+.choice {
+  --choice-bg: var(--prime-color-media-pill);
+  --choice-ring: var(--prime-color-media-shade-fg);
 }
 
 .fade {

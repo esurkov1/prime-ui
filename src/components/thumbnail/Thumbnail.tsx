@@ -111,7 +111,7 @@ function ThumbnailRoot({
           }}
         >
           {children}
-          <span className={styles.check} aria-hidden="true">
+          <span className={cx(styles.check, pill.choice)} aria-hidden="true">
             <Checkbox.Indicator checked={checked} size={fullWidth ? "s" : compactTier(size)} />
           </span>
         </button>

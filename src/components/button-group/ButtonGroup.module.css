@@ -22,6 +22,7 @@
   --prime-icon-size: var(--field-icon);
   /* Optical compensation: the icon side gets padX − 4px, never closer than 8px (xs). */
   --bg-px-icon: max(calc(var(--field-button-px) - var(--prime-space-1)), var(--prime-space-2));
+  --bg-invalid: 0;
 
   display: flex;
   gap: var(--prime-border-width);
@@ -29,6 +30,7 @@
 }
 
 .root[data-orientation="vertical"] {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: stretch;
@@ -127,9 +129,37 @@
   cursor: not-allowed;
 }
 
-/* Invalid (`invalid` / `error`): the inset danger ring of a field on every segment. */
-.root[data-invalid="true"] > .item {
+/* Invalid (`invalid` / `error`): one inset danger ring of a field around the whole group, never a
+   ring per segment. An overlay above the segments; it fades in and out with the state. In a row it
+   is a sticky zero-width flex item as wide as the scroller, so it stays on the visible box while
+   the row scrolls; a column does not scroll and takes it absolutely. The state sets
+   `--bg-invalid`, the overlay's opacity reads it. */
+.root[data-invalid="true"] {
+  --bg-invalid: 1;
+}
+
+.root::after {
+  content: "";
+  z-index: var(--prime-z-above);
+  border-radius: var(--field-radius);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+  opacity: var(--bg-invalid);
+  pointer-events: none;
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.root:not([data-orientation="vertical"])::after {
+  position: sticky;
+  inset-inline-start: 0;
+  order: -1;
+  flex: none;
+  width: 100%;
+  margin-inline-end: calc(-100% - var(--prime-border-width));
+}
+
+.root[data-orientation="vertical"]::after {
+  position: absolute;
+  inset: 0;
 }
 
 /* Full width: segments tend to equal widths and never get narrower than their label; when they do
