@@ -151,6 +151,27 @@ describe("Select (composable)", () => {
     expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
+  it("opened with a pointer, focuses the list without the ring until a key", async () => {
+    render(<BasicSelect />);
+    const trigger = screen.getByRole("combobox");
+    fireEvent.pointerDown(trigger);
+    fireEvent.click(trigger);
+    const listbox = screen.getByRole("listbox");
+    await waitFor(() => expect(listbox).toHaveFocus());
+    expect(listbox).toHaveAttribute("data-focus-quiet");
+    fireEvent.keyDown(listbox, { key: "ArrowDown" });
+    expect(listbox).not.toHaveAttribute("data-focus-quiet");
+  });
+
+  it("opened with a key, focuses the list with the ring", async () => {
+    render(<BasicSelect />);
+    const trigger = screen.getByRole("combobox");
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    const listbox = screen.getByRole("listbox");
+    await waitFor(() => expect(listbox).toHaveFocus());
+    expect(listbox).not.toHaveAttribute("data-focus-quiet");
+  });
+
   it("keyboard ArrowDown navigates to next item and Enter selects", () => {
     render(<BasicSelect />);
 

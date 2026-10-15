@@ -8,7 +8,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { type SwipeDismiss, useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import type { MotionDurationToken } from "@/internal/motionTiming";
 
-import { focusBack, focusInto, getFocusable, handoffFocus } from "./focus";
+import { captureOpener, focusBack, focusInto, getFocusable, handoffFocus } from "./focus";
 import { type DismissReason, type LayerEntry, useLayer } from "./layerStack";
 import { useContainScroll } from "./useContainScroll";
 
@@ -158,7 +158,11 @@ export function useFloatingLayer({
   React.useEffect(() => {
     if (!open || !panel || passive) return;
     outsideRef.current = false;
-    if (focusOnOpen) focusInto(panel, typeof focusOnOpen === "string" ? focusOnOpen : undefined);
+    if (focusOnOpen) {
+      // Opened with a pointer: focus lands in the panel without the ring (no keyboard turn yet).
+      const first = typeof focusOnOpen === "string" ? focusOnOpen : undefined;
+      focusInto(panel, first, captureOpener().byPointer);
+    }
     return () => {
       if (outsideRef.current) return;
       // Focus in the closing panel goes back to the trigger; so does focus lost to the body (the

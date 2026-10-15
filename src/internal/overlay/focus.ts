@@ -36,16 +36,24 @@ export function hasNativeTabStop(el: HTMLElement): boolean {
 /**
  * Moves focus into a layer that just opened, unless focus is already inside (a child `autoFocus`):
  * the first match of `first` (a menu's first enabled item, which is no tab stop of its own), else
- * `[data-autofocus]`, else the first tab stop, else the container itself.
+ * `[data-autofocus]`, else the first tab stop, else the container itself. `quiet` — a pointer
+ * opened the layer: focus lands without the focus ring until the person turns to the keyboard.
  */
-export function focusInto(container: HTMLElement, first?: string): void {
+export function focusInto(container: HTMLElement, first?: string, quiet = false): void {
   if (container.contains(document.activeElement)) return;
   const target =
     (first ? container.querySelector<HTMLElement>(first) : null) ??
     container.querySelector<HTMLElement>("[data-autofocus]") ??
     getFocusable(container)[0] ??
     container;
-  target.focus({ preventScroll: true });
+  focusQuietly(target, quiet);
+}
+
+/** Focuses `target`; `quiet` hides its ring until the next key (`quietRing`). */
+function focusQuietly(target: HTMLElement, quiet: boolean): void {
+  if (quiet) quietRing(target);
+  // `focusVisible` is a FocusOptions field newer than the DOM typings.
+  target.focus({ preventScroll: true, ...(quiet ? { focusVisible: false } : {}) } as FocusOptions);
 }
 
 /** Keys that only modify another: they do not count as the person turning to the keyboard. */
@@ -87,9 +95,7 @@ export function focusBack(el: HTMLElement | null | undefined, quiet = false): vo
   if (typeof document === "undefined") return;
   const target = el?.isConnected ? el : getFocusable(document.body)[0];
   if (!target) return;
-  if (quiet) quietRing(target);
-  // `focusVisible` is a FocusOptions field newer than the DOM typings.
-  target.focus({ preventScroll: true, ...(quiet ? { focusVisible: false } : {}) } as FocusOptions);
+  focusQuietly(target, quiet);
 }
 
 /**
