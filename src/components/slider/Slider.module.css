@@ -50,6 +50,11 @@
   --slider-range-bg: var(--prime-color-info-default);
 }
 
+/* Invalid: the fill takes the danger color at rest, over any `tone`; the error text says why. */
+.root[data-invalid="true"] {
+  --slider-range-bg: var(--prime-color-danger-default);
+}
+
 .root[data-disabled="true"] {
   --slider-track-bg: var(--prime-color-fill-muted);
   --slider-range-bg: var(--prime-color-text-disabled);
@@ -271,7 +276,12 @@
   outline-color: var(--prime-color-danger-border);
 }
 
+/* The disabled thumb is the strong fill laid over the surface, so it stays opaque: the end of the
+   range does not show through it. */
 .root[data-disabled="true"] .thumb {
+  background:
+    linear-gradient(var(--slider-thumb-bg), var(--slider-thumb-bg)),
+    var(--prime-color-layer-current);
   box-shadow: none;
 }
 

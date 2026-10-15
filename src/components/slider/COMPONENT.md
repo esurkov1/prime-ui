@@ -60,7 +60,7 @@ Slider                 field frame (FieldFrame): className, ref, rest
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the track (`aria-describedby`). Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
-| `invalid` | `boolean` | — | `aria-invalid` on the range input and a danger focus ring on the thumb. A non-empty `error` implies it. |
+| `invalid` | `boolean` | — | `aria-invalid` on the range input, a danger fill (over any `tone`) and a danger focus ring on the thumb. A non-empty `error` implies it. |
 | `showValue` | `boolean` | `false` | Shows the current value at the end of the label row (tabular numbers, `aria-hidden` — the input announces it). |
 | `formatValue` | `(value: number) => string` | — | Formats the shown value and `aria-valuetext` (units, currency). |
 | `id` | `string` | — | Id of the range input (generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
@@ -121,10 +121,10 @@ Tone never carries meaning alone: the label names what the value means.
 |---|---|---|
 | default | — | `data-size`, `data-tone` (`data-orientation="vertical"` when upright); track `fill-strong`, tone pill up to the thumb centre, opaque thumb |
 | hover | pointer (fine pointers only) | light liquid glass: the thumb grows to 110%, turns translucent and slightly frosted |
-| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the root, `aria-invalid` on the input; the error replaces the hint, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the root, `aria-invalid` on the input; the error replaces the hint, danger fill over any `tone`, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | pressed | dragging | clear glass: the thumb grows to 125%, the rounded end of the fill shows through |
 | focus-visible | keyboard | outer focus ring around the thumb |
-| disabled | `disabled` | `data-disabled="true"` on the root, native `disabled`; muted track and fill, flat thumb, `cursor: not-allowed` |
+| disabled | `disabled` | `data-disabled="true"` on the root, native `disabled`; muted track and fill, a flat opaque thumb, `cursor: not-allowed` |
 | saving | `onCommit` returned a pending promise | `data-pending="true"` on the root, `aria-busy` on the input; the thumb quiets to 0.6 (`fast`, both ways); the slider stays usable — only the latest commit's answer counts |
 | refused | that promise rejected | the value goes back to the last saved one (`onValueChange` when controlled); `data-settling` glides the thumb and the fill there (`base`, emphasized) |
 

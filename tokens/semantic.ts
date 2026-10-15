@@ -188,6 +188,12 @@ export const semanticTokens = {
     control: {
       /** Switch thumb, slider thumb. */
       thumb: "{color.white}",
+      /** A disabled switch thumb: quiet on the disabled track, like the rest of the control. */
+      thumbDisabled: "{color.white}",
+    },
+    skeleton: {
+      /** A loading placeholder: a wash over whatever layer it sits on, readable in both themes. */
+      fill: "color-mix(in srgb, {color.gray.925} 6%, transparent)",
     },
     /**
      * The tooltip is an inverse chip: everything inside it (a Kbd, a secondary line) reads its

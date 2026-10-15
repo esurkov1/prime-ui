@@ -97,7 +97,7 @@ No `variant` / `tone` / `color`.
 | off | `checked={false}` / default | `data-state="unchecked"`; track `fill-strong` (hover `fill-strong-hover`), thumb at the start |
 | on | `checked` / `defaultChecked` | `data-state="checked"`; accent track, the thumb glides to the end |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus; the row shakes once when an error arrives (`data-shake`) |
-| disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, `cursor: not-allowed` |
+| disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, thumb `control-thumb-disabled` without shadow, `cursor: not-allowed` |
 | read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the field; no hover or press, default cursor |
 | saving | `loading`, or `onCheckedChange` returned a pending promise | the thumb stands in the new position with a `Spinner` inside (accent when on, muted when off; it fades in by itself), `aria-busy` on the input, `data-loading` on the track, presses ignored; a rejection glides the thumb back (`base`, emphasized) |
 | pressed | pointer press | the track scales to the compact press scale (not when disabled or read-only) |
