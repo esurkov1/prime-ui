@@ -18,7 +18,7 @@ export default function DigitInputValidationExample() {
         onValueChange={() => setError(undefined)}
         onComplete={(value) => setError(value === CODE ? undefined : "Неверный код")}
       />
-      <DigitInput label="Код приглашения" optional />
+      <DigitInput label="Код приглашения" length={6} optional />
     </>
   );
 }
