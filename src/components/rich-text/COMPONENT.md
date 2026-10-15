@@ -37,7 +37,7 @@ RichText         <div>; the source as children
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `string` | — (required) | The source: `**bold**`, `_italic_`, `~~strike~~`, `\|\|spoiler\|\|`, inline and fenced code, `[label](url)`, bare URLs, `> ` quotes; line breaks are kept. |
+| `children` | `string` | — (required) | The source: `**bold**`, `_italic_`, `~~strike~~`, `\|\|spoiler\|\|`, inline and fenced code, links (`[label]` then the address in parentheses), bare URLs, `> ` quotes; line breaks are kept. |
 | `labels` | `Partial<RichTextLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `id`, `data-*` and the other div attributes. |
 

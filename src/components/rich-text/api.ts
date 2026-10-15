@@ -12,8 +12,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "string",
           required: true,
-          en: "The source: `**bold**`, `_italic_`, `~~strike~~`, `||spoiler||`, inline and fenced code, `[label](url)`, bare URLs, `> ` quotes; line breaks are kept.",
-          ru: "Исходник: `**bold**`, `_italic_`, `~~strike~~`, `||spoiler||`, код в строке и блоком, `[label](url)`, голые ссылки, цитаты `> `; переносы строк сохраняются.",
+          en: "The source: `**bold**`, `_italic_`, `~~strike~~`, `||spoiler||`, inline and fenced code, links (`[label]` then the address in parentheses), bare URLs, `> ` quotes; line breaks are kept.",
+          ru: "Исходник: `**bold**`, `_italic_`, `~~strike~~`, `||spoiler||`, код в строке и блоком, ссылки (`[label]`, затем адрес в скобках), голые ссылки, цитаты `> `; переносы строк сохраняются.",
         },
         {
           name: "labels",
