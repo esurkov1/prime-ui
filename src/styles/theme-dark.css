@@ -137,8 +137,8 @@
   --prime-color-success-text: var(--prime-ref-color-green-300);
   --prime-color-text-disabled: var(--prime-ref-color-gray-600);
   --prime-color-text-inverse: var(--prime-ref-color-gray-925);
-  --prime-color-text-muted: var(--prime-ref-color-gray-400);
-  --prime-color-text-placeholder: var(--prime-ref-color-gray-400);
+  --prime-color-text-muted: var(--prime-ref-color-gray-350);
+  --prime-color-text-placeholder: var(--prime-ref-color-gray-350);
   --prime-color-text-primary: var(--prime-ref-color-gray-100);
   --prime-color-text-secondary: var(--prime-ref-color-gray-300);
   --prime-color-tooltip-bg: var(--prime-ref-color-gray-100);
