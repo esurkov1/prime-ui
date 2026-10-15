@@ -57,12 +57,26 @@
   overflow: hidden;
 }
 
+/* Overscroll stops a scroll only along the region's own axes: a sideways swipe over a column that
+   scrolls up and down (a Kanban column inside its board) still moves the board around it. */
 .overscrollContain {
-  overscroll-behavior: contain;
+  --overscroll: contain;
 }
 
 .overscrollNone {
-  overscroll-behavior: none;
+  --overscroll: none;
+}
+
+.vertical:is(.overscrollContain, .overscrollNone) {
+  overscroll-behavior-block: var(--overscroll);
+}
+
+.horizontal:is(.overscrollContain, .overscrollNone) {
+  overscroll-behavior-inline: var(--overscroll);
+}
+
+.both:is(.overscrollContain, .overscrollNone) {
+  overscroll-behavior: var(--overscroll);
 }
 
 /* The kit keeps the visible position itself (`anchor="end"`, `onReachStart`): the browser's own

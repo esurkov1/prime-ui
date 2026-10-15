@@ -206,6 +206,16 @@ describe("ScrollContainer", () => {
     expect(node).not.toHaveAttribute("data-lock");
   });
 
+  it("overscroll stops a scroll only along the region's own axes", () => {
+    expect(value(".overscrollContain", "--overscroll")).toBe("contain");
+    expect(
+      value(".vertical:is(.overscrollContain, .overscrollNone)", "overscroll-behavior-block"),
+    ).toBe("var(--overscroll)");
+    expect(
+      value(".horizontal:is(.overscrollContain, .overscrollNone)", "overscroll-behavior-inline"),
+    ).toBe("var(--overscroll)");
+  });
+
   it("snap: proximity or mandatory snapping along the axis, children rest on their start", () => {
     const { rerender } = render(
       <ScrollContainer axis="horizontal" snap data-testid="scroll">
