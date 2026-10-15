@@ -33,7 +33,7 @@ export default function AppShellTemplateExample() {
         className={styles.shell}
         scrollResetKey={pageId}
         nav={
-          <Sidebar.Root offCanvas="never">
+          <Sidebar.Root>
             <Sidebar.Content>
               {PAGES.map((item) => (
                 <Sidebar.Item

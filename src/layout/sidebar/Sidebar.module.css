@@ -1205,6 +1205,12 @@
   transition: none;
 }
 
+/* The off-canvas panel's host in the body: no box of its own, only the root's classes and state for
+   the rules and custom properties below. */
+.layerHost {
+  display: contents;
+}
+
 /* Inline at the end of the header row of the off-canvas panel (whatever its width). */
 .root[data-off-canvas] .headerToggle {
   inset-inline: auto 0;
