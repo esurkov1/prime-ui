@@ -43,6 +43,8 @@
   inline-size: calc(var(--w) * 100% - (var(--gs) + var(--ge)) * var(--gallery-half-gap));
   block-size: calc(var(--h) * 100% - (var(--gt) + var(--gb)) * var(--gallery-half-gap));
   overflow: hidden;
+  /* A size container: a short video tile has no room for both media marks (`.play`, `.length`). */
+  container-type: size;
 }
 
 /* The Thumbnail fills its tile; a tile has square corners (the root rounds the outer ones). */
@@ -73,6 +75,15 @@
   z-index: var(--prime-z-top);
   inset-block-start: var(--prime-space-2);
   inset-inline-start: var(--prime-space-2);
+}
+
+/* A tile too short for the centred disk below the length pill (a small tile of a phone album): the
+   two marks would collide, so the length alone says it is a video and how long — the whole tile
+   still opens it. */
+@container (max-block-size: 6.5rem) {
+  .tile:has(> .length) > .play {
+    display: none;
+  }
 }
 
 .open {
