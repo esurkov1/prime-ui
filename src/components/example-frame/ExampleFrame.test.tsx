@@ -76,8 +76,20 @@ describe("ExampleFrame", () => {
       </ExampleFrame>,
     );
     await act(async () => {});
-    expect(form).toHaveAttribute("data-preview-stretch");
+    expect(form).toHaveAttribute("data-preview-stretch", "full");
     expect(stage).toHaveAttribute("data-stretch");
+  });
+
+  it("tells a table apart from a full-width block, so a table may leave the form column", async () => {
+    render(
+      <ExampleFrame code="" previewLayout="stack-narrow">
+        <div data-testid="calendar">
+          <table />
+        </div>
+      </ExampleFrame>,
+    );
+    await act(async () => {});
+    expect(screen.getByTestId("calendar")).toHaveAttribute("data-preview-stretch", "table");
   });
 
   it("gives a matrix as many columns as its first row has cells", () => {

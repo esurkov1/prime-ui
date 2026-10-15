@@ -274,9 +274,11 @@
   margin-inline: auto;
 }
 
+/* Past the stack measure, never past the stage: a block with its own width (a 320 px phone column)
+   shrinks on a narrower stage instead of overflowing it. */
 .previewInner[data-preview-layout="stack"] > [data-preview-stretch] {
   align-self: stretch;
-  max-width: none;
+  max-width: 100%;
 }
 
 /* Full width is a default only: a block with its own width (a 320 px phone column around a
@@ -315,6 +317,12 @@
   min-width: 0;
   max-width: min(100%, calc(var(--prime-space-16) * 7));
   margin-inline: auto;
+}
+
+/* A table (a DataTable, an embedded Datepicker panel) never squeezes into the form column: it may
+   take the stage, as in `stack`; a block with its own width (a booking card) keeps it, centered. */
+.previewInner[data-preview-layout="stack-narrow"] > [data-preview-stretch="table"] {
+  max-width: 100%;
 }
 
 /* Code tab: an explicit well (the previewed theme's page), same inset and radius as the stage. */

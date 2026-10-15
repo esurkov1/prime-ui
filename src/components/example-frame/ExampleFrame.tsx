@@ -88,9 +88,16 @@ const holdsStretch = (node: Node) =>
   node instanceof Element &&
   (node.matches(STRETCH_SELECTOR) || node.querySelector(STRETCH_SELECTOR) !== null);
 
+/** `table` — the child holds a table (it leaves a narrow column too); `full` — a `fullWidth` block. */
+const stretchOf = (child: Element): "table" | "full" | null => {
+  if (child.matches("table") || child.querySelector("table")) return "table";
+  return holdsStretch(child) ? "full" : null;
+};
+
 /**
  * Facts about the opaque preview children that the stage layouts need: which direct child holds a
- * stretching block (`data-preview-stretch` on it and `data-stretch` on the stage) and, for
+ * stretching block (`data-preview-stretch` on it — `table` or `full` — and `data-stretch` on the
+ * stage) and, for
  * `matrix`, the cell count of the first row (`--matrix-columns`) and whether the column grid fits
  * the stage (`data-matrix-wrap` when it does not: each row wraps its cells on its own). Read from
  * the DOM here, not by `:has()` in CSS: a descendant `:has()` on the stage and on every element
@@ -138,8 +145,9 @@ function usePreviewFacts(
     // scrolls, and a full-width card leaving the window must not narrow the stage under the reader.
     const read = () => {
       for (const child of Array.from(stage.children)) {
-        if (!child.hasAttribute("data-preview-stretch") && child.querySelector(STRETCH_SELECTOR)) {
-          child.setAttribute("data-preview-stretch", "");
+        const stretch = stretchOf(child);
+        if (stretch && child.getAttribute("data-preview-stretch") !== "table") {
+          child.setAttribute("data-preview-stretch", stretch);
         }
       }
       if (!stage.hasAttribute("data-stretch") && stage.querySelector(STRETCH_SELECTOR)) {
