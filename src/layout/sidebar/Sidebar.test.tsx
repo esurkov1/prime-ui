@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Icon } from "@/icons";
+import { cssRule, cssValue } from "@/test/css";
 
 import { AppShell } from "../app-shell/AppShell";
 import { Sidebar, type SidebarMode, useSidebar } from "./Sidebar";
@@ -418,6 +419,36 @@ describe("Sidebar", () => {
       expect(rootOf(nav)).not.toHaveAttribute("data-state");
       viewport.set(true);
       expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
+    });
+
+    it("a viewport crossing the breakpoint places the rail without motion for one frame", async () => {
+      const viewport = mockViewport(true);
+      render(<Basic />);
+      const root = rootOf(screen.getByRole("navigation", { hidden: true }));
+      // Mounting is no crossing.
+      expect(root).not.toHaveAttribute("data-placing");
+      viewport.set(false);
+      expect(root).toHaveAttribute("data-placing", "true");
+      // Two frames later (painted in place) motion is back for a person's toggle.
+      await act(
+        () =>
+          new Promise<void>((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+          ),
+      );
+      await act(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+      expect(root).not.toHaveAttribute("data-placing");
+      fireEvent.click(screen.getByRole("button", { name: "Свернуть панель" }));
+      expect(root).toHaveAttribute("data-mode", "compact");
+      expect(root).not.toHaveAttribute("data-placing");
+    });
+
+    it("CSS: a placing rail runs no transition", () => {
+      const rule = cssRule(
+        "src/layout/sidebar/Sidebar.module.css",
+        ".root[data-placing], .root[data-placing] *, .root[data-placing] *::before, .root[data-placing] *::after",
+      );
+      expect(cssValue(rule, "transition")).toBe("none");
     });
 
     it('offCanvas="never" never goes off-canvas', () => {

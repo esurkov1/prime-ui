@@ -233,6 +233,29 @@ export type SidebarRootProps = React.ComponentPropsWithoutRef<"div"> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/**
+ * True from the render in which the rail moves between docked and off-canvas (a viewport crossing
+ * the breakpoint, not a person's choice) until a frame has been painted in the new place: the rail
+ * lands at its width at once instead of growing from 0 (`data-placing` turns its motion off).
+ */
+function usePlacementSwitch(offCanvas: boolean): boolean {
+  const [previous, setPrevious] = React.useState(offCanvas);
+  const [placing, setPlacing] = React.useState(false);
+  if (previous !== offCanvas) {
+    setPrevious(offCanvas);
+    setPlacing(true);
+  }
+  React.useEffect(() => {
+    if (!placing) return;
+    // Two frames: the first paints the new place without motion, the second turns motion back on.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setPlacing(false));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [placing]);
+  return placing;
+}
+
 function SidebarRoot({
   children,
   className,
@@ -271,6 +294,7 @@ function SidebarRoot({
   const size = tier.size;
   const narrow = useMediaQuery(OFF_CANVAS_QUERY, offCanvasProp === "auto");
   const offCanvas = offCanvasProp === "always" || narrow;
+  const placing = usePlacementSwitch(offCanvas);
 
   const [mode, setMode] = useControllableState<SidebarMode>({
     value: modeProp,
@@ -387,6 +411,7 @@ function SidebarRoot({
             "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
             "from-hidden": (mode !== "hidden" && previousModeRef.current === "hidden") || undefined,
             "off-canvas": offCanvas || undefined,
+            placing: placing || undefined,
             state: offCanvas ? (open ? "open" : "closed") : undefined,
           })}
         >
