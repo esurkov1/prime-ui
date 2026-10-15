@@ -8,7 +8,7 @@ export default function HintOverviewExample() {
   const hintId = React.useId();
 
   return (
-    <div className={styles.field}>
+    <div className={styles.calendarField}>
       <Datepicker.Panel
         mode="single"
         role="group"
