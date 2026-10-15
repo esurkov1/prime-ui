@@ -378,8 +378,8 @@
 
 .row:not([data-plan="one"]) > .tools > .tool[data-grow="true"],
 .tools:not(.row > .tools) > .tool[data-grow="true"] {
-  flex: 999 1 calc(var(--prime-space-24) * 3);
-  min-width: min(100%, calc(var(--prime-space-24) * 2.5));
+  flex: 999 1 calc(var(--prime-space-24) * 2);
+  min-width: min(100%, calc(var(--prime-space-24) * 2));
 }
 
 .chips {
