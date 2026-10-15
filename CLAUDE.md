@@ -432,8 +432,8 @@ export const page: ComponentPageConfig = {
   (`slot-prop`). A required slot the kind does not allow fails the contract — extend `KIND_SLOTS` or
   change the kind, never work around it in `api.ts`.
 - Preview layout and surface are never set per page: the slot sets the layout (`layout` pages use
-  `full`); a component-specific scenario may pick another layout of its kind with `layout`
-  (`kindLayouts`); the surface is the playground-wide choice. Stack layouts centre their children in a
+  `full`); a component-specific scenario may pick another layout of its kind, or `full` for
+  page structure, with `layout` (`kindLayouts`); the surface is the playground-wide choice. Stack layouts centre their children in a
   column of at most 640, so container-typed components (Stepper, Breadcrumb) need no width hacks.
 - A new component needs only its section file: `category` is its sidebar group, `nav` its route and
   search entry. Nothing else to register.

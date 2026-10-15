@@ -24,7 +24,7 @@ export type SlotExample = { slot: SlotId; description: string };
 /**
  * A component-specific scenario: file `<scenario>.tsx` (kebab-case by meaning), own title. Its
  * preview layout is the kind's scenario layout unless `layout` picks another layout of the kind
- * (`kindLayouts`).
+ * or `full` (`kindLayouts`).
  */
 export type ScenarioExample = {
   scenario: string;

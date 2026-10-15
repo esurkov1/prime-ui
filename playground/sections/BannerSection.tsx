@@ -47,6 +47,7 @@ export const page: ComponentPageConfig = {
     {
       scenario: "page-strip",
       title: "Над страницей и в карточке",
+      layout: "full",
       description:
         "Полоса во всю ширину над страницей и скруглённый блок в карточке — `placement`.",
     },
