@@ -98,8 +98,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Avatar.Group",
-      en: '`ref` → `HTMLDivElement`. An overlapping row (`role="group"`); members overlap by 25% with a ring in `--avatar-ring`.',
-      ru: 'Ряд с наложением (`role="group"`); участники перекрываются на 25% с кольцом цвета `--avatar-ring`.',
+      en: '`ref` → `HTMLDivElement`. An overlapping row (`role="group"`); members overlap by an eighth of the diameter with a ring in `--avatar-ring`.',
+      ru: 'Ряд с наложением (`role="group"`); участники перекрываются на восьмую часть диаметра с кольцом цвета `--avatar-ring`.',
       props: [
         {
           name: "size",

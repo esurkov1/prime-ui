@@ -177,8 +177,10 @@
     var(--avatar-ring, var(--prime-color-layer-current));
 }
 
+/* The step: an eighth of the tier's diameter, so with the ring each member stays at least four
+   fifths visible and its initials (centred, 0.4 of the diameter) are never cut. */
 .group > * + * {
-  margin-inline-start: calc(var(--avatar-size) * -0.25);
+  margin-inline-start: calc(var(--avatar-size) * -0.125);
 }
 
 /* The «+N» fill is the muted fill composited over the same ground as the ring, so it is opaque
