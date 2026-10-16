@@ -1,6 +1,8 @@
 import { render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { cssRule, cssValue } from "@/test/css";
+
 import { MorphText } from "./MorphText";
 
 describe("MorphText", () => {
@@ -17,5 +19,10 @@ describe("MorphText", () => {
     const layers = Array.from(segment.children).slice(1);
     expect(layers.map((layer) => layer.textContent)).toEqual(["", "ф"]);
     expect(root).toHaveTextContent("Искать «фывф»");
+  });
+
+  it("never paints a leaving word past its own box sideways", () => {
+    const root = cssRule("src/internal/MorphText.module.css", ".root");
+    expect(cssValue(root, "overflow-x")).toBe("clip");
   });
 });
