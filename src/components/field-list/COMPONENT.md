@@ -126,7 +126,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 ## Layout & spacing
 - One grid for the list: every row, the heading row and the totals row share one track list `[columns] [end] [grip]`, so the columns line up like a table's; the end fits the row's «×» or «⋯» of the tier, the grip (with `reorderable` buttons) is one `xs` control wide (the handle or the lock) and ends the row on the inline-end side (on the left in RTL). Every row fills the same slots: a pinned row shows its remove off, never a hole.
-- Rows stand edge to edge, 8 of padding above and below their fields; a faint line between two rows (`hairline`), inset by the side padding, none above the first row. Columns 12 apart (`--prime-space-3`).
+- Rows stand edge to edge, 8 of padding above and below their fields. On `surface` a faint line parts two rows (`hairline`), inset by the side padding, none above the first row; a `plain` list draws no lines — the air between the fields parts its rows. Columns 12 apart (`--prime-space-3`).
 - `plain`: side padding 0. `surface`: the sheet's fill (`--prime-color-layer-current` at its `data-depth`), radius `--prime-radius-l`, 12 of side padding on every row and 12 above the headings and under the last row.
 - A `compact` column is measured: its track is the widest of its controls, its heading and its total, so the gaps between columns are all 12.
 - The remove button, the menu button, the handle and the lock stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.

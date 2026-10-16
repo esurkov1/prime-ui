@@ -3,8 +3,8 @@
  * One track list for the heading row, every row and the totals row (`--fl-columns`, set per row
  * so a row carried by Dnd keeps its tracks): [the columns] [end: remove or menu] [grip: handle or
  * lock]. Every row has the same slots: a pinned row's remove stands there, off. The rows stand
- * edge to edge on the sheet, a faint line between two rows inset by the side padding
- * (`hairline.between`); on a surface, a field-tone fill under the pointer. `variant="surface"` puts the sheet on a fill of
+ * edge to edge on the sheet; on a surface a faint line between two rows inset by the side padding
+ * (`hairline.between`) — a plain list has no lines, the air between fields parts its rows; on a surface, a field-tone fill under the pointer. `variant="surface"` puts the sheet on a fill of
  * its own, one step up the surface ladder (`data-depth`); `plain` leaves it on the host surface.
  * The column headings stand once above the rows; the fields inside carry them as hidden labels
  * (`fieldCell`). In a narrow container (`prime-field-list`, < 30rem) the heading row goes, a row
@@ -66,8 +66,13 @@
   padding: var(--prime-space-2) var(--fl-pad);
 }
 
-/* The lines between rows stop at the side padding (a plain sheet keeps the hairline's own 0%: the
-   unitless `--prime-space-0` cannot stand in its calc). */
+/* The lines between rows stop at the side padding. A plain sheet sets 0% itself (the unitless
+   `--prime-space-0` cannot stand in the calc), or it would inherit its host's inset — a Drawer's
+   or a Card's padding — and draw short lines. */
+.sheet .row {
+  --hairline-inset: 0%;
+}
+
 .sheet[data-variant="surface"] .row {
   --hairline-inset: var(--fl-pad);
 }

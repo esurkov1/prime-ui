@@ -677,7 +677,8 @@ export function FieldList<T extends object>({
         fieldTierClass,
         styles.row,
         styles.record,
-        hairline.between,
+        // Only a list on its own fill draws lines between its rows; a plain list is spaced by air.
+        surface && hairline.between,
         presence.entering.has(id) && enterMotion.enter,
       ),
       style: trackStyle,

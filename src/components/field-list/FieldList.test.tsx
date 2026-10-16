@@ -8,6 +8,7 @@ import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
+import hairline from "@/internal/hairline.module.css";
 
 import { FieldList, type FieldListColumn, type FieldListProps } from "./FieldList";
 
@@ -357,6 +358,13 @@ describe("FieldList", () => {
     rerender(<Lines variant="surface" />);
     expect(sheetOf()).toHaveAttribute("data-variant", "surface");
     expect(sheetOf()).toHaveAttribute("data-depth", "1");
+  });
+
+  it("draws lines between rows only on a surface; a plain list is parted by air", () => {
+    const { rerender } = render(<Lines />);
+    expect(rowsOf()[1]?.className).not.toContain(hairline.between);
+    rerender(<Lines variant="surface" />);
+    expect(rowsOf()[1]?.className).toContain(hairline.between);
   });
 
   it("Tab walks a row's fields, then its remove button, then the next row", async () => {
