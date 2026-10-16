@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "DataTable",
-      en: "Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.",
-      ru: "Блок с заливкой карточки: панель сверху, прокручиваемая `<table>` и подвал (диапазон, Pagination, статус догрузки); передаёт ярус контролам внутри.",
+      en: "Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer when it has something to show (Pagination, the range with `showRange`, the status while more rows load); passes its tier to the controls inside.",
+      ru: "Блок с заливкой карточки: панель сверху, прокручиваемая `<table>` и подвал, когда в нём есть что показать (Pagination, диапазон при `showRange`, статус догрузки строк); передаёт ярус контролам внутри.",
       props: [
         {
           name: "columns",
@@ -77,8 +77,8 @@ export const api: ComponentApi = {
           name: "rowCount",
           type: "number",
           default: "rows.length",
-          en: 'Total rows on the server (`source="server"`): the page count and «Показано {from}–{to} из {total}».',
-          ru: 'Всего строк на сервере (`source="server"`): число страниц и «Показано {from}–{to} из {total}».',
+          en: 'Total rows on the server (`source="server"`): the page count and the range line (`showRange`).',
+          ru: 'Всего строк на сервере (`source="server"`): число страниц и строка диапазона (`showRange`).',
         },
         {
           name: "getRowKey",
@@ -131,6 +131,13 @@ export const api: ComponentApi = {
           type: "(page: number) => void",
           en: "Page change from the pager; a sort change also returns to page 1.",
           ru: "Смена страницы; смена сортировки тоже возвращает на первую.",
+        },
+        {
+          name: "showRange",
+          type: "boolean",
+          default: "false",
+          en: 'A range line in the footer (`labels.range`) when the rows do not fit one page: paged with more than one page, or `paging="infinite"`.',
+          ru: 'Строка диапазона в подвале (`labels.range`), когда строки не помещаются на одну страницу: страницы, если их больше одной, или `paging="infinite"`.',
         },
         {
           name: "sort",
@@ -290,8 +297,8 @@ export const api: ComponentApi = {
           name: "loadingMore",
           type: "boolean",
           default: "false",
-          en: "A server batch is loading: footer status, `aria-busy`.",
-          ru: "Идёт догрузка с сервера: статус в подвале, `aria-busy`.",
+          en: "A server batch is loading: the footer shows `labels.loadingMore` with a Spinner, `aria-busy`.",
+          ru: "Идёт догрузка с сервера: подвал показывает `labels.loadingMore` со Spinner, `aria-busy`.",
         },
         {
           name: "onLoadMore",
@@ -611,8 +618,8 @@ export const api: ComponentApi = {
         {
           name: "grow",
           type: "boolean",
-          en: "Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping.",
-          ru: "Забирает свободную ширину и переносит текст; таблица тогда заполняет контейнер. С `minWidth` не становится уже: ниже этого таблица прокручивается, ячейки не наезжают.",
+          en: 'Takes the free width; the table then fills its container. Its cells fit the width they get: text wraps, `truncate` ellipsizes, a `Badge.Group` with `overflow="count"` shows «+N». It never gets narrower than its header or `minWidth`: below that the table scrolls instead of cells overlapping.',
+          ru: 'Забирает свободную ширину; таблица тогда заполняет контейнер. Ячейки укладываются в доставшуюся ширину: текст переносится, `truncate` обрезается многоточием, `Badge.Group` с `overflow="count"` показывает «+N». Уже заголовка или `minWidth` не становится: ниже этого таблица прокручивается, ячейки не наезжают.',
         },
         {
           name: "hideable",
@@ -650,16 +657,12 @@ export const api: ComponentApi = {
     },
     empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
     range: {
-      en: "Footer range line; `{from}`, `{to}`, `{total}` are replaced.",
-      ru: "Строка диапазона в подвале; `{from}`, `{to}`, `{total}` заменяются.",
+      en: "Footer range line with `showRange`; `{from}`, `{to}`, `{total}` are replaced.",
+      ru: "Строка диапазона в подвале при `showRange`; `{from}`, `{to}`, `{total}` заменяются.",
     },
     loadingMore: {
-      en: "Footer status while `loadingMore`.",
-      ru: "Статус в подвале при `loadingMore`.",
-    },
-    scrollForMore: {
-      en: "Footer hint when more rows can appear by scrolling.",
-      ru: "Подсказка в подвале, когда прокрутка добавит строки.",
+      en: "Footer status while more rows load (`loadingMore` or a pending `onLoadMore`); announced politely.",
+      ru: "Статус в подвале, пока догружаются строки (`loadingMore` или незавершённый `onLoadMore`); объявляется вежливо.",
     },
     selectAll: {
       en: "Name of the head «select all» checkbox.",

@@ -617,6 +617,14 @@
   min-width: 0;
 }
 
+/* In a dialog body: the blocks of the tab stand the section step apart, the rhythm of the body's
+   sections; a dialog section inside adds nothing to it. */
+.panelContent[data-stack] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-8);
+}
+
 /* ---------- Vertical → horizontal row in narrow containers ---------- */
 
 /* The column becomes the horizontal strip above the panel: the folder turns to rise from the top

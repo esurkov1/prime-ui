@@ -2,7 +2,8 @@ import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
-import { Dnd } from "@/components/dnd/Dnd";
+import { Dnd, DndLock } from "@/components/dnd/Dnd";
+import { useResizeEffect } from "@/hooks/useElementSize";
 import { ControlSizeProvider, useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -25,14 +26,17 @@ import styles from "./List.module.css";
 export type ListLabels = {
   /** `aria-label` of a row's drag handle (`onReorder`); `{label}` is the row's text. */
   reorderItem: string;
+  /** Name of the lock a `locked` row shows in the grip's place; `{label}` is the row's text. */
+  lockedItem: string;
 };
 
 export const LIST_LABELS: ListLabels = {
   reorderItem: "Переместить {label}",
+  lockedItem: "{label}: закреплено",
 };
 
-/** What a row of a reorderable list needs: the handle's name. */
-type ReorderContextValue = { handleLabel: string };
+/** What a row of a reorderable list needs: the names of its grip and of its lock. */
+type ReorderContextValue = { handleLabel: string; lockLabel: string };
 
 const ReorderContext = React.createContext<ReorderContextValue | null>(null);
 
@@ -67,8 +71,11 @@ function ListRoot({
 }: ListRootProps) {
   const tier = useHostTier(sizeProp);
   const size = tier.size;
-  const handleLabel = useLabels(LIST_LABELS, labels).reorderItem;
-  const reorder = React.useMemo<ReorderContextValue>(() => ({ handleLabel }), [handleLabel]);
+  const { reorderItem: handleLabel, lockedItem: lockLabel } = useLabels(LIST_LABELS, labels);
+  const reorder = React.useMemo<ReorderContextValue>(
+    () => ({ handleLabel, lockLabel }),
+    [handleLabel, lockLabel],
+  );
   const latest = React.useRef(onReorder);
   latest.current = onReorder;
   // Dnd keeps a row in its new place, busy with a busy grip, until a returned promise settles,
@@ -334,6 +341,7 @@ type ListItemOwnProps = {
   value?: string;
   current?: boolean;
   disabled?: boolean;
+  locked?: boolean;
   asChild?: boolean;
   children?: React.ReactNode;
 };
@@ -351,6 +359,7 @@ function ListItem({
   value,
   current = false,
   disabled = false,
+  locked = false,
   asChild = false,
   href,
   className,
@@ -366,6 +375,7 @@ function ListItem({
   const presence = React.useContext(PresenceContext);
   const key = React.useContext(RowKeyContext);
   const rowRef = React.useRef<HTMLLIElement | null>(null);
+  const frameRef = React.useRef<HTMLDivElement | null>(null);
   const entered = useListItemPresence(
     presence ?? NO_PRESENCE,
     key ?? value ?? "",
@@ -378,6 +388,19 @@ function ListItem({
     slotted ? slotted.props.children : children,
     ListItemActions,
   );
+  // The row's controls stand as far from its edge as from its top and bottom, at any row height:
+  // the frame carries its own height and the spacer beside the controls is computed from it. A
+  // percentage height cannot do it — the row is as tall as its content, and engines differ on
+  // whether a stretched box is definite for the width of a square inside it.
+  const hasActions = actions.length > 0;
+  const placeActions = React.useCallback(() => {
+    const frame = frameRef.current;
+    frame?.style.setProperty("--list-row-h", `${frame.offsetHeight}px`);
+  }, []);
+  React.useLayoutEffect(() => {
+    if (hasActions) placeActions();
+  }, [hasActions, placeActions]);
+  useResizeEffect(frameRef, placeActions, { enabled: hasActions });
   const shared = {
     ...rest,
     ref,
@@ -414,7 +437,7 @@ function ListItem({
     const leading = actions.filter((part) => part.props.side === "start");
     const trailing = actions.filter((part) => part.props.side !== "start");
     element = (
-      <div className={styles.frame}>
+      <div ref={frameRef} className={styles.frame}>
         {leading}
         {element}
         {trailing}
@@ -433,18 +456,27 @@ function ListItem({
 
   // A reorderable row: the grip after the row element and its controls, at the row's end (a button
   // cannot hold a button), so Tab reaches the row before its grip; Dnd makes the grip busy while the
-  // owner saves this row's move.
-  const label = formatLabel(reorder.handleLabel, { label: itemLabel({ asChild, children }) });
+  // owner saves this row's move. A locked row holds its place: a lock in the grip's box, so its
+  // columns line up with the movable rows, and the row itself works as any other.
+  const text = { label: itemLabel({ asChild, children }) };
   return (
     <Dnd.SortableItem
       ref={rowRef}
       id={value}
       disabled={disabled}
+      locked={locked}
       className={cx(rowClass, styles.sortableRow)}
     >
       {element}
       <span className={cx(fieldTierClass, styles.grip)} data-size="xs">
-        <Dnd.Handle aria-label={label.trim()} disabled={disabled} />
+        {locked ? (
+          <DndLock aria-label={formatLabel(reorder.lockLabel, text).trim()} />
+        ) : (
+          <Dnd.Handle
+            aria-label={formatLabel(reorder.handleLabel, text).trim()}
+            disabled={disabled}
+          />
+        )}
       </span>
     </Dnd.SortableItem>
   );

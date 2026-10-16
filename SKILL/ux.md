@@ -34,6 +34,7 @@ adds text that explains what the layout failed to show.
 | A base value and its overrides (a price and its changes by month) | one list: the base is the first, pinned row | `FieldList` `getLocked` |
 | Small attributes of a record (an icon, a color, a flag) | compact controls in the record's row, not fields of their own | icon-only `Select`, `ColorPresets`, `Switch` |
 | Short texts in an order the person sets | one column, a handle per row | `FieldList` `reorderable` |
+| Records of one kind, some fixed by the system (funnel stages, default roles) | one list in their real order, the fixed rows pinned in place | `List` `locked`, `FieldList` `getLocked` |
 | Settings that most people never touch | behind a disclosure, after the common ones | `Accordion`, a «Дополнительно» section |
 | One of a few options, sent with a form | all visible | `Radio.Group` |
 | One of a few modes of what the screen shows | all visible | `SegmentedControl` |
@@ -81,6 +82,36 @@ records they cannot see. A set that can be empty shows its empty state, never a 
 </Drawer.Section>
 ```
 
+**One kind, one list.** Records of one kind stay one list in the order they really have, whoever made
+them: the stages of a funnel, the team's and the system's alike, read top to bottom as the board shows
+them. What some rows cannot do (move, be removed) is a mark on those rows — the lock in the grip's
+place — never a second section. Two lists split one order in two, and their columns no longer line up.
+The test: does the board, the report or the process read these records as one sequence? Then they are
+one list.
+
+```tsx partial
+// bad — the system stages in a section of their own under the team's; one order, two lists
+<Drawer.Section label="Свои этапы">
+  <List.Root aria-label="Свои этапы" onReorder={reorder}>…</List.Root>
+</Drawer.Section>
+<Drawer.Section label="Системные этапы">
+  <List.Root aria-label="Системные этапы">…</List.Root>
+</Drawer.Section>
+```
+
+```tsx good
+// good — one list in board order; the system stages hold their places with a lock
+// declare: const stages: { id: string; name: string; system: boolean }[]
+// declare: const reorder: (id: string, beforeId: string | null) => void
+<List.Root aria-label="Этапы воронки" onReorder={reorder}>
+  {stages.map((stage) => (
+    <List.Item key={stage.id} value={stage.id} locked={stage.system}>
+      <List.ItemText>{stage.name}</List.ItemText>
+    </List.Item>
+  ))}
+</List.Root>
+```
+
 ## 3. Label economy
 
 Every word on screen must carry something the person does not see already.
@@ -91,6 +122,46 @@ Every word on screen must carry something the person does not see already.
   list already counts. The list label names the rows.
 - **No label that repeats its heading.** A field «Цена» inside the section «Цена» needs no label of
   its own beyond what the section says; a group of one field is the field.
+- **A heading only where it names what nothing else names.** A block that names itself — a chart or a
+  card with its own title, a table with its toolbar — gets no section heading over it, and the first
+  block of a tab never repeats the tab («Характеристики» under the tab «Характеристики»). A section
+  heading stands where several blocks share a topic that none of them names. The test: delete the
+  heading and read the screen; if nothing is lost, it goes. Blocks without a heading stand one under
+  another with the section step between them (a `Tabs.Panel` in a dialog body spaces them by itself;
+  no wrapper of your own).
+
+```tsx partial
+// bad — a section over a chart that has its own title, under a tab of the same name
+<Tabs.Panel value="analytics">
+  <Drawer.Section label="Аналитика" description="За 30 дней">
+    <ChartFrame.Root>
+      <ChartFrame.Header>
+        <ChartFrame.Title>Продажи</ChartFrame.Title>
+      </ChartFrame.Header>
+      …
+    </ChartFrame.Root>
+  </Drawer.Section>
+</Tabs.Panel>
+```
+
+```tsx good
+// good — the charts name themselves; the tab names the topic, the period is the tab's switcher
+// declare: const sales: Parameters<typeof ChartFrame.Root>[0]["rows"]
+// declare: const refunds: Parameters<typeof ChartFrame.Root>[0]["rows"]
+<Tabs.Panel value="analytics">
+  <ChartFrame.Root rows={sales}>
+    <ChartFrame.Header>
+      <ChartFrame.Title>Продажи</ChartFrame.Title>
+    </ChartFrame.Header>
+  </ChartFrame.Root>
+  <ChartFrame.Root rows={refunds}>
+    <ChartFrame.Header>
+      <ChartFrame.Title>Возвраты</ChartFrame.Title>
+    </ChartFrame.Header>
+  </ChartFrame.Root>
+</Tabs.Panel>
+```
+
 - **A unit lives in one place.** In the field (`Input.InlineAffix`) or in the heading, never both;
   never in the field's own label («Бюджет», not «Бюджет, ₽»). Prefer the field: the unit stays
   beside the number when the row stacks, and a screen reader hears it with the field (the affix
@@ -111,6 +182,11 @@ Every word on screen must carry something the person does not see already.
 | «Звук» (Switch) — «Применяется сразу, без сохранения» | no hint |
 | «Отключить доступ» — «Сотрудник не сможет войти, история его действий останется» | «Входы прекратятся» |
 | «Почта для входа» — «На эту почту придёт ссылка для входа в систему» | «Для входа и уведомлений» |
+- **Helper text is opt-in.** A hint, a limit, a counter, a range line («Показано 1–20 из 240») or a
+  description shows only where it tells this person something they need for this task; the kit
+  draws none of its own unless asked — DataTable shows its range with `showRange`, and FieldList and
+  FileUpload at `max` close up their add control without a word, so a limit worth knowing goes in
+  `hint` («До 10 фото»). Turn one on for a reason you can name, never because the prop exists.
 - **One name per thing.** The same action, entity and status keep one word on the whole screen
   (and across screens): «Счёт», not «Счёт» in the title and «Инвойс» in the button.
 - **Count the labels.** On a form of repeating rows, labels on screen ≤ number of columns + the
@@ -158,8 +234,9 @@ Which button starts each step and how the confirm behaves:
 ## 6. Nothing to guess
 
 - **A disabled control says why** when the reason is not on screen: a `hint` under the field, a
-  line beside the button («Не больше 3», as `FieldList` does at `max`), or the disabled control
-  itself in `Tooltip.Trigger`. An action a person may never take (no permission) is hidden, not
+  line beside the button, or the disabled control itself in `Tooltip.Trigger`. A control that
+  leaves at a limit (the add button of `FieldList` or `FileUpload` at `max`) says it ahead, in the
+  list's `hint`. An action a person may never take (no permission) is hidden, not
   disabled.
 - **The screen answers the latest question.** A request a value starts (a search, a filter, a page,
   a period) is cancelled when the value changes again — abort it (`AbortController`) or drop its

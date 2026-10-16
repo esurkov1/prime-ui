@@ -55,14 +55,14 @@ describe("FileUpload", () => {
     expect(label).toHaveAttribute("data-variant", "solid");
   });
 
-  it("renders built-in texts from labels; an empty description is hidden", () => {
-    render(
-      <FileUpload.Root labels={{ title: "Drop a file", description: "", browse: "Browse" }} />,
+  it("renders built-in texts from labels and states no formats or limits of its own", () => {
+    const { container } = render(
+      <FileUpload.Root labels={{ title: "Drop a file", browse: "Browse" }} />,
     );
 
     expect(screen.getByText("Drop a file")).toBeInTheDocument();
     expect(screen.getByText("Browse")).toBeInTheDocument();
-    expect(screen.queryByText(/JPEG/)).not.toBeInTheDocument();
+    expect(container.querySelector("label")).toHaveTextContent(/^Drop a fileBrowse$/);
   });
 
   it("sets invalid state on root and input", () => {
@@ -766,7 +766,6 @@ describe('FileUpload.Root trigger="tile", a value', () => {
     ];
     fireEvent.change(input, { target: { files } });
     expect(onFilesChange).toHaveBeenCalledWith([files[0]]);
-    expect(input.closest("label")).toHaveTextContent("3 из 4");
   });
 
   it("takes files dropped anywhere on the set; the add tile turns into the target", () => {
@@ -781,15 +780,53 @@ describe('FileUpload.Root trigger="tile", a value', () => {
     expect(container.querySelector("[data-dropping]")).toBeNull();
   });
 
-  it("at max the add tile says so and takes nothing", () => {
+  it("with room under max the add tile counts nothing", () => {
+    render(<Photos max={4} />);
+    expect(screen.getByLabelText("Добавить файлы").closest("label")).toHaveTextContent(
+      /^Добавить$/,
+    );
+  });
+
+  it("at max the add tile leaves and comes back once a file goes", () => {
     render(<Photos max={3} />);
+    expect(screen.queryByLabelText("Добавить файлы")).toBeNull();
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    const tile = screen.getByRole("listitem", { name: "Фото 1: Спереди" });
+    tile.focus();
+    fireEvent.keyDown(tile, { key: "Delete" });
+    expect(screen.getByLabelText("Добавить файлы")).toBeInTheDocument();
+  });
+
+  it("a pick that fills the set hands the focus from the add tile to the last file", async () => {
+    function Filling() {
+      const [value, setValue] = React.useState<readonly FileUploadFile[]>(PHOTOS.slice(0, 2));
+      return (
+        <FileUpload.Root
+          label="Фотографии"
+          trigger="tile"
+          layout="grid"
+          multiple
+          max={3}
+          value={value}
+          onValueChange={setValue}
+          onFilesChange={(files) =>
+            setValue((current) => [
+              ...current,
+              ...files.map((file) => ({ id: file.name, name: file.name, type: file.type })),
+            ])
+          }
+        />
+      );
+    }
+    render(<Filling />);
     const input = screen.getByLabelText("Добавить файлы");
-    // Marked off, not disabled: a disabled input would dim the whole field's label.
-    expect(input).not.toBeDisabled();
-    expect(input).toHaveAttribute("aria-disabled", "true");
-    expect(fireEvent.click(input)).toBe(false);
-    expect(screen.getByText("Лимит файлов")).toBeInTheDocument();
-    expect(screen.getByLabelText("Добавить файлы").closest("label")).toHaveTextContent("3 из 3");
+    input.focus();
+    const file = new File(["3"], "back.jpg", { type: "image/jpeg" });
+    await act(async () => {
+      fireEvent.change(input, { target: { files: [file] } });
+    });
+    expect(screen.queryByLabelText("Добавить файлы")).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole("listitem", { name: /^\S+ 3: back/ }));
   });
 
   it("a tile shows the base name; the full name stays in its title and aria-label", () => {

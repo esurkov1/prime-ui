@@ -27,6 +27,7 @@ import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
 import { useLongPress } from "@/internal/longPress";
+import { namedRole } from "@/internal/namedRole";
 import { usePartPresence } from "@/internal/partPresence";
 import { flattenChildren, isPart } from "@/internal/parts";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -177,7 +178,8 @@ export type ChatListItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, 
 
 /**
  * The avatar of the dialog before `ChatList.ItemText`; after it, a glyph beside the name (a
- * verified mark, a bot). Drawn by `ChatList.Item`.
+ * verified mark, a bot): any kit icon, sized by the row, named by the part's `aria-label`.
+ * Drawn by `ChatList.Item`.
  */
 function ChatListItemIcon(_props: ChatListItemIconProps): React.ReactNode {
   return null;
@@ -276,7 +278,7 @@ type ChatListItemOwnProps = {
 };
 
 export type ChatListItemProps = ChatListItemOwnProps &
-  Omit<ListItemProps, keyof ChatListItemOwnProps | "value" | "current" | "disabled">;
+  Omit<ListItemProps, keyof ChatListItemOwnProps | "value" | "current" | "disabled" | "locked">;
 
 /**
  * A dialog: a `List.Item` row (a button, a link with `href`, or the consumer's element with
@@ -357,7 +359,11 @@ function ChatListItem({
           // biome-ignore lint/suspicious/noArrayIndexKey: glyphs keep their written order
           <React.Fragment key={index}>
             {" "}
-            <span {...glyphRest} className={cx(styles.glyph, glyphClass)}>
+            <span
+              {...glyphRest}
+              role={namedRole(glyphRest, "img")}
+              className={cx(styles.glyph, glyphClass)}
+            >
               {glyphChildren}
             </span>
           </React.Fragment>

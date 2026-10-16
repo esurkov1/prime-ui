@@ -74,8 +74,6 @@ export type KanbanLabels = {
   countLimit: string;
   /** Text of an empty column. */
   empty: string;
-  /** Hint under it while cards can be dropped. */
-  emptyHint: string;
   /** Why a full column refuses a card (spoken, and shown under the carried card): `{column}`, `{limit}`. */
   full: string;
   /** Name of the grip that moves a column: `{column}`. */
@@ -92,7 +90,6 @@ export const KANBAN_LABELS: KanbanLabels = {
   count: "Карточек: {count}",
   countLimit: "Карточек: {count} из {limit}",
   empty: "Нет карточек",
-  emptyHint: "Перетащите сюда карточку",
   full: "Колонка «{column}» заполнена ({limit})",
   moveColumn: "Переместить колонку «{column}»",
   column: "Колонка «{column}»",
@@ -634,9 +631,6 @@ function KanbanColumnView<T>({
                 empty={
                   <EmptyPage.Root layout="compact">
                     <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
-                    {disabled ? null : (
-                      <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
-                    )}
                   </EmptyPage.Root>
                 }
                 renderItem={(item) => (

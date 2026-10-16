@@ -423,6 +423,14 @@ describe("formatting", () => {
     expect(field()).toHaveValue("Срок **~~до пятницы~~**");
   });
 
+  it("Mod+U underlines the selection", async () => {
+    const user = userEvent.setup();
+    render(<Composer.Root defaultValue="Счёт оплачен" />);
+    select(0, 4);
+    await user.keyboard("{Control>}u{/Control}");
+    expect(field()).toHaveValue("__Счёт__ оплачен");
+  });
+
   it("Mod+I, Mod+E, Mod+Shift+H and Mod+K format the selection", () => {
     render(<Composer.Root defaultValue="срок" />);
     select(0, 4);

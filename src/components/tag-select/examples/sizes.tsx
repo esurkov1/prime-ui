@@ -19,7 +19,6 @@ export default function TagSelectSizesExample() {
           label={size}
           options={OPTIONS}
           defaultValue={["design", "backend"]}
-          labels={{ panelHint: "Выберите метку" }}
         />
       ))}
     </div>

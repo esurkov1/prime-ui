@@ -11,6 +11,7 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
+import { BlockStackContext } from "@/internal/blockStack";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -769,6 +770,8 @@ function TabsPanelContent({
   ...rest
 }: Omit<TabsPanelProps, "keepMounted"> & { active: boolean }) {
   const { rootId, registerPanel } = useTabsContext();
+  // In a dialog body the panel stacks its blocks the section step apart, like the body's sections.
+  const stacked = React.useContext(BlockStackContext);
   React.useLayoutEffect(() => registerPanel(value), [registerPanel, value]);
   // The panel that mounts with the tabs is just there; one the tabs open later enters.
   const appear = useEnterOnAppear<HTMLDivElement>(active);
@@ -788,7 +791,10 @@ function TabsPanelContent({
     >
       {/* The content enters each time its tab opens it after the tabs are on screen: mounted
           anew, or a kept panel shown again. The panel shown on mount stands still. */}
-      <div className={cx(styles.panelContent, appear.entering && enterMotion.enterBase)}>
+      <div
+        className={cx(styles.panelContent, appear.entering && enterMotion.enterBase)}
+        data-stack={stacked || undefined}
+      >
         {children}
       </div>
     </div>

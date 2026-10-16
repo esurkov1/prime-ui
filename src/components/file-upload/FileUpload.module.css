@@ -8,7 +8,6 @@
 .root {
   --fu-pad: var(--prime-space-6);
   --fu-stack: var(--prime-space-4);
-  --fu-copy-gap: var(--prime-space-1);
   /* The tier of the zone comes from fieldTier (`fieldTierClass` in TSX). */
   --fu-title: var(--field-text);
   --fu-title-line-height: var(--field-lh);
@@ -60,7 +59,6 @@
 .root[data-size="xl"] {
   --fu-pad: var(--prime-space-10);
   --fu-stack: var(--prime-space-6);
-  --fu-copy-gap: var(--prime-space-2);
   --fu-radius: var(--prime-radius-xl);
 }
 
@@ -148,14 +146,6 @@
 
 .root[data-disabled="true"] .icon {
   color: var(--prime-color-text-disabled);
-}
-
-.copy {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--fu-copy-gap);
-  min-width: 0;
 }
 
 .title {
@@ -424,7 +414,7 @@
   border-radius: var(--prime-radius-l);
 }
 
-/* A small cell keeps the «+» and the count; the word goes. */
+/* A small cell keeps the «+»; the word goes. */
 @container (width < 6rem) {
   .addText {
     display: none;
@@ -481,28 +471,10 @@
   background: var(--prime-color-fill-muted);
 }
 
-/* Quiet text: the tile is an offer, not a heading — the caption role (textRole), the count a step
-   fainter. */
+/* Quiet text: the tile is an offer, not a heading — the caption role (textRole). */
 .addText {
   margin-block-start: var(--prime-space-1);
   font-weight: var(--prime-font-weight-medium);
-}
-
-.addHint {
-  color: var(--prime-color-text-disabled);
-  font-variant-numeric: tabular-nums;
-}
-
-/* At the limit the tile stays to say so, but takes nothing. */
-.add[data-full] .addTarget {
-  cursor: default;
-  opacity: var(--prime-opacity-busy);
-}
-
-@media (hover: hover) {
-  .add[data-full] .addTarget:hover {
-    background: none;
-  }
 }
 
 /* An empty set: the add tile is the whole row, a drop zone. */

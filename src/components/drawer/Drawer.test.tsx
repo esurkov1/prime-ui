@@ -1,12 +1,15 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
+import { Tabs } from "@/components/tabs/Tabs";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { swipe } from "@/test/mobile";
 import { describeOverlayConformance } from "@/test/overlayConformance";
 
@@ -80,6 +83,39 @@ describe("Drawer", () => {
     expect(close).toHaveFocus();
     await user.tab({ shift: true });
     expect(confirm).toHaveFocus();
+  });
+
+  it("stacks the blocks of a tab panel in the body; a panel outside a dialog stays plain", () => {
+    render(
+      <>
+        <Tabs.Root defaultValue="charts">
+          <Tabs.List aria-label="Снаружи">
+            <Tabs.Item value="charts">Снаружи</Tabs.Item>
+          </Tabs.List>
+          <Tabs.Panel value="charts">Вне диалога</Tabs.Panel>
+        </Tabs.Root>
+        <Drawer.Root defaultOpen>
+          <Drawer.Content>
+            <Tabs.Root defaultValue="analytics">
+              <Drawer.Header>
+                <Drawer.Title>Кресло «Орион»</Drawer.Title>
+                <Tabs.List aria-label="Модель">
+                  <Tabs.Item value="analytics">Аналитика</Tabs.Item>
+                </Tabs.List>
+              </Drawer.Header>
+              <Drawer.Body>
+                <Tabs.Panel value="analytics">
+                  <div>Продажи</div>
+                  <div>Возвраты</div>
+                </Tabs.Panel>
+              </Drawer.Body>
+            </Tabs.Root>
+          </Drawer.Content>
+        </Drawer.Root>
+      </>,
+    );
+    expect(screen.getByText("Вне диалога")).not.toHaveAttribute("data-stack");
+    expect(screen.getByText("Продажи").parentElement).toHaveAttribute("data-stack", "true");
   });
 
   it("opens from Trigger", () => {
@@ -432,6 +468,48 @@ describe("Drawer — header actions, footer meta, exit snapshot", () => {
     const close = screen.getByRole("button", { name: "Закрыть" });
     expect(actions.nextElementSibling).toBe(close);
     expect(screen.getByRole("button", { name: "Ещё" })).toHaveAttribute("data-size", "s");
+  });
+
+  it("holds a tab-wide switcher before the buttons at tier s; one shown later rises in", async () => {
+    function Card({ lang }: { lang: boolean }) {
+      return (
+        <Drawer.Root defaultOpen>
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title>Кресло «Орион»</Drawer.Title>
+              <Drawer.Actions data-testid="actions">
+                {lang ? (
+                  <SegmentedControl.Root aria-label="Язык текстов" defaultValue="ru">
+                    <SegmentedControl.Item value="ru">RU</SegmentedControl.Item>
+                    <SegmentedControl.Item value="en">EN</SegmentedControl.Item>
+                  </SegmentedControl.Root>
+                ) : null}
+                <Button.Root variant="ghost" tone="neutral" aria-label="Действия с моделью">
+                  ⋯
+                </Button.Root>
+              </Drawer.Actions>
+            </Drawer.Header>
+          </Drawer.Content>
+        </Drawer.Root>
+      );
+    }
+    const { rerender } = render(<Card lang={false} />);
+    const more = screen.getByRole("button", { name: "Действия с моделью" });
+    // The next task: the drawer is on screen.
+    await act(async () => {});
+    rerender(<Card lang />);
+    const radio = screen.getByRole("radio", { name: "RU" });
+    const cells = [...screen.getByTestId("actions").children];
+    const switcherCell = cells.find((cell) => cell.contains(radio));
+    // The switcher comes first, the buttons keep their element and their cell's stillness.
+    expect(cells[0]).toBe(switcherCell);
+    expect(switcherCell).toHaveClass(enterMotion.enter);
+    expect(screen.getByRole("button", { name: "Действия с моделью" })).toBe(more);
+    expect(more.parentElement).not.toHaveClass(enterMotion.enter);
+    expect(screen.getByRole("radiogroup", { name: "Язык текстов" })).toHaveAttribute(
+      "data-size",
+      "s",
+    );
   });
 
   it("renders Meta as a footer paragraph that does not describe the dialog", () => {

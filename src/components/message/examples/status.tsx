@@ -1,4 +1,4 @@
-/** Delivery of outgoing messages: a clock while sending, one check when sent, two when read, and a failed one with a retry that resolves after a second; the time comes as a date and reads to the second — `status`, `onRetry`, `formatTime`. */
+/** Delivery of outgoing messages: a clock while sending, one check when sent, two when read, and a failed one with its reason and a retry that resolves after a second; the time comes as a date and reads to the second — `status`, `failureReason`, `onRetry`, `formatTime`. */
 import { Message, type MessageStatus } from "prime-ui-kit";
 import * as React from "react";
 
@@ -54,6 +54,7 @@ export default function MessageStatusExample() {
         time={SECOND_AT}
         formatTime={formatSeconds}
         status={failed ? "failed" : "sent"}
+        failureReason="Клиент заблокировал бота — сообщение не доставлено"
         onRetry={retry}
       >
         <Message.Text>Подпишите, пожалуйста, до пятницы.</Message.Text>

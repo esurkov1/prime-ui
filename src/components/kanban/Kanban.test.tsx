@@ -70,10 +70,12 @@ describe("Kanban", () => {
     expect(screen.queryByText("Тариф для партнёров")).toBeNull();
   });
 
-  it("shows the empty state in a column without cards", () => {
+  it("shows the empty state in a column without cards: the text alone", () => {
     render(<Board />);
     const done = screen.getByRole("list", { name: "Готово" }).parentElement as HTMLElement;
-    expect(within(done).getByText("Нет карточек")).toBeInTheDocument();
+    expect(within(done).getByText("Нет карточек").parentElement).toHaveTextContent(
+      /^Нет карточек$/,
+    );
   });
 
   it("reads a WIP limit as count of limit", () => {

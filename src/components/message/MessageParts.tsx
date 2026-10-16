@@ -18,6 +18,7 @@ import { exitTimeoutMs } from "@/internal/motionTiming";
 import { hueOf } from "@/internal/palette";
 import palette from "@/internal/palette.module.css";
 import { RollingNumber } from "@/internal/RollingNumber";
+import type { TextEntity } from "@/internal/richText";
 import { RichText } from "@/internal/richText";
 import type { PaletteColor } from "@/internal/states";
 
@@ -179,6 +180,7 @@ MessageAuthorIcon.displayName = "Message.AuthorIcon";
 
 export type MessageTextProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   children: React.ReactNode;
+  entities?: readonly TextEntity[];
   plain?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -187,7 +189,13 @@ export type MessageTextProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
  * The text of a message, wrapping anywhere; the meta stands at the end of its last line (its
  * spacer closes the last line). Marks the matches of the chat's search (`Chat.Search`).
  */
-export function MessageText({ plain = false, className, children, ...rest }: MessageTextProps) {
+export function MessageText({
+  entities,
+  plain = false,
+  className,
+  children,
+  ...rest
+}: MessageTextProps) {
   const { spacer } = useMessagePart();
   const { labels } = React.useContext(RootContext);
   const highlight = useMessageHighlight().trim();
@@ -201,6 +209,7 @@ export function MessageText({ plain = false, className, children, ...rest }: Mes
       {typeof children === "string" && !plain ? (
         <RichText
           source={children}
+          entities={entities}
           end={spacer}
           highlight={highlight}
           labels={{ spoiler: labels.spoiler }}

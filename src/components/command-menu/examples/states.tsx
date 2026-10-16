@@ -46,7 +46,7 @@ export default function CommandMenuStatesExample() {
         onSearchChange={setSearch}
         loading={state === "loading"}
         aria-label="Выбор склада"
-        labels={{ empty: "Склад не найден", emptyHint: "В этом городе склада пока нет" }}
+        labels={{ empty: "В этом городе склада пока нет" }}
       >
         <CommandMenu.Input placeholder="Город склада" />
         <CommandMenu.List>

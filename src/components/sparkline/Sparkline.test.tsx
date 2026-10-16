@@ -17,16 +17,20 @@ const DATA: SparklinePoint[] = [
 const plot = () => screen.getByRole("slider", { name: "Выручка" });
 
 describe("Sparkline", () => {
-  it("heads with the latest point, its date and its change", () => {
-    render(<Sparkline data={DATA} label="Выручка" formatValue={(v) => `${v} ₽`} />);
+  it("heads with the latest point and its date, the change only when asked", () => {
+    const { rerender } = render(
+      <Sparkline data={DATA} label="Выручка" formatValue={(v) => `${v} ₽`} />,
+    );
     expect(screen.getByText("8 окт")).toBeInTheDocument();
     expect(plot()).toHaveAttribute("aria-valuenow", "2");
     expect(plot()).toHaveAttribute("aria-valuetext", "8 окт: 297 ₽");
+    expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+    rerender(<Sparkline data={DATA} label="Выручка" change="previous" />);
     expect(screen.getByText("−10%")).toBeInTheDocument();
   });
 
   it("walks the points with the arrow keys, Home and End, and returns on blur", () => {
-    render(<Sparkline data={DATA} label="Выручка" />);
+    render(<Sparkline data={DATA} label="Выручка" change="previous" />);
     plot().focus();
     fireEvent.keyDown(plot(), { key: "ArrowLeft" });
     expect(plot()).toHaveAttribute("aria-valuenow", "1");
@@ -355,6 +359,76 @@ describe("Sparkline", () => {
       render(<Sparkline data={GAPS} label="Выручка" summary="average" />);
       expect(plot()).toHaveAttribute("aria-valuetext", "6 окт – 9 окт: 309");
       expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+    });
+    it("rests on its own value of the period against compareTo and scrubs the points", () => {
+      const { container } = render(
+        <Sparkline data={DATA} label="Выручка" value={250} compareTo={200} change="previous" />,
+      );
+      expect(plot()).toHaveAttribute("aria-valuetext", "6 окт – 8 окт: 250");
+      expect(screen.getByText("+25%")).toBeInTheDocument();
+      expect(container.querySelector("[data-hidden]")).not.toBeNull();
+      fireEvent.keyDown(plot(), { key: "End" });
+      expect(plot()).toHaveAttribute("aria-valuetext", "8 окт: 297");
+      expect(screen.getByText("−10%")).toBeInTheDocument();
+    });
+
+    it("speaks an own value of null as empty", () => {
+      render(<Sparkline data={DATA} label="Выручка" value={null} compareTo={200} />);
+      expect(plot()).toHaveAttribute("aria-valuetext", "6 окт – 8 окт: Нет данных");
+      expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("change", () => {
+    const badge = (text: string) => screen.getByText(text).closest("[data-tone]");
+
+    it("paints growth danger and a fall success when lower is better", () => {
+      const { rerender } = render(
+        <Sparkline data={DATA} label="Выручка" change="previous" better="lower" />,
+      );
+      expect(badge("−10%")).toHaveAttribute("data-tone", "success");
+      rerender(
+        <Sparkline data={DATA.slice(0, 2)} label="Выручка" change="previous" better="lower" />,
+      );
+      expect(badge("+10%")).toHaveAttribute("data-tone", "danger");
+      rerender(<Sparkline data={DATA.slice(0, 2)} label="Выручка" change="previous" />);
+      expect(badge("+10%")).toHaveAttribute("data-tone", "success");
+    });
+
+    it("shows a zero change neutral, without an arrow", () => {
+      const FLAT: SparklinePoint[] = [
+        { label: "7 окт", value: 1_000 },
+        { label: "8 окт", value: 1_000.2 },
+      ];
+      render(<Sparkline data={FLAT} label="Выручка" change="previous" />);
+      const zero = badge("0%");
+      expect(zero).toHaveAttribute("data-tone", "neutral");
+      expect(zero?.querySelector("svg")).toBeNull();
+    });
+
+    it("measures a share in percentage points through labels.points", () => {
+      const SHARE: SparklinePoint[] = [
+        { label: "сен", value: 4.1 },
+        { label: "окт", value: 4.6 },
+      ];
+      const { rerender } = render(
+        <Sparkline data={SHARE} label="Выручка" change="previous" changeUnit="points" />,
+      );
+      expect(badge("+0,5 п. п.")).toHaveAttribute("data-tone", "success");
+      // A difference has a meaning across zero, where a percentage has none.
+      rerender(
+        <Sparkline
+          data={[
+            { label: "сен", value: -1 },
+            { label: "окт", value: 2 },
+          ]}
+          label="Выручка"
+          change="previous"
+          changeUnit="points"
+          labels={{ points: "{value} пп" }}
+        />,
+      );
+      expect(screen.getByText("+3 пп")).toBeInTheDocument();
     });
   });
 

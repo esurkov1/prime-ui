@@ -12,12 +12,25 @@ export const ICON_GROUPS = [
   { id: "theme", label: "Тема" },
   { id: "view", label: "Вид" },
   { id: "viewport", label: "Устройства" },
+  { id: "brand", label: "Сервисы" },
 ] as const;
 
 export type IconGroupId = (typeof ICON_GROUPS)[number]["id"];
 
 /** What each icon means in a product interface, plus search synonyms (Russian and English). */
 export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[] }> = {
+  "brand.telegram": {
+    meaning: "Канал или аккаунт в Telegram",
+    keywords: ["телеграм", "телеграмм", "мессенджер", "канал", "telegram", "tg", "brand"],
+  },
+  "brand.vk": {
+    meaning: "Канал или аккаунт во ВКонтакте",
+    keywords: ["вк", "вконтакте", "соцсеть", "мессенджер", "канал", "vk", "vkontakte", "brand"],
+  },
+  "brand.whatsapp": {
+    meaning: "Канал или аккаунт в WhatsApp",
+    keywords: ["ватсап", "вотсап", "мессенджер", "канал", "whatsapp", "brand"],
+  },
   "action.addContact": {
     meaning: "Добавить контакт",
     keywords: ["добавить контакт", "контакт", "add contact", "user plus"],

@@ -299,6 +299,13 @@ export default function IconsPage() {
             <code>{"<BellIcon />"}</code>. В сборку попадают только импортированные.
           </li>
           <li>Доменный рисунок, которого нет в наборе, оборачивает createIcon.</li>
+          <li>
+            Группа <code>brand.*</code> — знаки сервисов: <code>brand.telegram</code>,{" "}
+            <code>brand.vk</code>, <code>brand.whatsapp</code> для фильтра по каналу, выбора
+            подключения, пункта списка. Они залиты одним цветом текста и вписаны в тот же квадрат с
+            тем же визуальным весом, что и контурные иконки. Знаки — товарные знаки их владельцев:
+            ими называют сервис, а не украшают экран; фирменный цвет, если он нужен, задаёт продукт.
+          </li>
         </DocList>
       </DocBlock>
 
@@ -356,8 +363,9 @@ export default function IconsPage() {
           <>
             Рисунки — Lucide (лицензия ISC). Жесты адаптированы из lucide-animated, автор pqoqubbw
             (лицензия MIT): переписаны с Motion на CSS-кадры на токенах движения кита, без
-            runtime-зависимости. Тексты уведомлений об авторстве входят в пакет, файл
-            THIRD_PARTY_NOTICES.
+            runtime-зависимости. Знаки сервисов (<code>brand.*</code>) — Simple Icons (CC0);
+            лицензия покрывает рисунок, а не товарный знак. Тексты уведомлений об авторстве входят в
+            пакет, файл THIRD_PARTY_NOTICES.
           </>
         }
       >
@@ -378,7 +386,11 @@ export default function IconsPage() {
             pqoqubbw/icons
             <Icon name="action.externalLink" />
           </LinkButton>
-          <Badge.Root color="gray">ISC · MIT</Badge.Root>
+          <LinkButton href="https://simpleicons.org" target="_blank" rel="noopener noreferrer">
+            Simple Icons
+            <Icon name="action.externalLink" />
+          </LinkButton>
+          <Badge.Root color="gray">ISC · MIT · CC0</Badge.Root>
         </div>
       </DocBlock>
     </DocPage>

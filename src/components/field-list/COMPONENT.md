@@ -33,7 +33,7 @@ FieldList                    field frame: label · the list · hint / error
 │  │  └─ <li> row            [a cell per column] [end: × | ⋯] [grip: handle | lock]
 │  │     └─ cell             one kit field without `label`, named by its column heading
 │  └─ totals row             `renderTotals`: a group «Итого», a total per column on the same tracks
-└─ add row                   Button «addLabel» (+ `labels.maxReached` at `max`)
+└─ add row                   Button «addLabel» (leaves at `max`)
 ```
 A leaf: rows come from `value` through `renderItem`, which returns one element per column (a fragment). Every framed kit field (Input, Select, Datepicker, NativeSelect, ColorField…) in a cell takes its column heading as its label: read by screen readers, not shown while the heading row is on screen, shown above the field once the rows stack in a narrow container. `ColorPresets` takes it as the name of its trigger. Every row, a one-column row too, ends with the same slots: the remove «×» (or the «⋯» menu) and, with `reorderable` buttons, the grip after it — never a segment inside a field, where a «×» would read as «clear the text».
 
@@ -53,7 +53,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `value` | `readonly T[]` | — | The rows (controlled). |
 | `defaultValue` | `readonly T[]` | `[]` | The first rows (uncontrolled). |
 | `onValueChange` | `(value: T[]) => void \| Promise<void>` | — | The new list after an edit (`row.update`), an add, a remove or a move. Return the save's promise: the new list shows while it is pending, the owner's again on a reject (say why with `error`). |
-| `createItem` | `() => T` | — | A new empty item; with it the add button shows under the rows and focus goes to the new row's first field. |
+| `createItem` | `() => T` | — | A new empty item; with it the add button shows under the rows (until `max`) and focus goes to the new row's first field. |
 | `addLabel` | `string` | — | Text of the add button: what is added («Добавить позицию»). |
 | `getLabel` | `(item: T) => string` | — | The row's own text (its title field) for the remove button, the handle, the menu button and move announcements; else the row number. |
 | `getLocked` | `(item: T) => boolean` | — | Pinned rows: the remove stays in its place, off, and says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it. In the menu every item is off. |
@@ -61,7 +61,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `rowActions` | `"buttons" \| "menu"` | `"buttons"` | How a row offers its actions: `buttons` — a remove button «×» and, with `reorderable`, the handle after it; `menu` — one «⋯» button whose menu moves the row up or down and removes it. |
 | `variant` | `"plain" \| "surface"` | `"plain"` | Look of the list: `plain` — the rows on the host surface; `surface` — the rows on a fill of their own, one step up the surface ladder, with side padding. |
 | `min` | `number` | `0` | The fewest rows: at this count the remove buttons are disabled. |
-| `max` | `number` | — | The most rows: at this count the add button is disabled with `labels.maxReached` beside it. |
+| `max` | `number` | — | The most rows: at this count the add button closes up in place and comes back once a row is removed. The list says no limit text of its own; a limit the person should know goes in `hint`. |
 | `label` | `ReactNode` | — | Heading of the list; names the `<ol>`. Omit it inside a `Fieldset` whose legend names the list. |
 | `aria-label` | `string` | — | Name of the `<ol>` when no visible `label` names it (a section heading above the list). |
 | `hint` | `ReactNode` | — | Help text under the list; hidden while `error` shows. |
@@ -101,7 +101,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `reorderable` | buttons: a grip at the very end of every row, after the remove button, Alt + ↑ / ↓ on it; menu: «Выше» and «Ниже» in the menu, Alt + ↑ / ↓ on «⋯» | the order of the records matters (a pricing page, a checklist, payment stages) | `false` |
 | `getLocked` | the remove button in its place, off, with a tooltip saying why (`labels.lockedReason`); with `reorderable` a lock where the grip is and the row holds its place; in the menu every item off, «Удалить» says why | a base value, system records a person cannot drop | — |
 | `createItem` | the add button under the rows, aligned with the first column | the person grows the list | — |
-| `min` · `max` | remove buttons off at `min`; the add button off with «Не больше {max}» at `max` | the record count is bounded | `0` · — |
+| `min` · `max` | remove buttons off at `min`; the add button closes up at `max` and comes back when a row leaves — no limit text of its own, a limit the person should know goes in `hint` | the record count is bounded | `0` · — |
 | `renderTotals` | a row of totals under the rows over a faint line, each on its column, aligned as the column's field text; «Итого» in the first cell without a total | the rows add up (shares, amounts, hours) | — |
 
 **Combinations**
@@ -115,7 +115,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 |---|---|---|
 | empty | `value` with no items | no heading row; only the add button (with `createItem`) |
 | at min | `value.length <= min` | remove buttons (or «Удалить» items) `disabled` |
-| at max | `value.length >= max` | add button `disabled`, `labels.maxReached` beside it |
+| at max | `value.length >= max` | no add button: it closes up in place (`partPresence`) and rises in again when a row leaves |
 | pinned row | `getLocked(item)` | `data-locked="true"` on the `<li>`; the remove button stays in its slot, `disabled` behind a focusable Tooltip host, its tooltip `labels.lockedReason`; with `reorderable` Dnd's lock in the grip box; in the menu every item `disabled`, «Удалить» described by `labels.lockedReason` |
 | hover | the pointer over a row of a `surface` list (`(hover: hover)` only; a `plain` row has no fill of its own) | the whole row takes the field fill (`--prime-color-fill-muted`) and its fields the surface fill (`--prime-color-layer-current`) |
 | invalid | `error` (the list), a field's own `error` | the list's message under the add row; a field's under the field in its row |
@@ -172,7 +172,6 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `row` | `"строка {index}"` | Name of a row without `getLabel` text; `{index}` counts from 1. |
 | `namedRow` | `"«{label}»"` | Name of a row with `getLabel` text; `{label}` is that text. |
 | `lockedReason` | `"Закреплённую строку нельзя удалить"` | Why a pinned row (`getLocked`) cannot be removed: the tooltip of its remove button, the description of its menu's remove item. |
-| `maxReached` | `"Не больше {max}"` | Text beside the disabled add button once the list holds `max` rows. |
 | `totals` | `"Итого"` | Name of the totals row (`renderTotals`), shown in its first cell when that has no total. |
 
 ## Examples
@@ -185,7 +184,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [row-menu.tsx](examples/row-menu.tsx) | Payment stages of a project on a touch-first screen, where a drag is awkward: one more-button per row holds move up, move down and remove, the moves are off at the ends and next to the pinned advance, and Alt+arrows on the button move the row too — `rowActions`, `reorderable`, `getLocked`. |
 | [locked.tsx](examples/locked.tsx) | Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them — `getLocked`, `width`, `reorderable`. |
 | [base-row.tsx](examples/base-row.tsx) | A plan price and its changes by month in one table: the base price is the first, pinned row whose remove button is off and says why, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `labels`, `width`. |
-| [limits.tsx](examples/limits.tsx) | Recipients of invoice reminders, from one to three: the last row cannot be removed and the add button says why it is off once the list is full — `min`, `max`, `hint`. |
+| [limits.tsx](examples/limits.tsx) | Recipients of invoice reminders, from one to three: the last row cannot be removed, the add button leaves once the list is full and the hint names the limit — `min`, `max`, `hint`. |
 | [errors.tsx](examples/errors.tsx) | Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field; a `*` after a heading marks a required column — `error`, `required`. |
 | [totals.tsx](examples/totals.tsx) | A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts, each ending where its fields end their numbers — `renderTotals`, `width`. |
 | [saving.tsx](examples/saving.tsx) | Removing a recipient is saved on the server: the row leaves at once and comes back with the reason if the server refuses — `onValueChange`, `error`. |
@@ -206,6 +205,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A «⋯» menu or a «−» drawn by hand next to the rows → `rowActions`; a Card drawn around the list to set it apart from the form → `variant="surface"`.
 - `rowActions="menu"` on a two-column list a person reorders all day → the buttons: the handle and «×» in sight are one gesture, the menu is three.
 - `aria-label` written on every field in a cell → none: the column heading names the field.
+- `createItem` dropped by hand once nothing is left to add (every section picked) → `max`: the add button leaves at the limit by itself; a limit the person should know is a `hint` («Не больше трёх получателей»), never a count beside the button.
 - A grip, a remove button and an add button drawn by hand around a `.map()` of fields → FieldList.
 - A total under the list typed by hand in a line of text, or a DataTable of fields to get a totals row → `renderTotals`.
 

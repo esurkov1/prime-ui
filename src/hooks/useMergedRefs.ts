@@ -2,15 +2,27 @@ import * as React from "react";
 
 type MaybeRef<T> = React.Ref<T> | undefined;
 
-function assignRef<T>(ref: MaybeRef<T>, value: T | null) {
-  if (typeof ref === "function") ref(value);
-  else if (ref) ref.current = value;
+type Cleanup = (() => void) | undefined;
+
+/** Attaches `value`; a callback ref may return its cleanup (React 19), which detaching then runs. */
+function assignRef<T>(ref: MaybeRef<T>, value: T): Cleanup {
+  if (typeof ref === "function") {
+    const cleanup = ref(value);
+    return typeof cleanup === "function" ? cleanup : undefined;
+  }
+  if (ref) ref.current = value;
+  return undefined;
 }
 
-/** Detaches `node`: an object ref that holds another node by now (its successor) keeps it. */
-function releaseRef<T>(ref: MaybeRef<T>, node: T) {
-  if (typeof ref === "function") ref(null);
-  else if (ref && ref.current === node) ref.current = null;
+/**
+ * Detaches `node`: a callback ref runs the cleanup it returned (as React does), else gets `null`;
+ * an object ref that holds another node by now (its successor) keeps it.
+ */
+function releaseRef<T>(ref: MaybeRef<T>, node: T, cleanup: Cleanup) {
+  if (typeof ref === "function") {
+    if (cleanup) cleanup();
+    else ref(null);
+  } else if (ref && ref.current === node) ref.current = null;
 }
 
 /**
@@ -29,14 +41,14 @@ export function useMergedRefs<T>(
 ): React.RefCallback<T> {
   return React.useCallback(
     (value: T | null) => {
-      assignRef(a, value);
-      assignRef(b, value);
-      assignRef(c, value);
       if (value === null) return;
+      const cleanupA = assignRef(a, value);
+      const cleanupB = assignRef(b, value);
+      const cleanupC = assignRef(c, value);
       return () => {
-        releaseRef(a, value);
-        releaseRef(b, value);
-        releaseRef(c, value);
+        releaseRef(a, value, cleanupA);
+        releaseRef(b, value, cleanupB);
+        releaseRef(c, value, cleanupC);
       };
     },
     [a, b, c],

@@ -30,7 +30,6 @@ TagSelect                       field frame: label · control · hint/error (sin
 │   ├── input[type=hidden] × value   with `name`
 │   └── chevron
 └── list (portal)               role="listbox", multi-select
-    ├── panel hint              labels.panelHint (`""` hides it)
     ├── «Создать» row           with `creatable`: plus icon · labels.create · preview Badge
     └── option row              Checkbox.Indicator · Badge [· «⋯» Button → Popover menu]; picked options first
 ```
@@ -150,7 +149,6 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 
 | Key | Default | Used for |
 |---|---|---|
-| `panelHint` | `"Выберите вариант или создайте новый"` | Line above the list; `""` hides it. |
 | `create` | `"Создать"` | Action text before the preview of a new tag. |
 | `remove` | `"Удалить {label}"` | Accessible name of a chip's remove button; `{label}` is the tag text. |
 | `more` | `"Показать ещё {count}"` | Accessible name of the «+N» chip; `{count}` is the number of hidden tags. |

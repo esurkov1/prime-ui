@@ -32,7 +32,7 @@ Sheet.Root                     state and dismiss policy (no DOM)
    │  ├─ Sheet.Icon            tone tile around an Icon, or the record's Avatar / Thumbnail, no tile, 40
    │  ├─ Sheet.Title           line 1: <h2>; `loading` holds it with a skeleton
    │  ├─ Sheet.Description     line 2: <p>; the record's status Badges lead it (tier s), then the text
-   │  └─ Sheet.Actions         buttons only (icon buttons, a ⋯ Dropdown), tier s, on the title's line
+   │  └─ Sheet.Actions         one tab-wide switcher, then buttons (icon buttons, a ⋯ Dropdown), tier s, on the title's line
    ├─ Sheet.Body               the content; the only scrolling zone (ScrollContainer)
    └─ Sheet.Footer             optional: only for a form with an explicit submit
       ├─ Sheet.Actions         the start group: an action apart from the main pair
@@ -78,7 +78,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Sheet.Actions
-`ref` → `HTMLDivElement`. Header buttons only (icon buttons, a ⋯ Dropdown; a status goes in `Sheet.Description`), tier `s`, on the title's line; under it below 12rem. In `Sheet.Footer`: the start group at the footer tier.
+`ref` → `HTMLDivElement`. Header: a tab-wide switcher (`SegmentedControl`, `Datepicker`), then buttons (a status goes in `Sheet.Description`), tier `s`; under the title below 12rem. In `Sheet.Footer`: the start group at the footer tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -190,13 +190,13 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
   - **The header is optional.** Keep it when the content needs a title to be understood (a list of actions on «Заказ № 1042»). Drop it — and with it the × and the hairline — when the content speaks for itself (a calendar opened from a «Дата отгрузки» button): name the sheet with `aria-label` on `Sheet.Content`.
 - The header has one anatomy, the same in every modal, drawer and sheet:
   ```
-  [mark]  Title                                [icon buttons] [⋯] [×]
+  [mark]  Title                                [tab switcher] [icon buttons] [⋯] [×]
           [status badges] description text
   ```
   - mark — `Sheet.Icon`: a glyph on the tone tile, or the record's picture (`Avatar.Root`, `Thumbnail.Root`, also inside your own wrapper component) with no tile; both are 40 px.
   - line 1 — `Sheet.Title`; `loading` holds it with a Skeleton while the name loads.
   - line 2 — `Sheet.Description`: the record's statuses as `Badge.Root`s first, then the text. The kit sizes the badges (chip tier `s`, the line's 20 px), keeps them first and one gap apart, and wraps the text under them on a narrow panel.
-  - end — `Sheet.Actions`: only buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on the title's line; a status never goes here.
+  - end — `Sheet.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on the title's line; a status never goes here. A control rendered only on some tabs rises in and closes up in its own cell.
 - A form's action apart from its submit pair: `Sheet.Actions` inside `Sheet.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
 - The content is the sheet's own, across its width: `Datepicker.Panel` or a column of actions straight in `Sheet.Body` — never a Card or a padded box inside it.
 - Zone padding `--prime-sheet-padding`, width `--prime-sheet-width`. The bottom-sheet surface (`src/internal/sheet.module.css`, shared with a Modal and the floating layers on a phone) gives the height by content up to the top gap, the rounded top, the handle strip and the bottom safe-area inset below the content.
@@ -259,6 +259,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - A header with only a title over a calendar or a list that already says what it is → drop the header and name the sheet with `aria-label`.
 - No header and no `aria-label` → the dialog has no name; give `Sheet.Content` an `aria-label`.
 - A status `Badge` in the header's `Sheet.Actions`, beside the buttons → put it in `Sheet.Description`, before the text: the kit sizes it to the line and keeps it first.
+- A control that applies to the whole tab (the text language, the period) repeated in section headings or put in one section → one switcher in the header's `Sheet.Actions`, before the buttons, rendered only on the tabs it applies to.
 - A Badge with its own `size` in `Sheet.Description` → leave `size` out: the line gives every header the same chip tier.
 - A `Skeleton` placed by hand in `Sheet.Title` or `Sheet.Description` → their `loading`.
 - A start-side button («Выйти», «Удалить») put inside `Sheet.Meta` → `Sheet.Actions` inside `Sheet.Footer`; `Meta` is status text only.

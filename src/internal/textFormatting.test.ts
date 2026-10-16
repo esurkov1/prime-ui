@@ -21,6 +21,17 @@ describe("applyFormat", () => {
     expect(applyFormat(sel("||пароль||", 2, 8), "spoiler")).toEqual(sel("пароль", 0, 6));
   });
 
+  it("tells underline `__` from italic `_` when it toggles them", () => {
+    expect(applyFormat(sel("срок", 0, 4), "underline")).toEqual(sel("__срок__", 2, 6));
+    expect(applyFormat(sel("__срок__", 2, 6), "underline")).toEqual(sel("срок", 0, 4));
+    // Italic over an underline adds a third marker and takes only it off again.
+    expect(applyFormat(sel("__срок__", 2, 6), "italic")).toEqual(sel("___срок___", 3, 7));
+    expect(applyFormat(sel("___срок___", 3, 7), "italic")).toEqual(sel("__срок__", 2, 6));
+    expect(applyFormat(sel("___срок___", 3, 7), "underline")).toEqual(sel("_срок_", 1, 5));
+    expect(applyFormat(sel("_срок_", 1, 5), "underline")).toEqual(sel("___срок___", 3, 7));
+    expect(applyFormat(sel("__срок__", 0, 8), "underline")).toEqual(sel("срок", 0, 4));
+  });
+
   it("puts the caret between new markers when nothing is selected", () => {
     expect(applyFormat(sel("Итог: ", 6), "bold")).toEqual(sel("Итог: ****", 8, 8));
   });
@@ -70,6 +81,8 @@ describe("formatForKey", () => {
   it("reads the physical key, so a Russian layout works", () => {
     expect(formatForKey({ ...key("KeyB", { ctrl: true }), key: "и" })).toBe("bold");
     expect(formatForKey(key("KeyI", { meta: true }))).toBe("italic");
+    expect(formatForKey(key("KeyU", { meta: true }))).toBe("underline");
+    expect(formatForKey(key("KeyU", { ctrl: true, shift: true }))).toBeNull();
     expect(formatForKey(key("KeyX", { meta: true, shift: true }))).toBe("strikethrough");
     expect(formatForKey(key("KeyE", { ctrl: true }))).toBe("code");
     expect(formatForKey(key("KeyK", { ctrl: true }))).toBe("link");

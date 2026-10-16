@@ -1,4 +1,4 @@
-/** Checkout conversion against its plan: a dashed reference line, the scale from zero to 5% and the change over the whole period — `reference`, `min`, `max`, `change`. */
+/** Checkout conversion against its plan: a dashed reference line, the scale from zero to 5% and the change over the whole period in percentage points — `reference`, `min`, `max`, `change`, `changeUnit`. */
 import { Card, Sparkline, type SparklinePoint } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -29,6 +29,7 @@ export default function SparklineReferenceExample() {
           min={0}
           max={5}
           change="first"
+          changeUnit="points"
           formatValue={formatPercent}
           labels={{ reference: "План: {value}" }}
         />

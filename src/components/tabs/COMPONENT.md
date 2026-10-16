@@ -199,7 +199,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 
 ## Layout & spacing
 - Tabs are a bar, not a surface: the root has no fill, padding, radius or `data-depth`. On a page or in a `Card.Body`, put it straight into the host's padded region and the panel content straight into `Tabs.Panel`. The strip's edges and the panel content share the host's content edge; the panel stands one tier gap below the strip (`--prime-space-3` … `--prime-space-8`).
-- In a Modal or Drawer the tabs belong to the header: `Tabs.Root` wraps `X.Header` and `X.Body`, `Tabs.List` goes last into the header, the panels into the body. The header becomes the strip (painted like it, no hairline, edge to edge — the header hands the bar its side padding as `--prime-bleed-inline`), the active tab is the body rising into it, and the root renders no box (`display: contents`), so only the body scrolls and the tabs stay in view.
+- In a Modal or Drawer the tabs belong to the header: `Tabs.Root` wraps `X.Header` and `X.Body`, `Tabs.List` goes last into the header, the panels into the body. The header becomes the strip (painted like it, no hairline, edge to edge — the header hands the bar its side padding as `--prime-bleed-inline`), the active tab is the body rising into it, and the root renders no box (`display: contents`), so only the body scrolls and the tabs stay in view. A panel in the body stands its blocks 32 apart — the step between the body's sections — so a tab of self-titled blocks (charts, titled cards) or of `X.Section`s needs no spacing wrapper.
 
 ```tsx
 <Drawer.Content>

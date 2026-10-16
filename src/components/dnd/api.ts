@@ -402,6 +402,10 @@ export const api: ComponentApi = {
       en: "Live region: moved to a linked list with the keyboard; `{list}` is its accessible name.",
       ru: "Live-область: перенесён с клавиатуры в связанный список; `{list}` — его имя.",
     },
+    blocked: {
+      en: "Live region: a keyboard step refused because a `locked` item holds that place; `{locked}` is its label.",
+      ru: "Live-область: шаг с клавиатуры не сделан — место держит элемент с `locked`; `{locked}` — его подпись.",
+    },
     refused: {
       en: "Live region: a linked list refused a keyboard move (`canDrop` answered `false`).",
       ru: "Live-область: связанный список не принял перенос с клавиатуры (`canDrop` вернул `false`).",
@@ -436,8 +440,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: 'A live region (`role="status"`, `aria-live="polite"`) announces grabbed, dropped, returned, cancelled, «position N of M», a move to another list by its name and a refusal with its reason, from `labels`.',
-        ru: 'Live-область (`role="status"`, `aria-live="polite"`) объявляет: взят, перемещён, возвращён, отменён, позиция N из M, перенос в другой список и причину отказа (`labels`).',
+        en: 'A live region (`role="status"`, `aria-live="polite"`) announces grabbed, dropped, returned, cancelled, «position N of M», a move to another list by its name, a refusal with its reason and a keyboard step a `locked` item stops, from `labels`.',
+        ru: 'Live-область (`role="status"`, `aria-live="polite"`) объявляет: взят, перемещён, возвращён, отменён, позиция N из M, перенос в другой список, причину отказа и шаг, который не пускает элемент с `locked` (`labels`).',
       },
       {
         en: "The keyboard target of a sortable item has `aria-keyshortcuts` (with the across keys in linked lists) and `aria-roledescription` and is in the tab order: the item itself (`tabIndex={0}`; a named `<div>` item is a `button`, an `li` or a `tr` keeps its role), or with `handle` its grip. A role description stands only on an element with a role. The clone is `aria-hidden`.",

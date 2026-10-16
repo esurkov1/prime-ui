@@ -32,7 +32,7 @@ Modal.Root                    state and dismiss policy (no DOM)
     │   ├── Modal.Icon        40 tile with a tone fill; the record's Avatar / Thumbnail with no tile, 40
     │   ├── Modal.Title       line 1: <h2>, names the dialog; `loading` holds it with a skeleton
     │   ├── Modal.Description line 2: <p>, describes the dialog; status Badges lead it (tier s)
-    │   └── Modal.Actions     buttons only (icon buttons, a ⋯ Dropdown), tier s, on the title's line
+    │   └── Modal.Actions     one tab-wide switcher, then buttons (icon buttons, a ⋯ Dropdown), tier s, on the title's line
     ├── Modal.Body            the only scrolling zone
     │   └── Modal.Section     <section>: <h3> label, description, Modal.Actions at the heading's end
     └── Modal.Footer          actions, primary last
@@ -85,7 +85,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Modal.Actions
-`ref` → `HTMLDivElement`. Header buttons only (icon buttons, a ⋯ Dropdown; a status goes in `Modal.Description`), tier `s`, on the title's line; under it below 12rem; at the end of a `Modal.Section` heading. In `Modal.Footer`: the start group at the footer tier.
+`ref` → `HTMLDivElement`. Header: a tab-wide switcher (`SegmentedControl`, `Datepicker`), then buttons (a status goes in `Modal.Description`), tier `s`; under the title below 12rem; at the end of a `Modal.Section` heading. In `Modal.Footer`: the start group at the footer tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -245,13 +245,13 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 ## Layout & spacing
 - The header has one anatomy, the same in every modal, drawer and sheet:
   ```
-  [mark]  Title                                [icon buttons] [⋯] [×]
+  [mark]  Title                                [tab switcher] [icon buttons] [⋯] [×]
           [status badges] description text
   ```
   - mark — `Modal.Icon`: a glyph on the tone tile, or the record's picture (`Avatar.Root`, `Thumbnail.Root`, also inside your own wrapper component) with no tile; both are 40 px.
   - line 1 — `Modal.Title`; `loading` holds it with a Skeleton while the name loads.
   - line 2 — `Modal.Description`: the record's statuses as `Badge.Root`s first, then the text. The kit sizes the badges (chip tier `s`, the line's 20 px), keeps them first and one gap apart, and wraps the text under them on a narrow panel.
-  - end — `Modal.Actions`: only buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on the title's line; a status never goes here.
+  - end — `Modal.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on the title's line; a status never goes here. A control rendered only on some tabs rises in and closes up in its own cell.
 - An action apart from the main pair («Удалить» of a record, «Выйти»): `Modal.Actions` inside `Modal.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
 - Dialog padding `--prime-modal-padding` (24) on every zone; header 24 top / 20 bottom, body 20 with a 16 gap between blocks, footer 20 top / 24 bottom.
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
@@ -317,6 +317,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Busy or unsaved state lifted out of the form into Root props → put `Modal.Guard` next to the form, inside Content.
 - `key` or a conditional around `Modal.Root` to reset a form → the dialog unmounts at once, without its exit; keep the Root mounted and drive `open`.
 - A status `Badge` in the header's `Modal.Actions`, beside the buttons → put it in `Modal.Description`, before the text: the kit sizes it to the line and keeps it first.
+- A control that applies to the whole tab (the text language, the period) repeated in section headings or put in one section → one switcher in the header's `Modal.Actions`, before the buttons, rendered only on the tabs it applies to.
 - A Badge with its own `size` in `Modal.Description` → leave `size` out: the line gives every header the same chip tier.
 - A `Skeleton` placed by hand in `Modal.Title` or `Modal.Description` → their `loading`.
 - A start-side button («Выйти», «Удалить») put inside `Modal.Meta` → `Modal.Actions` inside `Modal.Footer`; `Meta` is status text only.

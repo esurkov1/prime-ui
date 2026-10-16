@@ -22,6 +22,25 @@ describe("RichText", () => {
     expect(root?.querySelector("b")).toBeNull();
   });
 
+  it("renders a plain text with its entities instead of reading Markdown", () => {
+    const { container } = render(
+      <RichText
+        entities={[
+          { type: "link", offset: 0, length: 4, url: "https://prime.app/i/1" },
+          { type: "underline", offset: 5, length: 3 },
+        ]}
+      >
+        {"счёт **ИНН**"}
+      </RichText>,
+    );
+    expect(screen.getByRole("link", { name: "счёт" })).toHaveAttribute(
+      "href",
+      "https://prime.app/i/1",
+    );
+    expect(container.querySelector("u")).toHaveTextContent("**И");
+    expect(container.querySelector("strong")).toBeNull();
+  });
+
   it("passes className, native attributes and ref to the root", () => {
     const ref = React.createRef<HTMLDivElement>();
     render(

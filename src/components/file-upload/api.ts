@@ -153,8 +153,8 @@ export const api: ComponentApi = {
         {
           name: "max",
           type: "number",
-          en: "Most files in the set: picked and dropped files are cut to the room left; the add tile counts `count из max` (the digits roll) and at the limit says «Лимит файлов» and takes nothing.",
-          ru: "Наибольшее число файлов: выбранные и брошенные файлы урезаются до оставшегося места; плитка добавления считает `count из max` (цифры прокручиваются), на пределе пишет «Лимит файлов» и ничего не принимает.",
+          en: "Most files in the set: picked and dropped files are cut to the room left; at the limit the add tile closes up in place and comes back once a file leaves. The limit a person should know goes in `hint`.",
+          ru: "Наибольшее число файлов: выбранные и брошенные файлы урезаются до оставшегося места; на пределе плитка добавления схлопывается на месте и возвращается, когда файл уходит. Предел, который человеку нужно знать, — в `hint`.",
         },
         {
           name: "name",
@@ -424,10 +424,6 @@ export const api: ComponentApi = {
   functions: [USE_UPLOAD_QUEUE_FUNCTION],
   labels: labelRows(FILE_UPLOAD_LABELS, {
     title: { en: "Title of the built-in zone body.", ru: "Заголовок встроенной зоны." },
-    description: {
-      en: "Description of the built-in body; an empty string hides it.",
-      ru: "Описание встроенной зоны; пустая строка скрывает его.",
-    },
     browse: {
       en: 'Text of the browse button: decorative in the built-in zone body, the control itself with `trigger="button"`.',
       ru: 'Текст кнопки выбора: декоративной во встроенной зоне, самой кнопки при `trigger="button"`.',
@@ -447,18 +443,6 @@ export const api: ComponentApi = {
     empty: {
       en: "Text of the add tile of an empty set (it spans the row).",
       ru: "Текст плитки добавления в пустом наборе (она во всю строку).",
-    },
-    emptyHint: {
-      en: "Second line of the empty add tile without `max` (with it the counter stands there).",
-      ru: "Вторая строка пустой плитки добавления без `max` (с ним там счётчик).",
-    },
-    full: {
-      en: "Text of the add tile when `max` is reached.",
-      ru: "Текст плитки добавления, когда достигнут `max`.",
-    },
-    count: {
-      en: "Counter on the add tile (with `max`).",
-      ru: "Счётчик на плитке добавления (при `max`).",
     },
     cover: { en: "Pill of the first tile with `cover`.", ru: "Плашка первой плитки при `cover`." },
     queued: {

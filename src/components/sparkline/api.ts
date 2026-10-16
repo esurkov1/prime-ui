@@ -46,9 +46,23 @@ export const api: ComponentApi = {
         {
           name: "change",
           type: '"previous" | "first" | "none"',
-          default: '"previous"',
-          en: "What the change badge of a shown point compares it with: `previous` — the point before it; `first` — the first point with a value (the change over the period); `none` — no badge.",
-          ru: "С чем бейдж изменения показанной точки её сравнивает: `previous` — с предыдущей; `first` — с первой точкой со значением (изменение за период); `none` — без бейджа.",
+          default: '"none"',
+          en: "What the change badge of a shown point compares it with: `previous` — the point before it; `first` — the first point with a value (the change over the period); `none` — no badge (`compareTo` still badges the rest).",
+          ru: "С чем бейдж изменения показанной точки её сравнивает: `previous` — с предыдущей; `first` — с первой точкой со значением (изменение за период); `none` — без бейджа (`compareTo` всё равно даёт бейдж в покое).",
+        },
+        {
+          name: "changeUnit",
+          type: '"percent" | "points"',
+          default: '"percent"',
+          en: "How the change badge measures: `percent` — the relative change («+12%»); `points` — the difference, for a share in percent (`labels.points`, «+0,5 п. п.»). A zero change is neutral, no arrow.",
+          ru: "Как бейдж изменения считает: `percent` — относительное изменение («+12%»); `points` — разница, для доли в процентах (`labels.points`, «+0,5 п. п.»). Нулевое — нейтрально, без стрелки.",
+        },
+        {
+          name: "better",
+          type: '"higher" | "lower"',
+          default: '"higher"',
+          en: "Which way of the change is good: `higher` — growth is `success`, a fall `danger` (revenue, orders); `lower` — a fall is `success`, growth `danger` (response time, costs, bounce rate). The arrow always follows the sign.",
+          ru: "Какое направление изменения хорошее: `higher` — рост `success`, падение `danger` (выручка, заказы); `lower` — падение `success`, рост `danger` (время ответа, расходы, отказы). Стрелка всегда следует знаку.",
         },
         {
           name: "summary",
@@ -61,14 +75,20 @@ export const api: ComponentApi = {
           name: "highlight",
           type: "number",
           defaultNote: { en: "the latest point with a value", ru: "последняя точка со значением" },
-          en: 'Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average`.',
-          ru: 'Индекс точки в покое при `summary="latest"` (текущий месяц): заголовок возвращается к ней; в `bars` остальные столбики тише. Не сочетается с `sum` / `average`.',
+          en: 'Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average` / `value`.',
+          ru: 'Индекс точки в покое при `summary="latest"` (текущий месяц): заголовок возвращается к ней; в `bars` остальные столбики тише. Не сочетается с `sum` / `average` / `value`.',
+        },
+        {
+          name: "value",
+          type: "number | null",
+          en: "The period's own value at rest, neither a sum nor a mean of the points (a median, unique clients), with the period as the date; `compareTo` is its previous period. Not with `summary` / `highlight`.",
+          ru: "Своё значение периода в покое — не сумма и не среднее точек (медиана, уникальные клиенты), с периодом вместо даты; `compareTo` — его прошлый период. Не с `summary` / `highlight`.",
         },
         {
           name: "compareTo",
           type: "number",
-          en: "The same summary for the previous period («прошлые 30 дней»): the badge at rest compares the headline with it. Without it a `sum` / `average` headline shows no change at rest.",
-          ru: "То же значение за прошлый период («прошлые 30 дней»): бейдж в покое сравнивает заголовок с ним. Без него у `sum` / `average` в покое изменения нет.",
+          en: "The same summary (or `value`) for the previous period («прошлые 30 дней»): the badge at rest compares the headline with it. Without it a `sum` / `average` / `value` headline shows no change at rest.",
+          ru: "То же значение (или `value`) за прошлый период («прошлые 30 дней»): бейдж в покое сравнивает заголовок с ним. Без него у `sum` / `average` / `value` в покое изменения нет.",
         },
         {
           name: "min",
@@ -123,12 +143,16 @@ export const api: ComponentApi = {
       ru: "Озвучка выбранной точки (`aria-valuetext`); `{label}` и `{value}` подставляются.",
     },
     period: {
-      en: "The date line of a `sum` / `average` headline at rest; `{first}` and `{last}` are the labels of the first and the last point.",
-      ru: "Дата заголовка `sum` / `average` в покое; `{first}` и `{last}` — подписи первой и последней точки.",
+      en: "The date line of a `sum` / `average` / `value` headline at rest; `{first}` and `{last}` are the labels of the first and the last point.",
+      ru: "Дата заголовка `sum` / `average` / `value` в покое; `{first}` и `{last}` — подписи первой и последней точки.",
     },
     empty: {
       en: "Shown and spoken in place of the value of a point with `value: null`.",
       ru: "Показывается и озвучивается вместо значения точки с `value: null`.",
+    },
+    points: {
+      en: 'The change badge with `changeUnit="points"`; `{value}` is the signed difference.',
+      ru: 'Бейдж изменения при `changeUnit="points"`; `{value}` — разница со знаком.',
     },
     reference: {
       en: "Description of the chart with a `reference` line (`aria-describedby`); `{value}` is replaced.",
@@ -156,16 +180,16 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: 'The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.',
-        ru: 'График — `role="slider"` с именем из `label`; `aria-valuetext` озвучивает точку: «8 окт: 312 400 ₽»; точка без данных — `labels.empty` («8 окт: Нет данных»); `labels.point` задаёт формат точки. В покое с `sum` / `average` — период и итог: «9 сен – 8 окт: 8 914 000 ₽». С `reference` слайдер описан `labels.reference` («Ориентир: 3%», `aria-describedby`). Заголовок следует за точкой под указателем или стрелками, текстом.',
+        en: 'The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` / `value` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.',
+        ru: 'График — `role="slider"` с именем из `label`; `aria-valuetext` озвучивает точку: «8 окт: 312 400 ₽»; точка без данных — `labels.empty` («8 окт: Нет данных»); `labels.point` задаёт формат точки. В покое с `sum` / `average` / `value` — период и итог: «9 сен – 8 окт: 8 914 000 ₽». С `reference` слайдер описан `labels.reference` («Ориентир: 3%», `aria-describedby`). Заголовок следует за точкой под указателем или стрелками, текстом.',
       },
       {
         en: "The headline with the value and change reads as plain text.",
         ru: "Заголовок с последним значением и изменением читается как обычный текст.",
       },
       {
-        en: "The change carries a sign and an arrow, never color alone; a negative bar goes down, not only red.",
-        ru: "Изменение показано знаком и стрелкой, а не только цветом; отрицательный столбик уходит вниз, а не только краснеет.",
+        en: "The change carries a sign and an arrow, never color alone (a zero change is a neutral badge with no arrow); a negative bar goes down, not only red.",
+        ru: "Изменение показано знаком и стрелкой, а не только цветом (нулевое изменение — нейтральный бейдж без стрелки); отрицательный столбик уходит вниз, а не только краснеет.",
       },
       {
         en: "While `loading` the root is `aria-busy` and the chart is not in the tab order yet.",

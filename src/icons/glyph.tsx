@@ -50,7 +50,10 @@ export type DomainIconProps = Omit<React.ComponentPropsWithoutRef<"svg">, "color
 
 /** A kit glyph component: an animated icon drawn on the 24-unit grid. */
 export type Glyph = React.ComponentType<DomainIconProps> & {
-  /** The Lucide glyph it is drawn from (PascalCase export name). */
+  /**
+   * The drawing it comes from: a Lucide export name (PascalCase), or `simple-icons:<slug>` for a
+   * brand mark.
+   */
   source: string;
 };
 
@@ -141,4 +144,23 @@ export function defineGlyph(source: string, body: React.ReactNode): Glyph {
   }
   GlyphIcon.displayName = `Glyph(${source})`;
   return Object.assign(GlyphIcon, { source });
+}
+
+/**
+ * Defines a brand mark from a Simple Icons path (CC0; filled, on a 24 grid edge to edge). A
+ * filled silhouette reads heavier than a stroked glyph of the same box, so the mark is drawn
+ * smaller, centred: `box` 20 for a mark drawn as a ring (as heavy as a stroked glyph), 18 for a
+ * solid one (a disc, a tile). It fills `currentColor` (monochrome: colour is the consumer's) and
+ * leans once as its gesture. Call once at module level.
+ */
+export function defineBrandGlyph(slug: string, d: string, box: 18 | 20): Glyph {
+  return defineGlyph(
+    `simple-icons:${slug}`,
+    <g data-motion="tilt" fill="currentColor" stroke="none">
+      <path
+        transform={`translate(${(24 - box) / 2} ${(24 - box) / 2}) scale(${Number((box / 24).toFixed(4))})`}
+        d={d}
+      />
+    </g>,
+  );
 }

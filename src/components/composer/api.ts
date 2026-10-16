@@ -437,9 +437,9 @@ export const api: ComponentApi = {
         ru: "Снимает выделение с панелью форматирования, затем отменяет ответ или правку; во время записи удаляет её и не доходит до окна вокруг (Modal, Drawer).",
       },
       {
-        keys: "Mod + B · Mod + I · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9",
-        en: "Bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works.",
-        ru: "Жирный, курсив, зачёркнутый, код, скрытый текст, ссылка и цитата для выделения.",
+        keys: "Mod + B · Mod + I · Mod + U · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9",
+        en: "Bold, italic, underline, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works.",
+        ru: "Жирный, курсив, подчёркнутый, зачёркнутый, код, скрытый текст, ссылка и цитата для выделения.",
       },
       {
         keys: "Enter · Space",

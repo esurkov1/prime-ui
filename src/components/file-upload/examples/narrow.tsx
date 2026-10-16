@@ -58,6 +58,7 @@ export default function FileUploadNarrowExample() {
       <FileUpload.Root label="Чек об оплате" defaultValue={RECEIPT} />
       <FileUpload.Root
         label="Фотографии скутера"
+        hint="До 10 фото"
         trigger="tile"
         layout="grid"
         cover

@@ -190,8 +190,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Actions`,
-      en: `\`ref\` → \`HTMLDivElement\`. Header buttons only (icon buttons, a ⋯ Dropdown; a status goes in \`${name}.Description\`), tier \`s\`, on the title's line; under it below 12rem${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group at the footer tier.`,
-      ru: `Только кнопки шапки (иконки, меню ⋯ Dropdown; статус — в \`${name}.Description\`), ярус \`s\`, перед крестиком на строке заголовка; под заголовком при ширине меньше 12rem${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале, ярус подвала.`,
+      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher (\`SegmentedControl\`, \`Datepicker\`), then buttons (a status goes in \`${name}.Description\`), tier \`s\`; under the title below 12rem${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group at the footer tier.`,
+      ru: `Шапка: переключатель вкладки (\`SegmentedControl\`, \`Datepicker\`), затем кнопки (статус — в \`${name}.Description\`), ярус \`s\`; под заголовком при ширине меньше 12rem${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале, ярус подвала.`,
       props: [
         {
           name: "…rest",

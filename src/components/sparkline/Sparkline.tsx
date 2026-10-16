@@ -26,12 +26,14 @@ export type SparklinePoint = {
 export type SparklineLabels = {
   /** Spoken value of the chosen point; `{label}` and `{value}` are replaced. */
   point: string;
-  /** The period of a `sum` / `average` headline at rest; `{first}` and `{last}` are point labels. */
+  /** The period of a `sum` / `average` / `value` headline at rest; `{first}` and `{last}` are point labels. */
   period: string;
   /** Shown and spoken in place of the value of a point with no data. */
   empty: string;
   /** Description of the reference line; `{value}` is replaced. */
   reference: string;
+  /** A change in percentage points (`changeUnit="points"`); `{value}` is the signed difference. */
+  points: string;
 };
 
 /**
@@ -42,7 +44,8 @@ export type SparklineVariant = "area" | "line" | "bars";
 
 /**
  * What the change badge compares the shown point with. `previous`: the point before it.
- * `first`: the first point of the series (the change over the period). `none`: no badge.
+ * `first`: the first point of the series (the change over the period). `none`: no badge (the
+ * default; `compareTo` still shows the change at rest).
  */
 export type SparklineChange = "previous" | "first" | "none";
 
@@ -52,6 +55,18 @@ export type SparklineChange = "previous" | "first" | "none";
  * per day. `average`: the mean of the period.
  */
 export type SparklineSummary = "latest" | "sum" | "average";
+
+/**
+ * Which way of the change is good. `higher`: growth is green (revenue, orders). `lower`: a fall is
+ * green and growth is red (response time, costs, bounce rate).
+ */
+export type SparklineBetter = "higher" | "lower";
+
+/**
+ * How the change badge measures. `percent`: the relative change. `points`: the difference of the
+ * values, for a share already in percent (conversion 4,1% → 4,6% is «+0,5 п. п.»).
+ */
+export type SparklineChangeUnit = "percent" | "points";
 
 /**
  * `default`: the headline (title · date, value · change) over the plot. `compact`: the plot alone at
@@ -64,19 +79,27 @@ export const SPARKLINE_LABELS: SparklineLabels = {
   period: "{first} – {last}",
   empty: "Нет данных",
   reference: "Ориентир: {value}",
+  points: "{value} п. п.",
 };
 
 const NUMBER = new Intl.NumberFormat("ru-RU");
-const PERCENT = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
+const CHANGE = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
 const formatNumber = (value: number) => NUMBER.format(value);
 
 type SparklineRest =
   | {
       summary?: "latest";
       highlight?: number;
+      value?: never;
     }
   | {
       summary: "sum" | "average";
+      highlight?: never;
+      value?: never;
+    }
+  | {
+      value: number | null;
+      summary?: never;
       highlight?: never;
     };
 
@@ -88,6 +111,8 @@ export type SparklineProps = Omit<React.HTMLAttributes<HTMLDivElement>, "childre
     curve?: SparklineCurve;
     layout?: SparklineLayout;
     change?: SparklineChange;
+    changeUnit?: SparklineChangeUnit;
+    better?: SparklineBetter;
     compareTo?: number;
     min?: number;
     max?: number;
@@ -99,18 +124,32 @@ export type SparklineProps = Omit<React.HTMLAttributes<HTMLDivElement>, "childre
   };
 
 /**
- * Change of the shown point against the compared one, in percent; `null` when there is nothing to
- * compare or a percentage means nothing — a value is missing, the base is 0, or the sign flips.
+ * Change of the shown point against the compared one; `null` when there is nothing to compare or the
+ * measure means nothing.
  */
-function changeAt(data: SparklinePoint[], index: number, mode: SparklineChange): number | null {
+function changeAt(
+  data: SparklinePoint[],
+  index: number,
+  mode: SparklineChange,
+  unit: SparklineChangeUnit,
+): number | null {
   if (mode === "none") return null;
   const from = mode === "first" ? data.findIndex((p) => p.value !== null) : index - 1;
   if (from < 0 || from >= index) return null;
-  return percentChange(data[from].value, data[index].value);
+  return changeOf(data[from].value, data[index].value, unit);
 }
 
-function percentChange(base: number | null, next: number | null): number | null {
+/**
+ * `points`: the difference; `percent`: the relative change, `null` when a percentage means nothing
+ * — the base is 0 or the sign flips. A value missing on either side is no change.
+ */
+function changeOf(
+  base: number | null,
+  next: number | null,
+  unit: SparklineChangeUnit,
+): number | null {
   if (base === null || next === null) return null;
+  if (unit === "points") return next - base;
   if (base === 0 || (next !== 0 && Math.sign(base) !== Math.sign(next))) return null;
   return ((next - base) / Math.abs(base)) * 100;
 }
@@ -122,7 +161,7 @@ function latestPresent(data: SparklinePoint[]): number {
 
 /**
  * A small chart with its headline: the value at rest (the latest point, `highlight`, or the period's
- * total or mean — `summary`), its change and its date or period. Scrubbing (pointer, touch, or the arrow keys on the chart) shows any point; the
+ * total or mean — `summary`, or its own `value`), its change and its date or period. Scrubbing (pointer, touch, or the arrow keys on the chart) shows any point; the
  * header follows instantly, the trend arrow turns, and leaving glides back to the point at rest.
  * The line is a monotone curve (`curve`), `null` values break it; `bars` draw signed values from a
  * zero line; a tooltip beside the scrubbed point shows its value and date. `layout="compact"` is
@@ -134,8 +173,11 @@ export function Sparkline({
   variant = "area",
   curve = "smooth",
   layout = "default",
-  change = "previous",
+  change = "none",
+  changeUnit = "percent",
+  better = "higher",
   summary = "latest",
+  value,
   highlight,
   compareTo,
   min,
@@ -246,14 +288,17 @@ export function Sparkline({
 
   const shownValue = point?.value ?? null;
   const valueText = shownValue === null ? labels.empty : formatValue(shownValue);
-  // A sum or a mean at rest stands for the whole period, not a point: no dot, the period as date.
-  const aggregate =
-    summary === "sum" && data.length
+  // A sum, a mean or the own value at rest stands for the whole period, not a point: no dot, the
+  // period as date.
+  const own = value !== undefined;
+  const aggregate = own
+    ? value
+    : summary === "sum" && data.length
       ? geometry.total
       : summary === "average"
         ? geometry.mean
         : null;
-  const restAggregate = atRest && summary !== "latest";
+  const restAggregate = atRest && (own || summary !== "latest");
   const restValue = restAggregate ? aggregate : shownValue;
   const headValue = restAggregate
     ? aggregate === null
@@ -266,10 +311,23 @@ export function Sparkline({
   const delta = !point
     ? null
     : atRest && compareTo !== undefined
-      ? percentChange(compareTo, restValue)
+      ? changeOf(compareTo, restValue, changeUnit)
       : restAggregate
         ? null
-        : changeAt(data, index, change);
+        : changeAt(data, index, change, changeUnit);
+  // The change as shown (one decimal): a change that rounds to zero is no change — neutral, no arrow.
+  const shownDelta = delta === null ? null : Math.round(delta * 10) / 10;
+  const signed =
+    shownDelta === null
+      ? ""
+      : `${shownDelta > 0 ? "+" : shownDelta < 0 ? "−" : ""}${CHANGE.format(Math.abs(shownDelta))}`;
+  const deltaText =
+    changeUnit === "points" ? formatLabel(labels.points, { value: signed }) : `${signed}%`;
+  const deltaTone = !shownDelta
+    ? "neutral"
+    : shownDelta > 0 === (better === "higher")
+      ? "success"
+      : "danger";
   const layoutAttr = compact ? layout : undefined;
   // Beside the pointer; from the keyboard beside the point, at the middle of the plot.
   const plotNode = plotRef.current;
@@ -312,12 +370,14 @@ export function Sparkline({
                   {/* Scrubbing changes the value every move: plain digits; a settled value rolls. */}
                   {atRest ? <RollingNumber>{headValue}</RollingNumber> : headValue}
                 </span>
-                {delta !== null ? (
-                  <Badge.Root tone={delta < 0 ? "danger" : "success"} className={styles.change}>
-                    <Badge.Icon className={styles.trend} data-down={delta < 0 || undefined}>
-                      <Icon name="status.trendUp" />
-                    </Badge.Icon>
-                    {`${delta > 0 ? "+" : delta < 0 ? "−" : ""}${PERCENT.format(Math.abs(delta))}%`}
+                {shownDelta !== null ? (
+                  <Badge.Root tone={deltaTone} className={styles.change}>
+                    {shownDelta !== 0 ? (
+                      <Badge.Icon className={styles.trend} data-down={shownDelta < 0 || undefined}>
+                        <Icon name="status.trendUp" />
+                      </Badge.Icon>
+                    ) : null}
+                    {deltaText}
                   </Badge.Root>
                 ) : null}
               </div>

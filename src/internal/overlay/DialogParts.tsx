@@ -15,26 +15,32 @@ import { useEnterConfirm } from "@/hooks/useEnterConfirm";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { Icon } from "@/icons";
+import { BlockStackContext } from "@/internal/blockStack";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
+import { leaveInPlace } from "@/internal/leaveInPlace";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
-import { splitParts } from "@/internal/parts";
+import { useEnterOnAppear } from "@/internal/partPresence";
+import { flattenChildren, splitParts } from "@/internal/parts";
 import { useSwapIn } from "@/internal/RegionSwap";
 import sheetStyles from "@/internal/sheet.module.css";
 import { Slot, type SlotPartProps } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
 import styles from "./DialogParts.module.css";
 import { SheetHandle } from "./FloatingPanel";
@@ -592,8 +598,15 @@ export type DialogHeaderProps = React.HTMLAttributes<HTMLElement> & {
  */
 function placeHeaderActions(header: HTMLElement): void {
   header.removeAttribute("data-actions-below");
-  if (!header.querySelector(`:scope > .${styles.actions}`)) return;
-  if (header.scrollWidth > header.clientWidth + 1) header.setAttribute("data-actions-below", "");
+  const actions = header.querySelector<HTMLElement>(`:scope > .${styles.actions}`);
+  if (!actions) return;
+  // A control closing up (`leaveInPlace`) is already gone: the place is decided without it, so a
+  // switcher that swaps for another between tabs never sends the row under the title for a moment.
+  const leaving = Array.from(actions.querySelectorAll<HTMLElement>(":scope > [data-leaving]"));
+  for (const ghost of leaving) ghost.style.display = "none";
+  const overflows = header.scrollWidth > header.clientWidth + 1;
+  for (const ghost of leaving) ghost.style.display = "";
+  if (overflows) header.setAttribute("data-actions-below", "");
 }
 
 /**
@@ -656,11 +669,54 @@ export type DialogActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 const DialogFooterContext = React.createContext(false);
 
 /**
- * The buttons at the end of the header, before the close button: ghost icon buttons (each named,
- * with a Tooltip) and a ⋯ Dropdown — never a status, which leads the `Description`. They take tier
- * `s`, the close button's, and sit on the title's line. In the footer
- * it is the start group — an action apart from the main pair («Удалить», «Выйти») — and its
- * buttons keep the footer's tier.
+ * One control of the header's row in a cell of its own: a control the consumer renders only on some
+ * tabs (the tab-wide switcher) rises in when it appears and closes up in place when it goes, so
+ * the buttons and the title glide instead of jumping. Mounted with the dialog, it is just there.
+ */
+function HeaderActionCell({ children }: { children: React.ReactNode }) {
+  const appear = useEnterOnAppear<HTMLDivElement>();
+  const appearRef = appear.ref;
+  const ref = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      appearRef(node);
+      if (!node) return;
+      return () => leaveInPlace(node, "inline");
+    },
+    [appearRef],
+  );
+  return (
+    <div ref={ref} className={cx(styles.actionCell, appear.entering && enterMotion.enter)}>
+      {children}
+    </div>
+  );
+}
+
+/** An id per element type: a control of another kind in the same place is a new cell. */
+const typeIds = new Map<unknown, number>();
+function typeId(type: unknown): number {
+  let id = typeIds.get(type);
+  if (id === undefined) {
+    id = typeIds.size;
+    typeIds.set(type, id);
+  }
+  return id;
+}
+
+/**
+ * The cell of a control: its place and its kind, so a ternary that swaps the period for the
+ * language switcher between tabs closes one up and brings the other in.
+ */
+const cellKey = (node: React.ReactNode, index: number) =>
+  React.isValidElement(node) ? `${node.key ?? `#${index}`}:${typeId(node.type)}` : `#${index}`;
+
+/**
+ * The controls at the end of the header, before the close button: first one switcher that applies
+ * to the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon
+ * buttons (each named, with a Tooltip) and a ⋯ Dropdown — never a status, which leads the
+ * `Description`. They take tier `s`, the close button's, and sit on the title's line; each stands
+ * in a cell that enters and closes up, so a switcher shown only on some tabs never jolts the row.
+ * In the footer it is the start group — an action apart from the main pair («Удалить», «Выйти») —
+ * and its buttons keep the footer's tier.
  */
 export function DialogActions({ className, children, ...rest }: DialogActionsProps) {
   useDialogShell("Actions");
@@ -674,7 +730,11 @@ export function DialogActions({ className, children, ...rest }: DialogActionsPro
   }
   return (
     <div className={cx(fieldTierClass, styles.actions, className)} data-size="s" {...rest}>
-      <ControlSizeProvider value="s">{children}</ControlSizeProvider>
+      <ControlSizeProvider value="s">
+        {flattenChildren(children).map((item, index) => (
+          <HeaderActionCell key={cellKey(item, index)}>{item}</HeaderActionCell>
+        ))}
+      </ControlSizeProvider>
     </div>
   );
 }
@@ -687,13 +747,12 @@ export type DialogBodyProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /** The only scrolling zone; header and footer stay put. An open layer: its end never scrolls the page. */
-export function DialogBody({ className, ...rest }: DialogBodyProps) {
+export function DialogBody({ className, children, ...rest }: DialogBodyProps) {
   return (
-    <ScrollContainer
-      overscrollBehavior="contain"
-      className={cx(styles.body, className)}
-      {...rest}
-    />
+    <ScrollContainer overscrollBehavior="contain" className={cx(styles.body, className)} {...rest}>
+      {/* A tab panel inside stacks its blocks the section step apart, like the body's sections. */}
+      <BlockStackContext value>{children}</BlockStackContext>
+    </ScrollContainer>
   );
 }
 DialogBody.displayName = "Dialog.Body";
@@ -707,14 +766,18 @@ export type DialogSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"
 };
 
 /**
- * How the parent of a section lays out its blocks: `gap` — a flex or grid column with its own gap
- * (the body, a form with the body's rhythm), so the section adds only its extra air; `block` —
- * plain flow (a `Tabs.Panel`, a wrapper div), so the section keeps the whole distance itself.
+ * How the parent of a section lays out its blocks: `step` — a column whose gap already is the
+ * section step (a `Tabs.Panel` in the body, a grid of 32), so the section adds nothing; `gap` — a
+ * flex or grid column with a smaller gap (the body, a form with the body's rhythm), so the section
+ * adds only its extra air; `block` — plain flow (a wrapper div), so the section keeps the whole
+ * distance itself.
  */
-function flowOf(parent: HTMLElement): "gap" | "block" {
+function flowOf(parent: HTMLElement): "step" | "gap" | "block" {
   const { display, rowGap } = getComputedStyle(parent);
-  const gapped = /flex|grid/.test(display) && Number.parseFloat(rowGap) > 0;
-  return gapped ? "gap" : "block";
+  const gap = Number.parseFloat(rowGap);
+  if (!/flex|grid/.test(display) || !(gap > 0)) return "block";
+  const step = readCssLengthPx("--prime-space-8", TOKEN_DEFAULTS["--prime-space-8"]);
+  return gap >= step ? "step" : "gap";
 }
 
 /**

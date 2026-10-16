@@ -122,6 +122,59 @@ describe("Message", () => {
     expect(screen.getByRole("img", { name: "Не отправлено" })).toBeInTheDocument();
   });
 
+  it("shows the reason of a failed send under the message and describes the row with it", async () => {
+    let reject: (reason: Error) => void = () => {};
+    const onRetry = vi.fn(
+      () =>
+        new Promise<void>((_resolve, rejectPromise) => {
+          reject = rejectPromise;
+        }),
+    );
+    const { rerender } = render(
+      <Message.Root
+        direction="outgoing"
+        time="10:00"
+        status="failed"
+        failureReason="Бот заблокирован клиентом"
+        onRetry={onRetry}
+      >
+        <Message.Text>Акт сверки</Message.Text>
+      </Message.Root>,
+    );
+    const article = screen.getByRole("article");
+    expect(article).toHaveAccessibleDescription("Бот заблокирован клиентом");
+    // A retry in flight takes the reason away; a rejection brings it back.
+    await userEvent.click(screen.getByRole("button", { name: "Повторить отправку" }));
+    expect(screen.queryByText("Бот заблокирован клиентом")).toBeNull();
+    expect(article).not.toHaveAttribute("aria-describedby");
+    await act(async () => reject(new Error("blocked")));
+    expect(screen.getByText("Бот заблокирован клиентом")).toBeInTheDocument();
+    rerender(
+      <Message.Root
+        direction="outgoing"
+        time="10:00"
+        status="sent"
+        failureReason="Бот заблокирован клиентом"
+      >
+        <Message.Text>Акт сверки</Message.Text>
+      </Message.Root>,
+    );
+    expect(screen.queryByText("Бот заблокирован клиентом")).toBeNull();
+  });
+
+  it("renders a text with its entities, Markdown-looking text included", () => {
+    render(
+      <Message.Root>
+        <Message.Text entities={[{ type: "bold", offset: 0, length: 4 }]}>
+          {"поле **ИНН**"}
+        </Message.Text>
+      </Message.Root>,
+    );
+    const text = screen.getByRole("article").querySelector("strong");
+    expect(text).toHaveTextContent(/^поле$/);
+    expect(screen.getByRole("article")).toHaveTextContent("поле **ИНН**");
+  });
+
   it("opens the reply's original through its button", async () => {
     const onClick = vi.fn();
     render(

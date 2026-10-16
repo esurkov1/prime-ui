@@ -15,7 +15,6 @@ export default function TagSelectOverviewExample() {
       options={OPTIONS}
       defaultValue={["design"]}
       placeholder="Добавить метку"
-      labels={{ panelHint: "Выберите метку" }}
     />
   );
 }

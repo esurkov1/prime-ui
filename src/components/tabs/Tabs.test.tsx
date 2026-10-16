@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { BlockStackContext } from "@/internal/blockStack";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import type { ControlSize } from "@/internal/states";
@@ -732,6 +733,20 @@ describe("Tabs — indicator", () => {
     const panel = cssRule(CSS, ".panel").decls.map((decl) => decl.prop);
     expect(panel).not.toContain("padding");
     expect(panel).not.toContain("background");
+  });
+
+  it("stacks a panel's blocks the section step apart only inside a host that asks for it", () => {
+    const { container, rerender } = render(<BasicTabs />);
+    const content = () => screen.getByRole("tabpanel").firstElementChild;
+    expect(content()).not.toHaveAttribute("data-stack");
+    rerender(
+      <BlockStackContext value>
+        <BasicTabs />
+      </BlockStackContext>,
+    );
+    expect(content()).toHaveAttribute("data-stack", "true");
+    expect(container.querySelectorAll("[data-stack]")).toHaveLength(1);
+    expect(cssValue(cssRule(CSS, ".panelContent[data-stack]"), "gap")).toBe("var(--prime-space-8)");
   });
 });
 

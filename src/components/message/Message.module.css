@@ -112,6 +112,15 @@
   align-self: center;
 }
 
+/* The reason of a failed send (`failureReason`): a caption under the message, on its side. */
+.failureReason {
+  max-inline-size: 100%;
+  margin-block-start: var(--prime-space-1);
+  padding-inline: var(--prime-space-2);
+  color: var(--prime-color-danger-text);
+  overflow-wrap: anywhere;
+}
+
 /*
  * Selection mode: a check at the start of every row (both directions), a press anywhere on the row
  * toggles it — the parts inside take no presses meanwhile. The selected messages stay as they are;

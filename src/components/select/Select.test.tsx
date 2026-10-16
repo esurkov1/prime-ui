@@ -1446,7 +1446,9 @@ describe("Select.Action", () => {
     fireEvent.change(search, { target: { value: "zzz" } });
 
     expect(screen.queryByRole("option", { name: "Ромашка" })).not.toBeInTheDocument();
-    expect(screen.getByText("Ничего не найдено")).toBeInTheDocument();
+    expect(screen.getByText("Ничего не найдено").closest('[role="status"]')).toHaveTextContent(
+      /^Ничего не найдено$/,
+    );
     const action = screen.getByRole("option", { name: "Новый клиент" });
     expect(action).toHaveAttribute("data-highlighted", "true");
 

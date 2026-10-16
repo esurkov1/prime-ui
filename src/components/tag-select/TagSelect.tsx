@@ -38,7 +38,6 @@ import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
-import textRole from "@/internal/textRole.module.css";
 import { isPromiseLike, usePendingChanges, usePendingKeys } from "@/internal/usePendingChanges";
 
 import { TagOptionMenu } from "./TagOptionMenu";
@@ -56,8 +55,6 @@ export type TagSelectOption = {
 export type TagSelectOptionUpdate = { label?: string; color?: PaletteColor };
 
 export type TagSelectLabels = {
-  /** Line above the list; `""` hides it. */
-  panelHint: string;
   /** Action text before the preview of a new tag (`creatable`). */
   create: string;
   /** Accessible name of a chip's remove button; `{label}` is the tag text. */
@@ -85,7 +82,6 @@ export type TagSelectLabels = {
 };
 
 export const TAG_SELECT_LABELS: TagSelectLabels = {
-  panelHint: "Выберите вариант или создайте новый",
   create: "Создать",
   remove: "Удалить {label}",
   more: "Показать ещё {count}",
@@ -810,9 +806,6 @@ export function TagSelect({
         ref={scrollerRef}
         className={cx(fieldTierClass, menu.tier, menu.menu, styles.panel)}
       >
-        {labels.panelHint ? (
-          <div className={cx(textRole.caption, styles.panelHint)}>{labels.panelHint}</div>
-        ) : null}
         {showCreate ? (
           <OptionRow
             id={optionDomId(listboxId, CREATE_VALUE)}

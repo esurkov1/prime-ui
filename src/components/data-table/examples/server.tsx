@@ -1,4 +1,4 @@
-/** A CRM deal list the server sorts, pages and searches, with its tools in its own row — search, filter and column chooser, the active filters under them; a new search returns to page 1 — `source`, `rowCount`, `sort`, `page`, `loading`, `toolbar`, `toolbarChips`. */
+/** A CRM deal list the server sorts, pages and searches, with its tools in its own row — search, filter and column chooser, the active filters under them; a new search returns to page 1, and the footer counts the deals shown out of the total — `source`, `rowCount`, `showRange`, `sort`, `page`, `loading`, `toolbar`, `toolbarChips`. */
 import {
   Badge,
   DataTable,
@@ -174,6 +174,7 @@ export default function DataTableServerExample() {
         hiddenColumns={hidden}
         rows={result.rows}
         rowCount={result.total}
+        showRange
         getRowKey={(row) => row.id}
         pageSize={PAGE_SIZE}
         page={page}

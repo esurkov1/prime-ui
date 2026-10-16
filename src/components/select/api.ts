@@ -466,10 +466,6 @@ export const api: ComponentApi = {
       en: "Empty state: no items or nothing matches.",
       ru: "Пустое состояние: пунктов нет или ничего не найдено.",
     },
-    emptyHint: {
-      en: 'Second line of the empty state while searching; `""` hides it.',
-      ru: 'Вторая строка пустого состояния при поиске; `""` скрывает её.',
-    },
     loading: {
       en: "Announced while `loading` or `loadingMore`.",
       ru: "Объявляется скринридером при `loading` или `loadingMore`.",

@@ -232,14 +232,14 @@
 }
 
 /* The controls, one tier below the row, as far from the row's edge as from its top and bottom at
-   any row height (one line, a description, an avatar, the touch row): the box stretches to the
-   row, and a square spacer at its outer edge is as wide as the space above a control box
-   (half the row less half the control) — the end edge, or the start edge for controls that lead
-   the row (`side="start"`). The spacer's negative margin takes back the gap before it. */
+   any row height (one line, a description, an avatar, the touch row): a spacer at their outer edge
+   is as wide as the space above a control box — half the row less half the control. The row's
+   height `--list-row-h` is measured onto the frame (List.tsx); before that it is the one-line
+   row. The end edge, or the start edge for controls that lead the row (`side="start"`). The
+   spacer's negative margin takes back the gap before it. */
 .actions {
   display: inline-flex;
   flex: none;
-  align-self: stretch;
   align-items: center;
   gap: var(--prime-space-1);
 }
@@ -248,8 +248,9 @@
 .actions[data-side="start"]::before {
   content: "";
   flex: none;
-  block-size: calc(50% - var(--field-step-h) / 2);
-  aspect-ratio: 1;
+  --list-inset: calc((var(--list-row-h, var(--field-h)) - var(--field-step-h)) / 2);
+
+  inline-size: max(var(--prime-space-0), var(--list-inset));
 }
 
 .actions[data-side="end"]::after {

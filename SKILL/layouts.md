@@ -112,8 +112,8 @@ export function OrdersPage() {
 ```
 
 What stands in the bar — the path ending in the title, the tools, every button, the active filters —
-is [the top bar](composition.md#the-top-bar); where the title stands on a document page or an
-overview is [the page skeleton](composition.md#1-page-skeleton).
+is [the top bar](composition.md#the-top-bar); the one exception, a document page with its title in
+the flow, is [the page skeleton](composition.md#1-page-skeleton).
 
 With React Router the frame's `children` is `<Outlet />` and every item is `Sidebar.Item asChild`
 around a `NavLink` ([the router example](../src/layout/sidebar/examples/router.tsx)). The same frame
@@ -152,8 +152,8 @@ shows only icons); none on the children of a sub-list.
 
 ## Page wrapper
 
-- App pages (dashboard, list, detail, a board): `Page.Root` — the full width of the panel; the
-  page's title and tools are in its `Page.TopBar`, its blocks go into `Page.Body`
+- App pages (dashboard, analytics, list, detail, a board): `Page.Root` — the full width of the
+  panel; the page's title and tools are in its `Page.TopBar`, its blocks go into `Page.Body`
   ([the page skeleton](composition.md#1-page-skeleton)).
 - Document pages — settings and long forms: `Page.Root maxWidth="wide"` with `Page.Header` in the
   flow (the page's h1) and a `Card.Root` with its own `Card.Header` per section

@@ -111,13 +111,13 @@ export default function ChatListStructureExample() {
             </ChatList.ItemIcon>
             <ChatList.ItemText>{item.name}</ChatList.ItemText>
             {item.verified ? (
-              <ChatList.ItemIcon>
-                <Icon name="status.success" tone="accent" label="Официальный аккаунт" />
+              <ChatList.ItemIcon aria-label="Официальный аккаунт">
+                <Icon name="status.success" tone="accent" />
               </ChatList.ItemIcon>
             ) : null}
             {item.group ? (
-              <ChatList.ItemIcon>
-                <Icon name="object.users" label="Группа" />
+              <ChatList.ItemIcon aria-label="Группа">
+                <Icon name="object.users" />
               </ChatList.ItemIcon>
             ) : null}
             <ChatList.ItemDescription

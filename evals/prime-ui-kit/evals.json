@@ -267,6 +267,69 @@
         "No second Sidebar level (Sidebar.Sub) for the two sub-pages and no Tabs strip inside Page.Body",
         "The channels table keeps its own search or filter (if any) in the DataTable toolbar, not in Page.Tools"
       ]
+    },
+    {
+      "id": 22,
+      "prompt": "На странице «Каналы» нужна кнопка «Подключить». Подключать можно Telegram (бот или аккаунт) и ВКонтакте (сообщество или аккаунт), у каждого типа своя форма: у бота — токен, у аккаунта — телефон и код, у сообщества — ключ доступа. Ещё пусть подключение можно начать из ⌘K.",
+      "expected_output": "«Подключить» is a Button in Page.Actions that opens a Dropdown: a Dropdown.Group per messenger (label «Telegram», «ВКонтакте») with one Dropdown.Item per kind, each with a Dropdown.ItemIcon (brand.telegram / brand.vk); a pick opens that kind's own Modal or Drawer form directly, titled by the kind («Подключить Telegram-бота»). The CommandMenu has one item per kind. No dialog whose first step chooses the messenger and the kind.",
+      "files": [],
+      "expectations": [
+        "«Подключить» opens a Dropdown menu, not a Modal",
+        "The menu groups the kinds by messenger with Dropdown.Group label, one Dropdown.Item per kind with a Dropdown.ItemIcon from the kit's brand icons",
+        "Picking an item opens that kind's own form straight away, titled by the kind (e.g. «Подключить Telegram-бота»)",
+        "No SegmentedControl or Radio.Group step choosing the messenger or the kind inside a dialog, and no «Далее» button before the fields",
+        "The CommandMenu offers one item per kind (four items), each opening the same form as the menu"
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "Сделай страницу «Аналитика мессенджеров»: период (по умолчанию последние 30 дней), четыре KPI — диалоги, конверсия в заказ, среднее время первого ответа, медиана чека — и график диалогов по дням. Плюс кнопка «Экспорт».",
+      "expected_output": "One Page.Root whose Page.TopBar holds Page.Heading (Page.Title «Аналитика мессенджеров» + a Page.Description with the period or data), the period in Page.Tools and «Экспорт» with an icon in Page.Actions; no Page.Header and no title in the flow, no `collapse` bar of tools only. KPI tiles in one Page.Grid; a conversion trend uses changeUnit=\"points\", the response time better=\"lower\", the median `value` (not summary).",
+      "files": [],
+      "expectations": [
+        "Page.Title with its Page.Description stands in Page.Heading inside Page.TopBar, beside Page.Tools and Page.Actions",
+        "There is no Page.Header and no large title in the flow; Page.TopBar has no `collapse`",
+        "The period control is in Page.Tools; «Экспорт» is a Button with a Button.Icon in Page.Actions",
+        "Every tile is in one Page.Grid",
+        "If a Sparkline shows the conversion, it uses changeUnit=\"points\"; one showing the first-response time uses better=\"lower\"; the median is passed as `value`, not computed as a sum or average"
+      ]
+    },
+    {
+      "id": 24,
+      "prompt": "Сделай карточку модели товара в дровере с вкладками «Характеристики» и «Аналитика». На «Характеристиках» — название и описание, которые есть на русском и английском. На «Аналитике» — график продаж и график возвратов за выбранный период; период по умолчанию такой же, как на странице каталога. В шапке есть меню действий с моделью.",
+      "expected_output": "Tabs.Root wraps Drawer.Header + Drawer.Body; the header's Drawer.Actions holds one tab-wide switcher before the ⋯ menu: a RU / EN SegmentedControl only on «Характеристики», a period Datepicker only on «Аналитика», starting from the catalog page's period. The first block of «Характеристики» carries no heading repeating the tab; the charts carry their own titles with no Drawer.Section heading over them; the blocks stand one under another with the section step.",
+      "files": [],
+      "expectations": [
+        "The language switch and the period are each one control in the header's Drawer.Actions, before the ⋯ menu — not in section headings or inside the panels",
+        "Each switcher renders only on the tab it applies to",
+        "The period's initial value is the catalog page's period, passed in, not a separate default",
+        "No Drawer.Section or heading «Характеристики» as the first block under the tab «Характеристики»",
+        "Each chart has its own title (e.g. ChartFrame.Title) and no Drawer.Section label above it repeating or wrapping it"
+      ]
+    },
+    {
+      "id": 25,
+      "prompt": "Сделай настройки воронки: у воронки есть системные этапы «Новая», «Успешно», «Отказ» и свои этапы команды между ними. Свои этапы можно переставлять, системные стоят на месте. У каждого этапа переключатель «Показывать на доске».",
+      "expected_output": "One List.Root with onReorder in board order: system stages as List.Item locked (the lock in the grip's place), the team's stages movable; every row leads with its Switch in List.ItemActions side=\"start\" and keeps one grid. No separate sections or lists for system and own stages.",
+      "files": [],
+      "expectations": [
+        "All stages are in one List.Root with onReorder, in the order the board shows them",
+        "System stages are List.Item locked — not disabled, not a separate list",
+        "There is no second section or heading splitting «Свои» and «Системные» stages",
+        "The «Показывать на доске» switch stands in the same place on every row (List.ItemActions side=\"start\"), so the switches line up in one column"
+      ]
+    },
+    {
+      "id": 26,
+      "prompt": "Сделай страницу «Сделки» с таблицей сделок (номер, клиент, сумма, этап) и форму новой сделки в дровере: название, клиент, позиции сделки (до 20 позиций: товар, количество, цена) и до 5 вложений.",
+      "expected_output": "The DataTable shows no range line unless the task asks for it (no showRange by default); the form's FieldList and FileUpload set `max` and say the limit, if at all, in a short `hint` («До 20 позиций», «До 5 файлов»); no hints repeating the label or the obvious outcome, no explanatory text under fields that need none.",
+      "files": [],
+      "expectations": [
+        "The DataTable does not turn on showRange without a stated reason",
+        "FieldList has max={20} and FileUpload max={5}; the limit, when shown, is the component's `hint`, not a text line of the screen's own",
+        "No field carries a hint that restates its label or the obvious result",
+        "No description or helper paragraph explains the form or the table"
+      ]
     }
   ]
 }

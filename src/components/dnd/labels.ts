@@ -21,6 +21,8 @@ export type DndLabels = {
   moved: string;
   /** Live region: an item was moved to a linked list with the keyboard: `{list}` is its name. */
   movedTo: string;
+  /** Live region: a keyboard step refused, a locked item holds the place: `{locked}` names it. */
+  blocked: string;
   /** Live region: a linked list refused an item moved with the keyboard. */
   refused: string;
   /** Live region: a target refused the item and said why (`canDrop` answered a string). */
@@ -37,6 +39,7 @@ export const DND_LABELS: DndLabels = {
   cancelled: "{label}: перемещение отменено",
   moved: "{label}: позиция {position} из {total}",
   movedTo: "{label}: «{list}», позиция {position} из {total}",
+  blocked: "{label}: «{locked}» закреплено, дальше не переместить",
   refused: "{label}: «{list}» не принимает элемент",
   refusedReason: "{label}: {reason}",
 };

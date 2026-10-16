@@ -260,10 +260,6 @@ export const api: ComponentApi = {
       ru: "Озвучиваемое имя счётчика колонки с `limit`.",
     },
     empty: { en: "Text of an empty column.", ru: "Текст пустой колонки." },
-    emptyHint: {
-      en: "Hint under the empty-column text, while cards can be dropped (not on a `disabled` board).",
-      ru: "Подсказка под текстом пустой колонки, пока в неё можно положить карточку (не на доске `disabled`).",
-    },
     full: {
       en: "Why a full column refuses a card: spoken, and shown under the carried card.",
       ru: "Почему заполненная колонка не принимает карточку: озвучивается и видна под переносимой карточкой.",

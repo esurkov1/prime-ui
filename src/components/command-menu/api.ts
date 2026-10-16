@@ -305,8 +305,8 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Empty",
-      en: '`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty` and `labels.emptyHint`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.',
-      ru: 'Компактный EmptyPage (`role="status"`), пока ничего не найдено и не грузится: `labels.empty` и `labels.emptyHint`, только текст. Действие для запроса — `persistent` `CommandMenu.Item` в конце списка.',
+      en: '`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.',
+      ru: 'Компактный EmptyPage (`role="status"`), пока ничего не найдено и не грузится: `labels.empty`, только текст. Действие для запроса — `persistent` `CommandMenu.Item` в конце списка.',
       props: [
         {
           name: "…rest",
@@ -358,10 +358,6 @@ export const api: ComponentApi = {
     empty: {
       en: "`CommandMenu.Empty`: nothing matches the query.",
       ru: "`CommandMenu.Empty`: по запросу ничего нет.",
-    },
-    emptyHint: {
-      en: 'Second line of `CommandMenu.Empty`; `""` hides it.',
-      ru: 'Вторая строка `CommandMenu.Empty`; `""` скрывает её.',
     },
     loading: {
       en: "Announced while `loading` or `loadingMore`.",

@@ -1285,6 +1285,10 @@ describe("locked items", () => {
     render(<Pinned onReorder={onReorder} />);
     fireEvent.keyDown(screen.getByTestId("grip-b"), { key: "ArrowUp", altKey: true });
     expect(onReorder).not.toHaveBeenCalled();
+    // The refused step says which item holds the place.
+    expect(screen.getByRole("status")).toHaveTextContent(
+      /«inbox» закреплено, дальше не переместить/,
+    );
     fireEvent.keyDown(screen.getByTestId("grip-b"), { key: "ArrowDown", altKey: true });
     expect(onReorder).toHaveBeenCalledWith("b", null);
 

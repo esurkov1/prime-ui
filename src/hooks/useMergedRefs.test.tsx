@@ -10,11 +10,22 @@ describe("useMergedRefs", () => {
     const object = React.createRef<HTMLDivElement>();
     const { result } = renderHook(() => useMergedRefs<HTMLDivElement>(callback, object));
     const node = document.createElement("div");
-    result.current(node);
+    const detach = result.current(node);
     expect(callback).toHaveBeenCalledWith(node);
     expect(object.current).toBe(node);
-    result.current(null);
+    if (typeof detach === "function") detach();
+    expect(callback).toHaveBeenLastCalledWith(null);
     expect(object.current).toBeNull();
+  });
+
+  it("runs the cleanup a callback ref returns instead of calling it with null", () => {
+    const cleanup = vi.fn();
+    const callback = vi.fn(() => cleanup);
+    const { result } = renderHook(() => useMergedRefs<HTMLDivElement>(callback));
+    const detach = result.current(document.createElement("div"));
+    if (typeof detach === "function") detach();
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 
   it("a node that leaves after its successor arrived keeps the successor in an object ref", () => {

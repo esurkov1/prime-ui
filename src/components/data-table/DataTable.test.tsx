@@ -95,7 +95,7 @@ describe("DataTable", () => {
   });
 
   it("supports pagination", () => {
-    render(<DataTable rows={rows} columns={columns} pageSize={2} />);
+    render(<DataTable showRange rows={rows} columns={columns} pageSize={2} />);
 
     expect(screen.getByText("Показано 1–2 из 6")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Страница 2" }));
@@ -192,14 +192,21 @@ describe("DataTable", () => {
   });
 
   it("starts on defaultPage", () => {
-    render(<DataTable rows={rows} columns={columns} pageSize={2} defaultPage={2} />);
+    render(<DataTable showRange rows={rows} columns={columns} pageSize={2} defaultPage={2} />);
     expect(screen.getByText("Показано 3–4 из 6")).toBeInTheDocument();
   });
 
   it("a controlled page is shown as is: no onPageChange on mount", () => {
     const onPageChange = vi.fn();
     render(
-      <DataTable rows={rows} columns={columns} pageSize={2} page={3} onPageChange={onPageChange} />,
+      <DataTable
+        showRange
+        rows={rows}
+        columns={columns}
+        pageSize={2}
+        page={3}
+        onPageChange={onPageChange}
+      />,
     );
     expect(screen.getByText("Показано 5–6 из 6")).toBeInTheDocument();
     expect(onPageChange).not.toHaveBeenCalled();
@@ -208,7 +215,14 @@ describe("DataTable", () => {
   it("an out-of-range page renders the last page without writing it back", () => {
     const onPageChange = vi.fn();
     render(
-      <DataTable rows={rows} columns={columns} pageSize={2} page={9} onPageChange={onPageChange} />,
+      <DataTable
+        showRange
+        rows={rows}
+        columns={columns}
+        pageSize={2}
+        page={9}
+        onPageChange={onPageChange}
+      />,
     );
     expect(screen.getByText("Показано 5–6 из 6")).toBeInTheDocument();
     expect(onPageChange).not.toHaveBeenCalled();
@@ -216,15 +230,17 @@ describe("DataTable", () => {
 
   it("an inline onPageChange never resets the page on re-render", () => {
     const { rerender } = render(
-      <DataTable rows={rows} columns={columns} pageSize={2} onPageChange={() => {}} />,
+      <DataTable showRange rows={rows} columns={columns} pageSize={2} onPageChange={() => {}} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Страница 2" }));
-    rerender(<DataTable rows={rows} columns={columns} pageSize={2} onPageChange={() => {}} />);
+    rerender(
+      <DataTable showRange rows={rows} columns={columns} pageSize={2} onPageChange={() => {}} />,
+    );
     expect(screen.getByText("Показано 3–4 из 6")).toBeInTheDocument();
   });
 
   it("a new sort returns to page 1", () => {
-    render(<DataTable rows={rows} columns={columns} pageSize={2} defaultPage={2} />);
+    render(<DataTable showRange rows={rows} columns={columns} pageSize={2} defaultPage={2} />);
     fireEvent.click(screen.getByRole("button", { name: "Name" }));
     expect(screen.getByText("Показано 1–2 из 6")).toBeInTheDocument();
   });
@@ -260,6 +276,7 @@ describe("DataTable", () => {
 
     render(
       <DataTable
+        showRange
         rows={rows}
         columns={columns}
         paging="infinite"
@@ -425,6 +442,7 @@ describe("DataTable", () => {
   it("renders the range line from labels.range", () => {
     render(
       <DataTable
+        showRange
         rows={rows}
         columns={columns}
         pageSize={2}
@@ -432,6 +450,23 @@ describe("DataTable", () => {
       />,
     );
     expect(screen.getByText(`1-2/${rows.length}`)).toBeInTheDocument();
+  });
+
+  it("keeps the range line off by default; an empty label draws nothing", () => {
+    const { container, rerender } = render(
+      <DataTable rows={rows} columns={columns} pageSize={2} />,
+    );
+    expect(screen.getByRole("button", { name: "Страница 2" })).toBeInTheDocument();
+    expect(screen.queryByText(/Показано/)).toBeNull();
+    rerender(
+      <DataTable showRange rows={rows} columns={columns} pageSize={2} labels={{ range: "" }} />,
+    );
+    const footer = screen.getByRole("navigation").parentElement as HTMLElement;
+    expect(footer.querySelector("p")).toBeNull();
+    // An infinite table at rest has no footer at all.
+    rerender(<DataTable rows={rows} columns={columns} paging="infinite" pageSize={2} />);
+    expect(container.querySelector("nav")).toBeNull();
+    expect(container.querySelector("p")).toBeNull();
   });
 
   it("marks selected rows", () => {
@@ -970,6 +1005,14 @@ describe("DataTable CSS contract", () => {
         "width",
       ),
     ).toBe("var(--prime-space-0)");
+    // The body of a grow column asks for no width then: a counted badge row or a truncated value
+    // fits the width the column gets instead of pushing the table wider.
+    expect(
+      cssValue(
+        cssRule(CSS, '.table[data-measuring] > tbody > tr > [data-grow="true"] > *'),
+        "max-width",
+      ),
+    ).toBe("var(--prime-space-0)");
     const measuring: (string | undefined)[] = [];
     const spy = vi
       .spyOn(HTMLElement.prototype, "getBoundingClientRect")
@@ -1070,6 +1113,7 @@ describe("DataTable CSS contract", () => {
   it("hides the range line when every row is on screen", () => {
     render(
       <DataTable
+        showRange
         rows={[{ id: 1 }, { id: 2 }]}
         columns={[{ id: "id", header: "№", accessor: "id" }]}
         paging="none"
@@ -2025,7 +2069,7 @@ describe("DataTable async load more", () => {
       });
   }
 
-  it("shows the loading status while the promise is pending, then asks again", async () => {
+  it("shows the footer only while more rows load: the status with a spinner, announced, then gone", async () => {
     const reach = mockObserver();
     let resolve = () => {};
     const onLoadMore = vi.fn(
@@ -2044,14 +2088,23 @@ describe("DataTable async load more", () => {
         onLoadMore={onLoadMore}
       />,
     );
+    // At rest an infinite table has no footer: no range, no scroll hint.
+    const footer = () => screen.queryByText("Догружаем строки…", { selector: "p" });
+    expect(footer()).toBeNull();
+    expect(screen.queryByText(/Показано/)).toBeNull();
     reach();
     expect(onLoadMore).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("Догружаем строки…")).toBeInTheDocument();
+    expect(footer()).toHaveAttribute("aria-hidden", "true");
+    expect(footer()?.querySelector('[role="status"]')).not.toBeNull();
+    // The announcement comes from a live region that stays mounted.
+    const live = container.querySelector('[aria-live="polite"]:not(p)');
+    expect(live).toHaveTextContent("Догружаем строки…");
     expect(container.querySelector("table")).toHaveAttribute("aria-busy", "true");
     reach();
     expect(onLoadMore).toHaveBeenCalledTimes(1);
     await act(async () => resolve());
-    expect(screen.queryByText("Догружаем строки…")).toBeNull();
+    expect(footer()).toBeNull();
+    expect(live).toHaveTextContent("");
     reach();
     expect(onLoadMore).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();

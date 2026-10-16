@@ -216,9 +216,9 @@ export const api: ComponentApi = {
         ru: "С `formatting`: сначала снимает выделение с панелью. С `onCommit`: возвращает сохранённый текст.",
       },
       {
-        keys: "Mod + B · Mod + I · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9",
-        en: "With `formatting`: bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works.",
-        ru: "С `formatting`: жирный, курсив, зачёркнутый, код, скрытый текст, ссылка и цитата для выделения; работает в любой раскладке.",
+        keys: "Mod + B · Mod + I · Mod + U · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9",
+        en: "With `formatting`: bold, italic, underline, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works.",
+        ru: "С `formatting`: жирный, курсив, подчёркнутый, зачёркнутый, код, скрытый текст, ссылка и цитата для выделения; работает в любой раскладке.",
       },
       {
         keys: "← · →",

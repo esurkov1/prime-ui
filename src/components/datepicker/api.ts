@@ -344,9 +344,9 @@ export const api: ComponentApi = {
       en: "Prefix of a range without a start: «до 6 окт».",
       ru: "Префикс периода без начала: «до 6 окт».",
     },
-    presetsTitle: {
-      en: "Heading and group name of the presets column.",
-      ru: "Заголовок и имя группы колонки периодов.",
+    presetsGroup: {
+      en: "Accessible name of the presets group (no visible heading).",
+      ru: "Имя группы периодов для ассистивных технологий (видимого заголовка нет).",
     },
     optional: {
       en: "Muted marker after the label when `optional`.",

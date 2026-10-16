@@ -58,12 +58,10 @@ export type DataTableLabels = {
   loading: string;
   /** Default empty-state text (when `empty` is not set). */
   empty: string;
-  /** Footer range line. */
+  /** Footer range line (`showRange`). */
   range: string;
-  /** Footer status while `loadingMore`. */
+  /** Footer status while more rows load. */
   loadingMore: string;
-  /** Footer hint when more rows can be revealed or loaded by scrolling. */
-  scrollForMore: string;
   /** `aria-label` of the header «select all» checkbox. */
   selectAll: string;
   /** `aria-label` of a row checkbox; `{label}` is `getRowLabel(row)` (empty without it). */
@@ -105,7 +103,6 @@ export const DATA_TABLE_LABELS: DataTableLabels = {
   empty: "Нет данных для отображения.",
   range: "Показано {from}–{to} из {total}",
   loadingMore: "Догружаем строки…",
-  scrollForMore: "Прокрутите вниз для загрузки",
   selectAll: "Выбрать все строки",
   selectRow: "Выбрать строку {label}",
   selectedCount: "Выбрано: {count}",
@@ -162,6 +159,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   page?: number;
   defaultPage?: number;
   onPageChange?: (page: number) => void;
+  showRange?: boolean;
   pageSize?: number;
   infiniteBatchSize?: number;
   hasMore?: boolean;
@@ -287,6 +285,7 @@ export function DataTable<Row>({
   page,
   defaultPage = 1,
   onPageChange,
+  showRange = false,
   pageSize = 10,
   infiniteBatchSize = 20,
   hasMore = false,
@@ -930,11 +929,17 @@ export function DataTable<Row>({
 
   /* «Показано 0–0 из 0» means nothing in loading / empty / error states: the body already says it,
      and «Показано 1–5 из 5» says nothing when every row is already on screen. */
-  const showRange = bodyState === "rows" && (infinite || (paged && totalPages > 1));
-  const showInfiniteStatus =
-    !hasError &&
-    infinite &&
-    (infiniteRows.hasInternalMore || infiniteRows.loading || infiniteRows.canRequestMore);
+  // Optional lines are off by default: the range only with `showRange`, the infinite status only
+  // while more rows load. An empty label draws nothing.
+  const rangeText =
+    showRange && bodyState === "rows" && (infinite || (paged && totalPages > 1))
+      ? formatLabel(labels.range, {
+          from: rangeOffset + 1,
+          to: rangeOffset + displayedCount,
+          total: totalRows,
+        })
+      : "";
+  const loadingMoreText = !hasError && infinite && infiniteRows.loading ? labels.loadingMore : "";
 
   const defaultOrder = allColumns.map((column) => column.id).join("\u0000");
   const menuReorder: ColumnsMenuReorder | null = reorderColumns
@@ -1261,28 +1266,16 @@ export function DataTable<Row>({
               <VisuallyHidden live="polite">{selection.announcement}</VisuallyHidden>
             ) : null}
 
+            {infinite ? <VisuallyHidden live="polite">{loadingMoreText}</VisuallyHidden> : null}
+
             <Footer
-              range={
-                showRange
-                  ? formatLabel(labels.range, {
-                      from: rangeOffset + 1,
-                      to: rangeOffset + displayedCount,
-                      total: totalRows,
-                    })
-                  : null
-              }
+              range={rangeText || null}
               pagination={
                 paged && totalPages > 1
                   ? { page: safePage, totalPages, onPageChange: setPageState }
                   : null
               }
-              status={
-                showInfiniteStatus
-                  ? infiniteRows.loading
-                    ? labels.loadingMore
-                    : labels.scrollForMore
-                  : null
-              }
+              status={loadingMoreText || null}
             />
           </div>,
         )}

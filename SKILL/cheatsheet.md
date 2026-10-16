@@ -95,7 +95,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A filtered page: `<SmartFilter.Root>` wraps `<Page.Root>` — it draws nothing; not `SmartFilter.Root` inside the bar.
 - No size knob on the title: the bar sizes the heading and gives way by width itself ([the five steps](responsive.md#the-pages-top-bar--pagetopbar)).
 - Sign-in, sign-up, an invite and a password reset are modes of one `/login` screen, one `LoginForm` with the action's icon in `LoginForm.Logo` and the default `align` — not a page per mode, not a centred brand mark ([auth](layouts.md#auth-sign-in-code)).
-- A document page (settings, a long form, help) and an overview (a dashboard) put `<Page.Header>` with its `<Page.Heading>` in the flow — the large title — with an optional `<Page.TopBar collapse>` above it that repeats the title once it scrolls away. One `<Page.Title>` per page — never two titles, never no `<h1>`.
+- A dashboard, analytics or statistics page titles itself in `<Page.TopBar>` like a list — not a bar of tools over a large title in the flow. Only a document page (settings, a long form, help) puts `<Page.Header>` with its `<Page.Heading>` in the flow, with an optional `<Page.TopBar collapse>` above it whose heading holds the path. One `<Page.Title>` per page — never two titles, never no `<h1>`.
 
 ## Cards and surfaces
 

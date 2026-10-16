@@ -59,7 +59,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `id` | `string` | — | Id of the `<textarea>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with a changed value on blur and Mod+Enter; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through `error`. |
-| `formatting` | `boolean` | `false` | Selecting text shows a floating toolbar of seven Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. Off: plain text. |
+| `formatting` | `boolean` | `false` | Selecting text shows a floating toolbar of eight Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. Off: plain text. |
 | `children` | `ReactNode` | — | Actions in the field's top end corner: `Textarea.CopyButton`, `Textarea.Action`. |
 | `labels` | `Partial<TextareaLabels>` | — | Built-in strings, see Labels. |
 | `className` | `string` | — | Class on the field frame `<div>` (label, field box, support row), as on every field root. |
@@ -116,7 +116,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `focusRing` | `false`: no focus ring; focus fill and caret remain | A single composer field where focus is obvious | `true` |
-| `formatting` | A floating toolbar over a selection (bold, italic, strikethrough, code, spoiler, link, quote) and the Mod-hotkeys; each writes Markdown around the selection | The text is shown later with its Markdown (Message renders the same subset) | `false` |
+| `formatting` | A floating toolbar over a selection (bold, italic, underline, strikethrough, code, spoiler, link, quote) and the Mod-hotkeys; each writes Markdown around the selection | The text is shown later with its Markdown (Message renders the same subset) | `false` |
 | `reserveSupportRow` | Empty support row of hint height | Live validation, fields side by side | `false` |
 | `required` / `optional` | Red `*` / muted «необязательно» after the label | Mark the minority of the form | — / `false` |
 
@@ -164,7 +164,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 | `Tab` | Focuses the field, then the buttons in its corner; Enter inserts a line break instead of submitting the form. |
 | `Mod+Enter` | With `onCommit`: saves a changed text; focus stays in the field. |
 | `Escape` | With `formatting`: first clears a selection with the toolbar. With `onCommit`: puts the committed text back. |
-| `Mod + B` · `Mod + I` · `Mod + Shift + X` · `Mod + E` · `Mod + Shift + H` · `Mod + K` · `Mod + Shift + 9` | With `formatting`: bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works. |
+| `Mod + B` · `Mod + I` · `Mod + U` · `Mod + Shift + X` · `Mod + E` · `Mod + Shift + H` · `Mod + K` · `Mod + Shift + 9` | With `formatting`: bold, italic, underline, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works. |
 | `←` · `→` | Move between the formatting buttons. |
 | `Home` · `End` | Jump to the first / last formatting button. |
 
@@ -194,6 +194,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 | `formatting` | `"Форматирование"` | Accessible name of the formatting toolbar. |
 | `bold` | `"Жирный"` | Bold tool. |
 | `italic` | `"Курсив"` | Italic tool. |
+| `underline` | `"Подчёркнутый"` | Underline tool (`__…__`). |
 | `strikethrough` | `"Зачёркнутый"` | Strikethrough tool. |
 | `code` | `"Моноширинный"` | Code tool. |
 | `spoiler` | `"Скрытый текст"` | Spoiler tool (`\|\|…\|\|`). |

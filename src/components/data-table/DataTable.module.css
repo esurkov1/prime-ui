@@ -263,6 +263,17 @@
   width: var(--prime-space-0);
 }
 
+/* The body of a `grow` column asks for no width while measured: its narrowest is its header (or
+   its `minWidth`), and the body fits the width the column then gets — a `truncate` value
+   ellipsizes, a `Badge.Group overflow="count"` shows «+N», text wraps (a long word included). */
+.table[data-measuring] > tbody > tr > [data-grow="true"] > * {
+  max-width: var(--prime-space-0);
+}
+
+.table:not([data-measuring]) > tbody > tr > [data-grow="true"] {
+  overflow-wrap: anywhere;
+}
+
 /* The leading utility columns (`--dt-lead`): the sticky first column stands after them and the
    detail panel lines up with the first content column. */
 .root[data-selectable="true"] .table {
@@ -447,9 +458,25 @@
 /* ---------- Body ---------- */
 
 /*
- * Every cell paints an opaque base (`--dt-cell-bg`) plus a translucent wash (`--dt-wash`), so sticky
- * cells stay opaque while hover / stripe / column highlight compose without extra colors.
+ * Every cell paints three layers: the table fill (`--dt-surface`, opaque) at the bottom, the row's
+ * fill (`--dt-cell-bg`: stripe, selection, expanded, heatmap step) over it, and a translucent wash
+ * (`--dt-wash`: hover, press, focus, column highlight) on top. A fill that is translucent in a theme
+ * (the selection's hover tint in dark) still composes over the opaque base, so a sticky cell never
+ * shows the columns scrolled under it (`DataTable.paint.test.ts`). Both are registered colours, so a
+ * fill change transitions.
  */
+@property --dt-cell-bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --dt-wash {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
 .row {
   --dt-cell-bg: var(--dt-surface);
   --dt-wash: transparent;
@@ -470,12 +497,16 @@
   /* A table cell's height is a minimum: content taller than one line grows the row. */
   height: var(--dt-row-height);
   padding: var(--dt-pad-y) var(--dt-pad-x);
-  background-color: var(--dt-cell-bg);
-  background-image: linear-gradient(var(--dt-wash), var(--dt-wash));
+  background-color: var(--dt-surface);
+  background-image:
+    linear-gradient(var(--dt-wash), var(--dt-wash)),
+    linear-gradient(var(--dt-cell-bg), var(--dt-cell-bg));
   color: var(--prime-color-text-primary);
   text-align: start;
   vertical-align: middle;
-  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+  transition:
+    --dt-cell-bg var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    --dt-wash var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 .cell[data-align="center"] {
@@ -562,7 +593,8 @@
 /* A row whose move is being saved: its content quiets down until the answer, both ways eased. */
 .root[data-reorderable="true"] .row > .cell {
   transition:
-    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    --dt-cell-bg var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    --dt-wash var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
@@ -592,7 +624,8 @@
   height: auto;
   padding-block: 0;
   transition:
-    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    --dt-cell-bg var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    --dt-wash var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
     border-top-width var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
@@ -662,7 +695,10 @@
   }
 }
 
-.root[data-highlight-column="true"] .cell[data-column-hovered="true"],
+.root[data-highlight-column="true"] .cell[data-column-hovered="true"] {
+  --dt-wash: var(--prime-color-fill-subtle-active);
+}
+
 .root[data-highlight-column="true"] .headCell[data-column-hovered="true"] {
   background-image: linear-gradient(
     var(--prime-color-fill-subtle-active),
@@ -1155,6 +1191,13 @@ tbody + tbody > .groupRow > .groupCell {
   line-height: var(--prime-text-body-s-line-height);
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+/* The loading status of infinite scroll: the kit Spinner of the table tier before the text. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-2);
 }
 
 .pagination {

@@ -159,7 +159,7 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 | refused | `limit` reached, `canDrop` returns `false` or a reason | `data-dnd-reject` on the `<ul>`: `danger-soft` fill; the reason in a chip under the carried card |
 | locked column | `locked` | `data-locked` on the column; the grip is a lock named «Закреплено» |
 | full | count ≥ `limit` | `data-full` on the column, orange count `count / limit` |
-| empty | no cards | a compact `EmptyPage` in Dnd's dashed drop slot at the top (`fill-strong` dashed line, no fill): «Нет карточек» and the hint «Перетащите сюда карточку»; a `disabled` board shows the text alone; the whole column stays a drop area |
+| empty | no cards | a compact `EmptyPage` in Dnd's dashed drop slot at the top (`fill-strong` dashed line, no fill): «Нет карточек»; the whole column stays a drop area |
 | loading | `loading` | `aria-busy` and `data-loading` on the root; `Skeleton` cards; `Crossfade` swaps them for the cards |
 | loading, no columns yet | `loading` with empty `columns` | an `aria-hidden` row of `loadingColumns` placeholder columns; the columns fade in where they stood (`enterMotion`) |
 | disabled | `disabled` / `Kanban.Item disabled` | `data-disabled` on the root / card; no `aria-roledescription`, no shortcuts, no column grips |
@@ -217,7 +217,6 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | `count` | `"Карточек: {count}"` | Spoken name of the count badge. |
 | `countLimit` | `"Карточек: {count} из {limit}"` | Spoken name of the count badge of a column with a `limit`. |
 | `empty` | `"Нет карточек"` | Text of an empty column. |
-| `emptyHint` | `"Перетащите сюда карточку"` | Hint under the empty-column text, while cards can be dropped (not on a `disabled` board). |
 | `full` | `"Колонка «{column}» заполнена ({limit})"` | Why a full column refuses a card: spoken, and shown under the carried card. |
 | `moveColumn` | `"Переместить колонку «{column}»"` | Name of the column grip (`reorderableColumns`). |
 | `column` | `"Колонка «{column}»"` | A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»). |

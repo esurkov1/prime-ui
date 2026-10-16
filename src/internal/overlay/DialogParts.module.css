@@ -80,6 +80,12 @@
     [close] auto;
 }
 
+/* While a control closes up beside the one that replaces it, the title gives the room for those
+   few frames: the close button never gets pushed out of the row. */
+.header:has(> .actions > [data-leaving]):not([data-actions-below]) {
+  grid-template-columns: [icon] auto [text] minmax(0, 1fr) [actions] auto [close] auto;
+}
+
 /* Title, description and any custom text sit in the text column. */
 .header > :not(.icon, .actions, .close) {
   grid-column: text;
@@ -106,6 +112,7 @@
 }
 
 .header > :has([role="tablist"]) {
+  order: 2;
   grid-column: 1 / -1;
   margin-block-start: var(--prime-space-4);
 }
@@ -213,12 +220,21 @@
   margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
 }
 
+/* A control of the row in its own cell (`HeaderActionCell`): the cell is what enters and closes up. */
+.actionCell {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-width: 0;
+}
+
 /* Beside the title the row never gives: the title's minimum decides. */
 .header:not([data-actions-below]) > .actions {
   min-width: max-content;
 }
 
-/* Under the text: the last row of the text column, after the description (placed last by `order`). */
+/* Under the text: the last row of the text column, after the description (placed last by `order`),
+   above a tab strip (`order: 2`), which always closes the header. */
 .header[data-actions-below] > .actions {
   grid-row: auto;
   grid-column: text / close;
@@ -287,11 +303,17 @@
   margin-block-start: var(--prime-space-4);
 }
 
-/* In plain flow (a `Tabs.Panel`, a wrapper div: `data-flow`, set in TSX) there is no gap to add to:
+/* In plain flow (a wrapper div: `data-flow`, set in TSX) there is no gap to add to:
    the section keeps the whole 32 itself. */
 .section[data-flow="block"]:not(:first-child),
 .section[data-flow="block"] + * {
   margin-block-start: var(--prime-space-8);
+}
+
+/* In a column whose gap already is the section step (a `Tabs.Panel` in the body) the gap is all. */
+.section[data-flow="step"]:not(:first-child),
+.section[data-flow="step"] + * {
+  margin-block-start: 0;
 }
 
 /* The heading and the dialog's `Actions` (tier s) at its end, centred on the title's first line. */

@@ -276,17 +276,20 @@ describe("DialogParts", () => {
     clientWidth.mockRestore();
   });
 
-  it("keeps 32 between sections in plain flow (a tab panel), 16 more than a gapped column gives", () => {
+  it("keeps 32 between sections in plain flow, adds 16 to a smaller gap and nothing to a 32 gap", () => {
     render(
       <Root defaultOpen>
         <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
           <DialogBody>
-            <div role="tabpanel" aria-label="Профиль">
+            <div>
               <DialogSection label="Контакты">Телефон</DialogSection>
               <DialogSection label="Сделки">Две открытые</DialogSection>
             </div>
-            <div data-testid="column" style={{ display: "flex", rowGap: "16px" }}>
+            <div style={{ display: "flex", rowGap: "16px" }}>
               <DialogSection label="Оплата">Карта</DialogSection>
+            </div>
+            <div style={{ display: "flex", rowGap: "32px" }}>
+              <DialogSection label="История">Три заказа</DialogSection>
             </div>
           </DialogBody>
         </DialogPanel>
@@ -294,6 +297,7 @@ describe("DialogParts", () => {
     );
     expect(screen.getByRole("region", { name: "Сделки" })).toHaveAttribute("data-flow", "block");
     expect(screen.getByRole("region", { name: "Оплата" })).toHaveAttribute("data-flow", "gap");
+    expect(screen.getByRole("region", { name: "История" })).toHaveAttribute("data-flow", "step");
   });
 
   it("holds the description's place with a Skeleton while it loads, then shows the data", () => {

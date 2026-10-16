@@ -136,6 +136,20 @@ describe("Datepicker.Panel", () => {
     expect(screen.getByRole("button", { name: "Сегодня" })).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("пресеты — именованная группа без видимого заголовка", () => {
+    render(
+      <Datepicker.Panel
+        mode="range"
+        value={{ from: null, to: null }}
+        onValueChange={() => {}}
+        today={TODAY}
+        presets={[datepickerPresets.today]}
+      />,
+    );
+    const group = screen.getByRole("group", { name: "Период" });
+    expect(group).toHaveTextContent(/^Сегодня$/);
+  });
+
   it("будущие и недоступные дни нельзя выбрать", () => {
     render(
       <Datepicker.Panel

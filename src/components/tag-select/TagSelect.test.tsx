@@ -363,15 +363,15 @@ describe("TagSelect", () => {
   });
 
   it("labels переопределяют системные строки", () => {
-    render(
-      <BasicTagSelect
-        defaultValue={["a"]}
-        labels={{ remove: "Remove {label}", panelHint: "Pick tags" }}
-      />,
-    );
+    render(<BasicTagSelect defaultValue={["a"]} labels={{ remove: "Remove {label}" }} />);
     expect(screen.getByRole("button", { name: "Remove Alpha" })).toBeInTheDocument();
+  });
+
+  it("список открывается без строки-подсказки над вариантами", () => {
+    render(<BasicTagSelect />);
     fireEvent.focus(screen.getByRole("combobox"));
-    expect(screen.getByText("Pick tags")).toBeInTheDocument();
+    const listbox = screen.getByRole("listbox");
+    expect(listbox.firstElementChild).toHaveAttribute("role", "option");
   });
 
   it("чипы — Tag: цвет опции в data-color", () => {

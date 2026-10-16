@@ -207,10 +207,6 @@ export const api: ComponentApi = {
     },
   ],
   labels: labelRows(TAG_SELECT_LABELS, {
-    panelHint: {
-      en: 'Line above the list; `""` hides it.',
-      ru: 'Строка над списком; `""` скрывает её.',
-    },
     create: {
       en: "Action text before the preview of a new tag.",
       ru: "Текст действия перед превью нового тега.",

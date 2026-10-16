@@ -3,7 +3,7 @@
 **Category:** data-display
 **Kind:** primitive
 
-> A small chart — a smooth line over a fading area, a bare line or bars — with its headline: the value at rest, its change and its date; any point can be scrubbed.
+> A small chart — a smooth line over a fading area, a bare line or bars — with its headline: the value at rest, its date and an optional change; any point can be scrubbed.
 
 ## When to use
 - A metric card on a dashboard: revenue, orders, sign-ups over the last days or weeks.
@@ -14,6 +14,8 @@
 - A daily flow over a period — revenue, orders, sign-ups (`summary="sum"`, `compareTo` the previous period).
 - A metric against its plan or average (`reference`), or its change over the whole period (`change="first"`).
 - A series with missing days — a collector that was down (`value: null` breaks the line).
+- A metric where growth is bad — response time, costs, bounce rate (`better="lower"`); a share in percent whose change is in percentage points (`changeUnit="points"`).
+- A period value that is neither the sum nor the mean of the days — a median, unique clients (`value`, `compareTo`).
 
 ## When not to use
 - Exact values on axes, several series, or a legend → a full chart library on the kit's chart palette (`chartColors`); Sparkline has no axes.
@@ -55,10 +57,13 @@ compact:               the plot alone (no head, no value row); loading — the p
 | `variant` | `"area" \| "line" \| "bars"` | `"area"` | `area` — a line over an accent gradient that fades to the bottom; `line` — the line alone, for many trends side by side; `bars` — a bar per point standing on a zero line: up when positive, down (danger) when negative. |
 | `curve` | `"smooth" \| "linear" \| "step"` | `"smooth"` | Shape of the line (`area`, `line`): `smooth` — a monotone cubic through every point that never overshoots a peak or a trough; `linear` — straight segments; `step` — a level per point, changing halfway between points. |
 | `layout` | `"default" \| "compact"` | `"default"` | `default` — the headline over an 80 px plot; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the scrubbed point shows in the tooltip and `aria-valuetext`. |
-| `change` | `"previous" \| "first" \| "none"` | `"previous"` | What the change badge of a shown point compares it with: `previous` — the point before it; `first` — the first point with a value (the change over the period); `none` — no badge. |
+| `change` | `"previous" \| "first" \| "none"` | `"none"` | What the change badge of a shown point compares it with: `previous` — the point before it; `first` — the first point with a value (the change over the period); `none` — no badge (`compareTo` still badges the rest). |
+| `changeUnit` | `"percent" \| "points"` | `"percent"` | How the change badge measures: `percent` — the relative change («+12%»); `points` — the difference, for a share in percent (`labels.points`, «+0,5 п. п.»). A zero change is neutral, no arrow. |
+| `better` | `"higher" \| "lower"` | `"higher"` | Which way of the change is good: `higher` — growth is `success`, a fall `danger` (revenue, orders); `lower` — a fall is `success`, growth `danger` (response time, costs, bounce rate). The arrow always follows the sign. |
 | `summary` | `"latest" \| "sum" \| "average"` | `"latest"` | What the headline shows at rest: `latest` — the latest point (or `highlight`), for a level (MRR, conversion); `sum` — the period total, for a flow (revenue per day); `average` — the period mean. |
-| `highlight` | `number` | the latest point with a value | Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average`. |
-| `compareTo` | `number` | — | The same summary for the previous period («прошлые 30 дней»): the badge at rest compares the headline with it. Without it a `sum` / `average` headline shows no change at rest. |
+| `highlight` | `number` | the latest point with a value | Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average` / `value`. |
+| `value` | `number \| null` | — | The period's own value at rest, neither a sum nor a mean of the points (a median, unique clients), with the period as the date; `compareTo` is its previous period. Not with `summary` / `highlight`. |
+| `compareTo` | `number` | — | The same summary (or `value`) for the previous period («прошлые 30 дней»): the badge at rest compares the headline with it. Without it a `sum` / `average` / `value` headline shows no change at rest. |
 | `min` | `number` | — | The value axis reaches down to at least this value: a floor of zero, or one scale for several sparklines (a table column). Data below widens the scale, never gets cut. |
 | `max` | `number` | — | The value axis reaches up to at least this value; data above widens the scale. |
 | `reference` | `number` | — | A dashed horizontal line at this value — a plan, a target, an average; the scale holds it and the chart is described by `labels.reference`. |
@@ -86,9 +91,23 @@ compact:               the plot alone (no head, no value row); loading — the p
 ### change
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `previous` | change against the point before the shown one | period-over-period (this month vs the last) | yes |
+| `previous` | change against the point before the shown one | period-over-period (this month vs the last) | |
 | `first` | change against the first point with a value | the change over the whole range («за полгода») | |
-| `none` | no badge | a percentage means nothing (a rate near zero, a count of events) | |
+| `none` | no badge for a point; with `compareTo` the badge at rest stays | the headline alone, or the change only against the previous period | yes |
+
+### changeUnit
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `percent` | «+12%», hidden when the base is 0 or the sign flips | counts, money, durations | yes |
+| `points` | the difference of the values, `labels.points` («+0,5 п. п.») | a share already in percent: conversion, churn, load | |
+
+A change that rounds to zero (one decimal) is a `neutral` badge without an arrow («0%»).
+
+### better
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `higher` | growth `success`, a fall `danger` | revenue, orders, conversion | yes |
+| `lower` | a fall `success`, growth `danger`; the arrow still follows the sign | response time, costs, bounce rate, deal cycle | |
 
 ### summary
 | Value | Looks like | Use when | Default |
@@ -98,6 +117,8 @@ compact:               the plot alone (no head, no value row); loading — the p
 | `average` | the period mean at rest, the period as its date, no dot | a rate over the period: average check, response time | |
 
 Scrubbing always shows the point under the pointer; leaving returns to the summary. With `compareTo` (the same summary for the previous period) the badge at rest is the change against it — «+8% к прошлым 30 дням».
+
+A period value that is neither the sum nor the mean of the points (a median, unique clients over the period) is passed as `value` (in place of `summary`): the headline rests on it like on a sum, with the period as its date and no dot; `compareTo` is the same value for the previous period.
 
 ### layout
 | Value | Looks like | Use when | Default |
@@ -118,11 +139,12 @@ Put it in a `Card` for a dashboard tile.
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| at rest | `summary`, `highlight`, `compareTo` | the latest point or `highlight` (`latest`), or the period total / mean with the period as date and no dot (`sum` / `average`, cursor `data-hidden`); the badge compares with `compareTo` when given; the value rolls its digits when `data` changes or scrubbing ends |
+| at rest | `summary`, `highlight`, `value`, `compareTo` | the latest point or `highlight` (`latest`), or the period total / mean / own `value` with the period as date and no dot (`sum` / `average` / `value`, cursor `data-hidden`); the badge compares with `compareTo` when given; the value rolls its digits when `data` changes or scrubbing ends |
 | scrubbing | pointer, touch or the arrow keys | `data-scrubbing` on the root; the guide and the tooltip (`data-state="open"`, date · value, right of the pointer at its height, left of it only where the right has no room in the viewport; from the keyboard beside the point at mid-height) fade in (`fast`), the cursor (or the bar under the pointer) and the headline follow with no easing (direct manipulation), digits change in place |
 | keyboard | arrows, Home, End on the focused plot | `aria-valuenow` / `aria-valuetext`, `data-scrubbing`; the cursor moves to the point at once (keyboard steps are high-frequency); in `bars` the current bar keeps its fill, the others go quiet (`fast` opacity) |
 | settle | pointer leaves, touch ends, focus leaves | back to the point at rest; the tooltip fades out (`fast`) |
-| change hidden | `change="none"`, nothing to compare with, a missing value, a base of 0, or a sign flip | no change Badge: a percentage would mean nothing |
+| change hidden | `change="none"`, nothing to compare with, a missing value, or (`percent`) a base of 0 or a sign flip | no change Badge: the measure would mean nothing |
+| no change | a change that rounds to zero | the change Badge is `neutral`, without an arrow |
 | no data | a point with `value: null` | the line breaks (a point alone between gaps is a dot), no bar; shown, the value reads `labels.empty` (`data-empty`, muted) and the dot fades out, the guide marks the point |
 | new series | a new `data` array | the chart cross-fades in (swap motion); the trend arrow turns half a turn between up and down |
 | compact | `layout="compact"` | `data-layout="compact"` on the root; no headline: `label` names the slider, the point is spoken through `aria-valuetext` and shown in the tooltip |
@@ -152,9 +174,9 @@ Put it in a `Card` for a dashboard tile.
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.
+- The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` / `value` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.
 - The headline with the value and change reads as plain text.
-- The change carries a sign and an arrow, never color alone; a negative bar goes down, not only red.
+- The change carries a sign and an arrow, never color alone (a zero change is a neutral badge with no arrow); a negative bar goes down, not only red.
 - While `loading` the root is `aria-busy` and the chart is not in the tab order yet.
 - `layout="compact"`: no visible title; `label` is only the slider's name, the point still goes to `aria-valuetext`.
 - The tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.
@@ -165,9 +187,10 @@ Put it in a `Card` for a dashboard tile.
 | Key | Default | Used for |
 |---|---|---|
 | `point` | `"{label}: {value}"` | Spoken value of the chosen point (`aria-valuetext`); `{label}` and `{value}` are replaced. |
-| `period` | `"{first} – {last}"` | The date line of a `sum` / `average` headline at rest; `{first}` and `{last}` are the labels of the first and the last point. |
+| `period` | `"{first} – {last}"` | The date line of a `sum` / `average` / `value` headline at rest; `{first}` and `{last}` are the labels of the first and the last point. |
 | `empty` | `"Нет данных"` | Shown and spoken in place of the value of a point with `value: null`. |
 | `reference` | `"Ориентир: {value}"` | Description of the chart with a `reference` line (`aria-describedby`); `{value}` is replaced. |
+| `points` | `"{value} п. п."` | The change badge with `changeUnit="points"`; `{value}` is the signed difference. |
 
 ## Examples
 | Example | Shows |
@@ -178,7 +201,9 @@ Put it in a `Card` for a dashboard tile.
 | [compact.tsx](examples/compact.tsx) | Revenue by month per client in a list: the plot alone at a row's height with the dot on the current month, scrubbing shows the month in a tooltip, the label is the chart's accessible name — `layout`, `label`. |
 | [signed-bars.tsx](examples/signed-bars.tsx) | Monthly profit with a sign: losses go below the zero line, the current month rests highlighted and any bar shows its value under the pointer or the arrows — `variant`, `highlight`. |
 | [curve.tsx](examples/curve.tsx) | The same month of active users as a smooth curve, straight segments and steps — `curve`. |
-| [reference.tsx](examples/reference.tsx) | Checkout conversion against its plan: a dashed reference line, the scale from zero to 5% and the change over the whole period — `reference`, `min`, `max`, `change`. |
+| [reference.tsx](examples/reference.tsx) | Checkout conversion against its plan: a dashed reference line, the scale from zero to 5% and the change over the whole period in percentage points — `reference`, `min`, `max`, `change`, `changeUnit`. |
+| [lower-is-better.tsx](examples/lower-is-better.tsx) | First response time by day, where a fall is good: growth paints the change red, a fall green — `better`, `summary`, `compareTo`. |
+| [own-value.tsx](examples/own-value.tsx) | Unique clients in dialogs: the period's own count is neither the sum nor the mean of the days, so the card passes it with the previous period's count — `value`, `compareTo`. |
 | [gaps.tsx](examples/gaps.tsx) | Daily API requests with days the collector was down: the line breaks over a missing day and the headline says there is no data — `data`, `labels`. |
 | [period.tsx](examples/period.tsx) | Another period swaps the series: the line cross-fades in and the headline digits roll to the new total — `data`, `summary`. |
 
@@ -191,6 +216,9 @@ Put it in a `Card` for a dashboard tile.
 - A missing day as `0` → the line dives to zero; pass `value: null`, the line breaks and the headline says there is no data.
 - Compact sparklines in a column, each on its own scale, when rows must be compared by size → pass the column's `min` / `max` to every row.
 - A plan drawn as a second series → `reference`.
+- Response time, costs or bounce rate with growth painted green → `better="lower"`.
+- A conversion's change in percent of itself («+62%» for 2,1% → 3,4%) → `changeUnit="points"` («+1,3 п. п.»).
+- A median or a unique count forced into `summary="sum"` / `"average"`, or a chart dropped for it → pass the period's own `value` with `compareTo`.
 - A grey box while the series loads → `loading`.
 - A full Sparkline squeezed into a table cell, or its headline hidden with CSS → `layout="compact"`.
 

@@ -18,7 +18,7 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 | [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, a card with its own header per section, form with its own save, Switches that apply at once, danger zone with a confirm |
 | [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts and the Drawer trigger in the top bar, the search in the table's toolbar; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
 | [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title and a line of description in `Page.Heading`, «Сохранить тариф» in `Page.Actions`, both in a `Page.Header` in the flow; a plan card edited in card sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
-| [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | the large title + a line of data in the flow, period switch and report in a collapsing `Page.TopBar`; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
+| [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | an overview titled in its `Page.TopBar`: the title + a line of data, the period switch and the report; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
 | [Screen states](#screen-states) | crossfade | [screen.tsx](../src/components/crossfade/examples/screen.tsx) | title + the statement date in `Page.TopBar`, page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
 | [Messenger](#messenger) | chat | [screen.tsx](../src/components/chat/examples/screen.tsx) | title + the unread count in `Page.TopBar`; a full-height Page.Split of a `ChatList` with its search (live last message, ticks, unread counts, «печатает…») and a `Chat`: `Chat.Header` with the back button, avatar, title, the status that turns into «печатает…» (`typing`) and the search button, `Chat.Search`, `Chat.Messages` from `items` + `renderMessage` (dates, runs and the unread band from the data, history loaded above with `hasOlder` / `onLoadOlder`, a first load in skeletons), text, a photo, a file and sent voice, reply and edit from the menu through `Composer.Context messageId` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Chat.Root typing`), unread counts from `onNewMessage` and `onRead`, the Composer with attachments in `Chat.Footer` |
 | [Sales pipeline board](#sales-pipeline-board) | kanban | [screen.tsx](../src/components/kanban/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the open deals and their sum) with SmartFilter search and a board / list SegmentedControl in `Page.Tools` and the one primary action in `Page.Actions`; Crossfade between a `plain` Kanban (stages without wells, deal cards on the page) and a DataTable of the same deals, column totals in `renderColumnMeta`, moves saved through an `onValueChange` promise that the server can refuse, the deal in a Drawer with a DescriptionList and stage actions, skeleton first load |
@@ -38,21 +38,56 @@ its `Page.TopBar` (sticky) and its `Page.Body`, plus a `Page.Header` in the flow
 **One title per page.** `Page.Title` is the page's only `<h1>`, a `Page.Description` with it is one
 line that carries data («Среда, 14 октября · 3 задачи», «Отправлен · оплатить до 14 октября»), and a
 nested record puts the path up (a `Breadcrumb.Root` before the title) — all three inside
-`Page.Heading`, the title group. Where the heading stands follows the kind of page; its size follows
+`Page.Heading`, the title group. Where the heading stands follows what the body is; its size follows
 the place:
 
-- **Work screens** — a list, a board, a chat, a schedule, a record: `Page.Heading` stands in
+- **Every screen of data** — a list, a board, a chat, a schedule, a record, and every overview
+  (a dashboard, analytics, statistics, finances, a builder): `Page.Heading` stands in
   `Page.TopBar` beside the page's tools and buttons ([the top bar](#the-top-bar)); there is no header
-  in the flow.
-- **Document pages** — settings, a long form, an article or help text: `Page.Header` in the flow
-  holds `Page.Heading` (the large title with one sentence of `Page.Description`) and the page's save
+  in the flow, and the body starts with the first block.
+- **Document pages** — settings, a long form, an article or help text, read top to bottom in one
+  column with no page tools (no period, view or sections): `Page.Header` in the flow holds
+  `Page.Heading` (the large title with one sentence of `Page.Description`) and the page's save
   action in `Page.Actions`; optionally a `Page.TopBar collapse` with only the path in its
   `Page.Heading`, which repeats the title once it scrolls away.
-- **Overviews** — dashboards: a `Page.TopBar collapse` with the page's tools (the period) in
-  `Page.Tools` and its buttons (a report) in `Page.Actions`, and the titled `Page.Header` in the flow.
 
+The test: a page with tools (a period, a view, sections), tiles or charts is a screen of data, and its
+title stands in the bar. `collapse` belongs only to a bar that holds a `Page.Heading` (the path of a
+document page); a bar of tools alone over a large title in the flow is two headers for one page.
 Never two titles; never no `<h1>`. A bar whose page shows no title still holds a `Page.Title` — inside
 `VisuallyHidden` — unless a flow `Page.Header` has one.
+
+```tsx partial
+// bad — an overview split in two: the bar holds only the period, the title stands in the flow
+<Page.Root>
+  <Page.TopBar collapse>
+    <Page.Tools aria-label="Аналитика">…</Page.Tools>
+  </Page.TopBar>
+  <Page.Header>
+    <Page.Heading>
+      <Page.Title>Аналитика</Page.Title>
+      <Page.Description>Продажи · на 8 октября, 9:40</Page.Description>
+    </Page.Heading>
+  </Page.Header>
+  <Page.Body>…</Page.Body>
+</Page.Root>
+```
+
+```tsx good
+// good — the overview titles itself in its bar, like every screen of data
+<Page.Root>
+  <Page.TopBar>
+    <Page.Heading>
+      <Page.Title>Аналитика</Page.Title>
+      <Page.Description>Продажи · на 8 октября, 9:40</Page.Description>
+    </Page.Heading>
+    <Page.Tools aria-label="Аналитика">
+      <Datepicker.Root mode="range" aria-label="Период" />
+    </Page.Tools>
+  </Page.TopBar>
+  <Page.Body>…</Page.Body>
+</Page.Root>
+```
 
 ```
 AppShell.Root                      once per app (layouts.md#app-frame-once-per-app)
@@ -74,9 +109,9 @@ AppShell.Root                      once per app (layouts.md#app-frame-once-per-a
             │  └─ Page.Cell        span (of 12), rows; the tile fills it
             └─ Page.Section        a new topic: h2 label (+ Page.Actions), 40 from its neighbours
 
-Document page or overview: the title in the flow
+Document page: the title in the flow
    └─ Page.Root maxWidth="wide" | "readable"
-      ├─ Page.TopBar collapse      the path (an overview: its tools and buttons); repeats the title once it scrolls away
+      ├─ Page.TopBar collapse      only the path in its Page.Heading; repeats the title once it scrolls away
       ├─ Page.Header               Page.Heading (the one h1, a sentence of description) + Page.Actions; 24 above the body
       └─ Page.Body
 ```
@@ -191,8 +226,9 @@ with «Сделки» and «Документы». Each facet is a route of its o
   the current link of the switch, never a second title or a title that names the facet.
 - **The switch is links in `Page.Tools`**: a `SegmentedControl` whose items are router links
   (`SegmentedControl.Item asChild`), `value` = the current path. It is a navigation (Tab moves
-  through the links, the current one is `aria-current="page"`), on a phone it takes a line of its
-  own under the title by itself.
+  through the links, the current one is `aria-current="page"`), and the bar always gives it a line
+  of its own under the title, at the start edge, so the switch stands still from one sub-page to the
+  next whatever each sub-page puts beside the title.
 - **The body is the sub-page**, swapped in a `Crossfade` keyed by the path (`Routes` given the
   `location`, so the leaving sub-page stays on its route while it fades).
 - **The Sidebar stays on the section.** Its item is current on every sub-route: a `NavLink` to
@@ -345,7 +381,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - **One primary per area** (the page, card, dialog, form): `solid`, last in its row. Secondary:
   `soft` + `tone="neutral"`. Dismiss / revert: `ghost` + `neutral` in pages and cards, `outline` +
   `neutral` in Modal / Drawer footers.
-- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a work screen, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
+- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
 - A dialog footer is the dialog's answer: Cancel and the primary. Deleting the record the dialog
@@ -444,7 +480,8 @@ row of a `FieldList` follows the same count ([forms](#7-forms)).
 
 ### Where the filters go
 
-A control stands with what it changes. Ask of each one: what does it narrow or switch?
+A control stands with what it changes. Ask of each one: what does it narrow or switch? (In a
+drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-in-a-drawer).)
 
 - **One table** — its search and filter fields, their chips, its column chooser and the actions on
   its selected rows belong to the `DataTable`, on every page: the page that is only this table, a
@@ -619,8 +656,10 @@ A control stands with what it changes. Ask of each one: what does it narrow or s
 
 ### Tables
 
-- Paging is built in: `paging="pages"` (default, Pagination and the «Показано 1–6 из 10» range in the
-  footer), `paging="infinite"` for feeds, `paging="none"` for short lists on dashboards and details.
+- Paging is built in: `paging="pages"` (default, Pagination in the footer once there is a second
+  page), `paging="infinite"` for feeds (its footer shows only while the next rows load),
+  `paging="none"` for short lists on dashboards and details. The «Показано 1–6 из 10» range is
+  `showRange`, only where the count matters to the task ([helper text is opt-in](ux.md#3-label-economy)).
 - When the server holds more than you load (a CRM list, a register): `source="server"` — `rows` is the
   page the server returned, `rowCount` its total; `sort` / `page` / the SmartFilter value make the
   request, a new search or filter sets `page` to 1, and the old rows stay with `loading` until the
@@ -642,6 +681,8 @@ A control stands with what it changes. Ask of each one: what does it narrow or s
   first child of a `Dnd.SortableItem` — so the on / off state reads first, like a checkbox, and the
   grip keeps the end edge ([reorder.tsx](../src/components/list/examples/reorder.tsx)).
 - Never a toggle between the label and the grip: «Почта … [Switch] [grip]» reads as two handles.
+- Rows that cannot move stay in the same list with `List.Item locked` — the lock takes the grip's
+  place, so every row keeps one grid ([one kind, one list](ux.md#2-the-shape-of-the-data-decides-the-layout)).
 
 ## 9. Feedback
 
@@ -685,7 +726,8 @@ changes) instead.
 A toast is no layer of that stack: `notify()` from inside a Drawer leaves it open, and a press on
 the toast closes nothing below it. Titled groups of a dialog's body (a client's contacts, its deals)
 are `Drawer.Section` / `Modal.Section` with their own `Drawer.Actions` / `Modal.Actions`, not a
-hand-made heading row; a footer's `Drawer.Meta` / `Modal.Meta` goes above the buttons by itself when
+hand-made heading row — and only where the heading names what the blocks do not
+([label economy](ux.md#3-label-economy)); a footer's `Drawer.Meta` / `Modal.Meta` goes above the buttons by itself when
 the footer runs short.
 
 ### A record in a drawer
@@ -716,6 +758,13 @@ wherever it opens:
   the save the button leaves, so the success is a `Notification`.
 - **Tabs are topics.** Each tab holds one topic, and a record's history (its log) is always a tab of
   its own. Tabs that outgrow the width never merge: the strip scrolls ([switchers](responsive.md#switchers)).
+- **A control for the whole tab stands in the header.** A switch that changes every block of the
+  open tab — the language of its texts, the period of its figures — is one control in
+  `Drawer.Actions`, before the buttons, rendered only while a tab it applies to is open
+  ([tab-switcher.tsx](../src/components/drawer/examples/tab-switcher.tsx)). It is the same rule as
+  [where the filters go](#where-the-filters-go): what it changes is the tab, and the tab's place is
+  the header. A control that changes one block stays in that block. A period starts from the
+  period of the page the drawer opened from, so the drawer's figures match the row it came from.
 - **Data at the drawer's level.** The drawer loads the record and the data of its tabs; a tab never
   fetches on mount, so coming back to it shows what it showed instead of a skeleton that collapses
   it. A tab that keeps a draft or its scroll keeps its panel with `Tabs.Panel keepMounted`. The
@@ -756,6 +805,45 @@ wherever it opens:
     ) : null}
   </Drawer.Footer>
 </Drawer.Content>
+```
+
+```tsx partial
+// bad — the tab's language switch repeated in the heading of every section
+<Tabs.Panel value="description">
+  <Drawer.Section label="Название">
+    <Drawer.Actions>
+      <SegmentedControl.Root aria-label="Язык" defaultValue="ru">…</SegmentedControl.Root>
+    </Drawer.Actions>
+    …
+  </Drawer.Section>
+  <Drawer.Section label="Описание">
+    <Drawer.Actions>
+      <SegmentedControl.Root aria-label="Язык" defaultValue="ru">…</SegmentedControl.Root>
+    </Drawer.Actions>
+    …
+  </Drawer.Section>
+</Tabs.Panel>
+```
+
+```tsx good
+// good — one switch for the open tab, in the header before ⋯, only on the tab it applies to
+// declare: const tab: string
+<Drawer.Header>
+  <Drawer.Title>Кресло «Орион»</Drawer.Title>
+  <Drawer.Actions>
+    {tab === "description" ? (
+      <SegmentedControl.Root aria-label="Язык текстов" defaultValue="ru">
+        <SegmentedControl.Item value="ru">RU</SegmentedControl.Item>
+        <SegmentedControl.Item value="en">EN</SegmentedControl.Item>
+      </SegmentedControl.Root>
+    ) : null}
+    <Button.Root variant="ghost" tone="neutral" aria-label="Действия с моделью">
+      <Button.Icon>
+        <Icon name="action.more" />
+      </Button.Icon>
+    </Button.Root>
+  </Drawer.Actions>
+</Drawer.Header>
 ```
 
 ## 11. Narrow screens
@@ -836,7 +924,7 @@ export function RevenuePanel() {
 
 For a plain KPI row use `Card.Root variant="stat-trend"` (Label · Value · Delta), each in a
 `Page.Cell span={3}` of the page's `Page.Grid` — see [the dashboard screen](../src/components/card/examples/screen.tsx). When the trend over days matters, put a
-`Sparkline` in the `Card.Body` instead: it brings the value, the change and a line to scrub.
+`Sparkline` in the `Card.Body` instead: it brings the value and a line to scrub, the change with `compareTo`.
 
 ## Screen rules
 
@@ -906,11 +994,11 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [card/examples/screen.tsx](../src/components/card/examples/screen.tsx)
 
-- An overview: the large `Page.Title` «Обзор» with a `Page.Description` line of data (what and as of when) in a `Page.Header` in the flow; a `Page.TopBar collapse` above it keeps the page's tools and buttons in reach and repeats the title once it scrolls away; the body starts with the tiles.
+- An overview titles itself in its `Page.TopBar` like any screen of data: `Page.Title` «Обзор» with a `Page.Description` line of data (what and as of when) in `Page.Heading`, beside the page's tools and buttons; no header in the flow, the body starts with the tiles.
 - The period is a `SegmentedControl` in the bar's `Page.Tools` and the report a `soft` + `neutral` button with an icon in its `Page.Actions`: the period changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
 - Every tile of the screen is one `Page.Grid`: KPI `Card variant="stat-trend"` in `Page.Cell span={3}`, 16 px on both axes; `Card.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
 - Another period — other values: each KPI tile is wrapped in `Crossfade state={period}` and flows instead of blinking; a Crossfade right in a `Page.Cell` fills it, so the tiles of a row keep one height.
-- A trend over days is a `Sparkline` in a `Card` in a full-width cell: the last value, the change and a line you can scrub with a finger; a new series appears by itself.
+- A trend over days is a `Sparkline` in a `Card` in a full-width cell: the period's sum (`summary`) and a line you can scrub with a finger; a new series appears by itself.
 - A chart with axes and several series is a `ChartFrame` in `Page.Cell span={8} rows={2}` beside two panels; `ChartFrame.Plot height="fill"` takes their height. A sized plot area (`renderPlot`), a legend that turns series off and a table for screen readers; series colors come from `series`, never your own.
 - Panels are `Card variant="panel"` with `Card.Title as="h2"` in `Card.Header` and quiet context on the right after the title (`caption` + `muted`).
 - Progress of one value is a `ProgressBar` with `label` and `showValue`; parts of a whole are `ProgressBar segments` with `legend` and `formatValue`: statuses are colored by `tone`, categories by `color`.

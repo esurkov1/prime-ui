@@ -1,4 +1,4 @@
-/** A dashboard: the title and a line of data in the page flow, the period switch and the report in the top bar that keeps the title once it scrolls away; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `collapse`, `Page.Grid`. */
+/** A dashboard: the title with a line of data, the period switch and the report in the page's top bar; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `Page.TopBar`, `Page.Grid`. */
 import {
   Badge,
   Button,
@@ -157,10 +157,14 @@ export default function CardScreenExample() {
 
   return (
     <Page.Root>
-      {/* An overview: the large title in the flow; the bar keeps the period and the report in
-          reach and repeats the title once it scrolls away. */}
-      <Page.TopBar collapse>
-        <Page.Tools>
+      {/* An overview titles itself in its bar like any work screen: the title with its line of
+          data, the period that drives the tiles, the report. */}
+      <Page.TopBar>
+        <Page.Heading>
+          <Page.Title>Обзор</Page.Title>
+          <Page.Description>Продажи и оплаты · на 8 октября, 9:40</Page.Description>
+        </Page.Heading>
+        <Page.Tools aria-label="Обзор">
           <SegmentedControl.Root
             aria-label="Период"
             value={period}
@@ -180,12 +184,6 @@ export default function CardScreenExample() {
           </Button.Root>
         </Page.Actions>
       </Page.TopBar>
-      <Page.Header>
-        <Page.Heading>
-          <Page.Title>Обзор</Page.Title>
-          <Page.Description>Продажи и оплаты · на 8 октября, 9:40</Page.Description>
-        </Page.Heading>
-      </Page.Header>
       <Page.Body>
         {/* One board: every tile of the screen in one grid, 16 apart on both axes. */}
         <Page.Grid>

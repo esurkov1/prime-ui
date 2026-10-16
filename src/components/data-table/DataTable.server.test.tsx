@@ -68,6 +68,7 @@ describe('DataTable source="server"', () => {
   it("counts pages and the range from rowCount", () => {
     render(
       <DataTable
+        showRange
         source="server"
         rows={PAGE_2}
         rowCount={8}
@@ -116,21 +117,23 @@ describe('DataTable source="server"', () => {
       pageSize: 3,
       scrollHeight: 200,
     };
-    const { container, rerender } = render(<DataTable {...props} rows={[]} loading page={1} />);
+    const { container, rerender } = render(
+      <DataTable showRange {...props} rows={[]} loading page={1} />,
+    );
     expect(screen.getByText("Загрузка данных…")).toBeInTheDocument();
 
-    rerender(<DataTable {...props} rows={PAGE_2} page={2} />);
+    rerender(<DataTable showRange {...props} rows={PAGE_2} page={2} />);
     const loaded = body(container);
     const viewport = container.querySelector("table")?.parentElement as HTMLElement;
     viewport.scrollTop = 80;
 
-    rerender(<DataTable {...props} rows={PAGE_2} page={3} loading />);
+    rerender(<DataTable showRange {...props} rows={PAGE_2} page={3} loading />);
     expect(container.querySelector("table")).toHaveAttribute("aria-busy", "true");
     expect(names(container)).toEqual(["Z", "B", "M"]);
     expect(screen.queryByText("Загрузка данных…")).toBeNull();
     expect(body(container)).toBe(loaded);
 
-    rerender(<DataTable {...props} rows={PAGE_3} page={3} />);
+    rerender(<DataTable showRange {...props} rows={PAGE_3} page={3} />);
     expect(container.querySelector("table")).not.toHaveAttribute("aria-busy");
     expect(names(container)).toEqual(["Q", "R"]);
     expect(body(container)).not.toBe(loaded);
@@ -258,19 +261,19 @@ describe('DataTable source="server"', () => {
       hasMore: true,
       onLoadMore,
     };
-    const { container, rerender } = render(<DataTable {...props} rows={PAGE_2} />);
+    const { container, rerender } = render(<DataTable showRange {...props} rows={PAGE_2} />);
     // pageSize 2, yet the whole server batch of 3 is on screen.
     expect(names(container)).toEqual(["Z", "B", "M"]);
     expect(screen.getByText("Показано 1–3 из 5")).toBeInTheDocument();
     reach();
     expect(onLoadMore).toHaveBeenCalledTimes(1);
 
-    rerender(<DataTable {...props} rows={[...PAGE_2, ...PAGE_3]} hasMore={false} />);
+    rerender(<DataTable showRange {...props} rows={[...PAGE_2, ...PAGE_3]} hasMore={false} />);
     const appended = bodyRows(container);
     expect(appended).toHaveLength(5);
     expect(appended[3]).toHaveAttribute("data-animate", "true");
 
-    rerender(<DataTable {...props} rows={[...PAGE_3]} />);
+    rerender(<DataTable showRange {...props} rows={[...PAGE_3]} />);
     expect(names(container)).toEqual(["Q", "R"]);
     expect(body(container)).toHaveClass(swapMotion.swapIn);
     vi.unstubAllGlobals();

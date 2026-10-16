@@ -80,7 +80,6 @@ export type { SelectLabels } from "./selectContext";
 export const SELECT_LABELS: SelectLabels = {
   search: "Поиск",
   empty: "Ничего не найдено",
-  emptyHint: "Попробуйте изменить запрос",
   loading: "Загрузка…",
   retry: "Повторить",
   clear: "Очистить",
@@ -802,9 +801,6 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
             {region === "ready" && isEmpty ? (
               <EmptyPage.Root layout="compact" size={size} role="status">
                 <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
-                {query !== "" && labels.emptyHint ? (
-                  <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
-                ) : null}
               </EmptyPage.Root>
             ) : null}
             {actions.length > 0 ? (

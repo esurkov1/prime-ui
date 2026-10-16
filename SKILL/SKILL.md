@@ -123,8 +123,9 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 7. Labels above fields, always — once per column for records in rows (`FieldList`), never numbered
    («Пункт 1»), never repeating their heading. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
-   the page title is `Page.Title`, one per page: in the `Page.Heading` of `Page.TopBar` on a work screen, in the flow
-   on a document page or an overview). No custom font sizes.
+   the page title is `Page.Title`, one per page: in the `Page.Heading` of `Page.TopBar` on every screen
+   of data — lists, boards, records, dashboards and analytics alike; in the flow only on a document page
+   with no page tools). No custom font sizes.
 9. Overlays (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select,
    MediaViewer) come from the kit — never hand-made — and stay mounted: drive them with `open`,
    never `{open && …}`.

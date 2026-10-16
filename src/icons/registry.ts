@@ -98,6 +98,7 @@ import { Star } from "./glyphs/star";
 import { Strikethrough } from "./glyphs/strikethrough";
 import { Sun } from "./glyphs/sun";
 import { Tablet } from "./glyphs/tablet";
+import { Telegram } from "./glyphs/telegram";
 import { TextQuote } from "./glyphs/text-quote";
 import { Trash2 } from "./glyphs/trash-2";
 import { TriangleAlert } from "./glyphs/triangle-alert";
@@ -108,9 +109,11 @@ import { UserPlus } from "./glyphs/user-plus";
 import { UserRound } from "./glyphs/user-round";
 import { Users } from "./glyphs/users";
 import { Video } from "./glyphs/video";
+import { Vk } from "./glyphs/vk";
 import { Volume2 } from "./glyphs/volume-2";
 import { VolumeX } from "./glyphs/volume-x";
 import { Wallet } from "./glyphs/wallet";
+import { Whatsapp } from "./glyphs/whatsapp";
 import { X } from "./glyphs/x";
 import { ZoomIn } from "./glyphs/zoom-in";
 import { ZoomOut } from "./glyphs/zoom-out";
@@ -119,7 +122,8 @@ import { ZoomOut } from "./glyphs/zoom-out";
  * Named kit glyphs: `<Icon name="…" />` renders one of these. Components and examples take glyphs
  * from here instead of importing `lucide-react` or drawing their own `<svg>`; a domain glyph the
  * kit lacks goes through `createIcon`. Drawings are Lucide's (ISC); gestures are adapted from
- * lucide-animated (MIT) — see `THIRD_PARTY_NOTICES`.
+ * lucide-animated (MIT); `brand.*` marks are Simple Icons' (CC0), monochrome, and name the service
+ * only (the marks are their owners' trademarks) — see `THIRD_PARTY_NOTICES`.
  */
 export const iconRegistry = {
   "nav.chevronDown": ChevronDown,
@@ -264,6 +268,12 @@ export const iconRegistry = {
   "viewport.desktop": Monitor,
   "viewport.mobile": Smartphone,
   "viewport.tablet": Tablet,
+  /** A channel or account on Telegram (a filter, a connect choice). */
+  "brand.telegram": Telegram,
+  /** A channel or account on VK. */
+  "brand.vk": Vk,
+  /** A channel or account on WhatsApp. */
+  "brand.whatsapp": Whatsapp,
 } as const;
 
 export type IconName = keyof typeof iconRegistry;

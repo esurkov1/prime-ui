@@ -224,15 +224,6 @@
   pointer-events: none;
 }
 
-.panelHint {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  min-height: var(--prime-panel-group-label-height);
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-}
-
 /* A row with the «⋯» menu: a pick button across the row and the menu button at the end. */
 .optionManaged {
   padding-inline-end: var(--prime-space-1);

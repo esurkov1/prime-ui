@@ -9,8 +9,8 @@
 - Every route rendered inside `AppShell.Main`: the app is navigation and the page, and the page carries its own top (`Page.TopBar`), title (`Page.Title`, the `<h1>`) and body.
 - A work screen (a list, a board, a chat, a schedule): `Page.TopBar` with the title (`Page.Heading`), the page's tools (`Page.Tools`: sections, search and filter, view), all its buttons (`Page.Actions`) and the active filters (`Page.Chips`).
 - A filter stands next to what it filters. `Page.Tools` holds what acts on the whole page: sections, the view, a period that drives several blocks (the KPI cards and the table), and a search and filter only when it narrows several views of one set (a board and its list). A table's search, filter, chips, «Колонки» and selection menu always belong to its own tools row (DataTable `toolbar` + `toolbarChips`), on a page that is only the table too.
-- A section with sub-pages (the «Мессенджеры» item of the Sidebar with «Каналы» and «Статистика»): each sub-page is a route of its own, `Page.Title` stays the section's name, and the switch is a `SegmentedControl` of links (`SegmentedControl.Item asChild`) in `Page.Tools`; the body is the current sub-page. The Sidebar keeps the section's item current on every sub-route — a router `NavLink` to the section's path without `end`, or `current={pathname.startsWith("/messengers")}`.
-- A document page (settings, a long form, help) or an overview (a dashboard): `Page.Header` in the flow — the large title and its buttons — and `Page.TopBar collapse`, which repeats the title once it scrolls away and keeps the path and the buttons in reach.
+- A section with sub-pages (the «Мессенджеры» item of the Sidebar with «Каналы», «Шаблоны» and «Статистика»): each sub-page is a route of its own, `Page.Title` stays the section's name, and the switch is a `SegmentedControl` of links (`SegmentedControl.Item asChild`) in `Page.Tools`, on a line of its own under the title at the start (see Top bar plan), so it stays put while each sub-page brings its own `Page.Actions` or none; the body is the current sub-page. The Sidebar keeps the section's item current on every sub-route — a router `NavLink` to the section's path without `end`, or `current={pathname.startsWith("/messengers")}`.
+- A document page (settings, a long form, help) read top to bottom with no page tools: `Page.Header` in the flow — the large title and its buttons — and `Page.TopBar collapse` with the path in its `Page.Heading`, which repeats the title once it scrolls away. A dashboard or an analytics page titles itself in `Page.TopBar` like a list.
 - A nested record: a `Breadcrumb` path in `Page.Heading`; in the bar the title reads as its last level.
 - A text page held to a reading measure (`maxWidth="readable"`), a wide dashboard capped at the content width (`maxWidth="wide"`).
 - The tiles of a dashboard — KPI cards, charts, panels — as one board (`Page.Grid` + `Page.Cell`).
@@ -94,7 +94,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (`Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — direct children), `className` and the other attributes. |
 
 ### Page.Header
-`ref` → `HTMLDivElement`. The document header in the page flow (settings, long forms, overviews): a `Page.Heading` and its `Page.Actions` in one row; the actions wrap under it on a narrow column.
+`ref` → `HTMLDivElement`. The document header in the page flow (settings, long forms): a `Page.Heading` and its `Page.Actions` in one row; the actions wrap under it on a narrow column.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -123,7 +123,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### Page.Tools
-`ref` → `HTMLDivElement`. What acts on the whole page: sections (route links of sub-pages), view, a shared period; a filter only over several views — a table's go in its `toolbar`. The DataTable tool row: a search takes the free room, the rest keep their width. Named, a `group`.
+`ref` → `HTMLDivElement`. What acts on the whole page: sub-page links, view, a shared period, a filter over several views (a table's tools go in its `toolbar`). Sub-page links take a line of their own at the start. Named, a `group`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -226,8 +226,8 @@ No DOM, no ref. Holds the page from anywhere inside it: a press on a `Sidebar.It
 ### Place of Page.Heading
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| in `Page.TopBar` | one line as high as the Sidebar brand row: path › title-m, the caption description under the whole line; both truncate | work screens: lists, boards, chats, records | |
-| in `Page.Header` in the flow | the large document header: path over a heading-m title, body-m description, the header's `Page.Actions` beside it, wrapping under it | document pages and overviews | |
+| in `Page.TopBar` | one line as high as the Sidebar brand row: path › title-m, the caption description under the whole line; both truncate | screens of data: lists, boards, chats, records, dashboards and analytics | |
+| in `Page.Header` in the flow | the large document header: path over a heading-m title, body-m description, the header's `Page.Actions` beside it, wrapping under it | document pages with no page tools: settings, long forms, help | |
 
 The size follows the place; the consumer passes nothing, and there are no title size props. One `Page.Title` (`<h1>`) per page, in one of the two places. A bar with no visible title still holds the `<h1>`: a `Page.Title` wrapped in `VisuallyHidden`, or a flow `Page.Title` (with `collapse` the bar repeats it).
 
@@ -236,7 +236,7 @@ The size follows the place; the consumer passes nothing, and there are no title 
 |---|---|---|---|
 | `fill` (Root) | the page is as high as main; the body takes what the bar and the header leave; main keeps gutter-high air under it | a full-height table, board, chat or `Page.Split` in an `AppShell.Root fillViewport` | `false` |
 | `sticky` (TopBar) | the bar stays at the top of main while the page scrolls under it | every page; `false` for a bar that should scroll away | `true` |
-| `collapse` (TopBar) | the flow title rises into the bar's title row once it scrolls away | a document page or an overview with the title in the flow | `false` |
+| `collapse` (TopBar) | the flow title rises into the bar's title row once it scrolls away | a document page with the path in the bar and the title in the flow | `false` |
 | `dirty` (Guard) | nothing until a person leaves: a press on the navigation or the path asks «leave without saving?» | a form that is the page has unsaved changes | `false` |
 | `busy` (Guard) | nothing until a person leaves: a press on the navigation or the path does nothing | the page's save request runs | `false` |
 
@@ -245,13 +245,13 @@ One plan, chosen from the natural widths of the groups (`data-plan` on the bar's
 
 | Step | Looks like | Use when | Default |
 |---|---|---|---|
-| `one` | `[Heading 1fr][Tools][Actions]` on one line | everything fits | yes |
-| `below` | the tools on a line of their own under the heading and the actions — the one tool row, as the DataTable `toolbar`: a search (`SmartFilter.Toolbar`, `Input.Root`) takes the free room, switchers, pickers and buttons keep their width at the end; under 36rem the search takes a line of its own and a `SegmentedControl.Root` / `Datepicker.Root` / Select fills the line it stands on | heading + tools + actions do not fit | |
+| `one` | `[Heading 1fr][Tools][Actions]` on one line | everything fits, and the tools hold no navigation | yes |
+| `below` | the tools on a line of their own under the heading and the actions — the one tool row, as the DataTable `toolbar`: a search (`SmartFilter.Toolbar`, `Input.Root`) takes the free room, switchers, pickers and buttons keep their width at the end; under 36rem the search takes a line of its own and a `SegmentedControl.Root` / `Datepicker.Root` / Select fills the line it stands on | heading + tools + actions do not fit; always for a section's sub-pages (the tools hold a navigation — a `SegmentedControl` of links), gathered at the start | |
 | `icons-secondary` | as `below`; secondary Buttons with a `Button.Icon` show only the icon, the label is their name and their tooltip | heading + actions still do not fit | |
 | `icons` | the primary Button gives way to its icon too | still too wide | |
 | `fold` | the secondary Buttons fold into «⋯» (`labels.more`); the primary stays | still too wide, and «⋯» is narrower than their icons (a single secondary keeps its icon); past it a Breadcrumb path folds into «…»; if the path and the title still do not share the line, the heading stacks: the path on its own line over the title, the title and the description wrapping (`data-heading="stack"`); a heading without a path truncates | |
 
-The actions stay on the first line beside the heading at every step; `Page.Chips` is always a line under everything; nothing overflows. The primary is the first solid `Button.Root`; a Button without an icon keeps its label at every step; anything that is not a `Button.Root` stays as it is.
+A section's sub-pages never share the first line: there they would stand where each sub-page's own heading and actions leave room, and those differ («Подключить канал» on one, none on another), so the switch would move under the pointer. On a line of their own at the start they stand at one place on every sub-page and at every width. The actions stay on the first line beside the heading at every step; `Page.Chips` is always a line under everything; nothing overflows. The primary is the first solid `Button.Root`; a Button without an icon keeps its label at every step; anything that is not a `Button.Root` stays as it is.
 
 ### Grid columns
 | Grid width | Cell `span` 1–3 | `span` 4 | `span` 5–6 | `span` 7–12 | `rows` |
@@ -342,9 +342,9 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 | [structure.tsx](examples/structure.tsx) | A document page in the flow: the path over the large title, its line of data and the page's buttons beside them, then the body with a section — `Page.Header`, `Page.Heading`, `Page.Description`, `Page.Section`. |
 | [top-bar.tsx](examples/top-bar.tsx) | A nested record in the top bar: the path ending in the title, a line of data, the page's tools and its buttons — `Page.TopBar`, `Page.Heading`, `Page.Tools`, `Page.Actions`. |
 | [loading.tsx](examples/loading.tsx) | A page whose figures load after it opens: the line of data keeps its place under the title while it loads, so nothing in the bar moves — `loading`. |
-| [collapse.tsx](examples/collapse.tsx) | An overview whose large title scrolls away under the top bar: the bar repeats it with its line of data and keeps the period and the page's buttons in reach — `collapse`. |
+| [collapse.tsx](examples/collapse.tsx) | A document page whose large title scrolls away under the top bar: the bar holds the path and repeats the title after it once the title is out of view — `collapse`, `Page.Header`. |
 | [tools.tsx](examples/tools.tsx) | The orders page's tools in its top bar: sections with counts, the search and filter that narrow both views, the view, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. |
-| [router.tsx](examples/router.tsx) | A section with sub-pages: the title is the section, each sub-page is a route of its own, the switch in the bar is their links and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. |
+| [router.tsx](examples/router.tsx) | A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the bar is their links on a line of their own and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. |
 | [actions-collapse.tsx](examples/actions-collapse.tsx) | The buttons of an invoices page on a tablet-wide column: the line runs short, so the secondary buttons show only their icons with the label as the name and the tooltip, the primary keeps its label — `Page.Actions`, `Button.Icon`. |
 | [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading — `Page.Section`, `label`, `description`, `Page.Actions`. |
 | [grid.tsx](examples/grid.tsx) | A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `Page.Grid`, `Page.Cell`, `span`, `rows`. |
@@ -365,6 +365,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - `SmartFilter.Root` inside the bar, around `Page.Tools` → it holds no DOM; wrap it around `Page.Root` so its Toolbar (in `Page.Tools`) and its Chips (in `Page.Chips`) share it.
 - A table's search, filter, chips or «Колонки» in `Page.Tools` / `Page.Chips` → they read as filters of the whole page and move when the page grows a block; they go in the table's `toolbar` / `toolbarChips` on every page, the one that is only the table too. The bar keeps the title, sections, the view, a period that drives every block and the page's buttons.
 - Sub-pages of a section as a second Sidebar level, a tab strip inside `Page.Body`, or a title that names the sub-page → the title stays the section, the sub-pages are route links in `Page.Tools` (`SegmentedControl.Item asChild`), and the section's Sidebar item stays current on every sub-route.
+- A dashboard or analytics page with a bar of tools only (`collapse`) over a large title in the flow → the title and its line of data go in the bar's `Page.Heading` beside the tools, as on a list; the flow header is for document pages.
 - `Page.Header` inside `Page.TopBar` → the bar takes `Page.Heading` and `Page.Actions` directly; `Page.Header` is the flow's document header.
 - A hand-made menu button for the phone Sidebar → the bar draws it while the Sidebar is off-canvas.
 - Hiding buttons with media queries on a phone → `Page.Actions` in the bar collapses and folds them by measured width.

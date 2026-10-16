@@ -226,7 +226,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- A live region (`role="status"`, `aria-live="polite"`) announces grabbed, dropped, returned, cancelled, «position N of M», a move to another list by its name and a refusal with its reason, from `labels`.
+- A live region (`role="status"`, `aria-live="polite"`) announces grabbed, dropped, returned, cancelled, «position N of M», a move to another list by its name, a refusal with its reason and a keyboard step a `locked` item stops, from `labels`.
 - The keyboard target of a sortable item has `aria-keyshortcuts` (with the across keys in linked lists) and `aria-roledescription` and is in the tab order: the item itself (`tabIndex={0}`; a named `<div>` item is a `button`, an `li` or a `tr` keeps its role), or with `handle` its grip. A role description stands only on an element with a role. The clone is `aria-hidden`.
 - While `onReorder`'s promise is pending, the item has `aria-busy` and holds still, and its `Dnd.Handle` is busy.
 - In lists sharing a `kind`, Alt + the across arrows move the item to the same row of the neighbouring list in document order; focus follows the item.
@@ -249,6 +249,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | `cancelled` | `"{label}: перемещение отменено"` | Live region: cancelled (Escape, interruption). |
 | `moved` | `"{label}: позиция {position} из {total}"` | Live region: moved with the keyboard. |
 | `movedTo` | `"{label}: «{list}», позиция {position} из {total}"` | Live region: moved to a linked list with the keyboard; `{list}` is its accessible name. |
+| `blocked` | `"{label}: «{locked}» закреплено, дальше не переместить"` | Live region: a keyboard step refused because a `locked` item holds that place; `{locked}` is its label. |
 | `refused` | `"{label}: «{list}» не принимает элемент"` | Live region: a linked list refused a keyboard move (`canDrop` answered `false`). |
 | `refusedReason` | `"{label}: {reason}"` | Live region: a target refused the item and said why (`canDrop` answered a string). |
 

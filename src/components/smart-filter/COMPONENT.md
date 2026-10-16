@@ -38,7 +38,7 @@ SmartFilter.Root                  state + context, no DOM
 │     │                           (groups: a caption over each group's values, role="group")
 │     ├─ range rows               field label · Input «от» – Input «до» · or a Datepicker range field
 │     ├─ no matches               compact EmptyPage naming the fields with nothing found
-│     └─ footer                   hint · count · Reset Button
+│     └─ footer                   Reset Button, while a filter is set
 └─ SmartFilter.Chips              applied filters as removable Badges · add / clear all Buttons
 ```
 The toolbar and the chips are separate parts so a page can put them in different places; both only need to be inside `Root`, which draws nothing of its own.
@@ -171,7 +171,7 @@ same height and type.
 - The panel is a flush Popover at least as wide as the toolbar (`width="min-trigger"`), by its content up to twice the panel minimum when the toolbar is narrow; every section is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`, footer `--prime-space-2` × `--prime-space-4`), Dividers run edge to edge, the field label column is at least `--prime-space-24` (a longer name takes its own width, never breaking inside a word); a row narrower than 24rem stacks the label over the values (an intrinsic wrap, no breakpoint).
 - The toolbar is one row of controls (`--prime-space-2` gap): the search first, growing from 9rem (`--prime-space-24` × 1.5), then the filter button at its own width. When less than 9rem is left beside the labelled button, the button shows only its icon and count and stays beside the search, which gives its width instead of wrapping. Every row stays one control high. The search and the button also stand alone: `searchable={false}` keeps the button, empty `fields` keep the search. Search first, filter second — the active filters (`SmartFilter.Chips`) sit under them.
 - Chips are Badges of the toolbar tier on the badge scale (`xs` → `s`), so a tag sits lower than the controls above it; «Добавить фильтр» is a tag of the same tier and «Сбросить все» a LinkButton with the tag's text size.
-- Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end. The chips row rises in with the first filter and closes up in place with the last (`partPresence`).
+- Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end. The chips row, and the panel footer with its Reset, rise in with the first filter and close up in place with the last (`partPresence`).
 - Option groups stack `--prime-space-3` apart, a caption `--prime-space-1` above each group's values. A range row holds two equal Inputs with a dash between them, centred on the field label.
 - While typing a search a range row stays only when its field name matches.
 - The root draws nothing: its host places Toolbar and Chips, next to what they filter. A table among other blocks (KPI cards, a chart) takes them in its own tools row — the DataTable `toolbar` (the Toolbar) and `toolbarChips` (the Chips), with `SmartFilter.Root` around the DataTable. A page that is one list takes them in its bar — the Toolbar in `Page.Tools`, the Chips in `Page.Chips`, with `SmartFilter.Root` around `Page.Root`. Elsewhere a host stacks them (a `Card.Body`, a form column).
@@ -208,9 +208,7 @@ same height and type.
 | `clearSearch` | `"Очистить поиск"` | Name of the search clear button. |
 | `searchText` | `"Искать «{query}»"` | The text search row while typing. |
 | `noMatches` | `"{fields} — нет совпадений"` | Fields with nothing found while typing (compact EmptyPage). |
-| `hint` | `"Нажмите значение, чтобы показать только его; «−» справа — скрыть"` | Panel footer hint. |
-| `count` | `"Фильтров: {count}"` | Panel footer counter. |
-| `reset` | `"Сбросить"` | Panel footer reset. |
+| `reset` | `"Сбросить"` | Panel footer reset, shown while a filter is set. |
 | `more` | `"Ещё {count}"` | Collapsed values of a field. |
 | `add` | `"Добавить фильтр"` | Chips row: opens the panel. |
 | `clearAll` | `"Сбросить все"` | Chips row: clears every field. |

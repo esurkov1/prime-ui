@@ -224,7 +224,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | load error | `loadError` | the list is `hidden`; a compact EmptyPage with `role="alert"` and a retry Button (`onRetry`) |
 | state swap | loading ↔ items ↔ load error | the new content fades in (`swapMotion`), the first render stays still |
 | searching | typing in the search | panel `data-searching="true"`; groups without matches and separators hide; the match in an option's title, description and plain text is a `<mark>` in `accent-text` (not in the trigger); the query clears when the list closes (`onSearchChange("")`) |
-| nothing to show | no option matches (and not loading) | a compact EmptyPage with `role="status"`: `labels.empty`, plus `labels.emptyHint` while a query is typed; a `Select.Action` stays under it, highlighted |
+| nothing to show | no option matches (and not loading) | a compact EmptyPage with `role="status"`: `labels.empty` alone; a `Select.Action` stays under it, highlighted |
 | sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it |
 | segment | inside `Input.Wrapper` | no frame (label, hint, error, support row): the root is `data-field-segment`, the trigger `data-segment="true"` — a tinted section flush with the box's start edge, a stronger fill on hover and while open, an inset focus ring; named «`aria-label`: value» |
 | option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is a fill only |
@@ -312,7 +312,6 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 |---|---|---|
 | `search` | `"Поиск"` | Placeholder and accessible name of the search field. |
 | `empty` | `"Ничего не найдено"` | Empty state: no items or nothing matches. |
-| `emptyHint` | `"Попробуйте изменить запрос"` | Second line of the empty state while searching; `""` hides it. |
 | `loading` | `"Загрузка…"` | Announced while `loading` or `loadingMore`. |
 | `retry` | `"Повторить"` | The retry button under `loadError` (`onRetry`). |
 | `clear` | `"Очистить"` | Tooltip of the clear segment. |

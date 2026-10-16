@@ -26,6 +26,7 @@ import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch, matchIndex } from "@/internal/HighlightMatch";
 import { useLabels } from "@/internal/labels";
+import { handoffFocus } from "@/internal/overlay/focus";
 import { usePartPresence } from "@/internal/partPresence";
 import { type ControlSize, stepDown } from "@/internal/states";
 
@@ -135,11 +136,7 @@ export type SmartFilterLabels = {
   searchText: string;
   /** Fields with no matches while typing. */
   noMatches: string;
-  /** Footer hint. */
-  hint: string;
-  /** Footer counter. */
-  count: string;
-  /** Footer reset button. */
+  /** Footer reset button, shown while a filter is set. */
   reset: string;
   /** Collapsed values of a field. */
   more: string;
@@ -181,8 +178,6 @@ export const SMART_FILTER_LABELS: SmartFilterLabels = {
   clearSearch: "Очистить поиск",
   searchText: "Искать «{query}»",
   noMatches: "{fields} — нет совпадений",
-  hint: "Нажмите значение, чтобы показать только его; «−» справа — скрыть",
-  count: "Фильтров: {count}",
   reset: "Сбросить",
   more: "Ещё {count}",
   add: "Добавить фильтр",
@@ -476,6 +471,22 @@ function Panel({ searchable }: { searchable: boolean }) {
     collapsedLimit,
   } = useSmartFilter();
   const query = searchable ? search.trim() : "";
+  const footer = usePartPresence<HTMLDivElement>({ present: total > 0, axis: "block" });
+  const leaveFooter = footer.ref;
+  const footerRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) return;
+      const leave = leaveFooter(node);
+      return () => {
+        // Reset took the footer with it: the focus stays in the panel, on its first control.
+        const held = node.contains(document.activeElement);
+        const panel = node.parentElement;
+        if (typeof leave === "function") leave();
+        if (held && panel) queueMicrotask(() => panel.isConnected && handoffFocus(node, panel));
+      };
+    },
+    [leaveFooter],
+  );
   const [expanded, setExpanded] = React.useState<ReadonlySet<string>>(() => new Set());
 
   const sections: { key: string; node: React.ReactNode }[] = [];
@@ -645,24 +656,24 @@ function Panel({ searchable }: { searchable: boolean }) {
       ),
     });
   }
-  sections.push({
-    key: "footer",
-    node: (
-      <div className={styles.footer}>
-        <Typography as="span" variant="caption" tone="muted" className={styles.hint}>
-          {labels.hint}
-        </Typography>
-        <Typography as="span" variant="caption" tone="muted">
-          {formatLabel(labels.count, { count: total })}
-        </Typography>
-        {total > 0 && (
-          <Button.Root variant="ghost" tone="neutral" size="xs" onClick={clearAll}>
-            {labels.reset}
-          </Button.Root>
-        )}
-      </div>
-    ),
-  });
+  // Reset is offered only while there is something to reset: it rises in with the first filter and
+  // closes up in place with the last.
+  if (total > 0) {
+    sections.push({
+      key: "footer",
+      node: (
+        // The divider over it comes and goes with it.
+        <div ref={footerRef} className={footer.className}>
+          <Divider role="presentation" />
+          <div className={styles.footer}>
+            <Button.Root variant="ghost" tone="neutral" size="xs" onClick={clearAll}>
+              {labels.reset}
+            </Button.Root>
+          </div>
+        </div>
+      ),
+    });
+  }
 
   return (
     <>
@@ -671,7 +682,7 @@ function Panel({ searchable }: { searchable: boolean }) {
       </Popover.Title>
       {sections.map((section, index) => (
         <React.Fragment key={section.key}>
-          {index > 0 && <Divider role="presentation" />}
+          {index > 0 && section.key !== "footer" && <Divider role="presentation" />}
           {section.node}
         </React.Fragment>
       ))}

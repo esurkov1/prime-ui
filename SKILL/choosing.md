@@ -42,7 +42,7 @@ under them → its `renderTotals`.
 |---|---|
 | a capability or a setting that is on or off, in a form or applied at once | Switch ([a flag, a level, a set](#a-flag-a-level-a-set)) |
 | items picked out of a set, a consent, an option of the action being sent | Checkbox |
-| exactly one of 2–5 visible options in a form | Radio (`Radio.Group` with `label`) |
+| exactly one of 2–5 visible options, a value of the one form whose other fields stay the same | Radio (`Radio.Group` with `label`); a choice that leads to a different form is a menu, not a field ([a kind that leads to its own form](#a-kind-that-leads-to-its-own-form)) |
 | exactly one of 2–5 modes that change the view right now — never a stored setting | SegmentedControl |
 | one of many (> 5) or a long list; icons, descriptions, search, groups | Select (`Select.Content searchable`) |
 | one record out of thousands for a form field (a client, a contract), searched on the server | Select with `search` / `onSearchChange`, `filter={false}`, `loading`, `hasMore` + `onLoadMore` — never a read-only field that opens a CommandMenu |
@@ -77,7 +77,7 @@ Records with a start and an end compared across time — who is busy when, a pro
 phases and milestones → Gantt (never a DataTable of dates or hand-drawn bars); moved and resized by
 hand through `onBarChange`.
 Chronological events → Timeline (two facts under an event → two `Timeline.ItemMeta`, they stack); a conversation between people (support, a team chat) → Message —
-never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A number with its trend over days or weeks (revenue, orders, sign-ups) → Sparkline: the latest value, its change and a line you can scrub; values with a sign by period → Sparkline `variant="bars"`; against a plan → `reference`; missing days → `value: null`; a chart with axes or several series → ChartFrame around a chart library or your own SVG (the panel, legend, tooltip, states and the screen-reader table come from the kit, the colors from `series` / `chartColors` — never status tones); values to read, sort or compare row by row → DataTable, not a chart.
+never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A number with its trend over days or weeks (revenue, orders, sign-ups) → Sparkline: the headline value and a line you can scrub; its change badge against the previous period → `compareTo` (`change` for a point-to-point badge while scrubbing, off by default); a metric whose growth is bad (response time, costs, refusals) → `better="lower"`; a share or a conversion in percent → `changeUnit="points"` («+0,5 п. п.», never a percent of a percent); a period figure that is neither the sum nor the mean of the points (a median, unique clients) → `value`; values with a sign by period → Sparkline `variant="bars"`; against a plan → `reference`; missing days → `value: null` in `data`; a chart with axes or several series → ChartFrame around a chart library or your own SVG (the panel, legend, tooltip, states and the screen-reader table come from the kit, the colors from `series` / `chartColors` — never status tones); values to read, sort or compare row by row → DataTable, not a chart.
 
 **Messages.** A whole conversation → `Chat`: `Chat.Root` with `Chat.Header` (avatar, `Chat.Title`,
 `Chat.Description`, `Chat.Actions` with `Chat.SearchButton`), `Chat.Search`, `Chat.Pinned`,
@@ -137,8 +137,8 @@ the rail has no brand header. On phones the off-canvas Sidebar opens from the me
 page's `Page.TopBar` draws by itself; a trigger of your own reads `useAppShellNav()`. There is no
 app-wide header: the bar at the top of the panel is the page's `Page.TopBar` — on a work screen the
 title group (`Page.Heading`), the page's tools (`Page.Tools`), its buttons (`Page.Actions`) and the
-active filters (`Page.Chips`) — [the top bar](composition.md#the-top-bar). A document
-page (settings, a long form, help) or an overview has its large title in the flow (`Page.Header`
+active filters (`Page.Chips`) — [the top bar](composition.md#the-top-bar), on a dashboard as on a
+list. Only a document page (settings, a long form, help) has its large title in the flow (`Page.Header`
 outside the bar), with an optional `Page.TopBar collapse` that repeats it once it scrolls away. A record opened from a table: its own page → DataTable `getRowHref`; in place →
 `onRowClick` + Drawer; a list worked through record by record → `Page.Split` with a `List` of
 the records (tickets, letters, invoices; `current` on the open one; a row's own Switch or menu in
@@ -221,6 +221,77 @@ column, and shows only the ones that have a level.
 </>
 ```
 
+### A kind that leads to its own form
+
+Creating or connecting one of several kinds of record whose forms differ (a Telegram bot or a
+Telegram account, a VK community or a VK account; an invoice or an act) is a fork before the form,
+not a field of it. Ask of the choice: do the fields after it stay the same?
+
+| The choice | Shape |
+|---|---|
+| the fields stay the same; the choice is one more value of the record (a client type, a currency) | a field of the form: `Radio.Group` for 2–5, `Select` for more |
+| each option has its own fields, its own steps or its own service to connect | the action button opens a `Dropdown`: one `Dropdown.Item` per kind (`Dropdown.ItemIcon` with its glyph), in a `Dropdown.Group label` per family when the kinds group (by messenger, by document type); a pick opens that kind's form straight away, titled by the kind («Подключить Telegram-бота»); in ⌘K, one `CommandMenu.Item` per kind |
+
+Never a dialog whose first step is the choice and a «Далее»: the person already said what they
+want by pressing the item, and a dialog that changes its fields under a choice cannot say what it
+will create. One kind only → the button opens its form directly, no menu.
+
+```tsx partial
+// bad — the kind is a first step inside the dialog: two choices and «Далее» before any field
+<Modal.Body>
+  <SegmentedControl.Root label="Мессенджер" defaultValue="telegram">…</SegmentedControl.Root>
+  <Radio.Group label="Что подключить" defaultValue="bot">…</Radio.Group>
+</Modal.Body>
+<Modal.Footer>
+  <Button.Root>Далее</Button.Root>
+</Modal.Footer>
+```
+
+```tsx good
+// good — the button is a menu of kinds grouped by messenger; a pick opens that kind's form
+// declare: const openConnect: (kind: "telegram-bot" | "telegram-account" | "vk-group" | "vk-account") => void
+<Dropdown.Root>
+  <Dropdown.Trigger>
+    <Button.Root>
+      <Button.Icon>
+        <Icon name="action.add" />
+      </Button.Icon>
+      Подключить
+    </Button.Root>
+  </Dropdown.Trigger>
+  <Dropdown.Content>
+    <Dropdown.Group label="Telegram">
+      <Dropdown.Item onSelect={() => openConnect("telegram-bot")}>
+        <Dropdown.ItemIcon>
+          <Icon name="brand.telegram" />
+        </Dropdown.ItemIcon>
+        Бот
+      </Dropdown.Item>
+      <Dropdown.Item onSelect={() => openConnect("telegram-account")}>
+        <Dropdown.ItemIcon>
+          <Icon name="brand.telegram" />
+        </Dropdown.ItemIcon>
+        Аккаунт
+      </Dropdown.Item>
+    </Dropdown.Group>
+    <Dropdown.Group label="ВКонтакте">
+      <Dropdown.Item onSelect={() => openConnect("vk-group")}>
+        <Dropdown.ItemIcon>
+          <Icon name="brand.vk" />
+        </Dropdown.ItemIcon>
+        Сообщество
+      </Dropdown.Item>
+      <Dropdown.Item onSelect={() => openConnect("vk-account")}>
+        <Dropdown.ItemIcon>
+          <Icon name="brand.vk" />
+        </Dropdown.ItemIcon>
+        Аккаунт
+      </Dropdown.Item>
+    </Dropdown.Group>
+  </Dropdown.Content>
+</Dropdown.Root>
+```
+
 ## 3. Pairs that are easy to confuse
 
 | Pair | Rule |
@@ -238,7 +309,7 @@ column, and shows only the ones that have a level.
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
 | Checkbox / Switch / Radio | Switch: a capability or a setting that is on or off — a permission, a privacy toggle — whether it saves with a form or at once. Checkbox: items picked out of a set, a consent, a one-off option of the action being sent. Radio: one of several, submitted later ([a flag, a level, a set](#a-flag-a-level-a-set)). |
 | Gallery / MediaViewer / Thumbnail | Thumbnail: one picture or video of an object in a list, card or picker (selectable with `checked`). Gallery: an album of 1–10 photos and videos laid out by their ratios; it opens MediaViewer itself. MediaViewer: the full-screen viewer on its own, opened from your own thumbnails or a button (`getOrigin` for the zoom out of the tile). A grid of many images to browse → a CSS grid of Thumbnails, not a Gallery. |
-| Sparkline / ChartFrame | Sparkline: one series as a headline number with its change and a small line or bars you can scrub (`variant="bars"` for signed values). ChartFrame: a panel around a real chart (axes, several series, legend, tooltip, states) drawn by a library or your SVG. Rows to compare → DataTable. |
+| Sparkline / ChartFrame | Sparkline: one series as a headline number and a small line or bars you can scrub, its change badge on request (`variant="bars"` for signed values). ChartFrame: a panel around a real chart (axes, several series, legend, tooltip, states) drawn by a library or your SVG. Rows to compare → DataTable. |
 | VoicePlayer / VideoNote | The same player props (`src`, `duration`, `playing`, transcript, `transfer`). VoicePlayer: audio, a waveform seek slider and a playback rate. VideoNote: a round face-to-camera video with a `poster`; alone in `Message.Root` it is the message. A video with controls → `Thumbnail.Video` / `Message.Media`. |
 | Card / plain section / Grid | Card for a bounded block of related content that stands out (metric, settings panel, side facts). A page section that is the only thing in its region needs no card: `Page.Section label` and the content. Several tiles of one screen → one `Page.Grid` with a `Page.Cell span` each; a grid inside one block (thumbnails, fields) is the block's own CSS. Never wrap a single field, a DataTable or a whole page in a Card. |
 | EmptyPage / empty DataTable | Empty table (no rows yet or nothing matches the filter): the DataTable `empty` prop — headers and toolbar stay. Whole page or region with no data at all (first run): EmptyPage with one action. |

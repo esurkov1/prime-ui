@@ -29,7 +29,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 │  └─ Crossfade               loading (placeholder List rows) ⇄ empty (EmptyPage compact) ⇄ the list
 │     └─ List.Root <ul>       aria-label «Диалоги»; spacer <li aria-hidden> stand for rows out of view
 │        └─ ChatList.Item     List.Item <li> + <button> | <a href> | your element (asChild); current from value; one Tab stop
-│           ├─ ChatList.ItemIcon         before the name: avatar slot (aria-hidden); after it: a glyph
+│           ├─ ChatList.ItemIcon         before the name: avatar slot (aria-hidden); after it: a glyph (role="img" with aria-label)
 │           ├─ ChatList.ItemText         the name; muted glyph after it
 │           ├─ ChatList.ItemDescription  author · media word · text — cross-fades with draft and «печатает…»
 │           ├─ (meta)                    delivery ticks · time
@@ -89,12 +89,12 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and the native attributes of the row element. |
 
 ### ChatList.ItemIcon
-`ref` → `HTMLSpanElement`. Before the name: the avatar slot (`aria-hidden`), an `Avatar.Root` sized by the row. After the name: a glyph beside it (verified, bot, group).
+`ref` → `HTMLSpanElement`. Before the name: the avatar slot (`aria-hidden`), an `Avatar.Root` sized by the row. After the name: a glyph beside it (verified, bot, channel type), any kit icon sized by the row; with `aria-label` it is `role="img"` of that name.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | An `Avatar.Root` (with `Avatar.Status`), or after the name an `Icon` with a `label`. |
-| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other `span` attributes. |
+| `children` | `ReactNode` | — (required) | An `Avatar.Root` (with `Avatar.Status`), or after the name an icon: `<Icon name>` or a glyph of `prime-ui-kit/icons` (`<SendIcon />`), as is. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className`, `aria-label` (names a glyph after the name: its channel, «Официальный аккаунт») and the other `span` attributes. |
 
 ### ChatList.ItemText
 `ref` → `HTMLSpanElement`. The name of the dialog: one line, truncated, the glyphs after it kept whole; the search query is marked.
@@ -200,7 +200,7 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 
 - The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, a link with `href`, or your link with `asChild`.
 - The open dialog is `aria-current="true"` on a button, `"page"` on a link. Selection does not follow the focus: arrows only move it (a dialog may load a conversation); Enter, Space and a click open.
-- The row is named by its content: the name, glyphs with a `label` («Без звука», a verified mark), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.
+- The row is named by its content: the name, the glyphs (`ChatList.ItemIcon` `aria-label`, «Без звука»), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.
 - While the other side types, the preview is `aria-hidden` and «печатает…» is read; a draft reads «Черновик: …».
 - A row with a menu has `aria-keyshortcuts="Shift+F10"`; the menu is a `Dropdown` (`menu` / `menuitem`).
 - The search field is `type="search"` named «Поиск по диалогам»; after a search a polite status says «Найдено: 4» or «Ничего не найдено».
@@ -257,6 +257,7 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 - Filtering inside `renderItem` (returning `null`) → filter `items`: the list counts, announces and glides by `items`.
 - Pinned dialogs mixed into the time order → put them first in `items`; `pinned` only draws the pin.
 - `onValueChange` used to mark a dialog read on focus → arrows only move the focus; mark read when the conversation shows it (`Chat.Messages onRead`) or on open.
+- A glyph after the name cloned with `label` and `size` → put the icon in `ChatList.ItemIcon` as is and name the part with `aria-label`: the row sizes it.
 - An `Avatar.Root size="s"` to fit the row → leave `size` out; the slot sizes the avatar to the tier.
 - A «⋯» button nested inside the row for the menu → `ChatList.ItemMenu`: it opens on right click, a long press and Shift+F10.
 - Deleting from the menu without a question → open a `ConfirmDialog` from the menu item.

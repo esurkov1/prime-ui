@@ -9,8 +9,6 @@ export type SelectLabels = {
   search: string;
   /** Empty state: no items or nothing matches. */
   empty: string;
-  /** Second line of the empty state while searching; `""` hides it. */
-  emptyHint: string;
   /** Announced while `loading` or `loadingMore`. */
   loading: string;
   /** The retry button of the load error (`onRetry`). */

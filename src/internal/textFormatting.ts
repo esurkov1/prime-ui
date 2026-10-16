@@ -8,6 +8,7 @@
 export type TextFormat =
   | "bold"
   | "italic"
+  | "underline"
   | "strikethrough"
   | "code"
   | "spoiler"
@@ -24,6 +25,7 @@ export const TEXT_FORMATTING_LABELS: TextFormattingLabels = {
   formatting: "Форматирование",
   bold: "Жирный",
   italic: "Курсив",
+  underline: "Подчёркнутый",
   strikethrough: "Зачёркнутый",
   code: "Моноширинный",
   spoiler: "Скрытый текст",
@@ -35,6 +37,7 @@ export const TEXT_FORMATTING_LABELS: TextFormattingLabels = {
 export const TEXT_FORMATS: readonly TextFormat[] = [
   "bold",
   "italic",
+  "underline",
   "strikethrough",
   "code",
   "spoiler",
@@ -45,9 +48,13 @@ export const TEXT_FORMATS: readonly TextFormat[] = [
 /** Text with its selection, `start <= end` (a caret when equal). */
 type TextSelection = { text: string; start: number; end: number };
 
-const MARKERS: Record<"bold" | "italic" | "strikethrough" | "code" | "spoiler", string> = {
+const MARKERS: Record<
+  "bold" | "italic" | "underline" | "strikethrough" | "code" | "spoiler",
+  string
+> = {
   bold: "**",
   italic: "_",
+  underline: "__",
   strikethrough: "~~",
   code: "`",
   spoiler: "||",
@@ -57,12 +64,33 @@ const FENCE = "```";
 const QUOTE = "> ";
 const LINK_PLACEHOLDER = "https://";
 
+/** Length of the run of `char` that ends just before `index` (`step` -1) or starts at it (`step` 1). */
+function runLength(text: string, index: number, step: 1 | -1, char: string): number {
+  let length = 0;
+  for (let at = step === 1 ? index : index - 1; text[at] === char; at += step) length += 1;
+  return length;
+}
+
+/**
+ * Whether a run of markers holds `marker`. Italic `_` and underline `__` share the character: a run
+ * of one or three holds italic, a run of two or three holds underline (`___word___` is both).
+ */
+function holds(run: number, marker: string): boolean {
+  if (marker === "_") return run % 2 === 1;
+  if (marker === "__") return run >= 2;
+  return run >= marker.length;
+}
+
 /** Wraps the selection in `marker`, or unwraps it when it is already wrapped (inside or around). */
 function toggleWrap({ text, start, end }: TextSelection, marker: string): TextSelection {
   const m = marker.length;
+  const char = marker[0];
   const selected = text.slice(start, end);
-  // Markers just outside the selection: `**[word]**`.
-  if (text.slice(start - m, start) === marker && text.slice(end, end + m) === marker) {
+  // Markers just outside the selection: `**[word]**`; the innermost ones are taken off.
+  if (
+    holds(runLength(text, start, -1, char), marker) &&
+    holds(runLength(text, end, 1, char), marker)
+  ) {
     return {
       text: text.slice(0, start - m) + selected + text.slice(end + m),
       start: start - m,
@@ -70,7 +98,14 @@ function toggleWrap({ text, start, end }: TextSelection, marker: string): TextSe
     };
   }
   // Markers inside the selection: `[**word**]`.
-  if (selected.length >= m * 2 && selected.startsWith(marker) && selected.endsWith(marker)) {
+  const lead = runLength(selected, 0, 1, char);
+  const trail = runLength(selected, selected.length, -1, char);
+  if (
+    selected.length >= m * 2 &&
+    lead < selected.length &&
+    holds(lead, marker) &&
+    holds(trail, marker)
+  ) {
     const inner = selected.slice(m, selected.length - m);
     return {
       text: text.slice(0, start) + inner + text.slice(end),
@@ -179,7 +214,7 @@ export function diffRange(
 }
 
 /**
- * The format a key press asks for: Mod+B · Mod+I · Mod+Shift+X · Mod+E · Mod+Shift+H · Mod+K ·
+ * The format a key press asks for: Mod+B · Mod+I · Mod+U · Mod+Shift+X · Mod+E · Mod+Shift+H · Mod+K ·
  * Mod+Shift+9. The spoiler is not Telegram's Mod+Shift+P: Firefox and Edge reserve it for a private
  * window and never hand it to the page.
  */
@@ -199,6 +234,8 @@ export function formatForKey(event: {
       return shift ? null : "bold";
     case "KeyI":
       return shift ? null : "italic";
+    case "KeyU":
+      return shift ? null : "underline";
     case "KeyX":
       return shift ? "strikethrough" : null;
     case "KeyE":
@@ -218,6 +255,7 @@ export function formatForKey(event: {
 export const FORMAT_SHORTCUTS: Record<TextFormat, { shift: boolean; key: string }> = {
   bold: { shift: false, key: "B" },
   italic: { shift: false, key: "I" },
+  underline: { shift: false, key: "U" },
   strikethrough: { shift: true, key: "X" },
   code: { shift: false, key: "E" },
   spoiler: { shift: true, key: "H" },

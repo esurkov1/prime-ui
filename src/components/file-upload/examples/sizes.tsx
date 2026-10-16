@@ -16,7 +16,7 @@ export default function FileUploadSizesExample() {
           size={size}
           label={size}
           defaultValue={CONTRACT}
-          labels={{ title: "Перетащите файл", description: "" }}
+          labels={{ title: "Перетащите файл" }}
         />
       ))}
     </div>

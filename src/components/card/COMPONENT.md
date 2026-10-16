@@ -220,7 +220,7 @@ No `labels`.
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [states.tsx](examples/states.tsx) | A KPI tile while its report loads next to the loaded one, in the `stat-trend` and `mini` templates — `loading`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem — `variant`. |
-| [screen.tsx](examples/screen.tsx) | A dashboard: the title and a line of data in the page flow, the period switch and the report in the top bar that keeps the title once it scrolls away; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `collapse`, `Page.Grid`. |
+| [screen.tsx](examples/screen.tsx) | A dashboard: the title with a line of data, the period switch and the report in the page's top bar; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `Page.TopBar`, `Page.Grid`. |
 
 ## Mistakes
 - A `<div>` with a border styled as a card → use `Card.Root`; depth comes from fill, not lines.

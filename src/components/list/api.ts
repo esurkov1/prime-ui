@@ -104,6 +104,13 @@ export const api: ComponentApi = {
           ru: "Приглушена и вне порядка Tab: недоступная кнопка или `aria-disabled` без перехода у ссылки.",
         },
         {
+          name: "locked",
+          type: "boolean",
+          default: "false",
+          en: "With `onReorder`: the row holds its place (a system stage) and shows a lock in the grip's box; no row moves past it. The row and its `List.ItemActions` work as on any row.",
+          ru: "С `onReorder`: строка держит своё место (системный этап), на месте ручки — замок; строки не переходят через неё. Сама строка и её `List.ItemActions` работают как обычно.",
+        },
+        {
           name: "children",
           type: "ReactNode",
           en: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions`; loose text becomes the text line.",
@@ -229,6 +236,10 @@ export const api: ComponentApi = {
       en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is the row's text line.",
       ru: "`aria-label` ручки строки (`onReorder`); `{label}` — текст строки.",
     },
+    lockedItem: {
+      en: "Name of the lock a `locked` row shows in the grip's place; `{label}` is the row's text line.",
+      ru: "Имя замка, который строка с `locked` показывает на месте ручки; `{label}` — текст строки.",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -244,8 +255,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Alt + ↑ · Alt + ↓",
-        en: "With `onReorder`, moves the row one place up or down (from its handle or the row).",
-        ru: "С `onReorder` переносит строку на место выше или ниже (с ручки или со строки).",
+        en: "With `onReorder`, moves the row one place up or down (from its handle or the row); a `locked` row does not move, and a step over one is refused and announced.",
+        ru: "С `onReorder` переносит строку на место выше или ниже (с ручки или со строки); строка с `locked` не двигается, шаг через неё не делается и объявляется.",
       },
     ],
     aria: [
@@ -270,8 +281,8 @@ export const api: ComponentApi = {
         ru: '`List.ItemActions` стоят рядом с элементом строки, не внутри: имя строки — её текст. Tab идёт, как строка читается: контролы `side="start"`, строка, контролы `side="end"`.',
       },
       {
-        en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row with its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",
-        ru: "С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`, последней в строке: Tab ведёт к строке с её `List.ItemActions`, затем к ручке; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`.",
+        en: 'With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row\'s text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row with its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`. A `locked` row ends with a lock instead: `role="img"` named «{label}: закреплено» (`labels.lockedItem`); a keyboard step over it is refused aloud («Переговоры: «Новая» закреплено, дальше не переместить», Dnd `labels.blocked`).',
+        ru: 'С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`, последней в строке: Tab ведёт к строке с её `List.ItemActions`, затем к ручке; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`. Строка с `locked` заканчивается замком: `role="img"` с именем «{label}: закреплено» (`labels.lockedItem`); шаг с клавиатуры через неё не делается и объявляется («Переговоры: «Новая» закреплено, дальше не переместить», `labels.blocked` у Dnd).',
       },
     ],
   },

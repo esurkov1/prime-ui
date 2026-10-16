@@ -8,8 +8,8 @@ export function formattingProp(defaultValue: "true" | "false"): ApiProp {
     name: "formatting",
     type: "boolean",
     default: defaultValue,
-    en: `Selecting text shows a floating toolbar of seven Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. ${on ? "`false` turns both off." : "Off: plain text."}`,
-    ru: `Выделение показывает плавающую панель из семи инструментов Markdown и включает их клавиши; инструмент оборачивает выделение, повторное нажатие снимает. ${on ? "`false` выключает и то, и другое." : "Выключено: простой текст."}`,
+    en: `Selecting text shows a floating toolbar of eight Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. ${on ? "`false` turns both off." : "Off: plain text."}`,
+    ru: `Выделение показывает плавающую панель из восьми инструментов Markdown и включает их клавиши; инструмент оборачивает выделение, повторное нажатие снимает. ${on ? "`false` выключает и то, и другое." : "Выключено: простой текст."}`,
   };
 }
 
@@ -21,6 +21,7 @@ export const TEXT_FORMATTING_LABEL_DOCS: LabelDocs<TextFormattingLabels> = {
   },
   bold: { en: "Bold tool.", ru: "Жирный." },
   italic: { en: "Italic tool.", ru: "Курсив." },
+  underline: { en: "Underline tool (`__…__`).", ru: "Подчёркнутый (`__…__`)." },
   strikethrough: { en: "Strikethrough tool.", ru: "Зачёркнутый." },
   code: { en: "Code tool.", ru: "Код." },
   spoiler: { en: "Spoiler tool (`||…||`).", ru: "Скрытый текст (`||…||`)." },

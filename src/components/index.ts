@@ -520,8 +520,14 @@ export type {
   RadioRootProps,
 } from "./radio/Radio";
 export { Radio } from "./radio/Radio";
-export type { RichTextLabels, RichTextProps } from "./rich-text/RichText";
-export { RichText } from "./rich-text/RichText";
+export type {
+  FormattedText,
+  RichTextLabels,
+  RichTextProps,
+  TextEntity,
+  TextEntityType,
+} from "./rich-text/RichText";
+export { getRichTextSource, getTextEntities, RichText } from "./rich-text/RichText";
 export type {
   ScrollContainerAxis,
   ScrollContainerEdges,

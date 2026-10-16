@@ -190,7 +190,7 @@ describe("CommandMenu — size и labels", () => {
         open
         onOpenChange={() => {}}
         size="xl"
-        labels={{ search: "Find", empty: "Nothing", emptyHint: "" }}
+        labels={{ search: "Find", empty: "Nothing" }}
         onSearchChange={onSearchChange}
       >
         <CommandMenu.Input />
@@ -209,7 +209,7 @@ describe("CommandMenu — size и labels", () => {
     expect(input).toHaveAttribute("placeholder", "Find");
     await user.type(input, "zz");
     expect(onSearchChange).toHaveBeenLastCalledWith("zz");
-    expect(screen.getByText("Nothing")).toBeInTheDocument();
+    expect(screen.getByText("Nothing").closest('[role="status"]')).toHaveTextContent(/^Nothing$/);
     expect(screen.getByText("Esc").tagName).toBe("KBD");
   });
 });

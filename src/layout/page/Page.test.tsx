@@ -609,6 +609,37 @@ describe("Page.TopBar plan", () => {
     expect(plan(container)).toBe("one");
   });
 
+  it("gives a section's sub-pages a line of their own at the start, whatever the room", () => {
+    layout(2000);
+    const { container } = render(
+      <Page.TopBar>
+        <Page.Heading data-testid="heading">
+          <Page.Title>Посев</Page.Title>
+        </Page.Heading>
+        <Page.Tools data-testid="tools" aria-label="Посев">
+          <SegmentedControl.Root value="/chats" aria-label="Подразделы">
+            <SegmentedControl.Item value="/chats" asChild>
+              <a href="/chats">Чаты</a>
+            </SegmentedControl.Item>
+            <SegmentedControl.Item value="/history" asChild>
+              <a href="/history">История</a>
+            </SegmentedControl.Item>
+          </SegmentedControl.Root>
+        </Page.Tools>
+      </Page.TopBar>,
+    );
+    expect(plan(container)).toBe("below");
+    expect(screen.getByTestId("tools")).toHaveAttribute("data-align", "start");
+    expect(screen.getByTestId("tools")).toHaveAttribute("data-fill", "true");
+  });
+
+  it("keeps other tools gathered at the end", () => {
+    layout(1000);
+    render(<Bar />);
+    resizeTo(600);
+    expect(screen.getByTestId("tools")).not.toHaveAttribute("data-align");
+  });
+
   it("collapses the secondary buttons first, then the primary; each keeps its name", () => {
     layout(450);
     const { container } = render(<Bar />);

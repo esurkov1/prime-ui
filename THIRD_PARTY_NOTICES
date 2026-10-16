@@ -4,6 +4,8 @@ Third-party notices for prime-ui-kit
 The kit's icon glyphs (src/icons/glyphs) draw their SVG paths from Lucide, and their gestures
 are adapted from lucide-animated, rewritten from Motion to CSS keyframes on the kit's motion
 tokens. Both licenses permit copying, modifying and redistributing with these notices kept.
+The brand marks (src/icons/glyphs/telegram.tsx, vk.tsx, whatsapp.tsx — `brand.*` in the
+registry) draw their SVG paths from Simple Icons, dedicated to the public domain (CC0).
 
 -------------------------------------------------------------------------------
 Lucide — https://lucide.dev — https://github.com/lucide-icons/lucide
@@ -74,3 +76,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+-------------------------------------------------------------------------------
+Simple Icons — https://simpleicons.org — https://github.com/simple-icons/simple-icons
+-------------------------------------------------------------------------------
+
+CC0 1.0 Universal (public domain dedication) — https://creativecommons.org/publicdomain/zero/1.0/
+
+The SVG paths of the Telegram, VK and WhatsApp marks are copied from simple-icons 16.35.0.
+The marks themselves are trademarks of their respective owners. CC0 covers the drawings, not
+the trademarks: the kit uses them only to refer to the service (a channel, an account, a
+connection) and draws them monochrome in the text colour; it implies no endorsement.

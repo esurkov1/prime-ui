@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -168,6 +168,22 @@ describe("SmartFilter", () => {
     expect(within(chips() as HTMLElement).getByText("Метод: GET")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "GET" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: /Фильтр/ })).toHaveTextContent("1");
+  });
+
+  it("the panel footer offers Reset only while a filter is set, with no hint or count", async () => {
+    render(<Harness />);
+    openPanel();
+    const dialog = () => within(screen.getByRole("dialog"));
+    expect(dialog().queryByRole("button", { name: "Сбросить" })).toBeNull();
+    expect(dialog().queryByText(/Фильтров/)).toBeNull();
+    fireEvent.click(dialog().getByRole("button", { name: "GET" }));
+    const reset = dialog().getByRole("button", { name: "Сбросить" });
+    reset.focus();
+    fireEvent.click(reset);
+    expect(dialog().getByRole("button", { name: "GET" })).toHaveAttribute("aria-pressed", "false");
+    expect(dialog().queryByRole("button", { name: "Сбросить" })).toBeNull();
+    await act(async () => {});
+    expect(screen.getByRole("dialog")).toContainElement(document.activeElement as HTMLElement);
   });
 
   it("a press shows a value, the «−» action hides it, pressing «−» again unhides", () => {

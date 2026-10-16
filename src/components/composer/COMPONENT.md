@@ -109,7 +109,7 @@ In an optimistic chat the send returns at once: add the message to the list with
 | `defaultRecordMode` | `"voice" \| "video"` | `"voice"` | Initial record mode, uncontrolled. |
 | `onRecordModeChange` | `(mode: "voice" \| "video") => void` | — | A double click / double tap on the record button (or ↑ / ↓ on it) switched voice and video. |
 | `queue` | `Pick<UploadQueue, "items" \| "add" \| "retry" \| "remove" \| "clear" \| "move">` | — | Attachments, usually `useUploadQueue(…)`: the paperclip, a paste and a drop add to it, and a tray above the row shows them as one reorderable strip of tiles. Without `queue` paste and drop of files do nothing. |
-| `formatting` | `boolean` | `true` | Selecting text shows a floating toolbar of seven Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. `false` turns both off. |
+| `formatting` | `boolean` | `true` | Selecting text shows a floating toolbar of eight Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. `false` turns both off. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the field, the buttons and the bar text. Without it the tier of its host, else `m`. |
 | `disabled` | `boolean` | `false` | A closed conversation: the field, the paperclip and the button are disabled; nothing is pasted or dropped. A disabled `Fieldset` around it sets it too (`data-disabled` included). |
 | `inputRef` | `Ref<HTMLTextAreaElement>` | — | The message `<textarea>`: focus it after «Ответить» in a message menu. |
@@ -197,7 +197,7 @@ Composer has no `variant`; what the row shows follows its state.
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `formatting` | a floating toolbar over a selection (bold, italic, strikethrough, code, spoiler, link, quote); Mod-hotkeys | always, unless the chat shows plain text only | `true` |
+| `formatting` | a floating toolbar over a selection (bold, italic, underline, strikethrough, code, spoiler, link, quote); Mod-hotkeys | always, unless the chat shows plain text only | `true` |
 | `disabled` | the field, paperclip and button disabled | a closed conversation, no permission to write | `false` |
 | `queue` | the tray above the field: one strip of tiles — photos, videos and files; paste and drop take files | the chat accepts files | — |
 | `onSendVoice` / `onSendVideoNote` | an empty field offers the record button | the chat takes voice / video messages | — |
@@ -250,7 +250,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | `Mod + Enter` | Always sends, on a touch screen too. |
 | `↑` | In an empty field opens your last message for editing (`onEditLast`). |
 | `Escape` | Clears a selection with the toolbar, then cancels the reply or edit; while recording throws the recording away and stops there, so an enclosing Modal or Drawer stays open. |
-| `Mod + B` · `Mod + I` · `Mod + Shift + X` · `Mod + E` · `Mod + Shift + H` · `Mod + K` · `Mod + Shift + 9` | Bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works. |
+| `Mod + B` · `Mod + I` · `Mod + U` · `Mod + Shift + X` · `Mod + E` · `Mod + Shift + H` · `Mod + K` · `Mod + Shift + 9` | Bold, italic, underline, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works. |
 | `Enter` · `Space` | On the record button: record hands-free at once. During a hands-free recording, wherever the focus is in the composer: Enter sends the recording (a paused one too), Space pauses and resumes it — the timer and the waveform stand, the dot turns into a pause glyph. |
 | `↑` · `↓` | On the record button, with voice and video both offered: switches voice and video (`aria-keyshortcuts`, named in the button's description). |
 | `←` · `→` | Move between the formatting buttons. |
@@ -310,6 +310,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | `formatting` | `"Форматирование"` | Accessible name of the formatting toolbar. |
 | `bold` | `"Жирный"` | Bold tool. |
 | `italic` | `"Курсив"` | Italic tool. |
+| `underline` | `"Подчёркнутый"` | Underline tool (`__…__`). |
 | `strikethrough` | `"Зачёркнутый"` | Strikethrough tool. |
 | `code` | `"Моноширинный"` | Code tool. |
 | `spoiler` | `"Скрытый текст"` | Spoiler tool (`\|\|…\|\|`). |
@@ -333,7 +334,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | [attach-menu.tsx](examples/attach-menu.tsx) | The paperclip as a menu of attachment kinds: photos and videos, documents, any file, and an invoice from the system that puts its link into the message and returns the focus to the field — `Composer.Item`, `Composer.ItemIcon`, `accept`, `onSelect`, `inputRef`. |
 | [reply-edit.tsx](examples/reply-edit.tsx) | Answering a client's message and correcting your own: the bar above the field quotes the message, Escape or the cross cancels, ↑ in an empty field opens your last message, send becomes save and hands over the message id — `Composer.Context`, `mode`, `messageId`, `onDismiss`, `onEditLast`. |
 | [typing.tsx](examples/typing.tsx) | The other side's status line follows what you do: typing, recording a voice or a video message, then nothing — `onActivityChange`. |
-| [formatting.tsx](examples/formatting.tsx) | Selected text gets a toolbar of bold, italic, strikethrough, code, spoiler, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. |
+| [formatting.tsx](examples/formatting.tsx) | Selected text gets a toolbar of bold, italic, underline, strikethrough, code, spoiler, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. |
 | [voice.tsx](examples/voice.tsx) | Voice and round video messages: hold the button to record and release to send, slide left to cancel, slide up or tap to record hands-free; a double tap or double click switches voice and video — `onSendVoice`, `onSendVideoNote`, `recordMode`. |
 | [bot-keyboard.tsx](examples/bot-keyboard.tsx) | A bot's reply keyboard under the field: a key sends its text as a message, the field asks for a key, the keyboard hides after use and the toggle brings it back — `Composer.Keyboard`, `rows`, `placeholder`, `oneTime`. |
 | [states.tsx](examples/states.tsx) | A closed conversation is disabled, a slow send keeps the text with a busy button until the server answers — `disabled`, `onSend`. |

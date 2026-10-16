@@ -45,8 +45,6 @@ export type CommandMenuLabels = {
   search: string;
   /** `CommandMenu.Empty`: nothing matches the query. */
   empty: string;
-  /** Second line of `CommandMenu.Empty`; `""` hides it. */
-  emptyHint: string;
   /** Announced while `loading` or `loadingMore`. */
   loading: string;
   /** The retry button of the load error (`onRetry`). */
@@ -56,7 +54,6 @@ export type CommandMenuLabels = {
 export const COMMAND_MENU_LABELS: CommandMenuLabels = {
   search: "Поиск",
   empty: "Ничего не найдено",
-  emptyHint: "Попробуйте изменить запрос",
   loading: "Загрузка…",
   retry: "Повторить",
 };
@@ -688,8 +685,7 @@ export type CommandMenuEmptyProps = Omit<
 };
 
 /**
- * Shown only while nothing matches the query and nothing loads: `labels.empty` and
- * `labels.emptyHint`, text only. An action for the query («Создать «…»») is a `persistent`
+ * Shown only while nothing matches the query and nothing loads: `labels.empty`, text only. An action for the query («Создать «…»») is a `persistent`
  * `CommandMenu.Item` at the end of the list, never a child of `Empty`.
  */
 function CommandMenuEmpty(props: CommandMenuEmptyProps) {
@@ -699,7 +695,6 @@ function CommandMenuEmpty(props: CommandMenuEmptyProps) {
   return (
     <EmptyPage.Root layout="compact" size={size} role="status" {...props}>
       <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
-      {labels.emptyHint ? <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description> : null}
     </EmptyPage.Root>
   );
 }

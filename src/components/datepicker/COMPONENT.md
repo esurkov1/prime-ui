@@ -150,7 +150,7 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `presets` | «Период» column on the left (a scrolling row above when narrow); the active preset is pressed | analytics periods | `false` |
+| `presets` | a column of preset buttons on the left (a scrolling row above when narrow); the active preset is pressed | analytics periods | `false` |
 | `prompt` | muted step line under the grid | infrequent use of ranges | `false` |
 | `footer` | dates (dd.MM.yyyy, dd.MM with `yearless`) and «Сбросить» / «Применить» | the user confirms, or with time | `false` |
 | `withTime` | HH:mm inputs in the footer | timestamps (with `footer`) | `false` |
@@ -227,7 +227,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 | `timeEnd` | `"Время конца"` | Name of the end time input. |
 | `time` | `"Время"` | Name of the time input of a single date. |
 | `until` | `"до"` | Prefix of a range without a start: «до 6 окт». |
-| `presetsTitle` | `"Период"` | Heading and group name of the presets column. |
+| `presetsGroup` | `"Период"` | Accessible name of the presets group (no visible heading). |
 | `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
 | `required` | `"обязательное поле"` | Read after the field name of a `required` field: its trigger is a button, which takes no `aria-required`. |
 

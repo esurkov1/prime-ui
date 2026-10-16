@@ -136,7 +136,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the title), `className` and the other span attributes. |
 
 ### CommandMenu.Empty
-`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty` and `labels.emptyHint`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.
+`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -236,7 +236,6 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 |---|---|---|
 | `search` | `"Поиск"` | Default placeholder and accessible name of `CommandMenu.Input`. |
 | `empty` | `"Ничего не найдено"` | `CommandMenu.Empty`: nothing matches the query. |
-| `emptyHint` | `"Попробуйте изменить запрос"` | Second line of `CommandMenu.Empty`; `""` hides it. |
 | `loading` | `"Загрузка…"` | Announced while `loading` or `loadingMore`. |
 | `retry` | `"Повторить"` | The retry button under `loadError` (`onRetry`). |
 

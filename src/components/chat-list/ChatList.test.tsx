@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import type { MessageStatus } from "@/components/message/Message";
+import { Send } from "@/icons/glyphs/send";
 
 import { ChatList, type ChatListRootProps, formatChatTime } from "./ChatList";
 
@@ -226,6 +227,30 @@ describe("ChatList", () => {
     );
     expect(row(/Лето/)).toHaveAccessibleName("Лето Не отправлено Закреплён");
     expect(row(/Склад/)).toHaveAttribute("data-muted", "true");
+  });
+
+  it("names a glyph after the name by the part's aria-label, whatever icon it holds", () => {
+    render(
+      <ChatList.Root
+        items={["a"]}
+        getKey={(item) => item}
+        renderItem={() => (
+          <ChatList.Item>
+            <ChatList.ItemText>Орлов</ChatList.ItemText>
+            <ChatList.ItemIcon aria-label="Telegram-бот @way2ride_bot">
+              <Send />
+            </ChatList.ItemIcon>
+            <ChatList.ItemIcon>
+              <Send />
+            </ChatList.ItemIcon>
+          </ChatList.Item>
+        )}
+      />,
+    );
+    const mark = screen.getByRole("img", { name: "Telegram-бот @way2ride_bot" });
+    expect(mark.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(row(/Орлов/)).toHaveAccessibleName("Орлов Telegram-бот @way2ride_bot");
   });
 
   it("writes the media word, the length and the author into the preview", () => {

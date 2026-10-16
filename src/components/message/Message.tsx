@@ -28,7 +28,7 @@ import {
   messagePartOf,
 } from "@/internal/messagePart";
 import { exitTimeoutMs } from "@/internal/motionTiming";
-import { useEnterOnAppear } from "@/internal/partPresence";
+import { useEnterOnAppear, usePartPresence } from "@/internal/partPresence";
 import { flattenChildren } from "@/internal/parts";
 import statusLoop from "@/internal/statusLoop.module.css";
 import {
@@ -481,6 +481,7 @@ export type MessageRootProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> &
   formatTime?: (date: Date, timeZone?: string) => string;
   edited?: boolean;
   status?: MessageStatus;
+  failureReason?: React.ReactNode;
   preview?: boolean;
   onRetry?: AsyncHandler;
   onReactionToggle?: AsyncHandler<[emoji: string], unknown>;
@@ -512,6 +513,7 @@ function MessageRoot({
   formatTime = formatMessageTime,
   edited = false,
   status,
+  failureReason,
   preview = false,
   onRetry,
   onReactionToggle,
@@ -598,14 +600,6 @@ function MessageRoot({
   const metaSpec = specs[metaIndex] ?? null;
   const metaMode: "inline" | "overlay" | "block" =
     shell !== "bubble" ? "overlay" : (metaSpec?.meta ?? "block");
-  // The last bubble of a run curls a tail out of its corner on the author's side — a bubble of
-  // fill only: never a picture (with a caption or not) or a circle. An inline keyboard closes the
-  // message under the bubble instead.
-  const tail =
-    shell === "bubble" &&
-    (position === "single" || position === "last") &&
-    !hasActions &&
-    !specs.some((spec) => spec?.picture);
   const sized = specs.some((spec) => spec?.sized);
   const bleedStart = shell === "bubble" && specs[0]?.bleed === true;
   const bleedEnd = shell === "bubble" && specs[body.length - 1]?.bleed === true;
@@ -642,6 +636,23 @@ function MessageRoot({
   // A returned promise shows `sending` until it settles; a rejection leaves the message failed.
   const { pending: retrying, run: retry } = usePendingAction(onRetry);
   const shownStatus: MessageStatus | undefined = retrying ? "sending" : status;
+  // The reason of a failed send, under the message; a retry in flight takes it away.
+  const showReason =
+    shownStatus === "failed" &&
+    failureReason != null &&
+    failureReason !== false &&
+    failureReason !== "";
+  const reasonId = `${React.useId()}-reason`;
+  const reasonPresence = usePartPresence<HTMLDivElement>({ present: showReason, axis: "block" });
+  // The last bubble of a run curls a tail out of its corner on the author's side — a bubble of
+  // fill only: never a picture (with a caption or not) or a circle. An inline keyboard or the
+  // reason of a failed send closes the message under the bubble instead.
+  const tail =
+    shell === "bubble" &&
+    (position === "single" || position === "last") &&
+    !hasActions &&
+    !showReason &&
+    !specs.some((spec) => spec?.picture);
   const time =
     timeProp instanceof Date
       ? formatTime(timeProp, timeZoneProp ?? list.timeZone)
@@ -879,6 +890,15 @@ function MessageRoot({
           } as Partial<MessageActionsProps>,
         ),
       )}
+      {showReason ? (
+        <div
+          ref={reasonPresence.ref}
+          id={reasonId}
+          className={cx(textRole.caption, styles.failureReason, reasonPresence.className)}
+        >
+          {failureReason}
+        </div>
+      ) : null}
       {/* First the hug, then the morph: the morph's new layout is the hugged one. */}
       <BubbleHug bubble={bubbleRef} />
       <MorphSnapshot morph={morph} />
@@ -895,6 +915,7 @@ function MessageRoot({
       role={selecting ? "option" : undefined}
       aria-selected={selecting ? selected : undefined}
       aria-label={name}
+      aria-describedby={cx(rest["aria-describedby"], showReason && reasonId) || undefined}
       aria-posinset={row?.position}
       aria-setsize={row?.size}
       data-message-article=""

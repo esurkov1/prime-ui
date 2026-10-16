@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { RichText } from "./richText";
+import { getRichTextSource, getTextEntities, RichText, type TextEntity } from "./richText";
 
 const LABELS = { spoiler: "Скрытый текст" };
 
@@ -9,8 +9,8 @@ const LABELS = { spoiler: "Скрытый текст" };
  * The rendered markup of `source`: tags and text only, links with their href, a masked spoiler as
  * `<spoiler>` (its wrapper spans unwrapped).
  */
-function markup(source: string) {
-  const { container } = render(<RichText labels={LABELS} source={source} />);
+function markup(source: string, entities?: TextEntity[]) {
+  const { container } = render(<RichText labels={LABELS} source={source} entities={entities} />);
   const serialize = (node: Node): string => {
     if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
     const element = node as Element;
@@ -29,6 +29,20 @@ describe("RichText markup", () => {
     expect(markup("**счёт** _срочно_ ~~вчера~~ `INV-204`")).toBe(
       "<p><strong>счёт</strong> <em>срочно</em> <s>вчера</s> <code>INV-204</code></p>",
     );
+  });
+
+  it("renders underline and backslash-escaped markers as text", () => {
+    expect(markup("__акт__ и \\*\\*ИНН\\*\\*")).toBe("<p><u>акт</u> и **ИНН**</p>");
+  });
+
+  it("renders a plain text with its entities, never reading Markdown in it", () => {
+    expect(
+      markup("поле **ИНН** полеИНН\nцитата", [
+        { type: "bold", offset: 17, length: 3 },
+        { type: "underline", offset: 13, length: 4 },
+        { type: "quote", offset: 21, length: 6 },
+      ]),
+    ).toBe("<p>поле **ИНН** <u>поле</u><strong>ИНН</strong></p><blockquote>цитата</blockquote>");
   });
 
   it("keeps underscores inside words and unmatched markers as text", () => {
@@ -165,5 +179,125 @@ describe("RichText spoiler", () => {
   it("takes its name from labels", () => {
     render(<RichText source="||секрет||" labels={{ spoiler: "Спойлер" }} />);
     expect(screen.getByRole("button", { name: "Спойлер" })).toBeInTheDocument();
+  });
+});
+
+describe("parseRichText", () => {
+  it("reads underline `__` apart from italic `_`, and both at once", () => {
+    expect(getTextEntities("__акт__ _срочно_ ___оба___")).toEqual({
+      text: "акт срочно оба",
+      entities: [
+        { type: "underline", offset: 0, length: 3 },
+        { type: "italic", offset: 4, length: 6 },
+        { type: "italic", offset: 11, length: 3 },
+        { type: "underline", offset: 11, length: 3 },
+      ],
+    });
+    expect(getTextEntities("snake__case__name").entities).toEqual([]);
+  });
+
+  it("opens bold, strike and spoiler inside a word, italic only at its edges", () => {
+    expect(getTextEntities("поле**ИНН** до~~вчера~~ order_id_x").entities).toEqual([
+      { type: "bold", offset: 4, length: 3 },
+      { type: "strikethrough", offset: 10, length: 5 },
+    ]);
+  });
+
+  it("writes a backslashed punctuation mark as text, a closer included", () => {
+    expect(getTextEntities("\\*\\*ИНН\\*\\* и \\_x\\_ и C:\\dir")).toEqual({
+      text: "**ИНН** и _x_ и C:\\dir",
+      entities: [],
+    });
+    expect(getTextEntities("**a\\**").text).toBe("**a**");
+    expect(getTextEntities("**a\\\\**")).toEqual({
+      text: "a\\",
+      entities: [{ type: "bold", offset: 0, length: 2 }],
+    });
+    expect(getTextEntities("\\> не цитата")).toEqual({ text: "> не цитата", entities: [] });
+  });
+
+  it("keeps the language of a fence and the breaks around blocks", () => {
+    expect(getTextEntities("Лог:\n\n```ts\nconst a = 1\n```\n> итог")).toEqual({
+      text: "Лог:\n\nconst a = 1\nитог",
+      entities: [
+        { type: "pre", offset: 6, length: 11, language: "ts" },
+        { type: "quote", offset: 18, length: 4 },
+      ],
+    });
+  });
+
+  it("gives links their address and leaves bare URLs to the messenger", () => {
+    expect(getTextEntities("[счёт](https://prime.app/i/1) и https://prime.app/i/2")).toEqual({
+      text: "счёт и https://prime.app/i/2",
+      entities: [{ type: "link", offset: 0, length: 4, url: "https://prime.app/i/1" }],
+    });
+  });
+});
+
+describe("entities", () => {
+  it("nest, and one that crosses another's end is cut", () => {
+    expect(
+      markup("ab cd", [
+        { type: "bold", offset: 0, length: 4 },
+        { type: "italic", offset: 3, length: 2 },
+      ]),
+    ).toBe("<p><strong>ab <em>c</em></strong><em>d</em></p>");
+  });
+
+  it("make blocks of pre and quote, and drop what is broken or unknown", () => {
+    const entities = [
+      { type: "quote", offset: 5, length: 6 },
+      { type: "pre", offset: 12, length: 3, language: "sh" },
+      { type: "bold", offset: 0, length: 0 },
+      { type: "mention", offset: 0, length: 4 },
+      { type: "link", offset: 0, length: 4, url: "javascript:alert(1)" },
+    ] as unknown as TextEntity[];
+    expect(markup("Итог\nстрока\nls\nконец", entities)).toBe(
+      "<p>Итог</p><blockquote>строка</blockquote><pre><code>ls</code></pre><p>конец</p>",
+    );
+  });
+
+  it("link a bare URL in plain text, a link without an address by its own text", () => {
+    expect(markup("см. www.prime.app и сайт", [{ type: "link", offset: 20, length: 4 }])).toBe(
+      '<p>см. <a href="https://www.prime.app">www.prime.app</a> и сайт</p>',
+    );
+  });
+});
+
+describe("getRichTextSource", () => {
+  const roundTrip = (text: string, entities: TextEntity[]) =>
+    getTextEntities(getRichTextSource({ text, entities }));
+
+  it("writes entities as Markdown and escapes text that would read as markup", () => {
+    expect(getRichTextSource({ text: "поле **ИНН** и snake_case", entities: [] })).toBe(
+      "поле \\*\\*ИНН\\*\\* и snake_case",
+    );
+    expect(
+      getRichTextSource({
+        text: "Счёт оплачен",
+        entities: [
+          { type: "bold", offset: 0, length: 4 },
+          { type: "underline", offset: 5, length: 7 },
+        ],
+      }),
+    ).toBe("**Счёт** __оплачен__");
+  });
+
+  it("round-trips nested, adjacent and block entities", () => {
+    const text = "Итог: полеИНН\nцитата\nnpm ci\nhttps://prime.app/a_b";
+    const entities: TextEntity[] = [
+      { type: "bold", offset: 6, length: 7 },
+      { type: "spoiler", offset: 10, length: 3 },
+      { type: "italic", offset: 14, length: 6 },
+      { type: "quote", offset: 14, length: 6 },
+      { type: "pre", offset: 21, length: 6, language: "sh" },
+    ];
+    expect(roundTrip(text, entities)).toEqual({ text, entities });
+  });
+
+  it("drops an italic it cannot hold inside a word, keeping the text", () => {
+    expect(
+      getRichTextSource({ text: "полеИНН", entities: [{ type: "italic", offset: 0, length: 4 }] }),
+    ).toBe("полеИНН");
   });
 });

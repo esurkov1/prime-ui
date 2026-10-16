@@ -215,9 +215,10 @@ export const api: ComponentApi = {
       en: "Fields with nothing found while typing (compact EmptyPage).",
       ru: "Поля без совпадений при вводе (компактный EmptyPage).",
     },
-    hint: { en: "Panel footer hint.", ru: "Подсказка в подвале панели." },
-    count: { en: "Panel footer counter.", ru: "Счётчик в подвале панели." },
-    reset: { en: "Panel footer reset.", ru: "Сброс в подвале панели." },
+    reset: {
+      en: "Panel footer reset, shown while a filter is set.",
+      ru: "Сброс в подвале панели, пока задан фильтр.",
+    },
     more: { en: "Collapsed values of a field.", ru: "Свёрнутые значения поля." },
     add: { en: "Chips row: opens the panel.", ru: "Ряд тегов: открывает панель." },
     clearAll: { en: "Chips row: clears every field.", ru: "Ряд тегов: сбрасывает все поля." },

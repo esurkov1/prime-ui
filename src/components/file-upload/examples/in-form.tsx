@@ -4,9 +4,8 @@ import * as React from "react";
 
 import styles from "./examples.module.css";
 
-const HINT = "Все страницы, с подписями обеих сторон";
-/** The zone names the formats the check takes. */
-const ZONE_LABELS = { description: "PDF до 20 МБ" };
+/** The hint names the formats the check takes. */
+const HINT = "PDF до 20 МБ, все страницы с подписями обеих сторон";
 const MAX_SIZE = 20 * 1024 * 1024;
 
 /** A picked file as a file of the set. */
@@ -52,7 +51,6 @@ export default function FileUploadInFormExample() {
         accept=".pdf"
         required
         hint={HINT}
-        labels={ZONE_LABELS}
         error={error}
         value={scan}
         onValueChange={change}

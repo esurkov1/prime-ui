@@ -202,7 +202,10 @@ export function useFrozenColumns(
     }
     // Rows already checked against these widths fit them.
     if (!newRows) return;
-    for (const cell of table.querySelectorAll<HTMLTableCellElement>(":scope > tbody > tr > td")) {
+    // A `grow` cell fits whatever width it gets (it wraps, truncates or counts).
+    for (const cell of table.querySelectorAll<HTMLTableCellElement>(
+      ":scope > tbody > tr > td:not([data-grow])",
+    )) {
       if (cell.scrollWidth > cell.clientWidth + 1) {
         freeze(table, frozen.current);
         return;

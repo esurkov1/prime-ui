@@ -385,7 +385,8 @@ crumb of your own.
 - `status.*`: `danger`, `emailSent`, `failed`, `favorite`, `info`, `locked`, `muted`, `sound`, `offline`, `pending`, `read`, `sent`, `success`, `trendUp`, `warning`;
 - `theme.*`: `dark`, `light`;
 - `view.*`: `code`, `columns`, `preview`;
-- `viewport.*`: `desktop`, `mobile`, `tablet`.
+- `viewport.*`: `desktop`, `mobile`, `tablet`;
+- `brand.*`: `telegram`, `vk`, `whatsapp`.
 <!-- icons:end -->
 
 Every glyph comes from the kit, in this order:

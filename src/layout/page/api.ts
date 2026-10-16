@@ -72,8 +72,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Header",
-      en: "`ref` → `HTMLDivElement`. The document header in the page flow (settings, long forms, overviews): a `Page.Heading` and its `Page.Actions` in one row; the actions wrap under it on a narrow column.",
-      ru: "Заголовок документа в потоке страницы (настройки, длинные формы, обзоры): `Page.Heading` и его `Page.Actions` в одном ряду; на узкой колонке действия переносятся под него.",
+      en: "`ref` → `HTMLDivElement`. The document header in the page flow (settings, long forms): a `Page.Heading` and its `Page.Actions` in one row; the actions wrap under it on a narrow column.",
+      ru: "Заголовок документа в потоке страницы (настройки, длинные формы): `Page.Heading` и его `Page.Actions` в одном ряду; на узкой колонке действия переносятся под него.",
       props: [
         divRest({
           en: "`children` (`Page.Heading`, `Page.Actions`)",
@@ -127,8 +127,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Tools",
-      en: "`ref` → `HTMLDivElement`. What acts on the whole page: sections (route links of sub-pages), view, a shared period; a filter only over several views — a table's go in its `toolbar`. The DataTable tool row: a search takes the free room, the rest keep their width. Named, a `group`.",
-      ru: "То, что действует на всю страницу: разделы (ссылки подстраниц), вид, общий период; фильтр — только над несколькими видами, фильтр таблицы — в её `toolbar`. Строка инструментов DataTable: поиск занимает свободное место, остальные держат ширину. С именем — `group`.",
+      en: "`ref` → `HTMLDivElement`. What acts on the whole page: sub-page links, view, a shared period, a filter over several views (a table's tools go in its `toolbar`). Sub-page links take a line of their own at the start. Named, a `group`.",
+      ru: "То, что действует на всю страницу: ссылки подстраниц, вид, общий период, фильтр над несколькими видами (инструменты таблицы — в её `toolbar`). Ссылки подстраниц стоят своей строкой в начале. С именем — `group`.",
       props: [divRest({ en: "`children` (kit controls)", ru: "`children` (контролы кита)" })],
     },
     {

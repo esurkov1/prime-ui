@@ -223,12 +223,25 @@ describe("FieldList", () => {
     expect(screen.getByRole("button", { name: "Удалить: строка 1" })).toBeInTheDocument();
   });
 
-  it("disables remove at min and add at max, saying why beside the add button", () => {
-    render(<Lines min={2} max={2} />);
+  it("disables remove at min and takes the add button away at max, with no text of its own", () => {
+    const { container } = render(<Lines min={2} max={2} />);
     for (const button of screen.getAllByRole("button", { name: /^Удалить/ }))
       expect(button).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Добавить позицию" })).toBeDisabled();
-    expect(screen.getByText("Не больше 2")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Добавить позицию" })).toBeNull();
+    expect(container).not.toHaveTextContent(/2/);
+  });
+
+  it("brings the add button back, rising in, once a row leaves a full list", async () => {
+    const user = userEvent.setup();
+    render(<Lines max={2} />);
+    expect(screen.queryByRole("button", { name: "Добавить позицию" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Удалить: «Обучение»" }));
+    const add = screen.getByRole("button", { name: "Добавить позицию" });
+    expect(add).toBeEnabled();
+    expect(add.parentElement).toHaveClass(enterMotion.enter);
+    await user.click(add);
+    expect(rowsOf()).toHaveLength(2);
+    expect(screen.queryByRole("button", { name: "Добавить позицию" })).toBeNull();
   });
 
   it("keeps a pinned row's remove in its slot, off, and says why on focus", async () => {

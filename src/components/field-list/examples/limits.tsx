@@ -1,4 +1,4 @@
-/** Recipients of invoice reminders, from one to three: the last row cannot be removed and the add button says why it is off once the list is full — `min`, `max`, `hint`. */
+/** Recipients of invoice reminders, from one to three: the last row cannot be removed, the add button leaves once the list is full and the hint names the limit — `min`, `max`, `hint`. */
 import { FieldList, type FieldListColumn, Input } from "prime-ui-kit";
 import * as React from "react";
 
@@ -18,7 +18,7 @@ export default function FieldListLimitsExample() {
   return (
     <FieldList
       label="Кому напоминать об оплате"
-      hint="Письмо уходит за три дня до срока."
+      hint="Письмо уходит за три дня до срока, не больше трёх получателей."
       columns={COLUMNS}
       min={1}
       max={3}

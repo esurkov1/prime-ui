@@ -5,7 +5,7 @@ checks.
 
 ## Composition
 - [ ] The screen starts from the closest working screen and keeps its skeleton ([screens](composition.md#screens)).
-- [ ] One `Page.Title` per page, always an `<h1>`: a work screen titles itself in the `Page.Heading` of its `Page.TopBar`, a document page or an overview in a `Page.Header` in the flow ([page skeleton](composition.md#1-page-skeleton)).
+- [ ] One `Page.Title` per page, always an `<h1>`: every screen of data — dashboards and analytics too — titles itself in the `Page.Heading` of its `Page.TopBar`, only a document page in a `Page.Header` in the flow; no `collapse` bar without a heading ([page skeleton](composition.md#1-page-skeleton)).
 - [ ] The top bar holds only this page's groups — `Page.Heading`, `Page.Tools`, `Page.Actions`, `Page.Chips` — no app-wide header or global search ([the top bar](composition.md#the-top-bar)).
 - [ ] A nested record's path ends in its title on one line inside `Page.Heading`; no title row under the path ([the top bar](composition.md#the-top-bar)).
 - [ ] Every button of the page is in one `Page.Actions`, the primary last, each with a `Button.Icon` ([the top bar](composition.md#the-top-bar)).
@@ -14,6 +14,7 @@ checks.
 - [ ] A control stands with what it changes: a table's search, filter, chips and chooser are in its `toolbar` / `toolbarChips` on every page; the bar keeps the title, sections, the view, the shared period and the buttons ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] A table section has an `options` filter field for each categorical column and a `date-range` field per date column, its value in the URL ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] Actions on selected rows are `renderSelectionActions` — one «Действия · N» menu added to the tools row, which stays ([controls of a table](composition.md#controls-of-a-table)).
+- [ ] Creating one of several kinds whose forms differ is a button with a `Dropdown` of kinds (grouped by family), a pick opens that kind's form; no choosing step and «Далее» inside a dialog ([a kind that leads to its own form](choosing.md#a-kind-that-leads-to-its-own-form)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 - [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
 - [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
@@ -24,6 +25,9 @@ checks.
 - [ ] Every entity is laid out by its shape: a record is one row or one block ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
 - [ ] A FieldList row shows its «×» in sight whatever its columns; `rowActions="menu"` only on a reorderable touch-first list; `variant` by the rule ([forms](composition.md#7-forms)).
 - [ ] A section named after a set of records shows the records, with an action per row ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
+- [ ] Records of one kind are one list in their real order; rows the system fixes are `locked` in it, never a second section ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
+- [ ] Every heading names what nothing else names: no section over a block with its own title, no first block repeating its tab ([label economy](ux.md#3-label-economy)).
+- [ ] Every hint, limit, counter and range line serves the task; none is on because the prop exists, and a `max` worth knowing is in `hint` ([label economy](ux.md#3-label-economy)).
 - [ ] Labels on a form of rows ≤ columns + the list label; none repeated, numbered or repeating its heading ([label economy](ux.md#3-label-economy)).
 - [ ] No text explains the layout; every hint is two to five words the label and the control leave out, never the obvious outcome ([label economy](ux.md#3-label-economy)).
 - [ ] Every setting sits with what it governs, as a field beside its neighbours; a stored choice is a `Select`, no section holds one setting ([where a setting lives](ux.md#10-where-a-setting-lives)).
@@ -74,6 +78,7 @@ checks.
 - [ ] One secondary action is an icon button with a Tooltip; a «⋯» menu holds two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
 - [ ] An entity has one drawer opened from everywhere; permissions lock fields and hide tabs and actions; header actions act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A record drawer is one form with one «Сохранить» in its footer while dirty and `Drawer.Guard`; no save per section, no unsaved-status text ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] A control that changes the whole open tab (a language, a period) is one control in the header's `Drawer.Actions` before the buttons, only on the tabs it applies to ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A drawer loads its tabs' data itself, the history has its own tab, and returning to a tab never shows a skeleton again ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] An on/off permission or setting is a `Switch`, a level per entity a `FieldList` of `Select`s, a set of values in a table cell `Badge.Group overflow="count"` ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).

@@ -210,14 +210,7 @@
 
 .add {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-3);
   min-width: 0;
-}
-
-.limit {
-  color: var(--prime-color-text-muted);
 }
 
 /*

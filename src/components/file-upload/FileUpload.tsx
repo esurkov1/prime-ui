@@ -39,8 +39,8 @@ import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
-import { useEnterOnAppear } from "@/internal/partPresence";
-import { RollingNumber } from "@/internal/RollingNumber";
+import { handoffFocus } from "@/internal/overlay/focus";
+import { useEnterOnAppear, usePartPresence } from "@/internal/partPresence";
 import type { ControlSize, PaletteColor, TextTone, Tone } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
@@ -90,8 +90,6 @@ export type FileUploadFile = {
 export type FileUploadLabels = {
   /** Title of the built-in drop zone body. */
   title: string;
-  /** Description under the title (formats, size limit). An empty string hides it. */
-  description: string;
   /** Text of the browse button: decorative in a zone, the control itself with `trigger="button"`. */
   browse: string;
   /** Muted marker after the field label when `optional`. */
@@ -102,12 +100,6 @@ export type FileUploadLabels = {
   addLabel: string;
   /** The add tile of an empty set: it spans the row. */
   empty: string;
-  /** Second line of the empty add tile without `max`. */
-  emptyHint: string;
-  /** Text of the add tile when `max` is reached. */
-  full: string;
-  /** Counter on the add tile: `{count}`, `{max}`. */
-  count: string;
   /** Pill of the first tile with `cover`. */
   cover: string;
   /** A file waiting for a free slot. */
@@ -148,15 +140,11 @@ export type FileUploadLabels = {
 
 export const FILE_UPLOAD_LABELS: FileUploadLabels = {
   title: "Выберите файл или перетащите его сюда",
-  description: "JPEG, PNG, PDF, MP4 до 50 МБ",
   browse: "Выбрать файл",
   optional: "необязательно",
   add: "Добавить",
   addLabel: "Добавить файлы",
   empty: "Нажмите или перетащите файлы",
-  emptyHint: "Можно несколько сразу",
-  full: "Лимит файлов",
-  count: "{count} из {max}",
   cover: "Обложка",
   queued: "В очереди",
   uploading: "Загрузка {percent}%",
@@ -1164,8 +1152,6 @@ function FileUploadField({
   const requestedAccept = React.useRef<{ accept: string | undefined } | null>(null);
 
   const count = set.files.length;
-  // The empty-set hint enters when the last file goes, not when the field mounts empty.
-  const emptyHint = useEnterOnAppear<HTMLSpanElement>(count === 0 && max === undefined);
   const room = max === undefined ? Number.POSITIVE_INFINITY : Math.max(0, max - count);
   const full = room === 0;
   const hasSet =
@@ -1208,14 +1194,7 @@ function FileUploadField({
       multiple={multiple}
       required={required}
       disabled={disabled}
-      // A full set keeps its input enabled, so the field (its label) does not read as disabled:
-      // the add tile is only marked off and its click opens no picker.
-      aria-disabled={(tile && full) || undefined}
       onClick={(event) => {
-        if (tile && full) {
-          event.preventDefault();
-          return;
-        }
         // The types of this pick: `picker.open({ accept })`, else the field's own.
         const requested = requestedAccept.current;
         requestedAccept.current = null;
@@ -1297,12 +1276,7 @@ function FileUploadField({
             <FileUploadIcon>
               <Icon name="action.upload" size={size} tone="secondary" />
             </FileUploadIcon>
-            <div className={styles.copy}>
-              <FileUploadTitle>{labels.title}</FileUploadTitle>
-              {labels.description ? (
-                <FileUploadDescription>{labels.description}</FileUploadDescription>
-              ) : null}
-            </div>
+            <FileUploadTitle>{labels.title}</FileUploadTitle>
             {/* Decorative: the whole zone is the target, so the «button» is a styled span. */}
             <Button.Root asChild variant="soft" tone="neutral" size={size} disabled={disabled}>
               <span>{labels.browse}</span>
@@ -1314,38 +1288,48 @@ function FileUploadField({
   }
 
   const empty = count === 0;
-  const countText = max === undefined ? null : formatLabel(labels.count, { count, max });
-  const addTile =
-    tile && !disabled ? (
-      <li className={styles.add} data-empty={empty || undefined} data-full={full || undefined}>
-        {/* biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child */}
-        <label className={styles.addTarget}>
-          {input}
-          <span className={cx(fieldTierClass, styles.addIcon)} data-size="xs" aria-hidden="true">
-            <Icon name="action.add" />
-          </span>
-          <span className={cx(textRole.caption, styles.addText)}>
-            <MorphText>{full ? labels.full : empty ? labels.empty : labels.add}</MorphText>
-          </span>
-          {countText !== null ? (
-            <span className={cx(textRole.caption, styles.addHint)}>
-              <RollingNumber>{countText}</RollingNumber>
-            </span>
-          ) : empty ? (
-            <span
-              ref={emptyHint.ref}
-              className={cx(
-                textRole.caption,
-                styles.addHint,
-                emptyHint.entering && enterMotion.enter,
-              )}
-            >
-              {labels.emptyHint}
-            </span>
-          ) : null}
-        </label>
-      </li>
-    ) : null;
+  // A full set has nothing to offer: the add tile closes up in place and comes back once a file
+  // leaves (a limit the person should know is the consumer's `hint`).
+  const canAdd = tile && !disabled && !full;
+  const addPresence = usePartPresence<HTMLLIElement>({ present: canAdd, axis: "inline" });
+  const leaveAddTile = addPresence.ref;
+  const addTileRef = React.useCallback(
+    (node: HTMLLIElement | null) => {
+      if (!node) return;
+      const leave = leaveAddTile(node);
+      return () => {
+        // The pick that filled the set was made from the tile: the focus goes to the last file.
+        const held = node.contains(document.activeElement);
+        const list = node.parentElement;
+        if (typeof leave === "function") leave();
+        if (!held || !list) return;
+        queueMicrotask(() => {
+          if (!list.isConnected) return;
+          const cells = list.querySelectorAll<HTMLElement>(":scope > :not([data-leaving])");
+          handoffFocus(node, cells[cells.length - 1]);
+        });
+      };
+    },
+    [leaveAddTile],
+  );
+  const addTile = canAdd ? (
+    <li
+      ref={addTileRef}
+      className={cx(styles.add, addPresence.className)}
+      data-empty={empty || undefined}
+    >
+      {/* biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child */}
+      <label className={styles.addTarget}>
+        {input}
+        <span className={cx(fieldTierClass, styles.addIcon)} data-size="xs" aria-hidden="true">
+          <Icon name="action.add" />
+        </span>
+        <span className={cx(textRole.caption, styles.addText)}>
+          <MorphText>{empty ? labels.empty : labels.add}</MorphText>
+        </span>
+      </label>
+    </li>
+  ) : null;
 
   // The drop zone and an add tile take files dropped anywhere on the field; a button takes none.
   const drops = !hiddenInput && !disabled;

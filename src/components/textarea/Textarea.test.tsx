@@ -362,6 +362,7 @@ describe("Textarea formatting", () => {
     expect(tools.map((tool) => tool.getAttribute("aria-label"))).toEqual([
       "Жирный",
       "Курсив",
+      "Подчёркнутый",
       "Зачёркнутый",
       "Моноширинный",
       "Скрытый текст",
@@ -397,6 +398,7 @@ describe("Textarea formatting", () => {
       "~~Смета~~ готова",
     );
     expect(await formatted(() => user.keyboard("{Control>}e{/Control}"))).toBe("`Смета` готова");
+    expect(await formatted(() => user.keyboard("{Meta>}u{/Meta}"))).toBe("__Смета__ готова");
     expect(await formatted(() => user.keyboard("{Meta>}{Shift>}h{/Shift}{/Meta}"))).toBe(
       "||Смета|| готова",
     );

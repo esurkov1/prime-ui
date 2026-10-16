@@ -69,6 +69,12 @@ export const api: ComponentApi = {
           ru: "Доставка исходящего: часы, одна галочка, две (акцентом) или знак ошибки; значки плавно сменяют друг друга. Для скринридера названы через `labels`.",
         },
         {
+          name: "failureReason",
+          type: "ReactNode",
+          en: "Why a `failed` message was not sent: a danger caption under the message that describes its row (`aria-describedby`). Shown only while `status` is `failed`; a retry in flight takes it away.",
+          ru: "Почему сообщение `failed` не отправлено: подпись в тоне danger под сообщением, описывает его строку (`aria-describedby`). Видна, только пока `status` — `failed`; идущий повтор её убирает.",
+        },
+        {
           name: "preview",
           type: "boolean",
           default: "false",
@@ -232,15 +238,21 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Text",
-      en: "`ref` → `HTMLDivElement`. The text: a string renders the Markdown subset the Composer writes as elements, never as HTML (`plain` shows it as is). Marks the matches of the chat's search.",
-      ru: "Текст: строка с разметкой, которую пишет Composer, рисуется элементами, никогда не HTML (`plain` показывает её как есть). Выделяет совпадения поиска чата.",
+      en: "`ref` → `HTMLDivElement`. The text: a string renders the Markdown subset the Composer writes as elements, never as HTML (`plain` shows it as is; with `entities` it is plain text those ranges format). Marks the matches of the chat's search.",
+      ru: "Текст: строка с разметкой, которую пишет Composer, рисуется элементами, никогда не HTML (`plain` показывает её как есть; с `entities` это простой текст, который размечают диапазоны). Выделяет совпадения поиска чата.",
       props: [
+        {
+          name: "entities",
+          type: "readonly TextEntity[]",
+          en: "Formatted ranges of a messenger's text (`TextEntity`, see RichText): the string is then plain text — `**` in it stays text — and a range may start inside a word.",
+          ru: "Размеченные диапазоны текста мессенджера (`TextEntity`, см. RichText): строка тогда простой текст — `**` в ней остаётся текстом — и диапазон может начинаться внутри слова.",
+        },
         {
           name: "plain",
           type: "boolean",
           default: "false",
-          en: "Render a string as is, without its Markdown.",
-          ru: "Показать строку как есть, без разметки.",
+          en: "Render a string as is, without its Markdown or `entities`.",
+          ru: "Показать строку как есть, без разметки и `entities`.",
         },
         {
           name: "children",

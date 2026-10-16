@@ -55,7 +55,7 @@ FileUpload.Root                 field frame: label → trigger → files → hin
       │                         middle: picture, video frame + play mark or the file's sheet ·
       │                         band at the bottom: name (no extension) … size (a video: duration);
       │                         the upload disk over the middle
-      └─ add tile               trigger="tile": «+», «Добавить», `count из max`; the whole row when empty
+      └─ add tile               trigger="tile": «+», «Добавить»; the whole row when empty, gone at `max`
 
 FileUpload.Queue                the same files with no trigger of their own (a tray whose paperclip lives elsewhere)
 
@@ -67,7 +67,7 @@ FileUpload.Item                 a file row the set does not draw (own actions, a
 ├─ FileUpload.ItemActions       buttons at the end of the row (kit Button)
 └─ FileUpload.ItemProgress      the kit ProgressBar across the row
 ```
-The built-in zone body (icon, `labels.title`, `labels.description` and a decorative soft Button) renders when there are no children; the built-in button content is the paperclip and `labels.browse`. The set draws its rows and tiles itself from `value` and `queue`; the `Item` parts are for a row it does not draw (a download button, a report being prepared).
+The built-in zone body (icon, `labels.title` and a decorative soft Button; formats and limits go in `hint`) renders when there are no children; the built-in button content is the paperclip and `labels.browse`. The set draws its rows and tiles itself from `value` and `queue`; the `Item` parts are for a row it does not draw (a download button, a report being prepared).
 
 **One set of files.** The files are application data: `value` (`{ id, name, size?, type?, src?, alt?, href? }`, controlled, or `defaultValue`) in its order, then every upload of `queue` that is not in it, in the queue's order. A file of `value` whose `id` is an upload's id shows that upload's state. `type` is the MIME type (without it the kind — picture, video, other — is read from the name's extension); `src` is a picture or a video; `alt` is spoken in place of the name and never drawn. `href` is the file's address: the row's name (a neutral `LinkButton`) or the whole tile under its chips becomes a link that opens the file in a new tab — the server's `Content-Disposition` decides open or download. Every change — a reorder by drag or Alt + ← / →, a removal, files added to the queue — goes through `onValueChange` with the whole new list, uploads included; the queue follows (a removed upload leaves it and stops, a moved one keeps its order through `queue.move`). Without `value` and `defaultValue` the set is the queue alone: an uncontrolled list of uploads that reorders through `queue.move`. Return a promise from `onValueChange` to save on a server: the touched files wait busy, a moved file or new files stand in their new places meanwhile, a removed file stays until the answer. Resolve and the change stands (a controlled owner applies `value` before resolving); reject and the set goes back and `labels.changeFailed` is announced.
 
@@ -127,7 +127,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `disabled` | `boolean` | `false` | Blocks picking and drag-and-drop; the files are read-only: no add tile, no reorder, no remove. |
 | `accept` | `string` | — | Native `accept` of the file input; dropped files outside it are not taken (MIME type, `type/*` or `.ext`; a file with no MIME type by its extension). |
 | `multiple` | `boolean` | — | Allows several files at once in the picker. |
-| `max` | `number` | — | Most files in the set: picked and dropped files are cut to the room left; the add tile counts `count из max` (the digits roll) and at the limit says «Лимит файлов» and takes nothing. |
+| `max` | `number` | — | Most files in the set: picked and dropped files are cut to the room left; at the limit the add tile closes up in place and comes back once a file leaves. The limit a person should know goes in `hint`. |
 | `name` | `string` | — | Name of the file input inside a form. |
 | `onFilesChange` | `(files: File[]) => void` | — | Called with the picked or dropped files (of `accept`, cut to `max`); the input is reset, so the same file can be picked again. Not called when `queue.add` takes them. |
 | `picker` | `Ref<{ open: (options?: { accept?: string }) => void }>` | — | Opens the file picker from code (a custom body button, a menu item): `open()`, or `open({ accept })` for one pick of other types that also filter its files. A disabled or full field does not open. |
@@ -250,7 +250,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 |---|---|---|---|
 | `dropzone` | the drop area with an icon, a title, a description and a decorative browse button, the files under it | a standalone upload field of a form; documents | yes |
 | `button` | a kit Button of the tier, no zone and no drop: soft with the paperclip and text, ghost when its content is a `Button.Icon` alone | a composer's paperclip, an «attach» action in a toolbar or a dense form; pair it with `FileUpload.Queue` when the files live elsewhere | |
-| `tile` | a dashed add tile — «+», «Добавить», `count из max` — as the last cell of the files; the whole row while empty; files drop anywhere on the set | file cards and the image gallery: files are added where they will lie | |
+| `tile` | a dashed add tile — «+», «Добавить» — as the last cell of the files; the whole row while empty; files drop anywhere on the set | file cards and the image gallery: files are added where they will lie | |
 | `none` | nothing of its own: a hidden file input that `picker.open({ accept })` clicks, no drop | a menu of attachment kinds whose items each open the picker with their own types (`Composer.Attach` with `Composer.Item`) | |
 
 ### variant (FileUpload.Root)
@@ -299,7 +299,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `max` | the add tile counts `count из max` (the digits roll); at the limit it says «Лимит файлов» and takes nothing | the set has a limit | — |
+| `max` | at the limit the add tile closes up in place and comes back once a file leaves; the limit is stated in `hint` | the set has a limit | — |
 | `invalid` (Root) | danger line and icon | a rejected file without a message; otherwise pass `error` | — |
 | `invalid` (Item) | danger soft fill, danger ring, danger description | an upload failed | `false` |
 | `disabled` | disabled fill and text, drops ignored; the files read-only | uploading is unavailable, a published set | `false` |
@@ -322,7 +322,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | disabled | `disabled` | `data-disabled="true"`, disabled input, disabled fill and text, drops ignored; no add tile, actions or drag; a disabled button with `trigger="button"` |
 | empty | no files, `trigger="tile"` | the add tile spans the row with «Нажмите или перетащите файлы» |
 | cover | `cover`, the first tile | «Обложка» in place of the format pill, `data-cover` on the tiles wrapper (the first tile takes a 2 × 2 cell in a grid) |
-| full | the set reaches `max` | `data-full` on the add tile: «Лимит файлов», faded; the file input is `aria-disabled` and opens no picker, so the field label stays undimmed |
+| full | the set reaches `max` | the add tile (and its file input) closes up in place; focus that was on it moves to the last file; it enters again once a file leaves |
 | queued | queue item `status: "queued"` | a row reads «size · В очереди» over an empty bar; a tile (`data-upload="queued"`) dims under a 40px disk on the `media` shade (Button `shape="circle"` `variant="shade"`) whose ring turns at its least arc, described by «В очереди» |
 | loading | `status: "loading"` | a row reads «size · Загрузка 40%» and its bar fills (`accent`); a tile's white arc grows clockwise from 12 o'clock with the share sent (the `progress` ring of a shade circle Button, one variable `--ring-value`, gliding `base` while it turns); the disk is the remove («Отменить загрузку: name», described by the state), the corner × is not drawn; the tile still reorders, its carried copy keeps the disk |
 | done | `status: "done"` | a row reads «size» over a full `success` bar; a tile's ring fills, then its disk fades and shrinks to 0.9 (`fast`, `inert`), the picture returns to full or the sheet comes back |
@@ -379,15 +379,11 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | Key | Default | Used for |
 |---|---|---|
 | `title` | `"Выберите файл или перетащите его сюда"` | Title of the built-in zone body. |
-| `description` | `"JPEG, PNG, PDF, MP4 до 50 МБ"` | Description of the built-in body; an empty string hides it. |
 | `browse` | `"Выбрать файл"` | Text of the browse button: decorative in the built-in zone body, the control itself with `trigger="button"`. |
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
 | `add` | `"Добавить"` | Text of the add tile (`trigger="tile"`). |
 | `addLabel` | `"Добавить файлы"` | Accessible name of the add tile's file input. |
 | `empty` | `"Нажмите или перетащите файлы"` | Text of the add tile of an empty set (it spans the row). |
-| `emptyHint` | `"Можно несколько сразу"` | Second line of the empty add tile without `max` (with it the counter stands there). |
-| `full` | `"Лимит файлов"` | Text of the add tile when `max` is reached. |
-| `count` | `"{count} из {max}"` | Counter on the add tile (with `max`). |
 | `cover` | `"Обложка"` | Pill of the first tile with `cover`. |
 | `queued` | `"В очереди"` | A file waiting for a free slot (a row's status, a tile's name and its empty ring). |
 | `uploading` | `"Загрузка {percent}%"` | A file in flight. |
@@ -415,7 +411,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | [sizes.tsx](examples/sizes.tsx) | Every tier of the zone and of its file rows: padding, icon, button, text and the format badge follow it — `size`. |
 | [states.tsx](examples/states.tsx) | A default zone, a disabled one whose files are read-only and an invalid one without a message — `disabled`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | A required scan checked as soon as it is picked: a wrong type or a large file shakes in an error that leaves when the file is removed; a hint and an optional zone — `required`, `hint`, `error`, `optional`. |
-| [gallery.tsx](examples/gallery.tsx) | An image gallery of an office listing: the first photo is the cover on two tiles and a photo dragged first takes its place, new photos upload in their tiles, one fails and retries, and the add tile counts up to the limit and then says so — `trigger`, `layout`, `cover`, `max`, `value`, `queue`. |
+| [gallery.tsx](examples/gallery.tsx) | An image gallery of an office listing: the first photo is the cover on two tiles and a photo dragged first takes its place, new photos upload in their tiles, one fails and retries, and the add tile leaves at the limit — `trigger`, `layout`, `cover`, `max`, `value`, `queue`. |
 | [file-cards.tsx](examples/file-cards.tsx) | Materials of a warehouse inspection as cards: photos and documents in one grid, each with its picture or format and the name with the size in megabytes as the report gives it; new files upload in their cards and the order is set by drag or Alt + arrows — `trigger`, `layout`, `defaultValue`, `queue`, `formatSize`. |
 | [attachment-tray.tsx](examples/attachment-tray.tsx) | A reply to a client with a paperclip instead of a drop zone: the icon-only picker button, and the attachments as one scrolling row of tiles above the message — `trigger`, `aria-label`, `FileUpload.Queue`, `layout`. |
 | [saving.tsx](examples/saving.tsx) | Published listing photos with no picker, every change saved on the server: a moved or removed photo waits busy, and a change the server refuses puts the set back — `FileUpload.Queue`, `onValueChange`, `value`, `cover`. |
@@ -431,7 +427,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 - A `Label` and a `Hint` placed around the zone by hand → pass `label`, `hint`, `error`.
 - Nesting `FileUpload.Root` in another `<label>` → it already is one.
 - A plain `<button>` in a custom body expecting it to open the picker → call `picker.current?.open()` in its `onClick` (`open({ accept })` for one pick of other types); an inline «browse» link is `<LinkButton asChild><button type="button" onClick={…}>`.
-- `labels.hint` → the built-in secondary line is `labels.description`; `hint` is the field hint under the zone.
+- Formats and size limits written into the zone → the zone states none of its own; they go in `hint`, under the zone.
 - A hand-written upload loop with its own progress, retry and abort per row → `useUploadQueue` + `queue`.
 - A zone recolored into a button for a paperclip → `trigger="button"`.
 - An image gallery — a grid of photos, an add tile, a cover and drag — written by hand, or looked for as a separate component → it is this one: `trigger="tile"`, `layout="grid"`, `cover`.

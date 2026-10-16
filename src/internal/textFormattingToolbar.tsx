@@ -33,6 +33,7 @@ import styles from "./textFormattingToolbar.module.css";
 const TOOL_ICONS: Record<TextFormat, IconName> = {
   bold: "format.bold",
   italic: "format.italic",
+  underline: "format.underline",
   strikethrough: "format.strikethrough",
   code: "format.code",
   spoiler: "format.spoiler",

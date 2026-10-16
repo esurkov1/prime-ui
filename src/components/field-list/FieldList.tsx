@@ -27,7 +27,6 @@ import { useListPresence } from "@/internal/listPresence";
 import { usePartPresence } from "@/internal/partPresence";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import textRole from "@/internal/textRole.module.css";
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 import { useFlipList } from "@/internal/useFlipList";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
@@ -57,8 +56,6 @@ export type FieldListLabels = {
   namedRow: string;
   /** Why a pinned row cannot be removed: the tooltip of its remove button, the note in its menu. */
   lockedReason: string;
-  /** Text beside the disabled add button once the list holds `max` rows; `{max}` is the limit. */
-  maxReached: string;
   /** Name of the totals row (`renderTotals`), shown in its first cell when that has no total. */
   totals: string;
 };
@@ -74,7 +71,6 @@ export const FIELD_LIST_LABELS: FieldListLabels = {
   row: "строка {index}",
   namedRow: "«{label}»",
   lockedReason: "Закреплённую строку нельзя удалить",
-  maxReached: "Не больше {max}",
   totals: "Итого",
 };
 
@@ -389,6 +385,10 @@ export function FieldList<T extends object>({
   });
   const atMax = max !== undefined && items.length >= max;
   const atMin = items.length <= min;
+  // A full list has nothing to offer: the add button closes up in place and comes back once a row
+  // leaves (a limit the person should know is the consumer's `hint`).
+  const canAdd = createItem !== undefined && !atMax;
+  const addZone = usePartPresence<HTMLDivElement>({ present: canAdd, axis: "block" });
 
   const compactColumns = columns.flatMap((column, index) =>
     column.width === "compact" ? [index] : [],
@@ -833,13 +833,13 @@ export function FieldList<T extends object>({
       >
         <div ref={bodyRef} className={styles.body}>
           {surface ? <SurfaceDepthProvider value={depth}>{sheet}</SurfaceDepthProvider> : sheet}
-          {createItem ? (
-            <div className={styles.add}>
+          {canAdd ? (
+            <div ref={addZone.ref} className={cx(styles.add, addZone.className)}>
               <Button.Root
                 ref={addRef}
                 variant="soft"
                 tone="neutral"
-                disabled={disabled || atMax}
+                disabled={disabled}
                 onClick={add}
               >
                 <Button.Icon>
@@ -847,11 +847,6 @@ export function FieldList<T extends object>({
                 </Button.Icon>
                 {addLabel}
               </Button.Root>
-              {atMax && max !== undefined ? (
-                <span className={cx(textRole.caption, styles.limit)}>
-                  {formatLabel(labels.maxReached, { max })}
-                </span>
-              ) : null}
             </div>
           ) : null}
           {menu && reorderable ? (

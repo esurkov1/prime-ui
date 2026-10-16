@@ -1,4 +1,4 @@
-/** An image gallery of an office listing: the first photo is the cover on two tiles and a photo dragged first takes its place, new photos upload in their tiles, one fails and retries, and the add tile counts up to the limit and then says so — `trigger`, `layout`, `cover`, `max`, `value`, `queue`. */
+/** An image gallery of an office listing: the first photo is the cover on two tiles and a photo dragged first takes its place, new photos upload in their tiles, one fails and retries, and the add tile leaves at the limit — `trigger`, `layout`, `cover`, `max`, `value`, `queue`. */
 import { FileUpload, type FileUploadFile, type UploadContext, useUploadQueue } from "prime-ui-kit";
 import * as React from "react";
 
@@ -88,7 +88,7 @@ export default function FileUploadGalleryExample() {
     <div className={styles.wide}>
       <FileUpload.Root
         label="Фотографии помещения"
-        hint="JPG или PNG, первое фото — обложка в каталоге"
+        hint="JPG или PNG, до 6 фото; первое фото — обложка в каталоге"
         trigger="tile"
         layout="grid"
         cover

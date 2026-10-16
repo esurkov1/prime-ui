@@ -5,9 +5,6 @@ import styles from "./examples.module.css";
 
 const MAX_SIZE = 10 * 1024 * 1024;
 
-/** The zone names the limit the stand-in server holds. */
-const ZONE_LABELS = { description: "Любые файлы до 10 МБ" };
-
 const ATTACHED: readonly FileUploadFile[] = [
   {
     id: "deal-contract",
@@ -53,8 +50,7 @@ export default function FileUploadOverviewExample() {
     <div className={styles.column}>
       <FileUpload.Root
         label="Документы сделки"
-        hint="Договор, смета и акты по сделке; можно несколько сразу"
-        labels={ZONE_LABELS}
+        hint="Договор, смета и акты по сделке; любые файлы до 10 МБ"
         multiple
         defaultValue={ATTACHED}
         queue={queue}

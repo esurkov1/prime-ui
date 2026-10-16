@@ -1,0 +1,158 @@
+/** A model card with tabs: one switcher for the whole open tab stands in the header before ⋯ — the text language on the description tab, the period on the analytics tab, whose two self-titled charts the panel spaces by itself — `Drawer.Actions`, `Tabs.Root`, `Tabs.Panel`. */
+import {
+  Button,
+  Card,
+  Datepicker,
+  type DatepickerRange,
+  DEFAULT_DATEPICKER_PRESETS,
+  DescriptionList,
+  Drawer,
+  Dropdown,
+  Icon,
+  SegmentedControl,
+  Sparkline,
+  type SparklinePoint,
+  Tabs,
+} from "prime-ui-kit";
+import * as React from "react";
+
+const MODEL = {
+  name: "Кресло «Орион»",
+  sku: "OR-240",
+  description: {
+    ru: "Офисное кресло с сетчатой спинкой и поддержкой поясницы. Подлокотники регулируются в четырёх направлениях, механизм качания фиксируется в пяти положениях.",
+    en: "An office chair with a mesh back and lumbar support. The armrests adjust in four directions, the tilt locks in five positions.",
+  },
+  title: { ru: "Кресло «Орион», графит", en: "Orion chair, graphite" },
+};
+
+const SOLD: SparklinePoint[] = [
+  { label: "май", value: 52 },
+  { label: "июн", value: 61 },
+  { label: "июл", value: 58 },
+  { label: "авг", value: 74 },
+  { label: "сен", value: 83 },
+  { label: "окт", value: 90 },
+];
+
+const RETURNS: SparklinePoint[] = [
+  { label: "май", value: 2 },
+  { label: "июн", value: 1 },
+  { label: "июл", value: 0 },
+  { label: "авг", value: 1 },
+  { label: "сен", value: 1 },
+  { label: "окт", value: 1 },
+];
+
+const formatPieces = (value: number) => `${value.toLocaleString("ru-RU")} шт.`;
+
+const ALL_TIME: DatepickerRange = { from: null, to: null };
+
+type Lang = "ru" | "en";
+
+export default function DrawerTabSwitcherExample() {
+  const [tab, setTab] = React.useState("description");
+  const [lang, setLang] = React.useState<Lang>("ru");
+  const [period, setPeriod] = React.useState<DatepickerRange>(ALL_TIME);
+
+  return (
+    <Drawer.Root>
+      <Drawer.Trigger>
+        <Button.Root variant="soft" tone="neutral">
+          Открыть модель
+        </Button.Root>
+      </Drawer.Trigger>
+      <Drawer.Content>
+        <Tabs.Root value={tab} onValueChange={setTab}>
+          <Drawer.Header>
+            <Drawer.Title>{MODEL.name}</Drawer.Title>
+            <Drawer.Description>Артикул {MODEL.sku}</Drawer.Description>
+            <Drawer.Actions>
+              {tab === "description" ? (
+                <SegmentedControl.Root
+                  aria-label="Язык текстов"
+                  value={lang}
+                  onValueChange={(next) => setLang(next as Lang)}
+                >
+                  <SegmentedControl.Item value="ru">RU</SegmentedControl.Item>
+                  <SegmentedControl.Item value="en">EN</SegmentedControl.Item>
+                </SegmentedControl.Root>
+              ) : (
+                <Datepicker.Root
+                  mode="range"
+                  aria-label="Период"
+                  placeholder="Всё время"
+                  value={period}
+                  onValueChange={setPeriod}
+                  resetValue={ALL_TIME}
+                  presets={DEFAULT_DATEPICKER_PRESETS}
+                  disableFuture
+                  align="end"
+                />
+              )}
+              <Dropdown.Root>
+                <Dropdown.Trigger>
+                  <Button.Root variant="ghost" tone="neutral" aria-label="Действия с моделью">
+                    <Button.Icon>
+                      <Icon name="action.more" />
+                    </Button.Icon>
+                  </Button.Root>
+                </Dropdown.Trigger>
+                <Dropdown.Content>
+                  <Dropdown.Item>Дублировать</Dropdown.Item>
+                  <Dropdown.Item>Снять с продажи</Dropdown.Item>
+                </Dropdown.Content>
+              </Dropdown.Root>
+            </Drawer.Actions>
+            <Tabs.List aria-label={MODEL.name}>
+              <Tabs.Item value="description">Описание</Tabs.Item>
+              <Tabs.Item value="analytics">Аналитика</Tabs.Item>
+            </Tabs.List>
+          </Drawer.Header>
+          <Drawer.Body>
+            <Tabs.Panel value="description">
+              <DescriptionList.Root>
+                <DescriptionList.Item label="Название на сайте">
+                  {MODEL.title[lang]}
+                </DescriptionList.Item>
+                <DescriptionList.Item label="Описание">
+                  {MODEL.description[lang]}
+                </DescriptionList.Item>
+              </DescriptionList.Root>
+            </Tabs.Panel>
+            <Tabs.Panel value="analytics">
+              <Card.Root variant="panel">
+                <Card.Header>
+                  <Card.Title>Продажи</Card.Title>
+                  <Card.Description>По месяцам, в штуках</Card.Description>
+                </Card.Header>
+                <Card.Body>
+                  <Sparkline
+                    data={SOLD}
+                    label="Продано за период"
+                    summary="sum"
+                    formatValue={formatPieces}
+                  />
+                </Card.Body>
+              </Card.Root>
+              <Card.Root variant="panel">
+                <Card.Header>
+                  <Card.Title>Возвраты</Card.Title>
+                  <Card.Description>По месяцам, в штуках</Card.Description>
+                </Card.Header>
+                <Card.Body>
+                  <Sparkline
+                    data={RETURNS}
+                    label="Возвращено за период"
+                    summary="sum"
+                    formatValue={formatPieces}
+                  />
+                </Card.Body>
+              </Card.Root>
+            </Tabs.Panel>
+          </Drawer.Body>
+        </Tabs.Root>
+      </Drawer.Content>
+    </Drawer.Root>
+  );
+}

@@ -127,12 +127,13 @@ type Place = "flow" | "bar";
 
 const PlaceContext = React.createContext<Place>("flow");
 
-type BarContextValue = { collapse: boolean; collapsed: boolean; plan: BarPlan };
+type BarContextValue = { collapse: boolean; collapsed: boolean; plan: BarPlan; nav: boolean };
 
 const BarContext = React.createContext<BarContextValue>({
   collapse: false,
   collapsed: false,
   plan: "one",
+  nav: false,
 });
 
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
@@ -268,6 +269,7 @@ function measureBar(row: HTMLElement): BarWidths {
     heading: widthOf(row.querySelector(`:scope > .${styles.heading}`)),
     path: row.querySelector(`:scope > .${styles.heading} .${styles.path}`) !== null,
     tools: widthOf(tools),
+    nav: tools?.querySelector('nav, [role="navigation"]') != null,
     actions: items.map((item) => ({
       role: item.dataset.role as BarAction["role"],
       full: widthOf(item),
@@ -293,9 +295,10 @@ function measureBar(row: HTMLElement): BarWidths {
 function useBarPlan(
   rowRef: React.RefObject<HTMLDivElement | null>,
   rowsRef: React.RefObject<HTMLDivElement | null>,
-): { plan: BarPlan; stacked: boolean } {
+): { plan: BarPlan; stacked: boolean; nav: boolean } {
   const [plan, setPlan] = React.useState<BarPlan>("one");
   const [stacked, setStacked] = React.useState(false);
+  const [nav, setNav] = React.useState(false);
   const widths = React.useRef<BarWidths | null>(null);
 
   const decide = React.useCallback(() => {
@@ -304,6 +307,7 @@ function useBarPlan(
     const next = planBar(widths.current, rows.clientWidth);
     setPlan((current) => (current === next ? current : next));
     setStacked(stackHeading(widths.current, rows.clientWidth, next));
+    setNav(widths.current.nav);
   }, [rowsRef]);
 
   const measure = React.useCallback(() => {
@@ -320,7 +324,7 @@ function useBarPlan(
     return () => fonts?.removeEventListener?.("loadingdone", measure);
   }, [measure]);
 
-  return { plan, stacked };
+  return { plan, stacked, nav };
 }
 
 export type PageTopBarProps = React.HTMLAttributes<HTMLElement> & {
@@ -333,7 +337,8 @@ export type PageTopBarProps = React.HTMLAttributes<HTMLElement> & {
  * The page's strip at its top edge, across the panel. Up to four groups in one grid —
  * `Page.Heading`, `Page.Tools`, `Page.Actions` on the first line, `Page.Chips` under them — laid
  * out by one plan chosen from their natural widths (`planBar`): one line while everything fits;
- * then the tools take a line of their own; then the buttons give way to their icons, secondary
+ * then the tools take a line of their own (a section's sub-pages — tools holding a navigation —
+ * always, at the start, so the switch stands still from one sub-page to the next); then the buttons give way to their icons, secondary
  * first, and fold into «⋯»; only then does a heading with a path stack (path over title), and a
  * heading without one truncate. Sticky inside the scroller of
  * the page; while the shell's Sidebar is off-canvas it starts with the menu button. With
@@ -354,8 +359,11 @@ function PageTopBar({
   const rowRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(barRef, ref);
   const collapsed = useCollapsed(collapse, barRef, page?.heading);
-  const { plan, stacked } = useBarPlan(rowRef, rowsRef);
-  const bar = React.useMemo(() => ({ collapse, collapsed, plan }), [collapse, collapsed, plan]);
+  const { plan, stacked, nav: subPages } = useBarPlan(rowRef, rowsRef);
+  const bar = React.useMemo(
+    () => ({ collapse, collapsed, plan, nav: subPages }),
+    [collapse, collapsed, plan, subPages],
+  );
 
   const items = flattenChildren(children);
   const of = (Part: React.ElementType) => items.filter((item) => isPart(item, Part));
@@ -873,12 +881,13 @@ export type PageToolsProps = DivProps;
  */
 function PageTools({ className, ...rest }: PageToolsProps) {
   const place = React.useContext(PlaceContext);
-  const { plan } = React.useContext(BarContext);
+  const { plan, nav } = React.useContext(BarContext);
   return (
     <ToolRow
       {...rest}
       role={namedRole(rest, "group")}
       fill={place === "flow" || plan !== "one"}
+      align={place === "bar" && nav ? "start" : "end"}
       className={cx(styles.tools, className)}
     />
   );

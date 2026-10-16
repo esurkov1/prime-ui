@@ -238,21 +238,21 @@ export const api: ComponentApi = {
     },
     {
       name: "ChatList.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. Before the name: the avatar slot (`aria-hidden`), an `Avatar.Root` sized by the row. After the name: a glyph beside it (verified, bot, group).",
-      ru: "Перед именем — слот аватара (`aria-hidden`): `Avatar.Root` под ярус строки. После имени — значок рядом с ним (подтверждён, бот, группа).",
+      en: '`ref` → `HTMLSpanElement`. Before the name: the avatar slot (`aria-hidden`), an `Avatar.Root` sized by the row. After the name: a glyph beside it (verified, bot, channel type), any kit icon sized by the row; with `aria-label` it is `role="img"` of that name.',
+      ru: 'Перед именем — слот аватара (`aria-hidden`): `Avatar.Root` под ярус строки. После имени — значок рядом с ним (подтверждён, бот, тип канала), любая иконка кита под ярус строки; с `aria-label` он — `role="img"` с этим именем.',
       props: [
         {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "An `Avatar.Root` (with `Avatar.Status`), or after the name an `Icon` with a `label`.",
-          ru: "`Avatar.Root` (с `Avatar.Status`) или после имени — `Icon` с `label`.",
+          en: "An `Avatar.Root` (with `Avatar.Status`), or after the name an icon: `<Icon name>` or a glyph of `prime-ui-kit/icons` (`<SendIcon />`), as is.",
+          ru: "`Avatar.Root` (с `Avatar.Status`) или после имени — иконка: `<Icon name>` или глиф из `prime-ui-kit/icons` (`<SendIcon />`) как есть.",
         },
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
-          en: "`className` and the other `span` attributes.",
-          ru: "`className` и остальные атрибуты `span`.",
+          en: "`className`, `aria-label` (names a glyph after the name: its channel, «Официальный аккаунт») and the other `span` attributes.",
+          ru: "`className`, `aria-label` (имя значка после имени: его канал, «Официальный аккаунт») и остальные атрибуты `span`.",
         },
       ],
     },
@@ -423,8 +423,8 @@ export const api: ComponentApi = {
         ru: 'Открытый диалог — `aria-current="true"` на кнопке, `"page"` на ссылке. Выбор не следует за фокусом: стрелки только переводят фокус, открывают Enter, Space и клик.',
       },
       {
-        en: "The row is named by its content: the name, glyphs with a `label` («Без звука», a verified mark), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.",
-        ru: "Имя строки: имя диалога, значки с `label` (без звука, подтверждён), превью, отметка доставки («Прочитано»), время и «непрочитанных: 3» вместо голого числа; аватар скрыт (`aria-hidden`).",
+        en: "The row is named by its content: the name, the glyphs (`ChatList.ItemIcon` `aria-label`, «Без звука»), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.",
+        ru: "Имя строки: имя диалога, значки (`ChatList.ItemIcon` `aria-label`, «Без звука»), превью, отметка доставки («Прочитано»), время и «непрочитанных: 3» вместо голого числа; аватар скрыт (`aria-hidden`).",
       },
       {
         en: "While the other side types, the preview is `aria-hidden` and «печатает…» is read; a draft reads «Черновик: …».",

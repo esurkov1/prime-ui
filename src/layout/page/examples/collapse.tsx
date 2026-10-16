@@ -1,60 +1,74 @@
-/** An overview whose large title scrolls away under the top bar: the bar repeats it with its line of data and keeps the period and the page's buttons in reach — `collapse`. */
-import { AppShell, Button, Card, Icon, Page, SegmentedControl, Typography } from "prime-ui-kit";
-import * as React from "react";
+/** A document page whose large title scrolls away under the top bar: the bar holds the path and repeats the title after it once the title is out of view — `collapse`, `Page.Header`. */
+import { AppShell, Breadcrumb, Button, Card, Icon, Page, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const WEEKS = [
+const SECTIONS = [
   {
-    id: "w41",
-    title: "6–12 октября",
-    text: "Выручка 1,2 млн ₽, 312 заказов, средний чек 3 850 ₽.",
+    id: "terms",
+    title: "Сроки",
+    text: "Клиент может вернуть заказ в течение 14 дней после получения. Срок считается от даты в акте приёмки.",
   },
-  { id: "w40", title: "29 сентября – 5 октября", text: "Выручка 1,1 млн ₽, 298 заказов." },
-  { id: "w39", title: "22–28 сентября", text: "Выручка 0,9 млн ₽, 264 заказа." },
-  { id: "w38", title: "15–21 сентября", text: "Выручка 1,0 млн ₽, 281 заказ." },
-  { id: "w37", title: "8–14 сентября", text: "Выручка 0,8 млн ₽, 240 заказов." },
+  {
+    id: "condition",
+    title: "Состояние товара",
+    text: "Товар принимается в заводской упаковке, без следов использования, с ярлыками и полным комплектом.",
+  },
+  {
+    id: "refund",
+    title: "Возврат денег",
+    text: "Деньги возвращаются тем же способом, которым был оплачен заказ, в течение 10 рабочих дней после проверки.",
+  },
+  {
+    id: "delivery",
+    title: "Доставка при возврате",
+    text: "Если товар с браком, доставку оплачивает магазин. В остальных случаях — клиент по тарифу службы доставки.",
+  },
+  {
+    id: "exceptions",
+    title: "Исключения",
+    text: "Не возвращаются товары, изготовленные по индивидуальному заказу, и цифровые лицензии после активации.",
+  },
 ];
 
 export default function PageCollapseExample() {
-  const [period, setPeriod] = React.useState("week");
-
   return (
     <div className={`${styles.window} ${styles.tall}`}>
       <AppShell.Root fillViewport className={styles.shell}>
         <AppShell.Main>
-          <Page.Root>
+          <Page.Root maxWidth="readable">
             <Page.TopBar collapse>
-              <Page.Tools aria-label="Продажи">
-                <SegmentedControl.Root value={period} onValueChange={setPeriod} aria-label="Период">
-                  <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
-                  <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
-                </SegmentedControl.Root>
-              </Page.Tools>
+              <Page.Heading>
+                <Breadcrumb.Root>
+                  <Breadcrumb.Item href="#documents">Документы</Breadcrumb.Item>
+                </Breadcrumb.Root>
+              </Page.Heading>
+            </Page.TopBar>
+            <Page.Header>
+              <Page.Heading>
+                <Page.Title>Политика возвратов</Page.Title>
+                <Page.Description>
+                  Действует с 1 сентября для всех заказов магазина.
+                </Page.Description>
+              </Page.Heading>
               <Page.Actions>
                 <Button.Root variant="soft" tone="neutral">
                   <Button.Icon>
                     <Icon name="action.download" />
                   </Button.Icon>
-                  Отчёт
+                  Скачать PDF
                 </Button.Root>
               </Page.Actions>
-            </Page.TopBar>
-            <Page.Header>
-              <Page.Heading>
-                <Page.Title>Продажи</Page.Title>
-                <Page.Description>Интернет-магазин · на 14 октября, 9:40</Page.Description>
-              </Page.Heading>
             </Page.Header>
             <Page.Body>
-              {WEEKS.map((week) => (
-                <Card.Root key={week.id} variant="panel">
+              {SECTIONS.map((section) => (
+                <Card.Root key={section.id} variant="panel">
                   <Card.Header>
-                    <Card.Title as="h2">{week.title}</Card.Title>
+                    <Card.Title as="h2">{section.title}</Card.Title>
                   </Card.Header>
                   <Card.Body>
                     <Typography variant="body-m" tone="secondary">
-                      {week.text}
+                      {section.text}
                     </Typography>
                   </Card.Body>
                 </Card.Root>

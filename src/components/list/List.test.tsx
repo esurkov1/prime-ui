@@ -401,6 +401,71 @@ describe("List onReorder", () => {
     fireEvent.pointerUp(window, { ...pointer, clientX: 10, clientY: 60 });
   });
 
+  it("a locked row holds its place: a named lock in the grip's box, the row works as any other", async () => {
+    const user = userEvent.setup();
+    const onMove = vi.fn();
+    const onOpen = vi.fn();
+    render(
+      <List.Root aria-label="Этапы воронки" onReorder={onMove}>
+        <List.Item value="new" locked onClick={() => onOpen("new")}>
+          <List.ItemText>Новая</List.ItemText>
+          <List.ItemActions>
+            <Switch.Root aria-label="Показывать «Новая»" />
+          </List.ItemActions>
+        </List.Item>
+        <List.Item value="talks">
+          <List.ItemText>Переговоры</List.ItemText>
+          <List.ItemActions>
+            <Switch.Root aria-label="Показывать «Переговоры»" />
+          </List.ItemActions>
+        </List.Item>
+      </List.Root>,
+    );
+    const lock = screen.getByRole("img", { name: "Новая: закреплено" });
+    const row = lock.closest("li");
+    // The lock stands in the grip's box, so the locked row keeps the movable rows' columns.
+    expect(lock.parentElement).toHaveClass(styles.grip ?? "");
+    expect(row).toHaveAttribute("data-locked");
+    expect(screen.queryByRole("button", { name: "Переместить Новая" })).toBeNull();
+    // The row itself is a normal row: enabled, it opens on a click, its control is its own.
+    const button = screen.getByRole("button", { name: "Новая" });
+    expect(button).toBeEnabled();
+    await user.click(button);
+    expect(onOpen).toHaveBeenCalledWith("new");
+    expect(screen.getByRole("switch", { name: "Показывать «Новая»" })).toBeEnabled();
+    // It does not move from the keyboard either.
+    await act(async () => {
+      fireEvent.keyDown(button, { key: "ArrowDown", altKey: true });
+    });
+    expect(onMove).not.toHaveBeenCalled();
+    // A neighbour does not step over it, and the refusal says why.
+    await act(async () => {
+      fireEvent.keyDown(screen.getByRole("button", { name: "Переместить Переговоры" }), {
+        key: "ArrowUp",
+        altKey: true,
+      });
+    });
+    expect(onMove).not.toHaveBeenCalled();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Переговоры: «Новая» закреплено, дальше не переместить",
+    );
+  });
+
+  it("names the lock from labels", () => {
+    render(
+      <List.Root
+        aria-label="Этапы"
+        onReorder={() => {}}
+        labels={{ lockedItem: "{label} — системный" }}
+      >
+        <List.Item value="won" locked>
+          Выиграна
+        </List.Item>
+      </List.Root>,
+    );
+    expect(screen.getByRole("img", { name: "Выиграна — системный" })).toBeInTheDocument();
+  });
+
   it("CSS: a sortable row has the row radius (the carried copy and its gap take it)", () => {
     const row = cssRule("src/components/list/List.module.css", ".sortableRow");
     expect(cssValue(row, "border-radius")).toBe("var(--field-radius)");
@@ -497,17 +562,19 @@ describe("List onReorder", () => {
     // The grip keeps the row's end.
     expect(handle.closest("li")?.lastElementChild).toContainElement(handle);
     // One tier below the row, as far from the row's start as from its top and bottom at any row
-    // height: the box stretches to the row and a square spacer leads it, as wide as the space
-    // above a control box of the tier.
+    // height: a spacer leads it, as wide as the space above a control box of the tier, from the
+    // row's measured height (no percentage height: engines differ on it).
     expect(toggle.closest("[data-size]")).toHaveAttribute("data-size", "s");
     const css = "src/components/list/List.module.css";
-    expect(cssValue(cssRule(css, ".actions"), "align-self")).toBe("stretch");
     const spacer = cssRule(
       css,
       '.actions[data-side="end"]::after, .actions[data-side="start"]::before',
     );
-    expect(cssValue(spacer, "block-size")).toBe("calc(50% - var(--field-step-h) / 2)");
-    expect(cssValue(spacer, "aspect-ratio")).toBe("1");
+    expect(cssValue(spacer, "--list-inset")).toBe(
+      "calc((var(--list-row-h, var(--field-h)) - var(--field-step-h)) / 2)",
+    );
+    expect(cssValue(spacer, "inline-size")).toBe("max(var(--prime-space-0), var(--list-inset))");
+    expect(spacer.decls.some((decl) => decl.prop === "aspect-ratio")).toBe(false);
     await user.tab();
     expect(toggle).toHaveFocus();
     await user.tab();
@@ -523,6 +590,44 @@ describe("List onReorder", () => {
     await user.tab({ shift: true });
     await user.tab({ shift: true });
     expect(toggle).toHaveFocus();
+  });
+
+  it("measures the row's height onto its frame for the controls' side inset, and follows it", () => {
+    let height = 56;
+    let resize: () => void = () => {};
+    const RO = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = class {
+      constructor(callback: () => void) {
+        resize = callback;
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    } as unknown as typeof ResizeObserver;
+    const offset = vi
+      .spyOn(HTMLElement.prototype, "offsetHeight", "get")
+      .mockImplementation(() => height);
+    try {
+      render(
+        <List.Root aria-label="Сеансы">
+          <List.Item>
+            <List.ItemText>MacBook Pro</List.ItemText>
+            <List.ItemDescription>Москва · активен сейчас</List.ItemDescription>
+            <List.ItemActions>
+              <button type="button">Завершить</button>
+            </List.ItemActions>
+          </List.Item>
+        </List.Root>,
+      );
+      const frame = screen.getByRole("button", { name: /MacBook Pro/ }).parentElement;
+      expect(frame?.style.getPropertyValue("--list-row-h")).toBe("56px");
+      height = 72;
+      act(() => resize());
+      expect(frame?.style.getPropertyValue("--list-row-h")).toBe("72px");
+    } finally {
+      offset.mockRestore();
+      globalThis.ResizeObserver = RO;
+    }
   });
 
   it("keeps List.ItemActions out of a link row made with asChild", () => {

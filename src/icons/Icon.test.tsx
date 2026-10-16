@@ -201,9 +201,13 @@ describe("icon gestures", () => {
     expect(screen.getByTestId("bike")).toHaveAttribute("data-icon-motion", "generic");
   });
 
-  it("draws every registry glyph from a Lucide source", () => {
+  it("draws every registry glyph from a Lucide source, and only brand.* from Simple Icons", () => {
     for (const [name, glyph] of Object.entries(iconRegistry)) {
-      expect((lucide as Record<string, unknown>)[glyph.source], name).toBeDefined();
+      if (name.startsWith("brand.")) {
+        expect(glyph.source, name).toMatch(/^simple-icons:[a-z0-9]+$/);
+      } else {
+        expect((lucide as Record<string, unknown>)[glyph.source], name).toBeDefined();
+      }
     }
   });
 });
@@ -233,7 +237,34 @@ describe("glyph drawings", () => {
     Object.values(exports).map((glyph): [string, Glyph] => [file.replace(/^.*\//, ""), glyph]),
   );
 
-  it.each(glyphs)("%s is the Lucide drawing at rest with one gesture", (_, Glyph) => {
+  const lucideGlyphs = glyphs.filter(([, glyph]) => !glyph.source.startsWith("simple-icons:"));
+  const brandGlyphs = glyphs.filter(([, glyph]) => glyph.source.startsWith("simple-icons:"));
+
+  it("reads the brand marks", () => {
+    expect(brandGlyphs.map(([, glyph]) => glyph.source).sort()).toEqual([
+      "simple-icons:telegram",
+      "simple-icons:vk",
+      "simple-icons:whatsapp",
+    ]);
+  });
+
+  it.each(
+    brandGlyphs,
+  )("%s is one filled monochrome path in a centred 18 or 20 box, with one gesture", (_, Glyph) => {
+    const svg = render(<Glyph />).container.querySelector("svg");
+    const paths = svg?.querySelectorAll("path") ?? [];
+    expect(paths).toHaveLength(1);
+    const mark = paths[0].parentElement;
+    expect(mark?.getAttribute("fill")).toBe("currentColor");
+    expect(mark?.getAttribute("stroke")).toBe("none");
+    expect(mark?.getAttribute("data-motion")).toBe("tilt");
+    expect(paths[0].getAttribute("transform")).toMatch(
+      /^translate\((2 2\) scale\(0\.8333|3 3\) scale\(0\.75)\)$/,
+    );
+    expect(svg?.querySelectorAll("[data-motion]")).toHaveLength(1);
+  });
+
+  it.each(lucideGlyphs)("%s is the Lucide drawing at rest with one gesture", (_, Glyph) => {
     const Lucide = (lucide as unknown as Record<string, React.ComponentType>)[Glyph.source];
     const ours = render(<Glyph />).container.querySelector("svg");
     const theirs = render(<Lucide />).container.querySelector("svg");

@@ -441,8 +441,18 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       if (index === -1 || to < 0 || to >= order.length) return;
       // Moving down lands in front of the item after the one stepped over.
       const beforeId = direction === -1 ? (order[to] ?? null) : (order[to + 1] ?? null);
-      // A locked item holds its place: no step shifts it.
-      if (displacesLocked(order, id, beforeId, lockedIn(elementRef.current))) return;
+      // A locked item holds its place: no step shifts it, and the step says which one stops it
+      // (the one stepped over).
+      if (displacesLocked(order, id, beforeId, lockedIn(elementRef.current))) {
+        const held = order[to];
+        controller.announce(
+          formatLabel(controller.labels().blocked, {
+            label: labelOf(id),
+            locked: held === undefined ? "" : labelOf(held),
+          }),
+        );
+        return;
+      }
       // Drawn at once and rolled back on a refusal, like a drop; the items glide there.
       setSettle((value) => value + 1);
       commit(id, beforeId, itemsKey, false);

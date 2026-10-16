@@ -91,17 +91,6 @@
   border-inline-end: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
-/* The caption role comes from textRole, in the medium weight of a group heading. */
-.presetTitle {
-  display: flex;
-  align-items: center;
-  min-height: var(--prime-panel-group-label-height);
-  margin: 0;
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-  font-weight: var(--prime-font-weight-medium);
-}
-
 /* Narrow: presets become a sideways ScrollContainer row of soft Buttons above the calendar. */
 .panel[data-layout="stacked"] .presets {
   flex-direction: row;
@@ -109,10 +98,6 @@
   width: auto;
   border-inline-end: 0;
   border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-.panel[data-layout="stacked"] .presetTitle {
-  display: none;
 }
 
 /* ─── Calendar ───────────────────────────────────────────────────────────── */

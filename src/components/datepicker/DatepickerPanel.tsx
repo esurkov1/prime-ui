@@ -62,8 +62,8 @@ export type DatepickerLabels = {
   time: string;
   /** Prefix of a range without a start: «до 6 окт». */
   until: string;
-  /** Heading of the presets column. */
-  presetsTitle: string;
+  /** Accessible name of the presets group. */
+  presetsGroup: string;
   /** Muted marker after the field label when `optional`. */
   optional: string;
   /** Read after the field name of a `required` field (its trigger is a button). */
@@ -86,7 +86,7 @@ export const DATEPICKER_LABELS: DatepickerLabels = {
   timeEnd: "Время конца",
   time: "Время",
   until: "до",
-  presetsTitle: "Период",
+  presetsGroup: "Период",
   optional: "необязательно",
   required: "обязательное поле",
 };
@@ -527,11 +527,8 @@ export function PanelView(props: PanelViewProps) {
           scrollbar={layout === "stacked" ? "hidden" : "thin"}
           className={styles.presets}
           role="group"
-          aria-label={labels.presetsTitle}
+          aria-label={labels.presetsGroup}
         >
-          <p className={cx(textRole.caption, styles.presetTitle)} aria-hidden>
-            {labels.presetsTitle}
-          </p>
           {presets.map((preset) => {
             const pressed = activePreset?.key === preset.key;
             return (

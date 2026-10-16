@@ -58,8 +58,8 @@ export const api: ComponentApi = {
         {
           name: "createItem",
           type: "() => T",
-          en: "A new empty item; with it the add button shows under the rows and focus goes to the new row's first field.",
-          ru: "Новая пустая запись; с ней под строками есть кнопка добавления, а фокус уходит в первое поле новой строки.",
+          en: "A new empty item; with it the add button shows under the rows (until `max`) and focus goes to the new row's first field.",
+          ru: "Новая пустая запись; с ней под строками есть кнопка добавления (пока строк меньше `max`), а фокус уходит в первое поле новой строки.",
         },
         {
           name: "addLabel",
@@ -110,8 +110,8 @@ export const api: ComponentApi = {
         {
           name: "max",
           type: "number",
-          en: "The most rows: at this count the add button is disabled with `labels.maxReached` beside it.",
-          ru: "Наибольшее число строк: при нём кнопка добавления выключена, рядом — `labels.maxReached`.",
+          en: "The most rows: at this count the add button closes up in place and comes back once a row is removed. The list says no limit text of its own; a limit the person should know goes in `hint`.",
+          ru: "Наибольшее число строк: при нём кнопка добавления схлопывается на месте и возвращается, когда строку удалят. Своего текста о пределе список не пишет; предел, о котором человеку нужно знать, — в `hint`.",
         },
         {
           name: "label",
@@ -207,10 +207,6 @@ export const api: ComponentApi = {
     lockedReason: {
       en: "Why a pinned row (`getLocked`) cannot be removed: the tooltip of its remove button, the description of its menu's remove item.",
       ru: "Почему закреплённую строку (`getLocked`) нельзя удалить: подсказка её кнопки удаления, описание пункта удаления в меню.",
-    },
-    maxReached: {
-      en: "Text beside the disabled add button once the list holds `max` rows.",
-      ru: "Текст у выключенной кнопки добавления, когда строк уже `max`.",
     },
     totals: {
       en: "Name of the totals row (`renderTotals`), shown in its first cell when that has no total.",
