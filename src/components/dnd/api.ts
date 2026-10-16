@@ -110,16 +110,16 @@ export const api: ComponentApi = {
         },
         {
           name: "as",
-          type: '"div" | "ul" | "ol" | "tbody"',
+          type: '"div" | "ul" | "ol" | "tbody" | "tr"',
           default: '"div"',
-          en: "Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr` (the gap is a row across every column, the carried copy keeps every cell's width).",
-          ru: "Корневой элемент; при `ul` / `ol` элементы — `li`, при `tbody` — строки таблицы `tr` (зазор — строка во все колонки, переносимая копия сохраняет ширину каждой ячейки).",
+          en: 'Root element; `ul` / `ol` render items as `li`, `tbody` as rows `tr` (a gap row, a one-row copy), `tr` as head cells `th` with `axis="x"` (cells keep their columns, the gap glides among them).',
+          ru: 'Корневой элемент; при `ul` / `ol` элементы — `li`, при `tbody` — строки `tr` (строка-зазор, копия в одну строку), при `tr` — ячейки шапки `th` с `axis="x"` (ячейки в своих колонках, зазор скользит между ними).',
         },
         {
           name: "header",
           type: "ReactNode",
-          en: "Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`.",
-          ru: "Содержимое перед элементами, которое не перемещается и не становится местом сброса: строка-заголовок группы в `tbody`.",
+          en: "Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`, the leading cells of a head row.",
+          ru: "Содержимое перед элементами, которое не перемещается и не становится местом сброса: строка-заголовок группы в `tbody`, ведущие ячейки строки шапки.",
         },
         {
           name: "aria-label",
@@ -137,8 +137,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.SortableItem",
-      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item; presses on controls inside never drag. Without `handle` it takes the keys, and a named `<div>` item is a `button`.",
-      ru: "`<li>` в `ul` / `ol`, `<tr>` в `tbody`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Один элемент; нажатия на элементы управления внутри не тянут его. Без `handle` клавиши работают на нём, а названный `<div>` — это `button`.",
+      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<th>` inside `tr`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item; presses on controls inside never drag. Without `handle` it takes the keys, and a named `<div>` item is a `button`.",
+      ru: "`<li>` в `ul` / `ol`, `<tr>` в `tbody`, `<th>` в `tr`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Один элемент; нажатия на элементы управления внутри не тянут его. Без `handle` клавиши работают на нём, а названный `<div>` — это `button`.",
       props: [
         {
           name: "id",
@@ -160,6 +160,13 @@ export const api: ComponentApi = {
           default: "false",
           en: "Holds its place: it does not move and nothing is put where it would shift it. Its `Dnd.Handle` turns into a lock. A pinned first row, a system column.",
           ru: "Держит своё место: не сдвигается, и ничто не ставится так, чтобы его сместить. Его `Dnd.Handle` становится замком. Закреплённая первая строка, системная колонка.",
+        },
+        {
+          name: "dragFromControls",
+          type: "boolean",
+          default: "false",
+          en: "Without `handle`: a press on a control inside picks the item up too once it travels (a finger: holds); a click stays the control's. A table header whose sort button fills it.",
+          ru: "Без `handle`: нажатие на контрол внутри тоже берёт элемент, когда указатель сдвинулся (пальцем — задержать); клик остаётся контролу. Заголовок таблицы с кнопкой сортировки.",
         },
         {
           name: "className",

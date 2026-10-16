@@ -306,8 +306,15 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - Records of one shape that a person adds, edits and removes are a `FieldList`: one row per record,
   the column headings once above the rows, small attributes (an icon, then its color) in `compact`
   columns. Never a label in every row, never numbered labels, never one record split over lines.
-  FieldList draws every row's actions itself — the remove inside the field of a one-column list, a
-  pinned row's remove off with its reason (`labels.lockedReason`) — so never add your own.
+  FieldList draws every row's actions itself — the remove «×» and the handle after it, a pinned
+  row's remove off with its reason (`labels.lockedReason`) — so never add your own.
+- The row's actions (`rowActions`): `"buttons"` (default) for short lists edited often on a desktop,
+  where moving rows is a main task — remove and handle in sight on every row; `"menu"` — one «⋯» with
+  «Выше», «Ниже», «Удалить» — for dense rows (three or more columns), touch-heavy screens, or a row
+  that would carry more than remove and move.
+- The look (`variant`): `"plain"` (default) when the list is the content of its card or section;
+  `"surface"` when the list stands among other fields of a form or card, so its rows read as one
+  block apart from the fields around it.
 - One value in several units is one row of fields under one heading, each unit in its field's
   `Input.InlineAffix`; a base value with overrides is one `FieldList` with the base pinned first.
   The shape of the data decides the layout: [ux.md](ux.md#2-the-shape-of-the-data-decides-the-layout).
@@ -343,9 +350,12 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 ### Controls of a table
 
-- The column chooser is part of the table: `columnsMenu` puts it at the end of the header row — in
-  the head cell of a trailing row-actions column (`hideHeader`), else in a narrow cell of its own —
-  and it sticks with `stickyLastColumn`. Give the key column and the actions column `hideable: false`.
+- The column chooser has one place per table. Over the row actions: `columnsMenu` puts the icon
+  trigger in the head cell of the row-actions column (the last column, `hideHeader`), and it sticks
+  with `stickyLastColumn`. A table without row actions gets no chooser cell in its header: the
+  chooser is `<DataTableColumnsMenu>` in the page's `Page.Tools` (or the host's toolbar), bound to
+  the same `hiddenColumns` / `columnOrder` state the table reads. Give the key column and the
+  actions column `hideable: false`.
 - The DataTable `toolbar` holds several controls of the table itself: a bulk bar of the selected
   rows, or the search and filters of a table that is not the page's main region (a table in a
   section of a record, in a Drawer).

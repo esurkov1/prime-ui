@@ -106,17 +106,25 @@ function apply(table: HTMLTableElement, frozen: Frozen, { cols, measured, minimu
 export function useFrozenColumns(
   tableRef: React.RefObject<HTMLTableElement | null>,
   rootRef: React.RefObject<HTMLDivElement | null>,
-  /** Changes with the column set: widths start from scratch. */
-  columnsKey: string,
+  /**
+   * One key per `<col>`, in order. A new set of columns starts the widths from scratch; the same
+   * set in another order (columns that changed places, a carried column's gap) keeps every
+   * column's width and only moves it, so nothing reflows while columns reorder.
+   */
+  slots: readonly string[],
   /** Changes with the rendered rows: widths widen when content no longer fits. */
   rowsKey: unknown,
   /** Real rows are on screen (not loading, empty or error). */
   ready: boolean,
 ) {
   /** The widths, and the columns and rows they were last checked against. */
-  const frozen = React.useRef<Frozen & { columnsKey: string; rowsKey: unknown }>({
+  const columnsKey = slots.join("\u0000");
+  const frozen = React.useRef<
+    Frozen & { columnsKey: string; slots: readonly string[]; rowsKey: unknown }
+  >({
     widths: null,
     columnsKey,
+    slots,
     rowsKey: undefined,
   });
 
@@ -151,7 +159,23 @@ export function useFrozenColumns(
     const table = tableRef.current;
     if (!table) return;
     if (frozen.current.columnsKey !== columnsKey) {
+      const before = frozen.current.slots;
+      const widths = frozen.current.widths;
       frozen.current.columnsKey = columnsKey;
+      frozen.current.slots = slots;
+      const moved =
+        widths !== null &&
+        before.length === slots.length &&
+        slots.every((slot) => before.includes(slot));
+      if (moved) {
+        // Every column keeps its width at its new place.
+        const next = slots.map((slot) => widths[before.indexOf(slot)] ?? 0);
+        colsOf(table).forEach((col, index) => {
+          if (col.dataset.grow !== "true") col.style.width = `${next[index]}px`;
+        });
+        frozen.current.widths = next;
+        return;
+      }
       unfreeze(table, frozen.current);
     }
     if (!ready) return;
@@ -169,5 +193,5 @@ export function useFrozenColumns(
         return;
       }
     }
-  }, [tableRef, columnsKey, rowsKey, ready]);
+  }, [tableRef, columnsKey, slots, rowsKey, ready]);
 }

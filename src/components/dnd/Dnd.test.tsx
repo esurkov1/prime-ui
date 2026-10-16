@@ -1587,6 +1587,166 @@ describe('table rows (`as="tbody"`)', () => {
   });
 });
 
+describe('table columns (`as="tr"`)', () => {
+  const COLUMN_WIDTH = 100;
+  /** Head cells line up left to right, 100 px each; a carried one keeps its column. */
+  function stubColumns() {
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const placed = (node: Element) =>
+        node.hasAttribute("data-dnd-item") || node.hasAttribute("data-column");
+      let box = { left: 0, top: 0, width: 400, height: 200 };
+      if (placed(this) && this.parentElement) {
+        const cells = Array.from(this.parentElement.children).filter(placed);
+        box = { left: cells.indexOf(this) * COLUMN_WIDTH, top: 0, width: COLUMN_WIDTH, height: 30 };
+      }
+      return {
+        ...box,
+        right: box.left + box.width,
+        bottom: box.top + box.height,
+        x: box.left,
+        y: box.top,
+        toJSON: () => ({}),
+      };
+    });
+  }
+
+  function Columns({
+    onSort,
+    onMove,
+  }: {
+    onSort?: (id: string) => void;
+    onMove?: (id: string, before: string | null) => void;
+  }) {
+    const [ids, setIds] = React.useState(["a", "b", "c"]);
+    return (
+      <Dnd.Root>
+        <table>
+          <thead>
+            <Dnd.Sortable
+              as="tr"
+              axis="x"
+              aria-label="columns"
+              items={ids}
+              getId={(id) => id}
+              onReorder={(id, before) => {
+                onMove?.(id, before);
+                setIds((current) => moveBefore(current, id, before, (x) => x));
+              }}
+              header={<td data-testid="lead" />}
+              renderItem={(id) => (
+                <Dnd.SortableItem id={id} data-testid={`head-${id}`} dragFromControls>
+                  <button type="button" onClick={() => onSort?.(id)}>
+                    {id}
+                  </button>
+                </Dnd.SortableItem>
+              )}
+            />
+          </thead>
+          <tbody>
+            <tr data-testid="body-row">
+              {ids.map((id) => (
+                <td key={id} data-column={id}>
+                  {id}1
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </Dnd.Root>
+    );
+  }
+
+  const heads = () =>
+    Array.from(screen.getByLabelText("columns").querySelectorAll("th[data-dnd-item]")).map((cell) =>
+      cell.getAttribute("data-dnd-item"),
+    );
+  const bodyCells = () =>
+    Array.from(screen.getByTestId("body-row").children).map((cell) =>
+      cell.getAttribute("data-column"),
+    );
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    stubColumns();
+  });
+
+  it("renders th items after the leading cells; the carried one keeps its column, the body stays", async () => {
+    render(<Columns />);
+    const row = screen.getByLabelText("columns");
+    expect(row.tagName).toBe("TR");
+    expect(row.firstElementChild).toBe(screen.getByTestId("lead"));
+    expect(screen.getByTestId("head-a").tagName).toBe("TH");
+    // A press on the button inside travels: the header is carried (`dragFromControls`).
+    pressOn(within(screen.getByTestId("head-c")).getByRole("button"), 250, 10);
+    moveTo(20, 10);
+    expect(screen.getByTestId("head-c")).toHaveAttribute("data-lifted");
+    // No gap node: every head cell stays in its column, and the body does not move mid-drag.
+    expect(document.querySelector("[data-dnd-gap]")).toBeNull();
+    expect(heads()).toEqual(["a", "b", "c"]);
+    expect(bodyCells()).toEqual(["a", "b", "c"]);
+    await act(async () => {
+      releaseAt(20, 10);
+    });
+    expect(heads()).toEqual(["c", "a", "b"]);
+    expect(bodyCells()).toEqual(["c", "a", "b"]);
+  });
+
+  it("carries the head cell alone, in a copy of its table", () => {
+    render(<Columns />);
+    pressOn(within(screen.getByTestId("head-b")).getByRole("button"), 150, 10);
+    moveTo(20, 10);
+    const copy = document.querySelector("[data-dnd-overlay] table");
+    expect(copy?.querySelector("thead th")).toHaveTextContent("b");
+    expect(copy?.querySelector("tbody")).toBeNull();
+    expect(copy?.querySelector("[data-dnd-item]")).toBeNull();
+    releaseAt(20, 10);
+  });
+
+  it("Escape takes the move back: nothing reorders", () => {
+    const onMove = vi.fn();
+    render(<Columns onMove={onMove} />);
+    pressOn(within(screen.getByTestId("head-a")).getByRole("button"), 50, 10);
+    moveTo(280, 10);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.getByTestId("head-a")).not.toHaveAttribute("data-lifted");
+    releaseAt(280, 10);
+    expect(onMove).not.toHaveBeenCalled();
+    expect(heads()).toEqual(["a", "b", "c"]);
+  });
+
+  it("a click without travel stays the control's; the click that ends a drag never is", async () => {
+    const onSort = vi.fn();
+    render(<Columns onSort={onSort} />);
+    const button = within(screen.getByTestId("head-a")).getByRole("button");
+    pressOn(button, 50, 10);
+    releaseAt(50, 10);
+    fireEvent.click(button);
+    expect(onSort).toHaveBeenCalledTimes(1);
+    pressOn(button, 50, 10);
+    moveTo(250, 10);
+    await act(async () => {
+      releaseAt(250, 10);
+    });
+    fireEvent.click(within(screen.getByTestId("head-a")).getByRole("button"));
+    expect(onSort).toHaveBeenCalledTimes(1);
+  });
+
+  it("moves a column with Alt + ← / → from the header and announces its place", () => {
+    render(<Columns />);
+    const head = screen.getByTestId("head-a");
+    expect(head).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowLeft Alt+ArrowRight");
+    fireEvent.keyDown(within(head).getByRole("button"), { key: "ArrowRight", altKey: true });
+    expect(heads()).toEqual(["b", "a", "c"]);
+    expect(
+      screen.getAllByRole("status").some((n) => n.textContent?.includes("a: позиция 2 из 3")),
+    ).toBe(true);
+    fireEvent.keyDown(screen.getByTestId("head-a"), { key: "ArrowLeft", altKey: true });
+    expect(heads()).toEqual(["a", "b", "c"]);
+  });
+});
+
 describe("one session", () => {
   it("a Dnd.Root inside another is its children: one live region, one overlay", () => {
     render(

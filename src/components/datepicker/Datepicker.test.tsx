@@ -3,7 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { Datepicker, datepickerPresets, formatDateValue, YEARLESS_YEAR } from "./Datepicker";
-import { matchPreset, monthGrid, parseTime, rowsNeeded } from "./datepickerModel";
+import {
+  DEFAULT_DATEPICKER_PRESETS,
+  matchPreset,
+  monthGrid,
+  parseTime,
+  rowsNeeded,
+} from "./datepickerModel";
 import { resolvePanelLayout } from "./panelLayout";
 
 const TODAY = new Date(2026, 9, 7); // 7 October 2026, a Wednesday
@@ -48,6 +54,13 @@ describe("datepickerModel", () => {
       "lastMonth",
     );
     expect(matchPreset(groups, new Date(2026, 8, 2), new Date(2026, 8, 30), TODAY)).toBeNull();
+  });
+
+  it("the default periods end with «Всё время»", () => {
+    const last = DEFAULT_DATEPICKER_PRESETS[DEFAULT_DATEPICKER_PRESETS.length - 1];
+    expect(last?.key).toBe("allTime");
+    expect(last?.label).toBe("Всё время");
+    expect(matchPreset(DEFAULT_DATEPICKER_PRESETS, null, TODAY, TODAY)?.key).toBe("allTime");
   });
 });
 

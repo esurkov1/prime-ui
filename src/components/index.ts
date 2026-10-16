@@ -217,6 +217,11 @@ export type {
 } from "./data-table/DataTable";
 export { DataTable } from "./data-table/DataTable";
 export type {
+  DataTableColumnsMenuLabels,
+  DataTableColumnsMenuProps,
+} from "./data-table/DataTableColumnsMenu";
+export { DataTableColumnsMenu } from "./data-table/DataTableColumnsMenu";
+export type {
   DatepickerLabels,
   DatepickerPanelProps,
   DatepickerPreset,

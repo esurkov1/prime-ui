@@ -137,11 +137,23 @@
       "expected_output": "One Page.Root with its Page.TopBar (Page.Title «Заказы»); a DataTable with columnsMenu, hiddenColumns kept with onHiddenColumnsChange in local storage, the key column «Заказ» and the actions column hideable: false, the actions column last with hideHeader and stickyLastColumn — the chooser sits in that column's head cell. The DataTable has no toolbar.",
       "files": [],
       "expectations": [
-        "The column chooser is the DataTable columnsMenu prop — it stands in the table's header row, not in a toolbar, Page.Actions or a hand-built Dropdown of checkboxes",
+        "The column chooser is the DataTable columnsMenu prop, because the table has a row-actions column: it stands in that column's head cell, not in a toolbar, Page.Actions or a hand-built Dropdown of checkboxes",
+        "No chooser cell of its own in the header: had the table no ⋯ column, the chooser would be DataTableColumnsMenu in Page.Tools on the same hiddenColumns, never columnsMenu",
         "The DataTable has no toolbar prop at all: no bar above the table holds a single control",
         "hiddenColumns and onHiddenColumnsChange keep the choice (local storage or the user's settings) and pass it back",
         "The «Заказ» column and the ⋯ actions column are hideable: false; the actions column is last, with hideHeader, and the table sets stickyLastColumn",
         "No count, export or other control is added in a bar above the table; anything of the page sits in its Page.TopBar"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "В форме договора с клиентом добавь этапы оплаты: название этапа, срок в днях, доля в процентах. Этапы можно переставлять, аванс всегда первый. Рядом в той же карточке — поля «Валюта» и «Комментарий».",
+      "expected_output": "A FieldList of three columns with rowActions=\"menu\" (dense rows), reorderable, the advance pinned by getLocked; variant=\"surface\" because the list stands among other fields of the card.",
+      "files": [],
+      "expectations": [
+        "The stages are a FieldList with reorderable and the advance pinned by getLocked",
+        "The rows use rowActions=\"menu\" (one «⋯» per row), not a hand-made menu or a remove button drawn beside the fields",
+        "The list sets variant=\"surface\" so it reads apart from the other fields of the card, not a Card or a border drawn around it"
       ]
     }
   ]

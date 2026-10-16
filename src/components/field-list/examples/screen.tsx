@@ -1,4 +1,4 @@
-/** A record editor as a document page, a long form whose title, description and save stand in the content header and whose blocks are titled cards one under another: a plan's name, its specs and prices; repeating records as FieldList rows with the headings once, an icon and its color side by side, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. */
+/** A record editor as a document page, a long form whose title, description and save stand in the content header and whose blocks are titled cards one under another: a plan's name, its specs and prices; repeating records as FieldList rows with the headings once, an icon and its color side by side, a base price pinned above its changes, the price list on its own fill among the fields of its card, one value in three currencies in one row — `getLocked`, `compact`, `variant`. */
 import {
   Button,
   Card,
@@ -243,6 +243,7 @@ export default function FieldListScreenExample() {
           <Card.Body className={styles.groups}>
             <Fieldset label="За месяц" disabled={saving}>
               <FieldList
+                variant="surface"
                 columns={PRICE_COLUMNS}
                 value={periods}
                 onValueChange={setPeriods}

@@ -6,6 +6,7 @@ import {
 import { formatLabel } from "@/internal/formatLabel";
 import { DRAG_HOLD_MS, DRAG_THRESHOLD_PX, PRESS_SLOP_PX } from "@/internal/longPress";
 import { swallowNextClick } from "@/internal/swallowNextClick";
+import { layoutRect } from "@/internal/useFlipList";
 import { distanceBetween, type Point, type Rect, rectContains, rectOf } from "./geometry";
 
 import { DND_LABELS, type DndLabels } from "./labels";
@@ -288,7 +289,8 @@ export function createDragController(
     active.over?.leave();
     // A source that leaves the layout while lifted measures as nothing, so the rect it had when the
     // drag began is what the overlay flies back to.
-    const current = element.isConnected ? rectOf(element) : null;
+    // Its layout box: a source kept in place may be drawn shifted aside (a carried head cell).
+    const current = element.isConnected ? layoutRect(element) : null;
     const origin = current && current.width > 0 ? current : active.origin;
     active = null;
     detach();

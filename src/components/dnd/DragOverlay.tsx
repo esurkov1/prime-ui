@@ -80,6 +80,35 @@ function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect):
   return sheet;
 }
 
+/**
+ * A head cell (`as="tr"`) flies alone, in a copy of its table with one column fixed at its width,
+ * its head row and its row group: the styles its table gives it reach the copy. Returns the table,
+ * which carries the lift.
+ */
+function inHeadCopy(cell: HTMLTableCellElement, copy: HTMLElement, origin: Rect): HTMLElement {
+  const sheet = (cell.closest("table")?.cloneNode(false) ??
+    document.createElement("table")) as HTMLElement;
+  sheet.style.tableLayout = "fixed";
+  sheet.style.width = `${origin.width}px`;
+  sheet.style.minWidth = "0";
+  sheet.style.maxWidth = "none";
+  sheet.style.margin = "0";
+  const column = document.createElement("col");
+  column.style.width = `${origin.width}px`;
+  const columns = document.createElement("colgroup");
+  columns.append(column);
+  const row = (cell.parentElement?.cloneNode(false) ?? document.createElement("tr")) as HTMLElement;
+  row.append(copy);
+  const group = (cell.parentElement?.parentElement?.cloneNode(false) ??
+    document.createElement("thead")) as HTMLElement;
+  group.append(row);
+  sheet.append(columns, group);
+  // A head cell painted with a see-through fill flies on the surface it was lifted from.
+  const layer = getComputedStyle(cell).getPropertyValue("--prime-color-layer-current").trim();
+  if (layer) sheet.style.backgroundColor = layer;
+  return sheet;
+}
+
 function cloneFor(preview: DragPreview): HTMLElement {
   const clone = preview.element.cloneNode(true) as HTMLElement;
   clone.style.width = `${preview.origin.width}px`;
@@ -93,9 +122,16 @@ function cloneFor(preview: DragPreview): HTMLElement {
     if (layer) clone.style.backgroundColor = layer;
   }
   const row = preview.element instanceof HTMLTableRowElement ? preview.element : null;
-  const lifted = row ? inTableCopy(row, clone, preview.origin) : clone;
+  const cell = preview.element instanceof HTMLTableCellElement ? preview.element : null;
+  const lifted = row
+    ? inTableCopy(row, clone, preview.origin)
+    : cell
+      ? inHeadCopy(cell, clone, preview.origin)
+      : clone;
   const outer = inHostCopy(
-    row ? (row.closest("table")?.parentElement ?? null) : preview.element.parentElement,
+    row || cell
+      ? (preview.element.closest("table")?.parentElement ?? null)
+      : preview.element.parentElement,
     lifted,
   );
   outer.setAttribute("aria-hidden", "true");

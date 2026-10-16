@@ -60,8 +60,8 @@ export type RowShared<Row> = {
   stickyFirstColumn: boolean;
   /** The last visible column sticks to the end edge (row actions). */
   stickyLastColumn: boolean;
-  /** A trailing cell under the head's column chooser (`columnsMenu` with no row-actions column). */
-  menuCell: boolean;
+  /** A trailing utility cell ends every row: the row grip (`reorderHandle="end"`). */
+  endCell: boolean;
   striped: boolean;
   totalColumns: number;
   /**
@@ -76,7 +76,7 @@ export type RowShared<Row> = {
   scaleDomains: Map<string, [number, number]>;
   selection: RowSelectionHandlers;
   toggleExpanded: (key: React.Key) => void;
-  /** Row reordering (`onReorder`): a handle column and sortable rows; null without it. */
+  /** Row reordering (`onReorder`): sortable rows with a grip cell or a row grip; null without it. */
   reorder: RowReorderShared | null;
 };
 
@@ -204,11 +204,11 @@ function DataTableRowImpl<Row>({
             : undefined
         }
       >
-        {shared.reorder ? (
+        {shared.reorder?.handle === "start" ? (
           <ReorderHandleCell
             reorder={shared.reorder}
             rowLabel={rowLabel}
-            className={lead}
+            className={cx(lead, styles.handleCell)}
             wrap={folded}
           />
         ) : null}
@@ -217,6 +217,8 @@ function DataTableRowImpl<Row>({
           <td
             className={cx(lead, styles.selectCell)}
             data-select-index={index}
+            // A row that is its own grip: a press here paints the selection, never carries the row.
+            data-dnd-ignore={shared.reorder?.handle === "row" ? "" : undefined}
             onPointerDown={(event) => selection.onPointerDown(index, event)}
             onClick={(event) => selection.onClick(index, event)}
           >
@@ -301,12 +303,24 @@ function DataTableRowImpl<Row>({
             </td>
           );
         })}
-        {shared.menuCell ? (
+        {shared.reorder?.handle === "end" ? (
+          <ReorderHandleCell
+            reorder={shared.reorder}
+            rowLabel={rowLabel}
+            className={cx(
+              styles.cell,
+              styles.endCell,
+              shared.stickyLastColumn && styles.endCellSticky,
+              enter,
+            )}
+            wrap={folded}
+          />
+        ) : shared.endCell ? (
           <td
             className={cx(
               styles.cell,
-              styles.menuCell,
-              shared.stickyLastColumn && styles.menuCellSticky,
+              styles.endCell,
+              shared.stickyLastColumn && styles.endCellSticky,
               enter,
             )}
           >
@@ -408,10 +422,10 @@ type MeasureBodyProps<Row> = {
   columns: DataTableColumn<Row>[];
   selectable: boolean;
   expandEnabled: boolean;
-  /** A leading column of row handles (`onReorder`). */
-  reorderable: boolean;
-  /** A trailing cell under the head's column chooser. */
-  menuCell: boolean;
+  /** A leading column of row grips (`reorderHandle="start"`). */
+  gripStart: boolean;
+  /** A trailing utility cell (the end grip, the column chooser). */
+  endCell: boolean;
 };
 
 /**
@@ -423,8 +437,8 @@ export function MeasureBody<Row>({
   columns,
   selectable,
   expandEnabled,
-  reorderable,
-  menuCell,
+  gripStart,
+  endCell,
 }: MeasureBodyProps<Row>) {
   return (
     <tbody className={styles.measureBody} aria-hidden="true" inert>
@@ -435,7 +449,7 @@ export function MeasureBody<Row>({
           style={{ "--dt-depth": depth } as React.CSSProperties}
           data-level={depth > 0 ? depth : undefined}
         >
-          {reorderable ? <td className={cx(styles.cell, styles.handleCell)} /> : null}
+          {gripStart ? <td className={cx(styles.cell, styles.handleCell)} /> : null}
           {selectable ? <td className={cx(styles.cell, styles.selectCell)} /> : null}
           {expandEnabled ? <td className={cx(styles.cell, styles.toggleCell)} /> : null}
           {columns.map((column, columnIndex) => (
@@ -450,7 +464,7 @@ export function MeasureBody<Row>({
               {renderCell(row, column, false)}
             </td>
           ))}
-          {menuCell ? <td className={cx(styles.cell, styles.menuCell)} /> : null}
+          {endCell ? <td className={cx(styles.cell, styles.endCell)} /> : null}
         </tr>
       ))}
     </tbody>

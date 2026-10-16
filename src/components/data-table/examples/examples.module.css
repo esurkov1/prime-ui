@@ -73,3 +73,17 @@
   min-width: 0;
   margin-inline: auto;
 }
+
+/* A table under the tools of its page: the column chooser (`DataTableColumnsMenu`) at the end. */
+.withTools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.tools {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}

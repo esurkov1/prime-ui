@@ -309,6 +309,11 @@ function contentOffenders(dir: string, file: string, source: string): string[] {
   ) {
     offenders.push(`${file}: fields with a submit and no <form>`);
   }
+  // The header chooser stands only over a row-actions column; without one, the page's tools hold
+  // `DataTableColumnsMenu`.
+  if (/<DataTable\b[^>]*\scolumnsMenu\b/.test(body) && !/hideHeader:\s*true/.test(body)) {
+    offenders.push(`${file}: columnsMenu without a row-actions column (DataTableColumnsMenu)`);
+  }
   for (const toolbar of dataTableToolbars(body)) {
     const controls = [...toolbar.matchAll(TABLE_TOOLBAR_CONTROL)].reduce(
       // SmartFilter.Toolbar is a search with filters; a mapped row is several controls.

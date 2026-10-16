@@ -107,8 +107,8 @@
   display: none;
 }
 
-/* A table row draws its focus on its cells (the table's own style); an outline on a row is clipped. */
-.draggable:not(tr):focus-visible {
+/* A table row or head cell draws its own focus (the table's style, inset); an outline is clipped. */
+.draggable:not(tr, th):focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
@@ -145,6 +145,22 @@ li.placeholder {
   border-radius: var(--dnd-gap-radius, 0);
   background: var(--prime-color-accent-soft);
   pointer-events: none;
+}
+
+/* A head row (`as="tr"`) keeps its cells in their columns: the carried cell stays in the layout and
+   is the gap — the same dashed, tinted slot as `.placeholder`, in the cell's own box and shape (an
+   inset outline, so the column keeps its width) — shifted with the others, by transforms, to where it will land. */
+th.draggable[data-lifted] {
+  display: table-cell;
+  outline: var(--prime-border-width) dashed var(--prime-color-accent-default);
+  outline-offset: var(--prime-focus-offset-inset);
+  background: var(--prime-color-accent-soft);
+  /* The gap at full strength, not the faded source of a spatial drag. */
+  opacity: 1;
+}
+
+th.draggable[data-lifted] > * {
+  visibility: hidden;
 }
 
 /* A refusing table body tints its cells. */

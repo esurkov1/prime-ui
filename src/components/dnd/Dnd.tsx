@@ -21,9 +21,10 @@ import {
   type DragOutcome,
 } from "./dragSession";
 import { type Point, type Rect, rectOf } from "./geometry";
+import { useInPlaceShift } from "./inPlaceRow";
 import { DND_LABELS, type DndLabels } from "./labels";
 import { useStoreSelector } from "./store";
-import { useDragSource } from "./useDragSource";
+import { DRAG_FROM_CONTROLS, useDragSource } from "./useDragSource";
 import { useDropTarget } from "./useDropTarget";
 import { useSortableList } from "./useSortableList";
 
@@ -190,13 +191,14 @@ DndHandle.displayName = "Dnd.Handle";
 // Sortable
 // ---------------------------------------------------------------------------------------------
 
-type ItemTag = "div" | "li" | "tr";
+type ItemTag = "div" | "li" | "tr" | "th";
 
-const ITEM_TAG: Record<"div" | "ul" | "ol" | "tbody", ItemTag> = {
+const ITEM_TAG: Record<"div" | "ul" | "ol" | "tbody" | "tr", ItemTag> = {
   div: "div",
   ul: "li",
   ol: "li",
   tbody: "tr",
+  tr: "th",
 };
 
 type SortableContextValue = {
@@ -236,7 +238,7 @@ export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "child
   kind?: string;
   canDrop?: (id: string) => boolean | string;
   empty?: React.ReactNode;
-  as?: "div" | "ul" | "ol" | "tbody";
+  as?: "div" | "ul" | "ol" | "tbody" | "tr";
   "aria-label"?: string;
   header?: React.ReactNode;
   children?: React.ReactNode;
@@ -285,6 +287,8 @@ function DndSortable<T>({
     disabled,
     handleOnly: handle,
     canDrop,
+    // A head row keeps its cells in their columns: the others glide aside by transforms instead.
+    inPlace: ITEM_TAG[Tag] === "th",
   });
 
   const byId = React.useMemo(
@@ -305,15 +309,21 @@ function DndSortable<T>({
     [list.itemProps, disabled, handle, itemTag, shortcuts, list.pending],
   );
 
-  const placeholder = list.gap ? (
-    <DndPlaceholder
-      as={itemTag}
-      width={list.gap.width}
-      height={list.gap.height}
-      radius={list.gap.radius}
-      key="dnd-gap"
-    />
-  ) : null;
+  // A head row inserts no gap node: the carried cell holds its column and is drawn as the gap, and
+  // it and the others glide to where they will stand (`useInPlaceShift`).
+  const inPlace = itemTag === "th";
+  const [rowElement, setRowElement] = React.useState<HTMLElement | null>(null);
+  useInPlaceShift(inPlace ? rowElement : null, list.order, list.draggingId, list.gapBefore);
+  const placeholder =
+    list.gap && itemTag !== "th" ? (
+      <DndPlaceholder
+        as={itemTag}
+        width={list.gap.width}
+        height={list.gap.height}
+        radius={list.gap.radius}
+        key="dnd-gap"
+      />
+    ) : null;
 
   // During a drag `index` is the place an item will have on release, so a position it shows (a
   // number) follows the gap as it moves, not only the drop.
@@ -352,15 +362,19 @@ function DndSortable<T>({
   }
 
   const { ref: targetRef, ...targetData } = list.containerProps;
-  const ref = useMergedRefs<HTMLElement | null>(targetRef, forwardedRef);
+  const ref = useMergedRefs<HTMLElement | null>(targetRef, forwardedRef, setRowElement);
   return (
     <SortableContext value={context}>
       <Tag
         ref={ref}
         {...rest}
         {...targetData}
-        // A table body keeps its table layout: the list look (flex column, gap) is for the others.
-        className={cx(Tag === "tbody" ? styles.sortableRows : styles.sortable, className)}
+        // A table body or a head row keeps its table layout: the list look (flex column, gap) is
+        // for the others.
+        className={cx(
+          Tag === "tbody" || Tag === "tr" ? styles.sortableRows : styles.sortable,
+          className,
+        )}
         data-axis={axis}
         data-disabled={disabled || undefined}
         data-dragging={list.draggingId !== null || undefined}
@@ -419,10 +433,13 @@ export type DndSortableItemProps = {
   id: string;
   disabled?: boolean;
   locked?: boolean;
+  dragFromControls?: boolean;
   className?: string;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
-} & Omit<React.HTMLAttributes<HTMLElement>, "id">;
+} & Omit<React.HTMLAttributes<HTMLElement>, "id"> &
+  // A head cell item (`as="tr"`) says what it heads.
+  Pick<React.ThHTMLAttributes<HTMLTableCellElement>, "scope">;
 
 /**
  * One item of a `Dnd.Sortable`. Renders `li` inside `ul` / `ol`, `tr` inside `tbody`, `div` otherwise.
@@ -432,6 +449,7 @@ function DndSortableItem({
   id,
   disabled: itemDisabled = false,
   locked = false,
+  dragFromControls = false,
   className,
   children,
   onPointerDown,
@@ -493,6 +511,7 @@ function DndSortableItem({
       data-locked={locked || undefined}
       data-pending={busy || undefined}
       data-handle={context.handle || undefined}
+      {...{ [DRAG_FROM_CONTROLS]: (dragFromControls && !context.handle) || undefined }}
     >
       <ItemContext value={item}>{children}</ItemContext>
     </Tag>
@@ -550,7 +569,7 @@ function DndPlaceholder({
   height,
   radius,
 }: {
-  as: ItemTag;
+  as: Exclude<ItemTag, "th">;
   width: number;
   height: number;
   radius: string | null;

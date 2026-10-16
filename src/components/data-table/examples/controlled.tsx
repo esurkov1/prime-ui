@@ -1,6 +1,13 @@
 /** Sort, page and the column choice owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`, `hiddenColumns`, `onHiddenColumnsChange`. */
-import { DataTable, type DataTableColumn, type DataTableSortState } from "prime-ui-kit";
+import {
+  DataTable,
+  type DataTableColumn,
+  DataTableColumnsMenu,
+  type DataTableSortState,
+} from "prime-ui-kit";
 import * as React from "react";
+
+import styles from "./examples.module.css";
 
 type Order = { id: number; customer: string; city: string; total: number };
 
@@ -48,21 +55,29 @@ export default function DataTableControlledExample() {
   const [hiddenColumns, setHiddenColumns] = React.useState<string[]>(["city"]);
 
   return (
-    <DataTable
-      columns={COLUMNS}
-      rows={ORDERS}
-      getRowKey={(row) => row.id}
-      columnsMenu
-      hiddenColumns={hiddenColumns}
-      onHiddenColumnsChange={setHiddenColumns}
-      sort={sort}
-      onSortChange={(next) => {
-        setSort(next);
-        setPage(1);
-      }}
-      page={page}
-      onPageChange={setPage}
-      pageSize={5}
-    />
+    <div className={styles.withTools}>
+      <div className={styles.tools}>
+        <DataTableColumnsMenu
+          columns={COLUMNS}
+          hiddenColumns={hiddenColumns}
+          onHiddenColumnsChange={setHiddenColumns}
+        />
+      </div>
+      <DataTable
+        columns={COLUMNS}
+        rows={ORDERS}
+        getRowKey={(row) => row.id}
+        hiddenColumns={hiddenColumns}
+        onHiddenColumnsChange={setHiddenColumns}
+        sort={sort}
+        onSortChange={(next) => {
+          setSort(next);
+          setPage(1);
+        }}
+        page={page}
+        onPageChange={setPage}
+        pageSize={5}
+      />
+    </div>
   );
 }

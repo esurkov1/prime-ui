@@ -1,13 +1,15 @@
 /*
- * FieldList — an editable list of records of one shape (foundation §1 rule 3: proximity, no lines).
- * One grid track list for the heading row and every row (`--fl-columns`, set per row so a row
- * carried by Dnd keeps its tracks): [the columns] [end: remove] [grip: handle or lock]. Every row
- * has the same slots: a pinned row's remove stands there, off. A one-column list has no end track:
- * its remove is the last segment of the field (`fieldCell`). The column
- * headings stand once above the rows; the fields inside carry them as hidden labels (`fieldCell`).
- * In a narrow container (`prime-field-list`, < 30rem) the heading row goes, every row stacks its
- * fields into one column and each field shows its label (FieldFrame). The totals row
- * (`renderTotals`) stands under the rows on the same tracks.
+ * FieldList — an editable list of records of one shape, read as one table of fields.
+ * One track list for the heading row, every row and the totals row (`--fl-columns`, set per row
+ * so a row carried by Dnd keeps its tracks): [the columns] [end: remove or menu] [grip: handle or
+ * lock]. Every row has the same slots: a pinned row's remove stands there, off. The rows stand
+ * edge to edge on the sheet, a faint line between two rows inset by the side padding
+ * (`hairline.between`); on a surface, a field-tone fill under the pointer. `variant="surface"` puts the sheet on a fill of
+ * its own, one step up the surface ladder (`data-depth`); `plain` leaves it on the host surface.
+ * The column headings stand once above the rows; the fields inside carry them as hidden labels
+ * (`fieldCell`). In a narrow container (`prime-field-list`, < 30rem) the heading row goes, a row
+ * puts its compact columns, its first field and its actions on the first line and the rest under
+ * them, and each field shows its label (FieldFrame).
  */
 /* A size container cannot take its width from its content: the list fills its column. */
 .root {
@@ -23,6 +25,26 @@
   min-width: 0;
 }
 
+/* The sheet holds the heading row, the rows and the totals; `--fl-pad` is its side padding, carried
+   by each row so the row wash reaches the sheet's edges and the lines stop short of them. */
+.sheet {
+  --fl-pad: var(--prime-space-0);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sheet[data-variant="surface"] {
+  --fl-pad: var(--prime-space-3);
+  padding-block-end: var(--prime-space-1);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-layer-current);
+}
+
+.sheet[data-empty] {
+  padding-block-end: var(--prime-space-0);
+}
+
 /*
  * Tracks, from the field tier of the row (`fieldTierClass` + `data-size` on it); FieldList.tsx
  * lists them per column. The row's field height and label line are kept here, resolved on the row,
@@ -35,26 +57,61 @@
   --fl-m: calc(var(--prime-space-24) * 2);
   --fl-row-h: var(--field-h);
   --fl-label-lh: var(--field-label-lh);
+  --fl-label-gap: var(--field-label-gap);
   display: grid;
   grid-template-columns: var(--fl-columns);
   align-items: start;
   column-gap: var(--prime-space-3);
   min-width: 0;
+  padding: var(--prime-space-2) var(--fl-pad);
+}
+
+/* The lines between rows stop at the side padding (a plain sheet keeps the hairline's own 0%: the
+   unitless `--prime-space-0` cannot stand in its calc). */
+.sheet[data-variant="surface"] .row {
+  --hairline-inset: var(--fl-pad);
 }
 
 .rows {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-3);
   min-width: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* The heading row sits at the label gap above the first row, as a label above its field. */
+/* A row of fields: a wash under the pointer, over the whole row. */
+.record {
+  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+.sheet[data-variant="plain"] .record {
+  border-radius: var(--prime-radius-m);
+}
+
+/* On a surface the row takes the fill of a field and its fields take the surface's: the step
+   between them stays, turned over (a wash on top of the field fill would melt the fields into the
+   row). A plain list has no side padding, so a row fill would sit flush against its fields: there
+   only the controls answer the pointer. */
+@media (hover: hover) {
+  .sheet[data-variant="surface"] .record:hover {
+    --prime-color-field-bg: var(--prime-color-layer-current);
+    background-color: var(--prime-color-fill-muted);
+  }
+}
+
+/* The heading row: the label gap above the first row's fields. */
 .head {
-  margin-block-end: calc(var(--field-label-gap) - var(--prime-space-3));
+  padding-block-end: var(--prime-space-0);
+}
+
+.sheet[data-variant="surface"] .head {
+  padding-block-start: var(--prime-space-3);
+}
+
+.sheet[data-variant="plain"] .head {
+  padding-block-start: var(--prime-space-0);
 }
 
 /* On wide rows the cells are the row's own grid items, under their headings. */
@@ -80,7 +137,8 @@
   width: max-content;
 }
 
-/* Handle, lock and remove sit on the middle of the first line of fields, not of a grown row. */
+/* Handle, lock and the action button sit on the middle of the first line of fields, not of a
+   grown row. */
 .grip,
 .end {
   display: flex;
@@ -100,10 +158,6 @@
  * of its column, its text where the field's text sits (the start, or the end for a field that ends
  * its number there); the first cell without a total names the row («Итого»).
  */
-.totals {
-  padding-block-start: var(--prime-space-3);
-}
-
 .total {
   display: flex;
   align-items: center;
@@ -150,8 +204,11 @@
 }
 
 /*
- * Narrow container: no heading row; a row is [its fields in one column] [remove] [grip], rows a
- * group apart so each record reads as one block.
+ * Narrow container: no heading row. A row is [the compact columns] [the first field] [the actions]
+ * on its first line and every other field on a line of its own under them, each field with its
+ * label. The first field keeps a least width (measured in FieldList.tsx, `data-stack` on the body):
+ * too narrow beside the actions, the actions end the second line, after the next field; too narrow
+ * even without them, the field takes a line of its own under the compact columns and the actions.
  */
 /* The width FieldFrame shows a cell field's own label at (`FieldFrame.module.css`). */
 @container prime-field-list (width < 30rem) {
@@ -159,38 +216,76 @@
     display: none;
   }
 
-  .rows {
-    gap: var(--prime-space-6);
-  }
-
-  /* A one-column row stays one field: nothing stacks, the rows keep the wide gap. */
-  .rows:has(> [data-single]) {
-    gap: var(--prime-space-3);
-  }
-
-  .row {
+  .record {
     grid-template-columns: var(--fl-stacked);
+    row-gap: var(--prime-space-4);
+    padding-block: var(--prime-space-3);
   }
 
-  /* The remove button and the handle stand on the line of the first field's label; a one-column
-     row shows no label, so they stay on the middle of its field. */
-  .row:not([data-single]) > :is(.grip, .end) {
-    height: var(--fl-label-lh);
+  .record .cell:is([data-place="value"], [data-place="rest"]) {
+    grid-column: 1 / -1;
   }
 
-  .cells {
-    display: flex;
-    flex-direction: column;
-    gap: var(--prime-space-4);
-    min-width: 0;
+  .record > .end {
+    grid-row: 1;
+    grid-column: var(--fl-end-column);
+  }
+
+  .record > .grip {
+    grid-row: 1;
+    grid-column: calc(var(--fl-end-column) + 1);
+  }
+
+  /* The actions stand on the line of the fields, under their labels; a one-column row shows no
+     label, so they stay on the middle of its field. */
+  .record:not([data-single]) > :is(.grip, .end) {
+    margin-block-start: calc(var(--fl-label-lh) + var(--fl-label-gap));
+  }
+
+  /* `data-stack="actions"`: the main field keeps the first line to its end; the actions end the
+     second line, after the value field. */
+  .body[data-stack="actions"] .record .cell[data-place="main"] {
+    grid-row: 1;
+    grid-column: var(--fl-main-column) / -1;
+  }
+
+  .body[data-stack="actions"] .record .cell[data-place="value"] {
+    grid-row: 2;
+    grid-column: 1 / var(--fl-end-column);
+  }
+
+  .body[data-stack="actions"] .record > :is(.end, .grip) {
+    grid-row: 2;
+  }
+
+  /* `data-stack="main"`: the compact columns and the actions keep the first line; the main field
+     takes the full width under them. */
+  .body[data-stack="main"] .record .cell[data-place="main"] {
+    grid-row: 2;
+    grid-column: 1 / -1;
   }
 
   /* Stacked totals: a line per total, its column name at the start and the value at the end
      (whatever the alignment of the wide row). */
+  .totals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .totals > :is(.end, .grip) {
+    display: none;
+  }
+
+  .totals .cells {
+    display: flex;
+    flex-direction: column;
+    gap: var(--prime-space-2);
+    min-width: 0;
+  }
+
   .totals .total {
     justify-content: space-between;
     min-height: auto;
-    padding-inline: 0;
+    padding-inline: var(--prime-space-0);
   }
 
   .total[data-empty] {

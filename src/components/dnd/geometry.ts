@@ -59,7 +59,9 @@ export function insertionBefore(
   const position = axis === "y" ? point.y : point.x;
   let gapShift = 0;
   for (const node of ownNodes(container, `${itemSelector}, ${DROP_GAP_SELECTOR}`)) {
-    if (node.hasAttribute("data-lifted")) continue;
+    // A lifted item leaves the layout (its gap stands for it); a head cell kept in its column
+    // (`as="tr"`) stays and counts like the gap.
+    if (node.hasAttribute("data-lifted") && node.tagName !== "TH") continue;
     const rect = layoutRect(node);
     if (rect.width === 0 && rect.height === 0) continue;
     if (node.matches(DROP_GAP_SELECTOR) || node.dataset.dndItem === liftedId) {

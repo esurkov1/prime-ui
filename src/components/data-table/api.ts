@@ -18,8 +18,8 @@ export const api: ComponentApi = {
         {
           name: "hiddenColumns",
           type: "string[]",
-          en: "Ids of columns that are not rendered, controlled. A column with `hideable: false` stays. The column chooser (`columnsMenu`) changes it.",
-          ru: "Id колонок, которые не выводятся, управляемо. Колонка с `hideable: false` остаётся. Меняет его выбор колонок (`columnsMenu`).",
+          en: "Ids of columns that are not rendered, controlled. A column with `hideable: false` stays. The column chooser (`columnsMenu`, `DataTableColumnsMenu`) changes it.",
+          ru: "Id колонок, которые не выводятся, управляемо. Колонка с `hideable: false` остаётся. Меняет его выбор колонок (`columnsMenu`, `DataTableColumnsMenu`).",
         },
         {
           name: "defaultHiddenColumns",
@@ -35,11 +35,29 @@ export const api: ComponentApi = {
           ru: "Скрытые колонки изменились (`columnsMenu`). Кит ничего не хранит: сохраните список (local storage, настройки пользователя) и передайте обратно, чтобы вернуть выбор.",
         },
         {
+          name: "columnOrder",
+          type: "string[]",
+          en: "Column ids in screen order, hidden ones keeping their place, controlled. Any prop of this triad makes columns reorder: a header drag (the body stays until the drop), Alt + ← / → on a header, grips in the column chooser.",
+          ru: "Id колонок в порядке на экране, скрытые сохраняют место, управляемо. Любой проп тройки включает перестановку: перетаскивание заголовка (тело стоит до сброса), Alt + ← / → на нём, ручки в выборе колонок.",
+        },
+        {
+          name: "defaultColumnOrder",
+          type: "string[]",
+          en: "Initial column order, uncontrolled; `[]` — the order of `columns`, reorderable.",
+          ru: "Начальный порядок колонок без контроля; `[]` — порядок `columns`, с перестановкой.",
+        },
+        {
+          name: "onColumnOrderChange",
+          type: "(columnOrder: string[]) => void",
+          en: "The order changed: a header dropped, a keyboard move, a chooser grip or «Исходный порядок». The kit stores nothing: keep it with `hiddenColumns` and pass it back.",
+          ru: "Порядок изменился: заголовок отпустили, ход с клавиатуры, ручка в выборе колонок или «Исходный порядок». Кит ничего не хранит: сохраните его вместе с `hiddenColumns` и передайте обратно.",
+        },
+        {
           name: "columnsMenu",
           type: "boolean",
           default: "false",
-          en: "The column chooser at the end of the header row: in the head cell of a trailing row-actions column (`hideHeader`), else in a cell of its own; sticks with `stickyLastColumn`. Needs `showHeader`.",
-          ru: "Выбор колонок в конце строки заголовков: в заголовке последней колонки действий (`hideHeader`), иначе в своей ячейке; закрепляется со `stickyLastColumn`. Нужен `showHeader`.",
+          en: "The column chooser in the head of the row-actions column (the last one, `hideHeader`); reorders with `columnOrder`. Without that column it renders nothing and warns: use `DataTableColumnsMenu` in the page's tools.",
+          ru: "Выбор колонок в заголовке колонки действий (последней, `hideHeader`); с `columnOrder` переставляет. Без такой колонки ничего не выводит и предупреждает: возьмите `DataTableColumnsMenu` в инструменты страницы.",
         },
         {
           name: "rows",
@@ -195,8 +213,15 @@ export const api: ComponentApi = {
         {
           name: "onReorder",
           type: "(id: Key, beforeId: Key | null) => void | Promise<void>",
-          en: "Rows reorder by a leading handle column. Row `id` goes in front of `beforeId` (`null` = last); apply it with `moveBefore`, return a promise to save. Off while sorted by a column.",
-          ru: "Перестановка строк за ведущую колонку с ручками. Строка `id` встаёт перед `beforeId` (`null` — в конец); применяйте через `moveBefore`, верните промис для сохранения. Выключено при сортировке по колонке.",
+          en: "Rows reorder (by a grip, see `reorderHandle`). Row `id` goes in front of `beforeId` (`null` = last); apply it with `moveBefore`, return a promise to save. Off while sorted by a column.",
+          ru: "Перестановка строк (за ручку, см. `reorderHandle`). Строка `id` встаёт перед `beforeId` (`null` — в конец); применяйте через `moveBefore`, верните промис для сохранения. Выключено при сортировке по колонке.",
+        },
+        {
+          name: "reorderHandle",
+          type: '"start" | "end" | "row"',
+          default: '"end"',
+          en: "Where a row is picked up (`onReorder`): `end` — a grip ends the row; `start` — a grip column leads it; `row` — no grip, the whole row is carried and takes Alt + ↑ / ↓ itself.",
+          ru: "За что берут строку (`onReorder`): `end` — ручка в конце строки; `start` — колонка ручек в начале; `row` — без ручки, строку переносят целиком, Alt + ↑ / ↓ принимает она сама.",
         },
         {
           name: "getRowChildren",
@@ -419,6 +444,65 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "DataTableColumnsMenu",
+      en: "Generic `DataTableColumnsMenu<Row>`; `ref` → `HTMLButtonElement`. The column chooser outside the table, for the page's tools: a soft Button «Колонки» with the count of shown columns, opening the same menu as `columnsMenu`. Bound to the table's state.",
+      ru: "Выбор колонок вне таблицы, для инструментов страницы: мягкая кнопка «Колонки» с числом показанных колонок, открывает то же меню, что `columnsMenu`. Связан с состоянием таблицы.",
+      props: [
+        {
+          name: "columns",
+          type: "DataTableColumn<Row>[]",
+          required: true,
+          en: "The table's `columns`, in the order of the code.",
+          ru: "`columns` таблицы в порядке кода.",
+        },
+        {
+          name: "hiddenColumns",
+          type: "string[]",
+          required: true,
+          en: "The ids the table hides: the same list its `hiddenColumns` reads.",
+          ru: "Скрытые колонки: тот же список, что читает `hiddenColumns` таблицы.",
+        },
+        {
+          name: "onHiddenColumnsChange",
+          type: "(hiddenColumns: string[]) => void",
+          required: true,
+          en: "A column was shown or hidden, or «Показать все».",
+          ru: "Колонку показали или скрыли, или нажали «Показать все».",
+        },
+        {
+          name: "columnOrder",
+          type: "string[]",
+          en: "The table's `columnOrder`.",
+          ru: "`columnOrder` таблицы.",
+        },
+        {
+          name: "onColumnOrderChange",
+          type: "(columnOrder: string[]) => void",
+          en: "Turns the items into a sortable list (a grip, Alt + ↑ / ↓) with «Исходный порядок»; the new order of every column.",
+          ru: "Делает пункты сортируемым списком (ручка, Alt + ↑ / ↓) с «Исходный порядок»; новый порядок всех колонок.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+          en: "Tier of the trigger and the menu.",
+          ru: "Ярус кнопки и меню.",
+        },
+        {
+          name: "labels",
+          type: "Partial<DataTableColumnsMenuLabels>",
+          en: "The chooser's strings: `columns`, `showColumns`, `showAllColumns`, `resetColumnOrder`, `reorderColumn`.",
+          ru: "Строки выбора: `columns`, `showColumns`, `showAllColumns`, `resetColumnOrder`, `reorderColumn`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type">',
+          en: "`className` and the other attributes of the trigger button.",
+          ru: "`className` и остальные атрибуты кнопки.",
+        },
+      ],
+    },
   ],
   types: [
     {
@@ -526,6 +610,13 @@ export const api: ComponentApi = {
           ru: "Колонку можно скрыть через `hiddenColumns` и `columnsMenu`; `false` — для ключевой колонки, которая называет строку, и для колонки действий.",
         },
         {
+          name: "reorderable",
+          type: "boolean",
+          default: "true",
+          en: "The column moves when columns reorder (`columnOrder`); `false` holds its place: no column moves past it, the chooser shows a lock. A `hideHeader` column and a pinned first or last column (`stickyFirstColumn`, `stickyLastColumn`) hold theirs too.",
+          ru: "Колонка переставляется (`columnOrder`); `false` держит место: ни одна колонка её не обходит, в выборе колонок — замок. Колонка с `hideHeader` и закреплённые первая и последняя (`stickyFirstColumn`, `stickyLastColumn`) тоже держат место.",
+        },
+        {
           name: "scale",
           type: "boolean | { min?: number; max?: number }",
           en: "Heatmap: each cell is shaded by its numeric value on the five-step chart scale. `true` spans the column's minimum to maximum over all rows; `{ min, max }` fixes either end.",
@@ -579,12 +670,24 @@ export const api: ComponentApi = {
       ru: "Имя переключателя раскрытой строки.",
     },
     columns: {
-      en: "Name and tooltip of the column chooser trigger (`columnsMenu`); `{shown}` and `{total}` are column counts.",
-      ru: "Имя и подсказка кнопки выбора колонок (`columnsMenu`); `{shown}` и `{total}` — число колонок.",
+      en: "Name and tooltip of the icon trigger (`columnsMenu`), the text of `DataTableColumnsMenu`; `{shown}` and `{total}` are column counts.",
+      ru: "Имя и подсказка кнопки-иконки (`columnsMenu`), текст `DataTableColumnsMenu`; `{shown}` и `{total}` — число колонок.",
+    },
+    showColumns: {
+      en: "The heading of the chooser's list of columns.",
+      ru: "Заголовок списка колонок в выборе.",
     },
     showAllColumns: {
       en: "The column chooser item that shows every column again.",
       ru: "Пункт выбора колонок, который возвращает все колонки.",
+    },
+    resetColumnOrder: {
+      en: "The column chooser item that puts the order of `columns` back (`columnOrder`).",
+      ru: "Пункт выбора колонок, который возвращает порядок `columns` (`columnOrder`).",
+    },
+    reorderColumn: {
+      en: "Name of a column's grip in the column chooser (`columnOrder`); `{label}` is its header.",
+      ru: "Имя ручки колонки в выборе колонок (`columnOrder`); `{label}` — её заголовок.",
     },
     reorderRow: {
       en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`.",
@@ -611,8 +714,8 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
-        en: "Moves through the toolbar, sort buttons, the column chooser (`columnsMenu`), row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination.",
-        ru: "Переходит по панели, кнопкам сортировки, выбору колонок (`columnsMenu`), ручкам строк, флажкам, переключателям раскрытия, ссылкам строк, строкам, которые открываются на месте, и Pagination.",
+        en: 'Moves through the toolbar, sort buttons, plain headers that move their column (`columnOrder`), the column chooser (`columnsMenu`, `DataTableColumnsMenu`), row handles, checkboxes, expand toggles, row links, rows that open in place or move themselves (`reorderHandle="row"`) and Pagination.',
+        ru: 'Переходит по панели, кнопкам сортировки, обычным заголовкам, которые переставляют колонку (`columnOrder`), выбору колонок (`columnsMenu`, `DataTableColumnsMenu`), ручкам строк, флажкам, переключателям раскрытия, ссылкам строк, строкам, которые открываются на месте или переставляются сами (`reorderHandle="row"`), и Pagination.',
       },
       {
         keys: "Enter · Space",
@@ -631,19 +734,28 @@ export const api: ComponentApi = {
       },
       {
         keys: "Alt + ↑ · Alt + ↓",
-        en: "On a row handle (`onReorder`), moves the row one place up or down.",
-        ru: "На ручке строки (`onReorder`) переставляет строку на место выше или ниже.",
+        en: 'On a row handle, or on the row itself with `reorderHandle="row"` (`onReorder`), moves the row one place up or down; on an item of the column chooser (`columnOrder`), moves that column one place.',
+        ru: 'На ручке строки или на самой строке при `reorderHandle="row"` (`onReorder`) переставляет строку на место выше или ниже; на пункте выбора колонок (`columnOrder`) — эту колонку на одно место.',
+      },
+      {
+        keys: "Alt + ← · Alt + →",
+        en: 'On a header (its sort button, or the plain header) with `columnOrder`, moves the column one place back or on; focus stays on it. A column that holds its place does not move and no column steps over it. The direction follows the writing direction (`dir="rtl"`: ← goes on).',
+        ru: 'На заголовке (его кнопке сортировки или самом обычном заголовке) с `columnOrder` переставляет колонку на место назад или вперёд; фокус остаётся на ней. Колонка, которая держит место, не двигается, и через неё не переступают. Направление следует письму (`dir="rtl"`: ← — вперёд).',
       },
       {
         keys: "Escape",
-        en: "Cancels a row drag; the row goes back to its place.",
-        ru: "Отменяет перетаскивание строки, она возвращается на место.",
+        en: "Cancels a row drag or a header drag; the row or the headers glide back, the body never moved.",
+        ru: "Отменяет перетаскивание строки или заголовка; строка или заголовки возвращаются, тело не двигалось.",
       },
     ],
     aria: [
       {
-        en: 'Native `<table>` semantics; head cells are `scope="col"` (the empty handle-column cell is a `<td>`); sortable heads hold a `<button>` and expose `aria-sort`; the whole head cell shows the inset focus ring.',
-        ru: 'Семантика нативной `<table>`; заголовки — `scope="col"` (пустая ячейка колонки ручек — `<td>`); у сортируемых — `<button>` и `aria-sort`; вся ячейка заголовка показывает внутреннее кольцо фокуса.',
+        en: 'Native `<table>` semantics; head cells are `scope="col"` (the head cells of the grip columns are `<td>`); sortable heads hold a `<button>` and expose `aria-sort`; the whole head cell shows the inset focus ring.',
+        ru: 'Семантика нативной `<table>`; заголовки — `scope="col"` (ячейки шапки над колонками ручек — `<td>`); у сортируемых — `<button>` и `aria-sort`; вся ячейка заголовка показывает внутреннее кольцо фокуса.',
+      },
+      {
+        en: "With `columnOrder` the head row is a `Dnd.Sortable`: a header that moves its column carries `aria-keyshortcuts` on its focus target (the sort button; a plain header is a tab stop of its own with Dnd's role description); a pick-up, a drop and a keyboard move are announced by Dnd («Сумма: позиция 3 из 7»). In the column chooser each item keeps `menuitemcheckbox` with `aria-keyshortcuts`, its grip (`labels.reorderColumn`) is out of the Tab order, a column that holds its place shows a lock named «Закреплено».",
+        ru: "С `columnOrder` строка шапки — `Dnd.Sortable`: заголовок, который переставляет колонку, несёт `aria-keyshortcuts` на своей цели фокуса (кнопке сортировки; обычный заголовок — отдельная остановка Tab с описанием роли от Dnd); взятие, сброс и ход с клавиатуры объявляет Dnd («Сумма: позиция 3 из 7»). В выборе колонок пункт остаётся `menuitemcheckbox` с `aria-keyshortcuts`, его ручка (`labels.reorderColumn`) вне порядка Tab, колонка, которая держит место, показывает замок «Закреплено».",
       },
       {
         en: 'A link row has one link for assistive tech: the `<a>` in the key cell, named by its text. Its copies over the other cells are `aria-hidden` and `tabindex="-1"`, so the pointer can use the whole row. An in-place row is focusable itself (`tabindex="0"`) and reads as its cells. Either way the focused row shows a ring around all its cells.',
@@ -658,8 +770,8 @@ export const api: ComponentApi = {
         ru: 'Заголовок группы — `<th scope="rowgroup">` во всю ширину, первым в своём `<tbody>`.',
       },
       {
-        en: "The column chooser (`columnsMenu`) is a menu button named by `labels.columns` (its tooltip says the same): `menuitemcheckbox` items with `aria-checked`; the key column is `aria-disabled`. In the row-actions head cell the column keeps its own name (`aria-labelledby`); its own trailing cell is a `<td>`.",
-        ru: "Выбор колонок (`columnsMenu`) — кнопка меню с именем `labels.columns` (подсказка повторяет его): пункты `menuitemcheckbox` с `aria-checked`; ключевая колонка выключена (`aria-disabled`). В заголовке колонки действий колонка сохраняет своё имя (`aria-labelledby`); собственная ячейка в конце — `<td>`.",
+        en: "The column chooser is a menu button: the icon one (`columnsMenu`) named by `labels.columns` (its tooltip says the same), `DataTableColumnsMenu` by its text and count. Its items are a group named `labels.showColumns` of `menuitemcheckbox` with `aria-checked`; the key column is `aria-disabled`. In the row-actions head cell the column keeps its own name (`aria-labelledby`).",
+        ru: "Выбор колонок — кнопка меню: иконка (`columnsMenu`) с именем `labels.columns` (подсказка повторяет его), `DataTableColumnsMenu` — по своему тексту и числу. Пункты — группа `labels.showColumns` из `menuitemcheckbox` с `aria-checked`; ключевая колонка выключена (`aria-disabled`). В заголовке колонки действий колонка сохраняет своё имя (`aria-labelledby`).",
       },
       {
         en: "Row checkboxes are named by `labels.selectRow` with `{label}` from `getRowLabel` (pass it so the names are unique); the head checkbox by `labels.selectAll`, `indeterminate` on a partial selection.",
@@ -670,8 +782,8 @@ export const api: ComponentApi = {
         ru: "После смены выбора вежливая область объявляет `labels.selectedCount`; выбранные строки — `aria-selected`.",
       },
       {
-        en: "A row handle is a button named by `labels.reorderRow` with `aria-keyshortcuts`; a pick-up, a drop and a keyboard move are announced in a polite live region («Договор: позиция 2 из 6»). While its move is saved the row is `aria-busy`; while the table is sorted the handles are disabled and a tooltip gives `labels.reorderSorted`.",
-        ru: "Ручка строки — кнопка с именем `labels.reorderRow` и `aria-keyshortcuts`; взятие, сброс и ход с клавиатуры объявляются вежливой областью («Этап: позиция 2 из 6»). Пока ход сохраняется, строка — `aria-busy`; при сортировке ручки неактивны, подсказка — `labels.reorderSorted`.",
+        en: 'A row handle is a button named by `labels.reorderRow` with `aria-keyshortcuts`; with `reorderHandle="row"` the row itself is the tab stop with `aria-keyshortcuts` and a role description, and reads as its cells. A pick-up, a drop and a keyboard move are announced in a polite live region («Договор: позиция 2 из 6»). While its move is saved the row is `aria-busy`; while the table is sorted the handles are disabled and a tooltip gives `labels.reorderSorted` (rows that are their own grip just stop moving).',
+        ru: 'Ручка строки — кнопка с именем `labels.reorderRow` и `aria-keyshortcuts`; при `reorderHandle="row"` остановка Tab — сама строка с `aria-keyshortcuts` и описанием роли, читается как свои ячейки. Взятие, сброс и ход с клавиатуры объявляются вежливой областью («Этап: позиция 2 из 6»). Пока ход сохраняется, строка — `aria-busy`; при сортировке ручки неактивны, подсказка — `labels.reorderSorted` (строки без ручки просто не двигаются).',
       },
       {
         en: "The expand toggle is a button with `aria-expanded`, `aria-controls` (detail row or sub-rows) and `labels.expand` / `labels.collapse`.",

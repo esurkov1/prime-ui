@@ -16,10 +16,10 @@ type StateRowsProps<Row> = {
   totalColumns: number;
   selectable: boolean;
   expandEnabled: boolean;
-  /** A leading column of row handles (`onReorder`). */
-  reorderable?: boolean;
-  /** A trailing cell under the head's column chooser. */
-  menuCell: boolean;
+  /** A leading column of row grips (`reorderHandle="start"`). */
+  gripStart: boolean;
+  /** A trailing utility cell (the end grip, the column chooser). */
+  endCell: boolean;
   loadError: React.ReactNode;
   empty: React.ReactNode;
   emptyLabel: string;
@@ -38,8 +38,8 @@ export function StateRows<Row>({
   totalColumns,
   selectable,
   expandEnabled,
-  reorderable = false,
-  menuCell,
+  gripStart,
+  endCell,
   loadError,
   empty,
   emptyLabel,
@@ -80,7 +80,7 @@ export function StateRows<Row>({
   return Array.from({ length: skeletonRows }, (_, rowIndex) => (
     // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
     <tr key={rowIndex} className={cx(styles.row, styles.skeletonRow)} data-skeleton="true">
-      {reorderable ? <td className={cx(styles.cell, styles.handleCell)} /> : null}
+      {gripStart ? <td className={cx(styles.cell, styles.handleCell)} /> : null}
       {selectable ? (
         <td className={cx(styles.cell, styles.selectCell)}>
           <Skeleton shape="block" className={styles.skeletonChoice} />
@@ -97,7 +97,7 @@ export function StateRows<Row>({
           <Skeleton className={styles.skeleton} />
         </td>
       ))}
-      {menuCell ? <td className={cx(styles.cell, styles.menuCell)} /> : null}
+      {endCell ? <td className={cx(styles.cell, styles.endCell)} /> : null}
     </tr>
   ));
 }

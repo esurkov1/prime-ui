@@ -196,6 +196,7 @@ export const DEFAULT_DATEPICKER_PRESETS: DatepickerPreset[] = [
   datepickerPresets.lastMonth,
   datepickerPresets.thisYear,
   datepickerPresets.lastYear,
+  datepickerPresets.allTime(),
 ];
 
 /** The preset that matches the selected days exactly. */

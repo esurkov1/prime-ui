@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { moveBefore } from "@/components/dnd/Dnd";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -10,6 +11,7 @@ import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
@@ -17,10 +19,12 @@ import { exitTimeoutMs } from "@/internal/motionTiming";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import { ColumnsMenu } from "./ColumnsMenu";
+import { useFlipList } from "@/internal/useFlipList";
+import { ColumnsMenu, type ColumnsMenuReorder, lockedInChooser } from "./ColumnsMenu";
+import { orderColumns, placeColumn } from "./columnOrder";
 import styles from "./DataTable.module.css";
 import { Footer } from "./Footer";
-import { Head } from "./Head";
+import { Head, type HeadColumnReorder } from "./Head";
 import { DataTableRow, GroupRow, MeasureBody, type RowShared } from "./Row";
 import { ReorderBody, ReorderRoot, useRowReorder } from "./reorder";
 import { type FlatRow, flatten, groupRows, nextSort, scaleDomains, sortRows } from "./rows";
@@ -69,8 +73,14 @@ export type DataTableLabels = {
   collapse: string;
   /** Name and tooltip of the column chooser (`columnsMenu`); `{shown}` and `{total}` are counts. */
   columns: string;
+  /** The heading of the column chooser's list of columns. */
+  showColumns: string;
   /** The column chooser item that shows every column again. */
   showAllColumns: string;
+  /** The column chooser item that puts the order of `columns` back (`columnOrder`). */
+  resetColumnOrder: string;
+  /** `aria-label` of a column's grip in the column chooser (`columnOrder`); `{label}` is its header. */
+  reorderColumn: string;
   /** `aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`. */
   reorderRow: string;
   /** Tooltip of the handles while the table is sorted by a column (reordering is off). */
@@ -95,7 +105,10 @@ export const DATA_TABLE_LABELS: DataTableLabels = {
   expand: "Развернуть строку {label}",
   collapse: "Свернуть строку {label}",
   columns: "Колонки",
+  showColumns: "Показывать",
   showAllColumns: "Показать все",
+  resetColumnOrder: "Исходный порядок",
+  reorderColumn: "Переместить колонку {label}",
   reorderRow: "Переместить строку {label}",
   reorderSorted: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
   expandGroup: "Развернуть группу {group}",
@@ -110,6 +123,9 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   hiddenColumns?: string[];
   defaultHiddenColumns?: string[];
   onHiddenColumnsChange?: (hiddenColumns: string[]) => void;
+  columnOrder?: string[];
+  defaultColumnOrder?: string[];
+  onColumnOrderChange?: (columnOrder: string[]) => void;
   columnsMenu?: boolean;
   rows: Row[];
   source?: "client" | "server";
@@ -152,6 +168,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   defaultSelected?: React.Key[];
   onSelectedChange?: (selected: React.Key[]) => void;
   onReorder?: (id: React.Key, beforeId: React.Key | null) => void | Promise<void>;
+  reorderHandle?: "start" | "end" | "row";
   getRowChildren?: (row: Row) => Row[] | undefined;
   renderExpanded?: (row: Row) => React.ReactNode;
   isRowExpandable?: (row: Row) => boolean;
@@ -183,6 +200,26 @@ const ONE_GROUP = () => 0;
 
 const domIdPart = (key: React.Key) => String(key).replace(/[^A-Za-z0-9_-]/g, "_");
 
+/** The head cells of the columns: they glide when the order changes from outside the head row. */
+const headCells = (table: HTMLElement) =>
+  table.querySelectorAll<HTMLElement>(":scope > thead > tr > [data-column-id]");
+const columnCellKey = (cell: HTMLElement) => cell.dataset.columnId;
+
+/**
+ * The columns that changed places between two orders of the same columns: the one that moved (a
+ * drop, a key, the chooser), or every one off its place (several moved at once, a reset).
+ */
+function movedColumns(before: readonly string[], after: readonly string[]): string[] {
+  if (before.length !== after.length || before.join("\u0000") === after.join("\u0000")) return [];
+  const set = new Set(before);
+  if (after.some((id) => !set.has(id))) return [];
+  const single = after.find((id) => {
+    const rest = (list: readonly string[]) => list.filter((each) => each !== id).join("\u0000");
+    return rest(before) === rest(after);
+  });
+  return single !== undefined ? [single] : after.filter((id, index) => before[index] !== id);
+}
+
 /**
  * `flat` while the rows on screen stay the same rows (by data, key and depth): a re-render that only
  * rebuilt it (an inline `getRowKey`, a selection) keeps the previous one, so the column widths are
@@ -210,6 +247,9 @@ export function DataTable<Row>({
   hiddenColumns,
   defaultHiddenColumns = EMPTY_IDS,
   onHiddenColumnsChange,
+  columnOrder,
+  defaultColumnOrder,
+  onColumnOrderChange,
   columnsMenu = false,
   rows,
   source = "client",
@@ -252,6 +292,7 @@ export function DataTable<Row>({
   defaultSelected = EMPTY_KEYS,
   onSelectedChange,
   onReorder,
+  reorderHandle = "end",
   getRowChildren,
   renderExpanded,
   isRowExpandable,
@@ -293,10 +334,86 @@ export function DataTable<Row>({
     onChange: onHiddenColumnsChange,
   });
   const hiddenSet = React.useMemo(() => new Set(hiddenIds), [hiddenIds]);
-  const columns = React.useMemo(() => {
-    if (hiddenSet.size === 0) return allColumns;
-    return allColumns.filter((column) => column.hideable === false || !hiddenSet.has(column.id));
-  }, [allColumns, hiddenSet]);
+  const visibleOf = React.useCallback(
+    (list: DataTableColumn<Row>[]) =>
+      hiddenSet.size === 0
+        ? list
+        : list.filter((column) => column.hideable === false || !hiddenSet.has(column.id)),
+    [hiddenSet],
+  );
+  // Columns reorder once the owner passes any of the triad (like folding groups): headers carry
+  // their columns, the chooser sorts its items. The kit stores nothing: the owner keeps the order.
+  const reorderColumns =
+    columnOrder !== undefined ||
+    defaultColumnOrder !== undefined ||
+    onColumnOrderChange !== undefined;
+  const [orderState, setOrderState] = useControllableState<string[]>({
+    value: columnOrder,
+    defaultValue: defaultColumnOrder ?? EMPTY_IDS,
+    onChange: onColumnOrderChange,
+  });
+  const orderedColumns = React.useMemo(
+    () => orderColumns(allColumns, orderState),
+    [allColumns, orderState],
+  );
+  const orderIds = React.useMemo(() => orderedColumns.map((column) => column.id), [orderedColumns]);
+  const orderedVisible = React.useMemo(
+    () => visibleOf(orderedColumns),
+    [visibleOf, orderedColumns],
+  );
+  const visibleIds = React.useMemo(
+    () => orderedVisible.map((column) => column.id),
+    [orderedVisible],
+  );
+  // Columns that hold their place: `reorderable: false`, the row actions (`hideHeader`, nothing to
+  // grab), and a pinned first or last column (it stays at its edge).
+  const lockedColumns = React.useMemo(() => {
+    const locked = lockedInChooser(allColumns as DataTableColumn<never>[]);
+    const first = orderedVisible[0];
+    const last = orderedVisible.at(-1);
+    if (stickyFirstColumn && first) locked.add(first.id);
+    if (stickyLastColumn && last) locked.add(last.id);
+    return locked;
+  }, [allColumns, orderedVisible, stickyFirstColumn, stickyLastColumn]);
+  const [tableElement, setTableElement] = React.useState<HTMLTableElement | null>(null);
+  const mergedTableRef = useMergedRefs(tableRef, setTableElement);
+  /**
+   * The visible order a move from the head row asked for (a drop, a key): the head row drew it
+   * already, so the head cells do not glide to it again.
+   */
+  const headMove = React.useRef<string | null>(null);
+  const refocusHead = React.useRef<HTMLElement | null>(null);
+  React.useLayoutEffect(() => {
+    const node = refocusHead.current;
+    if (!node) return;
+    refocusHead.current = null;
+    if (node.isConnected && document.activeElement !== node) {
+      node.focus({ focusVisible: true } as FocusOptions);
+    }
+  });
+  const headReorder = React.useMemo<HeadColumnReorder | null>(
+    () =>
+      reorderColumns
+        ? {
+            locked: lockedColumns,
+            onReorder: (id, beforeId) => {
+              // A keyboard move: the header (or its sort button) keeps the focus where it lands.
+              const focused = document.activeElement;
+              if (focused instanceof HTMLElement && tableRef.current?.tHead?.contains(focused)) {
+                refocusHead.current = focused;
+              }
+              const next = placeColumn(orderIds, visibleIds, id, beforeId, lockedColumns);
+              if (!next) return;
+              headMove.current = visibleOf(orderColumns(allColumns, next))
+                .map((column) => column.id)
+                .join("\u0000");
+              setOrderState(next);
+            },
+          }
+        : null,
+    [reorderColumns, lockedColumns, orderIds, visibleIds, setOrderState, visibleOf, allColumns],
+  );
+  const columns = orderedVisible;
   // Horizontal overflow of the viewport: the edge cue (shadows at the edges that hide columns).
   const edges = useEdgeOverflow(scrollRef, "horizontal");
 
@@ -361,6 +478,7 @@ export function DataTable<Row>({
 
   // ─── Reorder ───
   const reorder = useRowReorder({
+    handle: reorderHandle,
     onReorder,
     expandEnabled: Boolean(getRowChildren || renderExpanded),
     // The order on screen is the column's, not the manual one.
@@ -579,16 +697,30 @@ export function DataTable<Row>({
      table, so the body remounts under its state key and fades in; the first render, sorting and
      paging stay still (same state). A replaced server page (`rowArrival.batch`) swaps the same way. */
   const { key: bodyKey, className: swapClass } = useSwapIn(`${bodyState}-${rowArrival.batch}`);
-  // The column chooser lives in the head: in the header cell of a trailing row-actions column (the
-  // last visible column with `hideHeader`), else in a narrow cell of its own at the inline end.
-  const menuInHead = columnsMenu && showHeader;
-  const menuCell = menuInHead && columns.at(-1)?.hideHeader !== true;
+  // A row grip leads or ends its row (`reorderHandle`), or the row itself is the grip.
+  const rowHandle = reorder.enabled ? reorderHandle : null;
+  const gripStart = rowHandle === "start";
+  const gripEnd = rowHandle === "end";
+  // The column chooser stands in one place: the head cell of the row-actions column (the last
+  // visible column, `hideHeader`). A table without one shows it in the page's tools instead
+  // (`DataTableColumnsMenu`).
+  const actionsColumn = columns.at(-1)?.hideHeader === true;
+  const menuInHead = columnsMenu && showHeader && actionsColumn;
+  const misplacedMenu = columnsMenu && showHeader && !actionsColumn;
+  React.useEffect(() => {
+    if (!misplacedMenu) return;
+    console.warn(
+      "DataTable: `columnsMenu` stands in the head of a row-actions column (the last column, `hideHeader: true`). Without one, put `DataTableColumnsMenu` in the page's tools.",
+    );
+  }, [misplacedMenu]);
+  // The trailing utility cell holds the end grip.
+  const endCell = gripEnd;
   const totalColumns =
     columns.length +
-    (reorder.enabled ? 1 : 0) +
+    (gripStart ? 1 : 0) +
     (selectable ? 1 : 0) +
     (expandEnabled ? 1 : 0) +
-    (menuCell ? 1 : 0);
+    (endCell ? 1 : 0);
   const fillHeight = scrollHeight === "fill";
   const maxHeight = fillHeight
     ? undefined
@@ -658,13 +790,52 @@ export function DataTable<Row>({
     () => ({ rows: sameRows, first: firstRendered, last: lastRendered }),
     [sameRows, firstRendered, lastRendered],
   );
-  useFrozenColumns(
-    tableRef,
-    rootRef,
-    columns.map((column) => column.id).join("\u0000"),
-    renderedRows,
-    bodyState === "rows",
+  const slots = React.useMemo(
+    () => [
+      ...(gripStart ? ["\u0000grip"] : []),
+      ...(selectable ? ["\u0000select"] : []),
+      ...(expandEnabled ? ["\u0000toggle"] : []),
+      ...columns.map((column) => column.id),
+      ...(endCell ? ["\u0000end"] : []),
+    ],
+    [gripStart, selectable, expandEnabled, columns, endCell],
   );
+  // Widths are kept per column: a column that changes places (dropped, moved by its keys or in the
+  // chooser) keeps its width, so the head cells a drag drew aside are already where they land.
+  useFrozenColumns(tableRef, rootRef, slots, renderedRows, bodyState === "rows");
+
+  // A new column order. The head cells glide to it unless the head row drew it (Dnd: a drop, a
+  // key); the body is rebuilt once and the columns that changed places fade in there.
+  const visibleKey = visibleIds.join("\u0000");
+  const fromHead = headMove.current === visibleKey;
+  useFlipList({
+    container: reorderColumns ? tableElement : null,
+    nodes: headCells,
+    keyOf: columnCellKey,
+    layoutKey: visibleKey,
+    enabled: !fromHead,
+  });
+  const shownOrder = React.useRef(visibleIds);
+  React.useLayoutEffect(() => {
+    const before = shownOrder.current;
+    shownOrder.current = visibleIds;
+    headMove.current = null;
+    const table = tableRef.current;
+    if (!table || !reorderColumns) return;
+    for (const id of movedColumns(before, visibleIds)) {
+      for (const cell of table.querySelectorAll<HTMLElement>(
+        `:scope > tbody > tr > [data-column-id="${CSS.escape(id)}"]`,
+      )) {
+        cell.classList.remove(enterMotion.enterFade);
+        // A fresh start: the class may still be on the cell from a move a moment ago.
+        void cell.offsetWidth;
+        cell.classList.add(enterMotion.enterFade);
+        cell.addEventListener("animationend", () => cell.classList.remove(enterMotion.enterFade), {
+          once: true,
+        });
+      }
+    }
+  }, [visibleIds, reorderColumns]);
 
   const baseId = React.useId();
   const rowDomId = React.useCallback(
@@ -698,7 +869,7 @@ export function DataTable<Row>({
       expandEnabled,
       stickyFirstColumn,
       stickyLastColumn,
-      menuCell,
+      endCell,
       striped,
       totalColumns,
       openRow,
@@ -720,7 +891,7 @@ export function DataTable<Row>({
       expandEnabled,
       stickyFirstColumn,
       stickyLastColumn,
-      menuCell,
+      endCell,
       striped,
       totalColumns,
       openRow,
@@ -740,13 +911,29 @@ export function DataTable<Row>({
     infinite &&
     (infiniteRows.hasInternalMore || infiniteRows.loading || infiniteRows.canRequestMore);
 
+  const defaultOrder = allColumns.map((column) => column.id).join("\u0000");
+  const menuReorder: ColumnsMenuReorder | null = reorderColumns
+    ? {
+        locked: lockedColumns,
+        // Dnd holds the locked items and announces the item's new place in the menu itself.
+        onReorder: (id, beforeId) =>
+          setOrderState(moveBefore(orderIds, id, beforeId, (each) => each)),
+        reset:
+          orderIds.join("\u0000") === defaultOrder
+            ? null
+            : () => setOrderState(allColumns.map((column) => column.id)),
+      }
+    : null;
   const columnsMenuTrigger = menuInHead ? (
     <ColumnsMenu
-      columns={allColumns as DataTableColumn<never>[]}
+      columns={orderedColumns as DataTableColumn<never>[]}
       hidden={hiddenSet}
       setHidden={setHiddenIds}
+      reorder={menuReorder}
       labels={labels}
-      size={size}
+      // A control in the head sits one tier below the table, like the controls in its cells.
+      size={stepDown(size)}
+      trigger="icon"
     />
   ) : null;
 
@@ -849,7 +1036,7 @@ export function DataTable<Row>({
   };
 
   return (
-    <ReorderRoot enabled={reorder.enabled}>
+    <ReorderRoot enabled={reorder.enabled || (reorderColumns && showHeader)}>
       <SurfaceDepthProvider value={depth}>
         {tier.provide(
           <div
@@ -864,13 +1051,13 @@ export function DataTable<Row>({
               "sticky-header": stickyHeader,
               "sticky-first-column": stickyFirstColumn,
               "sticky-last-column": stickyLastColumn,
-              "menu-cell": menuCell || undefined,
               "table-width": columns.some((c) => c.grow) ? "grow" : fullWidth ? "fill" : "auto",
               "highlight-row": highlightRowOnHover,
               "highlight-column": highlightColumnOnHover,
               striped,
               loading: loading || undefined,
               reorderable: reorder.enabled || undefined,
+              "reorder-handle": rowHandle ?? undefined,
               selectable: selectable || undefined,
               expandable: expandEnabled || undefined,
               dragging: selection.dragging || undefined,
@@ -893,7 +1080,7 @@ export function DataTable<Row>({
                 style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
               >
                 <table
-                  ref={tableRef}
+                  ref={mergedTableRef}
                   className={cx(fieldTierClass, styles.table)}
                   data-size={stepDown(size)}
                   aria-busy={loading || infiniteRows.loading || undefined}
@@ -901,13 +1088,13 @@ export function DataTable<Row>({
                   {...columnHover}
                 >
                   <colgroup>
-                    {reorder.enabled ? <col /> : null}
+                    {gripStart ? <col /> : null}
                     {selectable ? <col /> : null}
                     {expandEnabled ? <col /> : null}
                     {columns.map((column) => (
                       <col key={column.id} data-grow={column.grow ? "true" : undefined} />
                     ))}
-                    {menuCell ? <col /> : null}
+                    {endCell ? <col /> : null}
                   </colgroup>
                   {showHeader ? (
                     <Head
@@ -920,9 +1107,10 @@ export function DataTable<Row>({
                       stickyHeader={stickyHeader}
                       expandEnabled={expandEnabled}
                       infoLabel={labels.columnInfo}
-                      reorderable={reorder.enabled}
+                      gripStart={gripStart}
                       columnsMenu={columnsMenuTrigger}
-                      menuCell={menuCell}
+                      endCell={endCell}
+                      reorder={headReorder}
                       selectAll={
                         selectable
                           ? {
@@ -944,6 +1132,7 @@ export function DataTable<Row>({
                           key={`group-${String(segment.key)}`}
                           entries={segment.rows}
                           start={segment.rows[0]?.index ?? 0}
+                          handle={rowHandle !== "row"}
                           locked={reorder.shared?.locked ?? false}
                           onReorder={reorder.reorderIn(segment.rows)}
                           getRowLabel={getRowLabel}
@@ -978,8 +1167,8 @@ export function DataTable<Row>({
                           totalColumns={totalColumns}
                           selectable={selectable}
                           expandEnabled={expandEnabled}
-                          reorderable={reorder.enabled}
-                          menuCell={menuCell}
+                          gripStart={gripStart}
+                          endCell={endCell}
                           loadError={loadError}
                           empty={empty}
                           emptyLabel={labels.empty}
@@ -998,8 +1187,8 @@ export function DataTable<Row>({
                       columns={columns}
                       selectable={selectable}
                       expandEnabled={expandEnabled}
-                      reorderable={reorder.enabled}
-                      menuCell={menuCell}
+                      gripStart={gripStart}
+                      endCell={endCell}
                     />
                   ) : null}
                 </table>

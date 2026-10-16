@@ -55,6 +55,11 @@ export type DataTableColumn<Row> = {
    */
   hideable?: boolean;
   /**
+   * The column can move when columns reorder (`columnOrder`). Default `true`; `false` holds its
+   * place: it never moves and no column moves past it.
+   */
+  reorderable?: boolean;
+  /**
    * Heatmap: each cell is shaded by its numeric value (`sortAccessor`, else `accessor`) on the
    * five-step chart scale (`--prime-color-chart-scale-1…5`); the value itself stays in the cell.
    * `true` spans the column's own minimum to maximum; `{ min, max }` fixes either end.

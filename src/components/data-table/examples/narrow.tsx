@@ -1,5 +1,6 @@
-/** A 320 px support queue: columns scroll inside the table with the first one pinned, the column chooser stays at the end of the header row, the footer reflows and the pager turns compact — `stickyFirstColumn`, `columnsMenu`, `size`. */
-import { Badge, DataTable, type DataTableColumn } from "prime-ui-kit";
+/** A 320 px support queue: columns scroll inside the table with the first one pinned, the column chooser stays in reach above it, the footer reflows and the pager turns compact — `stickyFirstColumn`, `DataTableColumnsMenu`, `size`. */
+import { Badge, DataTable, type DataTableColumn, DataTableColumnsMenu } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
@@ -31,17 +32,29 @@ const COLUMNS: DataTableColumn<Ticket>[] = [
 ];
 
 export default function DataTableNarrowExample() {
+  const [hidden, setHidden] = React.useState<string[]>([]);
+
   return (
     <div className={styles.narrow}>
-      <DataTable
-        size="s"
-        columns={COLUMNS}
-        rows={TICKETS}
-        getRowKey={(row) => row.id}
-        stickyFirstColumn
-        columnsMenu
-        pageSize={5}
-      />
+      <div className={styles.withTools}>
+        <div className={styles.tools}>
+          <DataTableColumnsMenu
+            size="s"
+            columns={COLUMNS}
+            hiddenColumns={hidden}
+            onHiddenColumnsChange={setHidden}
+          />
+        </div>
+        <DataTable
+          size="s"
+          columns={COLUMNS}
+          hiddenColumns={hidden}
+          rows={TICKETS}
+          getRowKey={(row) => row.id}
+          stickyFirstColumn
+          pageSize={5}
+        />
+      </div>
     </div>
   );
 }

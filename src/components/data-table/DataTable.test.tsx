@@ -1431,7 +1431,10 @@ describe("DataTable columns menu", () => {
     { id: "id", header: "Заказ", accessor: "id", hideable: false },
     { id: "client", header: "Клиент", accessor: "client" },
     { id: "city", header: "Город", accessor: "city" },
+    { id: "actions", header: "Действия", hideHeader: true, hideable: false, cell: () => "⋯" },
   ];
+  /** Without the row-actions column, whose head holds the chooser. */
+  const NO_ACTIONS = ORDER_COLUMNS.slice(0, 3);
 
   it("hides and shows columns through the triad; the key column stays", async () => {
     const user = userEvent.setup();
@@ -1465,18 +1468,22 @@ describe("DataTable columns menu", () => {
 
   it("never hides the last visible column; the trigger text takes {shown} and {total}", async () => {
     const user = userEvent.setup();
-    const columns = ORDER_COLUMNS.map((column) => ({ ...column, hideable: true }));
+    const columns = ORDER_COLUMNS.map((column) =>
+      column.id === "actions" ? column : { ...column, hideable: true },
+    );
     render(
       <DataTable
         rows={ORDERS}
         columns={columns}
-        hiddenColumns={["client", "city"]}
+        hiddenColumns={["id", "client"]}
         labels={{ columns: "Колонки: {shown} из {total}" }}
         columnsMenu
       />,
     );
-    await user.click(screen.getByRole("button", { name: "Колонки: 1 из 3" }));
-    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "Колонки: 2 из 4" }));
+    // «Город» is the last data column on screen; the actions column cannot be hidden.
+    expect(screen.getByRole("menuitemcheckbox", { name: "Город" })).not.toBeDisabled();
+    expect(screen.getByRole("menuitemcheckbox", { name: "Действия" })).toBeDisabled();
   });
 
   it("works from the keyboard: the menu opens on Enter, Space toggles a column", async () => {
@@ -1493,27 +1500,19 @@ describe("DataTable columns menu", () => {
     expect(screen.queryByRole("columnheader", { name: "Клиент" })).toBeNull();
   });
 
-  it("stands in a trailing cell of its own at the end of the head; every row gets the cell", () => {
-    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} columnsMenu />);
+  it("stands only over a row-actions column: without one, no chooser, no cell, and a warning", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<DataTable rows={ORDERS} columns={NO_ACTIONS} columnsMenu />);
+    expect(screen.queryByRole("button", { name: "Колонки" })).toBeNull();
     const [head, row] = screen.getAllByRole("row");
-    const headCells = within(head as HTMLElement).getAllByRole("cell");
-    expect(headCells).toHaveLength(1);
-    const menuCell = headCells[0] as HTMLElement;
-    expect(menuCell.tagName).toBe("TD");
-    expect(menuCell).toBe((head as HTMLElement).lastElementChild);
-    expect(within(menuCell).getByRole("button", { name: "Колонки" })).toBeInTheDocument();
-    expect((row as HTMLTableRowElement).cells).toHaveLength(ORDER_COLUMNS.length + 1);
-    expect((row as HTMLTableRowElement).lastElementChild).toHaveClass(styles.menuCell as string);
-    expect(screen.getByRole("table").querySelectorAll("col")).toHaveLength(
-      ORDER_COLUMNS.length + 1,
-    );
+    expect(within(head as HTMLElement).queryAllByRole("cell")).toHaveLength(0);
+    expect((row as HTMLTableRowElement).cells).toHaveLength(NO_ACTIONS.length);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("DataTableColumnsMenu"));
+    warn.mockRestore();
   });
 
   it("sits in the head cell of a row-actions column, which keeps its own name; no extra cell", () => {
-    const columns: DataTableColumn<Order>[] = [
-      ...ORDER_COLUMNS,
-      { id: "actions", header: "Действия", hideHeader: true, hideable: false, cell: () => "⋯" },
-    ];
+    const columns = ORDER_COLUMNS;
     render(<DataTable rows={ORDERS} columns={columns} columnsMenu stickyLastColumn />);
     const actions = screen.getByRole("columnheader", { name: "Действия" });
     expect(within(actions).getByRole("button", { name: "Колонки" })).toBeInTheDocument();
@@ -1521,18 +1520,6 @@ describe("DataTable columns menu", () => {
     const [head, row] = screen.getAllByRole("row");
     expect(within(head as HTMLElement).queryAllByRole("cell")).toHaveLength(0);
     expect((row as HTMLTableRowElement).cells).toHaveLength(columns.length);
-  });
-
-  it("sticks with stickyLastColumn: the trailing cell at the end edge, the last column before it", () => {
-    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} columnsMenu stickyLastColumn />);
-    const [head, row] = screen.getAllByRole("row");
-    expect((head as HTMLElement).lastElementChild).toHaveClass(styles.menuCellSticky as string);
-    expect((row as HTMLElement).lastElementChild).toHaveClass(styles.menuCellSticky as string);
-    expect(screen.getByRole("columnheader", { name: "Город" })).toHaveClass(
-      styles.lastColumnSticky as string,
-    );
-    const lastBeforeMenu = cssRule(CSS, '.root[data-menu-cell="true"] .lastColumnSticky');
-    expect(cssValue(lastBeforeMenu, "inset-inline-end")).toBe("var(--dt-menu-w)");
   });
 
   it("follows the head: no chooser without showHeader", () => {
@@ -2013,7 +2000,7 @@ describe("DataTable stacking ladder", () => {
       ".firstColumnSticky",
       ".stickyLead",
       ".lastColumnSticky",
-      ".menuCellSticky",
+      ".endCellSticky",
     ]) {
       expect(cssValue(cssRule(CSS, pinned), "position")).toBe("sticky");
       expect(cssValue(cssRule(CSS, pinned), "z-index")).toBe("var(--dt-z-column)");
@@ -2053,14 +2040,14 @@ describe("DataTable stacking ladder", () => {
         stickyHeader
         stickyFirstColumn
         stickyLastColumn
-        columnsMenu
+        onReorder={() => {}}
       />,
     );
     const head = document.querySelector("thead") as HTMLElement;
     expect(head).toHaveClass(styles.head as string);
     const cells = [...(head.querySelector("tr") as HTMLTableRowElement).cells];
-    const [select, first, middle, last, chooser] = cells;
-    for (const pinned of [select, first, last, chooser]) {
+    const [select, first, middle, last, grip] = cells;
+    for (const pinned of [select, first, last, grip]) {
       expect(pinned).toHaveClass(styles.cornerCellSticky as string);
       expect(pinned).not.toHaveClass(styles.headSticky as string);
     }
@@ -2075,7 +2062,7 @@ describe("DataTable stacking ladder", () => {
         selectable
         stickyFirstColumn
         stickyLastColumn
-        columnsMenu
+        onReorder={() => {}}
       />,
     );
     for (const cell of (document.querySelector("thead tr") as HTMLTableRowElement).cells) {
@@ -2084,31 +2071,31 @@ describe("DataTable stacking ladder", () => {
     }
   });
 
-  it("truncates the last head label inside its own cell, before the chooser's cell", () => {
+  it("truncates the last head label inside its own cell, before the end grips' cell", () => {
     render(
       <DataTable
         rows={rows.slice(0, 2)}
         columns={columns}
         paging="none"
         stickyLastColumn
-        columnsMenu
+        onReorder={() => {}}
       />,
     );
     const last = screen.getByRole("columnheader", { name: /Score/ });
-    const chooser = screen.getByRole("button", { name: /Колонки/ });
-    expect(last.contains(chooser)).toBe(false);
-    expect(last.nextElementSibling?.contains(chooser)).toBe(true);
+    expect(last.nextElementSibling).toHaveClass(styles.endCell as string);
     const label = cssRule(CSS, ".headLabel");
     expect(cssValue(label, "overflow")).toBe("hidden");
     expect(cssValue(label, "text-overflow")).toBe("ellipsis");
     expect(cssValue(label, "min-width")).toBe("0");
     expect(cssValue(cssRule(CSS, ".headTitle"), "min-width")).toBe("0");
     expect(cssValue(cssRule(CSS, ".sortButton"), "min-width")).toBe("0");
-    // The pinned last column stands exactly the chooser cell's width off the end edge.
-    const menu = cssRule(CSS, ".menuCell");
+    // The pinned last column stands exactly the trailing cell's width off the end edge.
+    const end = cssRule(CSS, ".endCell");
     for (const prop of ["width", "min-width", "max-width"]) {
-      expect(cssValue(menu, prop)).toBe("var(--dt-menu-w)");
+      expect(cssValue(end, prop)).toBe("var(--dt-handle-w)");
     }
-    expect(cssValue(menu, "box-sizing")).toBe("border-box");
+    const lastBeforeEnd = cssRule(CSS, '.root[data-reorder-handle="end"] .lastColumnSticky');
+    expect(cssValue(lastBeforeEnd, "inset-inline-end")).toBe("var(--dt-handle-w)");
+    expect(cssValue(end, "box-sizing")).toBe("border-box");
   });
 });

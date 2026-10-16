@@ -300,19 +300,49 @@ the page's actions ([controls of a table](composition.md#controls-of-a-table)):
 <DataTable columns={columns} rows={orders} toolbar={<Button.Root>Колонки</Button.Root>} />
 ```
 
+A chooser cell in the header of a table that has no row actions is a column of nothing — an empty
+cell in every row:
+
+```tsx partial
+// bad — columnsMenu with no row-actions column to stand over
+<DataTable columns={columns} rows={orders} columnsMenu />
+```
+
 ```tsx good
-// good — the chooser sits in the header row; the page's own actions live in its top bar
+// good — no row actions: the chooser is the page's tool, on the state the table reads
 // declare: const orders: { id: string; client: string; total: number }[]
-<DataTable
-  columns={[
-    { id: "id", header: "Заказ", accessor: "id", hideable: false },
-    { id: "client", header: "Клиент", accessor: "client" },
-    { id: "total", header: "Сумма", accessor: "total", numeric: true },
-  ]}
-  rows={orders}
-  getRowKey={(row) => row.id}
-  columnsMenu
-/>
+// declare: const hidden: string[]
+// declare: const setHidden: (hidden: string[]) => void
+<Page.Root>
+  <Page.TopBar>
+    <Page.Heading>
+      <Page.Title>Заказы</Page.Title>
+    </Page.Heading>
+    <Page.Tools>
+      <DataTableColumnsMenu
+        columns={[
+          { id: "id", header: "Заказ", accessor: "id", hideable: false },
+          { id: "client", header: "Клиент", accessor: "client" },
+          { id: "total", header: "Сумма", accessor: "total", numeric: true },
+        ]}
+        hiddenColumns={hidden}
+        onHiddenColumnsChange={setHidden}
+      />
+    </Page.Tools>
+  </Page.TopBar>
+  <Page.Body>
+    <DataTable
+      columns={[
+        { id: "id", header: "Заказ", accessor: "id", hideable: false },
+        { id: "client", header: "Клиент", accessor: "client" },
+        { id: "total", header: "Сумма", accessor: "total", numeric: true },
+      ]}
+      hiddenColumns={hidden}
+      rows={orders}
+      getRowKey={(row) => row.id}
+    />
+  </Page.Body>
+</Page.Root>
 ```
 
 ## 7b. A top bar out of its groups

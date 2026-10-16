@@ -11,6 +11,7 @@
 - Moving an item between lists to an exact position: a board of columns (several `Dnd.Sortable` with one `kind`; Alt + ← / → moves across from the keyboard).
 - A list with a pinned first row or a system item that must hold its place (`locked`).
 - Reordering the rows of a table of your own (`as="tbody"`; a group's heading row in `header`). For records in a [DataTable](../data-table/COMPONENT.md) use its `onReorder`.
+- Reordering the columns of a table of your own (`as="tr"` on the head row; the body follows the order on the drop). For a [DataTable](../data-table/COMPONENT.md) use its `columnOrder`.
 - Moving an item onto a target with no inner order: a folder, an assignee (`Dnd.Draggable` + `Dnd.DropZone`).
 
 ## When not to use
@@ -29,7 +30,7 @@ import { Dnd, moveBefore } from "prime-ui-kit";
 Dnd.Root                         session owner: overlay (portal), live region, labels — mount once
 ├─ Dnd.Sortable                  list container and drop target; renders items in the drawn order
 │  ├─ header                     optional content before the items that never moves (a group's heading row)
-│  ├─ Dnd.SortableItem           one item (li in ul/ol, div otherwise); the gap is drawn before it
+│  ├─ Dnd.SortableItem           one item (li in ul/ol, tr in tbody, th in tr, div otherwise); the gap is drawn before it
 │  │  └─ Dnd.Handle              optional grip, last in the item: a ghost icon-only Button (with `handle` on the list); a lock in a `locked` item; busy while the item's move is saved
 │  ├─ empty                      the `empty` content while the list has no items
 │  └─ children                   optional content after the items that never moves (an add tile)
@@ -67,19 +68,20 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `kind` | `string` | unique per list | Lists sharing a `kind` exchange items (a board): an item from another list arrives in `onReorder` with an `id` not in `items`. Alt + the arrows across the axis move it by keyboard. Name each list: it is spoken. |
 | `canDrop` | `(id: string) => boolean \| string` | — | Refuses an item by id: `false`, or a string that says why (spoken and shown under the carried copy). The list turns `danger` before the release. |
 | `empty` | `ReactNode` | — | Shown while the list has no items, inside a dashed drop slot while the list takes drops; fades out when a gap opens in the list, so the gap takes its place. |
-| `as` | `"div" \| "ul" \| "ol" \| "tbody"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr` (the gap is a row across every column, the carried copy keeps every cell's width). |
-| `header` | `ReactNode` | — | Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`. |
+| `as` | `"div" \| "ul" \| "ol" \| "tbody" \| "tr"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as rows `tr` (a gap row, a one-row copy), `tr` as head cells `th` with `axis="x"` (cells keep their columns, the gap glides among them). |
+| `header` | `ReactNode` | — | Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`, the leading cells of a head row. |
 | `aria-label` | `string` | — | Accessible name of the list. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element. |
 
 ### Dnd.SortableItem
-`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item; presses on controls inside never drag. Without `handle` it takes the keys, and a named `<div>` item is a `button`.
+`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<th>` inside `tr`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item; presses on controls inside never drag. Without `handle` it takes the keys, and a named `<div>` item is a `button`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `id` | `string` | — (required) | The item id (same as `getId`). |
 | `disabled` | `boolean` | `false` | This item cannot be dragged or moved (others may still move past it). |
 | `locked` | `boolean` | `false` | Holds its place: it does not move and nothing is put where it would shift it. Its `Dnd.Handle` turns into a lock. A pinned first row, a system column. |
+| `dragFromControls` | `boolean` | `false` | Without `handle`: a press on a control inside picks the item up too once it travels (a finger: holds); a click stays the control's. A table header whose sort button fills it. |
 | `className` | `string` | — | The row look: fill, radius, padding. |
 | `children` | `ReactNode` | — | The row content. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes. |
@@ -148,6 +150,7 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | `div` | a flex column / row / grid of `div` items | most lists | yes |
 | `ul` · `ol` | the same with `li` items | a list that reads as one to assistive tech | |
 | `tbody` | table rows (`tr` items) in the table's own layout; the gap is a row across every column; the row flies inside a one-row copy of its table at its column widths | rows of a table (`axis="y"`) | |
+| `tr` | a head row whose cells (`th` items) are the columns: every cell keeps its column, so the body stays still while a header is carried; the carried cell stays in the layout as the gap — the same dashed, tinted slot as every sortable gap, drawn inside the cell — and it and the others glide by transforms to where they will stand; the copy is the head cell alone in a one-cell copy of the table; the body takes the new order on the drop | reorderable columns of a table (`axis="x"`); keep each column's width by id across the reorder so the head cells land where they were drawn (DataTable does) | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -155,6 +158,7 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | `handle` | only the grip starts a drag; the row keeps its controls | rows with buttons, switches, text | `false` |
 | `kind` shared | lists exchange items at an exact position; Alt + ← / → moves across | boards | unique per list |
 | `locked` (item) | a lock where the grip would be; the item holds its place, nothing moves past it | a pinned first row, a system column | `false` |
+| `dragFromControls` (item) | without `handle`: a press on a control inside picks the item up once it travels (a finger: holds); a click stays the control's, and the click that ends a drag is swallowed | a table header whose sort button fills it | `false` |
 | `empty` | the list's own line inside a dashed drop slot while it is empty (no slot when the list is `disabled`); a gap opening takes its place | columns, lists that may run out | — |
 | `canDrop` → string | the refusal says why: live region and a chip under the clone | workflow rules a person must understand | — |
 | `flashOnDrop` | after a drop the zone's fill starts at `accent-soft` and fades back to its own | the eye must follow where the item went | `false` |
@@ -258,6 +262,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | [board.tsx](examples/board.tsx) | A ticket board: columns share one kind, so a ticket lands in another column at an exact position or moves there with Alt + ← / →, an empty column says so, and a full column refuses it before the release with the reason under the ticket — `kind`, `canDrop`, `empty`, `onReorder`. |
 | [drop-zones.tsx](examples/drop-zones.tsx) | Documents carried onto folders: a zone takes items by kind and gets the document as data, a locked folder refuses before the release and says why under the carried file, a syncing folder is no target at all, a document on signing stays put, the line above follows the drag, the target flashes where the file landed — `Dnd.Draggable`, `Dnd.DropZone`, `data`, `canDrop`, `disabled`, `onDragStart`, `onDragEnd`, `onEnter`, `onLeave`, `flashOnDrop`. |
 | [table.tsx](examples/table.tsx) | A project estimate as a table: each stage is its own body of rows under a heading row that never moves, a row is carried by its grip within a stage or into another, and the rows stay table rows — `as`, `header`, `kind`, `handle`. |
+| [table-columns.tsx](examples/table-columns.tsx) | A sales report whose columns change places: the head row is a sortable list, a header is carried alone while the rows stay still and the gap opens among the headers where it lands, and the month column holds its place — `as`, `axis`, `locked`. |
 | [states.tsx](examples/states.tsx) | A contract's approval route: a step already signed stays where it is while the rest reorder around it, and once the route is approved the whole list holds still — `Dnd.SortableItem`, `Dnd.Sortable`, `disabled`. |
 | [narrow.tsx](examples/narrow.tsx) | A row of status filters in a 320 px strip: tags reorder sideways and the strip scrolls when a tag is held near its edge — `axis`. |
 

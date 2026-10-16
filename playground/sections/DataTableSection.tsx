@@ -109,7 +109,7 @@ export const page: ComponentPageConfig = {
       scenario: "reorder",
       title: "Перестановка строк",
       description:
-        "Этапы воронки расставляются за ручку или Alt + ↑ / ↓; каждый ход сохраняется со спиннером в ручке, а сортировка по колонке выключает ручки — `onReorder`, `getRowLabel`.",
+        "Этапы воронки расставляются за ручку в конце строки, в начале или за всю строку, либо Alt + ↑ / ↓; каждый ход сохраняется со спиннером в ручке, а сортировка по колонке выключает перестановку — `onReorder`, `reorderHandle`, `getRowLabel`.",
     },
     {
       scenario: "groups",
@@ -121,7 +121,13 @@ export const page: ComponentPageConfig = {
       scenario: "columns-visibility",
       title: "Выбор колонок",
       description:
-        "Заказы с выбором колонок в конце строки заголовков; выбор переживает перезагрузку в local storage, номер заказа остаётся всегда — `columnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`.",
+        "Заказы без колонки действий: выбор колонок стоит в инструментах над таблицей с числом показанных колонок; выбор переживает перезагрузку в local storage, номер заказа остаётся всегда — `DataTableColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`.",
+    },
+    {
+      scenario: "column-order",
+      title: "Порядок колонок",
+      description:
+        "Менеджер расставляет колонки заказов, перетаскивая заголовок — он едет один, а зазор открывается среди заголовков там, куда ляжет колонка, — или Alt + ← / →, а в выборе колонок над меню строки показывает, скрывает и переставляет их; номер заказа всегда первый, меню строки — последнее, выбор переживает перезагрузку — `columnOrder`, `onColumnOrderChange`, `reorderable`, `columnsMenu`, `hiddenColumns`.",
     },
     {
       scenario: "infinite-scroll",
@@ -154,7 +160,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "narrow",
       description:
-        "Очередь поддержки шириной 320 px: колонки прокручиваются внутри, первая закреплена, выбор колонок остаётся в конце строки заголовков, подвал перестраивается, пагинация становится компактной — `stickyFirstColumn`, `columnsMenu`, `size`.",
+        "Очередь поддержки шириной 320 px: колонки прокручиваются внутри, первая закреплена, выбор колонок остаётся под рукой над таблицей, подвал перестраивается, пагинация становится компактной — `stickyFirstColumn`, `DataTableColumnsMenu`, `size`.",
     },
     {
       slot: "screen",

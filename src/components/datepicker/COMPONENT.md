@@ -78,7 +78,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `name` | `string` | — | Submits the value with a form through hidden inputs: `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with `withTime`); a range submits two values under the name, `from` then `to` (empty for an open bound). |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name without a `label` (the value is appended) and extra description ids. |
 | `months` | `1 \| 2` | `1` | Months side by side; one when there is no room. |
-| `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow. |
+| `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` (ends with «Всё время») or picks from `datepickerPresets`; a row above the calendar when narrow. |
 | `prompt` | `boolean` | `false` | Step prompt under the calendar (`labels.pickStart` / `pickEnd` / `pickDate`). |
 | `footer` | `boolean` | `false` | Footer with date fields and Reset / Apply; without it a pick applies at once. |
 | `withTime` | `boolean` | `false` | Time fields in the footer (00:00 — 23:59 by default). |
@@ -103,7 +103,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Panel tier (day cell 24 · 28 · 32 · 36 · 40). Without it the tier of its host, else `m`. |
 | `months` | `1 \| 2` | `1` | Months side by side; one when there is no room. |
-| `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow. |
+| `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` (ends with «Всё время») or picks from `datepickerPresets`; a row above the calendar when narrow. |
 | `prompt` | `boolean` | `false` | Step prompt under the calendar (`labels.pickStart` / `pickEnd` / `pickDate`). |
 | `footer` | `boolean` | `false` | Footer with date fields and Reset / Apply; without it a pick applies at once. |
 | `withTime` | `boolean` | `false` | Time fields in the footer (00:00 — 23:59 by default). |

@@ -1,63 +1,138 @@
-/** The invoice lines in a 320 px column: the headings give way, each row stacks its fields with their own labels and rows stand a group apart — `columns`. */
-import { FieldList, type FieldListColumn, Input } from "prime-ui-kit";
+/** Specs of a plan in a 320 px column: the headings give way, the icon, its color and the name keep the first line, and the value takes the line under it with the remove button and the handle, each field with its own label — `columns`, `width`. */
+import {
+  ColorPresets,
+  FieldList,
+  type FieldListColumn,
+  Icon,
+  type IconName,
+  Input,
+  Select,
+} from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-type Line = { id: string; service: string; quantity: string; price: string };
+type Spec = {
+  id: string;
+  icon: IconName;
+  name: string;
+  value: string;
+  color: string;
+  pinned?: boolean;
+};
 
 const COLUMNS: FieldListColumn[] = [
-  { label: "Услуга" },
-  { label: "Кол-во", width: "s" },
-  { label: "Цена", width: "m" },
+  { label: "Иконка", width: "compact" },
+  { label: "Цвет", width: "compact" },
+  { label: "Параметр" },
+  { label: "Значение" },
 ];
 
-const LINES: Line[] = [
-  { id: "setup", service: "Внедрение CRM", quantity: "1", price: "180 000" },
-  { id: "training", service: "Обучение менеджеров", quantity: "3", price: "15 000" },
+const ICONS: { name: IconName; label: string }[] = [
+  { name: "object.users", label: "Пользователи" },
+  { name: "object.storage", label: "Хранилище" },
+  { name: "object.headset", label: "Поддержка" },
+  { name: "object.chart", label: "Отчёты" },
+  { name: "object.key", label: "Доступ" },
+  { name: "object.globe", label: "Интеграции" },
+];
+
+const SPECS: Spec[] = [
+  {
+    id: "seats",
+    icon: "object.users",
+    name: "Сотрудники",
+    value: "до 50",
+    color: "#5068f5",
+    pinned: true,
+  },
+  {
+    id: "storage",
+    icon: "object.storage",
+    name: "Хранилище",
+    value: "200 ГБ",
+    color: "#22c55e",
+    pinned: true,
+  },
+  {
+    id: "support",
+    icon: "object.headset",
+    name: "Поддержка",
+    value: "8/5",
+    color: "#f97316",
+    pinned: true,
+  },
+  { id: "reports", icon: "object.chart", name: "Отчёты", value: "12 шаблонов", color: "#a855f7" },
+  { id: "sso", icon: "object.key", name: "Вход через SSO", value: "SAML, OIDC", color: "#14b8a6" },
 ];
 
 export default function FieldListNarrowExample() {
-  const [lines, setLines] = React.useState(LINES);
+  const [specs, setSpecs] = React.useState(SPECS);
 
   return (
     <div className={styles.narrow}>
       <FieldList
-        label="Позиции счёта"
+        label="Характеристики тарифа"
         columns={COLUMNS}
-        value={lines}
-        onValueChange={setLines}
-        getId={(line) => line.id}
-        getLabel={(line) => line.service}
-        createItem={() => ({ id: crypto.randomUUID(), service: "", quantity: "1", price: "" })}
-        addLabel="Добавить позицию"
-        renderItem={(line, row) => (
+        reorderable
+        value={specs}
+        onValueChange={setSpecs}
+        getId={(spec) => spec.id}
+        getLabel={(spec) => spec.name}
+        getLocked={(spec) => spec.pinned ?? false}
+        createItem={(): Spec => ({
+          id: crypto.randomUUID(),
+          icon: "object.globe",
+          name: "",
+          value: "",
+          color: "#14b8a6",
+        })}
+        addLabel="Добавить характеристику"
+        renderItem={(spec, row) => (
           <>
+            <Select.Root
+              value={spec.icon}
+              onValueChange={(icon) => row.update({ icon: icon as IconName })}
+            >
+              <Select.Trigger>
+                <Select.TriggerIcon>
+                  <Icon name={spec.icon} />
+                </Select.TriggerIcon>
+              </Select.Trigger>
+              <Select.Content>
+                {ICONS.map((icon) => (
+                  <Select.Item key={icon.name} value={icon.name}>
+                    <Select.ItemIcon>
+                      <Icon name={icon.name} />
+                    </Select.ItemIcon>
+                    {icon.label}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+            <ColorPresets.Root
+              value={spec.color}
+              onValueChange={(color) => row.update({ color: color ?? spec.color })}
+            >
+              <ColorPresets.Trigger>
+                <ColorPresets.SwatchButton />
+              </ColorPresets.Trigger>
+              <ColorPresets.Content />
+            </ColorPresets.Root>
             <Input.Root>
               <Input.Wrapper>
                 <Input.Field
-                  value={line.service}
-                  onChange={(event) => row.update({ service: event.target.value })}
+                  value={spec.name}
+                  onChange={(event) => row.update({ name: event.target.value })}
                 />
               </Input.Wrapper>
             </Input.Root>
             <Input.Root>
               <Input.Wrapper>
                 <Input.Field
-                  value={line.quantity}
-                  inputMode="numeric"
-                  onChange={(event) => row.update({ quantity: event.target.value })}
+                  value={spec.value}
+                  onChange={(event) => row.update({ value: event.target.value })}
                 />
-              </Input.Wrapper>
-            </Input.Root>
-            <Input.Root>
-              <Input.Wrapper>
-                <Input.Field
-                  value={line.price}
-                  inputMode="decimal"
-                  onChange={(event) => row.update({ price: event.target.value })}
-                />
-                <Input.InlineAffix side="end">₽</Input.InlineAffix>
               </Input.Wrapper>
             </Input.Root>
           </>

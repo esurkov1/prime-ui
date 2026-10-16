@@ -6,6 +6,7 @@ import { moveBefore } from "@/components/dnd/Dnd";
 import swapMotion from "@/internal/swapMotion.module.css";
 
 import { DataTable, type DataTableColumn, type DataTableSortState } from "./DataTable";
+import styles from "./DataTable.module.css";
 
 const ROW_HEIGHT = 20;
 const POINTER = { pointerId: 1, pointerType: "mouse", button: 0 };
@@ -209,11 +210,34 @@ describe("DataTable onReorder", () => {
     expect(onRowClick).toHaveBeenCalledTimes(1);
   });
 
-  it("works with selection: the handle leads, the checkbox follows", () => {
+  it("the grip ends the row by default; the checkbox leads", () => {
     render(<Pipeline selectable />);
+    const row = document.querySelector('tr[data-dnd-item="b"]') as HTMLTableRowElement;
+    expect(row.lastElementChild).toContainElement(handle("Переговоры"));
+    expect(row.cells[0]?.querySelector('input[type="checkbox"]')).not.toBeNull();
+    const head = document.querySelector("thead > tr") as HTMLTableRowElement;
+    // One trailing cell over the grips, empty in the head.
+    expect(head.cells).toHaveLength(row.cells.length);
+    expect(head.lastElementChild).toBeEmptyDOMElement();
+    expect(document.querySelector("[data-reorder-handle]")).toHaveAttribute(
+      "data-reorder-handle",
+      "end",
+    );
+  });
+
+  it('reorderHandle="start": the grip column leads, the checkbox follows', () => {
+    render(<Pipeline selectable reorderHandle="start" />);
     const row = document.querySelector('tr[data-dnd-item="b"]') as HTMLTableRowElement;
     expect(row.cells[0]).toContainElement(handle("Переговоры"));
     expect(row.cells[1]?.querySelector('input[type="checkbox"]')).not.toBeNull();
+    expect(row.lastElementChild).not.toHaveClass(styles.endCell as string);
+  });
+
+  it("with stickyLastColumn the end grip sticks, the last column right before it", () => {
+    render(<Pipeline stickyLastColumn />);
+    const row = document.querySelector('tr[data-dnd-item="b"]') as HTMLTableRowElement;
+    expect(row.lastElementChild).toHaveClass(styles.endCellSticky as string);
+    expect(row.cells[row.cells.length - 2]).toHaveClass(styles.lastColumnSticky as string);
   });
 
   it("moves rows only inside their group", async () => {
@@ -247,6 +271,57 @@ describe("DataTable onReorder", () => {
       fireEvent.pointerUp(window, { ...POINTER, clientX: 10, clientY: 200 });
     });
     expect(onMove).toHaveBeenCalledWith("a", "c");
+  });
+
+  it('reorderHandle="row": the whole row is carried and takes the move keys; no grip', async () => {
+    const onMove = vi.fn();
+    render(<Pipeline onMove={onMove} reorderHandle="row" />);
+    expect(screen.queryByRole("button", { name: /Переместить строку/ })).toBeNull();
+    const row = document.querySelector('tr[data-dnd-item="a"]') as HTMLTableRowElement;
+    expect(row.cells).toHaveLength(2);
+    expect(row).toHaveAttribute("tabindex", "0");
+    expect(row).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
+    expect(row).toHaveAttribute("aria-roledescription");
+
+    fireEvent.pointerDown(row.cells[1] as HTMLElement, { ...POINTER, clientX: 10, clientY: 5 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 10, clientY: 25 });
+    expect(document.querySelector("tr[data-dnd-gap]")).not.toBeNull();
+    await act(async () => {
+      fireEvent.pointerUp(window, { ...POINTER, clientX: 10, clientY: 25 });
+    });
+    expect(onMove).toHaveBeenCalledWith("a", "c");
+    expect(order()).toEqual(["b", "a", "c"]);
+
+    const first = document.querySelector('tr[data-dnd-item="b"]') as HTMLElement;
+    await act(async () => {
+      fireEvent.keyDown(first, { key: "ArrowDown", altKey: true });
+    });
+    expect(onMove).toHaveBeenLastCalledWith("b", "c");
+    expect(order()).toEqual(["a", "b", "c"]);
+    expect(announced("Переговоры: позиция 2 из 3")).toBe(true);
+  });
+
+  it('reorderHandle="row": a click still opens the row, the checkbox cell only selects', () => {
+    const onRowClick = vi.fn();
+    render(<Pipeline reorderHandle="row" onRowClick={onRowClick} selectable />);
+    const row = document.querySelector('tr[data-dnd-item="b"]') as HTMLTableRowElement;
+    // The row opens in place and moves: one tab stop for both.
+    expect(row).toHaveAttribute("tabindex", "0");
+    fireEvent.click(screen.getByText("Переговоры"));
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    const select = row.cells[0] as HTMLElement;
+    expect(select).toHaveAttribute("data-dnd-ignore");
+    // The press paints the selection over the row under the pointer (jsdom lays nothing out).
+    const original = document.elementFromPoint;
+    document.elementFromPoint = () => select;
+    try {
+      fireEvent.pointerDown(select, { ...POINTER, clientX: 10, clientY: 25 });
+      fireEvent.pointerMove(window, { ...POINTER, clientX: 10, clientY: 45 });
+      expect(document.querySelector("tr[data-dnd-gap]")).toBeNull();
+      fireEvent.pointerUp(window, { ...POINTER, clientX: 10, clientY: 45 });
+    } finally {
+      document.elementFromPoint = original;
+    }
   });
 
   it('source="server": the reordered rows that follow are no new page', async () => {

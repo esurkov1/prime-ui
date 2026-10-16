@@ -35,6 +35,11 @@ export type SortableListOptions = {
   canDrop?: ((id: string) => DropVerdict) | undefined;
   /** Only a press on a `[data-dnd-handle]` element starts a drag. */
   handleOnly?: boolean | undefined;
+  /**
+   * The items keep their places in the layout while one is carried (the cells of a table's head
+   * row stay in their columns): the host shifts them aside itself, nothing glides here mid-drag.
+   */
+  inPlace?: boolean | undefined;
 };
 
 export type SortableItemProps = DragSourceProps & {
@@ -383,7 +388,8 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     keyOf: flipKey,
     layoutKey: JSON.stringify([order, dragged?.id ?? null, gapKey]),
     // Only while the item is in the air: after the drop the list already stands in its final order.
-    enabled: dragged !== null,
+    // Items kept in place do not move in the layout while carried.
+    enabled: dragged !== null && !options.inPlace,
     settle,
   });
 

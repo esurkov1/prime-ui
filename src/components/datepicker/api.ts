@@ -48,8 +48,8 @@ const CALENDAR_OPTIONS: ApiProp[] = [
     name: "presets",
     type: "DatepickerPreset[] | false",
     default: "false",
-    en: "Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow.",
-    ru: "Колонка периодов (только `range`): `DEFAULT_DATEPICKER_PRESETS` или выборка из `datepickerPresets`; на узком — строкой над календарём.",
+    en: "Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` (ends with «Всё время») or picks from `datepickerPresets`; a row above the calendar when narrow.",
+    ru: "Колонка периодов (только `range`): `DEFAULT_DATEPICKER_PRESETS` (последний — «Всё время») или выборка из `datepickerPresets`; на узком — строкой над календарём.",
   },
   {
     name: "prompt",

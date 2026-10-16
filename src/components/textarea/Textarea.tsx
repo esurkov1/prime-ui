@@ -18,7 +18,6 @@ import {
   FieldFrame,
   useFieldFrame,
 } from "@/internal/FieldFrame";
-import { useFieldCell } from "@/internal/fieldCell";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
@@ -146,9 +145,7 @@ function TextareaRoot({
   );
   const hasCommit = onCommit !== undefined;
   const commit = useFieldCommit(innerRef, onCommit);
-  // The row's action of a FieldList cell (`fieldCell`) ends the edge, after the field's own.
-  const cellAction = useFieldCell()?.action;
-  const hasEdge = hasCommit || React.Children.count(children) > 0 || Boolean(cellAction);
+  const hasEdge = hasCommit || React.Children.count(children) > 0;
   const format = useTextFormatting({
     textareaRef: innerRef,
     enabled: formatting,
@@ -276,7 +273,6 @@ function TextareaRoot({
           <div className={styles.edge}>
             {hasCommit ? <FieldCommitStatus state={commit.state} labels={labels} /> : null}
             {children}
-            {cellAction}
           </div>
         </>
       ) : (

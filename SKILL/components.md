@@ -40,7 +40,7 @@ Type a value, and the field anatomy: label, hint, error.
 | Label | Field label (native `<label>`) with required and optional markers. | [COMPONENT.md](../src/components/label/COMPONENT.md) · [examples](../src/components/label/examples/) |
 | Hint | Help text or a validation error under a field. | [COMPONENT.md](../src/components/hint/COMPONENT.md) · [examples](../src/components/hint/examples/) |
 | Fieldset | A frameless group of related form fields: a native `<fieldset>` with a `title-s` legend, the form rhythm between its fields and one `disabled` for all of them. | [COMPONENT.md](../src/components/fieldset/COMPONENT.md) · [examples](../src/components/fieldset/examples/) |
-| FieldList | An editable list of records of one shape — invoice lines, specs, contacts, prices by period: one row per record, the column headings once above the rows, a remove button per row and an add button under them. | [COMPONENT.md](../src/components/field-list/COMPONENT.md) · [examples](../src/components/field-list/examples/) |
+| FieldList | An editable list of records of one shape — invoice lines, specs, contacts, prices by period: one row per record on one grid, the column headings once above the rows, the row's actions at its end and an add button under them. | [COMPONENT.md](../src/components/field-list/COMPONENT.md) · [examples](../src/components/field-list/examples/) |
 
 ## Selection (`selection`)
 

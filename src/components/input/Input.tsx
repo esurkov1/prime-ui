@@ -27,7 +27,6 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
-import { FieldCellContext, useFieldCell } from "@/internal/fieldCell";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
@@ -127,8 +126,6 @@ type InputContextValue = {
   mountedRef: React.RefObject<boolean>;
   /** `suggestions`: the field is a combobox with a list under the box. */
   suggest: InputSuggestions | null;
-  /** The row's action of a FieldList cell (`fieldCell`): the box ends with it. */
-  cellAction: React.ReactNode;
 };
 
 const [InputProvider, useInputContext] = createComponentContext<InputContextValue>("Input");
@@ -219,12 +216,6 @@ function InputRoot({
     return () => setAffixes((current) => current.filter((item) => item !== affixId));
   }, []);
   const affixIds = affixes.join(" ") || undefined;
-  // The row's action of a FieldList cell is this field's: a field nested inside (a popover's)
-  // reads the cell without it.
-  const cell = useFieldCell();
-  const cellAction = cell?.action;
-  const innerCell = React.useMemo(() => (cell ? { ...cell, action: undefined } : null), [cell]);
-
   const contextValue = React.useMemo(
     () => ({
       size,
@@ -245,7 +236,6 @@ function InputRoot({
       selectionRef,
       mountedRef,
       suggest,
-      cellAction,
     }),
     [
       size,
@@ -262,7 +252,6 @@ function InputRoot({
       hasCommit,
       revealed,
       suggest,
-      cellAction,
     ],
   );
   const level = strength ? getStrength(strengthValue) : 0;
@@ -310,11 +299,7 @@ function InputRoot({
           optionalLabel={labels.optional}
           className={cx(fieldTierClass, styles.root, className)}
         >
-          {cellAction ? (
-            <FieldCellContext value={innerCell}>{children}</FieldCellContext>
-          ) : (
-            children
-          )}
+          {children}
           {strength ? (
             <ProgressBar
               steps
@@ -340,8 +325,7 @@ export type InputWrapperProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) {
-  const { size, invalid, focusRing, commit, hasCommit, labels, suggest, cellAction } =
-    useInputContext();
+  const { size, invalid, focusRing, commit, hasCommit, labels, suggest } = useInputContext();
   // The box anchors the suggestion list (as wide as the box).
   const setRefs = useMergedRefs(suggest?.anchorRef, ref);
 
@@ -361,7 +345,6 @@ function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) 
       {hasCommit ? (
         <FieldCommitStatus state={commit.state} labels={labels} className={styles.status} />
       ) : null}
-      {cellAction}
       {suggest ? <InputSuggestionList suggest={suggest} size={size} /> : null}
     </div>
   );

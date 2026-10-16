@@ -1,6 +1,8 @@
-/** Orders with the column chooser at the end of the header row; the choice outlives a reload in local storage, the order number always stays — `columnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. */
-import { Badge, DataTable, type DataTableColumn } from "prime-ui-kit";
+/** Orders without a row-actions column: the column chooser stands in the tools above the table with the count of shown columns; the choice outlives a reload in local storage, the order number always stays — `DataTableColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. */
+import { Badge, DataTable, type DataTableColumn, DataTableColumnsMenu } from "prime-ui-kit";
 import * as React from "react";
+
+import styles from "./examples.module.css";
 
 type Status = "paid" | "shipped" | "waiting";
 type Order = {
@@ -129,14 +131,21 @@ export default function DataTableColumnsVisibilityExample() {
   };
 
   return (
-    <DataTable
-      columns={COLUMNS}
-      hiddenColumns={hidden}
-      onHiddenColumnsChange={changeHidden}
-      rows={ORDERS}
-      getRowKey={(row) => row.id}
-      stickyFirstColumn
-      columnsMenu
-    />
+    <div className={styles.withTools}>
+      <div className={styles.tools}>
+        <DataTableColumnsMenu
+          columns={COLUMNS}
+          hiddenColumns={hidden}
+          onHiddenColumnsChange={changeHidden}
+        />
+      </div>
+      <DataTable
+        columns={COLUMNS}
+        hiddenColumns={hidden}
+        rows={ORDERS}
+        getRowKey={(row) => row.id}
+        stickyFirstColumn
+      />
+    </div>
   );
 }

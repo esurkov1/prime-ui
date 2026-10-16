@@ -187,9 +187,9 @@ describe("FieldList", () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<Lines onChange={onChange} />);
-    await user.click(screen.getByRole("button", { name: "Удалить «Внедрение»" }));
+    await user.click(screen.getByRole("button", { name: "Удалить: «Внедрение»" }));
     expect(onChange).toHaveBeenLastCalledWith([LINES[1]]);
-    expect(screen.getByRole("button", { name: "Удалить «Обучение»" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Удалить: «Обучение»" })).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(rowsOf()).toHaveLength(0);
     expect(screen.getByRole("button", { name: "Добавить позицию" })).toHaveFocus();
@@ -216,7 +216,7 @@ describe("FieldList", () => {
 
   it("names an untitled row by its number", () => {
     render(<Lines initial={[{ id: "x", service: "", price: "" }]} />);
-    expect(screen.getByRole("button", { name: "Удалить строку 1" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Удалить: строка 1" })).toBeInTheDocument();
   });
 
   it("disables remove at min and add at max, saying why beside the add button", () => {
@@ -242,7 +242,7 @@ describe("FieldList", () => {
     expect(screen.queryByRole("img")).toBeNull();
     const [pinned, free] = Array.from(rowsOf());
     expect(pinned?.children).toHaveLength(free?.children.length ?? -1);
-    const off = screen.getByRole("button", { name: "Удалить «Внедрение»" });
+    const off = screen.getByRole("button", { name: "Удалить: «Внедрение»" });
     expect(off).toHaveAttribute("aria-disabled", "true");
     expect(pinned?.lastElementChild).toContainElement(off);
     (screen.getAllByRole("textbox", { name: "Цена" })[0] as HTMLElement).focus();
@@ -259,7 +259,7 @@ describe("FieldList", () => {
     const onChange = vi.fn();
     render(<Lines reorderable onChange={onChange} />);
     await act(async () => {
-      fireEvent.keyDown(screen.getByRole("button", { name: "Переместить «Внедрение»" }), {
+      fireEvent.keyDown(screen.getByRole("button", { name: "Переместить: «Внедрение»" }), {
         key: "ArrowDown",
         altKey: true,
       });
@@ -271,11 +271,92 @@ describe("FieldList", () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<Lines reorderable onChange={onChange} />);
-    const handle = screen.getByRole("button", { name: "Переместить «Обучение»" });
+    const handle = screen.getByRole("button", { name: "Переместить: «Обучение»" });
     handle.focus();
     await user.keyboard("{Alt>}{ArrowUp}{/Alt}");
     expect(onChange).toHaveBeenLastCalledWith([LINES[1], LINES[0]]);
-    expect(screen.getByRole("button", { name: "Переместить «Обучение»" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Переместить: «Обучение»" })).toHaveFocus();
+  });
+
+  it("menu mode: one «⋯» per row whose menu moves the row and removes it", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Lines rowActions="menu" reorderable onChange={onChange} />);
+    expect(screen.queryByRole("button", { name: /^Удалить/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Переместить/ })).toBeNull();
+    const more = screen.getByRole("button", { name: "Действия: «Внедрение»" });
+    expect(more).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
+    more.focus();
+    await user.keyboard("{Enter}");
+    // The first row cannot go higher: focus starts on «Ниже».
+    expect(await screen.findByRole("menuitem", { name: /Выше/ })).toBeDisabled();
+    expect(screen.getByRole("menuitem", { name: /Ниже/ })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onChange).toHaveBeenLastCalledWith([LINES[1], LINES[0]]);
+    expect(await screen.findByRole("status")).toHaveTextContent("«Внедрение»: позиция 2 из 2");
+  });
+
+  it("menu mode: «Удалить» removes the row and focus goes to the next row's «⋯»", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Lines rowActions="menu" onChange={onChange} />);
+    screen.getByRole("button", { name: "Действия: «Внедрение»" }).focus();
+    await user.keyboard("{Enter}");
+    // Without `reorderable` the menu holds only the remove.
+    expect(screen.queryByRole("menuitem", { name: /Выше/ })).toBeNull();
+    await user.keyboard("{Enter}");
+    expect(onChange).toHaveBeenLastCalledWith([LINES[1]]);
+    expect(screen.getByRole("button", { name: "Действия: «Обучение»" })).toHaveFocus();
+  });
+
+  it("menu mode: Alt+↓ on «⋯» moves the row without opening the menu and keeps focus there", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Lines rowActions="menu" reorderable onChange={onChange} />);
+    screen.getByRole("button", { name: "Действия: «Внедрение»" }).focus();
+    await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    expect(onChange).toHaveBeenLastCalledWith([LINES[1], LINES[0]]);
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(screen.getByRole("button", { name: "Действия: «Внедрение»" })).toHaveFocus();
+    await user.keyboard("{Alt>}{ArrowUp}{/Alt}");
+    expect(onChange).toHaveBeenLastCalledWith([LINES[0], LINES[1]]);
+  });
+
+  it("menu mode: a pinned row's items are off and the remove item says why", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Lines
+        rowActions="menu"
+        reorderable
+        onChange={onChange}
+        getLocked={(line) => line.id === "setup"}
+      />,
+    );
+    screen.getByRole("button", { name: "Действия: «Обучение»" }).focus();
+    await user.keyboard("{Enter}");
+    // A free row cannot trade places with the pinned one above it.
+    expect(await screen.findByRole("menuitem", { name: /Выше/ })).toBeDisabled();
+    await user.keyboard("{Escape}");
+    screen.getByRole("button", { name: "Действия: «Внедрение»" }).focus();
+    await user.keyboard("{Enter}");
+    const removeItem = await screen.findByRole("menuitem", { name: /Удалить/ });
+    expect(removeItem).toBeDisabled();
+    expect(removeItem).toHaveAccessibleDescription("Закреплённую строку нельзя удалить");
+    expect(screen.getByRole("menuitem", { name: /Ниже/ })).toBeDisabled();
+    await user.keyboard("{Escape}");
+    await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("variant surface puts the rows on a fill one step up the ladder; plain leaves them on the host", () => {
+    const { rerender } = render(<Lines />);
+    const sheetOf = () => rowsOf()[0]?.closest("ol")?.parentElement as HTMLElement;
+    expect(sheetOf()).toHaveAttribute("data-variant", "plain");
+    expect(sheetOf()).not.toHaveAttribute("data-depth");
+    rerender(<Lines variant="surface" />);
+    expect(sheetOf()).toHaveAttribute("data-variant", "surface");
+    expect(sheetOf()).toHaveAttribute("data-depth", "1");
   });
 
   it("Tab walks a row's fields, then its remove button, then the next row", async () => {
@@ -287,7 +368,7 @@ describe("FieldList", () => {
     await user.tab();
     expect(prices[0]).toHaveFocus();
     await user.tab();
-    expect(screen.getByRole("button", { name: "Удалить «Внедрение»" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Удалить: «Внедрение»" })).toHaveFocus();
     await user.tab();
     expect(services[1]).toHaveFocus();
   });
@@ -297,14 +378,14 @@ describe("FieldList", () => {
     render(<Lines reorderable />);
     const [first] = Array.from(rowsOf());
     expect(first?.lastElementChild).toContainElement(
-      screen.getByRole("button", { name: "Переместить «Внедрение»" }),
+      screen.getByRole("button", { name: "Переместить: «Внедрение»" }),
     );
     const prices = screen.getAllByRole("textbox", { name: "Цена" });
     (prices[0] as HTMLElement).focus();
     await user.tab();
-    expect(screen.getByRole("button", { name: "Удалить «Внедрение»" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Удалить: «Внедрение»" })).toHaveFocus();
     await user.tab();
-    expect(screen.getByRole("button", { name: "Переместить «Внедрение»" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Переместить: «Внедрение»" })).toHaveFocus();
     await user.tab();
     expect(screen.getAllByRole("textbox", { name: "Услуга" })[1]).toHaveFocus();
   });
@@ -322,80 +403,50 @@ describe("FieldList", () => {
       screen.getByRole("img", { name: "Закреплено" }),
     );
     expect(free?.lastElementChild).toContainElement(
-      screen.getByRole("button", { name: "Переместить «Обучение»" }),
+      screen.getByRole("button", { name: "Переместить: «Обучение»" }),
     );
     expect(pinned?.lastElementChild?.className).toBe(free?.lastElementChild?.className);
     // The remove slot before the grip holds the pinned row's remove too, off.
     expect(pinned?.children[1]).toContainElement(
-      screen.getByRole("button", { name: "Удалить «Внедрение»" }),
+      screen.getByRole("button", { name: "Удалить: «Внедрение»" }),
     );
-    expect(screen.getByRole("button", { name: "Удалить «Внедрение»" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Удалить: «Внедрение»" })).toHaveAttribute(
       "aria-disabled",
       "true",
     );
   });
 
-  it("puts a one-column row's remove inside its field: Tab reaches it, Enter removes the row", async () => {
+  it("ends a one-column row with its own remove button, as every row: Tab reaches it, Enter removes the row", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<Points onChange={onChange} />);
     const row = screen.getAllByRole("listitem")[0] as HTMLElement;
-    const remove = screen.getByRole("button", { name: "Удалить «200 ГБ»" });
-    // The remove is the field box's last segment; the row has no end slot of its own.
-    expect(remove).toHaveAttribute("data-field-action");
-    expect(remove.parentElement).toBe(
-      (screen.getAllByRole("textbox")[0] as HTMLElement).parentElement,
-    );
-    expect(row.style.getPropertyValue("--fl-columns")).toBe("minmax(0, 1fr)");
+    const remove = screen.getByRole("button", { name: "Удалить: «200 ГБ»" });
+    // Not a segment of the field (a «×» inside a field clears its text): the row's end slot.
+    expect(remove).not.toHaveAttribute("data-field-action");
+    expect(row.children[1]).toContainElement(remove);
+    expect(row.style.getPropertyValue("--fl-columns")).toBe("minmax(0, 1fr) var(--fl-end)");
     (screen.getAllByRole("textbox")[0] as HTMLElement).focus();
     await user.tab();
     expect(remove).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenLastCalledWith([POINTS[1]]);
-    expect(screen.getByRole("button", { name: "Удалить «API»" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Удалить: «API»" })).toHaveFocus();
   });
 
-  it("keeps a pinned one-column row's remove in its field, off, with its reason", async () => {
+  it("keeps a pinned one-column row's remove in its end slot, off, with its reason", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<Points onChange={onChange} getLocked={(point) => point.id === "storage"} />);
-    const off = screen.getByRole("button", { name: "Удалить «200 ГБ»" });
-    expect(off).toHaveAttribute("aria-disabled", "true");
-    expect(off).toHaveAttribute("data-field-action");
     (screen.getAllByRole("textbox")[0] as HTMLElement).focus();
     await user.tab();
-    expect(off).toHaveFocus();
     expect(await screen.findByRole("tooltip")).toHaveTextContent(
       "Закреплённую строку нельзя удалить",
     );
+    const off = screen.getByRole("button", { name: "Удалить: «200 ГБ»" });
+    expect(off).toHaveAttribute("aria-disabled", "true");
     await user.keyboard("{Enter}");
     expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it("keeps the remove in an end slot for a one-column field without an action edge", () => {
-    render(
-      <FieldList
-        aria-label="Этапы"
-        columns={[{ label: "Этап" }]}
-        defaultValue={[{ id: "a", stage: "draft" }]}
-        getId={(item) => item.id}
-        renderItem={(item) => (
-          <Select.Root defaultValue={item.stage}>
-            <Select.Trigger>
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="draft">Черновик</Select.Item>
-            </Select.Content>
-          </Select.Root>
-        )}
-      />,
-    );
-    const row = screen.getByRole("listitem");
-    expect(row.style.getPropertyValue("--fl-columns")).toBe("minmax(0, 1fr) var(--fl-end)");
-    expect(row.children[1]).toContainElement(
-      screen.getByRole("button", { name: "Удалить строку 1" }),
-    );
   });
 
   it("Space on the add button adds a row; Space on a remove button removes its row", async () => {
@@ -405,10 +456,10 @@ describe("FieldList", () => {
     await user.keyboard(" ");
     expect(rowsOf()).toHaveLength(3);
     expect(screen.getAllByRole("textbox", { name: "Услуга" })[2]).toHaveFocus();
-    screen.getByRole("button", { name: "Удалить «Внедрение»" }).focus();
+    screen.getByRole("button", { name: "Удалить: «Внедрение»" }).focus();
     await user.keyboard(" ");
     expect(rowsOf()).toHaveLength(2);
-    expect(screen.getByRole("button", { name: "Удалить «Обучение»" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Удалить: «Обучение»" })).toHaveFocus();
   });
 
   it("takes the host tier without its own size", () => {
@@ -507,7 +558,7 @@ describe("FieldList", () => {
         }),
     );
     render(<Lines value={LINES} onValueChange={onValueChange} />);
-    await user.click(screen.getByRole("button", { name: "Удалить «Внедрение»" }));
+    await user.click(screen.getByRole("button", { name: "Удалить: «Внедрение»" }));
     expect(onValueChange).toHaveBeenLastCalledWith([LINES[1]]);
     expect(rowsOf()).toHaveLength(1);
     expect(screen.getByRole("list", { name: "Позиции счёта" })).toHaveAttribute(
@@ -542,7 +593,7 @@ describe("FieldList", () => {
         )}
       />,
     );
-    await user.click(screen.getByRole("button", { name: "Удалить «Внедрение»" }));
+    await user.click(screen.getByRole("button", { name: "Удалить: «Внедрение»" }));
     await act(async () => resolve());
     expect(screen.getAllByRole("listitem")).toHaveLength(1);
   });
@@ -652,9 +703,78 @@ describe("FieldList", () => {
     expect(row.style.getPropertyValue("--fl-columns")).toBe(
       "var(--fl-compact-0, max-content) minmax(0, 1fr) var(--fl-end)",
     );
-    const body = row.closest("ol")?.parentElement as HTMLElement;
+    const body = row.closest("ol")?.parentElement?.parentElement as HTMLElement;
     expect(body.style.getPropertyValue("--fl-compact-0")).toBe("36px");
     expect(container.querySelector("label[data-width='compact']")).not.toBeNull();
+    rect.mockRestore();
+  });
+
+  it("stacked rows keep the main field wide enough: the actions move to the value line, else the field takes its own line", () => {
+    let rowWidth = 250;
+    const width = vi
+      .spyOn(HTMLElement.prototype, "clientWidth", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.tagName === "LI" ? rowWidth : 0;
+      });
+    const rect = vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: Element,
+    ) {
+      if (this.getAttribute("data-width") === "compact") return { width: 64 } as DOMRect;
+      return { width: this.tagName === "SPAN" ? 40 : 0 } as DOMRect;
+    });
+    const columns: FieldListColumn[] = [
+      { label: "Иконка", width: "compact" },
+      { label: "Параметр" },
+      { label: "Значение" },
+    ];
+    const renderSpecs = () => (
+      <>
+        <span>●</span>
+        <span>Вход через SSO</span>
+        <span>SAML, OIDC</span>
+      </>
+    );
+    const { rerender } = render(
+      <FieldList
+        aria-label="Характеристики"
+        columns={columns}
+        defaultValue={[{ id: "sso" }]}
+        getId={(item) => item.id}
+        renderItem={renderSpecs}
+      />,
+    );
+    const row = screen.getByRole("listitem");
+    const body = row.closest("ol")?.parentElement?.parentElement as HTMLElement;
+    // 250 − 64 (icon) − 40 (×) − the gaps leaves under the main field's least width (160).
+    expect(body).toHaveAttribute("data-stack", "actions");
+    expect(row.querySelector("[data-place='main']")).not.toBeNull();
+    expect(row.querySelector("[data-place='value']")).not.toBeNull();
+    // 200 − 64 leaves under it even without the actions: the main field takes its own line.
+    rowWidth = 200;
+    rerender(
+      <FieldList
+        aria-label="Характеристики"
+        columns={columns}
+        defaultValue={[{ id: "sso" }]}
+        getId={(item) => item.id}
+        renderItem={renderSpecs}
+        min={0}
+      />,
+    );
+    expect(body).toHaveAttribute("data-stack", "main");
+    rowWidth = 420;
+    rerender(
+      <FieldList
+        aria-label="Характеристики"
+        columns={columns}
+        defaultValue={[{ id: "sso" }]}
+        getId={(item) => item.id}
+        renderItem={renderSpecs}
+        rowActions="menu"
+      />,
+    );
+    expect(body).not.toHaveAttribute("data-stack");
+    width.mockRestore();
     rect.mockRestore();
   });
 

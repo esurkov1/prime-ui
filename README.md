@@ -215,7 +215,7 @@ accessibility, examples and common mistakes.
 | [**Label**](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) | Field label (native `<label>`) with required and optional markers. |
 | [**Hint**](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) | Help text or a validation error under a field. |
 | [**Fieldset**](https://github.com/esurkov1/prime-ui/blob/main/src/components/fieldset/COMPONENT.md) | A frameless group of related form fields: a native `<fieldset>` with a `title-s` legend, the form rhythm between its fields and one `disabled` for all of them. |
-| [**FieldList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/field-list/COMPONENT.md) | An editable list of records of one shape — invoice lines, specs, contacts, prices by period: one row per record, the column headings once above the rows, a remove button per row and an add button under them. |
+| [**FieldList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/field-list/COMPONENT.md) | An editable list of records of one shape — invoice lines, specs, contacts, prices by period: one row per record on one grid, the column headings once above the rows, the row's actions at its end and an add button under them. |
 
 ### Selection (`selection`)
 

@@ -10,6 +10,8 @@ import { useStoreSelector } from "./store";
 const INTERACTIVE = "button, input, select, textarea, a[href], [data-dnd-ignore]";
 // ...unless the control IS the grip: `Dnd.Handle` is a button so it can be reached by keyboard.
 const HANDLE = "[data-dnd-handle]";
+/** Set by `Dnd.SortableItem dragFromControls`: a press on a control inside picks the item up too. */
+export const DRAG_FROM_CONTROLS = "data-dnd-drag-controls";
 
 export type DragSourceItem<TData> = {
   id: string;
@@ -78,7 +80,10 @@ export function useDragSource<TData = unknown>(
         const target = event.target instanceof Element ? event.target : null;
         const onHandle = target?.closest(HANDLE) != null;
         if (current.handleOnly && !onHandle) return;
-        if (target?.closest(INTERACTIVE) && !onHandle) return;
+        // An item that is picked up by its controls too (a table header whose sort button fills
+        // it): a press there starts a drag once it travels; a click without travel stays theirs.
+        const fromControls = event.currentTarget.hasAttribute(DRAG_FROM_CONTROLS);
+        if (target?.closest(INTERACTIVE) && !onHandle && !fromControls) return;
         controller.beginPointerDrag<TData>({
           event: event.nativeEvent,
           element: event.currentTarget,

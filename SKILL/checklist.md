@@ -12,11 +12,13 @@ checks.
 - [ ] `SmartFilter.Root` wraps `Page.Root`; its toolbar is in `Page.Tools`, its chips in `Page.Chips` ([the top bar](composition.md#the-top-bar)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 - [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
-- [ ] The column chooser is `columnsMenu` in the table's header row; a DataTable `toolbar` holds two or more table controls or does not exist ([controls of a table](composition.md#controls-of-a-table)).
+- [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
+- [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` in `Page.Tools`; a DataTable `toolbar` holds two or more table controls or does not exist ([controls of a table](composition.md#controls-of-a-table)).
 
 ## UX ([ux.md](ux.md))
 - [ ] I wrote the five-line brief before the JSX ([brief](ux.md#1-brief-before-code)).
 - [ ] Every entity is laid out by its shape: a record is one row or one block ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
+- [ ] A FieldList picks its `rowActions` (buttons or menu) and its `variant` (plain or surface) by the rules ([forms](composition.md#7-forms)).
 - [ ] Labels on a form of rows ≤ columns + the list label; none repeated, numbered or repeating its heading ([label economy](ux.md#3-label-economy)).
 - [ ] No text explains the layout; every hint says what the person cannot see ([label economy](ux.md#3-label-economy)).
 - [ ] Buttons say the verb and the object, errors say how to fix it, empty states offer the next step ([words](ux.md#4-words)).

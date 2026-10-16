@@ -126,6 +126,7 @@ export const PART_REFS = {
   "ConfirmDialog.Trigger": null,
   Crossfade: ["HTMLDivElement"],
   DataTable: ["HTMLDivElement"],
+  DataTableColumnsMenu: ["HTMLButtonElement"],
   "Datepicker.Root": ["HTMLDivElement"],
   "Datepicker.Panel": ["HTMLDivElement"],
   "DescriptionList.Root": ["HTMLDListElement"],

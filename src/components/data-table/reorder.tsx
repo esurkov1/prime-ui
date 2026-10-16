@@ -1,15 +1,15 @@
 import * as React from "react";
 import { Dnd } from "@/components/dnd/Dnd";
 import { Tooltip } from "@/components/tooltip/Tooltip";
-import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { isPromiseLike } from "@/internal/usePendingChanges";
 
-import styles from "./DataTable.module.css";
 import type { FlatRow } from "./rows";
 
 /** What every row needs to know about reordering (part of the rows' shared props). */
 export type RowReorderShared = {
+  /** Where a row is picked up: a grip cell leading or ending it, or the row itself. */
+  handle: "start" | "end" | "row";
   /** The table is sorted by a column: the manual order is not what is on screen. */
   locked: boolean;
   /** `aria-label` of a row's handle; `{label}` is `getRowLabel(row)`. */
@@ -21,6 +21,8 @@ export type RowReorderShared = {
 type Entry<Row> = { item: FlatRow<Row>; index: number };
 
 export type RowReorderOptions<Row> = {
+  /** `reorderHandle`: a grip cell at the start or the end of a row, or the whole row. */
+  handle: "start" | "end" | "row";
   onReorder: ((id: React.Key, beforeId: React.Key | null) => void | Promise<void>) | undefined;
   /** Expandable rows (sub-rows, detail panels) do not reorder: a row would leave its children. */
   expandEnabled: boolean;
@@ -119,12 +121,13 @@ export function useRowReorder<Row>(options: RowReorderOptions<Row>) {
     () =>
       enabled
         ? {
+            handle: options.handle,
             locked: sorted,
             handleLabel: options.handleLabel,
             lockedHint: options.lockedHint,
           }
         : null,
-    [enabled, sorted, options.handleLabel, options.lockedHint],
+    [enabled, options.handle, sorted, options.handleLabel, options.lockedHint],
   );
 
   return { enabled, shared, reorderIn, isOwnMove };
@@ -134,6 +137,8 @@ type ReorderBodyProps<Row> = {
   entries: Entry<Row>[];
   /** First index of the run among the rows on screen. */
   start: number;
+  /** Only a row's grip picks it up (`reorderHandle` `start` / `end`); else the whole row. */
+  handle: boolean;
   locked: boolean;
   onReorder: (id: string, beforeId: string | null) => void | Promise<void>;
   getRowLabel: ((row: Row) => string) | undefined;
@@ -145,10 +150,14 @@ type ReorderBodyProps<Row> = {
 
 const entryId = <Row,>(entry: Entry<Row>) => String(entry.item.key);
 
-/** A `<tbody>` whose rows reorder: Dnd's sortable list in its table-rows mode, by the handle only. */
+/**
+ * A `<tbody>` whose rows reorder: Dnd's sortable list in its table-rows mode, by the grip only, or
+ * by the whole row (`reorderHandle="row"`: the row is the keyboard target and the drag source).
+ */
 export function ReorderBody<Row>({
   entries,
   start,
+  handle,
   locked,
   onReorder,
   getRowLabel,
@@ -169,7 +178,7 @@ export function ReorderBody<Row>({
       onReorder={onReorder}
       // On screen the position counts from the run, the stripes from the rows on screen.
       renderItem={(entry, index) => renderRow(entry.item, start + index)}
-      handle
+      handle={handle}
       disabled={locked}
       header={header}
       className={className}
@@ -199,17 +208,28 @@ type RowElementProps = Omit<React.ComponentProps<"tr">, "ref"> & {
  * A body row's `<tr>`; in a reorderable table, a sortable item rendered as that `<tr>` (it needs no
  * DOM id: only expandable rows are pointed at, and those do not reorder).
  */
-export function RowElement({ reorder, rowKey, rowRef, id, children, ...rest }: RowElementProps) {
+export function RowElement({
+  reorder,
+  rowKey,
+  rowRef,
+  id,
+  tabIndex,
+  children,
+  ...rest
+}: RowElementProps) {
   if (!reorder) {
     return (
-      <tr ref={rowRef} id={id} {...rest}>
+      <tr ref={rowRef} id={id} tabIndex={tabIndex} {...rest}>
         {children}
       </tr>
     );
   }
+  // A row that is its own grip is a tab stop through Dnd (the move keys); a row that opens keeps
+  // its own.
   return (
     <Dnd.SortableItem
       {...(rest as Omit<React.HTMLAttributes<HTMLElement>, "id">)}
+      {...(tabIndex === undefined ? null : { tabIndex })}
       id={String(rowKey)}
     >
       {children}
@@ -226,8 +246,9 @@ type HandleCellProps = {
 };
 
 /**
- * The leading cell of a reorderable row: the grip (Alt + ↑ / ↓ from the keyboard; busy while the
- * owner saves this row's move) and, while the table is sorted, a disabled grip that says why.
+ * The grip cell of a reorderable row, leading or ending it (`reorderHandle`): the grip (Alt + ↑ / ↓
+ * from the keyboard; busy while the owner saves this row's move) and, while the table is sorted, a
+ * disabled grip that says why.
  */
 export function ReorderHandleCell({ reorder, rowLabel, className, wrap }: HandleCellProps) {
   const label = formatLabel(reorder.handleLabel, { label: rowLabel ?? "" }).trim();
@@ -244,5 +265,5 @@ export function ReorderHandleCell({ reorder, rowLabel, className, wrap }: Handle
   } else {
     content = <Dnd.Handle aria-label={label} />;
   }
-  return <td className={cx(className, styles.handleCell)}>{wrap ? wrap(content) : content}</td>;
+  return <td className={className}>{wrap ? wrap(content) : content}</td>;
 }
