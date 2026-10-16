@@ -170,11 +170,13 @@ type MessageRowDescription = {
  * What a top-level child of a list is. Every child is a row (a message, a fragment with one, a
  * date, a service line, the unread band) except the parts that live at the list's end (`tail`:
  * typing, the selection bar). A `message` row describes itself; a `sticky` row is a date that
- * sticks while its day scrolls.
+ * sticks while its day scrolls; any other row may give its `estimate`.
  */
 type RowKind = {
   tail?: boolean;
   sticky?: boolean;
+  /** A row that is not a message: its height before it is measured (px). */
+  estimate?: number;
   message?: (props: Record<string, unknown>) => MessageRowDescription;
 };
 

@@ -36,7 +36,9 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 │  ├─ [first-load placeholders]   Skeleton bubbles on both sides in the list's place while `loading`
 │  ├─ [older placeholder]         a Skeleton bubble above the first message while `hasOlder`
 │  ├─ Chat.Separator              a date pill, sticky at the top of its day (from `items`, or yours)
-│  ├─ Chat.Service                an event of the chat, centered pill
+│  ├─ Chat.Service                an event of the chat, a centered pill; the time at its end
+│  │  ├─ Chat.ServiceIcon         the glyph before the text (aria-hidden)
+│  │  └─ Chat.ServiceChange       `from` › `to` (two Badge.Root), read as «с «Лид» на «Арендатор»»
 │  ├─ Chat.Unread                 «Непрочитанные сообщения» band (`unread`)
 │  ├─ Message.Root                a message row (see Message)
 │  ├─ Message.Typing              «печатает…» bubble at the end (from `Chat.Root typing`, or yours)
@@ -81,6 +83,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 - `renderMessage` may be an inline function: an item renders again only when it or its place changes, so whatever a row shows lives in its item (an edit, a reaction, a pin). Another message (a reply's original) comes from `entry.find(key)`.
 - `onRead` reports an incoming message once at least half of it, or half the view, has been on screen while the page is visible (`IntersectionObserver`); batched per frame, each `value` once per mount.
 - One sound at a time on the page: a `VoicePlayer`, a `VideoNote` and a video in `Message.Media` pause each other; nothing to wire.
+- What happened to the conversation's record (an agent took the client, a stage changed, a manager joined) goes into the list as `Chat.Service` rows — the same items, marked by `isService`, at their time. Events in a row stand as one group; a new one at the end rises in like a message.
 - Times in a profile's zone: `timeZone` (an IANA name) on `Chat.Messages` moves the date separators, the runs and every message's time to it; without it they follow the browser.
 
 ## API
@@ -202,11 +205,31 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the date), `className`. |
 
 ### Chat.Service
-`ref` → `HTMLDivElement`. An event of the chat, not a message («Анна добавила Олега»): a centered pill that wraps; a row, never a message (with `items`, render it for an `isService` item).
+`ref` → `HTMLDivElement`. An event of the chat, not a message: a centered pill that wraps — `Chat.ServiceIcon`, the words, `Chat.ServiceChange`, the time. A row (for an `isService` item): the arrows, the selection and the search pass it by; events in a row stand as one group.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the event), `className`. |
+| `time` | `Date \| string` | — | When it happened: a `Date` shown with `formatTime` (and put in `<time dateTime>`), or the text to show; muted, at the end of the pill. |
+| `timeZone` | `string` | the list's `timeZone`, else the browser's zone | The zone `time` is read in. |
+| `formatTime` | `(date: Date, timeZone?: string) => string` | «09:05» | Display of a `Date` time; gets the `timeZone` in force. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the event: words, `Chat.ServiceIcon`, `Chat.ServiceChange`, a link), `className`. |
+
+### Chat.ServiceIcon
+`ref` → `HTMLSpanElement`. The glyph before an event's text (who or what acted): an `Icon` at the caption's size, muted, `aria-hidden` — the words name it.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (an `Icon`), `className`. |
+
+### Chat.ServiceChange
+`ref` → `HTMLSpanElement`. A value that changed inside an event: `from` › `to`, two `Badge.Root` with your colours as a rule. It wraps as one unit; assistive tech hears one phrase, «с «Лид» на «Арендатор»» (`labels.change`), the drawing is hidden.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `from` | `ReactNode` | — (required) | The value before (a `Badge.Root`); its text fills `{from}`. |
+| `to` | `ReactNode` | — (required) | The value after; its text fills `{to}`. |
+| `labels` | `Partial<ChatServiceChangeLabels>` | — | `change` — the phrase assistive tech hears. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes. |
 
 ### Chat.Unread
 `ref` → `HTMLDivElement`. «Непрочитанные сообщения»: a band across the list above the first unread message (`unread` of `Chat.Messages items` puts it there).
@@ -252,6 +275,8 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | older history | `hasOlder` | a bubble-shaped `Skeleton` above the first message; reaching it calls `onLoadOlder`; the rows that arrive above keep the reader's place |
 | jumped to | `Message.Reply target`, `Chat.Pinned`, `jumpTo` | the list brings the message to the middle (a near one glides, a far one lands at once — rendering it first — and settles once its neighbours have laid out); the message itself steps back and comes forward three times, the others stay still (opacity 1 → the dimmed opacity of `Message` → 1, `base` each) — `data-pointing="a"` / `"b"` on the list, flipped on every jump so a repeated jump restarts it, and `data-pointed` with the same `data-blink` on the message; a reply's target also takes the focus, a `jumpTo` change leaves it where it is. While the search is open its current match takes the place of `jumpTo`. Reduced motion: no blink, the others stand back for a moment |
 | search | `search` (the bar open) | every case-insensitive match in the messages' text and transcripts under a soft accent wash (`<mark>`); the newest match is current: brought into view while the others stay back (`data-pointing="current"`); Enter and the older / newer buttons move the full strength to the older or newer match in one step; «2 из 5» or «Нет совпадений» beside the field |
+| new event | a `Chat.Service` (or a `Chat.Unread`) added at the end after the list mounted, decided from the row keys as messages are | its row floats up `--prime-space-1` and fades in once (`enterMotion.enter`, `fast`; reduced motion keeps the fade). Not on the first render, history or a row the window renders as it scrolls into view |
+| events in a row | consecutive `Chat.Service` rows | one group: `--prime-message-group-gap` between them, the row's `space-3` only around the group |
 | typing | `typing` | the description cross-fades into «печатает…» in the accent (`Crossfade`); the typing bubble enters at the end of the list like an incoming message and leaves closing its height |
 | pinned | `Chat.Pinned items` | the rail's current segment in the accent; a press jumps to the message and steps the bar to the older one (the oldest wraps to the newest), its line entering; without items the bar renders nothing |
 | selection mode | `selected` (not `null`); any of `selected` / `defaultSelected` / `onSelectedChange` adds «Выбрать» to every `Message.Menu` | listbox / options with `aria-selected`; a check at the row start; a click toggles, Shift+click selects the range from the anchor, press-and-drag (or a finger slid from a check) paints the messages it passes with the first one's new state and scrolls the list at its edges; the unselected messages step back to the dimmed opacity of `Message` with a slight desaturation (`fast`, both ways; `data-selecting` on the list, `data-selected` on the message); `Chat.SelectionBar` — the «к последним» button rises above it first (its height upward in `--message-bottom-lift` on the list, `fast`), then the bar fades in, so the two never overlap; outside selection the bar renders nothing |
@@ -263,6 +288,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 - The search bar and the pinned bar stand under the header with `space-3` side padding; the footer pads the Composer by `space-2` / `space-3`.
 - The list pads its own sides (`space-2`), so the focus rings of the bubbles fit; every row is a container: a bubble is at most `--prime-message-max-width` and 85% of the chat.
 - Gaps between runs `--prime-message-gap` (16), inside a run `--prime-message-group-gap` (8).
+- A date and an event stand in `space-3` above and below; their pill is a caption on `--prime-color-fill-muted`, `space-1` / `space-3` padding, never wider than a bubble. An event's content is inline and wraps as text: each part (`Chat.ServiceIcon`, `Chat.ServiceChange`, the time) is a box one caption line high; the change wraps as one unit and, wider than the pill, breaks around its arrow. Its content takes the compact tier (`compactTier`), so a change's badges are `xs` and the pill keeps one line's height.
 - The window: only the rows around the view render, in normal flow between two spacers whose nodes stay while the window moves (sticky dates keep working; the date of the day in view stays rendered). Each row is measured once (one shared `ResizeObserver`) and cached by key; until then it stands at an estimate its message gives from its props (a picture from its aspect, a text from its length). The scroller keeps the first element in view still when anything above it changes (history loaded, rows measured, a message that grows in place) — one correction before paint — never moves a row with a transform, and the window pins rows it must keep: a jump target, the focused message, a playing player.
 - The «к последним» button is a zero-height sticky row at the end of the list: it floats over the last messages at `space-3` from the bottom-end and takes no room.
 - Only text selects: the list and every message are `user-select: none`, the text-bearing parts opt back in.
@@ -291,6 +317,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 - `Chat.Pinned` is a button named by its content, the title and the line («Закреплённое 2 из 3» + the text); the rail is decorative; «Открепить» is a separate button.
 - The «к последним» button is named «К последним сообщениям», with the count «Новых сообщений: N. …»; the badge is `aria-hidden`.
 - `Chat.SelectionBar` is a `toolbar` named by the count «Выбрано: N», which is announced politely as it changes.
+- `Chat.Service` is a row of the log, not a message: no `article`, no place in the arrows' order or the selection; its text (with the change's phrase) is what the log announces when an event arrives.
 - The quick reaction (double tap, `L`) is announced politely.
 - One sound at a time on the page: a voice message, a video note and a chat video pause each other.
 - «Печатает…» in the header is visible text; in the list the typing bubble is a polite `status` «Собеседник печатает».
@@ -327,11 +354,18 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `pinnedOf` | `"Закреплённое {index} из {count}"` | `Chat.Pinned labels`: the title with several, the newest last. |
 | `unpin` | `"Открепить"` | `Chat.Pinned labels`: the name of the unpin button. |
 
+#### Chat.ServiceChange
+
+| Key | Default | Used for |
+|---|---|---|
+| `change` | `"с «{from}» на «{to}»"` | `Chat.ServiceChange labels`: the change as assistive tech hears it; `{from}`, `{to}` — the text of each value. |
+
 ## Examples
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A complete team messenger over two thousand messages: the header whose status turns into typing, search with highlight, pinned messages, history that loads above, author headers with tags in a group chat, every kind of message, transcripts, reactions, the menu with reply, edit, pin and select, jumps, the new-messages button and the Composer whose messages rise into the list — `Chat.Root`, `Chat.Header`, `Chat.Search`, `Chat.Pinned`, `Chat.Messages`, `group`, `items`, `renderMessage`, `typing`, `selected`, `Chat.Footer`. |
 | [structure.tsx](examples/structure.tsx) | The list alone, written as parts: `Chat.Root` with only `Chat.Messages`, a date that stays on top while its day scrolls, an event of the chat and the unread band — `Chat.Messages`, `Chat.Separator`, `Chat.Service`, `Chat.Unread`. |
+| [events.tsx](examples/events.tsx) | What happened to the client, right in the dialog: who took it, a stage it moved to, a manager who joined; events in a row stand as one group, a new one rises in at the end — `isService`, `Chat.Service`, `Chat.ServiceIcon`, `Chat.ServiceChange`, `time`. |
 | [group-chat.tsx](examples/group-chat.tsx) | A team chat from data: the first message of an author's run opens with the name in the author's hue, a crown for the owner and the member's tag; the avatar — a photo, or initials — closes the run, which holds messages up to a quarter of an hour apart; the dates carry the weekday — `group`, `items`, `renderMessage`, `groupWindow`, `formatDate`, `Message.Author`, `tag`, `Message.AuthorIcon`, `hueOf`. |
 | [reactions.tsx](examples/reactions.tsx) | A team's own reactions for approvals: a double tap or `L` puts the approval mark, a long press or `R` opens the team's set, and a chip toggles them back — `quickReaction`, `reactionOptions`, `onReactionToggle`. |
 | [live.tsx](examples/live.tsx) | A live support chat: the client types — the header and the end of the list say so — then answers; new messages enter at the end, read receipts come from what is on screen, and scrolled up the round button counts what arrived — `typing`, `onNewMessage`, `onRead`. |
@@ -340,7 +374,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | [states.tsx](examples/states.tsx) | The first load of a conversation: bubble-shaped placeholders on both sides stand in the list's place, then cross-fade into the messages — `loading`. |
 | [controlled.tsx](examples/controlled.tsx) | Selection mode owned by the screen: the Select item of a message's menu starts it, a check stands beside every message, a press toggles one while the others step back, the bar counts and acts, Escape leaves — `selected`, `onSelectedChange`, `Chat.SelectionBar`. |
 | [narrow.tsx](examples/narrow.tsx) | At phone width the header keeps its actions and lets the title ellipsize, bubbles take up to 85% of the chat, long links wrap and an album keeps its layout — `Chat.Root`, `Chat.Header`, `Chat.Messages`, `Chat.Footer`. |
-| [screen.tsx](examples/screen.tsx) | A support messenger as a work screen: the title and the unread count in its top bar, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`. |
+| [screen.tsx](examples/screen.tsx) | A support messenger as a work screen: the title and the unread count in its top bar, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, the request's events (an agent took it, its status moved, you joined) between the messages, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `isService`, `hasOlder`, `onLoadOlder`, `typing`. |
 
 ## Mistakes
 - A header, a search bar and a scroller of your own around the messages → `Chat.Header`, `Chat.Search`, `Chat.Messages`: the chat wires typing, search, jumps and selection between them.
@@ -355,9 +389,11 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 - Marking messages read on arrival → `onRead` reports what was really on screen while the page was visible.
 - «печатает…» as a text you swap in the header and a row you add to the list → `Chat.Root typing`: both move together, smoothly.
 - Search results computed and scrolled to by hand → `Chat.Search`: it finds, counts, marks and brings matches into view, the focus staying in the field.
+- A chat event as a `Message.Root` from «system», or a `Notification` → `Chat.Service`: a row of the list, outside the arrows, the selection and the search.
+- A change written as «Лид → Арендатор» in the text → `Chat.ServiceChange from to`: the values keep their colours and assistive tech hears «с «Лид» на «Арендатор»».
 - `scrollIntoView` to show a pinned or quoted message → `Chat.Pinned` and `Message.Reply target` jump in the chat's own scroller and point at the message.
 - Checkboxes and selection handling of your own → `Chat.Root selected` with `Chat.SelectionBar`: click, Shift range and drag like DataTable rows.
 
 ## Related
-- **Built from:** [Message](../message/COMPONENT.md) (`Message.Typing`, the rows), [ScrollContainer](../scroll-container/COMPONENT.md) (the scroller, `anchor="end"`), [Input](../input/COMPONENT.md) (the search field), [Button](../button/COMPONENT.md) (search, steps, unpin, «к последним», the selection bar), [Badge](../badge/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md) (the status line, the first load), [Skeleton](../skeleton/COMPONENT.md) (the first load, older history), [VisuallyHidden](../visually-hidden/COMPONENT.md) (the loading announcement), Icon (`action.search`, `nav.chevronUp`, `nav.chevronDown`, `action.pin`, `action.close`); `useVirtualRows` (the window), `internal/messageList` (the contract between the list and its messages), `internal/readReceipts`, `internal/useRangeSelection` (selection by click, Shift and drag), `internal/messagePart` (the search query its texts mark)
+- **Built from:** [Message](../message/COMPONENT.md) (`Message.Typing`, the rows), [ScrollContainer](../scroll-container/COMPONENT.md) (the scroller, `anchor="end"`), [Input](../input/COMPONENT.md) (the search field), [Button](../button/COMPONENT.md) (search, steps, unpin, «к последним», the selection bar), [Badge](../badge/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md) (the status line, the first load), [Skeleton](../skeleton/COMPONENT.md) (the first load, older history), [VisuallyHidden](../visually-hidden/COMPONENT.md) (the loading announcement, the phrase of a change), Icon (`action.search`, `nav.chevronUp`, `nav.chevronDown`, `nav.chevronRight`, `action.pin`, `action.close`); `useVirtualRows` (the window), `internal/messageList` (the contract between the list and its messages), `internal/readReceipts`, `internal/useRangeSelection` (selection by click, Shift and drag), `internal/messagePart` (the search query its texts mark)
 - **See also:** [Message](../message/COMPONENT.md) — one message and every content part; [Composer](../composer/COMPONENT.md) — the input in `Chat.Footer`; [Gallery](../gallery/COMPONENT.md), [VoicePlayer](../voice-player/COMPONENT.md), [VideoNote](../video-note/COMPONENT.md), [Timeline](../timeline/COMPONENT.md)

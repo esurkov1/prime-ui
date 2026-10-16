@@ -1,6 +1,7 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { CHAT_LABELS } from "./Chat";
 import { CHAT_PINNED_LABELS } from "./ChatPinned";
+import { CHAT_SERVICE_CHANGE_LABELS } from "./ChatRows";
 
 export const api: ComponentApi = {
   parts: [
@@ -390,14 +391,83 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Service",
-      en: "`ref` → `HTMLDivElement`. An event of the chat, not a message («Анна добавила Олега»): a centered pill that wraps; a row, never a message (with `items`, render it for an `isService` item).",
-      ru: "Событие чата, а не сообщение («Анна добавила Олега»): плашка посередине с переносом; строка, а не сообщение (с `items` рисуйте её для элемента `isService`).",
+      en: "`ref` → `HTMLDivElement`. An event of the chat, not a message: a centered pill that wraps — `Chat.ServiceIcon`, the words, `Chat.ServiceChange`, the time. A row (for an `isService` item): the arrows, the selection and the search pass it by; events in a row stand as one group.",
+      ru: "Событие чата, а не сообщение: плашка посередине с переносом — `Chat.ServiceIcon`, слова, `Chat.ServiceChange`, время. Строка (для элемента `isService`): стрелки, выбор и поиск её минуют; события подряд стоят одной группой.",
       props: [
+        {
+          name: "time",
+          type: "Date | string",
+          en: "When it happened: a `Date` shown with `formatTime` (and put in `<time dateTime>`), or the text to show; muted, at the end of the pill.",
+          ru: "Когда произошло: `Date` выводится через `formatTime` (и попадает в `<time dateTime>`) или готовый текст; приглушённо, в конце плашки.",
+        },
+        {
+          name: "timeZone",
+          type: "string",
+          defaultNote: {
+            en: "the list's `timeZone`, else the browser's zone",
+            ru: "`timeZone` списка, иначе пояс браузера",
+          },
+          en: "The zone `time` is read in.",
+          ru: "Пояс, в котором читается `time`.",
+        },
+        {
+          name: "formatTime",
+          type: "(date: Date, timeZone?: string) => string",
+          defaultNote: { en: "«09:05»", ru: "«09:05»" },
+          en: "Display of a `Date` time; gets the `timeZone` in force.",
+          ru: "Показ времени из `Date`; получает действующий `timeZone`.",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (the event), `className`.",
-          ru: "`children` (событие), `className`.",
+          en: "`children` (the event: words, `Chat.ServiceIcon`, `Chat.ServiceChange`, a link), `className`.",
+          ru: "`children` (событие: слова, `Chat.ServiceIcon`, `Chat.ServiceChange`, ссылка), `className`.",
+        },
+      ],
+    },
+    {
+      name: "Chat.ServiceIcon",
+      en: "`ref` → `HTMLSpanElement`. The glyph before an event's text (who or what acted): an `Icon` at the caption's size, muted, `aria-hidden` — the words name it.",
+      ru: "Глиф перед текстом события (кто или что действовало): `Icon` размера подписи, приглушённый, `aria-hidden` — его называют слова.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (an `Icon`), `className`.",
+          ru: "`children` (`Icon`), `className`.",
+        },
+      ],
+    },
+    {
+      name: "Chat.ServiceChange",
+      en: "`ref` → `HTMLSpanElement`. A value that changed inside an event: `from` › `to`, two `Badge.Root` with your colours as a rule. It wraps as one unit; assistive tech hears one phrase, «с «Лид» на «Арендатор»» (`labels.change`), the drawing is hidden.",
+      ru: "Значение, которое изменилось в событии: `from` › `to`, как правило два `Badge.Root` ваших цветов. Переносится целиком; вспомогательные технологии слышат одну фразу «с «Лид» на «Арендатор»» (`labels.change`), рисунок скрыт.",
+      props: [
+        {
+          name: "from",
+          type: "ReactNode",
+          required: true,
+          en: "The value before (a `Badge.Root`); its text fills `{from}`.",
+          ru: "Значение до (`Badge.Root`); его текст подставляется в `{from}`.",
+        },
+        {
+          name: "to",
+          type: "ReactNode",
+          required: true,
+          en: "The value after; its text fills `{to}`.",
+          ru: "Значение после; его текст подставляется в `{to}`.",
+        },
+        {
+          name: "labels",
+          type: "Partial<ChatServiceChangeLabels>",
+          en: "`change` — the phrase assistive tech hears.",
+          ru: "`change` — фраза для вспомогательных технологий.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes.",
+          ru: "`className` и прочие атрибуты.",
         },
       ],
     },
@@ -487,6 +557,13 @@ export const api: ComponentApi = {
         ru: "Вежливо объявляется, пока переписка загружается впервые (`Chat.Messages loading`).",
       },
     }),
+    ...labelRows(CHAT_SERVICE_CHANGE_LABELS, {
+      change: {
+        en: "`Chat.ServiceChange labels`: the change as assistive tech hears it; `{from}`, `{to}` — the text of each value.",
+        ru: "`Chat.ServiceChange labels`: изменение для вспомогательных технологий; `{from}`, `{to}` — текст каждого значения.",
+        part: "Chat.ServiceChange",
+      },
+    }),
     ...labelRows(CHAT_PINNED_LABELS, {
       pinned: {
         en: "`Chat.Pinned labels`: the title with one pinned message.",
@@ -568,6 +645,10 @@ export const api: ComponentApi = {
       {
         en: "`Chat.SelectionBar` is a `toolbar` named by the count «Выбрано: N», which is announced politely as it changes.",
         ru: "`Chat.SelectionBar` — `toolbar` с именем «Выбрано: N», которое объявляется по мере изменения.",
+      },
+      {
+        en: "`Chat.Service` is a row of the log, not a message: no `article`, no place in the arrows' order or the selection; its text (with the change's phrase) is what the log announces when an event arrives.",
+        ru: "`Chat.Service` — строка ленты, а не сообщение: без `article`, вне порядка стрелок и выбора; её текст (с фразой изменения) лента объявляет, когда событие приходит.",
       },
       {
         en: "The quick reaction (double tap, `L`) is announced politely.",

@@ -1,12 +1,14 @@
 import { Activity } from "./glyphs/activity";
 import { AppWindow } from "./glyphs/app-window";
 import { ArrowDown } from "./glyphs/arrow-down";
+import { ArrowRight } from "./glyphs/arrow-right";
 import { ArrowUp } from "./glyphs/arrow-up";
 import { ArrowUpDown } from "./glyphs/arrow-up-down";
 import { Bell } from "./glyphs/bell";
 import { Bike } from "./glyphs/bike";
 import { Bold } from "./glyphs/bold";
 import { BookOpen } from "./glyphs/book-open";
+import { Bot } from "./glyphs/bot";
 import { Calendar } from "./glyphs/calendar";
 import { Captions } from "./glyphs/captions";
 import { ChartColumn } from "./glyphs/chart-column";
@@ -128,6 +130,7 @@ import { ZoomOut } from "./glyphs/zoom-out";
 export const iconRegistry = {
   "nav.chevronDown": ChevronDown,
   "nav.chevronLeft": ChevronLeft,
+  "nav.arrowRight": ArrowRight,
   "nav.chevronRight": ChevronRight,
   "nav.chevronUp": ChevronUp,
   "nav.chevronsLeft": ChevronsLeft,
@@ -214,6 +217,7 @@ export const iconRegistry = {
   "object.fuel": Fuel,
   "object.funnel": Funnel,
   "object.globe": Globe,
+  "object.bot": Bot,
   "object.headset": Headset,
   "object.image": Image,
   "object.inbox": Inbox,

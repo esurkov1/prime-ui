@@ -20,7 +20,13 @@ import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Chat.module.css";
 import { ChatPinned } from "./ChatPinned";
-import { ChatSeparator, ChatService, ChatUnread } from "./ChatRows";
+import {
+  ChatSeparator,
+  ChatService,
+  ChatServiceChange,
+  ChatServiceIcon,
+  ChatUnread,
+} from "./ChatRows";
 import { type ChatContextValue, type ChatLabels, ChatProvider, useChat } from "./chatContext";
 import { type GroupMessagesOptions, groupMessages, type MessageListEntry } from "./groupMessages";
 import {
@@ -33,6 +39,9 @@ import {
 export type { ChatPinnedItem, ChatPinnedLabels, ChatPinnedProps } from "./ChatPinned";
 export type {
   ChatSeparatorProps,
+  ChatServiceChangeLabels,
+  ChatServiceChangeProps,
+  ChatServiceIconProps,
   ChatServiceProps,
   ChatUnreadLabels,
   ChatUnreadProps,
@@ -687,6 +696,8 @@ export const Chat = {
   SelectionBar: ChatSelectionBar,
   Separator: ChatSeparator,
   Service: ChatService,
+  ServiceIcon: ChatServiceIcon,
+  ServiceChange: ChatServiceChange,
   Unread: ChatUnread,
   Footer: ChatFooter,
 };

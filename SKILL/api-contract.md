@@ -376,11 +376,11 @@ crumb of your own.
 
 <!-- icons:start -->
 `<Icon name="…" />` names:
-- `nav.*`: `chevronDown`, `chevronLeft`, `chevronRight`, `chevronUp`, `chevronsLeft`, `chevronsUpDown`, `dashboard`, `home`, `itemDot`, `layoutGrid`, `menu`, `sidebarCollapse`, `sidebarExpand`;
+- `nav.*`: `chevronDown`, `chevronLeft`, `arrowRight`, `chevronRight`, `chevronUp`, `chevronsLeft`, `chevronsUpDown`, `dashboard`, `home`, `itemDot`, `layoutGrid`, `menu`, `sidebarCollapse`, `sidebarExpand`;
 - `action.*`: `add`, `addContact`, `attach`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `edit`, `externalLink`, `eyedropper`, `filter`, `forward`, `login`, `logout`, `more`, `openApp`, `pause`, `pin`, `play`, `react`, `refresh`, `report`, `remove`, `reply`, `search`, `send`, `settings`, `transcribe`, `upload`, `video`, `voice`, `zoomIn`, `zoomOut`;
 - `field.*`: `calendar`, `email`, `password.show`, `password.hide`;
 - `format.*`: `bold`, `code`, `italic`, `link`, `list`, `quote`, `spoiler`, `strikethrough`, `underline`;
-- `object.*`: `activity`, `bell`, `bike`, `book`, `cart`, `chart`, `crown`, `disc`, `document`, `file`, `fuel`, `funnel`, `globe`, `headset`, `image`, `inbox`, `key`, `mapPin`, `megaphone`, `message`, `motorbike`, `package`, `phone`, `receipt`, `rocket`, `scale`, `storage`, `tasks`, `trophy`, `truck`, `user`, `users`, `wallet`;
+- `object.*`: `activity`, `bell`, `bike`, `book`, `cart`, `chart`, `crown`, `disc`, `document`, `file`, `fuel`, `funnel`, `globe`, `bot`, `headset`, `image`, `inbox`, `key`, `mapPin`, `megaphone`, `message`, `motorbike`, `package`, `phone`, `receipt`, `rocket`, `scale`, `storage`, `tasks`, `trophy`, `truck`, `user`, `users`, `wallet`;
 - `sort.*`: `ascending`, `descending`, `none`;
 - `status.*`: `danger`, `emailSent`, `failed`, `favorite`, `info`, `locked`, `muted`, `sound`, `offline`, `pending`, `read`, `sent`, `success`, `trendUp`, `warning`;
 - `theme.*`: `dark`, `light`;

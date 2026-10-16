@@ -106,3 +106,29 @@ export function createMessageFlow({ region, onNew }: FlowOptions): MessageFlow {
     },
   };
 }
+
+/**
+ * The rows that are not messages (a service event, the unread band) new at the end, by row key, on
+ * the same terms as the messages' flow: planned in render against the last commit, so a row that
+ * mounts because it scrolled into view never enters, and neither does anything of the first commit.
+ */
+export type RowArrivals = {
+  plan: (keys: readonly string[]) => void;
+  isFresh: (key: string) => boolean;
+  commit: (keys: readonly string[]) => void;
+};
+
+export function createRowArrivals(): RowArrivals {
+  let committed: readonly string[] | null = null;
+  let planned = new Set<string>();
+  return {
+    plan(keys) {
+      planned = newAtEnd(committed, keys);
+    },
+    isFresh: (key) => planned.has(key),
+    commit(keys) {
+      committed = keys;
+      planned = new Set();
+    },
+  };
+}

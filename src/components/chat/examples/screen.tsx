@@ -1,6 +1,7 @@
-/** A support messenger as a work screen: the title and the unread count in its top bar, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`. */
+/** A support messenger as a work screen: the title and the unread count in its top bar, the dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, the unread band, reply and edit from the menu, the typing signal both ways, the request's events (an agent took it, its status moved, you joined) between the messages, unread counts from what was seen, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `isService`, `hasOlder`, `onLoadOlder`, `typing`. */
 import {
   Avatar,
+  Badge,
   Card,
   Chat,
   ChatList,
@@ -28,7 +29,13 @@ type Content =
   | { kind: "text"; text: string }
   | { kind: "media"; items: GalleryItem[]; caption?: string }
   | { kind: "voice"; src: string; waveform: number[]; duration: number }
-  | { kind: "file"; name: string; size: number; href: string };
+  | { kind: "file"; name: string; size: number; href: string }
+  | {
+      kind: "event";
+      icon: "object.bot" | "object.funnel" | "object.user";
+      text: string;
+      change?: { from: string; to: string };
+    };
 
 type ChatMessage = Content & {
   id: string;
@@ -130,6 +137,31 @@ const HISTORY: ChatMessage[] = [
     caption: "Вот так выглядит",
   },
   {
+    id: "e1",
+    from: "client",
+    sentAt: at(7, 10, 14),
+    kind: "event",
+    icon: "object.bot",
+    text: "ИИ-агент взял обращение",
+  },
+  {
+    id: "e2",
+    from: "client",
+    sentAt: at(7, 10, 14),
+    kind: "event",
+    icon: "object.funnel",
+    text: "ИИ-агент перевёл обращение",
+    change: { from: "Новое", to: "В работе" },
+  },
+  {
+    id: "e3",
+    from: "me",
+    sentAt: at(7, 10, 19),
+    kind: "event",
+    icon: "object.user",
+    text: "Вы подключились к диалогу",
+  },
+  {
     id: "m3",
     from: "me",
     sentAt: at(7, 10, 20),
@@ -228,6 +260,8 @@ const excerpt = (message: ChatMessage) => {
       );
     case "file":
       return message.name;
+    case "event":
+      return message.text;
   }
 };
 
@@ -260,6 +294,8 @@ const renderContent = (message: ChatMessage) => {
       );
     case "file":
       return <Message.File name={message.name} fileSize={message.size} href={message.href} />;
+    case "event":
+      return null;
   }
 };
 
@@ -522,6 +558,23 @@ export default function ChatScreenExample() {
   // re-renders the one message it touches. A dialog loads its own messages, so a row never
   // outlives the contact it names; a reply's original comes from the list (`entry.find`).
   const renderMessage = (message: ChatMessage, entry: ChatMessageEntry<ChatMessage>) => {
+    // What happened to the request (an agent took it, its status moved, you joined): a row.
+    if (message.kind === "event") {
+      return (
+        <Chat.Service time={message.sentAt}>
+          <Chat.ServiceIcon>
+            <Icon name={message.icon} />
+          </Chat.ServiceIcon>
+          {message.text}
+          {message.change ? (
+            <Chat.ServiceChange
+              from={<Badge.Root color="gray">{message.change.from}</Badge.Root>}
+              to={<Badge.Root color="blue">{message.change.to}</Badge.Root>}
+            />
+          ) : null}
+        </Chat.Service>
+      );
+    }
     const own = message.from === "me";
     const original = message.replyTo ? entry.find(message.replyTo) : undefined;
     return (
@@ -645,6 +698,7 @@ export default function ChatScreenExample() {
                   getKey={(message) => message.id}
                   getAuthor={(message) => message.from}
                   getDate={(message) => message.sentAt}
+                  isService={(message) => message.kind === "event"}
                   renderMessage={renderMessage}
                   unread={FIRST_UNREAD}
                   now={NOW}

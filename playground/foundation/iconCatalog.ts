@@ -95,6 +95,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Назад, предыдущая страница",
     keywords: ["стрелка влево", "назад", "chevron", "left", "back", "previous"],
   },
+  "nav.arrowRight": {
+    meaning: "Переход из одного состояния в другое, «было → стало»",
+    keywords: ["стрелка", "вправо", "переход", "стало", "arrow", "right", "change"],
+  },
   "nav.chevronRight": {
     meaning: "Вперёд, перейти глубже",
     keywords: ["стрелка вправо", "вперёд", "далее", "chevron", "right", "next", "forward"],
@@ -368,6 +372,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
       "language",
       "region",
     ],
+  },
+  "object.bot": {
+    meaning: "Бот, ИИ-агент",
+    keywords: ["бот", "робот", "ии", "агент", "нейросеть", "bot", "ai", "agent"],
   },
   "object.headset": {
     meaning: "Поддержка, оператор",

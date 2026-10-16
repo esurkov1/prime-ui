@@ -375,9 +375,65 @@
   box-shadow: var(--prime-shadow-overlay);
 }
 
+/*
+ * An event: inline content that wraps as text does — a glyph, the words, a change of two badges,
+ * the time — each part a box of one caption line, so a wrapped pill keeps its lines even.
+ */
 .service .pill {
+  --prime-icon-size: var(--prime-icon-xs);
+
   border-radius: var(--prime-radius-l);
   font-weight: var(--prime-font-weight-regular);
+}
+
+/*
+ * Events in a row (an agent took the client and moved it a stage) stand as one group: the air of a
+ * run of messages between them, the row's air only around the group. The rows of a list are boxes
+ * of their own (`.row`), so the group is read across them.
+ */
+.row:has(> .service:last-child) + .row > .service:first-child {
+  padding-block-start: var(--prime-message-group-gap);
+}
+
+.row:has(> .service:last-child):has(+ .row > .service:first-child) > .service:last-child {
+  padding-block-end: 0;
+}
+
+.serviceIcon,
+.serviceChange {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--prime-text-caption-line-height);
+  vertical-align: top;
+}
+
+.serviceIcon {
+  margin-inline-end: var(--prime-space-1);
+  color: var(--prime-color-text-muted);
+}
+
+/* The change wraps as one unit; two values wider than the pill break around the arrow. */
+.serviceChange {
+  max-inline-size: 100%;
+  margin-inline: var(--prime-space-1);
+}
+
+.serviceChangeValues {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-1);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  color: var(--prime-color-text-muted);
+}
+
+.serviceTime {
+  margin-inline-start: var(--prime-space-2);
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .unread {

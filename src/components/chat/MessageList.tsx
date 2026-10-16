@@ -42,7 +42,7 @@ import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import { useRangeSelection } from "@/internal/useRangeSelection";
 
 import styles from "./Chat.module.css";
-import { createMessageFlow, type MessageFlow } from "./messageFlow";
+import { createMessageFlow, createRowArrivals, type MessageFlow } from "./messageFlow";
 
 export type MessageListLabels = {
   /** The count of the selection bar: `{count}`. */
@@ -186,7 +186,7 @@ function rowOf(element: React.ReactElement, key: string): Row {
       direction: described?.direction ?? props.direction ?? "incoming",
       // A fragment adds its other rows (the unread band before a message).
       estimate:
-        (described?.estimate ?? ROW_ESTIMATE) +
+        (described?.estimate ?? kind?.estimate ?? ROW_ESTIMATE) +
         (message && message !== element
           ? (React.Children.toArray((element.props as { children?: React.ReactNode }).children)
               .length -
@@ -362,6 +362,25 @@ export function MessageList({
   React.useLayoutEffect(() => {
     flow.commit(messages.map((row) => ({ value: row.value as string, direction: row.direction })));
   }, [flow, messages]);
+  // A row that is not a message (a service event, the unread band) new at the end rises in as a
+  // new message does: marked in render, the mark turned into the enter class once it lands, kept
+  // until the keyframe ends whatever renders meanwhile.
+  const [arrivals] = React.useState(createRowArrivals);
+  arrivals.plan(shape.map((row) => row.key));
+  React.useLayoutEffect(() => {
+    arrivals.commit(shape.map((row) => row.key));
+    const marked = innerRef.current?.querySelectorAll<HTMLElement>(":scope > [data-row-enter]");
+    for (const row of marked ?? []) {
+      delete row.dataset.rowEnter;
+      row.classList.add(enterMotion.enter);
+      const clear = (event: AnimationEvent) => {
+        if (event.target !== row) return;
+        row.classList.remove(enterMotion.enter);
+        row.removeEventListener("animationend", clear);
+      };
+      row.addEventListener("animationend", clear);
+    }
+  }, [arrivals, shape]);
   const receipts = React.useRef<ReadReceipts | null>(null);
   const receiptsOf = React.useCallback(() => {
     receipts.current ??= createReadReceipts((values) => handlers.current.onRead?.(values));
@@ -752,6 +771,7 @@ export function MessageList({
         ref={windowed ? virtual.measure(index) : undefined}
         className={styles.row}
         data-message-row=""
+        data-row-enter={row.value === undefined && arrivals.isFresh(row.key) ? "" : undefined}
       >
         <MessageRowProvider value={positions.get(row.key) ?? null}>
           {row.element}

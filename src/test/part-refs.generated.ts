@@ -69,6 +69,8 @@ export const PART_REFS = {
   "Chat.SelectionBar": ["HTMLDivElement"],
   "Chat.Separator": ["HTMLDivElement"],
   "Chat.Service": ["HTMLDivElement"],
+  "Chat.ServiceIcon": ["HTMLSpanElement"],
+  "Chat.ServiceChange": ["HTMLSpanElement"],
   "Chat.Unread": ["HTMLDivElement"],
   "Chat.Footer": ["HTMLDivElement"],
   "ChatList.Root": ["HTMLDivElement"],
