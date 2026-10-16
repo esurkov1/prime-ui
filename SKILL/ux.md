@@ -32,18 +32,54 @@ adds text that explains what the layout failed to show.
 | Records of one shape a person reads, sorts, filters | a table | `DataTable` |
 | One value in several units or currencies (a deposit in ₽, $, ฿) | the fields side by side in one row under one heading, the unit in each field | `Input.InlineAffix` |
 | A base value and its overrides (a price and its changes by month) | one list: the base is the first, pinned row | `FieldList` `getLocked` |
-| Small attributes of a record (an icon, a color, a flag) | compact controls in the record's row, not fields of their own | icon-only `Select`, `ColorPresets`, `Checkbox` |
+| Small attributes of a record (an icon, a color, a flag) | compact controls in the record's row, not fields of their own | icon-only `Select`, `ColorPresets`, `Switch` |
 | Short texts in an order the person sets | one column, a handle per row | `FieldList` `reorderable` |
 | Settings that most people never touch | behind a disclosure, after the common ones | `Accordion`, a «Дополнительно» section |
 | One of a few options, sent with a form | all visible | `Radio.Group` |
 | One of a few modes of what the screen shows | all visible | `SegmentedControl` |
 | One of many options | a list that opens | `Select` |
 | Many values picked from options | tags | `TagSelect` |
+| A section named after a set of records (sessions, devices, API keys, members) | the records themselves, each with its own actions | `List` with `List.ItemActions` |
 
 How many options count as «a few» and the other selection cases: [choosing.md](choosing.md#2-inside-a-category).
 
 One record is one row or one block, never half a record per line. If a record does not fit one
 row, it is not a row: open it in a `Drawer`.
+
+**A section is what its name says.** A heading that names a set of records — «Сеансы», «Устройства»,
+«Ключи API», «Участники» — promises those records: show them, one row each (where, when, which one is
+this one), with the action on one record in its row and the action on all of them in the section's
+actions. One button standing for the set («Выйти на других устройствах») leaves the person to act on
+records they cannot see. A set that can be empty shows its empty state, never a missing section.
+
+```tsx partial
+// bad — «Сеансы» with nothing but a button
+<Drawer.Section label="Сеансы">
+  <Button.Root variant="soft" tone="neutral">Выйти на других устройствах</Button.Root>
+</Drawer.Section>
+```
+
+```tsx good
+// good — the sessions themselves, an end per row, the end of all of them beside the heading
+<Drawer.Section label="Сеансы">
+  <Drawer.Actions>
+    <Button.Root variant="soft" tone="neutral">Завершить остальные</Button.Root>
+  </Drawer.Actions>
+  <List.Root aria-label="Сеансы">
+    <List.Item value="mac">
+      <List.ItemText>Chrome · macOS</List.ItemText>
+      <List.ItemDescription>Москва · это устройство</List.ItemDescription>
+    </List.Item>
+    <List.Item value="iphone">
+      <List.ItemText>Safari · iPhone</List.ItemText>
+      <List.ItemDescription>Казань · вчера в 21:40</List.ItemDescription>
+      <List.ItemActions>
+        <Button.Root size="s" variant="ghost" tone="neutral">Завершить</Button.Root>
+      </List.ItemActions>
+    </List.Item>
+  </List.Root>
+</Drawer.Section>
+```
 
 ## 3. Label economy
 
@@ -60,7 +96,21 @@ Every word on screen must carry something the person does not see already.
   beside the number when the row stacks, and a screen reader hears it with the field (the affix
   describes the input; `aria-label="рублей"` on it when the sign reads badly).
 - **No text that explains the layout.** «Двигатель, места и скорость всегда первыми» — the lock on
-  those rows says it. A hint says what the person cannot see (a format, a consequence, a limit).
+  those rows says it.
+- **A hint is the few words the label and the control leave out** — two to five: a format («ДД.ММ.ГГГГ»),
+  a limit («До 10 МБ»), a consequence nobody would expect («Увидит клиент»). Never what the control
+  already shows («Применяется сразу» under a Switch, «Время в CRM показывается в этом поясе» under
+  «Часовой пояс»), never the obvious outcome of the action or what stays unchanged («пароль
+  останется прежним», «история его действий останется»), never the label again in other words. A
+  field that needs no hint has none; a hint that needs a sentence is a missing label or a missing
+  control.
+
+| bad hint | good |
+|---|---|
+| «Часовой пояс» — «Время в CRM показывается в этом поясе» | no hint |
+| «Звук» (Switch) — «Применяется сразу, без сохранения» | no hint |
+| «Отключить доступ» — «Сотрудник не сможет войти, история его действий останется» | «Входы прекратятся» |
+| «Почта для входа» — «На эту почту придёт ссылка для входа в систему» | «Для входа и уведомлений» |
 - **One name per thing.** The same action, entity and status keep one word on the whole screen
   (and across screens): «Счёт», not «Счёт» in the title and «Инвойс» in the button.
 - **Count the labels.** On a form of repeating rows, labels on screen ≤ number of columns + the
@@ -157,3 +207,48 @@ Code that passes every check can still read badly. Open the screen in a browser 
   button without an object — remove or rewrite it.
 - **Fill it badly:** the longest real name, an empty list, an error on every field, the slowest
   load. Nothing overflows, jumps or flips.
+
+## 10. Where a setting lives
+
+A setting lives with what it governs, as a field of the form that already holds its neighbours.
+
+- **Group by what it changes, not by how it looks.** A signal (a sound, a desktop banner, an e-mail
+  digest) changes how the person is told — it goes to the notifications; the theme, the language and
+  the time zone change how the app reads — profile preferences; what one record does goes to that
+  record. Ask «what would a person open to change this?» and put it there.
+- **No section for one setting.** A section with a single field joins the closest section; a new
+  section starts at three related fields.
+- **A stored preference is a field.** A setting with options (the theme: «Системная», «Светлая»,
+  «Тёмная») is a `Select` beside its related fields in the profile form — never a `SegmentedControl`,
+  which switches what a screen shows right now ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
+
+```tsx partial
+// bad — a section «Оформление» for the theme as a switch, and the dialog sounds next to it
+<Drawer.Section label="Оформление">
+  <SegmentedControl.Root label="Тема" defaultValue="system">…</SegmentedControl.Root>
+  <Switch.Root><Switch.Label>Звуки диалогов</Switch.Label></Switch.Root>
+</Drawer.Section>
+```
+
+```tsx good
+// good — the theme is one field of the profile, the sounds live with the notifications
+<>
+  <Drawer.Section label="Профиль">
+    <Select.Root label="Тема" defaultValue="system">
+      <Select.Trigger>
+        <Select.Value />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="system">Системная</Select.Item>
+        <Select.Item value="light">Светлая</Select.Item>
+        <Select.Item value="dark">Тёмная</Select.Item>
+      </Select.Content>
+    </Select.Root>
+  </Drawer.Section>
+  <Drawer.Section label="Уведомления">
+    <Switch.Root name="dialogSounds">
+      <Switch.Label>Звуки диалогов</Switch.Label>
+    </Switch.Root>
+  </Drawer.Section>
+</>
+```

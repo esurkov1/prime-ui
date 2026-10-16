@@ -43,8 +43,8 @@ describe("RegionSwap", () => {
   it("keeps the old state as a hidden fading layer and fades the new one in", () => {
     withMotion();
     const { rerender } = render(
-      <RegionSwap state="loading">
-        <p>Загрузка</p>
+      <RegionSwap state="empty">
+        <p>Пусто</p>
       </RegionSwap>,
     );
     rerender(
@@ -52,7 +52,7 @@ describe("RegionSwap", () => {
         <p>Данные</p>
       </RegionSwap>,
     );
-    const leaving = layerOf("Загрузка");
+    const leaving = layerOf("Пусто");
     expect(leaving).toHaveAttribute("data-state", "closed");
     expect(leaving).toHaveAttribute("aria-hidden", "true");
     expect(leaving).toHaveAttribute("inert");
@@ -61,10 +61,10 @@ describe("RegionSwap", () => {
     expect(layerOf("Данные")).toHaveClass(swapMotion.swapIn);
 
     // Only the layer's own animation removes it, not one bubbling from its content.
-    fireEvent.animationEnd(screen.getByText("Загрузка"));
-    expect(screen.getByText("Загрузка")).toBeInTheDocument();
+    fireEvent.animationEnd(screen.getByText("Пусто"));
+    expect(screen.getByText("Пусто")).toBeInTheDocument();
     fireEvent.animationEnd(leaving);
-    expect(screen.queryByText("Загрузка")).toBeNull();
+    expect(screen.queryByText("Пусто")).toBeNull();
   });
 
   it("updates the same state in place", () => {
@@ -165,8 +165,8 @@ describe("RegionSwap", () => {
       return { height } as DOMRect;
     });
     const { container, rerender } = render(
-      <RegionSwap state="loading">
-        <p>Загрузка</p>
+      <RegionSwap state="empty">
+        <p>Пусто</p>
       </RegionSwap>,
     );
     const root = rootOf(container);
@@ -183,6 +183,66 @@ describe("RegionSwap", () => {
       </RegionSwap>,
     );
     expect(setProperty.mock.calls[0]).toEqual(["--swap-height", "120px"]);
+  });
+
+  it("leaving loading: the data replaces the skeleton in place — no glide, a short fade", () => {
+    withMotion();
+    // The skeleton (leaving, 100) and the data (140) differ: a settled swap would glide.
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const height = this.dataset.state === "closed" ? 100 : 140;
+      return { height } as DOMRect;
+    });
+    const { container, rerender } = render(
+      <RegionSwap state="loading">
+        <p>Загрузка</p>
+      </RegionSwap>,
+    );
+    const root = rootOf(container);
+    const setProperty = vi.spyOn(root.style, "setProperty");
+    rerender(
+      <RegionSwap state="ready">
+        <p>Данные</p>
+      </RegionSwap>,
+    );
+    expect(root).not.toHaveAttribute("data-resizing");
+    expect(setProperty).not.toHaveBeenCalled();
+    expect(layerOf("Данные")).toHaveClass(swapMotion.settleIn);
+    expect(layerOf("Данные")).not.toHaveClass(swapMotion.swapIn);
+    // The skeleton fades out clipped to the data's height, never over the content below.
+    expect(root).toHaveAttribute("data-leaving", "true");
+    fireEvent.animationEnd(layerOf("Загрузка"));
+    expect(root).not.toHaveAttribute("data-leaving");
+  });
+
+  it("entering loading drops a running glide and takes the skeleton's height at once", () => {
+    withMotion();
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return { height: this.dataset.state === "closed" ? 100 : 140 } as DOMRect;
+    });
+    const { container, rerender } = render(
+      <RegionSwap state="empty">
+        <p>Пусто</p>
+      </RegionSwap>,
+    );
+    const root = rootOf(container);
+    rerender(
+      <RegionSwap state="ready">
+        <p>Данные</p>
+      </RegionSwap>,
+    );
+    expect(root).toHaveAttribute("data-resizing", "true");
+    rerender(
+      <RegionSwap state="loading">
+        <p>Загрузка</p>
+      </RegionSwap>,
+    );
+    expect(root).not.toHaveAttribute("data-resizing");
+    expect(root.style.getPropertyValue("--swap-height")).toBe("");
+    expect(layerOf("Загрузка")).toHaveClass(swapMotion.settleIn);
   });
 
   it("does not glide when the heights match, under fill, or under reduced motion", () => {
@@ -232,8 +292,8 @@ describe("RegionSwap", () => {
       return { height: this.dataset.state === "closed" ? 100 : 140 } as DOMRect;
     });
     const { container, rerender } = render(
-      <RegionSwap state="loading">
-        <p>Загрузка</p>
+      <RegionSwap state="error">
+        <p>Ошибка</p>
       </RegionSwap>,
     );
     rerender(
@@ -241,7 +301,7 @@ describe("RegionSwap", () => {
         <p>Данные</p>
       </RegionSwap>,
     );
-    expect(screen.queryByText("Загрузка")).toBeNull();
+    expect(screen.queryByText("Ошибка")).toBeNull();
     expect(layerOf("Данные")).toHaveClass(swapMotion.swapIn);
     expect(rootOf(container)).not.toHaveAttribute("data-resizing");
   });
@@ -355,15 +415,24 @@ describe("RegionSwap", () => {
     });
 
     it("remounts a new state with the fade-in and keeps fading every later one", () => {
-      const { rerender } = render(<Body state="loading" />);
-      const first = screen.getByText("loading");
+      const { rerender } = render(<Body state="empty" />);
+      const first = screen.getByText("empty");
       rerender(<Body state="rows" />);
       const rows = screen.getByText("rows");
       expect(rows).toHaveClass(swapMotion.swapIn);
       expect(rows).not.toBe(first);
+      rerender(<Body state="empty" />);
+      expect(screen.getByText("empty")).toHaveClass(swapMotion.swapIn);
+      expect(screen.getByText("empty")).not.toBe(first);
+    });
+
+    it("a swap into or out of loading takes the short fade", () => {
+      const { rerender } = render(<Body state="loading" />);
+      rerender(<Body state="rows" />);
+      expect(screen.getByText("rows")).toHaveClass(swapMotion.settleIn);
+      expect(screen.getByText("rows")).not.toHaveClass(swapMotion.swapIn);
       rerender(<Body state="loading" />);
-      expect(screen.getByText("loading")).toHaveClass(swapMotion.swapIn);
-      expect(screen.getByText("loading")).not.toBe(first);
+      expect(screen.getByText("loading")).toHaveClass(swapMotion.settleIn);
     });
   });
 
@@ -382,6 +451,15 @@ describe("RegionSwap", () => {
       expect(cssValue(cssRule(CSS, ".root"), "transition")).toBe(
         "height var(--prime-motion-duration-base) var(--prime-motion-easing-standard)",
       );
+    });
+
+    it("a leaving layer is clipped to the region; a load fades on the short clock", () => {
+      const leaving = cssRule(CSS, '.root[data-leaving="true"]');
+      expect(cssValue(leaving, "overflow-y")).toBe("clip");
+      expect(cssValue(leaving, "overflow-clip-margin")).toBe("var(--prime-focus-space)");
+      expect(
+        cssValue(cssRule("src/internal/swapMotion.module.css", ".settleIn"), "animation"),
+      ).toContain("var(--prime-motion-fade-fast)");
     });
   });
 });

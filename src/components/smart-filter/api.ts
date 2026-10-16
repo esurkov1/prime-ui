@@ -171,6 +171,12 @@ export const api: ComponentApi = {
           en: "`range` fields: a bound in the chip («1 000 ₽»).",
           ru: "Поля `range`: граница в теге («1 000 ₽»).",
         },
+        {
+          name: "calendar",
+          type: 'Pick<DatepickerPanelProps, "months" | "presets" | "prompt" | "footer" | "withTime" | "isDayDisabled" | "disableFuture" | "today" | "locale" | "weekStartsOn" | "labels">',
+          en: "`date-range` fields: the calendar of the period, as on a report's own Datepicker — `presets`, `months`, `prompt`, `footer`, `withTime`; the chip names a matching preset («Период: Этот месяц»). Without it the panel opens one month with no presets.",
+          ru: "Поля `date-range`: календарь периода, как у Datepicker самого отчёта — `presets`, `months`, `prompt`, `footer`, `withTime`; тег называет совпавший пресет («Период: Этот месяц»). Без него панель открывает один месяц без пресетов.",
+        },
       ],
     },
   ],

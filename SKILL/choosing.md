@@ -40,10 +40,10 @@ under them → its `renderTotals`.
 
 | Situation | Component |
 |---|---|
-| one independent yes/no that is submitted with a form | Checkbox |
-| one setting that applies immediately | Switch |
+| a capability or a setting that is on or off, in a form or applied at once | Switch ([a flag, a level, a set](#a-flag-a-level-a-set)) |
+| items picked out of a set, a consent, an option of the action being sent | Checkbox |
 | exactly one of 2–5 visible options in a form | Radio (`Radio.Group` with `label`) |
-| exactly one of 2–5 modes that change the view right now | SegmentedControl |
+| exactly one of 2–5 modes that change the view right now — never a stored setting | SegmentedControl |
 | one of many (> 5) or a long list; icons, descriptions, search, groups | Select (`Select.Content searchable`) |
 | one record out of thousands for a form field (a client, a contract), searched on the server | Select with `search` / `onSearchChange`, `filter={false}`, `loading`, `hasMore` + `onLoadMore` — never a read-only field that opens a CommandMenu |
 | one value from a plain text list on a mobile-first form, posted with the form (`name`) | NativeSelect — the OS picker opens on phones |
@@ -61,7 +61,7 @@ under them → its `renderTotals`.
 
 **Data.** Status, count, removable value or applied filter → Badge (`tone` for a status, `color` for a
 category, `onRemove` to remove, `pressed` / `onPressedChange` to toggle); several badges as one value
-(a client's tags) → `Badge.Group`. Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
+(a client's tags) → `Badge.Group`, on one line with «+N» in a table cell. Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
 `ratio` — never a round Avatar for things. Keyboard shortcut → Kbd. One block of related
 numbers/content → Card (pick the template; a whole tile that opens its details → `Card.Root asChild`
 with a link). Read-only properties of one record («label — value») → DescriptionList, never a
@@ -147,13 +147,86 @@ the records (tickets, letters, invoices; `current` on the open one; a row's own 
 `Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a `Dropdown.Trigger` at the bottom of
 `Sidebar.Footer`.
 
+### A flag, a level, a set
+
+Pick the control by what the value is, never by when it saves or by what fits in the row.
+
+| The value | Control |
+|---|---|
+| a capability or a setting that is on or off (a permission, «Звук», «Вход по ссылке») | `Switch` with its label: inside a form it saves with the form, outside one it applies at once and its section has no save |
+| items picked out of a set (rows, recipients, «Выбрать все»), a consent, a one-off option of the action being sent («Отправить копию себе») | `Checkbox` |
+| one level for each of several entities (access per section, a frequency per channel) | one row per entity, its level and scope as `Select`s in columns: a `FieldList` from five entities or whenever most entities have no level — an absent row is «no access», «Добавить раздел» adds one; up to four entities that every record has may stand as one labelled `Select` each |
+| a stored preference with options (the theme, the language, the start page) | a `Select` field beside the related fields (`Radio.Group` for 2–3 options that each need a line of description) |
+| a mode of what this screen shows now (a period, board / list, a section) | `SegmentedControl` — it switches the view and is never a stored value |
+| several values of one record in a table cell (roles, tags, access) | `Badge.Group overflow="count"`: one line, the rest behind a «+N» that lists them — never a string joined by «·» with a «+5» typed by hand |
+
+A stack of captioned `SegmentedControl`s, one per entity, makes a person read every caption to find
+the few entities that matter, and fails at 320px; a list of rows names each entity once, in its
+column, and shows only the ones that have a level.
+
+```tsx partial
+// bad — thirteen sections, each a caption, a description and a level switch
+<SegmentedControl.Root label="Сделки" hint="Карточки сделок и воронка" defaultValue="none">
+  <SegmentedControl.Item value="none">Нет</SegmentedControl.Item>
+  <SegmentedControl.Item value="view">Просмотр</SegmentedControl.Item>
+  <SegmentedControl.Item value="edit">Изменение</SegmentedControl.Item>
+  <SegmentedControl.Item value="full">Полный</SegmentedControl.Item>
+</SegmentedControl.Root>
+<SegmentedControl.Root label="Клиенты" …>…</SegmentedControl.Root>
+<Checkbox.Root><Checkbox.Label>Экспорт данных</Checkbox.Label></Checkbox.Root>
+```
+
+```tsx good
+// good — a row per section that has access, the level in a column; a permission flag is a Switch
+// declare: type Grant = { id: string; section: string; level: string }
+// declare: const grants: Grant[]
+// declare: const setGrants: (grants: Grant[]) => void
+<>
+  <FieldList
+    label="Доступ к разделам"
+    columns={[{ label: "Раздел" }, { label: "Уровень", width: "m" }]}
+    value={grants}
+    onValueChange={setGrants}
+    getId={(grant) => grant.id}
+    createItem={() => ({ id: crypto.randomUUID(), section: "", level: "view" })}
+    addLabel="Добавить раздел"
+    renderItem={(grant, row) => (
+      <>
+        <Select.Root value={grant.section} onValueChange={(section) => row.update({ section })}>
+          <Select.Trigger>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="deals">Сделки</Select.Item>
+            <Select.Item value="clients">Клиенты</Select.Item>
+          </Select.Content>
+        </Select.Root>
+        <Select.Root value={grant.level} onValueChange={(level) => row.update({ level })}>
+          <Select.Trigger>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="view">Просмотр</Select.Item>
+            <Select.Item value="edit">Изменение</Select.Item>
+            <Select.Item value="full">Полный</Select.Item>
+          </Select.Content>
+        </Select.Root>
+      </>
+    )}
+  />
+  <Switch.Root name="export">
+    <Switch.Label>Экспорт данных</Switch.Label>
+  </Switch.Root>
+</>
+```
+
 ## 3. Pairs that are easy to confuse
 
 | Pair | Rule |
 |---|---|
 | List / ChatList / Sidebar / Tabs / Card list / DataTable | List: the records of a list + detail screen that are not conversations (tickets, letters, invoices), one open at a time (`current`), each row a button or a link with a text line, a preview, meta and a count. ChatList: the conversations of a messenger or an inbox. Sidebar: the sections of the **app**. Tabs: panels of **one screen**. `Card.List` (`variant="list"`): static facts in a card, nothing opens. DataTable: many records compared by columns, sorted, filtered, selected in bulk. |
 | FieldList / DataTable / Fieldset / TagSelect | FieldList: records of one shape a person **edits** in a form, a row of fields each, added and removed by hand, up to four short fields per row. DataTable: records a person **reads**, sorts, filters and selects; edits open a Drawer. Fieldset: **one** record's fields under a heading. TagSelect: values **picked** from options, shown as tags. One value in several units is none of them — fields in one row under one heading. |
-| Tabs / SegmentedControl | Tabs switch **panels of content** (navigation inside a screen). SegmentedControl switches a **value or mode** of the same content (period, view mode, filter). |
+| Tabs / SegmentedControl | Tabs switch **panels of content** (navigation inside a screen). SegmentedControl switches a **mode** of the same content (period, view mode, filter) — never a stored setting, which is a `Select` field. |
 | Modal / Drawer / Sheet / Popover / Tooltip | Modal: blocking decision or a short form (≤ 4 fields) that needs full attention. Drawer: long form, filters, record details beside the page, while keeping page context. Sheet: a short task that ends by itself — a pick, an action, a short note — raised from the bottom edge. Popover: small non-modal panel anchored to a control (quick edit, explanation with a link). Tooltip: a few words naming or explaining a control, no interactive content. |
 | Select / NativeSelect | Select: the kit's floating list — icons, descriptions, groups, search, `multiple`, `clearable`. NativeSelect: a plain text list where the OS picker is better (phones) or the value must post with a form by `name`. |
 | Select / Dropdown / CommandMenu / TagSelect | Select picks a **value** for a field (form data). Dropdown runs **actions** (Edit, Duplicate, Delete). CommandMenu searches commands and pages across the app (locally or on the server) — it is not a field. TagSelect picks **several values** as tags. |
@@ -162,7 +235,7 @@ the records (tickets, letters, invoices; `current` on the open one; a row's own 
 | Banner / Notification / Hint | Banner: persistent message in the page flow about a page/section state (sync failed, trial ends). Notification: transient toast about the result of an action (saved, failed). Hint / `error`: help or validation text under one field; a status of its value (a deadline that nears) → `hintTone` on the field, `tone` on a lone Hint. |
 | ProgressBar / ProgressCircle / Spinner | ProgressBar: a share with width to spare and words beside it (an upload row, an import, a quota line). ProgressCircle: a share on the data scale (24–80) where width is short or a ring reads better (a KPI goal, a ring breakdown, a named import card); `value={null}` while the share is unknown, `spin` while a share grows, an icon in the centre. Spinner: an anonymous «busy» on the icon scale inside a control or a status line, no share, no name of its own. A ring you can press (cancel, retry, download a transfer) → Button `shape="circle"` with `progress`, not any of the three. |
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
-| Checkbox / Switch / Radio | Checkbox: choice submitted later with a button, can be multiple. Switch: on/off that applies at once (no Save button). Radio: one of several, submitted later. A privacy toggle inside a create form that is submitted → Checkbox. |
+| Checkbox / Switch / Radio | Switch: a capability or a setting that is on or off — a permission, a privacy toggle — whether it saves with a form or at once. Checkbox: items picked out of a set, a consent, a one-off option of the action being sent. Radio: one of several, submitted later ([a flag, a level, a set](#a-flag-a-level-a-set)). |
 | Gallery / MediaViewer / Thumbnail | Thumbnail: one picture or video of an object in a list, card or picker (selectable with `checked`). Gallery: an album of 1–10 photos and videos laid out by their ratios; it opens MediaViewer itself. MediaViewer: the full-screen viewer on its own, opened from your own thumbnails or a button (`getOrigin` for the zoom out of the tile). A grid of many images to browse → a CSS grid of Thumbnails, not a Gallery. |
 | Sparkline / ChartFrame | Sparkline: one series as a headline number with its change and a small line or bars you can scrub (`variant="bars"` for signed values). ChartFrame: a panel around a real chart (axes, several series, legend, tooltip, states) drawn by a library or your SVG. Rows to compare → DataTable. |
 | VoicePlayer / VideoNote | The same player props (`src`, `duration`, `playing`, transcript, `transfer`). VoicePlayer: audio, a waveform seek slider and a playback rate. VideoNote: a round face-to-camera video with a `poster`; alone in `Message.Root` it is the message. A video with controls → `Thumbnail.Video` / `Message.Media`. |

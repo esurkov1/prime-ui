@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Button } from "@/components/button/Button";
 import { Input } from "@/components/input/Input";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cssRule, cssValue } from "@/test/css";
 
 import { LoginForm } from "./LoginForm";
 
@@ -138,5 +139,11 @@ describe("LoginForm", () => {
     );
     expect(rootRef.current).toHaveClass("custom");
     expect(formRef.current?.tagName).toBe("FORM");
+  });
+
+  it("centres itself in a wider block, such as a Crossfade that swaps the page's states", () => {
+    const rule = cssRule("src/components/login-form/LoginForm.module.css", ".root");
+    expect(cssValue(rule, "margin-inline")).toBe("auto");
+    expect(cssValue(rule, "max-width")).toBe("var(--prime-modal-width-s)");
   });
 });

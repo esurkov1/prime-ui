@@ -4,15 +4,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Crossfade",
-      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and glides to the new height; still on the first render. Under reduced motion the old content goes at once and the height jumps; the new content still fades in.",
-      ru: "Область, которая плавно сменяет содержимое при смене `state` и мягко подстраивает высоту; на первом рендере неподвижна. При reduced motion старое содержимое уходит сразу и высота меняется скачком; новое всё равно проявляется.",
+      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and, between settled states, glides to the new height; still on the first render. Under reduced motion the old content goes at once and the height jumps.",
+      ru: "Область, которая плавно сменяет содержимое при смене `state` и между устоявшимися состояниями мягко подстраивает высоту; на первом рендере неподвижна. При reduced motion старое содержимое уходит сразу и высота меняется скачком.",
       props: [
         {
           name: "state",
           type: "string | number",
           required: true,
-          en: 'Key of what the region shows: `"loading"`, `"ready"`, `"empty"`, `"error"` or a record id. A new value cross-fades the old content into the new one; the same value updates in place.',
-          ru: 'Ключ того, что показывает область: `"loading"`, `"ready"`, `"empty"`, `"error"` или id записи. Новое значение — смена с переходом; то же значение — обновление на месте.',
+          en: 'Key of what the region shows: `"loading"`, `"ready"`, `"empty"`, `"error"` or a record id. A new value cross-fades; the same one updates in place. A swap into or out of `"loading"` never glides the height.',
+          ru: 'Ключ того, что показывает область: `"loading"`, `"ready"`, `"empty"`, `"error"` или id записи. Новое значение — смена с переходом, то же — обновление на месте. Смена в `"loading"` и из него не анимирует высоту.',
         },
         {
           name: "fill",

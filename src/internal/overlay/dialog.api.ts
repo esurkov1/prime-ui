@@ -190,8 +190,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Actions`,
-      en: `\`ref\` → \`HTMLDivElement\`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown; under the title when it would get less than 12rem${section ? `; or at the end of a \`${name}.Section\` heading` : ""}. Controls inside take tier \`s\`.`,
-      ru: `Ряд контролов в конце шапки перед крестиком: статус Badge, меню ⋯ Dropdown; под заголовком, если ему осталось бы меньше 12rem${section ? `; или в конце заголовка \`${name}.Section\`` : ""}; контролы внутри — яруса \`s\`.`,
+      en: `\`ref\` → \`HTMLDivElement\`. Header buttons only (icon buttons, a ⋯ Dropdown; a status goes in \`${name}.Description\`), tier \`s\`, on the title's line; under it below 12rem${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group at the footer tier.`,
+      ru: `Только кнопки шапки (иконки, меню ⋯ Dropdown; статус — в \`${name}.Description\`), ярус \`s\`, перед крестиком на строке заголовка; под заголовком при ширине меньше 12rem${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале, ярус подвала.`,
       props: [
         {
           name: "…rest",
@@ -203,8 +203,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Icon`,
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.",
-      ru: "`aria-hidden` плашка 40 px с заливкой тона; вокруг `Avatar.Root` или `Thumbnail.Root` (картинка записи) плашки нет — `data-media`, аватар 40 px.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.",
+      ru: "`aria-hidden` плашка 40 px с заливкой тона; вокруг картинки записи (`Avatar.Root` или `Thumbnail.Root` где угодно внутри, в том числе из вашего компонента) плашки нет (`data-media`), картинка — 40 px.",
       props: [
         {
           name: "tone",
@@ -217,8 +217,8 @@ export function dialogParts(
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`.",
-          ru: "`Icon` размера m или картинка записи: `Avatar.Root` (под размер плашки) или `Thumbnail.Root`.",
+          en: "An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (size `l`) or a `Thumbnail.Root` (size `m`), set by the slot.",
+          ru: "`Icon` размера m или картинка записи: `Avatar.Root` (размер `l`) или `Thumbnail.Root` (размер `m`) — размер задаёт слот.",
         },
         {
           name: "…rest",
@@ -234,6 +234,13 @@ export function dialogParts(
       ru: "`<h2>` (title-m); его id даёт диалогу имя.",
       props: [
         {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "The name loads (a record opened by a link): a `Skeleton` holds the title line and `aria-busy` is set, so the header never moves; the name fades in.",
+          ru: "Имя загружается (запись открыта по ссылке): `Skeleton` держит строку заголовка и ставит `aria-busy`, шапка не сдвигается; имя проявляется.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLHeadingElement>, "id">',
           en: "`className`, `children` and the other attributes except `id` (the dialog owns it).",
@@ -243,8 +250,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Description`,
-      en: "`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog.",
-      ru: "`<p>` (body-s, приглушённый) под заголовком; его id даёт диалогу описание.",
+      en: "`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog. The record's status `Badge.Root`s go here: first in the line, chip tier `s` (20 px), the text wraps under them when narrow.",
+      ru: "`<p>` (body-s, приглушённый) под заголовком; его id даёт диалогу описание. Статусы записи (`Badge.Root`) — сюда: в начале строки, ярус `s` (20 px), текст на узкой панели переносится под них.",
       props: [
         {
           name: "loading",
@@ -277,8 +284,8 @@ export function dialogParts(
     ...(section ? [dialogSectionPart(name)] : []),
     {
       name: `${name}.Footer`,
-      en: "`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.",
-      ru: "Рисует `<footer>` с действиями, главное последним, и необязательный `Meta` в начале.",
+      en: `\`ref\` → \`HTMLElement\`. Renders \`<footer>\` with the actions, primary last; at the start an optional \`${name}.Actions\` (an action apart from the main pair) and \`Meta\`. Stacked, the start comes first and the primary stays last.`,
+      ru: `Рисует \`<footer>\` с действиями, главное последним; в начале необязательные \`${name}.Actions\` (действие отдельно от главной пары) и \`Meta\`. Столбиком начало идёт первым, главное — последним.`,
       props: [
         {
           name: "layout",

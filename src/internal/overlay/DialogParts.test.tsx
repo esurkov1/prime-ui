@@ -3,6 +3,7 @@ import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
+import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import {
@@ -147,6 +148,63 @@ describe("DialogParts", () => {
       />,
     );
     expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "l");
+  });
+
+  it("finds the picture through the consumer's own component and a wrapper: no tile, size l", () => {
+    function ClientAvatar() {
+      return (
+        <Avatar.Root size="s" data-testid="avatar">
+          <Avatar.Fallback>ДВ</Avatar.Fallback>
+        </Avatar.Root>
+      );
+    }
+    render(
+      <Dialog
+        icon={
+          <span>
+            <ClientAvatar />
+          </span>
+        }
+      />,
+    );
+    const avatar = screen.getByTestId("avatar");
+    const box = avatar.closest(`.${styles.icon}`) as HTMLElement;
+    expect(box).toHaveAttribute("data-media", "true");
+    expect(box).not.toHaveAttribute("data-tone");
+    expect(avatar).toHaveAttribute("data-size", "l");
+  });
+
+  it("gives the tile back when the picture leaves the slot", () => {
+    const { rerender } = render(<Dialog icon={<Avatar.Root data-testid="avatar" />} />);
+    const box = screen.getByTestId("avatar").parentElement as HTMLElement;
+    expect(box).toHaveAttribute("data-media", "true");
+    rerender(<Dialog icon={<svg data-testid="glyph" />} />);
+    expect(screen.getByTestId("glyph").parentElement).toHaveAttribute("data-tone", "accent");
+    expect(screen.getByTestId("glyph").parentElement).not.toHaveAttribute("data-media");
+  });
+
+  it("sizes the status badges of the description line to chip tier s and keeps the text", () => {
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader>
+            <DialogTitle>Admin</DialogTitle>
+            <DialogDescription data-testid="line">
+              <Badge.Root tone="warning">Нужна авторизация</Badge.Root>
+              <Badge.Root color="blue">Менеджер</Badge.Root>
+              admin@way2ride.org
+            </DialogDescription>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    const line = screen.getByTestId("line");
+    const badges = Array.from(line.querySelectorAll("[data-tier]"));
+    expect(badges.map((badge) => badge.getAttribute("data-tier"))).toEqual(["s", "s"]);
+    expect(badges.map((badge) => badge.parentElement)).toEqual([line, line]);
+    expect(screen.getByRole("dialog")).toHaveAccessibleDescription(
+      expect.stringContaining("admin@way2ride.org"),
+    );
   });
 
   it("names a body section by its h3 heading and puts its Actions at the end of the heading row", () => {

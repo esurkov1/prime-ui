@@ -459,8 +459,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Account",
-      en: "`ref` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line and a ↕ chevron. A button, so it is a `Dropdown.Trigger` child; in compact mode only the avatar stays, with the name as a tooltip.",
-      ru: "Пользователь внизу `Sidebar.Footer`: аватар, имя, приглушённая строка и шеврон ↕. Это кнопка, поэтому её можно положить в `Dropdown.Trigger`; в компактном режиме остаётся аватар, имя — в подсказке.",
+      en: "`ref` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line; a ↕ chevron only as a `Dropdown.Trigger` child. In compact mode only the avatar stays, with the name as a tooltip.",
+      ru: "Пользователь внизу `Sidebar.Footer`: аватар, имя, приглушённая строка; шеврон ↕ — только внутри `Dropdown.Trigger`. В компактном режиме остаётся аватар, имя — в подсказке.",
       props: [
         {
           name: "description",

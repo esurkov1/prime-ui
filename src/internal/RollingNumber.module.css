@@ -1,22 +1,36 @@
 /*
- * RollingNumber — odometer digits. A digit column keeps its real glyph in the DOM (transparent) and
- * draws a 0–9 strip in `::before` that glides to the digit (`base` · `emphasized`, never past it).
- * The column's edges fade so a passing digit reads as motion, not two stacked glyphs. Reduced
- * motion collapses the duration: digits change in place.
+ * RollingNumber — odometer digits. The value is one run of real text (transparent: it gives the
+ * number its width, baseline, selection and its name, read as one word). Over it an aria-hidden
+ * row of columns paints the number: a digit column is a 0–9 strip in `::before` that glides to the
+ * digit (`base` · `emphasized`, never past it), its edges fade so a passing digit reads as motion,
+ * not two stacked glyphs. Reduced motion collapses the duration: digits change in place.
  */
 .root {
-  display: inline-flex;
+  position: relative;
+  /* Its box starts at the top of the line, so the columns laid at its top sit on the text's baseline. */
+  display: inline-block;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
+/* The real glyphs stay for text, copy and assistive tech but are not painted; the columns paint. */
+.value {
+  -webkit-text-fill-color: transparent;
+}
+
+.columns {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: flex;
+  pointer-events: none;
+  user-select: none;
+}
+
 .digit {
   position: relative;
-  display: inline-block;
   height: 1lh;
   overflow: hidden;
-  /* The real glyph stays for text and copy but is not painted; the strip paints the digit. */
-  -webkit-text-fill-color: transparent;
   mask-image: linear-gradient(
     transparent,
     var(--prime-color-text-primary) 20%,
@@ -25,20 +39,26 @@
   );
 }
 
-/* The strip is drawing only: its empty alternative text (`/ ""`) keeps it out of the accessible
- * name, so a counter inside a tab or a button reads «12», not «0 1 2 … 9». */
+/* Pseudo-elements draw only: the empty alternative text (`/ ""`) keeps them out of every name and
+ * copy. A column is as wide as its own digit (`::after`, unpainted), as the text under it is; the
+ * strip (`::before`) is laid over it. */
+.digit::after {
+  content: attr(data-digit) / "";
+  -webkit-text-fill-color: transparent;
+}
+
 .digit::before {
   content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9" / "";
   position: absolute;
   inset-block-start: 0;
   inset-inline: 0;
-  -webkit-text-fill-color: currentColor;
   white-space: pre;
   text-align: center;
   transform: translateY(calc(var(--rolling-n) * -1lh));
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
-.char {
+.char::before {
+  content: attr(data-char) / "";
   white-space: pre;
 }

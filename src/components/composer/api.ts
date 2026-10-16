@@ -251,6 +251,64 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "Composer.Keyboard",
+      en: "`ref` → `HTMLDivElement`. A bot's reply keyboard under the row (`role=\"group\"`): a key sends its text through the root's `onSend` and loads while its promise runs; the toggle before the send button shows and hides it.",
+      ru: 'Клавиатура ответов бота под строкой (`role="group"`): кнопка отправляет свой текст через `onSend` корня и грузится, пока идёт промис; переключатель перед кнопкой отправки показывает и прячет её.',
+      props: [
+        {
+          name: "rows",
+          type: "readonly (readonly ComposerKey[])[]",
+          required: true,
+          en: 'Rows of keys, each row one line shared equally. A key is its text, or `{ label, icon?, tone? }` with `tone` `"accent" | "success" | "danger"`.',
+          ru: 'Ряды кнопок, каждый в одну строку поровну. Кнопка — её текст или `{ label, icon?, tone? }`, `tone` — `"accent" | "success" | "danger"`.',
+        },
+        {
+          name: "placeholder",
+          type: "string",
+          en: "The field's placeholder while the keyboard is shown («Выберите раздел»).",
+          ru: "Плейсхолдер поля, пока клавиатура открыта («Выберите раздел»).",
+        },
+        {
+          name: "oneTime",
+          type: "boolean",
+          default: "false",
+          en: "Hides the keyboard after a key is used (once its promise resolves) and puts the caret in the field; the toggle shows it again.",
+          ru: "Прячет клавиатуру после нажатия (когда промис выполнился) и ставит курсор в поле; переключатель показывает её снова.",
+        },
+        {
+          name: "open",
+          type: "boolean",
+          en: "Whether the keys are shown (controlled).",
+          ru: "Открыта ли клавиатура (управляемое).",
+        },
+        {
+          name: "defaultOpen",
+          type: "boolean",
+          default: "true",
+          en: "Shown at first, uncontrolled: a keyboard the bot just sent is open.",
+          ru: "Начальное состояние без управления: только что пришедшая клавиатура открыта.",
+        },
+        {
+          name: "onOpenChange",
+          type: "(open: boolean) => void",
+          en: "The toggle pressed, or a `oneTime` keyboard used.",
+          ru: "Нажат переключатель или использована клавиатура `oneTime`.",
+        },
+        {
+          name: "aria-label",
+          type: "string",
+          en: "Name of the keyboard and of its toggle. Default `labels.keyboard`.",
+          ru: "Имя клавиатуры и её переключателя. По умолчанию `labels.keyboard`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`id`, `className` and the other div attributes.",
+          ru: "`id`, `className` и остальные атрибуты div.",
+        },
+      ],
+    },
   ],
   labels: labelRows(COMPOSER_LABELS, {
     region: { en: "Accessible name of the composer form.", ru: "Имя формы." },
@@ -349,6 +407,11 @@ export const api: ComponentApi = {
       en: "Name of the close button of an edit bar.",
       ru: "Имя кнопки закрытия правки.",
     },
+    keyboard: {
+      en: "Name of the reply keyboard and of the toggle that shows and hides it.",
+      ru: "Имя клавиатуры бота и переключателя, который её показывает и прячет.",
+      part: "Composer.Keyboard",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -399,6 +462,12 @@ export const api: ComponentApi = {
         ru: "Переходят к первой / последней кнопке панели форматирования.",
       },
       {
+        keys: "Enter · Space",
+        native: true,
+        en: "On a key of the reply keyboard: sends its text; on the keyboard's toggle: shows or hides the keys.",
+        ru: "На кнопке клавиатуры бота отправляют её текст; на переключателе показывают или прячут клавиатуру.",
+      },
+      {
         keys: "Alt + ← · Alt + →",
         en: "On a tile of the tray: moves the attachment one place.",
         ru: "На плитке вложения сдвигают её на одно место.",
@@ -445,6 +514,10 @@ export const api: ComponentApi = {
       {
         en: "Voice and video together: a single press records without holding, a double press (within 300 ms) switches the mode. The first press records silently until the window ends, so a double press shows no recording and sends nothing.",
         ru: "Голос и видео вместе: одиночное нажатие пишет без удержания, двойное (в пределах 300 мс) переключает режим. Первое нажатие пишет незаметно до конца окна, поэтому двойное не показывает записи и ничего не отправляет.",
+      },
+      {
+        en: "A reply keyboard is a `group` named «Клавиатура бота» of native buttons in Tab order; its toggle is a button of the same name with `aria-expanded` and `aria-controls`. A key whose send is pending is `aria-busy`. Closed, the keys leave the Tab order and the accessibility tree; a `oneTime` keyboard hands the focus to the field.",
+        ru: "Клавиатура ответов — `group` с именем «Клавиатура бота» из нативных кнопок в порядке Tab; переключатель — кнопка с тем же именем, `aria-expanded` и `aria-controls`. Кнопка, чья отправка идёт, — `aria-busy`. Закрытая клавиатура уходит из порядка Tab и дерева доступности; клавиатура `oneTime` передаёт фокус полю.",
       },
     ],
   },

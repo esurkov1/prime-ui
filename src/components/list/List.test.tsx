@@ -496,12 +496,18 @@ describe("List onReorder", () => {
     expect(row).not.toContainElement(toggle);
     // The grip keeps the row's end.
     expect(handle.closest("li")?.lastElementChild).toContainElement(handle);
-    // One tier below the row, as far from the row's start as from its top and bottom.
+    // One tier below the row, as far from the row's start as from its top and bottom at any row
+    // height: the box stretches to the row and a square spacer leads it, as wide as the space
+    // above a control box of the tier.
     expect(toggle.closest("[data-size]")).toHaveAttribute("data-size", "s");
-    const start = cssRule("src/components/list/List.module.css", '.actions[data-side="start"]');
-    expect(cssValue(start, "padding-inline")).toBe(
-      "calc((var(--field-h) - var(--field-step-h)) / 2) var(--prime-space-0)",
+    const css = "src/components/list/List.module.css";
+    expect(cssValue(cssRule(css, ".actions"), "align-self")).toBe("stretch");
+    const spacer = cssRule(
+      css,
+      '.actions[data-side="end"]::after, .actions[data-side="start"]::before',
     );
+    expect(cssValue(spacer, "block-size")).toBe("calc(50% - var(--field-step-h) / 2)");
+    expect(cssValue(spacer, "aspect-ratio")).toBe("1");
     await user.tab();
     expect(toggle).toHaveFocus();
     await user.tab();

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Button } from "@/components/button/Button";
+import { Button, type ButtonRootProps } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { HOVER_QUERY } from "@/hooks/breakpoints";
@@ -28,6 +28,7 @@ import {
   messagePartOf,
 } from "@/internal/messagePart";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import { flattenChildren } from "@/internal/parts";
 import statusLoop from "@/internal/statusLoop.module.css";
 import {
@@ -36,7 +37,12 @@ import {
   useNestedSurfaceDepth,
 } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";
-import { type AsyncHandler, isPromiseLike, usePendingAction } from "@/internal/usePendingChanges";
+import {
+  type AsyncHandler,
+  isPromiseLike,
+  usePendingAction,
+  usePendingKeys,
+} from "@/internal/usePendingChanges";
 
 import { BubbleHug } from "./bubbleHug";
 import { createBubbleMorph, MorphSnapshot } from "./bubbleMorph";
@@ -380,13 +386,62 @@ export type MessageActionsProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** Whether a key of the keyboard is a link (`asChild` around an `<a href>`): it gets the link mark. */
+function isLinkKey(props: ButtonRootProps): props is ButtonRootProps & {
+  children: React.ReactElement<React.AnchorHTMLAttributes<HTMLAnchorElement>>;
+} {
+  const child = props.children;
+  return (
+    props.asChild === true &&
+    React.isValidElement<React.AnchorHTMLAttributes<HTMLAnchorElement>>(child) &&
+    child.type === "a" &&
+    child.props.href !== undefined
+  );
+}
+
 /**
  * A row of a bot's inline keyboard under the message: `Button.Root` children sharing the row
- * equally, at the message's width (the bubble widens to the keyboard when it is wider). Several
- * make several rows, in the order written. A row too narrow for its buttons wraps them.
+ * equally on one line (a label too long ellipsizes), at the message's width (the bubble widens to
+ * the keyboard when it is wider). Several make several rows, in the order written; the last row's
+ * outer corners follow the bubble's radius. A key is `soft` `neutral` unless it sets its own
+ * `variant` / `tone`; a link (`asChild` around an `<a href>`) carries the link mark at its
+ * top-end corner; an `onClick` that returns a promise keeps its key loading until it settles.
  */
-function MessageActions({ className, ...rest }: MessageActionsProps) {
-  return <div className={cx(styles.actions, className)} {...rest} />;
+function MessageActions({ className, children, ...rest }: MessageActionsProps) {
+  const { pending, track } = usePendingKeys<number>();
+  return (
+    <div className={cx(styles.actions, className)} {...rest}>
+      {React.Children.map(children, (child, index) => {
+        if (!React.isValidElement<ButtonRootProps>(child) || child.type !== Button.Root) {
+          return child;
+        }
+        const { props } = child;
+        const link = isLinkKey(props)
+          ? React.cloneElement(props.children, {
+              children: (
+                <>
+                  {props.children.props.children}
+                  <Icon name="action.externalLink" size="xs" className={styles.linkMark} />
+                </>
+              ),
+            })
+          : undefined;
+        return React.cloneElement(child, {
+          variant: props.variant ?? "soft",
+          tone: props.tone ?? "neutral",
+          fullWidth: true,
+          loading: props.loading || pending.has(index),
+          onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+            track(
+              index,
+              (props.onClick as AsyncHandler<[typeof event], unknown> | undefined)?.(event),
+            );
+          },
+          ...(link ? { children: link } : null),
+        } as Partial<ButtonRootProps>);
+      })}
+    </div>
+  );
 }
 MessageActions.displayName = "Message.Actions";
 
@@ -496,6 +551,8 @@ function MessageRoot({
   const depth: SurfaceDepth = direction === "outgoing" ? "tinted" : neutralDepth;
 
   const { selecting, selected } = useMessageSelection(value);
+  // The selection mark pops in when selection starts, not on a chat that mounts selecting.
+  const selectMark = useEnterOnAppear<HTMLSpanElement>(selecting);
   /** Selection mode: a click or a key toggles this message, Shift sets the range from the anchor. */
   const toggleSelected = (event: { shiftKey: boolean; detail: number }) => {
     const article = rootRef.current;
@@ -789,11 +846,17 @@ function MessageRoot({
         {tail ? <span className={styles.bubbleTail} data-depth={depth} aria-hidden="true" /> : null}
       </SurfaceDepthProvider>
       {shell === "bubble" ? null : reactionsPart}
-      {preview
-        ? actions.map((row) =>
-            React.cloneElement(row as React.ReactElement<MessageActionsProps>, { inert: true }),
-          )
-        : actions}
+      {actions.map((row, index) =>
+        // The last row ends the message: its outer corners take the bubble's radius.
+        React.cloneElement(
+          row as React.ReactElement<MessageActionsProps>,
+          {
+            key: row.key ?? index,
+            inert: preview || undefined,
+            "data-end": index === actions.length - 1 ? "" : undefined,
+          } as Partial<MessageActionsProps>,
+        ),
+      )}
       {/* First the hug, then the morph: the morph's new layout is the hugged one. */}
       <BubbleHug bubble={bubbleRef} />
       <MorphSnapshot morph={morph} />
@@ -920,7 +983,11 @@ function MessageRoot({
       }}
     >
       {selecting ? (
-        <span className={cx(styles.select, enterMotion.enter)} aria-hidden="true">
+        <span
+          ref={selectMark.ref}
+          className={cx(styles.select, selectMark.entering && enterMotion.enter)}
+          aria-hidden="true"
+        >
           <Checkbox.Indicator shape="circle" checked={selected} />
         </span>
       ) : null}

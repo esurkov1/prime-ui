@@ -1386,3 +1386,90 @@ describe("recording", () => {
     });
   });
 });
+
+describe("Composer.Keyboard", () => {
+  const ROWS = [
+    ["Мои заказы", "Статус доставки"],
+    [{ label: "Оформить заказ", tone: "accent" as const }],
+  ];
+
+  it("is a named group of keys under the row; a key sends its text and keeps the draft", async () => {
+    const onSend = vi.fn();
+    render(
+      <Composer.Root defaultValue="черновик" onSend={onSend}>
+        <Composer.Keyboard rows={ROWS} placeholder="Выберите раздел" />
+      </Composer.Root>,
+    );
+    const keyboard = await screen.findByRole("group", { name: "Клавиатура бота" });
+    const field = screen.getByRole("textbox", { name: "Сообщение" });
+    // Under the row, after the field.
+    expect(field.compareDocumentPosition(keyboard) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(field).toHaveAttribute("placeholder", "Выберите раздел");
+    expect(screen.getByRole("button", { name: "Оформить заказ" })).toHaveAttribute(
+      "data-tone",
+      "accent",
+    );
+    const key = screen.getByRole("button", { name: "Статус доставки" });
+    key.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(onSend).toHaveBeenLastCalledWith({ text: "Статус доставки", albums: [], files: [] });
+    await userEvent.keyboard(" ");
+    expect(onSend).toHaveBeenCalledTimes(2);
+    expect(field).toHaveValue("черновик");
+  });
+
+  it("the toggle shows and hides the keys; the placeholder follows", async () => {
+    render(
+      <Composer.Root>
+        <Composer.Keyboard rows={ROWS} placeholder="Выберите раздел" />
+      </Composer.Root>,
+    );
+    const toggle = await screen.findByRole("button", { name: "Клавиатура бота" });
+    const keyboard = screen.getByRole("group", { name: "Клавиатура бота" });
+    const field = screen.getByRole("textbox", { name: "Сообщение" });
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveAttribute("aria-controls", keyboard.id);
+    toggle.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(keyboard).toHaveAttribute("data-state", "closed");
+    expect(field).toHaveAttribute("placeholder", "Сообщение");
+    await userEvent.keyboard(" ");
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(keyboard).toHaveAttribute("data-state", "open");
+  });
+
+  it("a pending key loads; oneTime hides the keyboard once it resolves and focuses the field", async () => {
+    let settle: () => void = () => {};
+    const onSend = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          settle = resolve;
+        }),
+    );
+    const onOpenChange = vi.fn();
+    render(
+      <Composer.Root onSend={onSend}>
+        <Composer.Keyboard rows={ROWS} oneTime onOpenChange={onOpenChange} />
+      </Composer.Root>,
+    );
+    const key = await screen.findByRole("button", { name: "Мои заказы" });
+    await userEvent.click(key);
+    expect(key).toHaveAttribute("aria-busy", "true");
+    expect(onOpenChange).not.toHaveBeenCalled();
+    await act(async () => settle());
+    expect(key).not.toHaveAttribute("aria-busy");
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(screen.getByRole("textbox", { name: "Сообщение" })).toHaveFocus();
+  });
+
+  it("is disabled with the composer", async () => {
+    render(
+      <Composer.Root disabled>
+        <Composer.Keyboard rows={ROWS} />
+      </Composer.Root>,
+    );
+    expect(await screen.findByRole("button", { name: "Мои заказы" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Клавиатура бота" })).toBeDisabled();
+  });
+});

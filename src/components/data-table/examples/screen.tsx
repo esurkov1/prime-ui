@@ -1,4 +1,4 @@
-/** A list page: the title, a line of figures, search, filters and the one primary action in its top bar, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. */
+/** A list page: the title, a line of figures and the one primary action in its top bar, search and filters in the table's own tools row, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. */
 import {
   Avatar,
   Badge,
@@ -293,16 +293,14 @@ export default function DataTableScreenExample() {
       onSearchChange={setSearch}
     >
       <Page.Root>
-        {/* A work screen titles itself in its top bar: the only h1, a line of figures under it, the
-            page's search and filters, then export and the one primary action. */}
+        {/* A work screen titles itself in its top bar: the only h1, a line of figures under it,
+            export and the one primary action. The table's search and filters stand in its own
+            tools row, next to what they filter. */}
         <Page.TopBar>
           <Page.Heading>
             <Page.Title>Счета</Page.Title>
             <Page.Description>{SUMMARY}</Page.Description>
           </Page.Heading>
-          <Page.Tools aria-label="Счета">
-            <SmartFilter.Toolbar />
-          </Page.Tools>
           <Page.Actions>
             <Button.Root variant="soft" tone="neutral">
               <Button.Icon>
@@ -317,9 +315,6 @@ export default function DataTableScreenExample() {
               Новый счёт
             </Button.Root>
           </Page.Actions>
-          <Page.Chips>
-            <SmartFilter.Chips />
-          </Page.Chips>
         </Page.TopBar>
         <Page.Body>
           <DataTable
@@ -331,6 +326,8 @@ export default function DataTableScreenExample() {
             stickyFirstColumn
             stickyLastColumn
             columnsMenu
+            toolbar={<SmartFilter.Toolbar />}
+            toolbarChips={<SmartFilter.Chips />}
             defaultSort={{ columnId: "due", order: "desc" }}
             empty={
               <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">

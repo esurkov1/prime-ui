@@ -84,7 +84,7 @@ The hint is always smaller than the field text; use the field's size.
 | State | Driven by | DOM |
 |---|---|---|
 | status | `tone` | `data-tone` with the shared text tone (none for `neutral`, and none while `invalid` or `disabled`); the color eases between tones |
-| error | `invalid` | `data-invalid="true"`; the message drops in over `fast` (fade + `--prime-space-1` from above, no shake, no layout shift) and the color eases from the hint color |
+| error | `invalid` | `data-invalid="true"`; the message drops in over `fast` (fade + `--prime-space-1` from above, no shake, no layout shift) when it arrives on a field already shown — an error the page mounts with stands still and the color eases from the hint color |
 | disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"` |
 | size | `size`, else the host tier | `data-size` |
 

@@ -82,10 +82,10 @@
     {
       "id": 7,
       "prompt": "Сделай страницу поиска клиентов: поле поиска, под ним таблица результатов. Сервера пока нет — сымитируй запрос задержкой в полсекунды.",
-      "expected_output": "SmartFilter with fields={[]} around the page, its toolbar in Page.Tools of the page's Page.TopBar, a DataTable with loading; the simulated request is cancelled when the query changes, so a slow answer never replaces a newer one.",
+      "expected_output": "A DataTable wrapped in SmartFilter.Root (fields={[]}) with SmartFilter.Toolbar in its toolbar — the search narrows the table, so it stands with the table, not in Page.Tools; the page's Page.TopBar holds the title; the table shows loading; the simulated request is cancelled when the query changes, so a slow answer never replaces a newer one.",
       "files": [],
       "expectations": [
-        "The search is a SmartFilter (fields={[]}): SmartFilter.Root wraps Page.Root and SmartFilter.Toolbar stands in Page.Tools inside Page.TopBar, not a bare Input above the table",
+        "The search is a SmartFilter (fields={[]}): SmartFilter.Root wraps the DataTable and SmartFilter.Toolbar is the DataTable toolbar, not Page.Tools and not a bare Input above the table",
         "The simulated request (setTimeout) is cleared, or its answer dropped, when the query changes again — in the effect's cleanup or through an AbortController",
         "While a request runs the table keeps its rows with loading, and an empty result offers to reset the search"
       ]
@@ -148,11 +148,11 @@
     {
       "id": 12,
       "prompt": "В форме договора с клиентом добавь этапы оплаты: название этапа, срок в днях, доля в процентах. Этапы можно переставлять, аванс всегда первый. Рядом в той же карточке — поля «Валюта» и «Комментарий».",
-      "expected_output": "A FieldList of three columns with rowActions=\"menu\" (dense rows), reorderable, the advance pinned by getLocked; variant=\"surface\" because the list stands among other fields of the card.",
+      "expected_output": "A FieldList of three columns with the default rowActions (the «×» and the grip in sight on every row — three columns are no reason for a menu), reorderable, the advance pinned by getLocked; variant=\"surface\" because the list stands among other fields of the card.",
       "files": [],
       "expectations": [
         "The stages are a FieldList with reorderable and the advance pinned by getLocked",
-        "The rows use rowActions=\"menu\" (one «⋯» per row), not a hand-made menu or a remove button drawn beside the fields",
+        "The rows keep the default rowActions=\"buttons\": the remove «×» and the grip in sight; no «⋯» menu chosen because the rows have three columns, no hand-made remove button",
         "The list sets variant=\"surface\" so it reads apart from the other fields of the card, not a Card or a border drawn around it"
       ]
     },
@@ -166,6 +166,92 @@
         "The search and the filter (SmartFilter.Toolbar) and the column chooser (DataTableColumnsMenu) are in the DataTable toolbar, not in Page.Tools above the KPI cards",
         "The active filters (SmartFilter.Chips) are in the DataTable toolbarChips, not in Page.Chips, and SmartFilter.Root wraps the DataTable",
         "The toolbar gets the controls as they are (no hand-made flex wrapper), and the KPI cards are Card tiles in one Page.Grid"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Сделай вход в CRM по почте и паролю и установку пароля по ссылке из приглашения (сотруднику приходит письмо со ссылкой). При неверном пароле человек должен понять, что случилось.",
+      "expected_output": "One auth route (/login) whose mode comes from the query (?invite=token): one LoginForm card with the default align=\"start\", the action's icon in LoginForm.Logo and a title naming the action («Войти в аккаунт», «Задайте пароль»); the invite mode sets a new password with strength + minStrength and a repeat with valid; a refused sign-in marks the e-mail invalid and puts «Неверная почта или пароль» as the password's error, no Banner.",
+      "files": [],
+      "expectations": [
+        "The invite is a mode of the same sign-in screen (a query parameter on /login), not a separate /invite page with its own LoginForm",
+        "LoginForm.Root has no align=\"center\": LoginForm.Logo holds an action icon (action.login or a key), the title names the action and the description is one line",
+        "A refused sign-in shows words: an error on the password field («Неверная почта или пароль») with the e-mail invalid — not only red rings and a shake, not a hidden live region alone, not a Banner",
+        "The new password uses strength with minStrength and a hint that states the requirement; the repeat field shows a match with valid (a check), not a «Пароли совпадают» hint"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Добавь в профиль смену пароля: текущий пароль, новый и повтор. Пароль должен быть не слабее «хорошего».",
+      "expected_output": "Three password fields; the new one with strength, minStrength and a hint naming the requirement, so the form refuses a weak password (and the server checks the same rule); the repeat shows valid when it matches and an error in words when it does not.",
+      "files": [],
+      "expectations": [
+        "The new password sets minStrength on Input.Root (not strength alone): a weak password cannot be submitted",
+        "The hint of the new password names the requirement in a few words",
+        "A matching repeat shows valid (a check mark), with no success text under the field; a mismatch is an error that says so",
+        "The answer mentions checking the same policy on the server"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Сделай страницу «Команда»: два раздела — «Сотрудники» и «Роли» (у каждого свой адрес), в каждом таблица. У сотрудников роль, статус, отдел, дата добавления; нужен поиск, выбор колонок и массовые действия над выбранными (сменить роль, отключить доступ). Есть кнопка «Пригласить».",
+      "expected_output": "Page.TopBar holds the title, the sections as a SegmentedControl of links (SegmentedControl.Item asChild) in Page.Tools and «Пригласить» in Page.Actions; each DataTable is wrapped in its SmartFilter.Root with SmartFilter.Toolbar (+ the chooser) in its toolbar and chips in toolbarChips; the members filter has options fields for role, status and department and a date-range for the date; bulk actions come from renderSelectionActions as one «Действия · N» menu that the toolbar keeps beside the search.",
+      "files": [],
+      "expectations": [
+        "The search, the filter and the column chooser are in the DataTable toolbar (or columnsMenu over the row actions), not in Page.Tools — even though the table is the whole section",
+        "The members SmartFilter has fields for the categorical columns (role, status, department) and a date-range field for the date, not a search alone",
+        "Bulk actions are renderSelectionActions returning Dropdown.Items: the search and filter stay while rows are selected; no «Выбрано: N» bar replaces the toolbar and no button per action in the row",
+        "The sections are a SegmentedControl in Page.Tools whose items are links (asChild) because each section has its own route; «Пригласить» is in Page.Actions with an icon"
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Сделай карточку сотрудника в дровере с вкладками «Профиль», «Доступ», «Уведомления», «Безопасность», «История». Она открывается из таблицы «Команда», а свой аккаунт человек открывает из меню профиля в сайдбаре — там он может менять не всё. В «Безопасности» — сеансы на других устройствах. У приглашённого, но не вошедшего сотрудника можно только удалить приглашение.",
+      "expected_output": "One user drawer component opened from both places by id; permissions make fields readOnly and hide tabs and actions; the header is Drawer.Icon with the Avatar, Drawer.Title, Drawer.Description with status badges and a line of data, Drawer.Actions only with actions on the record — one action as an icon Button with a Tooltip, a ⋯ menu only from two; one form over all tabs with one «Сохранить» in Drawer.Footer shown while dirty and Drawer.Guard; the drawer loads all tab data, tabs keep their content (keepMounted where drafts live); «История» its own tab; «Сеансы» a List of sessions with an end per row.",
+      "files": [],
+      "expectations": [
+        "There is one drawer component for the user, used for the own account and for a team member; no second «Мой аккаунт» drawer",
+        "Drawer.Actions hold no navigation (no «Команда и роли» button); the invited user's single action is an icon button with a Tooltip, not a ⋯ menu with one item",
+        "The tabs share one form with one «Сохранить» in Drawer.Footer (present only while there are changes) and Drawer.Guard dirty; no save button per section and no «Есть несохранённые изменения» text",
+        "Data for the tabs is loaded at the drawer level (not fetched inside each tab on mount); the body loads as a Skeleton in the form's geometry under a header and tabs that appear at once",
+        "«История» stays a tab of its own even when the tabs do not fit; the strip scrolls",
+        "«Сеансы» shows the sessions as a List with an action per session, not only a «Выйти на других устройствах» button"
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Сделай редактор роли: название, описание, доступ к 13 разделам CRM (у каждого уровень: нет, просмотр, изменение, полный — и область: свои или все записи) и дополнительные права (экспорт, удаление, управление командой). В таблице ролей покажи, к каким разделам у роли есть доступ.",
+      "expected_output": "Access is a FieldList with Раздел · Уровень · Записи columns of Selects and «Добавить раздел» (no row means no access), rows with the default «×» in sight; the extra permissions are Switches; in the roles table the sections are Badge.Group overflow=\"count\" in one line.",
+      "files": [],
+      "expectations": [
+        "Section access is a FieldList whose cells are Selects (section, level, scope), not thirteen captioned SegmentedControls",
+        "The FieldList keeps the default rowActions (an «×» per row), not rowActions=\"menu\" chosen for its three columns",
+        "The extra permissions are Switch controls with their labels, not Checkboxes",
+        "The roles table shows the sections as Badge.Group with overflow=\"count\", not a string joined by «·» with a hand-made «+5»"
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "В профиле пользователя добавь выбор темы оформления (системная, светлая, тёмная), часовой пояс и включение звуков новых сообщений в диалогах. Подпиши поля понятно.",
+      "expected_output": "The theme is a Select beside the time zone in the profile form (no SegmentedControl, no «Оформление» section for one field); the message sounds go to the notification settings; hints only where the label and control leave something out, a few words each.",
+      "files": [],
+      "expectations": [
+        "The theme is a Select field in the profile form next to related fields such as the time zone, not a SegmentedControl",
+        "The sound switch lives with the notification settings, not in a profile or appearance section",
+        "No section holds a single setting",
+        "No hint restates the label or the obvious behaviour (no «Время в CRM показывается в этом поясе», no «Применяется сразу»); any hint is two to five words"
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "Сделай страницу клиента: карточка с реквизитами и список последних счетов, оба грузятся с сервера после открытия страницы. Пусть всё появляется плавно и красиво.",
+      "expected_output": "Both regions show a Skeleton in the data's geometry from the first render under the Crossfade state \"loading\"; the data replaces it in place; nothing unfolds, slides in or grows from zero, and no own animation reveals the data.",
+      "files": [],
+      "expectations": [
+        "Each loading region renders a Skeleton in the geometry of its data (the same rows and lines) on the first render, not null, an empty box or a Spinner",
+        "The regions swap through Crossfade (or DataTable / Card.Root `loading`) with the loading state keyed \"loading\"",
+        "No own reveal of the data: no keyframes, transitions, staggered fade-ins, slide-ins or height animations written for the arrival of the data",
+        "The page layout does not change height when the data arrives: the skeleton has the data's rows, gaps and line heights"
       ]
     }
   ]

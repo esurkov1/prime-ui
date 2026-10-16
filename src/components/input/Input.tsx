@@ -71,6 +71,10 @@ export type InputLabels = {
   strengthEasy: string;
   strengthMedium: string;
   strengthHard: string;
+  /** The error under a `strength` field below `minStrength` once a submit was refused, and the browser's validation message. */
+  strengthTooWeak: string;
+  /** Spoken when the field is `valid`: the check mark itself is silent. */
+  valid: string;
 };
 
 export const INPUT_LABELS: InputLabels = {
@@ -88,6 +92,8 @@ export const INPUT_LABELS: InputLabels = {
   strengthEasy: "Лёгкий",
   strengthMedium: "Средний",
   strengthHard: "Сложный",
+  strengthTooWeak: "Пароль недостаточно надёжный",
+  valid: "Значение подходит",
 };
 
 /** Tone of each strength level: the meaning is also in the word, never in the color alone. */
@@ -101,6 +107,14 @@ const STRENGTH_TONES: Record<Exclude<PasswordStrength, 0>, Tone> = {
 type InputContextValue = {
   size: ControlSize;
   invalid: boolean;
+  /** `valid` and not invalid: the success ring and the check mark. */
+  valid: boolean;
+  /** The id of the spoken `labels.valid`; empty when the root takes no `valid`. */
+  validId: string;
+  /** A `strength` field below `minStrength`: the message the input reports to its form. */
+  customValidity: string | null;
+  /** The input refused a form submit (`invalid` event). */
+  reportInvalid: () => void;
   focusRing: boolean | undefined;
   required: boolean;
   inputId: string;
@@ -145,6 +159,7 @@ export type InputRootProps = FieldRootDomProps &
   FieldFocusRingProps & {
     size?: ControlSize;
     invalid?: boolean;
+    valid?: boolean;
     label?: React.ReactNode;
     required?: boolean;
     optional?: boolean;
@@ -156,6 +171,7 @@ export type InputRootProps = FieldRootDomProps &
     id?: string;
     strength?: boolean;
     getStrength?: (value: string) => PasswordStrength;
+    minStrength?: Exclude<PasswordStrength, 0>;
     onCommit?: FieldCommitHandler;
     suggestions?: readonly string[];
     closeOnEscape?: boolean;
@@ -167,6 +183,7 @@ export type InputRootProps = FieldRootDomProps &
 function InputRoot({
   size: sizeProp,
   invalid,
+  valid,
   focusRing,
   label,
   required = false,
@@ -179,6 +196,7 @@ function InputRoot({
   id,
   strength = false,
   getStrength = getPasswordStrength,
+  minStrength,
   onCommit,
   suggestions,
   closeOnEscape = true,
@@ -191,8 +209,15 @@ function InputRoot({
   const [strengthValue, setStrengthValue] = React.useState("");
   const tier = useHostTier(sizeProp);
   const { size } = tier;
-  const ids = useFieldFrame(id, { label, hint, error, invalid, required });
   const labels = useLabels(INPUT_LABELS, labelsProp);
+  const level = strength ? getStrength(strengthValue) : 0;
+  // Below the policy: an empty value is left to `required`.
+  const tooWeak = level > 0 && minStrength !== undefined && level < minStrength;
+  // A refused submit turns the policy into a visible error; from then on it follows the value.
+  const [weakReported, setWeakReported] = React.useState(false);
+  const reportInvalid = React.useCallback(() => setWeakReported(true), []);
+  const shownError = error ?? (weakReported && tooWeak ? labels.strengthTooWeak : undefined);
+  const ids = useFieldFrame(id, { label, hint, error: shownError, invalid, required });
   const { invalid: isInvalid, controlId: inputId, describedBy, required: isRequired } = ids;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const suggest = useInputSuggestions(
@@ -216,10 +241,19 @@ function InputRoot({
     return () => setAffixes((current) => current.filter((item) => item !== affixId));
   }, []);
   const affixIds = affixes.join(" ") || undefined;
+  // Invalid wins: a field is never both.
+  const isValid = Boolean(valid) && !isInvalid;
+  // The live region exists only for a field that tracks `valid` at all.
+  const validId = valid === undefined ? "" : `${inputId}-valid`;
+  const customValidity = minStrength === undefined ? null : tooWeak ? labels.strengthTooWeak : "";
   const contextValue = React.useMemo(
     () => ({
       size,
       invalid: isInvalid,
+      valid: isValid,
+      validId,
+      customValidity,
+      reportInvalid,
       focusRing,
       required: isRequired,
       inputId,
@@ -240,6 +274,10 @@ function InputRoot({
     [
       size,
       isInvalid,
+      isValid,
+      validId,
+      customValidity,
+      reportInvalid,
       focusRing,
       isRequired,
       inputId,
@@ -254,7 +292,11 @@ function InputRoot({
       suggest,
     ],
   );
-  const level = strength ? getStrength(strengthValue) : 0;
+  const levelTone: Tone | undefined = tooWeak
+    ? "danger"
+    : level
+      ? STRENGTH_TONES[level]
+      : undefined;
   const levelWord = level
     ? [labels.strengthWeak, labels.strengthEasy, labels.strengthMedium, labels.strengthHard][
         level - 1
@@ -273,13 +315,13 @@ function InputRoot({
           optional={optional}
           hint={hint}
           hintTone={hintTone}
-          error={error}
+          error={shownError}
           counter={
             strength ? (
               <>
                 <span
                   className={cx(textTone.tone, styles.strengthWord)}
-                  data-tone={level ? STRENGTH_TONES[level] : undefined}
+                  data-tone={levelTone}
                   aria-live="polite"
                 >
                   {levelWord ? (
@@ -305,7 +347,7 @@ function InputRoot({
               steps
               value={level}
               max={4}
-              tone={level ? STRENGTH_TONES[level] : "neutral"}
+              tone={levelTone ?? "neutral"}
               size="xs"
               aria-label={labels.strength}
             />
@@ -325,7 +367,8 @@ export type InputWrapperProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) {
-  const { size, invalid, focusRing, commit, hasCommit, labels, suggest } = useInputContext();
+  const { size, invalid, valid, validId, focusRing, commit, hasCommit, labels, suggest } =
+    useInputContext();
   // The box anchors the suggestion list (as wide as the box).
   const setRefs = useMergedRefs(suggest?.anchorRef, ref);
 
@@ -337,11 +380,18 @@ function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) 
       {...toDataAttributes({
         size,
         invalid: invalid || undefined,
+        valid: valid || undefined,
         "focus-ring": focusRing,
       })}
     >
       {/* A Select among the children becomes the box's start segment. */}
       <InputSegmentContext value>{children}</InputSegmentContext>
+      {valid ? <InputValidMark /> : null}
+      {validId ? (
+        <VisuallyHidden id={validId} live="polite">
+          {valid ? labels.valid : ""}
+        </VisuallyHidden>
+      ) : null}
       {hasCommit ? (
         <FieldCommitStatus state={commit.state} labels={labels} className={styles.status} />
       ) : null}
@@ -350,6 +400,32 @@ function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) 
   );
 }
 InputWrapper.displayName = "Input.Wrapper";
+
+/**
+ * The check of a `valid` field, before the end icon and segments: it pops in and draws its stroke
+ * when the value becomes valid after the field was shown, and closes up in place when it goes.
+ */
+function InputValidMark() {
+  const { mountedRef } = useInputContext();
+  // Mounted after the field: the value just became valid, the check draws in.
+  const [arrived] = React.useState(() => mountedRef.current);
+  const [drawn, setDrawn] = React.useState(!arrived);
+  React.useEffect(() => {
+    if (drawn) return;
+    const frame = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(frame);
+  }, [drawn]);
+  const presence = usePartPresence<HTMLSpanElement>({ axis: "inline" });
+  return (
+    <span
+      ref={presence.ref}
+      className={cx(iconSlotClass, styles.validMark, arrived && enterMotion.enter)}
+      aria-hidden="true"
+    >
+      <Icon name="action.check" drawn={drawn} />
+    </span>
+  );
+}
 
 // ---- InputField ----
 
@@ -371,6 +447,7 @@ function InputField({
   onBlur,
   onKeyDown,
   onClick,
+  onInvalid,
   ref,
   ...rest
 }: InputFieldProps) {
@@ -378,6 +455,10 @@ function InputField({
     inputId,
     inputRef,
     invalid,
+    valid,
+    validId,
+    customValidity,
+    reportInvalid,
     required: requiredCtx,
     describedBy,
     affixIds,
@@ -412,8 +493,15 @@ function InputField({
     else if (inputRef.current) reportValue(inputRef.current.value);
   }, [reportValue, controlled, inputRef]);
 
+  // `minStrength`: the form refuses to submit a password below the policy (constraint validation).
+  React.useEffect(() => {
+    if (customValidity !== null) inputRef.current?.setCustomValidity(customValidity);
+  }, [customValidity, inputRef]);
+
   const resolvedDescribedBy =
-    [ariaDescribedBy, affixIds, describedBy].filter(Boolean).join(" ") || undefined;
+    [ariaDescribedBy, affixIds, describedBy, valid ? validId : undefined]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
     <input
@@ -449,6 +537,10 @@ function InputField({
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) suggest?.onClick();
+      }}
+      onInvalid={(event) => {
+        onInvalid?.(event);
+        if (customValidity) reportInvalid();
       }}
       onFocus={(event) => {
         onFocus?.(event);

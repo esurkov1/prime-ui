@@ -68,7 +68,7 @@
 
 /*
  * With `Actions` the title keeps 12rem (or the whole row, if narrower). When the row cannot give it
- * that (a status and a ⋯ beside the × on a phone), the header measures an overflow and moves the
+ * that (icon buttons and a ⋯ beside the × on a phone), the header measures an overflow and moves the
  * actions under the text (`data-actions-below`, set in TSX): the title never folds into a column
  * of letters.
  */
@@ -162,7 +162,30 @@
   overflow-wrap: anywhere;
 }
 
+/*
+ * The record's status badges lead the line (`order`, whatever order they are written in), one
+ * chip gap apart, then the text; the chips (tier s, set in TSX) are the line's 20 high and centred
+ * on it. On a narrow panel the text wraps under the badges. Only a line with a badge (a chip root,
+ * `data-tier`) is a flex row: plain text keeps its inline flow.
+ */
+.description:has(> [data-tier]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-1) var(--prime-space-2);
+}
+
+.description > [data-tier] {
+  order: -1;
+}
+
 /* The line's place while its data loads. */
+.titleSkeleton {
+  inline-size: calc(var(--prime-space-24) * 2.5);
+  max-inline-size: 100%;
+  vertical-align: middle;
+}
+
 .descriptionSkeleton {
   inline-size: calc(var(--prime-space-24) * 1.5);
   max-inline-size: 100%;
@@ -190,7 +213,7 @@
   margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
 }
 
-/* Beside the title the row never gives (a Badge would truncate): the title's minimum decides. */
+/* Beside the title the row never gives: the title's minimum decides. */
 .header:not([data-actions-below]) > .actions {
   min-width: max-content;
 }
@@ -332,7 +355,7 @@
   gap: var(--prime-space-3);
 }
 
-.footer[data-layout="fill"] > :not(.meta, .footerActions) {
+.footer[data-layout="fill"] > :not(.meta, .footerStart, .footerActions) {
   flex: 1 1 0;
   min-width: max-content;
 }
@@ -346,13 +369,13 @@
 }
 
 /*
- * A status line at the start (`Meta`): it takes the free room, the buttons (one row in TSX,
+ * The start group (`Actions`) and a status line (`Meta`) at the start: the line takes the free room, the buttons (one row in TSX,
  * `.footerActions`) keep their width at the end, whatever the layout. When the line runs short the
  * row moves under the text as a whole — the text goes above the buttons first, the buttons never
  * split while they fit in one line. On a phone and in a narrow dialog the stack below wins: the
  * line on top, full-width buttons under it.
  */
-.footer[data-layout]:where(:has(> .meta)) {
+.footer[data-layout]:where(:has(> .meta, > .footerStart)) {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -361,7 +384,17 @@
   gap: var(--prime-space-2);
 }
 
-/* The buttons beside a `Meta`: one row at the end; it wraps only when it is wider than the footer. */
+/* The start group (`Actions`): its buttons in one row at the start, at their own width. */
+.footerStart {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* The buttons beside the start: one row at the end; it wraps only when it is wider than the footer. */
 .footerActions {
   display: flex;
   flex: 0 1 auto;
@@ -402,15 +435,17 @@
   }
 
   .footer[data-layout] > *,
+  .footerStart > *,
   .footerActions > * {
     width: 100%;
   }
 
-  .footer[data-layout="fill"] > :not(.meta, .footerActions) {
+  .footer[data-layout="fill"] > :not(.meta, .footerStart, .footerActions) {
     flex: 0 0 auto;
     min-width: 0;
   }
 
+  .footerStart,
   .footerActions {
     flex-direction: column;
     align-items: stretch;
@@ -426,15 +461,17 @@
   }
 
   .footer[data-layout] > *,
+  .footerStart > *,
   .footerActions > * {
     width: 100%;
   }
 
-  .footer[data-layout="fill"] > :not(.meta, .footerActions) {
+  .footer[data-layout="fill"] > :not(.meta, .footerStart, .footerActions) {
     flex: 0 0 auto;
     min-width: 0;
   }
 
+  .footerStart,
   .footerActions {
     flex-direction: column;
     align-items: stretch;

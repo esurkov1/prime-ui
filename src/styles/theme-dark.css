@@ -130,6 +130,7 @@
   --prime-color-palette-yellow-solid-fg: var(--prime-ref-color-gray-950);
   --prime-color-palette-yellow-text: var(--prime-ref-color-yellow-300);
   --prime-color-skeleton-fill: color-mix(in srgb, var(--prime-ref-color-gray-100) 10%, transparent);
+  --prime-color-success-border: var(--prime-ref-color-green-400);
   --prime-color-success-default: var(--prime-ref-color-green-400);
   --prime-color-success-fg: var(--prime-ref-color-gray-950);
   --prime-color-success-hover: var(--prime-ref-color-green-300);

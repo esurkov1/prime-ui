@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Button } from "@/components/button/Button";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -8,6 +9,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import type { TagRef } from "@/internal/polymorphic";
 import type { ControlSize, Tone } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
@@ -69,7 +71,10 @@ export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Parts rise in on first render, except in `compact` (it appears on every keystroke). */
+/**
+ * Parts rise in when it appears on a shown page (a search or a filter that came to nothing), except
+ * in `compact` (it appears on every keystroke); one that mounts with its page is just there.
+ */
 function EmptyPageRoot({
   size: sizeProp,
   layout = "default",
@@ -77,10 +82,13 @@ function EmptyPageRoot({
   labels,
   className,
   children,
+  ref,
   ...rest
 }: EmptyPageRootProps) {
   const { size, provide } = useHostTier(sizeProp);
   const mergedLabels = useLabels(EMPTY_PAGE_LABELS, labels);
+  const appear = useEnterOnAppear<HTMLDivElement>(layout !== "compact");
+  const mergedRef = useMergedRefs(appear.ref, ref);
   const context: Ctx = {
     tone,
     size,
@@ -89,9 +97,10 @@ function EmptyPageRoot({
   };
   return provide(
     <div
-      className={cx(styles.root, layout !== "compact" && enterMotion.enterBaseChildren, className)}
+      className={cx(styles.root, appear.entering && enterMotion.enterBaseChildren, className)}
       role={tone === "danger" ? "alert" : undefined}
       {...rest}
+      ref={mergedRef}
       {...toDataAttributes({
         size,
         layout: layout === "default" ? undefined : layout,

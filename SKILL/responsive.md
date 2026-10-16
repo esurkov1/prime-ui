@@ -119,7 +119,7 @@ const FIELDS: SmartFilterField[] = [
   { key: "city", label: "Город", options: [{ value: "msk", label: "Москва" }] },
 ];
 
-export function OrdersPage() {
+export function DealsPage() {
   const [section, setSection] = useState("all");
   const [period, setPeriod] = useState("30d");
   const [filter, setFilter] = useState<SmartFilterValue>({});
@@ -136,10 +136,10 @@ export function OrdersPage() {
       <Page.Root>
         <Page.TopBar>
           <Page.Heading>
-            <Page.Title>Заказы</Page.Title>
-            <Page.Description>128 в работе · 6 ждут оплаты</Page.Description>
+            <Page.Title>Сделки</Page.Title>
+            <Page.Description>128 в работе · 6,5 млн ₽</Page.Description>
           </Page.Heading>
-          <Page.Tools aria-label="Заказы">
+          <Page.Tools aria-label="Сделки">
             <SegmentedControl.Root value={section} onValueChange={setSection} aria-label="Раздел">
               <SegmentedControl.Item value="all">
                 Все<SegmentedControl.Count>128</SegmentedControl.Count>
@@ -170,14 +170,14 @@ export function OrdersPage() {
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              Новый заказ
+              Новая сделка
             </Button.Root>
           </Page.Actions>
           <Page.Chips>
             <SmartFilter.Chips />
           </Page.Chips>
         </Page.TopBar>
-        <Page.Body>{/* the orders table */}</Page.Body>
+        <Page.Body>{/* the deals as a board or a list: the filter in the bar narrows both views */}</Page.Body>
       </Page.Root>
     </SmartFilter.Root>
   );
@@ -210,6 +210,28 @@ export function OrdersPage() {
   segments' padding, and one whose items all have icons then collapses to icons (each named by its
   tooltip) before it scrolls. On a 320px phone two sections with counts fit a line of their own;
   more, or long labels, scroll — keep the section a person needs first at the start.
+- **Overflow is never fixed by merging.** A tab or a section is one topic; when the topics outgrow
+  the line the strip scrolls as above — never two topics joined in one tab («Доступ и история»),
+  never the last ones hidden in a «Ещё» of your own, never a second row. Shorten a label to one word
+  first; a topic that is rarely opened still keeps its own tab, at the end.
+
+```tsx partial
+// bad — the history folded into «Доступ» because five tabs did not fit the drawer
+<Tabs.Item value="access">Доступ и история</Tabs.Item>
+```
+
+```tsx good
+// good — every topic its own tab; the strip scrolls when it runs out of width
+<Tabs.Root defaultValue="profile">
+  <Tabs.List>
+    <Tabs.Item value="profile">Профиль</Tabs.Item>
+    <Tabs.Item value="access">Доступ</Tabs.Item>
+    <Tabs.Item value="notifications">Уведомления</Tabs.Item>
+    <Tabs.Item value="security">Безопасность</Tabs.Item>
+    <Tabs.Item value="history">История</Tabs.Item>
+  </Tabs.List>
+</Tabs.Root>
+```
 - Your duty as its host: give the switcher a bounded width. A flex or grid child that holds one sets
   `min-width: 0`, otherwise the switcher grows the row instead of scrolling
   ([foundation §9](../docs/foundation.md#9-layout-and-responsiveness)).

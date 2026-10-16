@@ -36,11 +36,13 @@ import {
   Datepicker,
   Dnd,
   Drawer,
+  EmptyPage,
   ExampleFrame,
   FieldList,
   FileUpload,
   Gallery,
   Gantt,
+  Hint,
   Input,
   Kanban,
   List,
@@ -725,6 +727,15 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "Badge.Group",
+    "DIV",
+    (ref) => (
+      <Badge.Group ref={ref} data-testid="part" overflow="count">
+        <Badge.Root>Сделки</Badge.Root>
+      </Badge.Group>
+    ),
+  ],
+  [
     "Checkbox.Root",
     "INPUT",
     (ref) => (
@@ -873,6 +884,27 @@ const CASES: Case[] = [
     ),
   ],
   ["Composer.Root", "FORM", (ref) => <Composer.Root ref={ref} data-testid="part" />],
+  [
+    "Composer.Context",
+    "DIV",
+    (ref) => (
+      <Composer.Root>
+        <Composer.Context ref={ref} data-testid="part">
+          Анна
+        </Composer.Context>
+      </Composer.Root>
+    ),
+  ],
+  ["EmptyPage.Root", "DIV", (ref) => <EmptyPage.Root ref={ref} data-testid="part" />],
+  [
+    "Hint.Root",
+    "P",
+    (ref) => (
+      <Hint.Root ref={ref} data-testid="part">
+        Подсказка
+      </Hint.Root>
+    ),
+  ],
   [
     "SmartFilter.Chips",
     "DIV",

@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { Badge } from "@/components/badge/Badge";
+import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Kbd } from "@/components/kbd/Kbd";
 import rowLink from "@/internal/rowLink.module.css";
 import { stickySurfaceClass } from "@/internal/sticky";
@@ -394,7 +395,8 @@ describe("DataTable", () => {
 
     rerender(<DataTable rows={rows} columns={columns} getRowKey={(row) => row.id} />);
     const loaded = body(container);
-    expect(loaded).toHaveClass(swapMotion.swapIn);
+    // Out of loading: the rows replace the skeleton rows with the short fade.
+    expect(loaded).toHaveClass(swapMotion.settleIn);
 
     // Same state (rows → rows): the body is not remounted, so nothing replays.
     fireEvent.click(screen.getByRole("button", { name: "Name" }));
@@ -528,10 +530,12 @@ describe("DataTable CSS contract", () => {
 
   describe("selection", () => {
     const five = rows.slice(0, 5);
-    function Selectable(props: {
-      onSelectedChange?: (keys: React.Key[]) => void;
-      onRowClick?: () => void;
-    }) {
+    function Selectable(
+      props: Partial<React.ComponentProps<typeof DataTable<Row>>> & {
+        onSelectedChange?: (keys: React.Key[]) => void;
+        onRowClick?: () => void;
+      },
+    ) {
       return (
         <DataTable
           rows={five}
@@ -696,6 +700,51 @@ describe("DataTable CSS contract", () => {
       expect(all.indeterminate).toBe(false);
       await user.click(all);
       for (const row of five) expect(box(row.name)).not.toBeChecked();
+    });
+
+    it("adds the selection actions menu last in the tool row while rows are selected", async () => {
+      const user = userEvent.setup();
+      const onArchive = vi.fn();
+      render(
+        <Selectable
+          toolbar={<button type="button">Экспорт</button>}
+          renderSelectionActions={(keys) => (
+            <Dropdown.Item onSelect={() => onArchive(keys)}>В архив</Dropdown.Item>
+          )}
+        />,
+      );
+      expect(screen.queryByRole("button", { name: /Действия/ })).toBeNull();
+      await user.click(box("C"));
+      await user.click(box("A"));
+      const trigger = screen.getByRole("button", { name: "Действия 2" });
+      // The toolbar stays; the menu stands after it.
+      const row = screen.getByRole("button", { name: "Экспорт" }).closest("div")
+        ?.parentElement as HTMLElement;
+      expect(row.lastElementChild).toContainElement(trigger);
+      trigger.focus();
+      await user.keyboard("{Enter}");
+      const items = await screen.findAllByRole("menuitem");
+      expect(items.map((item) => item.textContent)).toEqual(["Снять выбор", "В архив"]);
+      await user.keyboard("{ArrowDown}{Enter}");
+      expect(onArchive).toHaveBeenCalledWith([1, 2]);
+    });
+
+    it("clears the selection from the menu's first item, and the menu leaves", async () => {
+      const user = userEvent.setup();
+      const onSelectedChange = vi.fn();
+      render(
+        <Selectable
+          onSelectedChange={onSelectedChange}
+          labels={{ selectionActions: "Ещё", clearSelection: "Сбросить" }}
+          renderSelectionActions={() => <Dropdown.Item>В архив</Dropdown.Item>}
+        />,
+      );
+      await user.click(box("C"));
+      await user.click(screen.getByRole("button", { name: "Ещё 1" }));
+      await user.click(await screen.findByRole("menuitem", { name: "Сбросить" }));
+      expect(onSelectedChange).toHaveBeenLastCalledWith([]);
+      expect(box("C")).not.toBeChecked();
+      await waitFor(() => expect(screen.queryByRole("button", { name: /Ещё/ })).toBeNull());
     });
   });
 
@@ -901,7 +950,62 @@ describe("DataTable CSS contract", () => {
       "grow",
     );
     const noteCells = container.querySelectorAll<HTMLElement>('[data-column-id="note"]');
-    for (const cell of noteCells) expect(cell.style.width).toBe("100%");
+    for (const cell of noteCells) expect(cell).toHaveAttribute("data-grow", "true");
+    expect(
+      cssValue(
+        cssRule(CSS, '.table:not([data-measuring]) > :is(thead, tbody) > tr > [data-grow="true"]'),
+        "width",
+      ),
+    ).toBe("100%");
+  });
+
+  it("measures a grow table at its content width: a grow column claims no free width then", () => {
+    // Every other column — a whole header, a fixed width — measures at its natural width.
+    expect(
+      cssValue(cssRule(CSS, '.root[data-table-width="grow"] .table[data-measuring]'), "width"),
+    ).toBe("auto");
+    expect(
+      cssValue(
+        cssRule(CSS, '.table[data-measuring] > :is(thead, tbody) > tr > [data-grow="true"]'),
+        "width",
+      ),
+    ).toBe("var(--prime-space-0)");
+    const measuring: (string | undefined)[] = [];
+    const spy = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockImplementation(function (this: HTMLElement) {
+        const table = this.closest("table");
+        if (this.tagName === "TH" && table) measuring.push(table.dataset.measuring);
+        return {
+          width: 50,
+          height: 20,
+          top: 0,
+          left: 0,
+          right: 50,
+          bottom: 20,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        } as DOMRect;
+      });
+    const { container } = render(
+      <DataTable
+        rows={rows}
+        columns={[
+          { id: "name", header: "Name", accessor: "name" },
+          { id: "score", header: "Score", accessor: "score", grow: true },
+        ]}
+        paging="none"
+        pageSize={rows.length}
+      />,
+    );
+    const table = container.querySelector("table") as HTMLTableElement;
+    expect(measuring.length).toBeGreaterThan(0);
+    expect(measuring.every((value) => value === "true")).toBe(true);
+    expect(table).not.toHaveAttribute("data-measuring");
+    // The grow column measured at its narrowest content: the table never goes below it.
+    expect(table.style.minWidth).toBe("100px");
+    spy.mockRestore();
   });
 
   it("sorts from the keyboard: Tab reaches the sort button, Enter cycles the order", async () => {
@@ -1035,6 +1139,23 @@ describe("DataTable CSS contract", () => {
     expect((scoreCol as HTMLTableColElement).style.width).toBe("");
     expect(table.style.minWidth).toBe("400px");
     spy.mockRestore();
+  });
+
+  it("a fixed width is a column's floor in a table with a grow column", () => {
+    const { container } = render(
+      <DataTable
+        rows={rows}
+        columns={[
+          { id: "name", header: "Name", accessor: "name", width: "22rem" },
+          { id: "score", header: "Score", accessor: "score", grow: true },
+        ]}
+        paging="none"
+      />,
+    );
+    for (const cell of container.querySelectorAll<HTMLElement>('[data-column-id="name"]')) {
+      expect(cell.style.width).toBe("22rem");
+      expect(cell.style.minWidth).toBe("22rem");
+    }
   });
 });
 

@@ -17,6 +17,9 @@
   width: 100%;
   max-width: var(--prime-modal-width-s);
   min-width: 0;
+  /* Centred in a wider block too (a Crossfade swapping the page's states), not only on the
+     centring canvas. */
+  margin-inline: auto;
 }
 
 /* Inside the Card: the padding of the tier and the header → body rhythm. */

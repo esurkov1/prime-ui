@@ -36,7 +36,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### EmptyPage.Root
-`ref` → `HTMLDivElement`. A centered column: icon tile, title, description, actions; parts rise in one after another on first render.
+`ref` → `HTMLDivElement`. A centered column: icon tile, title, description, actions; parts rise in one after another when it appears on a page already shown (a search or a filter that came to nothing); one that mounts with its page stands still.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -116,7 +116,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| first render | mount (not `compact`) | parts rise in (`enterMotion`), `--prime-motion-stagger` apart; collapses under reduced motion |
+| appearing | mounted on its own into a page already shown — a search or a filter that came to nothing (not `compact`) | parts rise in (`enterMotion`), `--prime-motion-stagger` apart; collapses under reduced motion. Mounted with its page, or inside a region that swaps in (`Crossfade`), it stands still |
 | layout | `layout` | `data-layout="fill" \| "compact"` (none for `default`) |
 | size | `size` | `data-size`; controls inside get the same tier |
 | error | `tone="danger"` | `data-tone="danger"`, `role="alert"` (unless a `role` is passed), the icon tile danger |

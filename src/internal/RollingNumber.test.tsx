@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { carryRolling, RollingNumber } from "./RollingNumber";
@@ -8,10 +8,8 @@ describe("RollingNumber", () => {
     const { container } = render(<RollingNumber>{"4 812 ₽"}</RollingNumber>);
     const root = container.firstElementChild as HTMLElement;
     expect(root).toHaveTextContent("4 812 ₽");
-    const digits = [...root.children].filter((el) =>
-      (el as HTMLElement).style.getPropertyValue("--rolling-n"),
-    );
-    expect(digits.map((el) => (el as HTMLElement).style.getPropertyValue("--rolling-n"))).toEqual([
+    const digits = [...root.querySelectorAll<HTMLElement>("[data-rolling-digit]")];
+    expect(digits.map((el) => el.style.getPropertyValue("--rolling-n"))).toEqual([
       "4",
       "8",
       "1",
@@ -19,14 +17,33 @@ describe("RollingNumber", () => {
     ]);
   });
 
+  // A box per digit makes browsers split a name into words («Новые 1 2»): the value is one text
+  // node, and the painted columns are hidden from assistive tech and hold no text at all.
+  it("is read as one number: a single text node, the painted columns hidden and empty", () => {
+    render(
+      <button type="button">
+        Новые <RollingNumber>{"1 248"}</RollingNumber>
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Новые 1 248" });
+    const root = button.querySelector("[data-rolling-value]")?.parentElement as HTMLElement;
+    const texts: string[] = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) texts.push(walker.currentNode.textContent ?? "");
+    expect(texts).toEqual(["1 248"]);
+    const columns = root.querySelector("[data-rolling-digit]")?.parentElement;
+    expect(columns).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("keeps columns by their place from the right, so unchanged digits stay the same nodes", () => {
     const { container, rerender } = render(<RollingNumber>{98}</RollingNumber>);
     const root = container.firstElementChild as HTMLElement;
-    const ones = root.lastElementChild;
+    const columns = () => [...root.querySelectorAll<HTMLElement>("[data-rolling-digit]")];
+    const ones = columns().at(-1);
     rerender(<RollingNumber>{108}</RollingNumber>);
-    expect(root.lastElementChild).toBe(ones);
+    expect(columns().at(-1)).toBe(ones);
     expect(root).toHaveTextContent("108");
-    expect((root.firstElementChild as HTMLElement).style.getPropertyValue("--rolling-n")).toBe("1");
+    expect(columns()[0]?.style.getPropertyValue("--rolling-n")).toBe("1");
   });
 
   it("replays a changed digit from its old value, so a moved node still rolls", () => {
@@ -59,7 +76,11 @@ describe("RollingNumber", () => {
     const copy = render(<RollingNumber>{9}</RollingNumber>).container;
     const destination = render(<RollingNumber>{10}</RollingNumber>).container;
     expect(carryRolling(copy, destination)).toBe(false);
-    expect(copy).toHaveTextContent("0");
+    expect(
+      copy
+        .querySelector<HTMLElement>("[data-rolling-digit]")
+        ?.style.getPropertyValue("--rolling-n"),
+    ).toBe("0");
     expect(carryRolling(document.createElement("span"), destination)).toBe(false);
   });
 });

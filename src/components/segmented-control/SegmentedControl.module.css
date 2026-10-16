@@ -218,6 +218,7 @@
   line-height: var(--seg-line-height);
   font-weight: var(--prime-font-weight-medium);
   text-align: start;
+  text-decoration: none;
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
@@ -264,12 +265,13 @@
 
 /* Hover is a text step only: the sliding thumb is the only fill, so nothing fights its motion. */
 @media (hover: hover) {
-  .item[aria-checked="false"]:not([data-disabled="true"]):hover {
+  .item[data-state="unchecked"]:not([data-disabled="true"]):hover {
     color: var(--prime-color-text-primary);
   }
 }
 
-.item[aria-checked="true"] {
+.item[data-state="checked"],
+.item[aria-current="page"] {
   color: var(--prime-color-text-primary);
 }
 

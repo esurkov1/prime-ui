@@ -69,8 +69,8 @@ export const api: ComponentApi = {
     },
     {
       name: "SegmentedControl.Item",
-      en: '`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`.',
-      ru: 'Один вариант — `<button role="radio">` с перемещаемым `tabIndex`; простой текст оборачивается в `SegmentedControl.Label`.',
+      en: '`ref` → `HTMLButtonElement`, or the child element with `asChild`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`. With `asChild` the segment is the consumer\'s link.',
+      ru: 'Один вариант — `<button role="radio">` с перемещаемым `tabIndex`; простой текст оборачивается в `SegmentedControl.Label`. С `asChild` сегмент — ссылка потребителя.',
       props: [
         {
           name: "value",
@@ -91,6 +91,13 @@ export const api: ComponentApi = {
           type: PALETTE,
           en: "Palette hue: a dot before the content; while selected the thumb takes a soft fill of the hue with a ring of it.",
           ru: "Оттенок: точка перед содержимым; выбранный бегунок получает мягкую заливку оттенка.",
+        },
+        {
+          name: "asChild",
+          type: "boolean",
+          default: "false",
+          en: "The single child (a router `<Link>`) becomes the segment. A row of links is a navigation: links in the Tab order, the one matching `value` current, no arrow keys.",
+          ru: "Единственный дочерний элемент (`<Link>` роутера) становится сегментом. Ряд ссылок — навигация: ссылки в порядке Tab, совпавшая с `value` — текущая, без стрелок.",
         },
         {
           name: "children",
@@ -224,8 +231,8 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "ArrowRight · ArrowDown",
-        en: "Next option, wrapping and skipping disabled ones; focus and selection move together.",
-        ru: "Следующий вариант по кругу, пропуская неактивные; фокус и выбор двигаются вместе.",
+        en: "Next option, wrapping and skipping disabled ones; focus and selection move together (not in a row of links).",
+        ru: "Следующий вариант по кругу, пропуская неактивные; фокус и выбор двигаются вместе (кроме ряда ссылок).",
       },
       { keys: "ArrowLeft · ArrowUp", en: "Previous option.", ru: "Предыдущий вариант." },
       {
@@ -235,8 +242,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Tab",
-        en: "Enters the group on the selected option (or the first enabled one) and leaves it.",
-        ru: "Входит в группу на выбранном варианте (или первом доступном) и выходит из неё.",
+        en: "Enters the group on the selected option (or the first enabled one) and leaves it; in a row of links it moves from link to link.",
+        ru: "Входит в группу на выбранном варианте (или первом доступном) и выходит из неё; в ряду ссылок переходит от ссылки к ссылке.",
       },
     ],
     aria: [
@@ -251,6 +258,10 @@ export const api: ComponentApi = {
       {
         en: 'Items are `<button role="radio" aria-checked>` with roving `tabIndex`.',
         ru: 'Варианты — `<button role="radio" aria-checked>` с перемещаемым `tabIndex`.',
+      },
+      {
+        en: 'With an `asChild` item the track is `role="navigation"` (named the same way), the links keep their role and the current one has `aria-current="page"`; `required` and `invalid` do not apply.',
+        ru: 'С сегментом `asChild` дорожка — `role="navigation"` (с тем же именем), ссылки сохраняют свою роль, текущая — `aria-current="page"`; `required` и `invalid` не применяются.',
       },
       {
         en: "Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description; plain text is the label, so every reference resolves.",

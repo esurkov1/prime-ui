@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "EmptyPage.Root",
-      en: "`ref` → `HTMLDivElement`. A centered column: icon tile, title, description, actions; parts rise in one after another on first render.",
-      ru: "Колонка по центру: плашка с иконкой, заголовок, описание, действия; части появляются по очереди при первом показе.",
+      en: "`ref` → `HTMLDivElement`. A centered column: icon tile, title, description, actions; parts rise in one after another when it appears on a page already shown (a search or a filter that came to nothing); one that mounts with its page stands still.",
+      ru: "Колонка по центру: плашка с иконкой, заголовок, описание, действия; части появляются по очереди, когда состояние возникает на уже показанной странице (поиск или фильтр ничего не нашли); пустое состояние, открытое вместе со страницей, неподвижно.",
       props: [
         {
           name: "size",

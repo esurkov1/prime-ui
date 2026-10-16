@@ -187,39 +187,89 @@ form rules: `Modal.Body` holds the `<form id>`, `Modal.Footer` holds Cancel + su
 
 ## Auth (sign in, code)
 
-No AppShell. `LoginForm` is the whole card: logo, title, provider buttons, the form and the footer link;
-center it on the canvas. Code step: `DigitInput` inside `LoginForm.Form`. Scenarios for sign-up, password
-reset and code confirmation are in `src/components/login-form/examples/`.
+**One auth screen, in modes.** Sign-in, sign-up, an invite (set a password by a link), a password
+reset and a one-time code are one public route — `/login`, the mode in its query (`?invite=…`,
+`?reset=…`, `?step=code`) — and one `LoginForm` card whose header and form change with the mode.
+A new link-driven step is a new mode of that screen, never a page of its own: it would get its own
+canvas, its own copy of the card and drift from the others. No AppShell; `DigitInput` inside
+`LoginForm.Form` for a code; the scenarios are in `src/components/login-form/examples/`.
+
+**The head names the action.** `LoginForm.Root` keeps its default `align="start"`: `LoginForm.Logo`
+holds the icon of the action (`action.login` for «Войти в аккаунт»; a key for «Задайте пароль»),
+`LoginForm.Title` names the action, `LoginForm.Description` is one line of what or whom it concerns
+(«Приглашение в «Северный ветер» для a.sokolova@…»). The product mark centred over the title
+(`align="center"`) belongs to a public brand page, not to the product's own door. Another state of
+the screen (a link that expired, the check of a token) swaps inside the canvas around the card
+through a `Crossfade` without `fill`, its loading branch a `Skeleton` of the card's geometry.
+
+```tsx partial
+// bad — a page of its own for the invite, a centred brand mark over a generic title
+// /invite/:token
+<LoginForm.Root align="center">
+  <LoginForm.Header>
+    <LoginForm.Logo aria-label="CRM">…</LoginForm.Logo>
+    <LoginForm.Title>Добро пожаловать</LoginForm.Title>
+  </LoginForm.Header>
+  …
+</LoginForm.Root>
+```
 
 ```tsx
 import { Button, Icon, Input, LinkButton, LoginForm } from "prime-ui-kit";
 import styles from "./SignIn.module.css";
 
-export function SignIn() {
+/** The mode comes from the query of `/login`: `?invite=…` sets a password, nothing signs in. */
+type AuthMode = "login" | "invite";
+
+const HEAD = {
+  login: { icon: "action.login", title: "Войти в аккаунт", description: "Рабочая почта и пароль" },
+  invite: { icon: "object.key", title: "Задайте пароль", description: "Приглашение в «Северный ветер»" },
+} as const;
+
+export function SignIn({ mode }: { mode: AuthMode }) {
+  const head = HEAD[mode];
   return (
     <main className={styles.page}>
-      <LoginForm.Root align="center">
+      <LoginForm.Root>
         <LoginForm.Header>
           <LoginForm.Logo>
-            <Icon name="object.package" />
+            <Icon name={head.icon} />
           </LoginForm.Logo>
-          <LoginForm.Title>Вход</LoginForm.Title>
-          <LoginForm.Description>Отправим код на рабочую почту</LoginForm.Description>
+          <LoginForm.Title>{head.title}</LoginForm.Title>
+          <LoginForm.Description>{head.description}</LoginForm.Description>
         </LoginForm.Header>
         <LoginForm.Body>
           <LoginForm.Form onSubmit={(event) => event.preventDefault()}>
-            <Input.Root label="Рабочая почта" required>
+            {mode === "login" ? (
+              <Input.Root label="Рабочая почта" required>
+                <Input.Wrapper>
+                  <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
+                </Input.Wrapper>
+              </Input.Root>
+            ) : null}
+            <Input.Root
+              label={mode === "login" ? "Пароль" : "Новый пароль"}
+              required
+              strength={mode === "invite"}
+              minStrength={mode === "invite" ? 3 : undefined}
+            >
               <Input.Wrapper>
-                <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
+                <Input.Field
+                  type="password"
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                />
+                <Input.RevealButton />
               </Input.Wrapper>
             </Input.Root>
             <Button.Root type="submit" fullWidth>
-              Получить код
+              {mode === "login" ? "Войти" : "Сохранить пароль"}
             </Button.Root>
           </LoginForm.Form>
-          <LoginForm.Footer>
-            Нет аккаунта? <LinkButton href="/signup">Зарегистрироваться</LinkButton>
-          </LoginForm.Footer>
+          {mode === "login" ? (
+            <LoginForm.Footer>
+              Нет аккаунта? <LinkButton href="/login?mode=signup">Зарегистрироваться</LinkButton>
+            </LoginForm.Footer>
+          ) : null}
         </LoginForm.Body>
       </LoginForm.Root>
     </main>

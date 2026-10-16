@@ -64,12 +64,14 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it. |
+| `valid` | `boolean` | — | A confirmed value (a matching repeat, a verified code): a success ring and a drawn check at the field's end, `labels.valid` spoken. `invalid` wins. Pass `false` too: the live region exists only with it. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
 | `counter` | `ReactNode` | — | Right side of the support row, usually `<Input.Counter current max />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `strength` | `boolean` | `false` | A password strength meter for new-password fields: a stepped `ProgressBar` under the field and the level word (weak … hard) in the support row. Follows the value of `Input.Field`. |
-| `getStrength` | `(value: string) => 0 \| 1 \| 2 \| 3 \| 4` | `getPasswordStrength` | Replaces the kit's estimate of `strength`. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check. |
+| `getStrength` | `(value: string) => 0 \| 1 \| 2 \| 3 \| 4` | `getPasswordStrength` | Replaces the kit's estimate of `strength`. Return 0 for empty, 1 weak … 4 hard. |
+| `minStrength` | `1 \| 2 \| 3 \| 4` | — | The policy of `strength`: below this level the meter turns danger and the form refuses to submit (`setCustomValidity`), then shows `labels.strengthTooWeak` as the error. |
 | `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with a changed value on blur and Enter; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through `error`. |
 | `suggestions` | `readonly string[]` | — | Suggestions for free text (a combobox): a list under the box shows those containing the text; a pick goes into the field as typing would. Any text stays allowed; a value from a list only is `Select`. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the `suggestions` list; the text and the focus stay in the field. |
@@ -202,7 +204,7 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 - Pointless: `required` and `optional` together; `hint` and `error` together (the error replaces the hint); `invalid` without any message in a form where the user needs to know what is wrong.
 - Forbidden: `focusRing={false}` on regular form fields (WCAG 2.4.7).
 
-**Hierarchy:** keep one size for all fields of a form; mark required/optional consistently; a status of the value goes into the hint, not into the field.
+**Hierarchy:** keep one size for all fields of a form; mark required/optional consistently; a status of the value goes into the hint, not into the field — except a confirmed value (`valid`: a repeated password that matches, a verified email or code), which is a check mark in the field, never a «совпадает» text.
 
 ## States
 | State | Driven by | DOM |
@@ -211,6 +213,7 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | focus | keyboard focus on the input | wrapper gets the focus fill and an inset focus ring (`:has(input:focus-visible)`) |
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the wrapper |
 | invalid | `invalid` or non-empty `error` | `data-invalid="true"` on root and wrapper, `aria-invalid="true"` on the input, danger inset ring, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
+| valid | `valid` (and not invalid: `invalid` or `error` wins) | `data-valid="true"` on the wrapper, a success inset ring; a check (`aria-hidden`) at the end of the field before the end icon and segments pops in and draws its stroke when the value becomes valid, and closes up in place when it goes; a polite live region says `labels.valid` and is in the input's `aria-describedby` while valid |
 | disabled | native `disabled` on `Input.Field`, or a disabled `Fieldset` around it | disabled fill, disabled text and icons, `cursor: not-allowed`, clear button disabled look |
 | read-only | native `readOnly` on `Input.Field` | no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
@@ -218,6 +221,7 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | suggesting | `suggestions` + typing, ↓ / ↑ or a click in the field | `role="combobox"`, `aria-expanded="true"` and `aria-controls` on the input; the list fades in under the box (the floating panel's motion) with the matching part of each suggestion marked; the highlight is a fill (`data-highlighted`, `aria-selected`) named by `aria-activedescendant`; closes on a pick, Escape, Tab, blur or a press outside |
 | select segment | a `Select` inside `Input.Wrapper` | `data-field-segment` on the select root, `data-segment="true"` on its trigger: a tinted section (`fill-subtle`) flush with the start edge, a stronger fill on hover and while open, its own inset focus ring; the box's ring stays for the text |
 | strength | `strength` + the value of `Input.Field` | a stepped `ProgressBar` (4 cells, `aria-label` = `labels.strength`) under the field fills one cell after another, weak · easy · medium · hard, toned danger → warning → accent → success; the level word at the end of the support row flows in letter by letter and is announced (`aria-live`); the support row is reserved |
+| below the policy | `strength` + `minStrength` above the level of a non-empty value | the meter and the level word turn danger; `setCustomValidity(labels.strengthTooWeak)` on the input, so the form refuses to submit; after a refused submit the same text is the field's `error` (`aria-invalid`) until the level reaches `minStrength` |
 | saving | `onCommit` returned a pending Promise | `aria-busy="true"` on the input; a `Spinner` at the end of the field (`data-commit="pending"`); the field stays editable and focusable, neighbours are untouched; a live region says `labels.saving` |
 | saved | the Promise resolved (or `onCommit` returned nothing) | the spinner cross-fades into a success check (`data-commit="saved"`) that fades out after a moment; the live region says `labels.saved` |
 | save refused | the Promise rejected | the committed value is put back (unless the person typed on), the status leaves; the owner shows why through `error` |
@@ -229,6 +233,8 @@ Size: `data-size` on root and wrapper. Slots: `data-side="start" | "end"`. Segme
 Inline save (`onCommit`): the value at focus is the committed one. Blur and Enter commit a changed value (an unchanged one never fires); Escape puts the committed value back through the field's own `onChange`, so a controlled owner receives it, and is consumed — it does not also close the drawer around the field. Return a Promise for a server save: pending shows a spinner, reject restores the value, resolve shows the check.
 
 Strength estimate (`strength`, replaced by `getStrength`): every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. The meter follows `Input.Field` controlled or not.
+
+Strength policy (`minStrength`): a non-empty value below the level is invalid for the form (native constraint validation, `labels.strengthTooWeak`), so a submit stops at the field and its error appears; an empty value is left to `required`. The meter tells the person typing; the server still decides what it accepts.
 
 Suggestions (`suggestions`): the list shows the suggestions that contain the typed text (case-insensitive), and nothing when the text already is the only match. A pick writes the suggestion into the input the way typing does, so `onValueChange` (and `onCommit` on blur) receive it; the text is never restricted to the list.
 
@@ -262,6 +268,8 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 
 - `label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.
 - Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.
+- `valid` adds the id of a polite live region holding `labels.valid` to the input's `aria-describedby`: the state is heard when it arrives and on focus, never by colour alone; the check is `aria-hidden`.
+- `minStrength` uses native constraint validation: below the level the input's `validationMessage` is `labels.strengthTooWeak`, the form refuses to submit, and the message becomes the field's error (`aria-invalid`).
 - `Input.Icon` is decorative (`aria-hidden`). `Input.Affix` and `Input.InlineAffix` are `aria-hidden` in the reading order but describe the input (`aria-describedby`, before the hint): the unit is heard with the field, so the label never repeats it. An `aria-label` on the affix is said instead of its text («рублей» for `₽`).
 - `suggestions` make the input a `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` on the open `listbox`, which the label names); the highlight is `aria-activedescendant`, so focus never leaves the field.
 - A `Select` inside `Input.Wrapper` is the box's start segment: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).
@@ -290,6 +298,8 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | `strengthEasy` | `"Лёгкий"` | Level word for strength 2. |
 | `strengthMedium` | `"Средний"` | Level word for strength 3. |
 | `strengthHard` | `"Сложный"` | Level word for strength 4. |
+| `strengthTooWeak` | `"Пароль недостаточно надёжный"` | Validation message of a `strength` field below `minStrength`, and its error once a submit was refused. |
+| `valid` | `"Значение подходит"` | Spoken when the field is `valid`; the check mark itself is `aria-hidden`. |
 
 ## Examples
 | Example | Shows |
@@ -302,6 +312,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value, heard as a word by a screen reader — `Input.Affix`, `Input.InlineAffix`, `aria-label`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
 | [password-strength.tsx](examples/password-strength.tsx) | A new password with a show toggle and a meter that fills step by step and names the level beside the hint, and a service password measured by the company's own rule — `Input.RevealButton`, `strength`, `getStrength`. |
+| [password-policy.tsx](examples/password-policy.tsx) | A password change under a policy: a new password below the required level turns the meter danger and stops the submit, the repeat gets a check once it matches — `strength`, `minStrength`, `valid`. |
 | [edge-actions.tsx](examples/edge-actions.tsx) | Actions at the field's end: a mail link with a tooltip beside copying the value, and a profile link on a read-only field — `Input.Action`, `Input.CopyButton`. |
 | [inline-edit.tsx](examples/inline-edit.tsx) | Record card fields that save on blur and Enter, revert on Escape and show the server's refusal — `onCommit`, `error`. |
 | [suggestions.tsx](examples/suggestions.tsx) | Where a returned order is kept: free text with the places already used as suggestions — `suggestions`. |
@@ -315,6 +326,8 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `<Input.Field placeholder="Email" />` without a label → add `label` on `Input.Root` or `aria-label` on the field.
 - `<Input.Root disabled>` → `disabled` goes on `Input.Field`.
 - `<Input.Root fullWidth>` → there is no such prop; the root already fills its parent.
+- A success icon in `Input.Icon side="end"` or a «Пароли совпадают» hint for a matching value → `valid` on `Input.Root` (ring, check, spoken state).
+- Checking `strength` levels yourself and setting `error` → `minStrength`.
 - Passing both `hint` and `error` expecting both to show → only the error is shown.
 - Rendering `Input.ClearButton` for an empty field → render it only when there is a value.
 - Setting `className` with a custom border or background on `Input.Wrapper` → the fill comes from the surface context; fields inside Card/Modal already switch.
@@ -327,5 +340,5 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - Returning `false` from `onCommit` to refuse → reject the Promise (throw) and set `error`.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments), [VisuallyHidden](../visually-hidden/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md) (the `suggestions` list)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments, the `valid` check), [VisuallyHidden](../visually-hidden/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md) (the `suggestions` list)
 - **See also:** [Textarea](../textarea/COMPONENT.md), [Select](../select/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md) — fields with the same contract

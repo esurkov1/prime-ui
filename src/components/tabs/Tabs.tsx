@@ -20,6 +20,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import { labelPlainText, useTextPartId, useTextParts } from "@/internal/parts";
 import press from "@/internal/press.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -739,32 +740,57 @@ TabsSeparator.displayName = "Tabs.Separator";
 
 export type TabsPanelProps = React.HTMLAttributes<HTMLDivElement> & {
   value: string;
+  keepMounted?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function TabsPanel({ value, ...rest }: TabsPanelProps) {
+/**
+ * Mounted while its tab is active. With `keepMounted` a panel stays in the document once its tab
+ * has been opened: hidden (out of the layout, the tab order and the accessibility tree) while
+ * another tab is active, so its state — fetched data, a draft, a scroll position — survives.
+ */
+function TabsPanel({ value, keepMounted = false, ...rest }: TabsPanelProps) {
   const { activeValue } = useTabsContext();
-  if (activeValue !== value) return null;
-  return <TabsPanelContent value={value} {...rest} />;
+  const active = activeValue === value;
+  const [opened, setOpened] = React.useState(active);
+  if (active && !opened) setOpened(true);
+  if (!active && !(keepMounted && opened)) return null;
+  return <TabsPanelContent value={value} active={active} {...rest} />;
 }
 TabsPanel.displayName = "Tabs.Panel";
 
 /** The panel in the document: it tells its tab, which points at it (`aria-controls`) only then. */
-function TabsPanelContent({ value, children, className, ...rest }: TabsPanelProps) {
+function TabsPanelContent({
+  value,
+  active,
+  children,
+  className,
+  ref,
+  ...rest
+}: Omit<TabsPanelProps, "keepMounted"> & { active: boolean }) {
   const { rootId, registerPanel } = useTabsContext();
   React.useLayoutEffect(() => registerPanel(value), [registerPanel, value]);
+  // The panel that mounts with the tabs is just there; one the tabs open later enters.
+  const appear = useEnterOnAppear<HTMLDivElement>(active);
+  const mergedRef = useMergedRefs(appear.ref, ref);
   return (
     <div
       {...rest}
+      ref={mergedRef}
       role="tabpanel"
       id={panelId(rootId, value)}
       aria-labelledby={tabId(rootId, value)}
+      // A kept panel of an inactive tab: `display: none` takes it out of every reading.
+      hidden={!active || undefined}
       // biome-ignore lint/a11y/noNoninteractiveTabindex: WAI-ARIA APG — a tabpanel is focusable so keyboard users can reach its content
       tabIndex={0}
       className={cx(styles.panel, className)}
     >
-      {/* Mounted per tab, so the content enters each time its tab opens it. */}
-      <div className={cx(styles.panelContent, enterMotion.enterBase)}>{children}</div>
+      {/* The content enters each time its tab opens it after the tabs are on screen: mounted
+          anew, or a kept panel shown again. The panel shown on mount stands still. */}
+      <div className={cx(styles.panelContent, appear.entering && enterMotion.enterBase)}>
+        {children}
+      </div>
     </div>
   );
 }

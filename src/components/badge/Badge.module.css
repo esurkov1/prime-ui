@@ -449,3 +449,28 @@
 .group:is([data-tier="xs"], [data-tier="s"]) {
   gap: var(--prime-space-1);
 }
+
+/* `overflow="count"`: one line, as many badges as fit, the rest behind the «+N» badge. Only the
+   first badge gives way (it ellipsizes when it alone does not fit); while the row is measured,
+   none does. */
+.group[data-overflow="count"] {
+  position: relative;
+  flex-wrap: nowrap;
+}
+
+.group[data-overflow="count"] > * {
+  flex-shrink: 0;
+}
+
+.group[data-overflow="count"]:not([data-measuring]) > :first-child {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/* A badge that did not fit keeps its natural width out of the flow, unseen and out of reach. */
+.group[data-overflow="count"] > [data-overflowed] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  visibility: hidden;
+}

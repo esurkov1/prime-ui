@@ -340,3 +340,46 @@
 .description {
   color: var(--prime-color-text-secondary);
 }
+
+/* ── Reply keyboard (`Composer.Keyboard`) ── */
+
+/* The toggle's cell, before the send button; recording, it fades out with the field. */
+.keyboardToggle {
+  display: flex;
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.keyboardToggle:not(:empty) {
+  margin-inline-end: var(--prime-space-1);
+}
+
+.root[data-recording] .keyboardToggle {
+  opacity: 0;
+}
+
+/* Under the row: the keyboard folds open and closed (`internal/Disclosure`); its gap above it is
+   inside the fold, so a closed keyboard takes no room. Without a keyboard the place is gone. */
+.keyboardSlot {
+  margin-block-start: calc(var(--prime-space-2) * -1);
+}
+
+.keyboardSlot:empty {
+  display: none;
+}
+
+/* Rows of keys: each row one line, its keys sharing it equally; a long label ellipsizes. */
+.keyboardKeys {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  padding-block-start: var(--prime-space-2);
+}
+
+.keyboardRow {
+  display: flex;
+  gap: var(--prime-space-1);
+}
+
+.keyboardRow > * {
+  flex: 1 1 0;
+}

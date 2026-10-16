@@ -123,6 +123,7 @@ function ExampleBlock({ page, example }: { page: ComponentPageConfig; example: C
   return (
     <DocBlock title={exampleTitle(example)} description={renderInlineCode(example.description)}>
       <PlaygroundSourceFrame
+        id={`${page.base ?? "components"}/${page.dir}/${exampleFile(example)}`}
         entry={getExample(page.base ?? "components", page.dir, exampleFile(example))}
         previewLayout={exampleLayout(page.kind, example)}
         stage={slot === "screen" ? screenStage : undefined}

@@ -142,6 +142,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 - In a table the row grows to the thumbnail; never shrink the thumbnail to the row.
 - Card covers: `fullWidth` inside the card body, the body's gap to the title.
 - No outline by default: the fill separates the preview.
+- In a leading media slot (`Drawer.Icon`, `Modal.Icon`, `Sheet.Icon`, `Card.Icon`) the thumbnail takes the slot's size (`m`, 40px) whatever `size` it was given, also through a wrapper component of yours; the slot then draws no tile.
 
 ## Accessibility
 

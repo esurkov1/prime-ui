@@ -652,13 +652,13 @@ button.reply:focus-visible {
 /*
  * A bot's inline keyboard (`Message.Actions`): rows of buttons under the bubble, on the chat's own
  * surface, at the message's width. The column is as wide as the wider of the bubble and the
- * keyboard (up to the cap); the bubble then takes that width, so they line up. Buttons share a row
- * equally (`flex: 1 1 0`); a row too narrow for their labels wraps them: a button never shrinks
- * below its label (`fit-content`), so the row breaks instead of the labels running into each other.
+ * keyboard (up to the cap); the bubble then takes that width, so they line up. A row is one line,
+ * as in Telegram: its keys share it equally (`flex: 1 1 0`, the keys are `fullWidth`), and a label
+ * longer than its share ellipsizes. Keys keep the control radius; the last row's outer corners take
+ * the bubble's (`data-end`), so the keyboard closes the message like the bubble's own bottom.
  */
 .actions {
   display: flex;
-  flex-wrap: wrap;
   align-self: stretch;
   gap: var(--prime-space-1);
   margin-block-start: var(--prime-space-1);
@@ -666,7 +666,22 @@ button.reply:focus-visible {
 
 .actions > * {
   flex: 1 1 0;
-  min-inline-size: fit-content;
+  min-inline-size: 0;
+}
+
+.actions[data-end] > :first-child {
+  border-end-start-radius: var(--msg-radius);
+}
+
+.actions[data-end] > :last-child {
+  border-end-end-radius: var(--msg-radius);
+}
+
+/* A link key's mark (↗ in a box) at its top-end corner, out of the label's flow. */
+.linkMark {
+  position: absolute;
+  inset-block-start: var(--prime-space-1);
+  inset-inline-end: var(--prime-space-1);
 }
 
 .column[data-actions] > .bubble {

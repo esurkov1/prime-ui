@@ -35,7 +35,7 @@ Tabs.Root                 value, size (else the host tier), orientation, tone, f
 │  │  ├─ Tabs.Count       counter Badge, one tier below the tabs size
 │  │  └─ Tabs.Description muted second line; makes the tab two-line
 │  └─ Tabs.Separator      Divider hairline between groups of tabs
-└─ Tabs.Panel             role="tabpanel", rendered only while its tab is active; no fill, no padding
+└─ Tabs.Panel             role="tabpanel", rendered only while its tab is active (keepMounted: kept hidden once opened); no fill, no padding
 ```
 
 ## API
@@ -120,11 +120,12 @@ Tabs.Root                 value, size (else the host tier), orientation, tone, f
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other div attributes. |
 
 ### Tabs.Panel
-`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active. No fill and no padding: its content is the host's content, aligned with the strip's edges. Its content enters each time it opens.
+`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active (with `keepMounted`, kept hidden once opened). No fill and no padding: its content is the host's content, aligned with the strip's edges. Content opened after mount enters.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | — (required) | Tab value this panel belongs to. |
+| `keepMounted` | `boolean` | `false` | Once opened, the panel stays mounted and `hidden` while another tab is active: its data, form draft and scroll survive a switch. A panel never opened is not mounted. |
 | `children` | `ReactNode` | — | Panel content. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
@@ -187,13 +188,14 @@ Avoid icons or descriptions on only some tabs (uneven rows; without an icon on e
 | disabled | `disabled` on Item | native `disabled`, `data-disabled="true"`, `text-disabled`; a removable tab loses its close button |
 | removable | `onRemove` on Item | item wrapper `data-removable="true"`, close button, tab `aria-keyshortcuts="Delete"` |
 | closing, confirm pending | `onRemove` returned a promise that has not settled | the close button is `loading` (`aria-busy`); the tab, its selection and focus stay; resolved → the neighbour takes over, rejected → nothing changes |
+| kept | `keepMounted` on Panel, its tab once opened and now inactive | the panel stays mounted with `hidden` (out of the layout, the tab order and the accessibility tree); its tab keeps `aria-controls`; shown again, its content enters as on a first open |
 | two-line | `Tabs.Description` child | `data-two-line="true"` |
 | collapsed | tabs wider than the list, or a label that would be cut (horizontal) | list `data-collapse="full" \| "compact" \| "icon"`: `compact` hides icons and descriptions; `icon` takes labels, counts and close buttons out of the row — a `VisuallyHidden` copy of the label names the tab and a `Tooltip` shows it — only when every tab has an icon |
 | overflow | tabs at their narrowest (content width, `minItemWidth` or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (the switcher row, a ScrollContainer), faded edges as deep as the hidden part at most (they grow and melt with the scroll, never switch); when the end edge would cut only a tab's empty side, the tabs at `minItemWidth` widen a little (`--tabs-peek`, up to 30%) so a label fades out at the edge and shows that more tabs follow; the active tab is kept in view and clear of the fades on mount and on every value change, the first and the last tab scroll all the way to the end — only the list scrolls, never the page. A column (a wide vertical list) has plain edges |
 
 The indicator glides (`emphasized` + `base`, `data-animate="true"`) only into a choice by click, arrow keys or closing the active tab; on mount, a value set from outside, a resize, font loading, tabs added or removed and collapse it is placed without motion, and it stays still under `prefers-reduced-motion`. The list scrolls smoothly to the active tab only after such a choice too.
 
-Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; the folder (the list's first child, `data-indicator`) `data-axis="x" | "y"` (follows the list's direction, so a vertical list in a narrow container gets the top folder); Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted, and a tab points at its panel (`aria-controls`) only while the panel is in the document; a panel's content enters each time it opens.
+Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; the folder (the list's first child, `data-indicator`) `data-axis="x" | "y"` (follows the list's direction, so a vertical list in a narrow container gets the top folder); Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted (unless `keepMounted`), and a tab points at its panel (`aria-controls`) only while the panel is in the document; a panel's content enters each time it opens after mount (the panel shown on mount stands still).
 
 ## Layout & spacing
 - Tabs are a bar, not a surface: the root has no fill, padding, radius or `data-depth`. On a page or in a `Card.Body`, put it straight into the host's padded region and the panel content straight into `Tabs.Panel`. The strip's edges and the panel content share the host's content edge; the panel stands one tier gap below the strip (`--prime-space-3` … `--prime-space-8`).
@@ -261,7 +263,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 | [overflow.tsx](examples/overflow.tsx) | Drag the frame narrower: icons go first, then labels, and icons with tooltips stay; then the list scrolls — `Tabs.Icon`. |
 | [closable.tsx](examples/closable.tsx) | Open order cards as browser tabs: each closes by its button, Delete or a middle click; tabs stay between two widths, and the list scrolls when they do not fit — `onRemove`, `minItemWidth`, `maxItemWidth`. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a summary on the second — `Tabs.Count`, `Tabs.Description`. |
-| [in-drawer.tsx](examples/in-drawer.tsx) | Order details in a Drawer: the tab bar runs along the bottom of the header, the active tab is the body rising into it, and every panel is the body's own content — `Tabs.Root`, `Tabs.List`, `Tabs.Panel`. |
+| [in-drawer.tsx](examples/in-drawer.tsx) | Order details in a Drawer: the tab bar runs along the bottom of the header and scrolls sideways when the tabs outgrow the drawer, the active tab is the body rising into it, every panel is the body's own content, and the delivery form keeps its edits across tabs — `Tabs.Root`, `Tabs.List`, `Tabs.Panel`, `keepMounted`. |
 | [controlled.tsx](examples/controlled.tsx) | The active tab lives in parent state, e.g. synced with the URL — `value`, `onValueChange`. |
 
 ## Mistakes
@@ -274,6 +276,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 - A hand-made × inside `Tabs.Item` → a button inside a tab button; pass `onRemove` instead.
 - `onRemove` that does not drop the tab from your list → the tab stays; the kit only moves the selection.
 - `Tabs.List` without `aria-label` → add one.
+- Lifting a panel's data or form draft to the parent only so it survives a tab switch → `keepMounted` on that `Tabs.Panel`.
 - Tabs inside `Drawer.Body` / `Modal.Body` under the header → a floating strip under the header's hairline; wrap the header and the body in `Tabs.Root` and put `Tabs.List` into the header.
 
 ## Related

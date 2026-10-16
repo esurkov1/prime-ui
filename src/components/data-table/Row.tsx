@@ -23,12 +23,16 @@ export function columnAlign<Row>(column: DataTableColumn<Row>): DataTableCellAli
   return column.align ?? (column.numeric ? "end" : "start");
 }
 
-export function columnSizeStyle<Row>(
-  column: DataTableColumn<Row>,
-): React.CSSProperties | undefined {
-  const { width, minWidth, maxWidth, grow } = column;
-  if (!width && !minWidth && !maxWidth && !grow) return undefined;
-  return { width: width ?? (grow ? "100%" : undefined), minWidth, maxWidth };
+/**
+ * The size of a column's cells: its own lengths inline (a fixed `width` is also its floor, which the
+ * frozen widths keep), `data-grow` for the free width (CSS).
+ */
+export function columnSizeProps<Row>(column: DataTableColumn<Row>) {
+  const { width, minWidth = width, maxWidth, grow } = column;
+  return {
+    style: width || minWidth || maxWidth ? { width, minWidth, maxWidth } : undefined,
+    "data-grow": grow ? "true" : undefined,
+  };
 }
 
 function renderCell<Row>(row: Row, column: DataTableColumn<Row>, withTitle: boolean) {
@@ -269,7 +273,7 @@ function DataTableRowImpl<Row>({
                 shared.stickyLastColumn && isLastColumn && styles.lastColumnSticky,
                 enter,
               )}
-              style={columnSizeStyle(column)}
+              {...columnSizeProps(column)}
               data-align={columnAlign(column)}
               data-numeric={column.numeric ? "true" : undefined}
               data-first-column={isFirstColumn ? "true" : undefined}
@@ -456,7 +460,7 @@ export function MeasureBody<Row>({
             <td
               key={column.id}
               className={styles.cell}
-              style={columnSizeStyle(column)}
+              {...columnSizeProps(column)}
               data-align={columnAlign(column)}
               data-numeric={column.numeric ? "true" : undefined}
               data-first-column={columnIndex === 0 ? "true" : undefined}

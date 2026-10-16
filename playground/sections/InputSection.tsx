@@ -52,6 +52,12 @@ export const page: ComponentPageConfig = {
         "Новый пароль с кнопкой показа и шкалой, которая заполняется по шагам и называет уровень рядом с подсказкой, и пароль сервисного аккаунта по собственному правилу компании — `Input.RevealButton`, `strength`, `getStrength`.",
     },
     {
+      scenario: "password-policy",
+      title: "Смена пароля",
+      description:
+        "Смена пароля по требованию: новый пароль ниже нужного уровня красит шкалу и не даёт отправить форму, а повтор получает галочку, как только совпал, — `strength`, `minStrength`, `valid`.",
+    },
+    {
       scenario: "edge-actions",
       title: "Действия в поле",
       description:

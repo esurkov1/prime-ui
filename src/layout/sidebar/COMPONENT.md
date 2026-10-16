@@ -70,7 +70,7 @@ Sidebar.Root                       rail wrapper; renders <nav> inside; size tier
 │        ├─ Sidebar.SubTrigger     disclosure row, chevron at the end
 │        └─ Sidebar.SubContent     child Items on a guide line (a flyout on the compact rail)
 └─ Sidebar.Footer                  bottom items, the item Toggle, the account
-   └─ Sidebar.Account              avatar + name + muted line; a Dropdown.Trigger child
+   └─ Sidebar.Account              avatar + name + muted line; a ↕ chevron as a Dropdown.Trigger child
 useSidebar()                       state hook for custom parts inside Root (useAppShellNav outside it, in a shell)
 ```
 
@@ -220,7 +220,7 @@ useSidebar()                       state hook for custom parts inside Root (useA
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items), `className` (on the list) and the other div attributes. |
 
 ### Sidebar.Account
-`ref` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line and a ↕ chevron. A button, so it is a `Dropdown.Trigger` child; in compact mode only the avatar stays, with the name as a tooltip.
+`ref` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line; a ↕ chevron only as a `Dropdown.Trigger` child. In compact mode only the avatar stays, with the name as a tooltip.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -311,6 +311,7 @@ Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header,
 | flyout | hover / click / keyboard on a SubTrigger, or on the `…` row of a folded group, in compact mode | the row `aria-haspopup="dialog"`, `aria-expanded`; a Popover `role="dialog"` |
 | attention dot | a coloured `Sidebar.ItemCount` inside a folded Sub (always on the rail) or a folded Group | `Badge.Dot` with `data-attention="shown" \| "hidden"` on the parent row / heading / `…` row |
 | persisted | `persistKey` on Root | the mode and the open state of collapsible groups and sub-lists are read from and written to `localStorage` |
+| account menu | `Sidebar.Account` inside a `Dropdown.Trigger` (`aria-haspopup="menu"`) | the ↕ chevron at the end of the row; without a menu (a plain `onClick`, a `Drawer.Trigger`) no chevron |
 | disabled | `disabled` | Item `disabled` / `aria-disabled`, `data-disabled` |
 
 `persistKey` stores collapsible groups and sub-lists by their `id`, else by their label text — give an `id` when labels are translated or change. The stored state wins over `defaultMode` / `defaultOpen`; controlled `mode` / `open` are not stored, and unavailable storage is ignored. A hidden rail is stored as the mode it left, so a reload never strands a person on a hidden rail.
@@ -388,6 +389,7 @@ Leaving the narrow viewport closes the off-canvas panel; activating an item (a l
 | [collapsible-groups.tsx](examples/collapsible-groups.tsx) | Group headings that fold their items away, one group open at a time, with a chevron at the end of the heading; on the compact rail a folded group becomes one row whose items open in a flyout — `collapsible`, `open`, `onOpenChange`. |
 | [nested-items.tsx](examples/nested-items.tsx) | A parent item with child items on a guide line: a current child opens it and marks the parent; on the compact rail the children open in a flyout — `Sidebar.Sub`, `Sidebar.SubTrigger`, `Sidebar.SubContent`. |
 | [account.tsx](examples/account.tsx) | Footer items and the collapse row above the signed-in person: avatar, name and email open the account menu; collapse the rail from that row and only the avatar stays, on the icon axis — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`. |
+| [account-profile.tsx](examples/account-profile.tsx) | The signed-in person opens a profile panel, not a menu, so the row draws no chevron — `Sidebar.Account`, `description`. |
 | [router.tsx](examples/router.tsx) | Router links as the brand and the items: the router marks the current link and the item shows it as current; render it inside a router — `asChild`. |
 | [persist.tsx](examples/persist.tsx) | The first visit opens on the icon rail; the mode and the folded groups are remembered and come back after a reload — `persistKey`, `defaultMode`. |
 | [custom-part.tsx](examples/custom-part.tsx) | A part of your own in the footer reads the rail state: the storage meter shows on the full rail and in the off-canvas panel and steps aside on the icon rail — `useSidebar`. |

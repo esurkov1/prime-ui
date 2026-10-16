@@ -35,7 +35,8 @@ Use the component and the motion comes with it. Never re-animate these with your
 | Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers, sheets and toasts come from their edge; a dialog, drawer or sheet leaves faster than it came, a small floating panel opens and closes on the same quick `fast` clock; the last content stays on screen while the exit plays | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `ConfirmDialog`, `Drawer`, `Sheet`, `MediaViewer`, notifications — the `Root` kept mounted |
 | Tooltips along a toolbar | the first waits, the next ones show at once | `Tooltip` (shared warm window) |
 | Toast stack | depth stack, expands on hover | `NotificationProvider` + `useNotifications` |
-| Loading → data → empty → error | the region cross-fades and glides its height; loading is a skeleton of the data | `Crossfade` around the region, `Skeleton` in the data's geometry |
+| Loading → data | the skeleton is there from the first paint and the data takes its place with a short fade; the height never glides | `Crossfade` with the state `"loading"`, `Skeleton` in the data's geometry |
+| Data → empty → error, another record | the region cross-fades and glides its height | `Crossfade` around the region |
 | Drag | the carried piece lifts, its neighbours glide apart, the drop glides into place; while its save runs the piece stays still and its grip turns busy, and a refused save glides it back — across columns too | `Dnd`, `Kanban` cards and columns, DataTable and `List` `onReorder`, `FileUpload` tiles |
 | A setting saved on the server | the thumb moves at once and a spinner turns inside it (a slider thumb dims); a refused save glides it back | `Switch` (`onCheckedChange` returns a Promise, or `loading`), `Slider` (`onCommit`) |
 | A chip or a file row removed | it waits dimmed with a spinner on its ×; once gone it fades and closes up, the next ones glide into its place; refused, it stays | `Badge` `onRemove`, `FileUpload` `onValueChange`, TagSelect chips |
@@ -142,8 +143,10 @@ export function DeleteDraft({ onDelete }: { onDelete: () => void }) {
 }
 ```
 
-**A region that loads.** Wrap it in `Crossfade` keyed by the state and show a `Skeleton` in the shape
-of the data — never a spinner in the middle of an empty card, never a flip.
+**A region that loads.** Wrap it in `Crossfade` keyed by the state, the loading one keyed
+`"loading"`, and show a `Skeleton` in the shape of the data from the first render — never a spinner
+in the middle of an empty card, never a flip, never a region that unfolds as the data comes
+([the rule](foundations.md#11-state-changes-are-continuous)).
 
 **A metric that updates.** Put a number in a `Badge` or a `Sparkline` and change it: the digits roll.
 A number that changes by itself every frame (a running percentage) stays plain tabular text — rolling
@@ -188,6 +191,9 @@ export function CloseQuarter({ onClose }: { onClose: () => void }) {
 - `transition: all 0.3s ease` → list the properties, use tokens.
 - A spinner where the content's shape is known → `Skeleton` in that shape inside `Crossfade`.
 - Content that appears or disappears with no transition (`{loading ? <A/> : <B/>}`) → `Crossfade`.
+- A loading state that renders nothing, or a list that slides or unfolds in when its data arrives →
+  a `Skeleton` in the data's geometry from the first render, under the state `"loading"`, so the data
+  replaces it in place.
 - Bounce, elastic or a spring that overshoots → `emphasized` lands without passing the target.
 - Animating the highlight of a list moved by arrow keys, or a command palette → keep it still.
 - Hover lift on table rows or list items → fill change only.

@@ -1,17 +1,17 @@
-/** Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a centered header with the product's named mark — `align`, `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. */
+/** Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a header that names the action: its icon tile on the left, the title and one line beside it — `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. */
 import { Button, Divider, Icon, Input, LinkButton, LoginForm } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 export default function LoginFormOverviewExample() {
   return (
-    <LoginForm.Root align="center">
+    <LoginForm.Root>
       <LoginForm.Header>
-        <LoginForm.Logo aria-label="Маршрут">
-          <Icon name="action.send" />
+        <LoginForm.Logo>
+          <Icon name="action.login" />
         </LoginForm.Logo>
         <LoginForm.Title>Войти в аккаунт</LoginForm.Title>
-        <LoginForm.Description>Введите данные для входа в кабинет</LoginForm.Description>
+        <LoginForm.Description>Через SSO компании или по рабочей почте</LoginForm.Description>
       </LoginForm.Header>
       <LoginForm.Body>
         <LoginForm.Actions>

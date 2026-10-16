@@ -62,6 +62,12 @@ export const page: ComponentPageConfig = {
         "Подпись и счётчик в первой строке, показатель во второй — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`.",
     },
     {
+      scenario: "router",
+      title: "Ссылки роутера",
+      description:
+        "Ссылки роутера как сегменты: текущий маршрут — значение, каждый сегмент — ссылка, а ряд — навигация; рендерите внутри роутера — `asChild`, `value`.",
+    },
+    {
       slot: "controlled",
       description:
         "Выбор хранит родитель и обновляет по нему другой контент — `value`, `onValueChange`.",

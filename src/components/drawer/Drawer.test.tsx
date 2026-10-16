@@ -6,6 +6,7 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { swipe } from "@/test/mobile";
 import { describeOverlayConformance } from "@/test/overlayConformance";
 
@@ -341,6 +342,65 @@ describe("Drawer — overlay contract", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
+  it("focuses the panel itself on open; Tab goes on to the first control", async () => {
+    const user = userEvent.setup();
+    render(<BasicDrawer />);
+    await user.click(screen.getByRole("button", { name: "Open" }));
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Закрыть" })).toHaveFocus();
+  });
+
+  it("an autoFocus field inside wins over the panel", () => {
+    render(
+      <Drawer.Root defaultOpen>
+        <Drawer.Content aria-label="Новый клиент">
+          <Drawer.Body>
+            {/* biome-ignore lint/a11y/noAutofocus: the test checks that autoFocus wins */}
+            <input aria-label="Компания" autoFocus />
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>,
+    );
+    expect(screen.getByRole("textbox", { name: "Компания" })).toHaveFocus();
+  });
+
+  it("a click that opens it shows no tooltip of a header action; keyboard focus does", async () => {
+    const user = userEvent.setup();
+    render(
+      <Tooltip.Provider delayDuration={0}>
+        <Drawer.Root>
+          <Drawer.Trigger>
+            <Button.Root>Open</Button.Root>
+          </Drawer.Trigger>
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title>Сделка №1042</Drawer.Title>
+              <Drawer.Actions>
+                <Tooltip.Root>
+                  <Tooltip.Trigger>
+                    <Button.Root variant="ghost" tone="neutral" aria-label="Другие действия">
+                      ⋯
+                    </Button.Root>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>Другие действия</Tooltip.Content>
+                </Tooltip.Root>
+              </Drawer.Actions>
+            </Drawer.Header>
+          </Drawer.Content>
+        </Drawer.Root>
+      </Tooltip.Provider>,
+    );
+    await user.click(screen.getByRole("button", { name: "Open" }));
+    expect(screen.getByRole("dialog")).toHaveFocus();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Другие действия" })).toHaveFocus();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Другие действия");
+  });
+
   it("returns focus to the trigger", async () => {
     render(<BasicDrawer />);
     const trigger = screen.getByRole("button", { name: "Open" });
@@ -391,6 +451,63 @@ describe("Drawer — header actions, footer meta, exit snapshot", () => {
     const meta = screen.getByText("Есть несохранённые изменения");
     expect(meta.tagName).toBe("P");
     expect(screen.getByRole("dialog")).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("puts Actions in the footer at the start, apart from the main pair, at the footer's tier", () => {
+    render(
+      <Drawer.Root defaultOpen>
+        <Drawer.Content aria-label="Профиль">
+          <Drawer.Footer>
+            <Drawer.Actions data-testid="start">
+              <Button.Root variant="ghost" tone="danger">
+                Выйти
+              </Button.Root>
+            </Drawer.Actions>
+            <Drawer.Close>
+              <Button.Root variant="outline" tone="neutral">
+                Закрыть
+              </Button.Root>
+            </Drawer.Close>
+            <Button.Root>Сохранить</Button.Root>
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer.Root>,
+    );
+    const start = screen.getByTestId("start");
+    const footer = start.parentElement as HTMLElement;
+    expect(footer.tagName).toBe("FOOTER");
+    expect(footer.firstElementChild).toBe(start);
+    // The main pair moves as one row at the end, primary last.
+    const end = start.nextElementSibling as HTMLElement;
+    expect(end.lastElementChild).toBe(screen.getByRole("button", { name: "Сохранить" }));
+    // Not the header's tier `s`: the buttons keep the footer's.
+    expect(screen.getByRole("button", { name: "Выйти" })).not.toHaveAttribute("data-size", "s");
+  });
+
+  it("holds the title line with a skeleton while the name loads", () => {
+    function RecordByLink() {
+      const [name, setName] = React.useState<string | null>(null);
+      return (
+        <Drawer.Root defaultOpen>
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title loading={name === null}>{name}</Drawer.Title>
+            </Drawer.Header>
+            <Drawer.Body>
+              <Button.Root onClick={() => setName("Сделка №1042")}>Загрузить</Button.Root>
+            </Drawer.Body>
+          </Drawer.Content>
+        </Drawer.Root>
+      );
+    }
+    render(<RecordByLink />);
+    const title = screen.getByRole("heading", { level: 2 });
+    expect(title).toHaveAttribute("aria-busy", "true");
+    expect(title.querySelector('[aria-hidden="true"]')).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Загрузить" }));
+    const loaded = screen.getByRole("heading", { level: 2, name: "Сделка №1042" });
+    expect(loaded).not.toHaveAttribute("aria-busy");
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Сделка №1042");
   });
 
   it("keeps the last open content while it slides out", async () => {

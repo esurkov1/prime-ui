@@ -115,12 +115,14 @@ export function useRowSelection({
   };
 
   return {
+    selectedKeys,
     selectedSet,
     allSelected,
     someSelected: selectedInData > 0 && !allSelected,
     announcement,
     dragging: range.dragging,
     toggleAll,
+    clear: () => commit(new Set()),
     handlers,
   };
 }

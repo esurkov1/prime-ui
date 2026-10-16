@@ -42,9 +42,10 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A status of the value under a field («Осталось 12 дней»): `hint` with `hintTone="warning"`, the words carrying the status — not a coloured text of your own, and never `hintTone="danger"` for a validation error (that is `error`).
 - A unit or a prefix stands in the field's affix (`Input.InlineAffix`, `Input.Affix`) — not in its `label` too: the affix is read with the field.
 - Copy or call next to a value: `Input.CopyButton`, `Input.Action` inside `Input.Wrapper` — not a Button beside the field; a password: `Input.RevealButton`.
+- A permission or a setting that is on or off: `<Switch.Root>` with its `Switch.Label`, in a saved form too; a `Checkbox` only picks items out of a set, takes a consent or an option of the action sent. A level per entity (access per section): a `FieldList` of `Select`s, not a stack of `SegmentedControl`s; a stored preference (the theme): a `Select` field ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - Records of one shape a person adds and removes (invoice lines, contacts, specs, prices by period): `<FieldList columns={[{ label: "Услуга" }, { label: "Цена", width: "m" }]} value onValueChange getId createItem addLabel renderItem={(item, row) => <>…fields without label…</>} />` — the headings stand once, every field takes its column heading as its label; not a `.map()` of fields with a `label` in every row, not «Позиция 1», «Позиция 2».
 - Small attributes in a row of fields: an icon-only `Select` (`<Select.Trigger><Select.TriggerIcon>…</Select.TriggerIcon></Select.Trigger>`, no `Select.Value`) and a `ColorPresets` swatch in `width: "compact"` columns — not a full-width Select and a ColorField on a line of their own.
-- FieldList row actions: `rowActions="menu"` (one «⋯») for dense rows or touch, the default «×» + handle for short lists reordered often; `variant="surface"` when the list sits among other fields, `plain` when it is the card's content — not a hand-made «⋯» or a Card around the list.
+- FieldList row actions: the default «×» (and the grip with `reorderable`) in sight on every row, however many columns; `rowActions="menu"` only for a `reorderable` list on a touch-first screen — not a «⋯» that holds one «Удалить» ([a menu from two actions](composition.md#a-menu-from-two-actions)); `variant="surface"` when the list sits among other fields, `plain` when it is the card's content — not a Card around the list.
 - A base value with overrides (a price and its changes by month): one `FieldList`, the base as the first row pinned by `getLocked` — not a separate field above a list in another geometry.
 - Rows that add up: `FieldList renderTotals={(items) => <>…one node per column…</>}` draws «Итого» under the rows on the same tracks — not a line of text typed under the list, not a DataTable of fields.
 - One value in several units (a deposit in ₽, $, ฿): the fields side by side in one row under one heading, each unit in `Input.InlineAffix` — not a label per field, not the unit in the label and in the field.
@@ -76,6 +77,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 ## Buttons and actions
 
 - One primary per area (page header, card, dialog): the default `solid` accent, last in the row. Others `variant="soft" tone="neutral"`; dismiss `variant="ghost" tone="neutral"` (pages), `variant="outline" tone="neutral"` (Modal / Drawer footer).
+- One secondary action is in sight — an icon `Button.Root` with a `Tooltip` — and a «⋯» `Dropdown` only gathers two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
 - Destructive is `tone="danger"` — never `tone="error"`; which variant where and how it is confirmed: [api-contract.md](api-contract.md#destructive-actions) and [choosing.md](choosing.md).
 - Going somewhere is a link: `<LinkButton href>` or `<Button.Root asChild><a href>…</a></Button.Root>` — not `onClick={() => location.assign(url)}`.
 - Busy action: `<Button.Root loading>` — not a hand-made spinner or «Загрузка…» text.
@@ -85,13 +87,14 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 - The app is navigation and the page: everything at the top belongs to the page's `<Page.Root>` — not an app-wide header, a global search or notifications above every page.
 - A work screen (a list, a board, a chat, a record) titles itself in `<Page.TopBar>`: `<Page.Heading>` with `<Page.Title>` + `<Page.Description>` carrying a line of data («128 в работе · 6 ждут оплаты») — not a sentence about the page.
-- The bar holds only its four groups: `<Page.Heading>`, `<Page.Tools aria-label>` (sections, the view, a shared period; `<SmartFilter.Toolbar />` of a one-list page — in reading order), `<Page.Actions>`, `<Page.Chips>` (`<SmartFilter.Chips />`) — not a hand-made flex row of title, tabs, search and buttons ([the top bar](composition.md#the-top-bar)).
+- The bar holds only its four groups: `<Page.Heading>`, `<Page.Tools aria-label>` (sections, the view, a shared period; `<SmartFilter.Toolbar />` only when it filters several views — in reading order), `<Page.Actions>`, `<Page.Chips>` (`<SmartFilter.Chips />`) — not a hand-made flex row of title, tabs, search and buttons ([the top bar](composition.md#the-top-bar)).
 - A nested record: `<Breadcrumb.Root>` first in `<Page.Heading>`, then `<Page.Title>` with the record's name — the path ends in the title on one line; not a title row under the path, not a breadcrumb in the body. With a router each crumb is `<Breadcrumb.Item asChild>` around its `Link`.
 - A line of data that loads after the page opens: `<Page.Description loading={!summary}>` from the first render (`Drawer.Description` / `Modal.Description` alike) — not a Description mounted when the data arrives, which moves the title, nor a `Skeleton` placed in it by hand.
 - A page that edits a record: `<Page.Guard dirty={changed} busy={saving} />` inside `Page.Root` — the Sidebar, BottomNav and path links ask before the changes are lost; not your own `beforeunload` or a confirm wired to each link.
 - Every button of the page goes into one `<Page.Actions>`, secondary first, the primary last, each with a `<Button.Icon>` beside its label — not buttons split between two places, not a button with only text.
 - A filtered page: `<SmartFilter.Root>` wraps `<Page.Root>` — it draws nothing; not `SmartFilter.Root` inside the bar.
 - No size knob on the title: the bar sizes the heading and gives way by width itself ([the five steps](responsive.md#the-pages-top-bar--pagetopbar)).
+- Sign-in, sign-up, an invite and a password reset are modes of one `/login` screen, one `LoginForm` with the action's icon in `LoginForm.Logo` and the default `align` — not a page per mode, not a centred brand mark ([auth](layouts.md#auth-sign-in-code)).
 - A document page (settings, a long form, help) and an overview (a dashboard) put `<Page.Header>` with its `<Page.Heading>` in the flow — the large title — with an optional `<Page.TopBar collapse>` above it that repeats the title once it scrolls away. One `<Page.Title>` per page — never two titles, never no `<h1>`.
 
 ## Cards and surfaces
@@ -109,9 +112,10 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Tables
 
-- A list page is a `<DataTable columns rows getRowKey>` under the page's `<SmartFilter.Root fields value onValueChange>` with `<SmartFilter.Toolbar />` in its `Page.Tools` and `<SmartFilter.Chips />` in its `Page.Chips` ([where the filters go](composition.md#where-the-filters-go)); filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
-- A table beside KPI cards or a chart: `<SmartFilter.Root>` around the `<DataTable toolbar={<><SmartFilter.Toolbar /><DataTableColumnsMenu … /></>} toolbarChips={<SmartFilter.Chips />}>` — not its search, filter and «Колонки» in the page's bar above blocks they do not filter ([where the filters go](composition.md#where-the-filters-go)).
-- The column chooser is `<DataTable columnsMenu>` over the row actions, else `<DataTableColumnsMenu>` beside the table's search on the same state; `toolbar` takes two or more controls of the table as they are — no wrapper ([controls of a table](composition.md#controls-of-a-table)) — never a toolbar for one button.
+- A table's search, filters, chips, column chooser and selection menu are the DataTable's on every page, the page that is only this table included: `<SmartFilter.Root>` around `<DataTable toolbar={<SmartFilter.Toolbar />} toolbarChips={<SmartFilter.Chips />} renderSelectionActions={…}>`, rows filtered with `matchesSmartFilter` — not in `Page.Tools`, which holds sections, the view and a shared period ([where the filters go](composition.md#where-the-filters-go)).
+- A table section filters by its categorical columns (role, status, type, owner): an `options` field each, a `date-range` field per date column — not a search alone.
+- Actions on selected rows: `renderSelectionActions` returns `Dropdown.Item`s — the table adds «Действия · N» last in its tools row; not a bar that replaces the search, not a button per action ([controls of a table](composition.md#controls-of-a-table)).
+- The column chooser is `<DataTable columnsMenu>` over the row actions, else `<DataTableColumnsMenu>` beside the table's search on the same state; `toolbar` takes the table's controls as they are, a search first — no wrapper ([controls of a table](composition.md#controls-of-a-table)) — never a toolbar for one button.
 - Search over a table or a list page is always SmartFilter, even with no filter fields yet (`fields={[]}` is a plain search that grows into filters). A search `Input` only outside a filtered list: inside a picker, a settings section, a panel.
 - Paging is built in: `paging="pages"` (default) with `pageSize`, `paging="infinite"` for feeds, `paging="none"` for short lists — not a separate `<Pagination>` under a DataTable.
 - Long lists are virtualized inside the kit: pass the whole array to `DataTable` (with `scrollHeight` or `paging="infinite"`; over 100 rows — grouped, `onReorder` and `renderExpanded` bodies render every row, keep those short or paged), `TagSelect options`, `Chat.Messages items`, `Gantt rows` — never slice it by hand, never wrap a kit list in react-window / react-virtual or your own windowing. Big remote data is still paged or loaded on scroll by the server (`source="server"`, `onLoadMore`).
@@ -161,6 +165,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 - Blocking decision or ≤ 4 fields → `Modal` (`<Modal.Content size="s">` for a confirm); long form, filters, details → `Drawer`; a short task that ends by itself (a date, an action, a note) → `Sheet`; small panel at a control → `Popover`; list of actions → `Dropdown`; a field value → `Select`; a name for an icon button → `Tooltip`; ⌘K → `CommandMenu`; a photo, a scan or a video full screen from its thumbnail → `MediaViewer` (an album in a grid is `Gallery`, which opens it for you; a standalone viewer keeps `open` and `index` in two states) — not a Modal with an `<img>`.
 - A record's drawer or modal shows its person or object as `Drawer.Icon` / `Modal.Icon` around `Avatar.Root` / `Thumbnail.Root`. A confirm that asks for input (a reason) is a `Modal size="s"` with the field, `Modal.Confirm` and `Modal.Guard busy` — `ConfirmDialog` is a question only.
+- A record opened beside the page is one drawer component per entity, opened from everywhere: permissions make fields `readOnly` and hide tabs and actions; one form over all tabs with one «Сохранить» in `Drawer.Footer` while dirty and `Drawer.Guard`; data loaded by the drawer, not by each tab; the history its own tab; `Drawer.Actions` act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - A titled group in a dialog's body (contacts, deals, history): `<Drawer.Section label="Контакты">` (`Modal.Section`), its button in `Drawer.Actions` inside it — not a `Typography as="h3"` row with buttons of your own.
 - Never a hand-made `div` backdrop, dialog, menu or tooltip.
 - Every Modal and Drawer has its `Header` (title, ×); `Body` (content, scrolls) and `Footer` (actions) are there when it has content and actions. Actions always go into the `Footer`: details `<Drawer.Footer><Drawer.Close><Button.Root variant="outline" tone="neutral">Закрыть</Button.Root></Drawer.Close></Drawer.Footer>`, plus the main action last; a form: «Отмена» + submit — not Save at the bottom of the body. A `Sheet` (from the bottom edge) is the opposite: no footer by default — a pick or a swipe ends it — and its header is optional: keep it when the content needs a title, drop it (× and hairline go too) when the content speaks for itself, with `aria-label` on `Sheet.Content`. Never `Drawer.Content side="bottom"`.
@@ -173,13 +178,13 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 ## Motion — it comes with the components
 
 - Changed button text is new children: `<Button.Root>{saved ? "Сохранено" : "Сохранить"}</Button.Root>` flows in by letters — not two buttons swapped with a condition.
-- Saving a form, one rule: the form stays on screen after saving (a Drawer or card that stays open, a settings section) → the button says «Сохранено», no notification; the form goes away (a Drawer or Modal closes, the page navigates) → a notification. A failure is always a notification (or the field's `error`), never only the button.
+- Saving a form, one rule: the save button stays on screen after saving (a settings card) → it says «Сохранено», no notification; the button goes away (a Drawer or Modal closes, the page navigates, a record drawer's save that shows only while dirty) → a notification. A failure is always a notification (or the field's `error`), never only the button.
 - A long job from a button: `<Button.Root progress={0.42}>Экспорт 42%</Button.Root>` — not a ProgressBar next to it.
 - A round icon action (play, download, cancel or retry a transfer): `<Button.Root shape="circle" aria-label="Отменить отправку" progress={share}>` — its ring is the progress, it stays pressable; over a picture or video `variant="shade"`. Not a `border-radius: 50%` button of your own, not a ProgressCircle with `onClick`.
 - One ring in the kit: a share → `ProgressCircle value` (`null` while unknown, `spin` while it grows); an anonymous busy mark → `Spinner`; a ring you press → circle Button `progress`. Never your own `@keyframes` ring or conic gradient.
 - A single destructive action that is easy to redo by hand (clear a draft, revoke a token), no list and no dialog: `<Button.Root tone="danger" variant="soft" holdToConfirm onConfirm={remove}>` — the action in `onConfirm`, not `onClick`. A row in a list: delete at once and offer «Отменить» in the notification.
 - Counts: a number child of `Badge` rolls its digits — not a string you re-render with your own fade.
-- New password: `<Input.Root strength>`; steps of a whole: `<ProgressBar label="Шаги настройки" steps value={2} max={5} />`; a trend tile: `<Sparkline data label formatValue />`.
+- New password: `<Input.Root strength minStrength={3} hint="…requirement…">` (the policy stops the submit; the server checks it too), a repeat that matches: `valid` — a check, not a «Пароли совпадают» hint ([field outcomes](api-contract.md#field-outcomes-a-mark-for-success-words-for-a-problem)); steps of a whole: `<ProgressBar label="Шаги настройки" steps value={2} max={5} />`; a trend tile: `<Sparkline data label formatValue />`.
 - A rare milestone only: `celebrate({ origin: event.currentTarget })` — never for a saved form.
 - No motion on keyboard-driven or high-frequency actions; tokens only, no bounce. Full guide: [motion.md](motion.md).
 
@@ -188,13 +193,13 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 State change is continuous in the whole kit: every region that changes what it shows cross-fades, and loading holds the shape of what is coming.
 
 - Every region with loading / data / empty / error (or one record at a time): its content in `<Crossfade state={status} aria-busy={status === "loading"}>` — not `{loading ? <A /> : <B />}` that flips and makes the page jump. DataTable does this itself.
-- Region loading: `<Skeleton>` in the geometry of the data — same rows, same gaps (`<Skeleton />` for a text line, `shape="circle"` for an avatar, `shape="control"` for a field, `shape="block"` for an image or chart) — not a spinner in an empty card, not a grey box or shimmer you draw.
+- Region loading: the state `"loading"`, rendered from the first paint (never `null`), a `<Skeleton>` in the geometry of the data — same rows, same gaps (`<Skeleton />` for a text line, `shape="circle"` for an avatar, `shape="control"` for a field, `shape="block"` for an image or chart) — not a spinner in an empty card, not a grey box or shimmer you draw.
 - `Spinner` only where there is no shape to hold (a running job, a status line); a busy button is `<Button.Root loading>`.
 - Refreshing data already on screen: keep it, set `aria-busy` — not back to a skeleton on every refetch.
 - Table states in place: `loading` (+ `loadingRows`), `empty`, `loadError` on `DataTable` — the head and toolbar stay.
 - First run of a page or region: `EmptyPage.Root` + `EmptyPage.Icon` + `EmptyPage.Title` + `EmptyPage.Description` + `EmptyPage.Actions` with one action — not «Здесь пока ничего нет».
 - Page-level persistent problem: `<Banner.Root tone="danger">` first in `Page.Body`; the result of an action: `useNotifications().notify({ tone, title })` — a toast never closes the Drawer or Modal it was raised from.
-- A refused sign-in: `invalid` on the fields it concerns and the reason in a `<VisuallyHidden live="assertive">` mounted from the start — not a Banner in a `LoginForm`.
+- A refused sign-in: `invalid` on the e-mail and `error="Неверная почта или пароль"` on the password — not a Banner in a `LoginForm`, not red rings and a shake with no words.
 
 ## Sidebar
 
@@ -311,7 +316,7 @@ type InvoicesCardProps = {
 const PLACEHOLDER_ROWS = ["a", "b", "c"];
 
 export function InvoicesCard({ status, invoices, onRetry }: InvoicesCardProps) {
-  // One key per state: Crossfade cross-fades whenever it changes and glides the height.
+  // One key per state: "loading" hands over to the data in place; settled states glide the height.
   const state = status === "ready" && invoices.length === 0 ? "empty" : status;
 
   return (

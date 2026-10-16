@@ -7,6 +7,7 @@ import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 
@@ -79,6 +80,8 @@ export function ChatPinned({
       if (next !== undefined) onValueChange?.(next);
     },
   });
+  // The excerpt that replaces the last enters; the first one stands still with the chat.
+  const excerpt = useEnterOnAppear<HTMLSpanElement>();
   if (items.length === 0) return null;
   const found = items.findIndex((item) => item.value === value);
   const index = found === -1 ? items.length - 1 : found;
@@ -120,7 +123,11 @@ export function ChatPinned({
           </span>
           <span className={styles.text}>
             <span className={styles.title}>{title}</span>
-            <span key={current.value} className={cx(styles.excerpt, enterMotion.enter)}>
+            <span
+              key={current.value}
+              ref={excerpt.ref}
+              className={cx(styles.excerpt, excerpt.entering && enterMotion.enter)}
+            >
               {current.text}
             </span>
           </span>

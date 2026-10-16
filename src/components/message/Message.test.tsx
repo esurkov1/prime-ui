@@ -611,6 +611,63 @@ describe("Message", () => {
     expect(screen.getByRole("link", { name: "Открыть счёт" })).toHaveFocus();
   });
 
+  it("draws an inline keyboard as Telegram does: one-line rows, soft keys, link mark, loading callbacks", async () => {
+    let settle: () => void = () => {};
+    const onConfirm = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          settle = resolve;
+        }),
+    );
+    const onCancel = vi.fn();
+    render(
+      <Chat>
+        <Message.Root value="bot" time="15:02">
+          <Message.Text>Заказ № 4821 собран.</Message.Text>
+          <Message.Actions data-testid="row-1">
+            <Button.Root onClick={onConfirm}>Подтвердить</Button.Root>
+            <Button.Root tone="danger" onClick={onCancel}>
+              Отменить
+            </Button.Root>
+          </Message.Actions>
+          <Message.Actions data-testid="row-2">
+            <Button.Root asChild>
+              <a href="https://vector.example/invoices/4821">Открыть счёт</a>
+            </Button.Root>
+          </Message.Actions>
+        </Message.Root>
+      </Chat>,
+    );
+    const confirm = screen.getByRole("button", { name: "Подтвердить" });
+    const cancel = screen.getByRole("button", { name: "Отменить" });
+    const link = screen.getByRole("link", { name: "Открыть счёт" });
+    // Keys are soft neutral unless they set their own tone, and share the row (`fullWidth`).
+    expect(confirm).toHaveAttribute("data-variant", "soft");
+    expect(confirm).toHaveAttribute("data-tone", "neutral");
+    expect(cancel).toHaveAttribute("data-tone", "danger");
+    for (const key of [confirm, cancel, link])
+      expect(key).toHaveAttribute("data-full-width", "true");
+    // Only the last row closes the message with the bubble's corners.
+    expect(screen.getByTestId("row-1")).not.toHaveAttribute("data-end");
+    expect(screen.getByTestId("row-2")).toHaveAttribute("data-end");
+    // A link key carries the decorative link mark; a callback key does not.
+    expect(link.querySelector("svg[aria-hidden='true']")).not.toBeNull();
+    expect(confirm.querySelector("svg")).toBeNull();
+    // Space presses a key; a returned promise keeps it loading until it settles.
+    confirm.focus();
+    await userEvent.keyboard(" ");
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(confirm).toHaveAttribute("aria-busy", "true");
+    expect(cancel).not.toHaveAttribute("aria-busy");
+    await act(async () => settle());
+    expect(confirm).not.toHaveAttribute("aria-busy");
+    // A sync key never loads.
+    cancel.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(cancel).not.toHaveAttribute("aria-busy");
+  });
+
   it("moves between messages with the arrows and keeps one tab stop", async () => {
     render(
       <Chat>

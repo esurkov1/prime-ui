@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Вход через провайдера или по почте и паролю, ссылка «Забыли пароль?» и регистрация под центрированной шапкой с названным знаком продукта — `align`, `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`.",
+        "Вход через провайдера или по почте и паролю, ссылка «Забыли пароль?» и регистрация под шапкой, которая называет действие: плитка с его иконкой слева, заголовок и строка рядом — `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`.",
     },
     {
       slot: "sizes",
@@ -60,7 +60,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Цикл отправки: кнопка занята, пока идёт запрос, отказ во входе отмечает оба поля, они вздрагивают, а скрытая live-область называет причину — `loading`, `invalid`, `VisuallyHidden`.",
+        "Цикл отправки: кнопка занята, пока идёт запрос, отказ во входе отмечает оба поля, они вздрагивают, а поле пароля называет причину словами — `loading`, `invalid`, `error`.",
     },
     {
       slot: "narrow",

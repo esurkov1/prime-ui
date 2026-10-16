@@ -1,9 +1,11 @@
 /*
  * RegionSwap — a region that swaps its content between states (foundation §7 rule 8). The current
- * state is in flow and fades in (`swapMotion.swapIn`); the previous one is laid over it from the
- * top edge, click-through, and fades out (`swapMotion.swapOut`). The root glides from the old
- * height to the new one (base · standard, the "height glide" exception of foundation §7 rule 5)
- * through `--swap-height`, which the component sets only while it glides, and returns to `auto`.
+ * state is in flow and fades in (`swapMotion.swapIn`, `.settleIn` into or out of loading); the
+ * previous one is laid over it from the top edge, click-through, and fades out
+ * (`swapMotion.swapOut`). Between settled states the root glides from the old height to the new one
+ * (base · standard, the "height glide" exception of foundation §7 rule 5) through `--swap-height`,
+ * which the component sets only while it glides, and returns to `auto`. A swap into or out of
+ * loading takes the new height at once (`data-leaving` clips the old layer to it).
  */
 .root {
   position: relative;
@@ -22,6 +24,13 @@
    the region (a timeline in a scroller) keeps its scroll width. */
 .root[data-resizing="true"] {
   height: var(--swap-height);
+  overflow-y: clip;
+  overflow-clip-margin: var(--prime-focus-space);
+}
+
+/* A leaving state taller than the new one (a skeleton over shorter data) never paints over the
+   content below the region while it fades. */
+.root[data-leaving="true"] {
   overflow-y: clip;
   overflow-clip-margin: var(--prime-focus-space);
 }

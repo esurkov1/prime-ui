@@ -25,8 +25,8 @@ import { SegmentedControl } from "prime-ui-kit";
 ## Anatomy
 ```
 SegmentedControl.Root                 field frame: label row · track · support row (hint | error)
-└─ (track)                            role="radiogroup"; sliding thumb, switcher row, keyboard
-   └─ SegmentedControl.Item           role="radio" button, one option
+└─ (track)                            role="radiogroup" (role="navigation" with link items); sliding thumb, switcher row, keyboard
+   └─ SegmentedControl.Item           role="radio" button, one option; the consumer's link with `asChild`
       ├─ SegmentedControl.Icon        icon slot (optional; icon-only → square segment)
       ├─ SegmentedControl.Label       title, one line (optional; plain text becomes the label)
       ├─ SegmentedControl.Count       counter Badge after the label (optional)
@@ -63,13 +63,14 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange" \| "dir">` | — | `aria-label` / `aria-labelledby` / `aria-describedby` and `onKeyDown` go to the radiogroup (a prevented key skips the kit's handling); `className`, `data-*` and the other attributes to the field frame `<div>`. |
 
 ### SegmentedControl.Item
-`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`.
+`ref` → `HTMLButtonElement`, or the child element with `asChild`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`. With `asChild` the segment is the consumer's link.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | — (required) | Option value compared with the root value. |
 | `disabled` | `boolean` | `false` | Disables this option; arrow keys skip it. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | Palette hue: a dot before the content; while selected the thumb takes a soft fill of the hue with a ring of it. |
+| `asChild` | `boolean` | `false` | The single child (a router `<Link>`) becomes the segment. A row of links is a navigation: links in the Tab order, the one matching `value` current, no arrow keys. |
 | `children` | `ReactNode` | — (required) | Text, `Icon`, `Label`, `Count`, `Description`. Only an icon → square segment; give it `aria-label`. |
 | `className` | `string` | — | Class on the segment button. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" \| "type" \| "role">` | — | `aria-label`, `onClick` (runs first and can `preventDefault()` the selection), `className` and the other button attributes. |
@@ -141,6 +142,7 @@ Track is `fill-muted` with a faint 1px ring; the selected segment is a floating 
 |---|---|---|---|
 | `fullWidth` | fills the container; single-line segments tend to equal widths, a long label keeps its own width and the row scrolls when they do not fit; two-line segments grow from their content | modals, mobile panels, overview strips | off |
 | `disabled` | every segment disabled, thumb `fill-muted-hover` without shadow | the choice is temporarily unavailable | off |
+| `asChild` (Item) | the same segment; the consumer's element (a router `<Link>`) renders it | route sections («Сотрудники / Роли») that must be real links | off |
 | icon-only (only `SegmentedControl.Icon`) | square segment (`data-icon-only`) | toolbar view toggles; needs `aria-label` | — |
 
 Colour all items or none; do not give an item and its Count the same hue; prefer content width or two-line segments over `fullWidth` with many long labels.
@@ -157,6 +159,7 @@ Colour all items or none; do not give an item and its Count the same hue; prefer
 | required | `required` | red `*` after the label, `aria-required="true"` on the radiogroup |
 | optional | `optional` | a muted `labels.optional` marker after the label |
 | support row reserved | `reserveSupportRow` | the support row stays rendered while empty, so an error arriving shifts nothing |
+| link row | an Item with `asChild` | track `role="navigation"`; each link in the Tab order, no arrow-key selection; the segment matching `value` `aria-current="page"` and `data-state="checked"` |
 | focus-visible | keyboard | focus ring inside the segment |
 | compact | row wider than the container at the tier's padding | row `data-collapse="compact"`: single-line segments tighten their padding by one step, so a row a few pixels too wide keeps its last segment and count whole; if it still does not fit (and not every segment has an icon) it scrolls |
 | collapsed | even the compact row does not fit and every segment has an icon | row `data-collapse="icon"`: titles, counts and descriptions leave the row, segments turn square; a `VisuallyHidden` copy of the title names each segment and a `Tooltip` shows it |
@@ -180,10 +183,10 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 
 | Key | Action |
 |---|---|
-| `ArrowRight` · `ArrowDown` | Next option, wrapping and skipping disabled ones; focus and selection move together. |
+| `ArrowRight` · `ArrowDown` | Next option, wrapping and skipping disabled ones; focus and selection move together (not in a row of links). |
 | `ArrowLeft` · `ArrowUp` | Previous option. |
 | `Home` · `End` | First and last enabled option. |
-| `Tab` | Enters the group on the selected option (or the first enabled one) and leaves it. |
+| `Tab` | Enters the group on the selected option (or the first enabled one) and leaves it; in a row of links it moves from link to link. |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -191,6 +194,7 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 - The track is `role="radiogroup"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. `aria-disabled` when disabled.
 - Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.
 - Items are `<button role="radio" aria-checked>` with roving `tabIndex`.
+- With an `asChild` item the track is `role="navigation"` (named the same way), the links keep their role and the current one has `aria-current="page"`; `required` and `invalid` do not apply.
 - Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description; plain text is the label, so every reference resolves.
 - Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users). In a row collapsed to icons a `VisuallyHidden` copy of the title names the segment and a `Tooltip` shows it.
 
@@ -212,6 +216,7 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 | [full-width.tsx](examples/full-width.tsx) | The group fills its column; segments tend to equal widths and a long label keeps its own — `fullWidth`. |
 | [scroll.tsx](examples/scroll.tsx) | Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view — `defaultValue`. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a metric on the second — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`. |
+| [router.tsx](examples/router.tsx) | Router links as the segments: the current route is the value, each segment is a link and the row is a navigation; render it inside a router — `asChild`, `value`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the choice and updates other content from it — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen; an optional choice beside it — `label`, `hint`, `required`, `error`, `optional`. |
 
@@ -225,5 +230,5 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 - Expecting segments to wrap on narrow screens → they scroll; use `fullWidth` or fewer options.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (`internal/SwitcherScroller`, the row), [Badge](../badge/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md) (the title of a collapsed segment), [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md); `internal/selectionIndicator` (the thumb)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (`internal/SwitcherScroller`, the row), [Badge](../badge/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md) (the title of a collapsed segment), [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md); `internal/selectionIndicator` (the thumb), `internal/interactiveElement` (a link segment, `asChild`)
 - **See also:** [Tabs](../tabs/COMPONENT.md), [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [ButtonGroup](../button-group/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md)

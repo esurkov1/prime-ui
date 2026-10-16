@@ -1,11 +1,13 @@
 import type * as React from "react";
 
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldHintTextClass, fieldTierClass } from "@/internal/fieldClasses";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import type { ControlSize, Tone } from "@/internal/states";
 import textTone from "@/internal/textTone.module.css";
 
@@ -29,19 +31,24 @@ function HintRoot({
   invalid,
   disabled: disabledProp,
   children,
+  ref,
   ...rest
 }: HintRootProps) {
   const tier = useHostTier(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
+  // An error drops in when it arrives on a shown field, not when the page mounts with it.
+  const appear = useEnterOnAppear<HTMLParagraphElement>(Boolean(invalid));
+  const mergedRef = useMergedRefs(appear.ref, ref);
   const shownTone = tone === "neutral" || invalid || disabled ? undefined : tone;
   return tier.provide(
     <p
       {...rest}
+      ref={mergedRef}
       className={cx(
         fieldTierClass,
         fieldHintTextClass,
         styles.root,
-        invalid && enterMotion.enter,
+        appear.entering && enterMotion.enter,
         // A status color (`textTone`); an error or a disabled control takes over the color.
         shownTone && textTone.tone,
         className,

@@ -1,4 +1,4 @@
-/** Payment stages of a project in dense rows: one more-button per row holds move up, move down and remove, the moves are off at the ends and next to the pinned advance, and Alt+arrows on the button move the row too — `rowActions`, `reorderable`, `getLocked`. */
+/** Payment stages of a project on a touch-first screen, where a drag is awkward: one more-button per row holds move up, move down and remove, the moves are off at the ends and next to the pinned advance, and Alt+arrows on the button move the row too — `rowActions`, `reorderable`, `getLocked`. */
 import { FieldList, type FieldListColumn, Input } from "prime-ui-kit";
 import * as React from "react";
 

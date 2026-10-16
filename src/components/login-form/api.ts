@@ -284,8 +284,8 @@ export const api: ComponentApi = {
         ru: "Поля с `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) работают с менеджерами паролей и автозаполнением кода.",
       },
       {
-        en: 'Field errors come from the fields (`aria-invalid`, described by the error). A refused sign-in has no Banner: the fields it concerns take `invalid` and an always-mounted `VisuallyHidden live="assertive"` says why.',
-        ru: 'Ошибки полей приходят из самих полей (`aria-invalid`, описание из ошибки). Отказ во входе — без Banner: нужные поля получают `invalid`, а всегда смонтированный `VisuallyHidden live="assertive"` называет причину.',
+        en: "Field errors come from the fields (`aria-invalid`, described by the error). A refused sign-in has no Banner: the e-mail takes `invalid` and the `error` of the password says why, announced by the support row of the field.",
+        ru: "Ошибки полей приходят из самих полей (`aria-invalid`, описание из ошибки). Отказ во входе — без Banner: почта получает `invalid`, а `error` поля пароля называет причину, её озвучивает строка поддержки поля.",
       },
     ],
   },

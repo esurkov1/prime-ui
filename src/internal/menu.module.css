@@ -166,7 +166,8 @@
 
 /*
  * Trailing check mark of a chosen row (a single Select option, a checked Dropdown.CheckboxItem):
- * a fixed column at the end, accent colour; empty while not chosen, so labels never shift.
+ * a fixed column at the end, accent colour; empty while not chosen, so labels never shift and the
+ * rows' trailing parts (a badge, a price) end on one line.
  */
 .check {
   --prime-icon-size: var(--field-icon);

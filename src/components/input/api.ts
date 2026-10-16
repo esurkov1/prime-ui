@@ -72,6 +72,12 @@ export const api: ComponentApi = {
           ru: "Красное внутреннее кольцо на поле, `aria-invalid` на input. Непустой `error` включает его.",
         },
         {
+          name: "valid",
+          type: "boolean",
+          en: "A confirmed value (a matching repeat, a verified code): a success ring and a drawn check at the field's end, `labels.valid` spoken. `invalid` wins. Pass `false` too: the live region exists only with it.",
+          ru: "Подтверждённое значение (повтор совпал, код проверен): зелёное кольцо и прорисованная галочка у конца поля, озвучка `labels.valid`. `invalid` главнее. Передавайте и `false`: только тогда есть live-область.",
+        },
+        {
           name: "focusRing",
           type: "boolean",
           default: "true",
@@ -108,8 +114,14 @@ export const api: ComponentApi = {
           name: "getStrength",
           type: "(value: string) => 0 | 1 | 2 | 3 | 4",
           default: "getPasswordStrength",
-          en: "Replaces the kit's estimate of `strength`. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check.",
-          ru: "Заменяет оценку кита для `strength`. Верните 0 для пустого, 1 — слабый … 4 — сложный. Подсказка для человека, а не проверка безопасности.",
+          en: "Replaces the kit's estimate of `strength`. Return 0 for empty, 1 weak … 4 hard.",
+          ru: "Заменяет оценку кита для `strength`. Верните 0 для пустого, 1 — слабый … 4 — сложный.",
+        },
+        {
+          name: "minStrength",
+          type: "1 | 2 | 3 | 4",
+          en: "The policy of `strength`: below this level the meter turns danger and the form refuses to submit (`setCustomValidity`), then shows `labels.strengthTooWeak` as the error.",
+          ru: "Требование к `strength`: ниже этого уровня шкала красная, форма не отправляется (`setCustomValidity`) и показывает ошибку `labels.strengthTooWeak`.",
         },
         fieldCommitProp({ en: "Enter", ru: "Enter" }),
         {
@@ -371,6 +383,14 @@ export const api: ComponentApi = {
     strengthEasy: { en: "Level word for strength 2.", ru: "Слово уровня 2." },
     strengthMedium: { en: "Level word for strength 3.", ru: "Слово уровня 3." },
     strengthHard: { en: "Level word for strength 4.", ru: "Слово уровня 4." },
+    strengthTooWeak: {
+      en: "Validation message of a `strength` field below `minStrength`, and its error once a submit was refused.",
+      ru: "Сообщение проверки поля со `strength` ниже `minStrength` и его ошибка после отказа в отправке.",
+    },
+    valid: {
+      en: "Spoken when the field is `valid`; the check mark itself is `aria-hidden`.",
+      ru: "Озвучивается, когда поле `valid`; сама галочка скрыта (`aria-hidden`).",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -423,6 +443,14 @@ export const api: ComponentApi = {
       {
         en: 'Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.',
         ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`.',
+      },
+      {
+        en: "`valid` adds the id of a polite live region holding `labels.valid` to the input's `aria-describedby`: the state is heard when it arrives and on focus, never by colour alone; the check is `aria-hidden`.",
+        ru: "`valid` добавляет в `aria-describedby` поля id вежливой live-области с `labels.valid`: состояние слышно, когда наступает и при фокусе, а не только по цвету; галочка скрыта (`aria-hidden`).",
+      },
+      {
+        en: "`minStrength` uses native constraint validation: below the level the input's `validationMessage` is `labels.strengthTooWeak`, the form refuses to submit, and the message becomes the field's error (`aria-invalid`).",
+        ru: "`minStrength` работает через нативную проверку формы: ниже уровня `validationMessage` поля — `labels.strengthTooWeak`, форма не отправляется, а сообщение становится ошибкой поля (`aria-invalid`).",
       },
       {
         en: "`Input.Icon` is decorative (`aria-hidden`). `Input.Affix` and `Input.InlineAffix` are `aria-hidden` in the reading order but describe the input (`aria-describedby`, before the hint): the unit is heard with the field, so the label never repeats it. An `aria-label` on the affix is said instead of its text («рублей» for `₽`).",

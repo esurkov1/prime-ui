@@ -242,8 +242,8 @@ The same for one value in several units — one heading, the fields in a row, th
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |
 | a hand-built spinner, shimmer, grey placeholder box or «Loading…» text | `loading` on Button / Select / DataTable; a region: `Skeleton` of its content inside `Crossfade`; no shape to hold: `Spinner` |
 | `{loading ? <Spinner /> : <List />}` — a state that flips | `<Crossfade state={status}>` around the region, `Skeleton` while loading |
-| a search Input + a row of filter Selects above a table | `SmartFilter` next to the table it filters: its toolbar and chips in the table's `toolbar` / `toolbarChips` beside KPI cards, in `Page.Tools` / `Page.Chips` when the table is the page ([where the filters go](composition.md#where-the-filters-go)) |
-| the table's search, filter or «Колонки» in the page's bar above KPI cards | the bar keeps the title, the period that drives every block and the primary action; the table's tools go in its own `toolbar` ([where the filters go](composition.md#where-the-filters-go)) |
+| a search Input + a row of filter Selects above a table | `SmartFilter` with the table it filters: its toolbar and chips in the table's `toolbar` / `toolbarChips` on every page ([where the filters go](composition.md#where-the-filters-go)) |
+| the table's search, filter or «Колонки» in the page's bar, the page that is only the table included | the bar keeps the title, the sections, the view, a period that drives every block and the buttons; the table's tools go in its own `toolbar` ([where the filters go](composition.md#where-the-filters-go)) |
 | a grid of «label: value» text pairs for one record | `DescriptionList.Root` + `DescriptionList.Item` |
 | a Modal hand-built as «Удалить?» with your own pending flag | `ConfirmDialog.Root` with an async `onConfirm` |
 | a `<fieldset>` reset by hand, or `disabled` on every field while saving | `<Fieldset label disabled={saving}>` |
@@ -310,40 +310,38 @@ cell in every row:
 ```
 
 ```tsx good
-// good — a page that is the table, no row actions: the chooser is in the bar, on the state the table reads
+// good — no row actions: the chooser stands beside the table's search, on the state the table reads
+// declare: const FIELDS: Parameters<typeof SmartFilter.Root>[0]["fields"]
 // declare: const orders: { id: string; client: string; total: number }[]
 // declare: const hidden: string[]
 // declare: const setHidden: (hidden: string[]) => void
-<Page.Root>
-  <Page.TopBar>
-    <Page.Heading>
-      <Page.Title>Заказы</Page.Title>
-    </Page.Heading>
-    <Page.Tools>
-      <DataTableColumnsMenu
-        columns={[
-          { id: "id", header: "Заказ", accessor: "id", hideable: false },
-          { id: "client", header: "Клиент", accessor: "client" },
-          { id: "total", header: "Сумма", accessor: "total", numeric: true },
-        ]}
-        hiddenColumns={hidden}
-        onHiddenColumnsChange={setHidden}
-      />
-    </Page.Tools>
-  </Page.TopBar>
-  <Page.Body>
-    <DataTable
-      columns={[
-        { id: "id", header: "Заказ", accessor: "id", hideable: false },
-        { id: "client", header: "Клиент", accessor: "client" },
-        { id: "total", header: "Сумма", accessor: "total", numeric: true },
-      ]}
-      hiddenColumns={hidden}
-      rows={orders}
-      getRowKey={(row) => row.id}
-    />
-  </Page.Body>
-</Page.Root>
+<SmartFilter.Root fields={FIELDS}>
+  <DataTable
+    columns={[
+      { id: "id", header: "Заказ", accessor: "id", hideable: false },
+      { id: "client", header: "Клиент", accessor: "client" },
+      { id: "total", header: "Сумма", accessor: "total", numeric: true },
+    ]}
+    hiddenColumns={hidden}
+    rows={orders}
+    getRowKey={(row) => row.id}
+    toolbar={
+      <>
+        <SmartFilter.Toolbar />
+        <DataTableColumnsMenu
+          columns={[
+            { id: "id", header: "Заказ", accessor: "id", hideable: false },
+            { id: "client", header: "Клиент", accessor: "client" },
+            { id: "total", header: "Сумма", accessor: "total", numeric: true },
+          ]}
+          hiddenColumns={hidden}
+          onHiddenColumnsChange={setHidden}
+        />
+      </>
+    }
+    toolbarChips={<SmartFilter.Chips />}
+  />
+</SmartFilter.Root>
 ```
 
 ## 7b. A top bar out of its groups
@@ -409,13 +407,13 @@ Buttons in two places, buttons with only text:
 </Page.Actions>
 ```
 
-`SmartFilter.Root` inside the bar:
+`SmartFilter.Root` inside the bar of a page whose filter narrows several views (a board and its list):
 
 ```tsx partial
 // bad — the filter's state wraps one group, its chips land outside it
 <Page.TopBar>
   <SmartFilter.Root fields={FIELDS}>
-    <Page.Tools aria-label="Заказы">
+    <Page.Tools aria-label="Сделки">
       <SmartFilter.Toolbar />
     </Page.Tools>
   </SmartFilter.Root>
@@ -429,9 +427,9 @@ Buttons in two places, buttons with only text:
   <Page.Root>
     <Page.TopBar>
       <Page.Heading>
-        <Page.Title>Заказы</Page.Title>
+        <Page.Title>Сделки</Page.Title>
       </Page.Heading>
-      <Page.Tools aria-label="Заказы">
+      <Page.Tools aria-label="Сделки">
         <SmartFilter.Toolbar />
       </Page.Tools>
       <Page.Chips>

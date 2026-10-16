@@ -41,6 +41,12 @@ export const page: ComponentPageConfig = {
         "Шапка с коротким описанием и переключателем периода, под ней Sparkline с итогом за период над графиком — `Card.Header`, `Card.Description`, `Card.Body`.",
     },
     {
+      scenario: "person-header",
+      title: "Шапка с человеком",
+      description:
+        "Привязанный Telegram в карточке сотрудника: аватар открывает шапку, логин стоит под именем, кнопка «Отвязать» — в конце — `Card.Icon`, `Avatar.Root`, `Card.Description`.",
+    },
+    {
       scenario: "interactive",
       title: "Карточка-ссылка",
       description:

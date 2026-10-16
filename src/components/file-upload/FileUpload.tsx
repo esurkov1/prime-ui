@@ -39,6 +39,7 @@ import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize, PaletteColor, TextTone, Tone } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
@@ -708,6 +709,11 @@ function FileSetView({
   listRef,
 }: FileSetViewProps) {
   const { files, uploads, busy, canReorder, announcer } = set;
+  // The cover the set mounts with stands still; a new cover (a reorder, a first file) enters.
+  const coverId = cover ? files[0]?.id : undefined;
+  const [stillCover, setStillCover] = React.useState(coverId);
+  if (stillCover !== undefined && coverId !== stillCover) setStillCover(undefined);
+  const coverEnter = stillCover === undefined ? enterMotion.enter : undefined;
   const ownRef = React.useRef<HTMLUListElement | null>(null);
   const setListRef = useMergedRefs(ownRef, listRef);
   const kindId = `file-upload-${React.useId()}`;
@@ -821,11 +827,11 @@ function FileSetView({
               cover && index === 0 ? (
                 // A new cover: the word comes in where the format stood.
                 kind === "file" ? (
-                  <Badge.Root key="cover" className={enterMotion.enter}>
+                  <Badge.Root key="cover" className={coverEnter}>
                     {labels.cover}
                   </Badge.Root>
                 ) : (
-                  <span key="cover" className={enterMotion.enter}>
+                  <span key="cover" className={coverEnter}>
                     {labels.cover}
                   </span>
                 )
@@ -908,6 +914,9 @@ function FileRow({
   onRemove: (() => void) | undefined;
 }) {
   const rowRef = React.useRef<HTMLLIElement | null>(null);
+  // A row added to a shown queue enters; the rows the field mounts with are just there.
+  const appear = useEnterOnAppear<HTMLLIElement>();
+  const setRowRef = useMergedRefs(rowRef, appear.ref);
   const { id } = file;
   React.useLayoutEffect(() => {
     const node = rowRef.current;
@@ -925,8 +934,8 @@ function FileRow({
   );
   return (
     <li
-      ref={rowRef}
-      className={cx(styles.queueRow, enterMotion.enter)}
+      ref={setRowRef}
+      className={cx(styles.queueRow, appear.entering && enterMotion.enter)}
       aria-busy={pending || undefined}
       data-pending={pending || undefined}
     >
@@ -1155,6 +1164,8 @@ function FileUploadField({
   const requestedAccept = React.useRef<{ accept: string | undefined } | null>(null);
 
   const count = set.files.length;
+  // The empty-set hint enters when the last file goes, not when the field mounts empty.
+  const emptyHint = useEnterOnAppear<HTMLSpanElement>(count === 0 && max === undefined);
   const room = max === undefined ? Number.POSITIVE_INFINITY : Math.max(0, max - count);
   const full = room === 0;
   const hasSet =
@@ -1321,7 +1332,14 @@ function FileUploadField({
               <RollingNumber>{countText}</RollingNumber>
             </span>
           ) : empty ? (
-            <span className={cx(textRole.caption, styles.addHint, enterMotion.enter)}>
+            <span
+              ref={emptyHint.ref}
+              className={cx(
+                textRole.caption,
+                styles.addHint,
+                emptyHint.entering && enterMotion.enter,
+              )}
+            >
               {labels.emptyHint}
             </span>
           ) : null}

@@ -34,7 +34,7 @@ Composer.Root                  <form>: the column below, one tier for every part
 │  ├─ Composer.Title           «Ответ Анне», «Редактирование»
 │  └─ Composer.Description     the quoted message, one line
 ├─ (recording error)           Hint, role="alert"
-└─ (row)                       one grid row, always: auto · minmax(0, 1fr) · auto, bottom-aligned
+├─ (row)                       one grid row, always: auto · minmax(0, 1fr) · auto, bottom-aligned
    ├─ Composer.Attach          paperclip: FileUpload trigger="button", or a Dropdown of kinds
    │  └─ Composer.Item         a kind of attachment (accept), with Composer.ItemIcon
    ├─ (field)                  Textarea.Root rows={1} maxRows={8}, no focus ring (the caret shows focus)
@@ -42,10 +42,12 @@ Composer.Root                  <form>: the column below, one tier for every part
    ├─ (recording bar)          over the paperclip and the field cells: delete · pause Buttons · pulsing
    │                           dot (a pause glyph while paused) · timer · live waveform canvas (locked),
    │                           or dot · timer · «Влево — отмена» (held)
-   └─ (action Button)          send ↔ record ↔ save; the glyphs turn into one another
-      └─ (lock pill)           above it while a recording is held: slide up to lock
+│  ├─ (keyboard toggle)        with Composer.Keyboard: a ghost Button before the send button (grid ↔ chevron)
+│  └─ (action Button)          send ↔ record ↔ save; the glyphs turn into one another
+│     └─ (lock pill)           above it while a recording is held: slide up to lock
+└─ Composer.Keyboard           a bot's reply keyboard under the row: rows of soft Buttons, folding open and closed
 ```
-`Composer.Attach` may stand anywhere among the children, inside a fragment or a wrapper component: it renders itself into the start cell of the row (a portal), so the paperclip, the field and the button are always one row. Everything else stands above the row. Without it the row is field and button only.
+`Composer.Attach` may stand anywhere among the children, inside a fragment or a wrapper component: it renders itself into the start cell of the row (a portal), so the paperclip, the field and the button are always one row. `Composer.Keyboard` does the same with its two places: the keys under the row and the toggle before the send button. Everything else stands above the row. Without it the row is field and button only.
 
 Sending is an async event (`SKILL/api-contract.md`, Events):
 
@@ -160,6 +162,20 @@ In an optimistic chat the send returns at once: add the message to the list with
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the `Icon`), `className` and the other span attributes. |
 
+### Composer.Keyboard
+`ref` → `HTMLDivElement`. A bot's reply keyboard under the row (`role="group"`): a key sends its text through the root's `onSend` and loads while its promise runs; the toggle before the send button shows and hides it.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `rows` | `readonly (readonly ComposerKey[])[]` | — (required) | Rows of keys, each row one line shared equally. A key is its text, or `{ label, icon?, tone? }` with `tone` `"accent" \| "success" \| "danger"`. |
+| `placeholder` | `string` | — | The field's placeholder while the keyboard is shown («Выберите раздел»). |
+| `oneTime` | `boolean` | `false` | Hides the keyboard after a key is used (once its promise resolves) and puts the caret in the field; the toggle shows it again. |
+| `open` | `boolean` | — | Whether the keys are shown (controlled). |
+| `defaultOpen` | `boolean` | `true` | Shown at first, uncontrolled: a keyboard the bot just sent is open. |
+| `onOpenChange` | `(open: boolean) => void` | — | The toggle pressed, or a `oneTime` keyboard used. |
+| `aria-label` | `string` | — | Name of the keyboard and of its toggle. Default `labels.keyboard`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `id`, `className` and the other div attributes. |
+
 ## Variants
 Composer has no `variant`; what the row shows follows its state.
 
@@ -206,6 +222,8 @@ Composer has no `variant`; what the row shows follows its state.
 | starting | the press is answered, the device is not granted yet | already the recording bar with a running timer (it counts from the press) while the device is asked for in parallel; the waveform is a calm line of dots |
 | too short | a recording under 0.7 s | dropped: nothing is sent |
 | record error | the browser refused / found no device | the bar cross-fades back to the field; `Hint` with `role="alert"` above the row, cleared by typing or the next attempt |
+| reply keyboard | `Composer.Keyboard` `open` / `defaultOpen` (shown at first) | the keys fold open under the row (`internal/Disclosure`: height glide with a fade, both ways), the toggle shows a chevron down (`aria-expanded="true"`), the field's placeholder is the keyboard's `placeholder`; closed, the keys leave the Tab order and the toggle shows the grid; recording, both are `inert` and the toggle fades with the field |
+| key pressed | a key of `Composer.Keyboard` | `onSend({ text: key, albums: [], files: [] })`; a promise keeps that key `loading` (`aria-busy`); the draft in the field stays; with `oneTime` the keyboard closes once it resolves and the caret goes to the field |
 | disabled | `disabled` | `data-disabled`, disabled controls |
 
 Motion: the tray opens and closes as a Crossfade (fade and height glide, the row below stays still); tiles enter with `enterMotion`, a dragged or Alt-moved tile glides (Dnd), a removed tile closes up in place (`leaveInPlace`), an upload disk's ring fills along its edge and the disk fades out when done; the action glyphs cross-fade and turn (`fast` opacity, `base` emphasized transform) while the button's fill changes with the shared color transition — the button never changes its shape; the recording bar and the field cross-fade (`swapMotion`, both directions) inside the row's own height; the toolbar, the waveform and the delete button enter (`fast`); the recording dot breathes (`slow`, a status loop like a spinner); the lock pill rises in, its arrow follows the finger and it snaps away on lock (`fast`); the video preview scales in (`base` emphasized) and out (`fast`). The timer, the waveform and the video ring are painted per animation frame outside React: the waveform scrolls smoothly between samples. Under `prefers-reduced-motion` the loops stand still and the waveform steps sample by sample, still showing the level.
@@ -218,6 +236,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - The recording bar covers the paperclip and the field, so entering and leaving a recording never changes the row height; its waveform takes all the width between the timer and the send button, as tall as the button minus `--prime-space-2`, in VoicePlayer's bar geometry.
 - On touch the editable text is at least 16 px (no iOS zoom) and every button has the 44 px hit area.
 - The formatting toolbar floats above the field's start edge on the floating layer, over whatever is above the composer.
+- The reply keyboard (`Composer.Keyboard`) stands under the row, `--prime-space-2` below it inside the fold (a closed keyboard takes no room), rows and keys `--prime-space-1` apart. A row is one line, as in Telegram: its keys share it equally (`fullWidth` soft Buttons at the host tier), a label longer than its share ellipsizes. The keyboard is as tall as its rows — Telegram's `resize_keyboard` is always on: a web page has no system keyboard height to match. A key with `icon` puts it before its label (`Button.Icon`); `tone` maps Telegram's button `style` (`primary` → `accent`, `success`, `danger`). The toggle stands before the send button with `--prime-space-1` between them.
 
 ## Accessibility
 
@@ -236,6 +255,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | `↑` · `↓` | On the record button, with voice and video both offered: switches voice and video (`aria-keyshortcuts`, named in the button's description). |
 | `←` · `→` | Move between the formatting buttons. |
 | `Home` · `End` | Jump to the first / last formatting button. |
+| `Enter` · `Space` | On a key of the reply keyboard: sends its text; on the keyboard's toggle: shows or hides the keys. |
 | `Alt + ←` · `Alt + →` | On a tile of the tray: moves the attachment one place. |
 | `Delete` · `Backspace` | On a tile of the tray: removes the attachment; focus moves to its neighbour. |
 
@@ -251,9 +271,12 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - The attachments are one `<ul>` named «Вложения» (FileUpload.Queue `layout="strip"`): every tile is «Фото N: name» / «Видео N: name» / «Файл N: name» with its upload state, `aria-keyshortcuts` for `Alt + ←` / `→` and `Delete`, a remove button «Убрать name»; the upload disk is a `progressbar` while the file goes up. Moves are announced by Dnd's live region, finished and failed files by the queue's. «Отправить как файлы, без сжатия» is a labelled Checkbox.
 - Touch: the buttons get a 44 px hit area; Enter breaks the line, the button sends.
 - Voice and video together: a single press records without holding, a double press (within 300 ms) switches the mode. The first press records silently until the window ends, so a double press shows no recording and sends nothing.
+- A reply keyboard is a `group` named «Клавиатура бота» of native buttons in Tab order; its toggle is a button of the same name with `aria-expanded` and `aria-controls`. A key whose send is pending is `aria-busy`. Closed, the keys leave the Tab order and the accessibility tree; a `oneTime` keyboard hands the focus to the field.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+#### Composer.Root
 
 | Key | Default | Used for |
 |---|---|---|
@@ -295,6 +318,12 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | `cancelReply` | `"Отменить ответ"` | Name of the close button of a reply bar. |
 | `cancelEdit` | `"Отменить редактирование"` | Name of the close button of an edit bar. |
 
+#### Composer.Keyboard
+
+| Key | Default | Used for |
+|---|---|---|
+| `keyboard` | `"Клавиатура бота"` | Name of the reply keyboard and of the toggle that shows and hides it. |
+
 ## Examples
 | Example | Shows |
 |---|---|
@@ -306,6 +335,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | [typing.tsx](examples/typing.tsx) | The other side's status line follows what you do: typing, recording a voice or a video message, then nothing — `onActivityChange`. |
 | [formatting.tsx](examples/formatting.tsx) | Selected text gets a toolbar of bold, italic, strikethrough, code, spoiler, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. |
 | [voice.tsx](examples/voice.tsx) | Voice and round video messages: hold the button to record and release to send, slide left to cancel, slide up or tap to record hands-free; a double tap or double click switches voice and video — `onSendVoice`, `onSendVideoNote`, `recordMode`. |
+| [bot-keyboard.tsx](examples/bot-keyboard.tsx) | A bot's reply keyboard under the field: a key sends its text as a message, the field asks for a key, the keyboard hides after use and the toggle brings it back — `Composer.Keyboard`, `rows`, `placeholder`, `oneTime`. |
 | [states.tsx](examples/states.tsx) | A closed conversation is disabled, a slow send keeps the text with a busy button until the server answers — `disabled`, `onSend`. |
 | [controlled.tsx](examples/controlled.tsx) | Every conversation keeps its own draft: switching the chat swaps the text, a template button fills it from outside — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width chat the row keeps the paperclip, the field and the button; Enter makes a new line on touch screens and the button sends — `Composer.Attach`, `onSend`. |
@@ -326,5 +356,5 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - An `aria-label` on the root to rename the field → use `labels.placeholder` (the field) and `labels.region` (the form).
 
 ## Related
-- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip and the picker of the menu; `FileUpload.Queue layout="strip"`, the tray), [Gallery](../gallery/COMPONENT.md) (`GALLERY_MAX`, the size of an album in `albums`), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `nav.chevronLeft`, `nav.chevronUp`, `status.locked`), `useUploadQueue` (the `queue`), `internal/ring` (the video preview's ring), `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Textarea `formatting`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip and the picker of the menu; `FileUpload.Queue layout="strip"`, the tray), [Gallery](../gallery/COMPONENT.md) (`GALLERY_MAX`, the size of an album in `albums`), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `nav.chevronLeft`, `nav.chevronUp`, `nav.chevronDown`, `nav.layoutGrid`, `status.locked`), `internal/Disclosure` (the reply keyboard's fold), `useUploadQueue` (the `queue`), `internal/ring` (the video preview's ring), `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Textarea `formatting`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Message](../message/COMPONENT.md) — the bubbles the composer writes into; [VoicePlayer](../voice-player/COMPONENT.md) — plays a sent voice message; [Textarea](../textarea/COMPONENT.md), [Input](../input/COMPONENT.md)

@@ -69,6 +69,12 @@ export const page: ComponentPageConfig = {
         "Пункты подвала и строка сворачивания над блоком пользователя: аватар, имя и почта открывают меню аккаунта; сверните рельс этой строкой — останется только аватар, на оси иконок — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`.",
     },
     {
+      scenario: "account-profile",
+      title: "Аккаунт без меню",
+      description:
+        "Пользователь открывает панель профиля, а не меню, поэтому строка рисуется без шеврона — `Sidebar.Account`, `description`.",
+    },
+    {
       scenario: "router",
       title: "Ссылки роутера",
       description:

@@ -145,6 +145,7 @@ function MotionExample({ item }: { item: MotionItem }) {
       <DemoApiTitle>{item.title}</DemoApiTitle>
       <DemoDescription>{renderInlineCode(item.text)}</DemoDescription>
       <PlaygroundSourceFrame
+        id={`${page.base ?? "components"}/${page.dir}/${item.file}`}
         entry={getExample(page.base ?? "components", page.dir, item.file)}
         previewLayout={exampleLayout(page.kind, example)}
       />

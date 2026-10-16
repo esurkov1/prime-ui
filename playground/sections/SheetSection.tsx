@@ -32,7 +32,7 @@ export const page: ComponentPageConfig = {
       scenario: "header-actions",
       title: "Иконка и действия в шапке",
       description:
-        "Курьер у двери: шторку открывает плашка с иконкой, статус оплаты и меню ⋯ стоят перед крестиком, две равные кнопки заполняют подвал — `Sheet.Icon`, `Sheet.Actions`, `layout`.",
+        "Курьер у двери: шторку открывает плашка с иконкой, статус оплаты открывает строку под заголовком, меню ⋯ стоит перед крестиком, две равные кнопки заполняют подвал — `Sheet.Icon`, `Sheet.Description`, `Sheet.Actions`, `layout`.",
     },
     {
       scenario: "guard",

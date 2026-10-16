@@ -68,7 +68,7 @@ Spinner          <span role="status">; size and tone
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| appearing | mounted | fades in over `fast` (`internal/enterMotion`), so a spinner that comes and goes never blinks |
+| appearing | mounted into a host already shown | fades in over `fast` (`internal/enterMotion`), so a spinner that comes and goes never blinks; one that mounts with its page stands still |
 | spinning | mounted | the ring turns at a constant speed (`--prime-motion-loop × 3` per turn, linear) |
 | reduced motion | `prefers-reduced-motion` | the ring keeps turning, twice as slow (`--prime-motion-loop × 6` per turn) and linear: a loading cue is information, so the token is not zeroed |
 | size / tone | `size`, `tone` | `data-size` (the explicit size, else the host control tier, else `m`), `data-tone` (only for a non-default tone) |

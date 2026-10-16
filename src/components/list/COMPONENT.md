@@ -168,7 +168,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
 - Reorderable (`onReorder`): an `xs` handle box ends each row, 4px after the row element and its `List.ItemActions` (inline-end: on the left in RTL); the row keeps its own padding and fill, so every row's handle stands on one line.
-- `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's edge as from its top and bottom — the end edge, or the start edge with `side="start"`, where the row's own padding then parts the controls from its icon or text.
+- `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's edge as a control box of that tier stands from its top and bottom — at any row height: one line, with `List.ItemDescription`, with an avatar, the touch row. The end edge, or the start edge with `side="start"`, where the row's own padding then parts the controls from its icon or text.
 - One toggle place per row: a plain row ends with its toggle (label first); a reorderable row leads with it (`side="start"`) and ends with the grip — never a toggle between the label and the grip.
 - A colour dot in `List.ItemIcon` is the large `Badge.Dot` (8px) centred in an icon-wide box, so the text lines up with the rows that carry icons.
 

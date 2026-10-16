@@ -93,6 +93,7 @@ One entry of `fields`: data, not a part. Selected values missing from `options` 
 | `finite` | `boolean` | `true` | `options` fields: a fixed set — hiding every value is refused. `false` for an open set (services, users). |
 | `multiple` | `boolean` | `true` | `options` fields: many values at once. `false` — one value and no hiding: a press picks only that value, a second press clears it (an API that takes one value per field). |
 | `formatValue` | `(value: number) => string` | Russian digit groups | `range` fields: a bound in the chip («1 000 ₽»). |
+| `calendar` | `Pick<DatepickerPanelProps, "months" \| "presets" \| "prompt" \| "footer" \| "withTime" \| "isDayDisabled" \| "disableFuture" \| "today" \| "locale" \| "weekStartsOn" \| "labels">` | — | `date-range` fields: the calendar of the period, as on a report's own Datepicker — `presets`, `months`, `prompt`, `footer`, `withTime`; the chip names a matching preset («Период: Этот месяц»). Without it the panel opens one month with no presets. |
 
 ### Functions
 
@@ -233,7 +234,7 @@ same height and type.
 | [overview.tsx](examples/overview.tsx) | Filters above a request list: the filter button and the search, applied filters as tags, rows narrowed by the value and the text — `fields`, `value`, `search`, `matchesSmartFilter`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the filter button, the search, the tags and the panel follow one tier — `size`. |
 | [many-values.tsx](examples/many-values.tsx) | An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and marks the match in accent — `finite`, `icon`, `collapsedLimit`. |
-| [ranges.tsx](examples/ranges.tsx) | Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip, and the bounds go to the server as from / to parameters — `kind`, `formatValue`, `matchesSmartFilter`, `isSmartFilterRange`. |
+| [ranges.tsx](examples/ranges.tsx) | Deals narrowed by an amount from–to and a period from a calendar with presets, two months and an Apply footer; each range is one readable chip, and the bounds go to the server as from / to parameters — `kind`, `formatValue`, `calendar`, `matchesSmartFilter`, `isSmartFilterRange`. |
 | [single-value.tsx](examples/single-value.tsx) | For an API that takes one value per field: the filter button without a search, a press picks only that value and nothing can be hidden — `searchable`, `multiple`. |
 | [option-groups.tsx](examples/option-groups.tsx) | Values of different kinds in one field: owner types and people under their own headings — `options`, `group`. |
 | [controlled.tsx](examples/controlled.tsx) | A saved view sets the value from outside; the selection is read back as the list to ask the server for — `value`, `onValueChange`, `resolveSmartFilterValues`. |

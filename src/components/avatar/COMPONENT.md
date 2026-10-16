@@ -121,6 +121,7 @@ The soft fill is opaque: the soft hue is composited over the ground the avatar s
 - Avatar → name: space step 3 (12px) in lists and cards, step 2 (8px) in table cells.
 - Group: members overlap by an eighth of the diameter (initials are never cut) with a 2px ring in the ground they stand on: the current layer of the surface around them (no surface sets anything), or `--avatar-ring` from a host whose ground is not a layer (a reaction chip sets its own fill); the fills of initials and «+N» are composited over the same ground.
 - An icon fallback is half the diameter: a kit `Icon` reads `--prime-icon-size`, a raw svg too.
+- In a leading media slot (`Drawer.Icon`, `Modal.Icon`, `Sheet.Icon`, `Card.Icon`) the avatar takes the slot's size (`l`, 40px) whatever `size` it was given, also through a wrapper component of yours; the slot then draws no tile.
 
 ## Accessibility
 

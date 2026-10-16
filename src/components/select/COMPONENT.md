@@ -238,7 +238,10 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 - A rich row and its trigger use the same parts in the same order: leading media (`Avatar.Root`,
   `Thumbnail.Root`) → `Select.ItemText` (+ `Select.ItemDescription`) → trailing `Badge.Root` /
   `Select.ItemMeta`. In a row the trailing part sits before the check; in the trigger, at the end
-  before the chevron. Draw the trigger with `renderValue` returning the row's parts, so the picked
+  before the chevron. Every single-choice row keeps the check's column, chosen or not, so the
+  trailing parts of all rows end on one line, under the trailing part of the trigger (the check
+  column stands where the chevron does), and picking another option moves no badge or price.
+  Draw the trigger with `renderValue` returning the row's parts, so the picked
   person keeps their avatar and role badge when the list is closed:
 
 ```tsx

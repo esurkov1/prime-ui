@@ -30,3 +30,17 @@
   gap: var(--prime-space-6);
   inline-size: min(100%, calc(var(--prime-space-20) * 4));
 }
+
+/* overflow-count.tsx: rows of a narrow table — the role, then its sections in a cell. */
+.roles {
+  display: grid;
+  gap: var(--prime-space-3);
+  inline-size: min(100%, var(--prime-layout-form-width-s));
+}
+
+.role {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--prime-space-3);
+}

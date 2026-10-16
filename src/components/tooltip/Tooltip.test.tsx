@@ -43,6 +43,12 @@ function BasicTooltip({
 
 const trigger = (name = "Trigger") => screen.getByRole("button", { name });
 
+/** Focus from the keyboard: a Tab key, then focus lands on `el`. */
+function keyboardFocus(el: HTMLElement) {
+  fireEvent.keyDown(document.activeElement ?? document.body, { key: "Tab" });
+  el.focus();
+}
+
 async function hover(el: HTMLElement) {
   await act(async () => {
     fireEvent.pointerEnter(el);
@@ -120,7 +126,7 @@ describe("Tooltip", () => {
     expect(host.tagName).toBe("SPAN");
     expect(host).toHaveAttribute("tabindex", "0");
     expect(host).toHaveAttribute("aria-disabled", "true");
-    act(() => host.focus());
+    act(() => keyboardFocus(host));
     await act(async () => {
       vi.advanceTimersByTime(0);
     });
@@ -143,7 +149,7 @@ describe("Tooltip", () => {
     expect(host).toHaveAttribute("data-disabled-host");
     expect(host).toHaveAttribute("aria-disabled", "true");
     expect(host).toHaveAttribute("tabindex", "0");
-    act(() => host.focus());
+    act(() => keyboardFocus(host));
     await act(async () => {
       vi.advanceTimersByTime(0);
     });
@@ -229,7 +235,7 @@ describe("Tooltip", () => {
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
-  it("ignores touch hover; focus still opens it", async () => {
+  it("ignores touch hover; keyboard focus still opens it", async () => {
     render(<BasicTooltip delayDuration={0} />);
     await act(async () => {
       fireEvent.pointerEnter(trigger(), { pointerType: "touch" });
@@ -237,18 +243,59 @@ describe("Tooltip", () => {
     });
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     await act(async () => {
-      fireEvent.focus(trigger());
+      keyboardFocus(trigger());
     });
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
   });
 
-  it("opens on focus and closes on blur", async () => {
+  it("opens on keyboard focus and closes on blur", async () => {
     render(<BasicTooltip delayDuration={0} />);
     await act(async () => {
-      fireEvent.focus(trigger());
+      keyboardFocus(trigger());
     });
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
     fireEvent.blur(trigger());
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+
+  it("stays hidden on focus that follows a press elsewhere (a layer moving focus after a click)", async () => {
+    render(
+      <>
+        <button type="button">Открыть</button>
+        <BasicTooltip delayDuration={0} />
+      </>,
+    );
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Открыть" }));
+    await act(async () => {
+      trigger().focus();
+      vi.runOnlyPendingTimers();
+    });
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    // The person turns to the keyboard: Shift alone does not count, Tab back onto it does.
+    await act(async () => {
+      fireEvent.blur(trigger());
+      fireEvent.keyDown(document, { key: "Shift" });
+      trigger().blur();
+      trigger().focus();
+      vi.runOnlyPendingTimers();
+    });
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    await act(async () => {
+      trigger().blur();
+      keyboardFocus(trigger());
+      vi.runOnlyPendingTimers();
+    });
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+  });
+
+  it("stays hidden on a quiet focus (a layer a pointer opened returns focus without the ring)", async () => {
+    render(<BasicTooltip delayDuration={0} />);
+    fireEvent.keyDown(document, { key: "Enter" });
+    trigger().setAttribute("data-focus-quiet", "");
+    await act(async () => {
+      trigger().focus();
+      vi.runOnlyPendingTimers();
+    });
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 

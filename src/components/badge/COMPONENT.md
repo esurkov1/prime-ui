@@ -35,7 +35,9 @@ Badge.Root          <span>: fill, tier dimensions
 ├─ Badge.Action     optional end segment revealed on hover / focus (always shown on touch screens)
 └─ remove segment   with onRemove: full height, the whole end is the hit area (Icon action.close)
 
-Badge.Group         <div>: a wrapping row of Badge.Root, one value; `size` sets every badge's tier
+Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every badge's tier
+├─ Badge.Root …     one per value; with overflow="count" the ones that do not fit are hidden
+└─ «+N» badge       overflow="count": a focusable Badge.Root in a Tooltip listing the hidden values
 ```
 
 ## API
@@ -64,12 +66,14 @@ Badge.Group         <div>: a wrapping row of Badge.Root, one value; `size` sets 
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "onClick" \| "color">` | — | `aria-label` (an icon-only badge named by it is an image) and the other span attributes; no `onClick` — a pressable chip is the toggle. |
 
 ### Badge.Group
-`ref` → `HTMLDivElement`. A row of badges as one value (the tags of a record): it wraps onto more lines, the badges a chip gap apart.
+`ref` → `HTMLDivElement`. A row of badges as one value (the tags of a record): it wraps onto more lines, the badges a chip gap apart, or with `overflow` stays on one line behind a «+N» badge.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | the host tier, one step down | Tier of every badge in the group; a badge's own `size` wins. Small tiers stand closer. |
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the `Badge.Root`s), `className`, `aria-label` (a named group is `role="group"`) and the other div attributes. |
+| `overflow` | `"wrap" \| "count"` | `"wrap"` | `wrap` — the row wraps onto more lines. `count` — one line (a table cell): the badges that fit the container, the rest behind a focusable «+N» badge whose tooltip lists them. |
+| `labels` | `Partial<BadgeGroupLabels>` | — | Built-in strings of the «+N» badge, see Labels. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the `Badge.Root`s, one per value), `className`, `aria-label` (a named group is `role="group"`) and the other div attributes. |
 
 ### Badge.Icon
 `ref` → `HTMLSpanElement`. A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.
@@ -146,6 +150,12 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | `xl` | 32px high, text 14, icon 16 | large headers | |
 | — (omitted) | one tier below the surrounding control | inside Button, Input, Tabs | yes (inside controls) |
 
+### overflow (Badge.Group)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `wrap` | the row wraps onto more lines | tags of a record in a card, a form, a detail pane | yes |
+| `count` | one line: the badges that fit, then «+N» | a table cell, a list row — a set of values that must keep the row's height | |
+
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -167,6 +177,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | disabled | `disabled` | `data-disabled`, `aria-disabled`; inner buttons disabled, no hover wash |
 | icon-only, named | only `Badge.Icon` children and `aria-label` | `role="img"` with that name |
 | count | a number as the only child | the digits roll to the new value when the number changes |
+| overflowed | `Badge.Group overflow="count"`, the badge does not fit the row | `data-overflowed` on the badge (out of the flow, `visibility: hidden`); the group's `data-overflow="count"`; re-measured on every resize of the row or a badge (`useResizeEffect`), the «+N» text from `labels.more` |
 
 ## Layout & spacing
 - Inline-flex, `width: fit-content`, `max-width: 100%`; text never wraps and ends in an ellipsis.
@@ -175,6 +186,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - The root never clips: the text ellipsizes in its own box, so the segments' touch areas reach past the chip.
 - `Badge.Action` room is reserved, so revealing it never changes the badge width.
 - Several badges in a row: `Badge.Group` — it wraps, badges 8 apart (4 at the `xs` and `s` tiers).
+- `overflow="count"` fits the container, not the viewport: a DataTable cell, a 320px column. At least the first badge stays; when it alone does not fit it ellipsizes.
 - In a list row the badge is the trailing column; the title column gets `min-width: 0` and an ellipsis.
 
 ## Accessibility
@@ -184,7 +196,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 
 | Key | Action |
 |---|---|
-| `Tab` | Focuses the body of a toggle chip, then its action or remove segment. |
+| `Tab` | Focuses the body of a toggle chip, then its action or remove segment; in `Badge.Group` with `overflow` the «+N» badge, which opens its tooltip with the hidden values. |
 | `Enter` · `Space` | Presses the focused body (the toggle flips), remove or action button. |
 
 ### ARIA
@@ -195,14 +207,24 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - Give every remove button a unique name with `labels.remove`; after removing, move focus to a neighbouring badge or the source field.
 - While a removal is saved the badge has `aria-busy` and the segment `aria-disabled`; once a removal waits, the badge mounts a polite live region that speaks `labels.removeFailed` if the promise rejects.
 - `Badge.Dot` is `aria-hidden`; an icon-only badge needs `aria-label` and then is `role="img"`. Color never carries meaning alone, a `tone` neither.
+- `overflow="count"`: the badges that did not fit are `visibility: hidden` (out of the tree and the Tab order); the «+N» badge is a tab stop read as `labels.moreCount`; its tooltip, open while it has focus, lists the hidden values as its description.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+#### Badge.Root
 
 | Key | Default | Used for |
 |---|---|---|
 | `remove` | `"Удалить"` | Accessible name of the remove segment; include the badge text («Убрать фильтр «Москва»»). |
 | `removeFailed` | `"Не удалось удалить"` | Spoken when the `onRemove` promise rejects and the badge stays; name the badge («Фильтр «Москва» не убран»). |
+
+#### Badge.Group
+
+| Key | Default | Used for |
+|---|---|---|
+| `more` | `"+{count}"` | Visible text of the badge for the badges that did not fit; `{count}` — how many. |
+| `moreCount` | `"Ещё {count}"` | What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip. |
 
 ## Examples
 | Example | Shows |
@@ -218,6 +240,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | [filter-values.tsx](examples/filter-values.tsx) | Filter values as toggles with a hide action that slides in without changing the width — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`. |
 | [square.tsx](examples/square.tsx) | File formats as square tiles of text, large enough for three letters; the hue sorts them by kind — `shape`, `size`, `color`. |
 | [tag-row.tsx](examples/tag-row.tsx) | The tags of a client as one value: the row wraps in a narrow column and keeps one gap between badges — `Badge.Group`, `size`. |
+| [overflow-count.tsx](examples/overflow-count.tsx) | The sections of each role in one line of a narrow cell: what does not fit waits behind «+N» with the full list in its tooltip — `Badge.Group`, `overflow`. |
 | [controlled.tsx](examples/controlled.tsx) | Delivery cities as toggle chips whose state the screen owns: the summary counts the chosen ones — `pressed`, `onPressedChange`. |
 
 ## Mistakes
@@ -230,9 +253,10 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - A colored badge with no text → keep a word; color alone is not a signal.
 - An explicit `size` inside a control → drop it; the badge takes the tier one step down.
 - A row of badges in a hand-made flex wrapper with its own gap → `Badge.Group`.
+- A set of values in a table cell that wraps and grows the row, or a hand-made «+N» → `Badge.Group overflow="count"`.
 - `onRemove` together with `Badge.Action` → one end segment per badge.
 - Removing the badge from your list first and putting it back when the request fails → return the request's promise and remove it after it succeeds; the badge waits meanwhile.
 
 ## Related
-- **Built from:** `Icon` (remove ×, `Badge.Action` −), [Spinner](../spinner/COMPONENT.md) (removing), `internal/chipTier` (tiers), `internal/glyphSwap` (× ⇄ spinner), `internal/partPresence` (leaving), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** `Icon` (remove ×, `Badge.Action` −), [Spinner](../spinner/COMPONENT.md) (removing), `internal/chipTier` (tiers), `internal/glyphSwap` (× ⇄ spinner), `internal/partPresence` (leaving), [VisuallyHidden](../visually-hidden/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md) (the «+N» list), `useResizeEffect` (fitting the row), `internal/formatLabel` (`labels`)
 - **See also:** [TagSelect](../tag-select/COMPONENT.md), [Select](../select/COMPONENT.md) (row badges), [SegmentedControl](../segmented-control/COMPONENT.md) (`Count`, color dots), [SmartFilter](../smart-filter/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

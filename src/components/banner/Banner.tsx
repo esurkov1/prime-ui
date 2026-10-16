@@ -11,6 +11,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { handoffFocus, tabStopBeside } from "@/internal/overlay/focus";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import { type ControlSize, compactTier, type Tone, type Variant } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
@@ -59,7 +60,9 @@ function BannerRoot({
   ...rest
 }: BannerRootProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const mergedRef = useMergedRefs(rootRef, ref);
+  // It enters when it appears on a shown page (after an event), not when it mounts with the page.
+  const appear = useEnterOnAppear<HTMLDivElement>();
+  const mergedRef = useMergedRefs(rootRef, appear.ref, ref);
   const tier = useHostTier(sizeProp);
   const size = tier.size;
   // Unmounted by its parent (dismissed, condition gone): focus inside moves to the tab stop that
@@ -86,7 +89,7 @@ function BannerRoot({
     <div
       {...rest}
       ref={mergedRef}
-      className={cx(fieldTierClass, styles.root, enterMotion.enter, className)}
+      className={cx(fieldTierClass, styles.root, appear.entering && enterMotion.enter, className)}
       data-depth={depth}
       {...toDataAttributes({ variant, tone, size, placement })}
     >

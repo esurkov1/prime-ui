@@ -141,6 +141,12 @@
   text-align: end;
 }
 
+/* A leading `Card.Icon` in the header grid (see the header grid below) spans both text rows. */
+.header > .icon {
+  grid-column: icon;
+  grid-row: 1 / -1;
+}
+
 /* `panel` and `list`: the header is a zone with the side padding. */
 .root[data-variant="panel"] > .header,
 .root[data-variant="list"] > .header {
@@ -237,26 +243,46 @@
 }
 
 /*
- * A description in the header (`panel`, `list`): the title and the description stack in the first
- * column, anything else (a switch, a caption) stays at the end, centred on both lines.
+ * A description or a leading icon in the header: the header becomes a grid of named columns —
+ * the icon (a tile or the record's picture), the title and the description stacked in the text
+ * column, anything else (a switch, a caption, a button) at the end, the icon and the end centred
+ * on both lines.
  */
-.header:has(> .description) {
+.header:has(> .description, > .icon) {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: [text] minmax(0, 1fr) [end] auto;
   align-items: center;
   gap: var(--prime-space-1) var(--prime-space-3);
+}
+
+.header:has(> .icon) {
+  grid-template-columns: [icon] auto [text] minmax(0, 1fr) [end] auto;
+}
+
+/* Two explicit rows only with a description, so `1 / -1` spans both — or the one row without it. */
+.header:has(> .description) {
+  grid-template-rows: auto auto;
 }
 
 /* Grid placement applies only once the header is a grid, so the parts need no `:has()` of their
    own (a class-less target after `:has()` makes its invalidation whole-subtree page-wide). */
 .header > .title,
 .header > .description {
-  grid-column: 1;
+  grid-column: text;
 }
 
-.header > :not(.title, .description) {
-  grid-column: 2;
-  grid-row: 1 / span 2;
+.header > :not(.title, .description, .icon) {
+  grid-column: end;
+  grid-row: 1 / -1;
+}
+
+/* The record's picture (`Avatar.Root`, `Thumbnail.Root`) has no tile: the picture is the mark. */
+.icon[data-media="true"] {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-width: var(--prime-space-10);
+  height: var(--prime-space-10);
 }
 
 .body {
@@ -470,9 +496,9 @@
     flex-wrap: wrap;
   }
 
-  /* A header with a description: its control drops under the text. */
-  .header > :not(.title, .description) {
-    grid-column: 1;
+  /* A header grid (a description or an icon): its control drops under the text. */
+  .header > :not(.title, .description, .icon) {
+    grid-column: text;
     grid-row: auto;
     justify-self: start;
   }

@@ -666,6 +666,110 @@ describe("Input strength", () => {
   });
 });
 
+describe("Input minStrength", () => {
+  const meter = () => screen.getByRole("progressbar", { name: "Надёжность пароля" });
+
+  function Policy({ onSubmit }: { onSubmit: () => void }) {
+    return (
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit();
+        }}
+      >
+        <Input.Root label="Пароль" strength minStrength={3}>
+          <Input.Wrapper>
+            <Input.Field type="password" defaultValue="" />
+          </Input.Wrapper>
+        </Input.Root>
+      </form>
+    );
+  }
+
+  it("turns the meter and the word danger below the threshold; an empty value is valid", () => {
+    render(<Policy onSubmit={() => {}} />);
+    const field = screen.getByLabelText<HTMLInputElement>("Пароль");
+    expect(field.validity.valid).toBe(true);
+    fireEvent.change(field, { target: { value: "Graphite7" } }); // easy
+    expect(screen.getByText("Лёгкий").closest("[data-tone]")).toHaveAttribute(
+      "data-tone",
+      "danger",
+    );
+    expect(meter().closest("[data-tone]")).toHaveAttribute("data-tone", "danger");
+    expect(field.validationMessage).toBe("Пароль недостаточно надёжный");
+    fireEvent.change(field, { target: { value: "graphite7!" } }); // medium
+    expect(screen.getByText("Средний").closest("[data-tone]")).toHaveAttribute(
+      "data-tone",
+      "accent",
+    );
+    expect(field.validity.valid).toBe(true);
+  });
+
+  it("a weak password stops the submit and shows the error until the value is fixed", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { container } = render(<Policy onSubmit={onSubmit} />);
+    const form = container.querySelector("form") as HTMLFormElement;
+    const field = screen.getByLabelText("Пароль");
+    await user.type(field, "Graphite7");
+    expect(field).not.toHaveAttribute("aria-invalid");
+    act(() => form.requestSubmit());
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(field).toHaveAttribute("aria-invalid", "true");
+    expect(field).toHaveAccessibleDescription(/Пароль недостаточно надёжный/);
+    await user.type(field, "!");
+    expect(field).not.toHaveAttribute("aria-invalid");
+    act(() => form.requestSubmit());
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Input valid", () => {
+  function Repeat({ value, invalid }: { value: string; invalid?: boolean }) {
+    return (
+      <Input.Root label="Повторите пароль" valid={value === "Graphite2026"} invalid={invalid}>
+        <Input.Wrapper data-testid="box">
+          <Input.Field type="password" value={value} onChange={() => {}} />
+        </Input.Wrapper>
+      </Input.Root>
+    );
+  }
+
+  it("draws the success ring and the check, and says so to assistive tech", () => {
+    const { rerender } = render(<Repeat value="Graph" />);
+    const field = screen.getByLabelText("Повторите пароль");
+    const box = screen.getByTestId("box");
+    expect(box).not.toHaveAttribute("data-valid");
+    expect(screen.getByRole("status")).toHaveTextContent("");
+    expect(field).not.toHaveAccessibleDescription(/Значение подходит/);
+
+    rerender(<Repeat value="Graphite2026" />);
+    expect(box).toHaveAttribute("data-valid", "true");
+    expect(box.querySelector(`.${styles.validMark}`)).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("status")).toHaveTextContent("Значение подходит");
+    expect(field).toHaveAccessibleDescription("Значение подходит");
+  });
+
+  it("invalid wins over valid", () => {
+    render(<Repeat value="Graphite2026" invalid />);
+    const box = screen.getByTestId("box");
+    expect(box).toHaveAttribute("data-invalid", "true");
+    expect(box).not.toHaveAttribute("data-valid");
+    expect(box.querySelector(`.${styles.validMark}`)).toBeNull();
+  });
+
+  it("renders no live region for a field that takes no valid", () => {
+    render(
+      <Input.Root label="Город">
+        <Input.Wrapper>
+          <Input.Field />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+});
+
 describe("getPasswordStrength", () => {
   it("is empty only for an empty value", () => {
     expect(getPasswordStrength("")).toBe(0);

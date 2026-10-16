@@ -29,6 +29,16 @@ export function ToolGroup({ className, ...rest }: ToolGroupProps) {
   return <div {...rest} className={cx(styles.group, className)} />;
 }
 
+type ToolCellProps = DivProps;
+
+/**
+ * A cell the host draws itself, standing in the row as given: a part that comes and goes takes its
+ * presence (`usePartPresence`) on the cell, so the row closes up when it leaves. A fixed cell.
+ */
+export function ToolCell({ className, ...rest }: ToolCellProps) {
+  return <div {...rest} className={cx(styles.cell, className)} data-kind="fixed" />;
+}
+
 function kindOf(node: React.ReactNode): ToolKind {
   if (
     isPart(node, SmartFilter.Toolbar) ||
@@ -74,11 +84,15 @@ type ToolRowProps = DivProps & {
 export function ToolRow({ fill = true, className, children, ...rest }: ToolRowProps) {
   return (
     <div {...rest} className={cx(styles.row, className)} data-fill={fill ? "true" : undefined}>
-      {flattenChildren(children).map((item, index) => (
-        <div key={keyOf(item, index)} className={styles.cell} data-kind={kindOf(item)}>
-          {filled(item)}
-        </div>
-      ))}
+      {flattenChildren(children).map((item, index) =>
+        isPart(item, ToolCell) ? (
+          React.cloneElement(item, { key: keyOf(item, index) })
+        ) : (
+          <div key={keyOf(item, index)} className={styles.cell} data-kind={kindOf(item)}>
+            {filled(item)}
+          </div>
+        ),
+      )}
     </div>
   );
 }

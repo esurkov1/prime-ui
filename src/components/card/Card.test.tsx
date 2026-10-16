@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { cssRule, cssValue } from "@/test/css";
 
 import { Card } from "./Card";
@@ -170,6 +171,53 @@ describe("Card", () => {
     expect(cssValue(rule, "white-space")).toBe("normal");
   });
 
+  it("an avatar in Card.Icon is the record's picture: no tile, size l, hidden from assistive tech", () => {
+    render(
+      <Card.Root>
+        <Card.Header data-testid="header">
+          <Card.Icon data-testid="icon">
+            <Avatar.Root data-testid="avatar">
+              <Avatar.Fallback>АС</Avatar.Fallback>
+            </Avatar.Root>
+          </Card.Icon>
+          <Card.Title>Анна Соколова</Card.Title>
+          <Card.Description>@a.sokolova</Card.Description>
+          <button type="button">Отвязать</button>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("data-media", "true");
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+    expect(icon).not.toHaveAttribute("data-tone");
+    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "l");
+    expect(screen.getByRole("heading", { name: "Анна Соколова" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Отвязать" })).toBeInTheDocument();
+  });
+
+  it("a glyph in Card.Icon keeps the accent tile", () => {
+    render(
+      <Card.Root variant="mini">
+        <Card.Icon data-testid="icon" aria-hidden>
+          ×
+        </Card.Icon>
+      </Card.Root>,
+    );
+    const icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("data-tone", "accent");
+    expect(icon).not.toHaveAttribute("data-media");
+  });
+
+  it("CSS: a Card.Icon leads the header grid and spans the title and description rows", () => {
+    const grid = cssRule("src/components/card/Card.module.css", ".header:has(> .icon)");
+    expect(cssValue(grid, "grid-template-columns")).toBe(
+      "[icon] auto [text] minmax(0, 1fr) [end] auto",
+    );
+    const icon = cssRule("src/components/card/Card.module.css", ".header > .icon");
+    expect(cssValue(icon, "grid-column")).toBe("icon");
+    expect(cssValue(icon, "grid-row")).toBe("1 / -1");
+  });
+
   it("loading holds a Skeleton in the value, delta and meta, then fades the data in", () => {
     const tile = (loading: boolean) => (
       <Card.Root variant="stat-trend" loading={loading} data-testid="kpi">
@@ -196,8 +244,8 @@ describe("Card", () => {
     const value = screen.getByTestId("value");
     expect(value).toHaveTextContent("4,2 млн ₽");
     expect(value).not.toHaveAttribute("data-loading");
-    // The data enters with the region swap's fade-in.
-    expect(value.className).toMatch(/swapIn/);
+    // The data replaces the Skeleton with the region swap's short fade.
+    expect(value.className).toMatch(/settleIn/);
     expect(screen.getByTestId("delta")).toHaveTextContent("+18%");
     expect(screen.getByTestId("meta")).toHaveTextContent("Сделок 186");
   });
@@ -209,6 +257,6 @@ describe("Card", () => {
       </Card.Root>,
     );
     expect(screen.getByTestId("kpi")).not.toHaveAttribute("aria-busy");
-    expect(screen.getByTestId("value").className).not.toMatch(/swapIn/);
+    expect(screen.getByTestId("value").className).not.toMatch(/swapIn|settleIn/);
   });
 });

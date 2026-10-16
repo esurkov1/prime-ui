@@ -8,6 +8,7 @@
  * States come from the box itself or the native control inside it, so hosts only render markup:
  *   focus     :focus-visible on the box or on its input / textarea
  *   invalid   data-invalid / aria-invalid on the box, or aria-invalid on its direct input
+ *   valid     data-valid on the box (a success ring; invalid wins)
  *   disabled  :disabled / data-disabled on the box, or a disabled input / textarea inside
  *   read-only data-readonly on the box, or a read-only direct input (no hover wash)
  * `data-focus-ring="false"` on the box or an ancestor hides only the focus ring (WCAG 2.4.7).
@@ -50,6 +51,11 @@
   ) {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* A valid value (`data-valid` on the box): a success inset ring. Invalid, below, outranks it. */
+.surface[data-valid="true"] {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-success-border);
 }
 
 .surface:is(

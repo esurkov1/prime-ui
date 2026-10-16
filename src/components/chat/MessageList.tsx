@@ -35,6 +35,7 @@ import {
   useMessageList,
 } from "@/internal/messageList";
 import { MessageHighlightContext } from "@/internal/messagePart";
+import { useEnterOnAppear } from "@/internal/partPresence";
 import { createReadReceipts, type ReadReceipts } from "@/internal/readReceipts";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
@@ -997,7 +998,9 @@ export function ChatSelectionBar({ className, children, ref, ...rest }: ChatSele
   const { container, labels } = React.useContext(ChromeContext);
   const selected = useListSelection();
   const barRef = React.useRef<HTMLDivElement>(null);
-  const mergedRef = useMergedRefs(barRef, ref);
+  // It rises in when selection starts on a shown chat, not when the chat mounts selecting.
+  const appear = useEnterOnAppear<HTMLDivElement>();
+  const mergedRef = useMergedRefs(barRef, appear.ref, ref);
   useBottomBar(barRef, container, selected !== null);
   if (selected === null) return null;
   const count = formatLabel(labels.selectedCount, { count: selected.length });
@@ -1006,7 +1009,7 @@ export function ChatSelectionBar({ className, children, ref, ...rest }: ChatSele
       ref={mergedRef}
       role="toolbar"
       aria-label={count}
-      className={cx(styles.selectionBar, enterMotion.enter, className)}
+      className={cx(styles.selectionBar, appear.entering && enterMotion.enter, className)}
       data-depth="floating"
       {...rest}
     >

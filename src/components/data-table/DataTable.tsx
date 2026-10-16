@@ -16,10 +16,11 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { usePartPresence } from "@/internal/partPresence";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import { ToolChips, ToolRow } from "@/internal/ToolRow";
+import { ToolCell, ToolChips, ToolRow } from "@/internal/ToolRow";
 import { useFlipList } from "@/internal/useFlipList";
 import { ColumnsMenu, type ColumnsMenuReorder, lockedInChooser } from "./ColumnsMenu";
 import { orderColumns, placeColumn } from "./columnOrder";
@@ -29,6 +30,7 @@ import { Head, type HeadColumnReorder } from "./Head";
 import { DataTableRow, GroupRow, MeasureBody, type RowShared } from "./Row";
 import { ReorderBody, ReorderRoot, useRowReorder } from "./reorder";
 import { type FlatRow, flatten, groupRows, nextSort, scaleDomains, sortRows } from "./rows";
+import { SelectionMenu } from "./SelectionMenu";
 import { StateRows } from "./StateRows";
 import { rowsChange } from "./serverMode";
 import type {
@@ -72,6 +74,10 @@ export type DataTableLabels = {
   expand: string;
   /** `aria-label` of the expand toggle of an expanded row. */
   collapse: string;
+  /** Text of the menu button of the actions on the selected rows (`renderSelectionActions`). */
+  selectionActions: string;
+  /** The first item of the selection actions menu: clears the selection. */
+  clearSelection: string;
   /** Name and tooltip of the column chooser (`columnsMenu`); `{shown}` and `{total}` are counts. */
   columns: string;
   /** The heading of the column chooser's list of columns. */
@@ -103,6 +109,8 @@ export const DATA_TABLE_LABELS: DataTableLabels = {
   selectAll: "Выбрать все строки",
   selectRow: "Выбрать строку {label}",
   selectedCount: "Выбрано: {count}",
+  selectionActions: "Действия",
+  clearSelection: "Снять выбор",
   expand: "Развернуть строку {label}",
   collapse: "Свернуть строку {label}",
   columns: "Колонки",
@@ -180,6 +188,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   loadingRows?: number;
   toolbar?: React.ReactNode;
   toolbarChips?: React.ReactNode;
+  renderSelectionActions?: (selected: React.Key[]) => React.ReactNode;
   getRowGroup?: (row: Row) => string | number;
   renderGroupHeader?: (group: DataTableGroup<Row>) => React.ReactNode;
   stickyGroupHeaders?: boolean;
@@ -305,6 +314,7 @@ export function DataTable<Row>({
   loadingRows,
   toolbar,
   toolbarChips,
+  renderSelectionActions,
   getRowGroup,
   renderGroupHeader,
   stickyGroupHeaders = false,
@@ -691,6 +701,16 @@ export function DataTable<Row>({
     announce: (count) => formatLabel(labels.selectedCount, { count }),
   });
 
+  // The actions on the selected rows: a menu button last in the tool row while rows are selected.
+  const selectedKeys = selection.selectedKeys ?? EMPTY_KEYS;
+  const showSelectionActions = renderSelectionActions != null && selectedKeys.length > 0;
+  const selectionActions = usePartPresence<HTMLDivElement>({
+    present: showSelectionActions,
+    axis: "inline",
+  });
+  const hasToolbar = toolbar != null || toolbarChips != null || showSelectionActions;
+  const toolbarPresence = usePartPresence<HTMLDivElement>({ present: hasToolbar, axis: "block" });
+
   // ─── States ───
   const hasError = loadError != null && loadError !== false;
   const showSkeleton = !hasError && loading && displayedCount === 0;
@@ -699,7 +719,9 @@ export function DataTable<Row>({
   /* Body state swaps (loading → rows → empty / error) fade in place: rows cannot be laid over a
      table, so the body remounts under its state key and fades in; the first render, sorting and
      paging stay still (same state). A replaced server page (`rowArrival.batch`) swaps the same way. */
-  const { key: bodyKey, className: swapClass } = useSwapIn(`${bodyState}-${rowArrival.batch}`);
+  const { key: bodyKey, className: swapClass } = useSwapIn(
+    bodyState === "loading" ? bodyState : `${bodyState}-${rowArrival.batch}`,
+  );
   // A row grip leads or ends its row (`reorderHandle`), or the row itself is the grip.
   const rowHandle = reorder.enabled ? reorderHandle : null;
   const gripStart = rowHandle === "start";
@@ -1070,9 +1092,31 @@ export function DataTable<Row>({
             })}
           >
             {/* The table's own tools: the one tool row (as `Page.Tools`), the active filters under it. */}
-            {toolbar != null || toolbarChips != null ? (
-              <div className={styles.toolbar}>
-                {toolbar != null ? <ToolRow>{toolbar}</ToolRow> : null}
+            {hasToolbar ? (
+              <div
+                ref={toolbarPresence.ref}
+                className={cx(styles.toolbar, toolbarPresence.className)}
+              >
+                {toolbar != null || showSelectionActions ? (
+                  <ToolRow>
+                    {toolbar}
+                    {showSelectionActions ? (
+                      <ToolCell
+                        key="\u0000selection"
+                        ref={selectionActions.ref}
+                        className={selectionActions.className}
+                      >
+                        <SelectionMenu
+                          selected={selectedKeys}
+                          actions={renderSelectionActions(selectedKeys)}
+                          onClear={selection.clear}
+                          labels={labels}
+                          size={size}
+                        />
+                      </ToolCell>
+                    ) : null}
+                  </ToolRow>
+                ) : null}
                 {toolbarChips != null ? <ToolChips>{toolbarChips}</ToolChips> : null}
               </div>
             ) : null}

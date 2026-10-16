@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
-
+import { DEFAULT_DATEPICKER_PRESETS } from "@/components/datepicker/Datepicker";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { matchIndex } from "@/internal/HighlightMatch";
@@ -484,6 +484,39 @@ describe("SmartFilter range, single and grouped fields", () => {
     );
     const chip = within(chips() as HTMLElement).getByText(/^Период: /);
     expect(chip.textContent).toMatch(/1.*15 мар/);
+  });
+
+  it("a period with `calendar` gets presets and «Применить», and the chip names the preset", async () => {
+    const user = userEvent.setup();
+    const onValue = vi.fn();
+    const today = new Date(2026, 2, 20);
+    const fields: SmartFilterField[] = [
+      {
+        key: "period",
+        label: "Период",
+        kind: "date-range",
+        calendar: { presets: DEFAULT_DATEPICKER_PRESETS, months: 2, footer: true, today },
+      },
+    ];
+    render(
+      <Harness
+        fields={fields}
+        onValue={onValue}
+        initial={{ period: { from: new Date(2026, 2, 1), to: today } }}
+      />,
+    );
+    expect(within(chips() as HTMLElement).getByText("Период: Этот месяц")).toBeInTheDocument();
+    openPanel();
+    const trigger = screen
+      .getAllByRole("button", { name: "Период: Этот месяц" })
+      .find((button) => button.getAttribute("aria-haspopup") === "dialog");
+    await user.click(trigger as HTMLElement);
+    expect(screen.getByRole("button", { name: "Применить" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Прошлый месяц" }));
+    expect(onValue).toHaveBeenLastCalledWith({
+      period: { from: new Date(2026, 1, 1), to: expect.any(Date) },
+    });
+    expect(within(chips() as HTMLElement).getByText("Период: Прошлый месяц")).toBeInTheDocument();
   });
 
   it("a single-value field picks one value and has no hide action", () => {

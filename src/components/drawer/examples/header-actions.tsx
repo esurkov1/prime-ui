@@ -1,11 +1,22 @@
-/** A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller; on a phone, where the title has no room beside them, they move under it — `Drawer.Actions`. */
-import { Badge, Button, DescriptionList, Drawer, Dropdown, Icon } from "prime-ui-kit";
+/** The one header of a record: the avatar, the name, its statuses leading the line under it, and only buttons at the end — `Drawer.Icon`, `Drawer.Description`, `Drawer.Actions`. */
+import {
+  Avatar,
+  Badge,
+  Button,
+  DescriptionList,
+  Drawer,
+  Dropdown,
+  Icon,
+  Tooltip,
+} from "prime-ui-kit";
 
-const DEAL = {
-  title: "Сделка №1042",
-  client: "ООО «Северный ветер»",
-  amount: "480 000 ₽",
-  owner: "Анна Соколова",
+const MEMBER = {
+  name: "Анна Соколова",
+  initials: "АС",
+  email: "a.sokolova@severnyveter.ru",
+  role: "Менеджер",
+  team: "Продажи",
+  since: "12 марта 2024",
 };
 
 export default function DrawerHeaderActionsExample() {
@@ -13,46 +24,56 @@ export default function DrawerHeaderActionsExample() {
     <Drawer.Root>
       <Drawer.Trigger>
         <Button.Root variant="soft" tone="neutral">
-          Открыть сделку
+          Открыть сотрудника
         </Button.Root>
       </Drawer.Trigger>
       <Drawer.Content>
         <Drawer.Header>
-          <Drawer.Title>{DEAL.title}</Drawer.Title>
-          <Drawer.Description>{DEAL.client}</Drawer.Description>
+          <Drawer.Icon>
+            <Avatar.Root color="purple">
+              <Avatar.Fallback>{MEMBER.initials}</Avatar.Fallback>
+            </Avatar.Root>
+          </Drawer.Icon>
+          <Drawer.Title>{MEMBER.name}</Drawer.Title>
+          <Drawer.Description>
+            <Badge.Root color="blue">{MEMBER.role}</Badge.Root>
+            <Badge.Root tone="success">Активна</Badge.Root>
+            {MEMBER.email}
+          </Drawer.Description>
           <Drawer.Actions>
-            <Badge.Root tone="success">Выиграна</Badge.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="ghost" tone="neutral" aria-label="Скопировать ссылку">
+                  <Button.Icon>
+                    <Icon name="action.copy" />
+                  </Button.Icon>
+                </Button.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Скопировать ссылку</Tooltip.Content>
+            </Tooltip.Root>
             <Dropdown.Root>
               <Dropdown.Trigger>
-                <Button.Root variant="ghost" tone="neutral" aria-label="Действия со сделкой">
+                <Button.Root variant="ghost" tone="neutral" aria-label="Действия с сотрудником">
                   <Button.Icon>
                     <Icon name="action.more" />
                   </Button.Icon>
                 </Button.Root>
               </Dropdown.Trigger>
               <Dropdown.Content>
-                <Dropdown.Item>Дублировать</Dropdown.Item>
-                <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
+                <Dropdown.Item>Сменить роль</Dropdown.Item>
+                <Dropdown.Item>Сбросить пароль</Dropdown.Item>
                 <Dropdown.Separator />
-                <Dropdown.Item tone="danger">Удалить сделку</Dropdown.Item>
+                <Dropdown.Item tone="danger">Отключить доступ</Dropdown.Item>
               </Dropdown.Content>
             </Dropdown.Root>
           </Drawer.Actions>
         </Drawer.Header>
         <Drawer.Body>
           <DescriptionList.Root>
-            <DescriptionList.Item label="Сумма">{DEAL.amount}</DescriptionList.Item>
-            <DescriptionList.Item label="Ответственный">{DEAL.owner}</DescriptionList.Item>
+            <DescriptionList.Item label="Команда">{MEMBER.team}</DescriptionList.Item>
+            <DescriptionList.Item label="В компании с">{MEMBER.since}</DescriptionList.Item>
           </DescriptionList.Root>
         </Drawer.Body>
-        <Drawer.Footer>
-          <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral">
-              Закрыть
-            </Button.Root>
-          </Drawer.Close>
-          <Button.Root>Выставить счёт</Button.Root>
-        </Drawer.Footer>
       </Drawer.Content>
     </Drawer.Root>
   );

@@ -11,7 +11,7 @@ import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 
 import styles from "./DataTable.module.css";
-import { columnSizeStyle } from "./Row";
+import { columnSizeProps } from "./Row";
 import type { DataTableColumn, DataTableSortState } from "./types";
 
 const ARIA_SORT = { asc: "ascending", desc: "descending" } as const;
@@ -178,7 +178,7 @@ export function Head<Row>({
           stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
           stickyLastColumn && isLastColumn && styles.lastColumnSticky,
         ),
-        style: columnSizeStyle(column),
+        ...columnSizeProps(column),
         "data-align": column.headerAlign ?? "start",
         "data-sorted": order ? "true" : undefined,
         "aria-sort": column.sortable ? (order ? ARIA_SORT[order] : "none") : undefined,

@@ -88,6 +88,12 @@ export const page: ComponentPageConfig = {
         "Теги клиента как одно значение: ряд переносится в узкой колонке и держит один зазор между бейджами — `Badge.Group`, `size`.",
     },
     {
+      scenario: "overflow-count",
+      title: "Одна строка с «+N»",
+      description:
+        "Разделы каждой роли в одну строку узкой ячейки: что не поместилось, ждёт за «+N» с полным списком в подсказке — `Badge.Group`, `overflow`.",
+    },
+    {
       slot: "controlled",
       description:
         "Города доставки как чипы-переключатели, состоянием которых владеет экран: сводка считает выбранные — `pressed`, `onPressedChange`.",

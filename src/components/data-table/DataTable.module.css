@@ -244,8 +244,23 @@
 
 /* A `grow` column takes the free width and wraps: the table fills its container and may shrink
    below its content width (other columns keep their minimum). */
-.root[data-table-width="grow"] .table {
+.root[data-table-width="grow"] .table:not([data-measuring]) {
   width: 100%;
+}
+
+.table:not([data-measuring]) > :is(thead, tbody) > tr > [data-grow="true"] {
+  width: 100%;
+}
+
+/* While the widths are measured (`useFrozenColumns`) the table hugs its content and a `grow`
+   column asks for no width beyond its narrowest: every other column measures at its natural
+   width — a whole header, a fixed `width` — while the container has room for it. */
+.root[data-table-width="grow"] .table[data-measuring] {
+  width: auto;
+}
+
+.table[data-measuring] > :is(thead, tbody) > tr > [data-grow="true"] {
+  width: var(--prime-space-0);
 }
 
 /* The leading utility columns (`--dt-lead`): the sticky first column stands after them and the

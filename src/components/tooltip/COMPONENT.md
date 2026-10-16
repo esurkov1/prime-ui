@@ -110,7 +110,7 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| open / closed | hover (mouse, pen) or focus after `delayDuration`; `open` / `defaultOpen` / `onOpenChange` | `data-state="open" \| "closed"` on the chip (closed during the exit) and on the trigger |
+| open / closed | hover (mouse, pen) or keyboard focus after `delayDuration` (not the focus a click causes or a dialog moves in after a click); `open` / `defaultOpen` / `onOpenChange` | `data-state="open" \| "closed"` on the chip (closed during the exit) and on the trigger |
 | closing | blur, a press on the trigger, Escape, pointer leaving (unless it moves onto the chip) | — |
 | warm group | another tooltip of the Provider was just shown | `data-instant="true"`: opens and leaves without motion |
 | side | `side` and the room around the trigger | `data-side` (resolved), `data-align` |
@@ -128,7 +128,7 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 
 | Key | Action |
 |---|---|
-| `Tab` | Focus on the trigger opens the tooltip after the delay. |
+| `Tab` | Keyboard focus on the trigger opens the tooltip after the delay; focus a click causes, or a layer moves in after a click, does not. |
 | `Escape` | Hides the tooltip; focus stays on the trigger. |
 
 ### ARIA
@@ -137,7 +137,7 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 - The chip is `role="tooltip"`; while open the trigger points at it with `aria-describedby` (appended to the child's own).
 - `Tooltip.Trigger` composes the child's `ref`, sets `data-state` and chains the child's `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus` and `onBlur`.
 - The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.
-- The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.
+- The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, keyboard focus does.
 - Tooltip has no `closeOnEscape` / `closeOnOutsideClick` (foundation §8): it closes on pointer-leave, blur, a press on the trigger and Escape, and Escape cannot be turned off — WCAG 1.4.13 requires the chip to be dismissable without moving the pointer or focus.
 - A `disabled` control (its own prop or a disabled `Fieldset`) is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control. Around a button the host is that button for assistive tech — `role="button"`, `aria-disabled`, named by the control through `aria-labelledby` — and the control itself leaves the tree.
 - A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.

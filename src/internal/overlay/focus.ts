@@ -34,17 +34,30 @@ export function hasNativeTabStop(el: HTMLElement): boolean {
 }
 
 /**
+ * Where focus lands in a layer that just opened: `tabStop` — its first tab stop; `container` — the
+ * layer itself (a record panel: the person hears its name and description, and Tab goes on to the
+ * first control).
+ */
+export type FocusStart = "tabStop" | "container";
+
+/**
  * Moves focus into a layer that just opened, unless focus is already inside (a child `autoFocus`):
  * the first match of `first` (a menu's first enabled item, which is no tab stop of its own), else
- * `[data-autofocus]`, else the first tab stop, else the container itself. `quiet` — a pointer
- * opened the layer: focus lands without the focus ring until the person turns to the keyboard.
+ * `[data-autofocus]`, else per `start` the first tab stop, else the container itself. `quiet` — a
+ * pointer opened the layer: focus lands without the focus ring until the person turns to the
+ * keyboard.
  */
-export function focusInto(container: HTMLElement, first?: string, quiet = false): void {
+export function focusInto(
+  container: HTMLElement,
+  first?: string,
+  quiet = false,
+  start: FocusStart = "tabStop",
+): void {
   if (container.contains(document.activeElement)) return;
   const target =
     (first ? container.querySelector<HTMLElement>(first) : null) ??
     container.querySelector<HTMLElement>("[data-autofocus]") ??
-    getFocusable(container)[0] ??
+    (start === "tabStop" ? getFocusable(container)[0] : undefined) ??
     container;
   focusQuietly(target, quiet);
 }
@@ -143,6 +156,20 @@ function focusTarget(container: HTMLElement): HTMLElement {
   return container;
 }
 
+/**
+ * Whether focus on `el` came from the keyboard, so a part that shows on focus (a tooltip) may
+ * show: the last input was a key (or nothing yet, as `:focus-visible` has it), and `el` is not
+ * focused quietly (a layer a pointer opened or closed). Focus a click causes, or a layer moves after
+ * a click, is no keyboard focus — read from the input itself, since `:focus-visible` is not
+ * reported everywhere (jsdom) and a quiet focus keeps it until the next key.
+ */
+export function focusFromKeyboard(el: Element): boolean {
+  return lastInput !== "pointer" && !el.hasAttribute("data-focus-quiet");
+}
+
+/** The last input of the person: a press or a key (modifiers alone do not count). */
+let lastInput: "pointer" | "keyboard" | null = null;
+
 /** A press this recent opened the layer; an older one did not (a key did). */
 const PRESS_OPENS_MS = 1000;
 
@@ -159,14 +186,16 @@ if (typeof document !== "undefined") {
       const target = event.target instanceof Element ? event.target : null;
       const control = target?.closest<HTMLElement>(`${NATIVE_TAB_STOP}, ${FOCUSABLE}`) ?? null;
       press = { control, target, time: performance.now() };
+      lastInput = "pointer";
     },
     true,
   );
   // A key after the press is what acts next (Enter on a focused button): the press no longer counts.
   document.addEventListener(
     "keydown",
-    () => {
+    (event) => {
       press = null;
+      if (!MODIFIERS.has(event.key)) lastInput = "keyboard";
     },
     true,
   );

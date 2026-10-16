@@ -1,6 +1,7 @@
-/** Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip, and the bounds go to the server as from / to parameters — `kind`, `formatValue`, `matchesSmartFilter`, `isSmartFilterRange`. */
+/** Deals narrowed by an amount from–to and a period from a calendar with presets, two months and an Apply footer; each range is one readable chip, and the bounds go to the server as from / to parameters — `kind`, `formatValue`, `calendar`, `matchesSmartFilter`, `isSmartFilterRange`. */
 import {
   Card,
+  DEFAULT_DATEPICKER_PRESETS,
   formatDateValue,
   isSmartFilterRange,
   matchesSmartFilter,
@@ -17,7 +18,12 @@ const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
 
 const FIELDS: SmartFilterField[] = [
   { key: "amount", label: "Сумма", kind: "range", formatValue: formatRubles },
-  { key: "closed", label: "Период", kind: "date-range" },
+  {
+    key: "closed",
+    label: "Период",
+    kind: "date-range",
+    calendar: { presets: DEFAULT_DATEPICKER_PRESETS, months: 2, prompt: true, footer: true },
+  },
   {
     key: "stage",
     label: "Этап",

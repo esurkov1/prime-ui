@@ -9,7 +9,7 @@ import { SmartFilter } from "@/components/smart-filter/SmartFilter";
 import { Typography } from "@/components/typography/Typography";
 import { cssRule, cssValue } from "@/test/css";
 
-import { ToolChips, ToolGroup, ToolRow } from "./ToolRow";
+import { ToolCell, ToolChips, ToolGroup, ToolRow } from "./ToolRow";
 
 const CSS = "src/internal/ToolRow.module.css";
 
@@ -39,6 +39,22 @@ describe("ToolRow", () => {
     const row = screen.getByTestId("row");
     expect(kinds(row)).toEqual(["grow", "share", "fixed", "grow", "grow"]);
     for (const cell of Array.from(row.children)) expect(cell.children).toHaveLength(1);
+  });
+
+  it("stands a host's own cell in the row as given, a fixed cell", () => {
+    render(
+      <ToolRow data-testid="row">
+        <Button.Root>Экспорт</Button.Root>
+        <ToolCell className="own" data-testid="cell">
+          <Button.Root>Действия</Button.Root>
+        </ToolCell>
+      </ToolRow>,
+    );
+    const row = screen.getByTestId("row");
+    const cell = screen.getByTestId("cell");
+    expect(cell.parentElement).toBe(row);
+    expect(cell).toHaveClass("own");
+    expect(kinds(row)).toEqual(["fixed", "fixed"]);
   });
 
   it("fills by default and keeps one natural line without fill", () => {

@@ -6,11 +6,9 @@
  */
 import * as React from "react";
 
-import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
-import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { COMPACT_QUERY } from "@/hooks/breakpoints";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useEnterConfirm } from "@/hooks/useEnterConfirm";
@@ -27,6 +25,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
+import { useMediaSlotHost } from "@/internal/mediaSlot";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { splitParts } from "@/internal/parts";
@@ -39,6 +38,7 @@ import textRole from "@/internal/textRole.module.css";
 
 import styles from "./DialogParts.module.css";
 import { SheetHandle } from "./FloatingPanel";
+import type { FocusStart } from "./focus";
 import { LayerProvider } from "./layerStack";
 import { useOpenState } from "./useOpenState";
 
@@ -224,6 +224,8 @@ type DialogPanelProps = React.HTMLAttributes<HTMLDivElement> & {
   enterConfirm?: boolean;
   /** The tier of the controls inside (Modal: `m`); without it they keep the surrounding tier. */
   controlSize?: ControlSize;
+  /** Where focus lands on open (`useModalLayer`): the first tab stop, or the panel (Drawer). */
+  focusStart?: FocusStart;
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -271,6 +273,7 @@ function DialogPanelBody({
   overlayClassName,
   enterConfirm = false,
   controlSize,
+  focusStart,
   className,
   children,
   "aria-label": ariaLabel,
@@ -290,6 +293,7 @@ function DialogPanelBody({
     closeOnEscape: root.closeOnEscape,
     closeOnOutsideClick: root.closeOnOutsideClick,
     onDismiss: root.requestClose,
+    focusStart,
   });
   const panelRef = useMergedRefs(layerRef, ref);
   const compact = useMediaQuery(COMPACT_QUERY, swipePolicy === "compact");
@@ -324,7 +328,10 @@ function DialogPanelBody({
   const content = (
     <DialogShellProvider value={shell.value}>
       <LayerProvider value={layer}>
-        <SurfaceDepthProvider value="floating">{children}</SurfaceDepthProvider>
+        {/* A dialog opened from another one's footer starts outside any footer. */}
+        <DialogFooterContext.Provider value={false}>
+          <SurfaceDepthProvider value="floating">{children}</SurfaceDepthProvider>
+        </DialogFooterContext.Provider>
       </LayerProvider>
     </DialogShellProvider>
   );
@@ -477,19 +484,11 @@ export type DialogIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "child
 };
 
 /**
- * A person or an object stands for itself: a picture child needs no filled tile around it. An
- * avatar fills the 40px icon box (size `l`); a thumbnail keeps its `m` height (40) and its ratio.
+ * The leading mark: a glyph on the tone tile, or the record's picture (an `Avatar.Root` or a
+ * `Thumbnail.Root` anywhere inside, internal/mediaSlot) with no tile, at the tile's 40 box.
  */
-function mediaOf(children: React.ReactNode): React.ReactNode | null {
-  if (!React.isValidElement(children)) return null;
-  if (children.type === Avatar.Root) {
-    return React.cloneElement(children as React.ReactElement<AvatarRootProps>, { size: "l" });
-  }
-  return children.type === Thumbnail.Root ? children : null;
-}
-
 export function DialogIcon({ tone = "neutral", children, className, ...rest }: DialogIconProps) {
-  const media = mediaOf(children);
+  const { media, provide } = useMediaSlotHost();
   return (
     <span
       {...rest}
@@ -498,7 +497,7 @@ export function DialogIcon({ tone = "neutral", children, className, ...rest }: D
       data-media={media ? true : undefined}
       aria-hidden="true"
     >
-      {media ?? children}
+      {provide(children)}
     </span>
   );
 }
@@ -507,16 +506,33 @@ DialogIcon.displayName = "Dialog.Icon";
 // ─── Title / Description ──────────────────────────────────────────────────────
 
 export type DialogTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "id"> & {
+  loading?: boolean;
   ref?: React.Ref<HTMLHeadingElement>;
 };
 
-export function DialogTitle({ className, ...rest }: DialogTitleProps) {
+/**
+ * The dialog's name. While it loads (`loading`: a record opened by a link knows only its id) a
+ * Skeleton holds the title line, so the header never moves when the name arrives; the name then
+ * fades in under the same element.
+ */
+export function DialogTitle({ loading = false, className, children, ...rest }: DialogTitleProps) {
   const { titleId, registerTitle } = useDialogShell("Title");
+  const swap = useSwapIn(loading ? "loading" : "data");
   React.useLayoutEffect(() => {
     registerTitle(true);
     return () => registerTitle(false);
   }, [registerTitle]);
-  return <h2 id={titleId} className={cx(textRole.titleM, styles.title, className)} {...rest} />;
+  return (
+    <h2
+      {...rest}
+      key={swap.key}
+      id={titleId}
+      aria-busy={loading || undefined}
+      className={cx(textRole.titleM, styles.title, swap.className, className)}
+    >
+      {loading ? <Skeleton size="l" className={styles.titleSkeleton} /> : children}
+    </h2>
+  );
 }
 DialogTitle.displayName = "Dialog.Title";
 
@@ -528,6 +544,9 @@ export type DialogDescriptionProps = Omit<React.HTMLAttributes<HTMLParagraphElem
 /**
  * The line under the title. While its data loads (`loading`) it keeps its place with a Skeleton, so
  * the header never moves when the data arrives; the data then fades in under the same element.
+ * The record's status badges lead it: a Badge inside takes chip tier `s` (one step under the `m`
+ * it provides), the height of the line, and the badges stand before the text whatever the order
+ * they are written in.
  */
 export function DialogDescription({
   loading = false,
@@ -549,7 +568,11 @@ export function DialogDescription({
       aria-busy={loading || undefined}
       className={cx(textRole.bodyS, styles.description, swap.className, className)}
     >
-      {loading ? <Skeleton size="xs" className={styles.descriptionSkeleton} /> : children}
+      {loading ? (
+        <Skeleton size="xs" className={styles.descriptionSkeleton} />
+      ) : (
+        <ControlSizeProvider value="m">{children}</ControlSizeProvider>
+      )}
     </p>
   );
 }
@@ -629,12 +652,26 @@ export type DialogActionsProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** The footer around a part: there `Actions` is the footer's start group. */
+const DialogFooterContext = React.createContext(false);
+
 /**
- * A row of controls at the end of the header, before the close button: a status Badge, a ⋯
- * Dropdown, an icon button. Controls inside take tier `s`, the close button's tier.
+ * The buttons at the end of the header, before the close button: ghost icon buttons (each named,
+ * with a Tooltip) and a ⋯ Dropdown — never a status, which leads the `Description`. They take tier
+ * `s`, the close button's, and sit on the title's line. In the footer
+ * it is the start group — an action apart from the main pair («Удалить», «Выйти») — and its
+ * buttons keep the footer's tier.
  */
 export function DialogActions({ className, children, ...rest }: DialogActionsProps) {
   useDialogShell("Actions");
+  const inFooter = React.useContext(DialogFooterContext);
+  if (inFooter) {
+    return (
+      <div className={cx(styles.footerStart, className)} {...rest}>
+        {children}
+      </div>
+    );
+  }
   return (
     <div className={cx(fieldTierClass, styles.actions, className)} data-size="s" {...rest}>
       <ControlSizeProvider value="s">{children}</ControlSizeProvider>
@@ -730,26 +767,32 @@ export type DialogFooterProps = React.HTMLAttributes<HTMLElement> & {
 
 /**
  * Actions in DOM order, primary last. Stacks full width when the dialog is narrower than 360px.
- * With a `Meta` the buttons move as one row: when the line runs short the status text goes above
- * them first, so the buttons never split over two lines while there is room for them in one.
+ * An `Actions` holds the start group (an action apart from the main pair) and a `Meta` the status
+ * text, both at the start; the buttons then move as one row at the end: when the line runs short
+ * the start goes above them first, so the buttons never split over two lines while there is room
+ * for them in one. Stacked, the start comes first and the primary stays last.
  */
 export function DialogFooter({ layout, className, children, ...rest }: DialogFooterProps) {
   const { footerLayout } = useDialogShell("Footer");
-  const { parts: meta, rest: actions } = splitParts(children, DialogMeta);
+  const { parts: start, rest: other } = splitParts(children, DialogActions);
+  const { parts: meta, rest: actions } = splitParts(other, DialogMeta);
   return (
     <footer
       className={cx(hairline.top, styles.footer, className)}
       data-layout={layout ?? footerLayout}
       {...rest}
     >
-      {meta.length > 0 ? (
-        <>
-          {meta}
-          <div className={styles.footerActions}>{actions}</div>
-        </>
-      ) : (
-        children
-      )}
+      <DialogFooterContext.Provider value={true}>
+        {start.length + meta.length > 0 ? (
+          <>
+            {start}
+            {meta}
+            <div className={styles.footerActions}>{actions}</div>
+          </>
+        ) : (
+          children
+        )}
+      </DialogFooterContext.Provider>
     </footer>
   );
 }

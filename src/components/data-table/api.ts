@@ -181,8 +181,14 @@ export const api: ComponentApi = {
         {
           name: "toolbar",
           type: "ReactNode",
-          en: "The table's own tools row — search, filter, `DataTableColumnsMenu`, a view, bulk actions; two or more, unwrapped. Laid out as `Page.Tools`: the search takes the free room, the rest keep their width at the end.",
-          ru: "Своя строка инструментов таблицы — поиск, фильтр, `DataTableColumnsMenu`, вид, массовые действия; два и больше, без обёртки. Раскладка как у `Page.Tools`: поиск занимает свободное место, остальные — в конце.",
+          en: "The table's own tools row — search, filter, `DataTableColumnsMenu`, a view; two or more, as direct children or a fragment (a wrapper component is one cell). Laid out as `Page.Tools`.",
+          ru: "Своя строка инструментов таблицы — поиск, фильтр, `DataTableColumnsMenu`, вид; два и больше, напрямую или фрагментом (своя обёртка — одна ячейка). Раскладка как у `Page.Tools`.",
+        },
+        {
+          name: "renderSelectionActions",
+          type: "(selected: Key[]) => ReactNode",
+          en: "`Dropdown.Item`s acting on the selected keys: while rows are selected, a menu button with the count enters last in the tool row, after the `toolbar`; its first item clears the selection.",
+          ru: "`Dropdown.Item` для выбранных ключей: пока строки выбраны, последней в строке инструментов, после `toolbar`, появляется кнопка меню со счётчиком; первый пункт снимает выбор.",
         },
         {
           name: "toolbarChips",
@@ -666,6 +672,14 @@ export const api: ComponentApi = {
     selectedCount: {
       en: "Polite announcement after the selection changes.",
       ru: "Вежливое объявление после смены выбора.",
+    },
+    selectionActions: {
+      en: "Text of the menu button of the actions on the selected rows; its name adds the count.",
+      ru: "Текст кнопки меню действий над выбранными строками; к её имени добавляется счётчик.",
+    },
+    clearSelection: {
+      en: "The first item of the selection actions menu: clears the selection.",
+      ru: "Первый пункт меню действий над выбором: снимает выбор.",
     },
     expand: {
       en: "Name of the toggle of a collapsed row.",

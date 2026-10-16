@@ -83,6 +83,7 @@ export const darkThemeOverrides = {
       fg: "{color.gray.950}",
       soft: "color-mix(in srgb, {color.green.500} 16%, transparent)",
       text: "{color.green.300}",
+      border: "{color.green.400}",
     },
     warning: {
       default: "{color.orange.400}",

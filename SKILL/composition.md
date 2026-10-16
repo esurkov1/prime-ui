@@ -13,10 +13,10 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 
 | Screen | Main component | File | Shows |
 |---|---|---|---|
-| [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, SmartFilter search and filters, export and one primary action in the page's top bar; statuses, row menu, pages, filtered empty state |
+| [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, export and one primary action in the page's top bar; the table's SmartFilter search and filters in its own `toolbar`, the chips under it, the column chooser over the row menu; statuses, pages, filtered empty state |
 | [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | a nested record: the path ending in the title, status and due date and the record's actions by weight in the top bar; main column + side column of Cards, Timeline |
 | [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, a card with its own header per section, form with its own save, Switches that apply at once, danger zone with a confirm |
-| [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts, search and the Drawer trigger in the top bar; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
+| [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts and the Drawer trigger in the top bar, the search in the table's toolbar; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
 | [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title and a line of description in `Page.Heading`, «Сохранить тариф» in `Page.Actions`, both in a `Page.Header` in the flow; a plan card edited in card sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
 | [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | the large title + a line of data in the flow, period switch and report in a collapsing `Page.TopBar`; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
 | [Screen states](#screen-states) | crossfade | [screen.tsx](../src/components/crossfade/examples/screen.tsx) | title + the statement date in `Page.TopBar`, page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
@@ -66,7 +66,7 @@ AppShell.Root                      once per app (layouts.md#app-frame-once-per-a
          │  │  ├─ Breadcrumb.Root  only on a nested record: the levels above this page
          │  │  ├─ Page.Title       the one h1, the path's last level
          │  │  └─ Page.Description a line of data
-         │  ├─ Page.Tools          what acts on the whole page — sections, a period, view; a one-list page's search
+         │  ├─ Page.Tools          what acts on the whole page — sections, a period, view; a filter over several views
          │  ├─ Page.Actions        every button of the page, each with an icon; the primary last
          │  └─ Page.Chips          SmartFilter.Chips: a line under everything, gone while empty
          └─ Page.Body              blocks 24 apart, the first 24 under the bar's controls
@@ -99,10 +99,10 @@ order is Heading, Tools, Actions, Chips whatever the JSX order.
   `Page.Description` under the whole line. The title is never a row of its own under the path, and
   the path never repeats the title as its last item.
 - **`Page.Tools`** — what acts on the whole page, as kit controls in the order a person reads them:
-  sections (a `SegmentedControl` with counts), the view, a period that drives several blocks; the
-  search and filter (`SmartFilter.Toolbar`) only when the page is one list
-  ([where the filters go](#where-the-filters-go)). Named with `aria-label`; no buttons and no
-  wrappers inside.
+  sections (a `SegmentedControl` with counts), the view, a period that drives several blocks; a
+  search and filter (`SmartFilter.Toolbar`) only when it governs more than one table — a board and
+  its list, a media grid ([where the filters go](#where-the-filters-go)). Named with `aria-label`;
+  no buttons and no wrappers inside.
 - **`Page.Actions`** — the one place for the page's buttons: secondary ones (`soft` + `neutral`)
   first, the primary (`solid`) last. Every Button carries a `Button.Icon` beside its label: the bar
   shows it as the icon alone when the line runs short.
@@ -287,19 +287,62 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 - **One primary per area** (the page, card, dialog, form): `solid`, last in its row. Secondary:
   `soft` + `tone="neutral"`. Dismiss / revert: `ghost` + `neutral` in pages and cards, `outline` +
-  `neutral` in Modal / Drawer footers. Rare actions: a `Dropdown` behind an `action.more` icon button —
-  `soft` + `neutral` in a header row (it has a shape beside the other buttons), `ghost` size `s` in a
-  table cell.
+  `neutral` in Modal / Drawer footers.
 - Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a work screen, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
-  `Modal.Footer` / `Drawer.Footer`; row actions in the last column; bulk actions in the table toolbar.
+  `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
+  table in its selection menu ([controls of a table](#controls-of-a-table)).
 - A dialog footer is the dialog's answer: Cancel and the primary. Deleting the record the dialog
-  edits is not a third footer button: it is the last `tone="danger"` item of a ⋯ `Dropdown` in
-  `Modal.Actions` / `Drawer.Actions`, confirmed by a `ConfirmDialog`.
+  edits is not a third footer button: it stands in `Modal.Actions` / `Drawer.Actions` of the header
+  by the menu threshold below, confirmed by a `ConfirmDialog`.
 - An empty state's action replaces the header's primary, it does not duplicate it.
 - Destructive: `tone="danger"`; a standalone trigger is `outline`, in a menu it is the last item, the
   confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
 - Going somewhere is a link (`LinkButton`, `Button.Root asChild` + `<a>`), doing something is a Button.
   One action — one label on the whole screen.
+
+### A menu from two actions
+
+An action that is alone stays in sight; a «⋯» only gathers. Count the secondary actions of one
+place — a page or dialog header, a table row, a card, a list row:
+
+| Actions | Shape |
+|---|---|
+| one | an icon-only `Button.Root` (`aria-label`) in a `Tooltip.Trigger` (`ghost` in a dialog header), or a labelled button where its row has room |
+| two or more | one `Dropdown` behind an `action.more` icon button — `soft` + `neutral` in a page header (a shape beside its neighbours), `ghost` in a dialog header, `ghost` size `s` in a table cell; destructive last, `tone="danger"` |
+
+A ⋯ with one item hides the only action behind a second press and a guess. Nothing else decides:
+not the density of the row, not the number of its columns, not the room left for later actions. A
+row of a `FieldList` follows the same count ([forms](#7-forms)).
+
+```tsx partial
+// bad — a menu for the one thing this header can do
+<Drawer.Actions>
+  <Dropdown.Root>
+    <Dropdown.Trigger>
+      <Button.Root variant="ghost" tone="neutral" aria-label="Другие действия">…</Button.Root>
+    </Dropdown.Trigger>
+    <Dropdown.Content>
+      <Dropdown.Item tone="danger">Удалить приглашение</Dropdown.Item>
+    </Dropdown.Content>
+  </Dropdown.Root>
+</Drawer.Actions>
+```
+
+```tsx good
+// good — one action in sight, named by its tooltip
+<Drawer.Actions>
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      <Button.Root variant="ghost" tone="danger" aria-label="Удалить приглашение">
+        <Button.Icon>
+          <Icon name="action.delete" />
+        </Button.Icon>
+      </Button.Root>
+    </Tooltip.Trigger>
+    <Tooltip.Content>Удалить приглашение</Tooltip.Content>
+  </Tooltip.Root>
+</Drawer.Actions>
+```
 
 ## 7. Forms
 
@@ -310,10 +353,10 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   columns. Never a label in every row, never numbered labels, never one record split over lines.
   FieldList draws every row's actions itself — the remove «×» and the handle after it, a pinned
   row's remove off with its reason (`labels.lockedReason`) — so never add your own.
-- The row's actions (`rowActions`): `"buttons"` (default) for short lists edited often on a desktop,
-  where moving rows is a main task — remove and handle in sight on every row; `"menu"` — one «⋯» with
-  «Выше», «Ниже», «Удалить» — for dense rows (three or more columns), touch-heavy screens, or a row
-  that would carry more than remove and move.
+- The row's actions (`rowActions`) follow [the menu threshold](#a-menu-from-two-actions): a row
+  that only removes shows its «×» (the default `"buttons"`, and the grip after it with
+  `reorderable`), however many columns it has; `"menu"` — one «⋯» with «Выше», «Ниже», «Удалить» —
+  only for a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag.
 - The look (`variant`): `"plain"` (default) when the list is the content of its card or section;
   `"surface"` when the list stands among other fields of a form or card, so its rows read as one
   block apart from the fields around it.
@@ -334,40 +377,46 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   section, the whole `Card.Root` inside `<form>`, buttons in `Card.Footer`.
 - Submit: `noValidate`, validate all, set `error`s, focus the first invalid field, `loading` on the
   submit button and the fields disabled (one `Fieldset disabled` per group of fields), then the
-  result: the form stays on screen → the button says «Сохранено»; the form goes away (closes,
-  navigates) → a `Notification`; a failure → a `Notification` or the field's `error`.
+  result: the save button stays on screen → it says «Сохранено»; the button goes away (the dialog
+  closes, the page navigates, the button shows only while dirty) → a `Notification`; a failure → a `Notification` or the field's `error`.
 - A footer button outside the form submits it with `form={formId}`.
-- Choice controls: Checkbox when the value is submitted later, Switch when it applies at once (no Save
-  in that section), `Radio.Group label` for one of a few visible options
-  ([choosing.md](choosing.md#2-inside-a-category)).
+- Choice controls are picked by what the value means, not by when it saves:
+  [choosing.md](choosing.md#a-flag-a-level-a-set).
 
 ## 8. Tables and lists
 
 ### Where the filters go
 
-A filter stands next to what it filters.
+A control stands with what it changes. Ask of each one: what does it narrow or switch?
 
-- `Page.TopBar` holds only what acts on the whole page: the heading with its line of data, a period
-  or a date range that drives several blocks (the KPI cards and the table), the page's sections or
-  view, the primary action.
-- A page that holds more than its table — KPI cards, a chart, another block: the table's own
-  controls (search and filter, the chips, the column chooser, a table / cards view, bulk actions)
-  stand in the table's tools row. `SmartFilter.Root` wraps the `DataTable`; `SmartFilter.Toolbar`
-  and `DataTableColumnsMenu` go in its `toolbar`, `SmartFilter.Chips` in its `toolbarChips`
-  ([server.tsx](../src/components/data-table/examples/server.tsx)).
-- A page that is one list — the table, the board or the schedule is the whole page: «next to the
-  list» and «on the page» are one place, so its search and filter stay in the bar. `SmartFilter.Root`
-  wraps `Page.Root`, `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`
-  ([the list page](#list-page)). A search alone is the same SmartFilter with `fields={[]}`.
-- What picks the place: does the control change everything under the bar? A period that recomputes
-  the cards and the table does — the bar. A search that narrows only the rows does not — the
-  table's row.
+- **One table** — its search and filter fields, their chips, its column chooser and the actions on
+  its selected rows belong to the `DataTable`, on every page: the page that is only this table, a
+  page with KPI cards above it, a page whose sections switch between tables. `SmartFilter.Root`
+  wraps the `DataTable`; `SmartFilter.Toolbar` goes in its `toolbar` (with a `DataTableColumnsMenu`
+  when the table has no row-actions column to carry `columnsMenu`), `SmartFilter.Chips` in its
+  `toolbarChips`, the selection menu comes from `renderSelectionActions`
+  ([server.tsx](../src/components/data-table/examples/server.tsx), [the list page](#list-page)).
+  The tools then stay put when the page grows a block or another section, and every table of the
+  app reads the same.
+- **The whole page** — `Page.TopBar`: the heading with its line of data, the page's sections (a
+  `SegmentedControl`; of links, `SegmentedControl.Item asChild`, when each section is a route of its
+  own — «Сотрудники» / «Роли»), a view switch, a period that drives several blocks, the page's
+  buttons.
+- **Several views of one set** — a search and filter that narrows a board and its list alike, a
+  media grid, a schedule without a tools row of its own: `SmartFilter.Root` wraps `Page.Root`,
+  `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`
+  ([the board](#sales-pipeline-board)).
+- **A table section filters by its categories.** Every column with a closed set of values (a role, a
+  status, a type, an owner, a city) is an `options` field of the table's `SmartFilter`, a date
+  column a `date-range` field (its `calendar` with the presets of the domain), free text the
+  search. A search alone (`fields={[]}`) only for records with no such column. The value lives in
+  the URL ([nothing to guess](ux.md#6-nothing-to-guess)).
 - Both rows are one tool row of the kit: written in reading order, a search takes the free room,
   switchers and buttons keep their width at the end, and a short row wraps by itself — pass the
   controls as they are, never inside a flex wrapper of your own.
 
 ```tsx partial
-// bad — the table's search, filter, chips and chooser in the bar, above KPI cards they do not filter
+// bad — the table's search, filter, chips and chooser in the bar, away from the rows they filter
 <SmartFilter.Root fields={FIELDS}>
   <Page.Root>
     <Page.TopBar>
@@ -463,12 +512,53 @@ A filter stands next to what it filters.
   chooser is `<DataTableColumnsMenu>` beside the table's search ([where the filters go](#where-the-filters-go)),
   bound to the same `hiddenColumns` / `columnOrder` state the table reads. Give the key column and
   the actions column `hideable: false`.
-- The DataTable `toolbar` holds two or more controls of the table itself — its search and filter,
-  the chooser, a view, a bulk bar of the selected rows — as they are, in reading order; its chips go
-  to `toolbarChips`.
-- One control never gets a row of its own. A lone «Экспорт» or «Создать» is the page's
-  (`Page.Actions`); a lone chooser joins the table's search or the page's tools; a count or a total
-  of the list is data in `Page.Description`.
+- The DataTable `toolbar` holds the table's own controls — its search and filter, the chooser, a
+  table / cards view — as they are, in reading order; its chips go to `toolbarChips`. A search
+  heads the row; a button never does: a lone «Экспорт» or «Создать» is the page's
+  (`Page.Actions`), a lone chooser goes over the row actions, a count or a total of the list is data
+  in `Page.Description`.
+- **Actions on selected rows are one menu, added to the row.** `renderSelectionActions` returns the
+  `Dropdown.Item`s; while rows are selected the table puts a «Действия · N» menu button last in its
+  tools row — the search, filter and chooser stay where they were, and the button leaves when the
+  selection empties. Never a row of «Выбрано: N» and buttons that replaces the tools, never one
+  button per bulk action in the row. A destructive item asks with a `ConfirmDialog` that names the
+  count ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
+
+```tsx partial
+// bad — the selection swaps the tools row for a bar of buttons; search and filter vanish
+<DataTable
+  selectable
+  selected={selected}
+  onSelectedChange={setSelected}
+  toolbar={selected.length > 0 ? <SelectionBar count={selected.length} /> : <SmartFilter.Toolbar />}
+/>
+```
+
+```tsx good
+// good — the tools stay, the actions on the selection are one menu that enters last
+// declare: const FIELDS: Parameters<typeof SmartFilter.Root>[0]["fields"]
+// declare: const members: { id: string; name: string }[]
+// declare: const selected: string[]
+// declare: const setSelected: (keys: string[]) => void
+<SmartFilter.Root fields={FIELDS}>
+  <DataTable
+    columns={[{ id: "name", header: "Сотрудник", accessor: "name" }]}
+    rows={members}
+    getRowKey={(row) => row.id}
+    selectable
+    selected={selected}
+    onSelectedChange={(keys) => setSelected(keys.map(String))}
+    toolbar={<SmartFilter.Toolbar />}
+    toolbarChips={<SmartFilter.Chips />}
+    renderSelectionActions={() => (
+      <>
+        <Dropdown.Item>Сменить роль</Dropdown.Item>
+        <Dropdown.Item tone="danger">Отключить доступ</Dropdown.Item>
+      </>
+    )}
+  />
+</SmartFilter.Root>
+```
 
 ### Tables
 
@@ -500,11 +590,11 @@ A filter stands next to what it filters.
 
 | Situation | Component |
 |---|---|
-| the result of an action (sent, created, failed to save; saved when the form goes away) | `Notification` via `notify()` |
-| a form saved and still on screen | the submit button's text: «Сохранено» |
+| the result of an action (sent, created, failed to save; saved when the form or its save button goes away) | `Notification` via `notify()` |
+| a form saved whose save button stays on screen | the submit button's text: «Сохранено» |
 | a state of the page or a section that persists (sync failed, trial ends, read-only) | `Banner` as the first block of `Page.Body` (or inside the Card it concerns) |
 | a problem with one field | the field's `error` |
-| a refused sign-in | `invalid` on the fields it concerns and the reason in an always-mounted `VisuallyHidden live="assertive"` — no Banner on a sign-in or sign-up form ([LoginForm](../src/components/login-form/COMPONENT.md)) |
+| a refused sign-in | `invalid` on the e-mail and the reason in words as the password's `error` — no Banner ([field outcomes](api-contract.md#field-outcomes-a-mark-for-success-words-for-a-problem)) |
 | a region failed to load | the region shows it in place: DataTable `loadError`, or `EmptyPage tone="danger"` with `EmptyPage.RetryButton` |
 | a region is loading | DataTable `loading`; otherwise a `Skeleton` in the geometry of the content + `aria-busy` on the region; `Spinner` only when there is no shape to hold |
 | a region changes state (loading → data → empty → error, another record) | its content in `Crossfade state={status}` — always, so the change flows instead of flipping |
@@ -540,6 +630,76 @@ the toast closes nothing below it. Titled groups of a dialog's body (a client's 
 are `Drawer.Section` / `Modal.Section` with their own `Drawer.Actions` / `Modal.Actions`, not a
 hand-made heading row; a footer's `Drawer.Meta` / `Modal.Meta` goes above the buttons by itself when
 the footer runs short.
+
+### A record in a drawer
+
+A record opened beside the page — a person, a role, a deal — is one drawer per entity, the same
+wherever it opens:
+
+- **One entity, one drawer.** One component opens the record from every place — the person's own
+  account in the Sidebar, a row of the team table, a mention — by its id. Who looks decides what it
+  shows: a field the viewer may not change is `readOnly` (`disabled` when the reason is said beside
+  it), a tab the viewer may not see is not rendered, an action the viewer may not take is hidden. A
+  second drawer for the same entity («Мой аккаунт» beside «Сотрудник») drifts apart from the first
+  with every change.
+- **One record header** — the same in a Drawer, a Modal and a Sheet. `Drawer.Icon` leads: a
+  glyph gets a 40px tone tile, the record's `Avatar.Root` or `Thumbnail.Root` (even inside a wrapper
+  of your own) stands at 40 with no tile. Line 1 is `Drawer.Title`, the name (`loading` while it
+  comes). Line 2 is `Drawer.Description`: the status `Badge.Root`s first — the header sizes them, no
+  `size` — then the line of data. `Drawer.Actions` hold only buttons that act on this record: ghost
+  icon Buttons, each in a `Tooltip.Trigger`, counted by [the menu threshold](#a-menu-from-two-actions);
+  they are centred on line 1, before the ×. A Badge in `Drawer.Actions` is a status in the wrong place; a way to
+  another place (a section, a list) is no header action — a link in the body beside the data it leads
+  to, or nothing.
+- **One form, one save.** Every editable field of every tab is one form, and its submit is the one
+  «Сохранить» of `Drawer.Footer`, shown while the form is dirty, with `Drawer.Guard` (`dirty`,
+  `busy`). No save per section or tab, no «Есть несохранённые изменения» in `Drawer.Meta`: the save
+  button and the guard already say it. Actions that work at once — turn sign-in on, send a link,
+  end the other sessions — are buttons beside what they change and never wait for the save. After
+  the save the button leaves, so the success is a `Notification`.
+- **Tabs are topics.** Each tab holds one topic, and a record's history (its log) is always a tab of
+  its own. Tabs that outgrow the width never merge: the strip scrolls ([switchers](responsive.md#switchers)).
+- **Data at the drawer's level.** The drawer loads the record and the data of its tabs; a tab never
+  fetches on mount, so coming back to it shows what it showed instead of a skeleton that collapses
+  it. A tab that keeps a draft or its scroll keeps its panel with `Tabs.Panel keepMounted`. The
+  opening itself — the header and the tabs at once, the body as a Skeleton in the form's geometry —
+  is in [Drawer](../src/components/drawer/COMPONENT.md).
+
+```tsx partial
+// bad — a way out in the header, a save per section, a status line in the footer
+<Drawer.Actions>
+  <Button.Root variant="ghost" tone="neutral">Команда и роли</Button.Root>
+</Drawer.Actions>
+<Drawer.Section label="Профиль">… <Button.Root>Сохранить</Button.Root></Drawer.Section>
+<Drawer.Section label="Доступ">… <Button.Root>Сохранить</Button.Root></Drawer.Section>
+<Drawer.Footer>
+  <Drawer.Meta>Есть несохранённые изменения</Drawer.Meta>
+</Drawer.Footer>
+```
+
+```tsx good
+// good — one form over the tabs, one save while it is dirty, the guard holds the rest
+// declare: const dirty: boolean
+// declare: const saving: boolean
+<Drawer.Content>
+  <Drawer.Guard dirty={dirty} busy={saving} />
+  <Drawer.Header>
+    <Drawer.Title>Анна Соколова</Drawer.Title>
+  </Drawer.Header>
+  <Drawer.Body>
+    <form id="member-form" noValidate>
+      …
+    </form>
+  </Drawer.Body>
+  <Drawer.Footer>
+    {dirty ? (
+      <Button.Root type="submit" form="member-form" loading={saving}>
+        Сохранить
+      </Button.Root>
+    ) : null}
+  </Drawer.Footer>
+</Drawer.Content>
+```
 
 ## 11. Narrow screens
 
@@ -630,7 +790,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [data-table/examples/screen.tsx](../src/components/data-table/examples/screen.tsx)
 
 - A work screen titles itself in its `Page.TopBar`: `Page.Title` is the only heading, its `Page.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; there is no second header in the flow.
-- The table is the whole page, so its filters are the page's: `SmartFilter.Root` wraps the page, `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`; export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. The table itself has no `toolbar`; add a KPI row above it and the search, filter and chips move into the table's `toolbar` / `toolbarChips`.
+- The search and filters narrow the table, so they are the table's: `SmartFilter.Toolbar` in its `toolbar`, `SmartFilter.Chips` in its `toolbarChips`, the column chooser over the row menu (`columnsMenu`); the bar keeps the heading, export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. A KPI row added above changes nothing in the table's tools.
 - A status is a `Badge` with one `tone` per meaning across the product (`STATUS` is one map); the text carries the meaning, the tone repeats it.
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s` in the last column (`hideHeader`), pinned to the end edge with `stickyLastColumn` so they stay in reach while the columns scroll: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
@@ -664,7 +824,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [drawer/examples/screen.tsx](../src/components/drawer/examples/screen.tsx)
 
-- A work screen titles itself in its `Page.TopBar`: `Page.Title` with the counts in `Page.Description`, the search (`SmartFilter` with `fields={[]}`) in `Page.Tools`; there is no second header in the flow.
+- A work screen titles itself in its `Page.TopBar`: `Page.Title` with the counts in `Page.Description`; the search (`SmartFilter` with `fields={[]}`) narrows the table, so it is the table's `toolbar`; there is no second header in the flow.
 - The opening button is the page's primary action in `Page.Actions`; `Drawer.Trigger` wraps it as a slot.
 - The form is tied to the footer button through `form={formId}`: `Drawer.Footer` is outside the `<form>`, and submitting still works, by Enter too.
 - Groups are a `Fieldset` without a frame with a `title-s` heading 16 px above the fields; 32 px of air between groups, no dividers. `Fieldset disabled` turns all the fields off while the request runs.

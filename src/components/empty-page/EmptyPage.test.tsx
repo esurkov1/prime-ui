@@ -62,18 +62,34 @@ describe("EmptyPage", () => {
     expect(screen.getByTestId("empty")).not.toHaveAttribute("data-layout");
   });
 
-  it("parts rise in on first render, but not in the compact layout", () => {
-    const { rerender } = render(
+  it("stands still when it mounts with the page", () => {
+    render(
       <EmptyPage.Root data-testid="empty">
         <EmptyPage.Title>Нет данных</EmptyPage.Title>
       </EmptyPage.Root>,
     );
-    expect(screen.getByTestId("empty")).toHaveClass(enterMotion.enterBaseChildren);
-    rerender(
-      <EmptyPage.Root layout="compact" data-testid="empty">
-        <EmptyPage.Title>Нет данных</EmptyPage.Title>
-      </EmptyPage.Root>,
+    expect(screen.getByTestId("empty")).not.toHaveClass(enterMotion.enterBaseChildren);
+  });
+
+  it("parts rise in when it appears on a shown page, but not in the compact layout", async () => {
+    const page = (found: boolean, layout?: "compact") => (
+      <section>
+        {found ? (
+          <p>Заказ № 1042</p>
+        ) : (
+          <EmptyPage.Root layout={layout} data-testid="empty">
+            <EmptyPage.Title>Ничего не найдено</EmptyPage.Title>
+          </EmptyPage.Root>
+        )}
+      </section>
     );
+    const { rerender } = render(page(true));
+    await act(async () => {});
+    rerender(page(false));
+    expect(screen.getByTestId("empty")).toHaveClass(enterMotion.enterBaseChildren);
+    rerender(page(true, "compact"));
+    await act(async () => {});
+    rerender(page(false, "compact"));
     expect(screen.getByTestId("empty")).not.toHaveClass(enterMotion.enterBaseChildren);
   });
 

@@ -2,7 +2,11 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
-import { Datepicker, formatDatepickerValue } from "@/components/datepicker/Datepicker";
+import {
+  Datepicker,
+  type DatepickerPanelProps,
+  formatDatepickerValue,
+} from "@/components/datepicker/Datepicker";
 import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Input } from "@/components/input/Input";
@@ -92,9 +96,26 @@ export type SmartFilterRangeField = SmartFilterFieldBase & {
   formatValue?: (value: number) => string;
 };
 
+/** The Datepicker options a `date-range` field passes to its calendar. */
+type SmartFilterCalendar = Pick<
+  DatepickerPanelProps,
+  | "months"
+  | "presets"
+  | "prompt"
+  | "footer"
+  | "withTime"
+  | "isDayDisabled"
+  | "disableFuture"
+  | "today"
+  | "locale"
+  | "weekStartsOn"
+  | "labels"
+>;
+
 /** A period picked in the kit Datepicker (`mode="range"`). */
 export type SmartFilterDateRangeField = SmartFilterFieldBase & {
   kind: "date-range";
+  calendar?: SmartFilterCalendar;
 };
 
 export type SmartFilterField =
@@ -191,6 +212,7 @@ function rangeText(
 ): string | null {
   if (field.kind === "date-range") {
     return formatDatepickerValue({
+      ...field.calendar,
       mode: "range",
       value: {
         from: range.from instanceof Date ? range.from : null,
@@ -501,6 +523,7 @@ function Panel({ searchable }: { searchable: boolean }) {
               />
             ) : (
               <Datepicker.Root
+                {...field.calendar}
                 mode="range"
                 size={size}
                 fullWidth

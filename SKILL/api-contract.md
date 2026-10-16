@@ -25,7 +25,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Text value | native `value` / `onChange` + `onValueChange(string)` | Input (`Input.Field`), Textarea. |
 | Other state | `x` / `defaultX` / `onXChange(x)` | Badge `pressed`; Button `pressed`; ChartFrame `hiddenSeries`; Chat `selected`, `search`; ChatList `search`; ColorPicker `format`; CommandMenu `search`; Composer `recordMode`; DataTable `hiddenColumns`, `columnOrder`, `page`, `sort`, `selected`, `expanded`, `collapsedGroups`; ExampleFrame `viewport`, `colorScheme`; Gallery `index`; Gantt `scale`; Kanban `columnOrder`; MediaViewer `index`; Message.Media `index`; Select `search`; SmartFilter `search`; VideoNote `playing`, `transcriptExpanded`; VoicePlayer `rate`, `playing`, `transcriptExpanded`; Sidebar `mode`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Dropdown.CheckboxItem, Switch, Thumbnail. |
-| Open | `open` / `defaultOpen` / `onOpenChange(open)` | ColorPresets, CommandMenu, ConfirmDialog, Datepicker, Drawer, Dropdown, Gallery, MediaViewer, Message.Media, Modal, Popover, Select, Sheet, TagSelect, Tooltip, Page.Split, Sidebar, Sidebar.Group, Sidebar.Sub. |
+| Open | `open` / `defaultOpen` / `onOpenChange(open)` | ColorPresets, CommandMenu, Composer.Keyboard, ConfirmDialog, Datepicker, Drawer, Dropdown, Gallery, MediaViewer, Message.Media, Modal, Popover, Select, Sheet, TagSelect, Tooltip, Page.Split, Sidebar, Sidebar.Group, Sidebar.Sub. |
 | Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay that opens a layer: the dialogs, the floating panels, the panels of Select, TagSelect, Datepicker and ColorPresets, the `suggestions` list of Input, the off-canvas Sidebar and the reaction bar of a message. `ConfirmDialog` takes both with `closeOnOutsideClick` default `false` (Escape is held while `onConfirm` runs). Tooltip and Notification take neither. A form holds closing with `Modal.Guard` / `Drawer.Guard` / `Sheet.Guard`. |
 | Selection mode | `multiple` | One vs many (Select, Accordion) — never `type`. `mode` only for structurally different values (Datepicker `single \| range`). |
 | Status words | `selected`, `current`, `pressed` | `current` marks a navigation location (`Sidebar.Item`, `Breadcrumb.Item`) and sets `aria-current`; `pressed` a toggle button. |
@@ -168,6 +168,54 @@ export function InviteForm() {
 (`.form { display: grid; gap: var(--prime-space-5); }`.) A full create form with groups, validation,
 loading and a toast: [the Drawer screen](../src/components/drawer/examples/screen.tsx).
 
+### Field outcomes: a mark for success, words for a problem
+
+A field answers a check in one of two ways. Success is quiet; a problem is said.
+
+- **A confirmed value is a mark.** A repeat that matches, a code that passed, a free address: `valid`
+  on the root draws a check at the field's end and says it to a screen reader — no words under the
+  field. Never a `hint` with `hintTone="success"` that writes «Пароли совпадают»: the person reads a
+  sentence to learn that nothing is wrong. `hintTone` stays for the status of a value that is not a
+  check (a deadline that nears).
+- **A problem is words.** `error` says what is wrong and how to fix it, under the field it concerns.
+  Red rings and a shake alone leave the person guessing.
+- **A policy is enforced, not shown.** A new password is `strength` with `minStrength`: below the
+  level the form refuses to submit and says why, the `hint` names the requirement in words («От 10
+  символов, буквы и цифры»), and the server checks the same rule. A meter alone lets the weak
+  password through ([password-policy.tsx](../src/components/input/examples/password-policy.tsx)).
+- **A refused sign-in** marks the e-mail `invalid` and puts the reason on the password as its `error`
+  («Неверная почта или пароль») — one sentence that names neither field as the culprit, no Banner
+  over the form ([LoginForm](../src/components/login-form/COMPONENT.md)).
+
+```tsx partial
+// bad — a meter that lets anything through and a green sentence for a match
+<Input.Root label="Новый пароль" strength>…</Input.Root>
+<Input.Root label="Повторите пароль" hint="Пароли совпадают" hintTone="success">…</Input.Root>
+```
+
+```tsx good
+// good — the policy stops the submit, the match is a check, a mismatch is words
+// declare: const matches: boolean
+// declare: const mismatch: boolean
+<>
+  <Input.Root label="Новый пароль" strength minStrength={3} hint="От 10 символов, буквы и цифры">
+    <Input.Wrapper>
+      <Input.Field type="password" autoComplete="new-password" />
+      <Input.RevealButton />
+    </Input.Wrapper>
+  </Input.Root>
+  <Input.Root
+    label="Повторите пароль"
+    valid={matches}
+    error={mismatch ? "Пароли не совпадают" : undefined}
+  >
+    <Input.Wrapper>
+      <Input.Field type="password" autoComplete="new-password" />
+    </Input.Wrapper>
+  </Input.Root>
+</>
+```
+
 ### Choice controls
 
 Checkbox, Switch and Radio: the root renders the `<label>` with the input and the visible text is
@@ -263,7 +311,7 @@ A standalone destructive action that is easy to redo by hand is `Button.Root hol
 action in `onConfirm` ([the recipe](motion.md#5-recipes)).
 
 `tone="danger"`. A standalone trigger that opens a confirm (danger zone) is `variant="outline"`; inside
-a bar of other actions (DataTable bulk bar, card actions) it is `soft`; in a Dropdown it is the last item
+a bar of other actions (card actions) it is `soft`; in a Dropdown it is the last item
 with `tone="danger"`; an inline remove in a media or file row is `ghost`. The confirm itself is
 [ConfirmDialog](../src/components/confirm-dialog/COMPONENT.md) — never a hand-built Modal: it is a
 Modal `s` with a solid danger confirm (`tone="accent"` for an outward action that destroys nothing, like

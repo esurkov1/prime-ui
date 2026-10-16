@@ -8,6 +8,7 @@ import {
   type ImageSlotFallbackProps,
   type ImageSlotImageProps,
 } from "@/internal/imageSlot";
+import { useMediaSlotSize } from "@/internal/mediaSlot";
 import { namedRole } from "@/internal/namedRole";
 import palette from "@/internal/palette.module.css";
 import type { ControlSize, PaletteColor } from "@/internal/states";
@@ -39,13 +40,15 @@ export type AvatarRootProps = React.HTMLAttributes<HTMLDivElement> & {
  */
 function AvatarRoot({ size, color = "gray", className, children, ...rest }: AvatarRootProps) {
   const groupSize = React.useContext(AvatarGroupSizeContext);
+  // In a media slot (a dialog or card mark) the picture takes the slot's size.
+  const slotSize = useMediaSlotSize("avatar");
 
   return (
     <slot.ImageSlotProvider>
       <div
         role={namedRole(rest, "img")}
         className={cx(styles.root, palette.hue, className)}
-        {...toDataAttributes({ size: size ?? groupSize ?? "m", color })}
+        {...toDataAttributes({ size: slotSize ?? size ?? groupSize ?? "m", color })}
         {...rest}
       >
         {children}

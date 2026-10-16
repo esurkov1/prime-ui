@@ -4,6 +4,7 @@ import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import enterMotion from "@/internal/enterMotion.module.css";
 import type { ControlSize } from "@/internal/states";
 import { cssRule, cssValue } from "@/test/css";
 
@@ -372,6 +373,81 @@ describe("Tabs — controlled mode", () => {
     fireEvent.click(screen.getByRole("tab", { name: "Tab 2" }));
     expect(screen.getByText("Panel 1")).toBeInTheDocument();
     expect(screen.queryByText("Panel 2")).not.toBeInTheDocument();
+  });
+});
+
+describe("Tabs — kept panels", () => {
+  function KeptTabs() {
+    return (
+      <Tabs.Root defaultValue="profile">
+        <Tabs.List aria-label="Сотрудник">
+          <Tabs.Item value="profile">Профиль</Tabs.Item>
+          <Tabs.Item value="access">Доступ</Tabs.Item>
+          <Tabs.Item value="history">История</Tabs.Item>
+        </Tabs.List>
+        <Tabs.Panel value="profile" keepMounted>
+          <input aria-label="Имя" />
+        </Tabs.Panel>
+        <Tabs.Panel value="access" keepMounted>
+          Доступ
+        </Tabs.Panel>
+        <Tabs.Panel value="history">История</Tabs.Panel>
+      </Tabs.Root>
+    );
+  }
+
+  it("keeps an opened panel's state while another tab is active", async () => {
+    const user = userEvent.setup();
+    render(<KeptTabs />);
+    await user.type(screen.getByRole("textbox", { name: "Имя" }), "Анна");
+    await user.click(screen.getByRole("tab", { name: "История" }));
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Профиль" }));
+    expect(screen.getByRole("textbox", { name: "Имя" })).toHaveValue("Анна");
+  });
+
+  it("hides a kept panel: out of the accessibility tree, its tab still points at it", async () => {
+    const user = userEvent.setup();
+    render(<KeptTabs />);
+    await user.click(screen.getByRole("tab", { name: "История" }));
+    expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
+    const id = screen.getByRole("tab", { name: "Профиль" }).getAttribute("aria-controls");
+    expect(document.getElementById(id ?? "")).toHaveAttribute("hidden");
+  });
+
+  it("mounts a kept panel only once its tab opens; a plain panel still unmounts", async () => {
+    const user = userEvent.setup();
+    render(<KeptTabs />);
+    expect(screen.queryByText("Доступ", { selector: "[role=tabpanel] *" })).toBeNull();
+    expect(screen.getByRole("tab", { name: "Доступ" })).not.toHaveAttribute("aria-controls");
+    await user.click(screen.getByRole("tab", { name: "История" }));
+    await user.click(screen.getByRole("tab", { name: "Доступ" }));
+    expect(screen.queryByText("История", { selector: "[role=tabpanel] *" })).toBeNull();
+    expect(screen.getByRole("tabpanel", { name: "Доступ" })).not.toHaveAttribute("hidden");
+  });
+
+  it("opens a kept panel from the keyboard", async () => {
+    const user = userEvent.setup();
+    render(<KeptTabs />);
+    screen.getByRole("tab", { name: "Профиль" }).focus();
+    await user.keyboard("{ArrowRight}");
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("tabpanel", { name: "Профиль" })).not.toHaveAttribute("hidden");
+    const id = screen.getByRole("tab", { name: "Доступ" }).getAttribute("aria-controls");
+    expect(document.getElementById(id ?? "")).toHaveAttribute("hidden");
+  });
+
+  it("the panel shown on mount stands still; one the tabs open later enters", async () => {
+    const user = userEvent.setup();
+    render(<KeptTabs />);
+    const content = (name: string) =>
+      screen.getByRole("tabpanel", { name }).firstElementChild as HTMLElement;
+    expect(content("Профиль")).not.toHaveClass(enterMotion.enterBase);
+    await user.click(screen.getByRole("tab", { name: "История" }));
+    expect(content("История")).toHaveClass(enterMotion.enterBase);
+    // A kept panel shown again enters as on a first open.
+    await user.click(screen.getByRole("tab", { name: "Профиль" }));
+    expect(content("Профиль")).toHaveClass(enterMotion.enterBase);
   });
 });
 

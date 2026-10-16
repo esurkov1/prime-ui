@@ -1,15 +1,22 @@
 /*
  * State swap motion (foundation §7 rule 8: two states replacing each other in place cross-fade),
  * the fades of `RegionSwap`. Opacity only — no shift, so a swapped region never moves and creates
- * no containing block. Enter takes the content-swap clock (`base`), exit a shorter one (`fast`);
- * both are fade clocks, so under reduced motion the new state still fades in (rule 12).
+ * no containing block. Between settled states enter takes the content-swap clock (`base`); a swap
+ * into or out of loading (the Skeleton handing over to the data) is a short one (`fast`), so the
+ * data replaces its placeholder rather than revealing itself. Exit is always `fast`. All are fade
+ * clocks, so under reduced motion the new state still fades in (rule 12).
  *
- *   .swapIn   content of the new state
- *   .swapOut  the previous state's content while it leaves
+ *   .swapIn    content of the new state
+ *   .settleIn  content of the new state when the swap leaves or enters loading
+ *   .swapOut   the previous state's content while it leaves
  */
 /* `backwards`: once played nothing stays applied, so a swapped body keeps no stacking context. */
 .swapIn {
   animation: primeSwapIn var(--prime-motion-fade-base) var(--prime-motion-easing-enter) backwards;
+}
+
+.settleIn {
+  animation: primeSwapIn var(--prime-motion-fade-fast) var(--prime-motion-easing-enter) backwards;
 }
 
 .swapOut {

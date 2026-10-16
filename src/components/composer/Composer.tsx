@@ -22,6 +22,7 @@ import { Icon, type IconName } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { Disclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -29,13 +30,13 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
 import { type MediaKind, mediaKind } from "@/internal/mediaKind";
-import { usePartPresence } from "@/internal/partPresence";
+import { useEnterOnAppear, usePartPresence } from "@/internal/partPresence";
 import { Ring } from "@/internal/ring";
 import { type ControlSize, stepDown } from "@/internal/states";
 import statusLoop from "@/internal/statusLoop.module.css";
 import { TEXT_FORMATTING_LABELS, type TextFormattingLabels } from "@/internal/textFormatting";
 import { useTextFormatting } from "@/internal/textFormattingToolbar";
-import { type AsyncHandler, isPromiseLike } from "@/internal/usePendingChanges";
+import { type AsyncHandler, isPromiseLike, usePendingKeys } from "@/internal/usePendingChanges";
 import styles from "./Composer.module.css";
 import { drawLiveWave, type LiveWaveSize, type LiveWaveStyle } from "./liveWave";
 import {
@@ -111,6 +112,8 @@ export type ComposerLabels = TextFormattingLabels & {
   cancelReply: string;
   /** Name of the close button of an edit bar. */
   cancelEdit: string;
+  /** Name of the button that shows and hides the reply keyboard, and of the keyboard itself. */
+  keyboard: string;
 };
 
 export const COMPOSER_LABELS: ComposerLabels = {
@@ -145,6 +148,7 @@ export const COMPOSER_LABELS: ComposerLabels = {
   ...TEXT_FORMATTING_LABELS,
   cancelReply: "Отменить ответ",
   cancelEdit: "Отменить редактирование",
+  keyboard: "Клавиатура бота",
 };
 
 /** An attached photo or video: the uploaded queue item and what it shows. */
@@ -197,6 +201,14 @@ const [ComposerProvider, useComposerContext] = createComponentContext<{
   focusFieldIfLive: () => void;
   /** The start cell of the row: `Composer.Attach` renders itself into it from wherever it stands. */
   attachSlot: HTMLElement | null;
+  /** The place under the row and the toggle's cell before the send button: `Composer.Keyboard`. */
+  keyboardSlot: HTMLElement | null;
+  keyboardToggleSlot: HTMLElement | null;
+  /** The field's placeholder while a reply keyboard is shown (`null` — the default one). */
+  setKeyboardPlaceholder: (placeholder: string | null) => void;
+  /** Sends a key's text as a message through `onSend`; the field's draft stays. */
+  sendText: (text: string) => unknown;
+  recording: boolean;
 }>("Composer");
 
 /** A press shorter than this is a tap: it locks a recording. */
@@ -895,10 +907,44 @@ function ComposerRoot({
   // (a portal), so neither the order of the children, a wrapper around the paperclip, nor a
   // hot-reloaded component type can move it out of the row ──
   const [attachSlot, setAttachSlot] = React.useState<HTMLDivElement | null>(null);
+  const [keyboardSlot, setKeyboardSlot] = React.useState<HTMLDivElement | null>(null);
+  const [keyboardToggleSlot, setKeyboardToggleSlot] = React.useState<HTMLDivElement | null>(null);
+  const [keyboardPlaceholder, setKeyboardPlaceholder] = React.useState<string | null>(null);
+  const sendRef = React.useRef(onSend);
+  sendRef.current = onSend;
+  const sendText = React.useCallback(
+    (keyText: string) => sendRef.current?.({ text: keyText, albums: [], files: [] }),
+    [],
+  );
 
   const contextValue = React.useMemo(
-    () => ({ size, labels, disabled, addFiles, registerBar, focusFieldIfLive, attachSlot }),
-    [size, labels, disabled, addFiles, registerBar, focusFieldIfLive, attachSlot],
+    () => ({
+      size,
+      labels,
+      disabled,
+      addFiles,
+      registerBar,
+      focusFieldIfLive,
+      attachSlot,
+      keyboardSlot,
+      keyboardToggleSlot,
+      setKeyboardPlaceholder,
+      sendText,
+      recording,
+    }),
+    [
+      size,
+      labels,
+      disabled,
+      addFiles,
+      registerBar,
+      focusFieldIfLive,
+      attachSlot,
+      keyboardSlot,
+      keyboardToggleSlot,
+      sendText,
+      recording,
+    ],
   );
 
   const actionKind = recording ? "send" : editing ? "save" : showRecord ? recordMode : "send";
@@ -1060,7 +1106,7 @@ function ComposerRoot({
                 // The caret is the focus indicator of the one field of the composer (foundation §7).
                 focusRing={false}
                 value={value}
-                placeholder={labels.placeholder}
+                placeholder={keyboardPlaceholder ?? labels.placeholder}
                 aria-label={labels.placeholder}
                 aria-describedby={
                   [contextIds, recorder.error ? errorId : undefined].filter(Boolean).join(" ") ||
@@ -1146,6 +1192,11 @@ function ComposerRoot({
               </div>
             ) : null}
             <div className={styles.end}>
+              <div
+                ref={setKeyboardToggleSlot}
+                className={styles.keyboardToggle}
+                inert={recording}
+              />
               {lockPill.mounted ? (
                 <span
                   className={cx(
@@ -1186,6 +1237,8 @@ function ComposerRoot({
               </VisuallyHidden>
             </div>
           </div>
+          {/* `Composer.Keyboard` folds open here, under the row, in place of a phone's keyboard. */}
+          <div ref={setKeyboardSlot} className={styles.keyboardSlot} />
           <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
         </form>,
       )}
@@ -1267,9 +1320,13 @@ function ComposerContext({
   id: idProp,
   className,
   children,
+  ref,
   ...rest
 }: ComposerContextProps) {
   const { size, labels, registerBar, focusFieldIfLive } = useComposerContext();
+  // A bar a reply brings enters; one the composer mounts with (a saved draft) is just there.
+  const appear = useEnterOnAppear<HTMLDivElement>();
+  const mergedRef = useMergedRefs(appear.ref, ref);
   const ownId = React.useId();
   const id = idProp ?? ownId;
   const dismissRef = React.useRef(onDismiss);
@@ -1298,8 +1355,9 @@ function ComposerContext({
   return (
     <div
       {...rest}
+      ref={mergedRef}
       id={id}
-      className={cx(styles.context, enterMotion.enter, className)}
+      className={cx(styles.context, appear.entering && enterMotion.enter, className)}
       data-mode={mode}
     >
       <span className={styles.contextIcon} aria-hidden="true">
@@ -1464,6 +1522,155 @@ function ComposerItemIcon(props: ComposerItemIconProps) {
 }
 ComposerItemIcon.displayName = "Composer.ItemIcon";
 
+// ─── Reply keyboard ──────────────────────────────────────────────────────────
+
+/**
+ * A key of the reply keyboard: its text (sent as the message), or the text with an `icon` before
+ * it and a `tone` (Telegram's `primary` is `accent`).
+ */
+export type ComposerKey =
+  | string
+  | { label: string; icon?: React.ReactNode; tone?: "accent" | "success" | "danger" };
+
+export type ComposerKeyboardProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  rows: readonly (readonly ComposerKey[])[];
+  placeholder?: string;
+  oneTime?: boolean;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+const keyLabel = (key: ComposerKey) => (typeof key === "string" ? key : key.label);
+
+/**
+ * A bot's reply keyboard: rows of keys under the composer's row, in place of a phone's keyboard;
+ * a key sends its text through `onSend`. The toggle before the send button shows and hides it;
+ * `oneTime` hides it after a key is used.
+ */
+function ComposerKeyboard({
+  rows,
+  placeholder,
+  oneTime = false,
+  open: openProp,
+  defaultOpen = true,
+  onOpenChange,
+  id: idProp,
+  className,
+  "aria-label": ariaLabel,
+  ref,
+  ...rest
+}: ComposerKeyboardProps) {
+  const {
+    labels,
+    disabled,
+    keyboardSlot,
+    keyboardToggleSlot,
+    setKeyboardPlaceholder,
+    sendText,
+    focusFieldIfLive,
+    recording,
+  } = useComposerContext();
+  const [open, setOpen] = useControllableState({
+    value: openProp,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  const { pending, track } = usePendingKeys<string>();
+  const autoId = React.useId();
+  const id = idProp ?? autoId;
+
+  // The field asks for a key while the keyboard is shown.
+  React.useEffect(() => {
+    if (!open || placeholder === undefined) return;
+    setKeyboardPlaceholder(placeholder);
+    return () => setKeyboardPlaceholder(null);
+  }, [open, placeholder, setKeyboardPlaceholder]);
+
+  const press = (key: ComposerKey, position: string) => {
+    const outcome = track(position, sendText(keyLabel(key)));
+    if (!oneTime) return;
+    const hide = () => {
+      setOpen(false);
+      // The keys leave: the field takes the focus, as the letters come back on a phone.
+      focusFieldIfLive();
+    };
+    if (isPromiseLike(outcome)) outcome.then(hide, () => {});
+    else hide();
+  };
+
+  if (!keyboardSlot || !keyboardToggleSlot) return null;
+  // The grid of keys while they are hidden, the chevron that hides them while shown; `Button.Icon`
+  // cross-fades one into the other.
+  const toggleIcon: IconName = open ? "nav.chevronDown" : "nav.layoutGrid";
+
+  return (
+    <>
+      {createPortal(
+        <Button.Root
+          variant="ghost"
+          tone="neutral"
+          aria-label={ariaLabel ?? labels.keyboard}
+          aria-expanded={open}
+          aria-controls={id}
+          disabled={disabled}
+          onClick={() => setOpen(!open)}
+        >
+          <Button.Icon>
+            <Icon name={toggleIcon} />
+          </Button.Icon>
+        </Button.Root>,
+        keyboardToggleSlot,
+      )}
+      {createPortal(
+        <Disclosure
+          {...rest}
+          ref={ref}
+          id={id}
+          role="group"
+          aria-label={ariaLabel ?? labels.keyboard}
+          open={open}
+          inert={recording || undefined}
+          className={className}
+        >
+          <div className={styles.keyboardKeys}>
+            {rows.map((row, rowIndex) => (
+              <div
+                // Rows are positions: a bot sends the whole keyboard again to change it.
+                // biome-ignore lint/suspicious/noArrayIndexKey: rows have no identity of their own.
+                key={rowIndex}
+                className={styles.keyboardRow}
+              >
+                {row.map((key, keyIndex) => {
+                  const position = `${rowIndex}:${keyIndex}`;
+                  const custom = typeof key === "string" ? undefined : key;
+                  return (
+                    <Button.Root
+                      key={position}
+                      variant="soft"
+                      tone={custom?.tone ?? "neutral"}
+                      fullWidth
+                      disabled={disabled}
+                      loading={pending.has(position)}
+                      onClick={() => press(key, position)}
+                    >
+                      {custom?.icon ? <Button.Icon>{custom.icon}</Button.Icon> : null}
+                      {keyLabel(key)}
+                    </Button.Root>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </Disclosure>,
+        keyboardSlot,
+      )}
+    </>
+  );
+}
+ComposerKeyboard.displayName = "Composer.Keyboard";
+
 export const Composer = {
   Root: ComposerRoot,
   Context: ComposerContext,
@@ -1472,4 +1679,5 @@ export const Composer = {
   Attach: ComposerAttach,
   Item: ComposerItem,
   ItemIcon: ComposerItemIcon,
+  Keyboard: ComposerKeyboard,
 };

@@ -511,4 +511,116 @@ describe("Badge.Group", () => {
     expect(screen.getByTestId("group")).toHaveAttribute("data-tier", "m");
     expect(screen.getByText("ЭДО")).toHaveAttribute("data-tier", "m");
   });
+
+  describe('overflow="count"', () => {
+    const SECTIONS = ["Сделки", "Контакты", "Счета", "Отчёты", "Склад"];
+    let rowWidth = 200;
+
+    /** A badge is 10 px per letter, the «+N» badge (its visible text is `aria-hidden`) 40 px; the row is `rowWidth` wide. */
+    const mockSizes = () => {
+      const rect = vi
+        .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+        .mockImplementation(function (this: HTMLElement) {
+          const more = this.querySelector(":scope > span[aria-hidden='true']") !== null;
+          const width = more ? 40 : (this.textContent ?? "").length * 10;
+          return { width, height: 24 } as DOMRect;
+        });
+      const client = vi
+        .spyOn(HTMLElement.prototype, "clientWidth", "get")
+        .mockImplementation(function (this: HTMLElement) {
+          return this.classList.contains(styles.group) ? rowWidth : 0;
+        });
+      return () => {
+        rect.mockRestore();
+        client.mockRestore();
+      };
+    };
+
+    const Row = () => (
+      <Badge.Group overflow="count" aria-label="Разделы роли">
+        {SECTIONS.map((section) => (
+          <Badge.Root key={section}>{section}</Badge.Root>
+        ))}
+      </Badge.Group>
+    );
+
+    it("shows as many badges as fit and stands for the rest with «+N» that names them", () => {
+      rowWidth = 200;
+      const restore = mockSizes();
+      render(<Row />);
+      expect(badgeOf("Сделки")).not.toHaveAttribute("data-overflowed");
+      expect(badgeOf("Контакты")).not.toHaveAttribute("data-overflowed");
+      for (const section of ["Счета", "Отчёты", "Склад"]) {
+        expect(badgeOf(section)).toHaveAttribute("data-overflowed");
+      }
+      expect(screen.getByText("+3")).toHaveAttribute("aria-hidden", "true");
+      expect(screen.getByText("Ещё 3")).toBeInTheDocument();
+      expect(screen.getByRole("group", { name: "Разделы роли" })).toHaveAttribute(
+        "data-overflow",
+        "count",
+      );
+      restore();
+    });
+
+    it("Tab reaches «+N» and its tooltip lists the hidden values", async () => {
+      rowWidth = 200;
+      const restore = mockSizes();
+      const user = userEvent.setup();
+      render(<Row />);
+      await user.tab();
+      const more = badgeOf("+3");
+      expect(document.activeElement).toBe(more);
+      const tooltip = await screen.findByRole("tooltip");
+      expect(tooltip).toHaveTextContent("Счета, Отчёты, Склад");
+      // The list is said once: as the description, never also in the badge's own text.
+      expect(more).toHaveAccessibleDescription("Счета, Отчёты, Склад");
+      expect(more?.textContent).toBe("+3Ещё 3");
+      for (const section of ["Счета", "Отчёты", "Склад"]) {
+        expect(more?.textContent).not.toContain(section);
+      }
+      restore();
+    });
+
+    it("shows every badge once the row is wide enough, the «+N» badge out of the way", () => {
+      rowWidth = 200;
+      const restore = mockSizes();
+      const { rerender } = render(<Row />);
+      rowWidth = 400;
+      rerender(<Row />);
+      for (const section of SECTIONS) {
+        expect(badgeOf(section)).not.toHaveAttribute("data-overflowed");
+      }
+      expect(badgeOf("+0")).toHaveAttribute("data-overflowed");
+      restore();
+    });
+
+    it("takes its own texts from `labels`", () => {
+      rowWidth = 200;
+      const restore = mockSizes();
+      render(
+        <Badge.Group
+          overflow="count"
+          labels={{ more: "и ещё {count}", moreCount: "Скрыто: {count}" }}
+        >
+          {SECTIONS.map((section) => (
+            <Badge.Root key={section}>{section}</Badge.Root>
+          ))}
+        </Badge.Group>,
+      );
+      expect(screen.getByText("Скрыто: 3")).toBeInTheDocument();
+      restore();
+    });
+
+    it("keeps hidden badges out of the flow and out of sight; a wrapping group has no «+N»", () => {
+      const rule = cssRule(CSS, '.group[data-overflow="count"] > [data-overflowed]');
+      expect(cssValue(rule, "position")).toBe("absolute");
+      expect(cssValue(rule, "visibility")).toBe("hidden");
+      render(
+        <Badge.Group>
+          <Badge.Root>Сделки</Badge.Root>
+        </Badge.Group>,
+      );
+      expect(screen.queryByText(/^\+/)).toBeNull();
+    });
+  });
 });

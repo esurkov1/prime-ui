@@ -250,8 +250,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Panel",
-      en: "`ref` → `HTMLDivElement`. `<div role=\"tabpanel\">`, focusable, rendered only while its tab is active. No fill and no padding: its content is the host's content, aligned with the strip's edges. Its content enters each time it opens.",
-      ru: '`<div role="tabpanel">`, фокусируемая; рендерится только пока её вкладка активна. Без фона и отступов: её содержимое — контент хоста, по краям полосы вкладок. Содержимое появляется при каждом открытии.',
+      en: "`ref` → `HTMLDivElement`. `<div role=\"tabpanel\">`, focusable, rendered only while its tab is active (with `keepMounted`, kept hidden once opened). No fill and no padding: its content is the host's content, aligned with the strip's edges. Content opened after mount enters.",
+      ru: '`<div role="tabpanel">`, фокусируемая; рендерится только пока её вкладка активна (с `keepMounted` — после первого открытия остаётся скрытой). Без фона и отступов: её содержимое — контент хоста, по краям полосы вкладок. Содержимое, открытое после показа, появляется.',
       props: [
         {
           name: "value",
@@ -259,6 +259,13 @@ export const api: ComponentApi = {
           required: true,
           en: "Tab value this panel belongs to.",
           ru: "Значение вкладки, которой принадлежит панель.",
+        },
+        {
+          name: "keepMounted",
+          type: "boolean",
+          default: "false",
+          en: "Once opened, the panel stays mounted and `hidden` while another tab is active: its data, form draft and scroll survive a switch. A panel never opened is not mounted.",
+          ru: "После первого открытия панель остаётся смонтированной и `hidden`, пока активна другая вкладка: данные, черновик формы и прокрутка переживают переключение. Ни разу не открытая панель не монтируется.",
         },
         {
           name: "children",

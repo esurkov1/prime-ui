@@ -1528,11 +1528,16 @@ export type SidebarAccountProps = Omit<React.ComponentPropsWithoutRef<"button">,
 };
 
 /**
- * The signed-in person at the bottom of the rail: avatar, name, a muted line and a chevron. A
- * button, so it can be a `Dropdown.Trigger` child; in compact mode only the avatar stays.
+ * The signed-in person at the bottom of the rail: avatar, name, a muted line and, as a menu
+ * trigger, a chevron. A button, so it can be a `Dropdown.Trigger` child; in compact mode only the
+ * avatar stays.
  */
 function SidebarAccount({ description, className, children, type, ...rest }: SidebarAccountProps) {
   const { size } = useSidebar();
+  // The ↕ chevron promises a menu: it is drawn only when the button opens one (`Dropdown.Trigger`
+  // gives it `aria-haspopup="menu"`; `true` means a menu too).
+  const popup = rest["aria-haspopup"];
+  const opensMenu = popup === "menu" || popup === true || popup === "true";
   const nodes = React.Children.toArray(children);
   const avatar = nodes.find((node) => isElementOf<AvatarRootProps>(node, Avatar.Root));
   const name = nodes.filter((node) => node !== avatar);
@@ -1556,7 +1561,7 @@ function SidebarAccount({ description, className, children, type, ...rest }: Sid
             <span className={styles.accountDescription}>{description}</span>
           )}
         </span>
-        <Icon name="nav.chevronsUpDown" className={styles.accountChevron} />
+        {opensMenu ? <Icon name="nav.chevronsUpDown" className={styles.accountChevron} /> : null}
       </button>
     </CompactTooltip>
   );

@@ -18,6 +18,7 @@ import {
 } from "@/internal/FieldFrame";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
+import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import palette from "@/internal/palette.module.css";
 import { labelPlainText, useTextPartId, useTextParts } from "@/internal/parts";
@@ -30,6 +31,7 @@ import {
   selectionIndicatorClass,
   setFlag,
 } from "@/internal/selectionIndicator";
+import { slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import styles from "./SegmentedControl.module.css";
@@ -57,8 +59,9 @@ type SegmentedControlCollapse = "full" | "compact" | "icon";
 
 const CollapseContext = React.createContext<SegmentedControlCollapse>("full");
 
+const ITEM = `.${styles.item}`;
 const ENABLED_ITEM = '[role="radio"]:not([data-disabled="true"])';
-const CHECKED_ITEM = '[role="radio"][aria-checked="true"]';
+const CHECKED_ITEM = `${ITEM}[data-state="checked"]`;
 
 /** The thumb takes the hue of the checked segment (`color`), or none. */
 function syncThumbColor(thumb: HTMLElement, active: HTMLElement | null) {
@@ -71,16 +74,19 @@ function syncThumbColor(thumb: HTMLElement, active: HTMLElement | null) {
 /**
  * The widest level at which the row fits its viewport: full, then compact; icons alone go only when
  * every segment has one — otherwise the compact row scrolls. The level is applied to the DOM and
- * measured in place, so React re-renders only when it changes.
+ * measured in place, so React re-renders only when it changes. The viewport's scroll width is the
+ * measure, not the list's: the list clips the thumb, whose whole-pixel geometry may reach a pixel
+ * past the row — counted, it would flip the level on every commit in a host as wide as the row.
+ * The 1px slack absorbs the rounding of a fractional row width, like the edge-fade flags.
  */
 function fitCollapse(viewport: HTMLElement, list: HTMLElement): SegmentedControlCollapse {
   const fits = (level: SegmentedControlCollapse) => {
     list.dataset.collapse = level;
-    return list.scrollWidth <= viewport.clientWidth + 0.5;
+    return viewport.scrollWidth <= viewport.clientWidth + 1;
   };
   if (fits("full") || fits("compact")) return list.dataset.collapse as SegmentedControlCollapse;
-  const items = list.querySelectorAll('[role="radio"]');
-  const icons = list.querySelectorAll(`[role="radio"] > .${styles.icon}`);
+  const items = list.querySelectorAll(ITEM);
+  const icons = list.querySelectorAll(`${ITEM} > .${styles.icon}`);
   const level = items.length > 0 && icons.length === items.length ? "icon" : "compact";
   list.dataset.collapse = level;
   return level;
@@ -168,6 +174,10 @@ function SegmentedControlRoot({
   const size = tier.size;
   const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
+  // Router links as segments make the row a navigation: links in the Tab order, the current one
+  // `aria-current="page"`, no radio semantics or arrow-key selection (a link cannot be chosen by
+  // focus).
+  const links = hasLinkItems(children);
   const [selectedValue, setSelectedValue] = useControllableState<string>({
     value,
     defaultValue,
@@ -247,6 +257,7 @@ function SegmentedControlRoot({
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     onKeyDown?.(event);
+    if (links) return;
     const items = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>(ENABLED_ITEM));
     const index = items.indexOf(document.activeElement as HTMLButtonElement);
     const next = rovingIndex(event.key, index, items.length, "both");
@@ -288,15 +299,17 @@ function SegmentedControlRoot({
         className={cx(styles.field, className)}
         data-full-width={fullWidth || undefined}
       >
+        {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: the role switches to navigation when the segments are links */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: a radiogroup (or navigation) whose arrow keys move the selection */}
         <div
           id={ids.controlId}
-          role="radiogroup"
+          role={links ? "navigation" : "radiogroup"}
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy ?? ids.labelledBy}
           aria-describedby={ids.describedBy}
-          aria-invalid={ids.invalid || undefined}
-          aria-required={required || undefined}
-          aria-disabled={disabled || undefined}
+          aria-invalid={(!links && ids.invalid) || undefined}
+          aria-required={(!links && required) || undefined}
+          aria-disabled={(!links && disabled) || undefined}
           className={cx(fieldTierClass, styles.root)}
           onKeyDown={handleKeyDown}
           {...toDataAttributes({
@@ -357,10 +370,21 @@ export type SegmentedControlItemProps = Omit<
   value: string;
   disabled?: boolean;
   color?: PaletteColor;
+  asChild?: boolean;
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLButtonElement>;
 };
+
+/** Whether any segment is the consumer's element (`asChild`, a router link). */
+function hasLinkItems(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some(
+    (child) =>
+      React.isValidElement<SegmentedControlItemProps>(child) &&
+      child.type === SegmentedControlItem &&
+      child.props.asChild === true,
+  );
+}
 
 function isIconOnly(children: React.ReactNode): boolean {
   const nodes = React.Children.toArray(children);
@@ -394,6 +418,7 @@ function SegmentedControlItem({
   value,
   disabled = false,
   color,
+  asChild = false,
   children,
   className,
   onClick,
@@ -403,41 +428,65 @@ function SegmentedControlItem({
   const ctx = useSegmentedControlContext();
   const collapse = React.useContext(CollapseContext);
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
+  const child = asChild ? slotChild(children, "SegmentedControl.Item") : null;
+  // With `asChild` the segment's parts are the children of the consumer's element.
+  const content = child ? child.props.children : children;
   const isChecked = ctx.value === value;
   const isDisabled = ctx.rootDisabled || disabled;
   const isTabStop = !isDisabled && ctx.focusValue === value;
-  const twoLine = hasChildOfType(children, SegmentedControlDescription);
+  const twoLine = hasChildOfType(content, SegmentedControlDescription);
   const parts = useTextParts();
-  const label = labelOf(children);
+  const label = labelOf(content);
 
-  const segment = (
+  const shared = {
+    "aria-labelledby": parts.labelledBy,
+    "aria-describedby": parts.describedBy,
+    ...toDataAttributes({
+      state: isChecked ? "checked" : "unchecked",
+      disabled: isDisabled || undefined,
+      "icon-only": isIconOnly(content) || undefined,
+      "two-line": twoLine || undefined,
+      value,
+      color,
+    }),
+    className: cx(palette.hue, styles.item, touchTargetBlockClass, className),
+    onClick: (event: React.MouseEvent<HTMLElement>) => {
+      onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+      if (!isDisabled && !event.defaultPrevented) ctx.onSelect(value);
+    },
+  };
+  const inner = (
+    <>
+      {color ? <Badge.Dot className={styles.dot} /> : null}
+      {parts.provide(labelPlainText(content, SegmentedControlLabel))}
+    </>
+  );
+
+  const segment = child ? (
+    // A link segment: in the Tab order like any link, the current one `aria-current="page"`.
+    <InteractiveElement
+      {...(rest as React.HTMLAttributes<HTMLElement>)}
+      {...shared}
+      ref={ref as React.Ref<HTMLElement>}
+      element="slot"
+      disabled={isDisabled}
+      aria-current={isChecked ? "page" : undefined}
+    >
+      {React.cloneElement(child, undefined, inner)}
+    </InteractiveElement>
+  ) : (
     // biome-ignore lint/a11y/useSemanticElements: radiogroup of buttons with roving tabindex (WAI-ARIA APG)
     <button
       {...rest}
+      {...shared}
       ref={ref}
       role="radio"
       type="button"
       aria-checked={isChecked}
-      aria-labelledby={parts.labelledBy}
-      aria-describedby={parts.describedBy}
-      {...toDataAttributes({
-        state: isChecked ? "checked" : "unchecked",
-        disabled: isDisabled || undefined,
-        "icon-only": isIconOnly(children) || undefined,
-        "two-line": twoLine || undefined,
-        value,
-        color,
-      })}
       tabIndex={isTabStop ? 0 : -1}
       disabled={isDisabled}
-      className={cx(palette.hue, styles.item, touchTargetBlockClass, className)}
-      onClick={(event) => {
-        onClick?.(event);
-        if (!isDisabled && !event.defaultPrevented) ctx.onSelect(value);
-      }}
     >
-      {color ? <Badge.Dot className={styles.dot} /> : null}
-      {parts.provide(labelPlainText(children, SegmentedControlLabel))}
+      {inner}
     </button>
   );
 

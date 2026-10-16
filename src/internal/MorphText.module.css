@@ -14,13 +14,21 @@
  * composited and per letter it would restyle every letter on every frame.
  */
 /* The label never paints past its own box sideways — a host that already took the new width (a
-   button) keeps the leaving word inside it; letters still rise and leave vertically. */
+   button) keeps the leaving word inside it; letters still rise and leave vertically. A host that
+   squeezes the label (a shrinking button) ends it with an ellipsis at rest. */
 .root {
   display: inline-block;
+  min-width: 0;
   max-width: 100%;
   overflow-x: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: baseline;
+}
+
+/* While a change plays the label is one gliding box: an ellipsis would swap the whole box for «…». */
+.root:has(> .segment) {
+  text-overflow: clip;
 }
 
 .segment {

@@ -5,6 +5,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
+import { useMediaSlotHost } from "@/internal/mediaSlot";
 import press from "@/internal/press.module.css";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { Slot, slotChild } from "@/internal/slot";
@@ -100,7 +101,10 @@ CardRoot.displayName = "Card.Root";
 
 export type CardHeaderProps = DivProps;
 
-/** The top row: the title first, anything after it (a control, a quiet caption) at the end. */
+/**
+ * The top row: an optional `Card.Icon` first, then the title (and its description), anything after
+ * it (a control, a quiet caption) at the end.
+ */
 function CardHeader({ className, ...rest }: CardHeaderProps) {
   const zoned = useZoned();
   return (
@@ -162,14 +166,23 @@ CardFooter.displayName = "Card.Footer";
 
 export type CardIconProps = DivProps;
 
-/** The accent icon tile of a KPI; holds one icon. */
-function CardIcon({ className, ...rest }: CardIconProps) {
+/**
+ * The accent icon tile of a KPI (one icon), or the picture of the record a card is about (an
+ * `Avatar.Root` or a `Thumbnail.Root` anywhere inside, internal/mediaSlot): no tile, the tile's 40
+ * box. In `Card.Header` it leads, before the title and its description.
+ */
+function CardIcon({ className, children, ...rest }: CardIconProps) {
+  const { media, provide } = useMediaSlotHost();
   return (
     <div
+      aria-hidden={media ? true : undefined}
       {...rest}
-      className={cx(iconBoxStyles.tile, iconSlotClass, styles.icon, className)}
-      data-tone="accent"
-    />
+      className={cx(!media && iconBoxStyles.tile, !media && iconSlotClass, styles.icon, className)}
+      data-tone={media ? undefined : "accent"}
+      data-media={media ? "true" : undefined}
+    >
+      {provide(children)}
+    </div>
   );
 }
 CardIcon.displayName = "Card.Icon";

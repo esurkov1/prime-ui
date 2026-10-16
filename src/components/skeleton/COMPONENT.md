@@ -7,7 +7,7 @@
 
 ## When to use
 - A region whose content has a known shape is loading: a list, a card, a profile, a form with saved values.
-- The loading state inside [Crossfade](../crossfade/COMPONENT.md): the skeleton holds the data's geometry and cross-fades into it.
+- The loading state inside [Crossfade](../crossfade/COMPONENT.md) (the state `"loading"`), rendered from the first paint: the skeleton holds the data's geometry and the data replaces it in place with a short fade — the height never glides.
 - First load of a page section, when the structure is known before the values.
 
 ## When not to use
@@ -99,7 +99,8 @@ No `labels`.
 ## Mistakes
 - A hand-drawn grey box with its own `@keyframes` → use `Skeleton`.
 - A spinner in the middle of an empty card while its list loads → skeleton rows of that list.
-- Skeletons of a different geometry than the data (one tall block for three rows) → the swap jumps; mirror the rows.
+- Skeletons of a different geometry than the data (one tall block for three rows) → the swap jumps (it settles in one frame, nothing glides to hide it); mirror the rows.
+- Rendering nothing until the data arrives, or revealing the data by unfolding or sliding it in → the skeleton is there from the first render and the data takes its place.
 - Swapping a skeleton for data without `Crossfade` → wrap the region: `Crossfade state={loading ? "loading" : "ready"}`.
 - Returning to a skeleton on every refresh of data already shown → keep the data, set `aria-busy`.
 

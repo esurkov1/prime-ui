@@ -132,7 +132,7 @@ export const page: ComponentPageConfig = {
       scenario: "bot-actions",
       title: "Кнопки бота",
       description:
-        "Сообщение бота со встроенной клавиатурой: ряды кнопок под пузырём по его ширине делят ряд поровну, одна из них — ссылка — `Message.Actions`, `asChild`.",
+        "Сообщение бота со встроенной клавиатурой, как в Telegram: ряды в одну строку делят её поровну, цветная кнопка со значком грузится, пока идёт её промис, у ссылки — знак ссылки — `Message.Actions`, `tone`, `Button.Icon`, `asChild`.",
     },
     {
       scenario: "sticker",

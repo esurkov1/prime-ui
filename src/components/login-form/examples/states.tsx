@@ -1,5 +1,5 @@
-/** The submit cycle: the button is busy while the request runs, a refused sign-in marks both fields, which shake once, and a hidden live region says why — `loading`, `invalid`, `VisuallyHidden`. */
-import { Button, Fieldset, Icon, Input, LoginForm, VisuallyHidden } from "prime-ui-kit";
+/** The submit cycle: the button is busy while the request runs, a refused sign-in marks both fields, which shake once, and the password field says why in words — `loading`, `invalid`, `error`. */
+import { Button, Fieldset, Icon, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 export default function LoginFormStatesExample() {
@@ -30,9 +30,6 @@ export default function LoginFormStatesExample() {
             }, 1200);
           }}
         >
-          <VisuallyHidden live="assertive">
-            {failed ? "Неверный email или пароль" : ""}
-          </VisuallyHidden>
           <Fieldset disabled={pending}>
             <Input.Root label="Email" required invalid={failed}>
               <Input.Wrapper>
@@ -44,7 +41,11 @@ export default function LoginFormStatesExample() {
                 />
               </Input.Wrapper>
             </Input.Root>
-            <Input.Root label="Пароль" required invalid={failed}>
+            <Input.Root
+              label="Пароль"
+              required
+              error={failed ? "Неверная почта или пароль" : undefined}
+            >
               <Input.Wrapper>
                 <Input.Field
                   type="password"

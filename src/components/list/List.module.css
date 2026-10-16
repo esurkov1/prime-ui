@@ -231,18 +231,33 @@
   background: var(--prime-color-fill-muted-hover);
 }
 
-/* The controls, one tier below the row, as far from the row's edge as from its top and bottom:
-   the end edge, or the start edge for controls that lead the row (`side="start"`). */
+/* The controls, one tier below the row, as far from the row's edge as from its top and bottom at
+   any row height (one line, a description, an avatar, the touch row): the box stretches to the
+   row, and a square spacer at its outer edge is as wide as the space above a control box
+   (half the row less half the control) — the end edge, or the start edge for controls that lead
+   the row (`side="start"`). The spacer's negative margin takes back the gap before it. */
 .actions {
   display: inline-flex;
   flex: none;
+  align-self: stretch;
   align-items: center;
   gap: var(--prime-space-1);
-  padding-inline-end: calc((var(--field-h) - var(--field-step-h)) / 2);
 }
 
-.actions[data-side="start"] {
-  padding-inline: calc((var(--field-h) - var(--field-step-h)) / 2) var(--prime-space-0);
+.actions[data-side="end"]::after,
+.actions[data-side="start"]::before {
+  content: "";
+  flex: none;
+  block-size: calc(50% - var(--field-step-h) / 2);
+  aspect-ratio: 1;
+}
+
+.actions[data-side="end"]::after {
+  margin-inline-start: calc(var(--prime-space-0) - var(--prime-space-1));
+}
+
+.actions[data-side="start"]::before {
+  margin-inline-end: calc(var(--prime-space-0) - var(--prime-space-1));
 }
 
 /* --- Reorder (`onReorder`) ------------------------------------------------------- */

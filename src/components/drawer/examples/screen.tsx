@@ -128,8 +128,8 @@ export default function DrawerScreenExample() {
   return (
     <SmartFilter.Root fields={[]} search={search} onSearchChange={setSearch}>
       <Page.Root>
-        {/* A work screen titles itself in its top bar: the only h1, the counts under it, the search
-          and the one primary action — the Drawer trigger. */}
+        {/* A work screen titles itself in its top bar: the only h1, the counts under it and the one
+          primary action — the Drawer trigger. The table's search lives in the table's toolbar. */}
         <Page.TopBar>
           <Page.Heading>
             <Page.Title>Клиенты</Page.Title>
@@ -138,9 +138,6 @@ export default function DrawerScreenExample() {
               {plural(clients.length - people, COMPANY_WORDS)} и {people} ИП
             </Page.Description>
           </Page.Heading>
-          <Page.Tools aria-label="Клиенты">
-            <SmartFilter.Toolbar />
-          </Page.Tools>
           <Page.Actions>
             <Drawer.Root open={open} onOpenChange={changeOpen}>
               <Drawer.Trigger>
@@ -266,6 +263,7 @@ export default function DrawerScreenExample() {
             rows={shown}
             getRowKey={(row) => row.id}
             paging="none"
+            toolbar={<SmartFilter.Toolbar />}
             empty="Клиентов не найдено"
           />
         </Page.Body>

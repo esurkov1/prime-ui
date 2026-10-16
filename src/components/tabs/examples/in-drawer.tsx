@@ -1,10 +1,15 @@
-/** Order details in a Drawer: the tab bar runs along the bottom of the header, the active tab is the body rising into it, and every panel is the body's own content — `Tabs.Root`, `Tabs.List`, `Tabs.Panel`. */
+/** Order details in a Drawer: the tab bar runs along the bottom of the header and scrolls sideways when the tabs outgrow the drawer, the active tab is the body rising into it, every panel is the body's own content, and the delivery form keeps its edits across tabs — `Tabs.Root`, `Tabs.List`, `Tabs.Panel`, `keepMounted`. */
 import { Badge, Button, DescriptionList, Drawer, Fieldset, Input, Tabs } from "prime-ui-kit";
 
 const ITEMS = [
   { name: "Кресло «Орион», графит", amount: "2 × 18 900 ₽" },
   { name: "Стол «Лофт 140»", amount: "1 × 24 500 ₽" },
   { name: "Сборка и подъём на этаж", amount: "1 × 3 200 ₽" },
+];
+
+const DOCUMENTS = [
+  { name: "Счёт № 1042-С", date: "3 октября" },
+  { name: "Накладная № 1042-Н", date: "4 октября" },
 ];
 
 const HISTORY = [
@@ -33,6 +38,7 @@ export default function TabsInDrawerExample() {
                 <Tabs.Count>{ITEMS.length}</Tabs.Count>
               </Tabs.Item>
               <Tabs.Item value="delivery">Доставка</Tabs.Item>
+              <Tabs.Item value="documents">Документы</Tabs.Item>
               <Tabs.Item value="history">История</Tabs.Item>
             </Tabs.List>
           </Drawer.Header>
@@ -58,7 +64,7 @@ export default function TabsInDrawerExample() {
               </DescriptionList.Root>
             </Tabs.Panel>
 
-            <Tabs.Panel value="delivery">
+            <Tabs.Panel value="delivery" keepMounted>
               <Fieldset aria-label="Доставка">
                 <Input.Root label="Адрес">
                   <Input.Wrapper>
@@ -71,6 +77,16 @@ export default function TabsInDrawerExample() {
                   </Input.Wrapper>
                 </Input.Root>
               </Fieldset>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="documents">
+              <DescriptionList.Root>
+                {DOCUMENTS.map((document) => (
+                  <DescriptionList.Item key={document.name} label={document.name}>
+                    {document.date}
+                  </DescriptionList.Item>
+                ))}
+              </DescriptionList.Root>
             </Tabs.Panel>
 
             <Tabs.Panel value="history">

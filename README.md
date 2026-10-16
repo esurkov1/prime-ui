@@ -278,7 +278,7 @@ accessibility, examples and common mistakes.
 | [**Spinner**](https://github.com/esurkov1/prime-ui/blob/main/src/components/spinner/COMPONENT.md) | An indeterminate loading indicator: the kit ring with the share unknown — a quarter arc turning on a faint track while a request runs. |
 | [**Skeleton**](https://github.com/esurkov1/prime-ui/blob/main/src/components/skeleton/COMPONENT.md) | A placeholder in the shape of the content that is loading — text lines, a control, an avatar, a block — so the layout is in place before the data arrives. |
 | [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty or failed state of a page, a block or a menu: icon, title, explanation and an action — a retry for a failed load. |
-| [**Crossfade**](https://github.com/esurkov1/prime-ui/blob/main/src/components/crossfade/COMPONENT.md) | A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump. |
+| [**Crossfade**](https://github.com/esurkov1/prime-ui/blob/main/src/components/crossfade/COMPONENT.md) | A region that cross-fades between its states (loading → data → empty → error): the data replaces the loading skeleton in place, settled states glide to the new height, so the page below does not jump. |
 | [**VisuallyHidden**](https://github.com/esurkov1/prime-ui/blob/main/src/components/visually-hidden/COMPONENT.md) | Text that screen readers read and nobody sees: the words behind an icon, a badge or a change on the screen. |
 
 ### Navigation (`navigation`)

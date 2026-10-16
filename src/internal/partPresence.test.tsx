@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { withMotion } from "@/test/motion";
 
 import enterMotion from "./enterMotion.module.css";
-import { usePartPresence } from "./partPresence";
+import { useEnterOnAppear, usePartPresence } from "./partPresence";
 
 function Field({ value }: { value: string }) {
   const clear = usePartPresence<HTMLButtonElement>({ present: value !== "", axis: "inline" });
@@ -62,5 +62,51 @@ describe("usePartPresence", () => {
       await Promise.resolve();
     });
     expect(container.innerHTML).toBe("");
+  });
+});
+
+function Notice({ text, error }: { text: string; error?: boolean }) {
+  const appear = useEnterOnAppear<HTMLParagraphElement>(error ?? true);
+  return (
+    <p ref={appear.ref} className={appear.entering ? enterMotion.enter : undefined}>
+      {text}
+    </p>
+  );
+}
+
+function Screen({ shown, wrapped }: { shown: boolean; wrapped?: boolean }) {
+  const notice = shown ? <Notice text="Счёт отправлен" /> : null;
+  return <section>{wrapped && shown ? <div>{notice}</div> : notice}</section>;
+}
+
+const notice = (text = "Счёт отправлен") => screen.getByText(text);
+
+describe("useEnterOnAppear", () => {
+  it("a part that mounts with its page is just there", () => {
+    render(<Screen shown />);
+    expect(notice()).not.toHaveClass(enterMotion.enter);
+  });
+
+  it("a part inserted on its own into a shown host enters", async () => {
+    const { rerender } = render(<Screen shown={false} />);
+    await act(async () => {});
+    rerender(<Screen shown />);
+    expect(notice()).toHaveClass(enterMotion.enter);
+  });
+
+  it("a part that comes with a new region of a shown host is that region's", async () => {
+    const { rerender } = render(<Screen shown={false} wrapped />);
+    await act(async () => {});
+    rerender(<Screen shown wrapped />);
+    expect(notice()).not.toHaveClass(enterMotion.enter);
+  });
+
+  it("a mounted part enters when it turns on, not before", () => {
+    const { rerender } = render(<Notice text="Проверьте ИНН" error={false} />);
+    expect(notice("Проверьте ИНН")).not.toHaveClass(enterMotion.enter);
+    rerender(<Notice text="Проверьте ИНН" error />);
+    expect(notice("Проверьте ИНН")).toHaveClass(enterMotion.enter);
+    rerender(<Notice text="Проверьте ИНН" error={false} />);
+    expect(notice("Проверьте ИНН")).not.toHaveClass(enterMotion.enter);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -63,8 +63,13 @@ describe("Spinner", () => {
     expect(screen.getByTestId("s")).toHaveAttribute("data-tone", "muted");
   });
 
-  it("fades itself in when it appears", () => {
-    render(<Spinner data-testid="s" />);
+  it("fades itself in when it appears on a shown host, not when it mounts with it", async () => {
+    const host = (loading: boolean) => <div>{loading ? <Spinner data-testid="s" /> : null}</div>;
+    const { rerender } = render(host(true));
+    expect(screen.getByTestId("s")).not.toHaveClass(enterMotion.enterFade);
+    rerender(host(false));
+    await act(async () => {});
+    rerender(host(true));
     expect(screen.getByTestId("s")).toHaveClass(enterMotion.enterFade);
   });
 });

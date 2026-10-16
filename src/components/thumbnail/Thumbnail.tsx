@@ -18,6 +18,7 @@ import { MediaPlayMark } from "@/internal/mediaDisk";
 import { firstFrame } from "@/internal/mediaFrame";
 import pill from "@/internal/mediaPill.module.css";
 import { useMediaSession } from "@/internal/mediaSession";
+import { useMediaSlotSize } from "@/internal/mediaSlot";
 import palette from "@/internal/palette.module.css";
 import press from "@/internal/press.module.css";
 import { Slot } from "@/internal/slot";
@@ -70,7 +71,8 @@ function ThumbnailRoot({
   ref,
   ...rest
 }: ThumbnailRootProps) {
-  const { size, provide } = useHostTier(sizeProp);
+  // In a media slot (a dialog or card mark) the picture takes the slot's size.
+  const { size, provide } = useHostTier(useMediaSlotSize("thumbnail") ?? sizeProp);
   const selectable =
     checkedProp !== undefined || defaultChecked !== undefined || onCheckedChange !== undefined;
   const [checked, setChecked] = useControllableState({

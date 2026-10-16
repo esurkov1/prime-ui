@@ -61,8 +61,8 @@ export const api: ComponentApi = {
         ru: '`role="dialog"` и `aria-modal="true"`; имя — `Drawer.Title` (или `aria-label`), описание — `Drawer.Description`.',
       },
       {
-        en: "Focus moves into the panel on open and returns to the opener on close, including after a scrim click.",
-        ru: "При открытии фокус уходит в панель, при закрытии — на элемент, открывший её, в том числе после клика по подложке.",
+        en: "On open focus moves to the panel itself (its title and description are read; an `autoFocus` field wins), without the ring after a click; Tab goes on to the first control. On close it returns to the opener, including after a scrim click.",
+        ru: "При открытии фокус встаёт на саму панель (читаются заголовок и описание; поле с `autoFocus` побеждает), после клика — без рамки; Tab ведёт к первому контролу. При закрытии фокус возвращается на элемент, открывший панель, в том числе после клика по подложке.",
       },
       {
         en: "The page behind is `inert`, scroll is locked; only the topmost layer reacts.",

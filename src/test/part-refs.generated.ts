@@ -122,6 +122,7 @@ export const PART_REFS = {
   "Composer.Attach": ["HTMLDivElement"],
   "Composer.Item": ["HTMLButtonElement"],
   "Composer.ItemIcon": ["HTMLSpanElement"],
+  "Composer.Keyboard": ["HTMLDivElement"],
   "ConfirmDialog.Root": null,
   "ConfirmDialog.Trigger": null,
   Crossfade: ["HTMLDivElement"],

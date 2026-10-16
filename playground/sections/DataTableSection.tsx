@@ -67,7 +67,7 @@ export const page: ComponentPageConfig = {
       scenario: "selection",
       title: "Выбор строк",
       description:
-        "Участники с флажками: диапазон с Shift, протяжка, «выбрать все» и массовые действия на панели — `selectable`, `selected`, `onSelectedChange`, `getRowLabel`.",
+        "Участники с флажками: диапазон с Shift, протяжка, «выбрать все» и меню действий после поиска и выбора колонок, пока строки выбраны — `selectable`, `selected`, `onSelectedChange`, `getRowLabel`, `renderSelectionActions`.",
     },
     {
       scenario: "nested-rows",
@@ -165,7 +165,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "screen",
       description:
-        "Страница списка: заголовок, строка с цифрами, поиск, фильтры и одно главное действие в верхней полосе страницы, таблица счетов со статусами, действиями со строкой, страницами и пустым результатом фильтра — `empty`, `pageSize`, `stickyFirstColumn`.",
+        "Страница списка: заголовок, строка с цифрами и одно главное действие в верхней полосе страницы, поиск и фильтры в своей строке инструментов таблицы, таблица счетов со статусами, действиями со строкой, страницами и пустым результатом фильтра — `empty`, `pageSize`, `stickyFirstColumn`.",
     },
   ],
   api,

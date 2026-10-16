@@ -1,5 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
-import { BADGE_LABELS } from "./Badge";
+import { BADGE_GROUP_LABELS, BADGE_LABELS } from "./Badge";
 
 export const api: ComponentApi = {
   parts: [
@@ -106,8 +106,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Group",
-      en: "`ref` → `HTMLDivElement`. A row of badges as one value (the tags of a record): it wraps onto more lines, the badges a chip gap apart.",
-      ru: "Ряд бейджей как одно значение (теги записи): переносится на новые строки, бейджи на шаг друг от друга.",
+      en: "`ref` → `HTMLDivElement`. A row of badges as one value (the tags of a record): it wraps onto more lines, the badges a chip gap apart, or with `overflow` stays on one line behind a «+N» badge.",
+      ru: "Ряд бейджей как одно значение (теги записи): переносится на новые строки, бейджи на шаг друг от друга, или с `overflow` остаётся в одну строку с бейджем «+N».",
       props: [
         {
           name: "size",
@@ -117,10 +117,23 @@ export const api: ComponentApi = {
           ru: "Ярус всех бейджей группы; собственный `size` бейджа важнее. Малые ярусы стоят теснее.",
         },
         {
+          name: "overflow",
+          type: '"wrap" | "count"',
+          default: '"wrap"',
+          en: "`wrap` — the row wraps onto more lines. `count` — one line (a table cell): the badges that fit the container, the rest behind a focusable «+N» badge whose tooltip lists them.",
+          ru: "`wrap` — ряд переносится на новые строки. `count` — одна строка (ячейка таблицы): бейджи, что помещаются в контейнер, остальные — за фокусируемым «+N» со списком в подсказке.",
+        },
+        {
+          name: "labels",
+          type: "Partial<BadgeGroupLabels>",
+          en: "Built-in strings of the «+N» badge, see Labels.",
+          ru: "Системные строки бейджа «+N», см. «Доступность».",
+        },
+        {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: '`children` (the `Badge.Root`s), `className`, `aria-label` (a named group is `role="group"`) and the other div attributes.',
-          ru: '`children` (`Badge.Root`), `className`, `aria-label` (названная группа — `role="group"`) и остальные атрибуты div.',
+          en: '`children` (the `Badge.Root`s, one per value), `className`, `aria-label` (a named group is `role="group"`) and the other div attributes.',
+          ru: '`children` (`Badge.Root`, по одному на значение), `className`, `aria-label` (названная группа — `role="group"`) и остальные атрибуты div.',
         },
       ],
     },
@@ -229,22 +242,36 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: labelRows(BADGE_LABELS, {
-    remove: {
-      en: "Accessible name of the remove segment; include the badge text («Убрать фильтр «Москва»»).",
-      ru: "Имя сегмента удаления; включите текст бейджа («Убрать фильтр «Москва»»).",
-    },
-    removeFailed: {
-      en: "Spoken when the `onRemove` promise rejects and the badge stays; name the badge («Фильтр «Москва» не убран»).",
-      ru: "Озвучивается, когда промис `onRemove` отклонён и бейдж остался; назовите бейдж («Фильтр «Москва» не убран»).",
-    },
-  }),
+  labels: [
+    ...labelRows(BADGE_LABELS, {
+      remove: {
+        en: "Accessible name of the remove segment; include the badge text («Убрать фильтр «Москва»»).",
+        ru: "Имя сегмента удаления; включите текст бейджа («Убрать фильтр «Москва»»).",
+      },
+      removeFailed: {
+        en: "Spoken when the `onRemove` promise rejects and the badge stays; name the badge («Фильтр «Москва» не убран»).",
+        ru: "Озвучивается, когда промис `onRemove` отклонён и бейдж остался; назовите бейдж («Фильтр «Москва» не убран»).",
+      },
+    }),
+    ...labelRows(BADGE_GROUP_LABELS, {
+      more: {
+        en: "Visible text of the badge for the badges that did not fit; `{count}` — how many.",
+        ru: "Видимый текст бейджа для не поместившихся бейджей; `{count}` — сколько их.",
+        part: "Badge.Group",
+      },
+      moreCount: {
+        en: "What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip.",
+        ru: "Что читают ассистивные технологии вместо видимого текста этого бейджа; `{count}` — сколько. Сами значения — в его подсказке.",
+        part: "Badge.Group",
+      },
+    }),
+  ],
   accessibility: {
     keyboard: [
       {
         keys: "Tab",
-        en: "Focuses the body of a toggle chip, then its action or remove segment.",
-        ru: "Фокус на теле чипа-переключателя, затем на действии или удалении.",
+        en: "Focuses the body of a toggle chip, then its action or remove segment; in `Badge.Group` with `overflow` the «+N» badge, which opens its tooltip with the hidden values.",
+        ru: "Фокус на теле чипа-переключателя, затем на действии или удалении; в `Badge.Group` с `overflow` — на бейдже «+N», он открывает подсказку со скрытыми значениями.",
       },
       {
         keys: "Enter · Space",
@@ -272,6 +299,10 @@ export const api: ComponentApi = {
       {
         en: '`Badge.Dot` is `aria-hidden`; an icon-only badge needs `aria-label` and then is `role="img"`. Color never carries meaning alone, a `tone` neither.',
         ru: '`Badge.Dot` скрыт (`aria-hidden`); бейджу-иконке нужен `aria-label`, с ним он `role="img"`. Цвет никогда не несёт смысл один, `tone` тоже — оставляйте слово.',
+      },
+      {
+        en: '`overflow="count"`: the badges that did not fit are `visibility: hidden` (out of the tree and the Tab order); the «+N» badge is a tab stop read as `labels.moreCount`; its tooltip, open while it has focus, lists the hidden values as its description.',
+        ru: '`overflow="count"`: не поместившиеся бейджи скрыты (`visibility: hidden` — вне дерева и порядка Tab); бейдж «+N» — точка Tab, читается как `labels.moreCount`; его подсказка, открытая при фокусе, описывает его списком скрытых значений.',
       },
     ],
   },

@@ -1,0 +1,10 @@
+/*
+ * Crossfade — the public region swap (`src/internal/RegionSwap`). A region spans its parent's
+ * inline size, also as the item of a centring grid (`place-items: center`, the canvas of a sign-in
+ * page): shrunk to its content's width there, a child that is an inline-size container (a Card,
+ * a LoginForm, most kit blocks) has no intrinsic width, collapses to zero and grows tall. The rule
+ * has no specificity, so a consumer's class aligns the region another way.
+ */
+:where(.root) {
+  justify-self: stretch;
+}

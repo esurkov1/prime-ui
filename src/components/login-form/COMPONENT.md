@@ -6,7 +6,7 @@
 > A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation.
 
 ## When to use
-- A standalone sign-in, sign-up, password-reset or one-time-code screen of a product.
+- The one auth screen of a product: sign-in, sign-up, an invite (set a password by a link), a password reset and a one-time code are its modes (`/login?invite=…`), each the same card with another header and form — never a page of its own per mode.
 - The same flow inside a [Modal](../modal/COMPONENT.md) (`flat`) when sign-in is opened over a page.
 - Any short authentication step where one card holds a header, optional provider buttons, 1–5 fields and one primary action.
 
@@ -140,8 +140,8 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 ### align
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `start` | accent icon tile on the left, title over description to its right, left-aligned footer | product screens, sign-in over a page, inside a Modal | yes |
-| `center` | round logo, centered title, description and footer | a standalone brand-first sign-in screen | |
+| `start` | accent icon tile on the left, title over description to its right, left-aligned footer | every auth screen of a product and sign-in over a page: the tile holds the icon of the action (`action.login`), the title names it | yes |
+| `center` | round logo, centered title, description and footer | a public brand page outside the product, where the mark is the point | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -149,7 +149,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `flat` | card fill, no shadow | inside a Modal or any other surface | `false` |
 
 **Combinations**
-- Recommended: one `size` on Root only (fields and buttons follow it); `hint` / `error` on fields for validation; a refused sign-in as `invalid` on the fields it concerns plus a [VisuallyHidden](../visually-hidden/COMPONENT.md) live region with the reason.
+- Recommended: one `size` on Root only (fields and buttons follow it); `hint` / `error` on fields for validation; a refused sign-in as `invalid` on the e-mail and the reason in words as the password field's `error` («Неверная почта или пароль»).
 - Avoid: a [Banner](../banner/COMPONENT.md) in the form; more than one primary button; provider buttons in `solid` (they compete with the submit); a Card around LoginForm.
 
 ## States
@@ -159,14 +159,14 @@ LoginForm has no state of its own. Compose them:
 |---|---|---|
 | submitting | `loading` on the submit Button; the fields in a `Fieldset disabled`, the submit Button outside it | `aria-busy` on the button; native `disabled` on the `<fieldset>`, the fields in their disabled look |
 | field error | `error` / `invalid` on `Input.Root`, `error` on `DigitInput` | `aria-invalid`, the error under the field |
-| refused sign-in | `invalid` on the fields it concerns (they shake once); `VisuallyHidden live="assertive"`, mounted from the start in `LoginForm.Form`, gets the reason | `aria-invalid` on the fields; `role="alert"` on the hidden region |
+| refused sign-in | `invalid` on the e-mail, `error` with the reason on the password (both shake once) | `aria-invalid` on the fields; the error in the password's support row, announced by its live region |
 
 Root carries `data-size`, `data-align` and `data-flat`.
 
 ## Layout & spacing
 - header → body `--prime-space-8` (gap on Root); provider buttons → divider → form `--prime-space-4`; field → field → submit `--prime-space-5`; submit → back action `--prime-space-3`; form → footer `--prime-space-6`.
 - Spacing is `gap` on parents; no margins between parts.
-- The card has no border, takes the full width up to the small modal width. To center it on a page, wrap it in your own flex container on the page.
+- The card has no border, takes the full width up to the small modal width and centres itself in a wider block. Put it on a centring canvas of your own (a grid with `place-items: center` and `min-height: 100dvh`); a `Crossfade` that swaps the page's states (loading / form / expired link) goes around the card inside that canvas, without `fill`.
 - The form is a Card, a layer of the surface ladder (`data-depth`): on the page it is white in light with the raised whisper, fields inside are one step off it.
 
 ## Accessibility
@@ -185,7 +185,7 @@ Root carries `data-size`, `data-align` and `data-flat`.
 - The logo is decorative; with an `aria-label` it is the product mark image (`role="img"`).
 - Give `LoginForm.Form` an `aria-label` (or `aria-labelledby` pointing to the title id) so the form is a landmark.
 - Fields use `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) so password managers and OTP autofill work.
-- Field errors come from the fields (`aria-invalid`, described by the error). A refused sign-in has no Banner: the fields it concerns take `invalid` and an always-mounted `VisuallyHidden live="assertive"` says why.
+- Field errors come from the fields (`aria-invalid`, described by the error). A refused sign-in has no Banner: the e-mail takes `invalid` and the `error` of the password says why, announced by the support row of the field.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -195,24 +195,26 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a centered header with the product's named mark — `align`, `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. |
+| [overview.tsx](examples/overview.tsx) | Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a header that names the action: its icon tile on the left, the title and one line beside it — `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Padding, gaps and text roles of the card follow the tier; the fields and buttons take the same one — `size`. |
 | [structure.tsx](examples/structure.tsx) | The minimal form: no logo, description or footer, no shadow for a host that already is a surface and a second-level title under the host page's own heading — `flat`, `as`. |
 | [register.tsx](examples/register.tsx) | Sign-up: four fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. |
 | [forgot-password.tsx](examples/forgot-password.tsx) | Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. |
 | [reset-password.tsx](examples/reset-password.tsx) | A new password after the e-mail link: a strength meter on the first field and a mismatch error under the second one — `strength`, `error`. |
 | [verification-code.tsx](examples/verification-code.tsx) | The second step with a one-time code: a rejected code shows its error under the cells, resend is a quiet action — `DigitInput`, `LoginForm.Actions`. |
-| [states.tsx](examples/states.tsx) | The submit cycle: the button is busy while the request runs, a refused sign-in marks both fields, which shake once, and a hidden live region says why — `loading`, `invalid`, `VisuallyHidden`. |
+| [states.tsx](examples/states.tsx) | The submit cycle: the button is busy while the request runs, a refused sign-in marks both fields, which shake once, and the password field says why in words — `loading`, `invalid`, `error`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width — `LoginForm.Form`. |
 
 ## Mistakes
 - A separate block of your own for provider buttons → put them in `LoginForm.Actions`.
 - `disabled` on every field while the request runs → one [Fieldset](../fieldset/COMPONENT.md) `disabled` around the fields; keep the submit Button outside it so it shows `loading`.
-- A danger Banner above the fields for a refused sign-in → `invalid` on the fields and the reason in a `VisuallyHidden live="assertive"`; a sign-in or sign-up form has no banners.
+- A danger Banner above the fields for a refused sign-in → `invalid` on the e-mail and the reason as the password's `error`; a sign-in or sign-up form has no banners. A refusal shown only by red rings and a shake → the same `error`: a person needs the words.
+- A product mark centred over the title on the product's own sign-in → `align="start"` (the default) with the action's icon in `LoginForm.Logo`.
+- A separate page for an invite or a reset → a mode of the auth screen, the same card.
 - A placeholder instead of a field label → pass `label` to the field.
 - A Card around LoginForm → the root already is the card; use `flat` inside another surface.
 - Repeating the card `size` on every field and button → set it once on Root; fields and buttons follow it.
 
 ## Related
 - **Built from:** [Card](../card/COMPONENT.md) (the surface), [Typography](../typography/COMPONENT.md) (`Title`, `Description`, `Footer`), the icon tile (`iconBox` `.tile`, the `start` logo)
-- **See also:** [Input](../input/COMPONENT.md), [Fieldset](../fieldset/COMPONENT.md) (disables the fields while signing in), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md), [Modal](../modal/COMPONENT.md)
+- **See also:** [Input](../input/COMPONENT.md), [Fieldset](../fieldset/COMPONENT.md) (disables the fields while signing in), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [Modal](../modal/COMPONENT.md)

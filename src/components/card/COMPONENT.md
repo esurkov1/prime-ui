@@ -9,6 +9,7 @@
 - KPI tiles on a dashboard (`mini`, `stat-trend`, `split`).
 - A chart or text widget with a header and controls (`panel`).
 - A settings or profile form grouped on its own surface (`panel` + `Body` + `Footer`).
+- A block about one person or object — a linked account, a contact — headed by its picture (`Card.Icon` with an `Avatar.Root` in `Card.Header`).
 - An activity list (`list`), a call to action (`cta`), a tile with an image on top (`cover`).
 - A tile that is itself the way to its details — a KPI that opens its report, a project tile (`asChild` with a link or a button).
 
@@ -25,7 +26,7 @@ import { Card } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Card.Root variant="panel"        Header(Title, Description?, …trailing) · Body · Media · Footer
+Card.Root variant="panel"        Header(Icon?, Title, Description?, …trailing) · Body · Media · Footer
 Card.Root variant="mini"         Icon · Label · Value · Meta? · Media?
 Card.Root variant="stat-trend"   Label · Value · Delta · Meta?
                                  or Header(Badge or Icon, Value) · Description
@@ -52,7 +53,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
 ### Card.Header
-`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. Wraps below 22rem.
+`ref` → `HTMLDivElement`. The top row: an optional `Card.Icon`, `Card.Title` with an optional `Card.Description` under it, anything else (a control, a caption) at the end. Wraps below 22rem.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -95,7 +96,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Icon
-`ref` → `HTMLDivElement`. The 40px accent tile of a KPI holding one icon; it spans the label and the value rows in `mini` and a `split` cell.
+`ref` → `HTMLDivElement`. The 40px accent tile of one icon: beside the label and value in `mini` and a `split` cell, first in `Card.Header`. An `Avatar.Root` or `Thumbnail.Root` inside (also in a wrapper) is the record's picture: no tile, 40px, `aria-hidden`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -179,6 +180,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
 - Long values wrap; labels truncate, except in a `mini` tile and a `split` cell, where a label beside the icon wraps instead; a chart SVG needs a CSS height.
 - In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper. A `Card.Description` in the header stacks under the title, 4 apart; the control stays at the end, centred on both lines.
+- A `Card.Icon` in a `Header` leads the row, 12 before the title, centred on the title and the description: the accent tile, or the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own wrapper component, with no tile; it takes 40 px whatever size it was given — for a card about one person or object (a linked account, a contact).
 - `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up; in `mini` and a `split` cell it sits in the text column under the value.
 
 ## Accessibility
@@ -212,6 +214,7 @@ No `labels`.
 | [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change in every tone and a reference line — `variant`, `Card.Delta`, `tone`, `Card.Meta`. |
 | [kpi-media.tsx](examples/kpi-media.tsx) | A KPI with a sparkline or a fill level in the bottom slot of `mini` — `Card.Media`. |
 | [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a short description and a period switch, and a Sparkline with the period total over its chart — `Card.Header`, `Card.Description`, `Card.Body`. |
+| [person-header.tsx](examples/person-header.tsx) | A linked Telegram account in an employee card: the avatar leads the header, the handle stands under the name and the unlink button sits at the end — `Card.Icon`, `Avatar.Root`, `Card.Description`. |
 | [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
@@ -225,6 +228,7 @@ No `labels`.
 - `Card.Delta tone="success"` for every «+» → choose the tone by meaning.
 - Custom padding on a `panel` root → padding belongs to `Header` / `Body` / `Footer`.
 - A wrapper `<div>` around the label and the value of `mini` → put `Icon`, `Label`, `Value` straight into the root (or into a `split` cell); the template lays them out.
+- An avatar, a name and a handle hand-laid in `Card.Body` with a button beside them → `Card.Header` with `Card.Icon` (the `Avatar.Root`), `Card.Title`, `Card.Description` and the button.
 - A chart SVG with only a `viewBox` → give it a CSS height.
 - A hand-drawn trend SVG in a chart widget → `Sparkline` in the `Body` (or `Media`); a chart with a legend and states → `ChartFrame`.
 - A clickable `<div>` card with `onClick` → `asChild` with a real `<a href>` (Cmd-click, a new tab) or a `<button>`.
@@ -233,5 +237,5 @@ No `labels`.
 - Skeletons placed by hand inside `Card.Value` → `Card.Root loading`; keep the parts mounted while loading so each holds its place.
 
 ## Related
-- **Built from:** [Skeleton](../skeleton/COMPONENT.md)
+- **Built from:** [Skeleton](../skeleton/COMPONENT.md), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Card.Icon`)
 - **See also:** [Page](../../layout/page/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Sparkline](../sparkline/COMPONENT.md) (a trend with its total inside a `panel`), [ChartFrame](../chart-frame/COMPONENT.md) (a full chart with legend and states)

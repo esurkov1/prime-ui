@@ -7,7 +7,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
-import { hasNativeTabStop } from "@/internal/overlay/focus";
+import { focusFromKeyboard, hasNativeTabStop } from "@/internal/overlay/focus";
 import tooltipSurface from "@/internal/overlay/tooltipSurface.module.css";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { SlotPartProps } from "@/internal/slot";
@@ -263,7 +263,7 @@ function TooltipTrigger(props: TooltipTriggerProps) {
         ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
         ...(madeFocusable ? { tabIndex: 0, className: styles.focusHost } : null),
         onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
-          // Touch has no hover: a tap must not leave a tooltip behind. Focus still opens it.
+          // Touch has no hover: a tap must not leave a tooltip behind. Keyboard focus still opens it.
           if (e.pointerType === "touch") return;
           if (!pressedRef.current) scheduleOpen();
         },
@@ -275,8 +275,10 @@ function TooltipTrigger(props: TooltipTriggerProps) {
           pressedRef.current = true;
           close();
         },
-        onFocus: () => {
-          if (!pressedRef.current) scheduleOpen();
+        onFocus: (e: React.FocusEvent<HTMLElement>) => {
+          // Only keyboard focus shows it: not the focus a click causes, nor a layer moving focus
+          // in or back after a click (a ⋯ in a drawer's header).
+          if (!pressedRef.current && focusFromKeyboard(e.currentTarget)) scheduleOpen();
         },
         onBlur: () => {
           pressedRef.current = false;

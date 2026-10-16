@@ -80,6 +80,7 @@ function DrawerContent({
       panelClassName={styles.panel}
       swipe="never"
       footerLayout="end"
+      focusStart="container"
       data-side={side}
       data-size={size}
     />

@@ -163,6 +163,7 @@ export const semanticTokens = {
       fg: "{color.white}",
       soft: "{color.green.100}",
       text: "{color.green.700}",
+      border: "{color.green.500}",
     },
     warning: {
       default: "{color.orange.700}",
@@ -468,7 +469,7 @@ export const semanticTokens = {
       /** State that glides into place (thumbs, indicators, checkmarks); pair with `base`. */
       emphasized: "{easing.emphasized}",
     },
-    /** Step between items of a staggered first render. */
+    /** Step between items of a staggered entrance of parts that appear after their page is shown. */
     stagger: "{duration.80}",
     /**
      * Period unit of a loading loop (Spinner turns once in 3 units, 6 under reduced motion). A

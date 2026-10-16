@@ -131,8 +131,8 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
-        en: "Focus on the trigger opens the tooltip after the delay.",
-        ru: "Фокус на триггере открывает подсказку после задержки.",
+        en: "Keyboard focus on the trigger opens the tooltip after the delay; focus a click causes, or a layer moves in after a click, does not.",
+        ru: "Фокус с клавиатуры на триггере открывает подсказку после задержки; фокус от клика или фокус, который слой переносит после клика, — нет.",
       },
       {
         keys: "Escape",
@@ -154,8 +154,8 @@ export const api: ComponentApi = {
         ru: "Подсказка — описание, а не имя: иконке-кнопке нужен свой `aria-label`.",
       },
       {
-        en: "The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.",
-        ru: "Указатель может перейти на чип — подсказка не закроется (WCAG 1.4.13); касание не открывает её, фокус — открывает.",
+        en: "The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, keyboard focus does.",
+        ru: "Указатель может перейти на чип — подсказка не закроется (WCAG 1.4.13); касание не открывает её, фокус с клавиатуры — открывает.",
       },
       {
         en: "Tooltip has no `closeOnEscape` / `closeOnOutsideClick` (foundation §8): it closes on pointer-leave, blur, a press on the trigger and Escape, and Escape cannot be turned off — WCAG 1.4.13 requires the chip to be dismissable without moving the pointer or focus.",

@@ -591,7 +591,8 @@ describe("SegmentedControl — narrow row", () => {
       vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockImplementation(function (
         this: HTMLElement,
       ) {
-        return this.dataset.collapse === "compact" ? 148 : 156;
+        const list = this.querySelector<HTMLElement>("[data-collapse]") ?? this;
+        return list.dataset.collapse === "compact" ? 148 : 156;
       }),
       vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(150),
     ];
@@ -618,6 +619,69 @@ describe("SegmentedControl — narrow row", () => {
     expect(value('.list[data-collapse="icon"] :is(.label, .count, .description)', "display")).toBe(
       "none",
     );
+  });
+
+  it("settles in a host as wide as its row: the thumb's whole-pixel geometry never flips the level", () => {
+    // A shrink-to-fit host (a matrix cell): the viewport is exactly as wide as the row at the level
+    // it shows — full 138, compact 122. The thumb takes whole-pixel offsets, so on the last segment
+    // of the full row it reaches 1px past the row: the list's own scroll width sees it, the
+    // viewport's (the list clips the thumb) does not.
+    const ROW = { full: 138, compact: 122 } as const;
+    const levelOf = (el: HTMLElement) =>
+      ((el.closest(`.${styles.list}`) ?? el.querySelector(`.${styles.list}`)) as HTMLElement | null)
+        ?.dataset.collapse === "compact"
+        ? "compact"
+        : "full";
+    const isList = (el: HTMLElement) => el.classList.contains(styles.list);
+    const isViewport = (el: HTMLElement) => el.querySelector(`:scope > .${styles.list}`) !== null;
+    const spies = [
+      vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        return this.dataset.value === "list" ? ROW[levelOf(this)] / 2 : 0;
+      }),
+      vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        return this.dataset.value ? ROW[levelOf(this)] / 2 + 1 : 0;
+      }),
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        return isViewport(this) ? ROW[levelOf(this)] : 0;
+      }),
+      vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        if (isViewport(this)) return ROW[levelOf(this)];
+        if (!isList(this)) return 0;
+        const thumb = this.firstElementChild as HTMLElement;
+        const thumbEnd =
+          (Number.parseFloat(thumb.style.left) || 0) + (Number.parseFloat(thumb.style.width) || 0);
+        return Math.max(ROW[levelOf(this)], thumbEnd);
+      }),
+    ];
+    try {
+      const view = render(
+        <SegmentedControl.Root defaultValue="list" aria-label="Вид">
+          <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
+          <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
+        </SegmentedControl.Root>,
+      );
+      // Later commits re-measure with the thumb in place.
+      for (const label of ["Вид", "Вид работ", "Вид"]) {
+        view.rerender(
+          <SegmentedControl.Root defaultValue="list" aria-label={label}>
+            <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
+            <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
+          </SegmentedControl.Root>,
+        );
+      }
+      const list = screen.getByRole("radio", { name: "Доска" }).parentElement as HTMLElement;
+      expect(list).toHaveAttribute("data-collapse", "full");
+    } finally {
+      for (const spy of spies) spy.mockRestore();
+    }
   });
 });
 
@@ -784,5 +848,55 @@ describe("SegmentedControl field frame", () => {
     } finally {
       for (const spy of spies) spy.mockRestore();
     }
+  });
+});
+
+describe("SegmentedControl.Item asChild", () => {
+  function Links({ onValueChange }: { onValueChange?: (value: string) => void }) {
+    return (
+      <SegmentedControl.Root value="/roles" aria-label="Команда" onValueChange={onValueChange}>
+        <SegmentedControl.Item value="/" asChild>
+          <a href="#staff">Сотрудники</a>
+        </SegmentedControl.Item>
+        <SegmentedControl.Item value="/roles" asChild>
+          <a href="#roles">Роли</a>
+        </SegmentedControl.Item>
+      </SegmentedControl.Root>
+    );
+  }
+
+  it("makes the row a navigation of links; the current one is aria-current", () => {
+    render(<Links />);
+    const nav = screen.getByRole("navigation", { name: "Команда" });
+    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+    const staff = screen.getByRole("link", { name: "Сотрудники" });
+    const roles = screen.getByRole("link", { name: "Роли" });
+    expect(nav).toContainElement(staff);
+    expect(staff).toHaveAttribute("href", "#staff");
+    expect(staff).toHaveClass(styles.item);
+    expect(staff).not.toHaveAttribute("aria-current");
+    expect(roles).toHaveAttribute("aria-current", "page");
+    expect(roles).toHaveAttribute("data-state", "checked");
+  });
+
+  it("every link is a Tab stop and arrows select nothing", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Links onValueChange={onValueChange} />);
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Сотрудники" })).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("link", { name: "Сотрудники" })).toHaveFocus();
+    expect(onValueChange).not.toHaveBeenCalled();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Роли" })).toHaveFocus();
+  });
+
+  it("a click on a link reports its value", () => {
+    const onValueChange = vi.fn();
+    render(<Links onValueChange={onValueChange} />);
+    fireEvent.click(screen.getByRole("link", { name: "Сотрудники" }));
+    expect(onValueChange).toHaveBeenCalledWith("/");
   });
 });

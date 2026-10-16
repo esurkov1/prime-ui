@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -101,7 +101,7 @@ describe("Banner", () => {
     expect(onDismiss).toHaveBeenCalledTimes(2);
   });
 
-  it("enters on mount and passes its ref to the block", () => {
+  it("stands still when it mounts with the page and passes its ref to the block", () => {
     const ref = { current: null as HTMLDivElement | null };
     const { container } = render(
       <Banner.Root ref={ref}>
@@ -109,7 +109,23 @@ describe("Banner", () => {
       </Banner.Root>,
     );
     expect(ref.current).toBe(container.firstElementChild);
-    expect(ref.current).toHaveClass(enterMotion.enter);
+    expect(ref.current).not.toHaveClass(enterMotion.enter);
+  });
+
+  it("enters when it appears on a page already shown", async () => {
+    const page = (shown: boolean) => (
+      <main>
+        {shown ? (
+          <Banner.Root data-testid="banner">
+            <Banner.Content>Счёт отправлен</Banner.Content>
+          </Banner.Root>
+        ) : null}
+      </main>
+    );
+    const { rerender } = render(page(false));
+    await act(async () => {});
+    rerender(page(true));
+    expect(screen.getByTestId("banner")).toHaveClass(enterMotion.enter);
   });
 
   it("hands focus to the next tab stop when it is dismissed", async () => {

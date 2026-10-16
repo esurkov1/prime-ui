@@ -1,8 +1,10 @@
 import * as React from "react";
 
 import { Spinner } from "@/components/spinner/Spinner";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
@@ -11,9 +13,12 @@ import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
+import { formatLabel } from "@/internal/formatLabel";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconSlotClass } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
 import { namedRole } from "@/internal/namedRole";
+import { nodeText } from "@/internal/nodeText";
 import palette from "@/internal/palette.module.css";
 import { usePartPresence } from "@/internal/partPresence";
 import { splitParts } from "@/internal/parts";
@@ -81,8 +86,22 @@ export type BadgeActionProps = Omit<
   ref?: React.Ref<HTMLButtonElement>;
 };
 
+export type BadgeGroupLabels = {
+  /** The visible text of the badge that stands for the badges that did not fit. */
+  more: string;
+  /** What assistive tech reads for that badge: how many values are not shown (its tooltip lists them). */
+  moreCount: string;
+};
+
+export const BADGE_GROUP_LABELS: BadgeGroupLabels = {
+  more: "+{count}",
+  moreCount: "Ещё {count}",
+};
+
 export type BadgeGroupProps = React.HTMLAttributes<HTMLDivElement> & {
   size?: ControlSize;
+  overflow?: "wrap" | "count";
+  labels?: Partial<BadgeGroupLabels>;
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -356,21 +375,110 @@ function BadgeAction({
 BadgeAction.displayName = "Badge.Action";
 
 /**
+ * How many of `widths` stand in `available` px a `gap` apart; when not all of them do, the rest
+ * goes into a «+N» badge `moreWidth` wide at the end. At least one stays shown (it ellipsizes).
+ */
+function fitCount(widths: number[], gap: number, available: number, moreWidth: number): number {
+  const total = widths.reduce((sum, width) => sum + width, 0) + gap * (widths.length - 1);
+  if (total <= available) return widths.length;
+  let used = moreWidth;
+  let count = 0;
+  for (const width of widths) {
+    if (used + width + gap > available) break;
+    used += width + gap;
+    count += 1;
+  }
+  return Math.max(1, count);
+}
+
+/**
  * A row of badges as one value (the tags of a record, the stages a deal went through): the badges
  * wrap onto more lines, a chip gap apart. `size` sets the tier of every badge in it; without it the
- * badges follow the host, as a lone badge does.
+ * badges follow the host, as a lone badge does. `overflow="count"` keeps the row on one line: as
+ * many badges as fit the container, the rest behind a focusable «+N» badge: assistive tech
+ * reads how many, its tooltip (the badge's description) lists them.
  */
-function BadgeGroup({ size, className, ...rest }: BadgeGroupProps) {
+function BadgeGroup({
+  size,
+  overflow = "wrap",
+  labels: labelsProp,
+  className,
+  children,
+  ref,
+  ...rest
+}: BadgeGroupProps) {
   const { tier } = useChipTier(size);
+  const labels = useLabels(BADGE_GROUP_LABELS, labelsProp);
+  const counting = overflow === "count";
+  const groupRef = React.useRef<HTMLDivElement>(null);
+  const mergedRef = useMergedRefs(groupRef, ref);
+  const moreRef = React.useRef<HTMLSpanElement>(null);
+  const items = React.Children.toArray(children);
+  // How many badges stand in the row; the rest wait behind «+N».
+  const [shown, setShown] = React.useState(items.length);
+  const hidden = counting ? Math.max(0, items.length - shown) : 0;
+
+  const fitRow = React.useCallback(() => {
+    const group = groupRef.current;
+    const more = moreRef.current;
+    if (!group || !more) return;
+    const badges = Array.from(group.children).filter(
+      (child): child is HTMLElement => child !== more && child instanceof HTMLElement,
+    );
+    // Measured at their natural width: no badge shrinks while the row is being measured.
+    group.setAttribute("data-measuring", "");
+    const widths = badges.map((badge) => badge.getBoundingClientRect().width);
+    const moreWidth = more.getBoundingClientRect().width;
+    const style = getComputedStyle(group);
+    const gap = Number.parseFloat(style.columnGap) || 0;
+    const available =
+      group.clientWidth -
+      (Number.parseFloat(style.paddingInlineStart) || 0) -
+      (Number.parseFloat(style.paddingInlineEnd) || 0);
+    group.removeAttribute("data-measuring");
+    const count = fitCount(widths, gap, available, moreWidth + gap);
+    badges.forEach((badge, index) => {
+      badge.toggleAttribute("data-overflowed", index >= count);
+    });
+    setShown(count);
+  }, []);
+
+  // The first layout and every change of the badges; then every resize of the row or a badge.
+  React.useLayoutEffect(() => {
+    if (counting) fitRow();
+  });
+  useResizeEffect(groupRef, fitRow, { enabled: counting, children: true });
+
+  const hiddenText = items
+    .slice(items.length - hidden)
+    .map(nodeText)
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <GroupSizeContext value={size}>
       <div
         {...rest}
+        ref={mergedRef}
         // A named group is a `group` for assistive tech; an unnamed one is plain layout.
         role={namedRole(rest, "group")}
         className={cx(styles.group, className)}
         data-tier={tier}
-      />
+        data-overflow={overflow}
+      >
+        {children}
+        {counting ? (
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <BadgeRoot ref={moreRef} data-overflowed={hidden === 0 ? "" : undefined}>
+                <span aria-hidden="true">{formatLabel(labels.more, { count: hidden })}</span>
+                <VisuallyHidden>{formatLabel(labels.moreCount, { count: hidden })}</VisuallyHidden>
+              </BadgeRoot>
+            </Tooltip.Trigger>
+            <Tooltip.Content>{hiddenText}</Tooltip.Content>
+          </Tooltip.Root>
+        ) : null}
+      </div>
     </GroupSizeContext>
   );
 }

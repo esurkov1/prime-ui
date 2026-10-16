@@ -187,9 +187,20 @@ of your own elements — when to move at all, the tokens, the rules and recipes 
 
 ## 11. State changes are continuous
 
-Nothing on screen flips from one state to another. Kit controls already move into their new state.
-Every region you build that changes what it shows — loading → data → empty → error, one record →
-another — renders its content inside `<Crossfade state={status}>`: the old state fades out, the new
-one fades in, the height glides. The loading state is a `<Skeleton>` in the data's geometry (same
-rows, gaps and line heights), so the swap moves nothing; a `Spinner` only where there is no shape to
-hold. Data already on screen stays during a refresh (`aria-busy`), it does not go back to a skeleton.
+Nothing on screen flips from one state to another, and nothing that loads unfolds. Kit controls
+already move into their new state. Every region you build that changes what it shows — loading →
+data → empty → error, one record → another — renders its content inside `<Crossfade state={status}>`.
+
+- **Loading is a skeleton from the first paint.** While data loads the region shows the state
+  `"loading"` (that exact key): a `<Skeleton>` in the data's geometry (same rows, gaps and line
+  heights) rendered on the first render — never `null`, never an empty box that grows when the data
+  comes. A `Spinner` only where there is no shape to hold.
+- **The data replaces the skeleton in place.** Leaving `"loading"` (or entering it), Crossfade swaps
+  with a short fade and the height settles in one frame — no glide, no reveal, no slide-in. A
+  skeleton in the wrong geometry therefore shows as a jump: match the data.
+- **Only settled states glide.** data ↔ empty ↔ error, another record, a period or a section: the old
+  state fades out, the new one fades in, the height glides.
+- **A region that mounts in its state is still.** Content already loaded (a cached tab, a page
+  opened again) renders as it is, with no fade.
+
+Data already on screen stays during a refresh (`aria-busy`), it does not go back to a skeleton.

@@ -70,14 +70,21 @@ body {
   opacity: 0.5;
 }
 
-/* While an example's module and source load: Skeletons in the frame's shape (toolbar, stage). */
+/* While an example's module and source load: Skeletons in the frame's geometry — the frame's
+   padding, the toolbar row (12 + control s + 8) and the stage's minimum height; `--frame-height`,
+   the frame's last measured height, stretches the stage to the example's own height, so the frame
+   replaces the placeholder in place. */
 .playgroundFramePlaceholder {
+  box-sizing: border-box;
   display: grid;
-  gap: var(--prime-space-3);
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: var(--frame-height, auto);
+  padding: 0 var(--prime-space-1) var(--prime-space-1);
 }
 
 .playgroundFramePlaceholderToolbar {
   max-width: calc(var(--prime-space-24) * 2);
+  margin: var(--prime-space-3) var(--prime-space-2) var(--prime-space-2);
 }
 
 .playgroundFramePlaceholderStage {

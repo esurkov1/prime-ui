@@ -216,3 +216,15 @@
   font-weight: var(--prime-font-weight-medium);
   transition: color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
+
+/* ---- Valid mark (`valid`): a success check before the trailing icon and actions ---- */
+.validMark {
+  --enter-shift: 0;
+  --enter-scale: var(--prime-motion-scale-pop);
+  --prime-icon-size: var(--field-icon);
+  display: inline-flex;
+  flex-shrink: 0;
+  order: 2;
+  color: var(--prime-color-success-text);
+  pointer-events: none;
+}

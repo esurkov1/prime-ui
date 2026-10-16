@@ -9,7 +9,7 @@
 - A form part where a person adds, edits and removes several records of the same fields: invoice lines, contacts of a client, specs of a plan, recipients.
 - A base value with overrides (a price and its changes by month): the base is the first row, pinned with `getLocked`, each override is a row.
 - A list of short texts in the order a person sets (selling points, checklist items): one column, `reorderable`; each row ends with its remove button and its handle.
-- Dense rows (three or more columns), a touch-heavy screen, or rows that need more than remove and move → `rowActions="menu"`: one «⋯» per row.
+- Every row shows its actions in sight — the remove «×» and, with `reorderable`, the grip after it — however many columns it has (the default `rowActions="buttons"`). `rowActions="menu"` only for a `reorderable` list on a touch-first screen, where «Выше» / «Ниже» in one «⋯» replace a drag; never for a list without `reorderable`, whose menu would hold one item.
 - Small attributes of a record beside its text (an icon, a color): `width="compact"` columns with an icon-only `Select` (`Select.TriggerIcon` and no `Select.Value`) and a `ColorPresets` swatch.
 
 ## When not to use
@@ -83,8 +83,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ### rowActions
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `buttons` | a ghost «×» at the row's end and, with `reorderable`, the grip after it; a pinned row: «×» off, then the lock | short lists edited often, a desktop screen, moving rows is a main task | yes |
-| `menu` | one ghost «⋯» per row; its Dropdown holds «Выше», «Ниже» (with `reorderable`), a separator and «Удалить» (danger) | dense rows (three or more columns), a touch-heavy screen, a row that needs more than remove and move | |
+| `buttons` | a ghost «×» at the row's end and, with `reorderable`, the grip after it; a pinned row: «×» off, then the lock | every list: one action (remove) or remove and move, any number of columns | yes |
+| `menu` | one ghost «⋯» per row; its Dropdown holds «Выше», «Ниже» (with `reorderable`), a separator and «Удалить» (danger) | a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag; never without `reorderable` | |
 
 ### width (column)
 | Value | Looks like | Use when | Default |
@@ -182,7 +182,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [variants.tsx](examples/variants.tsx) | The two looks of the same list: the rows on the host surface, or on a fill of their own with side padding — `variant`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier: the headings, the fields, the handle and the buttons follow the list's size — `size`. |
 | [reorder.tsx](examples/reorder.tsx) | Selling points of a plan in the order of the pricing page: a one-column list has no headings and no numbers, each row ends with its remove button and then its handle, a point moves by the handle or Alt+arrows — `reorderable`, `getLabel`. |
-| [row-menu.tsx](examples/row-menu.tsx) | Payment stages of a project in dense rows: one more-button per row holds move up, move down and remove, the moves are off at the ends and next to the pinned advance, and Alt+arrows on the button move the row too — `rowActions`, `reorderable`, `getLocked`. |
+| [row-menu.tsx](examples/row-menu.tsx) | Payment stages of a project on a touch-first screen, where a drag is awkward: one more-button per row holds move up, move down and remove, the moves are off at the ends and next to the pinned advance, and Alt+arrows on the button move the row too — `rowActions`, `reorderable`, `getLocked`. |
 | [locked.tsx](examples/locked.tsx) | Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them — `getLocked`, `width`, `reorderable`. |
 | [base-row.tsx](examples/base-row.tsx) | A plan price and its changes by month in one table: the base price is the first, pinned row whose remove button is off and says why, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `labels`, `width`. |
 | [limits.tsx](examples/limits.tsx) | Recipients of invoice reminders, from one to three: the last row cannot be removed and the add button says why it is off once the list is full — `min`, `max`, `hint`. |

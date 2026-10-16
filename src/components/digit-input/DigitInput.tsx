@@ -156,6 +156,16 @@ export function DigitInput({
   };
 
   const cells = Array.from({ length }, (_, index) => value[index] ?? "");
+  // The digits the field mounts with are just there; a digit that lands later inks in. A cell
+  // once changed keeps inking in as it fills again.
+  const [mountCells] = React.useState(cells);
+  const [touched, setTouched] = React.useState<ReadonlySet<number>>(() => new Set());
+  const changed = cells.flatMap((cell, index) =>
+    cell !== mountCells[index] && !touched.has(index) ? [index] : [],
+  );
+  if (changed.length > 0) setTouched(new Set([...touched, ...changed]));
+  const inks = (index: number) =>
+    cells[index] !== "" && (touched.has(index) || cells[index] !== mountCells[index]);
   const inputRefs = React.useRef<Array<HTMLInputElement | null>>([]);
   /** Cell to focus once a value change has committed (its `onFocus` reads the new entry index). */
   const pendingFocusRef = React.useRef<number | null>(null);
@@ -302,7 +312,7 @@ export function DigitInput({
               fieldSurfaceClass,
               fieldCodeCellClass,
               styles.cell,
-              cell ? enterMotion.enterInk : undefined,
+              inks(index) ? enterMotion.enterInk : undefined,
             )}
             // The row's gliding ring replaces each cell's own.
             data-focus-ring="false"

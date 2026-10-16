@@ -12,11 +12,13 @@ type RollingNumberProps = {
 
 /**
  * A number whose digits roll to their new values column by column, like an odometer (foundation §7
- * rule 8: counters ease, they do not flip). The DOM holds the real digits (text, copy, assistive
- * tech and a page without CSS read the value); each digit column draws the 0–9 strip in a
- * pseudo-element. Columns are keyed from the right, so an unchanged digit stays still and a new
- * leading digit appears without rolling. A value that changes by itself every frame (a running
- * percentage) stays plain tabular text: rolling there is noise.
+ * rule 8: counters ease, they do not flip). The DOM holds the value as one run of text — copy, a
+ * page without CSS and assistive tech read it as one word («12», never «1 2»: separate boxes per
+ * digit make a browser split the name) — and an aria-hidden row of columns, with no text of its own,
+ * paints it: each digit column draws the 0–9 strip in a pseudo-element. Columns are keyed from the
+ * right, so an unchanged digit stays still and a new leading digit appears without rolling. A value
+ * that changes by itself every frame (a running percentage) stays plain tabular text: rolling there
+ * is noise.
  */
 export function RollingNumber({ children, className }: RollingNumberProps) {
   const value = String(children);
@@ -52,29 +54,32 @@ export function RollingNumber({ children, className }: RollingNumberProps) {
 
   return (
     <span ref={rootRef} className={cx(styles.root, className)}>
-      {chars.map((char, i) => {
-        const key = chars.length - i;
-        return /\d/.test(char) ? (
-          <span
-            key={`d${key}`}
-            className={styles.digit}
-            // A carried copy of a host finds its digits by this and rolls them too (`carryRolling`).
-            data-rolling-digit=""
-            style={{ "--rolling-n": char } as React.CSSProperties}
-          >
-            {char}
-          </span>
-        ) : (
-          <span key={`c${key}`} className={styles.char}>
-            {char}
-          </span>
-        );
-      })}
+      <span className={styles.value} data-rolling-value="">
+        {value}
+      </span>
+      <span className={styles.columns} aria-hidden="true">
+        {chars.map((char, i) => {
+          const key = chars.length - i;
+          return /\d/.test(char) ? (
+            <span
+              key={`d${key}`}
+              className={styles.digit}
+              // A carried copy of a host finds its digits by this and rolls them too (`carryRolling`).
+              data-rolling-digit=""
+              data-digit={char}
+              style={{ "--rolling-n": char } as React.CSSProperties}
+            />
+          ) : (
+            <span key={`c${key}`} className={styles.char} data-char={char} />
+          );
+        })}
+      </span>
     </span>
   );
 }
 
 const DIGIT = "[data-rolling-digit]";
+const VALUE = "[data-rolling-value]";
 
 /**
  * A copy of a host carried elsewhere (Dnd's overlay, flying while the real item is hidden) shows
@@ -90,7 +95,13 @@ export function carryRolling(copy: Element, destination: Element): boolean {
     const own = from[index];
     if (!own) return;
     own.style.setProperty("--rolling-n", digit.style.getPropertyValue("--rolling-n"));
-    own.textContent = digit.textContent;
+    own.dataset.digit = digit.dataset.digit;
+  });
+  const values = [...destination.querySelectorAll(VALUE)].reverse();
+  const ownValues = [...copy.querySelectorAll(VALUE)].reverse();
+  values.forEach((value, index) => {
+    const own = ownValues[index];
+    if (own) own.textContent = value.textContent;
   });
   return to.length > 0 && to.length === from.length;
 }

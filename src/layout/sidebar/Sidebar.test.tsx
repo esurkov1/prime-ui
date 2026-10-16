@@ -708,6 +708,24 @@ describe("Sidebar.Brand and Sidebar.Account", () => {
     fireEvent.click(account);
     expect(account).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("menuitem", { name: "Выйти" })).toBeInTheDocument();
+    expect(account.querySelector("svg")).not.toBeNull();
+  });
+
+  it("Account that opens no menu draws no chevron", () => {
+    const onClick = vi.fn();
+    render(
+      <Sidebar.Root offCanvas="never">
+        <Sidebar.Footer>
+          <Sidebar.Account description="anna@company.ru" onClick={onClick}>
+            Анна Смирнова
+          </Sidebar.Account>
+        </Sidebar.Footer>
+      </Sidebar.Root>,
+    );
+    const account = screen.getByRole("button", { name: /Анна Смирнова/ });
+    expect(account.querySelector("svg")).toBeNull();
+    fireEvent.click(account);
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -8,7 +8,7 @@
 ## When to use
 - Editing settings or a record without leaving the page.
 - Filters or navigation on narrow screens (`side="left"`).
-- Read-only details of a list row (order, user, event), with its status and a ⋯ menu in the header (`Drawer.Actions`).
+- Read-only details of a list row (order, user, event), with its status under the title (`Drawer.Description`) and a ⋯ menu in the header (`Drawer.Actions`).
 - Long content (history, logs) that needs a tall scrolling area.
 
 ## When not to use
@@ -30,13 +30,14 @@ Drawer.Root                    state and dismiss policy (no DOM)
 └─ Drawer.Content              portal + scrim + role="dialog" panel at the side
    ├─ Drawer.Guard             no DOM: holds the drawer (busy / dirty) from inside
    ├─ Drawer.Header            grid: [Icon] [Title + Description] [Actions] [close Button]
-   │  ├─ Drawer.Icon           tone tile around an Icon, or an Avatar.Root / Thumbnail.Root with no tile
-   │  ├─ Drawer.Title          <h2>
-   │  ├─ Drawer.Description    <p>
-   │  └─ Drawer.Actions        row of tier-s controls before the close button
+   │  ├─ Drawer.Icon           tone tile around an Icon, or the record's Avatar / Thumbnail, no tile, 40
+   │  ├─ Drawer.Title          line 1: <h2>; `loading` holds it with a skeleton
+   │  ├─ Drawer.Description    line 2: <p>; the record's status Badges lead it (tier s), then the text
+   │  └─ Drawer.Actions        buttons only (icon buttons, a ⋯ Dropdown), tier s, on the title's line
    ├─ Drawer.Body              the only scrolling zone (ScrollContainer)
    │  └─ Drawer.Section        <section>: <h3> label, description, Drawer.Actions at the heading's end
    └─ Drawer.Footer            always: Close or Cancel + the main action, primary last
+      ├─ Drawer.Actions        the start group: an action apart from the main pair
       ├─ Drawer.Meta           <p>, muted status at the start
       └─ Drawer.Close          clones its child; closes on click
 ```
@@ -81,19 +82,19 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Drawer.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown; under the title when it would get less than 12rem; or at the end of a `Drawer.Section` heading. Controls inside take tier `s`.
+`ref` → `HTMLDivElement`. Header buttons only (icon buttons, a ⋯ Dropdown; a status goes in `Drawer.Description`), tier `s`, on the title's line; under it below 12rem; at the end of a `Drawer.Section` heading. In `Drawer.Footer`: the start group at the footer tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
 
 ### Drawer.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.
+`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color; not used around a picture. |
-| `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
+| `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (size `l`) or a `Thumbnail.Root` (size `m`), set by the slot. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Drawer.Title
@@ -101,10 +102,11 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `loading` | `boolean` | `false` | The name loads (a record opened by a link): a `Skeleton` holds the title line and `aria-busy` is set, so the header never moves; the name fades in. |
 | `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Drawer.Description
-`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog.
+`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog. The record's status `Badge.Root`s go here: first in the line, chip tier `s` (20 px), the text wraps under them when narrow.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -128,7 +130,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content and an optional `Drawer.Actions`), `className` and the other attributes of the `<section>`. |
 
 ### Drawer.Footer
-`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.
+`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last; at the start an optional `Drawer.Actions` (an action apart from the main pair) and `Meta`. Stacked, the start comes first and the primary stays last.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -182,7 +184,7 @@ Below 640px of viewport every size is full width and loses its corners.
 | `fill` | equal-width buttons in one row | one full-width action («Понятно») | |
 
 ### tone (Icon)
-`neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color, as in Modal. Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by element type) — there is no tile and no tone: `data-media`, the avatar sized to 40 px, so a person's or an object's card shows its picture in the header.
+`neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color, as in Modal. Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own wrapper component (`<ClientAvatar />`) — there is no tile and no tone: `data-media`, and the picture takes the tile's 40 px (avatar `l`, thumbnail `m`) whatever `size` it was given, so every record header has the same mark.
 
 ## States
 | State | Driven by | DOM |
@@ -195,16 +197,29 @@ Below 640px of viewport every size is full width and loses its corners.
 | busy | `Drawer.Guard busy` | Escape, the scrim, the close button and `Drawer.Close` do nothing; the close button and the `Close` child are `disabled` in place |
 | dirty | `Drawer.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); its confirm closes the drawer |
 | leaving the tab | `Drawer.Guard busy` or `dirty` | the browser asks before the tab closes or reloads (`beforeunload`), as with `Page.Guard` |
+| title loading | `Drawer.Title loading` | a `Skeleton` holds the title line, `aria-busy` on the `<h2>`; the name fades in under the same element |
 | description loading | `Drawer.Description loading` | a `Skeleton` holds the line, `aria-busy` on the `<p>`; the data fades in under the same element |
 | actions below | the title would get less than 12rem beside `Drawer.Actions` | `data-actions-below` on the header: the actions move under the title and the description |
+| picture mark | an `Avatar.Root` or a `Thumbnail.Root` inside `Drawer.Icon` | `data-media` on the icon, no tile; the picture's `data-size` is the slot's (`l` / `m`) |
+| status in the line | a `Badge.Root` inside `Drawer.Description` | the line is a wrapping flex row, the badges first (`order`), each `data-tier="s"` |
 
 Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. The drawer has no touch gestures: it is not dragged or swiped away — it closes by its buttons, Escape and the scrim, with the same slide-out.
 
 ## Layout & spacing
+- The header has one anatomy, the same in every drawer, modal and sheet:
+  ```
+  [mark]  Title                                [icon buttons] [⋯] [×]
+          [status badges] description text
+  ```
+  - mark — `Drawer.Icon`: a glyph on the tone tile, or the record's picture (`Avatar.Root`, `Thumbnail.Root`) with no tile; both are 40 px, so the header never changes its height between a person and a setting.
+  - line 1 — `Drawer.Title`, the record's name.
+  - line 2 — `Drawer.Description`: the record's statuses as `Badge.Root`s first, then its text (an email, a handle, «Заказ № 1042 · 3 коробки»). The kit sizes the badges (chip tier `s`, the line's own 20 px), keeps them first and one gap apart, and wraps the text under them on a narrow panel. A status belongs to the record, so it lives on its line, never next to the buttons.
+  - end — `Drawer.Actions`: only buttons — ghost icon buttons, each named and with a Tooltip, and a ⋯ Dropdown for the rest — at the close button's tier, centred on the title's line.
 - A drawer has three zones: `Drawer.Header` (title, the × close button), `Drawer.Body` (the content, the only zone that scrolls) and `Drawer.Footer` (the actions). The footer is not optional decoration — it is where the drawer is finished:
   - read-only details: `Drawer.Close` around `<Button.Root variant="outline" tone="neutral">Закрыть</Button.Root>`, plus the record's main action (solid, last) when it has one;
   - a form: «Отмена» (`Drawer.Close`, outline neutral) and the submit button (solid, last; `type="submit" form={formId}`), `Drawer.Meta` for «Есть несохранённые изменения»;
-  - one acknowledgement: `<Drawer.Footer layout="fill">`.
+  - one acknowledgement: `<Drawer.Footer layout="fill">`;
+  - an action apart from the main pair («Выйти», «Удалить» — the latter through a ConfirmDialog): `Drawer.Actions` inside the footer puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
   Both the header × and the footer button stay: the × is the quick way out at the top, the footer is the end of the reading or editing path, where the hand already is.
 - Zone padding `--prime-drawer-padding`; hairlines between header, body and footer.
 - Full viewport height; only the body scrolls, with its own side padding.
@@ -212,8 +227,9 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Fields inside get the surface field fill.
 - Titled groups of the body (a record's contacts, its deals, its history): `Drawer.Section label` — an `<h3>` under the drawer's `<h2>` title, an optional `description`, a `Drawer.Actions` at the end of its heading row; content 16 below, sections 32 apart — directly in the body, in a `Tabs.Panel` or in a form, with no spacing wrapper of your own. A group of fields is a `Fieldset`; a page section is `Page.Section`.
 - With a `Drawer.Meta` the buttons stay one row: when the footer runs short the status goes above them first.
-- `Drawer.Actions` keep their place beside the title while it has 12rem; on a phone, where a status and a ⋯ beside the × would fold the title into letters, they move under it by themselves.
-- A record whose data is still loading: the title from the list row, `Drawer.Description loading` and a `Skeleton` body in the data's geometry under a `Crossfade` — not a skeleton of your own in the header.
+- `Drawer.Actions` keep their place beside the title while it has 12rem; on a phone, where the buttons beside the × would fold the title into letters, they move under it by themselves.
+- Opening a record: the header and its tabs come at once, the body as a `Skeleton` in the data's geometry. A record opened from a list row comes with the data the row already has (its title, often its status) at once, and only the rest loads (`Drawer.Description loading`); a record opened by a link knows only its id, so `Drawer.Title loading` holds the title line too. Read-only data swaps under a `Crossfade`; a form gets no `Crossfade` around it — its fields render once the record is there, so typing and focus are never cross-faded. Never a skeleton of your own in the header.
+- Focus on open lands on the panel itself, so a header action (a ⋯ with a Tooltip) is not focused and its tooltip does not pop up; a form that should start typing at once puts `autoFocus` on its first field.
 
 ## Accessibility
 
@@ -229,7 +245,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - `role="dialog"`, `aria-modal="true"`, named by `Drawer.Title` (or `aria-label`), described by `Drawer.Description`.
-- Focus moves into the panel on open and returns to the opener on close, including after a scrim click.
+- On open focus moves to the panel itself (its title and description are read; an `autoFocus` field wins), without the ring after a click; Tab goes on to the first control. On close it returns to the opener, including after a scrim click.
 - The page behind is `inert`, scroll is locked; only the topmost layer reacts.
 - A drawer opened from a Modal stacks above it.
 - No swipe: the close button, `Drawer.Close`, Escape and the scrim are the ways out.
@@ -253,9 +269,11 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile in the header and one full-width action in the footer — `Drawer.Icon`, `Drawer.Footer`, `layout`. |
 | [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
 | [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters, rounded only on the edge facing the page — `side`. |
-| [header-actions.tsx](examples/header-actions.tsx) | A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller; on a phone, where the title has no room beside them, they move under it — `Drawer.Actions`. |
+| [header-actions.tsx](examples/header-actions.tsx) | The one header of a record: the avatar, the name, its statuses leading the line under it, and only buttons at the end — `Drawer.Icon`, `Drawer.Description`, `Drawer.Actions`. |
+| [footer-actions.tsx](examples/footer-actions.tsx) | A profile panel: Sign out stands apart at the start of the footer, the main pair keeps the end; on a phone the column puts it first and the primary last — `Drawer.Footer`, `Drawer.Actions`. |
 | [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details in titled sections, one with its own action — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`. |
 | [loading.tsx](examples/loading.tsx) | A record card that opens before its data arrives: the title comes from the list row, the line under it and the body hold their place in skeletons, then the data fades in — `Drawer.Description`, `loading`. |
+| [link-loading.tsx](examples/link-loading.tsx) | A record opened by a link knows only its id: the title and the line under it hold their place in skeletons, the body keeps the data's geometry, then the name and the data fade in — `Drawer.Title`, `loading`. |
 | [guard.tsx](examples/guard.tsx) | A form that holds the drawer from inside: after an edit Escape, the scrim and Cancel ask before discarding, the footer says so, and saving locks every way out — `Drawer.Guard`, `Drawer.Meta`. |
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Drawer.Body`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
@@ -269,15 +287,19 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - A delete confirmation in a Drawer → use ConfirmDialog.
 - A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Drawer.Section label` with `Drawer.Actions`.
 - A wrapper with its own gap around `Drawer.Section`s inside a `Tabs.Panel` or a form → not needed: sections keep 32 between them in any wrapper.
-- A `Skeleton` placed by hand in `Drawer.Description` while the record loads → `Drawer.Description loading`.
+- A `Skeleton` placed by hand in `Drawer.Title` or `Drawer.Description` while the record loads → their `loading`; a placeholder title that shifts the header when the name arrives → `Drawer.Title loading`.
+- A start-side button («Выйти») put inside `Drawer.Meta` → `Drawer.Actions` inside `Drawer.Footer`; `Meta` is status text only.
 - Busy or unsaved state lifted out of the form into Root props → put `Drawer.Guard` next to the form, inside Content.
 - Clearing the record together with `open` and rendering a skeleton for «no record» → not needed: the panel keeps its last content while it slides out.
-- A Badge or a menu as a custom child of the header text column → put them in `Drawer.Actions`.
+- A status `Badge` in the header's `Drawer.Actions`, beside the buttons → put it in `Drawer.Description`, before the text: the kit sizes it to the line and keeps it first.
+- A menu or a button as a custom child of the header text column → put it in `Drawer.Actions`.
+- A Badge with its own `size` in `Drawer.Description` → leave `size` out: the line gives every header the same chip tier.
+- An avatar wrapped in its own box, or given its own `size`, in `Drawer.Icon` → pass the `Avatar.Root` (or your component that renders it) as it is: the slot drops the tile and sets 40 px.
 - Expecting Enter to submit via `Drawer.Confirm` → Drawer has no Confirm; use a `<form>` with a submit button.
 - `side="top"` or `side="bottom"` → only `left` and `right`; a panel from the bottom edge is a [Sheet](../sheet/COMPONENT.md).
 - Expecting a swipe to close a drawer → it has none; keep the header × and a footer button. A panel that swipes away is a [Sheet](../sheet/COMPONENT.md).
 - Padding on a wrapper inside Body → Body already pads and scrolls.
 
 ## Related
-- **Built from:** the dialog shared with Modal and Sheet (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Drawer.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Drawer.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Sheet (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Drawer.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Drawer.Title loading`, `Drawer.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Modal](../modal/COMPONENT.md) (the same header, body, footer and `Guard` in the centre), [Sheet](../sheet/COMPONENT.md) (the same parts raised from the bottom edge for a short task), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm), [Sidebar](../../layout/sidebar/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Avatar](../avatar/COMPONENT.md) (a person's picture in `Drawer.Icon`)

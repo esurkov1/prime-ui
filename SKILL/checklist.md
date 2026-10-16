@@ -10,18 +10,22 @@ checks.
 - [ ] A nested record's path ends in its title on one line inside `Page.Heading`; no title row under the path ([the top bar](composition.md#the-top-bar)).
 - [ ] Every button of the page is in one `Page.Actions`, the primary last, each with a `Button.Icon` ([the top bar](composition.md#the-top-bar)).
 - [ ] `SmartFilter.Root` wraps `Page.Root`; its toolbar is in `Page.Tools`, its chips in `Page.Chips` ([the top bar](composition.md#the-top-bar)).
-- [ ] A filter stands next to what it filters: beside KPI cards or a chart, the table's search, filter, chips and chooser are in its `toolbar` / `toolbarChips`; the bar keeps the title, the shared period and the primary action ([where the filters go](composition.md#where-the-filters-go)).
+- [ ] A control stands with what it changes: a table's search, filter, chips and chooser are in its `toolbar` / `toolbarChips` on every page; the bar keeps the title, sections, the view, the shared period and the buttons ([where the filters go](composition.md#where-the-filters-go)).
+- [ ] A table section has an `options` filter field for each categorical column and a `date-range` field per date column, its value in the URL ([where the filters go](composition.md#where-the-filters-go)).
+- [ ] Actions on selected rows are `renderSelectionActions` — one «Действия · N» menu added to the tools row, which stays ([controls of a table](composition.md#controls-of-a-table)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 - [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
 - [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
-- [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` beside the table's search; a DataTable `toolbar` holds two or more table controls, unwrapped, or does not exist ([controls of a table](composition.md#controls-of-a-table)).
+- [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` beside the table's search; a DataTable `toolbar` holds the table's controls unwrapped, never a lone button ([controls of a table](composition.md#controls-of-a-table)).
 
 ## UX ([ux.md](ux.md))
 - [ ] I wrote the five-line brief before the JSX ([brief](ux.md#1-brief-before-code)).
 - [ ] Every entity is laid out by its shape: a record is one row or one block ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
-- [ ] A FieldList picks its `rowActions` (buttons or menu) and its `variant` (plain or surface) by the rules ([forms](composition.md#7-forms)).
+- [ ] A FieldList row shows its «×» in sight whatever its columns; `rowActions="menu"` only on a reorderable touch-first list; `variant` by the rule ([forms](composition.md#7-forms)).
+- [ ] A section named after a set of records shows the records, with an action per row ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
 - [ ] Labels on a form of rows ≤ columns + the list label; none repeated, numbered or repeating its heading ([label economy](ux.md#3-label-economy)).
-- [ ] No text explains the layout; every hint says what the person cannot see ([label economy](ux.md#3-label-economy)).
+- [ ] No text explains the layout; every hint is two to five words the label and the control leave out, never the obvious outcome ([label economy](ux.md#3-label-economy)).
+- [ ] Every setting sits with what it governs, as a field beside its neighbours; a stored choice is a `Select`, no section holds one setting ([where a setting lives](ux.md#10-where-a-setting-lives)).
 - [ ] Buttons say the verb and the object, errors say how to fix it, empty states offer the next step ([words](ux.md#4-words)).
 - [ ] Money, numbers and dates go through `Intl` with `ru-RU`, in Russian typography ([words](ux.md#4-words)).
 - [ ] The friction of every action matches the cost of a mistake ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
@@ -65,7 +69,12 @@ checks.
 
 ## Hierarchy
 - [ ] One primary action per area, last in its row; the rest `soft` / `ghost` / `outline` neutral ([actions](composition.md#6-actions)).
-- [ ] A dialog footer holds Cancel and the primary only; deleting the edited record is the last item of the header ⋯ menu ([actions](composition.md#6-actions)).
+- [ ] A dialog footer holds Cancel and the primary only; deleting the edited record stands in the header's actions ([actions](composition.md#6-actions)).
+- [ ] One secondary action is an icon button with a Tooltip; a «⋯» menu holds two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
+- [ ] An entity has one drawer opened from everywhere; permissions lock fields and hide tabs and actions; header actions act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] A record drawer is one form with one «Сохранить» in its footer while dirty and `Drawer.Guard`; no save per section, no unsaved-status text ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] A drawer loads its tabs' data itself, the history has its own tab, and returning to a tab never shows a skeleton again ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] An on/off permission or setting is a `Switch`, a level per entity a `FieldList` of `Select`s, a set of values in a table cell `Badge.Group overflow="count"` ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 
 ## States
@@ -74,6 +83,7 @@ checks.
 - [ ] Fields show `hint` and `error`; only the minority is marked `required` or `optional` ([forms](api-contract.md#forms)).
 - [ ] Every data block has its loading, empty and error states ([feedback](composition.md#9-feedback)).
 - [ ] Every region swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
+- [ ] Whatever loads shows its skeleton on the first render under the state `"loading"`, and the data takes its place without unfolding, sliding or growing from zero ([continuity](foundations.md#11-state-changes-are-continuous)).
 - [ ] A `Page.Description` that waits for data stays mounted with `loading`, so the title in the bar never jumps ([screen states](composition.md#screen-states)).
 - [ ] A KPI tile that waits for its figure is `Card.Root loading`, its parts mounted ([inside a category](choosing.md#2-inside-a-category)).
 - [ ] While a form saves, its submit is `loading` and its fields sit in a `Fieldset disabled` ([forms](api-contract.md#forms)).
@@ -86,6 +96,7 @@ checks.
 ## Themes and widths
 - [ ] The screen passes the responsive checklist in both themes ([responsive](responsive.md#checklist-before-handing-a-screen-over)).
 - [ ] On a phone the Sidebar opens from the menu button the top bar draws; the page title stays in the bar ([app frame](layouts.md#app-frame-once-per-app)).
+- [ ] Tabs that outgrow the width scroll; no two topics merged into one tab ([switchers](responsive.md#switchers)).
 - [ ] At every width the bar fits: tools on their own line, then icon-only buttons, then «⋯», the primary always on screen ([the page's top bar](responsive.md#the-pages-top-bar--pagetopbar)).
 
 ## Keyboard and a11y
@@ -93,5 +104,7 @@ checks.
 - [ ] Every field has a label (visible, or `aria-label` for a toolbar search) ([forms](api-contract.md#forms)).
 - [ ] Meaning is never colour alone ([tone and color](foundations.md#6-tone-and-color)).
 - [ ] A toned hint says its status in words; a validation problem is `error`, never a `danger` hint ([forms](api-contract.md#forms)).
-- [ ] A refused sign-in marks its fields `invalid` and says why in a hidden live region, with no Banner ([feedback](composition.md#9-feedback)).
+- [ ] A refused sign-in marks the e-mail `invalid` and says why as the password's `error`, with no Banner ([field outcomes](api-contract.md#field-outcomes-a-mark-for-success-words-for-a-problem)).
+- [ ] A confirmed value is `valid` (a check, no text); a new password has `minStrength` and its requirement in the hint ([field outcomes](api-contract.md#field-outcomes-a-mark-for-success-words-for-a-problem)).
+- [ ] Sign-in, sign-up, invite and reset are modes of one auth screen whose head names the action, `align` left at `start` ([auth](layouts.md#auth-sign-in-code)).
 - [ ] Custom `labels` replace the default Russian strings where they do not fit ([system strings](api-contract.md#shared-vocabulary-exported-types)).

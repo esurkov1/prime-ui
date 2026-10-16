@@ -6,7 +6,7 @@ import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./DataTable.module.css";
-import { columnAlign, columnSizeStyle } from "./Row";
+import { columnAlign, columnSizeProps } from "./Row";
 import type { DataTableColumn } from "./types";
 
 type StateRowsProps<Row> = {
@@ -91,7 +91,7 @@ export function StateRows<Row>({
         <td
           key={column.id}
           className={styles.cell}
-          style={columnSizeStyle(column)}
+          {...columnSizeProps(column)}
           data-align={columnAlign(column)}
         >
           <Skeleton className={styles.skeleton} />

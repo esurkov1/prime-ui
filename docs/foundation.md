@@ -51,11 +51,14 @@ The design contract for every component. Tokens live in `tokens/` and are genera
    perfectly in a row (Button, Input, Select, Datepicker trigger, SegmentedControl, Tabs).
 5. **Nested radius = outer radius − padding.** Panel 12 with padding 4 → items 8.
 6. **Air is hierarchy.** Important content gets more space; secondary content is grouped tighter.
-7. **State changes are continuous.** Nothing on screen flips from one state to another. Controls move
-   into their new state (§7 Motion, rule 8); a region that changes what it shows — loading → data →
+7. **State changes are continuous; loading never unfolds.** Nothing on screen flips from one state to
+   another. Controls move into their new state (§7 Motion, rule 8). Whatever loads is a `Skeleton` in
+   the data's geometry from the first paint — never nothing, never a region that grows from zero —
+   and the data then replaces it in place: no height glide, no reveal, no slide, at most a short
+   cross-fade, the layout settled in one frame. A region swapping between settled states — data →
    empty → error, one record → another — cross-fades and glides to its new height (`Crossfade`). A
-   loading region holds the shape of what is coming (`Skeleton` with the data's geometry), so the
-   swap moves nothing. This holds for every region of every screen, not only for prominent ones.
+   region that mounts in its state shows it still. This holds for every region of every screen, not
+   only for prominent ones.
 
 ## 2. Token layers and naming
 
@@ -339,8 +342,8 @@ Every component is designed with its micro-animations, not only its static state
    `padding`, `top/left`; never `transition: all` — list the properties. Where size must animate, prefer
    `transform` / `scale` (progress fills). The exceptions are a closed list, each with one engine,
    and `src/styles/motion-perf.test.ts` allows nothing else:
-   - **height glide** — a region that swaps its content glides to the new height (`Crossfade`, the
-     Notification stack);
+   - **height glide** — a region that swaps its content between settled states glides to the new
+     height (`Crossfade`, the Notification stack); a swap into or out of loading never glides;
    - **row fold** — a part that folds open or closed animates `grid-template-rows` 0fr ↔ 1fr
      (`Disclosure`: Accordion, DataTable expanded rows);
    - **text width** — a label that morphs into another text glides its `width` (`MorphText`).
@@ -353,8 +356,11 @@ Every component is designed with its micro-animations, not only its static state
 8. **State moves, it does not swap.** Checkmark draws/scales in, switch thumb slides, selection indicator
    (tabs, segmented control) glides to the new item, chevrons rotate, progress fills, counters and fills
    ease. Two states cross-fade rather than flip when they replace each other in place: a region
-   swapping its content uses `Crossfade` (inside a component: `RegionSwap`), and its
-   loading state is a `Skeleton` of the coming content (principle 7).
+   swapping its content uses `Crossfade` (inside a component: `RegionSwap`). Its loading state is
+   the state `"loading"`: a `Skeleton` of the coming content, drawn from the first paint, which the
+   data replaces in place — the height settles in one frame and the fade takes `fast`; only a swap
+   between settled states fades on `base` and glides its height (principle 7). Nothing moves on the
+   first render of a region.
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
    for one-shot enter/exit (overlay presence, spinner, skeleton) and one-shot gestures (icons, rule 13;
    a field's error shake, rule 14).
@@ -394,7 +400,7 @@ should stay still, and say so in a CSS comment only when the omission is non-obv
 | selected | `accent-soft` bg + `accent-text`, or check icon in `accent-text` |
 | disabled | `fill-muted`/`field-bg-disabled` bg, `text-disabled` color, no shadow, `cursor: not-allowed` |
 | loading (control) | spinner replaces leading icon, label stays, width does not change, `aria-busy` |
-| loading (region) | `Skeleton` in the data's geometry inside `Crossfade`, `aria-busy` on the region; data already shown stays during a refresh |
+| loading (region) | `Skeleton` in the data's geometry from the first paint, as the `"loading"` state of `Crossfade` (the data replaces it in place, no height glide), `aria-busy` on the region; data already shown stays during a refresh |
 | error | `danger-border` inset ring + `danger-text` message; layout does not shift (support row reserves height when the component asks for it) |
 | empty | centered muted text in `body-s`, optional action; reached through `Crossfade` like every region state |
 

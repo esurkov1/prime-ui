@@ -45,8 +45,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Header",
-      en: "`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. Wraps below 22rem.",
-      ru: "Верхний ряд: сначала `Card.Title`, всё после него (контрол, тихая подпись) — в конце. Уже 22rem переносится.",
+      en: "`ref` → `HTMLDivElement`. The top row: an optional `Card.Icon`, `Card.Title` with an optional `Card.Description` under it, anything else (a control, a caption) at the end. Wraps below 22rem.",
+      ru: "Верхний ряд: необязательная `Card.Icon`, `Card.Title` с необязательным `Card.Description` под ним, всё остальное (контрол, подпись) — в конце. Уже 22rem переносится.",
       props: [
         {
           name: "…rest",
@@ -130,8 +130,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Icon",
-      en: "`ref` → `HTMLDivElement`. The 40px accent tile of a KPI holding one icon; it spans the label and the value rows in `mini` and a `split` cell.",
-      ru: "Плашка 40px с акцентом для одной иконки KPI; в `mini` и ячейке `split` занимает высоту подписи и значения.",
+      en: "`ref` → `HTMLDivElement`. The 40px accent tile of one icon: beside the label and value in `mini` and a `split` cell, first in `Card.Header`. An `Avatar.Root` or `Thumbnail.Root` inside (also in a wrapper) is the record's picture: no tile, 40px, `aria-hidden`.",
+      ru: "Плашка 40px с акцентом для одной иконки: рядом с подписью и значением в `mini` и ячейке `split`, первой в `Card.Header`. `Avatar.Root` или `Thumbnail.Root` внутри (и в обёртке) — изображение записи: без плашки, 40px, `aria-hidden`.",
       props: [
         {
           name: "…rest",

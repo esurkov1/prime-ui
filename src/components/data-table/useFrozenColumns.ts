@@ -18,10 +18,24 @@ function unfreeze(table: HTMLTableElement, frozen: Frozen) {
 
 type Measure = { cols: HTMLTableColElement[]; measured: number[]; minimums: number[] };
 
-/** Writes: the natural layout, so the widths can be measured. */
+/**
+ * Writes: the natural layout, so the widths can be measured. While measuring (`data-measuring`) a
+ * table with a `grow` column is sized to its content and the `grow` column claims no free width, so
+ * every other column — its header with the info and sort glyphs included, a fixed `width` — gets its
+ * natural width rather than its narrowest one.
+ */
 function release(table: HTMLTableElement) {
   table.style.tableLayout = "";
+  table.style.minWidth = "";
+  table.dataset.measuring = "true";
   for (const col of colsOf(table)) col.style.width = "";
+}
+
+/** Reads the natural widths of a released table and ends the measuring layout. */
+function measureReleased(table: HTMLTableElement): Measure | null {
+  const result = measure(table);
+  delete table.dataset.measuring;
+  return result;
 }
 
 /** Reads only: the natural widths of the columns on screen, or null when there is nothing to freeze. */
@@ -45,7 +59,7 @@ function measure(table: HTMLTableElement): Measure | null {
 
 function freeze(table: HTMLTableElement, frozen: Frozen) {
   release(table);
-  const result = measure(table);
+  const result = measureReleased(table);
   if (result) apply(table, frozen, result);
 }
 
@@ -69,7 +83,7 @@ function scheduleRefreeze(table: HTMLTableElement, frozen: Frozen) {
       node.style.minWidth = "";
       release(node);
     }
-    const measured = tables.map(([node]) => measure(node));
+    const measured = tables.map(([node]) => measureReleased(node));
     tables.forEach(([node, state], index) => {
       const result = measured[index];
       if (result) apply(node, state, result);
@@ -86,10 +100,11 @@ function apply(table: HTMLTableElement, frozen: Frozen, { cols, measured, minimu
   cols.forEach((col, index) => {
     const grows = col.dataset.grow === "true";
     if (!grows) col.style.width = `${next[index]}px`;
-    floor += grows ? (minimums[index] ?? 0) : (next[index] ?? 0);
+    // Measured, a `grow` column stood at its narrowest content (or its `minWidth`).
+    floor += grows ? Math.max(measured[index] ?? 0, minimums[index] ?? 0) : (next[index] ?? 0);
   });
   table.style.tableLayout = "fixed";
-  // A `grow` column takes the free width but never less than its `minWidth`: below that the
+  // A `grow` column takes the free width but never less than its narrowest: below that the
   // table keeps its width and the container scrolls instead of cells overlapping.
   table.style.minWidth = `${floor}px`;
   frozen.widths = next;
