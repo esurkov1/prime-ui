@@ -77,7 +77,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ### variant
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `plain` | the rows on the host surface, no side padding, faint lines between rows | the list is the content of its card or section | yes |
+| `plain` | the rows on the host surface, no side padding, 8 apart with no lines on one line per record; lines between stacked records | the list is the content of its card or section | yes |
 | `surface` | the rows on a fill one step up the surface ladder, radius `--prime-radius-l`, 12 of side padding and 12 of air under the last row | the list stands among other fields of a form or card and must read as one block | |
 
 ### rowActions
@@ -126,13 +126,13 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 ## Layout & spacing
 - One grid for the list: every row, the heading row and the totals row share one track list `[columns] [end] [grip]`, so the columns line up like a table's; the end fits the row's «×» or «⋯» of the tier, the grip (with `reorderable` buttons) is one `xs` control wide (the handle or the lock) and ends the row on the inline-end side (on the left in RTL). Every row fills the same slots: a pinned row shows its remove off, never a hole.
-- Rows stand edge to edge, 8 of padding above and below their fields. On `surface` a faint line parts two rows (`hairline`), inset by the side padding, none above the first row; a `plain` list draws no lines — the air between the fields parts its rows. Columns 12 apart (`--prime-space-3`).
+- On `surface` rows stand edge to edge, 8 of padding above and below their fields, and a faint line parts two rows (`hairline`), inset by the side padding, none above the first row. A `plain` list on one line per record draws no lines: its rows stand one gap apart (8, `--prime-space-2`: 4 of padding above and below each), the air between the fields parts them, and its headings keep 8 above the first row's fields. Columns 12 apart (`--prime-space-3`).
 - `plain`: side padding 0. `surface`: the sheet's fill (`--prime-color-layer-current` at its `data-depth`), radius `--prime-radius-l`, 12 of side padding on every row and 12 above the headings and under the last row.
 - A `compact` column is measured: its track is the widest of its controls, its heading and its total, so the gaps between columns are all 12.
 - The remove button, the menu button, the handle and the lock stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
 - The totals row stands under the last row over a faint line; a total's text sits where its column's field text does: at the start, or at the end for a field that ends its number there (an `Input` with `inputMode="decimal"` and an end `Input.InlineAffix`). Stacked, every total ends its line.
 - The add button lines up with the sheet's start, 12 under it.
-- Under 30rem of its own width (a container query): rows stack — the first line holds the compact columns, the first field and the actions; the other fields take the full width under it, 16 apart; rows 12 of padding above and below. The first field keeps at least 160 (measured, so a name such as «Вход через SSO» stays whole at 320 and 360): too narrow beside the actions, they end the second line after the next field; too narrow even without them (a narrow card), the field takes the full width under the compact columns and the actions.
+- Under 30rem of its own width (a container query): rows stack — the first line holds the compact columns, the first field and the actions; the other fields take the full width under it, 16 apart; rows 12 of padding above and below, and a faint line parts two records in both variants (edge to edge on `plain`), since one record spans several lines; a one-column `plain` list stays on one line per record and keeps its 8 apart with no lines. The first field keeps at least 160 (measured, so a name such as «Вход через SSO» stays whole at 320 and 360): too narrow beside the actions, they end the second line after the next field; too narrow even without them (a narrow card), the field takes the full width under the compact columns and the actions.
 
 ## Accessibility
 

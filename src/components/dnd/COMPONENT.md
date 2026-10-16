@@ -37,7 +37,7 @@ Dnd.Root                         session owner: overlay (portal), live region, l
 ├─ Dnd.Draggable                 an item to carry elsewhere; stays in place, faded, until the drop
 └─ Dnd.DropZone                  a box that takes dropped items
 ```
-A drag in flight is drawn by `Dnd.Root` as a clone of the lifted element above every layer, following the pointer. The clone flies inside empty copies (`display: contents`) of its ancestors up to the nearest surface (`data-depth`) and that surface's `data-theme`, so the host's variables and selectors (a List row's tier padding and radius) dress it exactly as the item in place, and it sets down without a jump; an item without a fill of its own flies on the fill of the surface it was lifted from (`--prime-color-layer-current`). A refusal with a reason shows the reason in the tooltip's chip under the clone. The page gets `data-dnd-active="mouse | touch | pen"` on `<html>` for the length of the gesture (the holding cursor), and every list of the carried item's kind gets `data-dnd-carrying`.
+A drag in flight is drawn by `Dnd.Root` as a clone of the lifted element above every layer, following the pointer. The clone keeps the original's size and flies inside empty copies of all its ancestors up to the page — `display: contents`, except a size container (`container-type`), which flies as an invisible box of its measured content width, so its container queries resolve as at the source — and the host's variables, `[data-…]` selectors, surface and scoped theme (a List row's tier padding and radius, a narrow FieldList's stacked row) dress it exactly as the item in place, and it sets down without a jump; an item without a fill of its own flies on the fill of the surface it was lifted from (`--prime-color-layer-current`). A refusal with a reason shows the reason in the tooltip's chip under the clone. The page gets `data-dnd-active="mouse | touch | pen"` on `<html>` for the length of the gesture (the holding cursor), and every list of the carried item's kind gets `data-dnd-carrying`.
 
 ## API
 
@@ -207,7 +207,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - A grid (`axis="grid"`) is `display: grid`: the host sets the tracks (`grid-template-columns`) and the cells' size; the gap takes a cell, and a carried item resizes to the cell it would land in.
 - A `Dnd.Handle` ends its item: the last child, after the item's own trailing controls (a remove button), at the inline end (on the left in RTL); a `locked` item's lock takes the same place, so the grips of every row stand on one line. In a table it is the last cell. An on / off switch leads the item (its first child), so its state reads first and nothing stands between the text and the grip.
 - The reason chip stands `--prime-tooltip-offset` under the carried copy, start-aligned, at most `--prime-tooltip-max-width` wide.
-- The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a radius on its own class (the gap and the clone's fill take it) and keep the row's look within its ancestors up to the nearest surface (`data-depth`) — the clone flies inside empty copies (`display: contents`) of exactly those, so their variables and selectors still apply. A table row flies in a one-row copy of its table inside them.
+- The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a radius on its own class (the gap and the clone's fill take it) and the row's ancestors may dress it — the clone flies inside empty copies of all of them (a size container as a box of its width), so their variables, selectors and container queries still apply. A table row flies in a one-row copy of its table inside them.
 - A scrollable ancestor under the pointer auto-scrolls within 64 px of its edge (a `ScrollContainer` strip works).
 - Keep a zone's height stable between states; it only changes fill and outline.
 
@@ -271,7 +271,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - A `Dnd.SortableItem` `id` that differs from `getId(item)` → the item never moves.
 - Rendering items yourself instead of through `renderItem` → the list cannot draw the gap or the optimistic order.
 - Using `index` as the id → ids must survive a reorder.
-- Styling a row from an ancestor above the nearest surface (`data-depth`) → the flying clone loses it; keep the row's look on the row and its hosts inside the surface.
+- Styling a row from its siblings (`li + li`, `:first-child`) → the flying clone stands alone and loses it; keep the row's look on the row and its ancestors.
 - Starting a drag from a button inside a row without `handle` → presses on controls are theirs; use `Dnd.Handle`.
 - A drag-only move with no alternative → add a button or a menu for the same action.
 - `aria-label` on an item that shows a title and a description → it hides them; point `aria-labelledby` / `aria-describedby` at them.

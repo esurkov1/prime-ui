@@ -9,8 +9,11 @@ import { Select } from "@/components/select/Select";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import hairline from "@/internal/hairline.module.css";
+import { cssRule, cssValue } from "@/test/css";
 
 import { FieldList, type FieldListColumn, type FieldListProps } from "./FieldList";
+
+const CSS = "src/components/field-list/FieldList.module.css";
 
 type Line = { id: string; service: string; price: string; pinned?: boolean };
 
@@ -360,11 +363,32 @@ describe("FieldList", () => {
     expect(sheetOf()).toHaveAttribute("data-depth", "1");
   });
 
-  it("draws lines between rows only on a surface; a plain list is parted by air", () => {
+  it("joins every row to the line run; a plain one-line list insets its lines to nothing", () => {
     const { rerender } = render(<Lines />);
-    expect(rowsOf()[1]?.className).not.toContain(hairline.between);
+    expect(rowsOf()[1]?.className).toContain(hairline.between);
     rerender(<Lines variant="surface" />);
     expect(rowsOf()[1]?.className).toContain(hairline.between);
+    // A plain list on one line per record: one gap between the rows, no line.
+    const plain = cssRule(CSS, '.sheet[data-variant="plain"] .record');
+    expect(cssValue(plain, "--hairline-inset")).toBe("50%");
+    expect(cssValue(plain, "padding-block")).toBe("var(--prime-space-1)");
+    // The heading keeps the label gap above the first row's fields.
+    expect(cssValue(cssRule(CSS, '.sheet[data-variant="plain"] .head'), "padding-block")).toBe(
+      "var(--prime-space-0) var(--prime-space-1)",
+    );
+    // A reorderable list adds no room of its own between the rows.
+    expect(cssValue(cssRule(CSS, ".rows"), "--dnd-sortable-gap")).toBe("var(--prime-space-0)");
+  });
+
+  it("parts stacked records with a line in both variants; a one-column plain list keeps its air", () => {
+    const narrow = ["@container prime-field-list (width < 30rem)"];
+    expect(cssValue(cssRule(CSS, ".record", narrow), "padding-block")).toBe("var(--prime-space-3)");
+    const plain = cssRule(CSS, '.sheet[data-variant="plain"] .record:not([data-single])', narrow);
+    expect(cssValue(plain, "--hairline-inset")).toBe("0%");
+    expect(cssValue(plain, "padding-block")).toBe("var(--prime-space-3)");
+    expect(cssValue(cssRule(CSS, '.sheet[data-variant="surface"] .row'), "--hairline-inset")).toBe(
+      "var(--fl-pad)",
+    );
   });
 
   it("Tab walks a row's fields, then its remove button, then the next row", async () => {

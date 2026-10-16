@@ -677,8 +677,9 @@ export function FieldList<T extends object>({
         fieldTierClass,
         styles.row,
         styles.record,
-        // Only a list on its own fill draws lines between its rows; a plain list is spaced by air.
-        surface && hairline.between,
+        // A list on its own fill draws lines between its rows; a plain one only once they stack
+        // (its one-line rows are parted by air: FieldList.module.css).
+        hairline.between,
         presence.entering.has(id) && enterMotion.enter,
       ),
       style: trackStyle,

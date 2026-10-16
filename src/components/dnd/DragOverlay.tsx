@@ -23,29 +23,62 @@ function isTransparent(color: string): boolean {
   return color === "" || color === "transparent" || /rgba?\([^)]*,\s*0\s*\)$/.test(color);
 }
 
+/** What a size container's empty copy must not draw or move: it only measures. */
+const CONTAINER_SHELL: Partial<Record<string, string>> = {
+  display: "block",
+  "box-sizing": "content-box",
+  "min-width": "0",
+  "max-width": "none",
+  "min-height": "0",
+  "max-height": "none",
+  margin: "0",
+  padding: "0",
+  border: "none",
+  background: "none",
+  "box-shadow": "none",
+  outline: "none",
+  overflow: "visible",
+  position: "static",
+  transform: "none",
+  translate: "none",
+  scale: "none",
+  rotate: "none",
+  opacity: "1",
+  filter: "none",
+  "clip-path": "none",
+};
+
 /**
- * The copy flies in empty copies (`display: contents`) of the elements its original stands in, up
- * to the nearest surface (`data-depth`) and its theme (`data-theme`): what a host gives its items — tier variables (a List row's
- * padding, radius, gap), context selectors, the surface fill — reaches the copy as it reaches the
- * original. Without them the copy flies bare and snaps into its look when the real item appears.
+ * The copy flies in empty copies of every element its original stands in, up to the page: what a
+ * host gives its items — tier variables (a List row's padding, radius, gap), context selectors
+ * (`[data-…]` ancestors), the surface fill, a scoped theme — reaches the copy as it reaches the
+ * original. An ancestor is `display: contents`, except a size container (`container-type`): a
+ * container query needs a box, so its copy is an invisible box of the container's measured content
+ * size, and the copy lays out as it does in place (a narrow list's stacked rows stay stacked).
+ * Without them the copy flies bare and snaps into its look when the real item appears.
  */
 function inHostCopy(parent: HTMLElement | null, inner: HTMLElement): HTMLElement {
   let outer = inner;
-  const wrap = (node: HTMLElement) => {
+  let node = parent;
+  while (node && node !== document.body && node !== document.documentElement) {
     const shell = node.cloneNode(false) as HTMLElement;
-    shell.style.display = "contents";
+    const source = getComputedStyle(node);
+    const container = source.getPropertyValue("container-type").trim();
+    if (container === "inline-size" || container === "size") {
+      for (const [property, value] of Object.entries(CONTAINER_SHELL))
+        shell.style.setProperty(property, value ?? null);
+      const px = (value: string) => Number.parseFloat(value) || 0;
+      const width = node.clientWidth - px(source.paddingLeft) - px(source.paddingRight);
+      shell.style.setProperty("width", `${Math.max(0, width)}px`);
+      if (container === "size") {
+        const height = node.clientHeight - px(source.paddingTop) - px(source.paddingBottom);
+        shell.style.setProperty("height", `${Math.max(0, height)}px`);
+      } else shell.style.setProperty("height", "auto");
+    } else {
+      shell.style.display = "contents";
+    }
     shell.append(outer);
     outer = shell;
-  };
-  let node = parent;
-  while (node && node !== document.body) {
-    wrap(node);
-    if (node.hasAttribute("data-depth")) {
-      // A theme scoped above the surface (a dark panel on a light page) colours the copy too.
-      const theme = node.parentElement?.closest<HTMLElement>("[data-theme]");
-      if (theme && theme !== document.documentElement && theme !== document.body) wrap(theme);
-      break;
-    }
     node = node.parentElement;
   }
   return outer;
@@ -114,13 +147,6 @@ function cloneFor(preview: DragPreview): HTMLElement {
   clone.style.width = `${preview.origin.width}px`;
   clone.style.height = `${preview.origin.height}px`;
   clone.style.margin = "0";
-  // An item without a fill of its own (a row of fields on a card) would fly as bare content over
-  // the page: the copy takes the fill of the surface it was lifted from.
-  const source = getComputedStyle(preview.element);
-  if (isTransparent(source.backgroundColor)) {
-    const layer = source.getPropertyValue("--prime-color-layer-current").trim();
-    if (layer) clone.style.backgroundColor = layer;
-  }
   const row = preview.element instanceof HTMLTableRowElement ? preview.element : null;
   const cell = preview.element instanceof HTMLTableCellElement ? preview.element : null;
   const lifted = row
@@ -152,6 +178,19 @@ function cloneFor(preview: DragPreview): HTMLElement {
   clone.setAttribute("data-dnd-copy", "");
   lifted.classList.add(styles.lift);
   return outer;
+}
+
+/**
+ * An item without a fill of its own at rest (a row of fields on a card; a row whose fill is only a
+ * hover wash, which the copy out of the pointer's way does not get) would fly as bare content over
+ * the page: the copy takes the fill of the surface it was lifted from. Read once the copy stands in
+ * the overlay, from its own resting look.
+ */
+function fillBareCopy(host: HTMLElement, source: HTMLElement) {
+  const copy = host.querySelector<HTMLElement>("[data-dnd-copy]");
+  if (!copy || !isTransparent(getComputedStyle(copy).backgroundColor)) return;
+  const layer = getComputedStyle(source).getPropertyValue("--prime-color-layer-current").trim();
+  if (layer) copy.style.backgroundColor = layer;
 }
 
 /** The element that lifts and sets down: the copy itself, or the table a copied row flies in. */
@@ -405,6 +444,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         mirrorRef.current = null;
         const copy = cloneFor(event.preview);
         host.replaceChildren(copy);
+        fillBareCopy(host, event.preview.element);
         host.style.transform = translate(event.preview.point, event.preview.grab);
         // The original is hidden but keeps rendering (its place number follows the gap).
         const source = event.preview.element;

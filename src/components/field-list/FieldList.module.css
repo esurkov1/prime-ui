@@ -4,12 +4,18 @@
  * so a row carried by Dnd keeps its tracks): [the columns] [end: remove or menu] [grip: handle or
  * lock]. Every row has the same slots: a pinned row's remove stands there, off. The rows stand
  * edge to edge on the sheet; on a surface a faint line between two rows inset by the side padding
- * (`hairline.between`) — a plain list has no lines, the air between fields parts its rows; on a surface, a field-tone fill under the pointer. `variant="surface"` puts the sheet on a fill of
+ * (`hairline.between`); on a surface, a field-tone fill under the pointer. `variant="surface"` puts the sheet on a fill of
  * its own, one step up the surface ladder (`data-depth`); `plain` leaves it on the host surface.
  * The column headings stand once above the rows; the fields inside carry them as hidden labels
  * (`fieldCell`). In a narrow container (`prime-field-list`, < 30rem) the heading row goes, a row
  * puts its compact columns, its first field and its actions on the first line and the rest under
  * them, and each field shows its label (FieldFrame).
+ *
+ * Spacing and lines: on a surface the rows keep room around a line between them. A plain list on one
+ * line per record stands its rows one gap apart (`--prime-space-2`, half a row's padding on each
+ * side) with no lines — the air between the fields parts them; once the rows stack, a record spans
+ * several lines, so both variants part the records with a line and the room around it (a plain
+ * one-column list stays on one line per record and keeps its air).
  */
 /* A size container cannot take its width from its content: the list fills its column. */
 .root {
@@ -78,6 +84,8 @@
 }
 
 .rows {
+  /* The rows' padding is the room between them: a reorderable list (Dnd.Sortable) adds none. */
+  --dnd-sortable-gap: var(--prime-space-0);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -91,7 +99,11 @@
   transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
+/* A plain list on one line per record: one gap between the rows, and its lines (every row joins
+   `hairline.between`) inset to nothing — they show once the rows stack. */
 .sheet[data-variant="plain"] .record {
+  --hairline-inset: 50%;
+  padding-block: var(--prime-space-1);
   border-radius: var(--prime-radius-m);
 }
 
@@ -116,7 +128,7 @@
 }
 
 .sheet[data-variant="plain"] .head {
-  padding-block-start: var(--prime-space-0);
+  padding-block: var(--prime-space-0) var(--prime-space-1);
 }
 
 /* On wide rows the cells are the row's own grid items, under their headings. */
@@ -224,6 +236,13 @@
   .record {
     grid-template-columns: var(--fl-stacked);
     row-gap: var(--prime-space-4);
+    padding-block: var(--prime-space-3);
+  }
+
+  /* A stacked record spans several lines: a plain list parts the records with a line too, edge to
+     edge, with the room a line needs around it. A one-column record keeps its one line. */
+  .sheet[data-variant="plain"] .record:not([data-single]) {
+    --hairline-inset: 0%;
     padding-block: var(--prime-space-3);
   }
 
