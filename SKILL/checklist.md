@@ -10,10 +10,11 @@ checks.
 - [ ] A nested record's path ends in its title on one line inside `Page.Heading`; no title row under the path ([the top bar](composition.md#the-top-bar)).
 - [ ] Every button of the page is in one `Page.Actions`, the primary last, each with a `Button.Icon` ([the top bar](composition.md#the-top-bar)).
 - [ ] `SmartFilter.Root` wraps `Page.Root`; its toolbar is in `Page.Tools`, its chips in `Page.Chips` ([the top bar](composition.md#the-top-bar)).
+- [ ] A filter stands next to what it filters: beside KPI cards or a chart, the table's search, filter, chips and chooser are in its `toolbar` / `toolbarChips`; the bar keeps the title, the shared period and the primary action ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 - [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
 - [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
-- [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` in `Page.Tools`; a DataTable `toolbar` holds two or more table controls or does not exist ([controls of a table](composition.md#controls-of-a-table)).
+- [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` beside the table's search; a DataTable `toolbar` holds two or more table controls, unwrapped, or does not exist ([controls of a table](composition.md#controls-of-a-table)).
 
 ## UX ([ux.md](ux.md))
 - [ ] I wrote the five-line brief before the JSX ([brief](ux.md#1-brief-before-code)).

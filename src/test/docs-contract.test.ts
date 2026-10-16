@@ -251,7 +251,10 @@ const FRAMED_FIELDS =
 
 /** The controls a DataTable `toolbar` may hold (SKILL/composition.md, controls of a table). */
 const TABLE_TOOLBAR_CONTROL =
-  /<(Button\.Root|LinkButton|Input\.Root|Select\.Root|NativeSelect|TagSelect|SegmentedControl\.Root|ButtonGroup\.Root|Datepicker\.Root|Switch\.Root|Checkbox\.Root|Dropdown\.Root|Popover\.Root|SmartFilter\.Toolbar)\b|(\.map\()/g;
+  /<(Button\.Root|LinkButton|Input\.Root|Select\.Root|NativeSelect|TagSelect|SegmentedControl\.Root|ButtonGroup\.Root|Datepicker\.Root|Switch\.Root|Checkbox\.Root|Dropdown\.Root|Popover\.Root|DataTableColumnsMenu|SmartFilter\.Toolbar)\b|(\.map\()/g;
+
+/** The `Page.Tools` groups of `body`, with their content. */
+const PAGE_TOOLS = /<Page\.Tools\b[^>]*>([\s\S]*?)<\/Page\.Tools>/g;
 
 /** The `toolbar={…}` expressions of the DataTable elements in `body`. */
 function dataTableToolbars(body: string): string[] {
@@ -309,8 +312,18 @@ function contentOffenders(dir: string, file: string, source: string): string[] {
   ) {
     offenders.push(`${file}: fields with a submit and no <form>`);
   }
-  // The header chooser stands only over a row-actions column; without one, the page's tools hold
-  // `DataTableColumnsMenu`.
+  // A filter stands next to what it filters: on a page that holds more than its table (tiles in a
+  // Page.Grid), the table's search, filter and chooser go to its `toolbar`, not the page's bar.
+  if (/<DataTable\b/.test(body) && /<Page\.Grid\b/.test(body)) {
+    for (const m of body.matchAll(PAGE_TOOLS)) {
+      if (/<(SmartFilter\.Toolbar|DataTableColumnsMenu)\b/.test(m[1])) {
+        offenders.push(`${file}: the table's tools in Page.Tools above other blocks (its toolbar)`);
+        break;
+      }
+    }
+  }
+  // The header chooser stands only over a row-actions column; without one, the table's toolbar or
+  // the tools of a page that is the table hold `DataTableColumnsMenu`.
   if (/<DataTable\b[^>]*\scolumnsMenu\b/.test(body) && !/hideHeader:\s*true/.test(body)) {
     offenders.push(`${file}: columnsMenu without a row-actions column (DataTableColumnsMenu)`);
   }

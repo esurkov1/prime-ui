@@ -242,7 +242,8 @@ The same for one value in several units — one heading, the fields in a row, th
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |
 | a hand-built spinner, shimmer, grey placeholder box or «Loading…» text | `loading` on Button / Select / DataTable; a region: `Skeleton` of its content inside `Crossfade`; no shape to hold: `Spinner` |
 | `{loading ? <Spinner /> : <List />}` — a state that flips | `<Crossfade state={status}>` around the region, `Skeleton` while loading |
-| a search Input + a row of filter Selects above a table | `SmartFilter` in the page's top bar: its toolbar in `Page.Tools`, its chips in `Page.Chips` ([where the filters go](composition.md#where-the-filters-go)) |
+| a search Input + a row of filter Selects above a table | `SmartFilter` next to the table it filters: its toolbar and chips in the table's `toolbar` / `toolbarChips` beside KPI cards, in `Page.Tools` / `Page.Chips` when the table is the page ([where the filters go](composition.md#where-the-filters-go)) |
+| the table's search, filter or «Колонки» in the page's bar above KPI cards | the bar keeps the title, the period that drives every block and the primary action; the table's tools go in its own `toolbar` ([where the filters go](composition.md#where-the-filters-go)) |
 | a grid of «label: value» text pairs for one record | `DescriptionList.Root` + `DescriptionList.Item` |
 | a Modal hand-built as «Удалить?» with your own pending flag | `ConfirmDialog.Root` with an async `onConfirm` |
 | a `<fieldset>` reset by hand, or `disabled` on every field while saving | `<Fieldset label disabled={saving}>` |
@@ -309,7 +310,7 @@ cell in every row:
 ```
 
 ```tsx good
-// good — no row actions: the chooser is the page's tool, on the state the table reads
+// good — a page that is the table, no row actions: the chooser is in the bar, on the state the table reads
 // declare: const orders: { id: string; client: string; total: number }[]
 // declare: const hidden: string[]
 // declare: const setHidden: (hidden: string[]) => void

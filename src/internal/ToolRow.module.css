@@ -1,0 +1,87 @@
+/*
+ * ToolRow — the one layout of a row of tools (`Page.Tools`, the DataTable `toolbar`, the Gantt
+ * toolbar). Each tool stands in a cell of its kind (`data-kind`, set in TSX from the element type):
+ *
+ *   grow   a search (`SmartFilter.Toolbar`, `Input.Root`), a line of text, a host's own group —
+ *          takes the free room;
+ *   share  a switcher or a picker (`SegmentedControl.Root`, `Datepicker.Root`, `Select.Root`) —
+ *          content width beside a search, the whole of a line it stands on alone when short;
+ *   fixed  a button, a menu, a chooser — always its content width.
+ *
+ * Without `data-fill` (the first line of a top bar, and its measuring layout) every cell keeps its
+ * natural width on one line. With it the row takes its line, wraps, and is the container its cells
+ * read: wide — the search grows, the rest stand at the end edge at content width; short (under
+ * 36rem of the row) — a search takes a line of its own, the switchers fill the line they share
+ * with the buttons, and a switcher narrower than its content scrolls inside itself.
+ */
+
+.row {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.row[data-fill="true"] {
+  container: prime-tool-row / inline-size;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.cell {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-width: 0;
+}
+
+.cell > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.row[data-fill="true"] > .cell {
+  flex: 0 1 auto;
+}
+
+.row[data-fill="true"] > .cell[data-kind="grow"] {
+  flex: 999 1 calc(var(--prime-space-24) * 2);
+  min-width: min(100%, calc(var(--prime-space-24) * 2));
+}
+
+@container prime-tool-row (max-width: 35.99rem) {
+  .row[data-fill="true"] > .cell[data-kind="grow"] {
+    flex-basis: 100%;
+  }
+
+  .row[data-fill="true"] > .cell[data-kind="share"] {
+    flex: 1 1 auto;
+  }
+}
+
+/* A host's own group of items (a legend, a title) in one grow cell: they wrap inside it. */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* The applied filters (`SmartFilter.Chips`) on a line of their own: the row takes the whole line,
+   so what it pushes to its end («Сбросить все») stands at the end edge; gone while empty. */
+.chips {
+  display: flex;
+  min-width: 0;
+}
+
+.chips > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chips:empty {
+  display: none;
+}

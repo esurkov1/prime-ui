@@ -119,17 +119,13 @@
 
 /* ---------- Toolbar ---------- */
 
+/* The tool row (`src/internal/ToolRow`) and the active filters under it, 12 apart. */
 .toolbar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-2);
-  padding: var(--prime-space-3) var(--dt-pad-x);
-}
-
-.toolbar > * {
+  flex-direction: column;
+  gap: var(--prime-space-3);
   min-width: 0;
+  padding: var(--prime-space-3) var(--dt-pad-x);
 }
 
 /* ---------- Viewport & table ---------- */
@@ -1152,11 +1148,6 @@ tbody + tbody > .groupRow > .groupCell {
 }
 
 @container (max-width: 30rem) {
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
   .footer {
     flex-direction: column;
     align-items: stretch;

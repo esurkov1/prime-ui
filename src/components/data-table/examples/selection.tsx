@@ -2,8 +2,6 @@
 import { Button, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
-
 type Member = { id: string; name: string; email: string; role: string };
 
 const MEMBERS: Member[] = [
@@ -35,25 +33,22 @@ export default function DataTableSelectionExample() {
       onSelectedChange={setSelected}
       paging="none"
       toolbar={
-        <div className={styles.toolbar}>
+        <>
           <Typography as="span" variant="body-s" tone="secondary">
             Выбрано: {selected.length} из {MEMBERS.length}
           </Typography>
-          <div className={styles.filters}>
-            <Button.Root
-              variant="outline"
-              tone="neutral"
-              size="s"
-              disabled={selected.length === 0}
-              onClick={() => setSelected([])}
-            >
-              Снять выбор
-            </Button.Root>
-            <Button.Root variant="soft" tone="danger" size="s" disabled={selected.length === 0}>
-              Удалить
-            </Button.Root>
-          </div>
-        </div>
+          <Button.Root
+            variant="outline"
+            tone="neutral"
+            disabled={selected.length === 0}
+            onClick={() => setSelected([])}
+          >
+            Снять выбор
+          </Button.Root>
+          <Button.Root variant="soft" tone="danger" disabled={selected.length === 0}>
+            Удалить
+          </Button.Root>
+        </>
       }
     />
   );

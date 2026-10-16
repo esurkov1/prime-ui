@@ -155,6 +155,18 @@
         "The rows use rowActions=\"menu\" (one «⋯» per row), not a hand-made menu or a remove button drawn beside the fields",
         "The list sets variant=\"surface\" so it reads apart from the other fields of the card, not a Card or a border drawn around it"
       ]
+    },
+    {
+      "id": 13,
+      "prompt": "Сделай страницу «Модели» для CRM проката самокатов: сверху четыре KPI-карточки (моделей в парке, поездок за период, средняя выручка на модель, в ремонте), под ними таблица моделей с поиском, фильтром по производителю и статусу и выбором колонок. Период выбирается диапазоном дат и пересчитывает и карточки, и таблицу. Есть кнопка «Добавить модель».",
+      "expected_output": "Page.TopBar holds only the title (with a line of data), the date range in Page.Tools and «Добавить модель» in Page.Actions; the KPI cards are a Page.Grid; the DataTable is wrapped in SmartFilter.Root with SmartFilter.Toolbar and DataTableColumnsMenu in its toolbar and SmartFilter.Chips in its toolbarChips.",
+      "files": [],
+      "expectations": [
+        "The page's top bar holds the title, the date range (a Datepicker range in Page.Tools — it drives the cards and the table) and «Добавить модель» in Page.Actions — nothing else",
+        "The search and the filter (SmartFilter.Toolbar) and the column chooser (DataTableColumnsMenu) are in the DataTable toolbar, not in Page.Tools above the KPI cards",
+        "The active filters (SmartFilter.Chips) are in the DataTable toolbarChips, not in Page.Chips, and SmartFilter.Root wraps the DataTable",
+        "The toolbar gets the controls as they are (no hand-made flex wrapper), and the KPI cards are Card tiles in one Page.Grid"
+      ]
     }
   ]
 }

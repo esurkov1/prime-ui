@@ -127,8 +127,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Tools",
-      en: "`ref` → `HTMLDivElement`. The page's tools in the order written: sections, `SmartFilter.Toolbar`, view. On a line of their own a search grows first, the rest share the line: a `SegmentedControl.Root` and a `Datepicker.Root` are `fullWidth` unless set. Named, a `group`.",
-      ru: "Инструменты страницы в порядке записи: разделы, `SmartFilter.Toolbar`, вид. Своей строкой первым растёт поиск, остальные делят строку: `SegmentedControl.Root` и `Datepicker.Root` — `fullWidth`, если не задан. С именем — `group`.",
+      en: "`ref` → `HTMLDivElement`. What acts on the whole page: sections, a shared period, view; the search of a one-list page. The tool row of the DataTable `toolbar`: a search takes the free room, the rest keep their width at the end. Named, a `group`.",
+      ru: "То, что действует на всю страницу: разделы, общий период, вид; поиск страницы-списка. Та же строка, что `toolbar` DataTable: поиск занимает свободное место, остальные — в конце. С именем — `group`.",
       props: [divRest({ en: "`children` (kit controls)", ru: "`children` (контролы кита)" })],
     },
     {

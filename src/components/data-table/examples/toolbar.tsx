@@ -1,4 +1,4 @@
-/** A campaign table with its own search and status filter above it — two table-scoped controls; the empty text when nothing matches — `toolbar`, `empty`. */
+/** A campaign table with its own tools row: the search takes the free room, the status switch keeps its width at the end, and on a narrow table they wrap; the empty text when nothing matches — `toolbar`, `empty`. */
 import {
   Badge,
   DataTable,
@@ -8,8 +8,6 @@ import {
   SegmentedControl,
 } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 type Status = "active" | "paused" | "archived";
 type Campaign = { id: string; name: string; status: Status; clicks: number; ctr: number };
@@ -86,8 +84,8 @@ export default function DataTableToolbarExample() {
       pageSize={5}
       empty="Ничего не найдено — измените запрос или фильтр"
       toolbar={
-        <div className={styles.filters}>
-          <Input.Root size="s" className={styles.search}>
+        <>
+          <Input.Root>
             <Input.Wrapper>
               <Input.Icon side="start">
                 <Icon name="action.search" />
@@ -101,17 +99,12 @@ export default function DataTableToolbarExample() {
               />
             </Input.Wrapper>
           </Input.Root>
-          <SegmentedControl.Root
-            size="s"
-            aria-label="Статус"
-            value={status}
-            onValueChange={setStatus}
-          >
+          <SegmentedControl.Root aria-label="Статус" value={status} onValueChange={setStatus}>
             <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
             <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
             <SegmentedControl.Item value="paused">На паузе</SegmentedControl.Item>
           </SegmentedControl.Root>
-        </div>
+        </>
       }
     />
   );

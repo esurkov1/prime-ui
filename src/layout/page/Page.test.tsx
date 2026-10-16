@@ -6,7 +6,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
 import { Button } from "@/components/button/Button";
 import { Crossfade } from "@/components/crossfade/Crossfade";
-import { Datepicker } from "@/components/datepicker/Datepicker";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Icon } from "@/icons";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -295,16 +294,30 @@ describe("Page.Tools", () => {
     expect(container.firstElementChild).not.toHaveAttribute("role");
   });
 
-  it("gives a SegmentedControl fullWidth; an explicit fullWidth={false} keeps it", () => {
+  it("is the one tool row: fills a line of its own in the flow, the bar's first line keeps it natural", () => {
+    render(
+      <>
+        <Page.Tools data-testid="flow">
+          <button type="button">Период</button>
+        </Page.Tools>
+        <Page.TopBar>
+          <Page.Tools data-testid="bar">
+            <button type="button">Вид</button>
+          </Page.Tools>
+        </Page.TopBar>
+      </>,
+    );
+    expect(screen.getByTestId("flow")).toHaveAttribute("data-fill", "true");
+    // jsdom measures nothing, so the plan stays "one": the tools share the first line.
+    expect(screen.getByTestId("bar")).not.toHaveAttribute("data-fill");
+  });
+
+  it("gives a SegmentedControl fullWidth (the tool row's rule)", () => {
     render(
       <Page.Tools>
         <SegmentedControl.Root defaultValue="all" aria-label="Раздел">
           <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
           <SegmentedControl.Item value="mine">Мои</SegmentedControl.Item>
-        </SegmentedControl.Root>
-        <SegmentedControl.Root defaultValue="board" fullWidth={false} aria-label="Вид">
-          <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
-          <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
         </SegmentedControl.Root>
       </Page.Tools>,
     );
@@ -312,25 +325,6 @@ describe("Page.Tools", () => {
       "data-full-width",
       "true",
     );
-    expect(screen.getByRole("radiogroup", { name: "Вид" })).not.toHaveAttribute("data-full-width");
-  });
-
-  it("gives a Datepicker fullWidth, so on a line of its own its field fills the tool", () => {
-    render(
-      <Page.Tools>
-        <Datepicker.Root mode="range" aria-label="Период" />
-        <Datepicker.Root mode="single" aria-label="Дата" fullWidth={false} />
-      </Page.Tools>,
-    );
-    expect(screen.getByRole("button", { name: /Период/ })).toHaveAttribute(
-      "data-full-width",
-      "true",
-    );
-    expect(screen.getByRole("button", { name: /Дата/ })).not.toHaveAttribute("data-full-width");
-  });
-
-  it("chips take no line while empty", () => {
-    expect(cssValue(cssRule(CSS, ".chips:empty"), "display")).toBe("none");
   });
 });
 

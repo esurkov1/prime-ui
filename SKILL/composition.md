@@ -66,7 +66,7 @@ AppShell.Root                      once per app (layouts.md#app-frame-once-per-a
          │  │  ├─ Breadcrumb.Root  only on a nested record: the levels above this page
          │  │  ├─ Page.Title       the one h1, the path's last level
          │  │  └─ Page.Description a line of data
-         │  ├─ Page.Tools          sections, search and filter, view — kit controls in reading order
+         │  ├─ Page.Tools          what acts on the whole page — sections, a period, view; a one-list page's search
          │  ├─ Page.Actions        every button of the page, each with an icon; the primary last
          │  └─ Page.Chips          SmartFilter.Chips: a line under everything, gone while empty
          └─ Page.Body              blocks 24 apart, the first 24 under the bar's controls
@@ -98,9 +98,11 @@ order is Heading, Tools, Actions, Chips whatever the JSX order.
   then `Page.Title` with its name, on one line (the heading draws the chevron between them), and
   `Page.Description` under the whole line. The title is never a row of its own under the path, and
   the path never repeats the title as its last item.
-- **`Page.Tools`** — the page's own tools as kit controls, in the order a person reads them: sections
-  (a `SegmentedControl` with counts), search and filter (`SmartFilter.Toolbar`), the view or the
-  period. Named with `aria-label`; no buttons and no wrappers inside.
+- **`Page.Tools`** — what acts on the whole page, as kit controls in the order a person reads them:
+  sections (a `SegmentedControl` with counts), the view, a period that drives several blocks; the
+  search and filter (`SmartFilter.Toolbar`) only when the page is one list
+  ([where the filters go](#where-the-filters-go)). Named with `aria-label`; no buttons and no
+  wrappers inside.
 - **`Page.Actions`** — the one place for the page's buttons: secondary ones (`soft` + `neutral`)
   first, the primary (`solid`) last. Every Button carries a `Button.Icon` beside its label: the bar
   shows it as the icon alone when the line runs short.
@@ -343,25 +345,130 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 ### Where the filters go
 
-- The page's search and filters are the page's: `SmartFilter.Root` around `Page.Root`,
-  `SmartFilter.Toolbar` in the bar's `Page.Tools`, `SmartFilter.Chips` in its `Page.Chips`
-  ([the list page](#list-page)).
-  A search alone is the same SmartFilter with `fields={[]}`.
+A filter stands next to what it filters.
+
+- `Page.TopBar` holds only what acts on the whole page: the heading with its line of data, a period
+  or a date range that drives several blocks (the KPI cards and the table), the page's sections or
+  view, the primary action.
+- A page that holds more than its table — KPI cards, a chart, another block: the table's own
+  controls (search and filter, the chips, the column chooser, a table / cards view, bulk actions)
+  stand in the table's tools row. `SmartFilter.Root` wraps the `DataTable`; `SmartFilter.Toolbar`
+  and `DataTableColumnsMenu` go in its `toolbar`, `SmartFilter.Chips` in its `toolbarChips`
+  ([server.tsx](../src/components/data-table/examples/server.tsx)).
+- A page that is one list — the table, the board or the schedule is the whole page: «next to the
+  list» and «on the page» are one place, so its search and filter stay in the bar. `SmartFilter.Root`
+  wraps `Page.Root`, `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`
+  ([the list page](#list-page)). A search alone is the same SmartFilter with `fields={[]}`.
+- What picks the place: does the control change everything under the bar? A period that recomputes
+  the cards and the table does — the bar. A search that narrows only the rows does not — the
+  table's row.
+- Both rows are one tool row of the kit: written in reading order, a search takes the free room,
+  switchers and buttons keep their width at the end, and a short row wraps by itself — pass the
+  controls as they are, never inside a flex wrapper of your own.
+
+```tsx partial
+// bad — the table's search, filter, chips and chooser in the bar, above KPI cards they do not filter
+<SmartFilter.Root fields={FIELDS}>
+  <Page.Root>
+    <Page.TopBar>
+      <Page.Heading>
+        <Page.Title>Модели</Page.Title>
+      </Page.Heading>
+      <Page.Tools aria-label="Модели">
+        <SmartFilter.Toolbar />
+        <DataTableColumnsMenu columns={COLUMNS} hiddenColumns={hidden} onHiddenColumnsChange={setHidden} />
+      </Page.Tools>
+      <Page.Chips>
+        <SmartFilter.Chips />
+      </Page.Chips>
+    </Page.TopBar>
+    <Page.Body>
+      <Page.Grid>{/* four KPI cards */}</Page.Grid>
+      <DataTable columns={COLUMNS} rows={models} hiddenColumns={hidden} />
+    </Page.Body>
+  </Page.Root>
+</SmartFilter.Root>
+```
+
+```tsx good
+// good — the bar keeps the title, the period that drives the cards and the table, the primary
+// action; the table's search, filter, chips and chooser stand in the table's own tools row
+// declare: const FIELDS: Parameters<typeof SmartFilter.Root>[0]["fields"]
+// declare: const models: { id: string; name: string; rides: number }[]
+// declare: const kpis: { label: string; value: string }[]
+// declare: const hidden: string[]
+// declare: const setHidden: (hidden: string[]) => void
+<Page.Root>
+  <Page.TopBar>
+    <Page.Heading>
+      <Page.Title>Модели</Page.Title>
+    </Page.Heading>
+    <Page.Tools aria-label="Модели">
+      <Datepicker.Root mode="range" aria-label="Период" />
+    </Page.Tools>
+    <Page.Actions>
+      <Button.Root>
+        <Button.Icon>
+          <Icon name="action.add" />
+        </Button.Icon>
+        Добавить модель
+      </Button.Root>
+    </Page.Actions>
+  </Page.TopBar>
+  <Page.Body>
+    <Page.Grid>
+      {kpis.map((kpi) => (
+        <Page.Cell key={kpi.label} span={3}>
+          <Card.Root variant="stat-trend">
+            <Card.Label>{kpi.label}</Card.Label>
+            <Card.Value>{kpi.value}</Card.Value>
+          </Card.Root>
+        </Page.Cell>
+      ))}
+    </Page.Grid>
+    <SmartFilter.Root fields={FIELDS}>
+      <DataTable
+        columns={[
+          { id: "name", header: "Модель", accessor: "name", hideable: false },
+          { id: "rides", header: "Поездки", accessor: "rides", numeric: true },
+        ]}
+        rows={models}
+        getRowKey={(row) => row.id}
+        hiddenColumns={hidden}
+        toolbar={
+          <>
+            <SmartFilter.Toolbar />
+            <DataTableColumnsMenu
+              columns={[
+                { id: "name", header: "Модель", accessor: "name", hideable: false },
+                { id: "rides", header: "Поездки", accessor: "rides", numeric: true },
+              ]}
+              hiddenColumns={hidden}
+              onHiddenColumnsChange={setHidden}
+            />
+          </>
+        }
+        toolbarChips={<SmartFilter.Chips />}
+      />
+    </SmartFilter.Root>
+  </Page.Body>
+</Page.Root>
+```
 
 ### Controls of a table
 
 - The column chooser has one place per table. Over the row actions: `columnsMenu` puts the icon
   trigger in the head cell of the row-actions column (the last column, `hideHeader`), and it sticks
   with `stickyLastColumn`. A table without row actions gets no chooser cell in its header: the
-  chooser is `<DataTableColumnsMenu>` in the page's `Page.Tools` (or the host's toolbar), bound to
-  the same `hiddenColumns` / `columnOrder` state the table reads. Give the key column and the
-  actions column `hideable: false`.
-- The DataTable `toolbar` holds several controls of the table itself: a bulk bar of the selected
-  rows, or the search and filters of a table that is not the page's main region (a table in a
-  section of a record, in a Drawer).
-- One control never gets a bar of its own. A lone «Экспорт» or «Создать» is the page's
-  (`Page.Actions`); the period, the view switch, the search and filters of the page go to
-  `Page.Tools`; a count or a total of the list is data in `Page.Description`.
+  chooser is `<DataTableColumnsMenu>` beside the table's search ([where the filters go](#where-the-filters-go)),
+  bound to the same `hiddenColumns` / `columnOrder` state the table reads. Give the key column and
+  the actions column `hideable: false`.
+- The DataTable `toolbar` holds two or more controls of the table itself — its search and filter,
+  the chooser, a view, a bulk bar of the selected rows — as they are, in reading order; its chips go
+  to `toolbarChips`.
+- One control never gets a row of its own. A lone «Экспорт» or «Создать» is the page's
+  (`Page.Actions`); a lone chooser joins the table's search or the page's tools; a count or a total
+  of the list is data in `Page.Description`.
 
 ### Tables
 
@@ -523,7 +630,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [data-table/examples/screen.tsx](../src/components/data-table/examples/screen.tsx)
 
 - A work screen titles itself in its `Page.TopBar`: `Page.Title` is the only heading, its `Page.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; there is no second header in the flow.
-- `SmartFilter.Root` wraps the page: `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`; export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. The table itself has no `toolbar`.
+- The table is the whole page, so its filters are the page's: `SmartFilter.Root` wraps the page, `SmartFilter.Toolbar` in `Page.Tools`, `SmartFilter.Chips` in `Page.Chips`; export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. The table itself has no `toolbar`; add a KPI row above it and the search, filter and chips move into the table's `toolbar` / `toolbarChips`.
 - A status is a `Badge` with one `tone` per meaning across the product (`STATUS` is one map); the text carries the meaning, the tone repeats it.
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s` in the last column (`hideHeader`), pinned to the end edge with `stickyLastColumn` so they stay in reach while the columns scroll: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.

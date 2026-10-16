@@ -121,36 +121,9 @@
 
 /* ---------- Toolbar ---------- */
 
+/* The tool row (`src/internal/ToolRow`, joined in TSX) inside the surface's padding. */
 .toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-2);
   padding: var(--prime-space-3) var(--gantt-pad-x);
-}
-
-.toolbarStart {
-  display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.toolbarStart:empty {
-  display: none;
-}
-
-.toolbarEnd {
-  display: flex;
-  flex: 0 1 auto;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--prime-space-2);
-  min-width: 0;
-  margin-inline-start: auto;
 }
 
 /* ---------- Viewport ---------- */
@@ -1014,11 +987,6 @@
 @container (max-width: 35.99rem) {
   .frame {
     --gantt-label-w: var(--prime-space-24);
-  }
-
-  .toolbarEnd {
-    flex: 1 1 100%;
-    justify-content: space-between;
   }
 
   /* With avatars the column keeps only them; the stops carry the row label as their name (TSX). */

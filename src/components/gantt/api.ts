@@ -137,8 +137,8 @@ export const api: ComponentApi = {
         {
           name: "toolbar",
           type: "ReactNode",
-          en: "Content at the start of the toolbar (title, filters, a primary action); the zoom and «Сегодня» sit at its end.",
-          ru: "Содержимое в начале панели (заголовок, фильтры, главное действие); масштаб и «Сегодня» стоят в её конце.",
+          en: "Content at the start of the toolbar (title, a legend, filters), kept together in the free room; «Сегодня» and the zoom keep their width at its end, and on a narrow chart they take the next line, the zoom filling it.",
+          ru: "Содержимое в начале панели (заголовок, легенда, фильтры) — вместе, в свободном месте; «Сегодня» и масштаб стоят в конце по своей ширине, а на узком графике уходят на следующую строку, и масштаб её заполняет.",
         },
         {
           name: "scrollHeight",

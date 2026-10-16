@@ -181,8 +181,14 @@ export const api: ComponentApi = {
         {
           name: "toolbar",
           type: "ReactNode",
-          en: "Panel above the table for several controls of the table itself (bulk actions on the selected rows, a table-local search with filters); stacks below 30rem of table width.",
-          ru: "Панель над таблицей для нескольких контролов самой таблицы (массовые действия с выбранными строками, свой поиск с фильтрами); уже 30rem — в столбик.",
+          en: "The table's own tools row — search, filter, `DataTableColumnsMenu`, a view, bulk actions; two or more, unwrapped. Laid out as `Page.Tools`: the search takes the free room, the rest keep their width at the end.",
+          ru: "Своя строка инструментов таблицы — поиск, фильтр, `DataTableColumnsMenu`, вид, массовые действия; два и больше, без обёртки. Раскладка как у `Page.Tools`: поиск занимает свободное место, остальные — в конце.",
+        },
+        {
+          name: "toolbarChips",
+          type: "ReactNode",
+          en: "The applied filters (`SmartFilter.Chips`) on a line under the `toolbar`, gone while empty; `SmartFilter.Root` wraps the DataTable.",
+          ru: "Применённые фильтры (`SmartFilter.Chips`) строкой под `toolbar`, пока пусто — без места; `SmartFilter.Root` оборачивает DataTable.",
         },
         {
           name: "selectable",

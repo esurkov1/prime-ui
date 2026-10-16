@@ -66,7 +66,7 @@ Use these as they are; never wrap them in your own breakpoints.
 | app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by the menu button `Page.TopBar` draws by itself while the Sidebar is off-canvas; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
 | page top bar | `Page.TopBar` lays out its groups from their natural widths: one line while they fit, then the tools on a line of their own, then icon-only buttons, then «⋯», and the heading gives last ([below](#the-pages-top-bar--pagetopbar)). `Page.Header` in the flow: actions wrap under the title |
 | switchers | [Switchers](#switchers) never wrap or truncate: they scroll inside themselves |
-| tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn` and `stickyLastColumn` (row actions), a column chooser (`columnsMenu` over the row actions, else `DataTableColumnsMenu` in `Page.Tools`), the toolbar stacks below a 30rem table, sticky head off on short screens |
+| tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn` and `stickyLastColumn` (row actions), a column chooser (`columnsMenu` over the row actions, else `DataTableColumnsMenu` beside the table's search), the `toolbar` lays out as `Page.Tools` — the search on a line of its own and a switcher filling its line below a 36rem table, sticky head off on short screens |
 | floating layers | Popover (opened from a Trigger), Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet — scrim, grab handle, swipe down to close, page scroll locked; Tooltip and TagSelect stay anchored |
 | dialogs | Modal is a bottom sheet with a handle below 640 (swipe down closes it while `closeOnOutsideClick` allows); footer actions stack on phones and in a dialog narrower than 360px; `Sheet` is a bottom sheet for a short task at every width (centred at 560 on a tablet or desktop) and closes with a swipe down from its handle or header; a Drawer has no swipe — buttons, Escape and the scrim close it |
 | date picking | Datepicker shows two months and side presets only when they fit; otherwise one month and presets above |
@@ -85,9 +85,11 @@ by one plan chosen from their natural widths. As the width runs out it gives way
 in this order, and nothing ever overflows:
 
 1. **One line** — `Page.Heading`, `Page.Tools` and `Page.Actions` side by side while they fit.
-2. **Tools below** — the tools take a line of their own under the first one and fill its width: a
-   search (`SmartFilter.Toolbar`, `Input.Root`) grows first, the switchers and a period
-   (`Datepicker.Root`) share the rest and wrap when one line is not enough. Beside a search that
+2. **Tools below** — the tools take a line of their own under the first one: a search
+   (`SmartFilter.Toolbar`, `Input.Root`) takes the free room, the switchers, a period
+   (`Datepicker.Root`) and buttons keep their width at the end; under 36rem of the line the search
+   takes a line of its own and a switcher fills the next. The DataTable `toolbar` is the same tool
+   row and lays out the same way from the table's width. Beside a search that
    would get too little room the SmartFilter button shows only its icon and count, on the same row.
    The actions stay on the first line beside the heading at every width.
 3. **Icons** — every Button with an icon shows only the icon, the secondary ones first, then the
@@ -187,7 +189,7 @@ export function OrdersPage() {
   inside takes that tier.
 - A Button without an icon keeps its label at every step and leaves the bar less room before it
   folds: give each one a `Button.Icon`.
-- A SegmentedControl or a Datepicker in `Page.Tools` needs no `fullWidth`: the bar sets it.
+- A SegmentedControl or a Datepicker in `Page.Tools` or a DataTable `toolbar` needs no `fullWidth`: the tool row sets it.
 - The primary action is on screen at every width — as its icon at the narrowest; it never folds and
   never disappears.
 - Section totals go into `SegmentedControl.Count`, not into stat cards above the table.
@@ -198,7 +200,7 @@ export function OrdersPage() {
 ## Switchers
 
 - **Three width modes:** by content (`fullWidth` off), full width (`fullWidth`), full width only on
-  a line of its own (a SegmentedControl in `Page.Tools` — the bar decides).
+  a short line (a SegmentedControl in `Page.Tools` or a DataTable `toolbar` — the tool row decides).
 - Sections of a page → SegmentedControl in `Page.Tools`; panels inside a card or a section →
   Tabs (the folder look belongs to its panel).
 - Every switcher — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — scrolls inside

@@ -4,15 +4,8 @@ import { Breadcrumb, type BreadcrumbRootProps } from "@/components/breadcrumb/Br
 import { Button, type ButtonRootProps } from "@/components/button/Button";
 import { ConfirmDialog } from "@/components/confirm-dialog/ConfirmDialog";
 import { Crossfade, type CrossfadeProps } from "@/components/crossfade/Crossfade";
-import { Datepicker, type DatepickerRootProps } from "@/components/datepicker/Datepicker";
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Input } from "@/components/input/Input";
-import {
-  SegmentedControl,
-  type SegmentedControlRootProps,
-} from "@/components/segmented-control/SegmentedControl";
 import { Skeleton } from "@/components/skeleton/Skeleton";
-import { SmartFilter } from "@/components/smart-filter/SmartFilter";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
@@ -38,6 +31,7 @@ import { nodeText } from "@/internal/nodeText";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { stickySurfaceClass } from "@/internal/sticky";
+import { ToolChips, ToolRow } from "@/internal/ToolRow";
 import textRole from "@/internal/textRole.module.css";
 import { useAppShellNav } from "@/layout/app-shell/AppShell";
 
@@ -257,7 +251,11 @@ function measureBar(row: HTMLElement): BarWidths {
   const folded = Array.from(row.querySelectorAll<HTMLElement>("[data-collapsed]")).map(
     (node) => [node, node.getAttribute("data-collapsed") as string] as const,
   );
+  // The tools are measured on one line at their natural widths, as on the bar's first line.
+  const tools = row.querySelector<HTMLElement>(`:scope > .${styles.tools}`);
+  const toolsFill = tools?.getAttribute("data-fill") ?? null;
   row.dataset.measure = "true";
+  tools?.removeAttribute("data-fill");
   for (const node of iconed) node.removeAttribute("data-button-label");
   for (const [node] of folded) node.removeAttribute("data-collapsed");
 
@@ -269,7 +267,7 @@ function measureBar(row: HTMLElement): BarWidths {
   const widths: BarWidths = {
     heading: widthOf(row.querySelector(`:scope > .${styles.heading}`)),
     path: row.querySelector(`:scope > .${styles.heading} .${styles.path}`) !== null,
-    tools: widthOf(row.querySelector(`:scope > .${styles.tools}`)),
+    tools: widthOf(tools),
     actions: items.map((item) => ({
       role: item.dataset.role as BarAction["role"],
       full: widthOf(item),
@@ -282,6 +280,7 @@ function measureBar(row: HTMLElement): BarWidths {
 
   for (const node of iconed) node.setAttribute("data-button-label", "icon");
   for (const [node, value] of folded) node.setAttribute("data-collapsed", value);
+  if (toolsFill !== null) tools?.setAttribute("data-fill", toolsFill);
   delete row.dataset.measure;
   return widths;
 }
@@ -865,43 +864,23 @@ function BarActions({ className, children, ...rest }: PageActionsProps) {
 export type PageToolsProps = DivProps;
 
 /**
- * The page's tools — sections, search and filter, view — as kit controls in the order written.
- * On the bar's first line each keeps its natural width; on a line of their own they fill it:
- * a search (`SmartFilter.Toolbar`, `Input.Root`) takes the room first, switchers and fields share
- * the rest (a `SegmentedControl.Root` and a `Datepicker.Root` are `fullWidth` unless set; a Select
- * trigger fills by itself), and they wrap when one line is not enough. Named (`aria-label`), it is
- * a `group`.
+ * The page's tools — sections, search and filter, view — as kit controls in the order written, laid
+ * out by the one tool row (`ToolRow`, as the DataTable `toolbar`). On the bar's first line each keeps
+ * its natural width; on a line of their own a search takes the free room, switchers and pickers
+ * keep their width at the end (a `SegmentedControl.Root` and a `Datepicker.Root` are `fullWidth`
+ * unless set, so they fill a short line), and they wrap when one line is not enough. Named
+ * (`aria-label`), it is a `group`.
  */
-function PageTools({ className, children, ref, ...rest }: PageToolsProps) {
+function PageTools({ className, ...rest }: PageToolsProps) {
+  const place = React.useContext(PlaceContext);
+  const { plan } = React.useContext(BarContext);
   return (
-    <div
+    <ToolRow
       {...rest}
-      ref={ref}
       role={namedRole(rest, "group")}
+      fill={place === "flow" || plan !== "one"}
       className={cx(styles.tools, className)}
-    >
-      {flattenChildren(children).map((item, index) => {
-        const grow = isPart(item, SmartFilter.Toolbar) || isPart(item, Input.Root);
-        const fills =
-          (isPart<SegmentedControlRootProps>(item, SegmentedControl.Root) ||
-            isPart<DatepickerRootProps>(item, Datepicker.Root)) &&
-          item.props.fullWidth === undefined;
-        const tool = fills
-          ? React.cloneElement(item as React.ReactElement<{ fullWidth?: boolean }>, {
-              fullWidth: true,
-            })
-          : item;
-        return (
-          <div
-            key={keyOf(item, index)}
-            className={styles.tool}
-            data-grow={grow ? "true" : undefined}
-          >
-            {tool}
-          </div>
-        );
-      })}
-    </div>
+    />
   );
 }
 PageTools.displayName = "Page.Tools";
@@ -910,7 +889,7 @@ export type PageChipsProps = DivProps;
 
 /** Active filters (`SmartFilter.Chips`) on a line of their own under the bar; gone while empty. */
 function PageChips({ className, ...rest }: PageChipsProps) {
-  return <div {...rest} className={cx(styles.chips, className)} />;
+  return <ToolChips {...rest} className={cx(styles.chips, className)} />;
 }
 PageChips.displayName = "Page.Chips";
 

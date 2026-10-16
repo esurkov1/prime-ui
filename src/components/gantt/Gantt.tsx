@@ -36,6 +36,7 @@ import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { ToolGroup, ToolRow } from "@/internal/ToolRow";
 import { isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./Gantt.module.css";
@@ -1587,7 +1588,11 @@ type GanttToolbarProps = {
   onScale: (scale: string) => void;
 };
 
-/** The chart's toolbar: your content, «Сегодня» and the zoom. Memoized: scrolling skips it. */
+/**
+ * The chart's toolbar: your content, «Сегодня» and the zoom on the one tool row (`ToolRow`, as the
+ * DataTable `toolbar`) — your content takes the free room, the zoom fills a short line. Memoized:
+ * scrolling skips it.
+ */
 const GanttToolbar = React.memo(function GanttToolbar({
   toolbar,
   labels,
@@ -1597,20 +1602,18 @@ const GanttToolbar = React.memo(function GanttToolbar({
   onScale,
 }: GanttToolbarProps) {
   return (
-    <div className={styles.toolbar}>
-      <div className={styles.toolbarStart}>{toolbar}</div>
-      <div className={styles.toolbarEnd}>
-        <Button.Root variant="ghost" tone="neutral" disabled={!todayInRange} onClick={onToday}>
-          {labels.today}
-        </Button.Root>
-        <SegmentedControl.Root aria-label={labels.scale} value={scale} onValueChange={onScale}>
-          {SCALES.map((value) => (
-            <SegmentedControl.Item key={value} value={value}>
-              {labels[value]}
-            </SegmentedControl.Item>
-          ))}
-        </SegmentedControl.Root>
-      </div>
-    </div>
+    <ToolRow className={styles.toolbar}>
+      {toolbar != null && toolbar !== false ? <ToolGroup>{toolbar}</ToolGroup> : null}
+      <Button.Root variant="ghost" tone="neutral" disabled={!todayInRange} onClick={onToday}>
+        {labels.today}
+      </Button.Root>
+      <SegmentedControl.Root aria-label={labels.scale} value={scale} onValueChange={onScale}>
+        {SCALES.map((value) => (
+          <SegmentedControl.Item key={value} value={value}>
+            {labels[value]}
+          </SegmentedControl.Item>
+        ))}
+      </SegmentedControl.Root>
+    </ToolRow>
   );
 });

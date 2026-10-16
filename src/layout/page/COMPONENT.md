@@ -8,6 +8,7 @@
 ## When to use
 - Every route rendered inside `AppShell.Main`: the app is navigation and the page, and the page carries its own top (`Page.TopBar`), title (`Page.Title`, the `<h1>`) and body.
 - A work screen (a list, a board, a chat, a schedule): `Page.TopBar` with the title (`Page.Heading`), the page's tools (`Page.Tools`: sections, search and filter, view), all its buttons (`Page.Actions`) and the active filters (`Page.Chips`).
+- A filter stands next to what it filters. `Page.Tools` holds what acts on the whole page: sections, the view, a period that drives several blocks (the KPI cards and the table). The search, filter, chips and column chooser of a page that is one list stay there too — the list is the page. On a page that holds more than its table (KPI cards, a chart), they belong to the table's own tools row (DataTable `toolbar` + `toolbarChips`), not the bar.
 - A document page (settings, a long form, help) or an overview (a dashboard): `Page.Header` in the flow — the large title and its buttons — and `Page.TopBar collapse`, which repeats the title once it scrolls away and keeps the path and the buttons in reach.
 - A nested record: a `Breadcrumb` path in `Page.Heading`; in the bar the title reads as its last level.
 - A text page held to a reading measure (`maxWidth="readable"`), a wide dashboard capped at the content width (`maxWidth="wide"`).
@@ -42,7 +43,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 │  │  ├─ Breadcrumb.Root           the path; the heading draws one chevron after it
 │  │  ├─ Page.Title                <h1>, title-m, the path's last level, truncates
 │  │  └─ Page.Description          <p>, muted caption under the whole line, truncates
-│  ├─ Page.Tools                   the page's controls in the order written, one wrapper each
+│  ├─ Page.Tools                   what acts on the whole page, in the order written: the one tool row (as the DataTable toolbar)
 │  │  ├─ SegmentedControl.Root     sections, view (fullWidth unless set)
 │  │  ├─ SmartFilter.Toolbar       search and filter: grows first on a line of its own
 │  │  ├─ Datepicker.Root           a period (fullWidth unless set)
@@ -121,7 +122,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### Page.Tools
-`ref` → `HTMLDivElement`. The page's tools in the order written: sections, `SmartFilter.Toolbar`, view. On a line of their own a search grows first, the rest share the line: a `SegmentedControl.Root` and a `Datepicker.Root` are `fullWidth` unless set. Named, a `group`.
+`ref` → `HTMLDivElement`. What acts on the whole page: sections, a shared period, view; the search of a one-list page. The tool row of the DataTable `toolbar`: a search takes the free room, the rest keep their width at the end. Named, a `group`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -244,7 +245,7 @@ One plan, chosen from the natural widths of the groups (`data-plan` on the bar's
 | Step | Looks like | Use when | Default |
 |---|---|---|---|
 | `one` | `[Heading 1fr][Tools][Actions]` on one line | everything fits | yes |
-| `below` | the tools on a line of their own under the heading and the actions, filling it: a search (`SmartFilter.Toolbar`, `Input.Root`) grows first, switchers and fields (`SegmentedControl.Root`, `Datepicker.Root`, a Select) share the rest and wrap when one line is not enough | heading + tools + actions do not fit | |
+| `below` | the tools on a line of their own under the heading and the actions — the one tool row, as the DataTable `toolbar`: a search (`SmartFilter.Toolbar`, `Input.Root`) takes the free room, switchers, pickers and buttons keep their width at the end; under 36rem the search takes a line of its own and a `SegmentedControl.Root` / `Datepicker.Root` / Select fills the line it stands on | heading + tools + actions do not fit | |
 | `icons-secondary` | as `below`; secondary Buttons with a `Button.Icon` show only the icon, the label is their name and their tooltip | heading + actions still do not fit | |
 | `icons` | the primary Button gives way to its icon too | still too wide | |
 | `fold` | the secondary Buttons fold into «⋯» (`labels.more`); the primary stays | still too wide, and «⋯» is narrower than their icons (a single secondary keeps its icon); past it a Breadcrumb path folds into «…»; if the path and the title still do not share the line, the heading stacks: the path on its own line over the title, the title and the description wrapping (`data-heading="stack"`); a heading without a path truncates | |
@@ -290,6 +291,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 ## Layout & spacing
 - The edge air comes from the host: `AppShell.Main` sets `--page-gutter` (the page gutter, 16 → 24 → 32) and `--page-top` (24 → 32 from 1024px); `Page.Root` pads itself with them. Outside a host the page brings no air. The page resets both for what it holds, so a page nested in it starts clean.
 - `Page.TopBar` steps out of the gutter to the panel's edges and keeps the gutter inside; padding 12 above (or the top safe-area inset) and below; what follows starts 24 under its controls (header → body; the bar's own 12 counts in). The first line is as high as the Sidebar brand row (control m + 8), so the two read as one line. Groups 16 apart on a line, lines 12 apart; tools 8 apart; buttons 8 apart.
+- `Page.Tools` and `Page.Chips` are the kit's one tool row and chips line (`ToolRow`), the same as the DataTable `toolbar` and `toolbarChips`: the bar only places them. On the first line every tool keeps its natural width; on a line of their own they take the line and lay out from its width (container `prime-tool-row`), never from the window.
 - In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its natural width until every button step is taken; then a heading with a path stacks (the path over the title, the title and the description wrapping), so no level is cut to a fragment; a heading without a path truncates its title.
 - The plan is measured, never chosen by breakpoints: the bar lays itself out from its own width.
 - Header (flow) → Body 24; blocks inside Body 24; a `Page.Section` 40 from its neighbours (the body's 24 + 16); tile → tile in a Grid 16 on both axes; section heading → content 16, heading → description 4; flow Title → Description 8; heading → Actions 24 side by side, 16 once they wrap below.
@@ -358,6 +360,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - Buttons without an icon in a crowded bar → they cannot give way to an icon; give each `Button.Root` a `Button.Icon` beside its label.
 - Two places for buttons (some beside the title, the primary among the tools) → every button of the page goes into the one `Page.Actions`, the primary last.
 - `SmartFilter.Root` inside the bar, around `Page.Tools` → it holds no DOM; wrap it around `Page.Root` so its Toolbar (in `Page.Tools`) and its Chips (in `Page.Chips`) share it.
+- A table's search, filter, chips or «Колонки» in `Page.Tools` / `Page.Chips` above KPI cards or a chart they do not filter → they read as filters of the whole page; move them into the table's `toolbar` / `toolbarChips`. The bar keeps the title, a period that drives every block, sections and the primary action.
 - `Page.Header` inside `Page.TopBar` → the bar takes `Page.Heading` and `Page.Actions` directly; `Page.Header` is the flow's document header.
 - A hand-made menu button for the phone Sidebar → the bar draws it while the Sidebar is off-canvas.
 - Hiding buttons with media queries on a phone → `Page.Actions` in the bar collapses and folds them by measured width.
@@ -371,5 +374,5 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - Tiles of a row cut to 6 + 6 so a mid-width grid keeps no hole → write the 8 and the 4 next to each other; the grid pairs them as 2/3 + 1/3.
 
 ## Related
-- **Built from:** [AppShell](../app-shell/COMPONENT.md) (the navigation the menu button opens), [Breadcrumb](../../components/breadcrumb/COMPONENT.md) (the path the heading places), [Button](../../components/button/COMPONENT.md) (the menu button, «⋯», `Page.BackButton`; the icon-only label hook), [Dropdown](../../components/dropdown/COMPONENT.md) (folded buttons), [Tooltip](../../components/tooltip/COMPONENT.md) (the label of an icon-only button), [SegmentedControl](../../components/segmented-control/COMPONENT.md) and [Datepicker](../../components/datepicker/COMPONENT.md) (`fullWidth` in `Page.Tools`), [SmartFilter](../../components/smart-filter/COMPONENT.md) and [Input](../../components/input/COMPONENT.md) (the search that grows first in `Page.Tools`), [Crossfade](../../components/crossfade/COMPONENT.md) (a `Page.Cell` child gets `fill`), [Skeleton](../../components/skeleton/COMPONENT.md) (the line of data while it loads), [ConfirmDialog](../../components/confirm-dialog/COMPONENT.md) (the confirm of `Page.Guard`), Icon (`nav.menu`, `nav.chevronRight`, `action.more`, `nav.chevronLeft`)
-- **See also:** [Sidebar](../sidebar/COMPONENT.md), [BottomNav](../bottom-nav/COMPONENT.md), [Select](../../components/select/COMPONENT.md), [Card](../../components/card/COMPONENT.md), [ChartFrame](../../components/chart-frame/COMPONENT.md), [List](../../components/list/COMPONENT.md), [EmptyPage](../../components/empty-page/COMPONENT.md), [Drawer](../../components/drawer/COMPONENT.md), [VisuallyHidden](../../components/visually-hidden/COMPONENT.md)
+- **Built from:** [AppShell](../app-shell/COMPONENT.md) (the navigation the menu button opens), [Breadcrumb](../../components/breadcrumb/COMPONENT.md) (the path the heading places), [Button](../../components/button/COMPONENT.md) (the menu button, «⋯», `Page.BackButton`; the icon-only label hook), [Dropdown](../../components/dropdown/COMPONENT.md) (folded buttons), [Tooltip](../../components/tooltip/COMPONENT.md) (the label of an icon-only button), `ToolRow` (`Page.Tools` and `Page.Chips`: the kit's one tool row and chips line) with [SmartFilter](../../components/smart-filter/COMPONENT.md), [Input](../../components/input/COMPONENT.md) and [Typography](../../components/typography/COMPONENT.md) (what grows in the tool row), [SegmentedControl](../../components/segmented-control/COMPONENT.md), [Datepicker](../../components/datepicker/COMPONENT.md) and [Select](../../components/select/COMPONENT.md) (what fills a short line; the first two get `fullWidth`), [Crossfade](../../components/crossfade/COMPONENT.md) (a `Page.Cell` child gets `fill`), [Skeleton](../../components/skeleton/COMPONENT.md) (the line of data while it loads), [ConfirmDialog](../../components/confirm-dialog/COMPONENT.md) (the confirm of `Page.Guard`), Icon (`nav.menu`, `nav.chevronRight`, `action.more`, `nav.chevronLeft`)
+- **See also:** [DataTable](../../components/data-table/COMPONENT.md) (`toolbar`, `toolbarChips`), [Sidebar](../sidebar/COMPONENT.md), [BottomNav](../bottom-nav/COMPONENT.md), [Select](../../components/select/COMPONENT.md), [Card](../../components/card/COMPONENT.md), [ChartFrame](../../components/chart-frame/COMPONENT.md), [List](../../components/list/COMPONENT.md), [EmptyPage](../../components/empty-page/COMPONENT.md), [Drawer](../../components/drawer/COMPONENT.md), [VisuallyHidden](../../components/visually-hidden/COMPONENT.md)

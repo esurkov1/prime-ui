@@ -173,7 +173,7 @@ same height and type.
 - Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end. The chips row rises in with the first filter and closes up in place with the last (`partPresence`).
 - Option groups stack `--prime-space-3` apart, a caption `--prime-space-1` above each group's values. A range row holds two equal Inputs with a dash between them, centred on the field label.
 - While typing a search a range row stays only when its field name matches.
-- The root draws nothing: its host places Toolbar and Chips. In a page bar the Toolbar goes in `Page.Tools` and the Chips in `Page.Chips`, with `SmartFilter.Root` around `Page.Root`; outside a page a host stacks them (a `Card.Body`, a form column).
+- The root draws nothing: its host places Toolbar and Chips, next to what they filter. A table among other blocks (KPI cards, a chart) takes them in its own tools row — the DataTable `toolbar` (the Toolbar) and `toolbarChips` (the Chips), with `SmartFilter.Root` around the DataTable. A page that is one list takes them in its bar — the Toolbar in `Page.Tools`, the Chips in `Page.Chips`, with `SmartFilter.Root` around `Page.Root`. Elsewhere a host stacks them (a `Card.Body`, a form column).
 
 ## Accessibility
 
@@ -252,4 +252,4 @@ same height and type.
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Input](../input/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Typography](../typography/COMPONENT.md), Icon (`action.search`, `action.filter`, `action.add`, `nav.chevronDown`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
-- **See also:** [Page](../../layout/page/COMPONENT.md) (`Page.Tools`, `Page.Chips`), [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)
+- **See also:** [Page](../../layout/page/COMPONENT.md) (`Page.Tools`, `Page.Chips`), [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md) (`toolbar`, `toolbarChips`)

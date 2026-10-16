@@ -19,6 +19,7 @@ import { exitTimeoutMs } from "@/internal/motionTiming";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { ToolChips, ToolRow } from "@/internal/ToolRow";
 import { useFlipList } from "@/internal/useFlipList";
 import { ColumnsMenu, type ColumnsMenuReorder, lockedInChooser } from "./ColumnsMenu";
 import { orderColumns, placeColumn } from "./columnOrder";
@@ -178,6 +179,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   loadError?: React.ReactNode;
   loadingRows?: number;
   toolbar?: React.ReactNode;
+  toolbarChips?: React.ReactNode;
   getRowGroup?: (row: Row) => string | number;
   renderGroupHeader?: (group: DataTableGroup<Row>) => React.ReactNode;
   stickyGroupHeaders?: boolean;
@@ -302,6 +304,7 @@ export function DataTable<Row>({
   loadError,
   loadingRows,
   toolbar,
+  toolbarChips,
   getRowGroup,
   renderGroupHeader,
   stickyGroupHeaders = false,
@@ -1066,7 +1069,13 @@ export function DataTable<Row>({
               "scroll-height": fillHeight ? "fill" : undefined,
             })}
           >
-            {toolbar != null ? <div className={styles.toolbar}>{toolbar}</div> : null}
+            {/* The table's own tools: the one tool row (as `Page.Tools`), the active filters under it. */}
+            {toolbar != null || toolbarChips != null ? (
+              <div className={styles.toolbar}>
+                {toolbar != null ? <ToolRow>{toolbar}</ToolRow> : null}
+                {toolbarChips != null ? <ToolChips>{toolbarChips}</ToolChips> : null}
+              </div>
+            ) : null}
 
             {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
             <div className={cx(fieldTierClass, styles.frame)} data-size={compactTier(size)}>

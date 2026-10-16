@@ -169,14 +169,6 @@
   flex: none;
 }
 
-.row[data-measure="true"] > .tools {
-  flex-wrap: nowrap;
-}
-
-.row[data-measure="true"] .tool {
-  flex: none;
-}
-
 .row[data-measure="true"] .actionItem[hidden] {
   display: flex;
 }
@@ -366,61 +358,10 @@
 /* ─── Tools and chips ──────────────────────────────────────────────────────── */
 
 /*
- * The tools as written. On the first line each keeps its natural width. On a line of their own
- * they fill it: a search grows first (a share 999 times the others), switchers share the rest,
- * and a control that does not fit wraps to the next line, which fills the same way. A switcher
- * narrower than its content scrolls inside itself, so nothing overflows a phone.
+ * The tools and the chips are laid out by the one tool row (`src/internal/ToolRow`, joined in
+ * TSX): the bar only places them — the tools on the first line or a line of their own (the plan),
+ * the chips on a line under everything.
  */
-.tools {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.tool {
-  display: flex;
-  flex: none;
-  align-items: center;
-  min-width: 0;
-}
-
-.tool > * {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.row:not([data-plan="one"]) > .tools,
-.tools:not(.row > .tools) {
-  flex-wrap: wrap;
-}
-
-.row:not([data-plan="one"]) > .tools > .tool,
-.tools:not(.row > .tools) > .tool {
-  flex: 1 1 auto;
-}
-
-.row:not([data-plan="one"]) > .tools > .tool[data-grow="true"],
-.tools:not(.row > .tools) > .tool[data-grow="true"] {
-  flex: 999 1 calc(var(--prime-space-24) * 2);
-  min-width: min(100%, calc(var(--prime-space-24) * 2));
-}
-
-.chips {
-  display: flex;
-  min-width: 0;
-}
-
-/* The row of filters takes the whole line, so what it pushes to its end (SmartFilter's «Сбросить
-   все») stands at the bar's end edge. */
-.chips > * {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.chips:empty {
-  display: none;
-}
 
 /* ─── Body and sections ────────────────────────────────────────────────────── */
 

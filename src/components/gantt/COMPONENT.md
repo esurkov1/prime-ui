@@ -25,7 +25,7 @@ import { Gantt, type GanttBar, type GanttDates, type GanttScale } from "prime-ui
 ## Anatomy
 ```
 Gantt                          surface (layer of the ladder), size container
-├─ toolbar                     your `toolbar` content · «Сегодня» · zoom (SegmentedControl)
+├─ toolbar                     the kit's tool row: your `toolbar` content (the free room) · «Сегодня» · zoom (SegmentedControl)
 └─ viewport                    ScrollContainer, both axes, own scroll only
    └─ role="grid"
       ├─ head row (sticky)     corner (sticky) · axis: top tier (months / years) over bottom tier (days / weeks / months), today chip
@@ -62,7 +62,7 @@ Gantt                          surface (layer of the ladder), size container
 | `readOnly` | `boolean` | `false` | No moving, resizing or creating; bars still select and show their dates. |
 | `loading` | `boolean` | `false` | Without rows — skeleton rows in the chart's geometry and a status for screen readers; with rows they stay and the grid is `aria-busy`. |
 | `empty` | `ReactNode` | — | Empty-state content when `rows` is empty; a string goes into a compact `EmptyPage`. Defaults to `labels.empty`. |
-| `toolbar` | `ReactNode` | — | Content at the start of the toolbar (title, filters, a primary action); the zoom and «Сегодня» sit at its end. |
+| `toolbar` | `ReactNode` | — | Content at the start of the toolbar (title, a legend, filters), kept together in the free room; «Сегодня» and the zoom keep their width at its end, and on a narrow chart they take the next line, the zoom filling it. |
 | `scrollHeight` | `number \| "fill"` | — | Max height of the viewport in px, so the header sticks while rows scroll; `"fill"` — the chart takes its flex / grid parent's height. |
 | `onItemOpen` | `(bar: Bar, row: Row) => void` | — | A bar was activated (click, Enter, Space): open its record. A drag never opens it. |
 | `onBarChange` | `(dates: GanttDates, bar: Bar, row: Row) => void \| Promise<void>` | — | New dates of a bar after a drag or an editing key — update your data. A returned Promise keeps the bar busy at the new dates; a rejection glides it back. Without it bars cannot be edited. |
@@ -151,7 +151,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - Editing precision: a move, a resize and a drawing snap to whole days at every zoom (at the month zoom a day is 4 px, so the snap holds a day until the pointer clearly leaves it); hold Alt to snap to the zoom's week or month. A bar is at least one day long: a resize past the opposite edge stops there and never flips. On touch a finger held on a bar picks it up, then it drags like a pointer.
 - Creating: on empty space the cursor is a crosshair and, on pointer devices, the cell under it is washed with a «+». Drag across a row to draw a range in days, double-click (or long-press on touch) for one unit of the zoom; a drag after the long press draws days. While drawing, a ghost with a dates and duration tooltip follows the pointer. Without `onBarCreate` (or with `readOnly`) nothing can be created and empty space shows no create cursor. Near the edges of the axis a drag, a resize and a drawing scroll the chart.
 - Tooltip: the bar's title, then its dates · duration · progress; `renderBarTooltip` adds lines under them (a client, planned hours) and never replaces them — the dates are what the bar means on the axis, and the same tooltip shows the new dates while dragging.
-- A legend of bar colours goes in `toolbar`: a row of `Badge.Root color` + `Badge.Dot` with the category name, one per hue the bars use; the toolbar wraps it. Say the category in the bar label or the tooltip too, never only by colour.
+- A legend of bar colours goes in `toolbar`: a row of `Badge.Root color` + `Badge.Dot` with the category name, one per hue the bars use; the toolbar keeps it together in the free room and wraps it, «Сегодня» and the zoom at the end (on a narrow chart on the next line, the zoom filling it). Say the category in the bar label or the tooltip too, never only by colour.
 - The default axis covers every bar and today with a unit of room on both sides; pass `range` for a fixed period.
 - The chart opens with today a third into the view; «Сегодня» and the arrow keys scroll only the chart's scroller, never the page.
 - A row grows by a lane for every overlapping bar: lanes are packed greedily by start date.
@@ -237,5 +237,5 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - Expecting the page to scroll to today → «Сегодня» scrolls only the chart.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), Icon (`action.add` in the create cue), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), Icon (`action.add` in the create cue), [VisuallyHidden](../visually-hidden/COMPONENT.md); `ToolRow` (the toolbar, as the DataTable `toolbar`) with [SmartFilter](../smart-filter/COMPONENT.md), [Input](../input/COMPONENT.md) and [Typography](../typography/COMPONENT.md) (what grows in the tool row), [SegmentedControl](../segmented-control/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md) and [Select](../select/COMPONENT.md) (what fills a short line; the first two get `fullWidth`)
 - **See also:** [Timeline](../timeline/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [Avatar](../avatar/COMPONENT.md)

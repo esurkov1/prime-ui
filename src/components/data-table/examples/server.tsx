@@ -1,8 +1,9 @@
-/** A CRM deal list the server sorts, pages and searches; a new search returns to page 1 — `source`, `rowCount`, `sort`, `page`, `loading`. */
+/** A CRM deal list the server sorts, pages and searches, with its tools in its own row — search, filter and column chooser, the active filters under them; a new search returns to page 1 — `source`, `rowCount`, `sort`, `page`, `loading`, `toolbar`, `toolbarChips`. */
 import {
   Badge,
   DataTable,
   type DataTableColumn,
+  DataTableColumnsMenu,
   type DataTableSortState,
   matchesSmartFilter,
   SmartFilter,
@@ -10,8 +11,6 @@ import {
   type SmartFilterValue,
 } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 type Stage = "new" | "talks" | "won" | "lost";
 type Deal = { id: number; client: string; manager: string; stage: Stage; amount: number };
@@ -79,7 +78,15 @@ const RUB = new Intl.NumberFormat("ru-RU", {
 });
 
 const COLUMNS: DataTableColumn<Deal>[] = [
-  { id: "id", header: "Сделка", accessor: "id", sortable: true, numeric: true, align: "start" },
+  {
+    id: "id",
+    header: "Сделка",
+    accessor: "id",
+    sortable: true,
+    numeric: true,
+    align: "start",
+    hideable: false,
+  },
   { id: "client", header: "Клиент", accessor: "client", sortable: true },
   { id: "manager", header: "Менеджер", accessor: "manager", sortable: true },
   {
@@ -125,6 +132,7 @@ export default function DataTableServerExample() {
   const [search, setSearch] = React.useState("");
   const [sort, setSort] = React.useState<DataTableSortState>({ columnId: "amount", order: "desc" });
   const [page, setPage] = React.useState(1);
+  const [hidden, setHidden] = React.useState<string[]>([]);
   const [result, setResult] = React.useState<DealsPage>({ rows: [], total: 0 });
   const [loading, setLoading] = React.useState(true);
 
@@ -153,33 +161,39 @@ export default function DataTableServerExample() {
   };
 
   return (
-    <DataTable
-      source="server"
-      columns={COLUMNS}
-      rows={result.rows}
-      rowCount={result.total}
-      getRowKey={(row) => row.id}
-      pageSize={PAGE_SIZE}
-      page={page}
-      onPageChange={setPage}
-      sort={sort}
-      onSortChange={setSort}
-      loading={loading}
-      empty="Сделок не найдено — измените запрос или фильтры"
-      toolbar={
-        <SmartFilter.Root
-          fields={FIELDS}
-          value={filter}
-          onValueChange={changeFilter}
-          search={search}
-          onSearchChange={changeSearch}
-        >
-          <div className={styles.filterColumn}>
+    <SmartFilter.Root
+      fields={FIELDS}
+      value={filter}
+      onValueChange={changeFilter}
+      search={search}
+      onSearchChange={changeSearch}
+    >
+      <DataTable
+        source="server"
+        columns={COLUMNS}
+        hiddenColumns={hidden}
+        rows={result.rows}
+        rowCount={result.total}
+        getRowKey={(row) => row.id}
+        pageSize={PAGE_SIZE}
+        page={page}
+        onPageChange={setPage}
+        sort={sort}
+        onSortChange={setSort}
+        loading={loading}
+        empty="Сделок не найдено — измените запрос или фильтры"
+        toolbar={
+          <>
             <SmartFilter.Toolbar />
-            <SmartFilter.Chips />
-          </div>
-        </SmartFilter.Root>
-      }
-    />
+            <DataTableColumnsMenu
+              columns={COLUMNS}
+              hiddenColumns={hidden}
+              onHiddenColumnsChange={setHidden}
+            />
+          </>
+        }
+        toolbarChips={<SmartFilter.Chips />}
+      />
+    </SmartFilter.Root>
   );
 }
