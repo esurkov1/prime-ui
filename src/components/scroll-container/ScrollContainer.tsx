@@ -44,7 +44,7 @@ const axisClass: Record<ScrollContainerAxis, string> = {
 export function ScrollContainer({
   as: Component = "div",
   axis = "vertical",
-  overscrollBehavior = "contain",
+  overscrollBehavior = "auto",
   edges = "fade",
   scrollbar = "thin",
   lock = false,

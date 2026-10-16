@@ -107,7 +107,8 @@ export function FloatingPanel<E extends HTMLElement = HTMLDivElement>({
   const panelRef = (sheet ? ref : mergedRef) as React.Ref<HTMLDivElement> | undefined;
 
   const panel = scroll ? (
-    <ScrollContainer {...props} edges="shadow" ref={panelRef}>
+    // An open layer: a touch scroll at its end never moves the page (the wheel: `useContainScroll`).
+    <ScrollContainer {...props} edges="shadow" overscrollBehavior="contain" ref={panelRef}>
       {children}
     </ScrollContainer>
   ) : (

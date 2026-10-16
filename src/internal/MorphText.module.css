@@ -5,8 +5,8 @@
  * exception of foundation §7 rule 5, listed in `src/styles/motion-perf.test.ts`. The old letters
  * leave upward (`fast` · `exit`), the new ones rise from below (`base` · `emphasized`), one sixth
  * of `--prime-motion-stagger` apart. Letters are one-shot keyframes; a change during a change
- * restarts from what is on screen. Reduced motion collapses the durations (and the component skips
- * the morph entirely).
+ * starts from what is on screen: the width mid-glide and each letter's pose. Reduced motion
+ * collapses the durations (and the component skips the morph entirely).
  *
  * The letters animate only `transform` and `opacity`, so they run on the compositor. The blur that
  * bridges the two words is the `--prime-motion-blur` row of foundation §7 (a change of shape hidden
@@ -86,7 +86,13 @@
   animation-fill-mode: both;
 }
 
+/* A letter starts from rest, or — in a change during a change — from the pose it has on screen
+   (`--morph-opacity`, `--morph-y`, set per letter by the component). */
 @keyframes primeMorphOut {
+  from {
+    opacity: var(--morph-opacity, 1);
+    transform: translateY(var(--morph-y, 0));
+  }
   to {
     opacity: 0;
     transform: translateY(calc(var(--prime-space-2) * -1));
@@ -95,8 +101,8 @@
 
 @keyframes primeMorphIn {
   from {
-    opacity: 0;
-    transform: translateY(var(--prime-space-2));
+    opacity: var(--morph-opacity, 0);
+    transform: translateY(var(--morph-y, var(--prime-space-2)));
   }
 }
 

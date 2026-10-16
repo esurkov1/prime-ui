@@ -20,6 +20,7 @@ export { AlignVerticalSpaceAround as AlignVerticalSpaceAroundIcon } from "./icon
 export { Ambulance as AmbulanceIcon } from "./icons/glyphs/ambulance";
 export { Angry as AngryIcon } from "./icons/glyphs/angry";
 export { Annoyed as AnnoyedIcon } from "./icons/glyphs/annoyed";
+export { AppWindow as AppWindowIcon } from "./icons/glyphs/app-window";
 export { Archive as ArchiveIcon } from "./icons/glyphs/archive";
 export { ArrowBigDown as ArrowBigDownIcon } from "./icons/glyphs/arrow-big-down";
 export { ArrowBigDownDash as ArrowBigDownDashIcon } from "./icons/glyphs/arrow-big-down-dash";

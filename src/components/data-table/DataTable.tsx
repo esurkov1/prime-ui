@@ -1127,7 +1127,6 @@ export function DataTable<Row>({
                 ref={scrollRef}
                 axis="both"
                 edges="none"
-                overscrollBehavior="none"
                 className={cx(fieldTierClass, styles.viewport)}
                 data-size="xs"
                 style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}

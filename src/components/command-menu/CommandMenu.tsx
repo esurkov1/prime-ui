@@ -495,6 +495,8 @@ function CommandMenuList({ className, children, ref, ...rest }: CommandMenuListP
           <ScrollContainer
             {...rest}
             ref={mergedRef}
+            // An open layer: the end of the list never scrolls the page behind the dialog.
+            overscrollBehavior="contain"
             id={listboxId}
             role="listbox"
             aria-busy={loading || loadingMore || undefined}

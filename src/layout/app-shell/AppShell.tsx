@@ -151,7 +151,6 @@ function AppShellMain({ className, children, ...rest }: AppShellMainProps) {
       as="main"
       axis="vertical"
       edges="none"
-      overscrollBehavior="contain"
       className={cx(styles.main, className)}
     >
       {children}

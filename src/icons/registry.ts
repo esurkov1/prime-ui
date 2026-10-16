@@ -1,4 +1,5 @@
 import { Activity } from "./glyphs/activity";
+import { AppWindow } from "./glyphs/app-window";
 import { ArrowDown } from "./glyphs/arrow-down";
 import { ArrowUp } from "./glyphs/arrow-up";
 import { ArrowUpDown } from "./glyphs/arrow-up-down";
@@ -154,6 +155,8 @@ export const iconRegistry = {
   "action.login": LogIn,
   "action.logout": LogOut,
   "action.more": Ellipsis,
+  /** Open a page of this product (a bot key's web app); `action.externalLink` leaves it. */
+  "action.openApp": AppWindow,
   "action.pause": Pause,
   /** Pin a message or an item to the top. */
   "action.pin": Pin,

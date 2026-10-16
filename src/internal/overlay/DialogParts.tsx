@@ -686,9 +686,15 @@ export type DialogBodyProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The only scrolling zone; header and footer stay put. */
+/** The only scrolling zone; header and footer stay put. An open layer: its end never scrolls the page. */
 export function DialogBody({ className, ...rest }: DialogBodyProps) {
-  return <ScrollContainer className={cx(styles.body, className)} {...rest} />;
+  return (
+    <ScrollContainer
+      overscrollBehavior="contain"
+      className={cx(styles.body, className)}
+      {...rest}
+    />
+  );
 }
 DialogBody.displayName = "Dialog.Body";
 

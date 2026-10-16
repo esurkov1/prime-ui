@@ -3,9 +3,11 @@
  * floating BottomNav capsule): one element under the items, placed over the selected one from TS
  * (`placeIndicator`). The host draws its look (fill, radius, flares) on the same element.
  *
- * It glides only into a person's choice (`data-animate`, set by the host for that commit);
- * mount, resize, fonts and items coming or going place it without motion, and under reduced
- * motion the host never sets the flag. The geometry rides `left` / `top` / `width` / `height`, not
+ * It glides only into a person's choice (`data-animate`, set by the host for that commit), and
+ * fades in or out only when that choice shows or clears it (`data-fade`); mount, resize, fonts and
+ * items coming or going place and show it without motion — it is there in the first frame of a
+ * host that opens (a Drawer, a Modal), never fading in under the selected label — and under
+ * reduced motion the host never sets the flags. The geometry rides `left` / `top` / `width` / `height`, not
  * a transform, on purpose: a transform transition makes the indicator a composited layer, and
  * Safari then misses its overlap with the later items inside a scrolling row and paints their text
  * under it until the glide ends (WebKit PR #75750). An indicator that stays in normal paint order
@@ -18,11 +20,14 @@
   left: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .indicator[data-visible="true"] {
   opacity: 1;
+}
+
+.indicator[data-fade="true"] {
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .indicator[data-animate="true"] {

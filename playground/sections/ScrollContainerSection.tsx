@@ -62,7 +62,7 @@ export const page: ComponentPageConfig = {
       scenario: "overscroll",
       title: "Передача прокрутки",
       description:
-        "В конце списка прокрутка переходит к странице, а не останавливается — `overscrollBehavior`.",
+        "Панель, которая держит прокрутку: в конце списка страница за ней стоит на месте — `overscrollBehavior`.",
     },
     {
       scenario: "log",

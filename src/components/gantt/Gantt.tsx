@@ -1447,7 +1447,6 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
               ref={scrollRef}
               axis="both"
               edges="none"
-              overscrollBehavior="none"
               className={styles.viewport}
               style={
                 typeof scrollHeight === "number" ? { maxHeight: `${scrollHeight}px` } : undefined

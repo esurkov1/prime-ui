@@ -64,9 +64,9 @@ export const api: ComponentApi = {
         {
           name: "overscrollBehavior",
           type: '"auto" | "contain" | "none"',
-          default: '"contain"',
-          en: "CSS `overscroll-behavior` along the region's own axes; `contain` stops scroll chaining into the page, a scroll across them still reaches the region around.",
-          ru: "CSS `overscroll-behavior` по своим осям области; `contain` не передаёт прокрутку странице, поперечная доходит до внешней области.",
+          default: '"auto"',
+          en: "At the region's end: `auto` hands the scroll on to the page (sideways it stops); `contain` / `none` hold both axes — an open layer, where the page behind must not move.",
+          ru: "В конце области: `auto` передаёт прокрутку странице (вбок останавливается); `contain` / `none` держат обе оси — открытый слой, за которым страница не двигается.",
         },
         {
           name: "as",

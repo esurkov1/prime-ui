@@ -210,6 +210,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Открыть меню действий",
     keywords: ["ещё", "три точки", "меню", "more", "ellipsis", "kebab", "overflow"],
   },
+  "action.openApp": {
+    meaning: "Открыть страницу или веб-приложение внутри продукта",
+    keywords: ["приложение", "окно", "веб-приложение", "app", "window", "web app", "mini app"],
+  },
   "action.play": {
     meaning: "Воспроизвести видео или запись",
     keywords: ["играть", "воспроизвести", "видео", "play", "video", "start"],

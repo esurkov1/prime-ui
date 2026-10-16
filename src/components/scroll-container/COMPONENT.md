@@ -48,7 +48,7 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, soft hidden edges
 | `anchor` | `"start" \| "end"` | `"start"` | `end` — a chat or a log: opens at the end and follows new content while the person is at the end; scrolled away, the view holds still. |
 | `onReachStart` | `() => void \| Promise<void>` | — | Fires within 120 px of the start, once per approach: load older content. A returned promise blocks repeats and sets `aria-busy`; content added above keeps the view. |
 | `onReachEnd` | `() => void \| Promise<void>` | — | The scroll position came within 120 px of the end: load the next page. Same once-per-approach and promise rules as `onReachStart`. |
-| `overscrollBehavior` | `"auto" \| "contain" \| "none"` | `"contain"` | CSS `overscroll-behavior` along the region's own axes; `contain` stops scroll chaining into the page, a scroll across them still reaches the region around. |
+| `overscrollBehavior` | `"auto" \| "contain" \| "none"` | `"auto"` | At the region's end: `auto` hands the scroll on to the page (sideways it stops); `contain` / `none` hold both axes — an open layer, where the page behind must not move. |
 | `as` | `"div" \| "main" \| "aside" \| "section" \| "nav" \| "article" \| "pre"` | `"div"` | Root element; a landmark tag when the region is one, `pre` for preformatted text (CodeBlock). |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` (height, padding), `aria-label`, `tabIndex`, `role`, event handlers and the other attributes. |
 
@@ -64,9 +64,9 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, soft hidden edges
 ### overscrollBehavior
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `contain` | Reaching the end does not scroll the page behind | Nested panels, lists inside a page | yes |
-| `auto` | Browser default: scroll chains to the parent | The region is the page's main scroller and should hand off | |
-| `none` | No chaining and no overscroll glow / bounce | Full-screen app regions | |
+| `auto` | At its end up or down the scroll goes on to the page (or the region around); a region that does not scroll never holds the wheel. Sideways it stops without a bounce: a page never scrolls sideways, and a sideways chain would swipe the browser's history | every region on a page: lists, tables, boards, chats, code | yes |
+| `contain` | Reaching the end on either axis does not scroll what is behind | an open layer — Modal / Drawer / Sheet body, a floating panel, the CommandMenu list set it themselves; a panel of your own that floats over the page | |
+| `none` | `contain` without the overscroll glow / bounce | a full-screen layer of your own | |
 
 ### edges
 | Value | Looks like | Use when | Default |
@@ -165,7 +165,7 @@ No `labels`.
 | [snap.tsx](examples/snap.tsx) | A strip of warehouse cards that always comes to rest on a card's start, scrolled by touch, a trackpad or the mouse wheel — `snap`, `axis`. |
 | [lock.tsx](examples/lock.tsx) | While an order is opened for review, the queue behind it holds still: no wheel, touch, key or drag moves it — `lock`. |
 | [auto-scroll.tsx](examples/auto-scroll.tsx) | A task dragged to the top or bottom edge of a scrolling list scrolls it, faster the closer it comes — `ScrollContainer`, `Dnd.Sortable`. |
-| [overscroll.tsx](examples/overscroll.tsx) | At the end of the list the scroll passes on to the page instead of stopping — `overscrollBehavior`. |
+| [overscroll.tsx](examples/overscroll.tsx) | A panel that keeps its scroll: at the end of the list the page behind stays put — `overscrollBehavior`. |
 | [log.tsx](examples/log.tsx) | A live exchange log pinned to its last entry: a new entry keeps it at the end, scrolling up loads older ones without moving what is on screen — `anchor`, `onReachStart`. |
 | [load-more.tsx](examples/load-more.tsx) | An order log that loads the next page as the reader nears its end, with loading lines in the rows' place — `onReachEnd`. |
 

@@ -566,9 +566,11 @@ describe("Tabs — indicator", () => {
     try {
       const { rerender } = render(<Tabs.Root value="tab1">{items}</Tabs.Root>);
       const indicator = screen.getByRole("tablist").firstElementChild as HTMLElement;
-      // Placed on mount without motion.
+      // Placed and shown on mount without motion: no fade-in under the active label while a
+      // Drawer or a Modal opening around the tabs slides in.
       expect(indicator).toHaveAttribute("data-visible", "true");
       expect(indicator).not.toHaveAttribute("data-animate");
+      expect(indicator).not.toHaveAttribute("data-fade");
 
       // A value set from outside snaps.
       rerender(<Tabs.Root value="tab2">{items}</Tabs.Root>);
@@ -633,8 +635,8 @@ describe("Tabs — indicator", () => {
   });
 
   it("the folder glides only under data-animate, and its geometry never as a transform", () => {
-    const base = cssValue(cssRule(INDICATOR_CSS, ".indicator"), "transition");
-    expect(base).not.toMatch(/left|width|transform/);
+    // The base rule moves nothing, its opacity included: it shows where it is placed.
+    expect(() => cssValue(cssRule(INDICATOR_CSS, ".indicator"), "transition")).toThrow();
     const glide = cssValue(cssRule(INDICATOR_CSS, '.indicator[data-animate="true"]'), "transition");
     expect(glide).toMatch(/^left /);
     expect(glide).not.toContain("transform");

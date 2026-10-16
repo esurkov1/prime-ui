@@ -206,14 +206,36 @@ describe("ScrollContainer", () => {
     expect(node).not.toHaveAttribute("data-lock");
   });
 
-  it("overscroll stops a scroll only along the region's own axes", () => {
-    expect(value(".overscrollContain", "--overscroll")).toBe("contain");
-    expect(
-      value(".vertical:is(.overscrollContain, .overscrollNone)", "overscroll-behavior-block"),
-    ).toBe("var(--overscroll)");
-    expect(
-      value(".horizontal:is(.overscrollContain, .overscrollNone)", "overscroll-behavior-inline"),
-    ).toBe("var(--overscroll)");
+  it("by default the scroll chains on up and down and holds sideways", () => {
+    render(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+    const node = screen.getByTestId("scroll");
+    expect(node.className).not.toMatch(/overscroll/);
+    expect(value(".root", "--overscroll-block")).toBe("auto");
+    expect(value(".root", "--overscroll-inline")).toBe("none");
+  });
+
+  it("contain and none hold both axes, set only along the region's own axes", () => {
+    const { rerender } = render(
+      <ScrollContainer overscrollBehavior="contain" data-testid="scroll">
+        items
+      </ScrollContainer>,
+    );
+    expect(screen.getByTestId("scroll").className).toMatch(/overscrollContain/);
+    rerender(
+      <ScrollContainer overscrollBehavior="none" data-testid="scroll">
+        items
+      </ScrollContainer>,
+    );
+    expect(screen.getByTestId("scroll").className).toMatch(/overscrollNone/);
+    expect(value(".overscrollContain", "--overscroll-block")).toBe("contain");
+    expect(value(".overscrollContain", "--overscroll-inline")).toBe("contain");
+    expect(value(".overscrollNone", "--overscroll-block")).toBe("none");
+    expect(value(".vertical", "overscroll-behavior-block")).toBe("var(--overscroll-block)");
+    const sets = (selector: string, prop: string) =>
+      cssRule(CSS, selector).decls.some((decl) => decl.prop === prop);
+    expect(sets(".vertical", "overscroll-behavior-inline")).toBe(false);
+    expect(value(".horizontal", "overscroll-behavior-inline")).toBe("var(--overscroll-inline)");
+    expect(sets(".horizontal", "overscroll-behavior-block")).toBe(false);
   });
 
   it("snap: proximity or mandatory snapping along the axis, children rest on their start", () => {

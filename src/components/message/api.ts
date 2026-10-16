@@ -300,8 +300,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Actions",
-      en: "`ref` → `HTMLDivElement`. A row of a bot's inline keyboard under the bubble: `Button.Root` keys (`soft` `neutral` by default) share one line equally, long labels ellipsize. A link key gets the link mark; a key whose `onClick` returns a promise loads until it settles.",
-      ru: "Ряд встроенной клавиатуры бота под пузырём: кнопки `Button.Root` (по умолчанию `soft` `neutral`) делят строку поровну, длинные подписи обрезаются. У ссылки — знак ссылки; кнопка, чей `onClick` вернул промис, грузится, пока он не завершится.",
+      en: "`ref` → `HTMLDivElement`. A bot's inline keyboard row under the bubble: `Button.Root` keys (`soft` `neutral` by default) share one line, long labels ellipsize. A link key gets a corner mark: ↗ out of the product, a window into it; a promise from `onClick` keeps a key loading.",
+      ru: "Ряд встроенной клавиатуры бота под пузырём: кнопки `Button.Root` (по умолчанию `soft` `neutral`) делят строку поровну, длинные подписи обрезаются. У ссылки одна метка в углу: ↗ — наружу, окно — внутрь продукта; кнопка, чей `onClick` вернул промис, грузится, пока он не завершится.",
       props: [
         {
           name: "…rest",
@@ -516,8 +516,8 @@ export const api: ComponentApi = {
         ru: "Плитки медиа — кнопки «Открыть: {alt}», открывающие альбом в MediaViewer, фокус после закрытия возвращается на плитку; передача — круглая кнопка отмены, повтора или скачивания с долей в описании; отказ объявляется вежливо; диск завершённой передачи — `inert`.",
       },
       {
-        en: "`Message.Actions` are plain buttons and links (`Button.Root`, `asChild`) with visible labels, in row order; in a chat's selection mode they take no presses.",
-        ru: "`Message.Actions` — обычные кнопки и ссылки (`Button.Root`, `asChild`) с видимыми подписями, в порядке рядов; в режиме выбора чата они не нажимаются.",
+        en: "`Message.Actions` are plain buttons and links (`Button.Root`, `asChild`) with visible labels, in row order; the corner mark of a link key is decorative (`aria-hidden`), the link is named by its label; in a chat's selection mode they take no presses.",
+        ru: "`Message.Actions` — обычные кнопки и ссылки (`Button.Root`, `asChild`) с видимыми подписями, в порядке рядов; метка в углу ссылки декоративная (`aria-hidden`), имя ссылки — её подпись; в режиме выбора чата они не нажимаются.",
       },
       {
         en: "Color is never the only signal: the status is named, the own reaction is `aria-pressed`, a selected message is `aria-selected` with a check, the author is text.",

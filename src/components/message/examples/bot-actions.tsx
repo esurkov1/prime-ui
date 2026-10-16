@@ -1,10 +1,11 @@
-/** A bot's message with an inline keyboard: one-line rows whose keys share the row equally, a coloured key with an icon that loads while its promise runs, a link with its mark — `Message.Actions`, `tone`, `Button.Icon`, `asChild`. */
+/** A bot's message with an inline keyboard: one-line rows whose keys share the row equally, a coloured key with an icon that loads while its promise runs, links marked by where they lead: a page of the product or another site — `Message.Actions`, `tone`, `Button.Icon`, `asChild`. */
 import { Button, Icon, Message } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
 const INVOICE_URL = "https://vector.example/invoices/4821";
+const CATALOG_PATH = "#catalog";
 const CONFIRM_DELAY_MS = 1200;
 
 export default function MessageBotActionsExample() {
@@ -59,8 +60,11 @@ export default function MessageBotActionsExample() {
         ) : null}
         <Message.Actions>
           <Button.Root asChild>
+            <a href={CATALOG_PATH}>Каталог</a>
+          </Button.Root>
+          <Button.Root asChild>
             <a href={INVOICE_URL} target="_blank" rel="noreferrer">
-              Открыть счёт
+              Счёт
             </a>
           </Button.Root>
         </Message.Actions>

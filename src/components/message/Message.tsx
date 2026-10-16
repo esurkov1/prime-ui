@@ -7,7 +7,7 @@ import { HOVER_QUERY } from "@/hooks/breakpoints";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useScrollRegion } from "@/hooks/useScrollRegion";
-import { Icon } from "@/icons";
+import { Icon, type IconName } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -386,17 +386,37 @@ export type MessageActionsProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Whether a key of the keyboard is a link (`asChild` around an `<a href>`): it gets the link mark. */
-function isLinkKey(props: ButtonRootProps): props is ButtonRootProps & {
-  children: React.ReactElement<React.AnchorHTMLAttributes<HTMLAnchorElement>>;
-} {
+/** An address with its own scheme (`https:`, `mailto:`) or host (`//cdn…`): absolute. */
+const ABSOLUTE_ADDRESS = /^([a-z][a-z\d+.-]*:|\/\/)/i;
+
+/**
+ * Whether a link leaves the product: another origin or another scheme (`mailto:`, `tel:`, an app
+ * link) leaves it; a relative path or an address on this origin stays. Without `location` (on the
+ * server) only an absolute address leaves.
+ */
+function leavesProduct(address: string): boolean {
+  if (typeof location === "undefined") return ABSOLUTE_ADDRESS.test(address);
+  try {
+    return new URL(address, location.href).origin !== location.origin;
+  } catch {
+    return ABSOLUTE_ADDRESS.test(address);
+  }
+}
+
+/**
+ * The mark of a key that is a link (`asChild` around an element with an `href`, or a router link's
+ * `to`): `action.externalLink` when it leaves the product, `action.openApp` when it opens a page of
+ * it — Telegram's url and web app keys. A key that is no link has none.
+ */
+function linkMarkOf(props: ButtonRootProps): IconName | undefined {
   const child = props.children;
-  return (
-    props.asChild === true &&
-    React.isValidElement<React.AnchorHTMLAttributes<HTMLAnchorElement>>(child) &&
-    child.type === "a" &&
-    child.props.href !== undefined
-  );
+  if (props.asChild !== true || !React.isValidElement<{ href?: unknown; to?: unknown }>(child)) {
+    return undefined;
+  }
+  const { href, to } = child.props;
+  const address = typeof href === "string" ? href : typeof to === "string" ? to : undefined;
+  if (address === undefined) return undefined;
+  return leavesProduct(address) ? "action.externalLink" : "action.openApp";
 }
 
 /**
@@ -404,8 +424,8 @@ function isLinkKey(props: ButtonRootProps): props is ButtonRootProps & {
  * equally on one line (a label too long ellipsizes), at the message's width (the bubble widens to
  * the keyboard when it is wider). Several make several rows, in the order written; the last row's
  * outer corners follow the bubble's radius. A key is `soft` `neutral` unless it sets its own
- * `variant` / `tone`; a link (`asChild` around an `<a href>`) carries the link mark at its
- * top-end corner; an `onClick` that returns a promise keeps its key loading until it settles.
+ * `variant` / `tone`; a link key carries its mark at its top-end corner (`linkMarkOf`); an
+ * `onClick` that returns a promise keeps its key loading until it settles.
  */
 function MessageActions({ className, children, ...rest }: MessageActionsProps) {
   const { pending, track } = usePendingKeys<number>();
@@ -416,12 +436,14 @@ function MessageActions({ className, children, ...rest }: MessageActionsProps) {
           return child;
         }
         const { props } = child;
-        const link = isLinkKey(props)
-          ? React.cloneElement(props.children, {
+        const mark = linkMarkOf(props);
+        const linkChild = props.children as React.ReactElement<{ children?: React.ReactNode }>;
+        const link = mark
+          ? React.cloneElement(linkChild, {
               children: (
                 <>
-                  {props.children.props.children}
-                  <Icon name="action.externalLink" size="xs" className={styles.linkMark} />
+                  {linkChild.props.children}
+                  <Icon name={mark} size="xs" className={styles.linkMark} />
                 </>
               ),
             })

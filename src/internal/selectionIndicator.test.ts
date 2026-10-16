@@ -75,10 +75,40 @@ describe("placeIndicator", () => {
     expect(indicator).not.toHaveAttribute("data-animate");
   });
 
+  it("shows at once on its first placement; fades only to show or clear a person's choice", () => {
+    const indicator = document.createElement("div");
+    const target = box(20, 106, 4, 36);
+    // Offsets in the shared parent: an open motion transforming an ancestor (a Drawer sliding
+    // in) cannot misplace it.
+    const rect = vi.spyOn(target, "getBoundingClientRect");
+    placeIndicator(indicator, target, false);
+    expect(rect).not.toHaveBeenCalled();
+    expect(indicator).toHaveAttribute("data-visible", "true");
+    expect(indicator).not.toHaveAttribute("data-fade");
+    expect(indicator).not.toHaveAttribute("data-animate");
+    // A person clears the choice: it fades out; picks again: it fades in where it lands.
+    placeIndicator(indicator, null, true);
+    expect(indicator).toHaveAttribute("data-fade", "true");
+    expect(indicator).not.toHaveAttribute("data-visible");
+    placeIndicator(indicator, box(140, 80), true);
+    expect(indicator).toHaveAttribute("data-fade", "true");
+    expect(indicator).not.toHaveAttribute("data-animate");
+    endIndicatorGlide({ target: indicator, currentTarget: indicator, propertyName: "opacity" });
+    expect(indicator).not.toHaveAttribute("data-fade");
+    // Cleared by the data, not a person: it leaves at once.
+    placeIndicator(indicator, null, false);
+    expect(indicator).not.toHaveAttribute("data-fade");
+  });
+
+  it("never transitions its opacity outside a fade or a glide", () => {
+    expect(() => cssValue(cssRule(CSS, ".indicator"), "transition")).toThrow(/sets no transition/);
+    expect(cssValue(cssRule(CSS, '.indicator[data-fade="true"]'), "transition")).toContain(
+      "opacity var(--prime-motion-fade-fast)",
+    );
+  });
+
   it("moves on left / top / width / height, never as a transform, and only under data-animate", () => {
     expect(selectionIndicatorClass).toBeTruthy();
-    const base = cssValue(cssRule(CSS, ".indicator"), "transition");
-    expect(base).not.toMatch(/left|width|transform/);
     const glide = cssValue(cssRule(CSS, '.indicator[data-animate="true"]'), "transition");
     for (const prop of ["left", "top", "width", "height"]) {
       expect(glide).toContain(`${prop} var(--prime-motion-duration-base)`);

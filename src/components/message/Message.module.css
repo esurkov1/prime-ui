@@ -677,7 +677,7 @@ button.reply:focus-visible {
   border-end-end-radius: var(--msg-radius);
 }
 
-/* A link key's mark (↗ in a box) at its top-end corner, out of the label's flow. */
+/* A link key's mark (↗ out of the product, a window into it) at its top-end corner, out of the label's flow. */
 .linkMark {
   position: absolute;
   inset-block-start: var(--prime-space-1);

@@ -216,7 +216,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 ```
 - The folder paints the host's `layer-current`, so the active tab is always the colour of the surface it stands on; controls in a panel read the host's field and fill tokens.
 - Vertical: the column is as wide as its widest section (at least four control heights, at most 40% of the root) and as tall as its sections; the panel sits beside it, one gap away.
-- The list is a switcher (foundation §9): it never wraps — it collapses, then scrolls horizontally with faded edges (hidden scrollbar, `overscroll-behavior: contain`). Give the list's container a width (`min-width: 0` on flex children).
+- The list is a switcher (foundation §9): it never wraps — it collapses, then scrolls horizontally with faded edges (hidden scrollbar; at its sideways edge it stops, a vertical wheel goes on to the page). Give the list's container a width (`min-width: 0` on flex children).
 - Without `size` the tabs take the tier of their host (a Card, a Drawer, a form), else `m`.
 - A horizontal tab is never narrower than its content (`min-width: max-content`; the tab bounds that content between `minItemWidth` and `maxItemWidth`), so a label is never cut to make room. Full width, tabs tend to equal widths, not widths in proportion to their labels (`flex: 1 1 0`): a long label keeps its width, the short ones share the rest.
 - A vertical Tabs.Root is a size container: give it a width (it measures itself to switch to a row).

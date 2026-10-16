@@ -24,17 +24,22 @@ export function setFlag(element: HTMLElement, name: `data-${string}`, on: boolea
 /**
  * Places the indicator over `target` — its offset box in the parent they share — straight in the
  * DOM, so a resize or a font swap never re-renders the host. With `animate` (a person's choice) a
- * move of a visible indicator glides; every other placement snaps. Without a target the
- * indicator fades out.
+ * move of a visible indicator glides, and an indicator that appears or leaves fades
+ * (`data-fade`); every other placement snaps, and its first one shows it at once: a fade on mount
+ * would leave the selected item without its fill while the host opens (a Drawer sliding in), and
+ * an opacity transition makes the indicator a composited layer that browsers paint over the
+ * item's text inside the row's edge-fade mask until it ends.
  */
 export function placeIndicator(
   indicator: HTMLElement,
   target: HTMLElement | null,
   animate: boolean,
 ): void {
+  const visible = indicator.hasAttribute("data-visible");
   if (!target) {
-    setFlag(indicator, "data-visible", false);
+    setFlag(indicator, "data-fade", animate && visible);
     setFlag(indicator, "data-animate", false);
+    setFlag(indicator, "data-visible", false);
     return;
   }
   const left = `${target.offsetLeft}px`;
@@ -48,16 +53,21 @@ export function placeIndicator(
     style.width !== width ||
     style.height !== height
   ) {
-    setFlag(indicator, "data-animate", animate && indicator.hasAttribute("data-visible"));
+    setFlag(indicator, "data-animate", animate && visible);
     style.left = left;
     style.top = top;
     style.width = width;
     style.height = height;
   }
+  if (!visible) setFlag(indicator, "data-fade", animate);
+  else if (!animate) setFlag(indicator, "data-fade", false);
   setFlag(indicator, "data-visible", true);
 }
 
-/** `onTransitionEnd` of the indicator: the glide is over, so the next layout change snaps. */
+/**
+ * `onTransitionEnd` of the indicator: the glide or the fade is over, so the next layout change
+ * snaps.
+ */
 export function endIndicatorGlide(
   event: Pick<React.TransitionEvent<HTMLElement>, "target" | "currentTarget" | "propertyName">,
 ): void {
@@ -65,6 +75,7 @@ export function endIndicatorGlide(
   if (["left", "top", "width", "height"].includes(event.propertyName)) {
     setFlag(event.currentTarget, "data-animate", false);
   }
+  if (event.propertyName === "opacity") setFlag(event.currentTarget, "data-fade", false);
 }
 
 /** Where `item` starts inside `scroller`'s content (a positioned scroller is its offset parent). */

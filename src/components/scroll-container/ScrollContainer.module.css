@@ -4,6 +4,10 @@
  * scrollbar pseudo-element cannot glide into a hover fill, and the standard path has none).
  */
 .root {
+  /* `overscrollBehavior="auto"`: see the overscroll rules below. */
+  --overscroll-block: auto;
+  --overscroll-inline: none;
+
   box-sizing: border-box;
   /* Lets the region shrink inside a flex/grid parent instead of growing with its content. */
   min-width: 0;
@@ -40,15 +44,19 @@
 .vertical {
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior-block: var(--overscroll-block);
 }
 
 .horizontal {
   overflow-x: auto;
   overflow-y: hidden;
+  overscroll-behavior-inline: var(--overscroll-inline);
 }
 
 .both {
   overflow: auto;
+  overscroll-behavior-block: var(--overscroll-block);
+  overscroll-behavior-inline: var(--overscroll-inline);
 }
 
 /* Content that fits along the scroll axis (`data-fits`, see `useFitFlag`): clipped, not a scroller,
@@ -57,26 +65,25 @@
   overflow: hidden;
 }
 
-/* Overscroll stops a scroll only along the region's own axes: a sideways swipe over a column that
-   scrolls up and down (a Kanban column inside its board) still moves the board around it. */
+/*
+ * Overscroll, only along the region's own axes: a sideways swipe over a column that scrolls up and
+ * down (a Kanban column inside its board) still moves the board around it.
+ *
+ * `auto` (the default): at its end the region hands the scroll on — up and down to the page or the
+ * next region around it, so a region (or one that fits and does not scroll at all) never swallows
+ * the wheel. Sideways it holds without a bounce: a page never scrolls sideways, so a sideways
+ * chain would only swipe the browser's history and pull a sticky column off its rows.
+ * `contain` / `none` hold both axes: an open layer, where the page behind must not move.
+ * The `auto` values are set on `.root`, the axes apply them in `.vertical` / `.horizontal` / `.both`.
+ */
 .overscrollContain {
-  --overscroll: contain;
+  --overscroll-block: contain;
+  --overscroll-inline: contain;
 }
 
 .overscrollNone {
-  --overscroll: none;
-}
-
-.vertical:is(.overscrollContain, .overscrollNone) {
-  overscroll-behavior-block: var(--overscroll);
-}
-
-.horizontal:is(.overscrollContain, .overscrollNone) {
-  overscroll-behavior-inline: var(--overscroll);
-}
-
-.both:is(.overscrollContain, .overscrollNone) {
-  overscroll-behavior: var(--overscroll);
+  --overscroll-block: none;
+  --overscroll-inline: none;
 }
 
 /* The kit keeps the visible position itself (`anchor="end"`, `onReachStart`): the browser's own

@@ -668,6 +668,67 @@ describe("Message", () => {
     expect(cancel).not.toHaveAttribute("aria-busy");
   });
 
+  it("marks a link key by where it leads: out of the product ↗, a page of it a window", () => {
+    /** Which mark a key draws, read from the glyph's drawing. */
+    const markOf = (key: HTMLElement) => {
+      const mark = key.querySelector("svg[aria-hidden='true']");
+      if (mark === null) return "none";
+      if (mark.querySelector('path[d="M15 3h6v6"]')) return "external";
+      if (mark.querySelector('path[d="M2 8h20"]')) return "app";
+      return "other";
+    };
+    /** A router link: no `<a>` of its own, the address is `to`. */
+    const RouterLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
+      <a href={to}>{children}</a>
+    );
+    render(
+      <Chat>
+        <Message.Root value="bot" time="15:02">
+          <Message.Text>Каталог и счёт.</Message.Text>
+          <Message.Actions>
+            <Button.Root asChild>
+              <a href="https://vector.example/invoices/4821">Счёт</a>
+            </Button.Root>
+            <Button.Root asChild>
+              <a href="/catalog">Каталог</a>
+            </Button.Root>
+          </Message.Actions>
+          <Message.Actions>
+            <Button.Root asChild>
+              <a href={`${window.location.origin}/app`}>Приложение</a>
+            </Button.Root>
+            <Button.Root asChild>
+              <RouterLink to="/orders/4821">Заказ</RouterLink>
+            </Button.Root>
+          </Message.Actions>
+          <Message.Actions>
+            <Button.Root asChild>
+              <a href="mailto:sales@vector.example">Почта</a>
+            </Button.Root>
+            <Button.Root asChild>
+              <a href="tel:+74950000000">Звонок</a>
+            </Button.Root>
+            <Button.Root>Позже</Button.Root>
+          </Message.Actions>
+        </Message.Root>
+      </Chat>,
+    );
+    const link = (name: string) => screen.getByRole("link", { name });
+    // Another origin and another scheme (mail, phone) leave the product: the ↗ mark.
+    expect(markOf(link("Счёт"))).toBe("external");
+    expect(markOf(link("Почта"))).toBe("external");
+    expect(markOf(link("Звонок"))).toBe("external");
+    // A relative path, this origin and a router link stay in it: the window mark.
+    expect(markOf(link("Каталог"))).toBe("app");
+    expect(markOf(link("Приложение"))).toBe("app");
+    expect(markOf(link("Заказ"))).toBe("app");
+    // One mark per key, decorative; a callback key has none.
+    for (const name of ["Счёт", "Каталог", "Заказ"]) {
+      expect(link(name).querySelectorAll("svg")).toHaveLength(1);
+    }
+    expect(markOf(screen.getByRole("button", { name: "Позже" }))).toBe("none");
+  });
+
   it("moves between messages with the arrows and keeps one tab stop", async () => {
     render(
       <Chat>

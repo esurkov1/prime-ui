@@ -11,7 +11,18 @@ type MorphTextProps = {
   className?: string;
 };
 
-type Morph = { id: number; from: string; to: string; width: number };
+/** Where a letter stands on screen: its opacity and its vertical shift in px. */
+type LetterPose = { opacity: number; y: number };
+
+type Morph = {
+  id: number;
+  from: string;
+  to: string;
+  width: number;
+  /** A change during a change: the leaving and arriving letters start where they are on screen. */
+  outPoses?: (LetterPose | undefined)[];
+  inPoses?: (LetterPose | undefined)[];
+};
 
 /** The unchanged start and end of two labels: only the part between them morphs. */
 function splitChange(from: string, to: string) {
@@ -40,17 +51,54 @@ function digitsOnly(a: string, b: string): boolean {
   return a.replace(/\d/g, "") === b.replace(/\d/g, "");
 }
 
-function letters(text: string, kind: "in" | "out") {
-  return [...text].map((char, i) => (
-    <span
-      // biome-ignore lint/suspicious/noArrayIndexKey: letters of one fixed string, never reordered
-      key={i}
-      className={cx(styles.letter, kind === "in" ? styles.letterIn : styles.letterOut)}
-      style={{ "--morph-i": i } as React.CSSProperties}
-    >
-      {char}
-    </span>
-  ));
+function letters(text: string, kind: "in" | "out", poses?: (LetterPose | undefined)[]) {
+  return [...text].map((char, i) => {
+    const pose = poses?.[i];
+    const style: Record<string, string | number> = { "--morph-i": i };
+    if (pose) {
+      style["--morph-opacity"] = pose.opacity;
+      style["--morph-y"] = `${pose.y}px`;
+    }
+    return (
+      <span
+        // biome-ignore lint/suspicious/noArrayIndexKey: letters of one fixed string, never reordered
+        key={i}
+        className={cx(styles.letter, kind === "in" ? styles.letterIn : styles.letterOut)}
+        style={style as React.CSSProperties}
+      >
+        {char}
+      </span>
+    );
+  });
+}
+
+/** The on-screen pose of each letter of a layer (its animated opacity and shift). */
+function readPoses(layer: HTMLElement | null): (LetterPose | undefined)[] {
+  if (!layer) return [];
+  return Array.from(layer.children, (letter) => {
+    const computed = getComputedStyle(letter);
+    const opacity = Number.parseFloat(computed.opacity);
+    if (Number.isNaN(opacity)) return undefined;
+    const transform = computed.transform;
+    const y =
+      transform && transform !== "none" && typeof DOMMatrixReadOnly === "function"
+        ? new DOMMatrixReadOnly(transform).m42
+        : 0;
+    return { opacity, y };
+  });
+}
+
+/**
+ * The poses of a running morph by character of one of its labels: the shared start and end stand
+ * still (no pose — a leaving letter starts from rest), the changed part takes its layer's poses.
+ */
+function posesOf(
+  label: string,
+  running: Morph,
+  layerPoses: (LetterPose | undefined)[],
+): (LetterPose | undefined)[] {
+  const head = [...splitChange(running.from, running.to).prefix].length;
+  return [...label].map((_, i) => layerPoses[i - head]);
 }
 
 /** When the morph of `text` has settled: the letters' clock plus the longest stagger. */
@@ -73,6 +121,8 @@ export function MorphText({ children: text, className }: MorphTextProps) {
   const rootRef = React.useRef<HTMLSpanElement>(null);
   const segmentRef = React.useRef<HTMLSpanElement>(null);
   const sizerRef = React.useRef<HTMLSpanElement>(null);
+  const outLayerRef = React.useRef<HTMLSpanElement>(null);
+  const inLayerRef = React.useRef<HTMLSpanElement>(null);
   const prevText = React.useRef<string | null>(null);
   /** The width the settled text takes: where the next change starts. */
   const restWidth = React.useRef<{ text: string; className?: string; width: number } | null>(null);
@@ -81,7 +131,8 @@ export function MorphText({ children: text, className }: MorphTextProps) {
   const morphRef = React.useRef(morph);
   morphRef.current = morph;
 
-  // A new text: start a morph from the width the old one had on screen.
+  // A new text: start a morph from what is on screen — the width the label has now (mid-glide
+  // when a change interrupts a change) and, for a change during a change, each letter's pose.
   React.useLayoutEffect(() => {
     const root = rootRef.current;
     const prev = prevText.current;
@@ -92,9 +143,27 @@ export function MorphText({ children: text, className }: MorphTextProps) {
       return;
     }
     const running = morphRef.current;
-    const width = running ? root.getBoundingClientRect().width : (restWidth.current?.width ?? 0);
     nextId.current += 1;
-    setMorph({ id: nextId.current, from: running ? running.to : prev, to: text, width });
+    if (!running) {
+      setMorph({ id: nextId.current, from: prev, to: text, width: restWidth.current?.width ?? 0 });
+      return;
+    }
+    // The arriving label of the running change leaves from where its letters are; going back to
+    // the label that was leaving, its letters return from where they are too.
+    const from = running.to;
+    const change = splitChange(from, text);
+    const head = [...change.prefix].length;
+    const arriving = posesOf(from, running, readPoses(inLayerRef.current));
+    const leaving = posesOf(running.from, running, readPoses(outLayerRef.current));
+    setMorph({
+      id: nextId.current,
+      from,
+      to: text,
+      width: root.getBoundingClientRect().width,
+      outPoses: arriving.slice(head, head + [...change.out].length),
+      inPoses:
+        text === running.from ? leaving.slice(head, head + [...change.in].length) : undefined,
+    });
   }, [text]);
 
   const change = morph ? splitChange(morph.from, morph.to) : null;
@@ -107,14 +176,18 @@ export function MorphText({ children: text, className }: MorphTextProps) {
     const segment = segmentRef.current;
     const sizer = sizerRef.current;
     if (!root || !segment || !sizer) return;
+    // The still start and end: the label less the changed part as it stands now — a segment
+    // interrupted mid-glide still holds its in-flight width, not the new text's.
     const target = sizer.getBoundingClientRect().width;
-    const still = root.getBoundingClientRect().width - target;
+    const still = root.getBoundingClientRect().width - segment.getBoundingClientRect().width;
     const from = Math.max(0, morph.width - still);
-    if (target !== from) {
-      segment.style.width = `${from}px`;
-      segment.getBoundingClientRect();
-      segment.style.width = `${target}px`;
-    }
+    // Start the glide at `from` exactly: an interrupted glide is dropped, not retargeted from its
+    // own clock, and the new one runs from the width on screen to the new text's.
+    segment.style.transition = "none";
+    segment.style.width = `${from}px`;
+    segment.getBoundingClientRect();
+    segment.style.transition = "";
+    segment.style.width = `${target}px`;
     const changed = splitChange(morph.from, morph.to);
     const longest = changed.in.length > changed.out.length ? changed.in : changed.out;
     const timer = window.setTimeout(() => setMorph(null), settleMs(longest));
@@ -143,11 +216,15 @@ export function MorphText({ children: text, className }: MorphTextProps) {
         <span ref={sizerRef} className={styles.sizer}>
           {change.in}
         </span>
-        <span key={`out-${morph.id}`} className={cx(styles.layer, styles.layerOut)}>
-          {letters(change.out, "out")}
+        <span
+          key={`out-${morph.id}`}
+          ref={outLayerRef}
+          className={cx(styles.layer, styles.layerOut)}
+        >
+          {letters(change.out, "out", morph.outPoses)}
         </span>
-        <span key={`in-${morph.id}`} className={cx(styles.layer, styles.layerIn)}>
-          {letters(change.in, "in")}
+        <span key={`in-${morph.id}`} ref={inLayerRef} className={cx(styles.layer, styles.layerIn)}>
+          {letters(change.in, "in", morph.inPoses)}
         </span>
       </span>
       <span aria-hidden="true">{change.suffix}</span>
