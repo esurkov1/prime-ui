@@ -393,7 +393,6 @@ function SmartFilterToolbar({
                 </Input.Icon>
                 <Input.Field
                   type="search"
-                  autoComplete="off"
                   aria-label={labels.searchPlaceholder}
                   placeholder={labels.searchPlaceholder}
                   value={search}
@@ -733,7 +732,6 @@ function NumberRange({
       <Input.Wrapper>
         <Input.Field
           inputMode="decimal"
-          autoComplete="off"
           aria-label={formatLabel(side === "from" ? labels.fromLabel : labels.toLabel, {
             field: field.label,
           })}

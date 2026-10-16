@@ -589,16 +589,26 @@ describe("Select (search, clear, loading, empty)", () => {
   it("фильтрует пункты по строке поиска и ключевым словам", () => {
     render(<SearchSelect />);
     fireEvent.click(screen.getByRole("combobox"));
-    const search = screen.getByRole("textbox", { name: "Найти город" });
+    const search = screen.getByRole("searchbox", { name: "Найти город" });
     fireEvent.change(search, { target: { value: "питер" } });
     expect(screen.getByRole("option", { name: "Санкт-Петербург" })).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "Москва" })).not.toBeInTheDocument();
   });
 
+  it("the search is a searchbox with autofill and the password managers off", () => {
+    render(<SearchSelect />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const search = screen.getByRole("searchbox", { name: "Найти город" });
+    expect(search).toHaveAttribute("type", "search");
+    expect(search).toHaveAttribute("autocomplete", "off");
+    expect(search).toHaveAttribute("data-1p-ignore");
+    expect(search).toHaveAttribute("data-lpignore", "true");
+  });
+
   it("показывает пустое состояние, когда ничего не найдено", () => {
     render(<SearchSelect />);
     fireEvent.click(screen.getByRole("combobox"));
-    fireEvent.change(screen.getByRole("textbox", { name: "Найти город" }), {
+    fireEvent.change(screen.getByRole("searchbox", { name: "Найти город" }), {
       target: { value: "zzz" },
     });
     expect(screen.queryAllByRole("option")).toHaveLength(0);
@@ -609,7 +619,7 @@ describe("Select (search, clear, loading, empty)", () => {
     const onChange = vi.fn();
     render(<SearchSelect onValueChange={onChange} />);
     fireEvent.click(screen.getByRole("combobox"));
-    const search = screen.getByRole("textbox", { name: "Найти город" });
+    const search = screen.getByRole("searchbox", { name: "Найти город" });
     fireEvent.change(search, { target: { value: "санкт" } });
     await waitFor(() =>
       expect(screen.getByRole("option", { name: "Санкт-Петербург" })).toHaveAttribute(
@@ -742,7 +752,7 @@ describe("Select (server search)", () => {
       );
     }
     render(<Harness />);
-    const field = screen.getByRole("textbox", { name: "Поиск" });
+    const field = screen.getByRole("searchbox", { name: "Поиск" });
     fireEvent.change(field, { target: { value: "zzz" } });
     expect(onSearchChange).toHaveBeenLastCalledWith("zzz");
     expect(field).toHaveValue("zzz");
@@ -753,7 +763,7 @@ describe("Select (server search)", () => {
   it("closing clears the query through onSearchChange", () => {
     const onSearchChange = vi.fn();
     render(<ServerSelect defaultSearch="век" onSearchChange={onSearchChange} />);
-    expect(screen.getByRole("textbox", { name: "Поиск" })).toHaveValue("век");
+    expect(screen.getByRole("searchbox", { name: "Поиск" })).toHaveValue("век");
     fireEvent.keyDown(document, { key: "Escape" });
     expect(onSearchChange).toHaveBeenLastCalledWith("");
   });
@@ -790,7 +800,7 @@ describe("Select (server search)", () => {
   it("the highlight reaching the last option asks for more once per round", () => {
     const onLoadMore = vi.fn();
     const { rerender } = render(<ServerSelect hasMore onLoadMore={onLoadMore} />);
-    const field = screen.getByRole("textbox", { name: "Поиск" });
+    const field = screen.getByRole("searchbox", { name: "Поиск" });
     fireEvent.keyDown(field, { key: "ArrowUp" });
     expect(onLoadMore).toHaveBeenCalledTimes(1);
     fireEvent.keyDown(field, { key: "ArrowDown" });
@@ -809,7 +819,7 @@ describe("Select (server search)", () => {
     expect(screen.queryByRole("option")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Повторить" }));
     expect(onRetry).toHaveBeenCalledTimes(1);
-    fireEvent.keyDown(screen.getByRole("textbox", { name: "Поиск" }), { key: "Enter" });
+    fireEvent.keyDown(screen.getByRole("searchbox", { name: "Поиск" }), { key: "Enter" });
     expect(onRetry).toHaveBeenCalledTimes(2);
   });
 
@@ -946,7 +956,7 @@ describe("Select focusRing", () => {
     );
     expect(screen.getByRole("combobox")).not.toHaveAttribute("data-focus-ring");
     fireEvent.click(screen.getByRole("combobox"));
-    expect(screen.getByRole("textbox", { name: "Поиск" })).toHaveFocus();
+    expect(screen.getByRole("searchbox", { name: "Поиск" })).toHaveFocus();
     const menuCss = "src/internal/menu.module.css";
     expect(cssValue(cssRule(menuCss, ".searchInput"), "outline")).toBe("none");
     expect(cssValue(cssRule(menuCss, ".searchRow:focus-within"), "color")).toBe(
@@ -1219,7 +1229,7 @@ describe("Select rich options", () => {
   it("search matches the description too", () => {
     render(<RichSelect />);
     fireEvent.click(screen.getByRole("combobox"));
-    fireEvent.change(screen.getByRole("textbox", { name: "Поиск" }), {
+    fireEvent.change(screen.getByRole("searchbox", { name: "Поиск" }), {
       target: { value: "максискутер" },
     });
     const options = screen.getAllByRole("option");
@@ -1230,7 +1240,7 @@ describe("Select rich options", () => {
   it("marks the match in the option title while searching, never in the trigger", () => {
     render(<RichSelect />);
     fireEvent.click(screen.getByRole("combobox"));
-    fireEvent.change(screen.getByRole("textbox", { name: "Поиск" }), {
+    fireEvent.change(screen.getByRole("searchbox", { name: "Поиск" }), {
       target: { value: "adv" },
     });
     for (const option of screen.getAllByRole("option")) {
@@ -1442,7 +1452,7 @@ describe("Select.Action", () => {
     const onCreate = vi.fn();
     render(<ClientSelect onCreate={onCreate} />);
     fireEvent.click(screen.getByRole("combobox"));
-    const search = screen.getByRole("textbox", { name: "Найти клиента" });
+    const search = screen.getByRole("searchbox", { name: "Найти клиента" });
     fireEvent.change(search, { target: { value: "zzz" } });
 
     expect(screen.queryByRole("option", { name: "Ромашка" })).not.toBeInTheDocument();
@@ -1461,7 +1471,7 @@ describe("Select.Action", () => {
     const onCreate = vi.fn();
     render(<ClientSelect onCreate={onCreate} />);
     fireEvent.click(screen.getByRole("combobox"));
-    const search = screen.getByRole("textbox", { name: "Найти клиента" });
+    const search = screen.getByRole("searchbox", { name: "Найти клиента" });
     fireEvent.keyDown(search, { key: "ArrowDown" });
     fireEvent.keyDown(search, { key: "ArrowDown" });
     fireEvent.keyDown(search, { key: "ArrowDown" });

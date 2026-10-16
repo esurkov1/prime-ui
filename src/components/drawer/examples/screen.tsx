@@ -180,11 +180,7 @@ export default function DrawerScreenExample() {
                       </Radio.Group>
                       <Input.Root label="Название" error={errors.name}>
                         <Input.Wrapper>
-                          <Input.Field
-                            name="name"
-                            placeholder="ООО «Ромашка»"
-                            autoComplete="organization"
-                          />
+                          <Input.Field name="name" placeholder="ООО «Ромашка»" />
                         </Input.Wrapper>
                       </Input.Root>
                       <div className={styles.pair}>

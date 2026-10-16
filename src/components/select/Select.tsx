@@ -12,6 +12,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -742,7 +743,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
         <div className={cx(menu.searchRow, styles.search)}>
           <Icon name="action.search" size="s" />
           <input
-            type="text"
+            type="search"
             className={menu.searchInput}
             value={query}
             placeholder={labels.search}
@@ -750,7 +751,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
             aria-controls={region === "error" ? undefined : listboxId}
             aria-activedescendant={activeDescendant}
             aria-autocomplete="list"
-            autoComplete="off"
+            {...AUTOFILL_OFF}
             spellCheck={false}
             data-autofocus=""
             onChange={(event) => setQuery(event.target.value)}

@@ -147,6 +147,16 @@ describe("model", () => {
 });
 
 describe("SmartFilter", () => {
+  it("keeps autofill and the password managers off the search", () => {
+    render(<Harness />);
+    const search = screen.getByRole("searchbox", { name: "Поиск" });
+    expect(search).toHaveAttribute("autocomplete", "off");
+    expect(search).toHaveAttribute("data-1p-ignore");
+    expect(search).toHaveAttribute("data-lpignore", "true");
+    expect(search).toHaveAttribute("data-bwignore");
+    expect(search).toHaveAttribute("data-form-type", "other");
+  });
+
   it("opens the panel from the filter button and from focusing the search", () => {
     render(<Harness />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

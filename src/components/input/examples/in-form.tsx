@@ -40,7 +40,6 @@ export default function InputInFormExample() {
                 name="name"
                 onValueChange={() => edit("name")}
                 defaultValue="ООО «Северный ветер»"
-                autoComplete="organization"
               />
             </Input.Wrapper>
           </Input.Root>

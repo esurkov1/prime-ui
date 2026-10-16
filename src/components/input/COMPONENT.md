@@ -96,6 +96,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `onValueChange` | `(value: string) => void` | — | Called with the new string; native `onChange` still fires first. |
 | `aria-describedby` | `string` | — | Merged with the affix and hint/error ids from the root. |
 | `required` | `boolean` | — | Overrides the root's `required` for the native input. |
+| `autoComplete` | `string` | `"off"` with the password-manager opt-outs; inside `LoginForm.Form`, left to the browser | A token opts in to autofill and drops the password-manager opt-outs; without one the field stays off. Pass one only on sign-in and sign-up fields and for a new password (`new-password`). |
 | `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size" \| "id">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
 
 ### Input.Icon
@@ -272,6 +273,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `minStrength` uses native constraint validation: below the level the input's `validationMessage` is `labels.strengthTooWeak`, the form refuses to submit, and the message becomes the field's error (`aria-invalid`).
 - `Input.Icon` is decorative (`aria-hidden`). `Input.Affix` and `Input.InlineAffix` are `aria-hidden` in the reading order but describe the input (`aria-describedby`, before the hint): the unit is heard with the field, so the label never repeats it. An `aria-label` on the affix is said instead of its text («рублей» for `₽`).
 - `suggestions` make the input a `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` on the open `listbox`, which the label names); the highlight is `aria-activedescendant`, so focus never leaves the field.
+- Autofill is off unless you pass `autoComplete`: without a token the input carries `autocomplete="off"` and the opt-outs of 1Password, LastPass, Bitwarden and Dashlane (`data-1p-ignore`, `data-lpignore`, `data-bwignore`, `data-form-type="other"`); a token passes through and drops them. With `suggestions` it stays off. Inside `LoginForm.Form` a field without a token is left to the browser.
 - A `Select` inside `Input.Wrapper` is the box's start segment: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).
 - `Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.
 - `Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.
@@ -338,6 +340,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - A Select and an Input side by side for one value (an icon + a name) → the Select inside `Input.Wrapper`, named by its `aria-label`.
 - A text field with a hand-made time mask, or a Datepicker for a time of day → `Input.Field type="time"`.
 - Returning `false` from `onCommit` to refuse → reject the Promise (throw) and set `error`.
+- `autoComplete="email"` / `"name"` on a search, filter or record field → leave it out: autofill is off unless you pass `autoComplete`; tokens belong on sign-in and sign-up fields (`LoginForm.Form`) and on a new password (`new-password`).
 
 ## Related
 - **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments, the `valid` check), [VisuallyHidden](../visually-hidden/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md) (the `suggestions` list)

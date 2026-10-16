@@ -3,6 +3,7 @@ import type { HintTone } from "@/components/hint/Hint";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+import { AUTOFILL_OFF, useAutofill } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -441,6 +442,7 @@ function InputField({
   required,
   disabled: disabledProp,
   type,
+  autoComplete,
   onChange,
   onValueChange,
   onFocus,
@@ -472,6 +474,7 @@ function InputField({
   const setRefs = useMergedRefs(inputRef, ref);
   const highlighted = useStoreSlice(suggest?.highlight ?? NO_HIGHLIGHT, (value) => value);
   const disabled = useInheritedDisabled(disabledProp);
+  const autofill = useAutofill(autoComplete);
 
   const fieldType = type === "password" && revealed ? "text" : type;
 
@@ -515,10 +518,12 @@ function InputField({
       required={required ?? (requiredCtx || undefined)}
       type={fieldType}
       aria-busy={commit.state === "pending" || undefined}
+      {...autofill}
       {...(suggest
         ? {
+            // The kit's own list: no browser or password-manager list on top of it.
+            ...AUTOFILL_OFF,
             role: "combobox",
-            autoComplete: "off",
             "aria-autocomplete": "list" as const,
             "aria-expanded": suggest.shown,
             "aria-controls": suggest.shown ? suggest.listboxId : undefined,

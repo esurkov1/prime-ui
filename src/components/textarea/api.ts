@@ -1,5 +1,6 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import {
+  FIELD_AUTOCOMPLETE_PROP,
   FIELD_COMMIT_LABEL_DOCS,
   FIELD_COPY_LABEL_DOCS,
   FIELD_HINT_TONE_PROP,
@@ -123,6 +124,7 @@ export const api: ComponentApi = {
         },
         fieldCommitProp({ en: "Mod+Enter", ru: "Mod+Enter" }),
         formattingProp("false"),
+        FIELD_AUTOCOMPLETE_PROP,
         {
           name: "children",
           type: "ReactNode",

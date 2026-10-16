@@ -27,6 +27,7 @@ import { Select } from "@/components/select/Select";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useDraft } from "@/hooks/useDraft";
 import { Icon } from "@/icons";
+import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -255,6 +256,7 @@ function ChannelField({
   return (
     <label className={cx(fieldTierClass, fieldSurfaceClass, styles.channelCell)} data-size="s">
       <input
+        {...AUTOFILL_OFF}
         ref={inputRef}
         aria-label={labels[channel]}
         className={cx(fieldInputTextClass, styles.channelInput)}
@@ -279,6 +281,7 @@ function StripHexField() {
       data-size="s"
     >
       <input
+        {...AUTOFILL_OFF}
         ref={inputRef}
         aria-label={labels.hex}
         autoCapitalize="off"

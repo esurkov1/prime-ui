@@ -330,6 +330,18 @@
         "No field carries a hint that restates its label or the obvious result",
         "No description or helper paragraph explains the form or the table"
       ]
+    },
+    {
+      "id": 27,
+      "prompt": "Сделай страницу «Сотрудники»: таблица с поиском по имени, почте или @username в Telegram, дровер карточки сотрудника (имя, рабочая почта, телефон) и экран входа в систему по почте и паролю.",
+      "expected_output": "Autofill appears only on the sign-in screen: the LoginForm email field carries autoComplete=\"email\" (or \"username\") and the password autoComplete=\"current-password\"; the table search and the employee drawer fields carry no autoComplete token, so the kit keeps autofill and password managers off there. The search placeholder names what is searched without login words (e.g. «Имя, контакт или @ник»), never «почта», «email» or «username», and the search has no name/id — Safari offers saved logins on such words despite autocomplete=\"off\".",
+      "files": [],
+      "expectations": [
+        "The sign-in fields sit in LoginForm.Form with autoComplete \"email\"/\"username\" and \"current-password\"",
+        "The table search has no autoComplete prop",
+        "The employee drawer's name, email and phone fields have no autoComplete prop",
+        "The table search placeholder contains none of «username», «login», «email», «логин», «почта», and the search has no name or id attribute"
+      ]
     }
   ]
 }

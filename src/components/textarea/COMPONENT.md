@@ -60,6 +60,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with a changed value on blur and Mod+Enter; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through `error`. |
 | `formatting` | `boolean` | `false` | Selecting text shows a floating toolbar of eight Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. Off: plain text. |
+| `autoComplete` | `string` | `"off"` with the password-manager opt-outs; inside `LoginForm.Form`, left to the browser | A token opts in to autofill and drops the password-manager opt-outs; without one the field stays off. Pass one only on sign-in and sign-up fields and for a new password (`new-password`). |
 | `children` | `ReactNode` | — | Actions in the field's top end corner: `Textarea.CopyButton`, `Textarea.Action`. |
 | `labels` | `Partial<TextareaLabels>` | — | Built-in strings, see Labels. |
 | `className` | `string` | — | Class on the field frame `<div>` (label, field box, support row), as on every field root. |
@@ -226,6 +227,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 - A copy `Button` under a read-only result → `Textarea.CopyButton` as a child of the root.
 - Other children than `Textarea.CopyButton` / `Textarea.Action` → the root renders the textarea itself; children are only the corner actions.
 - `formatting` on text that is shown as plain text → the reader sees `**` and `||`; turn it on only where the text is rendered with its Markdown.
+- Expecting the browser to offer saved addresses in a note → autofill is off unless you pass `autoComplete` (a token such as `street-address` opts in).
 
 ## Related
 - **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (corner actions, formatting tools), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [Button](../button/COMPONENT.md) and [Kbd](../kbd/COMPONENT.md) (formatting tools), Icon (`format.*`); `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Composer), [VisuallyHidden](../visually-hidden/COMPONENT.md)

@@ -1,6 +1,7 @@
 import * as React from "react";
 import type { HintTone } from "@/components/hint/Hint";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { useAutofill } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -115,6 +116,7 @@ function TextareaRoot({
   disabled: disabledProp,
   readOnly,
   value,
+  autoComplete,
   onInput,
   onChange,
   onValueChange,
@@ -135,6 +137,7 @@ function TextareaRoot({
   const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid, required }, ariaDescribedBy);
   const labels = useLabels(TEXTAREA_LABELS, labelsProp);
+  const autofill = useAutofill(autoComplete);
 
   const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
   const setRefs = useMergedRefs(innerRef, ref);
@@ -203,6 +206,7 @@ function TextareaRoot({
       aria-invalid={ids.invalid || undefined}
       aria-describedby={ids.describedBy}
       aria-busy={commit.state === "pending" || undefined}
+      {...autofill}
       value={value}
       onInput={(event) => {
         if (autoResize && mirrorRef.current) {

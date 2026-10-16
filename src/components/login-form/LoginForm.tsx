@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Card } from "@/components/card/Card";
 import { Typography, type TypographyRole } from "@/components/typography/Typography";
+import { AutofillScope } from "@/internal/autofill";
 import { useHostTier, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -190,11 +191,15 @@ export type LoginFormFormProps = {
   ref?: React.Ref<HTMLFormElement>;
 } & React.FormHTMLAttributes<HTMLFormElement>;
 
-/** The `<form>`: fields, then the submit button, one column with field → field spacing. Native submit and `onSubmit` work as usual. */
+/**
+ * The `<form>`: fields, then the submit button, one column with field → field spacing. Native
+ * submit and `onSubmit` work as usual. Autofill is the point of a sign-in form: a kit field inside
+ * it without an `autoComplete` token is left to the browser and the password managers.
+ */
 function LoginFormForm({ className, children, ref, ...rest }: LoginFormFormProps) {
   return (
     <form ref={ref} className={cx(styles.form, className)} {...rest}>
-      {children}
+      <AutofillScope>{children}</AutofillScope>
     </form>
   );
 }

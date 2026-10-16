@@ -1183,3 +1183,50 @@ describe("Input suggestions", () => {
     expect(field).not.toHaveAttribute("aria-expanded");
   });
 });
+
+describe("Input autofill", () => {
+  it("keeps autofill and the password managers off without a token", () => {
+    render(
+      <Input.Root label="Поиск">
+        <Input.Wrapper>
+          <Input.Field type="search" placeholder="Название или @username" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByRole("searchbox", { name: "Поиск" });
+    expect(field).toHaveAttribute("autocomplete", "off");
+    expect(field).toHaveAttribute("data-1p-ignore");
+    expect(field).toHaveAttribute("data-lpignore", "true");
+    expect(field).toHaveAttribute("data-bwignore");
+    expect(field).toHaveAttribute("data-form-type", "other");
+  });
+
+  it("passes a token through and drops the opt-outs", () => {
+    render(
+      <Input.Root label="Новый пароль">
+        <Input.Wrapper>
+          <Input.Field type="password" autoComplete="new-password" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByLabelText("Новый пароль");
+    expect(field).toHaveAttribute("autocomplete", "new-password");
+    expect(field).not.toHaveAttribute("data-1p-ignore");
+    expect(field).not.toHaveAttribute("data-lpignore");
+    expect(field).not.toHaveAttribute("data-bwignore");
+    expect(field).not.toHaveAttribute("data-form-type");
+  });
+
+  it("keeps autofill off under the kit's own suggestions, whatever the token", () => {
+    render(
+      <Input.Root label="Город" suggestions={["Москва", "Казань"]}>
+        <Input.Wrapper>
+          <Input.Field autoComplete="address-level2" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByRole("combobox", { name: "Город" });
+    expect(field).toHaveAttribute("autocomplete", "off");
+    expect(field).toHaveAttribute("data-1p-ignore");
+  });
+});

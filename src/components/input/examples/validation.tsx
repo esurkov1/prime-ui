@@ -28,7 +28,7 @@ export default function InputValidationExample() {
     <>
       <Input.Root label="Название организации" required hint="Как в учредительных документах">
         <Input.Wrapper>
-          <Input.Field defaultValue="ООО «Северный ветер»" autoComplete="organization" />
+          <Input.Field defaultValue="ООО «Северный ветер»" />
         </Input.Wrapper>
       </Input.Root>
       <Input.Root

@@ -32,7 +32,6 @@ export default function ButtonInFormExample() {
             type="email"
             name="email"
             placeholder="name@company.ru"
-            autoComplete="email"
             onValueChange={() => setError(undefined)}
           />
         </Input.Wrapper>

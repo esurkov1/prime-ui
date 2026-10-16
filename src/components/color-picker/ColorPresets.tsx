@@ -432,7 +432,6 @@ function CustomColorField() {
         <Input.Field
           value={draft}
           placeholder="#12A594"
-          autoComplete="off"
           spellCheck={false}
           onValueChange={(next) => {
             setDraft(next);

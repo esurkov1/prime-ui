@@ -28,6 +28,14 @@ describe("TagSelect", () => {
     expect(screen.getByRole("combobox", { name: "Тестовый tag select" })).toBeInTheDocument();
   });
 
+  it("keeps autofill and the password managers off its input", () => {
+    render(<BasicTagSelect />);
+    const input = screen.getByRole("combobox");
+    expect(input).toHaveAttribute("autocomplete", "off");
+    expect(input).toHaveAttribute("data-1p-ignore");
+    expect(input).toHaveAttribute("data-bwignore");
+  });
+
   it("открывает listbox при фокусе", () => {
     render(<BasicTagSelect />);
     fireEvent.focus(screen.getByRole("combobox"));

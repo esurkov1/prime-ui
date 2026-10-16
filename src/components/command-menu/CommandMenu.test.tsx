@@ -51,6 +51,14 @@ describe("CommandMenu", () => {
     expect(screen.getByRole("option", { name: "Beta" })).toBeInTheDocument();
   });
 
+  it("keeps autofill and the password managers off the search", () => {
+    render(<TestPalette />);
+    const input = screen.getByRole("combobox", { name: "Поиск команд" });
+    expect(input).toHaveAttribute("type", "search");
+    expect(input).toHaveAttribute("autocomplete", "off");
+    expect(input).toHaveAttribute("data-form-type", "other");
+  });
+
   it("фильтрует пункты по вводу в поле поиска", async () => {
     const user = userEvent.setup();
     render(<TestPalette />);

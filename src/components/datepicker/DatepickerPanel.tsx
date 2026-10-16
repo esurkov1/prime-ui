@@ -9,6 +9,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { getViewportPadPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
+import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
@@ -866,6 +867,7 @@ function FooterField({
           className={cx(fieldInputTextClass, styles.fieldTime)}
           value={time}
           inputMode="numeric"
+          {...AUTOFILL_OFF}
           maxLength={5}
           onChange={(e) => onTime(e.target.value)}
         />

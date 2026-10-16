@@ -16,12 +16,16 @@ export default function LoginFormSizesExample() {
             <LoginForm.Form onSubmit={(e) => e.preventDefault()}>
               <Input.Root label="Email">
                 <Input.Wrapper>
-                  <Input.Field type="email" placeholder="name@company.ru" />
+                  <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
                 </Input.Wrapper>
               </Input.Root>
               <Input.Root label="Пароль">
                 <Input.Wrapper>
-                  <Input.Field type="password" placeholder="********" />
+                  <Input.Field
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="********"
+                  />
                 </Input.Wrapper>
               </Input.Root>
               <Button.Root type="submit" fullWidth>

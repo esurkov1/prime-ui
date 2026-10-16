@@ -256,8 +256,25 @@ Which button starts each step and how the confirm behaves:
   person's own company, the last used currency. An empty required field the person always fills the
   same way is a missing default.
 - **The right control for the data:** `inputMode="numeric" | "decimal" | "tel" | "email"`,
-  `autoComplete` for personal data, `Datepicker` for a date, `Select` for a closed list. A free text
-  field for a closed set of values is a bug.
+  `Datepicker` for a date, `Select` for a closed list. A free text field for a closed set of values
+  is a bug.
+- **Autofill only where a person signs in:** `autoComplete` tokens go on sign-in and sign-up fields
+  (`email`, `current-password`, `new-password`, `one-time-code`) and on a new password; everywhere
+  else the kit keeps autofill off, so a saved login never drops over a search or a record field.
+- **Safari decides by words, not by attributes:** it ignores `autocomplete="off"` on a field it
+  takes for a login, and it takes a text field for one when its placeholder, label, `name` or `id`
+  speaks of a login: «username», «user», «login», «email», «e-mail», «логин», «почта», «имя
+  пользователя». The kit's opt-outs stop Chrome, Firefox and the password-manager extensions, not
+  Safari; on a field that is not a sign-in only the words do. So a search, a filter or a record
+  field never names itself with those words — it says what is searched in the domain's words:
+  - bad: a search `placeholder="Название или @username"`, `name="login"` on a filter, «Поиск по
+    email» → Safari offers the saved login over the table;
+  - good: `placeholder="Название или @ник"`, «Имя или контакт», «Клиент, телефон или ИНН»; no
+    `name` / `id` on a search at all.
+  A record's own e-mail field (a client's, an employee's) keeps its label «Почта» and
+  `type="email"`: Safari may offer a contact card there, which is right for e-mail. Never fight the
+  browser with tricks — a readonly-until-focus field, a hidden decoy, a made-up `autoComplete`
+  token: they break the field for assistive tech and stop working with the next Safari.
 - **Progressive disclosure:** the common 80% first; rare settings behind an `Accordion` item or a
   «Дополнительно» section; a long create flow in steps (`Stepper`).
 - **Group by meaning, order by use:** fields in the order a person has the information (company →

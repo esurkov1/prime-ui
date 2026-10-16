@@ -451,3 +451,20 @@ describe("Textarea formatting", () => {
     expect(screen.queryByRole("toolbar")).toBeNull();
   });
 });
+
+describe("Textarea autofill", () => {
+  it("is off without a token and passes a token through", () => {
+    render(
+      <>
+        <Root label="Комментарий" />
+        <Root label="Адрес доставки" autoComplete="street-address" />
+      </>,
+    );
+    const note = screen.getByRole("textbox", { name: "Комментарий" });
+    expect(note).toHaveAttribute("autocomplete", "off");
+    expect(note).toHaveAttribute("data-1p-ignore");
+    const address = screen.getByRole("textbox", { name: "Адрес доставки" });
+    expect(address).toHaveAttribute("autocomplete", "street-address");
+    expect(address).not.toHaveAttribute("data-1p-ignore");
+  });
+});

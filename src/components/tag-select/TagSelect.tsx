@@ -7,6 +7,7 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -747,6 +748,7 @@ export function TagSelect({
             aria-expanded={shown}
             aria-controls={shown ? listboxId : undefined}
             aria-autocomplete="list"
+            {...AUTOFILL_OFF}
             aria-label={ariaLabel}
             aria-labelledby={ariaLabelledBy}
             aria-invalid={ids.invalid || undefined}

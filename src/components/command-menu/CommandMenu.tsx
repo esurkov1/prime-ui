@@ -11,6 +11,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -398,7 +399,7 @@ function CommandMenuInput({
         aria-controls={listboxId}
         aria-activedescendant={activeId ? optionId(activeId) : undefined}
         aria-busy={loading || loadingMore || undefined}
-        autoComplete="off"
+        {...AUTOFILL_OFF}
         autoCorrect="off"
         spellCheck={false}
         data-autofocus=""

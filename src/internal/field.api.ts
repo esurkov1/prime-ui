@@ -11,6 +11,18 @@ export const FIELD_HINT_TONE_PROP: ApiProp = {
   ru: "Цвет статуса у `hint` («Осталось 12 дней» в `warning`). Статус несут слова, цвет его повторяет; `error` заменяет подсказку вместе с тоном. Ошибка проверки — это `error`, а не подсказка `danger`.",
 };
 
+/** `autoComplete` of every text field: autofill stays off unless a token opts in (`src/internal/autofill`). */
+export const FIELD_AUTOCOMPLETE_PROP: ApiProp = {
+  name: "autoComplete",
+  type: "string",
+  defaultNote: {
+    en: '`"off"` with the password-manager opt-outs; inside `LoginForm.Form`, left to the browser',
+    ru: '`"off"` с отказом для менеджеров паролей; внутри `LoginForm.Form` решает браузер',
+  },
+  en: "A token opts in to autofill and drops the password-manager opt-outs; without one the field stays off. Pass one only on sign-in and sign-up fields and for a new password (`new-password`).",
+  ru: "Токен включает автозаполнение и снимает отказ для менеджеров паролей; без него поле выключено. Передают его только в полях входа и регистрации и для нового пароля (`new-password`).",
+};
+
 /**
  * Field props of a framed group control (SegmentedControl, ButtonGroup): the group element is
  * named by the label and described by the hint or error. `control` names it (`radiogroup`).

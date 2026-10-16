@@ -39,6 +39,8 @@ checks.
 - [ ] A request a value starts — a simulated one too — is cancelled when the value changes again ([nothing to guess](ux.md#6-nothing-to-guess)).
 - [ ] Tabs, filters, search, page and the open record are in the URL ([nothing to guess](ux.md#6-nothing-to-guess)).
 - [ ] Defaults prefill what the system knows; each field has the control and `inputMode` of its data ([ask less](ux.md#7-ask-less)).
+- [ ] `autoComplete` tokens only on sign-in and sign-up fields (`LoginForm.Form`, a password change); no token on a search or a record field ([ask less](ux.md#7-ask-less)).
+- [ ] No search, filter or record field (other than a record's e-mail) says «username», «login», «email», «логин», «почта» in its placeholder, label, `name` or `id` — Safari offers saved logins there ([ask less](ux.md#7-ask-less)).
 - [ ] I looked at the screen in a browser, filled badly ([the visual check](ux.md#9-look-at-it-before-handing-it-over)).
 
 ## Grid and spacing

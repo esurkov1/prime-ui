@@ -147,3 +147,32 @@ describe("LoginForm", () => {
     expect(cssValue(rule, "max-width")).toBe("var(--prime-modal-width-s)");
   });
 });
+
+describe("LoginForm autofill", () => {
+  it("leaves its fields to the browser and passes their tokens through", () => {
+    render(
+      <LoginForm.Root>
+        <LoginForm.Body>
+          <LoginForm.Form aria-label="Вход">
+            <Input.Root label="Логин">
+              <Input.Wrapper>
+                <Input.Field />
+              </Input.Wrapper>
+            </Input.Root>
+            <Input.Root label="Пароль">
+              <Input.Wrapper>
+                <Input.Field type="password" autoComplete="current-password" />
+              </Input.Wrapper>
+            </Input.Root>
+          </LoginForm.Form>
+        </LoginForm.Body>
+      </LoginForm.Root>,
+    );
+    const login = screen.getByRole("textbox", { name: "Логин" });
+    expect(login).not.toHaveAttribute("autocomplete");
+    expect(login).not.toHaveAttribute("data-1p-ignore");
+    const password = screen.getByLabelText("Пароль");
+    expect(password).toHaveAttribute("autocomplete", "current-password");
+    expect(password).not.toHaveAttribute("data-lpignore");
+  });
+});

@@ -38,7 +38,7 @@ export default function TabsOrientationExample() {
         <div className={styles.form}>
           <Input.Root label="Имя и фамилия">
             <Input.Wrapper>
-              <Input.Field defaultValue="Анна Смирнова" autoComplete="name" />
+              <Input.Field defaultValue="Анна Смирнова" />
             </Input.Wrapper>
           </Input.Root>
           <Input.Root label="Должность">

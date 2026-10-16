@@ -1,5 +1,6 @@
 import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import {
+  FIELD_AUTOCOMPLETE_PROP,
   FIELD_COMMIT_LABEL_DOCS,
   FIELD_COPY_LABEL_DOCS,
   FIELD_HINT_TONE_PROP,
@@ -208,6 +209,7 @@ export const api: ComponentApi = {
           en: "Overrides the root's `required` for the native input.",
           ru: "Переопределяет `required` корня для нативного поля.",
         },
+        FIELD_AUTOCOMPLETE_PROP,
         {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "id">',
@@ -459,6 +461,10 @@ export const api: ComponentApi = {
       {
         en: '`suggestions` make the input a `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` on the open `listbox`, which the label names); the highlight is `aria-activedescendant`, so focus never leaves the field.',
         ru: '`suggestions` делают поле `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` на открытый `listbox`, названный подписью); подсветка — `aria-activedescendant`, фокус не уходит из поля.',
+      },
+      {
+        en: 'Autofill is off unless you pass `autoComplete`: without a token the input carries `autocomplete="off"` and the opt-outs of 1Password, LastPass, Bitwarden and Dashlane (`data-1p-ignore`, `data-lpignore`, `data-bwignore`, `data-form-type="other"`); a token passes through and drops them. With `suggestions` it stays off. Inside `LoginForm.Form` a field without a token is left to the browser.',
+        ru: 'Автозаполнение выключено, пока не передан `autoComplete`: без токена у поля `autocomplete="off"` и отказ для 1Password, LastPass, Bitwarden и Dashlane (`data-1p-ignore`, `data-lpignore`, `data-bwignore`, `data-form-type="other"`); токен проходит и снимает их. С `suggestions` оно всегда выключено. Внутри `LoginForm.Form` поле без токена отдано браузеру.',
       },
       {
         en: "A `Select` inside `Input.Wrapper` is the box's start segment: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).",

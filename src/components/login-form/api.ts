@@ -182,8 +182,8 @@ export const api: ComponentApi = {
     },
     {
       name: "LoginForm.Form",
-      en: "`ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.",
-      ru: "`<form>`: поля, затем кнопка отправки, с зазором поле → поле по ярусу.",
+      en: "`ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props. The one place autofill stays on: a kit field inside it without `autoComplete` is left to the browser and the password managers.",
+      ru: "`<form>`: поля, затем кнопка отправки, с зазором поле → поле по ярусу. Единственное место, где автозаполнение включено: поле кита внутри без `autoComplete` отдано браузеру и менеджерам паролей.",
       props: [
         {
           name: "children",
@@ -280,8 +280,8 @@ export const api: ComponentApi = {
         ru: "Дайте `LoginForm.Form` `aria-label` (или `aria-labelledby` на id заголовка), чтобы форма стала ориентиром.",
       },
       {
-        en: "Fields use `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) so password managers and OTP autofill work.",
-        ru: "Поля с `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) работают с менеджерами паролей и автозаполнением кода.",
+        en: "Every field names its purpose with `autoComplete` — `email` or `username`, `current-password` to sign in, `new-password` to sign up, reset or accept an invite, `one-time-code` for a code (`DigitInput` sets it) — so password managers fill and save the right field. Kit fields elsewhere keep autofill off.",
+        ru: "Каждое поле называет назначение через `autoComplete` — `email` или `username`, `current-password` для входа, `new-password` для регистрации, сброса и приглашения, `one-time-code` для кода (`DigitInput` ставит его сам) — так менеджеры паролей заполняют и сохраняют нужное поле. Поля кита вне формы входа держат автозаполнение выключенным.",
       },
       {
         en: "Field errors come from the fields (`aria-invalid`, described by the error). A refused sign-in has no Banner: the e-mail takes `invalid` and the `error` of the password says why, announced by the support row of the field.",

@@ -99,7 +99,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | The other div attributes. |
 
 ### LoginForm.Form
-`ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.
+`ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props. The one place autofill stays on: a kit field inside it without `autoComplete` is left to the browser and the password managers.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -184,7 +184,7 @@ Root carries `data-size`, `data-align` and `data-flat`.
 - The title is a real heading (`h1` by default) and the form is a native `<form>`: Enter submits.
 - The logo is decorative; with an `aria-label` it is the product mark image (`role="img"`).
 - Give `LoginForm.Form` an `aria-label` (or `aria-labelledby` pointing to the title id) so the form is a landmark.
-- Fields use `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) so password managers and OTP autofill work.
+- Every field names its purpose with `autoComplete` — `email` or `username`, `current-password` to sign in, `new-password` to sign up, reset or accept an invite, `one-time-code` for a code (`DigitInput` sets it) — so password managers fill and save the right field. Kit fields elsewhere keep autofill off.
 - Field errors come from the fields (`aria-invalid`, described by the error). A refused sign-in has no Banner: the e-mail takes `invalid` and the `error` of the password says why, announced by the support row of the field.
 
 ### Labels
