@@ -127,8 +127,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Tools",
-      en: "`ref` → `HTMLDivElement`. What acts on the whole page: sections, a shared period, view; the search of a one-list page. The tool row of the DataTable `toolbar`: a search takes the free room, the rest keep their width at the end. Named, a `group`.",
-      ru: "То, что действует на всю страницу: разделы, общий период, вид; поиск страницы-списка. Та же строка, что `toolbar` DataTable: поиск занимает свободное место, остальные — в конце. С именем — `group`.",
+      en: "`ref` → `HTMLDivElement`. What acts on the whole page: sections (route links of sub-pages), view, a shared period; a filter only over several views — a table's go in its `toolbar`. The DataTable tool row: a search takes the free room, the rest keep their width. Named, a `group`.",
+      ru: "То, что действует на всю страницу: разделы (ссылки подстраниц), вид, общий период; фильтр — только над несколькими видами, фильтр таблицы — в её `toolbar`. Строка инструментов DataTable: поиск занимает свободное место, остальные держат ширину. С именем — `group`.",
       props: [divRest({ en: "`children` (kit controls)", ru: "`children` (контролы кита)" })],
     },
     {

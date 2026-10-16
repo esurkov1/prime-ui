@@ -26,7 +26,10 @@ same place. Structure it by what people do, not by how the backend is split.
   it stays folded; its `…` row marks the page).
 - **One level of nesting.** `Sidebar.Sub` is one section with 2–6 views of the same objects
   (Сделки → Новые · В работе · Закрытые). The parent only discloses; an overview page is the first
-  child («Все сделки»). Never a sub-list inside a sub-list — split the section or use page tabs.
+  child («Все сделки»). Never a sub-list inside a sub-list — split the section. Facets of one section
+  («Мессенджеры» → «Каналы» · «Статистика») are no sub-list: they are route links in the page's
+  `Page.Tools`, and the section's item stays `current` on every sub-route (a `NavLink` without `end`,
+  or `current={pathname.startsWith("/messengers")}`).
 - **Icons.** Every top-level item and every sub-list parent has a distinct icon (on the rail the
   icon is all that is left); children of a sub-list have none.
 - **Numbers and dots.** A plain `Sidebar.ItemCount` is information (12 new deals): it leaves the

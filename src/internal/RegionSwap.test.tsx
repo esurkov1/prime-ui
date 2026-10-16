@@ -443,6 +443,11 @@ describe("RegionSwap", () => {
       expect(cssValue(cssRule(CSS, '.root[data-fill="true"] > .leaving'), "inset")).toBe("0");
     });
 
+    it("hands a height its parent stretches it to on to a lone child (tiles of a row match)", () => {
+      expect(cssValue(cssRule(CSS, ".root"), "display")).toBe("grid");
+      expect(cssValue(cssRule(CSS, ".layer:has(> :only-child)"), "display")).toBe("grid");
+    });
+
     it("glides the height through --swap-height, clipped with room for focus rings", () => {
       const resizing = cssRule(CSS, '.root[data-resizing="true"]');
       expect(cssValue(resizing, "height")).toBe("var(--swap-height)");

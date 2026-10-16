@@ -143,8 +143,9 @@ outside the bar), with an optional `Page.TopBar collapse` that repeats it once i
 `onRowClick` + Drawer; a list worked through record by record → `Page.Split` with a `List` of
 the records (tickets, letters, invoices; `current` on the open one; a row's own Switch or menu in
 `List.ItemActions`) or a `ChatList` of the conversations. A record edited on a page of its own →
-`Page.Guard` holds leaving it with unsaved changes. Sections of a long rail → `Sidebar.Group collapsible`; a section with sub-pages →
-`Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a `Dropdown.Trigger` at the bottom of
+`Page.Guard` holds leaving it with unsaved changes. Sections of a long rail → `Sidebar.Group collapsible`; views of one set of objects
+opened straight from the rail → `Sidebar.Sub`; the facets of one section («Каналы» / «Статистика»)
+→ route links in its `Page.Tools` ([a section with sub-pages](composition.md#a-section-with-sub-pages)); the signed-in user → `Sidebar.Account` in a `Dropdown.Trigger` at the bottom of
 `Sidebar.Footer`.
 
 ### A flag, a level, a set

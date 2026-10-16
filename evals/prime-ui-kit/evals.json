@@ -253,6 +253,20 @@
         "No own reveal of the data: no keyframes, transitions, staggered fade-ins, slide-ins or height animations written for the arrival of the data",
         "The page layout does not change height when the data arrives: the skeleton has the data's rows, gaps and line heights"
       ]
+    },
+    {
+      "id": 21,
+      "prompt": "В сайдбаре есть раздел «Мессенджеры». Хочу внутри него две вкладки — «Каналы» (таблица подключённых каналов) и «Статистика» (несколько KPI), у каждой свой адрес, а в сайдбаре при этом пусть остаётся выбранным «Мессенджеры». Приложение на react-router.",
+      "expected_output": "One Page whose Page.Title is «Мессенджеры» on both routes; the switch is a SegmentedControl of router links (SegmentedControl.Item asChild) in Page.TopBar → Page.Tools with value = the current path; the body is the current sub-page; the Sidebar item of the section stays current on every sub-route (a NavLink to the section without `end`, or current by path prefix).",
+      "files": [],
+      "expectations": [
+        "Each sub-page is its own route (e.g. /messengers/channels and /messengers/stats), not local state",
+        "The switch is a SegmentedControl in Page.Tools whose items are router links via SegmentedControl.Item asChild, value bound to the current path",
+        "Page.Title stays «Мессенджеры» on both sub-pages; no second title naming «Каналы» or «Статистика»",
+        "The section's Sidebar item stays current on every sub-route: a NavLink to the section path without `end`, or `current` from a path-prefix check",
+        "No second Sidebar level (Sidebar.Sub) for the two sub-pages and no Tabs strip inside Page.Body",
+        "The channels table keeps its own search or filter (if any) in the DataTable toolbar, not in Page.Tools"
+      ]
     }
   ]
 }

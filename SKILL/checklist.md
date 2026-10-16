@@ -10,6 +10,7 @@ checks.
 - [ ] A nested record's path ends in its title on one line inside `Page.Heading`; no title row under the path ([the top bar](composition.md#the-top-bar)).
 - [ ] Every button of the page is in one `Page.Actions`, the primary last, each with a `Button.Icon` ([the top bar](composition.md#the-top-bar)).
 - [ ] `SmartFilter.Root` wraps `Page.Root`; its toolbar is in `Page.Tools`, its chips in `Page.Chips` ([the top bar](composition.md#the-top-bar)).
+- [ ] A section's sub-pages are route links (`SegmentedControl.Item asChild`) in its `Page.Tools`; the title stays the section and its Sidebar item stays current on every sub-route — no second Sidebar level, no tab strip in the body ([a section with sub-pages](composition.md#a-section-with-sub-pages)).
 - [ ] A control stands with what it changes: a table's search, filter, chips and chooser are in its `toolbar` / `toolbarChips` on every page; the bar keeps the title, sections, the view, the shared period and the buttons ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] A table section has an `options` filter field for each categorical column and a `date-range` field per date column, its value in the URL ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] Actions on selected rows are `renderSelectionActions` — one «Действия · N» menu added to the tools row, which stays ([controls of a table](composition.md#controls-of-a-table)).

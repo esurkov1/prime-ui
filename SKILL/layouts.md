@@ -142,6 +142,7 @@ when a count gets a colour — are in
 | Everyday places | `Sidebar.Group` without `label` at the top, never folded |
 | Category of work | `Sidebar.Group label collapsible` |
 | Views of one section | `Sidebar.Sub`, one level only |
+| Facets of one section (its list, its statistics) | none: route links in the page's `Page.Tools` ([a section with sub-pages](composition.md#a-section-with-sub-pages)) |
 | Meta | `Sidebar.Footer`: help, settings, then `Sidebar.Account` with its menu last |
 
 ### Sidebar icons

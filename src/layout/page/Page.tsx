@@ -864,7 +864,7 @@ function BarActions({ className, children, ...rest }: PageActionsProps) {
 export type PageToolsProps = DivProps;
 
 /**
- * The page's tools — sections, search and filter, view — as kit controls in the order written, laid
+ * The page's tools — sections, view, a shared period, a filter over several views — as kit controls in the order written, laid
  * out by the one tool row (`ToolRow`, as the DataTable `toolbar`). On the bar's first line each keeps
  * its natural width; on a line of their own a search takes the free room, switchers and pickers
  * keep their width at the end (a `SegmentedControl.Root` and a `Datepicker.Root` are `fullWidth`

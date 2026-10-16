@@ -8,7 +8,8 @@
 ## When to use
 - Every route rendered inside `AppShell.Main`: the app is navigation and the page, and the page carries its own top (`Page.TopBar`), title (`Page.Title`, the `<h1>`) and body.
 - A work screen (a list, a board, a chat, a schedule): `Page.TopBar` with the title (`Page.Heading`), the page's tools (`Page.Tools`: sections, search and filter, view), all its buttons (`Page.Actions`) and the active filters (`Page.Chips`).
-- A filter stands next to what it filters. `Page.Tools` holds what acts on the whole page: sections, the view, a period that drives several blocks (the KPI cards and the table). The search, filter, chips and column chooser of a page that is one list stay there too — the list is the page. On a page that holds more than its table (KPI cards, a chart), they belong to the table's own tools row (DataTable `toolbar` + `toolbarChips`), not the bar.
+- A filter stands next to what it filters. `Page.Tools` holds what acts on the whole page: sections, the view, a period that drives several blocks (the KPI cards and the table), and a search and filter only when it narrows several views of one set (a board and its list). A table's search, filter, chips, «Колонки» and selection menu always belong to its own tools row (DataTable `toolbar` + `toolbarChips`), on a page that is only the table too.
+- A section with sub-pages (the «Мессенджеры» item of the Sidebar with «Каналы» and «Статистика»): each sub-page is a route of its own, `Page.Title` stays the section's name, and the switch is a `SegmentedControl` of links (`SegmentedControl.Item asChild`) in `Page.Tools`; the body is the current sub-page. The Sidebar keeps the section's item current on every sub-route — a router `NavLink` to the section's path without `end`, or `current={pathname.startsWith("/messengers")}`.
 - A document page (settings, a long form, help) or an overview (a dashboard): `Page.Header` in the flow — the large title and its buttons — and `Page.TopBar collapse`, which repeats the title once it scrolls away and keeps the path and the buttons in reach.
 - A nested record: a `Breadcrumb` path in `Page.Heading`; in the bar the title reads as its last level.
 - A text page held to a reading measure (`maxWidth="readable"`), a wide dashboard capped at the content width (`maxWidth="wide"`).
@@ -44,8 +45,8 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 │  │  ├─ Page.Title                <h1>, title-m, the path's last level, truncates
 │  │  └─ Page.Description          <p>, muted caption under the whole line, truncates
 │  ├─ Page.Tools                   what acts on the whole page, in the order written: the one tool row (as the DataTable toolbar)
-│  │  ├─ SegmentedControl.Root     sections, view (fullWidth unless set)
-│  │  ├─ SmartFilter.Toolbar       search and filter: grows first on a line of its own
+│  │  ├─ SegmentedControl.Root     sections (route links of sub-pages), view (fullWidth unless set)
+│  │  ├─ SmartFilter.Toolbar       a search and filter over several views: grows first on a line of its own
 │  │  ├─ Datepicker.Root           a period (fullWidth unless set)
 │  │  └─ Select.Root …             a period, columns; the trigger fills its place
 │  ├─ Page.Actions                 every button of the page; icons, then «⋯» when short
@@ -122,7 +123,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### Page.Tools
-`ref` → `HTMLDivElement`. What acts on the whole page: sections, a shared period, view; the search of a one-list page. The tool row of the DataTable `toolbar`: a search takes the free room, the rest keep their width at the end. Named, a `group`.
+`ref` → `HTMLDivElement`. What acts on the whole page: sections (route links of sub-pages), view, a shared period; a filter only over several views — a table's go in its `toolbar`. The DataTable tool row: a search takes the free room, the rest keep their width. Named, a `group`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -342,7 +343,8 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 | [top-bar.tsx](examples/top-bar.tsx) | A nested record in the top bar: the path ending in the title, a line of data, the page's tools and its buttons — `Page.TopBar`, `Page.Heading`, `Page.Tools`, `Page.Actions`. |
 | [loading.tsx](examples/loading.tsx) | A page whose figures load after it opens: the line of data keeps its place under the title while it loads, so nothing in the bar moves — `loading`. |
 | [collapse.tsx](examples/collapse.tsx) | An overview whose large title scrolls away under the top bar: the bar repeats it with its line of data and keeps the period and the page's buttons in reach — `collapse`. |
-| [tools.tsx](examples/tools.tsx) | The orders page's tools in its top bar: sections with counts, search and filter, the period, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. |
+| [tools.tsx](examples/tools.tsx) | The orders page's tools in its top bar: sections with counts, the search and filter that narrow both views, the view, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. |
+| [router.tsx](examples/router.tsx) | A section with sub-pages: the title is the section, each sub-page is a route of its own, the switch in the bar is their links and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. |
 | [actions-collapse.tsx](examples/actions-collapse.tsx) | The buttons of an invoices page on a tablet-wide column: the line runs short, so the secondary buttons show only their icons with the label as the name and the tooltip, the primary keeps its label — `Page.Actions`, `Button.Icon`. |
 | [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading — `Page.Section`, `label`, `description`, `Page.Actions`. |
 | [grid.tsx](examples/grid.tsx) | A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `Page.Grid`, `Page.Cell`, `span`, `rows`. |
@@ -361,7 +363,8 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - Buttons without an icon in a crowded bar → they cannot give way to an icon; give each `Button.Root` a `Button.Icon` beside its label.
 - Two places for buttons (some beside the title, the primary among the tools) → every button of the page goes into the one `Page.Actions`, the primary last.
 - `SmartFilter.Root` inside the bar, around `Page.Tools` → it holds no DOM; wrap it around `Page.Root` so its Toolbar (in `Page.Tools`) and its Chips (in `Page.Chips`) share it.
-- A table's search, filter, chips or «Колонки» in `Page.Tools` / `Page.Chips` above KPI cards or a chart they do not filter → they read as filters of the whole page; move them into the table's `toolbar` / `toolbarChips`. The bar keeps the title, a period that drives every block, sections and the primary action.
+- A table's search, filter, chips or «Колонки» in `Page.Tools` / `Page.Chips` → they read as filters of the whole page and move when the page grows a block; they go in the table's `toolbar` / `toolbarChips` on every page, the one that is only the table too. The bar keeps the title, sections, the view, a period that drives every block and the page's buttons.
+- Sub-pages of a section as a second Sidebar level, a tab strip inside `Page.Body`, or a title that names the sub-page → the title stays the section, the sub-pages are route links in `Page.Tools` (`SegmentedControl.Item asChild`), and the section's Sidebar item stays current on every sub-route.
 - `Page.Header` inside `Page.TopBar` → the bar takes `Page.Heading` and `Page.Actions` directly; `Page.Header` is the flow's document header.
 - A hand-made menu button for the phone Sidebar → the bar draws it while the Sidebar is off-canvas.
 - Hiding buttons with media queries on a phone → `Page.Actions` in the bar collapses and folds them by measured width.

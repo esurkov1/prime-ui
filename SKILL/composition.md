@@ -99,7 +99,8 @@ order is Heading, Tools, Actions, Chips whatever the JSX order.
   `Page.Description` under the whole line. The title is never a row of its own under the path, and
   the path never repeats the title as its last item.
 - **`Page.Tools`** — what acts on the whole page, as kit controls in the order a person reads them:
-  sections (a `SegmentedControl` with counts), the view, a period that drives several blocks; a
+  sections (a `SegmentedControl` with counts; of route links for
+  [a section with sub-pages](#a-section-with-sub-pages)), the view, a period that drives several blocks; a
   search and filter (`SmartFilter.Toolbar`) only when it governs more than one table — a board and
   its list, a media grid ([where the filters go](#where-the-filters-go)). Named with `aria-label`;
   no buttons and no wrappers inside.
@@ -176,6 +177,62 @@ export function DealsPage({ fields, filter, onFilterChange, view, onViewChange, 
         <Page.Body>{children}</Page.Body>
       </Page.Root>
     </SmartFilter.Root>
+  );
+}
+```
+
+### A section with sub-pages
+
+One place of the app, several facets of it: «Мессенджеры» with «Каналы» and «Статистика», a client
+with «Сделки» and «Документы». Each facet is a route of its own (`/messengers/channels`,
+`/messengers/stats`), and the section stays one page:
+
+- **The title is the section.** `Page.Title` reads «Мессенджеры» on every sub-route; the facet is
+  the current link of the switch, never a second title or a title that names the facet.
+- **The switch is links in `Page.Tools`**: a `SegmentedControl` whose items are router links
+  (`SegmentedControl.Item asChild`), `value` = the current path. It is a navigation (Tab moves
+  through the links, the current one is `aria-current="page"`), on a phone it takes a line of its
+  own under the title by itself.
+- **The body is the sub-page**, swapped in a `Crossfade` keyed by the path (`Routes` given the
+  `location`, so the leaving sub-page stays on its route while it fades).
+- **The Sidebar stays on the section.** Its item is current on every sub-route: a `NavLink` to
+  `/messengers` without `end`, or `current={pathname.startsWith("/messengers")}`.
+- Never a second Sidebar level for facets, never a `Tabs` strip inside `Page.Body` for sub-pages.
+  `Sidebar.Sub` is for views of one set of objects people open straight from the rail («Сделки» →
+  «Новые», «В работе»); `Tabs` switch panels that are not routes.
+
+Live: [router.tsx](../src/layout/page/examples/router.tsx).
+
+```tsx
+import { Page, SegmentedControl } from "prime-ui-kit";
+import type { ReactNode } from "react";
+import { Link, useLocation } from "react-router-dom";
+
+const MESSENGER_PAGES = [
+  { to: "/messengers/channels", label: "Каналы" },
+  { to: "/messengers/stats", label: "Статистика" },
+];
+
+export function MessengersPage({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  return (
+    <Page.Root>
+      <Page.TopBar>
+        <Page.Heading>
+          <Page.Title>Мессенджеры</Page.Title>
+        </Page.Heading>
+        <Page.Tools aria-label="Мессенджеры">
+          <SegmentedControl.Root value={pathname} aria-label="Подразделы">
+            {MESSENGER_PAGES.map((page) => (
+              <SegmentedControl.Item key={page.to} value={page.to} asChild>
+                <Link to={page.to}>{page.label}</Link>
+              </SegmentedControl.Item>
+            ))}
+          </SegmentedControl.Root>
+        </Page.Tools>
+      </Page.TopBar>
+      <Page.Body>{children}</Page.Body>
+    </Page.Root>
   );
 }
 ```

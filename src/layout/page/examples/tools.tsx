@@ -1,10 +1,9 @@
-/** The orders page's tools in its top bar: sections with counts, search and filter, the period, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. */
+/** The orders page's tools in its top bar: sections with counts, the search and filter that narrow both views, the view, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. */
 import {
   Button,
   Icon,
   Page,
   SegmentedControl,
-  Select,
   SmartFilter,
   type SmartFilterField,
   type SmartFilterValue,
@@ -18,10 +17,9 @@ const SECTIONS = [
   { value: "cancelled", label: "Отменены", count: 20 },
 ];
 
-const PERIODS = [
-  { value: "7d", label: "7 дней" },
-  { value: "30d", label: "30 дней" },
-  { value: "quarter", label: "Квартал" },
+const VIEWS = [
+  { value: "list", label: "Список" },
+  { value: "board", label: "Доска" },
 ];
 
 const FIELDS: SmartFilterField[] = [
@@ -46,7 +44,7 @@ const FIELDS: SmartFilterField[] = [
 
 export default function PageToolsExample() {
   const [section, setSection] = React.useState("all");
-  const [period, setPeriod] = React.useState("30d");
+  const [view, setView] = React.useState("list");
   const [filter, setFilter] = React.useState<SmartFilterValue>({
     city: { include: ["msk"], exclude: [] },
   });
@@ -75,21 +73,13 @@ export default function PageToolsExample() {
               ))}
             </SegmentedControl.Root>
             <SmartFilter.Toolbar />
-            <Select.Root value={period} onValueChange={setPeriod}>
-              <Select.Trigger aria-label="Период">
-                <Select.TriggerIcon>
-                  <Icon name="field.calendar" />
-                </Select.TriggerIcon>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content>
-                {PERIODS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
+            <SegmentedControl.Root value={view} onValueChange={setView} aria-label="Вид">
+              {VIEWS.map((item) => (
+                <SegmentedControl.Item key={item.value} value={item.value}>
+                  {item.label}
+                </SegmentedControl.Item>
+              ))}
+            </SegmentedControl.Root>
           </Page.Tools>
           <Page.Actions>
             <Button.Root>
