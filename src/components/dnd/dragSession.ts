@@ -53,6 +53,8 @@ export type DragSnapshot = {
   carried: { width: number; height: number } | null;
   /** The lifted element's `border-radius`, so the gap it leaves is shaped like it. */
   radius: string | null;
+  /** The lifted element is `bare` (no surface of its own): the gap it leaves is a bare hole too. */
+  bare: boolean;
   /** The live region text; `sequence` makes a repeated message count as new for assistive technology. */
   announcement: { message: string; sequence: number };
 };
@@ -68,6 +70,7 @@ export const IDLE_SNAPSHOT: DragSnapshot = {
   grab: null,
   carried: null,
   radius: null,
+  bare: false,
   announcement: { message: "", sequence: 0 },
 };
 
@@ -307,6 +310,7 @@ export function createDragController(
       grab: null,
       carried: null,
       radius: null,
+      bare: false,
     }));
     emit({ type: "end", item, outcome, origin });
     params.onDragEnd?.(item, outcome);
@@ -353,6 +357,7 @@ export function createDragController(
       grab: { x: pressPoint.x - origin.left, y: pressPoint.y - origin.top },
       carried: null,
       radius: getComputedStyle(element).borderRadius || null,
+      bare: element.hasAttribute("data-dnd-bare"),
     }));
     emit({
       type: "start",

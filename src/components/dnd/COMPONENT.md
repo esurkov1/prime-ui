@@ -82,7 +82,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `disabled` | `boolean` | `false` | This item cannot be dragged or moved (others may still move past it). |
 | `locked` | `boolean` | `false` | Holds its place: it does not move and nothing is put where it would shift it. Its `Dnd.Handle` turns into a lock. A pinned first row, a system column. |
 | `dragFromControls` | `boolean` | `false` | Without `handle`: a press on a control inside picks the item up too once it travels (a finger: holds); a click stays the control's. A table header whose sort button fills it. |
-| `bare` | `boolean` | `false` | The item has no surface of its own, only its parts do (a board column: a header and cards): its carried copy flies without a fill or a lift shadow, each part keeps its own look. |
+| `bare` | `boolean` | `false` | No surface of its own, only its parts have one (a board column): its copy flies without a fill or a lift shadow, and its gap is bare room (no tint, no dashed line). |
 | `className` | `string` | — | The row look: fill, radius, padding. |
 | `children` | `ReactNode` | — | The row content. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes. |
@@ -160,7 +160,7 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | `kind` shared | lists exchange items at an exact position; Alt + ← / → moves across | boards | unique per list |
 | `locked` (item) | a lock where the grip would be; the item holds its place, nothing moves past it | a pinned first row, a system column | `false` |
 | `dragFromControls` (item) | without `handle`: a press on a control inside picks the item up once it travels (a finger: holds); a click stays the control's, and the click that ends a drag is swallowed | a table header whose sort button fills it | `false` |
-| `bare` (item) | the carried copy flies without a fill or a lift shadow: only the item's parts (a header, cards) keep their own looks | an item that is a group of surfaces, not one (a board column) | `false` |
+| `bare` (item) | the carried copy flies without a fill or a lift shadow: only the item's parts (a header, cards) keep their own looks; the gap it leaves is bare room, no tint, no dashed line | an item that is a group of surfaces, not one (a board column) | `false` |
 | `empty` | the list's own line inside a dashed drop slot while it is empty (no slot when the list is `disabled`); a gap opening takes its place | columns, lists that may run out | — |
 | `canDrop` → string | the refusal says why: live region and a chip under the clone | workflow rules a person must understand | — |
 | `flashOnDrop` | after a drop the zone's fill starts at `accent-soft` and fades back to its own | the eye must follow where the item went | `false` |

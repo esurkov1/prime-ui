@@ -54,7 +54,7 @@ export type SortableListHandle = {
   /** The item the gap precedes; null means the end, undefined means idle. */
   gapBefore: string | null | undefined;
   /** The hole the lifted item left, in px. Set only while a drag is in flight. */
-  gap: { width: number; height: number; radius: string | null } | null;
+  gap: { width: number; height: number; radius: string | null; bare: boolean } | null;
   isOver: boolean;
   /** A drag of the list's kind is in flight: the list may take the item. */
   carrying: boolean;
@@ -368,6 +368,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
   const gapBefore = showGap ? effective.before : undefined;
   const origin = useStoreSelector(controller.store, (state) => state.origin);
   const radius = useStoreSelector(controller.store, (state) => state.radius);
+  const bare = useStoreSelector(controller.store, (state) => state.bare);
   // Everything that moves an item, and nothing else: re-renders from the owner's state must not animate.
   const gapKey = gapBefore === undefined ? "idle" : (gapBefore ?? "end");
   // A grid of mixed cells (a cover two cells wide): the carried copy takes the size of the cell the gap
@@ -540,7 +541,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     itemProps,
     draggingId: own && dragged ? dragged.id : null,
     gapBefore,
-    gap: showGap && origin ? { width: origin.width, height: origin.height, radius } : null,
+    gap: showGap && origin ? { width: origin.width, height: origin.height, radius, bare } : null,
     isOver: target.isOver,
     carrying: dragged !== null,
     pending,

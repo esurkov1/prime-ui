@@ -322,6 +322,7 @@ function DndSortable<T>({
         width={list.gap.width}
         height={list.gap.height}
         radius={list.gap.radius}
+        bare={list.gap.bare}
         key="dnd-gap"
       />
     ) : null;
@@ -572,11 +573,13 @@ function DndPlaceholder({
   width,
   height,
   radius,
+  bare,
 }: {
   as: Exclude<ItemTag, "th">;
   width: number;
   height: number;
   radius: string | null;
+  bare: boolean;
 }) {
   const controller = useDragController();
   const nodeRef = React.useRef<HTMLElement | null>(null);
@@ -623,6 +626,7 @@ function DndPlaceholder({
       ref={ref}
       aria-hidden="true"
       data-dnd-gap=""
+      data-dnd-bare={bare || undefined}
       className={styles.placeholder}
       style={style}
     />

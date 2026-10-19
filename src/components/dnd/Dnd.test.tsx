@@ -458,6 +458,41 @@ describe("nested sortables: one owner per press", () => {
   });
 });
 
+describe("Dnd.SortableItem bare", () => {
+  function Bare({ bare }: { bare: boolean }) {
+    return (
+      <Dnd.Root>
+        <Dnd.Sortable
+          aria-label="columns"
+          items={rows("a", "b")}
+          getId={(row) => row.id}
+          onReorder={() => {}}
+          renderItem={(row) => (
+            <Dnd.SortableItem id={row.id} bare={bare} data-testid={`item-${row.id}`}>
+              {row.id}
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>
+    );
+  }
+
+  it("a bare item leaves a bare gap; a surface item leaves the tinted one", () => {
+    const { unmount } = render(<Bare bare />);
+    pressOn(screen.getByTestId("item-a"), 10, 5);
+    moveTo(10, 45);
+    expect(document.querySelector("[data-dnd-gap]")).toHaveAttribute("data-dnd-bare");
+    releaseAt(10, 45);
+    unmount();
+
+    render(<Bare bare={false} />);
+    pressOn(screen.getByTestId("item-a"), 10, 5);
+    moveTo(10, 45);
+    expect(document.querySelector("[data-dnd-gap]")).not.toHaveAttribute("data-dnd-bare");
+    releaseAt(10, 45);
+  });
+});
+
 describe("Dnd.Draggable + Dnd.DropZone", () => {
   function Board({
     onDrop,

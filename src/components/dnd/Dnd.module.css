@@ -142,6 +142,13 @@ li.placeholder {
   list-style: none;
 }
 
+/* The hole a `bare` item leaves (a board column): it had no surface, so its place is bare room —
+   no tint, no dashed line around an empty column-sized box; the items around it make the gap. */
+.placeholder[data-dnd-bare] {
+  border-color: transparent;
+  background: none;
+}
+
 /* The gap in a table body: a row of the lifted row's height whose one cell spans every column. */
 .gapRow > td {
   box-sizing: border-box;

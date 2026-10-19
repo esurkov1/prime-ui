@@ -172,8 +172,8 @@ export const api: ComponentApi = {
           name: "bare",
           type: "boolean",
           default: "false",
-          en: "The item has no surface of its own, only its parts do (a board column: a header and cards): its carried copy flies without a fill or a lift shadow, each part keeps its own look.",
-          ru: "У элемента нет своей поверхности, она есть только у его частей (колонка доски: шапка и карточки): его копия летит без заливки и тени подъёма, каждая часть сохраняет свой вид.",
+          en: "No surface of its own, only its parts have one (a board column): its copy flies without a fill or a lift shadow, and its gap is bare room (no tint, no dashed line).",
+          ru: "Своей поверхности нет, она только у частей (колонка доски): копия летит без заливки и тени подъёма, а её место пустое (без тинта и пунктира).",
         },
         {
           name: "className",

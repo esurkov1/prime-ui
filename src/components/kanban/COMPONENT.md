@@ -157,7 +157,7 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 |---|---|---|
 | idle | — | cards show `cursor: grab`; under a mouse the card lifts to `--prime-shadow-overlay` (`@media (hover: hover)` only) — no wash: a wash is one ladder step, the column's own color |
 | carried | a drag | Dnd: the clone lifts on Dnd's carry shadow, a dashed accent gap opens where the card lands, cards glide aside |
-| column carried | a drag by the column grip | the same for the whole column: its clone lifts with its cards, a column-sized gap opens in the strip, the columns glide aside |
+| column carried | a drag by the column grip | the same for the whole column: its clone lifts with its cards, a column-sized gap opens in the strip, the columns glide aside; `plain` / `line` columns fly as they stand (no fill, no lift shadow) and leave bare room (no tint, no dashed line), a `well` column flies with its rounded fill and leaves the tinted dashed gap in its shape |
 | over a column | pointer over another column | the gap opens there; an empty column's slot fades out |
 | refused | `limit` reached, `canDrop` returns `false` or a reason | `data-dnd-reject` on the `<ul>`: `danger-soft` fill; the reason in a chip under the carried card |
 | locked column | `locked` | `data-locked` on the column; the grip is a lock named «Закреплено» |
