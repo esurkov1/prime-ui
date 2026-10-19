@@ -138,7 +138,8 @@ order is Heading, Tools, Actions, Chips whatever the JSX order.
   [a section with sub-pages](#a-section-with-sub-pages)), the view, a period that drives several blocks; a
   search and filter (`SmartFilter.Toolbar`) only when it governs more than one table — a board and
   its list, a media grid ([where the filters go](#where-the-filters-go)). Named with `aria-label`;
-  no buttons and no wrappers inside.
+  no buttons and no wrappers inside. While they fit, the tools stand in the heading row at the end
+  edge, right before `Page.Actions` — a switch of sub-page links like any other.
 - **`Page.Actions`** — the one place for the page's buttons: secondary ones (`soft` + `neutral`)
   first, the primary (`solid`) last. Every Button carries a `Button.Icon` beside its label: the bar
   shows it as the icon alone when the line runs short.
@@ -226,9 +227,11 @@ with «Сделки» and «Документы». Each facet is a route of its o
   the current link of the switch, never a second title or a title that names the facet.
 - **The switch is links in `Page.Tools`**: a `SegmentedControl` whose items are router links
   (`SegmentedControl.Item asChild`), `value` = the current path. It is a navigation (Tab moves
-  through the links, the current one is `aria-current="page"`), and the bar always gives it a line
-  of its own under the title, at the start edge, so the switch stands still from one sub-page to the
-  next whatever each sub-page puts beside the title.
+  through the links, the current one is `aria-current="page"`). It stands in the heading row at the
+  end edge, before the sub-page's buttons — tools, then actions, the primary last, as a view switch
+  does — never on a line of its own under the title on a wide screen; the bar moves it under the
+  title only when the row runs out of room. A sub-page with buttons of its own shifts the switch by
+  their width; that is the accepted cost of one heading row.
 - **The body is the sub-page**, swapped in a `Crossfade` keyed by the path (`Routes` given the
   `location`, so the leaving sub-page stays on its route while it fades).
 - **The Sidebar stays on the section.** Its item is current on every sub-route: a `NavLink` to
@@ -445,7 +448,9 @@ row of a `FieldList` follows the same count ([forms](#7-forms)).
   the column headings once above the rows, small attributes (an icon, then its color) in `compact`
   columns. Never a label in every row, never numbered labels, never one record split over lines.
   FieldList draws every row's actions itself — the remove «×» and the handle after it, a pinned
-  row's remove off with its reason (`labels.lockedReason`) — so never add your own.
+  row's remove off with its reason (`labels.lockedReason`) — so never add your own. Its add button
+  under the rows is the place for records filled in place; a list people pick from creates at its
+  top ([where the create button goes](#where-the-create-button-goes)).
 - The row's actions (`rowActions`) follow [the menu threshold](#a-menu-from-two-actions): a row
   that only removes shows its «×» (the default `"buttons"`, and the grip after it with
   `reorderable`), however many columns it has; `"menu"` — one «⋯» with «Выше», «Ниже», «Удалить» —
@@ -665,13 +670,30 @@ drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-
   request, a new search or filter sets `page` to 1, and the old rows stay with `loading` until the
   answer comes ([server.tsx](../src/components/data-table/examples/server.tsx)).
 - Columns: `numeric` for amounts, counts and dates (end-aligned, tabular; `headerAlign="end"` to line the
-  head up); statuses as `Badge` from one status → tone map; an avatar + two-line cell for people and
+  head up); statuses as `Badge` from the app's [one status map](foundations.md#one-status-map); an avatar + two-line cell for people and
   companies; row menu last.
 - States in place: `loading` (+ `loadingRows`) while there are no rows, `empty` for nothing found
   (string → compact EmptyPage, or your own `EmptyPage size="s"` with «Сбросить фильтры»), `loadError`
   for a failed load. The head and toolbar stay.
 - Phones: the table scrolls inside itself, `stickyFirstColumn` keeps the key column; never let the page
   scroll sideways. Short lists of objects can be `Card variant="list"` instead of a table.
+
+### Where the create button goes
+
+Creating stands where a person reaches for it, and that depends on what the list is for.
+
+- **A page of records** («Новая сделка», «Новый заказ») — the page's `Page.Actions`, the primary
+  last ([the top bar](#the-top-bar)).
+- **A pane people pick from** — the conversations of a messenger, the threads of an assistant —
+  reads search → create → list: the create button stands at the top
+  of the pane, under its search and over the rows, never under the list, where a long list pushes
+  it out of view. In a `ChatList` it is `ChatList.Actions` (a `fullWidth` Button fits a narrow
+  pane); the search stays the ChatList's own field ([messenger](#messenger)).
+- **Records of a form** a person adds and fills in place (invoice lines, contacts) — the add button
+  of `FieldList` under the rows: the new row appears right where the button was. This is FieldList's
+  own placement for editing in place, never a model for a list people pick from.
+
+Bad → good: [anti-slop.md](anti-slop.md#7c-a-create-button-out-of-reach).
 
 ### List rows
 
@@ -741,21 +763,33 @@ wherever it opens:
   it), a tab the viewer may not see is not rendered, an action the viewer may not take is hidden. A
   second drawer for the same entity («Мой аккаунт» beside «Сотрудник») drifts apart from the first
   with every change.
-- **One record header** — the same in a Drawer, a Modal and a Sheet. `Drawer.Icon` leads: a
-  glyph gets a 40px tone tile, the record's `Avatar.Root` or `Thumbnail.Root` (even inside a wrapper
-  of your own) stands at 40 with no tile. Line 1 is `Drawer.Title`, the name (`loading` while it
-  comes). Line 2 is `Drawer.Description`: the status `Badge.Root`s first — the header sizes them, no
-  `size` — then the line of data. `Drawer.Actions` hold only buttons that act on this record: ghost
-  icon Buttons, each in a `Tooltip.Trigger`, counted by [the menu threshold](#a-menu-from-two-actions);
-  they are centred on line 1, before the ×. A Badge in `Drawer.Actions` is a status in the wrong place; a way to
-  another place (a section, a list) is no header action — a link in the body beside the data it leads
-  to, or nothing.
+- **One record header** — the same in a Drawer, a Modal and a Sheet, three lines in this order.
+  Line 1 is `Drawer.Title`: the name, then the record's number as `number` («#678»), muted beside
+  it; the name ellipsizes, the number never does (`loading` while the name comes). Line 2 is
+  `Drawer.Description`, tight under the title: the record's context as one line of text
+  («ООО «Северный ветер» · 1 240 000 ₽», «Аренда байка Пхукет · заявка 19 сент, 06:37»), cut with an
+  ellipsis — never a badge, never the number. Line 3 is `Drawer.Badges`, the record's working
+  controls right over the body or the tabs: first the pickers — the status, then the assignee —
+  each a `Badge.Root` inside a `Dropdown.Trigger`; the assignee is a person's chip (`Badge.Avatar`
+  with the initials, then the name), and nobody assigned is
+  `<Badge.Root variant="outline">Назначить</Badge.Root>` in the same place; then the plain statuses
+  (the channel, «Ждёт человека», «VIP»). The header sizes the badges (no `size`) and keeps them on
+  one row, the rest behind «+N». The header places the lines in this order whatever the order in
+  code; write them in it anyway. `Drawer.Actions` hold only buttons that act on this
+  record: ghost icon Buttons, each in a `Tooltip.Trigger`, counted by
+  [the menu threshold](#a-menu-from-two-actions), centred on line 1 before the ×; on a phone one
+  icon button and the ⋯ beside the × keep the three lines whole. A Badge in `Drawer.Actions` is a
+  status in the wrong place; a way to another place (a section, a list) is no header action — a
+  link in the body beside the data it leads to, or nothing. `Drawer.Icon` (a tone tile, or the
+  record's picture at 40) is optional and a record header goes without it: the name leads.
 - **One form, one save.** Every editable field of every tab is one form, and its submit is the one
   «Сохранить» of `Drawer.Footer`, shown while the form is dirty, with `Drawer.Guard` (`dirty`,
   `busy`). No save per section or tab, no «Есть несохранённые изменения» in `Drawer.Meta`: the save
   button and the guard already say it. Actions that work at once — turn sign-in on, send a link,
   end the other sessions — are buttons beside what they change and never wait for the save. After
-  the save the button leaves, so the success is a `Notification`.
+  the save the button leaves, so the success is a `Notification`. An action apart from that answer
+  («Выйти» on the person's own account) is the footer's start group: `Drawer.Actions`
+  inside `Drawer.Footer`, never a third button beside «Сохранить» or text in `Drawer.Meta`.
 - **Tabs are topics.** Each tab holds one topic, and a record's history (its log) is always a tab of
   its own. Tabs that outgrow the width never merge: the strip scrolls ([switchers](responsive.md#switchers)).
 - **A control for the whole tab stands in the header.** A switch that changes every block of the
@@ -767,9 +801,128 @@ wherever it opens:
   period of the page the drawer opened from, so the drawer's figures match the row it came from.
 - **Data at the drawer's level.** The drawer loads the record and the data of its tabs; a tab never
   fetches on mount, so coming back to it shows what it showed instead of a skeleton that collapses
-  it. A tab that keeps a draft or its scroll keeps its panel with `Tabs.Panel keepMounted`. The
-  opening itself — the header and the tabs at once, the body as a Skeleton in the form's geometry —
-  is in [Drawer](../src/components/drawer/COMPONENT.md).
+  it. A tab that keeps a draft or its scroll keeps its panel with `Tabs.Panel keepMounted`.
+- **It opens at once.** The header and the tabs come with the press, the body as a Skeleton in the
+  data's geometry. Opened from a list row, the drawer shows what the row already knows (the name,
+  the status) and holds only the rest (`Drawer.Description loading`); opened by a link it knows
+  only the id, so `Drawer.Title loading` and `Drawer.Badges loading` hold those lines too — never a
+  skeleton of your own in the header ([Drawer](../src/components/drawer/COMPONENT.md)).
+- **A tab spaces its own blocks.** A `Tabs.Panel` in the body stands sections and self-titled
+  blocks apart by itself; a `Drawer.Section` heading only where it names what the blocks do not
+  ([label economy](ux.md#3-label-economy)).
+
+```tsx good
+// good — the record header: name and number, one line of data, the badges with the two pickers first
+// declare: const setStatus: (status: string) => void
+// declare: const setAssignee: (id: string | null) => void
+<Drawer.Header>
+  <Drawer.Title number="#678">Александра</Drawer.Title>
+  <Drawer.Description>Аренда байка Пхукет · заявка 19 сент, 06:37</Drawer.Description>
+  <Drawer.Badges>
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <Badge.Root tone="info" aria-label="Статус: Новая">
+          Новая
+        </Badge.Root>
+      </Dropdown.Trigger>
+      <Dropdown.Content>
+        <Dropdown.Item onSelect={() => setStatus("progress")}>В работе</Dropdown.Item>
+        <Dropdown.Item onSelect={() => setStatus("closed")}>Закрыта</Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown.Root>
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <Badge.Root aria-label="Ответственный: Анна Котова">
+          <Badge.Avatar>
+            <Avatar.Root color="purple">
+              <Avatar.Fallback>АК</Avatar.Fallback>
+            </Avatar.Root>
+          </Badge.Avatar>
+          Анна Котова
+        </Badge.Root>
+      </Dropdown.Trigger>
+      <Dropdown.Content>
+        <Dropdown.Item onSelect={() => setAssignee("sokolov")}>Илья Соколов</Dropdown.Item>
+        <Dropdown.Item onSelect={() => setAssignee(null)}>Снять ответственного</Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown.Root>
+    <Badge.Root color="sky">Telegram</Badge.Root>
+    <Badge.Root tone="warning">Ждёт человека</Badge.Root>
+  </Drawer.Badges>
+  <Drawer.Actions>
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">
+          <Button.Icon>
+            <Icon name="object.message" />
+          </Button.Icon>
+        </Button.Root>
+      </Tooltip.Trigger>
+      <Tooltip.Content>Диалог</Tooltip.Content>
+    </Tooltip.Root>
+  </Drawer.Actions>
+</Drawer.Header>
+```
+
+```tsx partial
+// bad — the statuses above the text, the number and a status in the description, a status beside
+// the buttons
+<Drawer.Header>
+  <Drawer.Title>Александра</Drawer.Title>
+  <Drawer.Badges>
+    <Badge.Root tone="warning">Ждёт человека</Badge.Root>
+  </Drawer.Badges>
+  <Drawer.Description>
+    Заявка #678 · Аренда байка Пхукет
+    <Badge.Root tone="info">Новая</Badge.Root>
+  </Drawer.Description>
+  <Drawer.Actions>
+    <Badge.Root color="sky">Telegram</Badge.Root>
+  </Drawer.Actions>
+</Drawer.Header>
+```
+
+```tsx good
+// good — the number by the name, one line of text under it, the statuses last, over the body
+<Drawer.Header>
+  <Drawer.Title number="#678">Александра</Drawer.Title>
+  <Drawer.Description>Аренда байка Пхукет</Drawer.Description>
+  <Drawer.Badges>
+    <Badge.Root tone="info">Новая</Badge.Root>
+    <Badge.Root color="sky">Telegram</Badge.Root>
+    <Badge.Root tone="warning">Ждёт человека</Badge.Root>
+  </Drawer.Badges>
+</Drawer.Header>
+```
+
+```tsx partial
+// bad — the assignee as an avatar and a name of your own, «Сменить» buttons for status and assignee
+<Drawer.Badges>
+  <Badge.Root tone="info">Новая</Badge.Root>
+  <span className={styles.owner}>
+    <Avatar.Root size="xs">…</Avatar.Root> Анна Котова
+  </span>
+</Drawer.Badges>
+<Drawer.Actions>
+  <Button.Root variant="ghost" tone="neutral">Сменить статус</Button.Root>
+  <Button.Root variant="ghost" tone="neutral">Сменить ответственного</Button.Root>
+</Drawer.Actions>
+```
+
+```tsx good
+// good — each badge is its own picker; nobody assigned is an outline «Назначить» in the same place
+// declare: const setAssignee: (id: string) => void
+<Drawer.Badges>
+  <Dropdown.Root>
+    <Dropdown.Trigger>
+      <Badge.Root variant="outline">Назначить</Badge.Root>
+    </Dropdown.Trigger>
+    <Dropdown.Content>
+      <Dropdown.Item onSelect={() => setAssignee("kotova")}>Анна Котова</Dropdown.Item>
+    </Dropdown.Content>
+  </Dropdown.Root>
+</Drawer.Badges>
+```
 
 ```tsx partial
 // bad — a way out in the header, a save per section, a status line in the footer
@@ -941,7 +1094,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - A work screen titles itself in its `Page.TopBar`: `Page.Title` is the only heading, its `Page.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; there is no second header in the flow.
 - The search and filters narrow the table, so they are the table's: `SmartFilter.Toolbar` in its `toolbar`, `SmartFilter.Chips` in its `toolbarChips`, the column chooser over the row menu (`columnsMenu`); the bar keeps the heading, export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. A KPI row added above changes nothing in the table's tools.
-- A status is a `Badge` with one `tone` per meaning across the product (`STATUS` is one map); the text carries the meaning, the tone repeats it.
+- A status is a `Badge` read from one map of the app (`STATUS`); an invoice's statuses are judgements, so each wears a `tone` — the text carries the meaning, the tone repeats it ([one status map](foundations.md#one-status-map)).
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s` in the last column (`hideHeader`), pinned to the end edge with `stickyLastColumn` so they stay in reach while the columns scroll: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
 - Empty after a filter is the table's `empty` with `EmptyPage size="s"` and a «Сбросить фильтры» action; the header and the filters stay in place.
@@ -1006,7 +1159,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - A trend over days is a `Sparkline` in a `Card` in a full-width cell: the period's sum (`summary`) and a line you can scrub with a finger; a new series appears by itself.
 - A chart with axes and several series is a `ChartFrame` in `Page.Cell span={8} rows={2}` beside two panels; `ChartFrame.Plot height="fill"` takes their height. A sized plot area (`renderPlot`), a legend that turns series off and a table for screen readers; series colors come from `series`, never your own.
 - Panels are `Card variant="panel"` with `Card.Title as="h2"` in `Card.Header` and quiet context on the right after the title (`caption` + `muted`).
-- Progress of one value is a `ProgressBar` with `label` and `showValue`; parts of a whole are `ProgressBar segments` with `legend` and `formatValue`: statuses are colored by `tone`, categories by `color`.
+- Progress of one value is a `ProgressBar` with `label` and `showValue`; parts of a whole are `ProgressBar segments` with `legend` and `formatValue`: judgements wear `tone`, stages and categories `color` ([tone or color](foundations.md#tone-or-color)).
 - Tiles of one screen are 16 px apart (`Page.Grid`), page blocks 24 px (`Page.Body`), a new topic with a heading 40 px (`Page.Section`): proximity shows what is related.
 - A short list is a `DataTable paging="none"` in `Page.Section label` without a card; «Все счета» is a `LinkButton` in the section's `Page.Actions`: it is a way somewhere, not an action.
 
@@ -1029,6 +1182,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - A work screen: the title «Поддержка» is `Page.Title` in `Page.TopBar` with the unread count in `Page.Description`.
 - Layout: `Page.Split` (`Page.List`, `Page.Detail`) in a `fill` page: the dialog list `ChatList` (last message, ticks, unread, «печатает…») and the conversation beside it; on a narrow panel one pane at a time with `Page.BackButton` in `Chat.Header`.
+- Creating a dialog or a thread («Новый чат») is `ChatList.Actions`: under the search, over the rows — search → create → list, never a button under the list ([where the create button goes](#where-the-create-button-goes)).
 - Search over the dialogs is the field of `ChatList` itself: `search` and `onSearchChange`; you filter the list (by name and last message), and the list shows the match in rows, the number found and an empty result itself. Never put a field of your own above the list.
 - The conversation is `Chat.Root` in the pane's card: the header, `Chat.Search`, `Chat.Messages` and `Chat.Footer` with the Composer. Never assemble your own header, `ScrollContainer` and feed — the chat links search, jumps, selection and «печатает…» itself.
 - Messages are data: `items` with `getKey`, `getAuthor`, `getDate` (events of the record — an agent took the client, a status moved — through `isService`, drawn as `Chat.Service` with `Chat.ServiceIcon` and `Chat.ServiceChange`), the first unread is `unread`; the feed computes dates, runs, tails and the avatar place. `renderMessage` may be inline: only a message whose item or place changed renders again, so whatever a row shows lives in its item, and a reply's original comes from `entry.find(key)`.

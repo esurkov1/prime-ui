@@ -2,6 +2,7 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
+import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -672,5 +673,101 @@ describe("Badge as a layer trigger", () => {
     const root = screen.getByRole("button", { name: "Бронь" }).parentElement;
     expect(root).toHaveAttribute("data-pressable", "true");
     expect(root).toHaveAttribute("data-icon-end", "true");
+  });
+});
+
+describe("Badge.Avatar", () => {
+  const Person = ({ size }: { size?: "xs" | "s" | "m" | "l" | "xl" }) => (
+    <Badge.Root size={size}>
+      Анна Котова
+      <Badge.Avatar>
+        <Avatar.Root color="purple">
+          <Avatar.Fallback>АК</Avatar.Fallback>
+        </Avatar.Root>
+      </Badge.Avatar>
+    </Badge.Root>
+  );
+
+  it("leads the chip, hidden from assistive tech, and makes it a pill", () => {
+    render(<Person />);
+    const root = badgeOf("Анна Котова");
+    expect(root).toHaveAttribute("data-avatar", "true");
+    const slot = root?.firstElementChild;
+    expect(slot).toHaveClass(styles.avatar);
+    expect(slot).toHaveAttribute("aria-hidden", "true");
+    expect(root).toHaveTextContent("АКАнна Котова");
+    expect(cssValue(cssRule(CSS, '.root[data-avatar="true"]'), "border-radius")).toBe(
+      "var(--prime-radius-full)",
+    );
+  });
+
+  it("sizes the avatar by the chip tier, 2 px inside its height", () => {
+    const expected = { xs: "2xs", s: "2xs", m: "xs", l: "s", xl: "s" } as const;
+    for (const [tier, size] of Object.entries(expected)) {
+      const { unmount } = render(<Person size={tier as keyof typeof expected} />);
+      expect(screen.getByText("АК").closest("[data-color]")).toHaveAttribute("data-size", size);
+      unmount();
+    }
+  });
+
+  it("is a picker inside a Dropdown.Trigger: named by its text, opened with the keyboard", async () => {
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <Badge.Root>
+            <Badge.Avatar>
+              <Avatar.Root>
+                <Avatar.Fallback>АК</Avatar.Fallback>
+              </Avatar.Root>
+            </Badge.Avatar>
+            Анна Котова
+          </Badge.Root>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Илья Соколов</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Анна Котова" });
+    button.focus();
+    await user.keyboard("{ArrowDown}");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("menuitem", { name: "Илья Соколов" })).toBeInTheDocument();
+  });
+
+  it("reads as its trigger's text in the «+N» tooltip, never as the menu behind it", async () => {
+    const rect = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockImplementation(() => ({ width: 100, height: 24 }) as DOMRect);
+    const client = vi
+      .spyOn(HTMLElement.prototype, "clientWidth", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains(styles.group) ? 150 : 0;
+      });
+    render(
+      <Badge.Group overflow="count">
+        <Badge.Root>Новая</Badge.Root>
+        <Dropdown.Root>
+          <Dropdown.Trigger>
+            <Badge.Root>
+              <Badge.Avatar>
+                <Avatar.Root>
+                  <Avatar.Fallback>АК</Avatar.Fallback>
+                </Avatar.Root>
+              </Badge.Avatar>
+              Анна Котова
+            </Badge.Root>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item>Илья Соколов</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+      </Badge.Group>,
+    );
+    act(() => (badgeOf("+1") as HTMLElement).focus());
+    expect(await screen.findByRole("tooltip")).toHaveTextContent(/^Анна Котова$/);
+    rect.mockRestore();
+    client.mockRestore();
   });
 });

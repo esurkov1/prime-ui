@@ -128,8 +128,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Author",
-      en: '`ref` → `HTMLDivElement`. The author header of a group chat or of outgoing runs (`authors="outgoing"`): the name in the author\'s hue, an optional `Message.AuthorIcon`, then the muted `tag`. Put it on every message: only the first of a run shows it.',
-      ru: 'Шапка автора в групповом чате или у исходящих серий (`authors="outgoing"`): имя в цвете автора, необязательный `Message.AuthorIcon`, затем приглушённый `tag`. Ставьте на каждое сообщение: показывает её только первое в серии.',
+      en: "`ref` → `HTMLDivElement`. The author header of a group chat or of the runs `Chat.Messages authors` names: the name in the author's hue, an optional `Message.AuthorIcon`, then the muted `tag`. Put it on every message: only the first of a run shows it.",
+      ru: "Шапка автора в групповом чате или у серий, которые называет `Chat.Messages authors`: имя в цвете автора, необязательный `Message.AuthorIcon`, затем приглушённый `tag`. Ставьте на каждое сообщение: показывает её только первое в серии.",
       props: [
         {
           name: "color",

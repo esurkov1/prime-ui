@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { MessageList } from "@/components/chat/MessageList";
 import { hueOf } from "@/internal/palette";
 import { paletteColors } from "@/internal/states";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Message } from "./Message";
 
@@ -23,7 +24,7 @@ function Messages({
 }: {
   rows: Row[];
   group?: boolean;
-  authors?: "outgoing";
+  authors?: "none" | "incoming" | "outgoing" | "all";
   direction?: "incoming" | "outgoing";
 }) {
   return (
@@ -147,5 +148,36 @@ describe("Message.Author: the author's header of a group chat", () => {
     render(<Messages rows={RUN} authors="outgoing" direction="incoming" />);
     expect(header("a")).toBeNull();
     expect(screen.queryByTestId("avatar-c")).toBeNull();
+  });
+
+  it('authors="incoming" and "all" head the runs of their sides, without avatars', () => {
+    const { unmount } = render(<Messages rows={RUN} authors="incoming" direction="incoming" />);
+    expect(header("a")).not.toBeNull();
+    expect(header("b")).toBeNull();
+    expect(screen.queryByTestId("avatar-c")).toBeNull();
+    unmount();
+    const outgoing = render(<Messages rows={RUN} authors="incoming" direction="outgoing" />);
+    expect(header("a")).toBeNull();
+    outgoing.unmount();
+    for (const direction of ["incoming", "outgoing"] as const) {
+      const all = render(<Messages rows={RUN} authors="all" direction={direction} />);
+      expect(header("a")).not.toBeNull();
+      expect(screen.queryByTestId("avatar-c")).toBeNull();
+      all.unmount();
+    }
+  });
+
+  it('authors="none" heads no run', () => {
+    render(<Messages rows={RUN} authors="none" direction="incoming" />);
+    expect(header("a")).toBeNull();
+  });
+
+  it("stands the tag at the end of the line; the name gives way first", () => {
+    const CSS = "src/components/message/Message.module.css";
+    const tag = cssRule(CSS, ".authorTag");
+    expect(cssValue(tag, "margin-inline-start")).toBe("auto");
+    expect(cssValue(tag, "max-inline-size")).toBe("50%");
+    expect(cssValue(tag, "flex")).toBe("0 1 auto");
+    expect(cssValue(cssRule(CSS, ".authorName"), "flex")).toBe("0 1000 auto");
   });
 });

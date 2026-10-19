@@ -609,35 +609,43 @@ describe("Page.TopBar plan", () => {
     expect(plan(container)).toBe("one");
   });
 
-  it("gives a section's sub-pages a line of their own at the start, whatever the room", () => {
-    layout(2000);
-    const { container } = render(
+  function SubPagesBar() {
+    return (
       <Page.TopBar>
         <Page.Heading data-testid="heading">
-          <Page.Title>Посев</Page.Title>
+          <Page.Title>AI</Page.Title>
         </Page.Heading>
-        <Page.Tools data-testid="tools" aria-label="Посев">
-          <SegmentedControl.Root value="/chats" aria-label="Подразделы">
-            <SegmentedControl.Item value="/chats" asChild>
-              <a href="/chats">Чаты</a>
+        <Page.Tools data-testid="tools" aria-label="AI">
+          <SegmentedControl.Root value="/chat" aria-label="Подразделы">
+            <SegmentedControl.Item value="/chat" asChild>
+              <a href="/chat">Чат</a>
             </SegmentedControl.Item>
-            <SegmentedControl.Item value="/history" asChild>
-              <a href="/history">История</a>
+            <SegmentedControl.Item value="/lessons" asChild>
+              <a href="/lessons">Уроки</a>
             </SegmentedControl.Item>
           </SegmentedControl.Root>
         </Page.Tools>
-      </Page.TopBar>,
+        <Page.Actions>
+          <Button.Root>Новый урок</Button.Root>
+        </Page.Actions>
+      </Page.TopBar>
     );
-    expect(plan(container)).toBe("below");
-    expect(screen.getByTestId("tools")).toHaveAttribute("data-align", "start");
-    expect(screen.getByTestId("tools")).toHaveAttribute("data-fill", "true");
+  }
+
+  it("puts a section's sub-pages in the heading row before the buttons while they fit", () => {
+    layout(1000);
+    const { container } = render(<SubPagesBar />);
+    expect(plan(container)).toBe("one");
+    const tools = screen.getByTestId("tools");
+    expect(tools).not.toHaveAttribute("data-fill");
+    expect(tools.nextElementSibling).toHaveTextContent("Новый урок");
   });
 
-  it("keeps other tools gathered at the end", () => {
-    layout(1000);
-    render(<Bar />);
-    resizeTo(600);
-    expect(screen.getByTestId("tools")).not.toHaveAttribute("data-align");
+  it("gives a section's sub-pages a line of their own on a narrow bar, like any tools", () => {
+    layout(300);
+    const { container } = render(<SubPagesBar />);
+    expect(plan(container)).toBe("below");
+    expect(screen.getByTestId("tools")).toHaveAttribute("data-fill", "true");
   });
 
   it("collapses the secondary buttons first, then the primary; each keeps its name", () => {

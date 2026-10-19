@@ -12,6 +12,8 @@
      even at the low point of its pulse. */
   --sk-fill: var(--prime-color-skeleton-fill);
   --sk-avatar: var(--prime-avatar-m);
+  --sk-chip: var(--prime-badge-m-height);
+  --sk-chip-radius: var(--prime-badge-m-radius);
 
   display: block;
   box-sizing: border-box;
@@ -22,18 +24,26 @@
 
 .root[data-size="xs"] {
   --sk-avatar: var(--prime-avatar-xs);
+  --sk-chip: var(--prime-badge-xs-height);
+  --sk-chip-radius: var(--prime-badge-xs-radius);
 }
 
 .root[data-size="s"] {
   --sk-avatar: var(--prime-avatar-s);
+  --sk-chip: var(--prime-badge-s-height);
+  --sk-chip-radius: var(--prime-badge-s-radius);
 }
 
 .root[data-size="l"] {
   --sk-avatar: var(--prime-avatar-l);
+  --sk-chip: var(--prime-badge-l-height);
+  --sk-chip-radius: var(--prime-badge-l-radius);
 }
 
 .root[data-size="xl"] {
   --sk-avatar: var(--prime-avatar-xl);
+  --sk-chip: var(--prime-badge-xl-height);
+  --sk-chip-radius: var(--prime-badge-xl-radius);
 }
 
 /*
@@ -67,6 +77,16 @@
   width: 100%;
   height: var(--field-h);
   border-radius: var(--field-radius);
+  background: var(--sk-fill);
+}
+
+/* A badge of the tier (a status, a chip): its height and radius; the width is the host's. */
+:where(.root[data-shape="chip"]) {
+  flex: none;
+  width: calc(var(--prime-space-16) + var(--prime-space-4));
+  max-width: 100%;
+  height: var(--sk-chip);
+  border-radius: var(--sk-chip-radius);
   background: var(--sk-fill);
 }
 

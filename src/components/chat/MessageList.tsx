@@ -25,6 +25,7 @@ import {
   createSelectionStore,
   DEFAULT_QUICK_REACTION,
   defineRowKind,
+  type MessageAuthors,
   type MessageListContextValue,
   MessageListProvider,
   type MessageRowInfo,
@@ -43,6 +44,7 @@ import { useRangeSelection } from "@/internal/useRangeSelection";
 
 import styles from "./Chat.module.css";
 import { createMessageFlow, createRowArrivals, type MessageFlow } from "./messageFlow";
+import { useRowGlide } from "./rowGlide";
 
 export type MessageListLabels = {
   /** The count of the selection bar: `{count}`. */
@@ -77,7 +79,7 @@ const ChromeContext = React.createContext<ListChrome>({
 
 export type MessageListProps = React.HTMLAttributes<HTMLDivElement> & {
   group?: boolean;
-  authors?: "outgoing";
+  authors?: MessageAuthors;
   /**
    * Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting.
    * Any of the triad lets a message's menu start selection («Выбрать»).
@@ -245,7 +247,7 @@ const OVERSCAN = 8;
  */
 export function MessageList({
   group = false,
-  authors,
+  authors = "none",
   selected: selectedProp,
   defaultSelected = null,
   onSelectedChange,
@@ -450,6 +452,7 @@ export function MessageList({
     [],
   );
   useDatePush(innerRef, scrollerRef);
+  useRowGlide(innerRef);
   const keys = React.useMemo(() => shape.map((row) => row.key), [shape]);
   const getKey = React.useCallback((index: number) => keys[index] ?? index, [keys]);
   const estimateSize = React.useCallback(
@@ -710,7 +713,7 @@ export function MessageList({
     () => ({
       inList: true,
       group,
-      outgoingAuthors: authors === "outgoing",
+      authors,
       register,
       arrivedNow: flow.arrivedNow,
       reveal,

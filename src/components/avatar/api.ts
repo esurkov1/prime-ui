@@ -10,10 +10,10 @@ export const api: ComponentApi = {
       props: [
         {
           name: "size",
-          type: '"xs" | "s" | "m" | "l" | "xl" | "2xl"',
+          type: '"2xs" | "xs" | "s" | "m" | "l" | "xl" | "2xl"',
           default: '"m"',
-          en: "Diameter 20 · 24 · 32 · 40 · 48 · 64 px. Inside `Avatar.Group` the group size is used when it is not set.",
-          ru: "Диаметр 20 · 24 · 32 · 40 · 48 · 64 px. Внутри `Avatar.Group` без него берётся размер группы.",
+          en: "Diameter 16 · 20 · 24 · 32 · 40 · 48 · 64 px (`2xs` is the person in a chip, `Badge.Avatar`). Inside `Avatar.Group` the group size is used when it is not set.",
+          ru: "Диаметр 16 · 20 · 24 · 32 · 40 · 48 · 64 px (`2xs` — человек в чипе, `Badge.Avatar`). Внутри `Avatar.Group` без него берётся размер группы.",
         },
         {
           name: "color",
@@ -103,7 +103,7 @@ export const api: ComponentApi = {
       props: [
         {
           name: "size",
-          type: '"xs" | "s" | "m" | "l" | "xl" | "2xl"',
+          type: '"2xs" | "xs" | "s" | "m" | "l" | "xl" | "2xl"',
           en: "Size of every `Avatar.Root` / `Avatar.Overflow` inside without its own `size`; unset, they stay `m`.",
           ru: "Размер каждого `Avatar.Root` / `Avatar.Overflow` внутри без своего `size`; без него они `m`.",
         },
@@ -122,7 +122,7 @@ export const api: ComponentApi = {
       props: [
         {
           name: "size",
-          type: '"xs" | "s" | "m" | "l" | "xl" | "2xl"',
+          type: '"2xs" | "xs" | "s" | "m" | "l" | "xl" | "2xl"',
           default: '"m"',
           en: "Diameter; inside `Avatar.Group` the group size when not set.",
           ru: "Диаметр; внутри `Avatar.Group` без него — размер группы.",

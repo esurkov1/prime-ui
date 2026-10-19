@@ -1484,6 +1484,28 @@ describe("the carried copy", () => {
     ).toBe("none");
     releaseAt(60, 60);
   });
+
+  it("carries none of the original's motion inside; only the lift is its own", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Draggable kind="row" id="r1" data-testid="row">
+          <span data-testid="part">Строка</span>
+        </Dnd.Draggable>
+      </Dnd.Root>,
+    );
+    boxes.set("row", { left: 0, top: 0, width: 200, height: 40 });
+    pressOn(screen.getByTestId("row"), 10, 10);
+    moveTo(60, 60);
+    const copy = document.querySelector<HTMLElement>("[data-dnd-overlay] [data-dnd-copy]");
+    const part = copy?.querySelector<HTMLElement>("span");
+    // A part that entered (an enter class, a drawn glyph) never plays again on the copy.
+    expect(part?.style.getPropertyValue("animation")).toBe("none");
+    expect(part?.style.getPropertyValue("transition")).toBe("none");
+    expect(copy?.style.getPropertyValue("animation")).toBe("none");
+    // The lift rises on the overlay's own transition.
+    expect(copy?.style.getPropertyValue("transition")).toBe("");
+    releaseAt(60, 60);
+  });
 });
 
 describe("a wrapping grid", () => {

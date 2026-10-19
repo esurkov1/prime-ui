@@ -13,7 +13,7 @@
 - An API that takes one value per field (`multiple: false`), a screen whose text search lives elsewhere (`searchable={false}`), values of different kinds in one field (`group`).
 
 ## When not to use
-- One field with a few options → use [SegmentedControl](../segmented-control/COMPONENT.md), [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md) in the page's `Page.Tools`.
+- One field with a few options → use [SegmentedControl](../segmented-control/COMPONENT.md), [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md) beside what it narrows: a table's `toolbar`, or the page's `Page.Tools` when it acts on the whole page.
 - A search outside a table or list page (inside a picker, a settings section, a panel) → [Input](../input/COMPONENT.md) with a search icon. Over a table or list page the search is SmartFilter even with no fields yet (`fields={[]}`): it grows into filters without a rebuild.
 - Choosing values for a form field → use [TagSelect](../tag-select/COMPONENT.md).
 - One period that drives a whole dashboard → [Datepicker](../datepicker/COMPONENT.md) in the page's `Page.Tools`; SmartFilter ranges filter rows of a list.
@@ -174,7 +174,7 @@ same height and type.
 - Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end. The chips row, and the panel footer with its Reset, rise in with the first filter and close up in place with the last (`partPresence`).
 - Option groups stack `--prime-space-3` apart, a caption `--prime-space-1` above each group's values. A range row holds two equal Inputs with a dash between them, centred on the field label.
 - While typing a search a range row stays only when its field name matches.
-- The root draws nothing: its host places Toolbar and Chips, next to what they filter. A table among other blocks (KPI cards, a chart) takes them in its own tools row — the DataTable `toolbar` (the Toolbar) and `toolbarChips` (the Chips), with `SmartFilter.Root` around the DataTable. A page that is one list takes them in its bar — the Toolbar in `Page.Tools`, the Chips in `Page.Chips`, with `SmartFilter.Root` around `Page.Root`. Elsewhere a host stacks them (a `Card.Body`, a form column).
+- The root draws nothing: its host places Toolbar and Chips, next to what they filter. A table takes them in its own tools row on every page, the page that is only this table included — the DataTable `toolbar` (the Toolbar) and `toolbarChips` (the Chips), with `SmartFilter.Root` around the DataTable. A filter over several views of one set (a board and its list, a media grid, a schedule) takes the page's bar — the Toolbar in `Page.Tools`, the Chips in `Page.Chips`, with `SmartFilter.Root` around `Page.Root`. Elsewhere a host stacks them (a `Card.Body`, a form column).
 
 ## Accessibility
 

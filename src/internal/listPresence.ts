@@ -77,12 +77,13 @@ export function useListPresence(keys: readonly string[]): ListPresence {
 /**
  * One row of a `useListPresence` list: whether it entered (join `enterMotion.enter` on its first
  * render), and on unmount, when the data took it out, the element in `node` closes up in place
- * along the block axis.
+ * along `axis` (the list's stacking axis: `block` for rows, `inline` for the slots of a row).
  */
 export function useListItemPresence(
   list: Pick<ListPresence, "entering" | "leaving">,
   key: string,
   node: React.RefObject<HTMLElement | null>,
+  axis: "inline" | "block",
 ): boolean {
   const [entered] = React.useState(() => list.entering.has(key));
   const { entering, leaving } = list;
@@ -94,9 +95,9 @@ export function useListItemPresence(
     return () => {
       if (element && leaving.has(key)) {
         leaving.delete(key);
-        leaveInPlace(element, "block");
+        leaveInPlace(element, axis);
       }
     };
-  }, [leaving, key, node]);
+  }, [leaving, key, node, axis]);
   return entered;
 }

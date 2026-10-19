@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Crossfade } from "@/components/crossfade/Crossfade";
 import { Input } from "@/components/input/Input";
@@ -11,11 +12,16 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import hairline from "@/internal/hairline.module.css";
 import { useLabels } from "@/internal/labels";
 import type { Selection } from "@/internal/messageList";
+import { usePartPresence } from "@/internal/partPresence";
 import { flattenChildren } from "@/internal/parts";
+import { RollingNumber } from "@/internal/RollingNumber";
 import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Chat.module.css";
@@ -57,6 +63,7 @@ export const CHAT_LABELS: ChatLabels = {
   // name says what it searches).
   searchPlaceholder: "Поиск",
   matches: "{index} из {count}",
+  matchCount: "{index}/{count}",
   noMatches: "Нет совпадений",
   previousMatch: "Предыдущее совпадение",
   nextMatch: "Следующее совпадение",
@@ -67,12 +74,20 @@ export const CHAT_LABELS: ChatLabels = {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
+/**
+ * How the chat stands in its host: `pane` — inset from its own edges (a `Card`, a page pane);
+ * `inline` — flush with the host's content edges (a dialog body, a tab, a `Card.Body`).
+ */
+export type ChatVariant = "pane" | "inline";
+
 export type ChatRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue"> & {
+  variant?: ChatVariant;
   selected?: Selection;
   defaultSelected?: Selection;
   onSelectedChange?: (selected: Selection) => void;
   search?: string | null;
   defaultSearch?: string | null;
+  minSearchLength?: number;
   onSearchChange?: (search: string | null) => void;
   jumpTo?: string | null;
   typing?: boolean;
@@ -88,11 +103,13 @@ export type ChatRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultV
  * `Chat.Messages`: a list without the rest is `Chat.Root` with `Chat.Messages` alone.
  */
 function ChatRoot({
+  variant = "pane",
   selected: selectedProp,
   defaultSelected,
   onSelectedChange,
   search: searchProp,
   defaultSearch = null,
+  minSearchLength = 2,
   onSearchChange,
   jumpTo: jumpToProp = null,
   typing = false,
@@ -132,6 +149,8 @@ function ChatRoot({
   const [hasTitle, setHasTitle] = React.useState(false);
 
   const searching = search !== null;
+  // A query shorter than the minimum is no search yet: nothing is marked, counted or stepped.
+  const searched = search !== null && search.trim().length >= minSearchLength ? search : "";
   const match = matches[matches.length - 1 - Math.min(matchIndex, matches.length - 1)];
   const jumpTo = searching ? (match ?? null) : jumpToProp;
   const selected = selectable ? selectedState : undefined;
@@ -142,6 +161,7 @@ function ChatRoot({
       setSelected,
       search,
       setSearch,
+      searched,
       matches,
       setMatches,
       matchIndex,
@@ -161,6 +181,7 @@ function ChatRoot({
       setSelected,
       search,
       setSearch,
+      searched,
       matches,
       matchIndex,
       jumpTo,
@@ -174,7 +195,7 @@ function ChatRoot({
 
   return (
     <ChatProvider value={value}>
-      <div ref={ref} className={cx(styles.root, className)} {...rest}>
+      <div ref={ref} className={cx(styles.root, className)} data-variant={variant} {...rest}>
         {children}
       </div>
     </ChatProvider>
@@ -190,9 +211,10 @@ export type ChatHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 
 /**
  * The top of the chat: who it is with. A row of the leading elements (a back button, an `Avatar`),
- * the title over the description, and the actions at the end. Children are sorted by type:
- * `Chat.Title`, `Chat.Description` and `Chat.Actions` take their places, everything else leads
- * the row side by side, in the order written.
+ * the title over the badges and the description, and the actions at the end. Children are sorted
+ * by type: `Chat.Title`, `Chat.Badges`, `Chat.Description` and `Chat.Actions` take their places,
+ * everything else leads the row side by side, in the order written. The header draws nothing of
+ * its own: every element in it is a part or a child you put.
  */
 function ChatHeader({ className, children, ...rest }: ChatHeaderProps) {
   const lead: React.ReactNode[] = [];
@@ -200,11 +222,14 @@ function ChatHeader({ className, children, ...rest }: ChatHeaderProps) {
   for (const child of flattenChildren(children)) {
     const own =
       React.isValidElement(child) &&
-      (child.type === ChatTitle || child.type === ChatDescription || child.type === ChatActions);
+      (child.type === ChatTitle ||
+        child.type === ChatBadges ||
+        child.type === ChatDescription ||
+        child.type === ChatActions);
     (own ? text : lead).push(child);
   }
   return (
-    <div className={cx(styles.header, className)} {...rest}>
+    <div className={cx(hairline.bottom, styles.header, className)} {...rest}>
       {lead.length > 0 ? <div className={styles.lead}>{lead}</div> : null}
       {text}
     </div>
@@ -214,21 +239,50 @@ ChatHeader.displayName = "Chat.Header";
 
 export type ChatTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
   as?: "h2" | "h3" | "h4";
+  number?: React.ReactNode;
   ref?: React.Ref<HTMLHeadingElement>;
 };
 
-/** Who the chat is with, one line; it also names the conversation for assistive tech. */
-function ChatTitle({ as: Tag = "h2", className, id, ...rest }: ChatTitleProps) {
+/**
+ * Who the chat is with, one line; it also names the conversation for assistive tech. A record's
+ * `number` stands muted after the name and is part of it: the name ellipsizes, the number never.
+ */
+function ChatTitle({ as: Tag = "h2", number, className, id, children, ...rest }: ChatTitleProps) {
   const { titleId, setHasTitle } = useChat();
   React.useEffect(() => {
     setHasTitle(true);
     return () => setHasTitle(false);
   }, [setHasTitle]);
   return (
-    <Tag id={id ?? titleId} className={cx(textRole.titleS, styles.title, className)} {...rest} />
+    <Tag id={id ?? titleId} className={cx(textRole.titleS, styles.title, className)} {...rest}>
+      <span className={styles.titleName}>{children}</span>
+      {number !== undefined && number !== null ? (
+        <>
+          {" "}
+          <span className={styles.titleNumber}>{number}</span>
+        </>
+      ) : null}
+    </Tag>
   );
 }
 ChatTitle.displayName = "Chat.Title";
+
+export type ChatBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * The line of the record's badges under the title, the record header of a dialog in the chat's
+ * tier: first the pickers (a stage, an assignee: a `Badge.Root` in a `Dropdown.Trigger`), then the
+ * plain statuses. One row of `s` chips that never wraps: what does not fit waits behind «+N»
+ * (`Badge.Group overflow="count"`), whose tooltip lists it.
+ */
+function ChatBadges({ className, ...rest }: ChatBadgesProps) {
+  return (
+    <Badge.Group size="s" overflow="count" className={cx(styles.badges, className)} {...rest} />
+  );
+}
+ChatBadges.displayName = "Chat.Badges";
 
 export type ChatDescriptionProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
@@ -254,9 +308,16 @@ export type ChatActionsProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The buttons at the end of the header: `Chat.SearchButton`, a call, a `Dropdown` of more. */
-function ChatActions({ className, ...rest }: ChatActionsProps) {
-  return <div className={cx(styles.actions, className)} {...rest} />;
+/**
+ * The controls at the end of the header, tier `s`: ghost icon buttons (`Chat.SearchButton`, a
+ * call, a toggle), a `Select` or a `SegmentedControl`, a ⋯ `Dropdown` last.
+ */
+function ChatActions({ className, children, ...rest }: ChatActionsProps) {
+  return (
+    <div className={cx(fieldTierClass, styles.actions, className)} data-size="s" {...rest}>
+      <ControlSizeProvider value="s">{children}</ControlSizeProvider>
+    </div>
+  );
 }
 ChatActions.displayName = "Chat.Actions";
 
@@ -296,22 +357,59 @@ ChatSearchButton.displayName = "Chat.SearchButton";
 // ─── Search ───────────────────────────────────────────────────────────────────
 
 export type ChatSearchProps = React.HTMLAttributes<HTMLDivElement> & {
+  persistent?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
 
 /**
- * The search bar, shown while the search is open: the field (focused as it opens), the place of
- * the current match («2 из 5», announced), and the steps to the older and newer match. Every match
- * in the messages' text and transcripts is marked; the current one is brought into view while the
- * others step back. Enter goes to the older match, Escape closes.
+ * The search bar: one control of yours at the start (`children`, a channel `Select`) and the field,
+ * whose end — once a query is typed — holds the steps to the older and newer match and, last, the
+ * place of the current match as a count badge («2/5», a gray «0/0» when none, each number rolling),
+ * once the query is `minSearchLength` long — rising in and closing up as
+ * the query comes and goes. Every match in the messages' text and transcripts is marked; the
+ * current one is brought into view while the others step back. Shown while the search is open (`Chat.SearchButton` opens it, focusing the field), or
+ * always with `persistent`: the field is there from the start, an empty query is no search.
+ * Enter and ↑ go to the older match, Shift+Enter and ↓ to the newer one; Escape closes the bar
+ * (persistent: clears the query).
  */
-function ChatSearch({ className, ...rest }: ChatSearchProps) {
-  const { search, setSearch, matches, matchIndex, setMatchIndex, labels, searchButtonRef } =
-    useChat();
+/**
+ * The count of the search as the `matchCount` template fills it, each number rolling on its own
+ * («2» of «2/5» rolls as the reader steps; the template's other text stays put).
+ */
+function rollingCount(template: string, index: number, count: number): React.ReactNode {
+  // One run of text in the badge (its flex gap stays out of «2/5»).
+  return (
+    <span>
+      {template.split(/(\{index\}|\{count\})/).map((part) => {
+        if (part === "{index}") return <RollingNumber key={part}>{index}</RollingNumber>;
+        if (part === "{count}") return <RollingNumber key={part}>{count}</RollingNumber>;
+        return part;
+      })}
+    </span>
+  );
+}
+
+function ChatSearch({ persistent = false, className, children, ...rest }: ChatSearchProps) {
+  const {
+    search,
+    setSearch,
+    searched,
+    matches,
+    matchIndex,
+    setMatchIndex,
+    labels,
+    searchButtonRef,
+  } = useChat();
   const fieldRef = React.useRef<HTMLInputElement>(null);
-  const open = search !== null;
+  const open = persistent || search !== null;
+  const query = search ?? "";
+  const typed = searched !== "";
+  // The count and the steps come and go with the query, closing up in place.
+  const countPresence = usePartPresence<HTMLSpanElement>({ present: typed, axis: "inline" });
+  const olderPresence = usePartPresence<HTMLButtonElement>({ present: typed, axis: "inline" });
+  const newerPresence = usePartPresence<HTMLButtonElement>({ present: typed, axis: "inline" });
   // The field takes the focus when the reader opens the search, never with a search open on mount
-  // (that would scroll the page to the chat).
+  // (that would scroll the page to the chat), never in a bar that is always there.
   const wasOpen = React.useRef(open);
   React.useEffect(() => {
     if (open && !wasOpen.current) fieldRef.current?.focus();
@@ -319,20 +417,17 @@ function ChatSearch({ className, ...rest }: ChatSearchProps) {
   }, [open]);
   if (!open) return null;
   const count = matches.length;
-  const step = (by: number) => setMatchIndex((((matchIndex + by) % count) + count) % count);
-  const older = () => {
-    if (count > 1) step(1);
+  const step = (by: number) => {
+    if (count > 1) setMatchIndex((((matchIndex + by) % count) + count) % count);
   };
-  const newer = () => {
-    if (count > 1) step(-1);
-  };
-  const place = search.trim()
+  const place = typed
     ? count > 0
       ? formatLabel(labels.matches, { index: count - Math.min(matchIndex, count - 1), count })
       : labels.noMatches
     : "";
   return (
     <div className={cx(styles.search, className)} {...rest}>
+      {children ? <div className={styles.searchStart}>{children}</div> : null}
       <Input.Root className={styles.searchField}>
         <Input.Wrapper>
           <Input.Icon side="start">
@@ -343,47 +438,77 @@ function ChatSearch({ className, ...rest }: ChatSearchProps) {
             type="search"
             aria-label={labels.search}
             placeholder={labels.searchPlaceholder}
-            value={search}
-            onValueChange={setSearch}
+            value={query}
+            // In a bar that is always there an empty query is no search: a `jumpTo` works again.
+            onValueChange={(next) => setSearch(persistent && next === "" ? null : next)}
             onKeyDown={(event) => {
               if (event.key === "Escape") {
-                event.preventDefault();
-                setSearch(null);
-                searchButtonRef.current?.focus();
+                if (persistent) {
+                  // An empty bar lets Escape through to the host (a dialog closes).
+                  if (search === null) return;
+                  event.preventDefault();
+                  setSearch(null);
+                } else {
+                  event.preventDefault();
+                  setSearch(null);
+                  searchButtonRef.current?.focus();
+                }
               }
               if (event.key === "Enter") {
                 event.preventDefault();
-                older();
+                step(event.shiftKey ? -1 : 1);
+              }
+              if ((event.key === "ArrowUp" || event.key === "ArrowDown") && count > 1) {
+                event.preventDefault();
+                step(event.key === "ArrowUp" ? 1 : -1);
               }
             }}
           />
+          {/* Once a query is typed, the field's own end: the steps to the older and newer match
+              (unavailable under two matches, still in the tab order with their names), then, last,
+              the place of the match as a count badge — «2/5», a gray «0/0» when none (the live
+              region says it in words). One order in every state. */}
+          {typed ? (
+            <Input.Action
+              ref={olderPresence.ref}
+              className={olderPresence.className}
+              label={labels.previousMatch}
+              aria-disabled={count < 2 || undefined}
+              onClick={() => step(1)}
+            >
+              <Icon name="nav.chevronUp" />
+            </Input.Action>
+          ) : null}
+          {typed ? (
+            <Input.Action
+              ref={newerPresence.ref}
+              className={newerPresence.className}
+              label={labels.nextMatch}
+              aria-disabled={count < 2 || undefined}
+              onClick={() => step(-1)}
+            >
+              <Icon name="nav.chevronDown" />
+            </Input.Action>
+          ) : null}
+          {typed ? (
+            <span
+              ref={countPresence.ref}
+              className={cx(styles.searchCount, countPresence.className)}
+              aria-hidden="true"
+            >
+              <Badge.Root color={count > 0 ? "blue" : undefined}>
+                {rollingCount(
+                  labels.matchCount,
+                  count > 0 ? count - Math.min(matchIndex, count - 1) : 0,
+                  count,
+                )}
+              </Badge.Root>
+            </span>
+          ) : null}
         </Input.Wrapper>
       </Input.Root>
-      <span className={styles.searchCount} aria-live="polite">
-        {place}
-      </span>
-      <Button.Root
-        variant="ghost"
-        tone="neutral"
-        aria-label={labels.previousMatch}
-        disabled={count < 2}
-        onClick={older}
-      >
-        <Button.Icon>
-          <Icon name="nav.chevronUp" />
-        </Button.Icon>
-      </Button.Root>
-      <Button.Root
-        variant="ghost"
-        tone="neutral"
-        aria-label={labels.nextMatch}
-        disabled={count < 2}
-        onClick={newer}
-      >
-        <Button.Icon>
-          <Icon name="nav.chevronDown" />
-        </Button.Icon>
-      </Button.Root>
+      {/* Mounted with the bar, so the place is announced as it changes. */}
+      <VisuallyHidden live="polite">{place}</VisuallyHidden>
     </div>
   );
 }
@@ -653,7 +778,7 @@ function ChatMessages<T>({
               group={group}
               timeZone={timeZone}
               jumpTo={chat.jumpTo}
-              highlight={chat.search ?? ""}
+              highlight={chat.searched}
               onMatchesChange={chat.setMatches}
               revealRef={chat.revealRef}
               labels={chat.labels}
@@ -687,6 +812,7 @@ export const Chat = {
   Root: ChatRoot,
   Header: ChatHeader,
   Title: ChatTitle,
+  Badges: ChatBadges,
   Description: ChatDescription,
   Actions: ChatActions,
   SearchButton: ChatSearchButton,

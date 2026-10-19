@@ -23,6 +23,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import hairline from "@/internal/hairline.module.css";
 import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
@@ -217,8 +218,9 @@ export type ChatListItemStatusProps = React.HTMLAttributes<HTMLSpanElement> & {
 };
 
 /**
- * The status of the record behind the dialog (a deal stage, the state of an AI agent), one line
- * of its own between the name and the preview, truncated on its own. Drawn by `ChatList.Item`.
+ * The status of the record behind the dialog (a deal stage, the state of an AI agent): its
+ * `Badge.Root`s on a line of their own under the preview, one line, the rest behind «+N». Drawn by
+ * `ChatList.Item`.
  */
 function ChatListItemStatus(_props: ChatListItemStatusProps): React.ReactNode {
   return null;
@@ -354,7 +356,7 @@ function ChatListItem({
   const mergedRef = useMergedRefs<HTMLElement>(own, ref);
 
   // A row new in the data rises in once; one the owner took out closes up in place.
-  const enter = useListItemPresence(list.presence, key, itemRef);
+  const enter = useListItemPresence(list.presence, key, itemRef, "block");
 
   // A long press of a finger opens the menu (a mouse has its right click).
   const longPress = useLongPress({
@@ -501,7 +503,11 @@ function ChatListItem({
       key="status"
       {...statusProps}
       className={cx(styles.record, statusProps.className)}
-    />
+    >
+      <Badge.Group size={compactTier(list.size)} overflow="count">
+        {statusProps.children}
+      </Badge.Group>
+    </List.ItemDescription>
   ) : null;
 
   // ── counts ──
@@ -544,8 +550,8 @@ function ChatListItem({
   const content = [
     avatarProps ? <List.ItemIcon key="avatar" {...avatarProps} /> : null,
     title,
-    statusLine,
     secondLine,
+    statusLine,
     meta,
     badges,
   ];
@@ -564,6 +570,7 @@ function ChatListItem({
         unread: count || undefined,
         muted: muted || undefined,
         menu: hasMenu || undefined,
+        record: statusLine !== null || undefined,
       })}
       onClick={(event) => {
         // The long press that opened the menu is not a click on the row.
@@ -666,6 +673,7 @@ export type ChatListRootProps<T = unknown> = Omit<
   timeZone?: string;
   formatTime?: (date: Date, now: Date, timeZone?: string) => string;
   labels?: Partial<ChatListLabels>;
+  children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -694,10 +702,12 @@ function ChatListRoot<T>({
   timeZone,
   formatTime = formatChatTime,
   labels: labelsProp,
+  children,
   className,
   ref,
   ...rest
 }: ChatListRootProps<T>) {
+  const actions = flattenChildren(children).filter((child) => isPart(child, ChatListActions));
   const labels = useLabels(CHAT_LIST_LABELS, labelsProp);
   const tier = useHostTier(sizeProp);
   const size = tier.size;
@@ -990,34 +1000,39 @@ function ChatListRoot<T>({
         className={cx(styles.root, className)}
         {...toDataAttributes({ size })}
       >
-        {searchable ? (
-          <div className={styles.search}>
-            <Input.Root>
-              <Input.Wrapper>
-                <Input.Icon side="start">
-                  <Icon name="action.search" tone="secondary" />
-                </Input.Icon>
-                <Input.Field
-                  ref={searchRef}
-                  type="search"
-                  aria-label={labels.search}
-                  placeholder={labels.searchPlaceholder}
-                  value={query}
-                  onValueChange={setQuery}
-                  onKeyDown={(event) => {
-                    if (event.key === "Escape" && query !== "") {
-                      event.preventDefault();
-                      setQuery("");
-                    }
-                    if (event.key === "ArrowDown" && tabKey !== null && state === "ready") {
-                      event.preventDefault();
-                      focusRow(tabKey);
-                    }
-                  }}
-                />
-                {query !== "" ? <Input.ClearButton onClick={() => setQuery("")} /> : null}
-              </Input.Wrapper>
-            </Input.Root>
+        {searchable || actions.length > 0 ? (
+          <div className={cx(hairline.bottom, styles.head)}>
+            {searchable ? (
+              <div className={styles.search}>
+                <Input.Root>
+                  <Input.Wrapper>
+                    <Input.Icon side="start">
+                      <Icon name="action.search" tone="secondary" />
+                    </Input.Icon>
+                    <Input.Field
+                      ref={searchRef}
+                      type="search"
+                      aria-label={labels.search}
+                      placeholder={labels.searchPlaceholder}
+                      value={query}
+                      onValueChange={setQuery}
+                      onKeyDown={(event) => {
+                        if (event.key === "Escape" && query !== "") {
+                          event.preventDefault();
+                          setQuery("");
+                        }
+                        if (event.key === "ArrowDown" && tabKey !== null && state === "ready") {
+                          event.preventDefault();
+                          focusRow(tabKey);
+                        }
+                      }}
+                    />
+                    {query !== "" ? <Input.ClearButton onClick={() => setQuery("")} /> : null}
+                  </Input.Wrapper>
+                </Input.Root>
+              </div>
+            ) : null}
+            {actions}
           </div>
         ) : null}
         <ScrollContainer
@@ -1035,10 +1050,25 @@ function ChatListRoot<T>({
 }
 ChatListRoot.displayName = "ChatList.Root";
 
+export type ChatListActionsProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * The pane's own buttons («Новый чат»): a row under the search and over the dialogs (first in the
+ * pane without a search), so creating stands where the reader starts, never under a long list.
+ * Its Buttons take the list's tier; a `fullWidth` Button fills the row.
+ */
+function ChatListActions({ className, ...rest }: ChatListActionsProps) {
+  return <div {...rest} className={cx(styles.actions, className)} />;
+}
+ChatListActions.displayName = "ChatList.Actions";
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 export const ChatList = {
   Root: ChatListRoot,
+  Actions: ChatListActions,
   Item: ChatListItem,
   ItemIcon: ChatListItemIcon,
   ItemText: ChatListItemText,

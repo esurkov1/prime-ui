@@ -4,7 +4,7 @@
  * widths it was chosen from (no re-measure loop).
  *
  * The steps, in the order the row gives way:
- * - `one` — heading · tools · actions on one line (never for a section's sub-pages, see `nav`);
+ * - `one` — heading · tools · actions on one line;
  * - `below` — the tools move to a line of their own under the heading and the actions;
  * - `icons-secondary` — the secondary buttons show only their icons;
  * - `icons` — the primary button too;
@@ -32,12 +32,6 @@ export type BarWidths = {
   path: boolean;
   /** Natural width of the tools on one line; 0 — none. */
   tools: number;
-  /**
-   * The tools hold a navigation — a section's sub-pages as route links. They keep a line of their
-   * own from the start: on the first line they would stand where the heading and the actions of
-   * each sub-page leave room, and those differ from one sub-page to the next.
-   */
-  nav: boolean;
   actions: BarAction[];
   /** Width of the «⋯» button. */
   more: number;
@@ -75,7 +69,7 @@ export function planBar(widths: BarWidths, available: number): BarPlan {
   const { heading, tools, gap } = widths;
   const fits = (actions: number, withTools = false) =>
     sum(withTools ? [heading, tools, actions] : [heading, actions], gap) <= available;
-  if (!widths.nav && fits(actionsWidth(widths, "full"), true)) return "one";
+  if (fits(actionsWidth(widths, "full"), true)) return "one";
   if (fits(actionsWidth(widths, "full"))) return "below";
   if (fits(actionsWidth(widths, "icons-secondary"))) return "icons-secondary";
   const icons = actionsWidth(widths, "icons");

@@ -81,6 +81,34 @@ describe("DescriptionList", () => {
     expect(onClick).toHaveBeenCalledTimes(2);
   });
 
+  it("gathers several row actions in one group after the value, in the order written", async () => {
+    const user = userEvent.setup();
+    render(
+      <DescriptionList.Root>
+        <DescriptionList.Item label="Ключ OpenAI">
+          sk-…4f2a
+          <DescriptionList.ItemAction label="Проверить">
+            <Icon name="action.check" />
+          </DescriptionList.ItemAction>
+          <DescriptionList.ItemAction label="Заменить">
+            <Icon name="action.edit" />
+          </DescriptionList.ItemAction>
+        </DescriptionList.Item>
+      </DescriptionList.Root>,
+    );
+    const value = screen.getByRole("definition");
+    const check = within(value).getByRole("button", { name: "Проверить" });
+    const replace = within(value).getByRole("button", { name: "Заменить" });
+    const group = value.lastElementChild as HTMLElement;
+    expect(group).toContainElement(check);
+    expect(group).toContainElement(replace);
+    expect(value.firstElementChild).toHaveTextContent(/^sk-…4f2a$/);
+    await user.tab();
+    expect(check).toHaveFocus();
+    await user.tab();
+    expect(replace).toHaveFocus();
+  });
+
   it("puts each value at the end of its row with align end", () => {
     const { container } = render(
       <DescriptionList.Root align="end">

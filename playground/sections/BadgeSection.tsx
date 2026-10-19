@@ -82,6 +82,12 @@ export const page: ComponentPageConfig = {
         "Этап сделки бейджем, который открывает выбор этапа: шеврон поворачивается, пока меню открыто, бейдж берёт цвет выбранного этапа — `Badge.Root`, `Dropdown.Trigger`, `color`.",
     },
     {
+      scenario: "assignee",
+      title: "Человек в чипе",
+      description:
+        "Ответственный за задачу — чипом человека, который открывает команду: аватар перед именем, а без ответственного на его месте контурный «Назначить» — `Badge.Avatar`, `Dropdown.Trigger`, `variant`.",
+    },
+    {
       scenario: "square",
       title: "Квадратная плитка",
       description:

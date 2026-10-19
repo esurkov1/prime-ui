@@ -9,10 +9,10 @@ export const api: ComponentApi = {
       props: [
         {
           name: "shape",
-          type: '"text" | "control" | "circle" | "block"',
+          type: '"text" | "control" | "chip" | "circle" | "block"',
           default: '"text"',
-          en: "`text` — lines of the tier's text; `control` — a field or button of the tier; `circle` — an avatar of the tier; `block` — a box that fills its container (image, chart, card).",
-          ru: "`text` — строки текста яруса; `control` — поле или кнопка яруса; `circle` — аватар яруса; `block` — блок на всю площадь контейнера (картинка, график, карточка).",
+          en: "`text` — lines of the tier's text; `control` — a field or button of the tier; `chip` — a badge of the tier; `circle` — an avatar of the tier; `block` — a box that fills its container (image, chart, card).",
+          ru: "`text` — строки текста яруса; `control` — поле или кнопка яруса; `chip` — бейдж яруса; `circle` — аватар яруса; `block` — блок на всю площадь контейнера (картинка, график, карточка).",
         },
         {
           name: "size",

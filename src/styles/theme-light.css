@@ -3,6 +3,7 @@
 :root[data-theme="light"],
 [data-theme="light"] {
   --prime-avatar-2xl: var(--prime-ref-space-16);
+  --prime-avatar-2xs: var(--prime-ref-space-4);
   --prime-avatar-l: var(--prime-ref-space-10);
   --prime-avatar-m: var(--prime-ref-space-8);
   --prime-avatar-s: var(--prime-ref-space-6);

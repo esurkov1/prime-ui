@@ -72,7 +72,7 @@ Crossfade has no variants: one treatment, keyed by `state`.
 | State | Driven by | DOM |
 |---|---|---|
 | first render | mount | one layer, `data-state="open"`, no motion |
-| swapping | `state` changes | previous layer `data-state="closed"`, `aria-hidden`, `inert`, absolutely placed, fades out over `fast` with `exit` easing and unmounts on `animationend` (timeout fallback), clipped to the root while it leaves (`data-leaving="true"`); the new layer fades in over `base` with `enter` easing |
+| swapping | `state` changes | previous layer `data-state="closed"`, `aria-hidden`, `inert`, absolutely placed, fades out over `fast` with `exit` easing and unmounts on `animationend` (timeout fallback), clipped to the root while it leaves (`data-swapping="true"`); the new layer fades in over `base` with `enter` easing |
 | loading swap | `state` changes into or out of `"loading"` | as swapping, but the new layer fades in over `fast` and the root takes the new height at once (no `data-resizing`) |
 | resizing | a swap between settled states, the new one of another height | root `data-resizing="true"`: height glides from the old to the new value over `base` with `standard` easing (a swap mid-glide starts from the height on screen), clipped with a `--prime-focus-space` margin, then returns to `auto` |
 | reduced motion | `prefers-reduced-motion: reduce` | the old layer goes before it is painted and the height does not glide; the new layer still fades in (the fade clock, foundation §7 rule 12) |

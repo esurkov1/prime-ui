@@ -7,6 +7,9 @@ import { Message } from "@/components/message/Message";
 
 import { Chat } from "./Chat";
 
+/** The place of the match as the live region says it (the visible count is `aria-hidden`). */
+const ANNOUNCED = { ignore: "[aria-hidden='true'], [aria-hidden='true'] *" };
+
 type Item = { id: string; from: "anna" | "me"; at: Date; text: string; service?: boolean };
 
 const at = (day: number, hour: number, minute: number) => new Date(2026, 9, day, hour, minute);
@@ -177,13 +180,13 @@ describe("Chat: the conversation assembled", () => {
     expect(field).toHaveFocus();
     await userEvent.type(field, "счёт");
     // m1 and m3 hold the query; the newest is current.
-    expect(screen.getByText("2 из 2")).toBeInTheDocument();
+    expect(screen.getByText("2 из 2", ANNOUNCED)).toBeInTheDocument();
     expect(document.querySelectorAll("mark")).toHaveLength(2);
     const log = screen.getByRole("log");
     expect(log).toHaveAttribute("data-pointing", "current");
     expect(article("m3")).toHaveAttribute("data-pointed");
     fireEvent.keyDown(field, { key: "Enter" });
-    expect(screen.getByText("1 из 2")).toBeInTheDocument();
+    expect(screen.getByText("1 из 2", ANNOUNCED)).toBeInTheDocument();
     expect(article("m1")).toHaveAttribute("data-pointed");
     // Focus stays in the field while the chat moves.
     expect(field).toHaveFocus();
@@ -195,7 +198,7 @@ describe("Chat: the conversation assembled", () => {
 
   it("says when nothing matches", async () => {
     render(<Thread defaultSearch="накладная" />);
-    expect(screen.getByText("Нет совпадений")).toBeInTheDocument();
+    expect(screen.getByText("Нет совпадений", ANNOUNCED)).toBeInTheDocument();
   });
 
   it("a pinned message's press brings it into view and blinks it", () => {

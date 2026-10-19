@@ -93,8 +93,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge.",
-          ru: "Текст, `Badge.Dot`, `Badge.Icon`, один `Badge.Action`. Только `Badge.Icon` (без удаления и действия) — квадратный бейдж-иконка.",
+          en: "Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Avatar` (a person's chip), one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge.",
+          ru: "Текст, `Badge.Dot`, `Badge.Icon`, один `Badge.Avatar` (чип человека), один `Badge.Action`. Только `Badge.Icon` (без удаления и действия) — квадратный бейдж-иконка.",
         },
         {
           name: "…rest",
@@ -160,6 +160,26 @@ export const api: ComponentApi = {
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
           en: "The other span attributes.",
           ru: "Остальные атрибуты span.",
+        },
+      ],
+    },
+    {
+      name: "Badge.Avatar",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` leading a person's chip (an assignee): the `Avatar.Root` inside takes the chip tier's size, 2 px inside its height (`2xs` at `xs`/`s`, `xs` at `m`, `s` at `l`/`xl`); the chip becomes a pill, the name is its text.",
+      ru: "`<span>` с `aria-hidden` в начале чипа человека (исполнитель, автор): `Avatar.Root` внутри берёт размер по ярусу чипа, на 2 px внутри его высоты (`2xs` 16 при `xs` и `s`, `xs` 20 при `m`, `s` 24 при `l` и `xl`), а чип становится пилюлей. Текстом остаётся имя рядом.",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "An `Avatar.Root` (photo or initials), also inside your own component; no `size` — the slot sets it.",
+          ru: "`Avatar.Root` (фото или инициалы), в том числе внутри вашего компонента; без `size` — его задаёт слот.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
         },
       ],
     },

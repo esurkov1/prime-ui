@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Select } from "@/components/select/Select";
 import { describeOverlayConformance } from "@/test/overlayConformance";
 
@@ -525,6 +525,181 @@ describe("Popover — keyboard on the trigger", () => {
     const panel = screen.getByRole("dialog");
     expect(panel).toHaveAttribute("aria-labelledby", "period-title");
     expect(panel).toHaveAccessibleName("Период отчёта");
+  });
+});
+
+describe("Popover openOn=hover", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function HoverCard({ onOpenChange }: { onOpenChange?: (open: boolean) => void }) {
+    return (
+      <>
+        <button type="button">До</button>
+        <Popover.Root openOn="hover" onOpenChange={onOpenChange}>
+          <Popover.Trigger>
+            <button type="button">Предоплата 30%</button>
+          </Popover.Trigger>
+          <Popover.Content size="s">
+            <p>Депозит списывается при бронировании.</p>
+            <a href="#deposits">Подробнее о депозитах</a>
+          </Popover.Content>
+        </Popover.Root>
+        <button type="button">После</button>
+      </>
+    );
+  }
+
+  const trigger = () => screen.getByRole("button", { name: "Предоплата 30%" });
+  const advance = (ms: number) =>
+    act(async () => {
+      vi.advanceTimersByTime(ms);
+    });
+  /** Keyboard runs on real timers (user-event waits on them); `wait` lets the delays run out. */
+  const user = () => {
+    vi.useRealTimers();
+    return userEvent.setup();
+  };
+  const wait = (ms: number) =>
+    act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, ms));
+    });
+
+  it("opens after the hover delay and leaves focus where it was", async () => {
+    render(<HoverCard />);
+    fireEvent.pointerEnter(trigger());
+    await advance(399);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await advance(1);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(trigger()).toHaveAttribute("aria-expanded", "true");
+    expect(trigger()).toHaveAttribute("aria-controls", screen.getByRole("dialog").id);
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("cancels a pending open when the pointer leaves first", async () => {
+    render(<HoverCard />);
+    fireEvent.pointerEnter(trigger());
+    await advance(200);
+    fireEvent.pointerLeave(trigger());
+    await advance(1000);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("closes after the grace once the pointer leaves the trigger", async () => {
+    const onOpenChange = vi.fn();
+    render(<HoverCard onOpenChange={onOpenChange} />);
+    fireEvent.pointerEnter(trigger());
+    await advance(400);
+    fireEvent.pointerLeave(trigger());
+    await advance(299);
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    await advance(1);
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("stays open while the pointer crosses into the panel (the bridge) and closes when it leaves", async () => {
+    const onOpenChange = vi.fn();
+    render(<HoverCard onOpenChange={onOpenChange} />);
+    fireEvent.pointerEnter(trigger());
+    await advance(400);
+    fireEvent.pointerLeave(trigger());
+    await advance(150);
+    const panel = screen.getByRole("dialog");
+    fireEvent.pointerEnter(panel);
+    await advance(2000);
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    fireEvent.pointerLeave(panel);
+    await advance(300);
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("ignores touch hover; a tap opens it and pins it until an outside press", async () => {
+    const onOpenChange = vi.fn();
+    render(<HoverCard onOpenChange={onOpenChange} />);
+    fireEvent.pointerEnter(trigger(), { pointerType: "touch" });
+    await advance(1000);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(trigger());
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    fireEvent.pointerLeave(trigger(), { pointerType: "touch" });
+    await advance(1000);
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    fireEvent.pointerDown(document.body);
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("opens on keyboard focus of the trigger and Tab moves into the panel", async () => {
+    const u = user();
+    render(<HoverCard />);
+    await u.tab();
+    await u.tab();
+    expect(trigger()).toHaveFocus();
+    await wait(450);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await u.tab();
+    expect(screen.getByRole("link", { name: "Подробнее о депозитах" })).toHaveFocus();
+    // Shift+Tab goes back to the trigger with the panel still open.
+    await u.tab({ shift: true });
+    expect(trigger()).toHaveFocus();
+    await wait(500);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("Tab past the panel's last stop closes it and returns to the trigger without reopening it", async () => {
+    const u = user();
+    const onOpenChange = vi.fn();
+    render(<HoverCard onOpenChange={onOpenChange} />);
+    await u.tab();
+    await u.tab();
+    await wait(450);
+    await u.tab();
+    // The browser's Tab goes on from the trigger to «После»; a bare keydown stops on the trigger.
+    fireEvent.keyDown(screen.getByRole("link", { name: "Подробнее о депозитах" }), { key: "Tab" });
+    expect(trigger()).toHaveFocus();
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    await wait(500);
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("closes when keyboard focus leaves the trigger elsewhere", async () => {
+    const u = user();
+    const onOpenChange = vi.fn();
+    render(<HoverCard onOpenChange={onOpenChange} />);
+    await u.tab();
+    await u.tab();
+    await wait(450);
+    await u.tab({ shift: true });
+    expect(screen.getByRole("button", { name: "До" })).toHaveFocus();
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("Escape in the panel closes it, returns focus to the trigger and does not reopen it", async () => {
+    const u = user();
+    const onOpenChange = vi.fn();
+    render(<HoverCard onOpenChange={onOpenChange} />);
+    await u.tab();
+    await u.tab();
+    await wait(450);
+    await u.tab();
+    await u.keyboard("{Escape}");
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    expect(trigger()).toHaveFocus();
+    await wait(500);
+    expect(onOpenChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not open on a focus a press causes", async () => {
+    render(<HoverCard />);
+    fireEvent.pointerDown(trigger());
+    trigger().focus();
+    await advance(1000);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });
 

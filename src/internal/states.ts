@@ -52,6 +52,19 @@ export const tierMappings = {
   railAvatar: { xs: "xs", s: "s", m: "m", l: "m", xl: "l" },
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
 
+/**
+ * The Avatar of a chip (`Badge.Avatar`): the circle 2 px inside the chip's height, flush in the
+ * smallest (chip 16 · 20 · 24 · 28 · 32 → avatar 16 · 16 · 20 · 24 · 24). A chip is lower than
+ * any control, so the avatar scale goes one size under `xs`.
+ */
+export const chipAvatarSize = {
+  xs: "2xs",
+  s: "2xs",
+  m: "xs",
+  l: "s",
+  xl: "s",
+} as const satisfies Record<ControlSize, "2xs" | ControlSize>;
+
 /** Visual treatment. */
 export const variants = ["solid", "soft", "outline", "ghost"] as const;
 export type Variant = (typeof variants)[number];

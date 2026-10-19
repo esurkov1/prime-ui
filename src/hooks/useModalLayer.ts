@@ -7,7 +7,12 @@ import {
   focusInto,
   type Opener,
 } from "@/internal/overlay/focus";
-import { type DismissReason, type LayerEntry, useLayer } from "@/internal/overlay/layerStack";
+import {
+  type DismissReason,
+  isTopLayer,
+  type LayerEntry,
+  useLayer,
+} from "@/internal/overlay/layerStack";
 
 import { useInertSiblings } from "./useInertSiblings";
 import { useScrollLock } from "./useScrollLock";
@@ -69,22 +74,7 @@ export function useModalLayer<T extends HTMLElement = HTMLElement>({
 
   useInertSiblings(open, ref);
 
-  // Declared after `useInertSiblings`: its cleanup lifts `inert` before focus goes back.
-  React.useEffect(() => {
-    const node = ref.current;
-    if (!open || !node) return;
-    focusInto(node, undefined, openerRef.current.byPointer, focusStartRef.current);
-    return () => {
-      const { element: opener, byPointer } = openerRef.current;
-      // A layer above this one that closes in the same commit may still hold the opener inert:
-      // its cleanup runs after this one. Focus it once every cleanup of the commit has run.
-      if (opener?.closest("[inert]")) queueMicrotask(() => focusBack(opener, byPointer));
-      else focusBack(opener, byPointer);
-    };
-  }, [open]);
-
-  useScrollLock(open);
-
+  // Joins the stack in a layout effect, before the passive effects below read its place.
   const layer = useLayer(open, {
     refs: [ref],
     dismiss: "click",
@@ -93,6 +83,25 @@ export function useModalLayer<T extends HTMLElement = HTMLElement>({
       if (reason === "escape" ? closeOnEscape : closeOnOutsideClick) onDismiss(reason);
     },
   });
+
+  // Declared after `useInertSiblings`: its cleanup lifts `inert` before focus goes back.
+  React.useEffect(() => {
+    const node = ref.current;
+    if (!open || !node) return;
+    // A layer that reopens under one drawn above it leaves focus where the person works.
+    if (isTopLayer(layer)) {
+      focusInto(node, undefined, openerRef.current.byPointer, focusStartRef.current);
+    }
+    return () => {
+      const { element: opener, byPointer } = openerRef.current;
+      // A layer above this one that closes in the same commit may still hold the opener inert:
+      // its cleanup runs after this one. Focus it once every cleanup of the commit has run.
+      if (opener?.closest("[inert]")) queueMicrotask(() => focusBack(opener, byPointer));
+      else focusBack(opener, byPointer);
+    };
+  }, [open, layer]);
+
+  useScrollLock(open);
 
   return { ref, layer };
 }

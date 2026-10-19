@@ -590,8 +590,8 @@ function MessageRoot({
   // avatar, the gutter kept on every incoming row; a direct chat shows neither. A message on its
   // own is a group of what it is given: the parts it holds, by its place in the run.
   const grouped = list.inList ? list.group : author !== undefined || avatar !== undefined;
-  // A direct chat with `authors="outgoing"` heads only the runs the reader's side wrote.
-  const authored = grouped || (list.outgoingAuthors && direction === "outgoing");
+  // A chat with `authors` heads the runs of the sides it names, with no avatar and no gutter.
+  const authored = grouped || list.authors === "all" || list.authors === direction;
   const showAuthor =
     author !== undefined && authored && (position === "single" || position === "first");
   const showAvatar = position === "single" || position === "last";
@@ -882,13 +882,11 @@ function MessageRoot({
       </SurfaceDepthProvider>
       {shell === "bubble" ? null : reactionsPart}
       {actions.map((row, index) =>
-        // The last row ends the message: its outer corners take the bubble's radius.
         React.cloneElement(
           row as React.ReactElement<MessageActionsProps>,
           {
             key: row.key ?? index,
             inert: preview || undefined,
-            "data-end": index === actions.length - 1 ? "" : undefined,
           } as Partial<MessageActionsProps>,
         ),
       )}

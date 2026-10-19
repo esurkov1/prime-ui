@@ -30,11 +30,6 @@
   width: 100%;
 }
 
-/* A section's sub-pages under its title gather at the start edge, where the title stands. */
-.row[data-fill="true"][data-align="start"] {
-  justify-content: flex-start;
-}
-
 .cell {
   display: flex;
   flex: none;

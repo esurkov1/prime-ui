@@ -164,8 +164,8 @@ export function dialogParts(
   return [
     {
       name: `${name}.Header`,
-      en: "`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button].",
-      ru: "Рисует `<header>`: [Icon] [Title + Description] [Actions] [кнопка закрытия].",
+      en: "`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title / Description / Badges] [Actions] [close button] — the title on line 1 with the actions and the close button centred on it, the description on line 2, the badges on line 3.",
+      ru: "Рисует `<header>`: [Icon] [Title / Description / Badges] [Actions] [кнопка закрытия] — заголовок в строке 1, действия и крестик по её центру, описание в строке 2, бейджи в строке 3.",
       props: [
         {
           name: "showClose",
@@ -177,8 +177,8 @@ export function dialogParts(
         {
           name: "children",
           type: "ReactNode",
-          en: "Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip.",
-          ru: "Icon, Title, Description, Actions в любом порядке; каждый встаёт в свою колонку. `Tabs.List` (с `Tabs.Root` вокруг шапки и тела) превращает шапку в полосу вкладок.",
+          en: "Icon, Title, Description, Badges, Actions in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip.",
+          ru: "Icon, Title, Description, Badges, Actions в любом порядке; каждый встаёт на своё место. `Tabs.List` (с `Tabs.Root` вокруг шапки и тела) превращает шапку в полосу вкладок.",
         },
         {
           name: "…rest",
@@ -190,8 +190,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Actions`,
-      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher (\`SegmentedControl\`, \`Datepicker\`), then buttons (a status goes in \`${name}.Description\`), tier \`s\`; under the title below 12rem${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group at the footer tier.`,
-      ru: `Шапка: переключатель вкладки (\`SegmentedControl\`, \`Datepicker\`), затем кнопки (статус — в \`${name}.Description\`), ярус \`s\`; под заголовком при ширине меньше 12rem${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале, ярус подвала.`,
+      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher (\`SegmentedControl\`, \`Datepicker\`), then buttons (a status is a badge), tier \`s\`, on line 1; under the title below 12rem${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group at the footer tier.`,
+      ru: `Шапка: переключатель вкладки (\`SegmentedControl\`, \`Datepicker\`), затем кнопки (статус — бейдж), ярус \`s\`, в строке 1; под заголовком при ширине меньше 12rem${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале, ярус подвала.`,
       props: [
         {
           name: "…rest",
@@ -203,8 +203,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Icon`,
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.",
-      ru: "`aria-hidden` плашка 40 px с заливкой тона; вокруг картинки записи (`Avatar.Root` или `Thumbnail.Root` где угодно внутри, в том числе из вашего компонента) плашки нет (`data-media`), картинка — 40 px.",
+      en: "`ref` → `HTMLSpanElement`. Optional mark centred on lines 1–2: an `aria-hidden` 40 px tone tile; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.",
+      ru: "Необязательная метка по центру строк 1–2: `aria-hidden` плашка 40 px с заливкой тона; вокруг картинки записи (`Avatar.Root` или `Thumbnail.Root` где угодно внутри, в том числе из вашего компонента) плашки нет (`data-media`), картинка — 40 px.",
       props: [
         {
           name: "tone",
@@ -230,9 +230,15 @@ export function dialogParts(
     },
     {
       name: `${name}.Title`,
-      en: "`ref` → `HTMLHeadingElement`. `<h2>` (title-m); its id names the dialog.",
-      ru: "`<h2>` (title-m); его id даёт диалогу имя.",
+      en: "`ref` → `HTMLHeadingElement`. Line 1: `<h2>` (title-m); its id names the dialog. In a record header (with `Badges` or a `number`) the name is one line with an ellipsis (the whole name in its `title` while cut); in a question dialog it wraps.",
+      ru: "Строка 1: `<h2>` (title-m); его id даёт диалогу имя. В шапке записи (с `Badges` или `number`) имя — одна строка с многоточием (целиком в `title`, пока обрезано); в диалоге-вопросе переносится.",
       props: [
+        {
+          name: "number",
+          type: "ReactNode",
+          en: "The record's number («#678», «№ 1042», «INV-2026-0142»): muted after the name, never cut, part of the dialog's name. Never in `Description`.",
+          ru: "Номер записи («#678», «№ 1042», «INV-2026-0142»): приглушённый после имени, не обрезается, входит в имя диалога. Не в `Description`.",
+        },
         {
           name: "loading",
           type: "boolean",
@@ -250,8 +256,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Description`,
-      en: "`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog. The record's status `Badge.Root`s go here: first in the line, chip tier `s` (20 px), the text wraps under them when narrow.",
-      ru: "`<p>` (body-s, приглушённый) под заголовком; его id даёт диалогу описание. Статусы записи (`Badge.Root`) — сюда: в начале строки, ярус `s` (20 px), текст на узкой панели переносится под них.",
+      en: "`ref` → `HTMLParagraphElement`. Line 2: `<p>` (body-s, muted), text only, 4 under the title; its id describes the dialog. In a record header one line with an ellipsis (the whole text in its `title` while cut); in a question dialog it wraps under the title.",
+      ru: "Строка 2: `<p>` (body-s, приглушённый), только текст, на 4 под заголовком; его id даёт диалогу описание. В шапке записи — одна строка с многоточием (целиком в `title`, пока обрезана); в диалоге-вопросе переносится под заголовком.",
       props: [
         {
           name: "loading",
@@ -265,6 +271,26 @@ export function dialogParts(
           type: 'Omit<HTMLAttributes<HTMLParagraphElement>, "id">',
           en: "`className`, `children` and the other attributes except `id` (the dialog owns it).",
           ru: "`className`, `children` и остальные атрибуты, кроме `id` (его задаёт диалог).",
+        },
+      ],
+    },
+    {
+      name: `${name}.Badges`,
+      en: "`ref` → `HTMLDivElement`. Line 3 of a record header: a `Badge.Group` — the pickers first (status; assignee with `Badge.Avatar`, or an `outline` «Назначить»; each a `Badge.Root` in a `Dropdown.Trigger`), then the statuses. Chip tier `m`; one row, the rest behind «+N».",
+      ru: "Строка 3 шапки записи: `Badge.Group` — сначала выборы (статус; исполнитель с `Badge.Avatar` или `outline` «Назначить»; каждый — `Badge.Root` в `Dropdown.Trigger`), затем статусы. Ярус чипов `m`; один ряд, остальное за «+N».",
+      props: [
+        {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "The record loads: a `Skeleton` holds the line and `aria-busy` is set, so the header never moves; the badges fade in.",
+          ru: "Запись загружается: `Skeleton` держит строку и ставит `aria-busy`, шапка не сдвигается; бейджи проявляются.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: '`children` (`Badge.Root`s, the pickers in their `Dropdown.Root`), `className`, `aria-label` (a named row is `role="group"`) and the other attributes of the row.',
+          ru: '`children` (`Badge.Root`, выборы — в своём `Dropdown.Root`), `className`, `aria-label` (названный ряд — `role="group"`) и остальные атрибуты ряда.',
         },
       ],
     },

@@ -26,7 +26,7 @@ describe("Skeleton", () => {
   });
 
   it("renders no lines for the other shapes", () => {
-    for (const shape of ["control", "circle", "block"] as const) {
+    for (const shape of ["control", "chip", "circle", "block"] as const) {
       const { container, unmount } = render(<Skeleton shape={shape} lines={3} />);
       const root = container.firstElementChild as HTMLElement;
       expect(root).toHaveAttribute("data-shape", shape);
@@ -72,6 +72,15 @@ describe("Skeleton", () => {
     expect(container.firstElementChild).toHaveClass(fieldTierClass);
     expect(cssValue(cssRule(CSS, ':where(.root[data-shape="control"])'), "height")).toBe(
       "var(--field-h)",
+    );
+  });
+
+  it("a chip has the height and radius of a badge of its tier, never a block's minimum", () => {
+    const chip = cssRule(CSS, ':where(.root[data-shape="chip"])');
+    expect(cssValue(chip, "height")).toBe("var(--sk-chip)");
+    expect(cssValue(chip, "border-radius")).toBe("var(--sk-chip-radius)");
+    expect(cssValue(cssRule(CSS, '.root[data-size="s"]'), "--sk-chip")).toBe(
+      "var(--prime-badge-s-height)",
     );
   });
 });

@@ -13,7 +13,7 @@ import styles from "./Skeleton.module.css";
  * of the tier; `circle` — an avatar of the tier; `block` — any box (image, chart, card), sized by
  * its container or `className`.
  */
-export type SkeletonShape = "text" | "control" | "circle" | "block";
+export type SkeletonShape = "text" | "control" | "chip" | "circle" | "block";
 
 export type SkeletonProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   shape?: SkeletonShape;

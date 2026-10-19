@@ -1,19 +1,39 @@
 /*
  * RegionSwap — a region that swaps its content between states (foundation §7 rule 8). The current
  * state is in flow and fades in (`swapMotion.swapIn`, `.settleIn` into or out of loading); the
- * previous one is laid over it from the top edge, click-through, and fades out
- * (`swapMotion.swapOut`). Between settled states the root glides from the old height to the new one
- * (base · standard, the "height glide" exception of foundation §7 rule 5) through `--swap-height`,
- * which the component sets only while it glides, and returns to `auto`. A swap into or out of
- * loading takes the new height at once (`data-leaving` clips the old layer to it).
+ * previous one is laid over it, click-through, and fades out (`swapMotion.swapOut`). Between
+ * settled states the root glides from the old size to the new one (base · standard, the "height
+ * glide" exception of foundation §7 rule 5) through `--swap-size`, which the component sets only
+ * while it glides, and returns to `auto`. A swap into or out of loading takes the new size at once
+ * (`data-swapping` clips the old layer to it).
+ *
+ * `data-axis="block"` (a region): the height glides, the old state lies over the new one from the
+ * top edge. `data-axis="inline"` (one cell of a row, `src/internal/rowCells`): the width glides, both
+ * states centre on the row's line and hold to the `data-align` edge, so whatever stands beyond it
+ * never moves.
  */
 .root {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
   box-sizing: border-box;
   min-width: 0;
+}
+
+.root[data-axis="block"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   transition: height var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.root[data-axis="inline"] {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-start;
+  transition: width var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.root[data-axis="inline"][data-align="end"] {
+  justify-content: flex-end;
 }
 
 /* Nothing to show and nothing leaving: no box, so a grid or flex gap closes around it. */
@@ -21,27 +41,38 @@
   display: none;
 }
 
-/* While the height glides the content may be taller than the root: clip it, but keep room for
-   focus rings (foundation §7). Only the block axis glides, so only it clips: content wider than
-   the region (a timeline in a scroller) keeps its scroll width. */
-.root[data-resizing="true"] {
-  height: var(--swap-height);
+/* While the size glides the content may be larger than the root: clip it along the gliding axis
+   only, with room for focus rings (foundation §7): content wider than a block region (a timeline
+   in a scroller) keeps its scroll width. */
+.root[data-axis="block"][data-resizing="true"] {
+  height: var(--swap-size);
   overflow-y: clip;
   overflow-clip-margin: var(--prime-focus-space);
 }
 
-/* A leaving state taller than the new one (a skeleton over shorter data) never paints over the
-   content below the region while it fades. */
-.root[data-leaving="true"] {
+.root[data-axis="inline"][data-resizing="true"] {
+  width: var(--swap-size);
+  overflow-x: clip;
+  overflow-clip-margin: var(--prime-focus-space);
+}
+
+/* A leaving state larger than the new one (a skeleton over shorter data) never paints over the
+   content beside the region while it fades. */
+.root[data-axis="block"][data-swapping="true"] {
   overflow-y: clip;
+  overflow-clip-margin: var(--prime-focus-space);
+}
+
+.root[data-axis="inline"][data-swapping="true"] {
+  overflow-x: clip;
   overflow-clip-margin: var(--prime-focus-space);
 }
 
 /*
  * A block formatting context: a state measures the same in flow and laid over as it leaves. The
- * root is a one-column grid, so a region its parent stretches (a `Page.Cell`, a grid row) hands
- * that height to the layer, and a layer of one element hands it on: the tiles of a row keep one
- * height with a swap around each.
+ * block root is a one-column grid, so a region its parent stretches (a `Page.Cell`, a grid row)
+ * hands that height to the layer, and a layer of one element hands it on: the tiles of a row keep
+ * one height with a swap around each.
  */
 .layer {
   display: flow-root;
@@ -53,12 +84,31 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* The leaving state lies over the new one from the top edge and takes no pointer events. */
+/* A slot's state keeps its own width: the root glides around it. */
+.root[data-axis="inline"] > .layer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+/* The leaving state lies over the new one and takes no pointer events. */
 .leaving {
   position: absolute;
+  pointer-events: none;
+}
+
+.root[data-axis="block"] > .leaving {
   inset-block-start: 0;
   inset-inline: 0;
-  pointer-events: none;
+}
+
+.root[data-axis="inline"] > .leaving {
+  inset-block: 0;
+  inset-inline-start: 0;
+}
+
+.root[data-axis="inline"][data-align="end"] > .leaving {
+  inset-inline: auto 0;
 }
 
 /*

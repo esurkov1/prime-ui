@@ -178,7 +178,8 @@
 
 /* ─── Option ─────────────────────────────────────────────────────────────── */
 
-/* With `menu.item` (TSX): the row's fades; a rich row also glides into its selected fill. */
+/* With `menu.item` (TSX): the row's fades. Every row, one line or rich, marks its choice the same
+   way: medium weight and the trailing check, on the neutral highlight fill — never a tint. */
 .item {
   transition:
     background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
@@ -205,14 +206,6 @@
 .item[data-rich="true"] .itemText {
   display: flex;
   flex-direction: column;
-}
-
-.item[data-rich="true"][data-selected="true"] {
-  background: var(--prime-color-accent-soft);
-}
-
-.item[data-rich="true"][data-selected="true"][data-highlighted="true"] {
-  background: var(--prime-color-accent-soft-hover);
 }
 
 .itemTitle,

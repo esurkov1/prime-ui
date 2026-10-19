@@ -5,12 +5,15 @@ import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Modal } from "@/components/modal/Modal";
+import { Popover } from "@/components/popover/Popover";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Tabs } from "@/components/tabs/Tabs";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { swipe } from "@/test/mobile";
+import { withMotion } from "@/test/motion";
 import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Drawer, type DrawerContentProps, type DrawerRootProps } from "./Drawer";
@@ -310,6 +313,180 @@ describe("Drawer", () => {
       ).not.toBeInTheDocument();
     });
     expect(screen.getByRole("heading", { name: "Outer", hidden: true })).toBeInTheDocument();
+  });
+});
+
+describe("Drawer — stacked drawers keep the order they are drawn in", () => {
+  /** Topmost dialog by document order: the one drawn above (one z-index for every layer). */
+  function dialogs() {
+    return screen.getAllByRole("dialog", { hidden: true });
+  }
+
+  function DealDrawer({
+    open = true,
+    onOpenChange,
+    children,
+  }: {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    children?: React.ReactNode;
+  }) {
+    return (
+      <Drawer.Root open={open} onOpenChange={onOpenChange}>
+        <Drawer.Content aria-label="Сделка">
+          <Drawer.Guard dirty />
+          <Drawer.Body>
+            <input aria-label="Сумма сделки" />
+            {children}
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>
+    );
+  }
+
+  function RentalDrawer({ onOpenChange }: { onOpenChange?: (open: boolean) => void }) {
+    return (
+      <Drawer.Root open onOpenChange={onOpenChange}>
+        <Drawer.Content aria-label="Аренда">
+          <Drawer.Body>
+            <input aria-label="Байк" />
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>
+    );
+  }
+
+  /** jsdom keeps `inert` as a property, not an attribute. */
+  function inert(element: HTMLElement | undefined) {
+    for (let el = element ?? null; el; el = el.parentElement) if (el.inert) return true;
+    return false;
+  }
+
+  /** The upper drawer works: a press inside dismisses nothing, Escape closes only it. */
+  async function expectRentalOnTop(onDeal: ReturnType<typeof vi.fn>, onRental: typeof onDeal) {
+    const [deal, rental] = dialogs();
+    expect(deal).toHaveAttribute("aria-label", "Сделка");
+    expect(rental).toHaveAttribute("aria-label", "Аренда");
+    expect(inert(rental)).toBe(false);
+    expect(inert(deal)).toBe(true);
+
+    const field = screen.getByRole("textbox", { name: "Байк" });
+    await userEvent.click(field);
+    expect(field).toHaveFocus();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(onDeal).not.toHaveBeenCalled();
+    expect(onRental).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onRental).toHaveBeenCalledWith(false);
+    expect(onDeal).not.toHaveBeenCalled();
+  }
+
+  it("a drawer opened inside another, both open at mount, is the top layer", async () => {
+    const onDeal = vi.fn();
+    const onRental = vi.fn();
+    render(
+      <DealDrawer onOpenChange={onDeal}>
+        <RentalDrawer onOpenChange={onRental} />
+      </DealDrawer>,
+    );
+    expect(screen.getByRole("dialog", { name: "Аренда" })).toContainElement(
+      document.activeElement as HTMLElement,
+    );
+    await expectRentalOnTop(onDeal, onRental);
+  });
+
+  it("a modal and a popover open at mount inside a drawer stand above it", async () => {
+    const onDeal = vi.fn();
+    const onPopover = vi.fn();
+    const onModal = vi.fn();
+    render(
+      <DealDrawer onOpenChange={onDeal}>
+        <Popover.Root defaultOpen onOpenChange={onPopover}>
+          <Popover.Trigger>
+            <Button.Root>Фильтр</Button.Root>
+          </Popover.Trigger>
+          <Popover.Content aria-label="Фильтр">
+            <input aria-label="Этап" />
+          </Popover.Content>
+        </Popover.Root>
+        <Modal.Root defaultOpen onOpenChange={onModal}>
+          <Modal.Content aria-label="Оплата">
+            <input aria-label="Сумма оплаты" />
+          </Modal.Content>
+        </Modal.Root>
+      </DealDrawer>,
+    );
+    const field = screen.getByRole("textbox", { name: "Сумма оплаты" });
+    await userEvent.click(field);
+    expect(field).toHaveFocus();
+    expect(onDeal).not.toHaveBeenCalled();
+    expect(onModal).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onModal).toHaveBeenCalledWith(false);
+    expect(onDeal).not.toHaveBeenCalled();
+  });
+
+  it("a drawer reopened while it slides out stays under the one drawn above it", async () => {
+    withMotion();
+    const onDeal = vi.fn();
+    const onRental = vi.fn();
+    const { rerender } = render(
+      <>
+        <DealDrawer onOpenChange={onDeal} />
+        <RentalDrawer onOpenChange={onRental} />
+      </>,
+    );
+    rerender(
+      <>
+        <DealDrawer open={false} onOpenChange={onDeal} />
+        <RentalDrawer onOpenChange={onRental} />
+      </>,
+    );
+    rerender(
+      <>
+        <DealDrawer onOpenChange={onDeal} />
+        <RentalDrawer onOpenChange={onRental} />
+      </>,
+    );
+    await expectRentalOnTop(onDeal, onRental);
+  });
+
+  it("a drawer whose effects re-run after a suspense stays under the one drawn above it", async () => {
+    const onDeal = vi.fn();
+    const onRental = vi.fn();
+    let resolve: () => void = () => {};
+    const pending = new Promise<void>((done) => {
+      resolve = done;
+    });
+    let ready = false;
+    void pending.then(() => {
+      ready = true;
+    });
+    function Tab({ load }: { load: boolean }) {
+      if (load && !ready) throw pending;
+      return null;
+    }
+    function App({ load }: { load: boolean }) {
+      return (
+        <>
+          <React.Suspense fallback={null}>
+            <DealDrawer onOpenChange={onDeal}>
+              <Tab load={load} />
+            </DealDrawer>
+          </React.Suspense>
+          <RentalDrawer onOpenChange={onRental} />
+        </>
+      );
+    }
+    const { rerender } = render(<App load={false} />);
+    rerender(<App load />);
+    await act(async () => {
+      resolve();
+      await pending;
+    });
+    await expectRentalOnTop(onDeal, onRental);
   });
 });
 

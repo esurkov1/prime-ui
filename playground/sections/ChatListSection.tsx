@@ -44,13 +44,19 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Все части строки: фото или инициалы с присутствием, значок у имени, статус записи, автор последнего сообщения, слова медиа с длительностью, участник группы печатает, отметки от отправки до ошибки — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`.",
+        "Все части строки: фото или инициалы с присутствием, значок у имени, статус записи бейджами, автор последнего сообщения, слова медиа с длительностью, участник группы печатает, отметки от отправки до ошибки — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`.",
     },
     {
       scenario: "search",
       title: "Поиск",
       description:
         "Поле поиска фильтрует диалоги по имени и последнему сообщению, подсвечивает совпадение в обоих, сообщает, сколько найдено, и показывает тихое пустое состояние — `defaultSearch`, `onSearchChange`.",
+    },
+    {
+      scenario: "actions",
+      title: "Кнопки панели",
+      description:
+        "Панель тредов ассистента: поиск, под ним «Новый чат», дальше треды — создание стоит наверху, а не под списком — `ChatList.Actions`, `onSearchChange`.",
     },
     {
       scenario: "live",

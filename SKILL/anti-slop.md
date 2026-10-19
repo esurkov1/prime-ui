@@ -15,13 +15,13 @@ Two status labels, one a Badge and one a styled `span`; three cards with three d
 ```
 
 ```tsx good
-// good — one component; a status wears a tone, the same one everywhere
+// good — one component; a judgement wears a tone, the same one everywhere
 <Badge.Root tone="success">Оплачен</Badge.Root>
 <Badge.Root tone="warning">Ожидает</Badge.Root>
 ```
 
-Map statuses to tones once (`const STATUS_TONE: Record<Status, …>`) and reuse it; `color` is for
-categories (a team, a tag).
+The label and colour of each status come from one map of the app:
+[foundations.md → One status map](foundations.md#one-status-map).
 
 ## 2. Inline styles, raw values, primitive tokens
 
@@ -438,6 +438,88 @@ Buttons in two places, buttons with only text:
     </Page.TopBar>
   </Page.Root>
 </SmartFilter.Root>
+```
+
+The switch of a section's sub-pages pushed onto a line of its own:
+
+```tsx partial
+// bad — the sub-page links in a row of their own under the bar, away from the heading row
+<Page.TopBar>
+  <Page.Heading>
+    <Page.Title>AI</Page.Title>
+  </Page.Heading>
+</Page.TopBar>
+<Page.Body>
+  <SegmentedControl.Root value={pathname} aria-label="Подразделы">…</SegmentedControl.Root>
+</Page.Body>
+```
+
+```tsx good
+// good — the links in Page.Tools: the heading row at the end edge, before the page's buttons
+// declare: const pathname: string
+<Page.TopBar>
+  <Page.Heading>
+    <Page.Title>AI</Page.Title>
+  </Page.Heading>
+  <Page.Tools aria-label="AI">
+    <SegmentedControl.Root value={pathname} aria-label="Подразделы">
+      <SegmentedControl.Item value="/ai/chat" asChild>
+        <a href="/ai/chat">Чат</a>
+      </SegmentedControl.Item>
+      <SegmentedControl.Item value="/ai/lessons" asChild>
+        <a href="/ai/lessons">Уроки</a>
+      </SegmentedControl.Item>
+      <SegmentedControl.Item value="/ai/settings" asChild>
+        <a href="/ai/settings">Настройки</a>
+      </SegmentedControl.Item>
+    </SegmentedControl.Root>
+  </Page.Tools>
+</Page.TopBar>
+```
+
+## 7c. A create button out of reach
+
+A pane people pick from creates at its top, under its search
+([where the create button goes](composition.md#where-the-create-button-goes)).
+
+```tsx partial
+// bad — «Новый чат» under the threads: with thirty threads it is off screen
+<ChatList.Root
+  items={threads}
+  getKey={(thread) => thread.id}
+  search={query}
+  onSearchChange={setQuery}
+  renderItem={renderThread}
+/>
+<Button.Root variant="soft" tone="neutral">Новый чат</Button.Root>
+```
+
+```tsx good
+// good — search → create → list: the create button is part of the pane, under its search
+// declare: const threads: { id: string; title: string }[]
+// declare: const query: string
+// declare: const setQuery: (query: string) => void
+<ChatList.Root
+  items={threads}
+  getKey={(thread) => thread.id}
+  search={query}
+  onSearchChange={setQuery}
+  labels={{ list: "Треды", search: "Поиск по тредам" }}
+  renderItem={(thread) => (
+    <ChatList.Item>
+      <ChatList.ItemText>{thread.title}</ChatList.ItemText>
+    </ChatList.Item>
+  )}
+>
+  <ChatList.Actions>
+    <Button.Root fullWidth variant="soft" tone="neutral">
+      <Button.Icon>
+        <Icon name="action.add" />
+      </Button.Icon>
+      Новый чат
+    </Button.Root>
+  </ChatList.Actions>
+</ChatList.Root>
 ```
 
 ## 8. Decoration and filler

@@ -26,7 +26,7 @@ import { DescriptionList } from "prime-ui-kit";
 DescriptionList.Root                 <dl>; size (host tier), orientation; a size container
 └─ DescriptionList.Item              <div> per pair; label
    ├─ <dt>                           the label
-   └─ <dd>                           the value (or labels.empty) · DescriptionList.ItemAction?
+   └─ <dd>                           the value (or labels.empty) · DescriptionList.ItemAction*
 ```
 
 ## API
@@ -51,11 +51,11 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | The visible name of the value (`<dt>`). |
 | `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | — | The ink of the value by meaning (an amount due is `warning`, a payment `success`); an empty value stays muted. |
-| `children` | `ReactNode` | — | The value (`<dd>`): text, a Badge, a link; plus an optional `DescriptionList.ItemAction`, which goes to the end of the value. |
+| `children` | `ReactNode` | — | The value (`<dd>`): text, a Badge, a link; plus optional `DescriptionList.ItemAction`s, which stand as one group at the end of the value. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `id`, `data-*` and the other attributes of the element. |
 
 ### DescriptionList.ItemAction
-`ref` → `HTMLButtonElement`. A row action at the end of the value («Копировать», «Позвонить»): a ghost icon Button one tier below the list, with `label` as its name and tooltip.
+`ref` → `HTMLButtonElement`. A row action at the end of the value («Копировать», «Позвонить»): a ghost icon Button one tier below the list, with `label` as its name and tooltip. Several in a row («Проверить», «Заменить») stand as one group at the end edge, in the order written.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -106,7 +106,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 ## Layout & spacing
 - The list fills its container; pairs are separated by air (8 · 12 · 16 by tier), not lines.
 - A horizontal pair: label column one third, value two thirds, 16 apart; values wrap anywhere, labels wrap too.
-- A row action sits at the end of the value, centred on its first line; it does not make the row taller.
+- Row actions sit at the end of the value, centred on its first line; they do not make the row taller. Several («Проверить», «Заменить») stand as one group at the end edge with the row's gap between them, in the order written; on a narrow list the value wraps and the group keeps its place.
 - Inside a `Drawer` or a `Modal` the list takes the host tier; do not pass `size` there. A `Card` gives no tier: the list is `m` unless `size` is set.
 
 ## Accessibility
@@ -142,6 +142,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 | [structure.tsx](examples/structure.tsx) | Optional pieces of a pair: a Badge or a link as the value, a row action that is a link and an empty value with its own mark — `DescriptionList.ItemAction`, `asChild`, `labels`. |
 | [vertical.tsx](examples/vertical.tsx) | Labels above their values at any width, for a side panel of a record — `orientation`. |
 | [totals.tsx](examples/totals.tsx) | The totals of an invoice: every amount at the end of its row in tabular figures, a payment in the success tone, the amount due a step larger in the warning tone — `align`, `tone`. |
+| [row-actions.tsx](examples/row-actions.tsx) | API keys of an assistant, each row with two actions that stand as one group at its end — `DescriptionList.ItemAction`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap — `DescriptionList.Item`, `label`. |
 | [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in its top bar, a main column with the line items and their totals and a side column with the client's details and the history — `align`, `orientation`. |
 
@@ -149,6 +150,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 - A grid of `Typography` pairs or a two-column table for record details → `DescriptionList`: the `<dl>` semantics and the stacking come with it.
 - `""` or «—» typed by hand for a missing value → pass nothing; the list shows `labels.empty` and speaks `labels.emptyText`.
 - A copy button placed after the list or inside the label → `DescriptionList.ItemAction` inside the item, at the end of its value.
+- Two actions of a row («Проверить», «Заменить») as a row of buttons under the list or a wrapper of your own in the value → one `DescriptionList.ItemAction` each inside the item; they stand as one group at the end of the value.
 - A viewport media query to stack the pairs → the list adapts to its own width already.
 - A hand-made `<dl>` with `justify-content: space-between` for invoice totals → `align="end"`.
 

@@ -12,7 +12,7 @@
 - A one-line definition of a term or abbreviation.
 
 ## When not to use
-- Content with links, buttons or fields, or anything the user must read to continue → use [Popover](../popover/COMPONENT.md).
+- Content with links, buttons or fields, or anything the user must read to continue → use [Popover](../popover/COMPONENT.md); a hint that opens on hover and holds a link («Подробнее», a record link) is a Popover with `openOn="hover"`. A tooltip is `role="tooltip"`: the pointer cannot reach a control in it and Tab never enters it (WAI-ARIA, WCAG 1.4.13).
 - A list of actions → use [Dropdown](../dropdown/COMPONENT.md).
 - Help text under a field → use the field `hint` or [Hint](../hint/COMPONENT.md).
 - Status messages → use [Notification](../notification/COMPONENT.md) or [Banner](../banner/COMPONENT.md).
@@ -163,7 +163,7 @@ No `labels`.
 ## Mistakes
 - Your own `<span tabIndex={0}>` around a disabled button → the trigger does it; a second wrapper adds a second tab stop.
 - An unnamed Badge or Icon as the trigger → give the icon `label` (or the element `aria-label`): the tooltip describes, it does not name.
-- Links or buttons inside Tooltip.Content → use Popover.
+- A link or a button inside Tooltip.Content → a Popover with `openOn="hover"`: it opens on hover and focus the same way, and its link is reachable by pointer and Tab.
 - Several children inside Tooltip.Trigger → exactly one element.
 - Relying on the tooltip as the button's name → add `aria-label` to the button.
 - A Provider per tooltip in a toolbar → one Provider around the toolbar, so neighbours open instantly.

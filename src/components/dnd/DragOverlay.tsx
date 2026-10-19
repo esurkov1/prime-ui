@@ -7,6 +7,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { motionDurationMs, motionTiming } from "@/internal/motionTiming";
 import tooltipSurface from "@/internal/overlay/tooltipSurface.module.css";
 import { carryRolling } from "@/internal/RollingNumber";
+import { stillCopy } from "@/internal/stillCopy";
 import { layoutRect } from "@/internal/useFlipList";
 
 import styles from "./Dnd.module.css";
@@ -52,8 +53,9 @@ const CONTAINER_SHELL: Partial<Record<string, string>> = {
  * The copy flies in empty copies of every element its original stands in, up to the page: what a
  * host gives its items — tier variables (a List row's padding, radius, gap), context selectors
  * (`[data-…]` ancestors), the surface fill, a scoped theme — reaches the copy as it reaches the
- * original; an ancestor copy never animates (no enter motion replays on it). An ancestor is `display: contents`, except a size container (`container-type`): a
- * container query needs a box, so its copy is an invisible box of the container's measured content
+ * original. Every copy is still (`stillCopy`): the slide-in of a Drawer the original stands in, or
+ * an enter its parts played, never starts over on the copy. An ancestor is `display: contents`,
+ * except a size container (`container-type`): a container query needs a box, so its copy is an invisible box of the container's measured content
  * size, and the copy lays out as it does in place (a narrow list's stacked rows stay stacked).
  * Without them the copy flies bare and snaps into its look when the real item appears.
  */
@@ -61,11 +63,7 @@ function inHostCopy(parent: HTMLElement | null, inner: HTMLElement): HTMLElement
   let outer = inner;
   let node = parent;
   while (node && node !== document.body && node !== document.documentElement) {
-    const shell = node.cloneNode(false) as HTMLElement;
-    // The copy is a new element: the enter motion of a Drawer, Modal or Sheet its original stands in
-    // (`data-state="open"` and its class) would play again on it. An ancestor copy only measures.
-    shell.style.setProperty("animation", "none", "important");
-    shell.style.setProperty("transition", "none", "important");
+    const shell = stillCopy(node, false);
     const source = getComputedStyle(node);
     const container = source.getPropertyValue("container-type").trim();
     if (container === "inline-size" || container === "size") {
@@ -88,6 +86,11 @@ function inHostCopy(parent: HTMLElement | null, inner: HTMLElement): HTMLElement
   return outer;
 }
 
+/** A still, empty copy of a table part the copy flies in, or a new one where it has none. */
+function shellOf(node: HTMLElement | null | undefined, tag: string): HTMLElement {
+  return node ? stillCopy(node, false) : document.createElement(tag);
+}
+
 /**
  * A table row cannot fly on its own: outside its table its cells shrink to their content and lose
  * every style their table gives them. It flies in a one-row copy of its table with each column
@@ -95,7 +98,7 @@ function inHostCopy(parent: HTMLElement | null, inner: HTMLElement): HTMLElement
  */
 function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect): HTMLElement {
   const table = row.closest("table");
-  const sheet = (table?.cloneNode(false) ?? document.createElement("table")) as HTMLElement;
+  const sheet = shellOf(table, "table");
   sheet.style.tableLayout = "fixed";
   sheet.style.width = `${origin.width}px`;
   sheet.style.minWidth = "0";
@@ -110,8 +113,7 @@ function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect):
       columns.append(column);
     }
   }
-  const body = (row.parentElement?.cloneNode(false) ??
-    document.createElement("tbody")) as HTMLElement;
+  const body = shellOf(row.parentElement, "tbody");
   body.append(copy);
   sheet.append(columns, body);
   return sheet;
@@ -123,8 +125,7 @@ function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect):
  * which carries the lift.
  */
 function inHeadCopy(cell: HTMLTableCellElement, copy: HTMLElement, origin: Rect): HTMLElement {
-  const sheet = (cell.closest("table")?.cloneNode(false) ??
-    document.createElement("table")) as HTMLElement;
+  const sheet = shellOf(cell.closest("table"), "table");
   sheet.style.tableLayout = "fixed";
   sheet.style.width = `${origin.width}px`;
   sheet.style.minWidth = "0";
@@ -134,10 +135,9 @@ function inHeadCopy(cell: HTMLTableCellElement, copy: HTMLElement, origin: Rect)
   column.style.width = `${origin.width}px`;
   const columns = document.createElement("colgroup");
   columns.append(column);
-  const row = (cell.parentElement?.cloneNode(false) ?? document.createElement("tr")) as HTMLElement;
+  const row = shellOf(cell.parentElement, "tr");
   row.append(copy);
-  const group = (cell.parentElement?.parentElement?.cloneNode(false) ??
-    document.createElement("thead")) as HTMLElement;
+  const group = shellOf(cell.parentElement?.parentElement, "thead");
   group.append(row);
   sheet.append(columns, group);
   // A head cell painted with a see-through fill flies on the surface it was lifted from.
@@ -147,7 +147,7 @@ function inHeadCopy(cell: HTMLTableCellElement, copy: HTMLElement, origin: Rect)
 }
 
 function cloneFor(preview: DragPreview): HTMLElement {
-  const clone = preview.element.cloneNode(true) as HTMLElement;
+  const clone = stillCopy(preview.element, true);
   clone.style.width = `${preview.origin.width}px`;
   clone.style.height = `${preview.origin.height}px`;
   clone.style.margin = "0";
@@ -181,6 +181,8 @@ function cloneFor(preview: DragPreview): HTMLElement {
   }
   clone.setAttribute("data-dnd-copy", "");
   lifted.classList.add(styles.lift);
+  // The lift is the overlay's own motion on the copy (`.overlay .lift` rises from rest).
+  lifted.style.removeProperty("transition");
   return outer;
 }
 

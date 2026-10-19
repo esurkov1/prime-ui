@@ -1,4 +1,4 @@
-/** The courier is at the door: an icon tile heads the sheet, the payment status leads the line under the title, a ⋯ menu sits before the close button, and two equal buttons fill the footer — `Sheet.Icon`, `Sheet.Description`, `Sheet.Actions`, `layout`. */
+/** The courier is at the door: an icon tile heads the sheet, the order's number stands by its name, a line of data under it and its statuses under that, a ⋯ menu sits before the close button, and two equal buttons fill the footer — `Sheet.Icon`, `Sheet.Badges`, `Sheet.Actions`, `layout`. */
 import { Badge, Button, ConfirmDialog, Dropdown, Icon, Sheet, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -23,11 +23,12 @@ export default function SheetHeaderActionsExample() {
           <Sheet.Icon tone="info">
             <Icon name="object.truck" />
           </Sheet.Icon>
-          <Sheet.Title>Курьер у двери</Sheet.Title>
-          <Sheet.Description>
+          <Sheet.Title number="№ 1042">Заказ</Sheet.Title>
+          <Sheet.Description>3 коробки · Анна Смирнова</Sheet.Description>
+          <Sheet.Badges>
+            <Badge.Root tone="info">Курьер у двери</Badge.Root>
             <Badge.Root tone="success">Оплачен</Badge.Root>
-            Заказ № 1042 · 3 коробки
-          </Sheet.Description>
+          </Sheet.Badges>
           <Sheet.Actions>
             <Dropdown.Root>
               <Dropdown.Trigger>

@@ -45,6 +45,12 @@ export const page: ComponentPageConfig = {
         "Итоги счёта: каждая сумма в конце строки табличными цифрами, оплата зелёным, сумма к оплате на шаг крупнее и оранжевым — `align`, `tone`.",
     },
     {
+      scenario: "row-actions",
+      title: "Несколько действий",
+      description:
+        "Ключи API ассистента: у каждой строки два действия, они стоят одной группой в её конце — `DescriptionList.ItemAction`.",
+    },
+    {
       slot: "narrow",
       description:
         "В карточке 320 px список уже 24rem: подпись встаёт над значением, длинные значения переносятся — `DescriptionList.Item`, `label`.",

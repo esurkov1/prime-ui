@@ -43,6 +43,20 @@ describe("mediaSlot", () => {
     expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "own");
   });
 
+  it("a host of another box gives its own sizes; a kind it leaves out keeps the picture's size", () => {
+    function ChipHost({ children }: { children: React.ReactNode }) {
+      return useMediaSlotHost({ avatar: "2xs" }).provide(children);
+    }
+    render(
+      <ChipHost>
+        <Picture kind="avatar" />
+        <Picture kind="thumbnail" />
+      </ChipHost>,
+    );
+    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "2xs");
+    expect(screen.getByTestId("thumbnail")).toHaveAttribute("data-size", "own");
+  });
+
   it("is no media slot without a picture, and stops being one when it leaves", () => {
     const { rerender } = render(
       <Host>

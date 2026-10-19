@@ -27,8 +27,8 @@ function release(el: HTMLElement) {
 }
 
 /**
- * While `enabled`, makes every `<body>` child inert except the one that holds `ref` (its portal)
- * and live regions, then restores the previous values. `inert` already removes the content from
+ * While `enabled`, makes every `<body>` child before the one that holds `ref` (its portal) inert,
+ * except live regions, then restores the previous values. `inert` already removes the content from
  * the accessibility tree, so no `aria-hidden` is added. Part of `useModalLayer`.
  */
 export function useInertSiblings(enabled: boolean, ref: React.RefObject<HTMLElement | null>) {
@@ -41,9 +41,13 @@ export function useInertSiblings(enabled: boolean, ref: React.RefObject<HTMLElem
       portalRoot = portalRoot.parentElement;
     }
 
-    const siblings = Array.from(document.body.children)
+    // Only what is drawn below the layer: a portal after it is a layer drawn above (one opened
+    // from inside it in the same commit, or one that stayed while this one reopened).
+    const children = Array.from(document.body.children);
+    const own = portalRoot ? children.indexOf(portalRoot) : -1;
+    const siblings = (own === -1 ? children : children.slice(0, own))
       .filter((el): el is HTMLElement => el instanceof HTMLElement)
-      .filter((el) => el !== portalRoot && !el.hasAttribute(LIVE_REGION_ATTR));
+      .filter((el) => !el.hasAttribute(LIVE_REGION_ATTR));
 
     for (const el of siblings) hold(el);
 

@@ -1,5 +1,5 @@
-/** Every piece of a row: a photo or initials with presence, a glyph beside the name, a record status line, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. */
-import { Avatar, Card, ChatList, hueOf, Icon, type MessageStatus } from "prime-ui-kit";
+/** Every piece of a row: a photo or initials with presence, a glyph beside the name, the record status as badges, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. */
+import { Avatar, Badge, Card, ChatList, hueOf, Icon, type MessageStatus } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -19,7 +19,7 @@ type Dialog = {
   status?: MessageStatus;
   typing?: string;
   unread?: number;
-  record?: string;
+  record?: { label: string; stage?: boolean }[];
 };
 
 const NOW = new Date(2026, 9, 14, 15, 0);
@@ -36,7 +36,7 @@ const DIALOGS: Dialog[] = [
     kind: "photo",
     text: "Вот так выглядит ошибка",
     unread: 1,
-    record: "Бронь · ждёт человека",
+    record: [{ label: "Бронь", stage: true }, { label: "Ждёт человека" }],
   },
   {
     id: "prime-bot",
@@ -67,6 +67,7 @@ const DIALOGS: Dialog[] = [
     kind: "location",
     text: "Рампа 2",
     typing: "Анна",
+    record: [{ label: "AI ответит в 16:00" }],
   },
   {
     id: "lena",
@@ -122,7 +123,21 @@ export default function ChatListStructureExample() {
                 <Icon name="object.users" />
               </ChatList.ItemIcon>
             ) : null}
-            {item.record ? <ChatList.ItemStatus>{item.record}</ChatList.ItemStatus> : null}
+            {item.record ? (
+              <ChatList.ItemStatus>
+                {item.record.map((badge) =>
+                  badge.stage ? (
+                    <Badge.Root key={badge.label} color="yellow">
+                      {badge.label}
+                    </Badge.Root>
+                  ) : (
+                    <Badge.Root key={badge.label} tone="warning">
+                      {badge.label}
+                    </Badge.Root>
+                  ),
+                )}
+              </ChatList.ItemStatus>
+            ) : null}
             <ChatList.ItemDescription
               author={item.author}
               kind={item.kind}

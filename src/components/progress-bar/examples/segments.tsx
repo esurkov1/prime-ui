@@ -11,8 +11,8 @@ const REVIEW: ProgressSegment[] = [
 
 const STORAGE: ProgressSegment[] = [
   { value: 38, label: "Видео" },
-  { value: 21, label: "Документы", tone: "success" },
-  { value: 12, label: "Архивы", tone: "warning" },
+  { value: 21, label: "Документы" },
+  { value: 12, label: "Архивы" },
 ];
 
 export default function ProgressBarSegmentsExample() {

@@ -9,6 +9,7 @@ import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { motionTiming } from "@/internal/motionTiming";
 import { namedRole } from "@/internal/namedRole";
+import { stillCopy } from "@/internal/stillCopy";
 import type { AsyncHandler } from "@/internal/usePendingChanges";
 
 import { DragControllerContext, useDragController } from "./context";
@@ -542,7 +543,7 @@ function fadeOutGap(node: HTMLElement, controller: DragController) {
   }
   const rect = rectOf(node);
   const box = rectOf(container);
-  const ghost = node.cloneNode(false) as HTMLElement;
+  const ghost = stillCopy(node, false);
   ghost.removeAttribute("data-dnd-gap");
   // Out of the flow and on its way out: hosts that count cells (a grid's first cell) skip it.
   ghost.setAttribute("data-dnd-ghost", "");

@@ -23,8 +23,8 @@ export const api: ComponentApi = {
         {
           name: "onOpenChange",
           type: "(open: boolean) => void",
-          en: "Called on every open and close: trigger, `Popover.Close`, Escape, outside press, code.",
-          ru: "Вызывается при каждом открытии и закрытии: триггер, `Popover.Close`, Escape, клик снаружи, код.",
+          en: 'Called on every open and close: trigger, hover (`openOn="hover"`), `Popover.Close`, Escape, outside press, code.',
+          ru: 'Вызывается при каждом открытии и закрытии: триггер, наведение (`openOn="hover"`), `Popover.Close`, Escape, клик снаружи, код.',
         },
         {
           name: "closeOnOutsideClick",
@@ -46,6 +46,13 @@ export const api: ComponentApi = {
           default: "false",
           en: "ArrowDown and ArrowUp on the trigger open the panel, as on a picker whose trigger reads as a field (a colour, a period); Enter and Space open it either way.",
           ru: "ArrowDown и ArrowUp на триггере открывают панель, как у выбора, чей триггер похож на поле (цвет, период); Enter и Space открывают её в любом случае.",
+        },
+        {
+          name: "openOn",
+          type: '"click" | "hover"',
+          default: '"click"',
+          en: "`click`: a press toggles the panel. `hover`: a hover card — hover or keyboard focus on the trigger opens it after a delay, Tab moves in; for a hint with a link a Tooltip cannot hold.",
+          ru: "`click` — нажатие открывает и закрывает панель. `hover` — карточка по наведению: наведение или фокус на триггере открывают её с задержкой, Tab ведёт внутрь; для подсказки со ссылкой.",
         },
         {
           name: "children",
@@ -72,8 +79,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title` (else by the control it opened from). Below 640px of viewport, opened from a Trigger, it is a bottom sheet (`data-sheet`).',
-      ru: 'Портал и плавающая панель `role="dialog"` с прокруткой внутри; имя — `Popover.Title`, иначе контрол, из которого её открыли. Уже 640px экрана, открытая из Trigger, она становится шторкой снизу (`data-sheet`).',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title` (else by the control it opened from). Below 640px of viewport, opened from a Trigger by a press, it is a bottom sheet (`data-sheet`); a hover panel stays anchored.',
+      ru: 'Портал и плавающая панель `role="dialog"` с прокруткой внутри; имя — `Popover.Title`, иначе контрол, из которого её открыли. Уже 640px экрана, открытая из Trigger нажатием, она становится шторкой снизу (`data-sheet`); панель по наведению остаётся у триггера.',
       props: [
         {
           name: "side",
@@ -114,8 +121,8 @@ export const api: ComponentApi = {
           name: "initialFocus",
           type: "boolean",
           defaultNote: {
-            en: "`true` with `Popover.Trigger`, `false` with `Popover.Anchor`",
-            ru: "`true` с `Popover.Trigger`, `false` с `Popover.Anchor`",
+            en: '`true` with `Popover.Trigger`, `false` with `Popover.Anchor` or `openOn="hover"`',
+            ru: '`true` с `Popover.Trigger`, `false` с `Popover.Anchor` или `openOn="hover"`',
           },
           en: "Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger.",
           ru: "Фокус переходит в панель при открытии (`[data-autofocus]`, иначе первый фокусируемый, иначе панель). Включите для привязанной панели, открытой командой — пунктом Dropdown, — чтобы фокус не остался на кнопке меню.",
@@ -158,6 +165,11 @@ export const api: ComponentApi = {
         ru: "На триггере открывает панель (фокус переходит в неё) и закрывает.",
       },
       {
+        keys: "Tab",
+        en: 'On the trigger of an open hover panel (`openOn="hover"`): moves focus to the first stop of the panel, which follows its trigger in the Tab order; Shift+Tab from that stop returns to the trigger with the panel open.',
+        ru: 'На триггере открытой панели по наведению (`openOn="hover"`): переводит фокус на первый элемент панели — она идёт в порядке Tab сразу за триггером; Shift+Tab с него возвращает на триггер, панель остаётся открытой.',
+      },
+      {
         keys: "ArrowDown · ArrowUp",
         en: "On the trigger with `openOnArrow`: opens the panel.",
         ru: "На триггере с `openOnArrow` открывает панель.",
@@ -185,6 +197,10 @@ export const api: ComponentApi = {
       {
         en: "Opened from a Trigger, focus moves into the panel: `[data-autofocus]`, else the first tab stop, else the panel. Opened at a `Popover.Anchor`, focus stays in the anchor (`initialFocus` moves it in), and presses on the anchor do not dismiss the panel.",
         ru: "При открытии от Trigger фокус уходит в панель: `[data-autofocus]`, иначе первая точка Tab, иначе сама панель. При открытии у `Popover.Anchor` фокус остаётся в якоре (`initialFocus` переносит его внутрь), а нажатия на якорь панель не закрывают.",
+      },
+      {
+        en: 'With `openOn="hover"` keyboard focus on the trigger opens the panel as the pointer does, and focus stays on the trigger; focus moving out of both the trigger and the panel closes it, and focus handed back to the trigger by a close does not reopen it. Content that holds links or buttons belongs here, not in a Tooltip (`role="tooltip"` takes no focus).',
+        ru: 'С `openOn="hover"` фокус с клавиатуры на триггере открывает панель так же, как курсор, и остаётся на триггере; уход фокуса и с триггера, и из панели закрывает её, а фокус, возвращённый на триггер при закрытии, не открывает её снова. Содержимое со ссылками или кнопками — сюда, а не в Tooltip (`role="tooltip"` не принимает фокус).',
       },
       {
         en: "`Popover.Close` closes the panel and returns focus to the trigger, unless the child's own `onClick` calls `preventDefault()`.",

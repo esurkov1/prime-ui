@@ -20,6 +20,9 @@ const LOADING = "loading";
 const isLoad = (from: string | number | null, to: string | number) =>
   from === LOADING || to === LOADING;
 
+/** The axis a swap glides the size along: the height (a region) or the width (a cell of a row). */
+type SwapAxis = "block" | "inline";
+
 type RegionSwapProps = React.HTMLAttributes<HTMLDivElement> & {
   /**
    * Key of what the region shows (`"loading"`, `"ready"`, `"empty"`, `"error"`, a record id). A new
@@ -30,6 +33,14 @@ type RegionSwapProps = React.HTMLAttributes<HTMLDivElement> & {
   /** The region takes its parent's height and every state fills it; the height never glides. */
   fill?: boolean;
   /**
+   * `"block"` — a region: the height glides, both states hold to the top edge. `"inline"` — a cell
+   * in a row (a control of a header's actions): the width glides, the states centre on the row's
+   * line and hold to the `align` edge.
+   */
+  axis?: SwapAxis;
+  /** The edge both states hold to while the size glides: the cell's alignment in its row. */
+  align?: "start" | "end";
+  /**
    * After a swap, once the new state is in the document (focus already handed off from a leaving
    * state): a host that moves focus or scrolls on a swap does it here.
    */
@@ -39,24 +50,29 @@ type RegionSwapProps = React.HTMLAttributes<HTMLDivElement> & {
 
 type Layer = { key: string | number; children: React.ReactNode };
 
-/** Drops a running glide: the root takes its natural height in this frame. */
+/** The size of `node` along `axis`. */
+const sizeOf = (node: HTMLElement, axis: SwapAxis) =>
+  node.getBoundingClientRect()[axis === "inline" ? "width" : "height"];
+
+/** Drops a running glide: the root takes its natural size in this frame. */
 function settle(root: HTMLElement) {
   root.removeAttribute("data-resizing");
-  root.style.removeProperty("--swap-height");
+  root.style.removeProperty("--swap-size");
 }
 
-/** Starts the height glide of `root` from `from` to its natural height; returns its cleanup. */
-function glide(root: HTMLElement, from: number): (() => void) | undefined {
+/** Starts the size glide of `root` from `from` to its natural size; returns its cleanup. */
+function glide(root: HTMLElement, from: number, axis: SwapAxis): (() => void) | undefined {
   settle(root);
-  const to = root.getBoundingClientRect().height;
+  const to = sizeOf(root, axis);
   if (Math.abs(from - to) < 1) return;
   const finish = () => settle(root);
-  root.style.setProperty("--swap-height", `${from}px`);
+  root.style.setProperty("--swap-size", `${from}px`);
   root.setAttribute("data-resizing", "true");
-  root.getBoundingClientRect(); // commit the start height before the transition target
-  root.style.setProperty("--swap-height", `${to}px`);
+  root.getBoundingClientRect(); // commit the start size before the transition target
+  root.style.setProperty("--swap-size", `${to}px`);
+  const property = axis === "inline" ? "width" : "height";
   const onEnd = (event: TransitionEvent) => {
-    if (event.target === root && event.propertyName === "height") finish();
+    if (event.target === root && event.propertyName === property) finish();
   };
   root.addEventListener("transitionend", onEnd);
   const id = window.setTimeout(finish, exitTimeoutMs("base"));
@@ -78,10 +94,16 @@ function glide(root: HTMLElement, from: number): (() => void) | undefined {
  * first render. Focus in the leaving state moves into the new one (`handoffFocus`). Under reduced
  * motion the old state goes at once and the height jumps; the new one still fades in (rule 12).
  * A region with nothing to show takes no room. `Crossfade` is this region, public.
+ *
+ * `axis="inline"` is the content swap of one cell in a row (`src/internal/rowCells`): the same
+ * cross-fade, the width gliding instead of the height, both states held to the cell's `align`
+ * edge, so whatever stands beyond that edge never moves.
  */
 export function RegionSwap({
   state,
   fill = false,
+  axis = "block",
+  align = "start",
   onSwap,
   children,
   className,
@@ -117,10 +139,10 @@ export function RegionSwap({
     childrenRef.current = children;
   });
 
-  const latest = React.useRef({ state, fill, onSwap });
-  latest.current = { state, fill, onSwap };
+  const latest = React.useRef({ state, fill, axis, onSwap });
+  latest.current = { state, fill, axis, onSwap };
 
-  // The swap is in the document: hand focus over, then glide the height between settled states
+  // The swap is in the document: hand focus over, then glide the size between settled states
   // (a load settles it at once; under reduced motion the old state also goes before it is painted).
   React.useLayoutEffect(() => {
     const root = rootRef.current;
@@ -135,12 +157,15 @@ export function RegionSwap({
     } else if (latest.current.fill || isLoad(swap.from, latest.current.state)) {
       settle(root);
     } else {
-      // The height on screen: mid-glide the running one, else the old content's (the leaving
-      // layer, laid over at the same width), else nothing (the region had no box).
+      // The size on screen: mid-glide the running one, else the old content's (the leaving
+      // layer, laid over in place), else nothing (the region had no box).
+      const { axis } = latest.current;
       const from = root.hasAttribute("data-resizing")
-        ? root.getBoundingClientRect().height
-        : (outgoing?.getBoundingClientRect().height ?? 0);
-      cleanup = glide(root, from);
+        ? sizeOf(root, axis)
+        : outgoing
+          ? sizeOf(outgoing, axis)
+          : 0;
+      cleanup = glide(root, from, axis);
     }
     latest.current.onSwap?.(latest.current.state);
     return cleanup;
@@ -204,7 +229,9 @@ export function RegionSwap({
       ref={mergedRef}
       className={cx(styles.root, className)}
       data-fill={fill ? "true" : undefined}
-      data-leaving={leaving.length > 0 ? "true" : undefined}
+      data-axis={axis}
+      data-align={align}
+      data-swapping={leaving.length > 0 ? "true" : undefined}
     >
       {layers}
     </div>

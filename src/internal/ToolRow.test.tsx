@@ -70,14 +70,8 @@ describe("ToolRow", () => {
     expect(screen.getByTestId("row")).not.toHaveAttribute("data-fill");
   });
 
-  it("gathers at the end by default and at the start with align start", () => {
-    const { rerender } = render(<ToolRow data-testid="row" />);
-    expect(screen.getByTestId("row")).not.toHaveAttribute("data-align");
-    rerender(<ToolRow data-testid="row" align="start" />);
-    expect(screen.getByTestId("row")).toHaveAttribute("data-align", "start");
-    expect(
-      cssValue(cssRule(CSS, '.row[data-fill="true"][data-align="start"]'), "justify-content"),
-    ).toBe("flex-start");
+  it("gathers a filled row at the end edge", () => {
+    expect(cssValue(cssRule(CSS, '.row[data-fill="true"]'), "justify-content")).toBe("flex-end");
   });
 
   it("gives a SegmentedControl and a Datepicker fullWidth unless set", () => {

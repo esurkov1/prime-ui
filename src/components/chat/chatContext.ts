@@ -14,6 +14,8 @@ export type ChatLabels = MessageListLabels & {
   searchPlaceholder: string;
   /** The place of the current match: `{index}` of `{count}`, counted from the newest. */
   matches: string;
+  /** The visible place of the current match at the field's end: `{index}`, `{count}`. */
+  matchCount: string;
   /** The search found nothing. */
   noMatches: string;
   /** The button that goes to the older match. */
@@ -36,6 +38,8 @@ export type ChatContextValue = {
   /** The search query, `null` while the search bar is closed. */
   search: string | null;
   setSearch: (next: string | null) => void;
+  /** The query as searched: the trimmed query once it is `minSearchLength` long, else `""`. */
+  searched: string;
   /** The messages that match the query, oldest first (reported by the list). */
   matches: readonly string[];
   setMatches: (values: readonly string[]) => void;

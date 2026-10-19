@@ -85,7 +85,7 @@ export const page: ComponentPageConfig = {
       scenario: "amount-currency",
       title: "Сумма и валюта",
       description:
-        "Сумма и её валюта одним полем: селект после поля — конечный сегмент у конечного края — `Input.Wrapper`, `Select.Root`, `Input.Field`, `aria-label`.",
+        "Сумма и её валюта одним полем: селект после поля — конечный сегмент, в триггере символ, в строках символ как иконка и название — `Input.Wrapper`, `Select.Root`, `renderValue`, `Select.ItemIcon`, `aria-label`.",
     },
     {
       scenario: "time",

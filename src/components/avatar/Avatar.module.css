@@ -36,6 +36,10 @@
   color: var(--hue-text);
 }
 
+:is(.root, .overflow)[data-size="2xs"] {
+  --avatar-size: var(--prime-avatar-2xs);
+}
+
 :is(.root, .overflow)[data-size="xs"] {
   --avatar-size: var(--prime-avatar-xs);
 }

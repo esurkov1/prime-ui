@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
   DEFAULT_ALIGN,
   DEFAULT_SIDE,
@@ -14,6 +13,7 @@ import {
   FloatingTrigger,
   type FloatingWidth,
 } from "@/internal/overlay/FloatingPanel";
+import { focusFromKeyboard, getFocusable } from "@/internal/overlay/focus";
 import { useAnchorName } from "@/internal/overlay/useAnchorName";
 import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
@@ -21,6 +21,38 @@ import { Slot, type SlotPartProps } from "@/internal/slot";
 import { type ControlSize, OVERLAY_CONTENT_SIZE } from "@/internal/states";
 
 import styles from "./Popover.module.css";
+
+/** What opens the panel: a press on the trigger, or hovering and keyboard-focusing it. */
+export type PopoverOpenOn = "click" | "hover";
+
+/** Hover intent: the pointer rests on the trigger this long (the tooltip delay) before it opens. */
+const HOVER_OPEN_DELAY_MS = 400;
+/**
+ * Grace after the pointer leaves the trigger or the panel: the bridge across the gap between them,
+ * so the pointer can travel into the panel (WCAG 1.4.13 "hoverable").
+ */
+const HOVER_CLOSE_DELAY_MS = 300;
+
+/** How a hover panel came open: a press pins it until a dismiss; hover and focus follow intent. */
+type HoverOpener = "hover" | "focus" | "click";
+
+/** The hover-intent controller of `openOn="hover"`, shared by the trigger and the panel. */
+type HoverIntent = {
+  /** The pointer enters the trigger or the panel. */
+  enter: () => void;
+  /** The pointer leaves the trigger or the panel. */
+  leave: () => void;
+  /** Keyboard focus reached the trigger. */
+  focus: () => void;
+  /** Focus left the trigger or the panel for `next`. */
+  blur: (next: EventTarget | null) => void;
+  /** A press on the trigger. */
+  press: () => void;
+  /** The panel element while mounted. */
+  panel: () => HTMLElement | null;
+  /** `Popover.Content` hands over the ref of its panel element. */
+  bindPanel: (ref: React.RefObject<HTMLElement | null>) => void;
+};
 
 type PopoverContextValue = {
   isOpen: boolean;
@@ -33,6 +65,8 @@ type PopoverContextValue = {
   openOnArrow: boolean;
   /** Set by `Popover.Anchor`: focus stays in the anchor (a field driving the panel) on open. */
   anchoredRef: React.RefObject<boolean>;
+  /** Set with `openOn="hover"`. */
+  hover: HoverIntent | null;
 };
 
 const [PopoverProvider, usePopoverContext] = createComponentContext<PopoverContextValue>("Popover");
@@ -44,8 +78,115 @@ export type PopoverRootProps = {
   closeOnOutsideClick?: boolean;
   closeOnEscape?: boolean;
   openOnArrow?: boolean;
+  openOn?: PopoverOpenOn;
   children: React.ReactNode;
 };
+
+/**
+ * Hover intent of a hover panel: opens after the delay when the pointer rests on the trigger (not
+ * on touch) or keyboard focus lands on it; stays open while the pointer is over the trigger or the
+ * panel, or focus is in either; closes after the grace once neither holds. A press opens it at once
+ * and pins it until a dismiss (Escape, an outside press, `Popover.Close`) — the touch path.
+ */
+function useHoverIntent(
+  enabled: boolean,
+  isOpen: boolean,
+  setOpen: (open: boolean) => void,
+  triggerRef: React.RefObject<HTMLElement | null>,
+): HoverIntent | null {
+  const timerRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  const panelHolderRef = React.useRef<React.RefObject<HTMLElement | null> | null>(null);
+  const pointerInsideRef = React.useRef(false);
+  const openerRef = React.useRef<HoverOpener | null>(null);
+  const openRef = React.useRef(isOpen);
+  openRef.current = isOpen;
+  if (!isOpen) openerRef.current = null;
+  // Closing with focus inside the panel: the focus the close hands back to the trigger (during
+  // this commit) is no keyboard visit and must not reopen it.
+  const returningRef = React.useRef(false);
+  const wasOpenRef = React.useRef(isOpen);
+  if (wasOpenRef.current && !isOpen) {
+    returningRef.current =
+      typeof document !== "undefined" &&
+      panelHolderRef.current?.current?.contains(document.activeElement) === true;
+  }
+  wasOpenRef.current = isOpen;
+  React.useEffect(() => {
+    if (!isOpen) returningRef.current = false;
+  }, [isOpen]);
+
+  React.useEffect(() => () => clearTimeout(timerRef.current), []);
+
+  return React.useMemo(() => {
+    if (!enabled) return null;
+    const panel = () => panelHolderRef.current?.current ?? null;
+    // Focus keeps the panel: inside it, or on the trigger that focus opened it from (focus left
+    // on the trigger by an earlier press does not hold a panel the pointer opened).
+    const focusHeld = () => {
+      const active = document.activeElement;
+      if (active === null) return false;
+      if (panel()?.contains(active)) return true;
+      return openerRef.current === "focus" && triggerRef.current?.contains(active) === true;
+    };
+    const openBy = (opener: HoverOpener) => {
+      clearTimeout(timerRef.current);
+      if (openRef.current) return;
+      timerRef.current = setTimeout(() => {
+        openerRef.current = opener;
+        setOpen(true);
+      }, HOVER_OPEN_DELAY_MS);
+    };
+    const closeSoon = () => {
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        if (!openRef.current || openerRef.current === "click") return;
+        if (pointerInsideRef.current || focusHeld()) return;
+        setOpen(false);
+      }, HOVER_CLOSE_DELAY_MS);
+    };
+    return {
+      panel,
+      bindPanel: (ref) => {
+        panelHolderRef.current = ref;
+      },
+      enter: () => {
+        pointerInsideRef.current = true;
+        openBy("hover");
+      },
+      leave: () => {
+        pointerInsideRef.current = false;
+        closeSoon();
+      },
+      focus: () => {
+        if (!returningRef.current) openBy("focus");
+      },
+      blur: (next) => {
+        const inside =
+          next instanceof Node &&
+          (triggerRef.current?.contains(next) === true || panel()?.contains(next) === true);
+        if (inside) return;
+        if (!openRef.current) {
+          // Focus left before the delay ran out; a resting pointer still opens it.
+          if (!pointerInsideRef.current) clearTimeout(timerRef.current);
+          return;
+        }
+        if (openerRef.current !== "click" && !pointerInsideRef.current) {
+          clearTimeout(timerRef.current);
+          setOpen(false);
+        }
+      },
+      press: () => {
+        clearTimeout(timerRef.current);
+        if (openRef.current && openerRef.current === "click") {
+          setOpen(false);
+          return;
+        }
+        openerRef.current = "click";
+        setOpen(true);
+      },
+    };
+  }, [enabled, setOpen, triggerRef]);
+}
 
 function PopoverRoot({
   open,
@@ -54,12 +195,14 @@ function PopoverRoot({
   closeOnOutsideClick = true,
   closeOnEscape = true,
   openOnArrow = false,
+  openOn = "click",
   children,
 }: PopoverRootProps) {
   const [isOpen, setOpen] = useOpenState({ open, defaultOpen, onOpenChange });
   const id = React.useId();
   const triggerRef = React.useRef<HTMLElement | null>(null);
   const anchoredRef = React.useRef(false);
+  const hover = useHoverIntent(openOn === "hover", isOpen, setOpen, triggerRef);
 
   const value = React.useMemo(
     () => ({
@@ -72,8 +215,9 @@ function PopoverRoot({
       closeOnEscape,
       openOnArrow,
       anchoredRef,
+      hover,
     }),
-    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape, openOnArrow],
+    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape, openOnArrow, hover],
   );
 
   return <PopoverProvider value={value}>{children}</PopoverProvider>;
@@ -87,7 +231,7 @@ export type PopoverTriggerProps = SlotPartProps;
  * click. Props a wrapping trigger adds (`Tooltip.Trigger`) pass on to the child.
  */
 function PopoverTrigger(props: PopoverTriggerProps) {
-  const { isOpen, setOpen, triggerId, contentId, triggerRef, openOnArrow } =
+  const { isOpen, setOpen, triggerId, contentId, triggerRef, openOnArrow, hover } =
     usePopoverContext("Popover.Trigger");
   // The child's own id wins (a field label's htmlFor points at it).
   return (
@@ -99,9 +243,42 @@ function PopoverTrigger(props: PopoverTriggerProps) {
         "aria-haspopup": "dialog",
         "aria-controls": isOpen ? contentId : undefined,
         ...floatingTriggerProps({ open: isOpen, setOpen, openOnArrow }),
+        ...(hover ? hoverTriggerProps(hover, isOpen) : null),
       }}
     />
   );
+}
+
+/**
+ * The trigger of a hover panel: hover and keyboard focus open it after the delay, a press opens
+ * it at once, and Tab from the open trigger moves into the panel — the panel follows its trigger in
+ * the Tab order although it is portaled. Focus coming back from the panel does not reopen it.
+ */
+function hoverTriggerProps(hover: HoverIntent, isOpen: boolean) {
+  const fromPanel = (node: EventTarget | null) =>
+    node instanceof Node && hover.panel()?.contains(node) === true;
+  return {
+    onClick: hover.press,
+    onPointerEnter: (event: React.PointerEvent<HTMLElement>) => {
+      // Touch has no hover: a tap is the press that opens it.
+      if (event.pointerType !== "touch") hover.enter();
+    },
+    onPointerLeave: (event: React.PointerEvent<HTMLElement>) => {
+      if (event.pointerType !== "touch") hover.leave();
+    },
+    onFocus: (event: React.FocusEvent<HTMLElement>) => {
+      if (!fromPanel(event.relatedTarget) && focusFromKeyboard(event.currentTarget)) hover.focus();
+    },
+    onBlur: (event: React.FocusEvent<HTMLElement>) => hover.blur(event.relatedTarget),
+    onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+      const panel = hover.panel();
+      if (event.key !== "Tab" || event.shiftKey || !isOpen || !panel) return;
+      const first = getFocusable(panel)[0];
+      if (!first) return;
+      event.preventDefault();
+      first.focus();
+    },
+  };
 }
 PopoverTrigger.displayName = "Popover.Trigger";
 
@@ -164,6 +341,7 @@ function PopoverContent({
     closeOnOutsideClick,
     closeOnEscape,
     anchoredRef,
+    hover,
   } = usePopoverContext("Popover.Content");
 
   // Overlay contract (foundation §8): focus moves into the panel on open (not with an Anchor) and
@@ -177,12 +355,17 @@ function PopoverContent({
     matchAnchorWidth: width === "trigger" || width === "min-trigger",
     closeOnEscape,
     closeOnOutsideClick,
-    focusOnOpen: initialFocus ?? !anchoredRef.current,
+    // A hover panel leaves focus on its trigger: Tab moves in.
+    focusOnOpen: initialFocus ?? (!anchoredRef.current && !hover),
     trap: trapFocus,
     tabExit: "edges",
-    // A panel driven by typing in its anchor stays next to the field.
-    sheet: !anchoredRef.current,
+    // A panel driven by typing in its anchor stays next to the field; a hover panel stays next
+    // to its trigger, where the pointer travels into it.
+    sheet: !anchoredRef.current && !hover,
   });
+  React.useLayoutEffect(() => {
+    hover?.bindPanel(floating.contentRef);
+  }, [hover, floating.contentRef]);
 
   const [titleId, setTitleId] = React.useState<string | null>(null);
   const [descriptionId, setDescriptionId] = React.useState<string | null>(null);
@@ -210,12 +393,48 @@ function PopoverContent({
       tabIndex={-1}
       data-flush={flush || undefined}
       className={cx(fieldTierClass, styles.content, className)}
+      {...(hover ? hoverPanelProps(hover, triggerRef, rest) : null)}
     >
       <PopoverSlotsContext.Provider value={slots}>{children}</PopoverSlotsContext.Provider>
     </FloatingPanel>
   );
 }
 PopoverContent.displayName = "Popover.Content";
+
+/**
+ * The panel of a hover panel: the pointer over it keeps it open, focus leaving both it and the
+ * trigger closes it, and Shift+Tab from its first stop goes back to the trigger with the panel
+ * still open (the trigger is the stop before it).
+ */
+function hoverPanelProps(
+  hover: HoverIntent,
+  triggerRef: React.RefObject<HTMLElement | null>,
+  own: React.HTMLAttributes<HTMLDivElement>,
+) {
+  return {
+    onPointerEnter: (event: React.PointerEvent<HTMLDivElement>) => {
+      own.onPointerEnter?.(event);
+      if (event.pointerType !== "touch") hover.enter();
+    },
+    onPointerLeave: (event: React.PointerEvent<HTMLDivElement>) => {
+      own.onPointerLeave?.(event);
+      if (event.pointerType !== "touch") hover.leave();
+    },
+    onBlur: (event: React.FocusEvent<HTMLDivElement>) => {
+      own.onBlur?.(event);
+      hover.blur(event.relatedTarget);
+    },
+    onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
+      own.onKeyDown?.(event);
+      if (event.defaultPrevented || event.key !== "Tab" || !event.shiftKey) return;
+      const first = getFocusable(event.currentTarget)[0];
+      if (document.activeElement !== first && document.activeElement !== event.currentTarget)
+        return;
+      event.preventDefault();
+      triggerRef.current?.focus();
+    },
+  };
+}
 
 // ─── Header / Title / Description / Actions ─────────────────────────────────
 

@@ -28,11 +28,12 @@ Modal.Root                    state and dismiss policy (no DOM)
 └── Modal.Content             portal + scrim + role="dialog"
     ├── (grab handle)         as a phone sheet with `closeOnOutsideClick`: aria-hidden bar, a drag starts here
     ├── Modal.Guard           no DOM: holds the dialog (busy / dirty) from inside
-    ├── Modal.Header          grid: [Icon] [Title + Description] [Actions] [close button]
-    │   ├── Modal.Icon        40 tile with a tone fill; the record's Avatar / Thumbnail with no tile, 40
-    │   ├── Modal.Title       line 1: <h2>, names the dialog; `loading` holds it with a skeleton
-    │   ├── Modal.Description line 2: <p>, describes the dialog; status Badges lead it (tier s)
-    │   └── Modal.Actions     one tab-wide switcher, then buttons (icon buttons, a ⋯ Dropdown), tier s, on the title's line
+    ├── Modal.Header          grid: [Icon] [Title / Description / Badges] [Actions] [close button]
+    │   ├── Modal.Title       line 1: <h2> name + muted `number`, names the dialog; `loading` holds it with a skeleton
+    │   ├── Modal.Description line 2: <p> text, describes the dialog; one line in a record header
+    │   ├── Modal.Badges      line 3: one row of Badges, tier m: status picker, assignee picker, statuses, «+N»
+    │   ├── Modal.Actions     one tab-wide switcher, then buttons (icon buttons, a ⋯ Dropdown), tier s, on line 1
+    │   └── Modal.Icon        optional: 40 tile with a tone fill, or a picture with no tile, centred on lines 1–2
     ├── Modal.Body            the only scrolling zone
     │   └── Modal.Section     <section>: <h3> label, description, Modal.Actions at the heading's end
     └── Modal.Footer          actions, primary last
@@ -76,23 +77,23 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Modal.Header
-`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button].
+`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title / Description / Badges] [Actions] [close button] — the title on line 1 with the actions and the close button centred on it, the description on line 2, the badges on line 3.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
-| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
+| `children` | `ReactNode` | — | Icon, Title, Description, Badges, Actions in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Modal.Actions
-`ref` → `HTMLDivElement`. Header: a tab-wide switcher (`SegmentedControl`, `Datepicker`), then buttons (a status goes in `Modal.Description`), tier `s`; under the title below 12rem; at the end of a `Modal.Section` heading. In `Modal.Footer`: the start group at the footer tier.
+`ref` → `HTMLDivElement`. Header: a tab-wide switcher (`SegmentedControl`, `Datepicker`), then buttons (a status is a badge), tier `s`, on line 1; under the title below 12rem; at the end of a `Modal.Section` heading. In `Modal.Footer`: the start group at the footer tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
 
 ### Modal.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.
+`ref` → `HTMLSpanElement`. Optional mark centred on lines 1–2: an `aria-hidden` 40 px tone tile; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -101,20 +102,29 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Modal.Title
-`ref` → `HTMLHeadingElement`. `<h2>` (title-m); its id names the dialog.
+`ref` → `HTMLHeadingElement`. Line 1: `<h2>` (title-m); its id names the dialog. In a record header (with `Badges` or a `number`) the name is one line with an ellipsis (the whole name in its `title` while cut); in a question dialog it wraps.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `number` | `ReactNode` | — | The record's number («#678», «№ 1042», «INV-2026-0142»): muted after the name, never cut, part of the dialog's name. Never in `Description`. |
 | `loading` | `boolean` | `false` | The name loads (a record opened by a link): a `Skeleton` holds the title line and `aria-busy` is set, so the header never moves; the name fades in. |
 | `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Modal.Description
-`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog. The record's status `Badge.Root`s go here: first in the line, chip tier `s` (20 px), the text wraps under them when narrow.
+`ref` → `HTMLParagraphElement`. Line 2: `<p>` (body-s, muted), text only, 4 under the title; its id describes the dialog. In a record header one line with an ellipsis (the whole text in its `title` while cut); in a question dialog it wraps under the title.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `loading` | `boolean` | `false` | Its data loads: a `Skeleton` holds the line's place and `aria-busy` is set, so the header never moves; the data fades in. |
 | `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+
+### Modal.Badges
+`ref` → `HTMLDivElement`. Line 3 of a record header: a `Badge.Group` — the pickers first (status; assignee with `Badge.Avatar`, or an `outline` «Назначить»; each a `Badge.Root` in a `Dropdown.Trigger`), then the statuses. Chip tier `m`; one row, the rest behind «+N».
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `loading` | `boolean` | `false` | The record loads: a `Skeleton` holds the line and `aria-busy` is set, so the header never moves; the badges fade in. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Badge.Root`s, the pickers in their `Dropdown.Root`), `className`, `aria-label` (a named row is `role="group"`) and the other attributes of the row. |
 
 ### Modal.Body
 `ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
@@ -221,7 +231,7 @@ Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere 
 | dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape, and a scrim press or the phone sheet's swipe, ask the Root to close; `false` turns that way off (no handle, no swipe) |
 | Enter confirms | `confirmOnEnter` (default `true`), `onEnterConfirm` | Enter in a field clicks the `Modal.Confirm` child, or calls `onEnterConfirm` instead; a focused button or link keeps its own Enter |
 | size | `size` on Content | `data-size` on the dialog |
-| header with description | a `Modal.Description` inside | `data-has-description="true"` on the header |
+| header with lines under the title | a `Modal.Badges` or a `Modal.Description` inside | `data-multiline="true"` on the header: the parts hang from the top, the actions and the close button centred on line 1 |
 | footer layout | `layout` or the size default | `data-layout` on the footer |
 | icon tone | `tone` on Icon | `data-tone` on the tile |
 | while open | — | focus trapped inside, page scroll locked, siblings of the portal `inert` (the toast region stays usable) |
@@ -233,7 +243,9 @@ Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere 
 | description loading | `Modal.Description loading` | a `Skeleton` holds the line, `aria-busy` on the `<p>`; the data fades in under the same element |
 | actions below | the title would get less than 12rem beside `Modal.Actions` | `data-actions-below` on the header: the actions move under the title and the description |
 | picture mark | an `Avatar.Root` or a `Thumbnail.Root` inside `Modal.Icon` | `data-media` on the icon, no tile; the picture's `data-size` is the slot's (`l` / `m`) |
-| status in the line | a `Badge.Root` inside `Modal.Description` | the line is a wrapping flex row, the badges first (`order`), each `data-tier="s"` |
+| record header | `Modal.Badges`, or a `Modal.Title number` | one line per line: the name and the description ellipsize, the number keeps its width; a cut line carries its whole text in `title` |
+| badges overflow | `Modal.Badges` wider than the dialog | the badges that do not fit wait behind a «+N» badge (`Badge.Group overflow="count"`) whose tooltip lists them; the row never wraps |
+| badges loading | `Modal.Badges loading` | a `Skeleton` of the chip height holds line 2, `aria-busy` on the row; the badges fade in |
 | sheet | a centred dialog on a phone viewport | `data-sheet` on the dialog: the bottom-sheet surface, the grab handle while it swipes |
 | swiping | as a phone sheet, a drag down from the handle or the header (with `closeOnOutsideClick`; without it there is no handle and no swipe) | `data-swiping` and `--swipe-offset` on the dialog while the pointer drags it; past 30% of its height or on a flick it closes, otherwise it glides back; a busy `Modal.Guard` sets `data-swipe-disabled` and the handle takes no drag |
 | placement | `placement` on Content | `data-placement` on the dialog |
@@ -243,15 +255,19 @@ Loading or disabled actions use the Button props (`loading`, `disabled`) inside 
 Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fades and scales from 0.98 over `base` and leaves over `fast`; as a bottom sheet it slides up over `slow` and down over `base`. Content stays mounted until the exit ends; under `prefers-reduced-motion` it unmounts at once.
 
 ## Layout & spacing
-- The header has one anatomy, the same in every modal, drawer and sheet:
+- The header has one anatomy, the same in every modal, drawer and sheet — three lines in the text column, the actions and the close button centred on the first:
   ```
-  [mark]  Title                                [tab switcher] [icon buttons] [⋯] [×]
-          [status badges] description text
+  Александра #678                              [icon buttons] [⋯] [×]
+  Аренда байка Пхукет · заявка 19 сент, 06:37
+  [Новая ⌄] [(АК) Анна Котова ⌄] [Telegram] [Ждёт человека] [+1]
   ```
-  - mark — `Modal.Icon`: a glyph on the tone tile, or the record's picture (`Avatar.Root`, `Thumbnail.Root`, also inside your own wrapper component) with no tile; both are 40 px.
-  - line 1 — `Modal.Title`; `loading` holds it with a Skeleton while the name loads.
-  - line 2 — `Modal.Description`: the record's statuses as `Badge.Root`s first, then the text. The kit sizes the badges (chip tier `s`, the line's 20 px), keeps them first and one gap apart, and wraps the text under them on a narrow panel.
-  - end — `Modal.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on the title's line; a status never goes here. A control rendered only on some tabs rises in and closes up in its own cell.
+  - line 1 — `Modal.Title`: the record's name, then its `number` muted («#678», «№ 1042»); `loading` holds it with a Skeleton while the name loads. The name ellipsizes, the number never does; both are the dialog's name.
+  - line 2 — `Modal.Description`, 4 under the title: the record's context in plain text, one line with an ellipsis in a record header; the whole text stays the dialog's description. A status or a number never goes here.
+  - line 3 — `Modal.Badges`, 8 under the line above, right over the body: the record's working controls — first the pickers — the status (a `Badge.Root` inside a `Dropdown.Trigger`), the assignee (`Badge.Avatar` + the name, or an `outline` «Назначить») — then the plain statuses. The kit sizes them (chip tier `m`) and keeps one row: what does not fit waits behind «+N».
+  - The header places the lines in this order whatever the order in code; write them in it anyway (Title, Description, Badges).
+  - end — `Modal.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on line 1; a status never goes here. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
+  - `Modal.Icon` is optional, before the text and centred on lines 1–2: a glyph on the tone tile, or a picture (`Avatar.Root`, `Thumbnail.Root`) with no tile; both are 40 px.
+  - A question or a form keeps a plain header: its title and description wrap; only `Modal.Badges` or a `number` make it a record header.
 - An action apart from the main pair («Удалить» of a record, «Выйти»): `Modal.Actions` inside `Modal.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
 - Dialog padding `--prime-modal-padding` (24) on every zone; header 24 top / 20 bottom, body 20 with a 16 gap between blocks, footer 20 top / 24 bottom.
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
@@ -297,7 +313,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A trigger opens a dialog with a title, a field and two actions; Enter presses the confirm — `Modal.Trigger`, `Modal.Confirm`. |
-| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a header whose status leads the line under the title, with a footer and no body between them — `Modal.Icon`, `Modal.Description`, `Modal.Footer`. |
+| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a record header — the status on its own line under the name and the text — with a footer and no body between them — `Modal.Icon`, `Modal.Badges`, `Modal.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every width; xs, s and m fill the footer with equal buttons, l and xl align them to the end — `size`. |
 | [long-content.tsx](examples/long-content.tsx) | A long body in titled sections scrolls on its own while the header and the footer stay in place; the primary closes the dialog and is the Enter target — `Modal.Body`, `Modal.Section`, `Modal.Confirm`. |
 | [custom-container.tsx](examples/custom-container.tsx) | The dialog portals into a given node instead of the document body — `container`. |
@@ -316,14 +332,16 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Modal.Section label` with `Modal.Actions`.
 - Busy or unsaved state lifted out of the form into Root props → put `Modal.Guard` next to the form, inside Content.
 - `key` or a conditional around `Modal.Root` to reset a form → the dialog unmounts at once, without its exit; keep the Root mounted and drive `open`.
-- A status `Badge` in the header's `Modal.Actions`, beside the buttons → put it in `Modal.Description`, before the text: the kit sizes it to the line and keeps it first.
+- A status `Badge` in the header's `Modal.Actions`, or inside `Modal.Description` → put it in `Modal.Badges`, line 3: the kit sizes it and keeps the row on one line.
+- The badges above the text, or the record number in `Modal.Description` → `Modal.Title number`, then `Modal.Description`, then `Modal.Badges`, in that order on screen whatever the order in code.
+- A long name wrapped onto two title lines in a record header → it is one line with an ellipsis; the whole name stays the dialog's name.
 - A control that applies to the whole tab (the text language, the period) repeated in section headings or put in one section → one switcher in the header's `Modal.Actions`, before the buttons, rendered only on the tabs it applies to.
-- A Badge with its own `size` in `Modal.Description` → leave `size` out: the line gives every header the same chip tier.
+- A Badge with its own `size` in `Modal.Badges` → leave `size` out: the row gives every header the same chip tier.
 - A `Skeleton` placed by hand in `Modal.Title` or `Modal.Description` → their `loading`.
 - A start-side button («Выйти», «Удалить») put inside `Modal.Meta` → `Modal.Actions` inside `Modal.Footer`; `Meta` is status text only.
 - Scrolling wrapper inside Modal.Body → Body already scrolls.
 - Long multi-section forms in a modal → use Drawer.
 
 ## Related
-- **Built from:** the dialog shared with Drawer and Sheet (`internal/overlay/DialogParts`, `internal/overlay/ModalDialog`), [Button](../button/COMPONENT.md) (header close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Modal.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Modal.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Drawer and Sheet (`internal/overlay/DialogParts`, `internal/overlay/ModalDialog`), [Badge](../badge/COMPONENT.md) (`Modal.Badges`: a one-line `Badge.Group` of tier m), [Button](../button/COMPONENT.md) (header close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Modal.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Modal.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm built on Modal `s`), [Drawer](../drawer/COMPONENT.md) (the same header, body, footer and `Guard` at the edge), [Popover](../popover/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md)

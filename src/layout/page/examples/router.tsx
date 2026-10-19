@@ -1,4 +1,4 @@
-/** A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the bar is their links on a line of their own and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. */
+/** A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the heading row before the buttons is their links and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. */
 import {
   Button,
   Card,

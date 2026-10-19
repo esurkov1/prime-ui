@@ -36,7 +36,7 @@ Skeleton           <span aria-hidden="true">; data-shape, data-size
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `shape` | `"text" \| "control" \| "circle" \| "block"` | `"text"` | `text` — lines of the tier's text; `control` — a field or button of the tier; `circle` — an avatar of the tier; `block` — a box that fills its container (image, chart, card). |
+| `shape` | `"text" \| "control" \| "chip" \| "circle" \| "block"` | `"text"` | `text` — lines of the tier's text; `control` — a field or button of the tier; `chip` — a badge of the tier; `circle` — an avatar of the tier; `block` — a box that fills its container (image, chart, card). |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the text line (control text size and line height), the control height or the avatar size. |
 | `lines` | `number` | `1` | `text` only: number of lines; the last of several is 60% wide. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` (width, height of a `block`), `data-*` and the other span attributes. |
@@ -48,6 +48,7 @@ Skeleton           <span aria-hidden="true">; data-shape, data-size
 |---|---|---|---|
 | `text` | rounded bars on the tier's text line boxes; the last of several lines is 60% wide | titles, names, descriptions, cells | yes |
 | `control` | a block of the tier's control height and radius, full width | fields, buttons, selects of a form | |
+| `chip` | a pill of the tier's badge height and radius, a short width the host may set | a status or a chip that is loading (a record header's badges) | |
 | `circle` | a circle of the tier's avatar size | avatars, round icons | |
 | `block` | a radius-l block that fills its container (at least 64px high) | images, covers, charts, whole cards | |
 

@@ -50,7 +50,7 @@ describe("useListPresence", () => {
 describe("useListItemPresence", () => {
   function Row({ list, id }: { list: ListPresence; id: string }) {
     const ref = React.useRef<HTMLLIElement>(null);
-    const entered = useListItemPresence(list, id, ref);
+    const entered = useListItemPresence(list, id, ref, "block");
     return (
       <li ref={ref} data-entered={entered || undefined}>
         {id}

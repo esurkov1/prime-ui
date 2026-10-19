@@ -16,6 +16,8 @@
   flex: 1 1 auto;
   flex-direction: column;
   box-sizing: border-box;
+  --pane-inset: var(--prime-space-3);
+
   inline-size: 100%;
   block-size: 100%;
   min-inline-size: 0;
@@ -23,12 +25,32 @@
 }
 
 /*
- * One inset all round, the panel's: in a card (radius 12) the rows and the field (radius 8) stand
- * 4px from every edge, so their corners follow the card's (nested radius = outer − padding).
+ * One pane inset (12px) for the search, the actions and the rows' highlight: they stand on one
+ * vertical, with the same air above the first control. The search and the actions are one block
+ * (an 8px gap) over a faint hairline (`hairline.bottom`, inset to the same vertical) that stays
+ * while the list scrolls under it.
  */
+.head {
+  --hairline-inset: var(--pane-inset);
+
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  padding: var(--pane-inset);
+}
+
 .search {
   flex: none;
-  padding: var(--prime-panel-padding);
+}
+
+/* The pane's own buttons: a row under the search (first in the block without one). */
+.actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
 }
 
 .scroller {
@@ -36,10 +58,10 @@
   min-block-size: 0;
 }
 
-/* The last row's own margin is the inset below it. */
+/* The last row's own margin and the padding add up to the inset below it. */
 .scroller .list {
   gap: 0;
-  padding: var(--prime-panel-padding) var(--prime-panel-padding) 0;
+  padding: var(--pane-inset) var(--pane-inset) calc(var(--pane-inset) - var(--prime-space-1));
 }
 
 /* The placeholder row of the next page keeps the rows' rhythm. */
@@ -132,20 +154,26 @@
   color: var(--prime-color-danger-text);
 }
 
-/* The record's status line (a deal stage, an AI state): one line, truncated on its own. */
-.record {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/*
+ * The record's status line (a deal stage, an AI state) under the preview: the badges of one line
+ * (`Badge.Group overflow="count"`), at a fixed height — the cell of the counts reads it to stay
+ * beside the preview.
+ */
+.root {
+  --record-h: var(--prime-badge-xs-height);
 }
 
-/* The record's status line (a deal stage, an AI state): one line, truncated on its own. */
+.root[data-size="l"],
+.root[data-size="xl"] {
+  --record-h: var(--prime-badge-s-height);
+}
+
 .record {
   display: block;
+  box-sizing: border-box;
+  block-size: calc(var(--record-h) + var(--prime-space-1));
+  padding-block-start: var(--prime-space-1);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /*
@@ -199,6 +227,11 @@
   gap: var(--prime-space-1);
 }
 
+/* The trail stretches over every line: with a status line the counts rise to the preview's. */
+.item[data-record="true"] .badges {
+  margin-block-end: calc(var(--record-h) + var(--prime-space-1));
+}
+
 .pop {
   display: inline-flex;
   align-items: center;
@@ -230,16 +263,19 @@
 
 /* --- Narrow container -------------------------------------------------------------- */
 
-/* A squeezed pane keeps the names and the counts: the preview line and the time step out. */
+/*
+ * A squeezed pane keeps the names and the counts: the preview line and the time step out. The
+ * status badges stay: they are the state of the record, not a preview, and shrink to «+N».
+ */
 @container chat-list (width < 15rem) {
   .preview,
-  .record,
   .meta {
     display: none;
   }
 
   /* Alone at the end of the row, the counts stand on its middle. */
-  .badges {
+  .badges,
+  .item[data-record="true"] .badges {
     margin-block: auto;
   }
 }

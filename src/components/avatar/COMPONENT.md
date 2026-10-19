@@ -42,7 +42,7 @@ Avatar.Group           overlapping row, gives its size to members
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | `"m"` | Diameter 20 · 24 · 32 · 40 · 48 · 64 px. Inside `Avatar.Group` the group size is used when it is not set. |
+| `size` | `"2xs" \| "xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | `"m"` | Diameter 16 · 20 · 24 · 32 · 40 · 48 · 64 px (`2xs` is the person in a chip, `Badge.Avatar`). Inside `Avatar.Group` the group size is used when it is not set. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the fallback; derive it from a stable user id. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-label` (when no name is shown: the avatar becomes `role="img"` of that name) and the other div attributes. |
 
@@ -76,7 +76,7 @@ Avatar.Group           overlapping row, gives its size to members
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | — | Size of every `Avatar.Root` / `Avatar.Overflow` inside without its own `size`; unset, they stay `m`. |
+| `size` | `"2xs" \| "xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | — | Size of every `Avatar.Root` / `Avatar.Overflow` inside without its own `size`; unset, they stay `m`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `aria-label`, `className` and the other div attributes. |
 
 ### Avatar.Overflow
@@ -84,7 +84,7 @@ Avatar.Group           overlapping row, gives its size to members
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | `"m"` | Diameter; inside `Avatar.Group` the group size when not set. |
+| `size` | `"2xs" \| "xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | `"m"` | Diameter; inside `Avatar.Group` the group size when not set. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` («+3»), `aria-label` («Ещё 3 участника») and the other div attributes. |
 
 ## Variants
@@ -100,6 +100,7 @@ The soft fill is opaque: the soft hue is composited over the ground the avatar s
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
+| `2xs` | 16px | the person in a chip (`Badge.Avatar` sets it) | |
 | `xs` | 20px | dense tables, inline mentions | |
 | `s` | 24px | compact lists, groups in headers | |
 | `m` | 32px | lists, comments | yes |
@@ -154,7 +155,7 @@ No keyboard interaction.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A photo with initials underneath while it loads, and initials alone; the name is on the avatar itself — `Avatar.Image`, `Avatar.Fallback`, `aria-label`. |
 | [variants.tsx](examples/variants.tsx) | Every palette hue of the fallback; derive it from a stable user id — `color`. |
-| [sizes.tsx](examples/sizes.tsx) | Every diameter, 20 to 64 px; initials take 40% of it — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Every diameter, 16 to 64 px; initials take 40% of it — `size`. |
 | [states.tsx](examples/states.tsx) | A loaded photo, a broken URL that falls back to initials, and an icon fallback for a guest — `Avatar.Image`, `Avatar.Fallback`. |
 | [presence.tsx](examples/presence.tsx) | A presence dot on the avatar edge: each state has its own shape and color and is announced by its name — `Avatar.Status`, `labels`. |
 | [team-group.tsx](examples/team-group.tsx) | Project members as an overlapping row with a «+N» cell; the group size goes to every member — `Avatar.Group`, `Avatar.Overflow`, `size`. |

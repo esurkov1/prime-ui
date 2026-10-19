@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import type { MessageStatus } from "@/components/message/Message";
 import { Send } from "@/icons/glyphs/send";
@@ -163,6 +165,43 @@ describe("ChatList", () => {
     await user.keyboard("{Escape}");
     expect(field).toHaveValue("");
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
+  });
+
+  it("stands its actions between the search and the dialogs, sized from the list's tier", async () => {
+    const user = userEvent.setup();
+    const onCreate = vi.fn();
+    const { container, rerender } = render(
+      <Dialogs search="" onSearchChange={() => {}} size="s">
+        <ChatList.Actions data-testid="actions">
+          <Button.Root fullWidth onClick={onCreate}>
+            Новый чат
+          </Button.Root>
+        </ChatList.Actions>
+      </Dialogs>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    const actions = screen.getByTestId("actions");
+    const create = screen.getByRole("button", { name: "Новый чат" });
+    expect(actions.previousElementSibling).toContainElement(screen.getByRole("searchbox"));
+    // The search and the actions are one block over the list.
+    expect(actions.parentElement).toContainElement(screen.getByRole("searchbox"));
+    expect(actions.parentElement?.nextElementSibling).toContainElement(screen.getByRole("list"));
+    expect(create).toHaveAttribute("data-size", "s");
+    await user.click(screen.getByRole("searchbox"));
+    await user.tab();
+    expect(create).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onCreate).toHaveBeenCalledTimes(1);
+    // Without a search the actions open the pane.
+    rerender(
+      <Dialogs>
+        <ChatList.Actions data-testid="actions">
+          <Button.Root>Новый чат</Button.Root>
+        </ChatList.Actions>
+      </Dialogs>,
+    );
+    expect(root.firstElementChild).toBe(screen.getByTestId("actions").parentElement);
+    expect(root.firstElementChild?.firstElementChild).toBe(screen.getByTestId("actions"));
   });
 
   it("shows nothing found for an empty search and its own empty state otherwise", () => {
@@ -430,7 +469,7 @@ describe("ChatList.Item asChild", () => {
     expect(screen.getByText("09:30")).toHaveAttribute("datetime", sent.toISOString());
   });
 
-  it("draws the record status as its own line beside the preview", () => {
+  it("draws the record status as badges on a line under the preview", () => {
     render(
       <ChatList.Root
         items={DIALOGS.slice(0, 1)}
@@ -438,14 +477,26 @@ describe("ChatList.Item asChild", () => {
         renderItem={(item) => (
           <ChatList.Item>
             <ChatList.ItemText>{item.name}</ChatList.ItemText>
-            <ChatList.ItemStatus data-testid="record">Бронь · ждёт человека</ChatList.ItemStatus>
             <ChatList.ItemDescription>{item.preview}</ChatList.ItemDescription>
+            <ChatList.ItemStatus data-testid="record">
+              <Badge.Root color="yellow">Бронь</Badge.Root>
+              <Badge.Root tone="warning">Ждёт человека</Badge.Root>
+            </ChatList.ItemStatus>
           </ChatList.Item>
         )}
       />,
     );
     const row = screen.getByRole("button", { name: /ООО «Вектор»/ });
-    expect(within(row).getByTestId("record")).toHaveTextContent("Бронь · ждёт человека");
-    expect(within(row).getByText("Счёт не выгружается")).toBeInTheDocument();
+    const record = within(row).getByTestId("record");
+    const preview = within(row).getByText("Счёт не выгружается");
+    expect(record).toHaveTextContent("Бронь");
+    expect(record).toHaveTextContent("Ждёт человека");
+    // Name, then the preview, then the badges.
+    expect(preview.compareDocumentPosition(record) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // The compact tier, in one line with a «+N» badge behind them.
+    const group = record.querySelector("[data-overflow]");
+    expect(group).toHaveAttribute("data-overflow", "count");
+    expect(group).toHaveAttribute("data-tier", "xs");
+    expect(row).toHaveAttribute("data-record", "true");
   });
 });

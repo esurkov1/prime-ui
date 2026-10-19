@@ -81,8 +81,12 @@ export default function DataTableRowOpenExample() {
       <Drawer.Root open={open} onOpenChange={setOpen}>
         <Drawer.Content size="s">
           <Drawer.Header>
-            <Drawer.Title>{deal?.title}</Drawer.Title>
-            <Drawer.Description>{deal?.id}</Drawer.Description>
+            <Drawer.Title number={deal?.id}>{deal?.title}</Drawer.Title>
+            {deal ? (
+              <Drawer.Badges>
+                <Badge.Root color={STAGE[deal.stage].color}>{STAGE[deal.stage].label}</Badge.Root>
+              </Drawer.Badges>
+            ) : null}
           </Drawer.Header>
           <Drawer.Body>
             {deal ? (

@@ -8,6 +8,9 @@ import enterMotion from "@/internal/enterMotion.module.css";
 
 import { Chat } from "./Chat";
 
+/** The place of the match as the live region says it (the visible count is `aria-hidden`). */
+const ANNOUNCED = { ignore: "[aria-hidden='true'], [aria-hidden='true'] *" };
+
 type Item = { id: string; at: Date; text: string; service?: boolean };
 
 const at = (hour: number, minute: number) => new Date(2026, 9, 15, hour, minute);
@@ -143,6 +146,6 @@ describe("Chat.Service: an event of the chat", () => {
 
   it("is not searched: a match is a message", () => {
     render(<Dialog items={ITEMS} search="взял клиента" />);
-    expect(screen.getByText("Нет совпадений")).toBeInTheDocument();
+    expect(screen.getByText("Нет совпадений", ANNOUNCED)).toBeInTheDocument();
   });
 });

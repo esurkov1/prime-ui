@@ -47,3 +47,10 @@
 .anchor {
   display: inline-flex;
 }
+
+/* hover-card.tsx: the avatar beside the name in a person card. */
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+}

@@ -90,12 +90,14 @@
   color: var(--prime-color-text-muted);
 }
 
-/* The action's box is the value's first line: the action centres in it (overflowing it evenly), so
-   it sits on that line at every tier and never pushes the row taller than the text. */
-.action {
+/* The actions' box is the value's first line: the actions centre in it (overflowing it evenly), so
+   they sit on that line at every tier and never push the row taller than the text. Several stand
+   as one group at the end edge, the row's gap between them; the text gives way, never the group. */
+.actions {
   display: flex;
   flex-shrink: 0;
   align-self: flex-start;
   align-items: center;
+  gap: var(--prime-space-2);
   height: var(--field-lh);
 }

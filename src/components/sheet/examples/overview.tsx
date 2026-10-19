@@ -27,7 +27,7 @@ export default function SheetOverviewExample() {
       </Sheet.Trigger>
       <Sheet.Content>
         <Sheet.Header>
-          <Sheet.Title>Заказ № 1042</Sheet.Title>
+          <Sheet.Title number="№ 1042">Заказ</Sheet.Title>
           <Sheet.Description>Анна Смирнова · 12 480 ₽</Sheet.Description>
         </Sheet.Header>
         <Sheet.Body>

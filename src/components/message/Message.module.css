@@ -382,9 +382,10 @@
 /* ─── Author, text ──────────────────────────────────────────────────────── */
 
 /*
- * The author's header: the name in the author's hue, an optional icon, the tag muted after them.
- * One line: the name ellipsizes first, then the tag. Nothing in it is pushed to the bubble's edge, so
- * a size change of the bubble never moves anything inside the line. The bubble hugs the line's intrinsic width
+ * The author's header: the name in the author's hue and an optional icon at the start, the tag
+ * muted at the end of the line (a Telegram admin title), `space-3` at least between them. One
+ * line: the name ellipsizes first, the tag keeps its width (at most half the line) and ellipsizes
+ * only once the name has given its room. The bubble hugs the line's intrinsic width
  * (`data-message-fit="row"`), so a long name or tag widens the bubble up to its cap.
  */
 .author {
@@ -401,7 +402,8 @@
 }
 
 .authorName {
-  flex: 0 1 auto;
+  /* Gives way long before the tag does. */
+  flex: 0 1000 auto;
   min-width: 0;
   overflow: hidden;
   font-weight: var(--prime-font-weight-semibold);
@@ -414,9 +416,11 @@
 }
 
 .authorTag {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
   max-inline-size: 50%;
-  padding-inline-start: var(--prime-space-1);
+  margin-inline-start: auto;
+  padding-inline-start: var(--prime-space-2);
   overflow: hidden;
   color: var(--prime-color-text-muted);
   text-overflow: ellipsis;
@@ -663,8 +667,7 @@ button.reply:focus-visible {
  * surface, at the message's width. The column is as wide as the wider of the bubble and the
  * keyboard (up to the cap); the bubble then takes that width, so they line up. A row is one line,
  * as in Telegram: its keys share it equally (`flex: 1 1 0`, the keys are `fullWidth`), and a label
- * longer than its share ellipsizes. Keys keep the control radius; the last row's outer corners take
- * the bubble's (`data-end`), so the keyboard closes the message like the bubble's own bottom.
+ * longer than its share ellipsizes. Every key keeps the control radius on all four corners.
  */
 .actions {
   display: flex;
@@ -676,14 +679,6 @@ button.reply:focus-visible {
 .actions > * {
   flex: 1 1 0;
   min-inline-size: 0;
-}
-
-.actions[data-end] > :first-child {
-  border-end-start-radius: var(--msg-radius);
-}
-
-.actions[data-end] > :last-child {
-  border-end-end-radius: var(--msg-radius);
 }
 
 /* A link key's mark (↗ out of the product, a window into it) at its top-end corner, out of the label's flow. */

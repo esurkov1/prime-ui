@@ -49,6 +49,7 @@ under them → its `renderTotals`.
 | one value from a plain text list on a mobile-first form, posted with the form (`name`) | NativeSelect — the OS picker opens on phones |
 | free text the team often repeats (a place, a city), any other text allowed | Input with `suggestions` — never a `<datalist>`, never a Select |
 | a pick that belongs to a text (an icon before a name) | Select with only `Select.TriggerIcon` inside `Input.Wrapper`, named by `aria-label` |
+| an amount and its currency as one field | Select after `Input.Field` inside `Input.Wrapper`: the trigger shows the symbol (`renderValue`), each row the symbol in `Select.ItemIcon` and the name ([amount-currency.tsx](../src/components/input/examples/amount-currency.tsx)) |
 | several of many, shown as tags, with search / creation | TagSelect (`Select.Root multiple` when tags are not needed) |
 | narrowing a list or table by several fields, with search and show / hide | SmartFilter |
 | an approximate number in a range | Slider (exact number → Input) |
@@ -59,8 +60,8 @@ under them → its `renderTotals`.
 | any color as a field of a form (swatch + hex, picker in a popover) | ColorField |
 | any color in a panel of its own (hex, eyedropper, channels) | ColorPicker |
 
-**Data.** Status, count, removable value or applied filter → Badge (`tone` for a status, `color` for a
-category, `onRemove` to remove, `pressed` / `onPressedChange` to toggle); several badges as one value
+**Data.** Status, count, removable value or applied filter → Badge (`tone` for a judgement, `color` for a
+stage or a category — [tone or color](foundations.md#tone-or-color), `onRemove` to remove, `pressed` / `onPressedChange` to toggle); several badges as one value
 (a client's tags) → `Badge.Group`, on one line with «+N» in a table cell. Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
 `ratio` — never a round Avatar for things. Keyboard shortcut → Kbd. One block of related
 numbers/content → Card (pick the template; a whole tile that opens its details → `Card.Root asChild`
@@ -89,10 +90,11 @@ messenger or an inbox) → `ChatList` (`items`, `renderItem` with `ChatList.Item
 counts, «печатает…», drafts, ticks, a row menu and search come with it — never `List` with a hand-made
 count and preview; `List` stays for records that are not conversations (tickets, letters, invoices). A group chat → `Chat.Messages group`: `Message.Author`
 (`tag`, `Message.AuthorIcon`) and `Message.Avatar` on every message, the list shows them on the
-first and the last of a run. A one-to-one chat whose outgoing messages are written by different
-people (an operator, the account owner, an AI agent) → `Chat.Messages authors="outgoing"`: the author
-heads each outgoing run, the client side stays bare. A record's state beside the preview in a dialog
-row (a deal stage, «ждёт человека») → `ChatList.ItemStatus`. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
+first and the last of a run. A one-to-one chat with several writers and no avatars → `Chat.Messages
+authors`: `outgoing` when your side has several (an operator, the account owner, an AI agent),
+`incoming` when the client's has, `all` for both — the author heads each run of that side. A chat
+inside a drawer tab or a `Card.Body` → `Chat.Root variant="inline"`. A record's state under the preview in a dialog
+row (a deal stage, «ждёт человека») → `ChatList.ItemStatus` with a `Badge.Root` per fact. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
 outside a chat → `VoicePlayer` alone. A round video message → `VideoNote` inside `Message.Root`
 (alone there it is the message: no bubble); a face-to-camera report outside a chat → `VideoNote`
 alone. The two players take the same props (`src`, `duration`, `unplayed`, `disabled`, `playing`,
@@ -101,7 +103,17 @@ the transcript and the `transfer` set); only VoicePlayer has `waveform` and a ra
 comment, a report) → `Gallery`; one picture of an object → `Thumbnail`. A video with controls →
 `Message.Media` or `Thumbnail.Video`, not VideoNote. «Печатает…» → `Chat.Root typing` (or
 `Message.Typing`), never a text row; a jump to a message → `Message.Reply target`, `Chat.Pinned` or
-`Chat.Root jumpTo`, never `scrollIntoView`; search inside a chat → `Chat.Search`. Files, photos,
+`Chat.Root jumpTo`, never `scrollIntoView`; search inside a chat → `Chat.Search`, always open
+without a search button → `Chat.Search persistent` (one control of yours, a channel `Select`, before
+the field; the «2/5» count sits inside the field and a query counts from `minSearchLength`, 2 by
+default). A chat about a record (a client, a deal) heads itself in two lines: the avatar, then
+`Chat.Title number` over `Chat.Badges` (the stage and assignee pickers first, then statuses), the
+`Chat.Actions` centred at the end — no `Chat.Description` under the badges. An event of the record in
+the feed (an agent took the client, a stage moved) → `Chat.Service` with `Chat.ServiceIcon` and
+`Chat.ServiceChange`, never a message from a fake author. A bot's inline keys under a message →
+`Message.Actions` (a link key gets the kit's corner mark — ↗ out of the product, a window into it —
+never an arrow of your own); its
+reply keyboard → `Composer.Keyboard`. Files, photos,
 places and contacts sent in a chat → the `Message` parts, not FileUpload rows or Cards; a sticker →
 `Message.Sticker` (a Lottie or video sticker is your player inside it). A message shown outside a
 chat (a bot's welcome message in its settings) → `Message.Root preview`; its formatted text alone →
@@ -302,7 +314,7 @@ will create. One kind only → the button opens its form directly, no menu.
 | List / ChatList / Sidebar / Tabs / Card list / DataTable | List: the records of a list + detail screen that are not conversations (tickets, letters, invoices), one open at a time (`current`), each row a button or a link with a text line, a preview, meta and a count. ChatList: the conversations of a messenger or an inbox. Sidebar: the sections of the **app**. Tabs: panels of **one screen**. `Card.List` (`variant="list"`): static facts in a card, nothing opens. DataTable: many records compared by columns, sorted, filtered, selected in bulk. |
 | FieldList / DataTable / Fieldset / TagSelect | FieldList: records of one shape a person **edits** in a form, a row of fields each, added and removed by hand, up to four short fields per row. DataTable: records a person **reads**, sorts, filters and selects; edits open a Drawer. Fieldset: **one** record's fields under a heading. TagSelect: values **picked** from options, shown as tags. One value in several units is none of them — fields in one row under one heading. |
 | Tabs / SegmentedControl | Tabs switch **panels of content** (navigation inside a screen). SegmentedControl switches a **mode** of the same content (period, view mode, filter) — never a stored setting, which is a `Select` field. |
-| Modal / Drawer / Sheet / Popover / Tooltip | Modal: blocking decision or a short form (≤ 4 fields) that needs full attention. Drawer: long form, filters, record details beside the page, while keeping page context. Sheet: a short task that ends by itself — a pick, an action, a short note — raised from the bottom edge. Popover: small non-modal panel anchored to a control (quick edit, explanation with a link). Tooltip: a few words naming or explaining a control, no interactive content. |
+| Modal / Drawer / Sheet / Popover / Tooltip | Modal: blocking decision or a short form (≤ 4 fields) that needs full attention. Drawer: long form, filters, record details beside the page, while keeping page context. Sheet: a short task that ends by itself — a pick, an action, a short note — raised from the bottom edge. Popover: small non-modal panel anchored to a control (quick edit, explanation with a link). Tooltip: a few words naming or explaining a control, no interactive content; a hint on hover that holds a link or a button (a person or record card by a name) → Popover `openOn="hover"`. |
 | Select / NativeSelect | Select: the kit's floating list — icons, descriptions, groups, search, `multiple`, `clearable`. NativeSelect: a plain text list where the OS picker is better (phones) or the value must post with a form by `name`. |
 | Select / Dropdown / CommandMenu / TagSelect | Select picks a **value** for a field (form data). Dropdown runs **actions** (Edit, Duplicate, Delete). CommandMenu searches commands and pages across the app (locally or on the server) — it is not a field. TagSelect picks **several values** as tags. |
 | SmartFilter / SegmentedControl / Select | Search and filters over a list → SmartFilter (`fields={[]}` for a search alone), even with one field. A switch of what the same data shows (sections with counts, a period, a view) → SegmentedControl, or a Select when the options are many. |

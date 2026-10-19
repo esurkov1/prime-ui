@@ -227,7 +227,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | nothing to show | no option matches (and not loading) | a compact EmptyPage with `role="status"`: `labels.empty` alone; a `Select.Action` stays under it, highlighted |
 | sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it |
 | segment | inside `Input.Wrapper` | no frame (label, hint, error, support row): the root is `data-field-segment`, the trigger `data-segment="true"` — a tinted section flush with the box's start edge, a stronger fill on hover and while open, an inset focus ring; named «`aria-label`: value» |
-| option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is a fill only |
+| option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is the neutral fill only; selected is medium weight and the trailing check (the checkbox with `multiple`), the same in one-line and rich rows |
 
 ## Layout & spacing
 - The trigger is 100% wide; set the width with the layout (grid column, max-width wrapper).

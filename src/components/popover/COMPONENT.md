@@ -10,6 +10,7 @@
 - A short form (invite, rename) that does not need a full dialog.
 - A must-finish step tied to a button (a note, a reason) that closes only from its own buttons.
 - An explanation with more than one sentence, or with a link, next to a term.
+- A hint or a person card that opens on hover yet holds a link or a button (`openOn="hover"`) — what a Tooltip cannot hold.
 
 ## When not to use
 - A one-line hint on hover → use [Tooltip](../tooltip/COMPONENT.md).
@@ -27,7 +28,7 @@ import { Popover } from "prime-ui-kit";
 ## Anatomy
 ```
 Popover.Root                 state and dismiss policy (no DOM)
-├── Popover.Trigger          clones its child; toggles the panel
+├── Popover.Trigger          clones its child; toggles the panel (with openOn="hover": hover and focus open it)
 ├── Popover.Anchor           instead of Trigger: positions the panel, no click / ARIA; its control names a panel without a Title
 └── Popover.Content          portaled role="dialog" on the floating surface, scrolls
     ├── Popover.Header       title + description, 4 apart
@@ -49,10 +50,11 @@ No DOM, no ref. Open state and dismiss policy.
 |---|---|---|---|
 | `open` | `boolean` | — | Controlled visibility; together with `onOpenChange`. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, `Popover.Close`, Escape, outside press, code. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, hover (`openOn="hover"`), `Popover.Close`, Escape, outside press, code. |
 | `closeOnOutsideClick` | `boolean` | `true` | A pointerdown outside the panel and its trigger closes it; focus follows the pointer. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the panel and returns focus to the trigger. |
 | `openOnArrow` | `boolean` | `false` | ArrowDown and ArrowUp on the trigger open the panel, as on a picker whose trigger reads as a field (a colour, a period); Enter and Space open it either way. |
+| `openOn` | `"click" \| "hover"` | `"click"` | `click`: a press toggles the panel. `hover`: a hover card — hover or keyboard focus on the trigger opens it after a delay, Tab moves in; for a hint with a link a Tooltip cannot hold. |
 | `children` | `ReactNode` | — (required) | Trigger (or Anchor) and Content. |
 
 ### Popover.Trigger · Popover.Anchor · Popover.Close
@@ -63,7 +65,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | `children` | `ReactElement` | — (required) | One element, usually a Button (Anchor: any element, e.g. a toolbar). |
 
 ### Popover.Content
-`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title` (else by the control it opened from). Below 640px of viewport, opened from a Trigger, it is a bottom sheet (`data-sheet`).
+`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title` (else by the control it opened from). Below 640px of viewport, opened from a Trigger by a press, it is a bottom sheet (`data-sheet`); a hover panel stays anchored.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -72,7 +74,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the text, padding and gap; also the size context of the controls inside. |
 | `width` | `"auto" \| "trigger" \| "min-trigger" \| "content"` | `"auto"` | `auto`: by content, panel minimum to twice that. `trigger`: exactly the trigger. `min-trigger`: `auto`, never narrower than the trigger. `content`: what the content needs. A sheet is full width. |
 | `trapFocus` | `boolean` | `false` | Tab cycles inside the panel (forms). Without it Tab past the last (Shift+Tab before the first) stop closes the panel and returns focus to the trigger. |
-| `initialFocus` | `boolean` | `true` with `Popover.Trigger`, `false` with `Popover.Anchor` | Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger. |
+| `initialFocus` | `boolean` | `true` with `Popover.Trigger`, `false` with `Popover.Anchor` or `openOn="hover"` | Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger. |
 | `flush` | `boolean` | `false` | No inner padding and no gap: rows and dividers reach the panel edges; the content lays out its own spacing. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `className` and the other attributes of the panel. |
 
@@ -108,6 +110,12 @@ Title uses the tier text size with title weight; Description uses the tier label
 | `align="center"` | Centred on the trigger | Small icon triggers | |
 | `align="start"` | Start edges aligned: the panel grows toward the end | The panel must line up with the start of a block whatever room there is | |
 
+### openOn (Root)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `click` | A press on the trigger opens and closes the panel; focus moves into it | Filters, forms, confirmations | yes |
+| `hover` | A hover card: the pointer resting on the trigger or keyboard focus on it opens the panel after 400 ms; it stays while the pointer is over the trigger or the panel (300 ms of grace bridge the gap) or focus is in either; focus stays on the trigger, Tab moves in; a press or a tap opens it at once and keeps it until a dismiss; no bottom sheet on a phone | A hint that holds a link («Подробнее»), a person or record card next to a name | |
+
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -134,13 +142,13 @@ A bottom sheet is always full width, whatever `width` says.
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state="open" \| "closed"` on the panel (closed while the exit animation plays) and on the trigger, `aria-expanded` on the trigger |
+| open / closed | `open` / `defaultOpen` / `onOpenChange`; with `openOn="hover"` also hover and keyboard focus | `data-state="open" \| "closed"` on the panel (closed while the exit animation plays) and on the trigger, `aria-expanded` on the trigger |
 | dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape and a press outside close the panel; `false` turns that way off |
 | side | `side` and the room next to the trigger | `data-side` (resolved) |
 | size | `size` on Content | `data-size` |
 | width | `width` on Content | `data-width` on the anchored panel |
 | flush | `flush` | `data-flush="true"` |
-| sheet | a phone viewport, opened from a Trigger (an Anchor keeps the panel next to its field) | a scrim and a full-width bottom sheet around the panel; the sheet carries `data-state`, the panel `data-sheet` and keeps its role and ref; page scroll locked; with `closeOnOutsideClick` an `aria-hidden` grab handle, and a swipe down from it closes the sheet |
+| sheet | a phone viewport, opened from a Trigger with `openOn="click"` (an Anchor keeps the panel next to its field, a hover panel next to its trigger) | a scrim and a full-width bottom sheet around the panel; the sheet carries `data-state`, the panel `data-sheet` and keeps its role and ref; page scroll locked; with `closeOnOutsideClick` an `aria-hidden` grab handle, and a swipe down from it closes the sheet |
 
 There is no `disabled` on Popover: a disabled trigger never opens it.
 
@@ -160,6 +168,7 @@ Motion (`overlayMotion`): the panel grows out of the side that faces its trigger
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | On the trigger: opens the panel (focus moves into it) and closes it. |
+| `Tab` | On the trigger of an open hover panel (`openOn="hover"`): moves focus to the first stop of the panel, which follows its trigger in the Tab order; Shift+Tab from that stop returns to the trigger with the panel open. |
 | `ArrowDown` · `ArrowUp` | On the trigger with `openOnArrow`: opens the panel. |
 | `Escape` | Closes the panel (`closeOnEscape`); focus returns to the trigger. |
 | `Tab` | Moves through the panel content; with `trapFocus` it cycles inside the panel, without it Tab past the last stop closes the panel and goes on from the trigger. |
@@ -170,6 +179,7 @@ Motion (`overlayMotion`): the panel grows out of the side that faces its trigger
 - The panel is `role="dialog"` without `aria-modal`, named by `Popover.Title` (its own `id` included), else by the control it opened from — the trigger, or the control inside `Popover.Anchor` — read from the page, and described by `Popover.Description`.
 - The trigger gets `aria-haspopup="dialog"`, `aria-expanded`, `data-state` and, while open, `aria-controls`; the child's own `id` wins. Other props given to `Popover.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
 - Opened from a Trigger, focus moves into the panel: `[data-autofocus]`, else the first tab stop, else the panel. Opened at a `Popover.Anchor`, focus stays in the anchor (`initialFocus` moves it in), and presses on the anchor do not dismiss the panel.
+- With `openOn="hover"` keyboard focus on the trigger opens the panel as the pointer does, and focus stays on the trigger; focus moving out of both the trigger and the panel closes it, and focus handed back to the trigger by a close does not reopen it. Content that holds links or buttons belongs here, not in a Tooltip (`role="tooltip"` takes no focus).
 - `Popover.Close` closes the panel and returns focus to the trigger, unless the child's own `onClick` calls `preventDefault()`.
 - An outside press closes the panel without moving focus back to the trigger: focus follows the pointer (foundation §8).
 - Only the topmost layer reacts: a Select open inside the panel closes first.
@@ -189,6 +199,7 @@ No `labels`.
 | [width.tsx](examples/width.tsx) | In a narrow column the panel takes the exact width of a full-width trigger and its text wraps; a short trigger opens a panel at least as wide as itself; a table of limits takes the width it needs — `width`. |
 | [flush.tsx](examples/flush.tsx) | A notification list whose rows and dividers reach the panel edges; each row brings its own padding — `flush`. |
 | [from-menu.tsx](examples/from-menu.tsx) | A menu command opens a panel at the same button: the rename item shows a form anchored to the menu button and focus lands in its field, not back on that button — `Popover.Anchor`, `initialFocus`. |
+| [hover-card.tsx](examples/hover-card.tsx) | A hint that holds a link and a person card open on hover and keyboard focus, and Tab moves into them — `openOn`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A note being typed is not lost to a stray click: the panel closes only from its buttons, and not at all while the note is saved — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: another button opens the panel from code, and the panel's own button in `Popover.Close` closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | An invite form in a panel: Tab stays inside, the role list does not count as an outside click, an invalid email shakes the field and keeps the panel open until it is fixed — `trapFocus`, `error`. |
@@ -196,6 +207,8 @@ No `labels`.
 ## Mistakes
 - A Popover opened from a Dropdown item with `Popover.Anchor` and no `initialFocus` → focus returns to the menu button and the panel is out of keyboard reach; set `initialFocus`.
 - A hint of a few words in a Popover → use Tooltip (hover / focus, no interactive content).
+- A link or a button inside a Tooltip → a Popover with `openOn="hover"`: the pointer reaches it and Tab moves into it.
+- A hover panel whose trigger is not focusable (a plain `<span>`) → keyboard users never open it; the trigger is a button or a link.
 - A form without `trapFocus` → add it so Tab stays in the panel.
 - Closing from inside through your own `open` state only → wrap the button in `Popover.Close`.
 - A menu of actions built from buttons in a Popover → use Dropdown (roving focus, menu roles).

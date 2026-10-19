@@ -1,7 +1,7 @@
-/** Every diameter, 20 to 64 px; initials take 40% of it — `size`. */
+/** Every diameter, 16 to 64 px; initials take 40% of it — `size`. */
 import { Avatar, Typography } from "prime-ui-kit";
 
-const SIZES = ["xs", "s", "m", "l", "xl", "2xl"] as const;
+const SIZES = ["2xs", "xs", "s", "m", "l", "xl", "2xl"] as const;
 
 export default function AvatarSizesExample() {
   return (

@@ -28,6 +28,7 @@ export type {
 export { Avatar } from "./avatar/Avatar";
 export type {
   BadgeActionProps,
+  BadgeAvatarProps,
   BadgeDotProps,
   BadgeGroupLabels,
   BadgeGroupProps,
@@ -132,6 +133,7 @@ export type {
 } from "./chat/Chat";
 export { Chat, formatMessageDate, groupMessages } from "./chat/Chat";
 export type {
+  ChatListActionsProps,
   ChatListItemDescriptionProps,
   ChatListItemIconProps,
   ChatListItemMenuProps,
@@ -463,6 +465,7 @@ export type { MessageMediaProps } from "./message/MessageMedia";
 export type { MessageStickerProps } from "./message/MessageSticker";
 export type {
   ModalActionsProps,
+  ModalBadgesProps,
   ModalBodyProps,
   ModalCloseProps,
   ModalConfirmProps,

@@ -18,7 +18,7 @@ export default function DrawerOverviewExample() {
       </Drawer.Trigger>
       <Drawer.Content size="s">
         <Drawer.Header>
-          <Drawer.Title>Заказ № 1042</Drawer.Title>
+          <Drawer.Title number="№ 1042">Заказ</Drawer.Title>
           <Drawer.Description>Оформлен 3 октября</Drawer.Description>
         </Drawer.Header>
         <Drawer.Body>

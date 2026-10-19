@@ -11,6 +11,13 @@ export const api: ComponentApi = {
       ru: "Рамка чата: владеет выбором, поиском, сигналом набора и переходами и раздаёт их частям. Колонка во всю высоту родителя; все части, кроме `Chat.Messages`, необязательны.",
       props: [
         {
+          name: "variant",
+          type: '"pane" | "inline"',
+          default: '"pane"',
+          en: "How the chat stands in its host: `pane` — inset from its own edges (a `Card`, a page pane); `inline` — flush with the content edges of a padded host (a `Drawer.Body`, a `Tabs.Panel`, a `Card.Body`).",
+          ru: "Как чат стоит в родителе: `pane` — с отступами от своих краёв (`Card`, панель страницы); `inline` — вровень с краями содержимого родителя с отступами (`Drawer.Body`, `Tabs.Panel`, `Card.Body`).",
+        },
+        {
           name: "selected",
           type: "readonly string[] | null",
           en: "Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting. Any of the triad adds «Выбрать» to every `Message.Menu`; without it the chat has no selection.",
@@ -34,6 +41,13 @@ export const api: ComponentApi = {
           type: "string | null",
           en: "The search query (controlled); `null` — the search bar is closed. Matches in the messages' text and transcripts are marked; the newest is current.",
           ru: "Поисковый запрос (управляемое); `null` — строка поиска закрыта. Совпадения в тексте и расшифровках сообщений выделены; самое новое — текущее.",
+        },
+        {
+          name: "minSearchLength",
+          type: "number",
+          default: "2",
+          en: "How many characters a query needs (trimmed) before it is searched: a shorter one marks, counts and steps nothing.",
+          ru: "Сколько символов нужно запросу (без пробелов по краям), чтобы искать: более короткий ничего не выделяет, не считает и не листает.",
         },
         {
           name: "defaultSearch",
@@ -78,14 +92,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Header",
-      en: "`ref` → `HTMLDivElement`. The top of the chat: who it is with. The title over the description and the actions at the end; every other child (a back button, an `Avatar`) leads the row, side by side in the order written.",
-      ru: "Верх чата: с кем переписка. Заголовок над описанием и действия в конце; все остальные дети (кнопка «Назад», `Avatar`) встают в начало ряда друг за другом в порядке записи.",
+      en: "`ref` → `HTMLDivElement`. The top of the chat: who it is with. The title over the badges and the description, the actions at the end; every other child (a back button, an `Avatar`) leads the row. It draws nothing of its own.",
+      ru: "Верх чата: с кем переписка. Заголовок над бейджами и описанием, действия в конце; все остальные дети (кнопка «Назад», `Avatar`) встают в начало ряда. Своего ничего не рисует.",
       props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (a `Page.BackButton`, an `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
-          ru: "`children` (`Page.BackButton`, `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
+          en: "`children` (a `Page.BackButton`, an `Avatar`, `Chat.Title`, `Chat.Badges`, `Chat.Description`, `Chat.Actions`), `className`.",
+          ru: "`children` (`Page.BackButton`, `Avatar`, `Chat.Title`, `Chat.Badges`, `Chat.Description`, `Chat.Actions`), `className`.",
         },
       ],
     },
@@ -94,6 +108,12 @@ export const api: ComponentApi = {
       en: "`ref` → `HTMLHeadingElement`. Who the chat is with, one line that ellipsizes; it also names the message list (`aria-labelledby`).",
       ru: "С кем переписка, одна строка с многоточием; она же называет ленту сообщений (`aria-labelledby`).",
       props: [
+        {
+          name: "number",
+          type: "ReactNode",
+          en: "The record's number («#4120»), muted after the name and part of it: the name ellipsizes, the number never.",
+          ru: "Номер записи («#4120»), приглушённо после имени и часть его: имя сокращается, номер — никогда.",
+        },
         {
           name: "as",
           type: '"h2" | "h3" | "h4"',
@@ -106,6 +126,19 @@ export const api: ComponentApi = {
           type: "HTMLAttributes<HTMLHeadingElement>",
           en: "`children` (the name), `className`.",
           ru: "`children` (имя), `className`.",
+        },
+      ],
+    },
+    {
+      name: "Chat.Badges",
+      en: "`ref` → `HTMLDivElement`. The record's badges under the title: the pickers first (a `Badge.Root` in a `Dropdown.Trigger`), then the statuses. One row of `s` chips (`Badge.Group`); what does not fit waits behind «+N».",
+      ru: "Бейджи записи под заголовком: сначала выбор (`Badge.Root` в `Dropdown.Trigger`), затем статусы. Один ряд чипов `s` (`Badge.Group`); что не влезло, ждёт за «+N».",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (`Badge.Root`, a `Dropdown.Root` around one), `className`.",
+          ru: "`children` (`Badge.Root`, `Dropdown.Root` вокруг него), `className`.",
         },
       ],
     },
@@ -124,14 +157,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Actions",
-      en: "`ref` → `HTMLDivElement`. The buttons at the end of the header: `Chat.SearchButton`, a call, a `Dropdown` of more.",
-      ru: "Кнопки в конце шапки: `Chat.SearchButton`, звонок, `Dropdown` с остальным.",
+      en: "`ref` → `HTMLDivElement`. The controls at the end of the header, tier `s`: ghost icon buttons (`Chat.SearchButton`, a call, a toggle with `pressed`), a `Select` or a `SegmentedControl`, a ⋯ `Dropdown` last. Centred on the header's text.",
+      ru: "Элементы управления в конце шапки, ярус `s`: призрачные кнопки-иконки (`Chat.SearchButton`, звонок, переключатель с `pressed`), `Select` или `SegmentedControl`, ⋯ `Dropdown` последним. По центру текста шапки.",
       props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (the buttons), `className`.",
-          ru: "`children` (кнопки), `className`.",
+          en: "`children` (the controls), `className`.",
+          ru: "`children` (элементы управления), `className`.",
         },
       ],
     },
@@ -150,14 +183,21 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Search",
-      en: "`ref` → `HTMLDivElement`. The search bar, shown while the search is open: the field (focused as it opens), the place of the current match («2 из 5») and the steps to the older and newer match.",
-      ru: "Строка поиска, видна, пока поиск открыт: поле (получает фокус при открытии), место текущего совпадения («2 из 5») и шаги к более старому и более новому совпадению.",
+      en: "`ref` → `HTMLDivElement`. The search bar: your control and the field; once a query of `minSearchLength` is typed the field's end holds the steps to the older and newer match and the count («2/5»). Shown while open, or always with `persistent`.",
+      ru: "Строка поиска: ваш элемент и поле; когда введён запрос длиной `minSearchLength`, в конце поля — шаги и счётчик («2/5»). Видна, пока поиск открыт, или всегда с `persistent`.",
       props: [
+        {
+          name: "persistent",
+          type: "boolean",
+          default: "false",
+          en: "The bar is always there, with no `Chat.SearchButton`: the field shows from the start and never takes the focus by itself; an empty field is no search (`search` is `null`), Escape clears the query.",
+          ru: "Строка видна всегда, без `Chat.SearchButton`: поле показано сразу и само фокус не берёт; пустое поле — не поиск (`search` равен `null`), Escape очищает запрос.",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`className` and the other attributes.",
-          ru: "`className` и прочие атрибуты.",
+          en: "`children` — one control before the field at its tier (a channel `Select.Root`, its own width, at most half the row); `className` and the other attributes.",
+          ru: "`children` — один элемент перед полем в его ярусе (`Select.Root` канала, своей ширины, не больше половины ряда); `className` и прочие атрибуты.",
         },
       ],
     },
@@ -232,9 +272,10 @@ export const api: ComponentApi = {
         },
         {
           name: "authors",
-          type: '"outgoing"',
-          en: "A direct chat with several outgoing authors (operator, AI agent): the first message of an outgoing run shows the author's header; incoming ones keep none. Ignored with `group`.",
-          ru: "Личный чат, где исходящие пишут разные авторы (оператор, владелец аккаунта, AI-агент): первое сообщение исходящей серии показывает шапку автора; у входящих нет ни шапки, ни места под аватар. С `group` не действует.",
+          type: '"none" | "incoming" | "outgoing" | "all"',
+          default: '"none"',
+          en: "Several writers, no avatars: the first message of a run on the named side (`incoming`, `outgoing`, `all`) shows the author's header; no avatar, no gutter. Ignored with `group`.",
+          ru: "Несколько авторов без аватаров: первое сообщение серии на названной стороне (`incoming`, `outgoing`, `all`) показывает шапку автора; ни аватара, ни места под него. С `group` не действует.",
         },
         {
           name: "items",
@@ -541,6 +582,10 @@ export const api: ComponentApi = {
         en: "The place of the current match, counted from the newest.",
         ru: "Место текущего совпадения, считая от самого нового.",
       },
+      matchCount: {
+        en: "The count badge at the field's end, each number rolling; no match shows «0/0».",
+        ru: "Бейдж-счётчик в конце поля, каждое число прокручивается; без совпадений — «0/0».",
+      },
       noMatches: { en: "The search found nothing.", ru: "Поиск ничего не нашёл." },
       previousMatch: {
         en: "The button that goes to the older match.",
@@ -597,8 +642,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "↑ · ↓",
-        en: "Moves to the previous / next message",
-        ru: "Переходит к предыдущему / следующему сообщению",
+        en: "Moves to the previous / next message; in the search field, with matches, goes to the older / newer match",
+        ru: "Переходит к предыдущему / следующему сообщению; в поле поиска, когда есть совпадения, — к более старому / более новому совпадению",
       },
       {
         keys: "Home · End",
@@ -612,8 +657,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Enter",
-        en: "In the search field goes to the older match; on a message opens its menu; in selection mode toggles the message (`Shift+Enter` — the range)",
-        ru: "В поле поиска — к более старому совпадению; на сообщении открывает его меню; в режиме выбора переключает сообщение (`Shift+Enter` — диапазон)",
+        en: "In the search field goes to the older match (`Shift+Enter` — the newer); on a message opens its menu; in selection mode toggles the message (`Shift+Enter` — the range)",
+        ru: "В поле поиска — к более старому совпадению (`Shift+Enter` — к более новому); на сообщении открывает его меню; в режиме выбора переключает сообщение (`Shift+Enter` — диапазон)",
       },
       {
         keys: "L · R",
@@ -627,8 +672,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Escape",
-        en: "In the search field closes the search and returns the focus to `Chat.SearchButton`; in the list leaves selection mode",
-        ru: "В поле поиска закрывает поиск и возвращает фокус на `Chat.SearchButton`; в ленте выходит из режима выбора",
+        en: "In the search field closes the search and returns the focus to `Chat.SearchButton` (`persistent`: clears the query); in the list leaves selection mode",
+        ru: "В поле поиска закрывает поиск и возвращает фокус на `Chat.SearchButton` (`persistent`: очищает запрос); в ленте выходит из режима выбора",
       },
     ],
     aria: [
@@ -637,8 +682,8 @@ export const api: ComponentApi = {
         ru: 'Лента — `role="log"`: новые сообщения вежливо объявляются; её имя — `Chat.Title` (`aria-labelledby`), без заголовка — `labels.messages` или ваш `aria-label`. Это одна остановка Tab; сообщения несут `aria-posinset` / `aria-setsize`, поэтому клавиатура доходит до строк вне окна отрисовки. В режиме выбора — `listbox` с `aria-multiselectable`, сообщения — `option` с `aria-selected`.',
       },
       {
-        en: "`Chat.SearchButton` is a toggle (`aria-pressed`); the search field takes the focus as it opens and keeps it while the chat steps through matches; the place of the match («2 из 5», «Нет совпадений») is announced politely.",
-        ru: "`Chat.SearchButton` — кнопка-переключатель (`aria-pressed`); поле поиска получает фокус при открытии и держит его, пока чат переходит по совпадениям; место совпадения («2 из 5», «Нет совпадений») объявляется вежливо.",
+        en: "`Chat.SearchButton` is a toggle (`aria-pressed`); the search field takes the focus as it opens and keeps it while the chat steps through matches; the place of the match («2 из 5», «Нет совпадений») is announced politely from a live region mounted with the bar, the visible count is `aria-hidden`.",
+        ru: "`Chat.SearchButton` — кнопка-переключатель (`aria-pressed`); поле поиска получает фокус при открытии и держит его, пока чат переходит по совпадениям; место совпадения («2 из 5», «Нет совпадений») вежливо объявляет живая область, которая стоит вместе со строкой, видимый счётчик — `aria-hidden`.",
       },
       {
         en: "`Chat.Pinned` is a button named by its content, the title and the line («Закреплённое 2 из 3» + the text); the rail is decorative; «Открепить» is a separate button.",

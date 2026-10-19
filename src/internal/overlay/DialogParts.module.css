@@ -52,16 +52,17 @@
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 
 /*
- * Grid, not markup order: icon | title + description | actions | close always share one row,
- * whatever order the children come in. Every column is named; an absent part leaves an empty
- * `auto` track of zero width, so the spacing is a margin on each part instead of a column gap.
+ * Grid, not markup order: icon | text | actions | close share the first row, whatever order the
+ * children come in. The text column stacks its lines by `order` — title, description, badges —
+ * then the actions when they move under it, then a tab strip. Every column is named; an absent
+ * part leaves an empty `auto` track of zero width, so the spacing is a margin on each part instead
+ * of a gap (an empty row costs nothing).
  */
 .header {
   display: grid;
   flex: 0 0 auto;
   grid-template-columns: [icon] auto [text] minmax(0, 1fr) [actions] auto [close] auto;
   align-items: center;
-  row-gap: var(--prime-space-1);
   min-width: 0;
   padding: var(--prime-space-6) var(--dialog-padding) var(--prime-space-5);
 }
@@ -80,22 +81,20 @@
     [close] auto;
 }
 
-/* While a control closes up beside the one that replaces it, the title gives the room for those
-   few frames: the close button never gets pushed out of the row. */
-.header:has(> .actions > [data-leaving]):not([data-actions-below]) {
-  grid-template-columns: [icon] auto [text] minmax(0, 1fr) [actions] auto [close] auto;
-}
-
-/* Title, description and any custom text sit in the text column. */
+/* Title, description, badges and any custom text sit in the text column. */
 .header > :not(.icon, .actions, .close) {
   grid-column: text;
 }
 
-/*
- * With a description the block is 24 + 4 + 20 = 48: the 40px icon box is offset to sit centered
- * against a one-line description and stays at the top when the description wraps.
- */
-.header[data-has-description="true"] {
+/* The actions and the close button stand on line 1 only: the lines under the title run on under
+   them to the content edge, so the description and the badges keep the panel's width on a phone. */
+.header > :is(.badges, .description) {
+  grid-column: text / -1;
+}
+
+/* With a line under the title the parts hang from the top: the icon, the actions and the close
+   button centre on the first lines, the text runs down. */
+.header[data-multiline="true"] {
   align-items: start;
 }
 
@@ -112,7 +111,7 @@
 }
 
 .header > :has([role="tablist"]) {
-  order: 2;
+  order: 4;
   grid-column: 1 / -1;
   margin-block-start: var(--prime-space-4);
 }
@@ -122,24 +121,17 @@
   padding-block-end: var(--prime-space-6);
 }
 
-/* The icon tile (internal/iconBox `.tile`) or the record's picture, in the icon column. */
+/* The icon tile (internal/iconBox `.tile`) or the record's picture, in the icon column, centred on
+   the first two lines of the text. */
 .icon {
   grid-column: icon;
   grid-row: 1;
   margin-inline-end: var(--prime-space-4);
 }
 
-.header[data-has-description="true"] > .icon {
+.header[data-multiline="true"] > .icon {
   grid-row: 1 / span 2;
-  margin-block-start: calc(
-    (
-      var(--prime-text-title-m-line-height) +
-      var(--prime-space-1) +
-      var(--prime-text-body-s-line-height) -
-      var(--prime-space-10)
-    ) /
-    2
-  );
+  align-self: center;
 }
 
 /*
@@ -155,35 +147,66 @@
   height: var(--prime-space-10);
 }
 
-/* Title (title-m) and description (body-s): the text role is joined in TSX (internal/textRole). */
+/*
+ * Line 1 — the title (title-m; the text role is joined in TSX). The record's number stands muted
+ * after the name. In a question dialog the title wraps, balanced.
+ */
 .title {
+  order: 0;
   margin: 0;
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
   text-wrap-style: balance;
 }
 
+.titleNumber {
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Line 2 — the description (body-s, muted): the record's context, 4 under the title (a tight pair). */
 .description {
-  margin: 0;
+  order: 1;
+  margin: var(--prime-space-1) 0 0;
   color: var(--prime-color-text-muted);
   overflow-wrap: anywhere;
 }
 
-/*
- * The record's status badges lead the line (`order`, whatever order they are written in), one
- * chip gap apart, then the text; the chips (tier s, set in TSX) are the line's 20 high and centred
- * on it. On a narrow panel the text wraps under the badges. Only a line with a badge (a chip root,
- * `data-tier`) is a flex row: plain text keeps its inline flow.
- */
-.description:has(> [data-tier]) {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-1) var(--prime-space-2);
+/* Line 3 — the badges (`Badge.Group` of tier m, one row, «+N»): the record's working controls,
+   8 under the line above them, right over the body or the tab strip. */
+.badges {
+  order: 2;
+  margin-block-start: var(--prime-space-2);
 }
 
-.description > [data-tier] {
-  order: -1;
+/*
+ * A record header (badges, or a title with a number) is one line per line: the name ellipsizes
+ * while its number keeps its width, the description is one line with an ellipsis. The whole text
+ * stays in the dialog's name and description, and in a `title` while a line is cut (TSX).
+ */
+.header:is(:has(> .badges), :has(> .title > .titleNumber)) > .title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.header:is(:has(> .badges), :has(> .title > .titleNumber)) .titleName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header:is(:has(> .badges), :has(> .title > .titleNumber)) .titleNumber {
+  flex: none;
+}
+
+.header:is(:has(> .badges), :has(> .title > .titleNumber)) > .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* The line's place while its data loads. */
@@ -191,6 +214,10 @@
   inline-size: calc(var(--prime-space-24) * 2.5);
   max-inline-size: 100%;
   vertical-align: middle;
+}
+
+.badgesSkeleton {
+  inline-size: calc(var(--prime-space-24) * 1.5);
 }
 
 .descriptionSkeleton {
@@ -201,8 +228,8 @@
 
 /*
  * A row of controls at the end of the header, before the close button (tier s, joined in TSX: the
- * close button's height `--field-h`). With a description it hangs from the top, centered on the
- * title's first line.
+ * close button's height `--field-h`). With lines under the title it hangs from the top, centred on
+ * the title's line.
  */
 .actions {
   grid-column: actions;
@@ -215,17 +242,9 @@
   margin-inline-start: var(--prime-space-4);
 }
 
-.header[data-has-description="true"] > .actions {
+.header[data-multiline="true"] > .actions {
   min-height: var(--field-h);
   margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
-}
-
-/* A control of the row in its own cell (`HeaderActionCell`): the cell is what enters and closes up. */
-.actionCell {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  min-width: 0;
 }
 
 /* Beside the title the row never gives: the title's minimum decides. */
@@ -233,20 +252,20 @@
   min-width: max-content;
 }
 
-/* Under the text: the last row of the text column, after the description (placed last by `order`),
-   above a tab strip (`order: 2`), which always closes the header. */
+/* Under the text: the last row of the text column, after the badges, above a tab strip,
+   which always closes the header. */
 .header[data-actions-below] > .actions {
   grid-row: auto;
   grid-column: text / close;
-  order: 1;
+  order: 3;
   flex-wrap: wrap;
   margin: var(--prime-space-2) 0 0;
 }
 
 /*
- * The ghost icon-only close (a square Button of tier s, whose own `--field-h` centres it). With a
- * description it hangs from the top, centered on the title's first line; the inline pull puts the
- * glyph on the content edge.
+ * The ghost icon-only close (a square Button of tier s, whose own `--field-h` centres it). With
+ * lines under the title it hangs from the top, centred on the title's line; the inline pull puts
+ * the glyph on the content edge.
  */
 .close {
   grid-column: close;
@@ -259,7 +278,7 @@
   margin-inline-start: var(--prime-space-2);
 }
 
-.header[data-has-description="true"] > .close {
+.header[data-multiline="true"] > .close {
   margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
 }
 

@@ -87,6 +87,31 @@
   text-overflow: clip;
 }
 
+/*
+ * A person's chip (`Badge.Avatar`): a pill, the avatar at its start 2 px inside the chip's height
+ * (flush in the 16 tier; the size is the slot's, `chipAvatarSize`), the same air on its end side.
+ */
+.root[data-avatar="true"] {
+  --badge-avatar: var(--prime-avatar-xs);
+  --badge-pad-start: calc((var(--chip-h) - var(--badge-avatar)) / 2);
+
+  border-radius: var(--prime-radius-full);
+}
+
+.root[data-avatar="true"]:is([data-tier="xs"], [data-tier="s"]) {
+  --badge-avatar: var(--prime-avatar-2xs);
+}
+
+.root[data-avatar="true"]:is([data-tier="l"], [data-tier="xl"]) {
+  --badge-avatar: var(--prime-avatar-s);
+}
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-inline-end: var(--badge-pad-start);
+}
+
 /* ─── Status tones: the role colors in the badge's color slots ──────────── */
 
 .root[data-tone="success"] {

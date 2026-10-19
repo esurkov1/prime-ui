@@ -1,6 +1,6 @@
 /* Layout of the DescriptionList scenarios: semantic tokens only. */
 
-/* overview.tsx: a record card as wide as a dialog of size m. */
+/* overview.tsx, row-actions.tsx: a record card as wide as a dialog of size m. */
 .card {
   width: min(100%, var(--prime-layout-form-width-m));
 }

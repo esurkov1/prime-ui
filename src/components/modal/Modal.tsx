@@ -1,6 +1,7 @@
 import { DialogGuard } from "@/internal/overlay/DialogGuard";
 import {
   DialogActions,
+  DialogBadges,
   DialogBody,
   DialogClose,
   DialogConfirm,
@@ -18,6 +19,7 @@ import { ModalContent, ModalRoot } from "@/internal/overlay/ModalDialog";
 export type { DialogGuardProps as ModalGuardProps } from "@/internal/overlay/DialogGuard";
 export type {
   DialogActionsProps as ModalActionsProps,
+  DialogBadgesProps as ModalBadgesProps,
   DialogBodyProps as ModalBodyProps,
   DialogCloseProps as ModalCloseProps,
   DialogConfirmProps as ModalConfirmProps,
@@ -44,6 +46,7 @@ export const Modal = {
   Header: DialogHeader,
   Icon: DialogIcon,
   Title: DialogTitle,
+  Badges: DialogBadges,
   Description: DialogDescription,
   Actions: DialogActions,
   Body: DialogBody,

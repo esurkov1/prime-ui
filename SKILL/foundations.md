@@ -90,15 +90,140 @@ Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Us
 
 ## 6. tone and color
 
-- `tone` is meaning: `neutral · accent · success · warning · danger · info`. Destructive is `danger`.
-- `color` is decoration from the palette: `gray · blue · green · orange · red · yellow · purple · sky ·
-  pink · teal` — Badge, Avatar, Thumbnail, SegmentedControl dots, count badges of Tabs,
-  SegmentedControl, Sidebar and BottomNav, FileUpload format badges, Timeline dots, TagSelect tags,
-  Kanban column counts, Gantt bars, the author hue of a chat (`Message.Author`). A category keeps one
-  hue across the product: keep one `Record<Category, PaletteColor>` map.
-- A status wears a `tone` (a Badge `tone`: «Оплачен» is `success` everywhere), never a palette hue;
-  keep one status → tone map.
-- Never convey meaning by color alone: a status badge has text.
+Colour means, it never decorates: every hue on a screen answers «what is this» or «what state is it
+in». A hue that answers neither goes.
+
+- `tone` is a judgement: `neutral · accent · success · warning · danger · info`. Destructive is
+  `danger`.
+- `color` is an identity from the palette (`PaletteColor`): `gray · blue · green · orange · red ·
+  yellow · purple · sky · pink · teal` — Badge, Avatar, Thumbnail, SegmentedControl dots, count
+  badges of Tabs, SegmentedControl, Sidebar and BottomNav, FileUpload format badges, Timeline dots,
+  TagSelect tags, Kanban column counts, Gantt bars, ProgressBar / ProgressCircle segments, the author
+  hue of a chat (`Message.Author`).
+- Never convey meaning by color alone: a badge has text, a dot or a bar has a label or a legend.
+
+### tone or color
+
+Ask what the state says about the record:
+
+| The state is | Wear | Examples |
+|---|---|---|
+| a judgement — good, needs attention, a problem, nothing going on | `tone` | «Оплачен» `success`, «Ожидает оплаты» `warning`, «Ошибка синхронизации» `danger` |
+| an identity with no judgement — a lifecycle stage, a phase, a category, a tag, a person, a channel | `color` | deal stages, project phases, lead sources, a client's tags, a chat author |
+
+Several identities never collapse into one tone. «Новая», «Бронь» and «В аренде» are all neutral
+news, and as `tone="info"` they become one sky badge three times; as hues (sky, yellow, blue) a
+person tells them apart at a glance.
+
+```tsx partial
+// bad — three stages, one colour; and each screen picks its hue inline
+<Badge.Root tone="info">Новая</Badge.Root>
+<Badge.Root tone="info">Бронь</Badge.Root>
+<Badge.Root tone="info">В аренде</Badge.Root>
+<Kanban.Root columns={[{ id: "rented", title: "В аренде", color: "purple" }]} />
+```
+
+### One status map
+
+Every status of an entity has one entry, `status → { label, tone | color }`, written once in a
+module of the app; every screen reads it. A badge, a ProgressBar or ProgressCircle segment, a
+Timeline dot, a Kanban column, a Gantt bar and a chart series of the same status take their label
+and colour from the same entry, so the badge in a list and its share in the bar always match.
+
+```tsx
+// entities/deal/stage.ts — the product's one map of deal stages
+import { Badge, type PaletteColor, ProgressBar } from "prime-ui-kit";
+
+export type DealStage = "new" | "booked" | "rented" | "ending" | "overdue" | "returned" | "cancelled";
+
+export const DEAL_STAGE = {
+  new: { label: "Новая", color: "sky" },
+  booked: { label: "Бронь", color: "yellow" },
+  rented: { label: "В аренде", color: "blue" },
+  ending: { label: "Скоро возврат", color: "orange" },
+  overdue: { label: "Просрочена", color: "red" },
+  returned: { label: "Возвращена", color: "green" },
+  cancelled: { label: "Отменена", color: "gray" },
+} as const satisfies Record<DealStage, { label: string; color: PaletteColor }>;
+
+const STAGES = Object.keys(DEAL_STAGE) as DealStage[];
+
+export function DealStageBadge({ stage }: { stage: DealStage }) {
+  return <Badge.Root color={DEAL_STAGE[stage].color}>{DEAL_STAGE[stage].label}</Badge.Root>;
+}
+
+export function DealStageShare({ counts }: { counts: Record<DealStage, number> }) {
+  return (
+    <ProgressBar
+      label="Сделки по этапам"
+      legend
+      segments={STAGES.map((stage) => ({
+        value: counts[stage],
+        label: DEAL_STAGE[stage].label,
+        color: DEAL_STAGE[stage].color,
+      }))}
+    />
+  );
+}
+```
+
+A status that is a judgement keeps the same shape with `tone` in place of `color`
+(`satisfies Record<InvoiceStatus, { label: string; tone: "success" | "warning" | "danger" }>`).
+
+### Hue meanings
+
+The kit suggests a generic meaning per hue; the product writes its own map on top, and a hue keeps
+its meaning across every map of that product:
+
+| Hue | Generic meaning |
+|---|---|
+| green | done, success |
+| red | a problem, overdue, an error |
+| orange | attention, soon |
+| yellow | reserved, scheduled, waiting for a date |
+| blue | in progress, active |
+| sky | new, incoming |
+| gray | inactive, archived, a draft, cancelled, no data |
+| purple, pink, teal | the product's own identities |
+
+- A derived state refines the story of its base hue: active blue → ending soon orange → overdue red.
+- An event in a history (a Timeline item, an audit row) takes the colour of the state it led to.
+  Kinds of events (calls, payments, edits) are a filter, not a colour.
+
+### Categories
+
+Categories (sources, regions, teams, tags) are a separate axis from statuses: their hues only tell
+the members of one set apart, unique within that set. A category keeps one hue across the product
+through one `Record<Category, PaletteColor>` map; members with no map of their own (people, ad-hoc
+tags) get `hueOf(id)`, stable per id. Inside one view a category never borrows a status hue: next
+to a red «Просрочена» badge no source is red.
+
+### Colours people choose
+
+A colour a person picks (a role, a tag, a pipeline) is stored as a palette name, never a hex: the
+theme then draws it right in light and dark. A stored value that is no palette name renders `gray`.
+
+```tsx good
+// declare: const tag: { name: string; color: string }
+<Badge.Root color={paletteColors.find((hue) => hue === tag.color) ?? "gray"}>{tag.name}</Badge.Root>
+```
+
+### Marks, not surfaces
+
+Colour lives on marks — a badge, a dot, a bar, a ring, a chart series — never on a large surface:
+no tinted panel, card or table row for a status, no coloured border or stripe. Groups are told apart
+by fill and type ([card in a card](#card-in-a-card)). A soft badge is the kit's mark and is fine.
+
+```css
+/* bad — the overdue row or card is painted red */
+.overdue { background: var(--prime-color-danger-soft); border-inline-start: 2px solid var(--prime-color-danger-default); }
+```
+
+```tsx good
+// declare: const DEAL_STAGE: Record<"overdue", { label: string; color: "red" }>
+// good — the row keeps the table's fill; its stage cell carries the mark and the word
+<Badge.Root color={DEAL_STAGE.overdue.color}>{DEAL_STAGE.overdue.label}</Badge.Root>
+```
 
 ### Charts and categorical colors
 

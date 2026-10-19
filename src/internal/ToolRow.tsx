@@ -75,28 +75,15 @@ const keyOf = (node: React.ReactNode, index: number) =>
 type ToolRowProps = DivProps & {
   /** The row has a line of its own: it wraps and its cells fill it by kind. Off — one line, every cell at its natural width. */
   fill?: boolean;
-  /** The edge a filled row gathers its cells at: `end` — tools of the content; `start` — a section's sub-pages under its title. */
-  align?: "start" | "end";
 };
 
 /**
  * A row of tools as written, each in a cell of its kind: a search grows, switchers and pickers
  * keep their content width beside it and fill a short line, buttons keep their width at the end.
  */
-export function ToolRow({
-  fill = true,
-  align = "end",
-  className,
-  children,
-  ...rest
-}: ToolRowProps) {
+export function ToolRow({ fill = true, className, children, ...rest }: ToolRowProps) {
   return (
-    <div
-      {...rest}
-      className={cx(styles.row, className)}
-      data-fill={fill ? "true" : undefined}
-      data-align={align === "start" ? "start" : undefined}
-    >
+    <div {...rest} className={cx(styles.row, className)} data-fill={fill ? "true" : undefined}>
       {flattenChildren(children).map((item, index) =>
         isPart(item, ToolCell) ? (
           React.cloneElement(item, { key: keyOf(item, index) })

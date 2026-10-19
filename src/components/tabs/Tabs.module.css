@@ -613,8 +613,18 @@
   margin: 0;
 }
 
+/* A shown panel hands its height on: in a host that gives it one (a dialog body) its content fills
+   it, so a region that fills its host (a `Chat.Root`) takes the whole tab. A hidden panel keeps
+   the `hidden` attribute's own display. */
+.panel:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+
 .panelContent {
+  flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
 }
 
 /* In a dialog body: the blocks of the tab stand the section step apart, the rhythm of the body's

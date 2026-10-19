@@ -138,7 +138,7 @@
       "files": [],
       "expectations": [
         "The column chooser is the DataTable columnsMenu prop, because the table has a row-actions column: it stands in that column's head cell, not in a toolbar, Page.Actions or a hand-built Dropdown of checkboxes",
-        "No chooser cell of its own in the header: had the table no ⋯ column, the chooser would be DataTableColumnsMenu in Page.Tools on the same hiddenColumns, never columnsMenu",
+        "No chooser cell of its own in the header: had the table no ⋯ column, the chooser would be DataTableColumnsMenu in the DataTable toolbar beside its search on the same hiddenColumns, never columnsMenu and never Page.Tools",
         "The DataTable has no toolbar prop at all: no bar above the table holds a single control",
         "hiddenColumns and onHiddenColumnsChange keep the choice (local storage or the user's settings) and pass it back",
         "The «Заказ» column and the ⋯ actions column are hideable: false; the actions column is last, with hideHeader, and the table sets stickyLastColumn",
@@ -207,7 +207,7 @@
     {
       "id": 17,
       "prompt": "Сделай карточку сотрудника в дровере с вкладками «Профиль», «Доступ», «Уведомления», «Безопасность», «История». Она открывается из таблицы «Команда», а свой аккаунт человек открывает из меню профиля в сайдбаре — там он может менять не всё. В «Безопасности» — сеансы на других устройствах. У приглашённого, но не вошедшего сотрудника можно только удалить приглашение.",
-      "expected_output": "One user drawer component opened from both places by id; permissions make fields readOnly and hide tabs and actions; the header is Drawer.Icon with the Avatar, Drawer.Title, Drawer.Description with status badges and a line of data, Drawer.Actions only with actions on the record — one action as an icon Button with a Tooltip, a ⋯ menu only from two; one form over all tabs with one «Сохранить» in Drawer.Footer shown while dirty and Drawer.Guard; the drawer loads all tab data, tabs keep their content (keepMounted where drafts live); «История» its own tab; «Сеансы» a List of sessions with an end per row.",
+      "expected_output": "One user drawer component opened from both places by id; permissions make fields readOnly and hide tabs and actions; the header is the record header — Drawer.Title with the name, Drawer.Description with one line of text, Drawer.Badges with the status and role badges (no badge in the description), Drawer.Actions only with actions on the record — one action as an icon Button with a Tooltip, a ⋯ menu only from two; one form over all tabs with one «Сохранить» in Drawer.Footer shown while dirty and Drawer.Guard; the drawer loads all tab data, tabs keep their content (keepMounted where drafts live); «История» its own tab; «Сеансы» a List of sessions with an end per row.",
       "files": [],
       "expectations": [
         "There is one drawer component for the user, used for the own account and for a team member; no second «Мой аккаунт» drawer",
@@ -215,7 +215,8 @@
         "The tabs share one form with one «Сохранить» in Drawer.Footer (present only while there are changes) and Drawer.Guard dirty; no save button per section and no «Есть несохранённые изменения» text",
         "Data for the tabs is loaded at the drawer level (not fetched inside each tab on mount); the body loads as a Skeleton in the form's geometry under a header and tabs that appear at once",
         "«История» stays a tab of its own even when the tabs do not fit; the strip scrolls",
-        "«Сеансы» shows the sessions as a List with an action per session, not only a «Выйти на других устройствах» button"
+        "«Сеансы» shows the sessions as a List with an action per session, not only a «Выйти на других устройствах» button",
+        "The header's status badges stand in Drawer.Badges after Drawer.Description, which holds only one line of text"
       ]
     },
     {
@@ -341,6 +342,60 @@
         "The table search has no autoComplete prop",
         "The employee drawer's name, email and phone fields have no autoComplete prop",
         "The table search placeholder contains none of «username», «login», «email», «логин», «почта», and the search has no name or id attribute"
+      ]
+    },
+    {
+      "id": 28,
+      "prompt": "Сделай страницу «AI» в CRM: в сайдбаре один пункт «AI», у раздела три подстраницы — «Чат», «Уроки», «Настройки», каждая своим маршрутом. На «Чате» слева колонка тредов с поиском и кнопкой «Новый чат», справа открытый тред; на «Уроках» есть кнопка «Новый урок».",
+      "expected_output": "One Page titled «AI» on every sub-route; the sub-pages are a SegmentedControl of router links (SegmentedControl.Item asChild) in Page.TopBar → Page.Tools, which stands in the heading row at the end edge before the page's Page.Actions («Новый урок» on the lessons route) — never a row of its own under the title or a switch inside Page.Body. The threads pane is a ChatList with its own search (search / onSearchChange) and «Новый чат» in ChatList.Actions inside it, so the pane reads search → «Новый чат» → threads; the create button is never under the list.",
+      "files": [],
+      "expectations": [
+        "Page.Title reads «AI» on all three sub-routes; the switch is SegmentedControl.Item asChild router links inside Page.Tools",
+        "The sub-page switch is not placed in Page.Body or in a wrapper of its own under the title",
+        "«Новый урок» is a Button in Page.Actions of the lessons route, after Page.Tools",
+        "The threads pane is a ChatList.Root with the search triad, not an Input of its own above the list",
+        "«Новый чат» is a Button inside ChatList.Actions within ChatList.Root, not a Button rendered after the ChatList or under the threads"
+      ]
+    },
+    {
+      "id": 29,
+      "prompt": "Сделай в CRM проката раздел «Аренды»: доска по этапам (новая, бронь, в аренде, скоро возврат, просрочена, возвращена, отменена) и список аренд с бейджем этапа, а над списком — полосу с распределением аренд по этапам.",
+      "expected_output": "One stage map module of the app, `stage → { label, color }` typed with `satisfies Record<Stage, { label: string; color: PaletteColor }>`, read by every place a stage shows: the Kanban column `color`, the list's `Badge.Root color` and the ProgressBar segment `color` and `label`. Stages are identities, so they wear palette hues, distinct per stage (new sky, booked yellow, rented blue, ending orange, overdue red, returned green, cancelled gray) — never `tone=\"info\"` shared by several stages. No row, card or column is tinted for a stage; the colour sits only on badges, counts and segments, and every mark has its text or the bar's legend.",
+      "files": [],
+      "expectations": [
+        "Stage labels and colours are defined once in a map (a const object with satisfies Record<…>) and imported by the board, the list and the bar — no hue literal for a stage inside a screen component",
+        "The Badge of a stage in the list and the ProgressBar segment of the same stage have the same `color`",
+        "«Бронь», «В аренде» and «Новая» have three different palette `color` values, none of them is `tone=\"info\"`",
+        "Stage badges use `color`, not `tone`; a `tone` appears only for judgements, if at all",
+        "No CSS tints a row, card or Kanban column background or border by stage; the ProgressBar has `legend` or labelled segments"
+      ]
+    },
+    {
+      "id": 30,
+      "prompt": "Сделай карточку лида в CRM проката: открывается справа из списка заявок. В шапке — имя клиента и номер заявки, статус (можно сменить), ответственный менеджер (можно назначить или сменить), канал (Telegram, WhatsApp), метка «Ждёт человека» и VIP, откуда заявка и когда пришла. Справа в шапке — кнопка «Диалог» и меню действий.",
+      "expected_output": "A Drawer with the one record header in three lines: `Drawer.Title number=\"#…\"` with the client's name; `Drawer.Description` with one line of text (the source and the time) under it; then `Drawer.Badges` with the status picker (a `Badge.Root` inside a `Dropdown.Trigger`) first, then the assignee picker (a `Badge.Root` with `Badge.Avatar` and the manager's name, or `<Badge.Root variant=\"outline\">Назначить</Badge.Root>` when nobody is assigned), then the channel, «Ждёт человека» and VIP badges. `Drawer.Actions` hold a ghost icon Button «Диалог» in a Tooltip and a ⋯ Dropdown, nothing else.",
+      "files": [],
+      "expectations": [
+        "The lead number is the `number` prop of `Drawer.Title` (or `Modal.Title`), not part of the title text and not in `Drawer.Description`",
+        "Every status, channel and label badge of the lead is inside `Drawer.Badges`; none is inside `Drawer.Description` or `Drawer.Actions`",
+        "The status and the assignee are each a `Badge.Root` inside a `Dropdown.Trigger`, the status first; there is no separate «Сменить статус» / «Назначить» button",
+        "The assigned manager is a `Badge.Root` with `Badge.Avatar` around an `Avatar.Root` without `size`; the unassigned state is `Badge.Root variant=\"outline\"` with «Назначить»",
+        "`Drawer.Description` holds only text (no Badge, no number); no Badge has its own `size` in the header",
+        "The header lines are written in the order `Drawer.Title`, `Drawer.Description`, `Drawer.Badges`: the line of data sits under the name and the badges stand last, over the body",
+        "`Drawer.Actions` holds only buttons: the «Диалог» icon Button with a Tooltip and a ⋯ Dropdown"
+      ]
+    },
+    {
+      "id": 31,
+      "prompt": "В карточке лида (дровер) добавь вкладку «Диалог»: переписка с клиентом из Telegram. Клиенту отвечают оператор, владелец аккаунта и AI-агент — видно, кто написал. В шапке чата — имя клиента с номером заявки, этап (можно сменить) и ответственный. Поиск по переписке всегда открыт, рядом выбор канала. В ленте видны события: «Анна взяла клиента», «Этап: Новая → В работе».",
+      "expected_output": "`Chat.Root variant=\"inline\"` inside the tab; the header is two lines — the avatar, then `Chat.Title number` over `Chat.Badges` with the stage and assignee pickers (`Badge.Root` in `Dropdown.Trigger`), `Chat.Actions` at the end, no `Chat.Description`; `Chat.Search persistent` with the channel `Select` as its one control before the field; `Chat.Messages authors=\"outgoing\"` (not `group`); the events are `Chat.Service` rows with `Chat.ServiceIcon` and `Chat.ServiceChange`.",
+      "files": [],
+      "expectations": [
+        "The chat inside the drawer tab is Chat.Root with variant=\"inline\"",
+        "The lead number is the `number` prop of Chat.Title; the stage and the assignee are Badge.Root pickers inside Chat.Badges, with no Chat.Description under them",
+        "The search is Chat.Search with `persistent` (no Chat.SearchButton); the channel Select is its child before the field and is its only control",
+        "Several writers on the business side are shown with Chat.Messages authors=\"outgoing\", not `group` and not names typed into message text",
+        "The events are Chat.Service rows (via isService) with Chat.ServiceIcon and, for the stage, Chat.ServiceChange — not messages from a fake author and not Notifications"
       ]
     }
   ]

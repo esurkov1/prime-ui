@@ -146,12 +146,12 @@ describe("RegionSwap", () => {
     );
     expect(root).toHaveAttribute("data-resizing", "true");
     expect(setProperty.mock.calls).toEqual([
-      ["--swap-height", "100px"],
-      ["--swap-height", "140px"],
+      ["--swap-size", "100px"],
+      ["--swap-size", "140px"],
     ]);
     heightEnd(root);
     expect(root).not.toHaveAttribute("data-resizing");
-    expect(root.style.getPropertyValue("--swap-height")).toBe("");
+    expect(root.style.getPropertyValue("--swap-size")).toBe("");
   });
 
   it("a swap during a glide starts from the height on screen", () => {
@@ -182,7 +182,7 @@ describe("RegionSwap", () => {
         <p>Ошибка</p>
       </RegionSwap>,
     );
-    expect(setProperty.mock.calls[0]).toEqual(["--swap-height", "120px"]);
+    expect(setProperty.mock.calls[0]).toEqual(["--swap-size", "120px"]);
   });
 
   it("leaving loading: the data replaces the skeleton in place — no glide, a short fade", () => {
@@ -211,9 +211,9 @@ describe("RegionSwap", () => {
     expect(layerOf("Данные")).toHaveClass(swapMotion.settleIn);
     expect(layerOf("Данные")).not.toHaveClass(swapMotion.swapIn);
     // The skeleton fades out clipped to the data's height, never over the content below.
-    expect(root).toHaveAttribute("data-leaving", "true");
+    expect(root).toHaveAttribute("data-swapping", "true");
     fireEvent.animationEnd(layerOf("Загрузка"));
-    expect(root).not.toHaveAttribute("data-leaving");
+    expect(root).not.toHaveAttribute("data-swapping");
   });
 
   it("entering loading drops a running glide and takes the skeleton's height at once", () => {
@@ -241,7 +241,7 @@ describe("RegionSwap", () => {
       </RegionSwap>,
     );
     expect(root).not.toHaveAttribute("data-resizing");
-    expect(root.style.getPropertyValue("--swap-height")).toBe("");
+    expect(root.style.getPropertyValue("--swap-size")).toBe("");
     expect(layerOf("Загрузка")).toHaveClass(swapMotion.settleIn);
   });
 
@@ -444,22 +444,40 @@ describe("RegionSwap", () => {
     });
 
     it("hands a height its parent stretches it to on to a lone child (tiles of a row match)", () => {
-      expect(cssValue(cssRule(CSS, ".root"), "display")).toBe("grid");
+      expect(cssValue(cssRule(CSS, '.root[data-axis="block"]'), "display")).toBe("grid");
       expect(cssValue(cssRule(CSS, ".layer:has(> :only-child)"), "display")).toBe("grid");
     });
 
-    it("glides the height through --swap-height, clipped with room for focus rings", () => {
-      const resizing = cssRule(CSS, '.root[data-resizing="true"]');
-      expect(cssValue(resizing, "height")).toBe("var(--swap-height)");
+    it("glides the height through --swap-size, clipped with room for focus rings", () => {
+      const resizing = cssRule(CSS, '.root[data-axis="block"][data-resizing="true"]');
+      expect(cssValue(resizing, "height")).toBe("var(--swap-size)");
       expect(cssValue(resizing, "overflow-y")).toBe("clip");
       expect(cssValue(resizing, "overflow-clip-margin")).toBe("var(--prime-focus-space)");
-      expect(cssValue(cssRule(CSS, ".root"), "transition")).toBe(
+      expect(cssValue(cssRule(CSS, '.root[data-axis="block"]'), "transition")).toBe(
         "height var(--prime-motion-duration-base) var(--prime-motion-easing-standard)",
       );
     });
 
+    it("an inline cell glides its width and holds both states to its align edge", () => {
+      const resizing = cssRule(CSS, '.root[data-axis="inline"][data-resizing="true"]');
+      expect(cssValue(resizing, "width")).toBe("var(--swap-size)");
+      expect(cssValue(resizing, "overflow-x")).toBe("clip");
+      expect(cssValue(cssRule(CSS, '.root[data-axis="inline"]'), "transition")).toBe(
+        "width var(--prime-motion-duration-base) var(--prime-motion-easing-standard)",
+      );
+      expect(
+        cssValue(cssRule(CSS, '.root[data-axis="inline"][data-align="end"]'), "justify-content"),
+      ).toBe("flex-end");
+      expect(
+        cssValue(
+          cssRule(CSS, '.root[data-axis="inline"][data-align="end"] > .leaving'),
+          "inset-inline",
+        ),
+      ).toBe("auto 0");
+    });
+
     it("a leaving layer is clipped to the region; a load fades on the short clock", () => {
-      const leaving = cssRule(CSS, '.root[data-leaving="true"]');
+      const leaving = cssRule(CSS, '.root[data-axis="block"][data-swapping="true"]');
       expect(cssValue(leaving, "overflow-y")).toBe("clip");
       expect(cssValue(leaving, "overflow-clip-margin")).toBe("var(--prime-focus-space)");
       expect(

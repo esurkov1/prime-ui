@@ -17,13 +17,19 @@ import { formatLabel } from "@/internal/formatLabel";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
+import { useMediaSlotHost } from "@/internal/mediaSlot";
 import { namedRole } from "@/internal/namedRole";
-import { nodeText } from "@/internal/nodeText";
 import palette from "@/internal/palette.module.css";
 import { usePartPresence } from "@/internal/partPresence";
 import { splitParts } from "@/internal/parts";
 import { RollingNumber } from "@/internal/RollingNumber";
-import type { ControlSize, PaletteColor, Tone, Variant } from "@/internal/states";
+import {
+  type ControlSize,
+  chipAvatarSize,
+  type PaletteColor,
+  type Tone,
+  type Variant,
+} from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { isPromiseLike } from "@/internal/usePendingChanges";
 
@@ -66,6 +72,11 @@ export type BadgeIconProps = {
   className?: string;
   ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+
+export type BadgeAvatarProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+  children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 export type BadgeDotProps = {
   color?: PaletteColor;
@@ -215,7 +226,10 @@ function BadgeRoot({
   };
 
   // Badge.Action lives at the end of the badge, outside the text body; one per badge.
-  const { parts: actions, rest: parts } = splitParts<BadgeActionProps>(children, BadgeAction);
+  const { parts: actions, rest: other } = splitParts<BadgeActionProps>(children, BadgeAction);
+  // A person's avatar leads the chip, whatever order it is written in; the chip turns into a pill.
+  const { parts: avatars, rest: parts } = splitParts<BadgeAvatarProps>(other, BadgeAvatar);
+  const avatar = avatars[0] ?? null;
   // A trigger badge shows the chevron of an opener at its end, turned by the layer's open state.
   const content = trigger
     ? [
@@ -230,6 +244,7 @@ function BadgeRoot({
   const iconOnly =
     !trailing &&
     !trigger &&
+    !avatar &&
     content.length > 0 &&
     content.every((child) => React.isValidElement(child) && child.type === BadgeIcon);
   // The end edge belongs to the remove segment or Badge.Action when there is one.
@@ -238,7 +253,7 @@ function BadgeRoot({
   });
   // A read-only badge of plain text is one element: the root itself lays the text out as a block
   // and ellipsizes it. Anything richer is a flex row, so its text runs are wrapped.
-  const textOnly = !trailing && !toggle && !trigger && edges.children.every(isText);
+  const textOnly = !trailing && !toggle && !trigger && !avatar && edges.children.every(isText);
   const body = (
     <ControlSizeProvider value={tier}>
       {typeof children === "number" ? (
@@ -247,7 +262,10 @@ function BadgeRoot({
       ) : textOnly ? (
         edges.children
       ) : (
-        wrapText(edges.children)
+        <>
+          {avatar}
+          {wrapText(edges.children)}
+        </>
       )}
     </ControlSizeProvider>
   );
@@ -277,6 +295,7 @@ function BadgeRoot({
         "icon-only": iconOnly || undefined,
         "text-only": (textOnly && edges.children.length > 0) || undefined,
         "icon-start": edges.start || undefined,
+        avatar: avatar ? true : undefined,
         "icon-end": edges.end || undefined,
         removable: onRemove ? true : undefined,
         pending: busy || undefined,
@@ -354,6 +373,23 @@ function BadgeIcon({ children, className, ...rest }: BadgeIconProps) {
 BadgeIcon.displayName = "Badge.Icon";
 
 /**
+ * The person of a chip (an assignee, an author): an `Avatar.Root` — or your component that renders
+ * one — at the start, sized by the chip (internal/mediaSlot: 2 px inside its height). Decorative:
+ * the name beside it is the text.
+ */
+function BadgeAvatar({ children, className, ...rest }: BadgeAvatarProps) {
+  const tier = useOptionalControlSize() ?? "m";
+  const { provide } = useMediaSlotHost({ avatar: chipAvatarSize[tier] });
+  return (
+    <span {...rest} className={cx(styles.avatar, className)} aria-hidden="true">
+      {provide(children)}
+    </span>
+  );
+}
+
+BadgeAvatar.displayName = "Badge.Avatar";
+
+/**
  * A status dot in the current text color, or in the solid step of a palette hue (`color`). Inside
  * a badge it takes the badge tier; standalone (a marker on an icon, before a label) it takes the
  * tier of the surrounding control.
@@ -408,6 +444,24 @@ function BadgeAction({
 BadgeAction.displayName = "Badge.Action";
 
 /**
+ * The text a person reads in a badge, without what assistive tech skips (a chip's avatar, a
+ * glyph): what the «+N» tooltip lists for a badge that did not fit, a picker's trigger included.
+ */
+function badgeText(badge: HTMLElement): string {
+  const walker = document.createTreeWalker(badge, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) =>
+      node instanceof Element && node.getAttribute("aria-hidden") === "true"
+        ? NodeFilter.FILTER_REJECT
+        : NodeFilter.FILTER_ACCEPT,
+  });
+  let text = "";
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node.nodeType === Node.TEXT_NODE) text += node.nodeValue ?? "";
+  }
+  return text.replace(/\s+/g, " ").trim();
+}
+
+/**
  * How many of `widths` stand in `available` px a `gap` apart; when not all of them do, the rest
  * goes into a «+N» badge `moreWidth` wide at the end. At least one stays shown (it ellipsizes).
  */
@@ -449,6 +503,8 @@ function BadgeGroup({
   const items = React.Children.toArray(children);
   // How many badges stand in the row; the rest wait behind «+N».
   const [shown, setShown] = React.useState(items.length);
+  // What the badges behind «+N» say, read from the row (a picker's trigger reads as its badge).
+  const [hiddenText, setHiddenText] = React.useState("");
   const hidden = counting ? Math.max(0, items.length - shown) : 0;
 
   const fitRow = React.useCallback(() => {
@@ -474,6 +530,7 @@ function BadgeGroup({
       badge.toggleAttribute("data-overflowed", index >= count);
     });
     setShown(count);
+    setHiddenText(badges.slice(count).map(badgeText).filter(Boolean).join(", "));
   }, []);
 
   // The first layout and every change of the badges; then every resize of the row or a badge.
@@ -481,12 +538,6 @@ function BadgeGroup({
     if (counting) fitRow();
   });
   useResizeEffect(groupRef, fitRow, { enabled: counting, children: true });
-
-  const hiddenText = items
-    .slice(items.length - hidden)
-    .map(nodeText)
-    .filter(Boolean)
-    .join(", ");
 
   return (
     <GroupSizeContext value={size}>
@@ -522,6 +573,7 @@ export const Badge = {
   Root: BadgeRoot,
   Group: BadgeGroup,
   Icon: BadgeIcon,
+  Avatar: BadgeAvatar,
   Dot: BadgeDot,
   Action: BadgeAction,
 };

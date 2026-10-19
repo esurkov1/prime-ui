@@ -29,7 +29,7 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "sizes",
-      description: "Все диаметры, от 20 до 64 px; инициалы — 40% диаметра — `size`.",
+      description: "Все диаметры, от 16 до 64 px; инициалы — 40% диаметра — `size`.",
     },
     {
       slot: "states",

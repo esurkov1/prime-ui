@@ -28,11 +28,12 @@ Sheet.Root                     state and dismiss policy (no DOM)
 └─ Sheet.Content               portal + scrim + role="dialog" panel at the bottom edge
    ├─ (grab handle)            aria-hidden bar on top while the sheet swipes (`closeOnOutsideClick`); a drag starts here
    ├─ Sheet.Guard              no DOM: holds the sheet (busy / dirty) from inside
-   ├─ Sheet.Header             optional: [Icon] [Title + Description] [Actions] [close Button]
-   │  ├─ Sheet.Icon            tone tile around an Icon, or the record's Avatar / Thumbnail, no tile, 40
-   │  ├─ Sheet.Title           line 1: <h2>; `loading` holds it with a skeleton
-   │  ├─ Sheet.Description     line 2: <p>; the record's status Badges lead it (tier s), then the text
-   │  └─ Sheet.Actions         one tab-wide switcher, then buttons (icon buttons, a ⋯ Dropdown), tier s, on the title's line
+   ├─ Sheet.Header             optional: [Icon] [Title / Description / Badges] [Actions] [close Button]
+   │  ├─ Sheet.Title           line 1: <h2> name + muted `number`; `loading` holds it with a skeleton
+   │  ├─ Sheet.Description     line 2: <p> text only, one line in a record header
+   │  ├─ Sheet.Badges          line 3: one row of Badges, tier m: status picker, assignee picker, statuses, «+N»
+   │  ├─ Sheet.Actions         one tab-wide switcher, then buttons (icon buttons, a ⋯ Dropdown), tier s, on line 1
+   │  └─ Sheet.Icon            optional: tone tile around an Icon, or a picture, 40, centred on lines 1–2
    ├─ Sheet.Body               the content; the only scrolling zone (ScrollContainer)
    └─ Sheet.Footer             optional: only for a form with an explicit submit
       ├─ Sheet.Actions         the start group: an action apart from the main pair
@@ -69,23 +70,23 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Sheet.Header
-`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button].
+`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title / Description / Badges] [Actions] [close button] — the title on line 1 with the actions and the close button centred on it, the description on line 2, the badges on line 3.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
-| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
+| `children` | `ReactNode` | — | Icon, Title, Description, Badges, Actions in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Sheet.Actions
-`ref` → `HTMLDivElement`. Header: a tab-wide switcher (`SegmentedControl`, `Datepicker`), then buttons (a status goes in `Sheet.Description`), tier `s`; under the title below 12rem. In `Sheet.Footer`: the start group at the footer tier.
+`ref` → `HTMLDivElement`. Header: a tab-wide switcher (`SegmentedControl`, `Datepicker`), then buttons (a status is a badge), tier `s`, on line 1; under the title below 12rem. In `Sheet.Footer`: the start group at the footer tier.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
 
 ### Sheet.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.
+`ref` → `HTMLSpanElement`. Optional mark centred on lines 1–2: an `aria-hidden` 40 px tone tile; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -94,20 +95,29 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Sheet.Title
-`ref` → `HTMLHeadingElement`. `<h2>` (title-m); its id names the dialog.
+`ref` → `HTMLHeadingElement`. Line 1: `<h2>` (title-m); its id names the dialog. In a record header (with `Badges` or a `number`) the name is one line with an ellipsis (the whole name in its `title` while cut); in a question dialog it wraps.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `number` | `ReactNode` | — | The record's number («#678», «№ 1042», «INV-2026-0142»): muted after the name, never cut, part of the dialog's name. Never in `Description`. |
 | `loading` | `boolean` | `false` | The name loads (a record opened by a link): a `Skeleton` holds the title line and `aria-busy` is set, so the header never moves; the name fades in. |
 | `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Sheet.Description
-`ref` → `HTMLParagraphElement`. `<p>` (body-s, muted) under the title; its id describes the dialog. The record's status `Badge.Root`s go here: first in the line, chip tier `s` (20 px), the text wraps under them when narrow.
+`ref` → `HTMLParagraphElement`. Line 2: `<p>` (body-s, muted), text only, 4 under the title; its id describes the dialog. In a record header one line with an ellipsis (the whole text in its `title` while cut); in a question dialog it wraps under the title.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `loading` | `boolean` | `false` | Its data loads: a `Skeleton` holds the line's place and `aria-busy` is set, so the header never moves; the data fades in. |
 | `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+
+### Sheet.Badges
+`ref` → `HTMLDivElement`. Line 3 of a record header: a `Badge.Group` — the pickers first (status; assignee with `Badge.Avatar`, or an `outline` «Назначить»; each a `Badge.Root` in a `Dropdown.Trigger`), then the statuses. Chip tier `m`; one row, the rest behind «+N».
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `loading` | `boolean` | `false` | The record loads: a `Skeleton` holds the line and `aria-busy` is set, so the header never moves; the badges fade in. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Badge.Root`s, the pickers in their `Dropdown.Root`), `className`, `aria-label` (a named row is `role="group"`) and the other attributes of the row. |
 
 ### Sheet.Body
 `ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
@@ -180,7 +190,9 @@ Sheet has no `variant`, `side` or `size`: it always rises from the bottom edge, 
 | description loading | `Sheet.Description loading` | a `Skeleton` holds the line, `aria-busy` on the `<p>`; the data fades in under the same element |
 | actions below | the title would get less than 12rem beside `Sheet.Actions` | `data-actions-below` on the header: the actions move under the title and the description |
 | picture mark | an `Avatar.Root` or a `Thumbnail.Root` inside `Sheet.Icon` | `data-media` on the icon, no tile; the picture's `data-size` is the slot's (`l` / `m`) |
-| status in the line | a `Badge.Root` inside `Sheet.Description` | the line is a wrapping flex row, the badges first (`order`), each `data-tier="s"` |
+| record header | `Sheet.Badges`, or a `Sheet.Title number` | one line per line: the name and the description ellipsize, the number keeps its width; a cut line carries its whole text in `title` |
+| badges overflow | `Sheet.Badges` wider than the dialog | the badges that do not fit wait behind a «+N» badge (`Badge.Group overflow="count"`) whose tooltip lists them; the row never wraps |
+| badges loading | `Sheet.Badges loading` | a `Skeleton` of the chip height holds line 2, `aria-busy` on the row; the badges fade in |
 
 Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. A swipe down moves the sheet with the pointer; on release it closes past 30% of its height or on a quick flick and glides the rest of the way out, otherwise it glides back — both over `base` on the `emphasized` (iOS sheet) curve. A pull upward meets growing resistance and stops at 24; the sheet's fill continues that far below the screen edge. The scrim thins as the sheet goes down. The drag starts from the handle or the header, never from the body, so its content scrolls and its controls work as usual.
 
@@ -188,15 +200,19 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - A sheet is a short task that ends by itself — a pick, a tap on an action, a swipe down. Its zones follow the task, not a template:
   - **No footer by default.** A footer only for a form with an explicit submit: «Отмена» (`Sheet.Close`, outline neutral) and the submit (solid, last; `type="submit" form={formId}`).
   - **The header is optional.** Keep it when the content needs a title to be understood (a list of actions on «Заказ № 1042»). Drop it — and with it the × and the hairline — when the content speaks for itself (a calendar opened from a «Дата отгрузки» button): name the sheet with `aria-label` on `Sheet.Content`.
-- The header has one anatomy, the same in every modal, drawer and sheet:
+- The header has one anatomy, the same in every modal, drawer and sheet — three lines in the text column, the actions and the close button centred on the first:
   ```
-  [mark]  Title                                [tab switcher] [icon buttons] [⋯] [×]
-          [status badges] description text
+  Александра #678                              [icon buttons] [⋯] [×]
+  Аренда байка Пхукет · заявка 19 сент, 06:37
+  [Новая ⌄] [(АК) Анна Котова ⌄] [Telegram] [Ждёт человека] [+1]
   ```
-  - mark — `Sheet.Icon`: a glyph on the tone tile, or the record's picture (`Avatar.Root`, `Thumbnail.Root`, also inside your own wrapper component) with no tile; both are 40 px.
-  - line 1 — `Sheet.Title`; `loading` holds it with a Skeleton while the name loads.
-  - line 2 — `Sheet.Description`: the record's statuses as `Badge.Root`s first, then the text. The kit sizes the badges (chip tier `s`, the line's 20 px), keeps them first and one gap apart, and wraps the text under them on a narrow panel.
-  - end — `Sheet.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on the title's line; a status never goes here. A control rendered only on some tabs rises in and closes up in its own cell.
+  - line 1 — `Sheet.Title`: the record's name, then its `number` muted («#678», «№ 1042»); `loading` holds it with a Skeleton while the name loads. The name ellipsizes, the number never does; both are the dialog's name.
+  - line 2 — `Sheet.Description`, 4 under the title: the record's context in plain text, one line with an ellipsis in a record header; the whole text stays the dialog's description. A status or a number never goes here.
+  - line 3 — `Sheet.Badges`, 8 under the line above, right over the body: the record's working controls — first the pickers — the status (a `Badge.Root` inside a `Dropdown.Trigger`), the assignee (`Badge.Avatar` + the name, or an `outline` «Назначить») — then the plain statuses. The kit sizes them (chip tier `m`) and keeps one row: what does not fit waits behind «+N».
+  - The header places the lines in this order whatever the order in code; write them in it anyway (Title, Description, Badges).
+  - end — `Sheet.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon buttons with a Tooltip and a ⋯ Dropdown — at the close button's tier, centred on line 1; a status never goes here. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
+  - `Sheet.Icon` is optional, before the text and centred on lines 1–2: a glyph on the tone tile, or a picture (`Avatar.Root`, `Thumbnail.Root`) with no tile; both are 40 px.
+  - A question or a form keeps a plain header: its title and description wrap; only `Sheet.Badges` or a `number` make it a record header.
 - A form's action apart from its submit pair: `Sheet.Actions` inside `Sheet.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
 - The content is the sheet's own, across its width: `Datepicker.Panel` or a column of actions straight in `Sheet.Body` — never a Card or a padded box inside it.
 - Zone padding `--prime-sheet-padding`, width `--prime-sheet-width`. The bottom-sheet surface (`src/internal/sheet.module.css`, shared with a Modal and the floating layers on a phone) gives the height by content up to the top gap, the rounded top, the handle strip and the bottom safe-area inset below the content.
@@ -247,7 +263,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Actions with an order raised from the bottom edge: a header names the order, a column of actions follows, and each action closes the sheet — `Sheet.Trigger`, `Sheet.Header`, `Sheet.Close`. |
 | [structure.tsx](examples/structure.tsx) | The content alone: a date sheet with no header and no footer, the calendar across its width, named by `aria-label`; a pick or a swipe down closes it — `aria-label`, `Sheet.Body`. |
-| [header-actions.tsx](examples/header-actions.tsx) | The courier is at the door: an icon tile heads the sheet, the payment status leads the line under the title, a ⋯ menu sits before the close button, and two equal buttons fill the footer — `Sheet.Icon`, `Sheet.Description`, `Sheet.Actions`, `layout`. |
+| [header-actions.tsx](examples/header-actions.tsx) | The courier is at the door: an icon tile heads the sheet, the order's number stands by its name, a line of data under it and its statuses under that, a ⋯ menu sits before the close button, and two equal buttons fill the footer — `Sheet.Icon`, `Sheet.Badges`, `Sheet.Actions`, `layout`. |
 | [guard.tsx](examples/guard.tsx) | A review form that holds the sheet: after an edit a swipe, the scrim, Escape and Cancel ask before discarding and the footer says so; sending locks every way out — `Sheet.Guard`, `Sheet.Meta`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A handover the courier must answer: no swipe, scrim or Escape closes the sheet, only its two buttons — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the state and raises the sheet from a link in the text, without a trigger — `open`, `onOpenChange`. |
@@ -258,9 +274,11 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - «Отмена» / «Готово» buttons under a sheet that closes on a pick → drop the footer; the pick, the swipe, the scrim and Escape close it.
 - A header with only a title over a calendar or a list that already says what it is → drop the header and name the sheet with `aria-label`.
 - No header and no `aria-label` → the dialog has no name; give `Sheet.Content` an `aria-label`.
-- A status `Badge` in the header's `Sheet.Actions`, beside the buttons → put it in `Sheet.Description`, before the text: the kit sizes it to the line and keeps it first.
+- A status `Badge` in the header's `Sheet.Actions`, or inside `Sheet.Description` → put it in `Sheet.Badges`, line 3: the kit sizes it and keeps the row on one line.
+- The badges above the text, or the record number in `Sheet.Description` → `Sheet.Title number`, then `Sheet.Description`, then `Sheet.Badges`, in that order on screen whatever the order in code.
+- A long name wrapped onto two title lines in a record header → it is one line with an ellipsis; the whole name stays the dialog's name.
 - A control that applies to the whole tab (the text language, the period) repeated in section headings or put in one section → one switcher in the header's `Sheet.Actions`, before the buttons, rendered only on the tabs it applies to.
-- A Badge with its own `size` in `Sheet.Description` → leave `size` out: the line gives every header the same chip tier.
+- A Badge with its own `size` in `Sheet.Badges` → leave `size` out: the row gives every header the same chip tier.
 - A `Skeleton` placed by hand in `Sheet.Title` or `Sheet.Description` → their `loading`.
 - A start-side button («Выйти», «Удалить») put inside `Sheet.Meta` → `Sheet.Actions` inside `Sheet.Footer`; `Meta` is status text only.
 - A Card or a padded `div` around the content → put it straight into `Sheet.Body`, across its width.
@@ -268,5 +286,5 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - `closeOnOutsideClick={false}` and `closeOnEscape={false}` with no header × and no `Sheet.Close` → nothing closes it; keep a button that answers.
 
 ## Related
-- **Built from:** the dialog shared with Modal and Drawer (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Sheet.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Sheet.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Drawer (`internal/overlay/DialogParts`), [Badge](../badge/COMPONENT.md) (`Sheet.Badges`: a one-line `Badge.Group` of tier m), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Sheet.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Sheet.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Drawer](../drawer/COMPONENT.md) (the same parts as a side panel), [Modal](../modal/COMPONENT.md) (the same parts in the centre), [Datepicker](../datepicker/COMPONENT.md) (`Datepicker.Panel` in a sheet), [Dropdown](../dropdown/COMPONENT.md)

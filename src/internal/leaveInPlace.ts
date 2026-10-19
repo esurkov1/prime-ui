@@ -1,5 +1,6 @@
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { motionTiming, motionToken } from "@/internal/motionTiming";
+import { stillCopy } from "@/internal/stillCopy";
 
 /**
  * The exit of a part the owner removed (a chip, a queue row): React drops the node at once, so a
@@ -26,12 +27,9 @@ export function leaveInPlace(node: HTMLElement, axis: "inline" | "block") {
   const padding = [own[padStart], own[padEnd]] as const;
   const gap =
     Number.parseFloat(axis === "inline" ? parentStyle.columnGap : parentStyle.rowGap) || 0;
-  const ghost = node.cloneNode(true) as HTMLElement;
-  ghost.removeAttribute("id");
-  for (const element of ghost.querySelectorAll("[id]")) element.removeAttribute("id");
-  ghost.setAttribute("aria-hidden", "true");
+  // A still copy: the enter it played, or any motion of its contents, never starts over on it.
+  const ghost = stillCopy(node, true);
   ghost.setAttribute("data-leaving", "");
-  ghost.inert = true;
   ghost.style.pointerEvents = "none";
   ghost.style.overflow = "hidden";
   ghost.style.boxSizing = "border-box";

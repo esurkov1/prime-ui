@@ -11,6 +11,8 @@ checks.
 - [ ] Every button of the page is in one `Page.Actions`, the primary last, each with a `Button.Icon` ([the top bar](composition.md#the-top-bar)).
 - [ ] `SmartFilter.Root` wraps `Page.Root`; its toolbar is in `Page.Tools`, its chips in `Page.Chips` ([the top bar](composition.md#the-top-bar)).
 - [ ] A section's sub-pages are route links (`SegmentedControl.Item asChild`) in its `Page.Tools`; the title stays the section and its Sidebar item stays current on every sub-route — no second Sidebar level, no tab strip in the body ([a section with sub-pages](composition.md#a-section-with-sub-pages)).
+- [ ] The sub-page switch stands in the heading row at the end edge, before the page's buttons — not on a line of its own under the title on a wide screen ([a section with sub-pages](composition.md#a-section-with-sub-pages)).
+- [ ] A pane people pick from (dialogs, threads) reads search → create → list: the create button is `ChatList.Actions` at the top, never under the list; only a FieldList adds under its rows ([where the create button goes](composition.md#where-the-create-button-goes)).
 - [ ] A control stands with what it changes: a table's search, filter, chips and chooser are in its `toolbar` / `toolbarChips` on every page; the bar keeps the title, sections, the view, the shared period and the buttons ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] A table section has an `options` filter field for each categorical column and a `date-range` field per date column, its value in the URL ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] Actions on selected rows are `renderSelectionActions` — one «Действия · N» menu added to the tools row, which stays ([controls of a table](composition.md#controls-of-a-table)).
@@ -61,6 +63,15 @@ checks.
 - [ ] Text colour comes from `tone`; numbers in tables and prices are tabular ([text colour](foundations.md#text-colour)).
 - [ ] No filler copy, no emoji, no text that restates the heading ([decoration](anti-slop.md#8-decoration-and-filler)).
 
+## Colour
+- [ ] Every hue answers «what is this» or «what state is it in»; none decorates ([tone and color](foundations.md#6-tone-and-color)).
+- [ ] Judgements wear `tone`, stages and categories wear `color`; no two stages share one tone ([tone or color](foundations.md#tone-or-color)).
+- [ ] Each status's label and colour come from one map of the app, read by every badge, segment, dot and series ([one status map](foundations.md#one-status-map)).
+- [ ] A hue keeps its meaning across the product; derived states refine their base hue; a history event wears the state it led to ([hue meanings](foundations.md#hue-meanings)).
+- [ ] Category hues are unique within their set, stable per id, and never a status hue in the same view ([categories](foundations.md#categories)).
+- [ ] A colour a person picks is a stored palette name, an unknown one gray ([colours people choose](foundations.md#colours-people-choose)).
+- [ ] No tinted row, card or panel and no coloured border for a status ([marks, not surfaces](foundations.md#marks-not-surfaces)).
+
 ## Tokens and surfaces
 - [ ] No raw values, `--prime-ref-*`, inline `style` or overrides of kit internals ([styling](api-contract.md#styling-your-own-wrappers)).
 - [ ] Every scroll region is a `ScrollContainer`; kit components are not wrapped in another one ([ready components](anti-slop.md#7-div-instead-of-a-ready-component)).
@@ -79,9 +90,14 @@ checks.
 - [ ] A dialog footer holds Cancel and the primary only; deleting the edited record stands in the header's actions ([actions](composition.md#6-actions)).
 - [ ] One secondary action is an icon button with a Tooltip; a «⋯» menu holds two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
 - [ ] An entity has one drawer opened from everywhere; permissions lock fields and hide tabs and actions; header actions act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] A record's dialog header is three lines in this order: `Title` with its `number`, one line of `Description` text, `Badges` (the status and assignee pickers first, «Назначить» when nobody is) over the body; no badge or number in the description, no status in `Actions` ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A record drawer is one form with one «Сохранить» in its footer while dirty and `Drawer.Guard`; no save per section, no unsaved-status text ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A control that changes the whole open tab (a language, a period) is one control in the header's `Drawer.Actions` before the buttons, only on the tabs it applies to ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A drawer loads its tabs' data itself, the history has its own tab, and returning to a tab never shows a skeleton again ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] A record dialog opens with its header and tabs at once: what the list row knows shows, only the unknown lines hold `loading` ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] An action apart from a dialog's answer («Выйти» on a profile) is `Drawer.Actions` / `Modal.Actions` inside the footer, at its start ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] A chat about a record heads itself in two lines — `Chat.Title number` over `Chat.Badges` — and an always-open search is `Chat.Search persistent` ([messages](choosing.md#2-inside-a-category)).
+- [ ] A tile that is a link shows the kit's arrow, never one of mine; a value in words is `stat-text` ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
 - [ ] An on/off permission or setting is a `Switch`, a level per entity a `FieldList` of `Select`s, a set of values in a table cell `Badge.Group overflow="count"` ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 
@@ -100,6 +116,7 @@ checks.
 - [ ] No hand-written animation on kit parts; my own motion uses the motion tokens ([your own motion](motion.md#4-rules-for-your-own-motion)).
 - [ ] Every glyph comes from the kit, none animated by hand ([icons](api-contract.md#icons)).
 - [ ] Every state change moves through the kit ([what the kit animates](motion.md#1-what-the-kit-already-animates--do-not-rebuild-it)).
+- [ ] No animated wrapper of mine around content; nothing moves on first mount, only what appears later enters ([who moves what](motion.md#who-moves-what)).
 
 ## Themes and widths
 - [ ] The screen passes the responsive checklist in both themes ([responsive](responsive.md#checklist-before-handing-a-screen-over)).

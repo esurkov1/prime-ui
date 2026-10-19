@@ -29,7 +29,7 @@ export default function TabsInDrawerExample() {
       <Drawer.Content>
         <Tabs.Root defaultValue="summary">
           <Drawer.Header>
-            <Drawer.Title>Заказ № 1042</Drawer.Title>
+            <Drawer.Title number="№ 1042">Заказ</Drawer.Title>
             <Drawer.Description>Оформлен 3 октября · 65 500 ₽</Drawer.Description>
             <Tabs.List aria-label="Заказ № 1042">
               <Tabs.Item value="summary">Сводка</Tabs.Item>

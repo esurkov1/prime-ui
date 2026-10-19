@@ -10,6 +10,8 @@
  * the messages' selection and pointing styles read.
  */
 .root {
+  /* Its width is its host's: the search bar reads it (`prime-chat`). */
+  container: prime-chat / inline-size;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -21,13 +23,34 @@
 
 /* ─── Header ───────────────────────────────────────────────────────────── */
 
+/* One line: the name ellipsizes, a record's number after it keeps its width, muted. */
 .title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
   min-width: 0;
   margin: 0;
-  overflow: hidden;
   color: var(--prime-color-text-primary);
+}
+
+.titleName {
+  min-width: 0;
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.titleNumber {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The record's badges (`Badge.Group` of tier s, one row, «+N»): 4 under the title. */
+.badges {
+  min-width: 0;
+  margin-block: var(--prime-space-1) 0;
 }
 
 .description {
@@ -52,19 +75,25 @@
 }
 
 /*
- * [lead: back button, avatar] [title over description] [actions]. `Chat.Header` sorts its children:
- * anything that is not the title, the description or the actions goes into `.lead`, side by side.
+ * [lead: back button, avatar] [title over badges over description] [actions]. `Chat.Header` sorts
+ * its children: anything that is not the title, the badges, the description or the actions goes
+ * into `.lead`, side by side. The text lines are auto rows: a line that is absent takes no room,
+ * and the lead and the actions centre on the lines there are.
  */
 .header {
   display: grid;
   flex: none;
   grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto;
   grid-template-areas:
     "lead title actions"
+    "lead badges actions"
     "lead description actions";
   align-items: center;
   column-gap: var(--prime-space-3);
-  padding: var(--prime-space-3) var(--prime-space-3) var(--prime-space-2) var(--prime-space-4);
+  padding: var(--prime-space-3) var(--prime-space-3) var(--prime-space-3) var(--prime-space-4);
+  /* The zone line under it (internal/hairline, joined in TSX), inset like the header's text. */
+  --hairline-inset: var(--prime-space-4);
 }
 
 .lead {
@@ -80,26 +109,29 @@
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     "title actions"
+    "badges actions"
     "description actions";
 }
 
 .header > .title {
   grid-area: title;
-  align-self: end;
+}
+
+.header > .badges {
+  grid-area: badges;
 }
 
 .header > .description {
   grid-area: description;
-  align-self: start;
 }
 
 .header > .actions {
   grid-area: actions;
 }
 
-.header:not(:has(> .description)) > .title {
-  grid-row: 1 / span 2;
-  align-self: center;
+/* Under badges the description stands 4 lower. */
+.header:has(> .badges) > .description {
+  margin-block-start: var(--prime-space-1);
 }
 
 /* ─── Search ───────────────────────────────────────────────────────────── */
@@ -109,21 +141,53 @@
   flex: none;
   align-items: center;
   gap: var(--prime-space-1);
-  padding: 0 var(--prime-space-3) var(--prime-space-2);
+  padding: var(--prime-space-2) var(--prime-space-3);
 }
 
+/*
+ * One control of the consumer's before the field (a channel Select), at the field's tier. The row
+ * never overflows: the field gives way first down to its minimum, then the control ellipsizes
+ * down to its own; in a chat under 20rem the control takes a line of its own
+ * above the field.
+ */
+.searchStart {
+  display: flex;
+  flex: 0 1 auto;
+  min-inline-size: var(--prime-space-16);
+  max-inline-size: 50%;
+}
+
+@container prime-chat (max-width: 20rem) {
+  .search:has(> .searchStart) {
+    flex-wrap: wrap;
+  }
+
+  .searchStart {
+    flex-basis: 100%;
+    max-inline-size: none;
+  }
+}
+
+/* The field takes what is left, never less than a few words of a query beside its own end (the
+   place of the match and the two steps). */
 .searchField {
-  flex: 1 1 auto;
-  min-inline-size: 0;
+  flex: 1 1 0;
+  min-inline-size: calc(var(--prime-space-20) * 2);
 }
 
+/*
+ * The count badge at the very end of the field, after the steps (which sit at the field's action
+ * place): a slot as wide as «12/48», so the steps never move as the count changes, and the field's
+ * own side padding after it.
+ */
 .searchCount {
+  display: flex;
   flex: none;
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
+  order: 5;
+  justify-content: center;
+  min-inline-size: var(--prime-space-12);
+  margin-inline-end: var(--field-gap);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
 /* ─── Pinned ───────────────────────────────────────────────────────────── */
@@ -133,10 +197,21 @@
   margin: 0 var(--prime-space-3) var(--prime-space-2);
 }
 
+/* Right under the header's line it keeps the air the search bar would. */
+.header + .pinned {
+  margin-block-start: var(--prime-space-2);
+}
+
 /* ─── Messages ─────────────────────────────────────────────────────────── */
 
-/* The conversation scrolls itself and pads its own sides, so the focus rings of the bubbles fit. */
+/*
+ * The conversation scrolls itself and pads its own sides, so the focus rings of the bubbles fit. A
+ * column: a conversation shorter than the pane is pushed to the end (the list's auto start margin),
+ * so the last message stands right above the footer; a longer one scrolls as usual.
+ */
 .scroller {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-block-size: 0;
   padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-3);
@@ -229,7 +304,9 @@
 .list {
   display: flex;
   flex-direction: column;
+  flex: none;
   align-self: stretch;
+  margin-block-start: auto;
   box-sizing: border-box;
   inline-size: 100%;
   min-width: 0;
@@ -453,4 +530,36 @@
 .footer {
   flex: none;
   padding: var(--prime-space-2) var(--prime-space-3) var(--prime-space-3);
+}
+
+/* ─── Inline ───────────────────────────────────────────────────────────── */
+
+/*
+ * `variant="inline"`: the chat is the content of a padded host (a dialog body, a tab, a
+ * `Card.Body`), so it drops its own insets — the header, the search, the pinned bar and the footer
+ * stand on the host's content edges, with no air above the first or below the last. The messages
+ * reach 16 into the host's side padding: that is the room of their scroller and rows (the focus
+ * rings), so a bubble's tail stands on the content edge, under the header's text. The air between
+ * the zones and inside the list stays.
+ */
+.root[data-variant="inline"] > .header {
+  --hairline-inset: 0%;
+
+  padding: 0 0 var(--prime-space-3);
+}
+
+.root[data-variant="inline"] > .search {
+  padding-inline: 0;
+}
+
+.root[data-variant="inline"] > .pinned {
+  margin-inline: 0;
+}
+
+.root[data-variant="inline"] > .messages {
+  margin-inline: calc(var(--prime-space-4) * -1);
+}
+
+.root[data-variant="inline"] > .footer {
+  padding: var(--prime-space-2) 0 0;
 }

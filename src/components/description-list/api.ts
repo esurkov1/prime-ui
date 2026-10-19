@@ -64,8 +64,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "The value (`<dd>`): text, a Badge, a link; plus an optional `DescriptionList.ItemAction`, which goes to the end of the value.",
-          ru: "Значение (`<dd>`): текст, Badge, ссылка; и необязательный `DescriptionList.ItemAction`, который встаёт в конец значения.",
+          en: "The value (`<dd>`): text, a Badge, a link; plus optional `DescriptionList.ItemAction`s, which stand as one group at the end of the value.",
+          ru: "Значение (`<dd>`): текст, Badge, ссылка; и необязательные `DescriptionList.ItemAction`, которые встают одной группой в конец значения.",
         },
         {
           name: "…rest",
@@ -77,8 +77,8 @@ export const api: ComponentApi = {
     },
     {
       name: "DescriptionList.ItemAction",
-      en: "`ref` → `HTMLButtonElement`. A row action at the end of the value («Копировать», «Позвонить»): a ghost icon Button one tier below the list, with `label` as its name and tooltip.",
-      ru: "Действие строки в конце значения («Копировать», «Позвонить»): иконочная Button ghost на ярус меньше списка, `label` — её имя и подсказка.",
+      en: "`ref` → `HTMLButtonElement`. A row action at the end of the value («Копировать», «Позвонить»): a ghost icon Button one tier below the list, with `label` as its name and tooltip. Several in a row («Проверить», «Заменить») stand as one group at the end edge, in the order written.",
+      ru: "Действие строки в конце значения («Копировать», «Позвонить»): иконочная Button ghost на ярус меньше списка, `label` — её имя и подсказка. Несколько в строке («Проверить», «Заменить») стоят одной группой у конечного края, в порядке записи.",
       props: [
         {
           name: "label",

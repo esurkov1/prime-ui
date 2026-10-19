@@ -22,10 +22,19 @@ export const ARTICLE = "[data-message-article]";
 /** The quick reaction of a double tap. */
 export const DEFAULT_QUICK_REACTION = "👍";
 
+/**
+ * The id of a row's give-way glide (a row of the list sliding to where a change of another row put
+ * it): a new one replaces it, whether a message's morph or the list started it.
+ */
+export const GIVE_WAY_ANIMATION = "message-give-way";
+
 // ─── Selection store ──────────────────────────────────────────────────────────
 
 /** The values of the selected messages, `null` while not selecting. */
 export type Selection = readonly string[] | null;
+
+/** Whose runs a chat without avatars heads with their author. */
+export type MessageAuthors = "none" | "incoming" | "outgoing" | "all";
 
 /**
  * The selection of a list, outside React state: each message subscribes to its own state in it
@@ -69,8 +78,11 @@ export type MessageListContextValue = {
    * author's run shows the author's header and the last one the avatar.
    */
   group: boolean;
-  /** A direct chat that heads the first message of an outgoing run with its author. */
-  outgoingAuthors: boolean;
+  /**
+   * Whose runs a chat without avatars heads with their author (`Chat.Messages authors`): `none`,
+   * the `incoming` side, the `outgoing` side or `all`. A group chat heads incoming runs by itself.
+   */
+  authors: MessageAuthors;
   /**
    * A message's article mounted (its layout effect): it enters when the list planned it as new at
    * the end, and is watched for `onRead`. Returns the unregister.
@@ -113,7 +125,7 @@ const NO_SELECTION = createSelectionStore(null);
 const MessageListContext = React.createContext<MessageListContextValue>({
   inList: false,
   group: false,
-  outgoingAuthors: false,
+  authors: "none",
   register: () => () => {},
   arrivedNow: () => false,
   reveal: () => false,

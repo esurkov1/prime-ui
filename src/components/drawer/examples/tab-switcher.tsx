@@ -19,6 +19,7 @@ import * as React from "react";
 const MODEL = {
   name: "Кресло «Орион»",
   sku: "OR-240",
+  summary: "Офисные кресла · 140 шт. на складе",
   description: {
     ru: "Офисное кресло с сетчатой спинкой и поддержкой поясницы. Подлокотники регулируются в четырёх направлениях, механизм качания фиксируется в пяти положениях.",
     en: "An office chair with a mesh back and lumbar support. The armrests adjust in four directions, the tilt locks in five positions.",
@@ -65,8 +66,8 @@ export default function DrawerTabSwitcherExample() {
       <Drawer.Content>
         <Tabs.Root value={tab} onValueChange={setTab}>
           <Drawer.Header>
-            <Drawer.Title>{MODEL.name}</Drawer.Title>
-            <Drawer.Description>Артикул {MODEL.sku}</Drawer.Description>
+            <Drawer.Title number={MODEL.sku}>{MODEL.name}</Drawer.Title>
+            <Drawer.Description>{MODEL.summary}</Drawer.Description>
             <Drawer.Actions>
               {tab === "description" ? (
                 <SegmentedControl.Root

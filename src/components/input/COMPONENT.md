@@ -319,7 +319,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [inline-edit.tsx](examples/inline-edit.tsx) | Record card fields that save on blur and Enter, revert on Escape and show the server's refusal — `onCommit`, `error`. |
 | [suggestions.tsx](examples/suggestions.tsx) | Where a returned order is kept: free text with the places already used as suggestions — `suggestions`. |
 | [with-select.tsx](examples/with-select.tsx) | A menu section's icon and name as one field: an icon-only Select is the box's start segment — `Input.Wrapper`, `Select.Root`, `aria-label`. |
-| [amount-currency.tsx](examples/amount-currency.tsx) | An amount and its currency as one field: a Select after the field is the box's end segment — `Input.Wrapper`, `Select.Root`, `Input.Field`, `aria-label`. |
+| [amount-currency.tsx](examples/amount-currency.tsx) | An amount and its currency as one field: a Select after the field is the box's end segment, its trigger the symbol, its rows the symbol as the icon and the name — `Input.Wrapper`, `Select.Root`, `renderValue`, `Select.ItemIcon`, `aria-label`. |
 | [time.tsx](examples/time.tsx) | A call slot as a time of day: the browser's hour and minute segments, arrows step them, working hours only — `type`, `step`, `min`, `max`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A delivery city whose suggestions stay open on a press beside the field while the address is copied from a letter; Escape still closes them — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |

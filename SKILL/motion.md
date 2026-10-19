@@ -46,6 +46,28 @@ Use the component and the motion comes with it. Never re-animate these with your
 | Playing a voice message | the waveform fills as it plays and is the seek slider; play and pause cross-fade; the speed label flows into the next rate | `VoicePlayer` |
 | A rare milestone | a short confetti burst | `celebrate({ origin })` |
 
+### Who moves what
+
+Motion belongs to the component that knows what changed. Four kinds move by themselves, each from
+the state you pass — never from the shape of your markup:
+
+- **A part appears or goes** because its data did (an error, a chip, a row, a bar that selection
+  brings): it rises in once and closes up in place. What mounts together with its page, its region
+  or an opening overlay is simply there.
+- **A value is replaced by another value** in one place (a label, a glyph, a control on one tab and
+  another control in the same place on the next): the two cross-fade where they stand and the place
+  glides to the new size from the edge it holds to.
+- **A region changes state** (`Crossfade` `state`): loading hands over to the data in place; data,
+  empty, error and another record cross-fade and glide the height.
+- **A layer opens or closes** (Modal, Drawer, Sheet, menus): only its panel and its scrim move;
+  nothing inside replays the opening, and a drag copy lifted out of it flies still.
+
+What a container never does for you: a row of the header's `Actions`, a toolbar or a list of your
+children does not invent motion for them by their kind. Each child keeps its place: write a control
+that changes per tab as one expression in one place (`{tab === "text" ? <SegmentedControl.Root … /> : <Datepicker.Root … />}`)
+and it cross-fades in that place; render a child on some tabs only and it rises in and closes up.
+Never add your own `key` per tab to such a child — that makes it another child, not another value.
+
 ## 2. Decide first: should it move at all?
 
 Ask by frequency, then by purpose.
@@ -202,6 +224,9 @@ export function CloseQuarter({ onClose }: { onClose: () => void }) {
   list → `animated={false}`.
 - Your own fade-in keyframes on a whole page or every card → no; first render is still, except a
   short staggered group.
+- An animated wrapper of your own around kit content (a fading or sliding `div`, an enter class on a
+  panel, a `key` that remounts a block to replay it) → no: the part that knows the change moves it
+  ([who moves what](#who-moves-what)); a region that swaps states is a `Crossfade`.
 - Confetti for a saved form → «Сохранено» on the button when the form stays on screen, a notification
   when it goes away; confetti only for rare milestones.
 - An overlay mounted conditionally (`{open && <Modal.Root>}`) or with a `key` that changes per record →

@@ -26,7 +26,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Необязательные части: плашка с иконкой в окне из одной шапки и шапка, где статус открывает строку под заголовком, с подвалом без тела между ними — `Modal.Icon`, `Modal.Description`, `Modal.Footer`.",
+        "Необязательные части: плашка с иконкой в окне из одной шапки и шапка записи — статус своей строкой под именем и текстом — с подвалом без тела между ними — `Modal.Icon`, `Modal.Badges`, `Modal.Footer`.",
     },
     {
       slot: "sizes",

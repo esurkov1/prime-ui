@@ -99,7 +99,7 @@ ring ≥ 3:1 — including `text.muted` on every layer and on every control fill
 
 ### Chart palette
 
-Categories wear the chart colors; statuses wear the tones (`danger`, `success`…).
+Categories wear the chart colors; a judgement (good, attention, a problem) wears a tone (`danger`, `success`…); a stage or another identity without a judgement wears a palette `color`.
 
 | Token | Use |
 |---|---|
@@ -343,7 +343,8 @@ Every component is designed with its micro-animations, not only its static state
    `transform` / `scale` (progress fills). The exceptions are a closed list, each with one engine,
    and `src/styles/motion-perf.test.ts` allows nothing else:
    - **height glide** — a region that swaps its content between settled states glides to the new
-     height (`Crossfade`, the Notification stack); a swap into or out of loading never glides;
+     height (`Crossfade`, the Notification stack); a swap into or out of loading never glides; a
+     cell of a row whose control is replaced by another glides its width the same way;
    - **row fold** — a part that folds open or closed animates `grid-template-rows` 0fr ↔ 1fr
      (`Disclosure`: Accordion, DataTable expanded rows);
    - **text width** — a label that morphs into another text glides its `width` (`MorphText`).
@@ -385,6 +386,14 @@ Every component is designed with its micro-animations, not only its static state
     the shared field frame (`src/internal/FieldFrame`): every field, the Radio group and a Checkbox / Switch
     row. Only the control moves — the label stays, the message drops in on its own. Never for an error the
     field mounts with; reduced motion keeps it still and the red ring and message still say it.
+15. **Motion is owned by what knows the change.** A part moves only because its owner's state
+    says what changed, through one of four mechanisms: presence of a part (it appears or goes),
+    a content swap in one stable place (cross-fade, the size gliding from the place's alignment
+    edge), a region swap (rule 8) and a layer's open / close (only its panel and scrim). A
+    container that holds the consumer's children never invents motion for them from their element
+    type — each child keeps its place, a new control in it is a content swap, a child that
+    comes and goes is presence. Nothing inside a layer replays its opening, and a copy of a node
+    (a drag copy, an exit copy) never carries motion of its own.
 
 Component checklist for motion: press · hover/focus fill · selection/toggle · open/close · enter/exit of
 parts (items, messages, badges, icons) · loading/progress · reduced motion. Skip what the rules above say

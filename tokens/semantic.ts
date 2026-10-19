@@ -764,6 +764,7 @@ export const semanticTokens = {
   },
 
   avatar: {
+    "2xs": "{space.4}",
     xs: "{space.5}",
     s: "{space.6}",
     m: "{space.8}",

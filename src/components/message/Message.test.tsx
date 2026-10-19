@@ -700,9 +700,6 @@ describe("Message", () => {
     expect(cancel).toHaveAttribute("data-tone", "danger");
     for (const key of [confirm, cancel, link])
       expect(key).toHaveAttribute("data-full-width", "true");
-    // Only the last row closes the message with the bubble's corners.
-    expect(screen.getByTestId("row-1")).not.toHaveAttribute("data-end");
-    expect(screen.getByTestId("row-2")).toHaveAttribute("data-end");
     // A link key carries the decorative link mark; a callback key does not.
     expect(link.querySelector("svg[aria-hidden='true']")).not.toBeNull();
     expect(confirm.querySelector("svg")).toBeNull();

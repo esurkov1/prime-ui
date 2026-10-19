@@ -1,7 +1,9 @@
 import * as React from "react";
 
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { GIVE_WAY_ANIMATION } from "@/internal/messageList";
 import { motionToken, readElementDurationMs } from "@/internal/motionTiming";
+import { stillCopy } from "@/internal/stillCopy";
 
 /**
  * The bubble morph: every size change of an existing message (a reaction row that opens or closes,
@@ -22,10 +24,11 @@ import { motionToken, readElementDurationMs } from "@/internal/motionTiming";
  * - nothing travels across text: a meta that stays while text passes through its place dips (out
  *   before the text reaches it, back once it has left, at the same spot), and a meta that changes
  *   line cross-fades instead of gliding; the text itself glides straight, keeping its padding;
- * - when the row changed its height, the conversation gives way (`giveWay`): a message grows from
- *   its bottom (reactions, edits: the meta and the tail stay) — the scroller scrolls by the change
- *   in the same frame and the rows above glide as one block — or from its top (a transcript: the
- *   player stays) and the rows below glide.
+ * - when the row changed its height, the conversation gives way (`giveWay`): a message keeps its
+ *   bottom (reactions, edits: the meta and the tail stay) or its top (a transcript: the player
+ *   stays) on screen — the scroller scrolls by what the commit moved that edge, as far as it can —
+ *   and the rows that moved glide once from where they were, whether the list grew downward (it
+ *   scrolls) or upward (a short conversation pushed to the end of its pane).
  *
  * Every delta is a difference of one element's box across one commit, on screen. Nothing renders
  * per frame. A commit that changes no box touches nothing; one that lands mid-flight retargets
@@ -48,7 +51,23 @@ type Snapshot = {
   anchor: MorphAnchor;
   /** Where the scroller the row stands in was (a commit that shrinks the end clamps it). */
   scrollTop: number | null;
+  /**
+   * Everything around the message in its scroller (the rows before and after it, a sticky date),
+   * each where it was seen: what gives way glides from here, and what did not move stays still.
+   */
+  around: { element: HTMLElement; top: number }[];
 };
+
+/** Everything before and after `origin` in `host`, walking up from it (rows of rows included). */
+function aroundOf(origin: HTMLElement, host: HTMLElement): HTMLElement[] {
+  const out: HTMLElement[] = [];
+  for (let node: HTMLElement | null = origin; node && node !== host; node = node.parentElement) {
+    for (const sibling of node.parentElement?.children ?? []) {
+      if (sibling !== node && sibling instanceof HTMLElement) out.push(sibling);
+    }
+  }
+  return out;
+}
 
 /** `end` — the bottom corner, the meta and the tail stay; `start` — the top stays. */
 export type MorphAnchor = "start" | "end";
@@ -213,6 +232,13 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
       items,
       anchor: options?.anchor ?? "end",
       scrollTop: row ? (scroller?.scrollTop ?? null) : null,
+      around:
+        row && scroller
+          ? aroundOf(column.parentElement ?? row, scroller).map((element) => ({
+              element,
+              top: element.getBoundingClientRect().top,
+            }))
+          : [],
     };
   };
 
@@ -222,69 +248,52 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
   };
 
   /**
-   * The conversation gives way to a row that changed its height. The row grows from its anchored
-   * edge: from its bottom (`end`: the meta and the tail stay where they are, the rows above give
-   * way) or from its top (`start`: a transcript under the player, the rows below give way). The
-   * layout grows downward, so an `end` row on screen scrolls the view by its change in the same
-   * frame — its bottom and every row below stay still — and the rows above glide up from where
-   * they were, as one block on the stroke's clock. A row above the view scrolls the same way,
-   * with nothing to glide (the view stays still); a row below the view needs nothing.
+   * The conversation gives way to a row that changed its height — one owner of the motion, from
+   * what the commit actually moved. The row keeps its anchored edge on screen: its bottom (`end`:
+   * reactions, edits — the meta and the tail stay) or its top (`start`: a transcript under the
+   * player). Where the list stands in its scroller decides how the commit moved things: a list that
+   * flows from the top grows downward (the row's top stays), one pushed to the end of a short pane
+   * by its auto top margin grows upward (the bottom stays), one with a little slack does a share of
+   * each. So nothing is assumed: the row's two edges are measured against where they were, the
+   * scroller scrolls by what brings the anchored edge back (as far as it can), and everything around
+   * the message — rows, a sticky date — glides from where it was seen before the commit to where it
+   * now stands, once, as one block on the stroke's clock, or not at all when it ends where it was (a
+   * date stuck at the top). A row out of view keeps the view still and glides nothing.
    */
-  const giveWay = (before: Snapshot, row: HTMLElement, delta: number) => {
+  const giveWay = (before: Snapshot, row: HTMLElement) => {
     const glides: { element: HTMLElement; dy: number }[] = [];
     const host = elements().scroller;
     if (!host || !before.row) return glides;
-    /** Where the walk over what gives way starts: the message (its article), inside its row. */
-    const origin = elements().column?.parentElement ?? row;
     elements().hold?.();
     const view = boxOf(host);
     const was = before.row;
+    const now = boxOf(row);
+    // How the commit moved the row's edges on screen (a clamp of a shrinking end included).
+    const topMoved = now.top - was.top;
+    const bottomMoved = now.top + now.height - (was.top + was.height);
     const aboveView = was.top + was.height <= view.top;
     const belowView = was.top >= view.top + view.height;
-    if (belowView) return glides;
-    let applied = 0;
-    if (aboveView || before.anchor === "end") {
-      // Everything before the row in the scroller, at its place before the scroll.
-      const ahead: HTMLElement[] = [];
-      if (!aboveView) {
-        // From the message itself: a row of the list may hold more than the message (the unread
-        // band before it, in one row), and those give way with the rest.
-        for (
-          let node: HTMLElement | null = origin;
-          node && node !== host;
-          node = node.parentElement
-        ) {
-          for (let sibling = node.previousElementSibling; sibling; ) {
-            if (sibling instanceof HTMLElement) ahead.push(sibling);
-            sibling = sibling.previousElementSibling;
-          }
-        }
+    // Out of view the view stays still: what is in view moved with the row's bottom (it is below
+    // the row) or with its top (above it).
+    const keep = aboveView
+      ? bottomMoved
+      : belowView
+        ? topMoved
+        : before.anchor === "end"
+          ? bottomMoved
+          : topMoved;
+    if (Math.abs(keep) >= SAME_PX) host.scrollTop += keep;
+    if (aboveView || belowView) return glides;
+    // Each glides from where it was seen before the commit to where it stands now: a sticky date
+    // that stayed at the top, or a row the change did not move, glides nothing. A glide still on
+    // its way (another message's) gives way to the new one, from where it is seen now.
+    for (const { element, top } of before.around) {
+      if (!element.isConnected) continue;
+      for (const animation of element.getAnimations?.() ?? []) {
+        if (animation.id === GIVE_WAY_ANIMATION) animation.cancel();
       }
-      const tops = ahead.map((element) => element.getBoundingClientRect().top);
-      // From where the reader was: a shrink at the end may have clamped the scroll already.
-      const from = before.scrollTop ?? host.scrollTop;
-      const clamped = host.scrollTop - from;
-      host.scrollTop = from + delta;
-      applied = host.scrollTop - from;
-      // A sticky date that stands at the top did not move: only what moved glides — from where it
-      // was before the commit (a clamp had already moved it by `clamped`).
-      ahead.forEach((element, index) => {
-        const dy = (tops[index] as number) + clamped - element.getBoundingClientRect().top;
-        if (Math.abs(dy) >= SAME_PX) glides.push({ element, dy });
-      });
-    }
-    // The rows after it moved by what the scroll did not take back.
-    const rest = delta - applied;
-    if (!aboveView && Math.abs(rest) >= SAME_PX) {
-      for (
-        let node: HTMLElement | null = origin;
-        node && node !== host;
-        node = node.parentElement
-      ) {
-        for (let next = node.nextElementSibling; next; next = next.nextElementSibling) {
-          if (next instanceof HTMLElement) glides.push({ element: next, dy: -rest });
-        }
-      }
+      const dy = top - element.getBoundingClientRect().top;
+      if (Math.abs(dy) >= SAME_PX) glides.push({ element, dy });
     }
     return glides;
   };
@@ -312,7 +321,7 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
 
     // ── the row's change of height, given way to before anything is read (reduced motion too) ──
     const rowDelta = row && before.row ? boxOf(row).height - before.row.height : 0;
-    const glides = row && Math.abs(rowDelta) >= SAME_PX ? giveWay(before, row, rowDelta) : [];
+    const glides = row && Math.abs(rowDelta) >= SAME_PX ? giveWay(before, row) : [];
 
     // ── the new layout, with every running offset taken out ──
     const bubbleLayout = boxOf(bubble);
@@ -650,12 +659,10 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
       const { element, box, dx, dy } = plan;
       if (element === meta && metaSwap && metaFrom) {
         // The meta stands at its new place and fades in there; its copy fades out at the old one.
-        const copy = element.cloneNode(true) as HTMLElement;
+        const copy = stillCopy(element, true);
         copy.removeAttribute("data-message-meta");
         copy.setAttribute("data-morph-meta", "");
         copy.setAttribute("data-morph-ghost", "");
-        copy.setAttribute("aria-hidden", "true");
-        copy.inert = true;
         Object.assign(copy.style, {
           position: "absolute",
           inset: "auto",
@@ -729,6 +736,7 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
         [{ transform: `translate(0px, ${dy}px)` }, { transform: "translate(0px, 0px)" }],
         { ...timing, composite: "add" },
       );
+      glide.id = GIVE_WAY_ANIMATION;
       fades.add(glide);
       glide.onfinish = glide.oncancel = () => fades.delete(glide);
     }

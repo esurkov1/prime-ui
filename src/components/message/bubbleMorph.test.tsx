@@ -328,6 +328,46 @@ describe("bubbleMorph", () => {
     expect(animations.some((a) => a.element === t.above || a.element === t.below)).toBe(false);
   });
 
+  it("in a short conversation pushed to the end, a growth moves the rows above once and nothing below", () => {
+    // The list stands at the end of a pane it does not fill (its auto top margin): nothing scrolls,
+    // and a row that grows moves its top up — the rows above with it — while its bottom stays.
+    const s = inScroller(300);
+    let lift = 0;
+    place(s.above, () => ({ left: 0, top: 200 - lift, width: 300, height: 100 }));
+    place(s.row, () => ({ left: 0, top: 300 - lift, width: 300, height: 80 + lift }));
+    place(s.below, { left: 0, top: 380, width: 300, height: 100 });
+    place(s.bubble, () => ({ left: 0, top: 304 - lift, width: 300, height: 72 + lift }));
+    s.morph.capture({ anchor: "end" });
+    lift = 36;
+    s.morph.play();
+    // Nothing to scroll: the row's bottom never moved.
+    expect(s.scrollTop()).toBe(1000);
+    // The row above glides from where it was, once; the row below never moves.
+    expect(animations.find((a) => a.element === s.above)?.keyframes[0]).toEqual({
+      transform: "translate(0px, 36px)",
+    });
+    expect(animations.some((a) => a.element === s.below)).toBe(false);
+  });
+
+  it("a shrink at the end: the rows above settle down once, a date stuck at the top never moves", () => {
+    const s = inScroller(300);
+    // A date stuck at the top of the view: it stands there whatever the scroll.
+    const date = document.createElement("div");
+    s.scroller.prepend(date);
+    place(date, { left: 0, top: 8, width: 300, height: 32 });
+    s.morph.capture({ anchor: "end" });
+    // A reaction taken back at the end: the content shrinks and the browser clamps the scroll.
+    s.grow(-36);
+    s.scroller.scrollTop = 964;
+    s.morph.play();
+    // The row's bottom stayed: nothing to scroll; the row above glides down from where it was.
+    expect(s.scrollTop()).toBe(964);
+    expect(animations.find((a) => a.element === s.above)?.keyframes[0]).toEqual({
+      transform: "translate(0px, -36px)",
+    });
+    expect(animations.some((a) => a.element === date)).toBe(false);
+  });
+
   it("closes a disclosed block like a disclosure: its fade spans the whole stroke", () => {
     const m = message();
     const block = document.createElement("div");

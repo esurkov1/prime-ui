@@ -1,13 +1,17 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import type * as React from "react";
+import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
+import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { cssRule, cssValue } from "@/test/css";
 import {
   DialogActions,
+  DialogBadges,
   DialogBody,
   DialogClose,
   DialogDescription,
@@ -25,6 +29,8 @@ import {
   useDialogRoot,
 } from "./DialogParts";
 import styles from "./DialogParts.module.css";
+
+const CSS = "src/internal/overlay/DialogParts.module.css";
 
 type DialogKind = React.ComponentProps<typeof DialogPanel>["kind"];
 
@@ -183,28 +189,172 @@ describe("DialogParts", () => {
     expect(screen.getByTestId("glyph").parentElement).not.toHaveAttribute("data-media");
   });
 
-  it("sizes the status badges of the description line to chip tier s and keeps the text", () => {
+  it("lays a record header out in three lines: title with its number, the description, the badges row", () => {
     render(
       <Root defaultOpen>
         <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
-          <DialogHeader>
-            <DialogTitle>Admin</DialogTitle>
-            <DialogDescription data-testid="line">
-              <Badge.Root tone="warning">Нужна авторизация</Badge.Root>
-              <Badge.Root color="blue">Менеджер</Badge.Root>
-              admin@way2ride.org
-            </DialogDescription>
+          <DialogHeader data-testid="header">
+            <DialogDescription>Аренда байка Пхукет · заявка 19 сент, 06:37</DialogDescription>
+            <DialogBadges data-testid="badges">
+              <Badge.Root tone="info">Новая</Badge.Root>
+              <Badge.Root color="sky">Telegram</Badge.Root>
+            </DialogBadges>
+            <DialogTitle number="#678">Александра</DialogTitle>
           </DialogHeader>
         </DialogPanel>
       </Root>,
     );
-    const line = screen.getByTestId("line");
-    const badges = Array.from(line.querySelectorAll("[data-tier]"));
-    expect(badges.map((badge) => badge.getAttribute("data-tier"))).toEqual(["s", "s"]);
-    expect(badges.map((badge) => badge.parentElement)).toEqual([line, line]);
-    expect(screen.getByRole("dialog")).toHaveAccessibleDescription(
-      expect.stringContaining("admin@way2ride.org"),
+    const dialog = screen.getByRole("dialog");
+    // The number is part of the name; the description is the text line alone.
+    expect(dialog).toHaveAccessibleName("Александра #678");
+    expect(dialog).toHaveAccessibleDescription("Аренда байка Пхукет · заявка 19 сент, 06:37");
+    expect(screen.getByText("#678")).toHaveClass(styles.titleNumber);
+    expect(screen.getByText("Александра")).toHaveClass(styles.titleName);
+    // The badges row is the one-line Badge.Group of tier m, whatever order the parts come in.
+    const badges = screen.getByTestId("badges");
+    expect(badges).toHaveClass(styles.badges);
+    expect(badges).toHaveAttribute("data-overflow", "count");
+    expect(
+      Array.from(badges.querySelectorAll(":scope > [data-tier]:not([data-overflowed])")).map(
+        (badge) => badge.getAttribute("data-tier"),
+      ),
+    ).toEqual(["m", "m"]);
+    expect(screen.getByTestId("header")).toHaveAttribute("data-multiline", "true");
+    // Line order comes from the header, not the JSX: title, description, badges.
+    expect(cssValue(cssRule(CSS, ".title"), "order")).toBe("0");
+    expect(cssValue(cssRule(CSS, ".description"), "order")).toBe("1");
+    expect(cssValue(cssRule(CSS, ".badges"), "order")).toBe("2");
+    // The title and the description are a tight pair (4); the badges stand 8 under the line above.
+    expect(cssValue(cssRule(CSS, ".description"), "margin")).toBe("var(--prime-space-1) 0 0");
+    expect(cssValue(cssRule(CSS, ".badges"), "margin-block-start")).toBe("var(--prime-space-2)");
+    expect(() => cssRule(CSS, ".header:has(> .badges) > .description")).toThrow();
+  });
+
+  it("cuts the name and the description of a record header to one line; the number never", () => {
+    const record = ".header:is(:has(> .badges), :has(> .title > .titleNumber))";
+    for (const line of [`${record} .titleName`, `${record} > .description`]) {
+      const rule = cssRule(CSS, line);
+      expect(cssValue(rule, "white-space")).toBe("nowrap");
+      expect(cssValue(rule, "text-overflow")).toBe("ellipsis");
+      expect(cssValue(rule, "overflow")).toBe("hidden");
+    }
+    expect(cssValue(cssRule(CSS, `${record} .titleNumber`), "flex")).toBe("none");
+    // A question dialog keeps its wrapping title and description.
+    expect(() => cssValue(cssRule(CSS, ".description"), "white-space")).toThrow();
+  });
+
+  it("tells a cut line whole in its title while it is cut, unless the consumer set one", () => {
+    const scroll = vi
+      .spyOn(HTMLElement.prototype, "scrollWidth", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.tagName === "HEADER" ? 0 : 400;
+      });
+    const client = vi
+      .spyOn(HTMLElement.prototype, "clientWidth", "get")
+      .mockImplementation(() => 200);
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader>
+            <DialogTitle number="#678">Александра Константинопольская</DialogTitle>
+            <DialogDescription title="Своя подсказка">Аренда байка Пхукет</DialogDescription>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
     );
+    expect(screen.getByText("Александра Константинопольская")).toHaveAttribute(
+      "title",
+      "Александра Константинопольская",
+    );
+    expect(screen.getByText("Аренда байка Пхукет")).toHaveAttribute("title", "Своя подсказка");
+    scroll.mockRestore();
+    client.mockRestore();
+  });
+
+  it("holds the badges line with a skeleton while the record loads", () => {
+    const { rerender } = render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader>
+            <DialogTitle>Александра</DialogTitle>
+            <DialogBadges loading data-testid="badges">
+              <Badge.Root tone="info">Новая</Badge.Root>
+            </DialogBadges>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    expect(screen.getByTestId("badges")).toHaveAttribute("aria-busy", "true");
+    expect(screen.queryByText("Новая")).toBeNull();
+    // The placeholder is a badge of the line's tier, never a block with its own minimum height.
+    const chip = screen.getByTestId("badges").querySelector("[data-shape]");
+    expect(chip).toHaveAttribute("data-shape", "chip");
+    expect(chip).toHaveAttribute("data-size", "m");
+    rerender(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader>
+            <DialogTitle>Александра</DialogTitle>
+            <DialogBadges data-testid="badges">
+              <Badge.Root tone="info">Новая</Badge.Root>
+            </DialogBadges>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    expect(screen.getByTestId("badges")).not.toHaveAttribute("aria-busy");
+    expect(screen.getByText("Новая")).toBeInTheDocument();
+  });
+
+  it("makes the assignee chip a picker in the badges row, opened and chosen from the keyboard", async () => {
+    const user = userEvent.setup();
+    function Assignee() {
+      const [name, setName] = React.useState<string | null>(null);
+      return (
+        <Dropdown.Root>
+          <Dropdown.Trigger>
+            {name ? (
+              <Badge.Root aria-label={`Ответственный: ${name}`}>
+                <Badge.Avatar>
+                  <Avatar.Root color="purple">
+                    <Avatar.Fallback>АК</Avatar.Fallback>
+                  </Avatar.Root>
+                </Badge.Avatar>
+                {name}
+              </Badge.Root>
+            ) : (
+              <Badge.Root variant="outline">Назначить</Badge.Root>
+            )}
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item onSelect={() => setName("Анна Котова")}>Анна Котова</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+      );
+    }
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader>
+            <DialogTitle>Александра</DialogTitle>
+            <DialogBadges>
+              <Assignee />
+            </DialogBadges>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    const assign = screen.getByRole("button", { name: "Назначить" });
+    assign.focus();
+    await user.keyboard("{Enter}");
+    expect(assign).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard("{ArrowDown}{Enter}");
+    const chip = await screen.findByRole("button", { name: "Ответственный: Анна Котова" });
+    expect(chip).toHaveAttribute("aria-expanded", "false");
+    // The avatar sits in the chip at the size of its tier (m → xs), decorative.
+    const avatar = chip.querySelector("[data-color]");
+    expect(avatar).toHaveAttribute("data-size", "xs");
+    expect(avatar?.parentElement).toHaveAttribute("aria-hidden", "true");
   });
 
   it("names a body section by its h3 heading and puts its Actions at the end of the heading row", () => {
@@ -317,6 +467,8 @@ describe("DialogParts", () => {
     const dialog = screen.getByRole("dialog");
     const busy = dialog.querySelector("[aria-busy='true']");
     expect(busy?.tagName).toBe("P");
+    // The line holds the height of the description's own text (body-s = the s tier).
+    expect(busy?.querySelector("[data-shape]")).toHaveAttribute("data-size", "s");
     expect(screen.queryByText("Тур 2, на линии")).toBeNull();
     rerender(<Header loading={false} />);
     expect(dialog).toHaveAccessibleDescription("Тур 2, на линии");

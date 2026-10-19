@@ -138,10 +138,28 @@ function listen(on: boolean) {
   }
 }
 
-/** Adds a layer above everything open — but below its own descendants that opened first. */
+/**
+ * Whether `upper` stands above `lower`: its descendant, else the panel later in the document
+ * (every layer paints at one z-index, so the later panel is the one on screen).
+ */
+function drawnAbove(upper: LayerEntry, lower: LayerEntry): boolean {
+  if (isAncestor(lower, upper)) return true;
+  if (isAncestor(upper, lower)) return false;
+  const a = upper.refs[0]?.current;
+  const b = lower.refs[0]?.current;
+  if (!a?.isConnected || !b?.isConnected) return false;
+  return (b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+}
+
+/**
+ * Adds a layer in the order the layers are drawn: above everything open, but below its own
+ * descendants and below a panel drawn after it. A layer registers again without moving on screen
+ * — reopened while it slides out, its effects re-run when a Suspense boundary shows it again, a
+ * child that registered first in one commit — so the order of registration says nothing.
+ */
 function push(entry: LayerEntry): () => void {
   if (stack.length === 0) listen(true);
-  const below = stack.findIndex((other) => isAncestor(entry, other));
+  const below = stack.findIndex((other) => drawnAbove(other, entry));
   if (below === -1) stack.push(entry);
   else stack.splice(below, 0, entry);
   return () => {
@@ -150,6 +168,11 @@ function push(entry: LayerEntry): () => void {
     if (pendingClick === entry) pendingClick = null;
     if (stack.length === 0) listen(false);
   };
+}
+
+/** Whether the layer is the topmost one that takes presses and Tab (focus belongs to it). */
+export function isTopLayer(entry: LayerEntry): boolean {
+  return topInteractive() === entry;
 }
 
 const LayerContext = React.createContext<LayerEntry | null>(null);

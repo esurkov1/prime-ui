@@ -3,6 +3,7 @@ import type * as React from "react";
 import { DialogGuard } from "@/internal/overlay/DialogGuard";
 import {
   DialogActions,
+  DialogBadges,
   DialogBody,
   DialogClose,
   DialogDescription,
@@ -23,6 +24,7 @@ import styles from "./Sheet.module.css";
 export type { DialogGuardProps as SheetGuardProps } from "@/internal/overlay/DialogGuard";
 export type {
   DialogActionsProps as SheetActionsProps,
+  DialogBadgesProps as SheetBadgesProps,
   DialogBodyProps as SheetBodyProps,
   DialogCloseProps as SheetCloseProps,
   DialogDescriptionProps as SheetDescriptionProps,
@@ -83,6 +85,7 @@ export const Sheet = {
   Header: DialogHeader,
   Icon: DialogIcon,
   Title: DialogTitle,
+  Badges: DialogBadges,
   Description: DialogDescription,
   Actions: DialogActions,
   Body: DialogBody,

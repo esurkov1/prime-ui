@@ -8,7 +8,6 @@ const WIDTHS: BarWidths = {
   heading: 300,
   path: false,
   tools: 400,
-  nav: false,
   actions: [
     { role: "secondary", full: 120, icon: 32 },
     { role: "secondary", full: 100, icon: 32 },
@@ -28,13 +27,6 @@ describe("planBar", () => {
     expect(planBar(WIDTHS, 300 + 16 + 112)).toBe("icons");
     expect(planBar(WIDTHS, 300 + 16 + 72)).toBe("fold");
     expect(planBar(WIDTHS, 120)).toBe("fold");
-  });
-
-  it("gives the sub-pages of a section a line of their own at any width", () => {
-    const nav = { ...WIDTHS, nav: true };
-    expect(planBar(nav, 4000)).toBe("below");
-    expect(planBar(nav, 300 + 16 + 220)).toBe("icons-secondary");
-    expect(planBar({ ...nav, actions: [] }, 4000)).toBe("below");
   });
 
   it("lets every button step come before the heading gives", () => {

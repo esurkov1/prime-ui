@@ -380,6 +380,7 @@ function ListItem({
     presence ?? NO_PRESENCE,
     key ?? value ?? "",
     rowRef as React.RefObject<HTMLElement | null>,
+    "block",
   );
   const link = href !== undefined || asChild;
   // The row's own controls leave the row element for the row (a button cannot hold a control).

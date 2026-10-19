@@ -3,6 +3,7 @@ import type * as React from "react";
 import { DialogGuard } from "@/internal/overlay/DialogGuard";
 import {
   DialogActions,
+  DialogBadges,
   DialogBody,
   DialogClose,
   DialogDescription,
@@ -25,6 +26,7 @@ import styles from "./Drawer.module.css";
 export type { DialogGuardProps as DrawerGuardProps } from "@/internal/overlay/DialogGuard";
 export type {
   DialogActionsProps as DrawerActionsProps,
+  DialogBadgesProps as DrawerBadgesProps,
   DialogBodyProps as DrawerBodyProps,
   DialogCloseProps as DrawerCloseProps,
   DialogDescriptionProps as DrawerDescriptionProps,
@@ -97,6 +99,7 @@ export const Drawer = {
   Header: DialogHeader,
   Icon: DialogIcon,
   Title: DialogTitle,
+  Badges: DialogBadges,
   Description: DialogDescription,
   Actions: DialogActions,
   Body: DialogBody,

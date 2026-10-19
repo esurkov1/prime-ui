@@ -635,6 +635,16 @@ describe("Tabs — indicator", () => {
     }
   });
 
+  it("a shown panel hands its height to its content; a hidden one keeps the hidden display", () => {
+    const shown = cssRule(CSS, ".panel:not([hidden])");
+    expect(cssValue(shown, "display")).toBe("flex");
+    expect(cssValue(shown, "flex-direction")).toBe("column");
+    expect(() => cssValue(cssRule(CSS, ".panel"), "display")).toThrow();
+    const content = cssRule(CSS, ".panelContent");
+    expect(cssValue(content, "flex")).toBe("1 1 auto");
+    expect(cssValue(content, "min-height")).toBe("0");
+  });
+
   it("the folder glides only under data-animate, and its geometry never as a transform", () => {
     // The base rule moves nothing, its opacity included: it shows where it is placed.
     expect(() => cssValue(cssRule(INDICATOR_CSS, ".indicator"), "transition")).toThrow();

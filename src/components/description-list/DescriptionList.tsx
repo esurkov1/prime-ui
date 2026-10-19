@@ -87,7 +87,7 @@ export type DescriptionListItemProps = Omit<React.HTMLAttributes<HTMLDivElement>
 const isEmptyValue = (node: React.ReactNode) =>
   node === null || node === undefined || node === false || node === "";
 
-/** One pair: a `<div>` holding the `<dt>` and the `<dd>`; the row action sits at the end of the value. */
+/** One pair: a `<div>` holding the `<dt>` and the `<dd>`; the row actions stand as a group at the end of the value. */
 function DescriptionListItem({
   label,
   tone,
@@ -97,10 +97,10 @@ function DescriptionListItem({
 }: DescriptionListItemProps) {
   const { labels } = React.useContext(DescriptionListContext);
   const parts = React.Children.toArray(children);
-  const action = parts.find(
+  const actions = parts.filter(
     (child) => React.isValidElement(child) && child.type === DescriptionListItemAction,
   );
-  const value = parts.filter((child) => child !== action);
+  const value = parts.filter((child) => !actions.includes(child));
   const empty = value.length === 0 || value.every(isEmptyValue);
 
   return (
@@ -121,7 +121,7 @@ function DescriptionListItem({
             value
           )}
         </span>
-        {action ? <span className={styles.action}>{action}</span> : null}
+        {actions.length > 0 ? <span className={styles.actions}>{actions}</span> : null}
       </dd>
     </div>
   );

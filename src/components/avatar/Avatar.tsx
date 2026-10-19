@@ -15,8 +15,8 @@ import type { ControlSize, PaletteColor } from "@/internal/states";
 
 import styles from "./Avatar.module.css";
 
-/** `xs` 20 · `s` 24 · `m` 32 · `l` 40 · `xl` 48 · `2xl` 64 (`--prime-avatar-*`). */
-export type AvatarSize = ControlSize | "2xl";
+/** `2xs` 16 · `xs` 20 · `s` 24 · `m` 32 · `l` 40 · `xl` 48 · `2xl` 64 (`--prime-avatar-*`). */
+export type AvatarSize = "2xs" | ControlSize | "2xl";
 
 const slot = createImageSlot("Avatar", {
   image: styles.image,

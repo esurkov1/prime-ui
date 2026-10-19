@@ -475,10 +475,13 @@ export default function KanbanScreenExample() {
             <Drawer.Content>
               <Drawer.Guard busy={saving} />
               <Drawer.Header>
-                <Drawer.Title>{deal?.company}</Drawer.Title>
-                <Drawer.Description>
-                  {deal?.id} · {STAGE_BY_ID.get(dealStage)?.title}
-                </Drawer.Description>
+                <Drawer.Title number={deal?.id}>{deal?.company}</Drawer.Title>
+                {deal ? (
+                  <Drawer.Description>
+                    {RUBLES.format(deal.amount)} · {deal.source}
+                  </Drawer.Description>
+                ) : null}
+                <Drawer.Badges>{stageBadge(dealStage)}</Drawer.Badges>
               </Drawer.Header>
               <Drawer.Body>
                 {deal ? (
