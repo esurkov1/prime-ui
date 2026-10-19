@@ -22,6 +22,7 @@ function fakeRegion(): ScrollRegion {
     subscribe: () => () => {},
     scrollToEnd: vi.fn(),
     scrollToElement: vi.fn(),
+    scrollToOffset: vi.fn(),
     hold: vi.fn(),
   };
 }

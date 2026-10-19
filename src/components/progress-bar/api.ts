@@ -68,8 +68,8 @@ export const api: ComponentApi = {
         {
           name: "segments",
           type: "ProgressSegment[]",
-          en: "Segments mode: parts in order, `{ value, label?, tone? | color? }`: `tone` names a meaning (default `accent`), `color` a category, as in its charts. Each part's width is its share of `max`.",
-          ru: "Режим сегментов: части по порядку, `{ value, label?, tone? | color? }`: `tone` — смысл (по умолчанию `accent`), `color` — категория, как на её графиках. Ширина части — её доля от `max`.",
+          en: "Segments mode: parts `{ value, label?, href?, onClick?, tone? | color? }`; share of `max` is the width. `rows` only: `href` makes the row a link, `onClick` runs on its press.",
+          ru: "Режим сегментов: части `{ value, label?, href?, onClick?, tone? | color? }`; ширина — доля от `max`. Только `rows`: `href` делает строку ссылкой, `onClick` — на её нажатие.",
         },
         {
           name: "segmentGap",
@@ -132,7 +132,20 @@ export const api: ComponentApi = {
     },
   }),
   accessibility: {
-    keyboard: [],
+    keyboard: [
+      {
+        keys: "Tab",
+        native: true,
+        en: "Rows with `href`: each link is a Tab stop, the whole row shows the focus ring. Without links the component takes no focus.",
+        ru: "Строки с `href`: каждая ссылка — остановка Tab, кольцо фокуса обводит всю строку. Без ссылок компонент не получает фокус.",
+      },
+      {
+        keys: "Enter",
+        native: true,
+        en: "Rows with `href`: follows the link (native `<a>`).",
+        ru: "Строки с `href`: переходит по ссылке (нативное поведение `<a>`).",
+      },
+    ],
     aria: [
       {
         en: "Value mode: native `<progress>` — role `progressbar` with value and max.",
@@ -143,8 +156,8 @@ export const api: ComponentApi = {
         ru: 'Режим сегментов: `role="group"`; его текст перечисляет доли от `max` («Видео: 38%, Документы: 21%»). С `label` (или `aria-label`) группа названа им и описана долями — или легендой, когда включён `legend`; без имени доли и есть имя.',
       },
       {
-        en: "Rows: an `<ol>` named by `label`; each row reads as text («Москва 1 284 52%»), the bars are `aria-hidden`.",
-        ru: "Строки: список `<ol>` с именем из `label`; каждая строка читается текстом («Москва 1 284 52%»), полосы — `aria-hidden`.",
+        en: "Rows: an `<ol>` named by `label`; each row reads as text («Москва 1 284 52%»), the bars are `aria-hidden`. A row with `href` is an `<a>` inside the item: a link named by the same text.",
+        ru: "Строки: список `<ol>` с именем из `label`; каждая строка читается текстом («Москва 1 284 52%»), полосы — `aria-hidden`. Строка с `href` — `<a>` внутри пункта: ссылка с тем же именем.",
       },
       {
         en: "A category color always sits beside its name (legend, row), so color is never the only cue.",

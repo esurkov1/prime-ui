@@ -426,3 +426,30 @@
   min-block-size: 0;
   border-radius: var(--prime-badge-s-radius);
 }
+
+/* Column groups (`columnGroups`): a phase is a heading over its own row of columns; the phases
+   stand apart by more than the columns do. */
+.groups {
+  display: flex;
+  flex: 1 0 auto;
+  gap: calc(var(--kanban-gap) * 2);
+  min-height: 0;
+}
+
+.group {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-height: 0;
+}
+
+.group > .columns[data-axis] {
+  flex: 1 1 auto;
+}
+
+/* The heading starts where the first column's title does. */
+.groupTitle {
+  padding-inline: calc(var(--kanban-inset) + var(--prime-space-3));
+  color: var(--prime-color-text-muted);
+}

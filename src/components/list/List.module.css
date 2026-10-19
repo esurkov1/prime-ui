@@ -75,13 +75,18 @@
 }
 
 @media (hover: hover) {
-  .item:hover {
+  .item:hover:not([data-static="true"]) {
     background: var(--prime-color-fill-subtle);
     color: var(--prime-color-text-primary);
   }
 }
 
-.item:active:not([data-disabled="true"], :disabled) {
+/* A row that opens nothing (no `onClick`, `href` or `asChild`): a plain box, no pointer, no wash. */
+.item[data-static="true"] {
+  cursor: default;
+}
+
+.item:active:not([data-disabled="true"], [data-static="true"], :disabled) {
   background: var(--prime-color-fill-subtle-active);
 }
 
@@ -214,7 +219,7 @@
     background: transparent;
   }
 
-  .frame:hover:not(:has(> .item[data-disabled="true"])) {
+  .frame:hover:not(:has(> .item[data-disabled="true"], > .item[data-static="true"])) {
     background: var(--prime-color-fill-subtle);
   }
 
@@ -223,7 +228,7 @@
   }
 }
 
-.frame:has(> .item:active:not([data-disabled="true"], :disabled)) {
+.frame:has(> .item:active:not([data-disabled="true"], [data-static="true"], :disabled)) {
   background: var(--prime-color-fill-subtle-active);
 }
 
@@ -231,12 +236,11 @@
   background: var(--prime-color-fill-muted-hover);
 }
 
-/* The controls, one tier below the row, as far from the row's edge as from its top and bottom at
-   any row height (one line, a description, an avatar, the touch row): a spacer at their outer edge
-   is as wide as the space above a control box — half the row less half the control. The row's
-   height `--list-row-h` is measured onto the frame (List.tsx); before that it is the one-line
-   row. The end edge, or the start edge for controls that lead the row (`side="start"`). The
-   spacer's negative margin takes back the gap before it. */
+/* The controls, one tier below the row, as far from the row's side edge as the row's own text is
+   (`--field-px`), at any row height: one line, a description, an avatar and the touch row stand on
+   one vertical. A spacer at their outer edge makes the distance; the end edge, or the start edge
+   for controls that lead the row (`side="start"`). The spacer's negative margin takes back the
+   gap before it. */
 .actions {
   display: inline-flex;
   flex: none;
@@ -248,9 +252,7 @@
 .actions[data-side="start"]::before {
   content: "";
   flex: none;
-  --list-inset: calc((var(--list-row-h, var(--field-h)) - var(--field-step-h)) / 2);
-
-  inline-size: max(var(--prime-space-0), var(--list-inset));
+  inline-size: var(--field-px);
 }
 
 .actions[data-side="end"]::after {

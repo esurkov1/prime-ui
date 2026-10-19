@@ -231,6 +231,12 @@ export const api: ComponentApi = {
           ru: "Групповой чат многих авторов: первое сообщение серии показывает шапку автора, последнее — аватар, входящие держат место под аватар. Без него — переписка двоих.",
         },
         {
+          name: "authors",
+          type: '"outgoing"',
+          en: "A direct chat with several outgoing authors (operator, AI agent): the first message of an outgoing run shows the author's header; incoming ones keep none. Ignored with `group`.",
+          ru: "Личный чат, где исходящие пишут разные авторы (оператор, владелец аккаунта, AI-агент): первое сообщение исходящей серии показывает шапку автора; у входящих нет ни шапки, ни места под аватар. С `group` не действует.",
+        },
+        {
           name: "items",
           type: "readonly T[]",
           en: "Messages as application data, in time order: the list adds the dates, the runs and the unread band and sets each message's `value` and `position`. Without it, children are the rows.",

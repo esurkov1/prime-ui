@@ -107,6 +107,12 @@
   border-radius: var(--prime-radius-m);
 }
 
+/* The totals line: a plain record keeps one step of room, the totals row two below the line; the
+   margin gives the line the same air above it as below. */
+.sheet[data-variant="plain"] .totals {
+  margin-block-start: var(--prime-space-1);
+}
+
 /* On a surface the row takes the fill of a field and its fields take the surface's: the step
    between them stays, turned over (a wash on top of the field fill would melt the fields into the
    row). A plain list has no side padding, so a row fill would sit flush against its fields: there

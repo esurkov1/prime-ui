@@ -76,6 +76,12 @@ export const page: ComponentPageConfig = {
         "Значения как переключатели с действием «скрыть», которое выезжает без изменения ширины — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`.",
     },
     {
+      scenario: "trigger",
+      title: "Бейдж-выбор",
+      description:
+        "Этап сделки бейджем, который открывает выбор этапа: шеврон поворачивается, пока меню открыто, бейдж берёт цвет выбранного этапа — `Badge.Root`, `Dropdown.Trigger`, `color`.",
+    },
+    {
       scenario: "square",
       title: "Квадратная плитка",
       description:

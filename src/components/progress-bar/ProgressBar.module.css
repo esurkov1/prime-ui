@@ -82,6 +82,45 @@
   min-width: 0;
 }
 
+.rowItem {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/*
+ * A row that links: the whole row (label, value, share, bar) is the anchor. It grows by the tier's
+ * padding and takes it back with a negative margin, so rows line up with the plain ones and the
+ * wash reaches past the text.
+ */
+.rowLink {
+  --pb-row-px: var(--prime-space-2);
+  --pb-row-py: var(--prime-space-1);
+
+  margin-block: calc(var(--pb-row-py) * -1);
+  margin-inline: calc(var(--pb-row-px) * -1);
+  padding: var(--pb-row-py) var(--pb-row-px);
+  border-radius: var(--field-radius);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+.rowLink:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+@media (hover: hover) {
+  .rowLink:hover {
+    background: var(--prime-color-fill-subtle);
+  }
+}
+
+.rowLink:active {
+  background: var(--prime-color-fill-subtle-active);
+}
+
 .rowHeader {
   display: flex;
   align-items: baseline;

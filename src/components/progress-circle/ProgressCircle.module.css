@@ -114,6 +114,7 @@
    (a colored host, media); the ring declares them, the root sets nothing. */
 
 /* A category color: the hue's step of the chart palette (`palette.hue` on the same element). */
+.root[data-color],
 .svg [data-color] {
   --pc-fill: var(--hue-chart);
 }
@@ -122,6 +123,12 @@
    color defaults never win over a tone. */
 .root:not([data-tone="inherit"]) .svg {
   --ring-fill: var(--pc-fill);
+}
+
+/* `track="tinted"`: the ring's line track (a tint of its color) in the arc's own color, so 0% reads
+   as an empty ring of that color. */
+.root[data-track="tinted"] .svg {
+  color: var(--pc-fill);
 }
 
 .segment,

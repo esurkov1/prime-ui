@@ -382,6 +382,8 @@ export { Play as PlayIcon } from "./icons/glyphs/play";
 export { PlugZap as PlugZapIcon } from "./icons/glyphs/plug-zap";
 export { Plus as PlusIcon } from "./icons/glyphs/plus";
 export { PoundSterling as PoundSterlingIcon } from "./icons/glyphs/pound-sterling";
+export { Power as PowerIcon } from "./icons/glyphs/power";
+export { PowerOff as PowerOffIcon } from "./icons/glyphs/power-off";
 export { Projector as ProjectorIcon } from "./icons/glyphs/projector";
 export { Rabbit as RabbitIcon } from "./icons/glyphs/rabbit";
 export { Radio as RadioIcon } from "./icons/glyphs/radio";

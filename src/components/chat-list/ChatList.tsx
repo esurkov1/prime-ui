@@ -212,6 +212,19 @@ function ChatListItemDescription(_props: ChatListItemDescriptionProps): React.Re
 }
 ChatListItemDescription.displayName = "ChatList.ItemDescription";
 
+export type ChatListItemStatusProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * The status of the record behind the dialog (a deal stage, the state of an AI agent), one line
+ * of its own between the name and the preview, truncated on its own. Drawn by `ChatList.Item`.
+ */
+function ChatListItemStatus(_props: ChatListItemStatusProps): React.ReactNode {
+  return null;
+}
+ChatListItemStatus.displayName = "ChatList.ItemStatus";
+
 export type ChatListItemMenuProps = Omit<
   DropdownContentProps,
   "side" | "align" | "matchTriggerWidth"
@@ -232,12 +245,20 @@ type ItemParts = {
   text: React.ReactElement<ChatListItemTextProps> | null;
   glyphs: React.ReactElement<ChatListItemIconProps>[];
   description: React.ReactElement<ChatListItemDescriptionProps> | null;
+  status: React.ReactElement<ChatListItemStatusProps> | null;
   menu: React.ReactElement<ChatListItemMenuProps> | null;
 };
 
 /** The parts of an item by type: an icon before the name is the avatar, after it a glyph. */
 function partsOf(children: React.ReactNode): ItemParts {
-  const parts: ItemParts = { avatar: null, text: null, glyphs: [], description: null, menu: null };
+  const parts: ItemParts = {
+    avatar: null,
+    text: null,
+    glyphs: [],
+    description: null,
+    status: null,
+    menu: null,
+  };
   for (const node of flattenChildren(children)) {
     if (isPart<ChatListItemIconProps>(node, ChatListItemIcon)) {
       if (parts.text === null && parts.avatar === null) parts.avatar = node;
@@ -245,6 +266,7 @@ function partsOf(children: React.ReactNode): ItemParts {
     } else if (isPart<ChatListItemTextProps>(node, ChatListItemText)) parts.text = node;
     else if (isPart<ChatListItemDescriptionProps>(node, ChatListItemDescription))
       parts.description = node;
+    else if (isPart<ChatListItemStatusProps>(node, ChatListItemStatus)) parts.status = node;
     else if (isPart<ChatListItemMenuProps>(node, ChatListItemMenu)) parts.menu = node;
   }
   return parts;
@@ -473,10 +495,19 @@ function ChatListItem({
     </List.ItemDescription>
   ) : null;
 
+  const statusProps = parts.status?.props;
+  const statusLine = statusProps ? (
+    <List.ItemDescription
+      key="status"
+      {...statusProps}
+      className={cx(styles.record, statusProps.className)}
+    />
+  ) : null;
+
   // ── counts ──
   // Beside two lines the cell stays even when empty: a count that goes closes up in place.
   const badges =
-    count || mention || pin || hasSecondLine ? (
+    count || mention || pin || hasSecondLine || statusLine ? (
       <List.ItemMeta key="badges" className={styles.badges}>
         {mention ? (
           <span ref={mentionPart.ref} className={cx(styles.pop, mentionPart.className)}>
@@ -513,6 +544,7 @@ function ChatListItem({
   const content = [
     avatarProps ? <List.ItemIcon key="avatar" {...avatarProps} /> : null,
     title,
+    statusLine,
     secondLine,
     meta,
     badges,
@@ -1011,5 +1043,6 @@ export const ChatList = {
   ItemIcon: ChatListItemIcon,
   ItemText: ChatListItemText,
   ItemDescription: ChatListItemDescription,
+  ItemStatus: ChatListItemStatus,
   ItemMenu: ChatListItemMenu,
 };

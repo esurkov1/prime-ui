@@ -50,7 +50,19 @@ export const page: ComponentPageConfig = {
       scenario: "interactive",
       title: "Карточка-ссылка",
       description:
-        "Карточки целиком ведут в свои отчёты: одна остановка Tab, подъём при наведении, нажатие и кольцо фокуса — `asChild`.",
+        "Карточки целиком ведут в свои отчёты: одна остановка Tab, стрелка перехода в углу, подъём при наведении, нажатие и кольцо фокуса — `asChild`.",
+    },
+    {
+      scenario: "record-link",
+      title: "Растянутая ссылка",
+      description:
+        "Карточка транспорта открывает запись кликом в любом месте, кнопка «Выдан» остаётся своей, линия над рядом действий — во всю ширину — `Card.Link`, `Card.Footer`, `divider`.",
+    },
+    {
+      scenario: "text-values",
+      title: "Значение — текст",
+      description:
+        "Плитки сводки, где значение — строка текста, одна из них в тоне — `variant`, `stat-text`, `tone`.",
     },
     {
       scenario: "content-templates",

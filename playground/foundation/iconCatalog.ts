@@ -235,6 +235,14 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Воспроизвести видео или запись",
     keywords: ["играть", "воспроизвести", "видео", "play", "video", "start"],
   },
+  "action.power": {
+    meaning: "Включить функцию или устройство",
+    keywords: ["включить", "питание", "power", "on", "enable", "start"],
+  },
+  "action.powerOff": {
+    meaning: "Выключить функцию или устройство",
+    keywords: ["выключить", "отключить", "питание", "power off", "disable", "turn off"],
+  },
   "action.refresh": {
     meaning: "Обновить данные",
     keywords: ["обновить", "перезагрузить", "refresh", "reload", "sync"],

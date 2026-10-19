@@ -12,7 +12,7 @@
 - Inline editing in a record card: each field saves itself (`onCommit`) on blur and Enter.
 - A value with actions beside it: copy, write, open a profile (`Input.CopyButton`, `Input.Action`); a password with a show toggle (`Input.RevealButton`).
 - Free text with suggestions (a combobox): a place, a city, a tag the team typed before — `suggestions`; any other text stays allowed.
-- A picker and a text as one field (an icon and a name, a channel and an address): a `Select` inside `Input.Wrapper` is the box's start segment.
+- A picker and a text as one field (an icon and a name, a channel and an address): a `Select` inside `Input.Wrapper` is the box's start segment, or its end segment when it follows `Input.Field` (an amount and its currency).
 - A time of day: `Input.Field type="time"` — the browser's hour and minute segments (arrows step them, `step`, `min`, `max`), a wheel on phones, and no calendar to open.
 - As the reference field: Select, Datepicker, TagSelect and Textarea follow the same label / field / support-row contract.
 
@@ -36,7 +36,7 @@ Input.Root            label row, field body, support row; provides size / invali
    ├─ Input.Affix          tinted section flush with the edge (start | end)
    ├─ Input.Icon           decorative icon (start | end)
    ├─ Input.InlineAffix    muted text next to the value (start | end)
-   ├─ Select.Root          optional start segment: an icon-only picker in the box (no frame)
+   ├─ Select.Root          optional start segment (before the field) or end segment (after it): a picker in the box (no frame)
    ├─ Input.Field          native <input>; a combobox with `suggestions`
    ├─ Input.ClearButton    clear segment (kit-rendered)
    ├─ Input.CopyButton     copy segment; the glyph morphs into a check (kit-rendered)
@@ -45,7 +45,7 @@ Input.Root            label row, field body, support row; provides size / invali
 listbox               `suggestions`: a floating list under the box, as wide as it
 Input.Counter         goes into Input.Root `counter` (support row, right side)
 ```
-The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · commit status (`onCommit`) · end icon · segments · end affix. The segments (`ClearButton`, `CopyButton`, `RevealButton`, `Action`) keep their JSX order among themselves and sit edge to edge, full field height, flush with the end edge. A `Select` segment comes first, flush with the start edge. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
+The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · commit status (`onCommit`) · end icon · segments · end affix. The segments (`ClearButton`, `CopyButton`, `RevealButton`, `Action`) keep their JSX order among themselves and sit edge to edge, full field height, flush with the end edge. A `Select` before `Input.Field` is the start segment, flush with the start edge; after it, the end segment, last, flush with the end edge. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
 
 ## API
 
@@ -274,7 +274,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `Input.Icon` is decorative (`aria-hidden`). `Input.Affix` and `Input.InlineAffix` are `aria-hidden` in the reading order but describe the input (`aria-describedby`, before the hint): the unit is heard with the field, so the label never repeats it. An `aria-label` on the affix is said instead of its text («рублей» for `₽`).
 - `suggestions` make the input a `combobox` (`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` on the open `listbox`, which the label names); the highlight is `aria-activedescendant`, so focus never leaves the field.
 - Autofill is off unless you pass `autoComplete`: without a token the input carries `autocomplete="off"` and the opt-outs of 1Password, LastPass, Bitwarden and Dashlane (`data-1p-ignore`, `data-lpignore`, `data-bwignore`, `data-form-type="other"`); a token passes through and drops them. With `suggestions` it stays off. Inside `LoginForm.Form` a field without a token is left to the browser.
-- A `Select` inside `Input.Wrapper` is the box's start segment: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).
+- A `Select` inside `Input.Wrapper` is the box's start segment, or the end segment when it follows `Input.Field`: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).
 - `Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.
 - `Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.
 - `Input.RevealButton` is a toggle: a constant name `labels.reveal`, `aria-pressed` and `aria-controls` on the input; a pointer press keeps the focus in the field.
@@ -319,6 +319,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [inline-edit.tsx](examples/inline-edit.tsx) | Record card fields that save on blur and Enter, revert on Escape and show the server's refusal — `onCommit`, `error`. |
 | [suggestions.tsx](examples/suggestions.tsx) | Where a returned order is kept: free text with the places already used as suggestions — `suggestions`. |
 | [with-select.tsx](examples/with-select.tsx) | A menu section's icon and name as one field: an icon-only Select is the box's start segment — `Input.Wrapper`, `Select.Root`, `aria-label`. |
+| [amount-currency.tsx](examples/amount-currency.tsx) | An amount and its currency as one field: a Select after the field is the box's end segment — `Input.Wrapper`, `Select.Root`, `Input.Field`, `aria-label`. |
 | [time.tsx](examples/time.tsx) | A call slot as a time of day: the browser's hour and minute segments, arrows step them, working hours only — `type`, `step`, `min`, `max`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A delivery city whose suggestions stay open on a press beside the field while the address is copied from a letter; Escape still closes them — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |

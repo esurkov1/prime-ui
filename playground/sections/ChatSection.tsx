@@ -53,6 +53,12 @@ export const page: ComponentPageConfig = {
         "Чат команды из данных: первое сообщение серии открывается именем в цвете автора, короной владельца и тегом участника; аватар — фото или инициалы — закрывает серию, в которую входят сообщения до четверти часа друг от друга; даты с днём недели — `group`, `items`, `renderMessage`, `groupWindow`, `formatDate`, `Message.Author`, `tag`, `Message.AuthorIcon`, `hueOf`.",
     },
     {
+      scenario: "outgoing-authors",
+      title: "Авторы исходящих",
+      description:
+        "Диалог с клиентом, где отвечают оператор и AI-агент: первое сообщение исходящей серии называет автора, у клиента шапок и аватаров нет — `authors`, `items`, `renderMessage`, `Message.Author`, `tag`.",
+    },
+    {
       scenario: "reactions",
       title: "Свои реакции",
       description:

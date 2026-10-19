@@ -1,4 +1,4 @@
-/** Every arc color; the tone tells the outcome, not the progress — `tone`. */
+/** Every arc color; the tone tells the outcome, not the progress — `tone`, `color`, `track`. */
 import { ProgressCircle, Typography } from "prime-ui-kit";
 
 const TONES = [
@@ -11,6 +11,11 @@ const TONES = [
   { tone: "inherit", label: "Экспорт", value: 64 },
 ] as const;
 
+const HUES = [
+  { color: "yellow", label: "Бронь", value: 0 },
+  { color: "blue", label: "В аренде", value: 60 },
+] as const;
+
 export default function ProgressCircleVariantsExample() {
   return (
     <div>
@@ -21,6 +26,16 @@ export default function ProgressCircleVariantsExample() {
           </ProgressCircle>
           <Typography as="span" variant="caption" tone="muted">
             {tone}
+          </Typography>
+        </div>
+      ))}
+      {HUES.map(({ color, label, value }) => (
+        <div key={color}>
+          <ProgressCircle value={value} color={color} track="tinted" aria-label={label}>
+            {`${value}%`}
+          </ProgressCircle>
+          <Typography as="span" variant="caption" tone="muted">
+            {`${color} · tinted`}
           </Typography>
         </div>
       ))}

@@ -32,6 +32,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 │           ├─ ChatList.ItemIcon         before the name: avatar slot (aria-hidden); after it: a glyph (role="img" with aria-label)
 │           ├─ ChatList.ItemText         the name; muted glyph after it
 │           ├─ ChatList.ItemDescription  author · media word · text — cross-fades with draft and «печатает…»
+│           ├─ ChatList.ItemStatus       the record's status line between the name and the preview (a deal stage, an AI state)
 │           ├─ (meta)                    delivery ticks · time
 │           ├─ (badges)                  «@» · unread count · pin
 │           └─ ChatList.ItemMenu         Dropdown.Content of the row, opened at the pointer
@@ -85,7 +86,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `target` | `string` | — | Where the `<a>` opens (`href` only). |
 | `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | The one child element (a router `Link`) is the row; the parts go inside it. |
-| `children` | `ReactNode` | — | `ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu` — inside the child element with `asChild`. |
+| `children` | `ReactNode` | — | `ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemStatus`, `ChatList.ItemMenu` — inside the child element with `asChild`. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and the native attributes of the row element. |
 
 ### ChatList.ItemIcon
@@ -102,6 +103,14 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className`, `title` and the other `span` attributes. |
+
+### ChatList.ItemStatus
+`ref` → `HTMLSpanElement`. The status of the record behind the dialog (a deal stage, an AI agent's state): a line of its own between the name and the preview, truncated on its own; hidden in a pane narrower than the preview.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The status text: «Бронь · ждёт человека». |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the native attributes of the `span`. |
 
 ### ChatList.ItemDescription
 `ref` → `HTMLSpanElement`. The preview of the last message, one line: «{author}: », a media word, the text; the search query is marked in the text.
@@ -242,7 +251,7 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A support inbox: pinned dialogs first, the search, unread and muted counts, the typing line, a draft, delivery ticks and a row menu that pins, mutes, marks read and deletes after a confirm — `ChatList.Root`, `items`, `renderItem`, `value`, `onSearchChange`, `ChatList.Item`, `ChatList.ItemMenu`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: row height, text, avatar, glyphs and the search field follow the tier — `size`. |
-| [structure.tsx](examples/structure.tsx) | Every piece of a row: a photo or initials with presence, a glyph beside the name, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. |
+| [structure.tsx](examples/structure.tsx) | Every piece of a row: a photo or initials with presence, a glyph beside the name, a record status line, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. |
 | [search.tsx](examples/search.tsx) | The search field filters dialogs by name and by the last message, marks the match in both, says how many were found and shows a quiet state when none match — `defaultSearch`, `onSearchChange`. |
 | [live.tsx](examples/live.tsx) | A live inbox: a client types, then writes — the preview turns into the typing line and back, the count rolls up and the dialog glides to the top; opening it clears the count — `typing`, `unread`, `items`. |
 | [long-list.tsx](examples/long-list.tsx) | A sales inbox of a thousand dialogs: only the rows around the view render, arrows walk through all of them, and the next page loads as the end comes near — `hasMore`, `onLoadMore`. |

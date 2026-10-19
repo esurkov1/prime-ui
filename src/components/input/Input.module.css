@@ -34,14 +34,24 @@
   padding-inline-end: 0;
 }
 
-/* A Select inside the box is its start segment (`InputSegmentContext`), flush with the edge. */
-.wrapper:has(> [data-field-segment]) {
+/* A Select inside the box is a segment (`InputSegmentContext`), flush with the edge: before
+   `Input.Field` in the source it is the start segment, after it the end segment. */
+.wrapper:has(> [data-field-segment]:not(.field ~ *)) {
   padding-inline-start: 0;
 }
 
-/* Before a start icon or affix: the segment is the box's first section. */
+.wrapper:has(> .field ~ [data-field-segment]) {
+  padding-inline-end: 0;
+}
+
+/* Before a start icon or affix: the start segment is the box's first section. */
 .wrapper > [data-field-segment] {
   order: -2;
+}
+
+/* The end segment is the box's last section, at the end edge like `Input.Affix side="end"`. */
+.wrapper > .field ~ [data-field-segment] {
+  order: 5;
 }
 
 .wrapper:has(> input:read-only:not(:disabled)) {

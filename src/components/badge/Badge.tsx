@@ -171,7 +171,20 @@ function BadgeRoot({
   // Whatever unmounts the badge (its owner took it out after the remove segment, a list changed),
   // it closes up in place and the badges after it glide.
   const presence = usePartPresence<HTMLSpanElement>({ axis: "inline" });
-  const rootRef = useMergedRefs(presence.ref, ref);
+  // A badge inside a layer's trigger (`Dropdown.Trigger`, `Popover.Trigger`) is handed the trigger's
+  // props: they belong to the body button, which then is the opener and the layer's anchor.
+  const trigger = rest["aria-expanded"] !== undefined;
+  const rootRef = useMergedRefs(presence.ref, trigger ? undefined : ref);
+  const triggerRef = useMergedRefs(trigger ? ref : undefined);
+  const triggerProps: Record<string, unknown> = {};
+  if (trigger) {
+    for (const key of Object.keys(rest)) {
+      if (/^(on[A-Z]|aria-)/.test(key) || key === "data-state" || key === "id") {
+        triggerProps[key] = (rest as Record<string, unknown>)[key];
+        delete (rest as Record<string, unknown>)[key];
+      }
+    }
+  }
   // A toggle when any part of the pressed triad is given: the body is a button over the badge.
   const toggle =
     pressedProp !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
@@ -202,11 +215,21 @@ function BadgeRoot({
   };
 
   // Badge.Action lives at the end of the badge, outside the text body; one per badge.
-  const { parts: actions, rest: content } = splitParts<BadgeActionProps>(children, BadgeAction);
+  const { parts: actions, rest: parts } = splitParts<BadgeActionProps>(children, BadgeAction);
+  // A trigger badge shows the chevron of an opener at its end, turned by the layer's open state.
+  const content = trigger
+    ? [
+        ...parts,
+        <BadgeIcon key="trigger-chevron" className={styles.chevron}>
+          <Icon name="nav.chevronDown" />
+        </BadgeIcon>,
+      ]
+    : parts;
   const actionElement = actions[0] ?? null;
   const trailing = Boolean(onRemove || actionElement);
   const iconOnly =
     !trailing &&
+    !trigger &&
     content.length > 0 &&
     content.every((child) => React.isValidElement(child) && child.type === BadgeIcon);
   // The end edge belongs to the remove segment or Badge.Action when there is one.
@@ -215,7 +238,7 @@ function BadgeRoot({
   });
   // A read-only badge of plain text is one element: the root itself lays the text out as a block
   // and ellipsizes it. Anything richer is a flex row, so its text runs are wrapped.
-  const textOnly = !trailing && !toggle && edges.children.every(isText);
+  const textOnly = !trailing && !toggle && !trigger && edges.children.every(isText);
   const body = (
     <ControlSizeProvider value={tier}>
       {typeof children === "number" ? (
@@ -257,7 +280,7 @@ function BadgeRoot({
         "icon-end": edges.end || undefined,
         removable: onRemove ? true : undefined,
         pending: busy || undefined,
-        pressable: toggle || undefined,
+        pressable: toggle || trigger || undefined,
         pressed: (toggle && pressed) || undefined,
         // A pressed action stays shown: its state must be seen, not only revealed on hover.
         action: actionElement
@@ -268,7 +291,17 @@ function BadgeRoot({
         disabled: disabled || undefined,
       })}
     >
-      {toggle ? (
+      {trigger ? (
+        <button
+          {...triggerProps}
+          ref={triggerRef}
+          type="button"
+          className={styles.body}
+          disabled={disabled}
+        >
+          {body}
+        </button>
+      ) : toggle ? (
         <button
           type="button"
           className={styles.body}

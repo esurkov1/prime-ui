@@ -590,8 +590,10 @@ function MessageRoot({
   // avatar, the gutter kept on every incoming row; a direct chat shows neither. A message on its
   // own is a group of what it is given: the parts it holds, by its place in the run.
   const grouped = list.inList ? list.group : author !== undefined || avatar !== undefined;
+  // A direct chat with `authors="outgoing"` heads only the runs the reader's side wrote.
+  const authored = grouped || (list.outgoingAuthors && direction === "outgoing");
   const showAuthor =
-    author !== undefined && grouped && (position === "single" || position === "first");
+    author !== undefined && authored && (position === "single" || position === "first");
   const showAvatar = position === "single" || position === "last";
   const gutter = direction === "incoming" && (list.inList ? list.group : avatar !== undefined);
   // The part that carries the meta: the circle of a round message, else the last part.

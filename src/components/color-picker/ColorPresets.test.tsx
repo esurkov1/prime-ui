@@ -263,11 +263,7 @@ describe("ColorPresets", () => {
 
   it("allowCustom: a value beyond the palette fills the field; Tab walks grid → field → on", async () => {
     const user = userEvent.setup();
-    render(
-      <>
-        <Picker allowCustom defaultValue="#0a7e6e" />
-      </>,
-    );
+    render(<Picker allowCustom defaultValue="#0a7e6e" />);
     fireEvent.click(screen.getByRole("button", { name: "Цвет: #0a7e6e" }));
     expect(screen.getByRole("textbox", { name: "Свой цвет" })).toHaveValue("#0a7e6e");
     expect(

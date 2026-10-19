@@ -160,7 +160,7 @@ describe("List", () => {
   it("places the parts: a leading icon, the body, the trail; a trailing icon after the text", () => {
     render(
       <List.Root size="s" aria-label="Проекты">
-        <List.Item>
+        <List.Item onClick={() => {}}>
           <List.ItemIcon>
             <svg data-testid="lead" />
           </List.ItemIcon>
@@ -235,7 +235,7 @@ describe("List", () => {
     const ref = React.createRef<HTMLElement>();
     render(
       <List.Root aria-label="Диалоги">
-        <List.Item ref={ref} className="custom" data-id="granit">
+        <List.Item ref={ref} className="custom" data-id="granit" onClick={() => {}}>
           <List.ItemText>ООО «Гранит»</List.ItemText>
         </List.Item>
       </List.Root>,
@@ -265,7 +265,7 @@ function Funnel({ onMove }: { onMove?: (id: string, beforeId: string | null) => 
       }}
     >
       {stages.map((stage) => (
-        <List.Item key={stage.id} value={stage.id}>
+        <List.Item key={stage.id} value={stage.id} onClick={() => {}}>
           <List.ItemText>{stage.name}</List.ItemText>
         </List.Item>
       ))}
@@ -413,7 +413,7 @@ describe("List onReorder", () => {
             <Switch.Root aria-label="Показывать «Новая»" />
           </List.ItemActions>
         </List.Item>
-        <List.Item value="talks">
+        <List.Item value="talks" onClick={() => {}}>
           <List.ItemText>Переговоры</List.ItemText>
           <List.ItemActions>
             <Switch.Root aria-label="Показывать «Переговоры»" />
@@ -507,13 +507,15 @@ describe("List onReorder", () => {
     const user = userEvent.setup();
     render(
       <List.Root aria-label="Этапы" onReorder={() => {}}>
-        <List.Item value="talks">
+        <List.Item value="talks" onClick={() => {}}>
           <List.ItemText>Переговоры</List.ItemText>
           <List.ItemActions>
             <Switch.Root aria-label="Показывать на доске" />
           </List.ItemActions>
         </List.Item>
-        <List.Item value="contract">Договор</List.Item>
+        <List.Item value="contract" onClick={() => {}}>
+          Договор
+        </List.Item>
       </List.Root>,
     );
     const handle = screen.getByRole("button", { name: "Переместить Переговоры" });
@@ -534,7 +536,7 @@ describe("List onReorder", () => {
     const user = userEvent.setup();
     render(
       <List.Root aria-label="Этапы" onReorder={() => {}}>
-        <List.Item value="talks">
+        <List.Item value="talks" onClick={() => {}}>
           <List.ItemActions side="start" data-testid="leading">
             <Switch.Root aria-label="Показывать на доске" />
           </List.ItemActions>
@@ -543,7 +545,9 @@ describe("List onReorder", () => {
             <button type="button">Ещё</button>
           </List.ItemActions>
         </List.Item>
-        <List.Item value="contract">Договор</List.Item>
+        <List.Item value="contract" onClick={() => {}}>
+          Договор
+        </List.Item>
       </List.Root>,
     );
     const row = screen.getByRole("button", { name: "Переговоры" });
@@ -561,19 +565,15 @@ describe("List onReorder", () => {
     expect(row).not.toContainElement(toggle);
     // The grip keeps the row's end.
     expect(handle.closest("li")?.lastElementChild).toContainElement(handle);
-    // One tier below the row, as far from the row's start as from its top and bottom at any row
-    // height: a spacer leads it, as wide as the space above a control box of the tier, from the
-    // row's measured height (no percentage height: engines differ on it).
+    // One tier below the row, as far from the row's side edge as its own text is (`--field-px`),
+    // at any row height: a spacer leads it.
     expect(toggle.closest("[data-size]")).toHaveAttribute("data-size", "s");
     const css = "src/components/list/List.module.css";
     const spacer = cssRule(
       css,
       '.actions[data-side="end"]::after, .actions[data-side="start"]::before',
     );
-    expect(cssValue(spacer, "--list-inset")).toBe(
-      "calc((var(--list-row-h, var(--field-h)) - var(--field-step-h)) / 2)",
-    );
-    expect(cssValue(spacer, "inline-size")).toBe("max(var(--prime-space-0), var(--list-inset))");
+    expect(cssValue(spacer, "inline-size")).toBe("var(--field-px)");
     expect(spacer.decls.some((decl) => decl.prop === "aspect-ratio")).toBe(false);
     await user.tab();
     expect(toggle).toHaveFocus();
@@ -592,42 +592,45 @@ describe("List onReorder", () => {
     expect(toggle).toHaveFocus();
   });
 
-  it("measures the row's height onto its frame for the controls' side inset, and follows it", () => {
-    let height = 56;
-    let resize: () => void = () => {};
-    const RO = globalThis.ResizeObserver;
-    globalThis.ResizeObserver = class {
-      constructor(callback: () => void) {
-        resize = callback;
-      }
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    } as unknown as typeof ResizeObserver;
-    const offset = vi
-      .spyOn(HTMLElement.prototype, "offsetHeight", "get")
-      .mockImplementation(() => height);
-    try {
-      render(
-        <List.Root aria-label="Сеансы">
-          <List.Item>
-            <List.ItemText>MacBook Pro</List.ItemText>
-            <List.ItemDescription>Москва · активен сейчас</List.ItemDescription>
-            <List.ItemActions>
-              <button type="button">Завершить</button>
-            </List.ItemActions>
-          </List.Item>
-        </List.Root>,
-      );
-      const frame = screen.getByRole("button", { name: /MacBook Pro/ }).parentElement;
-      expect(frame?.style.getPropertyValue("--list-row-h")).toBe("56px");
-      height = 72;
-      act(() => resize());
-      expect(frame?.style.getPropertyValue("--list-row-h")).toBe("72px");
-    } finally {
-      offset.mockRestore();
-      globalThis.ResizeObserver = RO;
-    }
+  it("renders a row without onClick, href or asChild as a static box out of the Tab order", async () => {
+    const user = userEvent.setup();
+    render(
+      <List.Root aria-label="Архив">
+        <List.Item data-testid="row">
+          <List.ItemText>Детское кресло</List.ItemText>
+          <List.ItemDescription>150 ₽ в сутки</List.ItemDescription>
+          <List.ItemActions>
+            <button type="button">Вернуть из архива</button>
+          </List.ItemActions>
+        </List.Item>
+      </List.Root>,
+    );
+    const row = screen.getByTestId("row");
+    expect(row.tagName).toBe("DIV");
+    expect(screen.queryByRole("button", { name: /Детское кресло/ })).toBeNull();
+    expect(row).toHaveTextContent(/Детское кресло.*150 ₽ в сутки/);
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Вернуть из архива" })).toHaveFocus();
+  });
+
+  it("sees parts passed in a fragment", () => {
+    render(
+      <List.Root aria-label="Проблемы">
+        <List.Item onClick={() => {}}>
+          <List.ItemText>Нет оплаты</List.ItemText>
+          <List.ItemDescription>Счёт № 4821</List.ItemDescription>
+          <List.ItemMeta>вчера</List.ItemMeta>
+          <List.ItemActions>
+            <button type="button">Закрыть</button>
+          </List.ItemActions>
+        </List.Item>
+      </List.Root>,
+    );
+    const row = screen.getByRole("button", { name: /Нет оплаты/ });
+    expect(screen.getByText("Нет оплаты")).toHaveClass(styles.text ?? "");
+    expect(screen.getByText("Счёт № 4821")).toHaveClass(styles.description ?? "");
+    expect(screen.getByText("вчера")).toHaveClass(styles.meta ?? "");
+    expect(row).not.toContainElement(screen.getByRole("button", { name: "Закрыть" }));
   });
 
   it("keeps List.ItemActions out of a link row made with asChild", () => {

@@ -1,4 +1,4 @@
-/** The totals of an invoice: every amount at the end of its row in tabular figures, the amount due a step larger — `align`. */
+/** The totals of an invoice: every amount at the end of its row in tabular figures, a payment in the success tone, the amount due a step larger in the warning tone — `align`, `tone`. */
 import { Card, DescriptionList, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -8,6 +8,7 @@ const TOTALS = [
   { label: "Скидка 5%", value: "−20 000 ₽" },
   { label: "НДС 20%", value: "76 000 ₽" },
 ];
+const PAID = "−200 000 ₽";
 
 export default function DescriptionListTotalsExample() {
   return (
@@ -22,7 +23,11 @@ export default function DescriptionListTotalsExample() {
               {row.value}
             </DescriptionList.Item>
           ))}
+          <DescriptionList.Item label="Оплачено" tone="success">
+            {PAID}
+          </DescriptionList.Item>
           <DescriptionList.Item
+            tone="warning"
             label={
               <Typography as="span" variant="title-m">
                 К оплате
@@ -30,7 +35,7 @@ export default function DescriptionListTotalsExample() {
             }
           >
             <Typography as="span" variant="title-m" numeric="tabular">
-              456 000 ₽
+              256 000 ₽
             </Typography>
           </DescriptionList.Item>
         </DescriptionList.Root>

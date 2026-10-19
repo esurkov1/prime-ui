@@ -435,8 +435,10 @@
  * board. Columns follow the grid's own width (container query, the numbers are written out — a
  * custom property cannot stand in a container condition): narrow — every cell takes the row; from
  * 30rem — small cells (KPI, span 1–3) pair up; from 40rem — spans 5–6 take half the row too, a third
- * stays a third, wide cells the whole row, and a wide cell written next to a narrow one (`data-pair`,
- * set by the grid in TSX) takes 2/3 beside its 1/3; from 64rem — every cell its own span. `dense`
+ * stays a third, wide cells the whole row, and a wide cell (span 7–11) next to a narrow one (span 4–5)
+ * in the DOM takes 2/3 beside its 1/3 — read from the cells' own `data-span`, wherever they are
+ * rendered; from 51rem (four tiles of the minimum width `--prime-layout-tile-min-width`, 12rem,
+ * and three gaps) small cells are a quarter; from 64rem — every cell its own span. `dense`
  * lets a small cell fill a hole left by a wide one.
  */
 .grid {
@@ -467,13 +469,8 @@
     grid-column: span 6;
   }
 
-  .cell[data-span="4"],
-  .cell[data-pair="narrow"] {
+  .cell[data-span="4"] {
     grid-column: span 4;
-  }
-
-  .cell[data-pair="wide"] {
-    grid-column: span 8;
   }
 
   .cell[data-rows="2"] {
@@ -486,6 +483,44 @@
 
   .cell[data-rows="4"] {
     grid-row: span 4;
+  }
+}
+
+/* Pairs only below 64rem: from there every cell has its own span. */
+@container prime-grid (min-width: 40rem) and (max-width: 63.99rem) {
+  .cell[data-span="5"]:is(
+      :has(
+          + .cell:is(
+              [data-span="7"],
+              [data-span="8"],
+              [data-span="9"],
+              [data-span="10"],
+              [data-span="11"]
+            )
+        ),
+      :is([data-span="7"], [data-span="8"], [data-span="9"], [data-span="10"], [data-span="11"])
+        + .cell
+    ) {
+    grid-column: span 4;
+  }
+
+  .cell:is(
+      [data-span="7"],
+      [data-span="8"],
+      [data-span="9"],
+      [data-span="10"],
+      [data-span="11"]
+    ):is(
+      :has(+ .cell:is([data-span="4"], [data-span="5"])),
+      :is([data-span="4"], [data-span="5"]) + .cell
+    ) {
+    grid-column: span 8;
+  }
+}
+
+@container prime-grid (min-width: 51rem) {
+  .cell:is([data-span="1"], [data-span="2"], [data-span="3"]) {
+    grid-column: span 3;
   }
 }
 

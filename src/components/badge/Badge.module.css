@@ -351,6 +351,21 @@
   cursor: not-allowed;
 }
 
+/* ─── Trigger: a badge inside a layer's trigger; the chevron turns with the open state ─── */
+
+.chevron {
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.body[data-state="open"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* Open: the layer's wash stays, as under the pointer. */
+.root[data-pressable="true"]:has(> .body[data-state="open"]) {
+  background-color: color-mix(in srgb, var(--badge-fg) var(--prime-tint-faint), var(--badge-bg));
+}
+
 /* ─── Badge.Action: a segment revealed at the end; the badge keeps its width ─ */
 
 /* The room for the segment is the segment plus the usual gap before it, like the remove segment.

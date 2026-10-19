@@ -82,6 +82,12 @@ export const page: ComponentPageConfig = {
         "Иконка и название раздела одним полем: селект только с иконкой — начальный сегмент поля — `Input.Wrapper`, `Select.Root`, `aria-label`.",
     },
     {
+      scenario: "amount-currency",
+      title: "Сумма и валюта",
+      description:
+        "Сумма и её валюта одним полем: селект после поля — конечный сегмент у конечного края — `Input.Wrapper`, `Select.Root`, `Input.Field`, `aria-label`.",
+    },
+    {
       scenario: "time",
       title: "Время суток",
       description:

@@ -22,6 +22,7 @@ describe("useScrollRegion", () => {
       subscribe: () => () => {},
       scrollToEnd: vi.fn(),
       scrollToElement: vi.fn(),
+      scrollToOffset: vi.fn(),
       hold: vi.fn(),
     };
     const seen = { current: undefined as ScrollRegion | null | undefined };

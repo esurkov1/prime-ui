@@ -31,7 +31,7 @@ import { Badge } from "prime-ui-kit";
 Badge.Root          <span>: fill, tier dimensions
 ├─ [start segment]  Badge.Icon or Badge.Dot at the start edge: full height, mark centred
 ├─ body             text, Badge.Dot, inline Badge.Icon
-│                   (a toggle <button> with the pressed triad; a <span> with a trailing segment; none when read-only)
+│                   (a toggle <button> with the pressed triad, or the opener inside a `Dropdown.Trigger`; a <span> with a trailing segment; none when read-only)
 ├─ Badge.Action     optional end segment revealed on hover / focus (always shown on touch screens)
 └─ remove segment   with onRemove: full height, the whole end is the hit area (Icon action.close)
 
@@ -45,7 +45,7 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Badge.Root
-`ref` → `HTMLSpanElement`. The chip: fill, tier dimensions; a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment.
+`ref` → `HTMLSpanElement`. The chip: a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment; inside a `Dropdown.Trigger` the body is the opener with a chevron.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -238,6 +238,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | [applied-filters.tsx](examples/applied-filters.tsx) | Applied filters: each badge drops its filter and names it for screen readers — `onRemove`, `labels`. |
 | [server-tags.tsx](examples/server-tags.tsx) | Order tags removed on the server: a badge waits dimmed with a spinner, leaves once the server agrees and stays with an announcement when it refuses — `onRemove`, `labels`. |
 | [filter-values.tsx](examples/filter-values.tsx) | Filter values as toggles with a hide action that slides in without changing the width — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`. |
+| [trigger.tsx](examples/trigger.tsx) | The stage of a deal as a badge that opens the stage picker: the chevron turns while the menu is open, the badge takes the picked stage's color — `Badge.Root`, `Dropdown.Trigger`, `color`. |
 | [square.tsx](examples/square.tsx) | File formats as square tiles of text, large enough for three letters; the hue sorts them by kind — `shape`, `size`, `color`. |
 | [tag-row.tsx](examples/tag-row.tsx) | The tags of a client as one value: the row wraps in a narrow column and keeps one gap between badges — `Badge.Group`, `size`. |
 | [overflow-count.tsx](examples/overflow-count.tsx) | The sections of each role in one line of a narrow cell: what does not fit waits behind «+N» with the full list in its tooltip — `Badge.Group`, `overflow`. |

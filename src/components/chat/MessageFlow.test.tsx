@@ -26,6 +26,7 @@ function fakeRegion(atEnd = true) {
     },
     scrollToEnd: vi.fn(),
     scrollToElement: vi.fn(),
+    scrollToOffset: vi.fn(),
     hold: vi.fn(),
     set(next) {
       state.atEnd = next;

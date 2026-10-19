@@ -48,6 +48,19 @@ export type KanbanColumn = {
   locked?: boolean;
 };
 
+/**
+ * A phase of the board: a heading over its columns. A column moves only within its group; columns
+ * named by no group stand after the last one, with no heading.
+ */
+export type KanbanColumnGroup = {
+  /** Stable unique id of the group. */
+  id: string;
+  /** Heading of the group, over its columns. */
+  title: string;
+  /** Ids of the columns the group holds. */
+  columnIds: readonly string[];
+};
+
 /** Where every card stands: column id → card ids in their order. */
 export type KanbanValue = Readonly<Record<string, readonly string[]>>;
 
@@ -84,6 +97,8 @@ export type KanbanLabels = {
   moveFailed: string;
   /** Spoken when a column's move is refused (its `onColumnOrderChange` promise rejected): `{column}`. */
   columnMoveFailed: string;
+  /** Why a column cannot leave its group (spoken, and shown under the carried column): `{column}`, `{group}`. */
+  columnGroupLocked: string;
 };
 
 export const KANBAN_LABELS: KanbanLabels = {
@@ -95,6 +110,7 @@ export const KANBAN_LABELS: KanbanLabels = {
   column: "Колонка «{column}»",
   moveFailed: "Не удалось переместить «{label}», карточка вернулась на место",
   columnMoveFailed: "Не удалось переместить колонку «{column}», она вернулась на место",
+  columnGroupLocked: "Колонка «{column}» остаётся в группе «{group}»",
 };
 
 const SKELETON_CARDS = [3, 2, 1];
@@ -127,6 +143,7 @@ export type KanbanRootProps<T> = Omit<
   "children" | "defaultValue"
 > & {
   columns: readonly KanbanColumn[];
+  columnGroups?: readonly KanbanColumnGroup[];
   items: readonly T[];
   getId: (item: T) => string;
   getLabel?: (item: T) => string;
@@ -211,6 +228,7 @@ const cardKey = (node: HTMLElement) => node.dataset.kanbanItem;
 
 function KanbanBoard<T>({
   columns,
+  columnGroups,
   items,
   getId,
   getLabel,
@@ -279,8 +297,32 @@ function KanbanBoard<T>({
       const column = known.get(id);
       return column ? [column] : [];
     });
-    return [...placed, ...columns.filter((column) => !order.includes(column.id))];
-  }, [columns, order]);
+    const all = [...placed, ...columns.filter((column) => !order.includes(column.id))];
+    if (!columnGroups) return all;
+    // With groups the columns stand group by group, each in the order's sequence.
+    const inGroups = new Set(columnGroups.flatMap((group) => group.columnIds));
+    return [
+      ...columnGroups.flatMap((group) =>
+        all.filter((column) => group.columnIds.includes(column.id)),
+      ),
+      ...all.filter((column) => !inGroups.has(column.id)),
+    ];
+  }, [columns, columnGroups, order]);
+  // The groups as drawn: the heading and the columns it holds; the strays form one more, unnamed.
+  const groups = React.useMemo(() => {
+    if (!columnGroups) return null;
+    const named = columnGroups.map((group) => ({
+      id: group.id,
+      title: group.title as string | null,
+      columns: ordered.filter((column) => group.columnIds.includes(column.id)),
+    }));
+    const inGroups = new Set(columnGroups.flatMap((group) => group.columnIds));
+    const strays = ordered.filter((column) => !inGroups.has(column.id));
+    return [
+      ...named.filter((group) => group.columns.length > 0),
+      ...(strays.length > 0 ? [{ id: "", title: null, columns: strays }] : []),
+    ];
+  }, [columnGroups, ordered]);
 
   const byId = React.useMemo(
     () => new Map(items.map((item) => [getId(item), item])),
@@ -351,6 +393,43 @@ function KanbanBoard<T>({
     return outcome;
   };
 
+  /** A group's move: past its last column means in front of the next group's first, not the end. */
+  const moveColumnIn = (
+    group: { columns: readonly KanbanColumn[] },
+    id: string,
+    beforeId: string | null,
+  ) => {
+    if (beforeId !== null) return moveColumn(id, beforeId);
+    const last = group.columns[group.columns.length - 1];
+    const at = last ? ordered.findIndex((column) => column.id === last.id) : -1;
+    return moveColumn(id, ordered[at + 1]?.id ?? null);
+  };
+
+  /**
+   * Alt + an arrow along the row on the first / last column of a group would leave it: the list
+   * holds still, so the refusal is said here (a pointer drop says it through `canDrop`).
+   */
+  const refuseAtEdge = (
+    event: React.KeyboardEvent<HTMLElement>,
+    group: { columns: readonly KanbanColumn[]; title: string | null },
+  ) => {
+    if (!event.altKey || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
+    if (!reorderableColumns || locked || !(event.target instanceof Element)) return;
+    const item = event.target.closest("[data-dnd-item]");
+    const id = item instanceof HTMLElement ? item.dataset.kanbanColumn : undefined;
+    const at = group.columns.findIndex((column) => column.id === id);
+    if (at === -1) return;
+    const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
+    const forward = (event.key === "ArrowRight") !== rtl;
+    if (at !== (forward ? group.columns.length - 1 : 0)) return;
+    announce?.(
+      formatLabel(labels.columnGroupLocked, {
+        column: group.columns[at]?.title ?? "",
+        group: group.title ?? "",
+      }),
+    );
+  };
+
   const locked = disabled || loading;
   // A board loading before its columns arrive draws placeholder columns (`loadingColumns`).
   const placeholders = loading && columns.length === 0;
@@ -383,6 +462,66 @@ function KanbanBoard<T>({
       cardDepth,
     }),
     [locked, links, opens, cardDepth],
+  );
+
+  /** The sortable row of columns: the whole board, or one group's (a linked list that refuses a stranger). */
+  const columnList = (
+    list: readonly KanbanColumn[],
+    {
+      group,
+      onReorder,
+    }: {
+      group?: { id: string; title: string | null };
+      onReorder: (id: string, beforeId: string | null) => void | Promise<void>;
+    },
+  ) => (
+    <Dnd.Sortable
+      as="ul"
+      axis="x"
+      handle
+      kind={group ? `${kind}-columns` : undefined}
+      // The columns that replace the placeholders fade in where they stood.
+      className={cx(styles.columns, placeholdersShown && enterMotion.enterFade)}
+      items={list}
+      getId={getColumnId}
+      getLabel={(column) => formatLabel(labels.column, { column: column.title })}
+      canDrop={
+        group
+          ? (id) =>
+              list.some((column) => column.id === id) ||
+              formatLabel(labels.columnGroupLocked, {
+                column: columns.find((column) => column.id === id)?.title ?? id,
+                group: group.title ?? "",
+              })
+          : undefined
+      }
+      disabled={!reorderableColumns || locked}
+      onReorder={onReorder}
+      renderItem={(column) => (
+        <KanbanColumnView
+          column={column}
+          titleAs={columnTitleAs}
+          cardDepth={cardDepth}
+          cards={idsOf(column.id).flatMap((id) => {
+            const item = byId.get(id);
+            return item === undefined ? [] : [item];
+          })}
+          skeletons={SKELETON_CARDS[ordered.indexOf(column) % SKELETON_CARDS.length] ?? 1}
+          kind={kind}
+          getId={getId}
+          getLabel={getLabel}
+          accepts={(id) => accepts(column, id)}
+          onReorder={(id, beforeId) => place(id, column.id, beforeId)}
+          renderItem={renderItem}
+          actions={renderColumnActions?.(column)}
+          meta={renderColumnMeta?.(column)}
+          reorderable={reorderableColumns && !disabled}
+          loading={loading}
+          disabled={disabled}
+          labels={labels}
+        />
+      )}
+    />
   );
 
   return (
@@ -423,47 +562,65 @@ function KanbanBoard<T>({
                 </div>
               ))}
             </div>
-          ) : (
-            <Dnd.Sortable
-              as="ul"
-              axis="x"
-              handle
-              // The columns that replace the placeholders fade in where they stood.
-              className={cx(styles.columns, placeholdersShown && enterMotion.enterFade)}
-              items={ordered}
-              getId={getColumnId}
-              getLabel={(column) => formatLabel(labels.column, { column: column.title })}
-              disabled={!reorderableColumns || locked}
-              onReorder={(id, beforeId) => moveColumn(id, beforeId)}
-              renderItem={(column, columnIndex) => (
-                <KanbanColumnView
-                  column={column}
-                  titleAs={columnTitleAs}
-                  cardDepth={cardDepth}
-                  cards={idsOf(column.id).flatMap((id) => {
-                    const item = byId.get(id);
-                    return item === undefined ? [] : [item];
+          ) : groups ? (
+            <div className={styles.groups}>
+              {groups.map((group) => (
+                <KanbanGroupView
+                  key={group.id}
+                  id={group.id}
+                  title={group.title}
+                  onKeyDownCapture={(event) => refuseAtEdge(event, group)}
+                  list={columnList(group.columns, {
+                    group,
+                    onReorder: (id, beforeId) => moveColumnIn(group, id, beforeId),
                   })}
-                  skeletons={SKELETON_CARDS[columnIndex % SKELETON_CARDS.length] ?? 1}
-                  kind={kind}
-                  getId={getId}
-                  getLabel={getLabel}
-                  accepts={(id) => accepts(column, id)}
-                  onReorder={(id, beforeId) => place(id, column.id, beforeId)}
-                  renderItem={renderItem}
-                  actions={renderColumnActions?.(column)}
-                  meta={renderColumnMeta?.(column)}
-                  reorderable={reorderableColumns && !disabled}
-                  loading={loading}
-                  disabled={disabled}
-                  labels={labels}
                 />
-              )}
-            />
+              ))}
+            </div>
+          ) : (
+            columnList(ordered, { onReorder: (id, beforeId) => moveColumn(id, beforeId) })
           )}
         </ScrollContainer>
       </div>
     </BoardContext>
+  );
+}
+
+/** A phase of the board: its heading over its columns. The unnamed group (strays) has no heading. */
+function KanbanGroupView({
+  id,
+  title,
+  list,
+  onKeyDownCapture,
+}: {
+  id: string;
+  title: string | null;
+  list: React.ReactNode;
+  onKeyDownCapture: React.KeyboardEventHandler<HTMLElement>;
+}) {
+  const headingId = React.useId();
+  // A named group of columns: a name on a bare `<div>` reaches no assistive tech.
+  const name = { "aria-labelledby": headingId } as const;
+  if (title === null) {
+    return (
+      <div className={styles.group} onKeyDownCapture={onKeyDownCapture}>
+        {list}
+      </div>
+    );
+  }
+  return (
+    <div
+      className={styles.group}
+      onKeyDownCapture={onKeyDownCapture}
+      data-kanban-group={id}
+      role={namedRole(name, "group")}
+      {...name}
+    >
+      <div id={headingId} className={cx(textRole.titleS, styles.groupTitle)}>
+        {title}
+      </div>
+      {list}
+    </div>
   );
 }
 

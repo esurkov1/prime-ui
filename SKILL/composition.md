@@ -925,6 +925,11 @@ export function RevenuePanel() {
 For a plain KPI row use `Card.Root variant="stat-trend"` (Label · Value · Delta), each in a
 `Page.Cell span={3}` of the page's `Page.Grid` — see [the dashboard screen](../src/components/card/examples/screen.tsx). When the trend over days matters, put a
 `Sparkline` in the `Card.Body` instead: it brings the value and a line to scrub, the change with `compareTo`.
+A tile whose value is words, not a number («Выдать PCX 160», «Заявка в Mini App») →
+`variant="stat-text"`; a value with a meaning («к оплате» due, a payment made) → `Card.Value tone`
+(and `DescriptionList.Item tone` in a pair). A tile that leads somewhere is a link (`Card.Root asChild`
+with the link, or `Card.Link` when the card holds its own buttons): the kit draws its arrow — never
+an arrow of your own in the label.
 
 ## Screen rules
 

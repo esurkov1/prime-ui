@@ -7,7 +7,8 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import { RowAction } from "@/internal/RowAction";
-import type { ControlSize } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
+import textTone from "@/internal/textTone.module.css";
 
 import styles from "./DescriptionList.module.css";
 
@@ -78,6 +79,7 @@ DescriptionListRoot.displayName = "DescriptionList.Root";
 
 export type DescriptionListItemProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   label: React.ReactNode;
+  tone?: Extract<Tone, "neutral" | "success" | "warning" | "danger">;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -86,7 +88,13 @@ const isEmptyValue = (node: React.ReactNode) =>
   node === null || node === undefined || node === false || node === "";
 
 /** One pair: a `<div>` holding the `<dt>` and the `<dd>`; the row action sits at the end of the value. */
-function DescriptionListItem({ label, children, className, ...rest }: DescriptionListItemProps) {
+function DescriptionListItem({
+  label,
+  tone,
+  children,
+  className,
+  ...rest
+}: DescriptionListItemProps) {
   const { labels } = React.useContext(DescriptionListContext);
   const parts = React.Children.toArray(children);
   const action = parts.find(
@@ -98,7 +106,11 @@ function DescriptionListItem({ label, children, className, ...rest }: Descriptio
   return (
     <div {...rest} className={cx(styles.item, className)}>
       <dt className={styles.label}>{label}</dt>
-      <dd className={styles.value} data-empty={empty || undefined}>
+      <dd
+        className={cx(styles.value, tone && !empty && textTone.tone)}
+        data-tone={empty ? undefined : tone}
+        data-empty={empty || undefined}
+      >
         <span className={styles.text}>
           {empty ? (
             <>

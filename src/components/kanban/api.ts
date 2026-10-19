@@ -16,6 +16,12 @@ export const api: ComponentApi = {
           ru: "Все колонки: `{ id, title, description?, color?, limit?, locked? }`, в порядке `columnOrder`. `color` — `PaletteColor` счётчика, `limit` — лимит работы, `locked` держит системный этап на месте.",
         },
         {
+          name: "columnGroups",
+          type: "readonly KanbanColumnGroup[]",
+          en: "Phases of the board: `{ id, title, columnIds }`, a heading over each group's columns. A column moves only within its group; a move past the edge is refused and announced. Unnamed columns follow, headless.",
+          ru: "Фазы доски: `{ id, title, columnIds }`, заголовок над колонками группы. Колонка переставляется только внутри группы; выход за край отклоняется и озвучивается. Остальные колонки идут следом, без заголовка.",
+        },
+        {
           name: "items",
           type: "readonly T[]",
           required: true,
@@ -280,6 +286,10 @@ export const api: ComponentApi = {
       en: "Spoken when the `onColumnOrderChange` promise rejects.",
       ru: "Озвучивается, когда промис `onColumnOrderChange` отклонён.",
     },
+    columnGroupLocked: {
+      en: "Why a column cannot leave its group (`columnGroups`), spoken and shown under the carried column; `{column}`, `{group}`.",
+      ru: "Почему колонка не может выйти из своей группы (`columnGroups`): озвучивается и показывается под переносимой колонкой; `{column}`, `{group}`.",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -313,6 +323,10 @@ export const api: ComponentApi = {
       {
         en: "Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.",
         ru: "Каждая колонка — `<ul>`, подписанный заголовком колонки (`aria-labelledby`) и описанный подзаголовком (`aria-describedby`); карточки — `<li>` с `aria-roledescription` и `aria-keyshortcuts`.",
+      },
+      {
+        en: 'With `columnGroups` every named group is a `role="group"` labelled by its heading; a keyboard move past the edge of a group is announced with `labels.columnGroupLocked`.',
+        ru: 'С `columnGroups` каждая именованная группа — `role="group"` с именем из её заголовка; перенос с клавиатуры за край группы озвучивается через `labels.columnGroupLocked`.',
       },
       {
         en: "The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position («Колонка «…»: позиция 2 из 4», `labels.column`). A locked column has a lock named «Закреплено» instead.",

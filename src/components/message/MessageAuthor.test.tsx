@@ -15,11 +15,27 @@ const RUN: Row[] = [
   { id: "c", position: "last" },
 ];
 
-function Messages({ rows, group }: { rows: Row[]; group: boolean }) {
+function Messages({
+  rows,
+  group = false,
+  authors,
+  direction,
+}: {
+  rows: Row[];
+  group?: boolean;
+  authors?: "outgoing";
+  direction?: "incoming" | "outgoing";
+}) {
   return (
-    <MessageList aria-label="Чат" group={group}>
+    <MessageList aria-label="Чат" group={group} authors={authors}>
       {rows.map((row) => (
-        <Message.Root key={row.id} value={row.id} position={row.position} time="10:00">
+        <Message.Root
+          key={row.id}
+          value={row.id}
+          position={row.position}
+          direction={direction}
+          time="10:00"
+        >
           <Message.Avatar>
             <span data-testid={`avatar-${row.id}`} />
           </Message.Avatar>
@@ -121,5 +137,15 @@ describe("Message.Author: the author's header of a group chat", () => {
     expect(tile.closest("[data-count]")).not.toHaveAttribute("data-pressed");
     fireEvent.pointerUp(tile);
     expect(column).not.toHaveAttribute("data-pressed");
+  });
+
+  it('authors="outgoing" heads outgoing runs only, without avatars or a gutter', () => {
+    const { unmount } = render(<Messages rows={RUN} authors="outgoing" direction="outgoing" />);
+    expect(header("a")).not.toBeNull();
+    expect(header("b")).toBeNull();
+    unmount();
+    render(<Messages rows={RUN} authors="outgoing" direction="incoming" />);
+    expect(header("a")).toBeNull();
+    expect(screen.queryByTestId("avatar-c")).toBeNull();
   });
 });

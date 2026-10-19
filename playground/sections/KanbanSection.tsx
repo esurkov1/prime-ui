@@ -63,6 +63,12 @@ export const page: ComponentPageConfig = {
         "Воронка продаж: этапы переставляются за ручку в шапке, первый и последний закреплены; у этапа цвет на счётчике, правило и цифры в две строки под названием, а в поповере его можно переименовать, перекрасить и удалить; порядок хранит страница — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`.",
     },
     {
+      scenario: "column-groups",
+      title: "Группы колонок",
+      description:
+        "Доска сделок по фазам: над колонками фазы стоит её заголовок, а этап переставляется только внутри своей фазы — мышью и с клавиатуры, выход за край фазы отклоняется с причиной — `columnGroups`, `reorderableColumns`, `columnOrder`, `onColumnOrderChange`.",
+    },
+    {
       scenario: "saving",
       title: "Сохранение на сервере",
       description:

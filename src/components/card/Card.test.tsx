@@ -259,4 +259,83 @@ describe("Card", () => {
     expect(screen.getByTestId("kpi")).not.toHaveAttribute("aria-busy");
     expect(screen.getByTestId("value").className).not.toMatch(/swapIn|settleIn/);
   });
+
+  it("Card.Link stretches over the card: the card opens as a whole, its button stays its own", async () => {
+    const onIssue = vi.fn();
+    render(
+      <Card.Root data-testid="card">
+        <Card.Header>
+          <Card.Title>
+            <Card.Link href="#pcx">Honda PCX</Card.Link>
+          </Card.Title>
+        </Card.Header>
+        <Card.Footer divider="full">
+          <button type="button" onClick={onIssue}>
+            Выдан
+          </button>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    const card = screen.getByTestId("card");
+    const link = screen.getByRole("link", { name: "Honda PCX" });
+    expect(card).toHaveAttribute("data-link", "true");
+    expect(link).toHaveAttribute("data-row-link");
+    // The kit draws the transition arrow; the card keeps one tab stop for the link.
+    expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(card.className).toMatch(/host/);
+    expect(cssValue(cssRule("src/components/card/Card.module.css", ".link::after"), "inset")).toBe(
+      "0",
+    );
+    await userEvent.tab();
+    expect(link).toHaveFocus();
+    await userEvent.click(screen.getByRole("button", { name: "Выдан" }));
+    expect(onIssue).toHaveBeenCalledTimes(1);
+  });
+
+  it("a card that is a link shows the transition arrow; a button card does not", () => {
+    const { rerender } = render(
+      <Card.Root variant="mini" asChild>
+        <a href="#x" data-testid="card">
+          <Card.Label>Лиды</Card.Label>
+        </a>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("card")).toHaveAttribute("data-mark", "true");
+    expect(screen.getByTestId("card").querySelector("svg")).not.toBeNull();
+    rerender(
+      <Card.Root variant="mini" asChild>
+        <button type="button" data-testid="card">
+          <Card.Label>Лиды</Card.Label>
+        </button>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("card")).not.toHaveAttribute("data-mark");
+    expect(screen.getByTestId("card").querySelector("svg")).toBeNull();
+  });
+
+  it("Card.Value takes a tone and stat-text a text value", () => {
+    render(
+      <Card.Root variant="stat-text" data-testid="card">
+        <Card.Value tone="warning" data-testid="value">
+          256 000 ₽
+        </Card.Value>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("card")).toHaveAttribute("data-variant", "stat-text");
+    expect(screen.getByTestId("value")).toHaveAttribute("data-tone", "warning");
+    expect(screen.getByTestId("value").className).toMatch(/tone/);
+  });
+
+  it("divider=full sets the zone hairline edge to edge on a footer of any template", () => {
+    render(
+      <Card.Root variant="cover">
+        <Card.Footer divider="full" data-testid="footer">
+          x
+        </Card.Footer>
+      </Card.Root>,
+    );
+    const footer = screen.getByTestId("footer");
+    expect(footer).toHaveAttribute("data-divider", "full");
+    expect(footer.className).toMatch(/top/);
+  });
 });

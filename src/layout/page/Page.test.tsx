@@ -789,38 +789,35 @@ describe("Page body", () => {
     expect(screen.getByTestId("chart")).toHaveAttribute("data-rows", "2");
   });
 
-  it("Grid: a wide cell next to a narrow one forms a 2/3 + 1/3 pair; others stay alone", () => {
+  it("Grid: pairs are read from the cells' data-span, wherever the cells are rendered", () => {
+    const Block = () => <Page.Cell data-testid="inner" span={4} />;
     render(
-      <Page.Grid>
-        <Page.Cell data-testid="kpi" span={3} />
+      <Page.Grid data-testid="grid">
         <Page.Cell data-testid="chart" span={8} rows={2} />
-        <Page.Cell data-testid="side" span={4} />
-        <Page.Cell data-testid="next" span={4} />
-        <>
-          <Page.Cell data-testid="third" span={5} />
-          <Page.Cell data-testid="wide" span={7} />
-        </>
-        <Page.Cell data-testid="full" />
-        <Page.Cell data-testid="after-full" span={4} />
+        <Block />
       </Page.Grid>,
     );
-    expect(screen.getByTestId("kpi")).not.toHaveAttribute("data-pair");
-    expect(screen.getByTestId("chart")).toHaveAttribute("data-pair", "wide");
-    expect(screen.getByTestId("side")).toHaveAttribute("data-pair", "narrow");
-    expect(screen.getByTestId("next")).not.toHaveAttribute("data-pair");
-    expect(screen.getByTestId("third")).toHaveAttribute("data-pair", "narrow");
-    expect(screen.getByTestId("wide")).toHaveAttribute("data-pair", "wide");
-    expect(screen.getByTestId("full")).not.toHaveAttribute("data-pair");
-    expect(screen.getByTestId("after-full")).not.toHaveAttribute("data-pair");
+    expect(screen.getByTestId("grid")).not.toHaveAttribute("data-pair");
+    expect(screen.getByTestId("chart")).toHaveAttribute("data-span", "8");
+    expect(screen.getByTestId("inner")).toHaveAttribute("data-span", "4");
+    expect(screen.getByTestId("inner").previousElementSibling).toBe(screen.getByTestId("chart"));
   });
 
-  it("CSS: on a mid-width grid a pair takes 8 + 4 and the grid keeps the dense flow", () => {
+  it("CSS: below 64rem a wide cell beside a narrow one takes 8 + 4, found by data-span in the DOM", () => {
     expect(cssValue(cssRule(CSS, ".grid"), "grid-auto-flow")).toBe("row dense");
-    const mid = ["@container prime-grid (min-width: 40rem)"];
-    expect(cssValue(cssRule(CSS, '.cell[data-pair="wide"]', mid), "grid-column")).toBe("span 8");
-    expect(
-      cssValue(cssRule(CSS, '.cell[data-span="4"], .cell[data-pair="narrow"]', mid), "grid-column"),
-    ).toBe("span 4");
+    const pairs = cssRules(CSS).filter((rule) =>
+      rule.parents.includes("@container prime-grid (min-width: 40rem) and (max-width: 63.99rem)"),
+    );
+    expect(pairs.map((rule) => cssValue(rule, "grid-column")).sort()).toEqual(["span 4", "span 8"]);
+    expect(pairs.every((rule) => rule.selector.includes("+ .cell"))).toBe(true);
+    expect(cssRules(CSS).some((rule) => rule.selector.includes("data-pair"))).toBe(false);
+  });
+
+  it("CSS: from 51rem (four 12rem tiles and three gaps) span 1–3 is a quarter", () => {
+    const rule = cssRule(CSS, '.cell:is([data-span="1"], [data-span="2"], [data-span="3"])', [
+      "@container prime-grid (min-width: 51rem)",
+    ]);
+    expect(cssValue(rule, "grid-column")).toBe("span 3");
   });
 
   it("Cell: a Crossfade child fills the cell unless it sets fill", () => {

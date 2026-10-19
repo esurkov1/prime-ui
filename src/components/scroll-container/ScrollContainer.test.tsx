@@ -583,6 +583,13 @@ describe("ScrollContainer anchor and edges", () => {
 
   afterEach(() => vi.restoreAllMocks());
 
+  /** The reader's own scroll: a wheel step, then the position moves. */
+  function readerScrolls(region: HTMLElement, top: number) {
+    fireEvent.wheel(region);
+    region.scrollTop = top;
+    fireEvent.scroll(region);
+  }
+
   function Chat({ messages, ...props }: { messages: string[] } & ScrollContainerProps) {
     return (
       <ScrollContainer data-testid="region" {...props}>
@@ -618,20 +625,55 @@ describe("ScrollContainer anchor and edges", () => {
     rerender(<Chat anchor="end" messages={["Привет", "Печатает"]} />);
     await waitFor(() => expect(region.scrollTop).toBe(1046));
     // The reader scrolls back: now the view stays.
-    region.scrollTop = 900;
-    fireEvent.scroll(region);
+    readerScrolls(region, 900);
     metrics.scrollHeight = 1300;
     rerender(<Chat anchor="end" messages={["Привет", "Печатает", "Ответ"]} />);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(region.scrollTop).toBe(900);
   });
 
+  it("a position the browser clamped while the content was short for a frame stays at the end", async () => {
+    render(<Chat anchor="end" messages={["Привет"]} />);
+    const region = screen.getByTestId("region");
+    expect(region.scrollTop).toBe(800);
+    // A font swap shortens the content, the browser clamps the position, the content grows back
+    // before anything observes it: only the scroll event is left, with no wheel, key or touch.
+    region.scrollTop = 750;
+    fireEvent.scroll(region);
+    expect(region.scrollTop).toBe(800);
+  });
+
+  it("scrollToOffset away from the end lets go of the end", async () => {
+    const seen = { current: null as ScrollRegion | null };
+    function Probe() {
+      seen.current = useScrollRegion();
+      return null;
+    }
+    const { rerender } = render(
+      <ScrollContainer data-testid="region" anchor="end">
+        <Probe />
+      </ScrollContainer>,
+    );
+    const region = screen.getByTestId("region");
+    expect(seen.current?.atEnd()).toBe(true);
+    seen.current?.scrollToOffset(300);
+    expect(region.scrollTop).toBe(300);
+    expect(seen.current?.atEnd()).toBe(false);
+    metrics.scrollHeight = 1240;
+    rerender(
+      <ScrollContainer data-testid="region" anchor="end">
+        <Probe />
+      </ScrollContainer>,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(region.scrollTop).toBe(300);
+  });
+
   it("scrolled away from the end, a new message keeps the view where it is", async () => {
     metrics.offsets.set("Первое", 0).set("Второе", 300);
     const { rerender } = render(<Chat anchor="end" messages={["Первое", "Второе"]} />);
     const region = screen.getByTestId("region");
-    region.scrollTop = 300;
-    fireEvent.scroll(region);
+    readerScrolls(region, 300);
     metrics.scrollHeight = 1240;
     rerender(<Chat anchor="end" messages={["Первое", "Второе", "Третье"]} />);
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -645,8 +687,7 @@ describe("ScrollContainer anchor and edges", () => {
       <Chat anchor="end" onReachStart={onReachStart} messages={["Сегодня"]} />,
     );
     const region = screen.getByTestId("region");
-    region.scrollTop = 0;
-    fireEvent.scroll(region);
+    readerScrolls(region, 0);
     // Two older messages land above: the visible one moves 600 down in the content.
     metrics.offsets.set("Позавчера", 0).set("Вчера", 300).set("Сегодня", 600);
     metrics.scrollHeight = 1600;
@@ -673,18 +714,15 @@ describe("ScrollContainer anchor and edges", () => {
     // The region opens at its start: it asks at once.
     expect(onReachStart).toHaveBeenCalledTimes(1);
     expect(region).toHaveAttribute("aria-busy", "true");
-    region.scrollTop = 30;
-    fireEvent.scroll(region);
+    readerScrolls(region, 30);
     expect(onReachStart).toHaveBeenCalledTimes(1);
     // Nothing came and the view never left the zone: no repeat.
     await act(async () => resolve());
     expect(region).not.toHaveAttribute("aria-busy");
     expect(onReachStart).toHaveBeenCalledTimes(1);
 
-    region.scrollTop = 400;
-    fireEvent.scroll(region);
-    region.scrollTop = 60;
-    fireEvent.scroll(region);
+    readerScrolls(region, 400);
+    readerScrolls(region, 60);
     expect(onReachStart).toHaveBeenCalledTimes(2);
     metrics.scrollHeight = 1400;
     await act(async () => resolve());
@@ -697,15 +735,11 @@ describe("ScrollContainer anchor and edges", () => {
     render(<Chat messages={["Заказ № 1040"]} onReachEnd={onReachEnd} />);
     const region = screen.getByTestId("region");
     expect(onReachEnd).not.toHaveBeenCalled();
-    region.scrollTop = 750;
-    fireEvent.scroll(region);
-    region.scrollTop = 790;
-    fireEvent.scroll(region);
+    readerScrolls(region, 750);
+    readerScrolls(region, 790);
     expect(onReachEnd).toHaveBeenCalledTimes(1);
-    region.scrollTop = 200;
-    fireEvent.scroll(region);
-    region.scrollTop = 800;
-    fireEvent.scroll(region);
+    readerScrolls(region, 200);
+    readerScrolls(region, 800);
     expect(onReachEnd).toHaveBeenCalledTimes(2);
   });
 
@@ -727,8 +761,7 @@ describe("ScrollContainer anchor and edges", () => {
       </ScrollContainer>,
     );
     const region = screen.getByTestId("region");
-    region.scrollTop = 320;
-    fireEvent.scroll(region);
+    readerScrolls(region, 320);
     // Something above grows by 100: the row under the edge moves down, the stuck date does not.
     metrics.offsets.set("Сегодня", 320).set("Ответ", 440);
     metrics.scrollHeight = 1100;

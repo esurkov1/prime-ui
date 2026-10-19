@@ -1476,6 +1476,12 @@ describe("the carried copy", () => {
     expect(container?.style.getPropertyValue("--tracks")).toBe("1fr auto");
     // Any other ancestor is an empty copy that takes no box.
     expect(copy?.closest<HTMLElement>('[data-variant="plain"]')?.style.display).toBe("contents");
+    // No ancestor copy animates: a Drawer's slide-in must not replay on the flying copy.
+    expect(container?.style.getPropertyValue("animation")).toBe("none");
+    expect(container?.style.getPropertyValue("transition")).toBe("none");
+    expect(
+      copy?.closest<HTMLElement>('[data-variant="plain"]')?.style.getPropertyValue("animation"),
+    ).toBe("none");
     releaseAt(60, 60);
   });
 });

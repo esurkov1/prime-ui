@@ -954,47 +954,14 @@ PageSection.displayName = "Page.Section";
 
 export type PageGridProps = DivProps;
 
-/** Where a cell stands in a wide + narrow pair: 2/3 or 1/3 of a mid-width grid. */
-type CellPair = "wide" | "narrow";
-
-const pairRole = (node: React.ReactNode): CellPair | undefined => {
-  if (!isPart<PageCellProps>(node, PageCell)) return undefined;
-  const span = node.props.span ?? 12;
-  if (span >= 7 && span <= 11) return "wide";
-  if (span === 4 || span === 5) return "narrow";
-  return undefined;
-};
-
 /**
  * The grid of the page's tiles (KPI cards, charts, panels): 12 columns, one gap on both axes.
  * Columns follow the grid's own width, so tiles fold on a narrow panel by themselves. A wide cell
  * (span 7–11) written next to a narrow one (span 4–5) forms a pair that a mid-width grid lays out as
- * 2/3 + 1/3, so the row keeps no hole.
+ * 2/3 + 1/3, so the row keeps no hole; the pair is read from the cells' own `data-span` in the DOM, so a cell rendered inside a consumer component pairs too.
  */
-function PageGrid({ className, children, ...rest }: PageGridProps) {
-  const items = flattenChildren(children);
-  const pairs = new Map<number, CellPair>();
-  for (let index = 0; index < items.length - 1; index += 1) {
-    const role = pairRole(items[index]);
-    const next = pairRole(items[index + 1]);
-    if (role && next && role !== next) {
-      pairs.set(index, role);
-      pairs.set(index + 1, next);
-      index += 1;
-    }
-  }
-  return (
-    <div {...rest} className={cx(styles.grid, className)}>
-      {items.map((item, index) => {
-        const pair = pairs.get(index);
-        return pair && React.isValidElement(item)
-          ? React.cloneElement(item as React.ReactElement<DivProps & { "data-pair"?: CellPair }>, {
-              "data-pair": pair,
-            })
-          : item;
-      })}
-    </div>
-  );
+function PageGrid({ className, ...rest }: PageGridProps) {
+  return <div {...rest} className={cx(styles.grid, className)} />;
 }
 PageGrid.displayName = "Page.Grid";
 

@@ -1,4 +1,4 @@
-/** Every piece of a row: a photo or initials with presence, a glyph beside the name, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. */
+/** Every piece of a row: a photo or initials with presence, a glyph beside the name, a record status line, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. */
 import { Avatar, Card, ChatList, hueOf, Icon, type MessageStatus } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -19,6 +19,7 @@ type Dialog = {
   status?: MessageStatus;
   typing?: string;
   unread?: number;
+  record?: string;
 };
 
 const NOW = new Date(2026, 9, 14, 15, 0);
@@ -35,6 +36,7 @@ const DIALOGS: Dialog[] = [
     kind: "photo",
     text: "Вот так выглядит ошибка",
     unread: 1,
+    record: "Бронь · ждёт человека",
   },
   {
     id: "prime-bot",
@@ -120,6 +122,7 @@ export default function ChatListStructureExample() {
                 <Icon name="object.users" />
               </ChatList.ItemIcon>
             ) : null}
+            {item.record ? <ChatList.ItemStatus>{item.record}</ChatList.ItemStatus> : null}
             <ChatList.ItemDescription
               author={item.author}
               kind={item.kind}

@@ -2,6 +2,7 @@
  * Shared props, math and accessible text of the progress indicators (ProgressBar, ProgressCircle):
  * one `value`, or `segments` that split a whole.
  */
+import type * as React from "react";
 import type { PaletteColor, Tone } from "./states";
 
 /** The two modes of a progress indicator; the component adds its own common props. */
@@ -50,6 +51,10 @@ export type ProgressSegment = {
   /** Non-negative weight; negative or non-finite values count as 0. */
   value: number;
   label?: string;
+  /** `rows` layout: the whole row is a link to it. */
+  href?: string;
+  /** `rows` layout: runs on a press of the row's link (`href` only), e.g. to navigate by a router. */
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 } & (
   | {
       /** Fill by meaning. Default `accent`. */

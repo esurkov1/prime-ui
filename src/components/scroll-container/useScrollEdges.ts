@@ -8,6 +8,12 @@ import { afterMotionMs, motionDurationMs, readElementDurationMs } from "@/intern
 const EDGE_PX = 120;
 /** How close to the end still counts as «at the end» for `anchor="end"` (sub-pixel scroll, zoom). */
 const PIN_PX = 4;
+/**
+ * How long after the reader's last wheel, touch, key or press a scroll back from the end is theirs.
+ * Later, a position that fell away is the browser's clamp (the content shrank for a frame: a font
+ * swap, a re-measure) and the end is kept.
+ */
+const READER_MS = 1000;
 /** How deep the visible-position anchor is looked for (a list inside a wrapper inside the region). */
 const ANCHOR_DEPTH = 4;
 /**
@@ -26,6 +32,7 @@ const NO_REGION: RegionImpl = {
   subscribe: () => () => {},
   scrollToEnd: () => {},
   scrollToElement: () => {},
+  scrollToOffset: () => {},
   hold: () => {},
 };
 
@@ -75,6 +82,7 @@ export function useScrollEdges(
       },
       scrollToEnd: (behavior) => impl.current.scrollToEnd(behavior),
       scrollToElement: (element, behavior) => impl.current.scrollToElement(element, behavior),
+      scrollToOffset: (position) => impl.current.scrollToOffset(position),
       hold: (clock) => impl.current.hold(clock),
     };
     return api;
@@ -125,6 +133,9 @@ export function useScrollEdges(
       holdUntil: 0,
       /** The scroll position at the last record: moving back from it is the reader's own scroll. */
       lastPosition: 0,
+      /** When the reader last scrolled by hand, and whether a pointer is held on the scroller. */
+      readerAt: -Infinity,
+      pressed: false,
       anchorEl: null as Element | null,
       anchorOffset: 0,
       lastSize: size(),
@@ -181,13 +192,15 @@ export function useScrollEdges(
     const contentOffset = (element: Element) =>
       near(element.getBoundingClientRect()) - near(node.getBoundingClientRect()) + position();
 
+    const byReader = () => state.pressed || performance.now() - state.readerAt < READER_MS;
+
     const record = () => {
       const pos = position();
       if (anchor === "end") {
         // Only the reader moving back unpins: a scroll event of our own correction can land a
         // frame late, after content that keeps growing (an animated height) moved the end again.
         const atEnd = max() - pos <= PIN_PX;
-        const back = pos < state.lastPosition - 0.5;
+        const back = pos < state.lastPosition - 0.5 && byReader();
         // A glide to the end writes its own positions (the end may move back under it).
         const holding = performance.now() < state.holdUntil;
         const pinned = atEnd && !holding ? true : back && !state.seeking ? false : state.pinned;
@@ -264,6 +277,18 @@ export function useScrollEdges(
     };
 
     const onScroll = () => {
+      const pos = position();
+      // Pinned, and the position fell away without the reader: the browser clamped it while the
+      // content was short for a frame. Back to the end.
+      const clamped =
+        anchor === "end" &&
+        state.pinned &&
+        !state.seeking &&
+        performance.now() >= state.holdUntil &&
+        pos < state.lastPosition - 0.5 &&
+        !byReader() &&
+        max() - pos > 0.5;
+      if (clamped) toEnd();
       record();
       checkEdges();
     };
@@ -349,6 +374,15 @@ export function useScrollEdges(
         }
         state.lastPosition = position();
       },
+      scrollToOffset: (target) => {
+        stopGlide();
+        setPosition(Math.min(max(), Math.max(0, target)));
+        if (anchor === "end" && max() - position() > PIN_PX && state.pinned) {
+          state.pinned = false;
+          notifyRegion();
+        }
+        state.lastPosition = position();
+      },
     };
 
     // Without anchoring or edge events the region only serves the requests of its content.
@@ -361,11 +395,23 @@ export function useScrollEdges(
     node.addEventListener("scroll", onScroll, { passive: true });
     // The reader takes the scroll back from a glide.
     const interrupt = () => {
+      state.readerAt = performance.now();
       if (state.seeking) stopGlide();
     };
-    for (const type of ["wheel", "touchstart", "pointerdown", "keydown"]) {
+    const press = () => {
+      state.pressed = true;
+      interrupt();
+    };
+    const release = () => {
+      state.pressed = false;
+      state.readerAt = performance.now();
+    };
+    for (const type of ["wheel", "touchstart", "touchmove", "keydown"]) {
       node.addEventListener(type, interrupt, { passive: true });
     }
+    node.addEventListener("pointerdown", press, { passive: true });
+    window.addEventListener("pointerup", release, { passive: true });
+    window.addEventListener("pointercancel", release, { passive: true });
     // Content changes: nodes added or removed anywhere inside, and size changes of the region and
     // its children (an image that loads, a message that grows). Both run before paint, so a
     // correction never flickers.
@@ -388,9 +434,12 @@ export function useScrollEdges(
       regionImpl.current = NO_REGION;
       state.alive = false;
       node.removeEventListener("scroll", onScroll);
-      for (const type of ["wheel", "touchstart", "pointerdown", "keydown"]) {
+      for (const type of ["wheel", "touchstart", "touchmove", "keydown"]) {
         node.removeEventListener(type, interrupt);
       }
+      node.removeEventListener("pointerdown", press);
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
       stopGlide();
       mutation.disconnect();
       resize?.disconnect();

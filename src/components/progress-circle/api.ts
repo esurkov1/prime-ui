@@ -65,6 +65,19 @@ export const api: ComponentApi = {
           ru: "Режим значения: цвет дуги, показывает исход. `inherit` — дуга цветом текста подложки на дорожке из 32 % этого цвета: кольцо на цветном фоне или поверх медиа.",
         },
         {
+          name: "color",
+          type: "PaletteColor",
+          en: "Value mode: arc color by category or status word (booking yellow, rented blue), a palette hue in its chart color. Mutually exclusive with `tone`.",
+          ru: "Режим значения: цвет дуги по категории или статусу (бронь — жёлтый, аренда — синий), оттенок палитры в цвете графиков. Не вместе с `tone`.",
+        },
+        {
+          name: "track",
+          type: '"surface" | "tinted"',
+          default: '"surface"',
+          en: 'Value mode: `tinted` — the track is a soft wash of the arc\'s color, so 0% reads as an empty ring of that color. Ignored with `tone="inherit"`.',
+          ru: 'Режим значения: `tinted` — дорожка — бледный оттенок цвета дуги, поэтому 0 % читается пустым кольцом этого цвета. Не действует с `tone="inherit"`.',
+        },
+        {
           name: "segments",
           type: "ProgressSegment[]",
           en: "Segments mode: parts in order, `{ value, label?, tone? | color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette. Each part's length is its share of `max`.",

@@ -147,7 +147,8 @@ const [InputProvider, useInputContext] = createComponentContext<InputContextValu
 
 /**
  * Inside `Input.Wrapper`: a Select there drops its own frame and draws its trigger as the box's
- * start segment, so the pick and the text read as one field.
+ * start segment (before `Input.Field`) or end segment (after it), so the pick and the text read as one
+ * field.
  */
 export const InputSegmentContext = React.createContext(false);
 

@@ -50,6 +50,7 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | The visible name of the value (`<dt>`). |
+| `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | — | The ink of the value by meaning (an amount due is `warning`, a payment `success`); an empty value stays muted. |
 | `children` | `ReactNode` | — | The value (`<dd>`): text, a Badge, a link; plus an optional `DescriptionList.ItemAction`, which goes to the end of the value. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `id`, `data-*` and the other attributes of the element. |
 
@@ -70,6 +71,14 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 |---|---|---|---|
 | `horizontal` | the label in a column (one third of the width) beside the value; stacked below 24rem of the list's width | record details in a card or a page | yes |
 | `vertical` | the label above its value at any width | a narrow side panel, a summary of a few long values | |
+
+### tone (Item)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `neutral` | the primary ink | a plain value | yes |
+| `success` | `success-text` | a payment, a good status | |
+| `warning` | `warning-text` | an amount due, something that needs attention | |
+| `danger` | `danger-text` | an overdue or failed value | |
 
 ### align
 
@@ -132,7 +141,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 | [sizes.tsx](examples/sizes.tsx) | Every tier changes the label and value type and the gap between pairs — `size`. |
 | [structure.tsx](examples/structure.tsx) | Optional pieces of a pair: a Badge or a link as the value, a row action that is a link and an empty value with its own mark — `DescriptionList.ItemAction`, `asChild`, `labels`. |
 | [vertical.tsx](examples/vertical.tsx) | Labels above their values at any width, for a side panel of a record — `orientation`. |
-| [totals.tsx](examples/totals.tsx) | The totals of an invoice: every amount at the end of its row in tabular figures, the amount due a step larger — `align`. |
+| [totals.tsx](examples/totals.tsx) | The totals of an invoice: every amount at the end of its row in tabular figures, a payment in the success tone, the amount due a step larger in the warning tone — `align`, `tone`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap — `DescriptionList.Item`, `label`. |
 | [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in its top bar, a main column with the line items and their totals and a side column with the client's details and the history — `align`, `orientation`. |
 

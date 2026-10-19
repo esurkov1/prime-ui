@@ -12,6 +12,7 @@ import {
   PROGRESS_SEGMENTS_LABELS,
   type ProgressModeProps,
   type ProgressScale,
+  type ProgressSegment,
   type ProgressSegmentsLabels,
   resolveRows,
   resolveSegments,
@@ -125,6 +126,23 @@ export function ProgressBar(props: ProgressBarProps) {
   };
   const barSkeleton = <Skeleton shape="block" className={styles.barSkeleton} />;
 
+  const rowBody = (segment: ProgressSegment, share: number, ratio: number) => (
+    <>
+      <div className={styles.rowHeader}>
+        <span className={styles.rowLabel}>{segment.label}</span>
+        <span className={styles.rowValue}>{formatValue(segment.value)}</span>
+        <span className={styles.rowShare}>{share}%</span>
+      </div>
+      <span className={styles.bar} aria-hidden="true">
+        <span
+          className={cx(palette.hue, styles.fill)}
+          style={{ "--pb-ratio": ratio } as React.CSSProperties}
+          {...toDataAttributes(segmentFill(segment))}
+        />
+      </span>
+    </>
+  );
+
   let percent: number | null = null;
   let tone: Tone | undefined;
   let body: React.ReactNode;
@@ -150,19 +168,18 @@ export function ProgressBar(props: ProgressBarProps) {
       >
         {rows.map(({ segment, ratio, percent: share }, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: rows in source order
-          <li key={i} className={styles.row}>
-            <div className={styles.rowHeader}>
-              <span className={styles.rowLabel}>{segment.label}</span>
-              <span className={styles.rowValue}>{formatValue(segment.value)}</span>
-              <span className={styles.rowShare}>{share}%</span>
-            </div>
-            <span className={styles.bar} aria-hidden="true">
-              <span
-                className={cx(palette.hue, styles.fill)}
-                style={{ "--pb-ratio": ratio } as React.CSSProperties}
-                {...toDataAttributes(segmentFill(segment))}
-              />
-            </span>
+          <li key={i} className={segment.href ? styles.rowItem : styles.row}>
+            {segment.href ? (
+              <a
+                className={cx(styles.row, styles.rowLink)}
+                href={segment.href}
+                onClick={segment.onClick}
+              >
+                {rowBody(segment, share, ratio)}
+              </a>
+            ) : (
+              rowBody(segment, share, ratio)
+            )}
           </li>
         ))}
       </ol>

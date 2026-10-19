@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Badge.Root",
-      en: "`ref` → `HTMLSpanElement`. The chip: fill, tier dimensions; a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment.",
-      ru: "Чип: заливка и размеры яруса; без действий — один `<span>`, триада `pressed` делает тело переключателем `<button>`, `onRemove` добавляет сегмент удаления.",
+      en: "`ref` → `HTMLSpanElement`. The chip: a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment; inside a `Dropdown.Trigger` the body is the opener with a chevron.",
+      ru: "Чип: без действий — один `<span>`, триада `pressed` делает тело переключателем `<button>`, `onRemove` добавляет сегмент удаления; внутри `Dropdown.Trigger` тело — кнопка-открывашка с шевроном.",
       props: [
         {
           name: "color",

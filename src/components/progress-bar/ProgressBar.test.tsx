@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { withMotion } from "@/test/motion";
@@ -252,6 +253,26 @@ describe("ProgressBar", () => {
       [...container.querySelectorAll<HTMLElement>("li [aria-hidden] > span")].map((s) =>
         s.style.getPropertyValue("--pb-ratio"),
       );
+
+    it("a part with href makes the whole row a link; the others stay text", async () => {
+      const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault());
+      const user = userEvent.setup();
+      render(
+        <ProgressBar
+          label="Воронка"
+          layout="rows"
+          segments={[{ ...cities[0], href: "/deals?city=msk", onClick }, cities[1]]}
+        />,
+      );
+      const link = screen.getByRole("link", { name: /Москва/ });
+      expect(link).toHaveAttribute("href", "/deals?city=msk");
+      expect(screen.getAllByRole("link")).toHaveLength(1);
+      expect(link).toContainElement(screen.getByText("Москва"));
+      await user.tab();
+      expect(link).toHaveFocus();
+      await user.keyboard("{Enter}");
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
 
     it("draws an ordered list named by the label, one row per part", () => {
       render(<ProgressBar label="Топ городов" layout="rows" segments={cities} />);

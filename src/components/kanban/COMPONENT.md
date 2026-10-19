@@ -22,6 +22,7 @@
 import {
   Kanban,
   type KanbanColumn,
+  type KanbanColumnGroup,
   type KanbanColumnMove,
   type KanbanMove,
   type KanbanValue,
@@ -32,6 +33,7 @@ import {
 ```
 Kanban.Root                          board: horizontal strip of columns, its own Dnd.Root if none above
 ├─ placeholder columns               while `loading` and `columns` is empty: `loadingColumns` columns of Skeleton title and cards
+├─ <div role="group"> per group      with `columnGroups`: the group heading over its own <ul>; columns stay inside their group
 └─ <ul> (Dnd.Sortable, axis x)       the columns in `columnOrder`
    └─ <li> column (from `columns`)   no well with a header plate (`plain`) or a header line (`line`), or a `fill-muted` well (`well`)
       ├─ header                      title (`columnTitleAs`, h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
@@ -58,6 +60,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `columns` | `readonly KanbanColumn[]` | — (required) | Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder`. `color` is a `PaletteColor` for the count badge, `limit` a WIP limit, `locked` keeps a system stage in place. |
+| `columnGroups` | `readonly KanbanColumnGroup[]` | — | Phases of the board: `{ id, title, columnIds }`, a heading over each group's columns. A column moves only within its group; a move past the edge is refused and announced. Unnamed columns follow, headless. |
 | `items` | `readonly T[]` | — (required) | Every card the board can show; `value` decides where each one stands. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id of a card, the one used in `value`. |
 | `getLabel` | `(item: T) => string` | the `id` | Spoken by the live region. |
@@ -200,6 +203,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.
+- With `columnGroups` every named group is a `role="group"` labelled by its heading; a keyboard move past the edge of a group is announced with `labels.columnGroupLocked`.
 - The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position («Колонка «…»: позиция 2 из 4», `labels.column`). A locked column has a lock named «Закреплено» instead.
 - A live region (`role="status"`) announces grabbed, dropped, «position N of M», a move to another column by its title and a refusal with its reason (`labels`, Dnd's labels).
 - The count is spoken as text («Карточек: 3 из 5»), not only by colour; a full column also reads `count / limit`.
@@ -222,6 +226,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | `column` | `"Колонка «{column}»"` | A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»). |
 | `moveFailed` | `"Не удалось переместить «{label}», карточка вернулась на место"` | Spoken when the `onValueChange` promise rejects; `{label}` is `getLabel(item)`. |
 | `columnMoveFailed` | `"Не удалось переместить колонку «{column}», она вернулась на место"` | Spoken when the `onColumnOrderChange` promise rejects. |
+| `columnGroupLocked` | `"Колонка «{column}» остаётся в группе «{group}»"` | Why a column cannot leave its group (`columnGroups`), spoken and shown under the carried column; `{column}`, `{group}`. |
 
 ## Examples
 | Example | Shows |
@@ -232,6 +237,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [cards.tsx](examples/cards.tsx) | Three kinds of cards on one board: a plain note, a ticket with a header row of key and priority, a design task with a cover — `Kanban.ItemHeader`, `Thumbnail`, `Kanban.ItemFooter`. |
 | [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule, its columns drawn as wells so each reads as a bounded queue: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`, `variant`. |
 | [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures in two lines under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
+| [column-groups.tsx](examples/column-groups.tsx) | A deal board whose stages stand in phases, each phase titled over its columns, and a stage moves only within its phase — `columnGroups`, `reorderableColumns`, `columnOrder`, `onColumnOrderChange`. |
 | [saving.tsx](examples/saving.tsx) | Every move is saved on the server: the card waits busy in its new place, and an invoice the server refuses to close glides back to its column — `onValueChange`. |
 | [item-link.tsx](examples/item-link.tsx) | Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemOpen`. |
 | [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry, and placeholder columns before the columns arrive; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `loadingColumns`, `disabled`. |

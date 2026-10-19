@@ -32,7 +32,7 @@ Message.Root                      role="article" row «{author}, {time}» (an op
 ├─ Message.Avatar                 gutter beside an incoming bubble of a group chat (last of a run)
 ├─ [retry Button]                 beside a failed outgoing bubble (`onRetry`)
 ├─ shell                          bubble · media · round, declared by the content parts (see Variants):
-│  ├─ Message.Author              header of a group chat (first of a run): name · Message.AuthorIcon · tag;
+│  ├─ Message.Author              header of a group chat or of outgoing runs (`authors="outgoing"`) (first of a run): name · Message.AuthorIcon · tag;
 │  │                              on a pill at the top-start corner over a picture or a circle
 │  ├─ Message.Forwarded           «Переслано от …»
 │  ├─ Message.Reply               quote of the answered message (button with target / onClick)
@@ -92,7 +92,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (an `Avatar.Root`), `className`. |
 
 ### Message.Author
-`ref` → `HTMLDivElement`. A group chat's author header: the name in the author's hue, an optional `Message.AuthorIcon`, then the muted `tag`. Put it on every message: only the first of a run shows it.
+`ref` → `HTMLDivElement`. The author header of a group chat or of outgoing runs (`authors="outgoing"`): the name in the author's hue, an optional `Message.AuthorIcon`, then the muted `tag`. Put it on every message: only the first of a run shows it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

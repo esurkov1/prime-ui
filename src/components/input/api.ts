@@ -467,8 +467,8 @@ export const api: ComponentApi = {
         ru: 'Автозаполнение выключено, пока не передан `autoComplete`: без токена у поля `autocomplete="off"` и отказ для 1Password, LastPass, Bitwarden и Dashlane (`data-1p-ignore`, `data-lpignore`, `data-bwignore`, `data-form-type="other"`); токен проходит и снимает их. С `suggestions` оно всегда выключено. Внутри `LoginForm.Form` поле без токена отдано браузеру.',
       },
       {
-        en: "A `Select` inside `Input.Wrapper` is the box's start segment: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).",
-        ru: "`Select` внутри `Input.Wrapper` — начальный сегмент поля: его триггер назван `aria-label` корня селекта и выбранным значением («Иконка: Звезда»).",
+        en: "A `Select` inside `Input.Wrapper` is the box's start segment, or the end segment when it follows `Input.Field`: its trigger is named by the select root's `aria-label` and the picked value («Иконка: Звезда»).",
+        ru: "`Select` внутри `Input.Wrapper` — начальный сегмент поля, а после `Input.Field` — конечный: его триггер назван `aria-label` корня селекта и выбранным значением («Иконка: Звезда»).",
       },
       {
         en: "`Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.",

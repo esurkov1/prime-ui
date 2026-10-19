@@ -44,7 +44,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Все части строки: фото или инициалы с присутствием, значок у имени, автор последнего сообщения, слова медиа с длительностью, участник группы печатает, отметки от отправки до ошибки — `ChatList.ItemIcon`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`.",
+        "Все части строки: фото или инициалы с присутствием, значок у имени, статус записи, автор последнего сообщения, слова медиа с длительностью, участник группы печатает, отметки от отправки до ошибки — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`.",
     },
     {
       scenario: "search",

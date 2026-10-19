@@ -233,4 +233,22 @@ describe("ProgressCircle", () => {
       expect(group).toHaveAttribute("data-segment-gap", "hairline");
     });
   });
+
+  it("value mode takes a palette color and a tinted track, set on the root", () => {
+    const { container } = render(
+      <ProgressCircle value={0} color="yellow" track="tinted" aria-label="Бронь" />,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveAttribute("data-color", "yellow");
+    expect(root).toHaveAttribute("data-track", "tinted");
+    expect(root).not.toHaveAttribute("data-tone");
+  });
+
+  it("tone keeps the surface track by default", () => {
+    const { container } = render(<ProgressCircle value={30} tone="success" aria-label="План" />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveAttribute("data-tone", "success");
+    expect(root).not.toHaveAttribute("data-track");
+    expect(root).not.toHaveAttribute("data-color");
+  });
 });

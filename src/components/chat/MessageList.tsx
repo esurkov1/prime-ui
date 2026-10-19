@@ -77,6 +77,7 @@ const ChromeContext = React.createContext<ListChrome>({
 
 export type MessageListProps = React.HTMLAttributes<HTMLDivElement> & {
   group?: boolean;
+  authors?: "outgoing";
   /**
    * Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting.
    * Any of the triad lets a message's menu start selection («Выбрать»).
@@ -244,6 +245,7 @@ const OVERSCAN = 8;
  */
 export function MessageList({
   group = false,
+  authors,
   selected: selectedProp,
   defaultSelected = null,
   onSelectedChange,
@@ -552,7 +554,7 @@ export function MessageList({
         const index = indexOfValue(value);
         if (index < 0) return false;
         if (view) {
-          view.scrollTop = offset() + virtual.startOf(index) - view.clientHeight / 2;
+          scroller?.scrollToOffset(offset() + virtual.startOf(index) - view.clientHeight / 2);
         }
         pending.current = { value, run: (found) => then?.(found) };
         keepRow("target", value);
@@ -708,6 +710,7 @@ export function MessageList({
     () => ({
       inList: true,
       group,
+      outgoingAuthors: authors === "outgoing",
       register,
       arrivedNow: flow.arrivedNow,
       reveal,
@@ -727,6 +730,7 @@ export function MessageList({
     [
       holdView,
       group,
+      authors,
       register,
       flow,
       reveal,

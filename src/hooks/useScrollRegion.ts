@@ -16,6 +16,8 @@ export type ScrollRegion = {
   scrollToEnd: (behavior?: ScrollBehavior) => void;
   /** Scrolls the region (only) so `element` stands in its middle. */
   scrollToElement: (element: Element, behavior?: ScrollBehavior) => void;
+  /** Scrolls the region (only) to `position` in its content; away from the end it lets go of the end. */
+  scrollToOffset: (position: number) => void;
   /**
    * Content is about to change size in place on the motion clock `clock` (a duration custom
    * property, read on the region: `--prime-message-morph-duration`): until that motion has played,

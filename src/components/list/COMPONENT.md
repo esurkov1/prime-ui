@@ -27,7 +27,7 @@ import { List } from "prime-ui-kit";
 ## Anatomy
 ```
 List.Root                   <ul aria-label>; size (else the host tier) → row tier; onReorder → Dnd.Sortable <ul>
-└─ List.Item                <li> with a full-width <button> | <a href> | asChild element; current, disabled
+└─ List.Item                <li> with a full-width <button> (onClick) | <a href> | asChild element | static <div>; current, disabled
    │                         value; with onReorder: Dnd.Handle (busy while saving) at the row's end, after its actions
    ├─ List.ItemIcon         leading Avatar.Root / Icon / Badge.Dot (aria-hidden); after the text — a trailing glyph
    ├─ List.ItemText         primary line, truncates
@@ -55,7 +55,7 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | `…rest` | `HTMLAttributes<HTMLUListElement>` | — | `className` and the other `ul` attributes. |
 
 ### List.Item
-`ref` → `HTMLElement` (the `<button>`, `<a>` or `asChild` element, not the `<li>`). `<li>` holding a full-width row: a button, a link (`href`) or your router link (`asChild`).
+`ref` → `HTMLElement` (the `<button>`, `<a>`, `<div>` or `asChild` element, not the `<li>`). `<li>` holding a full-width row: a button (`onClick`), a link (`href`), your router link (`asChild`), or — with none of them — a static `<div>` out of the Tab order.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -68,7 +68,7 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | `asChild` | `boolean` | `false` | Renders the single child (a router link) as the row; its children are the content. |
 | `disabled` | `boolean` | `false` | Muted and out of the Tab order: a disabled button, or `aria-disabled` and no navigation on a link. |
 | `locked` | `boolean` | `false` | With `onReorder`: the row holds its place (a system stage) and shows a lock in the grip's box; no row moves past it. The row and its `List.ItemActions` work as on any row. |
-| `children` | `ReactNode` | — | `List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions`; loose text becomes the text line. |
+| `children` | `ReactNode` | — | `List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (also inside a fragment); loose text becomes the text line. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and native attributes of the row element (`target`, `rel` on a link). |
 
 ### List.ItemIcon
@@ -170,7 +170,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
 - Reorderable (`onReorder`): an `xs` handle box ends each row, 4px after the row element and its `List.ItemActions` (inline-end: on the left in RTL); the row keeps its own padding and fill, so every row's handle stands on one line.
-- `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's edge as a control box of that tier stands from its top and bottom — at any row height: one line, with `List.ItemDescription`, with an avatar, the touch row. The row's height is measured onto it (a ResizeObserver), so the inset never rests on a percentage height that engines resolve differently. The end edge, or the start edge with `side="start"`, where the row's own padding then parts the controls from its icon or text.
+- `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's side edge as the row's own text (`--field-px`) — at any row height, so one-line and two-line rows stand on one vertical. The end edge, or the start edge with `side="start"`, where the row's own padding then parts the controls from its icon or text. A row with no `onClick`, `href` or `asChild` is a static `<div>` (no Tab stop, no hover wash) with the same parts and controls. Parts may be passed inside a fragment.
 - A locked row keeps every column of the movable rows: its `List.ItemActions` on the same side, the lock in the grip's box. System stages and the team's stages are one list, not two.
 - One toggle place per row: a plain row ends with its toggle (label first); a reorderable row leads with it (`side="start"`) and ends with the grip — never a toggle between the label and the grip.
 - A colour dot in `List.ItemIcon` is the large `Badge.Dot` (8px) centred in an icon-wide box, so the text lines up with the rows that carry icons.

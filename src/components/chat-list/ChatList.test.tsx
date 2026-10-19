@@ -429,4 +429,23 @@ describe("ChatList.Item asChild", () => {
     );
     expect(screen.getByText("09:30")).toHaveAttribute("datetime", sent.toISOString());
   });
+
+  it("draws the record status as its own line beside the preview", () => {
+    render(
+      <ChatList.Root
+        items={DIALOGS.slice(0, 1)}
+        getKey={(item) => item.id}
+        renderItem={(item) => (
+          <ChatList.Item>
+            <ChatList.ItemText>{item.name}</ChatList.ItemText>
+            <ChatList.ItemStatus data-testid="record">Бронь · ждёт человека</ChatList.ItemStatus>
+            <ChatList.ItemDescription>{item.preview}</ChatList.ItemDescription>
+          </ChatList.Item>
+        )}
+      />,
+    );
+    const row = screen.getByRole("button", { name: /ООО «Вектор»/ });
+    expect(within(row).getByTestId("record")).toHaveTextContent("Бронь · ждёт человека");
+    expect(within(row).getByText("Счёт не выгружается")).toBeInTheDocument();
+  });
 });

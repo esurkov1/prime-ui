@@ -124,4 +124,19 @@ describe("DescriptionList", () => {
     expect(listRef.current).toHaveAttribute("aria-label", "Реквизиты");
     expect(itemRef.current).toHaveClass("row");
   });
+
+  it("Item tone inks the value by meaning; an empty value stays muted", () => {
+    render(
+      <DescriptionList.Root>
+        <DescriptionList.Item label="К оплате" tone="warning">
+          256 000 ₽
+        </DescriptionList.Item>
+        <DescriptionList.Item label="Оплачено" tone="success" />
+      </DescriptionList.Root>,
+    );
+    expect(screen.getByText("256 000 ₽").closest("dd")).toHaveAttribute("data-tone", "warning");
+    expect(screen.getByText("Оплачено").closest("div")?.querySelector("dd")).not.toHaveAttribute(
+      "data-tone",
+    );
+  });
 });

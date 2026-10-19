@@ -69,6 +69,8 @@ export type MessageListContextValue = {
    * author's run shows the author's header and the last one the avatar.
    */
   group: boolean;
+  /** A direct chat that heads the first message of an outgoing run with its author. */
+  outgoingAuthors: boolean;
   /**
    * A message's article mounted (its layout effect): it enters when the list planned it as new at
    * the end, and is watched for `onRead`. Returns the unregister.
@@ -111,6 +113,7 @@ const NO_SELECTION = createSelectionStore(null);
 const MessageListContext = React.createContext<MessageListContextValue>({
   inList: false,
   group: false,
+  outgoingAuthors: false,
   register: () => () => {},
   arrivedNow: () => false,
   reveal: () => false,

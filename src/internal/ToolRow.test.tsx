@@ -22,13 +22,11 @@ describe("ToolRow", () => {
       <SmartFilter.Root fields={[{ key: "city", label: "Город", options: [] }]}>
         <ToolRow data-testid="row">
           <SmartFilter.Toolbar />
-          <>
-            <SegmentedControl.Root defaultValue="all" aria-label="Статус">
-              <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
-              <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
-            </SegmentedControl.Root>
-            <Button.Root>Колонки</Button.Root>
-          </>
+          <SegmentedControl.Root defaultValue="all" aria-label="Статус">
+            <SegmentedControl.Item value="all">Все</SegmentedControl.Item>
+            <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
+          </SegmentedControl.Root>
+          <Button.Root>Колонки</Button.Root>
           <Typography as="span" variant="body-s">
             Выбрано: 2
           </Typography>

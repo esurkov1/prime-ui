@@ -52,7 +52,7 @@ const CONTAINER_SHELL: Partial<Record<string, string>> = {
  * The copy flies in empty copies of every element its original stands in, up to the page: what a
  * host gives its items — tier variables (a List row's padding, radius, gap), context selectors
  * (`[data-…]` ancestors), the surface fill, a scoped theme — reaches the copy as it reaches the
- * original. An ancestor is `display: contents`, except a size container (`container-type`): a
+ * original; an ancestor copy never animates (no enter motion replays on it). An ancestor is `display: contents`, except a size container (`container-type`): a
  * container query needs a box, so its copy is an invisible box of the container's measured content
  * size, and the copy lays out as it does in place (a narrow list's stacked rows stay stacked).
  * Without them the copy flies bare and snaps into its look when the real item appears.
@@ -62,6 +62,10 @@ function inHostCopy(parent: HTMLElement | null, inner: HTMLElement): HTMLElement
   let node = parent;
   while (node && node !== document.body && node !== document.documentElement) {
     const shell = node.cloneNode(false) as HTMLElement;
+    // The copy is a new element: the enter motion of a Drawer, Modal or Sheet its original stands in
+    // (`data-state="open"` and its class) would play again on it. An ancestor copy only measures.
+    shell.style.setProperty("animation", "none", "important");
+    shell.style.setProperty("transition", "none", "important");
     const source = getComputedStyle(node);
     const container = source.getPropertyValue("container-type").trim();
     if (container === "inline-size" || container === "size") {

@@ -1,4 +1,4 @@
-/** Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step — `layout`, `scale`. */
+/** Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step, each step a link — `layout`, `scale`, `href`. */
 import { ProgressBar, type ProgressSegment } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -12,10 +12,10 @@ const CITIES: ProgressSegment[] = [
 ];
 
 const FUNNEL: ProgressSegment[] = [
-  { value: 2_400, label: "Заявка" },
-  { value: 1_380, label: "Квалификация" },
-  { value: 620, label: "Предложение" },
-  { value: 214, label: "Сделка" },
+  { value: 2_400, label: "Заявка", href: "/deals?stage=request" },
+  { value: 1_380, label: "Квалификация", href: "/deals?stage=qualification" },
+  { value: 620, label: "Предложение", href: "/deals?stage=offer" },
+  { value: 214, label: "Сделка", href: "/deals?stage=won" },
 ];
 
 export default function ProgressBarRankingExample() {

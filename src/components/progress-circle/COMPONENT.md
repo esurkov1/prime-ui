@@ -53,6 +53,8 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 | `spin` | `boolean` | `false` | Value mode: the ring turns at any share (one turn = 3 × `--prime-motion-loop`; slower under reduced motion, never still) and the arc never drops under 8%: a sync whose share grows. `null` always turns. |
 | `max` | `number` | `100` (value mode), the sum of the parts (segments mode) | Value mode: top of the scale. Segments mode: total capacity; the sum of the parts closes the ring, a larger `max` leaves the rest as track. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info" \| "inherit"` | `"accent"` | Value mode: arc color, telling the outcome. `inherit` — the arc in the host's text color over a 32% track of it, for a ring on a colored host or over media. |
+| `color` | `PaletteColor` | — | Value mode: arc color by category or status word (booking yellow, rented blue), a palette hue in its chart color. Mutually exclusive with `tone`. |
+| `track` | `"surface" \| "tinted"` | `"surface"` | Value mode: `tinted` — the track is a soft wash of the arc's color, so 0% reads as an empty ring of that color. Ignored with `tone="inherit"`. |
 | `segments` | `ProgressSegment[]` | — | Segments mode: parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette. Each part's length is its share of `max`. |
 | `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. |
 | `legend` | `boolean` | `false` | Segments mode: a legend beside the ring (below it when narrow), one row per part: color · name · value · share; with `aria-label` it becomes the group's description. The root turns into the row of ring and legend. |
@@ -84,12 +86,18 @@ The stroke is always 1/12 of the diameter (the kit ring's `data` weight). These 
 | `info` | info arc | informational processes (sync, indexing) | |
 | `inherit` (value mode) | the arc in the host's text color over a 32% track of it; the center text inherits it too | a ring on a colored host or over media | |
 
-### color (each segment, instead of tone)
+### color (value mode or each segment, instead of tone)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `blue` · `orange` · `teal` · `yellow` · `pink` · `green` · `purple` · `red` | the hue's step of the chart palette (`--prime-color-chart-1…8`) | categories: channels, sources, regions — the color they have in charts | |
 | `gray` | `--prime-color-chart-other` | the «Прочее» share | |
 | `sky` | the palette's sky solid (no chart step) | only when the category is sky elsewhere | |
+
+### track (value mode)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `surface` | a `fill-strong` track | a neutral ring on a surface | yes |
+| `tinted` | a soft wash of the arc's own color | a status ring whose 0% must read as an empty ring of that color (a booking at its start) | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -157,7 +165,7 @@ No keyboard interaction.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A plan ring with the percentage in the center, named for screen readers — `value`, `aria-label`. |
-| [variants.tsx](examples/variants.tsx) | Every arc color; the tone tells the outcome, not the progress — `tone`. |
+| [variants.tsx](examples/variants.tsx) | Every arc color; the tone tells the outcome, not the progress — `tone`, `color`, `track`. |
 | [sizes.tsx](examples/sizes.tsx) | Diameters 24 to 80 px; the center text is not rendered on `xs` and `s` — `size`. |
 | [states.tsx](examples/states.tsx) | Loading is a Skeleton ring of the same diameter and stroke; the number in the centre waits for the data — `loading`. |
 | [inner-content.tsx](examples/inner-content.tsx) | The center holds a percentage, a count on its own scale or an icon — `children`, `max`. |

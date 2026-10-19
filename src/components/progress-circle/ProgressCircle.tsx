@@ -19,7 +19,7 @@ import {
 } from "@/internal/progressSegments";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { RING_DATA_STROKE, RING_PATH, Ring, RingCap, RingCircle } from "@/internal/ring";
-import type { ControlSize, Tone } from "@/internal/states";
+import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
 
 import { Skeleton } from "../skeleton/Skeleton";
 import styles from "./ProgressCircle.module.css";
@@ -35,17 +35,19 @@ export type ProgressCircleLabels = ProgressSegmentsLabels;
 type ValueModeProps = {
   value: number | null;
   max?: number;
-  tone?: Tone | "inherit";
   spin?: boolean;
+  track?: "surface" | "tinted";
   segments?: never;
   segmentGap?: never;
   labels?: never;
   legend?: never;
   formatValue?: never;
-};
+} & ({ tone?: Tone | "inherit"; color?: never } | { color: PaletteColor; tone?: never });
 
 type SegmentsModeProps = Extract<ProgressModeProps, { segments: ProgressSegment[] }> & {
   spin?: never;
+  track?: never;
+  color?: never;
 };
 
 export type ProgressCircleProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
@@ -157,6 +159,8 @@ export function ProgressCircle(props: ProgressCircleProps) {
     value: valueProp,
     max: maxProp,
     tone: toneProp,
+    color,
+    track: trackProp,
     spin = false,
     segments: segmentsProp,
     segmentGap = "none",
@@ -236,14 +240,15 @@ export function ProgressCircle(props: ProgressCircleProps) {
   } else {
     const unknown = valueProp === null || valueProp === undefined;
     const { value, max, ratio } = resolveValue(valueProp ?? 0, maxProp);
-    tone = toneProp ?? "accent";
+    tone = color ? undefined : (toneProp ?? "accent");
     ring = (
       <Ring
         value={unknown ? null : ratio}
         spin={spin}
         weight="data"
-        // `inherit` keeps the ring's own track, a tint of the host's color.
-        track={tone === "inherit" ? "line" : "surface"}
+        // `inherit` keeps the ring's own track, a tint of the host's color; `tinted` is the same
+        // line track with the ring's color set to the fill.
+        track={tone === "inherit" || trackProp === "tinted" ? "line" : "surface"}
         className={styles.svg}
         role="progressbar"
         aria-valuenow={unknown ? undefined : value}
@@ -274,14 +279,21 @@ export function ProgressCircle(props: ProgressCircleProps) {
   );
   const rootProps = {
     ...rest,
+    className: cx(styles.root, color && !segmentsProp && palette.hue, className),
     "aria-busy": loading || undefined,
-    ...toDataAttributes({ size, tone, legend: legend || undefined }),
+    ...toDataAttributes({
+      size,
+      tone,
+      color: segmentsProp ? undefined : color,
+      track: segmentsProp || tone === "inherit" ? undefined : trackProp,
+      legend: legend || undefined,
+    }),
   };
 
   // With a legend the root is a row: the ring and the legend beside it (below when narrow).
   if (legend) {
     return provide(
-      <div className={cx(styles.root, className)} {...rootProps}>
+      <div {...rootProps}>
         <div className={styles.ring}>{body}</div>
         <RegionSwap state={loading ? "loading" : "data"} className={styles.legend}>
           {legendNode}
@@ -289,9 +301,5 @@ export function ProgressCircle(props: ProgressCircleProps) {
       </div>,
     );
   }
-  return provide(
-    <div className={cx(styles.root, className)} {...rootProps}>
-      {body}
-    </div>,
-  );
+  return provide(<div {...rootProps}>{body}</div>);
 }

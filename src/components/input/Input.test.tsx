@@ -3,8 +3,11 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Select } from "@/components/select/Select";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { DisabledProvider } from "@/internal/disabledContext";
+
+import { cssRule, cssValue } from "@/test/css";
 
 import { Input } from "./Input";
 import styles from "./Input.module.css";
@@ -1228,5 +1231,63 @@ describe("Input autofill", () => {
     const field = screen.getByRole("combobox", { name: "Город" });
     expect(field).toHaveAttribute("autocomplete", "off");
     expect(field).toHaveAttribute("data-1p-ignore");
+  });
+});
+
+describe("Input with a Select segment", () => {
+  const box = (selectFirst: boolean) => {
+    const select = (
+      <Select.Root aria-label="Валюта" defaultValue="USD">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="USD">$</Select.Item>
+          <Select.Item value="EUR">€</Select.Item>
+        </Select.Content>
+      </Select.Root>
+    );
+    return render(
+      <Input.Root label="Залог">
+        <Input.Wrapper>
+          {selectFirst ? select : null}
+          <Input.Field defaultValue="300" />
+          {selectFirst ? null : select}
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+  };
+
+  it("a Select after the field is a segment placed after it in the box", () => {
+    const { container } = box(false);
+    const segment = container.querySelector("[data-field-segment]") as HTMLElement;
+    const input = container.querySelector("input") as HTMLInputElement;
+    expect(segment.previousElementSibling).toBe(input);
+    expect(screen.getByRole("combobox", { name: "Валюта: $" })).toBeInTheDocument();
+  });
+
+  it("the end segment sits at the end edge, the start one before the field", () => {
+    const css = "src/components/input/Input.module.css";
+    expect(cssValue(cssRule(css, ".wrapper > .field ~ [data-field-segment]"), "order")).toBe("5");
+    expect(cssValue(cssRule(css, ".wrapper > [data-field-segment]"), "order")).toBe("-2");
+    expect(
+      cssValue(cssRule(css, ".wrapper:has(> .field ~ [data-field-segment])"), "padding-inline-end"),
+    ).toBe("0");
+  });
+
+  it("a Select before the field stays the start segment", () => {
+    const { container } = box(true);
+    const segment = container.querySelector("[data-field-segment]") as HTMLElement;
+    expect(segment.nextElementSibling).toBe(container.querySelector("input"));
+  });
+
+  it("opens from the keyboard and picks a currency", async () => {
+    const user = userEvent.setup();
+    box(false);
+    const trigger = screen.getByRole("combobox", { name: "Валюта: $" });
+    trigger.focus();
+    await user.keyboard("{Enter}");
+    await user.click(screen.getByRole("option", { name: "€" }));
+    expect(screen.getByRole("combobox", { name: "Валюта: €" })).toBeInTheDocument();
   });
 });

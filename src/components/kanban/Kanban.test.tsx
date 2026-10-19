@@ -692,6 +692,72 @@ describe("Kanban", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Kanban.Item>x</Kanban.Item>)).toThrow(/renderItem/);
   });
+
+  describe("columnGroups", () => {
+    const GROUPS = [
+      { id: "early", title: "Начало", columnIds: ["todo", "doing"] },
+      { id: "end", title: "Конец", columnIds: ["done"] },
+    ];
+    const gripOf = (title: string) =>
+      screen.getByRole("button", { name: `Переместить колонку «${title}»` });
+    const columnTitles = () =>
+      screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
+
+    it("draws a named group over its columns", () => {
+      render(<Board columnGroups={GROUPS} />);
+      const early = screen.getByRole("group", { name: "Начало" });
+      expect(within(early).getByRole("heading", { name: "К выполнению" })).toBeInTheDocument();
+      expect(within(early).getByRole("heading", { name: "В работе" })).toBeInTheDocument();
+      expect(within(early).queryByRole("heading", { name: "Готово" })).toBeNull();
+      expect(
+        within(screen.getByRole("group", { name: "Конец" })).getByRole("heading", {
+          name: "Готово",
+        }),
+      ).toBeInTheDocument();
+    });
+
+    it("lets columns outside every group stand after them, with no heading", () => {
+      render(<Board columnGroups={[GROUPS[0] as (typeof GROUPS)[number]]} />);
+      expect(columnTitles()).toEqual(["К выполнению", "В работе", "Готово"]);
+      expect(screen.queryByRole("group", { name: "Конец" })).toBeNull();
+    });
+
+    it("moves a column with Alt+→ within its group and reports the whole order", () => {
+      const onColumnOrderChange = vi.fn();
+      render(
+        <Board
+          reorderableColumns
+          columnGroups={GROUPS}
+          onColumnOrderChange={onColumnOrderChange}
+        />,
+      );
+      gripOf("К выполнению").focus();
+      fireEvent.keyDown(gripOf("К выполнению"), { key: "ArrowRight", altKey: true });
+      expect(onColumnOrderChange).toHaveBeenCalledWith(["doing", "todo", "done"], {
+        id: "todo",
+        index: 1,
+      });
+      expect(columnTitles()).toEqual(["В работе", "К выполнению", "Готово"]);
+    });
+
+    it("refuses a keyboard move past the group's edge and says why", () => {
+      const onColumnOrderChange = vi.fn();
+      render(
+        <Board
+          reorderableColumns
+          columnGroups={GROUPS}
+          onColumnOrderChange={onColumnOrderChange}
+        />,
+      );
+      gripOf("В работе").focus();
+      fireEvent.keyDown(gripOf("В работе"), { key: "ArrowRight", altKey: true });
+      expect(onColumnOrderChange).not.toHaveBeenCalled();
+      expect(columnTitles()).toEqual(["К выполнению", "В работе", "Готово"]);
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Колонка «В работе» остаётся в группе «Начало»",
+      );
+    });
+  });
 });
 
 describe("Kanban pointer drag", () => {

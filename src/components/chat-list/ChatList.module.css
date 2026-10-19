@@ -132,6 +132,22 @@
   color: var(--prime-color-danger-text);
 }
 
+/* The record's status line (a deal stage, an AI state): one line, truncated on its own. */
+.record {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The record's status line (a deal stage, an AI state): one line, truncated on its own. */
+.record {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /*
  * Second line: the preview, the draft and «печатает…» stand in one cell and cross-fade, each
  * truncated on its own. An unread dialog's preview is a step brighter.
@@ -217,6 +233,7 @@
 /* A squeezed pane keeps the names and the counts: the preview line and the time step out. */
 @container chat-list (width < 15rem) {
   .preview,
+  .record,
   .meta {
     display: none;
   }

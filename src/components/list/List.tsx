@@ -3,7 +3,6 @@ import * as React from "react";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Dnd, DndLock } from "@/components/dnd/Dnd";
-import { useResizeEffect } from "@/hooks/useElementSize";
 import { ControlSizeProvider, useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -264,6 +263,8 @@ function spaced(nodes: React.ReactNode[]): React.ReactNode[] {
  * becomes the text line), then the trail (meta, count, trailing icons) — stacked beside two lines.
  */
 function splitItemChildren(children: React.ReactNode) {
+  // Parts passed in a fragment are the row's parts too.
+  const nodes = flattenChildren(children);
   let leading: React.ReactNode = null;
   const body: React.ReactNode[] = [];
   const trail: React.ReactNode[] = [];
@@ -280,7 +281,7 @@ function splitItemChildren(children: React.ReactNode) {
     loose = [];
   };
 
-  for (const node of React.Children.toArray(children)) {
+  for (const node of nodes) {
     if (isPart(node, ListItemIcon)) {
       if (leading === null && body.length === 0 && loose.length === 0) leading = node;
       else
@@ -321,7 +322,7 @@ function itemLabel({ asChild, children }: Pick<ListItemProps, "asChild" | "child
     asChild && React.isValidElement<{ children?: React.ReactNode }>(children)
       ? children.props.children
       : children;
-  const nodes = React.Children.toArray(content);
+  const nodes = flattenChildren(content);
   const text = nodes.find((node) => isPart(node, ListItemText));
   const source = text
     ? text
@@ -375,7 +376,6 @@ function ListItem({
   const presence = React.useContext(PresenceContext);
   const key = React.useContext(RowKeyContext);
   const rowRef = React.useRef<HTMLLIElement | null>(null);
-  const frameRef = React.useRef<HTMLDivElement | null>(null);
   const entered = useListItemPresence(
     presence ?? NO_PRESENCE,
     key ?? value ?? "",
@@ -385,22 +385,9 @@ function ListItem({
   // The row's own controls leave the row element for the row (a button cannot hold a control).
   const slotted = asChild ? slotChild(children, "List.Item") : null;
   const { parts: actions, rest: content } = splitParts<ListItemActionsProps>(
-    slotted ? slotted.props.children : children,
+    flattenChildren(slotted ? slotted.props.children : children),
     ListItemActions,
   );
-  // The row's controls stand as far from its edge as from its top and bottom, at any row height:
-  // the frame carries its own height and the spacer beside the controls is computed from it. A
-  // percentage height cannot do it — the row is as tall as its content, and engines differ on
-  // whether a stretched box is definite for the width of a square inside it.
-  const hasActions = actions.length > 0;
-  const placeActions = React.useCallback(() => {
-    const frame = frameRef.current;
-    frame?.style.setProperty("--list-row-h", `${frame.offsetHeight}px`);
-  }, []);
-  React.useLayoutEffect(() => {
-    if (hasActions) placeActions();
-  }, [hasActions, placeActions]);
-  useResizeEffect(frameRef, placeActions, { enabled: hasActions });
   const shared = {
     ...rest,
     ref,
@@ -424,6 +411,14 @@ function ListItem({
         {splitItemChildren(content)}
       </InteractiveElement>
     );
+  } else if (onClick === undefined && type === undefined) {
+    // A row that opens nothing is no button: a plain box out of the Tab order, with the same parts.
+    const { onClick: _, ...staticShared } = shared;
+    element = (
+      <InteractiveElement {...staticShared} element="static" data-static="true">
+        {splitItemChildren(content)}
+      </InteractiveElement>
+    );
   } else {
     element = (
       <InteractiveElement {...shared} element="button" type={type ?? "button"}>
@@ -437,7 +432,7 @@ function ListItem({
     const leading = actions.filter((part) => part.props.side === "start");
     const trailing = actions.filter((part) => part.props.side !== "start");
     element = (
-      <div ref={frameRef} className={styles.frame}>
+      <div className={styles.frame}>
         {leading}
         {element}
         {trailing}

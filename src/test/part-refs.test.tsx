@@ -314,7 +314,7 @@ const CASES: Case[] = [
     "BUTTON",
     (ref) => (
       <List.Root aria-label="Диалоги">
-        <List.Item ref={ref} data-testid="part">
+        <List.Item ref={ref} data-testid="part" onClick={() => {}}>
           ООО «Гранит»
         </List.Item>
       </List.Root>

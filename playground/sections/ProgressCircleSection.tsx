@@ -25,7 +25,8 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "variants",
-      description: "Все цвета дуги; тон говорит об исходе, а не о прогрессе — `tone`.",
+      description:
+        "Все цвета дуги; тон говорит об исходе, а не о прогрессе, цвет палитры — о статусе, бледная дорожка — `tone`, `color`, `track`.",
     },
     {
       slot: "sizes",

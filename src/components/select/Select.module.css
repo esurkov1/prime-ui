@@ -309,6 +309,12 @@
   cursor: not-allowed;
 }
 
+/* After the field's input the segment is the end section: the usual gap on the text side, the
+   field's padding on the edge side. */
+:is(input, textarea) ~ .segment .segmentTrigger {
+  padding-inline: var(--field-gap) var(--field-px);
+}
+
 .segmentTrigger .triggerMain {
   flex: 0 0 auto;
 }

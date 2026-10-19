@@ -6,6 +6,7 @@
  */
 
 .root {
+  position: relative;
   --card-pad: var(--prime-card-padding-m);
   --card-gap: var(--prime-card-gap);
   /* Zone hairlines (`hairline` joined in TSX) are inset by the side padding, as in Modal/Drawer. */
@@ -35,6 +36,11 @@
  * A pressable card (`asChild` with a link or a button). A whole surface does not change its fill on
  * hover (foundation §8): it lifts — raised whisper → overlay shadow — and presses like a control.
  */
+.root[data-interactive],
+.root[data-link] {
+  cursor: pointer;
+}
+
 .root[data-interactive] {
   display: block;
   margin: 0;
@@ -46,12 +52,14 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .root[data-interactive]:hover {
+  .root[data-interactive]:hover,
+  .root[data-link]:hover {
     box-shadow: var(--prime-shadow-overlay);
   }
 }
 
-.root[data-interactive]:focus-visible {
+.root[data-interactive]:focus-visible,
+.root[data-link]:has(.link:focus-visible) {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
@@ -59,6 +67,7 @@
 /* ---------- Variants ---------- */
 
 .root[data-variant="stat-trend"],
+.root[data-variant="stat-text"],
 .root[data-variant="cta"] {
   display: flex;
   flex-direction: column;
@@ -88,6 +97,35 @@
 }
 
 /* ---------- Parts ---------- */
+
+/*
+ * A card that opens (a link as the root, or `Card.Link` inside): the kit's transition arrow in the
+ * corner at the end — it nudges on hover through the icon's own gesture. The text beside it keeps
+ * clear of it.
+ */
+.mark {
+  position: absolute;
+  inset-block-start: var(--card-pad);
+  inset-inline-end: var(--card-pad);
+  color: var(--prime-color-text-muted);
+  pointer-events: none;
+}
+
+/* The stretched link: its box is the whole card, over the content; the card's controls stand above. */
+.link {
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--prime-z-raised);
+  border-radius: var(--prime-card-radius);
+}
 
 .header {
   display: flex;
@@ -126,6 +164,14 @@
   color: var(--prime-color-text-primary);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
+}
+
+/* The text of a card that opens keeps clear of the arrow in the corner. */
+.root[data-mark] .label,
+.root[data-mark] .title,
+.root[data-link] .label,
+.root[data-link] .title {
+  padding-inline-end: var(--prime-space-6);
 }
 
 /* Everything after the title (a control, a caption, a header-row value) keeps its size at the end. */
@@ -211,7 +257,8 @@
 }
 
 /* In a column template the meta drops to the bottom, so a row of tiles lines its meta up. */
-.root[data-variant="stat-trend"] > .meta {
+.root[data-variant="stat-trend"] > .meta,
+.root[data-variant="stat-text"] > .meta {
   margin-top: auto;
   padding-top: var(--prime-space-1);
 }
@@ -311,6 +358,12 @@
   justify-content: flex-end;
   width: 100%;
   min-width: 0;
+}
+
+/* A full-width zone line (`divider="full"`): the hairline runs edge to edge. */
+.body[data-divider="full"],
+.footer[data-divider="full"] {
+  --hairline-inset: 0%;
 }
 
 .footer {

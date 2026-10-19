@@ -56,6 +56,12 @@ export const api: ComponentApi = {
           ru: "Видимое название значения (`<dt>`).",
         },
         {
+          name: "tone",
+          type: '"neutral" | "success" | "warning" | "danger"',
+          en: "The ink of the value by meaning (an amount due is `warning`, a payment `success`); an empty value stays muted.",
+          ru: "Цвет значения по смыслу (остаток к оплате — `warning`, оплата — `success`); пустое значение остаётся приглушённым.",
+        },
+        {
           name: "children",
           type: "ReactNode",
           en: "The value (`<dd>`): text, a Badge, a link; plus an optional `DescriptionList.ItemAction`, which goes to the end of the value.",

@@ -225,8 +225,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu` — inside the child element with `asChild`.",
-          ru: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu` — внутри дочернего элемента при `asChild`.",
+          en: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemStatus`, `ChatList.ItemMenu` — inside the child element with `asChild`.",
+          ru: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemStatus`, `ChatList.ItemMenu` — внутри дочернего элемента при `asChild`.",
         },
         {
           name: "…rest",
@@ -266,6 +266,25 @@ export const api: ComponentApi = {
           type: "HTMLAttributes<HTMLSpanElement>",
           en: "`className`, `title` and the other `span` attributes.",
           ru: "`className`, `title` и остальные атрибуты `span`.",
+        },
+      ],
+    },
+    {
+      name: "ChatList.ItemStatus",
+      en: "`ref` → `HTMLSpanElement`. The status of the record behind the dialog (a deal stage, an AI agent's state): a line of its own between the name and the preview, truncated on its own; hidden in a pane narrower than the preview.",
+      ru: "Статус записи за диалогом (этап сделки, состояние AI-агента): отдельная строка между именем и превью со своим усечением; в узкой панели скрыта вместе с превью.",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The status text: «Бронь · ждёт человека».",
+          ru: "Текст статуса: «Бронь · ждёт человека».",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`className` and the native attributes of the `span`.",
+          ru: "`className` и нативные атрибуты `span`.",
         },
       ],
     },

@@ -9,10 +9,10 @@ export const api: ComponentApi = {
       props: [
         {
           name: "variant",
-          type: '"panel" | "mini" | "stat-trend" | "split" | "cta" | "list" | "cover"',
+          type: '"panel" | "mini" | "stat-trend" | "stat-text" | "split" | "cta" | "list" | "cover"',
           default: '"panel"',
-          en: "Structural template: titled block with zones (`panel`), KPI tiles, a call to action, a list or a cover tile.",
-          ru: "Шаблон: блок с зонами (`panel`), плитки KPI, призыв к действию, список или плитка с обложкой.",
+          en: "Structural template: titled block with zones (`panel`), KPI tiles (`stat-text` for a value that is a line of text), a call to action, a list or a cover tile.",
+          ru: "Шаблон: блок с зонами (`panel`), плитки KPI (`stat-text` — значение-строка текста), призыв к действию, список или плитка с обложкой.",
         },
         {
           name: "flat",
@@ -32,14 +32,34 @@ export const api: ComponentApi = {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: "The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring. Nothing interactive may sit inside it.",
-          ru: "Вся карточка — одна ссылка или кнопка: передайте этот элемент единственным ребёнком с частями внутри; он получает наведение, нажатие и кольцо фокуса. Внутри не должно быть других интерактивных элементов.",
+          en: "The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring, a link draws the arrow. No interactive inside: see `Card.Link`.",
+          ru: "Вся карточка — одна ссылка или кнопка: передайте этот элемент единственным ребёнком с частями внутри; он получает наведение, нажатие и кольцо фокуса, ссылка рисует стрелку. Интерактива внутри нет: см. `Card.Link`.",
         },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
           en: "`className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes.",
           ru: "`className`, `role` + `aria-labelledby` для блока-ориентира и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "Card.Link",
+      en: "`ref` → `HTMLAnchorElement`. The stretched link around the title: a click anywhere on the card opens it, it is the one tab stop, the card's own buttons stay above it. The card draws the transition arrow.",
+      ru: "Растянутая ссылка вокруг заголовка: клик в любом месте карточки открывает её, это единственная остановка Tab, кнопки карточки остаются поверх. Карточка рисует стрелку перехода.",
+      props: [
+        {
+          name: "asChild",
+          type: "boolean",
+          default: "false",
+          en: "Render the single child element (a router `Link`) instead of the `<a>`.",
+          ru: "Отрисовать единственный дочерний элемент (`Link` роутера) вместо `<a>`.",
+        },
+        {
+          name: "…rest",
+          type: "AnchorHTMLAttributes<HTMLAnchorElement>",
+          en: "`href`, `className` and the other attributes of the link.",
+          ru: "`href`, `className` и остальные атрибуты ссылки.",
         },
       ],
     },
@@ -95,6 +115,12 @@ export const api: ComponentApi = {
       ru: "Зона содержимого с отступами (gap 16). В `split` — сетка из двух ячеек: каждый дочерний элемент — ячейка (столбиком уже 22rem); в `cover` — заголовок и описание через 4.",
       props: [
         {
+          name: "divider",
+          type: '"full"',
+          en: "A hairline above the zone that runs edge to edge, in any template (without it: the inset hairline of `panel` / `list` and the full one of `cta`).",
+          ru: "Тонкая линия над зоной во всю ширину в любом шаблоне (без неё: линия с отступом в `panel` / `list` и во всю ширину в `cta`).",
+        },
+        {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
           en: "`children`, `className` and the other attributes of the element.",
@@ -121,6 +147,12 @@ export const api: ComponentApi = {
       ru: "Нижний ряд кнопок с переносом: справа под тонкой линией в `panel` и `list`, под линией во всю ширину в `cta`.",
       props: [
         {
+          name: "divider",
+          type: '"full"',
+          en: "A hairline above the zone that runs edge to edge, in any template (without it: the inset hairline of `panel` / `list` and the full one of `cta`).",
+          ru: "Тонкая линия над зоной во всю ширину в любом шаблоне (без неё: линия с отступом в `panel` / `list` и во всю ширину в `cta`).",
+        },
+        {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
           en: "`children`, `className` and the other attributes of the element.",
@@ -142,10 +174,29 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Card.Label · Card.Value",
-      en: "`ref` → `HTMLSpanElement`. Metric text: the label (body-s; truncates, wraps in a `mini` tile and a `split` cell) and the value (tabular, sized by the template and the card width).",
-      ru: "Текст метрики: подпись (body-s; обрезается, в плитке `mini` и ячейке `split` переносится) и значение (табличные цифры, размер по шаблону и ширине карточки).",
+      name: "Card.Label",
+      en: "`ref` → `HTMLSpanElement`. The metric label (body-s; truncates, wraps in a `mini` tile and a `split` cell).",
+      ru: "Подпись метрики (body-s; обрезается, в плитке `mini` и ячейке `split` переносится).",
       props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLElement>",
+          en: "`children`, `className` and the other attributes of the element.",
+          ru: "`children`, `className` и остальные атрибуты элемента.",
+        },
+      ],
+    },
+    {
+      name: "Card.Value",
+      en: "`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width; body-m medium in `stat-text`.",
+      ru: "Значение метрики: табличные цифры, размер по шаблону и ширине карточки; в `stat-text` — body-m medium.",
+      props: [
+        {
+          name: "tone",
+          type: '"neutral" | "success" | "warning" | "danger"',
+          en: "The ink by meaning (an amount due is `warning`, a payment `success`).",
+          ru: "Цвет по смыслу (остаток к оплате — `warning`, оплата — `success`).",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",

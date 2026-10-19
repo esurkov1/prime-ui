@@ -84,6 +84,8 @@ import { Pin } from "./glyphs/pin";
 import { Pipette } from "./glyphs/pipette";
 import { Play } from "./glyphs/play";
 import { Plus } from "./glyphs/plus";
+import { Power } from "./glyphs/power";
+import { PowerOff } from "./glyphs/power-off";
 import { Receipt } from "./glyphs/receipt";
 import { RefreshCw } from "./glyphs/refresh-cw";
 import { Reply } from "./glyphs/reply";
@@ -168,6 +170,10 @@ export const iconRegistry = {
   /** Pin a message or an item to the top. */
   "action.pin": Pin,
   "action.play": Play,
+  /** Switch a feature or a device on. */
+  "action.power": Power,
+  /** Switch a feature or a device off. */
+  "action.powerOff": PowerOff,
   /** Add a reaction to a message. */
   "action.react": SmilePlus,
   "action.refresh": RefreshCw,

@@ -49,8 +49,8 @@ export const api: ComponentApi = {
     },
     {
       name: "List.Item",
-      en: "`ref` → `HTMLElement` (the `<button>`, `<a>` or `asChild` element, not the `<li>`). `<li>` holding a full-width row: a button, a link (`href`) or your router link (`asChild`).",
-      ru: "`<li>` со строкой во всю ширину: кнопка, ссылка (`href`) или ссылка роутера (`asChild`).",
+      en: "`ref` → `HTMLElement` (the `<button>`, `<a>`, `<div>` or `asChild` element, not the `<li>`). `<li>` holding a full-width row: a button (`onClick`), a link (`href`), your router link (`asChild`), or — with none of them — a static `<div>` out of the Tab order.",
+      ru: "`<li>` со строкой во всю ширину: кнопка (`onClick`), ссылка (`href`), ссылка роутера (`asChild`) или, без них, статичный `<div>` вне порядка Tab.",
       props: [
         {
           name: "value",
@@ -113,8 +113,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions`; loose text becomes the text line.",
-          ru: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions`; просто текст становится основной строкой.",
+          en: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (also inside a fragment); loose text becomes the text line.",
+          ru: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (и внутри фрагмента); просто текст становится основной строкой.",
         },
         {
           name: "…rest",

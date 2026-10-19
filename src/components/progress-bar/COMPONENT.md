@@ -9,7 +9,7 @@
 - Determinate progress of an operation: file upload, import, export (`value`).
 - How much of a quota or a set of steps is done («Профиль: 3 из 5 шагов») (`value` + `max`).
 - How a whole splits into parts: used space by file type, tasks by status (`segments`, `max`); categories wear `color`, meanings wear `tone`; `legend` adds color · name · value · share.
-- A ranking «label · value · share — bar»: top cities, reasons, funnel steps (`layout="rows"`, `scale`).
+- A ranking «label · value · share — bar»: top cities, reasons, funnel steps (`layout="rows"`, `scale`); a row that leads to the records behind it is a link (`href` of the segment: the whole row, hover wash and focus ring; `onClick` lets a router navigate with `event.preventDefault()`).
 - Per-row progress inside lists (FileUpload rows render it).
 
 ## When not to use
@@ -51,7 +51,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `max` | `number` | `100` (value mode), the sum of the parts (segments mode) | Value mode: top of the scale. Segments mode: total capacity; a `max` above the sum of the parts leaves the rest as track. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Value mode: fill color, telling the outcome. |
 | `steps` | `boolean` | `false` | Value mode: draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. For a level out of a few: password strength, onboarding steps. |
-| `segments` | `ProgressSegment[]` | — | Segments mode: parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category, as in its charts. Each part's width is its share of `max`. |
+| `segments` | `ProgressSegment[]` | — | Segments mode: parts `{ value, label?, href?, onClick?, tone? \| color? }`; share of `max` is the width. `rows` only: `href` makes the row a link, `onClick` runs on its press. |
 | `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout. |
 | `legend` | `boolean` | `false` | Segments mode: a legend under the bar, one row per part: color · name · value · share; it becomes the group's description. `bar` layout. |
 | `formatValue` | `(value: number) => string` | Russian digit groups | Segments mode: display of a part's value in the legend and the rows («1 840 000 ₽»). |
@@ -141,14 +141,17 @@ Always controlled: pass the current `value` or `segments` on every render.
 ### Keyboard
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No keyboard interaction.
+| Key | Action |
+|---|---|
+| `Tab` | Rows with `href`: each link is a Tab stop, the whole row shows the focus ring. Without links the component takes no focus. |
+| `Enter` | Rows with `href`: follows the link (native `<a>`). |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - Value mode: native `<progress>` — role `progressbar` with value and max.
 - Segments mode: `role="group"`; its text lists the shares of `max` («Видео: 38%, Документы: 21%»). With `label` (or `aria-label`) the group is named by it and described by the distribution — or by the legend when `legend` is on; without a name the distribution is the name.
-- Rows: an `<ol>` named by `label`; each row reads as text («Москва 1 284 52%»), the bars are `aria-hidden`.
+- Rows: an `<ol>` named by `label`; each row reads as text («Москва 1 284 52%»), the bars are `aria-hidden`. A row with `href` is an `<a>` inside the item: a link named by the same text.
 - A category color always sits beside its name (legend, row), so color is never the only cue.
 - Without `label`, pass `aria-label`, otherwise a value bar has no accessible name.
 - The `showValue` percentage is `aria-hidden`; while `loading` the root is `aria-busy` and the Skeletons are `aria-hidden`.
@@ -171,7 +174,7 @@ No keyboard interaction.
 | [custom-max.tsx](examples/custom-max.tsx) | A scale of steps instead of percent: 3 of 5 profile steps — `max`. |
 | [segments.tsx](examples/segments.tsx) | Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list with its own spoken text — `segments`, `segmentGap`, `max`, `labels`. |
 | [legend.tsx](examples/legend.tsx) | Shares of categories in their chart colors with a legend of color · name · value · share — `color`, `legend`, `formatValue`. |
-| [ranking.tsx](examples/ranking.tsx) | Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step — `layout`, `scale`. |
+| [ranking.tsx](examples/ranking.tsx) | Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step, each step a link — `layout`, `scale`, `href`. |
 | [steps.tsx](examples/steps.tsx) | The scale as whole cells that fill one after another: 2 of 5 onboarding steps, forward and back — `steps`, `max`. |
 | [milestone.tsx](examples/milestone.tsx) | A rare milestone: the last invoice of the quarter fills the bar, the tone turns success and a short confetti burst marks it — `value`, `tone`, `celebrate()`. |
 

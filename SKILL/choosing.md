@@ -89,7 +89,10 @@ messenger or an inbox) → `ChatList` (`items`, `renderItem` with `ChatList.Item
 counts, «печатает…», drafts, ticks, a row menu and search come with it — never `List` with a hand-made
 count and preview; `List` stays for records that are not conversations (tickets, letters, invoices). A group chat → `Chat.Messages group`: `Message.Author`
 (`tag`, `Message.AuthorIcon`) and `Message.Avatar` on every message, the list shows them on the
-first and the last of a run. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
+first and the last of a run. A one-to-one chat whose outgoing messages are written by different
+people (an operator, the account owner, an AI agent) → `Chat.Messages authors="outgoing"`: the author
+heads each outgoing run, the client side stays bare. A record's state beside the preview in a dialog
+row (a deal stage, «ждёт человека») → `ChatList.ItemStatus`. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
 outside a chat → `VoicePlayer` alone. A round video message → `VideoNote` inside `Message.Root`
 (alone there it is the message: no bubble); a face-to-camera report outside a chat → `VideoNote`
 alone. The two players take the same props (`src`, `duration`, `unplayed`, `disabled`, `playing`,

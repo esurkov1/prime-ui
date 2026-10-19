@@ -2,6 +2,7 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
+import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import fieldTier from "@/internal/fieldTier.module.css";
@@ -622,5 +623,54 @@ describe("Badge.Group", () => {
       );
       expect(screen.queryByText(/^\+/)).toBeNull();
     });
+  });
+});
+
+describe("Badge as a layer trigger", () => {
+  const stagePicker = (onSelect = vi.fn()) =>
+    render(
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <Badge.Root color="yellow">Бронь</Badge.Root>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item onSelect={onSelect}>В аренде</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+
+  it("is a button with the layer's ARIA, a chevron at the end, and opens the menu", async () => {
+    const user = userEvent.setup();
+    stagePicker();
+    const button = screen.getByRole("button", { name: "Бронь" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(button.querySelector("svg")).not.toBeNull();
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("data-state", "open");
+    expect(screen.getByRole("menuitem", { name: "В аренде" })).toBeInTheDocument();
+  });
+
+  it("opens with Enter, ArrowDown, and a pick closes the menu and returns focus to it", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    stagePicker(onSelect);
+    const button = screen.getByRole("button", { name: "Бронь" });
+    button.focus();
+    await user.keyboard("{ArrowDown}");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    await user.click(screen.getByRole("menuitem", { name: "В аренде" }));
+    expect(onSelect).toHaveBeenCalled();
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(button).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("is pressable and not a plain read-only badge", () => {
+    stagePicker();
+    const root = screen.getByRole("button", { name: "Бронь" }).parentElement;
+    expect(root).toHaveAttribute("data-pressable", "true");
+    expect(root).toHaveAttribute("data-icon-end", "true");
   });
 });

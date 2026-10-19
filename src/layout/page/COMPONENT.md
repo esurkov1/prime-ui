@@ -258,10 +258,11 @@ A section's sub-pages never share the first line: there they would stand where e
 |---|---|---|---|---|---|
 | < 30rem | the row | the row | the row | the row | — |
 | 30–40rem | half | the row | the row | the row | — |
-| 40–64rem | half | a third | half (a third in a pair) | the row (2/3 in a pair) | spans |
+| 40–51rem | half | a third | half (a third in a pair) | the row (2/3 in a pair) | spans |
+| 51–64rem | a quarter | a third | half (a third in a pair) | the row (2/3 in a pair) | spans |
 | ≥ 64rem | its span | its span | its span | its span | spans |
 
-A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pair: on a 40–64rem grid it takes 2/3 and its neighbour 1/3, so an 8 + 4 row keeps no hole. Cells pair in the order written, two at a time; a `span` 12 never pairs. The flow is `dense`: a small cell fills a hole left by a wide one.
+A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pair: on a 40–64rem grid it takes 2/3 and its neighbour 1/3, so an 8 + 4 row keeps no hole. The pair is read from the cells' own `data-span` among their DOM siblings (a wide cell with a narrow one right before or after it), so a cell rendered inside a consumer component pairs too as long as it is a direct child of the grid; a `span` 12 never pairs. 51rem is four tiles of `--prime-layout-tile-min-width` (12rem) and three gaps. The flow is `dense`: a small cell fills a hole left by a wide one.
 
 ### Split layout
 | Value | Looks like | Use when | Default |
