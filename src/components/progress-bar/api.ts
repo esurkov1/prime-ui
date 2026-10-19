@@ -48,8 +48,8 @@ export const api: ComponentApi = {
             en: "`100` (value mode), the sum of the parts (segments mode)",
             ru: "`100` (режим значения), сумма частей (режим сегментов)",
           },
-          en: "Value mode: top of the scale. Segments mode: total capacity; a `max` above the sum of the parts leaves the rest as track.",
-          ru: "Режим значения: верх шкалы. Режим сегментов: полная ёмкость; `max` больше суммы частей оставляет остаток дорожкой.",
+          en: "Value mode: top of the scale. Segments mode: total capacity; a `max` above the sum of the parts leaves the rest as track. `scale` `own`: the top of every row without its own `max` (default `100`).",
+          ru: "Режим значения: верх шкалы. Режим сегментов: полная ёмкость; `max` больше суммы частей оставляет остаток дорожкой. `scale` `own`: верх шкалы каждой строки без своего `max` (по умолчанию `100`).",
         },
         {
           name: "tone",
@@ -68,8 +68,8 @@ export const api: ComponentApi = {
         {
           name: "segments",
           type: "ProgressSegment[]",
-          en: "Segments mode: parts `{ value, label?, href?, onClick?, tone? | color? }`; share of `max` is the width. `rows` only: `href` makes the row a link, `onClick` runs on its press.",
-          ru: "Режим сегментов: части `{ value, label?, href?, onClick?, tone? | color? }`; ширина — доля от `max`. Только `rows`: `href` делает строку ссылкой, `onClick` — на её нажатие.",
+          en: "Segments mode: parts `{ value, label?, max?, href?, onClick?, tone? | color? }`; the width is a share of `max`. `rows` only: `href` makes the row a link, `onClick` runs on its press, `max` tops the row's own scale.",
+          ru: "Режим сегментов: части `{ value, label?, max?, href?, onClick?, tone? | color? }`; ширина — доля от `max`. Только `rows`: `href` делает строку ссылкой, `onClick` — на её нажатие, `max` — верх своей шкалы строки.",
         },
         {
           name: "segmentGap",
@@ -101,10 +101,10 @@ export const api: ComponentApi = {
         },
         {
           name: "scale",
-          type: '"sum" | "max" | "first"',
+          type: '"sum" | "max" | "first" | "own"',
           default: '"sum"',
-          en: "Segments mode: `rows` only: what 100% is. `sum` — bars and shares of the total (`max` raises it); `max` — the leader is a full bar, shares stay of the total; `first` — bars and shares against the first row (a funnel).",
-          ru: "Режим сегментов: только `rows`: что такое 100%. `sum` — полосы и доли от суммы (`max` её поднимает); `max` — лидер на всю ширину, доли от суммы; `first` — полосы и доли от первой строки (воронка).",
+          en: "`rows` only: what 100% is. `sum` — the total (`max` raises it); `max` — the leader is a full bar, shares of the total; `first` — the first row (a funnel); `own` — each row's `max`, else the root `max`, else 100.",
+          ru: "Только `rows`: что такое 100%. `sum` — сумма (`max` её поднимает); `max` — лидер на всю ширину, доли от суммы; `first` — первая строка (воронка); `own` — `max` строки, иначе `max` корня, иначе 100.",
         },
         {
           name: "labels",

@@ -181,9 +181,7 @@ describe("VideoNote", () => {
     expect(badge(container, "play")).toHaveAttribute("data-shown", "true");
     await user.click(circleButton());
     // The pointer aid over the whole circle is off too.
-    await user.click(
-      container.querySelector("[data-message-outline] > [data-disabled]") as Element,
-    );
+    await user.click(container.querySelector("[data-frame] > [data-disabled]") as Element);
     await user.keyboard("{Enter}");
     rerender(<VideoNote src={SRC} duration={6} disabled transcript="Текст" playing />);
     expect(play).not.toHaveBeenCalled();
@@ -242,7 +240,7 @@ describe("VideoNote", () => {
 
   it("shows a skeleton until the first frame loads", () => {
     const { container } = render(<VideoNote src={SRC} />);
-    const circle = container.querySelector("[data-message-outline]");
+    const circle = container.querySelector("[data-frame]");
     expect(circle).toHaveAttribute("data-frame", "loading");
     fireEvent.loadedData(container.querySelector("video") as HTMLVideoElement);
     expect(circle).toHaveAttribute("data-frame", "loaded");
@@ -267,9 +265,7 @@ describe("VideoNote", () => {
     try {
       const { container } = render(<VideoNote src={SRC} />);
       const skeleton = () =>
-        container.querySelector(
-          '[data-message-outline] [aria-hidden="true"] > [aria-hidden="true"]',
-        );
+        container.querySelector('[data-frame] [aria-hidden="true"] > [aria-hidden="true"]');
       expect(skeleton()).not.toBeNull();
       fireEvent.loadedData(container.querySelector("video") as HTMLVideoElement);
       expect(skeleton()).not.toBeNull();
@@ -464,7 +460,7 @@ describe("VideoNote geometry", () => {
       </MessagePartProvider>,
     );
     const circle = screen.getByTestId("meta").parentElement as HTMLElement;
-    expect(circle).toHaveAttribute("data-message-outline");
+    expect(circle).toHaveAttribute("data-frame");
     expect(circle).toContainElement(screen.getByRole("button", { name: PLAY }));
     expect(messagePartOf(VideoNote)).toMatchObject({ shell: "round", meta: "overlay" });
   });
@@ -492,7 +488,7 @@ describe("VideoNote transfer", () => {
         onCancel={onCancel}
       />,
     );
-    const circle = container.querySelector("[data-message-outline]");
+    const circle = container.querySelector("[data-frame]");
     expect(circle).toHaveAttribute("data-covered");
     // The circle does not play while it is on its way: its disk is the cross, described by the share.
     expect(screen.queryByRole("button", { name: PLAY })).toBeNull();

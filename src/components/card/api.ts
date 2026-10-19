@@ -11,8 +11,8 @@ export const api: ComponentApi = {
           name: "variant",
           type: '"panel" | "mini" | "stat-trend" | "stat-text" | "split" | "cta" | "list" | "cover"',
           default: '"panel"',
-          en: "Structural template: titled block with zones (`panel`), KPI tiles (`stat-text` for a value that is a line of text), a call to action, a list or a cover tile.",
-          ru: "Шаблон: блок с зонами (`panel`), плитки KPI (`stat-text` — значение-строка текста), призыв к действию, список или плитка с обложкой.",
+          en: "Structural template: titled block with zones (`panel`), KPI tiles (`stat-text` for a value that is a line of text, with an action at the end of the row), a call to action, a list or a cover tile.",
+          ru: "Шаблон: блок с зонами (`panel`), плитки KPI (`stat-text` — значение-строка текста, с действием в конце строки), призыв к действию, список или плитка с обложкой.",
         },
         {
           name: "flat",
@@ -52,8 +52,8 @@ export const api: ComponentApi = {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: "Render the single child element (a router `Link`) instead of the `<a>`.",
-          ru: "Отрисовать единственный дочерний элемент (`Link` роутера) вместо `<a>`.",
+          en: "Render the single child element instead of the `<a>`: a router `Link`, or a `<button>` when the record opens in place (a window).",
+          ru: "Отрисовать единственный дочерний элемент вместо `<a>`: `Link` роутера или `<button>`, когда запись открывается на месте (в окне).",
         },
         {
           name: "…rest",
@@ -117,8 +117,8 @@ export const api: ComponentApi = {
         {
           name: "divider",
           type: '"full"',
-          en: "A hairline above the zone that runs edge to edge, in any template (without it: the inset hairline of `panel` / `list` and the full one of `cta`).",
-          ru: "Тонкая линия над зоной во всю ширину в любом шаблоне (без неё: линия с отступом в `panel` / `list` и во всю ширину в `cta`).",
+          en: "A line above the zone that runs edge to edge, in any template, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset hairline of `panel` / `list` and the full one of `cta`).",
+          ru: "Линия над зоной во всю ширину в любом шаблоне, цветом `Divider` (`border-subtle`), чтобы читалась в обеих темах (без неё: едва заметная линия с отступом в `panel` / `list` и во всю ширину в `cta`).",
         },
         {
           name: "…rest",
@@ -149,8 +149,8 @@ export const api: ComponentApi = {
         {
           name: "divider",
           type: '"full"',
-          en: "A hairline above the zone that runs edge to edge, in any template (without it: the inset hairline of `panel` / `list` and the full one of `cta`).",
-          ru: "Тонкая линия над зоной во всю ширину в любом шаблоне (без неё: линия с отступом в `panel` / `list` и во всю ширину в `cta`).",
+          en: "A line above the zone that runs edge to edge, in any template, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset hairline of `panel` / `list` and the full one of `cta`).",
+          ru: "Линия над зоной во всю ширину в любом шаблоне, цветом `Divider` (`border-subtle`), чтобы читалась в обеих темах (без неё: едва заметная линия с отступом в `panel` / `list` и во всю ширину в `cta`).",
         },
         {
           name: "…rest",
@@ -271,6 +271,10 @@ export const api: ComponentApi = {
       {
         en: "With `asChild` the card is the link or button itself; its name is the text of its parts. Nothing interactive may sit inside it — put row actions next to the card instead.",
         ru: "С `asChild` карточка — сама ссылка или кнопка: её имя складывается из текста частей; внутри не должно быть других интерактивных элементов.",
+      },
+      {
+        en: "`Card.Link` is the card's one tab stop: an `<a>` named by the title, or, through `asChild`, a `<button>` (the record opens in a window) with the same name; the arrow is `aria-hidden`.",
+        ru: "`Card.Link` — единственная остановка Tab карточки: `<a>` с именем из заголовка или через `asChild` — `<button>` (запись открывается в окне) с тем же именем; стрелка — `aria-hidden`.",
       },
       {
         en: '`Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.',

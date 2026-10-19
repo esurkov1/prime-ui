@@ -205,7 +205,7 @@
 /* ─── Messages ─────────────────────────────────────────────────────────── */
 
 /*
- * The conversation scrolls itself and pads its own sides, so the focus rings of the bubbles fit. A
+ * The conversation scrolls itself and pads its own sides, so a focused row's wash fits. A
  * column: a conversation shorter than the pane is pushed to the end (the list's auto start margin),
  * so the last message stands right above the footer; a longer one scrolls as usual.
  */
@@ -457,12 +457,41 @@
 .separator:not(.service) .pill {
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/*
+ * Stuck, a date shows only while a person scrolls the view (`data-scroll="moving"` on the list):
+ * at rest it covers nothing — not the first row of its day when a short conversation opens a
+ * little scrolled, nor a bubble mid-day. Once the view has stood still (`"settled"`) it lingers a
+ * moment, then fades; a date stuck before anyone scrolled is simply not shown.
+ */
 .separator[data-stuck]:not(.service) .pill {
   background-color: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.list[data-scroll="settled"] .separator[data-stuck]:not(.service) .pill {
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard)
+    var(--prime-motion-duration-slow);
+}
+
+.list[data-scroll="moving"] .separator[data-stuck]:not(.service) .pill {
+  opacity: 1;
+  pointer-events: auto;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /*
@@ -551,8 +580,8 @@
  * `variant="inline"`: the chat is the content of a padded host (a dialog body, a tab, a
  * `Card.Body`), so it drops its own insets — the header, the search, the pinned bar and the footer
  * stand on the host's content edges, with no air above the first or below the last. The messages
- * reach 16 into the host's side padding: that is the room of their scroller and rows (the focus
- * rings), so a bubble's tail stands on the content edge, under the header's text. The air between
+ * reach 16 into the host's side padding: that is the room of their scroller and rows (a focused
+ * row's wash), so a bubble's tail stands on the content edge, under the header's text. The air between
  * the zones and inside the list stays.
  */
 .root[data-variant="inline"] > .header {

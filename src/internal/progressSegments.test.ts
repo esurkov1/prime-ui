@@ -90,6 +90,17 @@ describe("resolveRows", () => {
     expect(rows.map((row) => row.percent)).toEqual([100, 50, 13]);
   });
 
+  it("own: each row against its own max, else the root max, else 100; overload keeps its share", () => {
+    const rows = resolveRows(
+      [{ value: 30, max: 40 }, { value: 45 }, { value: 12, max: 10 }, { value: 5, max: 0 }],
+      "own",
+      undefined,
+    );
+    expect(rows.map((row) => row.ratio)).toEqual([0.75, 0.45, 1, 0.05]);
+    expect(rows.map((row) => row.percent)).toEqual([75, 45, 120, 5]);
+    expect(resolveRows([{ value: 30 }], "own", 60).map((row) => row.percent)).toEqual([50]);
+  });
+
   it("draws nothing for an all-zero ranking", () => {
     expect(resolveRows([{ value: 0 }], "max", undefined)).toEqual([
       { segment: { value: 0 }, ratio: 0, percent: 0 },

@@ -255,8 +255,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Alt + ↑ · Alt + ↓",
-        en: "With `onReorder`, moves the row one place up or down (from its handle or the row); a `locked` row does not move, and a step over one is refused and announced.",
-        ru: "С `onReorder` переносит строку на место выше или ниже (с ручки или со строки); строка с `locked` не двигается, шаг через неё не делается и объявляется.",
+        en: "With `onReorder`, moves the row one place up or down (from its handle or the row); a `locked` row does not move, and a step over one is refused and announced. Nothing when no row can move.",
+        ru: "С `onReorder` переносит строку на место выше или ниже (с ручки или со строки); строка с `locked` не двигается, шаг через неё не делается и объявляется. Ничего, если двигать нечего.",
       },
     ],
     aria: [
@@ -281,8 +281,8 @@ export const api: ComponentApi = {
         ru: '`List.ItemActions` стоят рядом с элементом строки, не внутри: имя строки — её текст. Tab идёт, как строка читается: контролы `side="start"`, строка, контролы `side="end"`.',
       },
       {
-        en: 'With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row\'s text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row with its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`. A `locked` row ends with a lock instead: `role="img"` named «{label}: закреплено» (`labels.lockedItem`); a keyboard step over it is refused aloud («Переговоры: «Новая» закреплено, дальше не переместить», Dnd `labels.blocked`).',
-        ru: 'С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`, последней в строке: Tab ведёт к строке с её `List.ItemActions`, затем к ручке; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`. Строка с `locked` заканчивается замком: `role="img"` с именем «{label}: закреплено» (`labels.lockedItem`); шаг с клавиатуры через неё не делается и объявляется («Переговоры: «Новая» закреплено, дальше не переместить», `labels.blocked` у Dnd).',
+        en: 'With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row\'s text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row with its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`. A `locked` row ends with a lock instead: `role="img"` named «{label}: закреплено» (`labels.lockedItem`); a keyboard step over it is refused aloud («Переговоры: «Новая» закреплено, дальше не переместить», Dnd `labels.blocked`). While no row can move, rows carry neither a handle, a lock nor `aria-keyshortcuts`.',
+        ru: 'С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`, последней в строке: Tab ведёт к строке с её `List.ItemActions`, затем к ручке; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`. Строка с `locked` заканчивается замком: `role="img"` с именем «{label}: закреплено» (`labels.lockedItem`); шаг с клавиатуры через неё не делается и объявляется («Переговоры: «Новая» закреплено, дальше не переместить», `labels.blocked` у Dnd). Пока двигать нечего, у строк нет ни ручки, ни замка, ни `aria-keyshortcuts`.',
       },
     ],
   },

@@ -198,6 +198,8 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | `data-locked`, `data-disabled`, `data-handle`, `data-pending` | an item | `locked`, `disabled`, the list has `handle`, its move is being saved |
 | `data-dnd-hover` | an item that just landed under the mouse | style its hover on `:is(:hover, [data-dnd-hover])` |
 | `data-dnd-landing` | an item | hidden while the clone lands on it |
+| `data-dnd-copy` | the root of the carried copy | the copy flies outside the item's own layout: a host gives it what the layout gave the item (a board column takes its own rows instead of the board's subgrid) |
+| `data-windowed` | a `Dnd.Sortable virtual` that draws a window | only the items around the view are in the DOM |
 | `data-axis` | a `Dnd.Sortable` | `x`, `y` or `grid` (a host widens its rule with it: `.gallery[data-axis]`) |
 | `data-dnd-over`, `data-dnd-reject` | a list or a zone | an accepted item is over it / the spot refuses it |
 | `data-dnd-flash` | a `Dnd.DropZone` | flashing after a drop (`flashOnDrop`) |

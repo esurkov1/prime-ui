@@ -292,6 +292,66 @@ describe("Card", () => {
     expect(onIssue).toHaveBeenCalledTimes(1);
   });
 
+  it("Card.Link asChild takes a <button>: it stretches over the card and opens it in place", async () => {
+    const onOpen = vi.fn();
+    const onIssue = vi.fn();
+    render(
+      <Card.Root data-testid="card">
+        <Card.Header>
+          <Card.Title>
+            <Card.Link asChild>
+              <button type="button" onClick={onOpen}>
+                Залог
+              </button>
+            </Card.Link>
+          </Card.Title>
+        </Card.Header>
+        <Card.Footer>
+          <button type="button" onClick={onIssue}>
+            Выдан
+          </button>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    const link = screen.getByRole("button", { name: "Залог" });
+    expect(screen.getByTestId("card")).toHaveAttribute("data-link", "true");
+    expect(link).toHaveAttribute("data-row-link");
+    expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    // The host never raises its own link: the `::after` is laid out by the card, not the button.
+    expect(cssValue(cssRule("src/components/card/Card.module.css", ".link"), "border")).toBe("0");
+    await userEvent.tab();
+    expect(link).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    await userEvent.click(screen.getByRole("button", { name: "Выдан" }));
+    expect(onIssue).toHaveBeenCalledTimes(1);
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it("stat-text puts an action at the end of the row, centred on the text", () => {
+    const CSS = "src/components/card/Card.module.css";
+    const grid = cssRule(
+      CSS,
+      '.root[data-variant="stat-text"]:has(> :not(.label, .value, .delta, .meta, .mark))',
+    );
+    expect(cssValue(grid, "display")).toBe("grid");
+    expect(cssValue(grid, "align-items")).toBe("center");
+    const end = cssRule(
+      CSS,
+      '.root[data-variant="stat-text"] > :not(.label, .value, .delta, .meta, .mark)',
+    );
+    expect(cssValue(end, "grid-column")).toBe("end");
+    expect(cssValue(end, "grid-row")).toBe("1 / -1");
+    render(
+      <Card.Root variant="stat-text">
+        <Card.Label>Выдан</Card.Label>
+        <Card.Value>14 октября, 12:40</Card.Value>
+        <button type="button">Отменить</button>
+      </Card.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Отменить" })).toBeInTheDocument();
+  });
+
   it("a card that is a link shows the transition arrow; a button card does not", () => {
     const { rerender } = render(
       <Card.Root variant="mini" asChild>
@@ -337,5 +397,27 @@ describe("Card", () => {
     const footer = screen.getByTestId("footer");
     expect(footer).toHaveAttribute("data-divider", "full");
     expect(footer.className).toMatch(/top/);
+  });
+
+  it("a divider the consumer asks for is drawn in the Divider ink; zone lines stay faint", () => {
+    render(
+      <Card.Root>
+        <Card.Header data-testid="header">
+          <Card.Title>Транспорт</Card.Title>
+        </Card.Header>
+        <Card.Body divider="full" data-testid="body">
+          x
+        </Card.Body>
+        <Card.Footer data-testid="footer">y</Card.Footer>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("body").className).toMatch(/subtle/);
+    expect(screen.getByTestId("footer").className).not.toMatch(/subtle/);
+    expect(
+      cssValue(
+        cssRule("src/internal/hairline.module.css", ".top.subtle, .bottom.subtle"),
+        "background-image",
+      ),
+    ).toContain("--prime-color-border-subtle");
   });
 });

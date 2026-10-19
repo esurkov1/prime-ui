@@ -51,6 +51,8 @@ export type ProgressSegment = {
   /** Non-negative weight; negative or non-finite values count as 0. */
   value: number;
   label?: string;
+  /** `rows` layout, `scale="own"`: the top of this row's own scale (else the root `max`, else 100). */
+  max?: number;
   /** `rows` layout: the whole row is a link to it. */
   href?: string;
   /** `rows` layout: runs on a press of the row's link (`href` only), e.g. to navigate by a router. */
@@ -79,7 +81,7 @@ export function segmentFill(segment: ProgressSegment): {
 }
 
 /** What 100% of a row is in the `rows` layout. */
-export type ProgressScale = "sum" | "max" | "first";
+export type ProgressScale = "sum" | "max" | "first" | "own";
 
 type ResolvedRow = {
   segment: ProgressSegment;
@@ -92,7 +94,8 @@ type ResolvedRow = {
 /**
  * Rows of a ranking: `sum` — length and share of the total (`max` raises the total); `max` — the
  * leader is a full bar, the share is still of the total; `first` — both against the first row
- * (a funnel: the first step is 100%).
+ * (a funnel: the first step is 100%); `own` — each row against its own `max` (else the root `max`,
+ * else 100): a load per model, a quota per seat.
  */
 export function resolveRows(
   input: ProgressSegment[],
@@ -106,6 +109,17 @@ export function resolveRows(
   const first = segments[0]?.value ?? 0;
   const lengthBase = scale === "max" ? largest : scale === "first" ? first : sum;
   const shareBase = scale === "first" ? first : sum;
+  if (scale === "own") {
+    const fallback = max !== undefined && max > 0 ? max : 100;
+    return segments.map((segment) => {
+      const top = segment.max !== undefined && segment.max > 0 ? segment.max : fallback;
+      return {
+        segment,
+        ratio: Math.min(1, segment.value / top),
+        percent: Math.round((segment.value / top) * 100),
+      };
+    });
+  }
   return segments.map((segment) => ({
     segment,
     ratio: lengthBase > 0 ? Math.min(1, segment.value / lengthBase) : 0,

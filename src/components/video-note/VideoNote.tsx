@@ -110,7 +110,6 @@ function VideoNoteInner(props: VideoNoteProps) {
       {/* A press anywhere on the circle (its hit area or its disk) gives the whole circle. */}
       <div
         className={cx(press.press, styles.circle)}
-        data-message-outline=""
         data-state={state}
         data-frame={frame}
         data-covered={covered || undefined}

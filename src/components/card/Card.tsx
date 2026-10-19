@@ -223,7 +223,13 @@ function CardBody({ divider, className, ...rest }: CardBodyProps) {
   const zoned = useZoned();
   return (
     <div
-      className={cx(styles.body, zoned && hairline.between, divider && hairline.top, className)}
+      className={cx(
+        styles.body,
+        zoned && hairline.between,
+        divider && hairline.top,
+        divider && hairline.subtle,
+        className,
+      )}
       data-divider={divider}
       {...rest}
     />
@@ -248,7 +254,7 @@ function CardFooter({ divider, className, ...rest }: CardFooterProps) {
     divider !== undefined || variant === "panel" || variant === "list" || variant === "cta";
   return (
     <div
-      className={cx(styles.footer, ruled && hairline.top, className)}
+      className={cx(styles.footer, ruled && hairline.top, divider && hairline.subtle, className)}
       data-divider={divider}
       {...rest}
     />

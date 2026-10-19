@@ -303,6 +303,31 @@ describe("Sticky dates in a scroller", () => {
     expect(row("Вчера")).not.toHaveAttribute("data-stuck");
   });
 
+  it("a stuck date shows only while a person scrolls: at rest it covers no row of its day", async () => {
+    dates(20);
+    renderDays();
+    const list = screen.getByRole("log");
+    const scroller = screen.getByTestId("scroller");
+    expect(row("Вчера")).toHaveAttribute("data-stuck");
+    // Opened a little scrolled (the kit put the view at the end): the stuck date is not shown.
+    expect(list).not.toHaveAttribute("data-scroll");
+    // A scroll the kit makes (a jump) shows none either.
+    await scrollTo(40);
+    expect(list).not.toHaveAttribute("data-scroll");
+    // A person's wheel: the date shows while the view moves…
+    fireEvent.wheel(scroller, { deltaY: 20 });
+    await scrollTo(60);
+    expect(list).toHaveAttribute("data-scroll", "moving");
+    // …and steps away once the view has stood still a moment.
+    await act(async () => {
+      await new Promise((resolve) => window.setTimeout(resolve, 400));
+    });
+    expect(list).toHaveAttribute("data-scroll", "settled");
+    // The next kit scroll after it shows nothing.
+    await scrollTo(80);
+    expect(list).toHaveAttribute("data-scroll", "settled");
+  });
+
   it("reads the layout, never the painted box: a row gliding by moves no pill", async () => {
     dates(200);
     renderDays();

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dnd } from "@/components/dnd/Dnd";
 import { DRAG_HOLD_MS } from "@/internal/longPress";
+import { cssRule, cssValue } from "@/test/css";
 import { withMotion } from "@/test/motion";
 
 import { Kanban, type KanbanColumn, type KanbanMove, type KanbanValue } from "./Kanban";
@@ -1193,5 +1194,24 @@ describe("a long column", () => {
     expect(drawn.length).toBeLessThan(40);
     expect(drawn[0]).toHaveAttribute("aria-setsize", "400");
     vi.restoreAllMocks();
+  });
+});
+
+describe("column headers", () => {
+  const CSS = "src/components/kanban/Kanban.module.css";
+
+  it("share one row across the board, so the cards of every column start on one line", () => {
+    expect(cssValue(cssRule(CSS, ".column"), "grid-template-rows")).toBe("subgrid");
+    expect(cssValue(cssRule(CSS, ".column"), "grid-row")).toBe("1 / -1");
+    // Phases share the rows too.
+    expect(cssValue(cssRule(CSS, ".group > .columns[data-axis]"), "grid-template-rows")).toBe(
+      "subgrid",
+    );
+  });
+
+  it("a carried column, out of the board, takes its own rows", () => {
+    expect(cssValue(cssRule(CSS, ".column[data-dnd-copy]"), "grid-template-rows")).toBe(
+      "auto minmax(0, 1fr)",
+    );
   });
 });

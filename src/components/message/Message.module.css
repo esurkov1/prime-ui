@@ -47,9 +47,9 @@
 /* ─── Row ───────────────────────────────────────────────────────────────── */
 
 /*
- * Rows split the gap above and below them (half a run's gap each side), so the focus ring around a
- * bubble stays inside the row's paint; a row that starts a run adds the rest of the larger gap as a
- * margin.
+ * Rows split the gap above and below them (half a run's gap each side), so the focus wash of a row
+ * covers its share of the air around the bubble; a row that starts a run adds the rest of the larger
+ * gap as a margin.
  */
 .root {
   --msg-pad-x: var(--prime-message-padding-x);
@@ -67,7 +67,9 @@
   gap: var(--prime-space-2);
   padding-block: calc(var(--prime-message-group-gap) / 2);
   padding-inline: var(--prime-space-2);
+  border-radius: var(--prime-radius-l);
   outline: none;
+  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 .root:is([data-position="single"], [data-position="first"]) {
@@ -273,19 +275,14 @@
   background: none;
 }
 
-/* Keyboard focus on the message draws the ring around its bubble. */
-.root:focus-visible .bubble {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.root:focus-visible .bubble[data-shell="round"] {
+/*
+ * Keyboard focus on a message is a quiet wash of its row — never an outline or a ring around the
+ * message or its bubble (the author's decision); the controls inside keep their own rings. Distinct
+ * from «selected», which washes nothing.
+ */
+.root:focus-visible {
   outline: none;
-}
-
-.root:focus-visible .bubble[data-shell="round"] [data-message-outline] {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
+  background-color: var(--prime-color-fill-subtle);
 }
 
 /*
@@ -383,9 +380,9 @@
 
 /*
  * The author's header: the name in the author's hue and an optional icon at the start, the tag
- * muted at the end of the line (a Telegram admin title), `space-3` at least between them. One
- * line: the name ellipsizes first, the tag keeps its width (at most half the line) and ellipsizes
- * only once the name has given its room. The bubble hugs the line's intrinsic width
+ * muted at the end of the line (a Telegram admin title, a channel's handle), `space-2` at least
+ * between them. One line: the name keeps its room — the tag ellipsizes first, and only once it has
+ * given all of it does the name ellipsize. The bubble hugs the line's intrinsic width
  * (`data-message-fit="row"`), so a long name or tag widens the bubble up to its cap.
  */
 .author {
@@ -402,8 +399,7 @@
 }
 
 .authorName {
-  /* Gives way long before the tag does. */
-  flex: 0 1000 auto;
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   font-weight: var(--prime-font-weight-semibold);
@@ -415,12 +411,15 @@
   flex: none;
 }
 
+/*
+ * The rest of the line, never more: the name and the icon take theirs first (a basis of 0, so the
+ * name never gives a fraction of a pixel to it), the tag ends the line and ellipsizes.
+ */
 .authorTag {
-  flex: 0 1 auto;
+  flex: 1 1 0;
   min-width: 0;
-  max-inline-size: 50%;
-  margin-inline-start: auto;
   padding-inline-start: var(--prime-space-2);
+  text-align: end;
   overflow: hidden;
   color: var(--prime-color-text-muted);
   text-overflow: ellipsis;

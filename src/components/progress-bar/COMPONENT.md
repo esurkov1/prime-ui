@@ -10,6 +10,7 @@
 - How much of a quota or a set of steps is done («Профиль: 3 из 5 шагов») (`value` + `max`).
 - How a whole splits into parts: used space by file type, tasks by status (`segments`, `max`); categories wear `color`, meanings wear `tone`; `legend` adds color · name · value · share.
 - A ranking «label · value · share — bar»: top cities, reasons, funnel steps (`layout="rows"`, `scale`); a row that leads to the records behind it is a link (`href` of the segment: the whole row, hover wash and focus ring; `onClick` lets a router navigate with `event.preventDefault()`).
+- A ranking where each row has its own whole: fleet load per model, a quota per seat (`layout="rows"`, `scale="own"`, `max` per segment).
 - Per-row progress inside lists (FileUpload rows render it).
 
 ## When not to use
@@ -48,15 +49,15 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `showValue` | `boolean` | `false` | Shows the rounded filled percentage at the end of the label row (`aria-hidden`); `bar` layout only. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton in the bar's geometry cross-fades into the data; the label stays. Pass the last known `value` or `segments` (or `0` / `[]`). |
 | `value` | `number` | — | Value mode: the current value, clamped to `0…max`. |
-| `max` | `number` | `100` (value mode), the sum of the parts (segments mode) | Value mode: top of the scale. Segments mode: total capacity; a `max` above the sum of the parts leaves the rest as track. |
+| `max` | `number` | `100` (value mode), the sum of the parts (segments mode) | Value mode: top of the scale. Segments mode: total capacity; a `max` above the sum of the parts leaves the rest as track. `scale` `own`: the top of every row without its own `max` (default `100`). |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Value mode: fill color, telling the outcome. |
 | `steps` | `boolean` | `false` | Value mode: draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. For a level out of a few: password strength, onboarding steps. |
-| `segments` | `ProgressSegment[]` | — | Segments mode: parts `{ value, label?, href?, onClick?, tone? \| color? }`; share of `max` is the width. `rows` only: `href` makes the row a link, `onClick` runs on its press. |
+| `segments` | `ProgressSegment[]` | — | Segments mode: parts `{ value, label?, max?, href?, onClick?, tone? \| color? }`; the width is a share of `max`. `rows` only: `href` makes the row a link, `onClick` runs on its press, `max` tops the row's own scale. |
 | `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout. |
 | `legend` | `boolean` | `false` | Segments mode: a legend under the bar, one row per part: color · name · value · share; it becomes the group's description. `bar` layout. |
 | `formatValue` | `(value: number) => string` | Russian digit groups | Segments mode: display of a part's value in the legend and the rows («1 840 000 ₽»). |
 | `layout` | `"bar" \| "rows"` | `"bar"` | Segments mode: `bar` — every part in one bar; `rows` — a ranking: an `<ol>`, one row per part with label · value · share over its own bar. |
-| `scale` | `"sum" \| "max" \| "first"` | `"sum"` | Segments mode: `rows` only: what 100% is. `sum` — bars and shares of the total (`max` raises it); `max` — the leader is a full bar, shares stay of the total; `first` — bars and shares against the first row (a funnel). |
+| `scale` | `"sum" \| "max" \| "first" \| "own"` | `"sum"` | `rows` only: what 100% is. `sum` — the total (`max` raises it); `max` — the leader is a full bar, shares of the total; `first` — the first row (a funnel); `own` — each row's `max`, else the root `max`, else 100. |
 | `labels` | `Partial<ProgressBarLabels>` | — | Segments mode: built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root; `aria-label` names the bar when there is no `label`. |
 
@@ -91,6 +92,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `sum` | bars and shares of the total | parts of a whole («доля от всех заказов») | yes |
 | `max` | the leader is a full bar, shares of the total | a top list where the gap to the leader matters | |
 | `first` | bars and shares against the first row | a funnel: each step as a share of the first | |
+| `own` | each row against its own `max` (the part's, else the root's, else 100); above 100% the bar stops full, the share keeps the number | a load or a quota per item: fleet per model, seats per plan | |
 
 ### segmentGap
 | Value | Looks like | Use when | Default |
@@ -175,6 +177,7 @@ Always controlled: pass the current `value` or `segments` on every render.
 | [segments.tsx](examples/segments.tsx) | Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list with its own spoken text — `segments`, `segmentGap`, `max`, `labels`. |
 | [legend.tsx](examples/legend.tsx) | Shares of categories in their chart colors with a legend of color · name · value · share — `color`, `legend`, `formatValue`. |
 | [ranking.tsx](examples/ranking.tsx) | Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step, each step a link — `layout`, `scale`, `href`. |
+| [own-scale.tsx](examples/own-scale.tsx) | A ranking where each row has its own scale: fleet load per model, each model out of its own fleet, each row a link — `layout`, `scale`, `max`, `href`. |
 | [steps.tsx](examples/steps.tsx) | The scale as whole cells that fill one after another: 2 of 5 onboarding steps, forward and back — `steps`, `max`. |
 | [milestone.tsx](examples/milestone.tsx) | A rare milestone: the last invoice of the quarter fills the bar, the tone turns success and a short confetti burst marks it — `value`, `tone`, `celebrate()`. |
 
@@ -187,6 +190,7 @@ Always controlled: pass the current `value` or `segments` on every render.
 - A fake value as a spinner → use [Spinner](../spinner/COMPONENT.md).
 - Categories (sources, platforms) painted with `tone` → `tone` says good or bad; categories take `color`, the same as in their charts.
 - The number written into `label` of each row of a hand-built ranking → `layout="rows"` with `formatValue`.
+- A column of separate value bars for rows that each have their own whole → `layout="rows"`, `scale="own"`, `max` on each segment.
 - A grey box while the data loads → `loading` draws the Skeleton in the bar's geometry.
 
 ## Related

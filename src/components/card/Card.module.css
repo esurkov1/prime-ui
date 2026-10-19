@@ -111,9 +111,19 @@
   pointer-events: none;
 }
 
-/* The stretched link: its box is the whole card, over the content; the card's controls stand above. */
+/*
+ * The stretched link: its box is the whole card, over the content; the card's controls stand above.
+ * A `<button>` in its place (a record that opens in a window) reads as the same text.
+ */
 .link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
   color: inherit;
+  font: inherit;
+  text-align: inherit;
+  appearance: none;
   text-decoration: none;
   outline: none;
   cursor: pointer;
@@ -261,6 +271,34 @@
 .root[data-variant="stat-text"] > .meta {
   margin-top: auto;
   padding-top: var(--prime-space-1);
+}
+
+/*
+ * `stat-text` with an action (anything besides the text parts — a button «Выдан», «Отменить»): a
+ * grid of two columns, the label, the value and the meta stacked in the text column, the action at
+ * the end of the row at its own size, centred on the text. With a meta the last row takes the free
+ * height, so the meta still keeps to the bottom of the tile.
+ */
+.root[data-variant="stat-text"]:has(> :not(.label, .value, .delta, .meta, .mark)) {
+  display: grid;
+  grid-template-columns: [text] minmax(0, 1fr) [end] auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: var(--prime-space-2) var(--prime-space-3);
+}
+
+.root[data-variant="stat-text"]:has(> :not(.label, .value, .delta, .meta, .mark)):has(> .meta) {
+  grid-template-rows: auto auto 1fr;
+}
+
+.root[data-variant="stat-text"] > :is(.label, .value, .delta, .meta) {
+  grid-column: text;
+}
+
+.root[data-variant="stat-text"] > :not(.label, .value, .delta, .meta, .mark) {
+  grid-column: end;
+  grid-row: 1 / -1;
+  justify-self: end;
 }
 
 /*
@@ -519,6 +557,15 @@
   .value.headline {
     font-size: var(--prime-text-heading-m-size);
     line-height: var(--prime-text-heading-m-line-height);
+  }
+}
+
+/* A narrow `stat-text` tile keeps its text whole: the action drops under it, at the start. */
+@container (max-width: 20rem) {
+  .root[data-variant="stat-text"] > :not(.label, .value, .delta, .meta, .mark) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: start;
   }
 }
 

@@ -297,6 +297,19 @@ describe("ProgressBar", () => {
       expect(shares()).toEqual(["100", "60", "40"]);
       expect(ratios(container)).toEqual(["1", "0.6", "0.4"]);
     });
+
+    it("scale own: each row against its own max, the root max as the default", () => {
+      const fleet = [
+        { value: 34, max: 40, label: "Газель Next" },
+        { value: 18, label: "Валдай" },
+      ];
+      const { container } = render(
+        <ProgressBar aria-label="a" layout="rows" scale="own" max={30} segments={fleet} />,
+      );
+      expect(shares()).toEqual(["85", "60"]);
+      expect(ratios(container)).toEqual(["0.85", "0.6"]);
+      expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("Газель Next3485%");
+    });
   });
 
   describe("loading", () => {

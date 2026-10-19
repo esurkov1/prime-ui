@@ -35,27 +35,31 @@
   padding-block-end: var(--prime-space-2);
 }
 
-/* The sortable row of columns (`Dnd.Sortable`, axis x): the board's own gap between them. */
-.columns[data-axis] {
-  flex: 1 0 auto;
-  gap: var(--kanban-gap);
-  min-height: 0;
-}
-
-/* Placeholder columns of a board loading before its columns arrive (`loadingColumns`). */
+/*
+ * The sortable row of columns (`Dnd.Sortable`, axis x), and the placeholder columns of a board
+ * loading before its columns arrive (`loadingColumns`): a grid of two rows shared by every column
+ * (subgrid) — the headers, as tall as the tallest one (a column with figures under its title, one
+ * without), and the bodies, so the cards of every column start on one line.
+ */
+.columns[data-axis],
 .placeholders {
-  display: flex;
+  display: grid;
   flex: 1 0 auto;
-  gap: var(--kanban-gap);
+  grid-auto-columns: max-content;
+  grid-auto-flow: column;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0 var(--kanban-gap);
   min-height: 0;
 }
 
-/* Positioned: the visually hidden count stays inside the column instead of the page. */
+/* Positioned: the visually hidden count stays inside the column instead of the page. Its header
+   and body stand in the board's two rows (subgrid). */
 .column {
   position: relative;
-  display: flex;
-  flex: none;
-  flex-direction: column;
+  display: grid;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  row-gap: 0;
   box-sizing: border-box;
   inline-size: var(--kanban-column-width);
   max-block-size: 100%;
@@ -65,6 +69,12 @@
   /* well: one ladder step off the surface around the board (its control fill, foundation §4). */
   background: var(--prime-color-fill-muted);
   scroll-snap-align: start;
+}
+
+/* The carried copy of a column (`data-dnd-copy`, Dnd) flies out of the board, with no rows to
+   share: its header takes its own height and its body the rest. */
+.column[data-dnd-copy] {
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 /*
@@ -107,6 +117,8 @@
 .header {
   display: grid;
   grid-template-columns: minmax(0, max-content) auto 1fr;
+  /* A header stretched to the tallest one keeps its lines at the top. */
+  align-content: start;
   align-items: center;
   column-gap: var(--prime-space-2);
   padding-block-end: var(--prime-space-3);
@@ -559,27 +571,35 @@
 
 /* Column groups (`columnGroups`): a phase is a heading over its own row of columns; the phases
    stand apart by more than the columns do. */
+/* The phases share the rows too — the group titles, the headers, the bodies — so the cards of
+   every column of every phase start on one line. */
 .groups {
-  display: flex;
+  display: grid;
   flex: 1 0 auto;
-  gap: calc(var(--kanban-gap) * 2);
+  grid-auto-columns: max-content;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  column-gap: calc(var(--kanban-gap) * 2);
   min-height: 0;
 }
 
 .group {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  gap: var(--prime-space-2);
+  display: grid;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  row-gap: 0;
   min-height: 0;
 }
 
 .group > .columns[data-axis] {
-  flex: 1 1 auto;
+  grid-row: 2 / -1;
+  grid-template-rows: subgrid;
 }
 
 /* The heading starts where the first column's title does. */
 .groupTitle {
+  grid-row: 1;
+  padding-block-end: var(--prime-space-2);
   padding-inline: calc(var(--kanban-inset) + var(--prime-space-3));
   color: var(--prime-color-text-muted);
 }

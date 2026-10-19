@@ -1293,6 +1293,29 @@ describe("Message shells and layout contract", () => {
     expect(all).not.toContain(":has(");
   });
 
+  it("shows a focused message as a wash of its row, never an outline or a ring around it", () => {
+    const focused = rule(".root:focus-visible");
+    expect(cssValue(focused, "outline")).toBe("none");
+    expect(cssValue(focused, "background-color")).toBe("var(--prime-color-fill-subtle)");
+    const roots = cssRules(SHEET).filter((item) => item.selector === ".root");
+    const rootDecl = (prop: string) =>
+      roots.flatMap((item) => item.decls).find((decl) => decl.prop === prop)?.value;
+    expect(rootDecl("outline")).toBe("none");
+    expect(rootDecl("transition")).toContain("background-color");
+    // No rule keyed on the message's focus draws an outline, a ring shadow or the outline hook.
+    const onFocus = cssRules(SHEET).filter((item) =>
+      /\.root:focus(-visible|-within)?\b/.test(item.selector),
+    );
+    for (const item of onFocus) {
+      for (const decl of item.decls) {
+        if (decl.prop === "outline") expect(decl.value).toBe("none");
+        expect(decl.prop).not.toBe("box-shadow");
+        expect(decl.prop).not.toBe("outline-offset");
+      }
+    }
+    expect(selectors().join("\n")).not.toContain("data-message-outline");
+  });
+
   it("gives a picture message no backing, and an album neutral gaps in both directions", () => {
     const album = [
       { src: "/a.jpg", alt: "Склад", width: 800, height: 600 },

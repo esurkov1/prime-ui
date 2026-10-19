@@ -172,12 +172,15 @@ describe("Message.Author: the author's header of a group chat", () => {
     expect(header("a")).toBeNull();
   });
 
-  it("stands the tag at the end of the line; the name gives way first", () => {
+  it("stands the tag at the end of the line; the tag gives way first, the name keeps its room", () => {
     const CSS = "src/components/message/Message.module.css";
     const tag = cssRule(CSS, ".authorTag");
-    expect(cssValue(tag, "margin-inline-start")).toBe("auto");
-    expect(cssValue(tag, "max-inline-size")).toBe("50%");
-    expect(cssValue(tag, "flex")).toBe("0 1 auto");
-    expect(cssValue(cssRule(CSS, ".authorName"), "flex")).toBe("0 1000 auto");
+    // The rest of the line, from a basis of 0: the name never gives it a fraction of a pixel.
+    expect(cssValue(tag, "flex")).toBe("1 1 0");
+    expect(cssValue(tag, "min-width")).toBe("0");
+    expect(cssValue(tag, "text-align")).toBe("end");
+    // No cap of its own: a long handle takes the line's room until the line runs out.
+    expect(tag.decls.some((decl) => decl.prop === "max-inline-size")).toBe(false);
+    expect(cssValue(cssRule(CSS, ".authorName"), "flex")).toBe("0 1 auto");
   });
 });

@@ -30,12 +30,13 @@ Card.Root variant="panel"        Header(Icon?, Title, Description?, …trailing)
 Card.Root variant="mini"         Icon · Label · Value · Meta? · Media?
 Card.Root variant="stat-trend"   Label · Value · Delta · Meta?
                                  or Header(Badge or Icon, Value) · Description
-Card.Root variant="stat-text"    Label · Value (a line of text) · Meta?
+Card.Root variant="stat-text"    Label · Value (a line of text) · Meta? · …action (a Button at the end)
 Card.Root variant="split"        Body(cell × 2: any element, e.g. <div> with Icon · Label · Value)
 Card.Root variant="cta"          Title · Description · Footer
 Card.Root variant="list"         Header(Title, …trailing) · List(ListItem …)
 Card.Root variant="cover"        Media · Body(Title, Description) · Footer
-Card.Root … Title > Link         a stretched link: the card opens from anywhere, its own buttons stay
+Card.Root … Title > Link         a stretched link (an <a>, or asChild a <button> that opens a window):
+                                 the card opens from anywhere, its own buttons stay
 Card.Root asChild                <a> or <button> (the only child) holding the parts of any template
 ```
 
@@ -48,7 +49,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"panel" \| "mini" \| "stat-trend" \| "stat-text" \| "split" \| "cta" \| "list" \| "cover"` | `"panel"` | Structural template: titled block with zones (`panel`), KPI tiles (`stat-text` for a value that is a line of text), a call to action, a list or a cover tile. |
+| `variant` | `"panel" \| "mini" \| "stat-trend" \| "stat-text" \| "split" \| "cta" \| "list" \| "cover"` | `"panel"` | Structural template: titled block with zones (`panel`), KPI tiles (`stat-text` for a value that is a line of text, with an action at the end of the row), a call to action, a list or a cover tile. |
 | `flat` | `boolean` | `false` | No raised shadow: a flat tile for dense grids. |
 | `loading` | `boolean` | `false` | The KPI is loading: `Card.Value`, `Card.Delta` and `Card.Meta` show a Skeleton in their own geometry and the root sets `aria-busy`; the data fades in when it arrives. Labels and titles stay. |
 | `asChild` | `boolean` | `false` | The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring, a link draws the arrow. No interactive inside: see `Card.Link`. |
@@ -59,7 +60,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `asChild` | `boolean` | `false` | Render the single child element (a router `Link`) instead of the `<a>`. |
+| `asChild` | `boolean` | `false` | Render the single child element instead of the `<a>`: a router `Link`, or a `<button>` when the record opens in place (a window). |
 | `…rest` | `AnchorHTMLAttributes<HTMLAnchorElement>` | — | `href`, `className` and the other attributes of the link. |
 
 ### Card.Header
@@ -89,7 +90,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `divider` | `"full"` | — | A hairline above the zone that runs edge to edge, in any template (without it: the inset hairline of `panel` / `list` and the full one of `cta`). |
+| `divider` | `"full"` | — | A line above the zone that runs edge to edge, in any template, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset hairline of `panel` / `list` and the full one of `cta`). |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Media
@@ -104,7 +105,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `divider` | `"full"` | — | A hairline above the zone that runs edge to edge, in any template (without it: the inset hairline of `panel` / `list` and the full one of `cta`). |
+| `divider` | `"full"` | — | A line above the zone that runs edge to edge, in any template, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset hairline of `panel` / `list` and the full one of `cta`). |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Icon
@@ -159,7 +160,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `panel` | no root padding; `Header` with a faint hairline, padded `Body`, edge-to-edge `Media`, right-aligned `Footer` | chart widgets, settings forms, any titled block | yes |
 | `mini` | 40px accent `Icon` tile beside the label and the title-l value; a `Media` child is a full-width bottom slot | a compact KPI tile, with a sparkline or a ProgressBar | |
 | `stat-trend` | label, large value (adapts to the card width), delta; or a `Header` (lead left, heading-m value right) + description | the main number of a dashboard row; a KPI with a qualifier badge | |
-| `stat-text` | the `stat-trend` column with the value as a body-m medium line of text | a summary tile whose value is a phrase («Выдать PCX 160»), not a number | |
+| `stat-text` | the `stat-trend` column with the value as a body-m medium line of text; anything else in the root (a Button) sits at the end of the row, centred on the text | a summary tile whose value is a phrase («Выдать PCX 160»), not a number; a step of a record with its action («Выдан» · «Отменить») | |
 | `split` | `Body` with two metric cells and a faint hairline; stacked below 22rem | two related metrics in one tile | |
 | `cta` | title, body-s text, `Footer` under a hairline | a call to action | |
 | `list` | `Header` with a hairline, items with faint hairlines | recent events, short lists | |
@@ -168,7 +169,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 ### divider (Body · Footer)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `full` | the zone's top hairline runs edge to edge in any template | a zone line wider than the card padding | |
+| `full` | the zone's top line runs edge to edge in any template, in the `Divider` ink (`border-subtle`), so it reads in both themes; the zone lines of `panel` / `list` / `cta` stay faint | a zone line wider than the card padding | |
 
 ### tone (Delta · Value)
 | Value | Looks like | Use when | Default |
@@ -192,7 +193,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | flat | `flat` | `data-flat` |
 | loading | `loading` | `aria-busy` on the root; `data-loading` on `Card.Value`, `Card.Delta`, `Card.Meta`, each holding a `Skeleton`; on `false` the data fades in (`useSwapIn`, foundation §1 rule 7) |
 | depth | nesting: one above the nearest surface (the page and the AppShell panel are 0) | `data-depth` (`1`–`4`, `floating-1`/`floating-2` inside a floating layer); the fill is `--prime-color-layer-current`, the shadow only at depth 1 |
-| card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem (a header control under its description), the `stat-trend` value changes at 20rem / 36rem |
+| card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem (a header control under its description), the `stat-trend` value changes at 20rem / 36rem, a `stat-text` action drops under the text below 20rem |
 | hover | `asChild`, a fine pointer | the fill stays (a whole surface never changes its fill, foundation §8); the shadow lifts to `--prime-shadow-overlay` over `fast` |
 | press | `asChild`, `:active` | `scale(--prime-motion-press-scale)` over `fast`; reduced motion keeps it still |
 | focus | `asChild`, `:focus-visible` | the focus ring outside the card |
@@ -207,6 +208,8 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 - Long values wrap; labels truncate, except in a `mini` tile and a `split` cell, where a label beside the icon wraps instead; a chart SVG needs a CSS height.
 - In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper. A `Card.Description` in the header stacks under the title, 4 apart; the control stays at the end, centred on both lines.
 - A `Card.Icon` in a `Header` leads the row, 12 before the title, centred on the title and the description: the accent tile, or the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own wrapper component, with no tile; it takes 40 px whatever size it was given — for a card about one person or object (a linked account, a contact).
+- `stat-text` with an action: put the Button straight into the root after the text parts — the tile becomes two columns, the label, value and meta in the first, the action at its own size at the end, centred on the text (no wrapper, no layout of your own in `Card.Body`).
+- `Card.Link` is an `<a>` with `href`; a record that opens in place (a window, a drawer) takes `asChild` with a `<button>` — it stretches over the card the same way, with the same arrow and focus ring.
 - `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up; in `mini` and a `split` cell it sits in the text column under the value.
 
 ## Accessibility
@@ -223,6 +226,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - With `asChild` the card is the link or button itself; its name is the text of its parts. Nothing interactive may sit inside it — put row actions next to the card instead.
+- `Card.Link` is the card's one tab stop: an `<a>` named by the title, or, through `asChild`, a `<button>` (the record opens in a window) with the same name; the arrow is `aria-hidden`.
 - `Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.
 - `Card.Title` renders `<h3>`; directly under the page title pass `as="h2"`.
 - Decorative icons in `Card.Icon` and cover images in `Card.Media` get `aria-hidden`; controls in `Card.Header` need their own names.
@@ -242,8 +246,9 @@ No `labels`.
 | [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a short description and a period switch, and a Sparkline with the period total over its chart — `Card.Header`, `Card.Description`, `Card.Body`. |
 | [person-header.tsx](examples/person-header.tsx) | A linked Telegram account in an employee card: the avatar leads the header, the handle stands under the name and the unlink button sits at the end — `Card.Icon`, `Avatar.Root`, `Card.Description`. |
 | [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
-| [record-link.tsx](examples/record-link.tsx) | A transport card that opens its record from anywhere and keeps its own button, a full-width line above the action row — `Card.Link`, `Card.Footer`, `divider`. |
+| [record-link.tsx](examples/record-link.tsx) | A transport card that opens its record from anywhere and keeps its own button, a full-width line above the action row, and a deposit card that opens its window in place — `Card.Link`, `asChild`, `Card.Footer`, `divider`. |
 | [text-values.tsx](examples/text-values.tsx) | Summary tiles whose value is a line of text, one of them in a tone — `variant`, `stat-text`, `tone`. |
+| [text-action.tsx](examples/text-action.tsx) | Summary tiles of a rental with the action of each step at the end of the row — `stat-text`, `Card.Value`, `Card.Meta`. |
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [states.tsx](examples/states.tsx) | A KPI tile while its report loads next to the loaded one, in the `stat-trend` and `mini` templates — `loading`. |
@@ -261,6 +266,8 @@ No `labels`.
 - A hand-drawn trend SVG in a chart widget → `Sparkline` in the `Body` (or `Media`); a chart with a legend and states → `ChartFrame`.
 - A clickable `<div>` card with `onClick` → `asChild` with a real `<a href>` (Cmd-click, a new tab) or a `<button>`.
 - Buttons or links inside an `asChild` card → nested interactive elements; move them out of the card.
+- A `Card.Body` with a hand-laid row of label, value and button in a `stat-text` tile → the Button straight in the root, after `Card.Meta`.
+- A `?modal=…` link to open a window from a card → `Card.Link asChild` with a `<button>`.
 - The reference figures written into `Card.Delta` or `Card.Label` → `Card.Meta`.
 - Skeletons placed by hand inside `Card.Value` → `Card.Root loading`; keep the parts mounted while loading so each holds its place.
 

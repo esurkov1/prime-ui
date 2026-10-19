@@ -1,12 +1,14 @@
 /*
  * A host that opens as a whole through its own stretched link (`data-row-link`, drawn at
  * `--prime-z-raised`): join `.host` on it while it is a link. Every control inside — the list of
- * `ROW_CONTROLS` in `rowLink.ts` — stands above the link, so it takes its own press. Zero
- * specificity: a control's own `position` / `z-index` always wins.
+ * `ROW_CONTROLS` in `rowLink.ts` — stands above the link, so it takes its own press. The link
+ * itself (an `<a>` or a `<button>`, `data-row-link`) is no control inside the host: it stays in
+ * place, so its stretched `::after` covers the host. Zero specificity: a control's own
+ * `position` / `z-index` always wins.
  */
 :where(.host)
   :where(
-    a[href]:not([data-row-link]),
+    a[href],
     button,
     input,
     select,
@@ -30,7 +32,7 @@
     [role="combobox"],
     [role="textbox"],
     [data-row-click-ignore]
-  ) {
+  ):where(:not([data-row-link])) {
   position: relative;
   z-index: var(--prime-z-above);
 }

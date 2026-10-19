@@ -32,6 +32,16 @@
   background-position: center bottom;
 }
 
+/* `.subtle` beside `.top` / `.bottom`: a line the consumer asked for (a `divider` prop) is drawn in
+   the `Divider` ink, so it reads in both themes; the zone lines of a surface stay faint. */
+.top.subtle,
+.bottom.subtle {
+  background-image: linear-gradient(
+    var(--prime-color-border-subtle),
+    var(--prime-color-border-subtle)
+  );
+}
+
 /* A line separates two zones: a header with no zone after it, a footer with none before it, and a
    footer right under a header (the header's line is already there) draw none. */
 .bottom:last-child,

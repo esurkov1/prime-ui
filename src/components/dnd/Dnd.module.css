@@ -220,6 +220,12 @@ th.draggable[data-lifted] > * {
   align-items: stretch;
 }
 
+/* A row a host lays out as a grid whose rows its items share (a board: headers over bodies, by
+   subgrid): the gap spans every row, as the item it stands for does. */
+.sortable[data-axis="x"] > .placeholder {
+  grid-row: 1 / -1;
+}
+
 /* A wrapping grid: the host sets the tracks (`grid-template-columns`) and the cells' size. The gap
    is a cell like the others, so it takes the cell's size instead of the lifted item's. */
 .sortable[data-axis="grid"] {

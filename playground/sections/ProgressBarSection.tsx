@@ -68,6 +68,12 @@ export const page: ComponentPageConfig = {
         "Рейтинг строками «подпись · число · доля» над полосой: города от лидера и воронка от первого шага, каждый шаг — ссылка — `layout`, `scale`, `href`.",
     },
     {
+      scenario: "own-scale",
+      title: "Своя шкала у строки",
+      description:
+        "Рейтинг, где у каждой строки своя шкала: загрузка парка по моделям, каждая модель от своего парка, строка — ссылка — `layout`, `scale`, `max`, `href`.",
+    },
+    {
       scenario: "steps",
       title: "Ступени",
       description:

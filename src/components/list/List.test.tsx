@@ -372,6 +372,7 @@ describe("List onReorder", () => {
     render(
       <List.Root aria-label="Этапы" onReorder={() => {}} labels={{ reorderItem: "Этап {label}" }}>
         <List.Item value="lead">Лид</List.Item>
+        <List.Item value="talks">Переговоры</List.Item>
       </List.Root>,
     );
     expect(screen.getByRole("button", { name: "Этап Лид" })).toBeInTheDocument();
@@ -419,6 +420,7 @@ describe("List onReorder", () => {
             <Switch.Root aria-label="Показывать «Переговоры»" />
           </List.ItemActions>
         </List.Item>
+        <List.Item value="contract">Договор</List.Item>
       </List.Root>,
     );
     const lock = screen.getByRole("img", { name: "Новая: закреплено" });
@@ -451,6 +453,66 @@ describe("List onReorder", () => {
     );
   });
 
+  it("draws no grip while nothing can move; the grip comes in its kept box with a second row", async () => {
+    const onMove = vi.fn();
+    function Phase({ stages }: { stages: string[] }) {
+      return (
+        <List.Root aria-label="Этапы фазы" onReorder={onMove}>
+          <List.Item value="new" locked>
+            Новая
+          </List.Item>
+          {stages.map((stage) => (
+            <List.Item key={stage} value={stage} onClick={() => {}}>
+              {stage}
+            </List.Item>
+          ))}
+        </List.Root>
+      );
+    }
+    const { rerender } = render(<Phase stages={["Квалификация"]} />);
+    const row = screen.getByRole("button", { name: "Квалификация" });
+    const box = row.closest("li")?.lastElementChild;
+    // One movable row beside a pinned one: no grip, no lock, the grip box kept empty.
+    expect(screen.queryByRole("button", { name: "Переместить Квалификация" })).toBeNull();
+    expect(screen.queryByRole("img", { name: "Новая: закреплено" })).toBeNull();
+    expect(box).toHaveClass(styles.grip ?? "");
+    expect(box).toBeEmptyDOMElement();
+    // No Alt+arrow either.
+    await act(async () => {
+      fireEvent.keyDown(row, { key: "ArrowUp", altKey: true });
+    });
+    expect(onMove).not.toHaveBeenCalled();
+
+    rerender(<Phase stages={["Квалификация", "Переговоры"]} />);
+    const handle = screen.getByRole("button", { name: "Переместить Квалификация" });
+    expect(handle.parentElement).toBe(box);
+    expect(handle).toHaveClass(enterMotion.enter);
+    expect(handle).toHaveAttribute("aria-keyshortcuts");
+    expect(screen.getByRole("img", { name: "Новая: закреплено" })).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.keyDown(handle, { key: "ArrowDown", altKey: true });
+    });
+    expect(onMove).toHaveBeenCalledWith("Квалификация", null);
+  });
+
+  it("a single row draws no grip and takes no Alt+arrow", async () => {
+    const onMove = vi.fn();
+    render(
+      <List.Root aria-label="Этапы" onReorder={onMove}>
+        <List.Item value="lead" onClick={() => {}}>
+          Лид
+        </List.Item>
+      </List.Root>,
+    );
+    const row = screen.getByRole("button", { name: "Лид" });
+    expect(screen.queryByRole("button", { name: "Переместить Лид" })).toBeNull();
+    expect(row.closest("li")).not.toHaveAttribute("aria-keyshortcuts");
+    await act(async () => {
+      fireEvent.keyDown(row, { key: "ArrowDown", altKey: true });
+    });
+    expect(onMove).not.toHaveBeenCalled();
+  });
+
   it("names the lock from labels", () => {
     render(
       <List.Root
@@ -458,6 +520,8 @@ describe("List onReorder", () => {
         onReorder={() => {}}
         labels={{ lockedItem: "{label} — системный" }}
       >
+        <List.Item value="lead">Лид</List.Item>
+        <List.Item value="talks">Переговоры</List.Item>
         <List.Item value="won" locked>
           Выиграна
         </List.Item>

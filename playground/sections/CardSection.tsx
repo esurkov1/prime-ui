@@ -56,13 +56,19 @@ export const page: ComponentPageConfig = {
       scenario: "record-link",
       title: "Растянутая ссылка",
       description:
-        "Карточка транспорта открывает запись кликом в любом месте, кнопка «Выдан» остаётся своей, линия над рядом действий — во всю ширину — `Card.Link`, `Card.Footer`, `divider`.",
+        "Карточка транспорта открывает запись кликом в любом месте, кнопка «Выдан» остаётся своей, линия над рядом действий — во всю ширину, а карточка залога открывает своё окно на месте — `Card.Link`, `asChild`, `Card.Footer`, `divider`.",
     },
     {
       scenario: "text-values",
       title: "Значение — текст",
       description:
         "Плитки сводки, где значение — строка текста, одна из них в тоне — `variant`, `stat-text`, `tone`.",
+    },
+    {
+      scenario: "text-action",
+      title: "Значение с действием",
+      description:
+        "Плитки аренды с действием своего шага в конце строки, по центру по вертикали — `stat-text`, `Card.Value`, `Card.Meta`.",
     },
     {
       scenario: "content-templates",

@@ -34,14 +34,22 @@ const CONTROLS = [
   "<span data-row-click-ignore>Виджет</span>",
 ];
 
-/** The selectors the stylesheet raises above a stretched link. */
+/** The host's own link is never raised, whatever element it is. */
+const OWN_LINK = ":where(:not([data-row-link]))";
+
+/** The selectors the stylesheet raises above a stretched link (each one short of the host's link). */
 function raisedSelectors(): string[] {
   const rule = cssRules("src/internal/rowLink.module.css").find((item) =>
     item.selector.startsWith(":where(.host)"),
   );
   if (!rule) throw new Error("rowLink.module.css: no .host rule");
-  const list = rule.selector.replace(/^:where\(\.host\)\s*:where\(/, "").replace(/\)$/, "");
-  return postcss.list.comma(list);
+  if (!rule.selector.endsWith(`)${OWN_LINK}`))
+    throw new Error("rowLink.module.css: own link raised");
+  const list = rule.selector
+    .slice(0, -OWN_LINK.length)
+    .replace(/^:where\(\.host\)\s*:where\(/, "")
+    .replace(/\)$/, "");
+  return postcss.list.comma(list).map((selector) => `${selector}${OWN_LINK}`);
 }
 
 function clickInRow(html: string) {
@@ -69,6 +77,7 @@ describe("rowLink", () => {
 
   it("the row's own link opens it", () => {
     expect(clickInRow('<a href="/orders/1" data-row-link>Заказ</a>').opened).toBe(true);
+    expect(clickInRow('<button type="button" data-row-link>Залог</button>').opened).toBe(true);
   });
 
   it("the stylesheet raises exactly the controls the predicate skips", () => {
@@ -88,9 +97,18 @@ describe("rowLink", () => {
       ).toBe(true);
     }
     expect(selectors).toHaveLength(CONTROLS.length);
-    // The row's own link stays under the controls.
-    const own = clickInRow('<a href="/orders/1" data-row-link>Заказ</a>').target;
-    expect(selectors.some((selector) => own.matches(selector))).toBe(false);
+    // The row's own link stays under the controls: an `<a>` or a `<button>` (a card that opens
+    // a window in place).
+    for (const html of [
+      '<a href="/orders/1" data-row-link>Заказ</a>',
+      '<button type="button" data-row-link>Залог</button>',
+    ]) {
+      const own = clickInRow(html).target;
+      expect(
+        selectors.some((selector) => own.matches(selector)),
+        html,
+      ).toBe(false);
+    }
   });
 
   it("a plain click has no modifier", () => {

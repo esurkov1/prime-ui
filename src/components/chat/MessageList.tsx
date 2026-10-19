@@ -36,6 +36,7 @@ import {
   useMessageList,
 } from "@/internal/messageList";
 import { MessageHighlightContext } from "@/internal/messagePart";
+import { afterMotionMs, motionDurationMs } from "@/internal/motionTiming";
 import { useEnterOnAppear } from "@/internal/partPresence";
 import { createReadReceipts, type ReadReceipts } from "@/internal/readReceipts";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -881,7 +882,7 @@ const DATE_ROW = `.${styles.separator}:not(.${styles.service})`;
 
 /**
  * A date sticks in the flow (`position: sticky`, CSS); this hook only reads where the layout put
- * it, once per frame the scroller moves or the list resizes, and writes two things:
+ * it, once per frame the scroller moves or the list resizes, and writes three things:
  *
  * - **Stuck.** A date is stuck while its sticky offset holds it below its place in the flow — it
  *   then overlaps the row after it. Only then it lifts with the overlay shadow (`data-stuck`); a
@@ -890,6 +891,11 @@ const DATE_ROW = `.${styles.separator}:not(.${styles.service})`;
  *   would stay stuck under the next one. As the next day's date reaches the stuck one, it pushes it
  *   up and out of the scroller, as messengers do — a scroll-linked shift of the stuck pill
  *   (`translate`) by how far the two rows overlap.
+ * - **Moving.** A stuck date shows only while a person scrolls the view (`data-scroll` on the
+ *   list: `"moving"` from a wheel, touch, pointer or key scroll, `"settled"` once the view has
+ *   stood still a moment): at rest it covers nothing — not the first row of its day (an event, a
+ *   message) when a short conversation opens a little scrolled, nor a bubble mid-day. A scroll
+ *   the kit makes (opening at the end, a jump) shows none. The dates in the flow stay as they are.
  *
  * Both read layout boxes (`offsetTop`, `offsetHeight` — sticky offsets in, transforms out), never
  * the painted ones: a row gliding by (`rowGlide`, `bubbleMorph`) never leaves a pill shifted or a
@@ -926,13 +932,43 @@ function useDatePush(
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+    // Moving: a person scrolls the view (`data-scroll="moving"`) until it has stood still for a
+    // moment (`"settled"`). A scroll the kit makes (opening at the end, a jump) shows no date.
+    let top = view.scrollTop;
+    let person = false;
+    let settle = 0;
+    const settled = () => {
+      settle = 0;
+      person = false;
+      if (list.dataset.scroll === "moving") list.dataset.scroll = "settled";
+    };
+    const wait = () => {
+      window.clearTimeout(settle);
+      settle = window.setTimeout(settled, afterMotionMs(motionDurationMs("fast")));
+    };
+    const gesture = () => {
+      person = true;
+      wait();
+    };
+    const scrolled = () => {
+      schedule();
+      if (view.scrollTop === top) return;
+      top = view.scrollTop;
+      if (!person) return;
+      if (list.dataset.scroll !== "moving") list.dataset.scroll = "moving";
+      wait();
+    };
+    const gestures = ["wheel", "touchmove", "pointerdown", "keydown"] as const;
+    for (const type of gestures) view.addEventListener(type, gesture, { passive: true });
     update();
-    view.addEventListener("scroll", schedule, { passive: true });
+    view.addEventListener("scroll", scrolled, { passive: true });
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
     observer?.observe(list);
     return () => {
       cancelAnimationFrame(frame);
-      view.removeEventListener("scroll", schedule);
+      window.clearTimeout(settle);
+      view.removeEventListener("scroll", scrolled);
+      for (const type of gestures) view.removeEventListener(type, gesture);
       observer?.disconnect();
     };
   }, [container, scroller]);

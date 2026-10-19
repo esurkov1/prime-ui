@@ -13,6 +13,7 @@ import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
 import { nodeText } from "@/internal/nodeText";
+import { usePartPresence } from "@/internal/partPresence";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { slotChild } from "@/internal/slot";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
@@ -34,8 +35,11 @@ export const LIST_LABELS: ListLabels = {
   lockedItem: "{label}: закреплено",
 };
 
-/** What a row of a reorderable list needs: the names of its grip and of its lock. */
-type ReorderContextValue = { handleLabel: string; lockLabel: string };
+/**
+ * What a row of a reorderable list needs: the names of its grip and of its lock, and whether any
+ * row can move at all (`active`) — with nothing to reorder the grip box stays empty.
+ */
+type ReorderContextValue = { handleLabel: string; lockLabel: string; active: boolean };
 
 const ReorderContext = React.createContext<ReorderContextValue | null>(null);
 
@@ -71,10 +75,6 @@ function ListRoot({
   const tier = useHostTier(sizeProp);
   const size = tier.size;
   const { reorderItem: handleLabel, lockedItem: lockLabel } = useLabels(LIST_LABELS, labels);
-  const reorder = React.useMemo<ReorderContextValue>(
-    () => ({ handleLabel, lockLabel }),
-    [handleLabel, lockLabel],
-  );
   const latest = React.useRef(onReorder);
   latest.current = onReorder;
   // Dnd keeps a row in its new place, busy with a busy grip, until a returned promise settles,
@@ -88,6 +88,15 @@ function ListRoot({
   const nodes = flattenChildren(children);
   const items = nodes.filter((node): node is React.ReactElement<ListItemProps> =>
     isPart(node, ListItem),
+  );
+  // Something can move only with two rows that are not locked, one of them enabled: a single
+  // movable row (a stage alone in its phase, one beside pinned rows) has nowhere to go, so the list
+  // draws no grip, no lock and takes no Alt+arrow.
+  const unlocked = items.filter((item) => !item.props.locked);
+  const active = unlocked.length >= 2 && unlocked.some((item) => !item.props.disabled);
+  const reorder = React.useMemo<ReorderContextValue>(
+    () => ({ handleLabel, lockLabel, active }),
+    [handleLabel, lockLabel, active],
   );
   // Rows rise in when the data adds them and close up in place when it takes them out.
   const presence = useListPresence(items.map(rowKey));
@@ -131,6 +140,7 @@ function ListRoot({
             onReorder={move}
             renderItem={(item) => keyed(item, items.indexOf(item))}
             handle
+            disabled={!active}
             className={cx(fieldTierClass, styles.root, className)}
             {...toDataAttributes({ size, reorderable: true })}
           />
@@ -376,6 +386,9 @@ function ListItem({
   const presence = React.useContext(PresenceContext);
   const key = React.useContext(RowKeyContext);
   const rowRef = React.useRef<HTMLLIElement | null>(null);
+  // The grip comes when a second row makes the list reorderable and goes when it leaves; its box
+  // stays, so the row keeps its columns and the lists beside it line up.
+  const grip = usePartPresence<HTMLElement>({ present: reorder?.active ?? false, axis: "inline" });
   const entered = useListItemPresence(
     presence ?? NO_PRESENCE,
     key ?? value ?? "",
@@ -453,7 +466,8 @@ function ListItem({
   // A reorderable row: the grip after the row element and its controls, at the row's end (a button
   // cannot hold a button), so Tab reaches the row before its grip; Dnd makes the grip busy while the
   // owner saves this row's move. A locked row holds its place: a lock in the grip's box, so its
-  // columns line up with the movable rows, and the row itself works as any other.
+  // columns line up with the movable rows, and the row itself works as any other. With nothing to
+  // reorder the box stays empty.
   const text = { label: itemLabel({ asChild, children }) };
   return (
     <Dnd.SortableItem
@@ -465,10 +479,16 @@ function ListItem({
     >
       {element}
       <span className={cx(fieldTierClass, styles.grip)} data-size="xs">
-        {locked ? (
-          <DndLock aria-label={formatLabel(reorder.lockLabel, text).trim()} />
+        {!reorder.active ? null : locked ? (
+          <DndLock
+            ref={grip.ref}
+            className={grip.className}
+            aria-label={formatLabel(reorder.lockLabel, text).trim()}
+          />
         ) : (
           <Dnd.Handle
+            ref={grip.ref}
+            className={grip.className}
             aria-label={formatLabel(reorder.handleLabel, text).trim()}
             disabled={disabled}
           />

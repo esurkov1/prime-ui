@@ -1,4 +1,4 @@
-/** A group chat's run of one author: the first message opens with the name in the author's hue, a crown and the member's tag, the last one shows the avatar in the gutter; another author with initials only, a long name that ellipsizes before its tag, a header on a pill over a photo, and your own reply — `Message.Author`, `tag`, `Message.AuthorIcon`, `Message.Avatar`, `position`, `hueOf`. */
+/** A group chat's run of one author: the first message opens with the name in the author's hue, a crown and the member's tag, the last one shows the avatar in the gutter; another author with initials only, a channel's long handle that ellipsizes before the name, a header on a pill over a photo, and your own reply — `Message.Author`, `tag`, `Message.AuthorIcon`, `Message.Avatar`, `position`, `hueOf`. */
 import { Avatar, hueOf, Icon, Message } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -40,8 +40,8 @@ export default function MessageAuthorExample() {
             <Avatar.Fallback>ИБ</Avatar.Fallback>
           </Avatar.Root>
         </Message.Avatar>
-        <Message.Author color={hueOf("irina")} tag="Бухгалтерия">
-          Ирина Белова-Константинопольская, главный бухгалтер
+        <Message.Author color={hueOf("irina")} tag="@severnyveter_buhgalteriya_otchety_bot">
+          Ирина Белова
         </Message.Author>
         <Message.Text>Акты сверки после релиза.</Message.Text>
       </Message.Root>
