@@ -29,7 +29,7 @@ export default function BottomNavInAppShellExample() {
                   {order}
                 </Typography>
               ))}
-              <Button.Root variant="soft" tone="neutral">
+              <Button.Root aria-label="Новый заказ" variant="soft" tone="neutral">
                 <Button.Icon>
                   <Icon name="action.add" />
                 </Button.Icon>

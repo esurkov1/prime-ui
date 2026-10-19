@@ -43,7 +43,7 @@ export default function AppShellOverviewExample() {
                 <Page.Description>Октябрь · 37 сделок в работе</Page.Description>
               </Page.Heading>
               <Page.Actions>
-                <Button.Root>
+                <Button.Root aria-label="Новая сделка">
                   <Button.Icon>
                     <Icon name="action.add" />
                   </Button.Icon>

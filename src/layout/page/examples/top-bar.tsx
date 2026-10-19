@@ -72,7 +72,7 @@ export default function PageTopBarExample() {
             </Button.Icon>
             Экспорт
           </Button.Root>
-          <Button.Root>
+          <Button.Root aria-label="Новая сделка">
             <Button.Icon>
               <Icon name="action.add" />
             </Button.Icon>

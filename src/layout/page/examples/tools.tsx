@@ -82,7 +82,7 @@ export default function PageToolsExample() {
             </SegmentedControl.Root>
           </Page.Tools>
           <Page.Actions>
-            <Button.Root>
+            <Button.Root aria-label="Новый заказ">
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>

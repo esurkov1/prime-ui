@@ -62,7 +62,13 @@ export default function ChatListActionsExample() {
         )}
       >
         <ChatList.Actions>
-          <Button.Root fullWidth variant="soft" tone="neutral" onClick={() => setValue(null)}>
+          <Button.Root
+            aria-label="Новый чат"
+            fullWidth
+            variant="soft"
+            tone="neutral"
+            onClick={() => setValue(null)}
+          >
             <Button.Icon>
               <Icon name="action.add" />
             </Button.Icon>

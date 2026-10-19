@@ -203,8 +203,11 @@ The kit's UI language is Russian; these are the rules of its copy.
   заказ», «+ Создать заказ», «⬇ Скачать отчёт». When nothing is left without the verb (the object
   is plain from where the button stands: a row, a card, a selection), the button is icon-only —
   `aria-label` with the verb and the object («Удалить выбранные») and a `Tooltip` with the same
-  words. A labelled button is named by its text alone (the kit hides its icon from assistive tech),
-  which reads right in its context.
+  words. The whole action belongs in the name and the tooltip, where it helps a person who did not
+  read the icon: a labelled button takes `aria-label` with the action that contains its visible word
+  («+ Заказ» → `aria-label="Новый заказ"`, «+ Канал» → «Подключить канал»), so a screen reader says
+  the action and `Page.Actions` shows it as the tooltip once the button folds to its icon; an
+  icon-only button's `aria-label` and `Tooltip` say «Новый заказ», «Создать счёт» freely.
 - **A button without an icon says the verb and the object:** «Выставить счёт», «Сохранить
   изменения». Never «ОК», «Да», «Подтвердить», «Отправить» without an object when the object is not
   obvious. The confirm of a destructive action keeps its verb and takes no icon («Удалить проект»).
@@ -242,7 +245,7 @@ The kit's UI language is Russian; these are the rules of its copy.
     </Button.Icon>
     Отчёт CSV
   </Button.Root>
-  <Button.Root>
+  <Button.Root aria-label="Новая оплата">
     <Button.Icon>
       <Icon name="action.add" />
     </Button.Icon>

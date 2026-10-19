@@ -31,7 +31,7 @@ export default function PageActionsCollapseExample() {
               </Button.Icon>
               Отправить клиентам
             </Button.Root>
-            <Button.Root>
+            <Button.Root aria-label="Новый счёт">
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>

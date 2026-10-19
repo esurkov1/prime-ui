@@ -308,7 +308,7 @@ export default function DataTableScreenExample() {
               </Button.Icon>
               Экспорт
             </Button.Root>
-            <Button.Root>
+            <Button.Root aria-label="Новый счёт">
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>

@@ -14,10 +14,19 @@ import { Link, Route, Routes, useLocation } from "react-router-dom";
 type Channel = { id: string; name: string; dialogs: number; reply: string };
 type Template = { id: string; name: string; uses: number };
 
-// The action of each sub-page: its own label, none on the statistics.
+// The action of each sub-page: the object on the button, the whole action in its name (the tooltip
+// once the button folds to its icon); none on the statistics.
 const SUB_PAGES = [
-  { to: "/messengers/channels", label: "Каналы", action: "Подключить канал" },
-  { to: "/messengers/templates", label: "Шаблоны", action: "Шаблон" },
+  {
+    to: "/messengers/channels",
+    label: "Каналы",
+    action: { text: "Канал", name: "Подключить канал" },
+  },
+  {
+    to: "/messengers/templates",
+    label: "Шаблоны",
+    action: { text: "Шаблон", name: "Новый шаблон" },
+  },
   { to: "/messengers/stats", label: "Статистика", action: null },
 ];
 
@@ -86,11 +95,11 @@ export default function PageRouterExample() {
         </Page.Tools>
         {current.action ? (
           <Page.Actions>
-            <Button.Root>
+            <Button.Root aria-label={current.action.name}>
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              {current.action}
+              {current.action.text}
             </Button.Root>
           </Page.Actions>
         ) : null}

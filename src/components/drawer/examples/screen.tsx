@@ -141,7 +141,7 @@ export default function DrawerScreenExample() {
           <Page.Actions>
             <Drawer.Root open={open} onOpenChange={changeOpen}>
               <Drawer.Trigger>
-                <Button.Root>
+                <Button.Root aria-label="Новый клиент">
                   <Button.Icon>
                     <Icon name="action.add" />
                   </Button.Icon>

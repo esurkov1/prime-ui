@@ -411,7 +411,8 @@
         "The download button reads «Реестр» (or another object) beside action.download, not «Скачать реестр»",
         "The refresh button has no visible text: an icon-only Button.Root with aria-label naming the verb and the object (e.g. «Обновить оплаты») inside Tooltip.Trigger, with Tooltip.Content",
         "No row button shows a trash icon beside the text «Удалить»: it is icon-only with an aria-label naming the payment and a Tooltip, or the verb without the icon",
-        "The new «Возврат» button stands in the same Page.Actions, the solid primary stays last"
+        "The new «Возврат» button stands in the same Page.Actions, the solid primary stays last",
+        "The «Оплата» and «Возврат» buttons carry an aria-label with the whole action that contains their visible word (e.g. «Новая оплата», «Оформить возврат»), so the tooltip of a folded button says the action"
       ]
     }
   ]
