@@ -29,6 +29,12 @@
   transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/* A `bare` item has no surface to lift (a board column: its header and cards keep their own looks):
+   the copy rises without a shadow of its own, which would outline the empty box around its parts. */
+.overlay .lift[data-dnd-bare] {
+  box-shadow: none;
+}
+
 /* The clone rises from its resting size as it is picked up. */
 @starting-style {
   .overlay .lift {

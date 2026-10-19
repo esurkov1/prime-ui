@@ -169,6 +169,13 @@ export const api: ComponentApi = {
           ru: "Без `handle`: нажатие на контрол внутри тоже берёт элемент, когда указатель сдвинулся (пальцем — задержать); клик остаётся контролу. Заголовок таблицы с кнопкой сортировки.",
         },
         {
+          name: "bare",
+          type: "boolean",
+          default: "false",
+          en: "The item has no surface of its own, only its parts do (a board column: a header and cards): its carried copy flies without a fill or a lift shadow, each part keeps its own look.",
+          ru: "У элемента нет своей поверхности, она есть только у его частей (колонка доски: шапка и карточки): его копия летит без заливки и тени подъёма, каждая часть сохраняет свой вид.",
+        },
+        {
           name: "className",
           type: "string",
           en: "The row look: fill, radius, padding.",

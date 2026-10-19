@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DRAG_HOLD_MS } from "@/internal/longPress";
 import { RollingNumber } from "@/internal/RollingNumber";
 import { withMotion } from "@/test/motion";
 import { DND_CARRYING_ATTRIBUTE, Dnd, DndLock, moveBefore } from "./Dnd";
@@ -356,6 +357,104 @@ describe("Dnd.Sortable", () => {
     pressOn(screen.getByTestId("row-a"), 10, 5);
     moveTo(10, 30);
     expect(screen.getByRole("status")).toHaveTextContent("a picked");
+  });
+});
+
+describe("nested sortables: one owner per press", () => {
+  const GROUPS = [
+    { id: "g1", rows: rows("a", "b") },
+    { id: "g2", rows: rows("c") },
+  ];
+
+  /** Groups that move by their grip (or anywhere), each holding rows that move by their link. */
+  function Nested({ outerHandle = true }: { outerHandle?: boolean }) {
+    return (
+      <Dnd.Root>
+        <Dnd.Sortable
+          aria-label="groups"
+          kind="group"
+          handle={outerHandle}
+          items={GROUPS}
+          getId={(group) => group.id}
+          onReorder={() => {}}
+          renderItem={(group) => (
+            <Dnd.SortableItem id={group.id} data-testid={`group-${group.id}`}>
+              {outerHandle ? <Dnd.Handle data-testid={`grip-${group.id}`} /> : null}
+              <Dnd.Sortable
+                aria-label={`rows ${group.id}`}
+                kind="row"
+                items={group.rows}
+                getId={(row) => row.id}
+                onReorder={() => {}}
+                renderItem={(row) => (
+                  <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                    <a href={`#/${row.id}`} data-dnd-handle="" data-testid={`link-${row.id}`}>
+                      {row.id}
+                    </a>
+                  </Dnd.SortableItem>
+                )}
+              />
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>
+    );
+  }
+
+  it("a press on a row's handle lifts the row; the group around never takes that handle", () => {
+    render(<Nested />);
+    pressOn(screen.getByTestId("link-a"), 10, 5);
+    moveTo(10, 45);
+    expect(screen.getByTestId("row-a")).toHaveAttribute("data-lifted");
+    expect(screen.getByTestId("group-g1")).not.toHaveAttribute("data-lifted");
+    releaseAt(10, 45);
+  });
+
+  it("the group's own grip still lifts the group", () => {
+    render(<Nested />);
+    pressOn(screen.getByTestId("grip-g1"), 10, 5);
+    moveTo(10, 45);
+    expect(screen.getByTestId("group-g1")).toHaveAttribute("data-lifted");
+    expect(screen.getByTestId("row-a")).not.toHaveAttribute("data-lifted");
+    releaseAt(10, 45);
+  });
+
+  it("a press an inner row picked up is not picked up again by a group that drags from anywhere", () => {
+    render(<Nested outerHandle={false} />);
+    pressOn(screen.getByTestId("row-a"), 10, 5);
+    moveTo(10, 45);
+    expect(screen.getByTestId("row-a")).toHaveAttribute("data-lifted");
+    expect(screen.getByTestId("group-g1")).not.toHaveAttribute("data-lifted");
+    releaseAt(10, 45);
+  });
+
+  it("a touch hold on a row lifts the row alone", () => {
+    vi.useFakeTimers();
+    try {
+      render(<Nested outerHandle={false} />);
+      pressOn(screen.getByTestId("link-a"), 10, 5, { pointerType: "touch" });
+      act(() => {
+        vi.advanceTimersByTime(DRAG_HOLD_MS + 10);
+      });
+      expect(screen.getByTestId("row-a")).toHaveAttribute("data-lifted");
+      expect(screen.getByTestId("group-g1")).not.toHaveAttribute("data-lifted");
+      fireEvent.pointerUp(window, { ...POINTER, pointerType: "touch", clientX: 10, clientY: 5 });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("Alt + an arrow on a row's handle moves the row, never the group", () => {
+    render(<Nested />);
+    const link = screen.getByTestId("link-a");
+    act(() => link.focus());
+    fireEvent.keyDown(link, { key: "ArrowDown", altKey: true });
+    expect(
+      Array.from(
+        screen.getByLabelText("groups").querySelectorAll<HTMLElement>("[data-dnd-kind='group']"),
+      ).map((node) => node.dataset.dndItem),
+    ).toEqual(["g1", "g2"]);
+    expect(screen.getByRole("status")).toHaveTextContent("a: позиция 2 из 2");
   });
 });
 

@@ -10,8 +10,28 @@ import { useStoreSelector } from "./store";
 const INTERACTIVE = "button, input, select, textarea, a[href], [data-dnd-ignore]";
 // ...unless the control IS the grip: `Dnd.Handle` is a button so it can be reached by keyboard.
 const HANDLE = "[data-dnd-handle]";
+const ITEM = "[data-dnd-item]";
 /** Set by `Dnd.SortableItem dragFromControls`: a press on a control inside picks the item up too. */
 export const DRAG_FROM_CONTROLS = "data-dnd-drag-controls";
+
+/**
+ * A grip belongs to the nearest item around it: in nested lists (cards in the columns of a board)
+ * an outer item never takes an inner item's grip for its own.
+ */
+export function ownHandle(item: Element, target: Element | null = null): HTMLElement | null {
+  if (target) {
+    const handle = target.closest<HTMLElement>(HANDLE);
+    return handle?.closest(ITEM) === item ? handle : null;
+  }
+  for (const handle of item.querySelectorAll<HTMLElement>(HANDLE)) {
+    if (handle.closest(ITEM) === item) return handle;
+  }
+  return null;
+}
+
+// One owner per gesture: the press an inner item picked up bubbles on through the items around it,
+// which leave it alone (a second pick-up would cancel the first).
+const claimed = new WeakSet<Event>();
 
 export type DragSourceItem<TData> = {
   id: string;
@@ -76,14 +96,15 @@ export function useDragSource<TData = unknown>(
       "aria-roledescription": disabled ? undefined : controller.labels().roleDescription,
       onPointerDown: (event) => {
         const current = optionsRef.current;
-        if (current.disabled) return;
+        if (current.disabled || claimed.has(event.nativeEvent)) return;
         const target = event.target instanceof Element ? event.target : null;
-        const onHandle = target?.closest(HANDLE) != null;
+        const onHandle = target !== null && ownHandle(event.currentTarget, target) !== null;
         if (current.handleOnly && !onHandle) return;
         // An item that is picked up by its controls too (a table header whose sort button fills
         // it): a press there starts a drag once it travels; a click without travel stays theirs.
         const fromControls = event.currentTarget.hasAttribute(DRAG_FROM_CONTROLS);
         if (target?.closest(INTERACTIVE) && !onHandle && !fromControls) return;
+        claimed.add(event.nativeEvent);
         controller.beginPointerDrag<TData>({
           event: event.nativeEvent,
           element: event.currentTarget,

@@ -7,7 +7,7 @@ import { useDragController } from "./context";
 import type { DragItem, DropVerdict } from "./dragSession";
 import { type Axis, insertionBefore, ownNodes } from "./geometry";
 import { useStoreSelector } from "./store";
-import { type DragSourceProps, useDraggedItem, useDragSource } from "./useDragSource";
+import { type DragSourceProps, ownHandle, useDraggedItem, useDragSource } from "./useDragSource";
 import { type DropTargetProps, useDropTarget } from "./useDropTarget";
 
 /**
@@ -426,9 +426,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     if (!node) return;
     pendingFocus = null;
     // With `handle` the grip is what takes the keys.
-    const focusable = options.handleOnly
-      ? (node.querySelector<HTMLElement>("[data-dnd-handle]") ?? node)
-      : node;
+    const focusable = options.handleOnly ? (ownHandle(node) ?? node) : node;
     // A keyboard move: the ring must show even if the element was first focused by a click.
     focusable.focus({ focusVisible: true } as FocusOptions);
   });

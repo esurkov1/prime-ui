@@ -4,6 +4,7 @@ import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Dnd } from "@/components/dnd/Dnd";
+import { DRAG_HOLD_MS } from "@/internal/longPress";
 import { withMotion } from "@/test/motion";
 
 import { Kanban, type KanbanColumn, type KanbanMove, type KanbanValue } from "./Kanban";
@@ -383,6 +384,16 @@ describe("Kanban", () => {
     expect(card()).not.toHaveAttribute("data-surface");
   });
 
+  it("a plain or line column is bare in flight (its header and cards carry it), a well column is not", () => {
+    const { rerender } = render(<Board />);
+    const col = () => document.querySelector("[data-kanban-column='todo']");
+    expect(col()).toHaveAttribute("data-dnd-bare");
+    rerender(<Board variant="line" />);
+    expect(col()).toHaveAttribute("data-dnd-bare");
+    rerender(<Board variant="well" />);
+    expect(col()).not.toHaveAttribute("data-dnd-bare");
+  });
+
   it("has no column grips unless reorderableColumns is set", () => {
     render(<Board />);
     expect(screen.queryByRole("button", { name: /Переместить колонку/ })).toBeNull();
@@ -688,6 +699,24 @@ describe("Kanban", () => {
     expect(onItemOpen).toHaveBeenCalledTimes(3);
   });
 
+  it("with movable columns Alt + an arrow on a card's link moves the card, never its column", () => {
+    const onValueChange = vi.fn();
+    const onColumnOrderChange = vi.fn();
+    render(
+      <Board
+        reorderableColumns
+        onColumnOrderChange={onColumnOrderChange}
+        getItemHref={(task) => `#/tasks/${task.id}`}
+        onValueChange={onValueChange}
+      />,
+    );
+    const link = within(screen.getByTestId("card-b")).getByRole("link");
+    act(() => link.focus());
+    fireEvent.keyDown(link, { key: "ArrowRight", altKey: true });
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
+  });
+
   it("throws when Kanban.Item is rendered outside renderItem", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Kanban.Item>x</Kanban.Item>)).toThrow(/renderItem/);
@@ -856,6 +885,69 @@ describe("Kanban pointer drag", () => {
     // The click was cancelled: the browser does not navigate.
     expect(click).toBe(false);
     expect(onItemOpen).not.toHaveBeenCalled();
+  });
+
+  it("with movable columns a press on a card's link drags only the card; a click opens it", () => {
+    const onItemOpen = vi.fn((_task: Task, event: React.SyntheticEvent) => event.preventDefault());
+    const onValueChange = vi.fn();
+    const onColumnOrderChange = vi.fn();
+    render(
+      <Board
+        reorderableColumns
+        onColumnOrderChange={onColumnOrderChange}
+        getItemHref={(task) => `#/tasks/${task.id}`}
+        onItemOpen={onItemOpen}
+        onValueChange={onValueChange}
+      />,
+    );
+    stubLayout();
+    const link = within(screen.getByTestId("card-b")).getByRole("link");
+    fireEvent.pointerDown(link, { ...POINTER, clientX: 10, clientY: 25 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 310, clientY: 5 });
+    expect(screen.getByTestId("card-b")).toHaveAttribute("data-lifted");
+    expect(document.querySelector("[data-kanban-column='todo']")).not.toHaveAttribute(
+      "data-lifted",
+    );
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 310, clientY: 5 });
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
+    fireEvent.click(within(screen.getByTestId("card-b")).getByRole("link"));
+    expect(onItemOpen).not.toHaveBeenCalled();
+    // A press without travel is a click: the card opens, nothing moves.
+    const still = within(screen.getByTestId("card-a")).getByRole("link");
+    fireEvent.pointerDown(still, { ...POINTER, clientX: 10, clientY: 5 });
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 10, clientY: 5 });
+    fireEvent.click(still);
+    expect(onItemOpen).toHaveBeenCalledTimes(1);
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
+  });
+
+  it("with movable columns a touch hold on a card lifts the card, never its column", () => {
+    vi.useFakeTimers();
+    const onColumnOrderChange = vi.fn();
+    render(
+      <Board
+        reorderableColumns
+        onColumnOrderChange={onColumnOrderChange}
+        getItemHref={(task) => `#/tasks/${task.id}`}
+      />,
+    );
+    stubLayout();
+    const touch = { ...POINTER, pointerType: "touch" };
+    fireEvent.pointerDown(within(screen.getByTestId("card-b")).getByRole("link"), {
+      ...touch,
+      clientX: 10,
+      clientY: 25,
+    });
+    act(() => {
+      vi.advanceTimersByTime(DRAG_HOLD_MS + 10);
+    });
+    expect(screen.getByTestId("card-b")).toHaveAttribute("data-lifted");
+    expect(document.querySelector("[data-kanban-column='todo']")).not.toHaveAttribute(
+      "data-lifted",
+    );
+    fireEvent.pointerUp(window, { ...touch, clientX: 10, clientY: 25 });
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
   });
 
   it("drops into an empty column", () => {

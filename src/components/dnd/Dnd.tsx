@@ -435,6 +435,7 @@ export type DndSortableItemProps = {
   disabled?: boolean;
   locked?: boolean;
   dragFromControls?: boolean;
+  bare?: boolean;
   className?: string;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
@@ -451,6 +452,7 @@ function DndSortableItem({
   disabled: itemDisabled = false,
   locked = false,
   dragFromControls = false,
+  bare = false,
   className,
   children,
   onPointerDown,
@@ -512,6 +514,7 @@ function DndSortableItem({
       data-locked={locked || undefined}
       data-pending={busy || undefined}
       data-handle={context.handle || undefined}
+      data-dnd-bare={bare || undefined}
       {...{ [DRAG_FROM_CONTROLS]: (dragFromControls && !context.handle) || undefined }}
     >
       <ItemContext value={item}>{children}</ItemContext>

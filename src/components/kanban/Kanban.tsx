@@ -717,6 +717,8 @@ function KanbanColumnView<T>({
       id={column.id}
       locked={column.locked ?? false}
       className={styles.column}
+      // plain / line: no surface of its own, the carried column is its header and its cards.
+      bare={cardDepth !== undefined}
       data-kanban-column={column.id}
       data-full={full || undefined}
     >

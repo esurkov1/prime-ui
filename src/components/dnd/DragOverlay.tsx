@@ -193,6 +193,8 @@ function cloneFor(preview: DragPreview): HTMLElement {
  * the overlay, from its own resting look.
  */
 function fillBareCopy(host: HTMLElement, source: HTMLElement) {
+  // A `bare` item (a board column: a header and cards) flies as its parts, which keep their own.
+  if (source.hasAttribute("data-dnd-bare")) return;
   const copy = host.querySelector<HTMLElement>("[data-dnd-copy]");
   if (!copy || !isTransparent(getComputedStyle(copy).backgroundColor)) return;
   const layer = getComputedStyle(source).getPropertyValue("--prime-color-layer-current").trim();
