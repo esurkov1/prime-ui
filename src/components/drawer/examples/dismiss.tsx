@@ -43,7 +43,7 @@ export default function DrawerDismissExample() {
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Отмена
             </Button.Root>
           </Drawer.Close>

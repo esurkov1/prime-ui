@@ -31,7 +31,7 @@ export default function DrawerSizesExample() {
               </Drawer.Body>
               <Drawer.Footer>
                 <Drawer.Close>
-                  <Button.Root variant="outline" tone="neutral">
+                  <Button.Root variant="soft" tone="neutral">
                     Закрыть
                   </Button.Root>
                 </Drawer.Close>

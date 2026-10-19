@@ -381,9 +381,45 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 ## 6. Actions
 
-- **One primary per area** (the page, card, dialog, form): `solid`, last in its row. Secondary:
-  `soft` + `tone="neutral"`. Dismiss / revert: `ghost` + `neutral` in pages and cards, `outline` +
-  `neutral` in Modal / Drawer footers.
+- **One primary per area** (the page, card, dialog, form): `solid`, last in its row.
+- **A button with text always has a fill.** Every other labelled button — secondary, «Отмена»,
+  «Закрыть», revert, «+ Транспорт» under a list — is `soft` + `tone="neutral"` (`tone="danger"` for a
+  destructive one), wherever it stands: a page header, a card, a dialog footer, under a list. A
+  button without fill is an icon-only `ghost` (`aria-label` + `Tooltip`) in a dialog header, a table
+  cell, a row or a toolbar. Buttons have no outline: `variant="outline"` is not for product screens.
+  A text with no fill reads as a caption, an outline as a disabled field — the fill is what says
+  «press me», and its strength says how much.
+
+```tsx partial
+// bad — text without a fill, a cancel drawn as an outline
+<Button.Root variant="ghost" tone="neutral">
+  <Button.Icon>
+    <Icon name="action.add" />
+  </Button.Icon>
+  Транспорт
+</Button.Root>
+<Drawer.Footer>
+  <Drawer.Close>
+    <Button.Root variant="outline" tone="neutral">Закрыть</Button.Root>
+  </Drawer.Close>
+</Drawer.Footer>
+```
+
+```tsx good
+// good — every labelled secondary is soft neutral; ghost only for an icon in the header
+<Button.Root variant="soft" tone="neutral">
+  <Button.Icon>
+    <Icon name="action.add" />
+  </Button.Icon>
+  Транспорт
+</Button.Root>
+<Drawer.Footer>
+  <Drawer.Close>
+    <Button.Root variant="soft" tone="neutral">Закрыть</Button.Root>
+  </Drawer.Close>
+</Drawer.Footer>
+```
+
 - Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
@@ -391,7 +427,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   edits is not a third footer button: it stands in `Modal.Actions` / `Drawer.Actions` of the header
   by the menu threshold below, confirmed by a `ConfirmDialog`.
 - An empty state's action replaces the header's primary, it does not duplicate it.
-- Destructive: `tone="danger"`; a standalone trigger is `outline`, in a menu it is the last item, the
+- Destructive: `tone="danger"`; a standalone trigger is `soft`, in a menu it is the last item, the
   confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
 - Going somewhere is a link (`LinkButton`, `Button.Root asChild` + `<a>`), doing something is a Button.
   One action — one label on the whole screen.
@@ -720,8 +756,45 @@ Bad → good: [anti-slop.md](anti-slop.md#7c-a-create-button-out-of-reach).
 | a region changes state (loading → data → empty → error, another record) | its content in `Crossfade state={status}` — always, so the change flows instead of flipping |
 | nothing here yet (first run) | `EmptyPage` with one action (`tone="accent"` icon for a call to start) |
 | nothing matches the filter | the table's `empty`, with a reset action |
+| a list of cards with nothing in it yet (the vehicles of a deal, the contacts of a client) | `EmptyPage size="s"` inside a `Card.Root` in the list's place, the add button under it ([an empty list of cards](#an-empty-list-of-cards)) |
 
 Stale data beats an empty block: show the last known values and say when they are from.
+
+### An empty list of cards
+
+A list of cards that is empty keeps the shape of the list: one `Card.Root` in its place holds an
+`EmptyPage size="s"` — what goes here and why it matters — and the list's add button stays where it
+is with cards, under the list. Not a line of text (it reads as a caption of something missing), not a
+card drawn «like a record» with the button inside it (it reads as a record).
+
+```tsx partial
+// bad — a line of text where the cards go
+<Typography tone="muted">Транспорт не добавлен</Typography>
+<Button.Root variant="ghost">+ Добавить транспорт</Button.Root>
+```
+
+```tsx good
+// good — the empty state in a card in the list's place, the add button under it
+<Card.Root>
+  <Card.Body>
+    <EmptyPage.Root size="s" aria-labelledby="deal-vehicles-empty">
+      <EmptyPage.Icon>
+        <Icon name="object.package" />
+      </EmptyPage.Icon>
+      <EmptyPage.Title as="h3" id="deal-vehicles-empty">
+        Транспорта нет
+      </EmptyPage.Title>
+      <EmptyPage.Description>Добавьте машины, которые клиент берёт по сделке.</EmptyPage.Description>
+    </EmptyPage.Root>
+  </Card.Body>
+</Card.Root>
+<Button.Root variant="soft" tone="neutral">
+  <Button.Icon>
+    <Icon name="action.add" />
+  </Button.Icon>
+  Транспорт
+</Button.Root>
+```
 
 State change is continuous across the kit: a region never jumps from one state
 to the next. Give every region its states, render them inside `Crossfade`, and let the loading state
@@ -1117,11 +1190,11 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - A document page: `Page.Root maxWidth="wide"`, the large `Page.Title` with a sentence of `Page.Description` in the `Page.Heading` of a `Page.Header` in the flow, and a `Page.TopBar collapse` whose `Page.Heading` holds only the path and repeats the title once it scrolls away.
 - A section is a `Card variant="panel"` with its own `Card.Header` (`Card.Title as="h2"` + a line of `Card.Description`), the cards stacked in the flow ([a titled block](#4-surfaces)).
-- The form wraps the whole `Card.Root` in `<form noValidate>`; the buttons are in `Card.Footer`: «Отменить изменения» `ghost` + `neutral`, then the primary «Сохранить». While the request runs — `loading` on the button, and one `Fieldset disabled` turns the fields off; the form stays on screen, so success is the button text «Сохранено» for two seconds, without a notification.
+- The form wraps the whole `Card.Root` in `<form noValidate>`; the buttons are in `Card.Footer`: «Отменить изменения» `soft` + `neutral`, then the primary «Сохранить». While the request runs — `loading` on the button, and one `Fieldset disabled` turns the fields off; the form stays on screen, so success is the button text «Сохранено» for two seconds, without a notification.
 - Fields are 20 px apart; two short related fields side by side while there is width, with `align-items: start` and `reserveSupportRow`, so an error does not shift the neighbour.
 - An error comes through the field's `error` after submit, not while typing; a format hint goes in `hint`.
 - A `Switch` applies at once — its section has no «Сохранить» button; the explanation is in the switch's own `hint`.
-- The danger zone is the last section: an `outline` + `tone="danger"` button in `ConfirmDialog.Trigger`; `onConfirm` returns the delete Promise — the dialog holds `loading` itself, disables cancel and does not close while the request runs.
+- The danger zone is the last section: a `soft` + `tone="danger"` button in `ConfirmDialog.Trigger`; `onConfirm` returns the delete Promise — the dialog holds `loading` itself, disables cancel and does not close while the request runs.
 
 ### Form in a Drawer
 
@@ -1133,7 +1206,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - Groups are a `Fieldset` without a frame with a `title-s` heading 16 px above the fields; 32 px of air between groups, no dividers. `Fieldset disabled` turns all the fields off while the request runs.
 - Validation on submit: errors in each field's `error`, focus on the first invalid field; mark the minority: required fields are the majority, so `optional` stands only on the optional ones.
 - The client type is a `Radio.Group` with `label` (two visible options), the manager a `Select`, consent a `Checkbox` with `hint`: the value goes with the form, it does not apply at once.
-- Footer: «Отмена» `outline` + `neutral`, the primary action last, in `loading` during the request; closing is held by `Drawer.Guard` (`busy` — while saving, neither Escape nor the close button closes; `dirty` — after an edit it asks whether to discard the changes).
+- Footer: «Отмена» `soft` + `neutral`, the primary action last, in `loading` during the request; closing is held by `Drawer.Guard` (`busy` — while saving, neither Escape nor the close button closes; `dirty` — after an edit it asks whether to discard the changes).
 - The result is a `Notification` and a new row in the table; the panel closes by itself.
 
 ### Record editor

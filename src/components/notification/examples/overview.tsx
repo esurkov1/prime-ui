@@ -5,7 +5,7 @@ function CopyLinkButton() {
   const { notify } = useNotifications();
   return (
     <Button.Root
-      variant="outline"
+      variant="soft"
       tone="neutral"
       onClick={() => notify({ tone: "success", title: "Ссылка на счёт скопирована" })}
     >

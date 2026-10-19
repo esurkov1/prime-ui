@@ -66,7 +66,7 @@ export default function TagSelectInFormExample() {
           </Typography>
         ) : null}
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           type="reset"
           onClick={() => {

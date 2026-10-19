@@ -29,7 +29,7 @@ export default function PopoverOverviewExample() {
         </div>
         <Popover.Actions>
           <Popover.Close>
-            <Button.Root variant="ghost" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Сбросить
             </Button.Root>
           </Popover.Close>

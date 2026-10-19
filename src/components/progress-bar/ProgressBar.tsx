@@ -42,15 +42,18 @@ type ProgressBarModeProps =
       steps?: boolean;
       layout?: never;
       scale?: never;
+      showShare?: never;
     })
   | (SegmentsModeProps & { steps?: never } & (
         | {
             layout?: "bar";
             scale?: never;
+            showShare?: never;
           }
         | {
             layout: "rows";
             scale?: ProgressScale;
+            showShare?: boolean;
             segmentGap?: never;
             legend?: never;
           }
@@ -100,6 +103,7 @@ export function ProgressBar(props: ProgressBarProps) {
     formatValue = formatProgressValue,
     layout = "bar",
     scale = "sum",
+    showShare = true,
     labels,
     "aria-label": ariaLabel,
     ...rest
@@ -131,7 +135,7 @@ export function ProgressBar(props: ProgressBarProps) {
       <div className={styles.rowHeader}>
         <span className={styles.rowLabel}>{segment.label}</span>
         <span className={styles.rowValue}>{formatValue(segment.value)}</span>
-        <span className={styles.rowShare}>{share}%</span>
+        {showShare ? <span className={styles.rowShare}>{share}%</span> : null}
       </div>
       <span className={styles.bar} aria-hidden="true">
         <span

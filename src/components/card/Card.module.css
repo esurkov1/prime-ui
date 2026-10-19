@@ -276,19 +276,41 @@
 /*
  * `stat-text` with an action (anything besides the text parts — a button «Выдан», «Отменить»): a
  * grid of two columns, the label, the value and the meta stacked in the text column, the action at
- * the end of the row at its own size, centred on the text. With a meta the last row takes the free
- * height, so the meta still keeps to the bottom of the tile.
+ * the end of the row at its own size, centred on the text. One row per text part that is there —
+ * an absent part leaves no empty row and no extra gap; with a meta its row takes the free height,
+ * so the meta still keeps to the bottom of the tile.
  */
 .root[data-variant="stat-text"]:has(> :not(.label, .value, .delta, .meta, .mark)) {
+  --stat-rows-label: 0;
+  --stat-rows-value: 0;
+  --stat-rows-delta: 0;
+
   display: grid;
   grid-template-columns: [text] minmax(0, 1fr) [end] auto;
-  grid-template-rows: auto auto;
+  grid-template-rows:
+    repeat(
+      max(1, calc(var(--stat-rows-label) + var(--stat-rows-value) + var(--stat-rows-delta))),
+      auto
+    )
+    var(--stat-row-meta,);
   align-items: center;
   gap: var(--prime-space-2) var(--prime-space-3);
 }
 
-.root[data-variant="stat-text"]:has(> :not(.label, .value, .delta, .meta, .mark)):has(> .meta) {
-  grid-template-rows: auto auto 1fr;
+.root[data-variant="stat-text"]:has(> .label) {
+  --stat-rows-label: 1;
+}
+
+.root[data-variant="stat-text"]:has(> .value) {
+  --stat-rows-value: 1;
+}
+
+.root[data-variant="stat-text"]:has(> .delta) {
+  --stat-rows-delta: 1;
+}
+
+.root[data-variant="stat-text"]:has(> .meta) {
+  --stat-row-meta: 1fr;
 }
 
 .root[data-variant="stat-text"] > :is(.label, .value, .delta, .meta) {
@@ -379,6 +401,11 @@
   min-width: 0;
   min-height: 0;
   padding: var(--card-gap) var(--card-pad) var(--card-pad);
+}
+
+/* The body that opens the card (no header or media above it) has the card padding on every side. */
+.body:first-child {
+  padding-top: var(--card-pad);
 }
 
 .body > *:only-child {

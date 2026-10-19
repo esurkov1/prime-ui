@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function BadgeInControlsExample() {
   return (
     <div className={styles.controls}>
-      <Button.Root variant="outline" tone="neutral">
+      <Button.Root variant="soft" tone="neutral">
         Входящие
         <Badge.Root color="blue">12</Badge.Root>
       </Button.Root>

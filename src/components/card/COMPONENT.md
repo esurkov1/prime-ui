@@ -203,7 +203,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 ## Layout & spacing
 - Cards on a page: one `Page.Grid` with a `Page.Cell span` per card (16 on both axes, the cards of a row share one height); a grid inside one block is the block's own intrinsic `auto-fill` grid on the tile width of the layout tokens (a lone card keeps its column width), gap `--prime-space-4`.
 - Radius `--prime-card-radius`, no border. In `panel` and `list` the `Header` is a padded zone with a faint inset hairline below; in `stat-trend` it can pair a leading Badge or icon with a compact `Card.Value`.
-- Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
+- Padding `--prime-card-padding-m` (20); a `Body` that opens the card (no `Header` or `Media` above) has it on all four sides; `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
 - Long values wrap; labels truncate, except in a `mini` tile and a `split` cell, where a label beside the icon wraps instead; a chart SVG needs a CSS height.
 - In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper. A `Card.Description` in the header stacks under the title, 4 apart; the control stays at the end, centred on both lines.

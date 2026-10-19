@@ -294,8 +294,8 @@ place (a `Banner` for the page; for a region `EmptyPage tone="danger"` — it an
 
 ## Secondary actions
 
-- Page and card forms: dismiss or revert with `variant="ghost" tone="neutral"`, before the primary.
-- Modal / Drawer footers: cancel is `variant="outline" tone="neutral"` (as in Modal COMPONENT.md).
+- Dismiss, cancel and revert stand before the primary; which variant every labelled button takes
+  is [composition.md → actions](composition.md#6-actions).
 - One label per action per screen («Отмена» to leave, «Отменить изменения» to revert, «Сбросить
   фильтры»), and the same action keeps the same variant in the header, toolbars and menus. If «Отмена»
   would clash with the action itself («Отменить заказ»), use an unambiguous label («Не отменять»).
@@ -310,8 +310,8 @@ Which step an action deserves — undo, a held press, a confirm — is
 A standalone destructive action that is easy to redo by hand is `Button.Root holdToConfirm` with the
 action in `onConfirm` ([the recipe](motion.md#5-recipes)).
 
-`tone="danger"`. A standalone trigger that opens a confirm (danger zone) is `variant="outline"`; inside
-a bar of other actions (card actions) it is `soft`; in a Dropdown it is the last item
+`tone="danger"`. A trigger that opens a confirm (a danger zone, card actions) is `variant="soft"`;
+in a Dropdown it is the last item
 with `tone="danger"`; an inline remove in a media or file row is `ghost`. The confirm itself is
 [ConfirmDialog](../src/components/confirm-dialog/COMPONENT.md) — never a hand-built Modal: it is a
 Modal `s` with a solid danger confirm (`tone="accent"` for an outward action that destroys nothing, like
@@ -332,7 +332,7 @@ export function DeleteProject({ onDelete }: { onDelete: () => Promise<void> }) {
       onConfirm={onDelete}
     >
       <ConfirmDialog.Trigger>
-        <Button.Root variant="outline" tone="danger">
+        <Button.Root variant="soft" tone="danger">
           Удалить проект
         </Button.Root>
       </ConfirmDialog.Trigger>

@@ -627,7 +627,7 @@ export default function GanttScreenExample() {
               </Modal.Body>
               <Modal.Footer>
                 <Modal.Close>
-                  <Button.Root variant="outline" tone="neutral">
+                  <Button.Root variant="soft" tone="neutral">
                     Отмена
                   </Button.Root>
                 </Modal.Close>
@@ -677,7 +677,7 @@ export default function GanttScreenExample() {
               </Drawer.Body>
               <Drawer.Footer>
                 <Drawer.Close>
-                  <Button.Root variant="outline" tone="neutral">
+                  <Button.Root variant="soft" tone="neutral">
                     Закрыть
                   </Button.Root>
                 </Drawer.Close>

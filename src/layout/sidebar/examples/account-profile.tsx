@@ -52,7 +52,7 @@ export default function SidebarAccountProfileExample() {
                 </DescriptionList.Root>
               </Drawer.Body>
               <Drawer.Footer>
-                <Button.Root variant="outline" tone="neutral">
+                <Button.Root variant="soft" tone="neutral">
                   Выйти
                 </Button.Root>
               </Drawer.Footer>

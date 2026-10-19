@@ -34,7 +34,7 @@ export default function DrawerFooterActionsExample() {
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Actions>
-            <Button.Root variant="ghost" tone="danger">
+            <Button.Root variant="soft" tone="danger">
               <Button.Icon>
                 <Icon name="action.logout" />
               </Button.Icon>
@@ -42,7 +42,7 @@ export default function DrawerFooterActionsExample() {
             </Button.Root>
           </Drawer.Actions>
           <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Закрыть
             </Button.Root>
           </Drawer.Close>

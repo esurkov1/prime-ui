@@ -222,7 +222,7 @@ Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere 
 
 **Combinations** — destructive confirm: use [ConfirmDialog](../confirm-dialog/COMPONENT.md). An edit form: `Modal.Guard busy={saving} dirty={changed}`, `Modal.Meta` «Есть несохранённые изменения» while changed, the submit Button `loading` while saving.
 
-**Hierarchy** — one primary action, last in the footer and wrapped in `Modal.Confirm`; the secondary is `outline` neutral. A form is the exception: its primary is the `type="submit" form={formId}` button, outside `Modal.Confirm` — Enter in a field submits the form natively.
+**Hierarchy** — one primary action, last in the footer and wrapped in `Modal.Confirm`; the secondary is `soft` neutral. A form is the exception: its primary is the `type="submit" form={formId}` button, outside `Modal.Confirm` — Enter in a field submits the form natively.
 
 ## States
 | State | Driven by | DOM |

@@ -20,7 +20,7 @@ export default function CardRecordLinkExample() {
           <Badge.Root color="blue">Ждёт выдачи</Badge.Root>
         </Card.Body>
         <Card.Footer divider="full">
-          <Button.Root size="s" variant="outline" tone="neutral">
+          <Button.Root size="s" variant="soft" tone="neutral">
             <Button.Icon>
               <Icon name="action.check" />
             </Button.Icon>
@@ -51,7 +51,7 @@ export default function CardRecordLinkExample() {
           </Modal.Header>
           <Modal.Footer>
             <Modal.Close>
-              <Button.Root variant="outline" tone="neutral">
+              <Button.Root variant="soft" tone="neutral">
                 Закрыть
               </Button.Root>
             </Modal.Close>

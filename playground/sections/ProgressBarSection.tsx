@@ -74,6 +74,12 @@ export const page: ComponentPageConfig = {
         "Рейтинг, где у каждой строки своя шкала: загрузка парка по моделям, каждая модель от своего парка, строка — ссылка — `layout`, `scale`, `max`, `href`.",
     },
     {
+      scenario: "percent-rows",
+      title: "Значения в процентах",
+      description:
+        "Рейтинг, где значение уже процент: загрузка по моделям, строка показывает только его — `layout`, `scale`, `showShare`, `formatValue`.",
+    },
+    {
       scenario: "steps",
       title: "Ступени",
       description:

@@ -15,7 +15,7 @@ export default function EmptyPageNarrowExample() {
           Под выбранные регион и категорию никто не подходит. Ослабьте фильтры.
         </EmptyPage.Description>
         <EmptyPage.Actions>
-          <Button.Root variant="outline" tone="neutral">
+          <Button.Root variant="soft" tone="neutral">
             Сбросить фильтры
           </Button.Root>
           <Button.Root>Пригласить поставщика</Button.Root>

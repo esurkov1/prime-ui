@@ -18,7 +18,7 @@ export default function AccordionControlledExample() {
 
   return (
     <div className={styles.panel}>
-      <Button.Root variant="ghost" tone="neutral" onClick={() => setOpen(allOpen ? [] : ALL)}>
+      <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(allOpen ? [] : ALL)}>
         {allOpen ? "Свернуть все" : "Развернуть все"}
       </Button.Root>
       <Accordion.Root multiple value={open} onValueChange={setOpen}>

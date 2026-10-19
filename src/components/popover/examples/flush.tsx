@@ -36,7 +36,7 @@ export default function PopoverFlushExample() {
         <Divider role="presentation" />
         <div className={styles.flushFooter}>
           <Popover.Close>
-            <Button.Root variant="ghost" tone="neutral" size="s">
+            <Button.Root variant="soft" tone="neutral" size="s">
               Прочитать все
             </Button.Root>
           </Popover.Close>

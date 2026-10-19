@@ -9,7 +9,7 @@ export default function ButtonHoldToConfirmExample() {
   const [deleted, setDeleted] = React.useState(false);
 
   return deleted ? (
-    <Button.Root variant="ghost" tone="neutral" onClick={() => setDeleted(false)}>
+    <Button.Root variant="soft" tone="neutral" onClick={() => setDeleted(false)}>
       <Button.Icon>
         <Icon name="action.refresh" />
       </Button.Icon>

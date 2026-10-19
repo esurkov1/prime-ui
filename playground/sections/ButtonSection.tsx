@@ -86,7 +86,7 @@ export const page: ComponentPageConfig = {
       scenario: "on-colored-host",
       title: "На цветной подложке",
       description:
-        'Действия на solid-баннере берут его цвет текста: soft-действие и ghost рядом — `tone="inherit"`.',
+        'Действия на solid-баннере берут его цвет текста: действие и отказ рядом, оба soft — `tone="inherit"`.',
     },
     {
       scenario: "as-child",

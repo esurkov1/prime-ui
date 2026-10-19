@@ -33,7 +33,7 @@ export default function BannerStructureExample() {
           <Banner.Title>Пробный период закончится 12 октября</Banner.Title>
           <Banner.Description>Выберите тариф, чтобы сохранить отчёты команды.</Banner.Description>
           <Banner.Actions>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Сравнить
             </Button.Root>
             <Button.Root>Выбрать тариф</Button.Root>

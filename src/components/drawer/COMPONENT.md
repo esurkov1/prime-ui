@@ -232,8 +232,8 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
   - `Drawer.Icon` is optional and stands before the text, centred on lines 1–2: a glyph on the tone tile for a setting or a notice, or a picture (`Avatar.Root`, `Thumbnail.Root`) with no tile at 40 px. A record header usually goes without it: the name leads.
   - A question or a form keeps a plain header: a title that wraps and a description that wraps under it; only `Drawer.Badges` or a `number` make it a record header.
 - A drawer has three zones: `Drawer.Header` (title, the × close button), `Drawer.Body` (the content, the only zone that scrolls) and `Drawer.Footer` (the actions). The footer is not optional decoration — it is where the drawer is finished:
-  - read-only details: `Drawer.Close` around `<Button.Root variant="outline" tone="neutral">Закрыть</Button.Root>`, plus the record's main action (solid, last) when it has one;
-  - a form: «Отмена» (`Drawer.Close`, outline neutral) and the submit button (solid, last; `type="submit" form={formId}`), `Drawer.Meta` for «Есть несохранённые изменения»;
+  - read-only details: `Drawer.Close` around `<Button.Root variant="soft" tone="neutral">Закрыть</Button.Root>`, plus the record's main action (solid, last) when it has one;
+  - a form: «Отмена» (`Drawer.Close`, soft neutral) and the submit button (solid, last; `type="submit" form={formId}`), `Drawer.Meta` for «Есть несохранённые изменения»;
   - one acknowledgement: `<Drawer.Footer layout="fill">`;
   - an action apart from the main pair («Выйти»; deleting the record goes in the header's «⋯» through a ConfirmDialog): `Drawer.Actions` inside the footer puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
   Both the header × and the footer button stay: the × is the quick way out at the top, the footer is the end of the reading or editing path, where the hand already is.

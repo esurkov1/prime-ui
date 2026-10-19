@@ -31,7 +31,7 @@ LoginForm.Root                      width cap; a Card inside: card fill, radius,
    ├─ LoginForm.Actions             provider buttons
    ├─ Divider                       «или»
    ├─ LoginForm.Form                <form>: Input.Root … · Button submit
-   │  └─ LoginForm.Actions          primary button + ghost back action
+   │  └─ LoginForm.Actions          primary button + soft neutral back action
    └─ LoginForm.Footer              «Нет аккаунта? <LinkButton>»
 ```
 Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, dividers and links are the regular kit components; LoginForm owns only the layout and the rhythm.
@@ -108,7 +108,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `…rest` | `FormHTMLAttributes<HTMLFormElement>` | — | The other form (`onSubmit`, `action`) attributes. |
 
 ### LoginForm.Actions
-`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action.
+`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `soft` neutral back action.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

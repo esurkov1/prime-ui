@@ -56,7 +56,7 @@ export default function SheetHeaderActionsExample() {
         </Sheet.Body>
         <Sheet.Footer layout="fill">
           <Sheet.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Позже
             </Button.Root>
           </Sheet.Close>

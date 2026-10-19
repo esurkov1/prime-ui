@@ -18,7 +18,7 @@ export default function LoginFormRegisterExample() {
       </LoginForm.Header>
       <LoginForm.Body>
         <LoginForm.Actions>
-          <Button.Root variant="outline" tone="neutral" fullWidth>
+          <Button.Root variant="soft" tone="neutral" fullWidth>
             <Button.Icon>
               <Icon name="object.key" />
             </Button.Icon>

@@ -28,7 +28,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 ├─ EmptyPage.Title           <h2> (as)
 ├─ EmptyPage.Description     <p>
 └─ EmptyPage.Actions         row of buttons
-   └─ EmptyPage.RetryButton  the kit's «Повторить» (Button outline neutral + refresh icon); onRetry
+   └─ EmptyPage.RetryButton  the kit's «Повторить» (Button soft neutral + refresh icon); onRetry
 ```
 
 ## API
@@ -77,7 +77,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Buttons in the same `size`), `className` and the other div attributes. |
 
 ### EmptyPage.RetryButton
-`ref` → `HTMLButtonElement`. The kit's retry of a failed region: an outline neutral Button with the refresh icon and `labels.retry`, in the root's tier. Put it in `EmptyPage.Actions`.
+`ref` → `HTMLButtonElement`. The kit's retry of a failed region: a soft neutral Button with the refresh icon and `labels.retry`, in the root's tier. Put it in `EmptyPage.Actions`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

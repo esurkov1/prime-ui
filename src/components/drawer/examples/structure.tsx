@@ -24,7 +24,7 @@ export default function DrawerStructureExample() {
         </Drawer.Body>
         <Drawer.Footer layout="fill">
           <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Понятно
             </Button.Root>
           </Drawer.Close>

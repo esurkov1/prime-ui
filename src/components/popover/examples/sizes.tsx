@@ -21,7 +21,7 @@ export default function PopoverSizesExample() {
               </Popover.Header>
               <Popover.Actions>
                 <Popover.Close>
-                  <Button.Root variant="ghost" tone="neutral" size={size}>
+                  <Button.Root variant="soft" tone="neutral" size={size}>
                     Отмена
                   </Button.Root>
                 </Popover.Close>

@@ -7,7 +7,7 @@ export default function ButtonAsChildExample() {
       <Button.Root asChild>
         <a href="#invoices">Открыть счета</a>
       </Button.Root>
-      <Button.Root variant="outline" tone="neutral" asChild disabled>
+      <Button.Root variant="soft" tone="neutral" asChild disabled>
         <a href="#export">Экспорт недоступен</a>
       </Button.Root>
     </>

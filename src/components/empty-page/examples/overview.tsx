@@ -12,7 +12,7 @@ export default function EmptyPageOverviewExample() {
         По запросу «монитор 32″» нет товаров. Измените фильтры или сбросьте поиск.
       </EmptyPage.Description>
       <EmptyPage.Actions>
-        <Button.Root variant="outline" tone="neutral">
+        <Button.Root variant="soft" tone="neutral">
           Сбросить фильтры
         </Button.Root>
         <Button.Root>Новый поиск</Button.Root>

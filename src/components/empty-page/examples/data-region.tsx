@@ -8,7 +8,7 @@ export default function EmptyPageDataRegionExample() {
     <Card.Root role="region" aria-labelledby="orders-region-title" className={styles.region}>
       <Card.Header>
         <Card.Title id="orders-region-title">Заказы</Card.Title>
-        <Button.Root variant="outline" tone="neutral" size="s">
+        <Button.Root variant="soft" tone="neutral" size="s">
           Импорт
         </Button.Root>
       </Card.Header>
@@ -21,7 +21,7 @@ export default function EmptyPageDataRegionExample() {
           Создайте заказ вручную или подключите магазин — заказы начнут появляться автоматически.
         </EmptyPage.Description>
         <EmptyPage.Actions>
-          <Button.Root variant="outline" tone="neutral">
+          <Button.Root variant="soft" tone="neutral">
             Подключить магазин
           </Button.Root>
           <Button.Root>Создать заказ</Button.Root>

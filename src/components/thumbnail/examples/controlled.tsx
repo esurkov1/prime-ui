@@ -31,7 +31,7 @@ export default function ThumbnailControlledExample() {
           {selected.size === 0 ? "Ничего не выбрано" : `Выбрано: ${selected.size}`}
         </Typography>
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           disabled={selected.size === 0}
           onClick={() => setSelected(new Set())}

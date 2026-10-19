@@ -28,7 +28,7 @@ export default function SheetDismissExample() {
         </Sheet.Body>
         <Sheet.Footer>
           <Sheet.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Клиент не вышел
             </Button.Root>
           </Sheet.Close>

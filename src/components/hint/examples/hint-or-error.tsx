@@ -13,7 +13,7 @@ export default function HintHintOrErrorExample() {
         <Button.Root variant="soft" tone="neutral" onClick={() => setInvalid(true)}>
           Опубликовать
         </Button.Root>
-        <Button.Root variant="ghost" tone="neutral" onClick={() => setInvalid(false)}>
+        <Button.Root variant="soft" tone="neutral" onClick={() => setInvalid(false)}>
           Сбросить
         </Button.Root>
       </div>

@@ -71,7 +71,7 @@ export default function ModalGuardExample() {
         <Modal.Footer>
           {dirty ? <Modal.Meta>Есть несохранённые изменения</Modal.Meta> : null}
           <Modal.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Отмена
             </Button.Root>
           </Modal.Close>

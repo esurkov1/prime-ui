@@ -24,7 +24,7 @@ export default function BannerDismissibleExample() {
           </Banner.Content>
         </Banner.Root>
       ) : (
-        <Button.Root variant="outline" tone="neutral" onClick={() => setVisible(true)}>
+        <Button.Root variant="soft" tone="neutral" onClick={() => setVisible(true)}>
           Вернуть баннер
         </Button.Root>
       )}

@@ -12,7 +12,7 @@ export default function ConfirmDialogVariantsExample() {
           onConfirm={() => {}}
         >
           <ConfirmDialog.Trigger>
-            <Button.Root variant="outline" tone="danger">
+            <Button.Root variant="soft" tone="danger">
               Отозвать доступ
             </Button.Root>
           </ConfirmDialog.Trigger>

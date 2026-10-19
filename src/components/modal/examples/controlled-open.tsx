@@ -18,7 +18,7 @@ export default function ModalControlledOpenExample() {
           </Modal.Header>
           <Modal.Footer>
             <Modal.Close>
-              <Button.Root variant="outline" tone="neutral">
+              <Button.Root variant="soft" tone="neutral">
                 Выйти
               </Button.Root>
             </Modal.Close>

@@ -189,7 +189,7 @@ export type EmptyPageRetryButtonProps = Omit<
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** The kit's «Повторить» for an error state: an outline neutral Button with the refresh icon. */
+/** The kit's «Повторить» for an error state: a soft neutral Button with the refresh icon. */
 function EmptyPageRetryButton({ onRetry, children, disabled, ...rest }: EmptyPageRetryButtonProps) {
   const { labels } = React.useContext(EmptyPageContext);
   // One retry at a time; on a rejection the owner keeps the error state and says why, and the
@@ -199,7 +199,7 @@ function EmptyPageRetryButton({ onRetry, children, disabled, ...rest }: EmptyPag
   return (
     <Button.Root
       {...rest}
-      variant="outline"
+      variant="soft"
       tone="neutral"
       loading={retry.pending}
       disabled={disabled}

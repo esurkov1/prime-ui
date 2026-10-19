@@ -175,8 +175,8 @@ function BannerActions({ className, children, ...rest }: BannerActionsProps) {
       {children}
       {banner?.onDismiss ? (
         <Button.Root
-          variant="outline"
-          tone="neutral"
+          variant="soft"
+          tone="inherit"
           size={banner.size}
           aria-label={banner.dismissLabel}
           className={styles.actionsClose}

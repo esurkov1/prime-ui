@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function KbdInControlsExample() {
   return (
     <div className={styles.controls}>
-      <Button.Root variant="outline" tone="neutral">
+      <Button.Root variant="soft" tone="neutral">
         Найти
         <span className={styles.chord}>
           <Kbd aria-label="Command" title="Command">

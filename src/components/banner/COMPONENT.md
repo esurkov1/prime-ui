@@ -114,7 +114,7 @@ Banner.Root                 <div>; variant, tone, size, placement
 | State | Driven by | DOM |
 |---|---|---|
 | look | `variant`, `tone`, `size`, `placement` | `data-variant`, `data-tone`, `data-size`, `data-placement` |
-| dismissible | `onDismiss` | corner ghost Button (`xs`, `s` on `l` / `xl`), or the last outline Button in `Banner.Actions` |
+| dismissible | `onDismiss` | corner ghost Button (`xs`, `s` on `l` / `xl`), or the last soft Button (`tone="inherit"`) in `Banner.Actions` |
 | narrow | own width < 36rem (a banner with `Banner.Actions` is a size container) | actions move under the text; the close button returns to the corner |
 
 No `open` prop: the parent mounts and unmounts the banner. A banner that appears on a page already shown enters (a short fade and rise), one that mounts with its page stands still; an unmounted one closes up in place, so the content below glides up instead of jumping. To swap the banner for another block in the same spot (a «restore» button), wrap both in [Crossfade](../crossfade/COMPONENT.md).

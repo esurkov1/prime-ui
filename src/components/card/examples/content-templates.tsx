@@ -19,7 +19,7 @@ export default function CardContentTemplatesExample() {
         </Card.Description>
         <Card.Footer>
           <Button.Root size="s">Скачать CSV</Button.Root>
-          <Button.Root variant="ghost" tone="neutral" size="s">
+          <Button.Root variant="soft" tone="neutral" size="s">
             Настроить
           </Button.Root>
         </Card.Footer>
@@ -63,7 +63,7 @@ export default function CardContentTemplatesExample() {
           <Card.Description>Охват и клики за 7 дней</Card.Description>
         </Card.Body>
         <Card.Footer>
-          <Button.Root variant="outline" tone="neutral" size="s">
+          <Button.Root variant="soft" tone="neutral" size="s">
             Открыть отчёт
           </Button.Root>
         </Card.Footer>

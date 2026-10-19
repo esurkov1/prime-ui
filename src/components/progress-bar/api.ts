@@ -107,6 +107,13 @@ export const api: ComponentApi = {
           ru: "Только `rows`: что такое 100%. `sum` — сумма (`max` её поднимает); `max` — лидер на всю ширину, доли от суммы; `first` — первая строка (воронка); `own` — `max` строки, иначе `max` корня, иначе 100.",
         },
         {
+          name: "showShare",
+          type: "boolean",
+          default: "true",
+          en: "`rows` only: the share at the end of each row. `false` when the value already is the share — a load in percent under `scale` `own` with `max` `100`.",
+          ru: "Только `rows`: доля в конце строки. `false`, когда значение уже и есть доля — загрузка в процентах при `scale` `own` и `max` `100`.",
+        },
+        {
           name: "labels",
           type: "Partial<ProgressBarLabels>",
           en: "Segments mode: built-in strings, see Labels.",

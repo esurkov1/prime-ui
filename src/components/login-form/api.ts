@@ -207,8 +207,8 @@ export const api: ComponentApi = {
     },
     {
       name: "LoginForm.Actions",
-      en: "`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action.",
-      ru: "Колонка кнопок на всю ширину: кнопки провайдеров над формой или главное действие с `ghost`-действием назад.",
+      en: "`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `soft` neutral back action.",
+      ru: "Колонка кнопок на всю ширину: кнопки провайдеров над формой или главное действие с `soft` нейтральным действием назад.",
       props: [
         {
           name: "children",

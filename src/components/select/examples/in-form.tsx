@@ -70,7 +70,7 @@ export default function SelectInFormExample() {
           </Typography>
         ) : null}
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           type="reset"
           onClick={() => {

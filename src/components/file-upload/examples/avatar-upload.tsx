@@ -45,7 +45,7 @@ export default function FileUploadAvatarUploadExample() {
             {preview ? "Заменить" : "Загрузить"}
           </Button.Root>
           {preview ? (
-            <Button.Root variant="ghost" tone="danger" onClick={() => setPreview(null)}>
+            <Button.Root variant="soft" tone="danger" onClick={() => setPreview(null)}>
               Удалить
             </Button.Root>
           ) : null}

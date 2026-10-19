@@ -3,7 +3,7 @@ import { Button, Icon } from "prime-ui-kit";
 
 export default function ButtonToggleExample() {
   return (
-    <Button.Root variant="ghost" tone="neutral" defaultPressed>
+    <Button.Root variant="soft" tone="neutral" defaultPressed>
       <Button.Icon>
         <Icon name="status.favorite" />
       </Button.Icon>

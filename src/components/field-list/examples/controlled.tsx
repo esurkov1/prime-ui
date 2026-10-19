@@ -63,7 +63,7 @@ export default function FieldListControlledExample() {
       />
       <div className={styles.summary}>
         <Typography variant="title-m">Итого {RUB.format(totalOf(lines))}</Typography>
-        <Button.Root variant="ghost" tone="neutral" onClick={() => setLines(SAVED)}>
+        <Button.Root variant="soft" tone="neutral" onClick={() => setLines(SAVED)}>
           Вернуть сохранённое
         </Button.Root>
       </div>

@@ -48,7 +48,7 @@ export default function TextareaInFormExample() {
       </Fieldset>
       <div className={styles.formActions}>
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           type="reset"
           onClick={() => {

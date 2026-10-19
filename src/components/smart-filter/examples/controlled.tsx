@@ -36,7 +36,7 @@ export default function SmartFilterControlledExample() {
         <Button.Root variant="soft" tone="neutral" onClick={() => setValue(NO_READS)}>
           Без GET и POST
         </Button.Root>
-        <Button.Root variant="ghost" tone="neutral" onClick={() => setValue({})}>
+        <Button.Root variant="soft" tone="neutral" onClick={() => setValue({})}>
           Сбросить
         </Button.Root>
       </div>

@@ -50,7 +50,7 @@ export default function ModalDismissExample() {
         </Modal.Body>
         <Modal.Footer>
           <Modal.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Позже
             </Button.Root>
           </Modal.Close>

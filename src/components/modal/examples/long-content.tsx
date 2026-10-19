@@ -57,7 +57,7 @@ export default function ModalLongContentExample() {
         </Modal.Body>
         <Modal.Footer>
           <Modal.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Не сейчас
             </Button.Root>
           </Modal.Close>

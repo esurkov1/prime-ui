@@ -63,7 +63,7 @@ export default function PopoverInFormExample() {
           </Select.Root>
           <Popover.Actions>
             <Popover.Close>
-              <Button.Root variant="ghost" tone="neutral">
+              <Button.Root variant="soft" tone="neutral">
                 Отмена
               </Button.Root>
             </Popover.Close>

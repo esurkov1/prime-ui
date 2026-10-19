@@ -8,14 +8,14 @@ function DismissButtons() {
   return (
     <div className={styles.row}>
       <Button.Root
-        variant="outline"
+        variant="soft"
         tone="neutral"
         onClick={() => notify({ title: "Черновик сохранён", duration: 2000 })}
       >
         На 2 секунды
       </Button.Root>
       <Button.Root
-        variant="outline"
+        variant="soft"
         tone="neutral"
         onClick={() =>
           notify({
@@ -30,7 +30,7 @@ function DismissButtons() {
         Без таймера
       </Button.Root>
       <Button.Root
-        variant="outline"
+        variant="soft"
         tone="neutral"
         onClick={() => notify({ tone: "success", title: "Ссылка скопирована", closable: false })}
       >

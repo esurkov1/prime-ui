@@ -135,9 +135,9 @@ Title uses the tier text size with title weight; Description uses the tier label
 
 A bottom sheet is always full width, whatever `width` says.
 
-**Combinations** — panel `size` = trigger `size` = sizes of the buttons in Actions. Forms: `trapFocus` + Header + Actions inside a `<form>`. A must-finish step: `closeOnOutsideClick={false}`, ghost neutral «Отмена» in `Popover.Close` and the primary action; a destructive confirm is a [ConfirmDialog](../confirm-dialog/COMPONENT.md).
+**Combinations** — panel `size` = trigger `size` = sizes of the buttons in Actions. Forms: `trapFocus` + Header + Actions inside a `<form>`. A must-finish step: `closeOnOutsideClick={false}`, soft neutral «Отмена» in `Popover.Close` and the primary action; a destructive confirm is a [ConfirmDialog](../confirm-dialog/COMPONENT.md).
 
-**Hierarchy** — one primary button in Actions (last), the rest `ghost` neutral.
+**Hierarchy** — one primary button in Actions (last), the rest `soft` neutral.
 
 ## States
 | State | Driven by | DOM |

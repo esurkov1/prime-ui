@@ -38,7 +38,7 @@ export default function PopoverWidthExample() {
       </Popover.Root>
       <Popover.Root>
         <Popover.Trigger>
-          <Button.Root variant="ghost" tone="neutral" fullWidth>
+          <Button.Root variant="soft" tone="neutral" fullWidth>
             Все лимиты
           </Button.Root>
         </Popover.Trigger>

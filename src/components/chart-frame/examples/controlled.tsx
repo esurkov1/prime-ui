@@ -37,7 +37,7 @@ export default function ChartFrameControlledExample() {
         <ChartFrame.Description>Май — октябрь</ChartFrame.Description>
         <ChartFrame.Actions>
           <Button.Root
-            variant="ghost"
+            variant="soft"
             tone="neutral"
             disabled={hidden.length === 0}
             onClick={() => setHidden([])}

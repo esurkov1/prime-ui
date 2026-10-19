@@ -19,7 +19,7 @@ export default function AvatarSrcFromStateExample() {
         <Avatar.Fallback>ИП</Avatar.Fallback>
       </Avatar.Root>
       <Button.Root
-        variant="outline"
+        variant="soft"
         tone="neutral"
         onClick={() => setIndex((i) => (i + 1) % SOURCES.length)}
       >

@@ -198,7 +198,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 
 ## Layout & spacing
 - A sheet is a short task that ends by itself — a pick, a tap on an action, a swipe down. Its zones follow the task, not a template:
-  - **No footer by default.** A footer only for a form with an explicit submit: «Отмена» (`Sheet.Close`, outline neutral) and the submit (solid, last; `type="submit" form={formId}`).
+  - **No footer by default.** A footer only for a form with an explicit submit: «Отмена» (`Sheet.Close`, soft neutral) and the submit (solid, last; `type="submit" form={formId}`).
   - **The header is optional.** Keep it when the content needs a title to be understood (a list of actions on «Заказ № 1042»). Drop it — and with it the × and the hairline — when the content speaks for itself (a calendar opened from a «Дата отгрузки» button): name the sheet with `aria-label` on `Sheet.Content`.
 - The header has one anatomy, the same in every modal, drawer and sheet — three lines in the text column, the actions and the close button centred on the first:
   ```

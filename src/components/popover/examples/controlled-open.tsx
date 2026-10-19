@@ -7,7 +7,7 @@ export default function PopoverControlledOpenExample() {
 
   return (
     <>
-      <Button.Root variant="ghost" tone="neutral" onClick={() => setOpen(true)}>
+      <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(true)}>
         Показать подсказку
       </Button.Root>
       <Popover.Root open={open} onOpenChange={setOpen}>

@@ -663,7 +663,7 @@ export function PanelView(props: PanelViewProps) {
               ) : null}
             </div>
             <div className={styles.footerActions}>
-              <Button.Root variant="ghost" tone="neutral" size={controlSize} onClick={reset}>
+              <Button.Root variant="soft" tone="neutral" size={controlSize} onClick={reset}>
                 {labels.reset}
               </Button.Root>
               <Button.Root size={controlSize} disabled={!canApply} onClick={apply}>

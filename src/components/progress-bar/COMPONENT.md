@@ -58,6 +58,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `formatValue` | `(value: number) => string` | Russian digit groups | Segments mode: display of a part's value in the legend and the rows («1 840 000 ₽»). |
 | `layout` | `"bar" \| "rows"` | `"bar"` | Segments mode: `bar` — every part in one bar; `rows` — a ranking: an `<ol>`, one row per part with label · value · share over its own bar. |
 | `scale` | `"sum" \| "max" \| "first" \| "own"` | `"sum"` | `rows` only: what 100% is. `sum` — the total (`max` raises it); `max` — the leader is a full bar, shares of the total; `first` — the first row (a funnel); `own` — each row's `max`, else the root `max`, else 100. |
+| `showShare` | `boolean` | `true` | `rows` only: the share at the end of each row. `false` when the value already is the share — a load in percent under `scale` `own` with `max` `100`. |
 | `labels` | `Partial<ProgressBarLabels>` | — | Segments mode: built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root; `aria-label` names the bar when there is no `label`. |
 
@@ -116,6 +117,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `legend` | rows of swatch · name · value · share under the bar | a distribution the reader compares in numbers | `false` |
 | `loading` | a Skeleton bar (and legend or row lines) in the same geometry | the data is on its way | `false` |
 | `steps` | `max` equal cells (2–12), each filled whole | a level out of a few: password strength, an onboarding step | `false` |
+| `showShare` | `rows`: the muted share at the end of each row | off when the value already is the share (a load in percent) | `true` |
 
 ## States
 | State | Driven by | DOM |
@@ -178,6 +180,7 @@ Always controlled: pass the current `value` or `segments` on every render.
 | [legend.tsx](examples/legend.tsx) | Shares of categories in their chart colors with a legend of color · name · value · share — `color`, `legend`, `formatValue`. |
 | [ranking.tsx](examples/ranking.tsx) | Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step, each step a link — `layout`, `scale`, `href`. |
 | [own-scale.tsx](examples/own-scale.tsx) | A ranking where each row has its own scale: fleet load per model, each model out of its own fleet, each row a link — `layout`, `scale`, `max`, `href`. |
+| [percent-rows.tsx](examples/percent-rows.tsx) | A ranking whose values already are percents: fleet load per model, each row its value alone — `layout`, `scale`, `showShare`, `formatValue`. |
 | [steps.tsx](examples/steps.tsx) | The scale as whole cells that fill one after another: 2 of 5 onboarding steps, forward and back — `steps`, `max`. |
 | [milestone.tsx](examples/milestone.tsx) | A rare milestone: the last invoice of the quarter fills the bar, the tone turns success and a short confetti burst marks it — `value`, `tone`, `celebrate()`. |
 
@@ -191,6 +194,7 @@ Always controlled: pass the current `value` or `segments` on every render.
 - Categories (sources, platforms) painted with `tone` → `tone` says good or bad; categories take `color`, the same as in their charts.
 - The number written into `label` of each row of a hand-built ranking → `layout="rows"` with `formatValue`.
 - A column of separate value bars for rows that each have their own whole → `layout="rows"`, `scale="own"`, `max` on each segment.
+- «79% 79%» in a ranking of percents → `showShare={false}` with a `formatValue` that adds `%`.
 - A grey box while the data loads → `loading` draws the Skeleton in the bar's geometry.
 
 ## Related

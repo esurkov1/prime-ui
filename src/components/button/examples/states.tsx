@@ -23,7 +23,7 @@ export default function ButtonStatesExample() {
         </Typography>
       </div>
       <div>
-        <Button.Root variant="outline" tone="neutral" loading>
+        <Button.Root variant="soft" tone="neutral" loading>
           <Button.Icon>
             <Icon name="action.upload" />
           </Button.Icon>

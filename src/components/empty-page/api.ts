@@ -111,8 +111,8 @@ export const api: ComponentApi = {
     },
     {
       name: "EmptyPage.RetryButton",
-      en: "`ref` → `HTMLButtonElement`. The kit's retry of a failed region: an outline neutral Button with the refresh icon and `labels.retry`, in the root's tier. Put it in `EmptyPage.Actions`.",
-      ru: "Готовая кнопка повтора для упавшего региона: Button outline neutral с иконкой обновления и `labels.retry`, в ярусе корня. Кладите в `EmptyPage.Actions`.",
+      en: "`ref` → `HTMLButtonElement`. The kit's retry of a failed region: a soft neutral Button with the refresh icon and `labels.retry`, in the root's tier. Put it in `EmptyPage.Actions`.",
+      ru: "Готовая кнопка повтора для упавшего региона: Button soft neutral с иконкой обновления и `labels.retry`, в ярусе корня. Кладите в `EmptyPage.Actions`.",
       props: [
         {
           name: "onRetry",

@@ -44,7 +44,7 @@ export default function DrawerClientCardExample() {
           </Drawer.Section>
           <Drawer.Section label="Открытые сделки" description="2 сделки на 1 620 000 ₽">
             <Drawer.Actions>
-              <Button.Root variant="ghost" tone="neutral">
+              <Button.Root variant="soft" tone="neutral">
                 <Button.Icon>
                   <Icon name="action.add" />
                 </Button.Icon>
@@ -62,7 +62,7 @@ export default function DrawerClientCardExample() {
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Закрыть
             </Button.Root>
           </Drawer.Close>

@@ -39,7 +39,7 @@ export default function LoginFormVerificationCodeExample() {
             <Button.Root type="submit" fullWidth disabled={code.length < 6}>
               Подтвердить
             </Button.Root>
-            <Button.Root variant="ghost" tone="neutral" fullWidth>
+            <Button.Root variant="soft" tone="neutral" fullWidth>
               Отправить код ещё раз
             </Button.Root>
           </LoginForm.Actions>

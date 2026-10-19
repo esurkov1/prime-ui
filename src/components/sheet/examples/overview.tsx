@@ -34,7 +34,7 @@ export default function SheetOverviewExample() {
           <div className={styles.actions}>
             {ACTIONS.map((action) => (
               <Sheet.Close key={action.label}>
-                <Button.Root variant="ghost" tone="neutral" fullWidth>
+                <Button.Root variant="soft" tone="neutral" fullWidth>
                   <Button.Icon>
                     <Icon name={action.icon} />
                   </Button.Icon>
@@ -49,7 +49,7 @@ export default function SheetOverviewExample() {
               onConfirm={() => cancelOrder().then(() => setOpen(false))}
             >
               <ConfirmDialog.Trigger>
-                <Button.Root variant="ghost" tone="danger" fullWidth>
+                <Button.Root variant="soft" tone="danger" fullWidth>
                   <Button.Icon>
                     <Icon name="action.delete" />
                   </Button.Icon>

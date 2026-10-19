@@ -43,7 +43,7 @@ export default function PopoverDismissExample() {
           </Input.Root>
           <Popover.Actions>
             <Popover.Close>
-              <Button.Root variant="ghost" tone="neutral" disabled={saving}>
+              <Button.Root variant="soft" tone="neutral" disabled={saving}>
                 Отмена
               </Button.Root>
             </Popover.Close>

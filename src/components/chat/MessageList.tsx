@@ -1098,7 +1098,7 @@ export function ChatSelectionBar({ className, children, ref, ...rest }: ChatSele
         <span className={styles.selectionActions}>
           {children}
           <Button.Root
-            variant="ghost"
+            variant="soft"
             tone="neutral"
             size="s"
             onClick={() => list.setSelected(null)}

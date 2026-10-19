@@ -6,7 +6,7 @@ export default function DividerOrSeparatorExample() {
     <>
       <Button.Root fullWidth>Войти</Button.Root>
       <Divider>или</Divider>
-      <Button.Root variant="outline" tone="neutral" fullWidth>
+      <Button.Root variant="soft" tone="neutral" fullWidth>
         <Button.Icon>
           <Icon name="field.email" />
         </Button.Icon>

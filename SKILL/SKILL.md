@@ -119,7 +119,7 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 4. One size per row. Default `m` everywhere (omit `size`); change the tier for a whole region.
 5. Air is hierarchy: tighter inside a group, wider between groups, widest between sections — spacing via
    `gap` on the parent, never margins.
-6. One primary action per area. The rest are `soft`/`ghost`/`outline` with `tone="neutral"`.
+6. One primary action per area. Every other button with text is `soft` with `tone="neutral"`; `ghost` only for icon-only buttons; no `outline` buttons.
 7. Labels above fields, always — once per column for records in rows (`FieldList`), never numbered
    («Пункт 1»), never repeating their heading. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;

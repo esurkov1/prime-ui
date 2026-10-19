@@ -310,6 +310,20 @@ describe("ProgressBar", () => {
       expect(ratios(container)).toEqual(["0.85", "0.6"]);
       expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("Газель Next3485%");
     });
+
+    it("showShare false: a row shows its value alone", () => {
+      render(
+        <ProgressBar
+          aria-label="Загрузка"
+          layout="rows"
+          scale="own"
+          showShare={false}
+          formatValue={(v) => `${v}%`}
+          segments={[{ value: 79, label: "Газель Next" }]}
+        />,
+      );
+      expect(screen.getByRole("listitem")).toHaveTextContent(/^Газель Next79%$/);
+    });
   });
 
   describe("loading", () => {

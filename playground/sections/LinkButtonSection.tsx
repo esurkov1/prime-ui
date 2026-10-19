@@ -16,7 +16,7 @@ export const page: ComponentPageConfig = {
   title: "LinkButton",
   kind: "primitive",
   description:
-    'Настоящая ссылка в виде текстового действия, на ярусах контролов. Для действия без адреса — Button с `variant="ghost"`.',
+    'Настоящая ссылка в виде текстового действия, на ярусах контролов. Для действия без адреса — Button с `variant="soft"`.',
   examples: [
     {
       slot: "overview",

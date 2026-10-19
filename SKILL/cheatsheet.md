@@ -17,7 +17,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Set `size` on the root (`Input.Root size="s"`, `Select.Root size="s"`) — not on `Input.Field` or `Select.Trigger`.
 - One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit.
 - Inside a sized host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave the kit controls without `size` — the host passes its tier ([the host tier](api-contract.md#size-and-the-host-tier)).
-- A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="ghost" tone="neutral">`.
+- A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="soft" tone="neutral">` (an icon-only one `variant="ghost"`).
 
 ## Structure
 
@@ -76,7 +76,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Buttons and actions
 
-- One primary per area (page header, card, dialog): the default `solid` accent, last in the row. Others `variant="soft" tone="neutral"`; dismiss `variant="ghost" tone="neutral"` (pages), `variant="outline" tone="neutral"` (Modal / Drawer footer).
+- One primary per area (page header, card, dialog): the default `solid` accent, last in the row. Every other button with text — cancel, close and dismiss too — `variant="soft" tone="neutral"`: a labelled button always has a fill; `ghost` is only for icon-only buttons; no `outline` buttons ([actions](composition.md#6-actions)).
 - One secondary action is in sight — an icon `Button.Root` with a `Tooltip` — and a «⋯» `Dropdown` only gathers two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
 - Destructive is `tone="danger"` — never `tone="error"`; which variant where and how it is confirmed: [api-contract.md](api-contract.md#destructive-actions) and [choosing.md](choosing.md).
 - Going somewhere is a link: `<LinkButton href>` or `<Button.Root asChild><a href>…</a></Button.Root>` — not `onClick={() => location.assign(url)}`.
@@ -174,7 +174,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A record opened beside the page is one drawer component per entity, opened from everywhere: permissions make fields `readOnly` and hide tabs and actions; one form over all tabs with one «Сохранить» in `Drawer.Footer` while dirty and `Drawer.Guard`; data loaded by the drawer, not by each tab; the history its own tab; `Drawer.Actions` act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - A titled group in a dialog's body (contacts, deals, history): `<Drawer.Section label="Контакты">` (`Modal.Section`), its button in `Drawer.Actions` inside it — not a `Typography as="h3"` row with buttons of your own.
 - Never a hand-made `div` backdrop, dialog, menu or tooltip.
-- Every Modal and Drawer has its `Header` (title, ×); `Body` (content, scrolls) and `Footer` (actions) are there when it has content and actions. Actions always go into the `Footer`: details `<Drawer.Footer><Drawer.Close><Button.Root variant="outline" tone="neutral">Закрыть</Button.Root></Drawer.Close></Drawer.Footer>`, plus the main action last; a form: «Отмена» + submit — not Save at the bottom of the body. A `Sheet` (from the bottom edge) is the opposite: no footer by default — a pick or a swipe ends it — and its header is optional: keep it when the content needs a title, drop it (× and hairline go too) when the content speaks for itself, with `aria-label` on `Sheet.Content`. Never `Drawer.Content side="bottom"`.
+- Every Modal and Drawer has its `Header` (title, ×); `Body` (content, scrolls) and `Footer` (actions) are there when it has content and actions. Actions always go into the `Footer`: details `<Drawer.Footer><Drawer.Close><Button.Root variant="soft" tone="neutral">Закрыть</Button.Root></Drawer.Close></Drawer.Footer>`, plus the main action last; a form: «Отмена» + submit — not Save at the bottom of the body. A `Sheet` (from the bottom edge) is the opposite: no footer by default — a pick or a swipe ends it — and its header is optional: keep it when the content needs a title, drop it (× and hairline go too) when the content speaks for itself, with `aria-label` on `Sheet.Content`. Never `Drawer.Content side="bottom"`.
 - Content inside a Drawer, a Sheet or a Card is the host's own: a calendar is `Datepicker.Panel` straight in the body, across its width — no card, no padded box around it.
 - A destructive confirm is `<ConfirmDialog.Root title description confirmLabel onConfirm={remove}>` with a `ConfirmDialog.Trigger` — not a Modal assembled as a confirm with your own pending state; a reversible delete offers «Отменить» in the notification instead.
 - Overlays close smoothly only if they stay mounted: render the `Root` always and drive visibility with `open` alone — never `{open && <Drawer.Root>}`, never a changing `key` on the Root. The kit keeps the last content on screen while the exit plays.

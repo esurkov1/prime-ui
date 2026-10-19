@@ -41,7 +41,7 @@ export default function KanbanControlledExample() {
         </Typography>
         <div className={styles.spacer} />
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           disabled={placement === INITIAL}
           onClick={() => {

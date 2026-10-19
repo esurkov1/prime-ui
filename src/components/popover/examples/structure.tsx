@@ -8,7 +8,7 @@ export default function PopoverStructureExample() {
     <>
       <Popover.Root>
         <Popover.Trigger>
-          <Button.Root variant="ghost" tone="neutral">
+          <Button.Root variant="soft" tone="neutral">
             <Button.Icon>
               <Icon name="status.info" />
             </Button.Icon>
@@ -35,7 +35,7 @@ export default function PopoverStructureExample() {
           </Popover.Header>
           <Popover.Actions>
             <Popover.Close>
-              <Button.Root variant="ghost" tone="neutral">
+              <Button.Root variant="soft" tone="neutral">
                 Отмена
               </Button.Root>
             </Popover.Close>

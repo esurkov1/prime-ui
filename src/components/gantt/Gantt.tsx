@@ -1622,7 +1622,7 @@ const GanttToolbar = React.memo(function GanttToolbar({
   return (
     <ToolRow className={styles.toolbar}>
       {toolbar != null && toolbar !== false ? <ToolGroup>{toolbar}</ToolGroup> : null}
-      <Button.Root variant="ghost" tone="neutral" disabled={!todayInRange} onClick={onToday}>
+      <Button.Root variant="soft" tone="neutral" disabled={!todayInRange} onClick={onToday}>
         {labels.today}
       </Button.Root>
       <SegmentedControl.Root aria-label={labels.scale} value={scale} onValueChange={onScale}>

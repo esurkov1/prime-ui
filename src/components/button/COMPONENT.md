@@ -89,18 +89,18 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `solid` + `danger` | danger fill, danger-fg text | confirming a destructive action in a dialog | |
 | `solid` + `success` | success fill, success-fg text; a button turning success glides its fill over `fast` | an action that is done: «Оплачено», «Отправлено» | |
 | `soft` + `accent` | `accent-soft` fill, accent text | secondary but highlighted action | |
-| `soft` + `neutral` | translucent `fill-subtle` wash, primary text | secondary actions (Cancel, Filters) | |
-| `soft` + `danger` | `danger-soft` fill, danger text | secondary destructive action | |
+| `soft` + `neutral` | translucent `fill-subtle` wash, primary text | every secondary text action: Cancel, Close, Back, Reset, Filters | |
+| `soft` + `danger` | `danger-soft` fill, danger text | secondary destructive text action (Delete in a footer, a trigger that opens a confirm) | |
 | `soft` / `outline` / `ghost` + `success` | `success-soft` fill or wash, success text | a quieter done state next to other actions | |
-| `outline` + `accent` | transparent, 1px `border-default` inset line, accent text | rare; accent action lighter than solid | |
-| `outline` + `neutral` | transparent, 1px inset line, primary text | secondary action that needs an edge (Draft, Back) | |
-| `outline` + `danger` | 1px inset line, danger text, `danger-soft` on hover | destructive trigger that opens a confirm | |
-| `ghost` + `accent` | transparent, accent text, `fill-subtle` on hover | tertiary accent action in text-heavy areas | |
-| `ghost` + `neutral` | transparent, secondary text → primary on hover | toolbar buttons, icon-only buttons | |
-| `ghost` + `danger` | transparent, danger text, `danger-soft` on hover | destructive action set apart in a footer | |
+| `outline` + `accent` | transparent, 1px `border-default` inset line, accent text | not for product screens: a text action takes a fill (`soft`) | |
+| `outline` + `neutral` | transparent, 1px inset line, primary text | not for product screens: Cancel, Close and Back are `soft` neutral | |
+| `outline` + `danger` | 1px inset line, danger text, `danger-soft` on hover | not for product screens: a destructive trigger is `soft` danger | |
+| `ghost` + `accent` | transparent, accent text, `fill-subtle` on hover | an icon-only accent action | |
+| `ghost` + `neutral` | transparent, secondary text → primary on hover | icon-only buttons (toolbars, dialog headers, table cells, rows); a text button always has a fill | |
+| `ghost` + `danger` | transparent, danger text, `danger-soft` on hover | an icon-only destructive action (a row's delete) | |
 | `ghost` + `inherit` | transparent, the host's text color, a `currentColor` wash on hover / press | close or icon action on a colored host (solid Banner, accent strip) | |
 | `soft` + `inherit` | `currentColor` wash fill, the host's text color | a labelled action on a colored host | |
-| `outline` + `inherit` | 1px inset line in a `currentColor` wash, the host's text color | an action with an edge on a colored host | |
+| `outline` + `inherit` | 1px inset line in a `currentColor` wash, the host's text color | not for product screens: a labelled action on a colored host is `soft` | |
 | `shade` (+ `accent` / `neutral` / `success`) | the media disk ground (`--prime-color-media-disk`, lighter than the pills' `media-shade`) under a gentle backdrop blur (`--prime-media-disk-blur`), so the frame shows through, and its light glyph (≥ 3:1 even over a white frame); the same in both themes and the same look as the still play mark of a video frame | a button over a picture, a video or a video circle (edit a cover, cancel an upload) | |
 | `shade` + `danger` | the danger fill, danger-fg glyph | a failed transfer over media: the retry | |
 | `glass` | the glass of a floating bar (`--prime-color-bg-glass`) over a strong backdrop blur (`--prime-glass-blur`), ink text; the solid floating fill where the user asks for less transparency; the host draws the rim and the lift | a floating action beside a glass bar, a labelled action over a photo | |
@@ -148,7 +148,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | `pressed` / `defaultPressed` | on: accent soft fill and accent text over any variant; off: the variant's own look | a single toggle (favourite, pin, «show archived») | — (not a toggle) |
 | `current` | the selected look, `aria-current="page"` | the current page of a set (page numbers) | off |
 
-**Hierarchy:** one primary (`solid accent`) per area, the rest neutral `soft`/`outline`/`ghost`; a destructive action is `tone="danger"` and sits apart (start of the footer). Avoid two `solid accent` buttons side by side and `tone="danger"` for non-destructive actions.
+**Hierarchy:** one primary (`solid accent`) per area, the rest neutral `soft` — a button with visible text always has a fill; `ghost` is for icon-only buttons and `outline` stays off product screens; a destructive action is `tone="danger"` and sits apart (start of the footer). Avoid two `solid accent` buttons side by side and `tone="danger"` for non-destructive actions.
 
 ## States
 | State | Driven by | DOM |
@@ -222,7 +222,7 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `
 | [align.tsx](examples/align.tsx) | A column of export actions reads from the start edge, every row the full width — `align`, `fullWidth`. |
 | [hold-to-confirm.tsx](examples/hold-to-confirm.tsx) | A destructive action that needs a held press; letting go early rolls the fill back and does nothing, and the delete request keeps the button loading until the server answers — `holdToConfirm`, `onConfirm`. |
 | [label-morph.tsx](examples/label-morph.tsx) | A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `loading`, `tone`. |
-| [on-colored-host.tsx](examples/on-colored-host.tsx) | Actions on a solid banner take its text color: a soft action and a ghost one beside it — `tone="inherit"`. |
+| [on-colored-host.tsx](examples/on-colored-host.tsx) | Actions on a solid banner take its text color: the action and the dismissal beside it, both soft — `tone="inherit"`. |
 | [as-child.tsx](examples/as-child.tsx) | The button look on a real link; a disabled link blocks navigation — `asChild`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | A toggle whose state the screen owns: pinning an order shows the note under it — `pressed`, `onPressedChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A full-width submit button that shows the request in progress after the email passes validation — `type`, `loading`, `fullWidth`. |

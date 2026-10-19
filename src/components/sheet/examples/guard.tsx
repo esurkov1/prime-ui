@@ -58,7 +58,7 @@ export default function SheetGuardExample() {
         <Sheet.Footer>
           {dirty ? <Sheet.Meta>Есть несохранённые изменения</Sheet.Meta> : null}
           <Sheet.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Отмена
             </Button.Root>
           </Sheet.Close>

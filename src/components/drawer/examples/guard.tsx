@@ -64,7 +64,7 @@ export default function DrawerGuardExample() {
         <Drawer.Footer>
           {dirty ? <Drawer.Meta>Есть несохранённые изменения</Drawer.Meta> : null}
           <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Отмена
             </Button.Root>
           </Drawer.Close>

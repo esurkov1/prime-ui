@@ -62,7 +62,7 @@ export default function FileUploadInFormExample() {
         </Typography>
       ) : null}
       <div className={styles.formActions}>
-        <Button.Root variant="ghost" tone="neutral" type="reset">
+        <Button.Root variant="soft" tone="neutral" type="reset">
           Отменить
         </Button.Root>
         <Button.Root type="submit">Отправить</Button.Root>

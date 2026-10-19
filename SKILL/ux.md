@@ -75,7 +75,7 @@ records they cannot see. A set that can be empty shows its empty state, never a 
       <List.ItemText>Safari · iPhone</List.ItemText>
       <List.ItemDescription>Казань · вчера в 21:40</List.ItemDescription>
       <List.ItemActions>
-        <Button.Root size="s" variant="ghost" tone="neutral">Завершить</Button.Root>
+        <Button.Root size="s" variant="soft" tone="neutral">Завершить</Button.Root>
       </List.ItemActions>
     </List.Item>
   </List.Root>

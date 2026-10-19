@@ -30,7 +30,7 @@ export default function StepperControlledExample() {
       </Stepper.Root>
       <div className={styles.actions}>
         <Button.Root
-          variant="outline"
+          variant="soft"
           tone="neutral"
           disabled={step === 0}
           onClick={() => setStep(step - 1)}

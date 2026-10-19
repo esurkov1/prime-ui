@@ -54,7 +54,7 @@ export default function FileUploadControlledExample() {
         </Typography>
         <div className={styles.spacer} />
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           disabled={documents === SAVED}
           onClick={() => {

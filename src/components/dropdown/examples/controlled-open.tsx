@@ -10,7 +10,7 @@ export default function DropdownControlledOpenExample() {
 
   return (
     <>
-      <Button.Root variant="ghost" tone="neutral" onClick={() => setOpen(true)}>
+      <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(true)}>
         Перейти к шагу
       </Button.Root>
       <Dropdown.Root open={open} onOpenChange={setOpen}>

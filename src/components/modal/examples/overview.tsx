@@ -21,7 +21,7 @@ export default function ModalOverviewExample() {
         </Modal.Body>
         <Modal.Footer>
           <Modal.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Отмена
             </Button.Root>
           </Modal.Close>

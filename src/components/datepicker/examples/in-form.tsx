@@ -57,7 +57,7 @@ export default function DatepickerInFormExample() {
           </Typography>
         ) : null}
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           onClick={() => {
             setPeriod(EMPTY_PERIOD);

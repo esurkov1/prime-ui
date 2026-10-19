@@ -42,7 +42,7 @@ export default function DataTableStatesExample() {
             loadError={
               <>
                 Не удалось загрузить платежи
-                <Button.Root variant="outline" tone="neutral" size="s">
+                <Button.Root variant="soft" tone="neutral" size="s">
                   Повторить
                 </Button.Root>
               </>

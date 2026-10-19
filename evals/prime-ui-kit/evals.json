@@ -414,6 +414,19 @@
         "The new «Возврат» button stands in the same Page.Actions, the solid primary stays last",
         "The «Оплата» and «Возврат» buttons carry an aria-label with the whole action that contains their visible word (e.g. «Новая оплата», «Оформить возврат»), so the tooltip of a folded button says the action"
       ]
+    },
+    {
+      "id": 33,
+      "prompt": "Сделай дровер сделки: клиент, список транспорта по сделке карточками (сейчас пусто) с кнопкой добавления, список оплат с кнопкой добавления, в подвале — закрыть.",
+      "expected_output": "Every labelled button has a fill: the add buttons («+ Транспорт», «+ Оплата») and «Закрыть» are soft neutral; only icon-only buttons in the header are ghost; no outline buttons. The empty vehicle list is an EmptyPage size s inside a Card.Root in the list's place, the add button under it.",
+      "files": [],
+      "expectations": [
+        "Every Button.Root with visible text is variant=\"soft\" tone=\"neutral\" or the solid primary: no labelled Button.Root with variant=\"ghost\" or variant=\"outline\"",
+        "«Закрыть» in Drawer.Footer is a soft neutral Button.Root inside Drawer.Close, not outline",
+        "variant=\"ghost\" appears only on icon-only Button.Root elements with an aria-label",
+        "The empty vehicle list is EmptyPage.Root size=\"s\" inside Card.Root (Card.Body) where the cards go, not a line of Typography text and not a card with the add button inside it",
+        "The add button for vehicles stands under the list (outside the empty card) and reads «Транспорт» beside action.add, without «Добавить»"
+      ]
     }
   ]
 }

@@ -22,7 +22,7 @@ export default function BadgeAppliedFiltersExample() {
               {label}
             </Badge.Root>
           ))}
-          <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setFilters([])}>
+          <Button.Root variant="soft" tone="neutral" size="s" onClick={() => setFilters([])}>
             Сбросить все
           </Button.Root>
         </div>
@@ -31,7 +31,7 @@ export default function BadgeAppliedFiltersExample() {
           <Typography variant="body-s" tone="muted">
             Фильтры не выбраны — показаны все товары.
           </Typography>
-          <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setFilters(INITIAL)}>
+          <Button.Root variant="soft" tone="neutral" size="s" onClick={() => setFilters(INITIAL)}>
             Вернуть
           </Button.Root>
         </div>

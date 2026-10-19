@@ -40,7 +40,7 @@ function PositionPicker() {
         </Select.Root>
       </div>
       <Button.Root
-        variant="outline"
+        variant="soft"
         tone="neutral"
         onClick={() =>
           notify({

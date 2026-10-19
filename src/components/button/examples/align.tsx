@@ -13,7 +13,7 @@ export default function ButtonAlignExample() {
   return (
     <div className={styles.column}>
       {EXPORTS.map((item) => (
-        <Button.Root key={item.label} variant="ghost" tone="neutral" align="start" fullWidth>
+        <Button.Root key={item.label} variant="soft" tone="neutral" align="start" fullWidth>
           <Button.Icon>
             <Icon name={item.icon} />
           </Button.Icon>

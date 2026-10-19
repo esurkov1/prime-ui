@@ -665,7 +665,7 @@ function Panel({ searchable }: { searchable: boolean }) {
         <div ref={footerRef} className={footer.className}>
           <Divider role="presentation" />
           <div className={styles.footer}>
-            <Button.Root variant="ghost" tone="neutral" size="xs" onClick={clearAll}>
+            <Button.Root variant="soft" tone="neutral" size="xs" onClick={clearAll}>
               {labels.reset}
             </Button.Root>
           </div>

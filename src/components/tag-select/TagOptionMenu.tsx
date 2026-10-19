@@ -125,7 +125,7 @@ export function TagOptionMenu({
           ) : null}
           {onDelete ? (
             <Button.Root
-              variant="ghost"
+              variant="soft"
               tone="danger"
               size="s"
               className={styles.menuDelete}

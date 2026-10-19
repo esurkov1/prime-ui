@@ -92,7 +92,7 @@ export default function SelectCreateActionExample() {
           </Modal.Body>
           <Modal.Footer>
             <Modal.Close>
-              <Button.Root variant="outline" tone="neutral">
+              <Button.Root variant="soft" tone="neutral">
                 Отмена
               </Button.Root>
             </Modal.Close>

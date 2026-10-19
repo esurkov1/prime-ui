@@ -31,7 +31,7 @@ export default function ModalEnterKeyExample() {
         closeOnOutsideClick={false}
       >
         <Modal.Trigger>
-          <Button.Root variant="outline" tone="neutral">
+          <Button.Root variant="soft" tone="neutral">
             Передать пространство
           </Button.Root>
         </Modal.Trigger>
@@ -56,7 +56,7 @@ export default function ModalEnterKeyExample() {
           </Modal.Body>
           <Modal.Footer>
             <Modal.Close>
-              <Button.Root variant="outline" tone="neutral">
+              <Button.Root variant="soft" tone="neutral">
                 Отмена
               </Button.Root>
             </Modal.Close>

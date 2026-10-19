@@ -474,7 +474,7 @@ export default function FileUploadScreenExample() {
                         <Tooltip.Trigger>
                           <ConfirmDialog.Trigger>
                             <Button.Root
-                              variant="outline"
+                              variant="soft"
                               tone="danger"
                               aria-label="Удалить выбранные"
                               disabled={selected.size === 0}
@@ -488,7 +488,7 @@ export default function FileUploadScreenExample() {
                         <Tooltip.Content>Удалить выбранные</Tooltip.Content>
                       </Tooltip.Root>
                     </ConfirmDialog.Root>
-                    <Button.Root variant="ghost" tone="neutral" onClick={stopSelecting}>
+                    <Button.Root variant="soft" tone="neutral" onClick={stopSelecting}>
                       Отмена
                     </Button.Root>
                   </div>

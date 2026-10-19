@@ -59,7 +59,7 @@ export default function GanttControlledExample() {
       toolbar={PRESETS.map((preset) => (
         <Button.Root
           key={preset.scale}
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           pressed={scale === preset.scale}
           onClick={() => setScale(preset.scale)}

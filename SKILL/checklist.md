@@ -88,7 +88,8 @@ checks.
 - [ ] Record properties, uploads, a chat, an album and a schedule are the kit's components ([choosing](choosing.md#2-inside-a-category)).
 
 ## Hierarchy
-- [ ] One primary action per area, last in its row; the rest `soft` / `ghost` / `outline` neutral ([actions](composition.md#6-actions)).
+- [ ] One primary action per area, last in its row; every other button with text is `soft` neutral, `ghost` only icon-only, no `outline` button ([actions](composition.md#6-actions)).
+- [ ] An empty list of cards is `EmptyPage size="s"` in a `Card.Root` in the list's place, the add button under it ([an empty list of cards](composition.md#an-empty-list-of-cards)).
 - [ ] A dialog footer holds Cancel and the primary only; deleting the edited record stands in the header's actions ([actions](composition.md#6-actions)).
 - [ ] One secondary action is an icon button with a Tooltip; a «⋯» menu holds two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
 - [ ] An entity has one drawer opened from everywhere; permissions lock fields and hide tabs and actions; header actions act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).

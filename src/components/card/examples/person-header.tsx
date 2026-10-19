@@ -22,7 +22,7 @@ export default function CardPersonHeaderExample() {
           </Card.Icon>
           <Card.Title>{ACCOUNT.name}</Card.Title>
           <Card.Description>{ACCOUNT.handle}</Card.Description>
-          <Button.Root variant="outline" tone="neutral">
+          <Button.Root variant="soft" tone="neutral">
             Отвязать
           </Button.Root>
         </Card.Header>

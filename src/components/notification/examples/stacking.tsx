@@ -8,7 +8,7 @@ function StackControls() {
   return (
     <div className={styles.row}>
       <Button.Root
-        variant="outline"
+        variant="soft"
         tone="neutral"
         onClick={() =>
           notify({
@@ -20,12 +20,7 @@ function StackControls() {
       >
         Оформить заказ
       </Button.Root>
-      <Button.Root
-        variant="ghost"
-        tone="neutral"
-        disabled={items.length === 0}
-        onClick={dismissAll}
-      >
+      <Button.Root variant="soft" tone="neutral" disabled={items.length === 0} onClick={dismissAll}>
         Закрыть все
       </Button.Root>
       <Typography as="span" variant="body-s" tone="secondary">

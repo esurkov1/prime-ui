@@ -14,7 +14,7 @@ export default function MessageContactExample() {
           <Button.Root variant="soft" tone="neutral" size="s">
             Написать
           </Button.Root>
-          <Button.Root variant="ghost" tone="neutral" size="s">
+          <Button.Root variant="soft" tone="neutral" size="s">
             Добавить
           </Button.Root>
         </Message.Contact>

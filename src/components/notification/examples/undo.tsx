@@ -31,7 +31,7 @@ function TaskList() {
           <Typography as="span" variant="body-m">
             {task}
           </Typography>
-          <Button.Root variant="ghost" tone="danger" onClick={() => remove(task)}>
+          <Button.Root variant="soft" tone="danger" onClick={() => remove(task)}>
             Удалить
           </Button.Root>
         </div>

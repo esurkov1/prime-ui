@@ -16,7 +16,7 @@
 - An inline action inside running text that must read as a link («Отправить ещё раз», «выберите файл») — `asChild inline` around a `<button type="button">`.
 
 ## When not to use
-- An action without a URL outside running text (save, open a dialog) → use [Button](../button/COMPONENT.md) with `variant="ghost"`.
+- An action without a URL outside running text (save, open a dialog) → use [Button](../button/COMPONENT.md) with `variant="soft"` `tone="neutral"`.
 - A navigation item that must look like a button → use [Button](../button/COMPONENT.md) with `asChild` and an `<a>`.
 - The path to the current page → use [Breadcrumb](../breadcrumb/COMPONENT.md).
 - Long-form text styling → use [Typography](../typography/COMPONENT.md).
@@ -131,7 +131,7 @@ No `labels`.
 | [as-child.tsx](examples/as-child.tsx) | The link look on a button for an inline action that is not navigation — `asChild`. |
 
 ## Mistakes
-- `<LinkButton onClick={save}>` without `href` → an `<a>` without a URL is not a button (the type requires `href`): use `<Button.Root variant="ghost">`, or `<LinkButton asChild inline><button type="button">` inside running text.
+- `<LinkButton onClick={save}>` without `href` → an `<a>` without a URL is not a button (the type requires `href`): use `<Button.Root variant="soft" tone="neutral">`, or `<LinkButton asChild inline><button type="button">` inside running text.
 - A link in a sentence without `inline` → it keeps the control tier and hides its underline at rest; add `inline`.
 - `target="_blank"` without `rel="noopener noreferrer"` → add `rel`.
 - Wrapping a LinkButton in an `<a>` → pass `href` directly.

@@ -1,4 +1,4 @@
-/** Actions on a solid banner take its text color: a soft action and a ghost one beside it — `tone="inherit"`. */
+/** Actions on a solid banner take its text color: the action and the dismissal beside it, both soft — `tone="inherit"`. */
 import { Banner, Button } from "prime-ui-kit";
 
 const HOSTS = [
@@ -17,7 +17,7 @@ export default function ButtonOnColoredHostExample() {
               <Button.Root variant="soft" tone="inherit">
                 {action}
               </Button.Root>
-              <Button.Root variant="ghost" tone="inherit">
+              <Button.Root variant="soft" tone="inherit">
                 {later}
               </Button.Root>
             </Banner.Actions>

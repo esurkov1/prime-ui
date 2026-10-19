@@ -7,7 +7,7 @@ export default function ButtonControlledExample() {
 
   return (
     <>
-      <Button.Root variant="ghost" tone="neutral" pressed={pinned} onPressedChange={setPinned}>
+      <Button.Root variant="soft" tone="neutral" pressed={pinned} onPressedChange={setPinned}>
         <Button.Icon>
           <Icon name="action.pin" />
         </Button.Icon>

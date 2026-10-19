@@ -28,7 +28,7 @@ export default function CardOverviewExample() {
           </Fieldset>
         </Card.Body>
         <Card.Footer>
-          <Button.Root type="reset" variant="ghost" tone="neutral">
+          <Button.Root type="reset" variant="soft" tone="neutral">
             Отмена
           </Button.Root>
           <Button.Root type="submit">Сохранить</Button.Root>

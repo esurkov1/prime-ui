@@ -24,7 +24,7 @@ export default function LoginFormForgotPasswordExample() {
             <Button.Root type="submit" fullWidth>
               Отправить ссылку
             </Button.Root>
-            <Button.Root variant="ghost" tone="neutral" fullWidth>
+            <Button.Root variant="soft" tone="neutral" fullWidth>
               Вернуться ко входу
             </Button.Root>
           </LoginForm.Actions>

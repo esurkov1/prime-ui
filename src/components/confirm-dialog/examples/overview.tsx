@@ -15,7 +15,7 @@ export default function ConfirmDialogOverviewExample() {
       onConfirm={deleteProject}
     >
       <ConfirmDialog.Trigger>
-        <Button.Root variant="outline" tone="danger">
+        <Button.Root variant="soft" tone="danger">
           Удалить проект
         </Button.Root>
       </ConfirmDialog.Trigger>

@@ -130,7 +130,7 @@ export default function PageScreenExample() {
               </Fieldset>
             </Card.Body>
             <Card.Footer>
-              <Button.Root type="reset" variant="ghost" tone="neutral" disabled={saving}>
+              <Button.Root type="reset" variant="soft" tone="neutral" disabled={saving}>
                 Отменить изменения
               </Button.Root>
               <Button.Root type="submit" loading={saving}>
@@ -181,7 +181,7 @@ export default function PageScreenExample() {
                 onConfirm={removeWorkspace}
               >
                 <ConfirmDialog.Trigger>
-                  <Button.Root variant="outline" tone="danger">
+                  <Button.Root variant="soft" tone="danger">
                     Удалить
                   </Button.Root>
                 </ConfirmDialog.Trigger>
