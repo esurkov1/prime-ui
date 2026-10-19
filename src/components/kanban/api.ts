@@ -1,5 +1,6 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { KANBAN_LABELS } from "./Kanban";
+import { KANBAN_FIELDS_MENU_LABELS } from "./KanbanFieldsMenu";
 
 export const api: ComponentApi = {
   parts: [
@@ -195,8 +196,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemHeader",
-      en: "`ref` → `HTMLDivElement`. Optional top row of a card: the key or project at the start, the last child (a priority `Badge`, an assignee) at the end.",
-      ru: "Необязательная верхняя строка карточки: ключ или проект в начале, последний элемент (`Badge` приоритета, исполнитель) — в конце.",
+      en: "`ref` → `HTMLDivElement`. Optional top row of a card: the key or project at the start, cut with an ellipsis; the last child (a priority `Badge`, an assignee) at the end, never shrunk.",
+      ru: "Необязательная верхняя строка карточки: ключ или проект в начале, обрезается многоточием; последний элемент (`Badge` приоритета, исполнитель) — в конце, не сжимается.",
       props: [
         {
           name: "…rest",
@@ -207,9 +208,28 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Kanban.ItemTitle · Kanban.ItemDescription",
-      en: "`ref` → `HTMLSpanElement`. The card title (medium body text, up to three lines) and the muted meta line under it (id, due date; one line, tabular numbers).",
-      ru: "Заголовок карточки (средний текст, до трёх строк) и приглушённая строка меты под ним (id, срок; одна строка, моноширинные цифры).",
+      name: "Kanban.ItemTitle",
+      en: "`ref` → `HTMLSpanElement`. The card title: medium body text, up to three lines. With a tail — `number`, an `Avatar.Root` child (the owner, last) — one row: the name cut with an ellipsis, the tail never shrinks.",
+      ru: "Заголовок карточки: средний текст, до трёх строк. С хвостом — `number`, дочерний `Avatar.Root` (ответственный, последним) — одна строка: имя обрезается многоточием, хвост не сжимается.",
+      props: [
+        {
+          name: "number",
+          type: "ReactNode",
+          en: "The record's number («#866»): a small muted caption in tabular digits at the end of the row, before the owner.",
+          ru: "Номер записи («#866»): мелкая приглушённая подпись с моноширинными цифрами в конце строки, перед ответственным.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the name, an owner `Avatar.Root`), `className` and the other span attributes.",
+          ru: "`children` (имя, `Avatar.Root` ответственного), `className` и остальные атрибуты span.",
+        },
+      ],
+    },
+    {
+      name: "Kanban.ItemDescription",
+      en: "`ref` → `HTMLSpanElement`. The muted meta line under the title: id, due date; one line, tabular numbers.",
+      ru: "Приглушённая строка меты под заголовком: id, срок; одна строка, моноширинные цифры.",
       props: [
         {
           name: "…rest",
@@ -234,8 +254,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemFooter",
-      en: "`ref` → `HTMLDivElement`. The bottom row: `Kanban.ItemCount`s at the start; the last child, unless a count, sits at the end (the assignee `Avatar`).",
-      ru: "Нижняя строка: `Kanban.ItemCount` в начале; последний элемент, если это не счётчик, — в конце (`Avatar` исполнителя).",
+      en: "`ref` → `HTMLDivElement`. The bottom row: `Kanban.ItemCount`s at the start (an icon alone marks a channel); text cut with an ellipsis; the last child, unless a count, at the end, never shrunk (an `Avatar`, a date).",
+      ru: "Нижняя строка: `Kanban.ItemCount` в начале (одна иконка — канал); текст обрезается многоточием; последний элемент, если не счётчик, — в конце и не сжимается (`Avatar`, дата).",
       props: [
         {
           name: "…rest",
@@ -258,39 +278,164 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "Kanban.ItemSection",
+      en: "`ref` → `HTMLDivElement`. A zone of a card, a group of its parts: zones stand `space-3` off a faint line between them, parts inside one `space-2` apart. A zone with nothing in it is not drawn and leaves no line.",
+      ru: "Зона карточки, группа её частей: зоны стоят на `space-3` от еле видимой линии между ними, части внутри — через `space-2`. Пустая зона не рисуется и не оставляет линию.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "Kanban.ItemResource",
+      en: "`ref` → `HTMLDivElement`. One unit a record holds (a vehicle, a room): a mark at the start (a `ProgressCircle` of its term; kit marks take the `s` tier), then its name and a caption line, each cut with an ellipsis.",
+      ru: "Одна единица записи (машина, комната): отметка в начале (`ProgressCircle` срока; отметки кита берут ярус `s`), затем название и подпись, каждая обрезается многоточием.",
+      props: [
+        {
+          name: "label",
+          type: "ReactNode",
+          required: true,
+          en: "The unit's name: body-s, medium, one line.",
+          ru: "Название единицы: body-s, medium, одна строка.",
+        },
+        {
+          name: "description",
+          type: "ReactNode",
+          en: "The caption line under the name: muted, tabular digits; a span inside may carry a tone (an overdue term in `danger`).",
+          ru: "Подпись под названием: приглушённая, моноширинные цифры; span внутри может нести свой тон (просрочка — `danger`).",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The mark at the start: a `ProgressCircle` of the unit's term (a short text in it: «18 д»), an `Avatar`, a `Thumbnail`.",
+          ru: "Отметка в начале: `ProgressCircle` срока единицы (короткий текст в нём: «18 д»), `Avatar`, `Thumbnail`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "Kanban.ItemFact",
+      en: "`ref` → `HTMLDivElement`. One fact of a record: an `Icon` (14 px) and a secondary caption line cut with an ellipsis; a part of the text may carry its own tone (a `Typography` span). Facts in a row stand `space-1` apart.",
+      ru: "Один факт записи: `Icon` (14 px) и вторичная подпись, обрезается многоточием; часть текста может нести свой тон (`Typography` span). Факты подряд стоят через `space-1`.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "KanbanFieldsMenu",
+      en: "`ref` → `HTMLButtonElement`. The view of a board's cards, for the page's tools beside the filter: a soft Button «Вид» opening a menu of the card fields to show and «По умолчанию». The cards read the same `hiddenFields`.",
+      ru: "Вид карточек доски, для инструментов страницы рядом с фильтром: мягкая кнопка «Вид» открывает меню полей карточки и «По умолчанию». Карточки читают те же `hiddenFields`.",
+      props: [
+        {
+          name: "fields",
+          type: "readonly KanbanField[]",
+          required: true,
+          en: "The card fields a person may hide: `{ id, label }`, in menu order.",
+          ru: "Поля карточки, которые можно скрыть: `{ id, label }`, в порядке меню.",
+        },
+        {
+          name: "hiddenFields",
+          type: "readonly string[]",
+          en: "Ids of the hidden fields (controlled).",
+          ru: "Id скрытых полей (управляемо).",
+        },
+        {
+          name: "defaultHiddenFields",
+          type: "readonly string[]",
+          default: "[]",
+          en: "The default view: the initial hidden fields (uncontrolled) and what «По умолчанию» puts back.",
+          ru: "Вид по умолчанию: скрытые поля в начале (неуправляемо) и то, что возвращает «По умолчанию».",
+        },
+        {
+          name: "onHiddenFieldsChange",
+          type: "(hiddenFields: readonly string[]) => void",
+          en: "A field was shown or hidden, or the default view put back.",
+          ru: "Поле показали или скрыли, или вернули вид по умолчанию.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+          en: "Tier of the trigger and the menu.",
+          ru: "Ярус кнопки и меню.",
+        },
+        {
+          name: "labels",
+          type: "Partial<KanbanFieldsMenuLabels>",
+          en: "The menu's strings: `view`, `fields`, `reset`.",
+          ru: "Строки меню: `view`, `fields`, `reset`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type">',
+          en: "`className` and the other attributes of the trigger button.",
+          ru: "`className` и остальные атрибуты кнопки.",
+        },
+      ],
+    },
   ],
-  labels: labelRows(KANBAN_LABELS, {
-    count: { en: "Spoken name of the count badge.", ru: "Озвучиваемое имя счётчика." },
-    countLimit: {
-      en: "Spoken name of the count badge of a column with a `limit`.",
-      ru: "Озвучиваемое имя счётчика колонки с `limit`.",
-    },
-    empty: { en: "Text of an empty column.", ru: "Текст пустой колонки." },
-    full: {
-      en: "Why a full column refuses a card: spoken, and shown under the carried card.",
-      ru: "Почему заполненная колонка не принимает карточку: озвучивается и видна под переносимой карточкой.",
-    },
-    moveColumn: {
-      en: "Name of the column grip (`reorderableColumns`).",
-      ru: "Имя ручки колонки (`reorderableColumns`).",
-    },
-    column: {
-      en: "A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»).",
-      ru: "Колонка в объявлениях live-области, когда её переносят («Колонка «Демо»: позиция 2 из 4»).",
-    },
-    moveFailed: {
-      en: "Spoken when the `onValueChange` promise rejects; `{label}` is `getLabel(item)`.",
-      ru: "Озвучивается, когда промис `onValueChange` отклонён; `{label}` — `getLabel(item)`.",
-    },
-    columnMoveFailed: {
-      en: "Spoken when the `onColumnOrderChange` promise rejects.",
-      ru: "Озвучивается, когда промис `onColumnOrderChange` отклонён.",
-    },
-    columnGroupLocked: {
-      en: "Why a column cannot leave its group (`columnGroups`), spoken and shown under the carried column; `{column}`, `{group}`.",
-      ru: "Почему колонка не может выйти из своей группы (`columnGroups`): озвучивается и показывается под переносимой колонкой; `{column}`, `{group}`.",
-    },
-  }),
+  labels: [
+    ...labelRows(KANBAN_LABELS, {
+      count: { en: "Spoken name of the count badge.", ru: "Озвучиваемое имя счётчика." },
+      countLimit: {
+        en: "Spoken name of the count badge of a column with a `limit`.",
+        ru: "Озвучиваемое имя счётчика колонки с `limit`.",
+      },
+      empty: { en: "Text of an empty column.", ru: "Текст пустой колонки." },
+      full: {
+        en: "Why a full column refuses a card: spoken, and shown under the carried card.",
+        ru: "Почему заполненная колонка не принимает карточку: озвучивается и видна под переносимой карточкой.",
+      },
+      moveColumn: {
+        en: "Name of the column grip (`reorderableColumns`).",
+        ru: "Имя ручки колонки (`reorderableColumns`).",
+      },
+      column: {
+        en: "A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»).",
+        ru: "Колонка в объявлениях live-области, когда её переносят («Колонка «Демо»: позиция 2 из 4»).",
+      },
+      moveFailed: {
+        en: "Spoken when the `onValueChange` promise rejects; `{label}` is `getLabel(item)`.",
+        ru: "Озвучивается, когда промис `onValueChange` отклонён; `{label}` — `getLabel(item)`.",
+      },
+      columnMoveFailed: {
+        en: "Spoken when the `onColumnOrderChange` promise rejects.",
+        ru: "Озвучивается, когда промис `onColumnOrderChange` отклонён.",
+      },
+      columnGroupLocked: {
+        en: "Why a column cannot leave its group (`columnGroups`), spoken and shown under the carried column; `{column}`, `{group}`.",
+        ru: "Почему колонка не может выйти из своей группы (`columnGroups`): озвучивается и показывается под переносимой колонкой; `{column}`, `{group}`.",
+      },
+    }),
+    ...labelRows(KANBAN_FIELDS_MENU_LABELS, {
+      view: { en: "Text of the trigger.", ru: "Текст кнопки.", part: "KanbanFieldsMenu" },
+      fields: {
+        en: "Heading of the group of card fields.",
+        ru: "Заголовок группы полей карточки.",
+        part: "KanbanFieldsMenu",
+      },
+      reset: {
+        en: "The item that puts `defaultHiddenFields` back.",
+        ru: "Пункт, который возвращает `defaultHiddenFields`.",
+        part: "KanbanFieldsMenu",
+      },
+    }),
+  ],
   accessibility: {
     keyboard: [
       {

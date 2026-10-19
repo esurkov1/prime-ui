@@ -3,11 +3,13 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { Dnd } from "@/components/dnd/Dnd";
 import { DRAG_HOLD_MS } from "@/internal/longPress";
 import { withMotion } from "@/test/motion";
 
 import { Kanban, type KanbanColumn, type KanbanMove, type KanbanValue } from "./Kanban";
+import { KanbanFieldsMenu } from "./KanbanFieldsMenu";
 
 type Task = { id: string; title: string };
 
@@ -1019,5 +1021,153 @@ describe("Kanban pointer drag", () => {
       id: "todo",
       index: 2,
     });
+  });
+});
+
+describe("rich card parts", () => {
+  function RichBoard({ children }: { children: React.ReactNode }) {
+    return (
+      <Kanban.Root
+        aria-label="Сделки"
+        columns={[{ id: "booked", title: "Забронировано" }]}
+        items={[{ id: "d1" }]}
+        getId={(deal) => deal.id}
+        defaultValue={{ booked: ["d1"] }}
+        renderItem={() => <Kanban.Item data-testid="card">{children}</Kanban.Item>}
+      />
+    );
+  }
+
+  it("draws zones apart over a faint line and drops an empty zone with its line", () => {
+    render(
+      <RichBoard>
+        <Kanban.ItemSection data-testid="zone-1">
+          <Kanban.ItemTitle>Bilal</Kanban.ItemTitle>
+        </Kanban.ItemSection>
+        <Kanban.ItemSection data-testid="zone-empty">
+          {null}
+          {false}
+        </Kanban.ItemSection>
+        <Kanban.ItemSection data-testid="zone-2">
+          <Kanban.ItemFact>Депозит 300 $</Kanban.ItemFact>
+        </Kanban.ItemSection>
+      </RichBoard>,
+    );
+    expect(screen.queryByTestId("zone-empty")).not.toBeInTheDocument();
+    const second = screen.getByTestId("zone-2");
+    // The zones stand side by side: the second one draws the line at its top.
+    expect(second.previousElementSibling).toBe(screen.getByTestId("zone-1"));
+    expect(second.className).toBe(screen.getByTestId("zone-1").className);
+  });
+
+  it("a title with a number and an owner is one row: the name, the number, the owner last", () => {
+    render(
+      <RichBoard>
+        <Kanban.ItemTitle number="#866" data-testid="title">
+          <Avatar.Root size="s" aria-label="Евгений Смирнов">
+            <Avatar.Fallback>ЕС</Avatar.Fallback>
+          </Avatar.Root>
+          Bilal Rahman
+        </Kanban.ItemTitle>
+      </RichBoard>,
+    );
+    const parts = Array.from(screen.getByTestId("title").children);
+    expect(parts[0]).toHaveTextContent("Bilal Rahman");
+    expect(parts[1]).toHaveTextContent("#866");
+    expect(parts[2]).toHaveTextContent("ЕС");
+  });
+
+  it("a plain title keeps its single element", () => {
+    render(
+      <RichBoard>
+        <Kanban.ItemTitle data-testid="title">Отчёт по складу</Kanban.ItemTitle>
+      </RichBoard>,
+    );
+    expect(screen.getByTestId("title").children).toHaveLength(0);
+  });
+
+  it("a resource shows its mark, its name and its caption", () => {
+    render(
+      <RichBoard>
+        <Kanban.ItemResource
+          data-testid="unit"
+          label="Honda PCX 160"
+          description="20 окт → 27 окт · через 1 дн."
+        >
+          <span data-testid="mark" />
+        </Kanban.ItemResource>
+      </RichBoard>,
+    );
+    const unit = screen.getByTestId("unit");
+    expect(within(unit).getByTestId("mark")).toBeInTheDocument();
+    expect(within(unit).getByText("Honda PCX 160")).toBeInTheDocument();
+    expect(within(unit).getByText("20 окт → 27 окт · через 1 дн.")).toBeInTheDocument();
+  });
+
+  it("the footer wraps plain text so it can be cut, and keeps the last child whole", () => {
+    render(
+      <RichBoard>
+        <Kanban.ItemFooter data-testid="footer">
+          Посев · Пхукет Аренда Авто
+          <span>15 окт</span>
+        </Kanban.ItemFooter>
+      </RichBoard>,
+    );
+    const footer = screen.getByTestId("footer");
+    expect(footer.firstElementChild?.tagName).toBe("SPAN");
+    expect(footer.firstElementChild).toHaveTextContent("Посев · Пхукет Аренда Авто");
+    expect(footer.lastElementChild).toHaveTextContent("15 окт");
+  });
+});
+
+describe("KanbanFieldsMenu", () => {
+  const FIELDS = [
+    { id: "vehicles", label: "Транспорт" },
+    { id: "source", label: "Источник" },
+  ];
+
+  it("opens from the keyboard and hides a field with Enter", async () => {
+    const onHiddenFieldsChange = vi.fn();
+    const user = userEvent.setup();
+    render(<KanbanFieldsMenu fields={FIELDS} onHiddenFieldsChange={onHiddenFieldsChange} />);
+    const trigger = screen.getByRole("button", { name: "Вид" });
+    act(() => trigger.focus());
+    await user.keyboard("{Enter}");
+    const item = await screen.findByRole("menuitemcheckbox", { name: "Источник" });
+    expect(item).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("group", { name: "На карточке" })).toBeInTheDocument();
+    act(() => item.focus());
+    await user.keyboard("{Enter}");
+    expect(onHiddenFieldsChange).toHaveBeenLastCalledWith(["source"]);
+  });
+
+  it("«По умолчанию» puts the default hidden fields back and is off while they are shown", async () => {
+    const user = userEvent.setup();
+    function View() {
+      const [hidden, setHidden] = React.useState<readonly string[]>(["vehicles", "source"]);
+      return (
+        <KanbanFieldsMenu
+          fields={FIELDS}
+          hiddenFields={hidden}
+          defaultHiddenFields={["source"]}
+          onHiddenFieldsChange={setHidden}
+        />
+      );
+    }
+    render(<View />);
+    await user.click(screen.getByRole("button", { name: "Вид" }));
+    const reset = await screen.findByRole("menuitem", { name: "По умолчанию" });
+    expect(reset).not.toHaveAttribute("aria-disabled", "true");
+    await user.click(reset);
+    await user.click(screen.getByRole("button", { name: "Вид" }));
+    expect(await screen.findByRole("menuitemcheckbox", { name: "Транспорт" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    expect(screen.getByRole("menuitemcheckbox", { name: "Источник" })).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
+    expect(screen.getByRole("menuitem", { name: "По умолчанию" })).toBeDisabled();
   });
 });

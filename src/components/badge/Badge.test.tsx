@@ -168,6 +168,19 @@ describe("Badge", () => {
     expect(cssValue(cssRule(CSS, '.root[data-shape="square"]'), "width")).toBe("var(--chip-h)");
   });
 
+  it("fullWidth is a plate as wide as its container, the text centred", () => {
+    render(<Badge.Root fullWidth>Выдать завтра</Badge.Root>);
+    expect(badgeOf("Выдать завтра")).toHaveAttribute("data-full-width", "true");
+    const rule = cssRule(CSS, '.root[data-full-width="true"]');
+    expect(cssValue(rule, "width")).toBe("100%");
+    expect(cssValue(rule, "text-align")).toBe("center");
+  });
+
+  it("a chip has no full width by default", () => {
+    render(<Badge.Root>Новый</Badge.Root>);
+    expect(badgeOf("Новый")).not.toHaveAttribute("data-full-width");
+  });
+
   it("a Dot of its own hue paints the solid step", () => {
     const { container } = render(<Badge.Dot color="purple" />);
     const dot = container.querySelector(`.${styles.dot}`);

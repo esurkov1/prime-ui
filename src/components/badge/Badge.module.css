@@ -87,6 +87,14 @@
   text-overflow: clip;
 }
 
+/* A plate as wide as its container (`fullWidth`): the one «what to do next» of a record, its text
+   centred. */
+.root[data-full-width="true"] {
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+}
+
 /*
  * A person's chip (`Badge.Avatar`): a pill, the avatar at its start 2 px inside the chip's height
  * (flush in the 16 tier; the size is the slot's, `chipAvatarSize`), the same air on its end side.

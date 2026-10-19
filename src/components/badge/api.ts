@@ -42,6 +42,13 @@ export const api: ComponentApi = {
           ru: "`square` — плитка, ширина равна высоте, текст по центру: формат файла («PDF»), короткий код.",
         },
         {
+          name: "fullWidth",
+          type: "boolean",
+          default: "false",
+          en: "A plate as wide as its container, the text centred: the one next step of a record on its card («Выдать завтра в 06:00»).",
+          ru: "Плашка на всю ширину контейнера, текст по центру: главный следующий шаг записи на её карточке («Выдать завтра в 06:00»).",
+        },
+        {
           name: "onRemove",
           type: "() => void | Promise<void>",
           en: "Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays.",

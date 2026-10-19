@@ -350,7 +350,18 @@
   min-width: 0;
 }
 
+/* Text before the last child is cut with an ellipsis; the last child (a priority, a date) never
+   shrinks. */
+.itemHeader > :not(:last-child),
+.footer > :not(:last-child):not(.count) {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .itemHeader > :last-child:not(:first-child) {
+  flex: none;
   margin-inline-start: auto;
 }
 
@@ -373,15 +384,47 @@
   white-space: nowrap;
 }
 
+/* A title with a tail (`number`, an owner `Avatar`): one row, the name cut with an ellipsis, the
+   tail at the end never shrinks. */
+.itemTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.itemTitleRow > * {
+  flex: none;
+}
+
+.itemTitleRow > .itemTitleText {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The record's number: a small muted caption in tabular digits. */
+.itemNumber {
+  color: var(--prime-color-text-muted);
+  font-weight: var(--prime-font-weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
 /* The title and its meta line read as one block. */
 .itemTitle + .itemDescription {
   margin-block-start: calc(var(--prime-space-1) - var(--prime-space-2));
 }
 
-/* Counts at the start; the last child, unless a count, at the end (the assignee). At least as tall
-   as an `xs` control (`fieldTierClass` + `data-size="xs"`, joined in TSX). */
+/* Counts at the start; the last child, unless a count, at the end (the assignee, a date): muted
+   caption text (`textRole.caption`, joined in TSX). At least as tall as an `xs` control
+   (`fieldTierClass` + `data-size="xs"`, joined in TSX). */
 .footer {
   display: flex;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
   align-items: center;
   gap: var(--prime-space-3);
   min-width: 0;
@@ -393,7 +436,12 @@
 }
 
 .footer > :last-child:not(.count):not(:first-child) {
+  flex: none;
   margin-inline-start: auto;
+}
+
+.footer > .count {
+  flex: none;
 }
 
 .count {
@@ -406,6 +454,88 @@
   line-height: var(--prime-text-caption-line-height);
   color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/*
+ * A zone of the card (`Kanban.ItemSection`): its parts stand `space-2` apart, as in the card; a zone
+ * after a zone stands `space-3` off the faint line between them (`hairline.between`, joined in TSX)
+ * on both sides.
+ */
+.itemSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.itemSection + .itemSection {
+  margin-block-start: calc(var(--prime-space-3) - var(--prime-space-2));
+  padding-block-start: var(--prime-space-3);
+}
+
+/* One unit a record holds: the mark, then its name over a caption line. */
+.resource {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.resourceMark {
+  display: inline-flex;
+  flex: none;
+}
+
+.resourceText {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* `body-s` (`textRole.bodyS`, joined in TSX) at the medium weight. */
+.resourceLabel,
+.resourceDescription {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resourceLabel {
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.resourceDescription {
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A fact of the record: a 14 px icon and a secondary caption line (`textRole.caption`, joined in
+   TSX). Facts in a row stand `space-1` apart. */
+.fact {
+  --prime-icon-size: var(--prime-icon-xs);
+
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  color: var(--prime-color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.fact > :not(.factText) {
+  flex: none;
+}
+
+.factText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fact + .fact {
+  margin-block-start: calc(var(--prime-space-1) - var(--prime-space-2));
 }
 
 /* Loading: cards of the same geometry, no hover, no drag. */

@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Crossfade } from "@/components/crossfade/Crossfade";
 import { Dnd, useDragAnnouncer, useSortableItemBusy } from "@/components/dnd/Dnd";
@@ -11,6 +12,7 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -19,6 +21,7 @@ import { formatLabel } from "@/internal/formatLabel";
 import hairline from "@/internal/hairline.module.css";
 import { hasContent } from "@/internal/hasContent";
 import { namedRole } from "@/internal/namedRole";
+import { splitParts } from "@/internal/parts";
 import { isPlainClick, opensRow } from "@/internal/rowLink";
 import rowLink from "@/internal/rowLink.module.css";
 import type { PaletteColor } from "@/internal/states";
@@ -910,11 +913,18 @@ export type KanbanItemHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** Plain text children of a row become spans, so the row can cut them with an ellipsis. */
+function textInSpans(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, (child) =>
+    typeof child === "string" || typeof child === "number" ? <span>{child}</span> : child,
+  );
+}
+
 /**
  * The top zone of a card above a faint hairline: a muted row with the key or project at the start
  * and the last child (a priority, an assignee) at the end.
  */
-function KanbanItemHeader({ className, ...rest }: KanbanItemHeaderProps) {
+function KanbanItemHeader({ className, children, ...rest }: KanbanItemHeaderProps) {
   return (
     <div
       className={cx(
@@ -926,18 +936,40 @@ function KanbanItemHeader({ className, ...rest }: KanbanItemHeaderProps) {
       )}
       data-size="xs"
       {...rest}
-    />
+    >
+      {textInSpans(children)}
+    </div>
   );
 }
 KanbanItemHeader.displayName = "Kanban.ItemHeader";
 
 export type KanbanItemTitleProps = React.HTMLAttributes<HTMLSpanElement> & {
+  number?: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** The card title: medium body text, wraps up to three lines. */
-function KanbanItemTitle({ className, ...rest }: KanbanItemTitleProps) {
-  return <span className={cx(textRole.bodyM, styles.itemTitle, className)} {...rest} />;
+/**
+ * The card title: medium body text, wraps up to three lines. With a tail — the record's `number`,
+ * an `Avatar.Root` child (the owner) — it is one row: the name cut with an ellipsis, the tail at
+ * the end, never shrunk.
+ */
+function KanbanItemTitle({ number, className, children, ...rest }: KanbanItemTitleProps) {
+  const { parts: avatars, rest: text } = splitParts(children, Avatar.Root);
+  const hasNumber = hasContent(number);
+  if (!hasNumber && avatars.length === 0) {
+    return (
+      <span className={cx(textRole.bodyM, styles.itemTitle, className)} {...rest}>
+        {children}
+      </span>
+    );
+  }
+  return (
+    <span className={cx(textRole.bodyM, styles.itemTitleRow, className)} {...rest}>
+      <span className={styles.itemTitleText}>{text}</span>
+      {hasNumber ? <span className={cx(textRole.caption, styles.itemNumber)}>{number}</span> : null}
+      {avatars}
+    </span>
+  );
 }
 KanbanItemTitle.displayName = "Kanban.ItemTitle";
 
@@ -965,9 +997,20 @@ export type KanbanItemFooterProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The bottom row: `Kanban.ItemCount`s at the start, anything else (an assignee) at the end. */
-function KanbanItemFooter({ className, ...rest }: KanbanItemFooterProps) {
-  return <div className={cx(fieldTierClass, styles.footer, className)} data-size="xs" {...rest} />;
+/**
+ * The bottom row: `Kanban.ItemCount`s at the start, anything else (an assignee, a date) at the
+ * end. Text before the last child is cut with an ellipsis; the last child never shrinks.
+ */
+function KanbanItemFooter({ className, children, ...rest }: KanbanItemFooterProps) {
+  return (
+    <div
+      className={cx(fieldTierClass, textRole.caption, styles.footer, className)}
+      data-size="xs"
+      {...rest}
+    >
+      {textInSpans(children)}
+    </div>
+  );
 }
 KanbanItemFooter.displayName = "Kanban.ItemFooter";
 
@@ -981,6 +1024,80 @@ function KanbanItemCount({ className, ...rest }: KanbanItemCountProps) {
 }
 KanbanItemCount.displayName = "Kanban.ItemCount";
 
+export type KanbanItemSectionProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * A zone of a card: a group of its parts. Neighbouring zones stand apart by more air than the parts
+ * inside one, over a faint line; a zone with nothing in it is not drawn and leaves no line.
+ */
+function KanbanItemSection({ className, children, ...rest }: KanbanItemSectionProps) {
+  if (!hasContent(children)) return null;
+  return (
+    <div className={cx(styles.itemSection, hairline.between, className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+KanbanItemSection.displayName = "Kanban.ItemSection";
+
+export type KanbanItemResourceProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  label: React.ReactNode;
+  description?: React.ReactNode;
+  children?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * One unit a record holds (a vehicle, a room, a seat): its mark at the start (a `ProgressCircle`
+ * of its term, an `Avatar`, a `Thumbnail`; kit marks take the `s` tier), then its name and a
+ * caption line, each cut with an ellipsis.
+ */
+function KanbanItemResource({
+  label,
+  description,
+  children,
+  className,
+  ...rest
+}: KanbanItemResourceProps) {
+  return (
+    <div className={cx(styles.resource, className)} {...rest}>
+      {hasContent(children) ? (
+        <ControlSizeProvider value="s">
+          <span className={styles.resourceMark}>{children}</span>
+        </ControlSizeProvider>
+      ) : null}
+      <span className={styles.resourceText}>
+        <span className={cx(textRole.bodyS, styles.resourceLabel)}>{label}</span>
+        {hasContent(description) ? (
+          <span className={cx(textRole.caption, styles.resourceDescription)}>{description}</span>
+        ) : null}
+      </span>
+    </div>
+  );
+}
+KanbanItemResource.displayName = "Kanban.ItemResource";
+
+export type KanbanItemFactProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * One fact of a record: an `Icon` (14 px) and a secondary caption line, cut with an ellipsis; a
+ * part of the text may carry its own tone (a `Typography` span). Facts in a row stand close.
+ */
+function KanbanItemFact({ className, children, ...rest }: KanbanItemFactProps) {
+  const { parts: icons, rest: text } = splitParts(children, Icon);
+  return (
+    <div className={cx(textRole.caption, styles.fact, className)} {...rest}>
+      {icons}
+      <span className={styles.factText}>{text}</span>
+    </div>
+  );
+}
+KanbanItemFact.displayName = "Kanban.ItemFact";
+
 export const Kanban = {
   Root: KanbanRoot,
   Item: KanbanItem,
@@ -990,4 +1107,7 @@ export const Kanban = {
   ItemBadges: KanbanItemBadges,
   ItemFooter: KanbanItemFooter,
   ItemCount: KanbanItemCount,
+  ItemSection: KanbanItemSection,
+  ItemResource: KanbanItemResource,
+  ItemFact: KanbanItemFact,
 };

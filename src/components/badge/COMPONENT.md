@@ -56,6 +56,7 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 | `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | Treatment. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down; outside a control it is `m`. |
 | `shape` | `"chip" \| "square"` | `"chip"` | `square` — a tile as wide as it is tall, the text centred: a file format («PDF»), a short code. |
+| `fullWidth` | `boolean` | `false` | A plate as wide as its container, the text centred: the one next step of a record on its card («Выдать завтра в 06:00»). |
 | `onRemove` | `() => void \| Promise<void>` | — | Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays. |
 | `loading` | `boolean` | `false` | The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, which takes no press. A promise from `onRemove` does the same on its own. |
 | `pressed` | `boolean` | — | A toggle chip (a filter value): the body becomes a `<button>` over the whole badge with `aria-pressed`; on takes the selected look (accent soft). |
@@ -169,13 +170,14 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
+| `fullWidth` | a plate as wide as its container, the text centred | the one next step of a record, first in its zone of a card («Выдать завтра в 06:00») | `false` |
 | `disabled` | muted fill, disabled text, no outline, for every variant | the labelled item is inactive | `false` |
 | `loading` | content dimmed, a spinner in the remove segment | the value waits on a request its owner runs (a tag being created); a promise from `onRemove` needs no flag | `false` |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| hue / treatment | `color` or `tone`, `variant` | `data-color` (a hue, or gray for `neutral`), `data-tone`, `data-variant` (always set); `data-shape="square"` for a tile |
+| hue / treatment | `color` or `tone`, `variant` | `data-color` (a hue, or gray for `neutral`), `data-tone`, `data-variant` (always set); `data-shape="square"` for a tile, `data-full-width` for a plate |
 | size | `size`, else the control, else `m` | `data-size`, `data-tier` (visual tier) |
 | icon segments | edge `Badge.Icon` / `Badge.Dot`, icon-only | `data-icon-start`, `data-icon-end`, `data-icon-only` |
 | plain text | read-only, text children only | `data-text-only`: the root is one block box that ellipsizes; otherwise each text run sits in its own block span |
@@ -253,6 +255,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | [trigger.tsx](examples/trigger.tsx) | The stage of a deal as a badge that opens the stage picker: the chevron turns while the menu is open, the badge takes the picked stage's color — `Badge.Root`, `Dropdown.Trigger`, `color`. |
 | [assignee.tsx](examples/assignee.tsx) | The assignee of a task as a person's chip that opens the team: the avatar leads the name, and with nobody assigned an outline call to assign stands in its place — `Badge.Avatar`, `Dropdown.Trigger`, `variant`. |
 | [square.tsx](examples/square.tsx) | File formats as square tiles of text, large enough for three letters; the hue sorts them by kind — `shape`, `size`, `color`. |
+| [full-width.tsx](examples/full-width.tsx) | The next step of a record as a plate across its card, the text centred — `fullWidth`, `tone`. |
 | [tag-row.tsx](examples/tag-row.tsx) | The tags of a client as one value: the row wraps in a narrow column and keeps one gap between badges — `Badge.Group`, `size`. |
 | [overflow-count.tsx](examples/overflow-count.tsx) | The sections of each role in one line of a narrow cell: what does not fit waits behind «+N» with the full list in its tooltip — `Badge.Group`, `overflow`. |
 | [controlled.tsx](examples/controlled.tsx) | Delivery cities as toggle chips whose state the screen owns: the summary counts the chosen ones — `pressed`, `onPressedChange`. |

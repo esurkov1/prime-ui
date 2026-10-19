@@ -51,6 +51,12 @@ export const page: ComponentPageConfig = {
         "Три вида карточек на одной доске: простая заметка, тикет с шапкой из ключа и приоритета, задача дизайна с обложкой — `Kanban.ItemHeader`, `Thumbnail`, `Kanban.ItemFooter`.",
     },
     {
+      scenario: "deal-cards",
+      title: "Насыщенная карточка",
+      description:
+        "Сделки аренды насыщенными карточками: строка заголовка с номером и ответственным, транспорт со сроками, следующий шаг плашкой, факты и источник; меню вида скрывает поля карточки — `Kanban.ItemSection`, `Kanban.ItemTitle`, `Kanban.ItemResource`, `Kanban.ItemFact`, `KanbanFieldsMenu`.",
+    },
+    {
       scenario: "limits",
       title: "Лимиты и правила",
       description:

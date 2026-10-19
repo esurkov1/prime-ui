@@ -55,6 +55,7 @@ export type BadgeRootProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "onClic
     variant?: Exclude<Variant, "ghost">;
     size?: ControlSize;
     shape?: "chip" | "square";
+    fullWidth?: boolean;
     onRemove?: () => void | Promise<void>;
     loading?: boolean;
     pressed?: boolean;
@@ -161,6 +162,7 @@ function BadgeRoot({
   variant = "soft",
   size: sizeProp,
   shape = "chip",
+  fullWidth = false,
   onRemove,
   pressed: pressedProp,
   defaultPressed,
@@ -292,6 +294,7 @@ function BadgeRoot({
         size,
         tier,
         shape: shape === "square" ? "square" : undefined,
+        "full-width": fullWidth || undefined,
         "icon-only": iconOnly || undefined,
         "text-only": (textOnly && edges.children.length > 0) || undefined,
         "icon-start": edges.start || undefined,

@@ -375,10 +375,13 @@ export type {
   KanbanItemBadgesProps,
   KanbanItemCountProps,
   KanbanItemDescriptionProps,
+  KanbanItemFactProps,
   KanbanItemFooterProps,
   KanbanItemHeaderProps,
   KanbanItemOpenEvent,
   KanbanItemProps,
+  KanbanItemResourceProps,
+  KanbanItemSectionProps,
   KanbanItemTitleProps,
   KanbanLabels,
   KanbanMove,
@@ -387,6 +390,12 @@ export type {
   KanbanVariant,
 } from "./kanban/Kanban";
 export { Kanban } from "./kanban/Kanban";
+export type {
+  KanbanField,
+  KanbanFieldsMenuLabels,
+  KanbanFieldsMenuProps,
+} from "./kanban/KanbanFieldsMenu";
+export { KanbanFieldsMenu } from "./kanban/KanbanFieldsMenu";
 export type { KbdProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
 export type {

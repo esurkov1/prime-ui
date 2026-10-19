@@ -94,6 +94,12 @@ export const page: ComponentPageConfig = {
         "Форматы файлов квадратными плитками текста, достаточно крупными для трёх букв; оттенок разделяет их по виду — `shape`, `size`, `color`.",
     },
     {
+      scenario: "full-width",
+      title: "На всю ширину",
+      description:
+        "Следующий шаг по записи плашкой на всю ширину карточки, текст по центру — `fullWidth`, `tone`.",
+    },
+    {
       scenario: "tag-row",
       title: "Ряд бейджей",
       description:
