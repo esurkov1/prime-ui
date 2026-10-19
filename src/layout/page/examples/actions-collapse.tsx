@@ -21,9 +21,9 @@ export default function PageActionsCollapseExample() {
             </Button.Root>
             <Button.Root variant="soft" tone="neutral">
               <Button.Icon>
-                <Icon name="action.refresh" />
+                <Icon name="action.upload" />
               </Button.Icon>
-              Обновить
+              Импорт
             </Button.Root>
             <Button.Root variant="soft" tone="neutral">
               <Button.Icon>
@@ -35,7 +35,7 @@ export default function PageActionsCollapseExample() {
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              Новый счёт
+              Счёт
             </Button.Root>
           </Page.Actions>
         </Page.TopBar>

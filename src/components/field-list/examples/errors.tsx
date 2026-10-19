@@ -54,7 +54,7 @@ export default function FieldListErrorsExample() {
         getId={(contact) => contact.id}
         getLabel={(contact) => contact.role}
         createItem={() => ({ id: crypto.randomUUID(), role: "", phone: "" })}
-        addLabel="Добавить контакт"
+        addLabel="Контакт"
         renderItem={(contact, row) => (
           <>
             <Input.Root

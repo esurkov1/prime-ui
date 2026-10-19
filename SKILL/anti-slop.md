@@ -171,7 +171,7 @@ The most common shape bug of generated forms: rules for one field applied to a l
   getId={(spec) => spec.id}
   getLabel={(spec) => spec.name}
   createItem={newSpec}
-  addLabel="Добавить характеристику"
+  addLabel="Характеристика"
   renderItem={(spec, row) => (
     <>
       <Select.Root value={spec.icon} onValueChange={(icon) => row.update({ icon })}>
@@ -402,7 +402,7 @@ Buttons in two places, buttons with only text:
     <Button.Icon>
       <Icon name="action.add" />
     </Button.Icon>
-    Новый заказ
+    Заказ
   </Button.Root>
 </Page.Actions>
 ```
@@ -483,7 +483,7 @@ A pane people pick from creates at its top, under its search
 ([where the create button goes](composition.md#where-the-create-button-goes)).
 
 ```tsx partial
-// bad — «Новый чат» under the threads: with thirty threads it is off screen
+// bad — the create button under the threads: with thirty threads it is off screen
 <ChatList.Root
   items={threads}
   getKey={(thread) => thread.id}
@@ -516,7 +516,7 @@ A pane people pick from creates at its top, under its search
       <Button.Icon>
         <Icon name="action.add" />
       </Button.Icon>
-      Новый чат
+      Чат
     </Button.Root>
   </ChatList.Actions>
 </ChatList.Root>

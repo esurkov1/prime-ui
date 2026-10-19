@@ -23,7 +23,7 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 | [Messenger](#messenger) | chat | [screen.tsx](../src/components/chat/examples/screen.tsx) | title + the unread count in `Page.TopBar`; a full-height Page.Split of a `ChatList` with its search (live last message, ticks, unread counts, «печатает…») and a `Chat`: `Chat.Header` with the back button, avatar, title, the status that turns into «печатает…» (`typing`) and the search button, `Chat.Search`, `Chat.Messages` from `items` + `renderMessage` (dates, runs and the unread band from the data, history loaded above with `hasOlder` / `onLoadOlder`, a first load in skeletons), text, a photo, a file and sent voice, reply and edit from the menu through `Composer.Context messageId` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Chat.Root typing`), unread counts from `onNewMessage` and `onRead`, the Composer with attachments in `Chat.Footer` |
 | [Sales pipeline board](#sales-pipeline-board) | kanban | [screen.tsx](../src/components/kanban/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the open deals and their sum) with SmartFilter search and a board / list SegmentedControl in `Page.Tools` and the one primary action in `Page.Actions`; Crossfade between a `plain` Kanban (stages without wells, deal cards on the page) and a DataTable of the same deals, column totals in `renderColumnMeta`, moves saved through an `onValueChange` promise that the server can refuse, the deal in a Drawer with a DescriptionList and stage actions, skeleton first load |
 | [App frame](#app-frame) | app-shell | [screen.tsx](../src/layout/app-shell/examples/screen.tsx) | Sidebar rail on a wide screen, floating BottomNav in `AppShell.Footer` on a phone («Ещё» opens the Sidebar panel), a `Page.TopBar` with the menu button and the page title (`h1`) with a line of data, counts on items, a home page that cross-fades between sections |
-| [Media library](#media-library) | file-upload | [screen.tsx](../src/components/file-upload/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the object) with sections and counts, search (`SmartFilter` with `fields={[]}`) and order in `Page.Tools` and «Загрузить» in `Page.Actions`; uploads through `useUploadQueue` in `FileUpload` tiles (`trigger="tile"`, `layout="grid"`) with progress, a failure and retry, a done file moving into the library; a grid of `Thumbnail` / `Thumbnail.Video` tiles that open `MediaViewer` out of the tile (`getOrigin`, `thumbnails`, `renderActions`) or, in selection mode, are picked (`checked`) for bulk download and a `ConfirmDialog` delete; a Skeleton first load and a filtered `EmptyPage` in a `Crossfade` |
+| [Media library](#media-library) | file-upload | [screen.tsx](../src/components/file-upload/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the object) with sections and counts, search (`SmartFilter` with `fields={[]}`) and order in `Page.Tools` and «⬆ Файлы» in `Page.Actions`; uploads through `useUploadQueue` in `FileUpload` tiles (`trigger="tile"`, `layout="grid"`) with progress, a failure and retry, a done file moving into the library; a grid of `Thumbnail` / `Thumbnail.Video` tiles that open `MediaViewer` out of the tile (`getOrigin`, `thumbnails`, `renderActions`) or, in selection mode, are picked (`checked`) for bulk download and a `ConfirmDialog` delete (icon-only buttons with tooltips); a Skeleton first load and a filtered `EmptyPage` in a `Crossfade` |
 | [Resource schedule](#resource-schedule) | gantt | [screen.tsx](../src/components/gantt/examples/screen.tsx) | `Page.TopBar` titles the page (`h1` + a Description with the people shown) with search, role / client filters and team sections in `Page.Tools` and «Назначить» in `Page.Actions` over a full-height `Gantt` (`scrollHeight="fill"`); people with avatars, client hues, lanes for overlaps, locked absences and milestones; moves saved through an async `onBarChange` or refused and glided back, new work drawn with `onBarCreate` and named in a Modal (cancel fades the ghost), `onItemOpen` details in a Drawer with a `DescriptionList` and a confirmed removal, `loading` and filtered `empty` |
 
 Pick the closest one, rename the domain, keep the skeleton. Change structure only when the task needs
@@ -203,7 +203,7 @@ export function DealsPage({ fields, filter, onFilterChange, view, onViewChange, 
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              Новая сделка
+              Сделка
             </Button.Root>
           </Page.Actions>
           <Page.Chips>
@@ -559,7 +559,7 @@ drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-
         <Button.Icon>
           <Icon name="action.add" />
         </Button.Icon>
-        Добавить модель
+        Модель
       </Button.Root>
     </Page.Actions>
   </Page.TopBar>
@@ -682,7 +682,7 @@ drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-
 
 Creating stands where a person reaches for it, and that depends on what the list is for.
 
-- **A page of records** («Новая сделка», «Новый заказ») — the page's `Page.Actions`, the primary
+- **A page of records** («+ Сделка», «+ Заказ») — the page's `Page.Actions`, the primary
   last ([the top bar](#the-top-bar)).
 - **A pane people pick from** — the conversations of a messenger, the threads of an assistant —
   reads search → create → list: the create button stands at the top
@@ -1182,7 +1182,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - A work screen: the title «Поддержка» is `Page.Title` in `Page.TopBar` with the unread count in `Page.Description`.
 - Layout: `Page.Split` (`Page.List`, `Page.Detail`) in a `fill` page: the dialog list `ChatList` (last message, ticks, unread, «печатает…») and the conversation beside it; on a narrow panel one pane at a time with `Page.BackButton` in `Chat.Header`.
-- Creating a dialog or a thread («Новый чат») is `ChatList.Actions`: under the search, over the rows — search → create → list, never a button under the list ([where the create button goes](#where-the-create-button-goes)).
+- Creating a dialog or a thread («+ Чат») is `ChatList.Actions`: under the search, over the rows — search → create → list, never a button under the list ([where the create button goes](#where-the-create-button-goes)).
 - Search over the dialogs is the field of `ChatList` itself: `search` and `onSearchChange`; you filter the list (by name and last message), and the list shows the match in rows, the number found and an empty result itself. Never put a field of your own above the list.
 - The conversation is `Chat.Root` in the pane's card: the header, `Chat.Search`, `Chat.Messages` and `Chat.Footer` with the Composer. Never assemble your own header, `ScrollContainer` and feed — the chat links search, jumps, selection and «печатает…» itself.
 - Messages are data: `items` with `getKey`, `getAuthor`, `getDate` (events of the record — an agent took the client, a status moved — through `isService`, drawn as `Chat.Service` with `Chat.ServiceIcon` and `Chat.ServiceChange`), the first unread is `unread`; the feed computes dates, runs, tails and the avatar place. `renderMessage` may be inline: only a message whose item or place changed renders again, so whatever a row shows lives in its item, and a reply's original comes from `entry.find(key)`.
@@ -1199,7 +1199,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [kanban/examples/screen.tsx](../src/components/kanban/examples/screen.tsx)
 
 - The page titles itself in its top bar: `Page.Title` with a `Page.Description` that carries data («7 сделок в работе · 6 461 750 ₽», counted over the filtered deals).
-- Search, filters and the view switch are the bar's `Page.Tools`, the one primary action «Новая сделка» its `Page.Actions`, the active filters its `Page.Chips`; `SmartFilter.Root` wraps the page.
+- Search, filters and the view switch are the bar's `Page.Tools`, the one primary action «+ Сделка» its `Page.Actions`, the active filters its `Page.Chips`; `SmartFilter.Root` wraps the page.
 - The board and the list are the same data: `Kanban` and `DataTable` replace each other through `Crossfade`, the filter is `matchesSmartFilter`.
 - The board is the main area of the page, so its `variant` is the default, `plain`: stages without wells, headers and deal cards stand right on the page — one level of nesting, no frames of your own around the columns.
 - The placement of deals is `value` as `{ [stage]: id[] }`; `onValueChange` returns the request's promise and applies `value` only after the answer; a server refusal returns the card to its place.
@@ -1227,8 +1227,8 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [file-upload/examples/screen.tsx](../src/components/file-upload/examples/screen.tsx)
 
 - A work screen titles itself in its top bar: `Page.Title` «Медиатека» with a `Page.Description` naming the object.
-- Sections, search and order are the bar's `Page.Tools`, «Загрузить» its `Page.Actions`: search is a `SmartFilter.Toolbar` with `fields={[]}`, sections a `SegmentedControl` with `SegmentedControl.Count`.
-- Uploads are `useUploadQueue` + `FileUpload.Root trigger="tile" layout="grid"`: progress, «В очереди», the failure reason and retry are built in, the add tile is also the drop zone; «Загрузить» opens the same picker (`picker.current?.open()`).
+- Sections, search and order are the bar's `Page.Tools`, «⬆ Файлы» its `Page.Actions`: search is a `SmartFilter.Toolbar` with `fields={[]}`, sections a `SegmentedControl` with `SegmentedControl.Count`.
+- Uploads are `useUploadQueue` + `FileUpload.Root trigger="tile" layout="grid"`: progress, «В очереди», the failure reason and retry are built in, the add tile is also the drop zone; «⬆ Файлы» opens the same picker (`picker.current?.open()`).
 - A finished file leaves the queue for the library: its address is `item.result` of the server's answer, not the queue's `preview`.
 - The library grid is a CSS grid of `Thumbnail` with `fullWidth` and one `ratio`; a video is `Thumbnail.Video`, which draws the duration and the play mark itself. `Gallery` does not fit here: it is an album of up to 10.
 - A tile either opens or selects: when browsing it is `Thumbnail.Root asChild` with a button, when selecting — `checked` / `onCheckedChange`; «Выбрать» turns the mode on.

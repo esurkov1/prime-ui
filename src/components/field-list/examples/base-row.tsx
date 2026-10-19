@@ -32,7 +32,7 @@ export default function FieldListBaseRowExample() {
       getLocked={(period) => period.base ?? false}
       labels={{ lockedReason: "Базовую цену нельзя удалить" }}
       createItem={() => ({ id: crypto.randomUUID(), from: "", price: "" })}
-      addLabel="Добавить изменение цены"
+      addLabel="Изменение цены"
       renderItem={(period, row) => (
         <>
           {period.base ? (

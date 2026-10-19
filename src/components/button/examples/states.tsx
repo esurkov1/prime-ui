@@ -27,7 +27,7 @@ export default function ButtonStatesExample() {
           <Button.Icon>
             <Icon name="action.upload" />
           </Button.Icon>
-          Загрузить
+          Файл
         </Button.Root>
         <Typography as="span" variant="caption" tone="muted">
           loading · Button.Icon

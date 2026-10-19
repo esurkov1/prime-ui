@@ -87,7 +87,7 @@ export default function FieldListNarrowExample() {
           value: "",
           color: "#14b8a6",
         })}
-        addLabel="Добавить характеристику"
+        addLabel="Характеристика"
         renderItem={(spec, row) => (
           <>
             <Select.Root

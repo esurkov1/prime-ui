@@ -171,7 +171,7 @@ Pick the control by what the value is, never by when it saves or by what fits in
 |---|---|
 | a capability or a setting that is on or off (a permission, «Звук», «Вход по ссылке») | `Switch` with its label: inside a form it saves with the form, outside one it applies at once and its section has no save |
 | items picked out of a set (rows, recipients, «Выбрать все»), a consent, a one-off option of the action being sent («Отправить копию себе») | `Checkbox` |
-| one level for each of several entities (access per section, a frequency per channel) | one row per entity, its level and scope as `Select`s in columns: a `FieldList` from five entities or whenever most entities have no level — an absent row is «no access», «Добавить раздел» adds one; up to four entities that every record has may stand as one labelled `Select` each |
+| one level for each of several entities (access per section, a frequency per channel) | one row per entity, its level and scope as `Select`s in columns: a `FieldList` from five entities or whenever most entities have no level — an absent row is «no access», «+ Раздел» adds one; up to four entities that every record has may stand as one labelled `Select` each |
 | a stored preference with options (the theme, the language, the start page) | a `Select` field beside the related fields (`Radio.Group` for 2–3 options that each need a line of description) |
 | a mode of what this screen shows now (a period, board / list, a section) | `SegmentedControl` — it switches the view and is never a stored value |
 | several values of one record in a table cell (roles, tags, access) | `Badge.Group overflow="count"`: one line, the rest behind a «+N» that lists them — never a string joined by «·» with a «+5» typed by hand |
@@ -205,7 +205,7 @@ column, and shows only the ones that have a level.
     onValueChange={setGrants}
     getId={(grant) => grant.id}
     createItem={() => ({ id: crypto.randomUUID(), section: "", level: "view" })}
-    addLabel="Добавить раздел"
+    addLabel="Раздел"
     renderItem={(grant, row) => (
       <>
         <Select.Root value={grant.section} onValueChange={(section) => row.update({ section })}>

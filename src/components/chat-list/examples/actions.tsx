@@ -66,7 +66,7 @@ export default function ChatListActionsExample() {
             <Button.Icon>
               <Icon name="action.add" />
             </Button.Icon>
-            Новый чат
+            Чат
           </Button.Root>
         </ChatList.Actions>
       </ChatList.Root>

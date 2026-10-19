@@ -1055,7 +1055,7 @@ export type ChatListActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * The pane's own buttons («Новый чат»): a row under the search and over the dialogs (first in the
+ * The pane's own buttons («+ Чат»): a row under the search and over the dialogs (first in the
  * pane without a search), so creating stands where the reader starts, never under a long list.
  * Its Buttons take the list's tier; a `fullWidth` Button fills the row.
  */

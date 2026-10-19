@@ -33,7 +33,7 @@ export default function FieldListRowMenuExample() {
       getLocked={(stage) => stage.pinned ?? false}
       labels={{ lockedReason: "Аванс всегда первый" }}
       createItem={() => ({ id: crypto.randomUUID(), name: "", days: "", percent: "" })}
-      addLabel="Добавить этап"
+      addLabel="Этап"
       renderItem={(stage, row) => (
         <>
           <Input.Root>

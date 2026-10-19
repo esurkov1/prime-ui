@@ -277,6 +277,71 @@ function dataTableToolbars(body: string): string[] {
 }
 
 /**
+ * The verbs a button icon already says (SKILL/ux.md «An icon is the verb»): a labelled button with
+ * one of these icons names only the object, so its text never starts with the icon's verb.
+ */
+const ICON_VERBS: Record<string, RegExp> = {
+  "action.add": /^(добавить|новый|новая|новое|новые|создать)(?![а-яё])/i,
+  "action.delete": /^(удалить|убрать)(?![а-яё])/i,
+  "action.remove": /^(удалить|убрать)(?![а-яё])/i,
+  "action.download": /^(скачать|выгрузить)(?![а-яё])/i,
+  "action.upload": /^(загрузить|выгрузить)(?![а-яё])/i,
+  "action.copy": /^(копировать|скопировать)(?![а-яё])/i,
+  "action.send": /^(отправить)(?![а-яё])/i,
+  "action.edit": /^(изменить|редактировать)(?![а-яё])/i,
+  "action.refresh": /^(обновить)(?![а-яё])/i,
+  "action.search": /^(найти|искать)(?![а-яё])/i,
+  "action.filter": /^(фильтровать|отфильтровать)(?![а-яё])/i,
+};
+
+/** Labelled `Button.Root`s whose text repeats the verb their `Button.Icon` already draws. */
+function iconVerbOffenders(file: string, source: string): string[] {
+  const offenders: string[] = [];
+  const sf = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const tagName = (node: ts.JsxElement | ts.JsxSelfClosingElement) =>
+    (ts.isJsxElement(node) ? node.openingElement : node).tagName.getText(sf);
+  const inspect = (button: ts.JsxElement) => {
+    const icons: string[] = [];
+    const texts: string[] = [];
+    const walkChildren = (node: ts.Node) => {
+      if (ts.isJsxText(node)) texts.push(node.getText(sf));
+      else if (ts.isJsxSelfClosingElement(node) && tagName(node) === "Icon") {
+        const name = node.attributes.properties.find(
+          (prop) => ts.isJsxAttribute(prop) && prop.name.getText(sf) === "name",
+        );
+        const value = name && ts.isJsxAttribute(name) ? name.initializer : undefined;
+        if (value && ts.isStringLiteral(value)) icons.push(value.text);
+      } else if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
+        for (const child of node.children) walkChildren(child);
+      }
+    };
+    for (const child of button.children) walkChildren(child);
+    const text = texts.join(" ").replace(/\s+/g, " ").trim();
+    for (const icon of icons) {
+      if (ICON_VERBS[icon]?.test(text)) {
+        offenders.push(`${file}: «${text}» repeats the verb of ${icon} (name the object)`);
+      }
+    }
+  };
+  const visit = (node: ts.Node) => {
+    if (ts.isJsxElement(node) && tagName(node) === "Button.Root") inspect(node);
+    // FieldList draws its add button with `action.add`: `addLabel` is its text.
+    if (
+      ts.isJsxAttribute(node) &&
+      node.name.getText(sf) === "addLabel" &&
+      node.initializer &&
+      ts.isStringLiteral(node.initializer) &&
+      ICON_VERBS["action.add"].test(node.initializer.text)
+    ) {
+      offenders.push(`${file}: addLabel «${node.initializer.text}» repeats the verb of action.add`);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return offenders;
+}
+
+/**
  * Scenarios that break the kit's own rules (CLAUDE.md §2, SKILL/ux.md), as offender ids for the
  * `example-content` guard.
  */
@@ -347,6 +412,7 @@ function contentOffenders(dir: string, file: string, source: string): string[] {
       break;
     }
   }
+  offenders.push(...iconVerbOffenders(file, source));
   return offenders;
 }
 

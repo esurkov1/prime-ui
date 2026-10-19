@@ -34,7 +34,8 @@ checks.
 - [ ] Labels on a form of rows ≤ columns + the list label; none repeated, numbered or repeating its heading ([label economy](ux.md#3-label-economy)).
 - [ ] No text explains the layout; every hint is two to five words the label and the control leave out, never the obvious outcome ([label economy](ux.md#3-label-economy)).
 - [ ] Every setting sits with what it governs, as a field beside its neighbours; a stored choice is a `Select`, no section holds one setting ([where a setting lives](ux.md#10-where-a-setting-lives)).
-- [ ] Buttons say the verb and the object, errors say how to fix it, empty states offer the next step ([words](ux.md#4-words)).
+- [ ] No button text repeats its icon's verb («+ Оплата», never «+ Добавить оплату»); a bare verb is icon-only with `aria-label` and a `Tooltip`; a button without an icon says the verb and the object ([words](ux.md#4-words)).
+- [ ] Errors say how to fix it, empty states offer the next step ([words](ux.md#4-words)).
 - [ ] Money, numbers and dates go through `Intl` with `ru-RU`, in Russian typography ([words](ux.md#4-words)).
 - [ ] The friction of every action matches the cost of a mistake ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
 - [ ] A form in a dialog holds its dismiss with `Modal.Guard` / `Drawer.Guard`, a form that is the page with `Page.Guard` ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).

@@ -56,7 +56,7 @@ export const page: ComponentPageConfig = {
       scenario: "actions",
       title: "Кнопки панели",
       description:
-        "Панель тредов ассистента: поиск, под ним «Новый чат», дальше треды — создание стоит наверху, а не под списком — `ChatList.Actions`, `onSearchChange`.",
+        "Панель тредов ассистента: поиск, под ним «+ Чат», дальше треды — создание стоит наверху, а не под списком — `ChatList.Actions`, `onSearchChange`.",
     },
     {
       scenario: "live",

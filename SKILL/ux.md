@@ -196,8 +196,61 @@ Every word on screen must carry something the person does not see already.
 
 The kit's UI language is Russian; these are the rules of its copy.
 
-- **Buttons say the verb and the object:** «Выставить счёт», «Добавить позицию», «Удалить проект».
-  Never «ОК», «Да», «Подтвердить», «Отправить» without an object when the object is not obvious.
+- **An icon on a button is its verb; the text names the object.** `action.add` says add, create
+  and new; `action.delete` delete; `action.download`, `action.upload`, `action.copy`, `action.send`,
+  `action.edit`, `action.refresh`, `action.search`, `action.filter` say theirs. The text never
+  repeats that verb: «+ Оплата», «+ Заказ», «⬇ Отчёт CSV» — not «+ Добавить оплату», «+ Новый
+  заказ», «+ Создать заказ», «⬇ Скачать отчёт». When nothing is left without the verb (the object
+  is plain from where the button stands: a row, a card, a selection), the button is icon-only —
+  `aria-label` with the verb and the object («Удалить выбранные») and a `Tooltip` with the same
+  words. A labelled button is named by its text alone (the kit hides its icon from assistive tech),
+  which reads right in its context.
+- **A button without an icon says the verb and the object:** «Выставить счёт», «Сохранить
+  изменения». Never «ОК», «Да», «Подтвердить», «Отправить» without an object when the object is not
+  obvious. The confirm of a destructive action keeps its verb and takes no icon («Удалить проект»).
+  Either the icon or the verb says the action, never both. Menu rows (`Dropdown.Item`,
+  `Select.Action`, `CommandMenu.Item`) keep the verb beside their icon: a row has no icon-only form.
+
+```tsx partial
+// bad — the «+» and the text both say «add»
+<Page.Actions>
+  <Button.Root>
+    <Button.Icon>
+      <Icon name="action.add" />
+    </Button.Icon>
+    Добавить оплату
+  </Button.Root>
+</Page.Actions>
+```
+
+```tsx good
+// good — the icon is the verb, the text the object; a bare verb is an icon-only button
+<Page.Actions>
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      <Button.Root variant="soft" tone="neutral" aria-label="Обновить платежи">
+        <Button.Icon>
+          <Icon name="action.refresh" />
+        </Button.Icon>
+      </Button.Root>
+    </Tooltip.Trigger>
+    <Tooltip.Content>Обновить платежи</Tooltip.Content>
+  </Tooltip.Root>
+  <Button.Root variant="soft" tone="neutral">
+    <Button.Icon>
+      <Icon name="action.download" />
+    </Button.Icon>
+    Отчёт CSV
+  </Button.Root>
+  <Button.Root>
+    <Button.Icon>
+      <Icon name="action.add" />
+    </Button.Icon>
+    Оплата
+  </Button.Root>
+</Page.Actions>
+```
+
 - **A confirm names the thing and the consequence:** «Удалить проект «Север»? Задачи и файлы
   удалятся без возможности восстановления.», «Выставить счёт на 48 000 ₽ ООО «Север»? Счёт уйдёт
   клиенту на почту.» — not «Вы уверены?».
@@ -205,7 +258,7 @@ The kit's UI language is Russian; these are the rules of its copy.
   «Неверное значение», «Ошибка».
 - **An empty state says what to do next** and offers it: «Счетов пока нет» + «Выставить счёт». A
   filtered empty state offers to reset the filter.
-- **Sentence case** everywhere: «Новый счёт», not «Новый Счёт».
+- **Sentence case** everywhere: «Счета к оплате», not «Счета К Оплате».
 - **Numbers as digits:** «3 файла», not «три файла».
 - **Typography:** quotes «ёлочки» (inner „лапки“), a dash — with spaces, ranges with an en dash
   without spaces (10–20), `…` as one character, a non-breaking space before units and after short

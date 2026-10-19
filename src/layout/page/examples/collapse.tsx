@@ -56,7 +56,7 @@ export default function PageCollapseExample() {
                   <Button.Icon>
                     <Icon name="action.download" />
                   </Button.Icon>
-                  Скачать PDF
+                  PDF
                 </Button.Root>
               </Page.Actions>
             </Page.Header>

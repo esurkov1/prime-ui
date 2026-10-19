@@ -145,7 +145,7 @@ export default function DrawerScreenExample() {
                   <Button.Icon>
                     <Icon name="action.add" />
                   </Button.Icon>
-                  Новый клиент
+                  Клиент
                 </Button.Root>
               </Drawer.Trigger>
               <Drawer.Content>

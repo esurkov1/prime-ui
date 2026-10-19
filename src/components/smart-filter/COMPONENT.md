@@ -73,7 +73,7 @@ No DOM, no ref. The value, the search and the panel state shared by its parts; t
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the toolbar. |
 
 ### SmartFilter.Chips
-`ref` → `HTMLDivElement`. A `<div>` of applied filters as removable Badges with «Добавить фильтр» and «Сбросить все»; renders nothing without filters.
+`ref` → `HTMLDivElement`. A `<div>` of applied filters as removable Badges with «+ Фильтр» and «Сбросить все»; renders nothing without filters.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -123,7 +123,7 @@ Tells a range entry from a selection.
 | `l` | toolbar 40; tags 28 | roomier pages | |
 | `xl` | toolbar 48; tags 32 | hero search | |
 
-In the tag row «Добавить фильтр» is a pressable gray Badge of the tag tier and «Сбросить все» a
+In the tag row «+ Фильтр» is a pressable gray Badge of the tag tier and «Сбросить все» a
 neutral LinkButton with the tags' text size, at the end of the row: every element of the row has the
 same height and type.
 
@@ -170,7 +170,7 @@ same height and type.
 ## Layout & spacing
 - The panel is a flush Popover at least as wide as the toolbar (`width="min-trigger"`), by its content up to twice the panel minimum when the toolbar is narrow; every section is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`, footer `--prime-space-2` × `--prime-space-4`), Dividers run edge to edge, the field label column is at least `--prime-space-24` (a longer name takes its own width, never breaking inside a word); a row narrower than 24rem stacks the label over the values (an intrinsic wrap, no breakpoint).
 - The toolbar is one row of controls (`--prime-space-2` gap): the search first, growing from 9rem (`--prime-space-24` × 1.5), then the filter button at its own width. When less than 9rem is left beside the labelled button, the button shows only its icon and count and stays beside the search, which gives its width instead of wrapping. Every row stays one control high. The search and the button also stand alone: `searchable={false}` keeps the button, empty `fields` keep the search. Search first, filter second — the active filters (`SmartFilter.Chips`) sit under them.
-- Chips are Badges of the toolbar tier on the badge scale (`xs` → `s`), so a tag sits lower than the controls above it; «Добавить фильтр» is a tag of the same tier and «Сбросить все» a LinkButton with the tag's text size.
+- Chips are Badges of the toolbar tier on the badge scale (`xs` → `s`), so a tag sits lower than the controls above it; «+ Фильтр» is a tag of the same tier and «Сбросить все» a LinkButton with the tag's text size.
 - Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end. The chips row, and the panel footer with its Reset, rise in with the first filter and close up in place with the last (`partPresence`).
 - Option groups stack `--prime-space-3` apart, a caption `--prime-space-1` above each group's values. A range row holds two equal Inputs with a dash between them, centred on the field label.
 - While typing a search a range row stays only when its field name matches.
@@ -210,7 +210,7 @@ same height and type.
 | `noMatches` | `"{fields} — нет совпадений"` | Fields with nothing found while typing (compact EmptyPage). |
 | `reset` | `"Сбросить"` | Panel footer reset, shown while a filter is set. |
 | `more` | `"Ещё {count}"` | Collapsed values of a field. |
-| `add` | `"Добавить фильтр"` | Chips row: opens the panel. |
+| `add` | `"Фильтр"` | Chips row: opens the panel. |
 | `clearAll` | `"Сбросить все"` | Chips row: clears every field. |
 | `showValue` | `"Показать только {value}"` | Title of a value. |
 | `hideValue` | `"Скрыть {value}"` | Name of the «−» of a value. |

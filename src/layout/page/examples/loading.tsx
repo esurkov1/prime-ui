@@ -1,5 +1,5 @@
 /** A page whose figures load after it opens: the line of data keeps its place under the title while it loads, so nothing in the bar moves — `loading`. */
-import { Button, Card, Crossfade, Icon, Page, Skeleton, Typography } from "prime-ui-kit";
+import { Button, Card, Crossfade, Icon, Page, Skeleton, Tooltip, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 const ORDERS = [
@@ -27,12 +27,21 @@ export default function PageLoadingExample() {
           <Page.Description loading={loading}>128 в работе · 6 ждут оплаты</Page.Description>
         </Page.Heading>
         <Page.Actions>
-          <Button.Root variant="soft" tone="neutral" onClick={() => setLoading(true)}>
-            <Button.Icon>
-              <Icon name="action.refresh" />
-            </Button.Icon>
-            Обновить
-          </Button.Root>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <Button.Root
+                variant="soft"
+                tone="neutral"
+                aria-label="Обновить"
+                onClick={() => setLoading(true)}
+              >
+                <Button.Icon>
+                  <Icon name="action.refresh" />
+                </Button.Icon>
+              </Button.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Обновить</Tooltip.Content>
+          </Tooltip.Root>
         </Page.Actions>
       </Page.TopBar>
       <Page.Body>

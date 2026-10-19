@@ -36,7 +36,7 @@ export default function FieldListControlledExample() {
         getId={(line) => line.id}
         getLabel={(line) => line.service}
         createItem={() => ({ id: crypto.randomUUID(), service: "", amount: "" })}
-        addLabel="Добавить услугу"
+        addLabel="Услуга"
         renderItem={(line, row) => (
           <>
             <Input.Root>

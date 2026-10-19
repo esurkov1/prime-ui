@@ -76,7 +76,7 @@ export default function PageTopBarExample() {
             <Button.Icon>
               <Icon name="action.add" />
             </Button.Icon>
-            Новая сделка
+            Сделка
           </Button.Root>
         </Page.Actions>
       </Page.TopBar>

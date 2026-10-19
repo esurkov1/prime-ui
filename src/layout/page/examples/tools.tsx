@@ -86,7 +86,7 @@ export default function PageToolsExample() {
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              Новый заказ
+              Заказ
             </Button.Root>
           </Page.Actions>
           <Page.Chips>

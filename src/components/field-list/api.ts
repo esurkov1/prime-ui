@@ -64,8 +64,8 @@ export const api: ComponentApi = {
         {
           name: "addLabel",
           type: "string",
-          en: "Text of the add button: what is added («Добавить позицию»).",
-          ru: "Текст кнопки добавления: что добавляется («Добавить позицию»).",
+          en: "Text of the add button: the object it adds, without the verb its «+» already says («Позиция»).",
+          ru: "Текст кнопки добавления: что добавляется, без глагола — его уже говорит «+» («Позиция»).",
         },
         {
           name: "getLabel",

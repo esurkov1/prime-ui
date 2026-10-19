@@ -242,7 +242,7 @@ Full rules: [responsive.md](responsive.md).
 - Five lines of brief before the JSX: who and what for, the data and its shape, the main action, the states, the narrow screen ([ux.md](ux.md)) — not a layout picked by habit.
 - The shape of the data picks the layout: one record → a form or a `DescriptionList`; records a person edits → `FieldList`; records a person reads → `DataTable` ([the table](ux.md#2-the-shape-of-the-data-decides-the-layout)).
 - Every label carries something new: once per column, never numbered, never repeating its heading; no hint that explains what the layout shows (a lock already says «закреплено»).
-- Buttons say the verb and the object («Выставить счёт»), errors say how to fix it («Формат: +7 912 404-18-20»), empty states offer the next step — not «ОК», «Ошибка», «Нет данных».
+- A button's icon is its verb, so its text is the object («+ Оплата», «⬇ Отчёт CSV»; a bare verb goes icon-only with `aria-label` + `Tooltip`); a button without an icon says the verb and the object («Выставить счёт»); errors say how to fix it («Формат: +7 912 404-18-20»), empty states offer the next step — not «+ Добавить оплату», «ОК», «Ошибка», «Нет данных».
 - Money, numbers and dates through `Intl` (`ru-RU`); «ёлочки», `…`, a non-breaking space before a unit — not `toFixed` and string glue.
 - Friction matches the cost of a mistake ([the ladder](ux.md#5-friction-matches-the-cost-of-a-mistake)) — not «Вы уверены?» on every delete.
 - A disabled control says why when the reason is not on screen; an action without permission is hidden.

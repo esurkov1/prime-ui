@@ -23,7 +23,7 @@
       "expectations": [
         "The list is a FieldList with one column and reorderable",
         "No label is numbered («Преимущество 1», «Пункт 2») and no field repeats the block heading as its visible label",
-        "The add button says what it adds («Добавить преимущество»)"
+        "The add button names what it adds without the verb its «+» already says (addLabel «Преимущество», not «Добавить преимущество»)"
       ]
     },
     {
@@ -72,7 +72,7 @@
       "files": [],
       "expectations": [
         "The answer starts with a short brief: the person, the data and its shape, the main action, the states, the narrow screen",
-        "The line items are a FieldList with the headings once and an add button «Добавить позицию»",
+        "The line items are a FieldList with the headings once and an add button «Позиция» (the «+» says «add»; not «Добавить позицию»)",
         "The total is formatted with Intl.NumberFormat ru-RU currency RUB",
         "The primary button names the action and the object («Выставить счёт»)",
         "Sending asks for confirmation in a ConfirmDialog that names the client, the amount and the consequence (the invoice goes to the client by email, «Счёт уйдёт клиенту на почту»), not «Вы уверены?»",
@@ -99,7 +99,7 @@
         "The frame holds no open / onOpenChange state for the Sidebar and no hand-made menu button with aria-expanded or onClick",
         "The «Сделки» page renders its own Page.Root with Page.Title in Page.Heading inside Page.TopBar; the frame has no header of its own",
         "Every Sidebar.Item is a link (href or asChild) with a Sidebar.ItemIcon, and current marks the open page",
-        "«Новая сделка» is the page's one primary action in its top bar (Page.Actions of Page.TopBar), with a Button.Icon beside its label"
+        "The create button is the page's one primary action in its top bar (Page.Actions of Page.TopBar): an action.add Button.Icon beside the text «Сделка», not «Новая сделка»"
       ]
     },
     {
@@ -111,7 +111,7 @@
         "The path ends in the title: Breadcrumb.Root lists only Клиенты and ООО «Север», and Page.Title «Сделка № 2026-418» follows it inside the same Page.Heading — no title on a separate row, no breadcrumb item repeating the title",
         "Page.Description under the title carries the figures «7 в работе · 6,5 млн ₽»",
         "The sections, SmartFilter.Toolbar and the view switch stand in one Page.Tools with an aria-label, in reading order; no fullWidth written on the SegmentedControls",
-        "«Поделиться», «Экспорт» and «Новая сделка» are all in one Page.Actions — no button in Page.Heading or Page.Tools; the secondary ones are soft + neutral, «Новая сделка» is the solid one and last",
+        "«Поделиться», «Экспорт» and the create button («+ Сделка»: action.add beside the text «Сделка») are all in one Page.Actions — no button in Page.Heading or Page.Tools; the secondary ones are soft + neutral, the create button is the solid one and last",
         "Every button in Page.Actions has a Button.Icon beside its text label",
         "SmartFilter.Chips stands in Page.Chips",
         "SmartFilter.Root wraps Page.Root (outside Page.TopBar), not a group inside the bar",
@@ -159,10 +159,10 @@
     {
       "id": 13,
       "prompt": "Сделай страницу «Модели» для CRM проката самокатов: сверху четыре KPI-карточки (моделей в парке, поездок за период, средняя выручка на модель, в ремонте), под ними таблица моделей с поиском, фильтром по производителю и статусу и выбором колонок. Период выбирается диапазоном дат и пересчитывает и карточки, и таблицу. Есть кнопка «Добавить модель».",
-      "expected_output": "Page.TopBar holds only the title (with a line of data), the date range in Page.Tools and «Добавить модель» in Page.Actions; the KPI cards are a Page.Grid; the DataTable is wrapped in SmartFilter.Root with SmartFilter.Toolbar and DataTableColumnsMenu in its toolbar and SmartFilter.Chips in its toolbarChips.",
+      "expected_output": "Page.TopBar holds only the title (with a line of data), the date range in Page.Tools and «+ Модель» in Page.Actions; the KPI cards are a Page.Grid; the DataTable is wrapped in SmartFilter.Root with SmartFilter.Toolbar and DataTableColumnsMenu in its toolbar and SmartFilter.Chips in its toolbarChips.",
       "files": [],
       "expectations": [
-        "The page's top bar holds the title, the date range (a Datepicker range in Page.Tools — it drives the cards and the table) and «Добавить модель» in Page.Actions — nothing else",
+        "The page's top bar holds the title, the date range (a Datepicker range in Page.Tools — it drives the cards and the table) and the add button in Page.Actions (action.add beside the text «Модель», not «Добавить модель») — nothing else",
         "The search and the filter (SmartFilter.Toolbar) and the column chooser (DataTableColumnsMenu) are in the DataTable toolbar, not in Page.Tools above the KPI cards",
         "The active filters (SmartFilter.Chips) are in the DataTable toolbarChips, not in Page.Chips, and SmartFilter.Root wraps the DataTable",
         "The toolbar gets the controls as they are (no hand-made flex wrapper), and the KPI cards are Card tiles in one Page.Grid"
@@ -222,7 +222,7 @@
     {
       "id": 18,
       "prompt": "Сделай редактор роли: название, описание, доступ к 13 разделам CRM (у каждого уровень: нет, просмотр, изменение, полный — и область: свои или все записи) и дополнительные права (экспорт, удаление, управление командой). В таблице ролей покажи, к каким разделам у роли есть доступ.",
-      "expected_output": "Access is a FieldList with Раздел · Уровень · Записи columns of Selects and «Добавить раздел» (no row means no access), rows with the default «×» in sight; the extra permissions are Switches; in the roles table the sections are Badge.Group overflow=\"count\" in one line.",
+      "expected_output": "Access is a FieldList with Раздел · Уровень · Записи columns of Selects and «+ Раздел» (no row means no access), rows with the default «×» in sight; the extra permissions are Switches; in the roles table the sections are Badge.Group overflow=\"count\" in one line.",
       "files": [],
       "expectations": [
         "Section access is a FieldList whose cells are Selects (section, level, scope), not thirteen captioned SegmentedControls",
@@ -347,14 +347,14 @@
     {
       "id": 28,
       "prompt": "Сделай страницу «AI» в CRM: в сайдбаре один пункт «AI», у раздела три подстраницы — «Чат», «Уроки», «Настройки», каждая своим маршрутом. На «Чате» слева колонка тредов с поиском и кнопкой «Новый чат», справа открытый тред; на «Уроках» есть кнопка «Новый урок».",
-      "expected_output": "One Page titled «AI» on every sub-route; the sub-pages are a SegmentedControl of router links (SegmentedControl.Item asChild) in Page.TopBar → Page.Tools, which stands in the heading row at the end edge before the page's Page.Actions («Новый урок» on the lessons route) — never a row of its own under the title or a switch inside Page.Body. The threads pane is a ChatList with its own search (search / onSearchChange) and «Новый чат» in ChatList.Actions inside it, so the pane reads search → «Новый чат» → threads; the create button is never under the list.",
+      "expected_output": "One Page titled «AI» on every sub-route; the sub-pages are a SegmentedControl of router links (SegmentedControl.Item asChild) in Page.TopBar → Page.Tools, which stands in the heading row at the end edge before the page's Page.Actions («+ Урок» on the lessons route) — never a row of its own under the title or a switch inside Page.Body. The threads pane is a ChatList with its own search (search / onSearchChange) and «+ Чат» in ChatList.Actions inside it, so the pane reads search → «+ Чат» → threads; the create button is never under the list.",
       "files": [],
       "expectations": [
         "Page.Title reads «AI» on all three sub-routes; the switch is SegmentedControl.Item asChild router links inside Page.Tools",
         "The sub-page switch is not placed in Page.Body or in a wrapper of its own under the title",
-        "«Новый урок» is a Button in Page.Actions of the lessons route, after Page.Tools",
+        "The new lesson button is a Button in Page.Actions of the lessons route, after Page.Tools, reading «Урок» beside action.add (not «Новый урок»)",
         "The threads pane is a ChatList.Root with the search triad, not an Input of its own above the list",
-        "«Новый чат» is a Button inside ChatList.Actions within ChatList.Root, not a Button rendered after the ChatList or under the threads"
+        "The new chat button is a Button inside ChatList.Actions within ChatList.Root, not a Button rendered after the ChatList or under the threads; it reads «Чат» beside action.add (not «Новый чат»)"
       ]
     },
     {
@@ -396,6 +396,22 @@
         "The search is Chat.Search with `persistent` (no Chat.SearchButton); the channel Select is its child before the field and is its only control",
         "Several writers on the business side are shown with Chat.Messages authors=\"outgoing\", not `group` and not names typed into message text",
         "The events are Chat.Service rows (via isService) with Chat.ServiceIcon and, for the stage, Chat.ServiceChange — not messages from a fake author and not Notifications"
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "Вот страница оплат (evals/prime-ui-kit/files/payments-page.tsx). Добавь рядом с кнопкой оплаты кнопку «Добавить возврат».",
+      "expected_output": "The agent audits the page first: every icon button repeats its icon's verb. «+ Добавить оплату» becomes «+ Оплата», «⬇ Скачать реестр» becomes «⬇ Реестр», the bare «↻ Обновить» becomes an icon-only Button with an aria-label naming the verb and the object inside a Tooltip, the row «Удалить» with a trash icon becomes icon-only (aria-label with the payment, Tooltip) or keeps the verb without the icon; the new button reads «Возврат» beside action.add.",
+      "files": [
+        "evals/prime-ui-kit/files/payments-page.tsx"
+      ],
+      "expectations": [
+        "Before or with the change, the answer names the copy problem: the button texts repeat the verb their icon already says",
+        "No Button.Root with an action.add Button.Icon has text starting with «Добавить», «Новый», «Новая» or «Создать»: the payment button reads «Оплата», the new one «Возврат»",
+        "The download button reads «Реестр» (or another object) beside action.download, not «Скачать реестр»",
+        "The refresh button has no visible text: an icon-only Button.Root with aria-label naming the verb and the object (e.g. «Обновить оплаты») inside Tooltip.Trigger, with Tooltip.Content",
+        "No row button shows a trash icon beside the text «Удалить»: it is icon-only with an aria-label naming the payment and a Tooltip, or the verb without the icon",
+        "The new «Возврат» button stands in the same Page.Actions, the solid primary stays last"
       ]
     }
   ]

@@ -1,0 +1,7 @@
+/* The layout of payments-page.tsx as its author wrote it: one grid line per payment. */
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: var(--prime-space-4);
+  align-items: center;
+}

@@ -27,7 +27,7 @@ export default function FieldListOverviewExample() {
       getId={(line) => line.id}
       getLabel={(line) => line.service}
       createItem={() => ({ id: crypto.randomUUID(), service: "", quantity: "1", price: "" })}
-      addLabel="Добавить позицию"
+      addLabel="Позиция"
       renderItem={(line, row) => (
         <>
           <Input.Root>

@@ -1,5 +1,5 @@
 /** A list that reloads: placeholder rows of the same geometry cross-fade into the data, nothing jumps — `Crossfade`, `state`. */
-import { Button, Card, Crossfade, Icon, Skeleton, Typography } from "prime-ui-kit";
+import { Button, Card, Crossfade, Icon, Skeleton, Tooltip, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -23,17 +23,22 @@ export default function SkeletonWithCrossfadeExample() {
 
   return (
     <div className={styles.stack}>
-      <Button.Root
-        variant="soft"
-        tone="neutral"
-        disabled={loading}
-        onClick={() => setLoading(true)}
-      >
-        <Button.Icon>
-          <Icon name="action.refresh" />
-        </Button.Icon>
-        Обновить
-      </Button.Root>
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <Button.Root
+            variant="soft"
+            tone="neutral"
+            aria-label="Обновить"
+            disabled={loading}
+            onClick={() => setLoading(true)}
+          >
+            <Button.Icon>
+              <Icon name="action.refresh" />
+            </Button.Icon>
+          </Button.Root>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Обновить</Tooltip.Content>
+      </Tooltip.Root>
 
       <Card.Root variant="panel">
         <Card.Header>

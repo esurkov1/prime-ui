@@ -1,5 +1,14 @@
 /** A data region that failed to load: the error state takes the region, the retry shows its loading until the data cross-fades in; its text comes from labels — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`, `labels`. */
-import { Button, Card, Crossfade, DescriptionList, EmptyPage, Icon, Skeleton } from "prime-ui-kit";
+import {
+  Button,
+  Card,
+  Crossfade,
+  DescriptionList,
+  EmptyPage,
+  Icon,
+  Skeleton,
+  Tooltip,
+} from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -35,18 +44,23 @@ export default function EmptyPageRegionErrorExample() {
     <Card.Root role="region" aria-labelledby="invoices-title" className={styles.region}>
       <Card.Header>
         <Card.Title id="invoices-title">Счета к оплате</Card.Title>
-        <Button.Root
-          variant="ghost"
-          tone="neutral"
-          size="s"
-          disabled={state === "loading"}
-          onClick={() => setState("loading")}
-        >
-          <Button.Icon>
-            <Icon name="action.refresh" />
-          </Button.Icon>
-          Обновить
-        </Button.Root>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <Button.Root
+              variant="ghost"
+              tone="neutral"
+              size="s"
+              aria-label="Обновить счета"
+              disabled={state === "loading"}
+              onClick={() => setState("loading")}
+            >
+              <Button.Icon>
+                <Icon name="action.refresh" />
+              </Button.Icon>
+            </Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Обновить счета</Tooltip.Content>
+        </Tooltip.Root>
       </Card.Header>
       <Card.Body>
         <Crossfade state={state} aria-busy={state === "loading"}>

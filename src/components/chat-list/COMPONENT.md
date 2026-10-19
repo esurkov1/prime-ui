@@ -25,7 +25,7 @@ import { ChatList, formatChatTime } from "prime-ui-kit";
 ```
 ChatList.Root                 <div> column filling its host (container `chat-list`); items, getKey, renderItem
 ├─ search field               Input type="search" — with search / defaultSearch / onSearchChange
-├─ ChatList.Actions          <div> the pane's own buttons («Новый чат»), under the search
+├─ ChatList.Actions          <div> the pane's own buttons («+ Чат»), under the search
 ├─ ScrollContainer            the list's own scroller; onReachEnd → onLoadMore while hasMore
 │  └─ Crossfade               loading (placeholder List rows) ⇄ empty (EmptyPage compact) ⇄ the list
 │     └─ List.Root <ul>       aria-label «Диалоги»; spacer <li aria-hidden> stand for rows out of view
@@ -71,7 +71,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other `div` attributes of the column. |
 
 ### ChatList.Actions
-`ref` → `HTMLDivElement`. The pane's own buttons («Новый чат»): a row under the search and over the dialogs, first in the pane without a search — creating stands where the reader starts, never under the list. Its Buttons take the list's tier; a `fullWidth` Button fills the row.
+`ref` → `HTMLDivElement`. The pane's own buttons («+ Чат»): a row under the search and over the dialogs, first in the pane without a search — creating stands where the reader starts, never under the list. Its Buttons take the list's tier; a `fullWidth` Button fills the row.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -283,7 +283,7 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 - A «⋯» button nested inside the row for the menu → `ChatList.ItemMenu`: it opens on right click, a long press and Shift+F10.
 - Deleting from the menu without a question → open a `ConfirmDialog` from the menu item.
 - `href` with an `onClick` that calls `preventDefault()` and the router's `navigate` → `asChild` with the router's `Link`, the parts inside it.
-- «Новый чат» under the list, or a button of your own above the search → `ChatList.Actions` inside the root: search → create → dialogs.
+- «+ Чат» under the list, or a button of your own above the search → `ChatList.Actions` inside the root: search → create → dialogs.
 - The record's status as plain text («Бронь · ждёт человека») in `ChatList.ItemStatus` → one `Badge.Root` per fact (`color` for a stage, `tone` for a judgement): a badge is noticed, muted text is not.
 - Times shifted by hand to a profile's zone before `time` → `timeZone` on the root: «сегодня», the weekday and the clock are read in it.
 

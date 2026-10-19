@@ -104,8 +104,8 @@ export const api: ComponentApi = {
     },
     {
       name: "SmartFilter.Chips",
-      en: "`ref` → `HTMLDivElement`. A `<div>` of applied filters as removable Badges with «Добавить фильтр» and «Сбросить все»; renders nothing without filters.",
-      ru: "`<div>` с применёнными фильтрами — удаляемыми Badge — и кнопками «Добавить фильтр», «Сбросить все»; без фильтров ничего не рендерит.",
+      en: "`ref` → `HTMLDivElement`. A `<div>` of applied filters as removable Badges with «+ Фильтр» and «Сбросить все»; renders nothing without filters.",
+      ru: "`<div>` с применёнными фильтрами — удаляемыми Badge — и кнопками «+ Фильтр», «Сбросить все»; без фильтров ничего не рендерит.",
       props: [
         {
           name: "…rest",

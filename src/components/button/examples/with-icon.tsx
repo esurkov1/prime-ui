@@ -9,7 +9,7 @@ export default function ButtonWithIconExample() {
           <Button.Icon>
             <Icon name="action.upload" />
           </Button.Icon>
-          Загрузить файл
+          Файл
         </Button.Root>
         <Typography as="span" variant="caption" tone="muted">
           leading

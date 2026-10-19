@@ -17,7 +17,7 @@ type Template = { id: string; name: string; uses: number };
 // The action of each sub-page: its own label, none on the statistics.
 const SUB_PAGES = [
   { to: "/messengers/channels", label: "Каналы", action: "Подключить канал" },
-  { to: "/messengers/templates", label: "Шаблоны", action: "Новый шаблон" },
+  { to: "/messengers/templates", label: "Шаблоны", action: "Шаблон" },
   { to: "/messengers/stats", label: "Статистика", action: null },
 ];
 

@@ -32,7 +32,7 @@ export default function PageOverviewExample() {
                   <Button.Icon>
                     <Icon name="action.add" />
                   </Button.Icon>
-                  Новый заказ
+                  Заказ
                 </Button.Root>
               </Page.Actions>
             </Page.TopBar>

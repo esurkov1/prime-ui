@@ -170,7 +170,7 @@ export function DealsPage() {
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              Новая сделка
+              Сделка
             </Button.Root>
           </Page.Actions>
           <Page.Chips>

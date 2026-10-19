@@ -48,15 +48,15 @@ export default function PageNarrowExample() {
                 </Button.Root>
                 <Button.Root variant="soft" tone="neutral">
                   <Button.Icon>
-                    <Icon name="action.refresh" />
+                    <Icon name="action.upload" />
                   </Button.Icon>
-                  Обновить
+                  Импорт
                 </Button.Root>
                 <Button.Root>
                   <Button.Icon>
                     <Icon name="action.add" />
                   </Button.Icon>
-                  Новый заказ
+                  Заказ
                 </Button.Root>
               </Page.Actions>
             </Page.TopBar>

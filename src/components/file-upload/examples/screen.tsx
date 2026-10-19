@@ -17,6 +17,7 @@ import {
   Skeleton,
   SmartFilter,
   Thumbnail,
+  Tooltip,
   Typography,
   type UploadContext,
   type UploadItem,
@@ -414,7 +415,7 @@ export default function FileUploadScreenExample() {
               <Button.Icon>
                 <Icon name="action.upload" />
               </Button.Icon>
-              Загрузить
+              Файлы
             </Button.Root>
           </Page.Actions>
         </Page.TopBar>
@@ -447,31 +448,45 @@ export default function FileUploadScreenExample() {
               <Crossfade state={selecting ? "select" : "browse"}>
                 {selecting ? (
                   <div className={styles.bar}>
-                    <Button.Root
-                      variant="soft"
-                      tone="neutral"
-                      disabled={selected.size === 0}
-                      onClick={download}
-                    >
-                      <Button.Icon>
-                        <Icon name="action.download" />
-                      </Button.Icon>
-                      Скачать
-                    </Button.Root>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger>
+                        <Button.Root
+                          variant="soft"
+                          tone="neutral"
+                          aria-label="Скачать выбранные"
+                          disabled={selected.size === 0}
+                          onClick={download}
+                        >
+                          <Button.Icon>
+                            <Icon name="action.download" />
+                          </Button.Icon>
+                        </Button.Root>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content>Скачать выбранные</Tooltip.Content>
+                    </Tooltip.Root>
                     <ConfirmDialog.Root
                       title={`Удалить ${selected.size} ${filesWord(selected.size)}?`}
                       description="Файлы пропадут из карточки объекта в каталоге. Восстановить их будет нельзя."
                       confirmLabel="Удалить"
                       onConfirm={removeSelected}
                     >
-                      <ConfirmDialog.Trigger>
-                        <Button.Root variant="outline" tone="danger" disabled={selected.size === 0}>
-                          <Button.Icon>
-                            <Icon name="action.delete" />
-                          </Button.Icon>
-                          Удалить
-                        </Button.Root>
-                      </ConfirmDialog.Trigger>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger>
+                          <ConfirmDialog.Trigger>
+                            <Button.Root
+                              variant="outline"
+                              tone="danger"
+                              aria-label="Удалить выбранные"
+                              disabled={selected.size === 0}
+                            >
+                              <Button.Icon>
+                                <Icon name="action.delete" />
+                              </Button.Icon>
+                            </Button.Root>
+                          </ConfirmDialog.Trigger>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>Удалить выбранные</Tooltip.Content>
+                      </Tooltip.Root>
                     </ConfirmDialog.Root>
                     <Button.Root variant="ghost" tone="neutral" onClick={stopSelecting}>
                       Отмена
@@ -600,7 +615,7 @@ export default function FileUploadScreenExample() {
                     Файлов пока нет
                   </EmptyPage.Title>
                   <EmptyPage.Description>
-                    Перетащите фото и видео объекта в поле выше или нажмите «Загрузить».
+                    Перетащите фото и видео объекта в поле выше или нажмите «Файлы».
                   </EmptyPage.Description>
                 </EmptyPage.Root>
               ) : null}

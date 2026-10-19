@@ -35,7 +35,7 @@ export default function FieldListTotalsExample() {
       getId={(share) => share.id}
       getLabel={(share) => share.member}
       createItem={() => ({ id: crypto.randomUUID(), member: "", percent: "" })}
-      addLabel="Добавить участника"
+      addLabel="Участник"
       renderItem={(share, row) => (
         <>
           <Input.Root>

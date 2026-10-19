@@ -782,9 +782,7 @@ describe('FileUpload.Root trigger="tile", a value', () => {
 
   it("with room under max the add tile counts nothing", () => {
     render(<Photos max={4} />);
-    expect(screen.getByLabelText("Добавить файлы").closest("label")).toHaveTextContent(
-      /^Добавить$/,
-    );
+    expect(screen.getByLabelText("Добавить файлы").closest("label")).toHaveTextContent(/^Файлы$/);
   });
 
   it("at max the add tile leaves and comes back once a file goes", () => {

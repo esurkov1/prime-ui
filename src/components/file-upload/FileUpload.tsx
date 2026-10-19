@@ -142,7 +142,7 @@ export const FILE_UPLOAD_LABELS: FileUploadLabels = {
   title: "Выберите файл или перетащите его сюда",
   browse: "Выбрать файл",
   optional: "необязательно",
-  add: "Добавить",
+  add: "Файлы",
   addLabel: "Добавить файлы",
   empty: "Нажмите или перетащите файлы",
   cover: "Обложка",

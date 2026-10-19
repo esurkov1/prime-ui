@@ -141,8 +141,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChatList.Actions",
-      en: "`ref` → `HTMLDivElement`. The pane's own buttons («Новый чат»): a row under the search and over the dialogs, first in the pane without a search — creating stands where the reader starts, never under the list. Its Buttons take the list's tier; a `fullWidth` Button fills the row.",
-      ru: "Свои кнопки панели («Новый чат»): ряд под поиском и над диалогами, без поиска — первым в панели; создание стоит там, где начинает читатель, а не под списком. Кнопки берут ярус списка; `fullWidth` Button занимает весь ряд.",
+      en: "`ref` → `HTMLDivElement`. The pane's own buttons («+ Чат»): a row under the search and over the dialogs, first in the pane without a search — creating stands where the reader starts, never under the list. Its Buttons take the list's tier; a `fullWidth` Button fills the row.",
+      ru: "Свои кнопки панели («+ Чат»): ряд под поиском и над диалогами, без поиска — первым в панели; создание стоит там, где начинает читатель, а не под списком. Кнопки берут ярус списка; `fullWidth` Button занимает весь ряд.",
       props: [
         {
           name: "children",

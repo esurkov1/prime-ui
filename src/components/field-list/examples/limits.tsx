@@ -27,7 +27,7 @@ export default function FieldListLimitsExample() {
       getId={(recipient) => recipient.id}
       getLabel={(recipient) => recipient.name}
       createItem={() => ({ id: crypto.randomUUID(), name: "", email: "" })}
-      addLabel="Добавить получателя"
+      addLabel="Получатель"
       renderItem={(recipient, row) => (
         <>
           <Input.Root>

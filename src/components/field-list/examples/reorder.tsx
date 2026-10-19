@@ -26,7 +26,7 @@ export default function FieldListReorderExample() {
       getId={(point) => point.id}
       getLabel={(point) => point.text}
       createItem={() => ({ id: crypto.randomUUID(), text: "" })}
-      addLabel="Добавить преимущество"
+      addLabel="Преимущество"
       renderItem={(point, row) => (
         <Input.Root>
           <Input.Wrapper>

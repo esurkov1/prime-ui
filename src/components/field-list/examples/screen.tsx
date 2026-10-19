@@ -183,7 +183,7 @@ export default function FieldListScreenExample() {
                 value: "",
                 color: "#14b8a6",
               })}
-              addLabel="Добавить характеристику"
+              addLabel="Характеристика"
               renderItem={(spec, row) => (
                 <>
                   <Select.Root
@@ -251,7 +251,7 @@ export default function FieldListScreenExample() {
                 getLocked={(period) => period.base ?? false}
                 labels={{ lockedReason: "Базовую цену нельзя удалить" }}
                 createItem={() => ({ id: crypto.randomUUID(), from: "", price: "" })}
-                addLabel="Добавить изменение цены"
+                addLabel="Изменение цены"
                 renderItem={(period, row) => (
                   <>
                     {period.base ? (

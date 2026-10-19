@@ -180,7 +180,7 @@ export const SMART_FILTER_LABELS: SmartFilterLabels = {
   noMatches: "{fields} — нет совпадений",
   reset: "Сбросить",
   more: "Ещё {count}",
-  add: "Добавить фильтр",
+  add: "Фильтр",
   clearAll: "Сбросить все",
   showValue: "Показать только {value}",
   hideValue: "Скрыть {value}",

@@ -97,7 +97,7 @@ export default function DescriptionListScreenExample() {
             <Button.Icon>
               <Icon name="action.download" />
             </Button.Icon>
-            Скачать PDF
+            PDF
           </Button.Root>
           <Button.Root variant="soft" tone="neutral">
             <Button.Icon>

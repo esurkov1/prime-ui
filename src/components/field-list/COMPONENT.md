@@ -54,7 +54,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `defaultValue` | `readonly T[]` | `[]` | The first rows (uncontrolled). |
 | `onValueChange` | `(value: T[]) => void \| Promise<void>` | — | The new list after an edit (`row.update`), an add, a remove or a move. Return the save's promise: the new list shows while it is pending, the owner's again on a reject (say why with `error`). |
 | `createItem` | `() => T` | — | A new empty item; with it the add button shows under the rows (until `max`) and focus goes to the new row's first field. |
-| `addLabel` | `string` | — | Text of the add button: what is added («Добавить позицию»). |
+| `addLabel` | `string` | — | Text of the add button: the object it adds, without the verb its «+» already says («Позиция»). |
 | `getLabel` | `(item: T) => string` | — | The row's own text (its title field) for the remove button, the handle, the menu button and move announcements; else the row number. |
 | `getLocked` | `(item: T) => boolean` | — | Pinned rows: the remove stays in its place, off, and says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it. In the menu every item is off. |
 | `reorderable` | `boolean` | `false` | Rows move: with `rowActions="buttons"` by a handle that ends the row, after the remove button (drag, a touch hold, Alt + ↑ / ↓); with `"menu"` by its items «Выше» and «Ниже» and Alt + ↑ / ↓ on the menu button. |

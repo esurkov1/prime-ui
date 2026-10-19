@@ -55,7 +55,7 @@ FileUpload.Root                 field frame: label → trigger → files → hin
       │                         middle: picture, video frame + play mark or the file's sheet ·
       │                         band at the bottom: name (no extension) … size (a video: duration);
       │                         the upload disk over the middle
-      └─ add tile               trigger="tile": «+», «Добавить»; the whole row when empty, gone at `max`
+      └─ add tile               trigger="tile": «+», «Файлы»; the whole row when empty, gone at `max`
 
 FileUpload.Queue                the same files with no trigger of their own (a tray whose paperclip lives elsewhere)
 
@@ -250,7 +250,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 |---|---|---|---|
 | `dropzone` | the drop area with an icon, a title, a description and a decorative browse button, the files under it | a standalone upload field of a form; documents | yes |
 | `button` | a kit Button of the tier, no zone and no drop: soft with the paperclip and text, ghost when its content is a `Button.Icon` alone | a composer's paperclip, an «attach» action in a toolbar or a dense form; pair it with `FileUpload.Queue` when the files live elsewhere | |
-| `tile` | a dashed add tile — «+», «Добавить» — as the last cell of the files; the whole row while empty; files drop anywhere on the set | file cards and the image gallery: files are added where they will lie | |
+| `tile` | a dashed add tile — «+», «Файлы» — as the last cell of the files; the whole row while empty; files drop anywhere on the set | file cards and the image gallery: files are added where they will lie | |
 | `none` | nothing of its own: a hidden file input that `picker.open({ accept })` clicks, no drop | a menu of attachment kinds whose items each open the picker with their own types (`Composer.Attach` with `Composer.Item`) | |
 
 ### variant (FileUpload.Root)
@@ -381,7 +381,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | `title` | `"Выберите файл или перетащите его сюда"` | Title of the built-in zone body. |
 | `browse` | `"Выбрать файл"` | Text of the browse button: decorative in the built-in zone body, the control itself with `trigger="button"`. |
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
-| `add` | `"Добавить"` | Text of the add tile (`trigger="tile"`). |
+| `add` | `"Файлы"` | Text of the add tile (`trigger="tile"`). |
 | `addLabel` | `"Добавить файлы"` | Accessible name of the add tile's file input. |
 | `empty` | `"Нажмите или перетащите файлы"` | Text of the add tile of an empty set (it spans the row). |
 | `cover` | `"Обложка"` | Pill of the first tile with `cover`. |

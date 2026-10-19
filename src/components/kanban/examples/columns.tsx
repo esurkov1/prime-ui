@@ -158,9 +158,6 @@ export default function KanbanColumnsExample() {
                       setColumns((current) => current.filter((item) => item.id !== column.id))
                     }
                   >
-                    <Button.Icon>
-                      <Icon name="action.delete" />
-                    </Button.Icon>
                     Удалить этап
                   </Button.Root>
                 </Popover.Actions>

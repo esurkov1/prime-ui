@@ -30,7 +30,7 @@ export default function FieldListStatesExample() {
               getId={(stage) => stage.id}
               getLabel={(stage) => stage.name}
               createItem={() => ({ id: crypto.randomUUID(), name: "", days: "" })}
-              addLabel="Добавить этап"
+              addLabel="Этап"
               renderItem={(stage) => (
                 <>
                   <Input.Root>

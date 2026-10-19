@@ -55,7 +55,7 @@ export default function FieldListSavingExample() {
       getId={(recipient) => recipient.id}
       getLabel={(recipient) => recipient.name}
       createItem={() => ({ id: crypto.randomUUID(), name: "", email: "", billing: false })}
-      addLabel="Добавить получателя"
+      addLabel="Получатель"
       renderItem={(recipient, row) => (
         <>
           <Input.Root>

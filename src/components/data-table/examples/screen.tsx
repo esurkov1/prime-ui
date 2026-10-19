@@ -312,7 +312,7 @@ export default function DataTableScreenExample() {
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
-              Новый счёт
+              Счёт
             </Button.Root>
           </Page.Actions>
         </Page.TopBar>

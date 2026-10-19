@@ -77,7 +77,13 @@ function Harness({
   );
 }
 
-const openPanel = () => fireEvent.click(screen.getByRole("button", { name: /Фильтр/ }));
+/** The toolbar's filter button (the chips row has its own «+ Фильтр»). */
+const filterButton = () =>
+  within(document.querySelector('[data-slot="smart-filter-toolbar"]') as HTMLElement).getByRole(
+    "button",
+    { name: /Фильтр/ },
+  );
+const openPanel = () => fireEvent.click(filterButton());
 const chips = () => document.querySelector('[data-slot="smart-filter-chips"]');
 
 describe("model", () => {
@@ -177,7 +183,7 @@ describe("SmartFilter", () => {
     expect(chips()).not.toBeNull();
     expect(within(chips() as HTMLElement).getByText("Метод: GET")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "GET" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: /Фильтр/ })).toHaveTextContent("1");
+    expect(filterButton()).toHaveTextContent("1");
   });
 
   it("the panel footer offers Reset only while a filter is set, with no hint or count", async () => {
@@ -297,7 +303,7 @@ describe("SmartFilter", () => {
         </SmartFilter.Root>
       </ControlSizeProvider>,
     );
-    expect(screen.getByRole("button", { name: /Фильтр/ })).toHaveAttribute("data-size", "l");
+    expect(filterButton()).toHaveAttribute("data-size", "l");
   });
 
   it("the chips row rises in when the first filter applies", () => {
@@ -323,7 +329,7 @@ describe("SmartFilter", () => {
       </SmartFilter.Root>,
     );
     const row = () => chips() as HTMLElement;
-    const add = () => screen.getByRole("button", { name: "Добавить фильтр" });
+    const add = () => within(row()).getByRole("button", { name: "Фильтр" });
     expect(row().firstElementChild).toHaveAttribute("data-size", "s");
     // LinkButton runs one tier larger than Badge: an xs link has the 12px text of an s tag.
     expect(add()).toHaveAttribute("data-size", "xs");
@@ -483,7 +489,7 @@ describe("SmartFilter range, single and grouped fields", () => {
     expect(onValue).toHaveBeenLastCalledWith({ amount: { from: 1000, to: 5000 } });
     const chip = within(chips() as HTMLElement).getByText("Сумма: 1000 ₽–5000 ₽");
     expect(chip).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Фильтр/ })).toHaveTextContent("1");
+    expect(filterButton()).toHaveTextContent("1");
     fireEvent.click(screen.getByRole("button", { name: "Убрать фильтр «Сумма: 1000 ₽–5000 ₽»" }));
     expect(onValue).toHaveBeenLastCalledWith({});
     expect(screen.getByRole("textbox", { name: "Сумма, от" })).toHaveValue("");
@@ -615,7 +621,7 @@ describe("SmartFilter.Toolbar compact button", () => {
 
   it("keeps the count beside the icon while filters apply", () => {
     renderAt(200, { service: { include: ["billing"], exclude: [] } });
-    const button = screen.getByRole("button", { name: /Фильтр/ });
+    const button = filterButton();
     expect(button).not.toHaveAttribute("aria-label");
     expect(button).toHaveTextContent("1");
   });

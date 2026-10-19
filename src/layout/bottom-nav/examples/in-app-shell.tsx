@@ -33,7 +33,7 @@ export default function BottomNavInAppShellExample() {
                 <Button.Icon>
                   <Icon name="action.add" />
                 </Button.Icon>
-                Новый заказ
+                Заказ
               </Button.Root>
             </Page.Body>
           </Page.Root>
