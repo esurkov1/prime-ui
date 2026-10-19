@@ -419,11 +419,16 @@
   pointer-events: none;
 }
 
-/* A date stays at the top while its day scrolls under it. */
+/*
+ * A date stays at the top while its day scrolls under it. A sticky box sticks inside the
+ * scroller's padding, so it reaches back over it (the scroller's `space-2` top padding,
+ * `.scroller`): stuck, the date's row meets the scroller's edge and no strip of a message shows
+ * above the pill.
+ */
 .separator:not(.service) {
   position: sticky;
   z-index: var(--prime-z-raised);
-  inset-block-start: 0;
+  inset-block-start: calc(var(--prime-space-2) * -1);
 }
 
 /* A date or a service line is never wider than a bubble. */
@@ -442,13 +447,21 @@
 }
 
 /*
- * The date floats over the messages that scroll under it, so it never wears the bubbles' fill: it
- * stands one step above an incoming bubble on the ladder (`data-depth` two steps off the list's
- * host, set by `Chat.Separator`) and lifts with the overlay shadow, so in both themes it reads as
- * its own surface over a bubble and the bubble's text passes under it.
+ * In the flow among the messages a date is a caption chip like an event's. Stuck at the top
+ * (`data-stuck`, read from the layout by the list) it floats over the messages that scroll under
+ * it, so it never wears the bubbles' fill: it stands one step above an incoming bubble on the
+ * ladder (`data-depth` two steps off the list's host, set by `Chat.Separator`) and lifts with the
+ * overlay shadow, so in both themes it reads as its own surface while the bubbles' text passes
+ * under it.
  */
 .separator:not(.service) .pill {
-  background: var(--prime-color-layer-current);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.separator[data-stuck]:not(.service) .pill {
+  background-color: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
 }
 

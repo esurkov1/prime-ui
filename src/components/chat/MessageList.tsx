@@ -880,10 +880,21 @@ export function MessageList({
 const DATE_ROW = `.${styles.separator}:not(.${styles.service})`;
 
 /**
- * Two dates never pile up at the top: the rows are flat siblings, so each sticky date would stay
- * stuck under the next one. As the next day's date reaches the stuck one, it pushes it up and out
- * of the scroller, as messengers do — a scroll-linked shift of the stuck pill (`translate`) by how
- * far the two rows overlap, written once per frame the scroller moves or the list resizes.
+ * A date sticks in the flow (`position: sticky`, CSS); this hook only reads where the layout put
+ * it, once per frame the scroller moves or the list resizes, and writes two things:
+ *
+ * - **Stuck.** A date is stuck while its sticky offset holds it below its place in the flow — it
+ *   then overlaps the row after it. Only then it lifts with the overlay shadow (`data-stuck`); a
+ *   date in the flow among the messages wears none.
+ * - **Push.** Two dates never pile up at the top: the rows are flat siblings, so each sticky date
+ *   would stay stuck under the next one. As the next day's date reaches the stuck one, it pushes it
+ *   up and out of the scroller, as messengers do — a scroll-linked shift of the stuck pill
+ *   (`translate`) by how far the two rows overlap.
+ *
+ * Both read layout boxes (`offsetTop`, `offsetHeight` — sticky offsets in, transforms out), never
+ * the painted ones: a row gliding by (`rowGlide`, `bubbleMorph`) never leaves a pill shifted or a
+ * shadow on. A hidden list (a pane with `display: none`) has no layout and keeps what it had until
+ * it shows again.
  */
 function useDatePush(
   container: React.RefObject<HTMLElement | null>,
@@ -896,14 +907,18 @@ function useDatePush(
     let frame = 0;
     const update = () => {
       frame = 0;
+      if (view.getBoundingClientRect().height <= 0) return;
       const dates = list.querySelectorAll<HTMLElement>(DATE_ROW);
       dates.forEach((row, index) => {
         const pill = row.firstElementChild as HTMLElement | null;
         if (!pill) return;
+        const bottom = row.offsetTop + row.offsetHeight;
+        const after = row.nextElementSibling as HTMLElement | null;
+        // Rows stand edge to edge: in its place a date ends where the row after it begins.
+        const stuck = after !== null && bottom - after.offsetTop >= 1;
+        if (stuck !== row.hasAttribute("data-stuck")) row.toggleAttribute("data-stuck", stuck);
         const next = dates[index + 1];
-        const overlap = next
-          ? row.getBoundingClientRect().bottom - next.getBoundingClientRect().top
-          : 0;
+        const overlap = next ? bottom - next.offsetTop : 0;
         const value = overlap > 0 ? `0 ${-overlap}px` : "";
         if (pill.style.translate !== value) pill.style.translate = value;
       });

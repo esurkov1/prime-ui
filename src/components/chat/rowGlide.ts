@@ -18,6 +18,12 @@ const ROW = "[data-message-row]";
  *
  * Its ResizeObserver is made after the scroller's own (a passive effect), so it reads the layout
  * the scroller has already corrected in the same frame, before paint.
+ *
+ * Only what the reader saw moving glides. A list in a hidden pane (`display: none`, an inactive
+ * tab of the app) has no layout: its rows read as zero high and stand at the top, so nothing is
+ * recorded or glided while it is hidden, and the batch that shows it again only records where the
+ * rows stand. A page the browser hid (another tab) resumes from where the rows stand on return:
+ * whatever changed meanwhile is simply in place.
  */
 export function useRowGlide(listRef: React.RefObject<HTMLElement | null>): void {
   React.useEffect(() => {
@@ -25,6 +31,8 @@ export function useRowGlide(listRef: React.RefObject<HTMLElement | null>): void 
     if (!list || typeof ResizeObserver === "undefined") return;
     // The reader's scroll moves every row: that is where they are seen now.
     const scroller = list.parentElement;
+    /** Whether the list has a layout: a hidden pane (or a hidden ancestor) has none. */
+    const shown = () => (scroller ?? list).getBoundingClientRect().height > 0;
     /** Where a child stands in the scroller's view (its glide included; the page's scroll aside). */
     const topOf = (child: Element) =>
       child.getBoundingClientRect().top - (scroller?.getBoundingClientRect().top ?? 0);
@@ -32,8 +40,11 @@ export function useRowGlide(listRef: React.RefObject<HTMLElement | null>): void 
     const seen = new Map<Element, number>();
     const heights = new Map<Element, number>();
     const record = () => {
+      if (!shown()) return;
       for (const child of list.children) seen.set(child, topOf(child));
     };
+    /** Set while the list is hidden: the batch that shows it again glides nothing. */
+    let hidden = false;
     const glide = (changed: Set<Element>) => {
       const duration = readElementDurationMs(
         document.documentElement,
@@ -58,6 +69,11 @@ export function useRowGlide(listRef: React.RefObject<HTMLElement | null>): void 
       }
     };
     const resize = new ResizeObserver((entries) => {
+      if (!shown()) {
+        // Zero sizes of a hidden pane are no sizes: the rows keep the ones last seen.
+        hidden = true;
+        return;
+      }
       const changed = new Set<Element>();
       for (const entry of entries) {
         const height = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
@@ -73,7 +89,8 @@ export function useRowGlide(listRef: React.RefObject<HTMLElement | null>): void 
           changed.add(entry.target);
         }
       }
-      if (changed.size > 0) glide(changed);
+      if (changed.size > 0 && !hidden) glide(changed);
+      hidden = false;
       record();
     });
     const observe = () => {
@@ -88,10 +105,16 @@ export function useRowGlide(listRef: React.RefObject<HTMLElement | null>): void 
     });
     mutation.observe(list, { childList: true });
     scroller?.addEventListener("scroll", record, { passive: true });
+    // Back from another tab: the rows are seen where they stand now, before any late size batch.
+    const resume = () => {
+      if (document.visibilityState === "visible") record();
+    };
+    document.addEventListener("visibilitychange", resume);
     return () => {
       resize.disconnect();
       mutation.disconnect();
       scroller?.removeEventListener("scroll", record);
+      document.removeEventListener("visibilitychange", resume);
     };
   }, [listRef]);
 }

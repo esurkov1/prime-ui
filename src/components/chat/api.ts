@@ -425,8 +425,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Separator",
-      en: "`ref` → `HTMLDivElement`. A date between messages (`items` add them for you) («Сегодня», «12 марта» — `formatMessageDate`): a pill a step above the bubbles that stays at the top while its day scrolls, until the next date pushes it out.",
-      ru: "Дата между сообщениями (`items` ставят их сами) («Сегодня», «12 марта» — `formatMessageDate`): плашка на ступень выше пузырей, которая держится сверху, пока листается её день, пока её не вытолкнет следующая дата.",
+      en: "`ref` → `HTMLDivElement`. A date between messages (`items` add them for you) («Сегодня», «12 марта» — `formatMessageDate`): a muted chip in the flow that sticks at the top while its day scrolls (then a pill a step above the bubbles) until the next date pushes it out.",
+      ru: "Дата между сообщениями (`items` ставят их сами) («Сегодня», «12 марта» — `formatMessageDate`): приглушённая плашка в потоке; пока листается её день, держится сверху (тогда — на ступень выше пузырей), пока её не вытолкнет следующая дата.",
       props: [
         {
           name: "…rest",

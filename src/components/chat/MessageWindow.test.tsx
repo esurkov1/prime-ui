@@ -234,20 +234,32 @@ describe("The message list in a scroller: a window of rows", () => {
 });
 
 describe("Sticky dates in a scroller", () => {
-  /** Rows' boxes by the date they hold: `Вчера` stuck at the top, `Сегодня` `next` px below. */
-  function dates(next: number) {
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+  /**
+   * The layout by the date a row holds: `Вчера` stuck at the top over its day (whose first message
+   * scrolled away above), `Сегодня` `next` px below. `shown: false` is a hidden pane: no layout.
+   */
+  function dates(next: number, { shown = true }: { shown?: boolean } = {}) {
+    const height = shown ? 48 : 0;
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () => ({ top: 0, bottom: height, left: 0, right: 0, width: 0, height }) as DOMRect,
+    );
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(() => height);
+    vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(function (
       this: HTMLElement,
     ) {
-      const text = this.textContent;
-      const top = text === "Вчера" ? 0 : text === "Сегодня" ? next : 0;
-      return { top, bottom: top + 48, left: 0, right: 0, width: 0, height: 48 } as DOMRect;
+      if (!shown) return 0;
+      const text = this.textContent ?? "";
+      if (text === "Вчера") return 0;
+      if (text === "Сегодня") return next;
+      // The first message of yesterday: above the view once yesterday's date is stuck.
+      if (text.includes("Инструкция")) return next > 100 ? 48 : -100;
+      return next + 48;
     });
   }
   const pill = (text: string) => screen.getByText(text);
+  const row = (text: string) => pill(text).parentElement as HTMLElement;
 
-  it("the next day's date pushes the stuck one up and out instead of piling on it", async () => {
-    dates(20);
+  function renderDays() {
     render(
       <ScrollRegionContext.Provider value={fakeRegion()}>
         <div data-testid="scroller" style={{ overflowY: "auto" }}>
@@ -264,6 +276,11 @@ describe("Sticky dates in a scroller", () => {
         </div>
       </ScrollRegionContext.Provider>,
     );
+  }
+
+  it("the next day's date pushes the stuck one up and out instead of piling on it", async () => {
+    dates(20);
+    renderDays();
     // The pill stands one step above the incoming bubbles (depth 1 on the page): never their fill.
     expect(pill("Вчера")).toHaveAttribute("data-depth", "2");
     expect(article("a")?.querySelector("[data-depth]")).toHaveAttribute("data-depth", "1");
@@ -274,5 +291,51 @@ describe("Sticky dates in a scroller", () => {
     dates(200);
     await scrollTo(0);
     expect(pill("Вчера").style.translate).toBe("");
+  });
+
+  it("only a date stuck over its day lifts with a shadow; one in the flow wears none", async () => {
+    dates(20);
+    renderDays();
+    expect(row("Вчера")).toHaveAttribute("data-stuck");
+    expect(row("Сегодня")).not.toHaveAttribute("data-stuck");
+    dates(200);
+    await scrollTo(0);
+    expect(row("Вчера")).not.toHaveAttribute("data-stuck");
+  });
+
+  it("reads the layout, never the painted box: a row gliding by moves no pill", async () => {
+    dates(200);
+    renderDays();
+    // A glide paints the rows elsewhere (a transform); their layout boxes stay where they are.
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () => ({ top: -500, bottom: 300, left: 0, right: 0, width: 0, height: 800 }) as DOMRect,
+    );
+    await scrollTo(0);
+    expect(pill("Вчера").style.translate).toBe("");
+    expect(row("Вчера")).not.toHaveAttribute("data-stuck");
+  });
+
+  it("a hidden pane keeps its dates as they were, and shown again they stand where the layout says", async () => {
+    dates(20);
+    renderDays();
+    dates(20, { shown: false });
+    await scrollTo(0);
+    expect(pill("Вчера").style.translate).toBe("0 -28px");
+    expect(row("Вчера")).toHaveAttribute("data-stuck");
+    dates(200);
+    await scrollTo(0);
+    expect(pill("Вчера").style.translate).toBe("");
+    expect(row("Вчера")).not.toHaveAttribute("data-stuck");
+  });
+
+  it("a date is a sticky row in the flow: no inline position, no transform of its own", () => {
+    dates(20);
+    renderDays();
+    for (const text of ["Вчера", "Сегодня"]) {
+      expect(row(text).style.transform).toBe("");
+      expect(row(text).style.top).toBe("");
+      expect(row(text).style.translate).toBe("");
+      expect(row(text).parentElement).toHaveAttribute("role", "log");
+    }
   });
 });
