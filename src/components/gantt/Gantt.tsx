@@ -508,14 +508,28 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     [dayPx, direction, labelWidth],
   );
 
-  /** The day in the middle of the visible axis, kept across zoom changes. */
-  const centerDate = React.useRef<Date | null>(null);
+  /*
+   * The moment in view: the day under the middle of the visible axis, fractional, kept across zoom
+   * changes. A scroll records it, except the scroll the chart makes to restore it: when the new zoom
+   * cannot put that day in the middle (the whole axis fits, an edge), the clamped view is not a new
+   * moment, and the next zoom returns to the day the person chose.
+   */
+  const viewAnchor = React.useRef<{ day: Date; offset: number; restoredAt: number | null } | null>(
+    null,
+  );
   const rememberCenter = () => {
     const viewport = scrollRef.current;
     const px = dayPx();
     if (!viewport || px <= 0) return;
-    const center = Math.abs(viewport.scrollLeft) + (viewport.clientWidth - labelWidth()) / 2;
-    centerDate.current = addDays(range.start, Math.floor(center / px));
+    const left = Math.abs(viewport.scrollLeft);
+    if (viewAnchor.current?.restoredAt === left) return;
+    const center = (left + (viewport.clientWidth - labelWidth()) / 2) / px;
+    const whole = Math.floor(center);
+    viewAnchor.current = {
+      day: addDays(range.start, whole),
+      offset: center - whole,
+      restoredAt: null,
+    };
   };
 
   /*
@@ -529,9 +543,14 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     if (!previous) {
       scrollToDay(todayInRange ? todayX + 0.5 : 0, 1 / 3, false);
     } else if (previous.scale !== scale) {
-      const center = centerDate.current;
-      if (center) scrollToDay(daysBetween(range.start, center) + 0.5, 1 / 2, false);
-      else scrollToDay(todayInRange ? todayX + 0.5 : 0, 1 / 3, false);
+      const anchor = viewAnchor.current;
+      const viewport = scrollRef.current;
+      if (anchor && viewport) {
+        scrollToDay(daysBetween(range.start, anchor.day) + anchor.offset, 1 / 2, false);
+        anchor.restoredAt = Math.abs(viewport.scrollLeft);
+      } else {
+        scrollToDay(todayInRange ? todayX + 0.5 : 0, 1 / 3, false);
+      }
     } else if (previous.start !== range.start.getTime() && scrollRef.current) {
       const grown = daysBetween(range.start, new Date(previous.start));
       scrollRef.current.scrollLeft += grown * dayPx() * direction();

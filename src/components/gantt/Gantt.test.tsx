@@ -716,6 +716,126 @@ describe("Gantt virtualization", () => {
 });
 
 /**
+ * A scroller that lays out like a browser: a 600 px viewport, a label column of 200, the axis
+ * `--gantt-days` × the zoom's day (40 / 16 / 4 px), and `scrollLeft` clamped to the content.
+ */
+function zoomLayout() {
+  const DAY_PX: Record<string, number> = { day: 40, week: 16, month: 4 };
+  const axisWidth = (node: Element) => {
+    const grid = node.closest('[role="grid"]') as HTMLElement | null;
+    const scale = (node.closest("[data-scale]") as HTMLElement | null)?.dataset.scale ?? "day";
+    return Number(grid?.style.getPropertyValue("--gantt-days") ?? 0) * DAY_PX[scale];
+  };
+  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
+    let width = 0;
+    if (this.getAttribute("aria-label") === "Шкала времени") width = axisWidth(this);
+    else if (this.getAttribute("role") === "columnheader") width = 200;
+    return { width, height: 0, left: 0, right: width, top: 0, bottom: 0 } as DOMRect;
+  });
+  const isScroller = (node: Element) => node.firstElementChild?.getAttribute("role") === "grid";
+  const contentWidth = (node: HTMLElement) => {
+    const axis = node.querySelector('[aria-label="Шкала времени"]');
+    return axis ? 200 + axisWidth(axis) : 0;
+  };
+  vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return isScroller(this) ? 600 : 0;
+  });
+  vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return isScroller(this) ? 300 : 0;
+  });
+  vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return isScroller(this) ? Math.max(600, contentWidth(this)) : 0;
+  });
+  const offsets = new WeakMap<HTMLElement, number>();
+  const clamp = (node: HTMLElement, value: number) =>
+    Math.min(Math.max(value, 0), Math.max(0, node.scrollWidth - node.clientWidth));
+  vi.spyOn(HTMLElement.prototype, "scrollLeft", "get").mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return clamp(this, offsets.get(this) ?? 0);
+  });
+  vi.spyOn(HTMLElement.prototype, "scrollLeft", "set").mockImplementation(function (
+    this: HTMLElement,
+    value: number,
+  ) {
+    offsets.set(this, clamp(this, value));
+  });
+}
+
+describe("Gantt zoom keeps the moment in view", () => {
+  // July – September 2026: 92 days, 3680 px at the day zoom, 368 px at the month zoom (all in view).
+  const QUARTER = { start: day(7, 1), end: day(10, 1) };
+  const scroller = () => screen.getByRole("grid").parentElement as HTMLElement;
+  /** The day under the middle of the visible axis, as a date with its fraction of a day. */
+  const centerAt = (start: Date, px: number) => {
+    const days = (scroller().scrollLeft + (600 - 200) / 2) / px;
+    return addDays(start, Math.floor(days)).getTime() + (days % 1) * 86_400_000;
+  };
+  const switchTo = (name: string) => {
+    fireEvent.click(screen.getByRole("radio", { name }));
+    // The browser reports the scroll the switch made (the clamp, the restored view).
+    fireEvent.scroll(scroller());
+  };
+
+  it("keeps the day in the middle across day ⇄ week, with no drift", () => {
+    zoomLayout();
+    render(<Chart range={QUARTER} />);
+    act(() => {
+      scroller().scrollLeft = 600;
+    });
+    fireEvent.scroll(scroller());
+    const chosen = centerAt(day(7, 1), 40);
+    expect(chosen).toBe(day(7, 21).getTime());
+
+    switchTo("Неделя");
+    // The week axis starts on Monday 29 June.
+    expect(centerAt(day(6, 29), 16)).toBe(chosen);
+    switchTo("День");
+    expect(scroller().scrollLeft).toBe(600);
+    expect(centerAt(day(7, 1), 40)).toBe(chosen);
+  });
+
+  it("returns to the chosen day after a zoom where the whole axis fits", () => {
+    zoomLayout();
+    const onScaleChange = vi.fn();
+    const { rerender } = render(
+      <Chart range={QUARTER} scale="day" onScaleChange={onScaleChange} />,
+    );
+    act(() => {
+      scroller().scrollLeft = 600;
+    });
+    fireEvent.scroll(scroller());
+
+    // Controlled: the owner switches the zoom; the month axis fits and the view clamps to its start.
+    rerender(<Chart range={QUARTER} scale="month" onScaleChange={onScaleChange} />);
+    fireEvent.scroll(scroller());
+    expect(scroller().scrollLeft).toBe(0);
+    rerender(<Chart range={QUARTER} scale="day" onScaleChange={onScaleChange} />);
+    fireEvent.scroll(scroller());
+    expect(scroller().scrollLeft).toBe(600);
+  });
+
+  it("returns to the chosen day after the month zoom, switched from the toolbar", () => {
+    zoomLayout();
+    render(<Chart range={QUARTER} />);
+    act(() => {
+      scroller().scrollLeft = 600;
+    });
+    fireEvent.scroll(scroller());
+    switchTo("Месяц");
+    expect(scroller().scrollLeft).toBe(0);
+    switchTo("День");
+    expect(scroller().scrollLeft).toBe(600);
+  });
+});
+
+/**
  * The timeline for tooltip tests: a 600 × 300 scroller at the origin, a label column of 200 and a
  * header of 50 (sticky parts), and every bar at `bar` horizontally, in the first row.
  */

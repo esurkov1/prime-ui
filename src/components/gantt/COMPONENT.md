@@ -127,7 +127,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| zoom | `scale` / `defaultScale` | `data-scale` on the root; the grid cross-fades into the new zoom, the day in the middle stays in the middle |
+| zoom | `scale` / `defaultScale` | `data-scale` on the root; the grid cross-fades into the new zoom, the day in the middle stays in the middle; a zoom that cannot centre it (the whole axis fits, an edge) shows the nearest view, and the next zoom returns to that day |
 | tier | `size` (else the host tier) | `data-size` on the root; each row's track carries the tier one down (`data-size`), the size of the bar text |
 | bar color | `color` / `tone` | `data-color` (without a tone) or `data-tone` on the bar |
 | milestone | `start` equal to `end` | `data-milestone`: a diamond on its day, the label beside it |
