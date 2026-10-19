@@ -18,8 +18,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Content in the center (number, percent, `Icon`): text from `m`, an icon from `s`, nothing on `xs`. A string or number also becomes `aria-valuetext`.",
-          ru: "Содержимое в центре (число, процент, `Icon`): текст — от `m`, иконка — от `s`, на `xs` ничего. Строка или число становятся и `aria-valuetext`.",
+          en: "Content in the center (number, percent, `Icon`): an icon or a short text from `s` (compact on `s`: «18 д», «72%»), nothing on `xs`. A string or number also becomes `aria-valuetext`.",
+          ru: "Содержимое в центре (число, процент, `Icon`): иконка или короткий текст — от `s` (на `s` компактный: «18 д», «72%»), на `xs` ничего. Строка или число становятся и `aria-valuetext`.",
         },
         {
           name: "aria-label",

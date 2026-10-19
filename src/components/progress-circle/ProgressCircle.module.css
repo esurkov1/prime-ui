@@ -67,6 +67,9 @@
 
 .root[data-size="s"] {
   --pc-size: var(--prime-space-8);
+  /* s (32px): a short compact text («18 д», «75%») fits the hole. */
+  --pc-text-size: var(--prime-progress-circle-compact-text-size);
+  --pc-line-height: var(--prime-progress-circle-compact-line-height);
   --pc-icon-size: var(--prime-icon-s);
 }
 

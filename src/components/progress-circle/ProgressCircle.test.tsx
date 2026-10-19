@@ -59,17 +59,27 @@ describe("ProgressCircle", () => {
     expect(screen.getByText("75%")).toBeInTheDocument();
   });
 
-  it.each([
-    "xs",
-    "s",
-  ] as const)("does not render inner text at size %s, keeps aria-valuetext", (size) => {
+  it("does not render inner text at size xs, keeps aria-valuetext", () => {
     render(
-      <ProgressCircle value={75} size={size}>
+      <ProgressCircle value={75} size="xs">
         75%
       </ProgressCircle>,
     );
     expect(screen.queryByText("75%")).not.toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "75%");
+  });
+
+  it("renders a short compact text at size s, hidden from assistive tech, spoken as aria-valuetext", () => {
+    render(
+      <ProgressCircle value={60} size="s" aria-label="Срок аренды">
+        18 д
+      </ProgressCircle>,
+    );
+    expect(screen.getByText("18 д").closest("[aria-hidden]")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "18 д");
   });
 
   it("merges className on root", () => {

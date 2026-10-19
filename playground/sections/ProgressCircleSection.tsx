@@ -30,7 +30,8 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "sizes",
-      description: "Диаметр от 24 до 80 px; на `xs` и `s` текст в центре не рендерится — `size`.",
+      description:
+        "Диаметр от 24 до 80 px; на `s` текст в центре компактный, на `xs` не рендерится — `size`.",
     },
     {
       slot: "states",

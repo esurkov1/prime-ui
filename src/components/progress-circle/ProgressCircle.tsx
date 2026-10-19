@@ -173,12 +173,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
   const { size, provide } = useHostTier(sizeProp);
   const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
   const isText = typeof children === "string" || typeof children === "number";
-  const showInner =
-    !loading &&
-    children != null &&
-    children !== false &&
-    size !== "xs" &&
-    (size !== "s" || !isText);
+  const showInner = !loading && children != null && children !== false && size !== "xs";
   const valueText = isText ? String(children) : undefined;
 
   let tone: Tone | "inherit" | undefined;

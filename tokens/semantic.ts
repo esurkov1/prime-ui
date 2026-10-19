@@ -962,6 +962,12 @@ export const semanticTokens = {
    * Tooltip tiers: a chip of tier T is as tall as a menu item of tier T (24 · 28 · 32 · 36 · 40),
    * and text, padding and radius grow together, one step per tier.
    */
+  progressCircle: {
+    /** The short text in the hole of an `s` ring (32): «18 д», «75%» at 10 / 12, clear of the ring. */
+    compactTextSize: "{font.size.10}",
+    compactLineHeight: "{font.lineHeight.12}",
+  },
+
   tooltip: {
     xs: {
       textSize: "{font.size.12}",
