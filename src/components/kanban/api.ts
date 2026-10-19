@@ -466,8 +466,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.",
-        ru: "Каждая колонка — `<ul>`, подписанный заголовком колонки (`aria-labelledby`) и описанный подзаголовком (`aria-describedby`); карточки — `<li>` с `aria-roledescription` и `aria-keyshortcuts`.",
+        en: "Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`, and `aria-posinset` / `aria-setsize`, since a column draws only the cards around its view. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.",
+        ru: "Каждая колонка — `<ul>`, подписанный заголовком колонки (`aria-labelledby`) и описанный подзаголовком (`aria-describedby`); карточки — `<li>` с `aria-roledescription`, `aria-keyshortcuts` и `aria-posinset` / `aria-setsize`, ведь колонка рисует только карточки около видимой зоны.",
       },
       {
         en: 'With `columnGroups` every named group is a `role="group"` labelled by its heading; a keyboard move past the edge of a group is announced with `labels.columnGroupLocked`.',

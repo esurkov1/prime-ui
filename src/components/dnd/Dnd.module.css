@@ -194,6 +194,22 @@ th.draggable[data-lifted] > * {
   transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
+/* A windowed list (`virtual`) places its items itself: the browser never anchors the scroll to
+   one of them or to a spacer — an anchor that changes as the window moves (a spacer that shrinks,
+   an item a keyboard move brought in) would carry the scroll position away, back to the top. */
+.sortable[data-windowed] {
+  overflow-anchor: none;
+}
+
+/* A spacer stands for a run of items not drawn, as tall as they are. */
+.spacer {
+  flex: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+
 /* A list that refuses the item in flight says so before the release. */
 .sortable[data-dnd-reject] {
   background-color: var(--prime-color-danger-soft);

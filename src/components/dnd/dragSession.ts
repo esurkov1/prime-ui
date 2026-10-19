@@ -166,6 +166,11 @@ export type DragController = {
   subscribeOverlay: (listener: (event: DragOverlayEvent) => void) => () => void;
   /** Fits the carried copy to the cell it would land in (a grid list of mixed cells). */
   resizeCarried: (size: { width: number; height: number }) => void;
+  /**
+   * The layout under the pointer changed with the pointer still (a windowed list drew other items
+   * as it scrolled): the target under it answers again.
+   */
+  reresolve: () => void;
   destroy: () => void;
 };
 
@@ -519,6 +524,7 @@ export function createDragController(
     announce,
     labels: getLabels,
     cancel,
+    reresolve: resolveOver,
     resizeCarried: (size) => {
       const state = store.getSnapshot();
       if (!active || !state.origin) return;

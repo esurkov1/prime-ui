@@ -69,6 +69,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `canDrop` | `(id: string) => boolean \| string` | — | Refuses an item by id: `false`, or a string that says why (spoken and shown under the carried copy). The list turns `danger` before the release. |
 | `empty` | `ReactNode` | — | Shown while the list has no items, inside a dashed drop slot while the list takes drops; fades out when a gap opens in the list, so the gap takes its place. |
 | `as` | `"div" \| "ul" \| "ol" \| "tbody" \| "tr"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as rows `tr` (a gap row, a one-row copy), `tr` as head cells `th` with `axis="x"` (cells keep their columns, the gap glides among them). |
+| `virtual` | `boolean` | `false` | A long vertical list inside a `ScrollContainer` draws only the items around the view; the carried, focused and arriving items stay drawn, each item says its place (`aria-posinset`). |
 | `header` | `ReactNode` | — | Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`, the leading cells of a head row. |
 | `aria-label` | `string` | — | Accessible name of the list. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element. |
@@ -161,6 +162,7 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | `locked` (item) | a lock where the grip would be; the item holds its place, nothing moves past it | a pinned first row, a system column | `false` |
 | `dragFromControls` (item) | without `handle`: a press on a control inside picks the item up once it travels (a finger: holds); a click stays the control's, and the click that ends a drag is swallowed | a table header whose sort button fills it | `false` |
 | `bare` (item) | the carried copy flies without a fill or a lift shadow: only the item's parts (a header, cards) keep their own looks; the gap it leaves is bare room, no tint, no dashed line | an item that is a group of surfaces, not one (a board column) | `false` |
+| `virtual` | the same list; only the items around the view are in the DOM, spacers as tall as the rest stand for them | a list of hundreds of items in a `ScrollContainer` (a backlog, a board column); outside one every item is drawn | `false` |
 | `empty` | the list's own line inside a dashed drop slot while it is empty (no slot when the list is `disabled`); a gap opening takes its place | columns, lists that may run out | — |
 | `canDrop` → string | the refusal says why: live region and a chip under the clone | workflow rules a person must understand | — |
 | `flashOnDrop` | after a drop the zone's fill starts at `accent-soft` and fades back to its own | the eye must follow where the item went | `false` |
@@ -266,6 +268,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | [drop-zones.tsx](examples/drop-zones.tsx) | Documents carried onto folders: a zone takes items by kind and gets the document as data, a locked folder refuses before the release and says why under the carried file, a syncing folder is no target at all, a document on signing stays put, the line above follows the drag, the target flashes where the file landed — `Dnd.Draggable`, `Dnd.DropZone`, `data`, `canDrop`, `disabled`, `onDragStart`, `onDragEnd`, `onEnter`, `onLeave`, `flashOnDrop`. |
 | [table.tsx](examples/table.tsx) | A project estimate as a table: each stage is its own body of rows under a heading row that never moves, a row is carried by its grip within a stage or into another, and the rows stay table rows — `as`, `header`, `kind`, `handle`. |
 | [table-columns.tsx](examples/table-columns.tsx) | A sales report whose columns change places: the head row is a sortable list, a header is carried alone while the rows stay still and the gap opens among the headers where it lands, and the month column holds its place — `as`, `axis`, `locked`. |
+| [long-list.tsx](examples/long-list.tsx) | A backlog of two thousand tasks in its own scroller stays fast: only the rows in view are drawn, a row held near an edge scrolls the list, and Alt + arrows reach any row — `virtual`, `ScrollContainer`. |
 | [states.tsx](examples/states.tsx) | A contract's approval route: a step already signed stays where it is while the rest reorder around it, and once the route is approved the whole list holds still — `Dnd.SortableItem`, `Dnd.Sortable`, `disabled`. |
 | [narrow.tsx](examples/narrow.tsx) | A row of status filters in a 320 px strip: tags reorder sideways and the strip scrolls when a tag is held near its edge — `axis`. |
 

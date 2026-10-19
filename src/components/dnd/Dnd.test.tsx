@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { DRAG_HOLD_MS } from "@/internal/longPress";
 import { RollingNumber } from "@/internal/RollingNumber";
 import { withMotion } from "@/test/motion";
@@ -490,6 +491,138 @@ describe("Dnd.SortableItem bare", () => {
     moveTo(10, 45);
     expect(document.querySelector("[data-dnd-gap]")).not.toHaveAttribute("data-dnd-bare");
     releaseAt(10, 45);
+  });
+});
+
+describe("Dnd.Sortable virtual", () => {
+  const many = (prefix: string, count: number) =>
+    Array.from({ length: count }, (_, index) => ({ id: `${prefix}${index}` }));
+
+  const nextFrame = () =>
+    act(async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    });
+
+  /** Scrolls the scroller of list `name` (the ScrollContainer that takes the test id). */
+  const scrollTo = async (name: string, top: number) => {
+    const scroller = screen.getByTestId(`scroller-${name}`);
+    scroller.scrollTop = top;
+    fireEvent.scroll(scroller);
+    await nextFrame();
+  };
+
+  /** Every box is 360px tall; items have no CSS, so each is the 64px estimate. */
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(360);
+  });
+
+  /** Lists of one kind side by side, each in its own scroller, reorders applied. */
+  function Columns({ initial }: { initial: Record<string, Row[]> }) {
+    const [lists, setLists] = React.useState(initial);
+    return (
+      <Dnd.Root>
+        {Object.entries(lists).map(([name, items]) => (
+          <ScrollContainer key={name} data-testid={`scroller-${name}`}>
+            <Dnd.Sortable
+              as="ul"
+              aria-label={name}
+              kind="card"
+              virtual
+              items={items}
+              getId={(row) => row.id}
+              onReorder={(id, beforeId) =>
+                setLists((current) => {
+                  const all = Object.values(current).flat();
+                  const moved = all.find((row) => row.id === id);
+                  if (!moved) return current;
+                  const next: Record<string, Row[]> = {};
+                  for (const [key, list] of Object.entries(current)) {
+                    const rest = list.filter((row) => row.id !== id);
+                    next[key] =
+                      key === name
+                        ? moveBefore([...rest, moved], id, beforeId, (row) => row.id)
+                        : rest;
+                  }
+                  return next;
+                })
+              }
+              renderItem={(row) => (
+                <Dnd.SortableItem id={row.id} data-testid={row.id}>
+                  {row.id}
+                </Dnd.SortableItem>
+              )}
+            />
+          </ScrollContainer>
+        ))}
+      </Dnd.Root>
+    );
+  }
+
+  it("draws only the items around the view, each with its place in the whole list", async () => {
+    render(<Columns initial={{ a: many("a", 300) }} />);
+    await nextFrame();
+    const list = screen.getByRole("list", { name: "a" });
+    const items = list.querySelectorAll("[data-dnd-item]");
+    expect(items.length).toBeLessThan(40);
+    expect(items[0]).toHaveAttribute("aria-posinset", "1");
+    expect(items[0]).toHaveAttribute("aria-setsize", "300");
+    // A spacer stands for the items below the window.
+    expect(list.lastElementChild).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("follows the scroll: the items in view are drawn", async () => {
+    render(<Columns initial={{ a: many("a", 300) }} />);
+    await nextFrame();
+    await scrollTo("a", 64 * 150);
+    expect(screen.queryByTestId("a0")).not.toBeInTheDocument();
+    expect(screen.getByTestId("a150")).toBeInTheDocument();
+  });
+
+  it("Alt + ArrowDown moves a focused item and keeps it drawn and focused", async () => {
+    render(<Columns initial={{ a: many("a", 300) }} />);
+    await nextFrame();
+    const item = screen.getByTestId("a0");
+    act(() => item.focus());
+    fireEvent.keyDown(item, { key: "ArrowDown", altKey: true });
+    await nextFrame();
+    expect(screen.getByTestId("a0")).toHaveAttribute("aria-posinset", "2");
+    expect(screen.getByTestId("a0")).toHaveFocus();
+  });
+
+  it("Alt + ArrowRight carries an item to a place the other list does not draw, and focuses it there", async () => {
+    render(<Columns initial={{ a: many("a", 300), b: many("b", 300) }} />);
+    await nextFrame();
+    // The second list is scrolled far down: its first rows are not drawn.
+    const second = screen.getByRole("list", { name: "b" });
+    await scrollTo("b", 64 * 150);
+    expect(screen.queryByTestId("b0")).not.toBeInTheDocument();
+    const item = screen.getByTestId("a0");
+    act(() => item.focus());
+    fireEvent.keyDown(item, { key: "ArrowRight", altKey: true });
+    await nextFrame();
+    const moved = within(second).getByTestId("a0");
+    expect(moved).toHaveFocus();
+    expect(moved).toHaveAttribute("aria-posinset", "1");
+    expect(moved).toHaveAttribute("aria-setsize", "301");
+  });
+
+  it("draws every item outside a ScrollContainer", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Sortable
+          as="ul"
+          aria-label="plain"
+          virtual
+          items={many("p", 60)}
+          getId={(row) => row.id}
+          onReorder={() => {}}
+          renderItem={(row) => <Dnd.SortableItem id={row.id}>{row.id}</Dnd.SortableItem>}
+        />
+      </Dnd.Root>,
+    );
+    const items = screen.getByRole("list", { name: "plain" }).querySelectorAll("[data-dnd-item]");
+    expect(items).toHaveLength(60);
+    expect(items[0]).not.toHaveAttribute("aria-setsize");
   });
 });
 

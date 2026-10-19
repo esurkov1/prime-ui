@@ -229,6 +229,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 ## Layout & spacing
 - Give the root a height (`className`): columns span it and every column body scrolls on its own; without one the columns take the height of the tallest.
 - The board is a size container. From 40rem of its own width columns keep a fixed 18rem; below it a column takes 85% of the board, so the next column peeks. The strip snaps to the start of a column (ScrollContainer `snap="mandatory"`); snapping is off while a drag carries a card.
+- Every column draws only the cards around its view (Dnd.Sortable `virtual`): a column of thousands scrolls and drags as fast as one of ten. Pass every card in `items` and `value` — never slice a column by hand; the carried, the focused and a card arriving by Alt + ← / → stay drawn.
 - The strip scrolls sideways inside the board, never the page. Cards sit at the top of their column; the drop area runs to the bottom of the column, so a card can be released anywhere in it.
 - `plain` / `line`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
 - The column title is `title-m`; the header is at least a control `m` tall, its text starts where the card text does.
@@ -258,7 +259,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.
+- Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`, and `aria-posinset` / `aria-setsize`, since a column draws only the cards around its view. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.
 - With `columnGroups` every named group is a `role="group"` labelled by its heading; a keyboard move past the edge of a group is announced with `labels.columnGroupLocked`.
 - The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position («Колонка «…»: позиция 2 из 4», `labels.column`). A locked column has a lock named «Закреплено» instead.
 - A live region (`role="status"`) announces grabbed, dropped, «position N of M», a move to another column by its title and a refusal with its reason (`labels`, Dnd's labels).
@@ -307,6 +308,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [column-groups.tsx](examples/column-groups.tsx) | A deal board whose stages stand in phases, each phase titled over its columns, and a stage moves only within its phase — `columnGroups`, `reorderableColumns`, `columnOrder`, `onColumnOrderChange`. |
 | [saving.tsx](examples/saving.tsx) | Every move is saved on the server: the card waits busy in its new place, and an invoice the server refuses to close glides back to its column — `onValueChange`. |
 | [item-link.tsx](examples/item-link.tsx) | Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemOpen`. |
+| [large.tsx](examples/large.tsx) | Three thousand orders on one board stay fast: each column draws only the cards in view, a card dragged near an edge scrolls its column, and Alt + arrows reach any card — `items`, `defaultValue`, `getLabel`. |
 | [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry, and placeholder columns before the columns arrive; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `loadingColumns`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The placement lives in the parent: every move arrives with its source, target and position to save, and a button resets the board — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page — `Kanban.Root`, `columns`. |

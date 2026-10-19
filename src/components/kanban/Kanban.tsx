@@ -781,6 +781,8 @@ function KanbanColumnView<T>({
               <Dnd.Sortable
                 as="ul"
                 kind={kind}
+                // A long column draws only the cards around the view.
+                virtual
                 aria-labelledby={headingId}
                 aria-describedby={describedBy}
                 className={styles.list}

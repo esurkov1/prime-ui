@@ -19,6 +19,7 @@ const INERT: DragController = {
   cancel: () => {},
   subscribeOverlay: () => () => {},
   resizeCarried: () => {},
+  reresolve: () => {},
   destroy: () => {},
 };
 

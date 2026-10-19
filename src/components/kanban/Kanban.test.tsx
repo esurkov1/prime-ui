@@ -1171,3 +1171,27 @@ describe("KanbanFieldsMenu", () => {
     expect(screen.getByRole("menuitem", { name: "По умолчанию" })).toBeDisabled();
   });
 });
+
+describe("a long column", () => {
+  it("draws only the cards around the view; each says its place in the column", async () => {
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(360);
+    const cards = Array.from({ length: 400 }, (_, index) => ({
+      id: `t${index}`,
+      title: `Задача ${index}`,
+    }));
+    render(
+      <Board
+        items={cards}
+        defaultValue={{ todo: cards.map((card) => card.id), doing: [], done: [] }}
+      />,
+    );
+    await act(async () => {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    });
+    const column = screen.getByRole("list", { name: "К выполнению" });
+    const drawn = column.querySelectorAll("[data-kanban-item]");
+    expect(drawn.length).toBeLessThan(40);
+    expect(drawn[0]).toHaveAttribute("aria-setsize", "400");
+    vi.restoreAllMocks();
+  });
+});

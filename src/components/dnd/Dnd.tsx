@@ -3,7 +3,10 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { useScrollRegion } from "@/hooks/useScrollRegion";
+import { flowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
@@ -211,6 +214,15 @@ type SortableContextValue = {
   shortcuts: string;
   /** Items whose move the owner is still saving. */
   pending: ReadonlySet<string>;
+  /**
+   * A windowed list (`virtual`): the ref that measures an item, and its place in the whole list —
+   * the items not drawn still count for assistive tech. `null` when every item is drawn.
+   */
+  windowed: {
+    measure: (id: string) => ((node: HTMLElement | null) => void) | undefined;
+    position: (id: string) => number;
+    size: number;
+  } | null;
 };
 
 const ALONG: Record<"x" | "y" | "grid", string> = {
@@ -242,9 +254,26 @@ export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "child
   as?: "div" | "ul" | "ol" | "tbody" | "tr";
   "aria-label"?: string;
   header?: React.ReactNode;
+  virtual?: boolean;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 };
+
+/** Where `list` starts in the content of `scroller`, px: layout offsets, which scrolling leaves alone. */
+function offsetIn(scroller: HTMLElement | null, list: HTMLElement | null): number {
+  if (!scroller || !list) return 0;
+  let top = 0;
+  let node: HTMLElement | null = list;
+  while (node && node !== scroller && scroller.contains(node)) {
+    top += node.offsetTop;
+    node = node.offsetParent as HTMLElement | null;
+  }
+  // The chain stepped past the scroller (it is not positioned): both are measured from there.
+  return node === scroller ? top : top - scroller.offsetTop;
+}
+
+/** Every item shares one measured height until it is measured itself. */
+const ONE_GROUP = () => 0;
 
 /**
  * A reorderable list: pointer drag with a gap where the item lands, neighbours that glide aside, an
@@ -264,6 +293,7 @@ function DndSortable<T>({
   empty,
   as: Tag = "div",
   header,
+  virtual = false,
   className,
   children: trailing,
   ref: forwardedRef,
@@ -298,6 +328,74 @@ function DndSortable<T>({
   );
   const itemTag = ITEM_TAG[Tag];
   const shortcuts = ALONG[axis] + (linked ? ACROSS[axis] : "");
+  const [rowElement, setRowElement] = React.useState<HTMLElement | null>(null);
+
+  // `virtual`: a vertical list inside a ScrollContainer draws only the items around the view (and
+  // the ones it must keep: carried, focused, at the gap, arriving by a keyboard move); spacers stand
+  // for the rest.
+  const region = useScrollRegion();
+  const windowed =
+    virtual && axis === "y" && (itemTag === "li" || itemTag === "div") && region !== null;
+  const drawn = React.useMemo(() => list.order.filter((id) => byId.has(id)), [list.order, byId]);
+  const indexOf = React.useMemo(() => new Map(drawn.map((id, index) => [id, index])), [drawn]);
+  const [rowGap, setRowGap] = React.useState(0);
+  React.useLayoutEffect(() => {
+    if (!windowed || !rowElement) return;
+    setRowGap(Number.parseFloat(getComputedStyle(rowElement).rowGap) || 0);
+  }, [windowed, rowElement]);
+  const scrollRef = React.useMemo<React.RefObject<HTMLElement | null>>(
+    () => ({
+      get current() {
+        return windowed ? (region?.element() ?? null) : null;
+      },
+    }),
+    [region, windowed],
+  );
+  const offset = React.useCallback(
+    () => offsetIn(region?.element() ?? null, rowElement),
+    [region, rowElement],
+  );
+  const getKey = React.useCallback((index: number) => drawn[index] ?? index, [drawn]);
+  const estimate = React.useMemo(() => readCssLengthPx("--prime-space-16", 64), []);
+  const estimateSize = React.useCallback(() => estimate, [estimate]);
+  const virtualRows = useVirtualRows({
+    count: windowed ? drawn.length : 0,
+    scrollRef,
+    getKey,
+    estimateSize,
+    getGroup: ONE_GROUP,
+    offset,
+    pinned: list.keep.flatMap((id) => {
+      const index = indexOf.get(id);
+      return index === undefined ? [] : [index];
+    }),
+    gap: rowGap,
+  });
+  const { measure } = virtualRows;
+  // A carried item over a list that drew other items as it scrolled (an edge auto-scroll): the gap
+  // is placed again among the items now drawn, not the ones drawn a frame ago.
+  const controller = useDragController();
+  const firstRow = virtualRows.rows[0]?.index ?? -1;
+  const lastRow = virtualRows.rows[virtualRows.rows.length - 1]?.index ?? -1;
+  React.useLayoutEffect(() => {
+    if (!windowed || !list.carrying || firstRow < 0 || lastRow < 0) return;
+    controller.reresolve();
+  }, [windowed, list.carrying, firstRow, lastRow, controller]);
+  const windowedContext = React.useMemo(
+    () =>
+      windowed
+        ? {
+            measure: (id: string) => {
+              const index = indexOf.get(id);
+              return index === undefined ? undefined : measure(index);
+            },
+            position: (id: string) => (indexOf.get(id) ?? 0) + 1,
+            size: drawn.length,
+          }
+        : null,
+    [windowed, indexOf, measure, drawn.length],
+  );
+
   const context = React.useMemo<SortableContextValue>(
     () => ({
       itemProps: list.itemProps,
@@ -306,14 +404,14 @@ function DndSortable<T>({
       itemTag,
       shortcuts,
       pending: list.pending,
+      windowed: windowedContext,
     }),
-    [list.itemProps, disabled, handle, itemTag, shortcuts, list.pending],
+    [list.itemProps, disabled, handle, itemTag, shortcuts, list.pending, windowedContext],
   );
 
   // A head row inserts no gap node: the carried cell holds its column and is drawn as the gap, and
   // it and the others glide to where they will stand (`useInPlaceShift`).
   const inPlace = itemTag === "th";
-  const [rowElement, setRowElement] = React.useState<HTMLElement | null>(null);
   useInPlaceShift(inPlace ? rowElement : null, list.order, list.draggingId, list.gapBefore);
   const placeholder =
     list.gap && itemTag !== "th" ? (
@@ -331,14 +429,36 @@ function DndSortable<T>({
   // number) follows the gap as it moves, not only the drop.
   const shownIndex = previewIndex(list.order, list.draggingId, list.gapBefore);
   const children: React.ReactNode[] = [];
-  list.order.forEach((id, index) => {
+  const pushItem = (id: string, index: number) => {
     const item = byId.get(id);
     if (item === undefined) return;
     if (placeholder && list.gapBefore === id) children.push(placeholder);
     children.push(
       <React.Fragment key={id}>{renderItem(item, shownIndex.get(id) ?? index)}</React.Fragment>,
     );
-  });
+  };
+  if (windowed) {
+    const SpacerTag = itemTag === "li" ? "li" : "div";
+    const spacer = (height: number, key: string) =>
+      height > 0 ? (
+        <SpacerTag
+          key={key}
+          aria-hidden="true"
+          className={styles.spacer}
+          style={{ blockSize: height }}
+        />
+      ) : null;
+    const laid = flowGaps(virtualRows, rowGap);
+    for (const row of laid.rows) {
+      const id = drawn[row.index];
+      if (id === undefined) continue;
+      children.push(spacer(row.spacer, `dnd-spacer-${id}`));
+      pushItem(id, list.order.indexOf(id));
+    }
+    children.push(spacer(laid.end, "dnd-spacer-end"));
+  } else {
+    list.order.forEach(pushItem);
+  }
   if (placeholder && list.gapBefore === null) children.push(placeholder);
   if (empty != null && empty !== false && list.order.length === 0) {
     if (itemTag === "tr") {
@@ -379,6 +499,7 @@ function DndSortable<T>({
         )}
         data-axis={axis}
         data-disabled={disabled || undefined}
+        data-windowed={windowed || undefined}
         data-dragging={list.draggingId !== null || undefined}
         {...{ [DND_CARRYING_ATTRIBUTE]: list.carrying || undefined }}
       >
@@ -463,8 +584,8 @@ function DndSortableItem({
   ...rest
 }: DndSortableItemProps) {
   const context = React.useContext(SortableContext);
-  // A callback ref fits whichever tag the list picks.
-  const elementRef = useMergedRefs<HTMLElement | null>(ref);
+  // A callback ref fits whichever tag the list picks; a windowed list measures the item too.
+  const elementRef = useMergedRefs<HTMLElement | null>(ref, context?.windowed?.measure(id));
   if (context === null) throw new Error("Dnd.SortableItem must be rendered inside Dnd.Sortable");
   const Tag = context.itemTag;
   const disabled = context.disabled || itemDisabled;
@@ -498,6 +619,9 @@ function DndSortableItem({
       role={role}
       aria-roledescription={describes ? roleDescription : undefined}
       aria-busy={busy || rest["aria-busy"] || undefined}
+      // A windowed list draws some of its items: each one says its place in the whole list.
+      aria-posinset={context.windowed && Tag === "li" ? context.windowed.position(id) : undefined}
+      aria-setsize={context.windowed && Tag === "li" ? context.windowed.size : undefined}
       onPointerDown={(event: React.PointerEvent<HTMLElement>) => {
         onPointerDown?.(event);
         if (!still && !event.defaultPrevented) sortable.onPointerDown(event);

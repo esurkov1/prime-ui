@@ -39,6 +39,12 @@ type UseVirtualRowsOptions = {
    * row stays rendered, so it can stick while its rows scroll under it.
    */
   sticky?: readonly number[];
+  /**
+   * Space between neighbouring rows, px (a flex list's `row-gap`): a row starts this far after the
+   * one before it ends. A host laying rows out in flow draws a skipped run as one spacer
+   * (`flowGaps`).
+   */
+  gap?: number;
 };
 
 type VirtualRows = {
@@ -96,6 +102,7 @@ export function useVirtualRows({
   initialCount = 30,
   initialAlign = "start",
   sticky,
+  gap = 0,
 }: UseVirtualRowsOptions): VirtualRows {
   // Sizes are written as rows report them and published once per frame: the offsets read the
   // published copy, so a render never depends on a ref.
@@ -117,10 +124,11 @@ export function useVirtualRows({
     for (let index = 0; index < count; index++) {
       const own = measuredSizes.sizes.get(getKey(index));
       const group = getGroup ? measuredSizes.groups.get(getGroup(index)) : undefined;
-      result[index + 1] = result[index] + (own ?? group ?? estimateSize(index));
+      // A row's slot runs to the start of the next one: its size and the gap after it.
+      result[index + 1] = result[index] + (own ?? group ?? estimateSize(index)) + gap;
     }
     return result;
-  }, [count, getKey, getGroup, estimateSize, measuredSizes]);
+  }, [count, getKey, getGroup, estimateSize, measuredSizes, gap]);
 
   const startsRef = React.useRef(starts);
   React.useLayoutEffect(() => {
@@ -215,6 +223,10 @@ export function useVirtualRows({
   React.useLayoutEffect(() => {
     getGroupRef.current = getGroup;
   });
+  const gapRef = React.useRef(gap);
+  React.useLayoutEffect(() => {
+    gapRef.current = gap;
+  });
   const record = React.useCallback((size: number, index: number) => {
     const offsets = startsRef.current;
     if (size <= 0 || index >= offsets.length - 1) return;
@@ -225,7 +237,7 @@ export function useVirtualRows({
     const groupChanged = group !== undefined && groupSizes.current.get(group) !== size;
     if (group !== undefined) groupSizes.current.set(group, size);
     // The size the offsets already use: nothing moves, nothing re-renders.
-    if (!groupChanged && offsets[index + 1] - offsets[index] === size) return;
+    if (!groupChanged && offsets[index + 1] - offsets[index] - gapRef.current === size) return;
     if (!measureFrame.current) {
       measureFrame.current = requestAnimationFrame(() => {
         measureFrame.current = 0;
@@ -321,12 +333,18 @@ export function useVirtualRows({
   }
   const rows = [...indexes]
     .sort((a, b) => a - b)
-    .map((index) => ({ index, start: starts[index], size: starts[index + 1] - starts[index] }));
+    .map((index) => ({
+      index,
+      start: starts[index],
+      size: starts[index + 1] - starts[index] - gap,
+    }));
 
   const startOf = React.useCallback((index: number) => starts[index] ?? 0, [starts]);
   const measured = rows.every(({ index }) => measuredSizes.sizes.has(getKey(index)));
 
-  return { rows, totalSize: starts[count] ?? 0, startOf, measure, measured };
+  // The last row has no gap after it.
+  const totalSize = count > 0 ? (starts[count] ?? 0) - gap : 0;
+  return { rows, totalSize, startOf, measure, measured };
 }
 
 /**
@@ -345,4 +363,26 @@ export function rowGaps({ rows, totalSize }: Pick<VirtualRows, "rows" | "totalSi
     return { ...row, gap };
   });
   return { rows: withGaps, end: Math.max(0, totalSize - cursor) };
+}
+
+/**
+ * For rows laid out in a flex list with its own `row-gap` (`gap` of `useVirtualRows`): the height
+ * of the spacer before each rendered row and after the last one, px, or 0 for none. A spacer stands
+ * for a run of rows not rendered and is itself a flex item, so the list's gap is drawn on both of
+ * its sides: it is that much shorter than the run it replaces.
+ */
+export function flowGaps(
+  { rows, totalSize }: Pick<VirtualRows, "rows" | "totalSize">,
+  gap: number,
+): { rows: (VirtualRow & { spacer: number })[]; end: number } {
+  let cursor = 0;
+  const spaced = rows.map((row, at) => {
+    const distance = row.start - cursor;
+    // Before the first row a spacer has a list gap after it only; between rows, on both sides.
+    const spacer = distance > (at === 0 ? 0 : gap) ? distance - (at === 0 ? gap : 2 * gap) : 0;
+    cursor = row.start + row.size;
+    return { ...row, spacer: Math.max(0, spacer) };
+  });
+  const tail = totalSize - cursor;
+  return { rows: spaced, end: tail > 0 ? Math.max(0, tail - gap) : 0 };
 }

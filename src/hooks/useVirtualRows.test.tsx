@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { useVirtualRows } from "./useVirtualRows";
+import { flowGaps, useVirtualRows } from "./useVirtualRows";
 
 function List({ count, pinned }: { count: number; pinned?: number[] }) {
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
@@ -147,3 +147,56 @@ function KeyedList({ keys }: { keys: string[] }) {
     </div>
   );
 }
+
+describe("rows with a gap between them (a flex list's row-gap)", () => {
+  function GappedList({ count, gap }: { count: number; gap: number }) {
+    const scrollRef = React.useRef<HTMLDivElement | null>(null);
+    const virtual = useVirtualRows({
+      count,
+      scrollRef,
+      getKey: (index) => index,
+      estimateSize: () => 50,
+      overscan: 0,
+      initialCount: 3,
+      gap,
+    });
+    const laid = flowGaps(virtual, gap);
+    return (
+      <div
+        ref={scrollRef}
+        data-testid="scroller"
+        data-total={virtual.totalSize}
+        data-spacers={[...laid.rows.map((row) => row.spacer), laid.end].join(",")}
+        data-starts={laid.rows.map((row) => row.start).join(",")}
+      />
+    );
+  }
+
+  it("places every row a gap after the one before and leaves no gap after the last", () => {
+    render(<GappedList count={10} gap={8} />);
+    const scroller = screen.getByTestId("scroller");
+    // 10 rows of 50 with 9 gaps of 8.
+    expect(scroller).toHaveAttribute("data-total", "572");
+    expect(scroller).toHaveAttribute("data-starts", "0,58,116");
+  });
+
+  it("a spacer is the run it stands for, less the list gaps drawn on its sides", () => {
+    // Rows 0–2 drawn of 10: the 7 rows after them are 7 × 50 + 6 gaps between them.
+    render(<GappedList count={10} gap={8} />);
+    expect(screen.getByTestId("scroller")).toHaveAttribute("data-spacers", "0,0,0,398");
+    // A window from row 4: the spacer before it stands for rows 0–3 and 3 gaps between them.
+    const spaced = flowGaps(
+      {
+        rows: [
+          { index: 4, start: 4 * 58, size: 50 },
+          { index: 5, start: 5 * 58, size: 50 },
+        ],
+        totalSize: 572,
+      },
+      8,
+    );
+    expect(spaced.rows.map((row) => row.spacer)).toEqual([4 * 50 + 3 * 8, 0]);
+    // After row 5: rows 6–9, 4 × 50 + 3 gaps.
+    expect(spaced.end).toBe(4 * 50 + 3 * 8);
+  });
+});

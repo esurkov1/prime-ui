@@ -61,6 +61,11 @@ export type SortableListHandle = {
   /** Items whose move the owner is still saving (a promise from `onReorder`). */
   pending: ReadonlySet<string>;
   /**
+   * Items a windowed list must keep drawn wherever it is scrolled: the one being carried, the one
+   * with the focus, the one the gap stands in front of and one a keyboard move is bringing here.
+   */
+  keep: readonly string[];
+  /**
    * The order to DRAW: `items`, except right after a drop, when the owner answers a beat later and
    * drawing the old order until then would snap the item back and then jump again.
    */
@@ -150,6 +155,27 @@ function lockedIn(element: HTMLElement | null): Set<string> {
       node.dataset.dndItem === undefined ? [] : [node.dataset.dndItem],
     ),
   );
+}
+
+/**
+ * In a windowed list (`Dnd.Sortable virtual`), the first item of `order` after the last one drawn,
+ * leaving out the carried one; `null` when every item to the end is drawn.
+ */
+function firstUndrawnAfter(
+  element: HTMLElement,
+  order: readonly string[],
+  liftedId: string,
+): string | null {
+  const drawn = ownNodes(element, ITEM_SELECTOR).flatMap((node) =>
+    node.dataset.dndItem === undefined || node.dataset.dndItem === liftedId
+      ? []
+      : [node.dataset.dndItem],
+  );
+  const last = drawn[drawn.length - 1];
+  if (last === undefined) return null;
+  const at = order.indexOf(last);
+  if (at === -1) return null;
+  return order.slice(at + 1).find((id) => id !== liftedId) ?? null;
 }
 
 /** The accessible name of a list: its `aria-label`, else the text of its `aria-labelledby`. */
@@ -312,6 +338,9 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
           ? { x: corner.x + origin.width / 2, y: corner.y + origin.height / 2 }
           : corner;
       let before = insertionBefore(element, ITEM_SELECTOR, aim, axis, item.id);
+      // Past the last item drawn is not the end of a windowed list: the item lands in front of the
+      // first one not drawn after it.
+      if (before === null) before = firstUndrawnAfter(element, order, item.id);
       // In front of itself, or of whatever already follows it, is where the item already is. An
       // item from another list always moves.
       const own = order.includes(item.id);
@@ -503,6 +532,38 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     [controller, entry, items, kind, labelOf],
   );
 
+  // The item holding the focus inside this list (its own, not one of a nested list).
+  const [focusedId, setFocusedId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    const element = target.element;
+    if (!element) return;
+    const follow = () => {
+      const active = document.activeElement;
+      const item = active && element.contains(active) ? active.closest(ITEM_SELECTOR) : null;
+      const owner = item?.parentElement?.closest(ITEM_SELECTOR);
+      const own = item instanceof HTMLElement && !(owner && element.contains(owner));
+      setFocusedId(own ? (item.dataset.dndItem ?? null) : null);
+    };
+    // After the focus has moved: `focusout` fires before the next element takes it.
+    const later = () => queueMicrotask(follow);
+    element.addEventListener("focusin", follow);
+    element.addEventListener("focusout", later);
+    return () => {
+      element.removeEventListener("focusin", follow);
+      element.removeEventListener("focusout", later);
+    };
+  }, [target.element]);
+  const incoming =
+    pendingFocus !== null && pendingFocus.kind === kind && items.includes(pendingFocus.id)
+      ? pendingFocus.id
+      : null;
+  const keep = [
+    own && dragged ? dragged.id : null,
+    focusedId,
+    typeof gapBefore === "string" ? gapBefore : null,
+    incoming,
+  ].filter((id): id is string => id !== null);
+
   const { props: sourceProps, draggingId: liftedId } = source;
   const itemProps = React.useCallback(
     (id: string): SortableItemProps => ({
@@ -545,6 +606,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     isOver: target.isOver,
     carrying: dragged !== null,
     pending,
+    keep,
     order,
   };
 }

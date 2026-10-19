@@ -116,6 +116,13 @@ export const api: ComponentApi = {
           ru: 'Корневой элемент; при `ul` / `ol` элементы — `li`, при `tbody` — строки `tr` (строка-зазор, копия в одну строку), при `tr` — ячейки шапки `th` с `axis="x"` (ячейки в своих колонках, зазор скользит между ними).',
         },
         {
+          name: "virtual",
+          type: "boolean",
+          default: "false",
+          en: "A long vertical list inside a `ScrollContainer` draws only the items around the view; the carried, focused and arriving items stay drawn, each item says its place (`aria-posinset`).",
+          ru: "Длинный вертикальный список в `ScrollContainer` рисует только элементы около видимой зоны; переносимый, в фокусе и прибывающий остаются, каждый сообщает своё место (`aria-posinset`).",
+        },
+        {
           name: "header",
           type: "ReactNode",
           en: "Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`, the leading cells of a head row.",
