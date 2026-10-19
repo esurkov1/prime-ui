@@ -21,6 +21,7 @@ checks.
 - [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
 - [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
 - [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` beside the table's search; a DataTable `toolbar` holds the table's controls unwrapped, never a lone button ([controls of a table](composition.md#controls-of-a-table)).
+- [ ] A rich board card is made of the Kanban card parts (zones, title with number, resources, facts, a `fullWidth` next step), its hideable fields a `KanbanFieldsMenu` beside the filter, every card in `items` ([sales pipeline board](composition.md#sales-pipeline-board)).
 
 ## UX ([ux.md](ux.md))
 - [ ] I wrote the five-line brief before the JSX ([brief](ux.md#1-brief-before-code)).

@@ -123,7 +123,7 @@ chat (a bot's welcome message in its settings) → `Message.Root preview`; its f
 **Status and loading.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
 ProgressBar `segments` (categories wear `color`, meanings wear `tone`; `legend` for color · name ·
 value · share); a ranking «label · value · share — bar» (top cities, a funnel) → ProgressBar
-`layout="rows"` with `scale`; compact goal / KPI ring or a ring breakdown → ProgressCircle (`value` or
+`layout="rows"` with `scale` (`own` when each row has its own whole: a load per model, a quota per seat); compact goal / KPI ring or a ring breakdown → ProgressCircle (`value` or
 `segments`). Loading with unknown progress → `loading` on the component that has it (Button, Select,
 DataTable, ProgressBar, ProgressCircle, Sparkline, ChartFrame `state`); a region whose content has a shape (list, card,
 form) → Skeleton of that shape; nothing to hold (a running job, a status line) → Spinner. Nothing to
