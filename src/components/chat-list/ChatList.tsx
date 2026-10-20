@@ -229,7 +229,7 @@ ChatListItemStatus.displayName = "ChatList.ItemStatus";
 
 export type ChatListItemMenuProps = Omit<
   DropdownContentProps,
-  "side" | "align" | "matchTriggerWidth"
+  "side" | "align" | "width" | "maxRows" | "matchTriggerWidth"
 >;
 
 /**

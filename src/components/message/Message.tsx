@@ -421,8 +421,8 @@ function linkMarkOf(props: ButtonRootProps): IconName | undefined {
 
 /**
  * A row of a bot's inline keyboard under the message: `Button.Root` children sharing the row
- * equally on one line (a label too long ellipsizes), at the message's width (the bubble widens to
- * the keyboard when it is wider). Several make several rows, in the order written; the last row's
+ * equally, each at least as wide as its label — a row wider than the message wraps, its keys stack
+ * — at the message's width (the bubble widens to the keyboard when it is wider). Several make several rows, in the order written; the last row's
  * outer corners follow the bubble's radius. A key is `soft` `neutral` unless it sets its own
  * `variant` / `tone`; a link key carries its mark at its top-end corner (`linkMarkOf`); an
  * `onClick` that returns a promise keeps its key loading until it settles.
@@ -448,19 +448,24 @@ function MessageActions({ className, children, ...rest }: MessageActionsProps) {
               ),
             })
           : undefined;
-        return React.cloneElement(child, {
-          variant: props.variant ?? "soft",
-          tone: props.tone ?? "neutral",
-          fullWidth: true,
-          loading: props.loading || pending.has(index),
-          onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
-            track(
-              index,
-              (props.onClick as AsyncHandler<[typeof event], unknown> | undefined)?.(event),
-            );
-          },
-          ...(link ? { children: link } : null),
-        } as Partial<ButtonRootProps>);
+        // A cell around the key: it holds the key's share and its label's width (`.key`); the key fills it.
+        return (
+          <div className={styles.key}>
+            {React.cloneElement(child, {
+              variant: props.variant ?? "soft",
+              tone: props.tone ?? "neutral",
+              fullWidth: true,
+              loading: props.loading || pending.has(index),
+              onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+                track(
+                  index,
+                  (props.onClick as AsyncHandler<[typeof event], unknown> | undefined)?.(event),
+                );
+              },
+              ...(link ? { children: link } : null),
+            } as Partial<ButtonRootProps>)}
+          </div>
+        );
       })}
     </div>
   );

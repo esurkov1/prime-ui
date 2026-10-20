@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DROPDOWN_LABELS } from "./Dropdown";
 
 export const api: ComponentApi = {
   parts: [
@@ -48,6 +49,12 @@ export const api: ComponentApi = {
           ru: "Точка внутри триггера или `Dropdown.Anchor` (px от левого верхнего угла), у которой открывается меню: контекстное меню у указателя. Двигается вместе с элементом при прокрутке.",
         },
         {
+          name: "labels",
+          type: "Partial<DropdownLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
+        },
+        {
           name: "children",
           type: "ReactNode",
           required: true,
@@ -72,8 +79,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` floating panel that scrolls inside, named by the control it opened from; focus moves to the first enabled item. Below 640px of viewport it is a bottom sheet.',
-      ru: 'Портал и плавающая панель `role="menu"` с прокруткой внутри; имя — контрол, из которого её открыли; фокус встаёт на первый доступный пункт. Уже 640px экрана меню становится шторкой снизу.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` floating panel that scrolls inside, named by the control it opened from; focus moves to the first enabled item (or to a `Dropdown.Search`, the menu then under it). Below 640px of viewport it is a bottom sheet.',
+      ru: 'Портал и плавающая панель `role="menu"` с прокруткой внутри; имя — контрол, из которого её открыли; фокус встаёт на первый доступный пункт (или в `Dropdown.Search`, меню тогда под ним). Уже 640px экрана меню становится шторкой снизу.',
       props: [
         {
           name: "side",
@@ -97,17 +104,50 @@ export const api: ComponentApi = {
           ru: "Ярус строк: высота пункта, текст и иконка; подсказки клавиш на ярус меньше. Свой у меню: размер триггера на него не влияет.",
         },
         {
+          name: "width",
+          type: '"auto" | "s" | "m" | "l"',
+          default: '"auto"',
+          en: "`auto`: the content's width between `--prime-panel-min-width` and twice that. `s`, `m`, `l`: a fixed 1.5, 2 or 2.5 panel minimums within the viewport, labels truncate (threads, projects).",
+          ru: "`auto` — ширина содержимого от `--prime-panel-min-width` до двойной. `s`, `m`, `l` — постоянные 1,5, 2 или 2,5 минимума панели в пределах экрана, подписи обрезаются (чаты, проекты).",
+        },
+        {
+          name: "maxRows",
+          type: "number",
+          en: "The height of about this many item rows (a search row on top), then the list scrolls; without it `--prime-panel-max-height`. Never more than the room at the trigger; a bottom sheet uses its own.",
+          ru: "Высота примерно в столько строк пунктов (строка поиска — сверх них), дальше прокрутка; без него — `--prime-panel-max-height`. Не больше места у триггера; шторка снизу — своя высота.",
+        },
+        {
           name: "matchTriggerWidth",
           type: "boolean",
           default: "false",
-          en: "The menu is at least as wide as the trigger.",
-          ru: "Меню не уже триггера.",
+          en: "The menu is at least as wide as the trigger (with `width`, too).",
+          ru: "Меню не уже триггера (и с `width`).",
         },
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "role">',
-          en: "`className`, `onKeyDown` (runs before the arrow-key navigation) and the other attributes of the menu.",
-          ru: "`className`, `onKeyDown` (до навигации стрелками) и остальные атрибуты меню.",
+          en: "`className`, `onKeyDown` (runs before the arrow-key navigation) and the other attributes of the menu (with a search: of the panel).",
+          ru: "`className`, `onKeyDown` (до навигации стрелками) и остальные атрибуты меню (с поиском — панели).",
+        },
+      ],
+    },
+    {
+      name: "Dropdown.Search",
+      en: '`ref` → `HTMLInputElement`. The search row, first in `Dropdown.Content`: `<input type="search">` controlling the menu. Focus stays in it while the arrows move the highlight; items filter by label, description and `keywords`, empty groups hide; the query clears on opening.',
+      ru: 'Строка поиска, первая в `Dropdown.Content`: `<input type="search">`, управляющее меню. Фокус остаётся в поле, стрелки двигают подсветку; пункты фильтруются по подписи, описанию и `keywords`, пустые группы скрываются; запрос сбрасывается при открытии.',
+      props: [
+        {
+          name: "placeholder",
+          type: "string",
+          default: "labels.search",
+          en: "Placeholder; the default accessible name comes from `labels.search` too.",
+          ru: "Плейсхолдер; имя поля по умолчанию — тоже `labels.search`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type" | "role" | "value" | "defaultValue">',
+          en: "`className`, `onChange`, `onKeyDown` (runs before the highlight moves) and the other input attributes except `value` / `defaultValue`.",
+          ru: "`className`, `onChange`, `onKeyDown` (до перемещения подсветки) и остальные атрибуты input, кроме `value` / `defaultValue`.",
         },
       ],
     },
@@ -144,10 +184,23 @@ export const api: ComponentApi = {
           ru: "Пункт — его единственный дочерний элемент-ссылка (`<a href>`, `Link` роутера): работают Cmd/Ctrl-клик и «открыть в новой вкладке»; выбор закрывает меню.",
         },
         {
+          name: "keywords",
+          type: "string",
+          en: "With `Dropdown.Search`: extra words the query also matches (a client's name, an English title).",
+          ru: "С `Dropdown.Search`: дополнительные слова, по которым тоже ищет запрос (имя клиента, английское название).",
+        },
+        {
+          name: "persistent",
+          type: "boolean",
+          default: "false",
+          en: "With `Dropdown.Search`: shown whatever the query and never counted as a match (the empty state still shows) — an action above the list («Новый чат»). The highlight goes to it only when nothing matches.",
+          ru: "С `Dropdown.Search`: виден при любом запросе и не считается совпадением (пустое состояние всё равно показывается) — действие над списком («Новый чат»). Подсветка встаёт на него, только если ничего не найдено.",
+        },
+        {
           name: "children",
           type: "ReactNode",
-          en: "`Dropdown.ItemIcon`, the label, `Dropdown.ItemDescription`, `Dropdown.ItemShortcut`; with `asChild` one link element holding them.",
-          ru: "`Dropdown.ItemIcon`, подпись, `Dropdown.ItemDescription`, `Dropdown.ItemShortcut`; с `asChild` — одна ссылка с ними внутри.",
+          en: "`Dropdown.ItemIcon`, the label, `Dropdown.ItemDescription`, `Dropdown.ItemMeta`, `Dropdown.ItemShortcut`; with `asChild` one link element holding them.",
+          ru: "`Dropdown.ItemIcon`, подпись, `Dropdown.ItemDescription`, `Dropdown.ItemMeta`, `Dropdown.ItemShortcut`; с `asChild` — одна ссылка с ними внутри.",
         },
         {
           name: "…rest",
@@ -187,6 +240,19 @@ export const api: ComponentApi = {
           default: "false",
           en: "Muted and `disabled`, skipped by the arrow keys; no handler runs, the item's own `onClick` included.",
           ru: "Приглушён и `disabled`, стрелки его пропускают; не срабатывает ни один обработчик, включая собственный `onClick` пункта.",
+        },
+        {
+          name: "keywords",
+          type: "string",
+          en: "With `Dropdown.Search`: extra words the query also matches (a client's name, an English title).",
+          ru: "С `Dropdown.Search`: дополнительные слова, по которым тоже ищет запрос (имя клиента, английское название).",
+        },
+        {
+          name: "persistent",
+          type: "boolean",
+          default: "false",
+          en: "With `Dropdown.Search`: shown whatever the query and never counted as a match (the empty state still shows) — an action above the list («Новый чат»). The highlight goes to it only when nothing matches.",
+          ru: "С `Dropdown.Search`: виден при любом запросе и не считается совпадением (пустое состояние всё равно показывается) — действие над списком («Новый чат»). Подсветка встаёт на него, только если ничего не найдено.",
         },
         {
           name: "children",
@@ -232,6 +298,26 @@ export const api: ComponentApi = {
           type: "HTMLAttributes<HTMLSpanElement>",
           en: "`className`, `children` (the glyph) and the other attributes.",
           ru: "`className`, `children` (глиф) и остальные атрибуты.",
+        },
+      ],
+    },
+    {
+      name: "Dropdown.ItemMeta",
+      en: "`ref` → `HTMLSpanElement`. A muted meta at the end of the item, on the label's line (the time of a thread, a count): one line that never shrinks — the label truncates first. Describes the item for assistive tech; the label alone names it.",
+      ru: "Приглушённая метка в конце пункта, на строке подписи (время чата, счётчик): одна строка, которая не сжимается — первой обрезается подпись. Описывает пункт для скринридера; имя пункта — только подпись.",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "The meta («14:32», «вчера»).",
+          ru: "Метка («14:32», «вчера»).",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other attributes of the `<span>`.",
+          ru: "`className` и остальные атрибуты `<span>`.",
         },
       ],
     },
@@ -301,7 +387,18 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: labelRows(DROPDOWN_LABELS, {
+    search: {
+      en: "Default placeholder and accessible name of `Dropdown.Search`.",
+      ru: "Плейсхолдер и имя `Dropdown.Search` по умолчанию.",
+      part: "Dropdown.Search",
+    },
+    empty: {
+      en: "Shown under the search while no item matches the query (a compact EmptyPage).",
+      ru: "Показывается под поиском, пока ни один пункт не подходит под запрос (компактный EmptyPage).",
+      part: "Dropdown.Search",
+    },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -318,6 +415,11 @@ export const api: ComponentApi = {
         keys: "Home · End",
         en: "First / last enabled item.",
         ru: "Первый / последний доступный пункт.",
+      },
+      {
+        keys: "ArrowDown · ArrowUp · Enter",
+        en: "In `Dropdown.Search` the arrows move the highlight over the shown enabled items, wrapping, while focus stays in the field; Enter runs the highlighted item. Space, Home and End edit the query.",
+        ru: "В `Dropdown.Search` стрелки двигают подсветку по видимым доступным пунктам по кругу, фокус остаётся в поле; Enter выполняет подсвеченный пункт. Пробел, Home и End редактируют запрос.",
       },
       {
         keys: "Escape",
@@ -340,12 +442,16 @@ export const api: ComponentApi = {
         ru: 'Триггер получает `aria-haspopup="menu"`, `aria-expanded`, `data-state`, а пока меню открыто — `aria-controls`; собственный `id` ребёнка сохраняется. Остальные пропсы `Dropdown.Trigger` (обработчики, ARIA, `ref`) доходят до ребёнка, поэтому обёртка `Tooltip.Trigger` продолжает работать.',
       },
       {
-        en: "With a `Dropdown.ItemDescription` the label names the item (`aria-labelledby`) and the description describes it (`aria-describedby`).",
-        ru: "С `Dropdown.ItemDescription` подпись называет пункт (`aria-labelledby`), а описание описывает его (`aria-describedby`).",
+        en: "With a `Dropdown.ItemDescription` or a `Dropdown.ItemMeta` the label names the item (`aria-labelledby`) and they describe it (`aria-describedby`).",
+        ru: "С `Dropdown.ItemDescription` или `Dropdown.ItemMeta` подпись называет пункт (`aria-labelledby`), а они описывают его (`aria-describedby`).",
       },
       {
         en: "An `asChild` item merges its props onto the link; the link's children are the item content. A disabled link item gets `aria-disabled` and its click is stopped.",
         ru: "Пункт с `asChild` переносит свои пропсы на ссылку; дети ссылки — содержимое пункта. Неактивный пункт-ссылка получает `aria-disabled`, его клик останавливается.",
+      },
+      {
+        en: 'With `Dropdown.Search` the field is `<input type="search">` named by `labels.search`, with `aria-controls` pointing at the menu and `aria-activedescendant` at the highlighted item; items that do not match are `hidden`; the empty state is `role="status"`.',
+        ru: 'С `Dropdown.Search` поле — `<input type="search">` с именем из `labels.search`, `aria-controls` указывает на меню, `aria-activedescendant` — на подсвеченный пункт; неподходящие пункты `hidden`; пустое состояние — `role="status"`.',
       },
       {
         en: '`Dropdown.Group` is `role="group"` named by its `label`.',

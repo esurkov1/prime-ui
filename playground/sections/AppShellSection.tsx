@@ -8,7 +8,17 @@ export const page: ComponentPageConfig = {
     segment: "app-shell",
     label: "App Shell",
     summary: "Каркас приложения: рельс навигации и панель контента",
-    keywords: ["каркас", "оболочка", "layout", "nav", "main", "footer", "fillViewport"],
+    keywords: [
+      "каркас",
+      "оболочка",
+      "layout",
+      "nav",
+      "main",
+      "footer",
+      "fillViewport",
+      "fab",
+      "плавающая кнопка",
+    ],
     icon: LayoutTemplate,
     order: 1,
   },
@@ -17,7 +27,7 @@ export const page: ComponentPageConfig = {
   title: "AppShell",
   kind: "layout",
   description:
-    "Каркас приложения — навигация и страница: колонка навигации на холсте, панель со страницей в прокручиваемом main и нижняя полоса телефона.",
+    "Каркас приложения — навигация и страница: колонка навигации на холсте, панель со страницей в прокручиваемом main, нижняя полоса телефона и плавающая кнопка главного действия.",
   examples: [
     {
       slot: "overview",
@@ -29,6 +39,12 @@ export const page: ComponentPageConfig = {
       title: "Нижняя полоса",
       description:
         "Приложение для телефона без Sidebar: полоса в нижней зоне стоит внизу, пока main прокручивается под ней — `AppShell.Footer`.",
+    },
+    {
+      scenario: "fab",
+      title: "Плавающая кнопка",
+      description:
+        "Плавающее главное действие приложения: в углу рядом с рейлом Sidebar на широком экране, над плавающим BottomNav на телефоне, под дровером, который оно открывает — `AppShell.Fab`.",
     },
     {
       scenario: "template",

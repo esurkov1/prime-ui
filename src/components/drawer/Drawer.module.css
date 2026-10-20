@@ -13,6 +13,14 @@
   top: 0;
   bottom: 0;
   width: min(100vw, var(--drawer-width));
+  /*
+   * The safe-area insets of the app's container (`--prime-safe-area-*`: the notch, the home
+   * indicator, a host app's buttons): the fill runs to the screen edge, the content steps in. Every
+   * first and last zone of the shell has 24 of air and every zone the dialog's side padding, so the
+   * panel adds only what an inset needs beyond that — the content stands at max(air, inset).
+   */
+  padding-block: max(var(--prime-space-0), calc(var(--prime-safe-area-top) - var(--prime-space-6)))
+    max(var(--prime-space-0), calc(var(--prime-safe-area-bottom) - var(--prime-space-6)));
   box-shadow: var(--prime-shadow-modal);
 }
 
@@ -31,22 +39,36 @@
 /* Rounded only on the edge that faces the page. */
 .panel[data-side="right"] {
   right: 0;
+  padding-inline-end: max(
+    var(--prime-space-0),
+    calc(var(--prime-safe-area-right) - var(--prime-drawer-padding))
+  );
   border-start-start-radius: var(--prime-modal-radius);
   border-end-start-radius: var(--prime-modal-radius);
 }
 
 .panel[data-side="left"] {
   left: 0;
+  padding-inline-start: max(
+    var(--prime-space-0),
+    calc(var(--prime-safe-area-left) - var(--prime-drawer-padding))
+  );
   border-start-end-radius: var(--prime-modal-radius);
   border-end-end-radius: var(--prime-modal-radius);
 }
 
 /* ─── Narrow viewport: full width, square ───────────────────────────────── */
 
-/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). Full width, the panel meets both side edges: it
+   steps in from both side insets. */
 @media (max-width: 639px) {
   .panel {
     width: 100vw;
+    padding-inline: max(
+        var(--prime-space-0),
+        calc(var(--prime-safe-area-left) - var(--prime-drawer-padding))
+      )
+      max(var(--prime-space-0), calc(var(--prime-safe-area-right) - var(--prime-drawer-padding)));
     border-radius: 0;
   }
 }

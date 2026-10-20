@@ -5,14 +5,13 @@
  * fade clock, so reduced motion keeps only the fade in (foundation §7 rule 12); the leaving layer
  * never mounts then.
  *
- *   .swap   the cell
+ *   .swap   the cell, sized by its glyph (never by its host: as a flex item of a row it would take
+ *           the row's width); the host places it
  *   .layer  one glyph (`data-entering` — the incoming one, `data-leaving` — the outgoing one)
  */
 .swap {
   display: inline-grid;
   place-items: center;
-  width: 100%;
-  height: 100%;
 }
 
 .layer {

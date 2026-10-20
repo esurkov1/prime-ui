@@ -17,9 +17,12 @@ export const api: ComponentApi = {
         {
           name: "valueSize",
           type: '"m" | "l"',
-          default: '"m"',
-          en: "The step of a `stat-text` value, a number or a phrase alike: `m` — body-m medium, `l` — title-m, a step above the text (the fact tiles of a record). The loading Skeleton takes the same height.",
-          ru: "Ступень значения `stat-text`, число и фраза одинаково: `m` — body-m medium, `l` — title-m, на шаг крупнее текста (плитки фактов записи). Skeleton загрузки — той же высоты.",
+          defaultNote: {
+            en: 'the card width (`stat-trend`) · `"m"` (`stat-text`)',
+            ru: 'ширина карточки (`stat-trend`) · `"m"` (`stat-text`)',
+          },
+          en: "A fixed step of the KPI value, so a row of tiles keeps one size: `stat-trend` — `m` heading-m, `l` heading-l, unset it follows the card width; `stat-text` — `m` body-m medium, `l` title-m, a step above the text.",
+          ru: "Фиксированная ступень значения KPI, чтобы ряд плиток держал один размер: `stat-trend` — `m` heading-m, `l` heading-l, без него — по ширине карточки; `stat-text` — `m` body-m medium, `l` title-m, на шаг крупнее текста.",
         },
         {
           name: "flat",
@@ -72,8 +75,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Header",
-      en: "`ref` → `HTMLDivElement`. The top row: an optional `Card.Icon`, `Card.Title` with an optional `Card.Description` under it, anything else (a control, a caption) at the end. Wraps below 22rem.",
-      ru: "Верхний ряд: необязательная `Card.Icon`, `Card.Title` с необязательным `Card.Description` под ним, всё остальное (контрол, подпись) — в конце. Уже 22rem переносится.",
+      en: "`ref` → `HTMLDivElement`. The top row: an optional `Card.Icon`, `Card.Title` with an optional `Card.Description` under it, anything else (controls, a caption) in one end row, 8 apart. Wraps below 22rem.",
+      ru: "Верхний ряд: необязательная `Card.Icon`, `Card.Title` с необязательным `Card.Description` под ним, всё остальное (контролы, подпись) — одним рядом в конце, через 8. Уже 22rem переносится.",
       props: [
         {
           name: "…rest",
@@ -208,8 +211,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Value",
-      en: '`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`.',
-      ru: 'Значение метрики: табличные цифры, размер по шаблону и ширине карточки; в `stat-text` — body-m medium (title-m с `valueSize="l"`); в `Card.Total` — title-m.',
+      en: '`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width, or fixed by `valueSize`; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`.',
+      ru: 'Значение метрики: табличные цифры, размер по шаблону и ширине карточки или фиксированный через `valueSize`; в `stat-text` — body-m medium (title-m с `valueSize="l"`); в `Card.Total` — title-m.',
       props: [
         {
           name: "tone",
@@ -247,8 +250,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Meta",
-      en: "`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; under the value; in `Card.Total` the total's state above it.",
-      ru: "Справочная строка KPI («Лидов 120 · сделок 18»): caption, приглушённый, табличные цифры; под значением; в `Card.Total` — состояние итога над ним.",
+      en: "`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): body-s, muted, tabular; under the value; in `Card.Total` the total's state above it.",
+      ru: "Справочная строка KPI («Лидов 120 · сделок 18»): body-s, приглушённый, табличные цифры; под значением; в `Card.Total` — состояние итога над ним.",
       props: [
         {
           name: "tone",

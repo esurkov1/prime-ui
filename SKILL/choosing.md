@@ -117,7 +117,12 @@ reply keyboard → `Composer.Keyboard`. Files, photos,
 places and contacts sent in a chat → the `Message` parts, not FileUpload rows or Cards; a sticker →
 `Message.Sticker` (a Lottie or video sticker is your player inside it). A message shown outside a
 chat (a bot's welcome message in its settings) → `Message.Root preview`; its formatted text alone →
-`RichText`, never `dangerouslySetInnerHTML`. Times and date separators in a profile's zone →
+`RichText`, never `dangerouslySetInnerHTML`. An assistant's Markdown goes to `Message.Text` as
+written — `# ` headings, `- ` / `1. ` lists and relative links `/path` render as they are; route those
+links with `onLinkClick` (`event.preventDefault()`), never rewrite headings to bold, bullets to «•»
+or paths to absolute URLs. A long list behind one button (chats, projects) →
+`Dropdown.Content width="m" maxRows={12}` with `Dropdown.Search` first and `Dropdown.ItemMeta` for a
+row's time; an action above the list («Новый чат») is `persistent`. Times and date separators in a profile's zone →
 `timeZone` on `Chat.Messages`, `ChatList.Root` and a lone `Message.Root`.
 
 **Status and loading.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →

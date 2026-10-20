@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
@@ -58,6 +59,12 @@ function syncSelection(track: HTMLElement, selection: HTMLElement, animate: bool
   placeIndicator(selection, current, animate && !prefersReducedMotion());
 }
 
+/**
+ * The end slot of the bar, for an Action rendered among the items — inside a component of the
+ * consumer's own, where the root cannot see it as its child; `null` outside the item track.
+ */
+const ActionSlotContext = React.createContext<HTMLElement | null | undefined>(undefined);
+
 /** Actions before the first item stand at the start of the bar, the rest at its end. */
 function splitRootChildren(children: React.ReactNode) {
   const start: React.ReactNode[] = [];
@@ -91,6 +98,7 @@ function BottomNavRoot({
   const selectionRef = React.useRef<HTMLSpanElement>(null);
   const { start, items, end } = splitRootChildren(children);
   const look = React.useMemo(() => ({ iconOnly, floating }), [iconOnly, floating]);
+  const [endSlot, setEndSlot] = React.useState<HTMLDivElement | null>(null);
 
   // The current item can change outside this render (a router link sets `aria-current` itself),
   // so the capsule follows the attribute, not the props.
@@ -143,10 +151,12 @@ function BottomNavRoot({
                 onTransitionEnd={endIndicatorGlide}
               />
             ) : null}
-            {items}
+            <ActionSlotContext.Provider value={endSlot}>{items}</ActionSlotContext.Provider>
           </SwitcherScroller>
         </div>
-        {end}
+        <div ref={setEndSlot} className={styles.actionSlot}>
+          {end}
+        </div>
       </nav>
     </LookContext.Provider>
   );
@@ -167,7 +177,14 @@ export type BottomNavActionProps = Omit<React.ComponentPropsWithoutRef<"button">
  * Button `glass` disk as tall as the capsule (the bar gives it its height); the bar draws the rim
  * and the lift around it.
  */
-function BottomNavAction({ className, children, ...rest }: BottomNavActionProps) {
+function BottomNavAction(props: BottomNavActionProps) {
+  // Among the items (wrapped in a component of the consumer's own): it goes to the bar's end.
+  const slot = React.useContext(ActionSlotContext);
+  if (slot === undefined) return <ActionButton {...props} />;
+  return slot ? createPortal(<ActionButton {...props} />, slot) : null;
+}
+
+function ActionButton({ className, children, ...rest }: BottomNavActionProps) {
   const { floating } = React.useContext(LookContext);
   return (
     <Button.Root

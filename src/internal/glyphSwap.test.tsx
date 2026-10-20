@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Icon } from "@/icons";
 
+import { cssRule } from "@/test/css";
 import { withMotion } from "@/test/motion";
 
 import { GlyphSwap } from "./glyphSwap";
@@ -36,6 +37,14 @@ describe("GlyphSwap", () => {
       </GlyphSwap>,
     );
     expect(layers(container)).toHaveLength(2);
+  });
+
+  it("sizes its box by the glyph, never by the host", () => {
+    // A host that is a flex item of a row (Composer's recording dot) would take the row's width.
+    const props = cssRule("src/internal/glyphSwap.module.css", ".swap").decls.map((d) => d.prop);
+    for (const prop of ["width", "height", "inline-size", "block-size", "flex", "flex-grow"]) {
+      expect(props).not.toContain(prop);
+    }
   });
 
   it("renders no layer for nothing", () => {

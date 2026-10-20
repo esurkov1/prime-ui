@@ -14,8 +14,11 @@ import statusLoop from "./statusLoop.module.css";
  *
  * The subset: **bold** · _italic_ · __underline__ · ~~strike~~ · ||spoiler|| · `code` ·
  * ```fenced code``` (a language after the opening fence) · [label](url) · bare URLs · lines
- * starting with `> ` (a quote). A backslash before ASCII punctuation writes it as text (`\*`).
- * Links take only http(s), mailto and tel addresses; anything else stays text.
+ * starting with `> ` (a quote), `# ` to `###### ` (a heading line), `- ` / `* ` (a bulleted list
+ * item) or `1. ` (a numbered one, numbered from its first item). A backslash before ASCII
+ * punctuation writes it as text (`\*`, `\# `, `\- `, `3\. `). Links take http(s), mailto and tel
+ * addresses and relative ones on the same origin (`/path`, `./`, `../`, `?query`, `#hash`);
+ * anything else stays text.
  */
 
 type RichInline =
@@ -28,6 +31,10 @@ type RichInline =
 type RichBlock =
   | { type: "text"; children: RichInline[] }
   | { type: "quote"; children: RichInline[] }
+  /** A heading line (`# `…): a bold line of the text's own type, not a heading of the page. */
+  | { type: "heading"; children: RichInline[] }
+  /** `marker` — `-` or `*` for a bulleted list, the first item's number for a numbered one. */
+  | { type: "list"; marker: "-" | "*" | number; items: RichInline[][] }
   | { type: "code"; text: string; language?: string };
 
 /** What a range of a message text is: its format, and the address of a `link`. */
@@ -58,16 +65,30 @@ export type FormattedText = { text: string; entities: TextEntity[] };
 
 const SAFE_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 
-/** The address when it is a safe link, else `null`. */
+/** A relative address: a path from the root or from here, a query or a hash — never `//host`. */
+const RELATIVE = /^(?:\/(?![/\\])|\.\.?\/|\?|#)/;
+/** The origin a relative address is resolved against to prove it stays on the same origin. */
+const RELATIVE_BASE = "https://relative.invalid";
+
+/**
+ * The address when it is a safe link, else `null`: an absolute http(s), `mailto:` or `tel:` one,
+ * or a relative one that resolves on the same origin (`/\\host` and tab tricks do not).
+ */
 function safeHref(raw: string): string | null {
   const href = raw.trim();
   try {
+    if (RELATIVE.test(href)) {
+      return new URL(href, `${RELATIVE_BASE}/`).origin === RELATIVE_BASE ? href : null;
+    }
     const url = new URL(href);
     return SAFE_PROTOCOLS.has(url.protocol) ? href : null;
   } catch {
     return null;
   }
 }
+
+/** A safe address without a scheme: it stays in the product and opens in the same tab. */
+const isRelativeHref = (href: string) => RELATIVE.test(href);
 
 /** The address of bare URL text (`www.` reads as https). */
 const bareHref = (text: string) => safeHref(text.startsWith("www.") ? `https://${text}` : text);
@@ -204,18 +225,43 @@ function parseInline(source: string): RichInline[] {
 
 const FENCE = "```";
 
+/** A heading line: one to six `#`, a space, the text. `#tag` without the space is text. */
+const HEADING = /^#{1,6}[ \t]+(\S.*)$/;
+/** A list item at the very start of a line: `- ` / `* ` or a number with a dot, then its text. */
+const BULLET = /^([-*])[ \t]+(\S.*)$/;
+const NUMBERED = /^(\d{1,9})\.[ \t]+(\S.*)$/;
+
+type ListItem = { marker: "-" | "*" | number; text: string };
+
+/** The list item a line is, or `null`. Numbered items continue each other whatever their numbers. */
+function listItemOf(line: string): ListItem | null {
+  const bullet = BULLET.exec(line);
+  if (bullet) return { marker: bullet[1] as "-" | "*", text: bullet[2] };
+  const numbered = NUMBERED.exec(line);
+  return numbered ? { marker: Number(numbered[1]), text: numbered[2] } : null;
+}
+
+/** Items of one list: the same bullet, or both numbered. */
+const sameList = (a: ListItem["marker"], b: ListItem["marker"]) =>
+  a === b || (typeof a === "number" && typeof b === "number");
+
 /**
- * Blocks of a Markdown source: runs of text, quotes (`> ` lines) and fenced code. Neighbouring
- * blocks stand one line break apart in the source; the breaks around them stay in the text.
+ * Blocks of a Markdown source: runs of text, quotes (`> ` lines), heading lines, lists and fenced
+ * code. Neighbouring blocks stand one line break apart in the source; the breaks around them stay
+ * in the text. A blank line between two items of one list keeps the list whole.
  */
 function parseRichText(source: string): RichBlock[] {
   const blocks: RichBlock[] = [];
   const lines = source.replace(/\r\n?/g, "\n").split("\n");
-  type Run = { type: "text" | "quote"; lines: string[] };
+  type Run =
+    | { type: "text" | "quote"; lines: string[] }
+    | { type: "list"; marker: ListItem["marker"]; items: string[] };
   const state: { run: Run | null } = { run: null };
   const flush = () => {
     const { run } = state;
-    if (run) blocks.push({ type: run.type, children: parseInline(run.lines.join("\n")) });
+    if (run?.type === "list") {
+      blocks.push({ type: "list", marker: run.marker, items: run.items.map(parseInline) });
+    } else if (run) blocks.push({ type: run.type, children: parseInline(run.lines.join("\n")) });
     state.run = null;
   };
   for (let i = 0; i < lines.length; i += 1) {
@@ -234,6 +280,26 @@ function parseRichText(source: string): RichBlock[] {
         continue;
       }
     }
+    const heading = HEADING.exec(line);
+    if (heading) {
+      flush();
+      blocks.push({ type: "heading", children: parseInline(heading[1].trim()) });
+      continue;
+    }
+    const item = listItemOf(line);
+    if (item) {
+      if (state.run?.type !== "list" || !sameList(state.run.marker, item.marker)) {
+        flush();
+        state.run = { type: "list", marker: item.marker, items: [] };
+      }
+      state.run.items.push(item.text.trimEnd());
+      continue;
+    }
+    if (state.run?.type === "list" && line.trim() === "") {
+      const next = lines.slice(i + 1).find((rest) => rest.trim() !== "");
+      const nextItem = next === undefined ? null : listItemOf(next);
+      if (nextItem && sameList(state.run.marker, nextItem.marker)) continue;
+    }
     const quote = /^>\s?/.exec(line);
     const type = quote ? "quote" : "text";
     const content = quote ? line.slice(quote[0].length) : line;
@@ -241,7 +307,7 @@ function parseRichText(source: string): RichBlock[] {
       flush();
       state.run = { type, lines: [] };
     }
-    state.run?.lines.push(content);
+    if (state.run?.type === type) state.run.lines.push(content);
   }
   flush();
   return blocks;
@@ -438,7 +504,15 @@ const ENTITY_OF = {
   spoiler: "spoiler",
 } as const;
 
-/** The plain text of the tree and its entities; bare URLs make none (a messenger links them). */
+/** The marker a list item is written with: its bullet, or its number counted from the first. */
+const itemMarker = (marker: "-" | "*" | number, index: number) =>
+  typeof marker === "number" ? `${marker + index}.` : marker;
+
+/**
+ * The plain text of the tree and its entities; bare URLs make none (a messenger links them). A
+ * messenger has no headings or lists: a heading line is its text in bold, a list item keeps its
+ * marker as text (`- `, `3. `).
+ */
 function entitiesOf(blocks: RichBlock[]): FormattedText {
   let text = "";
   const entities: TextEntity[] = [];
@@ -473,9 +547,16 @@ function entitiesOf(blocks: RichBlock[]): FormattedText {
         length: block.text.length,
         ...(block.language ? { language: block.language } : {}),
       });
+    } else if (block.type === "list") {
+      block.items.forEach((item, itemIndex) => {
+        if (itemIndex > 0) text += "\n";
+        text += `${itemMarker(block.marker, itemIndex)} `;
+        walk(item);
+      });
     } else {
       walk(block.children);
       if (block.type === "quote") add({ type: "quote", offset, length: text.length - offset });
+      if (block.type === "heading") add({ type: "bold", offset, length: text.length - offset });
     }
   });
   entities.sort(
@@ -589,12 +670,20 @@ function inlineMarkdown(nodes: RichInline[], plain: string, always: boolean): st
   return write(nodes);
 }
 
-/** A text line that the block parser would read as a quote or a fence is escaped. */
+/** A heading or list marker at a line's start, up to the character a backslash escapes. */
+const LINE_MARKER = /^(?:#(?=#{0,5}[ \t]+\S)|[-*](?=[ \t]+\S)|\d{1,9}(?=\.[ \t]+\S))/;
+
+/**
+ * A text line that the block parser would read as a quote, a fence, a heading or a list item is
+ * escaped (`\>`, `\#`, `\-`, `3\.`).
+ */
 const escapeLineStarts = (markdown: string) =>
   markdown
     .split("\n")
     .map((line) =>
-      line.replace(/^>|^(\s*)(?=```)/, (found, space = "") => `${space}\\${found.trimStart()}`),
+      line
+        .replace(/^>|^(\s*)(?=```)/, (found, space = "") => `${space}\\${found.trimStart()}`)
+        .replace(LINE_MARKER, (found) => (/^\d/.test(found) ? `${found}\\` : `\\${found}`)),
     )
     .join("\n");
 
@@ -607,7 +696,16 @@ function toMarkdown(blocks: RichBlock[], always: boolean): string {
         }
         return `${FENCE}${block.language ?? ""}\n${block.text}\n${FENCE}`;
       }
+      if (block.type === "list") {
+        return block.items
+          .map(
+            (item, index) =>
+              `${itemMarker(block.marker, index)} ${inlineMarkdown(item, plainOf(item), always)}`,
+          )
+          .join("\n");
+      }
       const markdown = inlineMarkdown(block.children, plainOf(block.children), always);
+      if (block.type === "heading") return `# ${markdown}`;
       if (block.type === "text") return escapeLineStarts(markdown);
       return markdown
         .split("\n")
@@ -664,6 +762,16 @@ type RichTextLabels = {
 };
 
 /**
+ * A press on a link of the text, with its address: `event.preventDefault()` keeps the browser from
+ * following it (the app routes a relative address itself). A modified press (a button other than
+ * the main one, ⌘, Ctrl, Shift, Alt) is the browser's: a new tab or window, no call.
+ */
+export type RichTextLinkClick = (href: string, event: React.MouseEvent<HTMLAnchorElement>) => void;
+
+/** What every inline node of one text renders with. */
+type InlineContext = { labels: RichTextLabels; onLinkClick?: RichTextLinkClick };
+
+/**
  * A `||spoiler||`: a button named «Скрытый текст» over a masked run until it is pressed (click,
  * Enter, Space), then the run itself (its links work); a keyboard press moves the focus onto it, so
  * a screen reader goes on from the text. One way, like a chat: a revealed spoiler stays revealed.
@@ -671,11 +779,11 @@ type RichTextLabels = {
 function Spoiler({
   nodes,
   highlight,
-  labels,
+  context,
 }: {
   nodes: RichInline[];
   highlight: string;
-  labels: RichTextLabels;
+  context: InlineContext;
 }) {
   const [revealed, setRevealed] = React.useState(false);
   const textRef = React.useRef<HTMLSpanElement>(null);
@@ -691,7 +799,7 @@ function Spoiler({
         data-state="revealed"
         tabIndex={-1}
       >
-        {renderInline(nodes, highlight, labels)}
+        {renderInline(nodes, highlight, context)}
       </span>
     );
   }
@@ -706,7 +814,7 @@ function Spoiler({
       tabIndex={0}
       className={cx(styles.spoiler, statusLoop.glint)}
       data-state="masked"
-      aria-label={labels.spoiler}
+      aria-label={context.labels.spoiler}
       onClick={reveal}
       onKeyDown={(event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
@@ -715,15 +823,19 @@ function Spoiler({
       }}
     >
       {/* Out of the accessibility tree until revealed; no search marks or links under the mask. */}
-      <span aria-hidden="true">{renderInline(nodes, "", labels, true)}</span>
+      <span aria-hidden="true">{renderInline(nodes, "", context, true)}</span>
     </span>
   );
 }
 
+/** A press the browser keeps for itself: another button or a modifier (a new tab or window). */
+const isModifiedClick = (event: React.MouseEvent) =>
+  event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+
 function renderInline(
   nodes: RichInline[],
   highlight: string,
-  labels: RichTextLabels,
+  context: InlineContext,
   masked = false,
 ): React.ReactNode[] {
   const mark = (text: string) =>
@@ -734,19 +846,21 @@ function renderInline(
       case "text":
         return <React.Fragment key={key}>{mark(node.text)}</React.Fragment>;
       case "bold":
-        return <strong key={key}>{renderInline(node.children, highlight, labels, masked)}</strong>;
+        return <strong key={key}>{renderInline(node.children, highlight, context, masked)}</strong>;
       case "italic":
-        return <em key={key}>{renderInline(node.children, highlight, labels, masked)}</em>;
+        return <em key={key}>{renderInline(node.children, highlight, context, masked)}</em>;
       case "underline":
-        return <u key={key}>{renderInline(node.children, highlight, labels, masked)}</u>;
+        return <u key={key}>{renderInline(node.children, highlight, context, masked)}</u>;
       case "strike":
-        return <s key={key}>{renderInline(node.children, highlight, labels, masked)}</s>;
+        return <s key={key}>{renderInline(node.children, highlight, context, masked)}</s>;
       case "spoiler":
         // Inside a masked spoiler a nested one is masked text too (never a button in a button).
         return masked ? (
-          <React.Fragment key={key}>{renderInline(node.children, "", labels, true)}</React.Fragment>
+          <React.Fragment key={key}>
+            {renderInline(node.children, "", context, true)}
+          </React.Fragment>
         ) : (
-          <Spoiler key={key} nodes={node.children} highlight={highlight} labels={labels} />
+          <Spoiler key={key} nodes={node.children} highlight={highlight} context={context} />
         );
       case "code":
         return (
@@ -754,26 +868,38 @@ function renderInline(
             {mark(node.text)}
           </code>
         );
-      default:
+      default: {
         if (masked) {
           return (
             <React.Fragment key={key}>
-              {renderInline(node.children, "", labels, true)}
+              {renderInline(node.children, "", context, true)}
             </React.Fragment>
           );
         }
+        const { onLinkClick } = context;
+        const href = node.href;
+        // A relative address stays in the product: the same tab. An absolute one opens a new tab.
+        const leaves = !isRelativeHref(href);
         // A link. Not LinkButton: that is an inline-flex control, a link in running text wraps with the line.
         return (
           <a
             key={key}
             className={styles.link}
-            href={node.href}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={href}
+            target={leaves ? "_blank" : undefined}
+            rel={leaves ? "noopener noreferrer" : undefined}
+            onClick={
+              onLinkClick
+                ? (event) => {
+                    if (!isModifiedClick(event)) onLinkClick(href, event);
+                  }
+                : undefined
+            }
           >
-            {renderInline(node.children, highlight, labels, masked)}
+            {renderInline(node.children, highlight, context, masked)}
           </a>
         );
+      }
     }
   });
 }
@@ -789,18 +915,32 @@ type RichTextProps = {
   highlight?: string;
   /** The host's strings (`Message.Text` passes its `spoiler`). */
   labels: RichTextLabels;
+  /** A press on a link (the app routes a relative one). */
+  onLinkClick?: RichTextLinkClick;
 };
 
-/** A message text with its Markdown subset rendered safely; `end` closes the last text line. */
-export function RichText({ source, entities, end, highlight = "", labels }: RichTextProps) {
+/**
+ * A message text with its Markdown subset rendered safely; `end` closes the last text line (the
+ * last list item's, after a list). A heading line is a `<p>` holding a `<strong>`: a message is
+ * not a section of the page, so it adds nothing to the page's outline of headings.
+ */
+export function RichText({
+  source,
+  entities,
+  end,
+  highlight = "",
+  labels,
+  onLinkClick,
+}: RichTextProps) {
   const query = highlight.trim();
   // Parsed once per text: a message re-renders on its hover, menu and reaction state.
   const blocks = React.useMemo(
     () => trimBlocks(entities ? blocksFromEntities(source, entities) : parseRichText(source)),
     [source, entities],
   );
+  const context = React.useMemo(() => ({ labels, onLinkClick }), [labels, onLinkClick]);
   const last = blocks[blocks.length - 1];
-  const endsInText = last?.type === "text" || last?.type === "quote";
+  const endsInText = last !== undefined && last.type !== "code";
   return (
     <>
       {blocks.map((block, index) => {
@@ -815,17 +955,46 @@ export function RichText({ source, entities, end, highlight = "", labels }: Rich
             </pre>
           );
         }
+        if (block.type === "list") {
+          const { marker } = block;
+          const items = block.items.map((item, itemIndex) => {
+            const itemKey = itemIndex;
+            return (
+              <li key={itemKey} className={styles.item}>
+                {renderInline(item, query, context)}
+                {itemIndex === block.items.length - 1 ? tail : null}
+              </li>
+            );
+          });
+          return typeof marker === "number" ? (
+            <ol key={key} className={styles.list} start={marker === 1 ? undefined : marker}>
+              {items}
+            </ol>
+          ) : (
+            <ul key={key} className={styles.list}>
+              {items}
+            </ul>
+          );
+        }
+        if (block.type === "heading") {
+          return (
+            <p key={key} className={styles.heading}>
+              <strong>{renderInline(block.children, query, context)}</strong>
+              {tail}
+            </p>
+          );
+        }
         if (block.type === "quote") {
           return (
             <blockquote key={key} className={styles.quote}>
-              {renderInline(block.children, query, labels)}
+              {renderInline(block.children, query, context)}
               {tail}
             </blockquote>
           );
         }
         return (
           <p key={key} className={styles.paragraph}>
-            {renderInline(block.children, query, labels)}
+            {renderInline(block.children, query, context)}
             {tail}
           </p>
         );

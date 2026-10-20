@@ -1,26 +1,39 @@
 /*
  * Rich text of a message (`RichText`): paragraphs keep their line breaks and wrap anywhere, so a long
- * URL never widens the bubble; a quote is a wash with an accent bar on its start edge; code is the
+ * URL never widens the bubble; a heading line is a paragraph in bold (its `<strong>`); a quote is a wash with an accent bar on its start edge; code is the
  * mono face on a wash. Colors are the semantic roles, so a tinted host (an outgoing bubble) recolors
  * everything by redefining them.
  */
 
 .paragraph,
+.heading,
 .quote,
-.pre {
+.pre,
+.list {
   margin: 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.paragraph + .paragraph,
-.paragraph + .quote,
-.paragraph + .pre,
-.quote + .paragraph,
-.quote + .pre,
-.pre + .paragraph,
-.pre + .quote {
+/* Blocks stand a step apart; a heading line takes a step more above it, so it leads what follows. */
+:is(.paragraph, .heading, .quote, .pre, .list) + :is(.paragraph, .quote, .pre, .list) {
   margin-block-start: var(--prime-space-1);
+}
+
+:is(.paragraph, .heading, .quote, .pre, .list) + .heading {
+  margin-block-start: var(--prime-space-2);
+}
+
+/*
+ * A list: real `<ul>` / `<ol>` with their markers in the start padding, in the text's own type;
+ * numbers line up (`tabular-nums`). Items stand line to line — one list, not paragraphs.
+ */
+.list {
+  padding-inline-start: var(--prime-space-5);
+}
+
+.item::marker {
+  font-variant-numeric: tabular-nums;
 }
 
 .quote {

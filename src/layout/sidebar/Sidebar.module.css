@@ -1198,6 +1198,9 @@
 
 /* The scrim behind the panel is the kit modal scrim (`internal/sheet`, `overlayMotion`). */
 .root[data-off-canvas] {
+  /* The off-canvas panel's top air: clear of the top safe-area inset (`--prime-safe-area-top`). */
+  --sb-panel-top: max(var(--prime-space-3), var(--prime-safe-area-top));
+
   width: 0;
   background: none;
   clip-path: none;
@@ -1213,6 +1216,7 @@
 
 /* Inline at the end of the header row of the off-canvas panel (whatever its width). */
 .root[data-off-canvas] .headerToggle {
+  inset-block-start: calc(var(--sb-panel-top) + (var(--sb-header-h) - var(--sb-toggle)) / 2);
   inset-inline: auto 0;
   translate: calc(var(--sb-pad) * -1) 0;
 }
@@ -1222,8 +1226,16 @@
   inset-block: 0;
   inset-inline-start: 0;
   z-index: var(--prime-z-overlay);
-  width: min(var(--sb-expanded), calc(100% - var(--prime-space-12)));
+  /* On the screen's top, bottom and start edges: the fill runs to them, the rows step in from
+     their safe-area insets (`--prime-safe-area-*`: the notch, the home indicator, a host app's
+     buttons), and the panel grows by the start inset so the rows keep their width. */
+  width: min(
+    calc(var(--sb-expanded) + var(--prime-safe-area-left)),
+    calc(100% - var(--prime-space-12))
+  );
   min-width: 0;
+  padding-block: var(--sb-panel-top) max(var(--prime-space-3), var(--prime-safe-area-bottom));
+  padding-inline-start: max(var(--sb-pad), var(--prime-safe-area-left));
   background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-modal);
   transform: translateX(-100%);

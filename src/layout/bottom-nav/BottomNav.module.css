@@ -105,7 +105,7 @@
  * and a soft lift. Told as glass by its rim (below).
  */
 .root[data-floating="true"] > .bar,
-.root[data-floating="true"] > .action {
+.root[data-floating="true"] .action {
   box-shadow: var(--prime-shadow-overlay);
   -webkit-backdrop-filter: blur(var(--prime-bottom-nav-blur))
     saturate(var(--prime-glass-saturation));
@@ -118,7 +118,7 @@
  * along the sides — a gradient ring cut out of a pseudo-element by a mask.
  */
 .root[data-floating="true"] > .bar::before,
-.root[data-floating="true"] > .action::before {
+.root[data-floating="true"] .action::before {
   /* The faded middle of the rim. */
   --bn-rim-fade: color-mix(
     in srgb,
@@ -314,8 +314,15 @@
 
 /* ─── Action ─────────────────────────────────────────────────────────────── */
 
+/* The end slot: the actions after the items, and an Action the consumer wrapped in a component of
+   their own (it finds the slot through context). It adds no box: the actions stay the root's flex
+   items. */
+.actionSlot {
+  display: contents;
+}
+
 /* Floating: the Button `glass` disk, as tall as the capsule (the root sets the host height); its
    glyph is the capsule's icon size. */
-.root[data-floating="true"] > .action {
+.root[data-floating="true"] .action {
   --prime-icon-size: var(--prime-bottom-nav-floating-icon-size);
 }

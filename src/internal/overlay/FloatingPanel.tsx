@@ -31,6 +31,9 @@ export function SheetHandle({ swipe }: { swipe: Pick<SwipeDismiss, "enabled"> })
 /** How wide an anchored panel is (`data-width` on the floating surface). */
 export type FloatingWidth = "auto" | "trigger" | "min-trigger" | "content";
 
+/** A fixed measure of an anchored panel: 1.5, 2 or 2.5 panel minimums (Dropdown `width`). */
+export type PanelMeasure = "s" | "m" | "l";
+
 /**
  * The panel is a `<div>`; `E` is the element type its consumer holds it as (a menu, a listbox:
  * `HTMLElement`), so the consumer ref needs no cast.
@@ -49,9 +52,10 @@ type FloatingPanelProps<E extends HTMLElement = HTMLDivElement> = Omit<
   /**
    * `auto` — the content's width between the panel minimum (or the trigger's width) and twice the
    * minimum; `trigger` — exactly the trigger's width; `content` — what the content needs, within
-   * the viewport. A bottom sheet is always full width.
+   * the viewport; `s` / `m` / `l` — a fixed measure (`PanelMeasure`), within the viewport. A
+   * bottom sheet is always full width.
    */
-  width?: FloatingWidth;
+  width?: FloatingWidth | PanelMeasure;
   ref?: React.Ref<E>;
 };
 

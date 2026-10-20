@@ -48,7 +48,9 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  max-height: calc(100dvh - var(--prime-sheet-top-gap));
+  /* Clear of the safe-area insets (`--prime-safe-area-*`): the top gap starts under the top inset,
+     the content ends over the bottom one while the fill runs on to the edge. */
+  max-height: calc(100dvh - var(--prime-sheet-top-gap) - var(--prime-safe-area-top));
   margin: 0 auto;
   padding-block-end: var(--prime-safe-area-bottom);
   border-radius: var(--prime-sheet-radius) var(--prime-sheet-radius) 0 0;

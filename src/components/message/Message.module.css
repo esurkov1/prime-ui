@@ -664,20 +664,25 @@ button.reply:focus-visible {
 /*
  * A bot's inline keyboard (`Message.Actions`): rows of buttons under the bubble, on the chat's own
  * surface, at the message's width. The column is as wide as the wider of the bubble and the
- * keyboard (up to the cap); the bubble then takes that width, so they line up. A row is one line,
- * as in Telegram: its keys share it equally (`flex: 1 1 0`, the keys are `fullWidth`), and a label
- * longer than its share ellipsizes. Every key keeps the control radius on all four corners.
+ * keyboard (up to the cap); the bubble then takes that width, so they line up. A row's keys share
+ * it equally (`flex: 1 1 0` on each key's cell, the key `fullWidth` in it), but a key is never
+ * narrower than its label (`min-inline-size: fit-content`): under a short bubble the row grows to
+ * its keys, and a row the message cannot hold wraps, so its keys stack one under another. Only a
+ * key whose label is wider than the whole message ellipsizes. Every key keeps the control radius on all four corners.
  */
 .actions {
   display: flex;
+  flex-wrap: wrap;
   align-self: stretch;
   gap: var(--prime-space-1);
   margin-block-start: var(--prime-space-1);
 }
 
-.actions > * {
+/* A key's cell (the key is `fullWidth` inside it): its share of the row, never under its label. */
+.key {
+  display: flex;
   flex: 1 1 0;
-  min-inline-size: 0;
+  min-inline-size: fit-content;
 }
 
 /* A link key's mark (↗ out of the product, a window into it) at its top-end corner, out of the label's flow. */

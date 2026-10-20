@@ -1,8 +1,12 @@
 import { act, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import type * as React from "react";
+import { describe, expect, it, vi } from "vitest";
 
-import { cssRule, cssValue } from "@/test/css";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
+import { BottomNav } from "../bottom-nav/BottomNav";
 import { Page } from "../page/Page";
 import { Sidebar } from "../sidebar/Sidebar";
 import { AppShell, AppShellBoundary, type AppShellNavState, useAppShellNav } from "./AppShell";
@@ -157,5 +161,124 @@ describe("AppShell", () => {
     );
     expect(ref.current).toBe(screen.getByRole("main"));
     expect(screen.getByRole("main")).toHaveAttribute("id", "content");
+  });
+
+  describe("Fab", () => {
+    const CSS = "src/layout/app-shell/AppShell.module.css";
+    const shell = (fab: React.ReactNode) => (
+      <AppShell.Root>
+        <AppShell.Main>
+          <button type="button">Последняя кнопка страницы</button>
+          {fab}
+        </AppShell.Main>
+        <AppShell.Footer>
+          <BottomNav.Root floating>
+            <BottomNav.Item current>Сделки</BottomNav.Item>
+            <BottomNav.Item>Клиенты</BottomNav.Item>
+          </BottomNav.Root>
+        </AppShell.Footer>
+      </AppShell.Root>
+    );
+
+    it("renders a named circle button into the dock, after the page and before the bar", async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      const ref = { current: null as HTMLButtonElement | null };
+      render(
+        shell(
+          <AppShell.Fab aria-label="AI-ассистент" ref={ref} className="custom" onClick={onClick}>
+            <svg />
+          </AppShell.Fab>,
+        ),
+      );
+      const fab = screen.getByRole("button", { name: "AI-ассистент" });
+      expect(ref.current).toBe(fab);
+      expect(fab).toHaveClass("custom");
+      expect(fab).toHaveAttribute("data-shape", "circle");
+      // Rendered inside main, it stands in the dock: not in main, before the bar's nav.
+      expect(screen.getByRole("main")).not.toContainElement(fab);
+      const nav = screen.getByRole("navigation");
+      expect(fab.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+      // Keyboard: the page, then the action, then the sections.
+      await user.tab();
+      expect(screen.getByRole("button", { name: "Последняя кнопка страницы" })).toHaveFocus();
+      await user.tab();
+      expect(fab).toHaveFocus();
+      await user.keyboard("{Enter}");
+      await user.keyboard(" ");
+      expect(onClick).toHaveBeenCalledTimes(2);
+      await user.tab();
+      expect(screen.getByRole("button", { name: "Сделки" })).toHaveFocus();
+    });
+
+    it("stands still with the shell and pops in when it appears later", async () => {
+      const fab = <AppShell.Fab aria-label="Ассистент">x</AppShell.Fab>;
+      const { unmount } = render(shell(fab));
+      const still = screen.getByRole("button", { name: "Ассистент" }).parentElement;
+      expect(still).not.toHaveClass(enterMotion.enter);
+      unmount();
+
+      const view = render(shell(null));
+      await act(async () => {});
+      view.rerender(shell(fab));
+      expect(screen.getByRole("button", { name: "Ассистент" }).parentElement).toHaveClass(
+        enterMotion.enter,
+      );
+    });
+
+    it("must be inside AppShell.Root (and a frame of its own keeps it out)", () => {
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
+      expect(() => render(<AppShell.Fab aria-label="Ассистент">x</AppShell.Fab>)).toThrow(
+        /AppShell\.Fab/,
+      );
+      expect(() =>
+        render(
+          <AppShell.Root>
+            <AppShellBoundary>
+              <AppShell.Fab aria-label="Ассистент">x</AppShell.Fab>
+            </AppShellBoundary>
+          </AppShell.Root>,
+        ),
+      ).toThrow(/AppShell\.Fab/);
+      error.mockRestore();
+    });
+
+    it("CSS: the dock sticks on the sticky layer, under the overlays", () => {
+      const dock = cssRule(CSS, ".dock");
+      expect(cssValue(dock, "position")).toBe("sticky");
+      expect(cssValue(dock, "bottom")).toBe("0");
+      expect(cssValue(dock, "z-index")).toBe("var(--prime-z-sticky)");
+      // The panel isolates it: no z-index in the shell reaches the overlay layer.
+      expect(cssValue(cssRule(CSS, ".panel"), "isolation")).toBe("isolate");
+      const zs = cssRules(CSS).flatMap((rule) =>
+        rule.decls.filter((decl) => decl.prop === "z-index").map((decl) => decl.value),
+      );
+      expect(zs.length).toBeGreaterThan(0);
+      expect(zs.every((z) => z === "var(--prime-z-sticky)")).toBe(true);
+    });
+
+    it("CSS: the corner clears the bar, the capsule and the safe area", () => {
+      const fabs = cssRule(CSS, ".fabs");
+      expect(cssValue(fabs, "position")).toBe("absolute");
+      expect(cssValue(fabs, "bottom")).toBe("calc(100% + var(--shell-fab-lift))");
+      expect(cssValue(fabs, "inset-inline-end")).toBe(
+        "calc(var(--shell-fab-end) + var(--prime-safe-area-right))",
+      );
+      const corner = "calc(var(--prime-layout-gutter) + var(--prime-safe-area-bottom))";
+      expect(cssValue(cssRule(CSS, ".dock"), "--shell-fab-lift")).toBe(corner);
+      expect(cssValue(cssRule(CSS, ".dock:has(> .footer)"), "--shell-fab-lift")).toBe(
+        "var(--prime-layout-gutter)",
+      );
+      const floating = cssRule(CSS, '.dock:has(> .footer > [data-floating="true"])');
+      const lift = cssValue(floating, "--shell-fab-lift").replace(/\s+/g, " ");
+      expect(lift).toContain("var(--shell-capsule)");
+      expect(lift).toContain("var(--prime-bottom-nav-floating-inset) * 2");
+      expect(lift).toContain("var(--prime-safe-area-bottom)");
+      expect(cssValue(floating, "--shell-fab-end")).toBe("var(--prime-bottom-nav-floating-inset)");
+      // Beside the rail the bar is gone: back to the corner.
+      const rail = cssRule(CSS, '.root[data-nav="true"]:not([data-off-canvas]) > .panel > .dock');
+      expect(cssValue(rail, "--shell-fab-lift")).toBe(corner);
+    });
   });
 });

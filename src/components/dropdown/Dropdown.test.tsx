@@ -873,3 +873,181 @@ describeOverlayConformance("Dropdown", {
   trigger: "Открыть",
   role: "menu",
 });
+
+// ─── Search, meta, width, rows ────────────────────────────────────────────────
+
+function ChatsDropdown({
+  onNew,
+  onPick,
+  labels,
+}: {
+  onNew?: () => void;
+  onPick?: (title: string) => void;
+  labels?: { search?: string; empty?: string };
+}) {
+  return (
+    <Dropdown.Root labels={labels}>
+      <Dropdown.Trigger>
+        <button type="button">Чаты</button>
+      </Dropdown.Trigger>
+      <Dropdown.Content width="m" maxRows={12}>
+        <Dropdown.Search />
+        <Dropdown.Item persistent onSelect={onNew}>
+          Новый чат
+        </Dropdown.Item>
+        <Dropdown.Separator />
+        <Dropdown.Group label="Сегодня">
+          <Dropdown.Item onSelect={() => onPick?.("Сверка счетов")}>
+            Сверка счетов
+            <Dropdown.ItemMeta>14:32</Dropdown.ItemMeta>
+          </Dropdown.Item>
+          <Dropdown.Item onSelect={() => onPick?.("Отчёт по выручке")}>
+            Отчёт по выручке
+            <Dropdown.ItemMeta>11:05</Dropdown.ItemMeta>
+          </Dropdown.Item>
+        </Dropdown.Group>
+        <Dropdown.Group label="Ранее">
+          <Dropdown.Item disabled>Отчёт за август</Dropdown.Item>
+          <Dropdown.Item keywords="оптовый" onSelect={() => onPick?.("Расчёт скидки")}>
+            Расчёт скидки
+            <Dropdown.ItemMeta>вчера</Dropdown.ItemMeta>
+          </Dropdown.Item>
+        </Dropdown.Group>
+      </Dropdown.Content>
+    </Dropdown.Root>
+  );
+}
+
+describe("Dropdown.Search", () => {
+  it("takes focus on open; the arrows move the highlight while focus stays in the field", async () => {
+    const user = userEvent.setup();
+    render(<ChatsDropdown />);
+    await user.click(screen.getByRole("button", { name: "Чаты" }));
+    const search = screen.getByRole("searchbox", { name: "Поиск" });
+    expect(search).toHaveFocus();
+    expect(search).toHaveAttribute("aria-controls", screen.getByRole("menu").id);
+    const first = screen.getByRole("menuitem", { name: "Новый чат" });
+    expect(search).toHaveAttribute("aria-activedescendant", first.id);
+    expect(first).toHaveAttribute("data-highlighted", "true");
+
+    await user.keyboard("{ArrowDown}");
+    const next = screen.getByRole("menuitem", { name: "Сверка счетов" });
+    expect(search).toHaveFocus();
+    expect(search).toHaveAttribute("aria-activedescendant", next.id);
+    expect(next).toHaveAttribute("data-highlighted", "true");
+    expect(first).not.toHaveAttribute("data-highlighted");
+
+    // Wraps both ways; a disabled item is skipped.
+    await user.keyboard("{ArrowUp}{ArrowUp}");
+    expect(search).toHaveAttribute(
+      "aria-activedescendant",
+      screen.getByRole("menuitem", { name: "Расчёт скидки" }).id,
+    );
+  });
+
+  it("filters by the item text and keywords, hides empty groups and separators, marks the match", async () => {
+    const user = userEvent.setup();
+    render(<ChatsDropdown />);
+    await user.click(screen.getByRole("button", { name: "Чаты" }));
+    await user.keyboard("отчёт");
+    expect(screen.getByRole("menuitem", { name: "Отчёт по выручке" })).toBeVisible();
+    expect(screen.queryByRole("menuitem", { name: "Сверка счетов" })).toBeNull();
+    // The persistent action stays; the highlight goes to the first match, not to it.
+    expect(screen.getByRole("menuitem", { name: "Новый чат" })).toBeVisible();
+    expect(screen.getByRole("searchbox")).toHaveAttribute(
+      "aria-activedescendant",
+      screen.getByRole("menuitem", { name: "Отчёт по выручке" }).id,
+    );
+    expect(screen.queryByRole("separator")).toBeNull();
+    expect(
+      screen.getByRole("menuitem", { name: "Отчёт по выручке" }).querySelector("mark"),
+    ).toHaveTextContent("Отчёт");
+
+    await user.clear(screen.getByRole("searchbox"));
+    await user.keyboard("оптовый");
+    expect(screen.getByRole("menuitem", { name: "Расчёт скидки" })).toBeVisible();
+    expect(screen.queryByRole("group", { name: "Сегодня" })).toBeNull();
+    expect(screen.getByRole("group", { name: "Ранее" })).toBeVisible();
+  });
+
+  it("Enter runs the highlighted item and closes the menu; Space types into the query", async () => {
+    const user = userEvent.setup();
+    const onPick = vi.fn();
+    render(<ChatsDropdown onPick={onPick} />);
+    const trigger = screen.getByRole("button", { name: "Чаты" });
+    await user.click(trigger);
+    await user.keyboard("расчёт скидки");
+    expect(screen.getByRole("searchbox")).toHaveValue("расчёт скидки");
+    await user.keyboard("{Enter}");
+    expect(onPick).toHaveBeenCalledWith("Расчёт скидки");
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("shows the empty state while nothing matches; the persistent item still runs", async () => {
+    const user = userEvent.setup();
+    const onNew = vi.fn();
+    render(<ChatsDropdown onNew={onNew} labels={{ empty: "Таких чатов нет" }} />);
+    await user.click(screen.getByRole("button", { name: "Чаты" }));
+    await user.keyboard("накладная");
+    expect(screen.getByRole("status")).toHaveTextContent("Таких чатов нет");
+    await user.keyboard("{Enter}");
+    expect(onNew).toHaveBeenCalledTimes(1);
+  });
+
+  it("starts every opening with an empty query; Escape closes from the field", async () => {
+    const user = userEvent.setup();
+    render(<ChatsDropdown />);
+    const trigger = screen.getByRole("button", { name: "Чаты" });
+    await user.click(trigger);
+    await user.keyboard("скидки");
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(trigger).toHaveFocus();
+    await user.click(trigger);
+    expect(screen.getByRole("searchbox")).toHaveValue("");
+    expect(screen.getByRole("menuitem", { name: "Сверка счетов" })).toBeVisible();
+  });
+
+  it("the pointer moves the highlight", async () => {
+    const user = userEvent.setup();
+    render(<ChatsDropdown />);
+    await user.click(screen.getByRole("button", { name: "Чаты" }));
+    const item = screen.getByRole("menuitem", { name: "Отчёт по выручке" });
+    fireEvent.pointerMove(item);
+    expect(screen.getByRole("searchbox")).toHaveAttribute("aria-activedescendant", item.id);
+  });
+});
+
+describe("Dropdown.Content width and maxRows · Dropdown.ItemMeta", () => {
+  it("writes the measure and the row count onto the panel", async () => {
+    const user = userEvent.setup();
+    render(<ChatsDropdown />);
+    await user.click(screen.getByRole("button", { name: "Чаты" }));
+    const panel = screen.getByRole("searchbox").closest("[data-width]");
+    expect(panel).toHaveAttribute("data-width", "m");
+    expect(panel).toHaveAttribute("data-rows");
+    expect((panel as HTMLElement).style.getPropertyValue("--menu-rows")).toBe("12");
+  });
+
+  it("the meta sits after the label on its line and describes the item, not names it", () => {
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Open</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>
+            Квартальный отчёт
+            <Dropdown.ItemMeta>14:32</Dropdown.ItemMeta>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitem", { name: "Квартальный отчёт" });
+    expect(item).toHaveAccessibleDescription("14:32");
+    const [label, meta] = Array.from(item.children);
+    expect(label).toHaveTextContent("Квартальный отчёт");
+    expect(meta).toHaveTextContent("14:32");
+  });
+});

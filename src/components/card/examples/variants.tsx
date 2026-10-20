@@ -1,4 +1,4 @@
-/** KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change in every tone and a reference line — `variant`, `Card.Delta`, `tone`, `Card.Meta`. */
+/** KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change in every tone and a reference line, and a line-of-text value at both steps — `variant`, `Card.Delta`, `tone`, `Card.Meta`, `valueSize`. */
 import { Badge, Card, Icon, Typography } from "prime-ui-kit";
 
 const TRENDS = [
@@ -75,6 +75,28 @@ export default function CardVariantsExample() {
             </Typography>
           </div>
         ))}
+      </div>
+      <div>
+        <div>
+          <Card.Root variant="stat-text">
+            <Card.Label>К оплате</Card.Label>
+            <Card.Value>56 000 ₽</Card.Value>
+            <Card.Meta>Оплачено 200 000 ₽</Card.Meta>
+          </Card.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            stat-text
+          </Typography>
+        </div>
+        <div>
+          <Card.Root variant="stat-text" valueSize="l">
+            <Card.Label>Сумма сделки</Card.Label>
+            <Card.Value>256 000 ₽</Card.Value>
+            <Card.Meta>3 скутера · 30 дней</Card.Meta>
+          </Card.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            stat-text · valueSize="l"
+          </Typography>
+        </div>
       </div>
     </>
   );

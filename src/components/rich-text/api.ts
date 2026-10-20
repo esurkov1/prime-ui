@@ -12,14 +12,20 @@ export const api: ComponentApi = {
           name: "children",
           type: "string",
           required: true,
-          en: "The Markdown subset (`**`, `_`, `__`, `~~`, `||`, code, links, `> ` quotes; `\\*` escapes a mark), or with `entities` the plain text they format.",
-          ru: "Подмножество Markdown (`**`, `_`, `__`, `~~`, `||`, код, ссылки, цитаты `> `; `\\*` экранирует знак) или с `entities` — простой текст, который они размечают.",
+          en: "The Markdown subset (`**`, `_`, `__`, `~~`, `||`, code, links, `> ` quotes, `# ` headings, `- ` / `* ` / `1. ` lists; `\\*` escapes a mark), or with `entities` the plain text they format.",
+          ru: "Подмножество Markdown (`**`, `_`, `__`, `~~`, `||`, код, ссылки, цитаты `> `, заголовки `# `, списки `- ` / `* ` / `1. `; `\\*` экранирует знак) или с `entities` — простой текст, который они размечают.",
         },
         {
           name: "entities",
           type: "readonly TextEntity[]",
           en: "The formatted ranges of a messenger's text (Telegram, VK): `children` is then plain text, never read as Markdown, and a range may start inside a word. Bare URLs in it still link.",
           ru: "Размеченные диапазоны текста мессенджера (Telegram, VK): `children` тогда простой текст, разметка в нём не читается, и диапазон может начинаться внутри слова. Голые ссылки в нём по-прежнему ссылки.",
+        },
+        {
+          name: "onLinkClick",
+          type: "(href: string, event: MouseEvent<HTMLAnchorElement>) => void",
+          en: "A press on a link with its address: call `event.preventDefault()` to open a relative one with the app's router. A press with ⌘, Ctrl, Shift, Alt or another button stays the browser's: no call.",
+          ru: "Нажатие на ссылку с её адресом: `event.preventDefault()` — и относительный адрес открывает роутер приложения. Нажатие с ⌘, Ctrl, Shift, Alt или другой кнопкой остаётся браузеру: без вызова.",
         },
         {
           name: "labels",
@@ -66,8 +72,8 @@ export const api: ComponentApi = {
         {
           name: "url",
           type: "string",
-          en: "The address of a `link`; without it the range itself is the address. Only http(s), `mailto:` and `tel:` link.",
-          ru: "Адрес `link`; без него адрес — сам диапазон. Ссылками становятся только http(s), `mailto:` и `tel:`.",
+          en: "The address of a `link`; without it the range itself is the address. Only http(s), `mailto:`, `tel:` and relative addresses on the same origin (`/path`, `./`, `../`, `?query`, `#hash`) link.",
+          ru: "Адрес `link`; без него адрес — сам диапазон. Ссылками становятся только http(s), `mailto:`, `tel:` и относительные адреса того же источника (`/path`, `./`, `../`, `?query`, `#hash`).",
         },
         {
           name: "language",
@@ -103,14 +109,14 @@ export const api: ComponentApi = {
     {
       name: "getTextEntities(source)",
       type: "(source: string) => FormattedText",
-      en: "The plain `text` and `entities` of a Markdown source — what a messenger's API takes from a Composer message. Bare URLs make no entity (the messenger links them).",
-      ru: "Простой `text` и `entities` исходника Markdown — то, что берёт API мессенджера из сообщения Composer. Голые ссылки сущностей не дают (мессенджер свяжет их сам).",
+      en: "The plain `text` and `entities` of a Markdown source — what a messenger's API takes from a Composer message. Bare URLs make no entity (the messenger links them); a heading line is its text in `bold`, a list item keeps its marker as text (`- `, `3. `).",
+      ru: "Простой `text` и `entities` исходника Markdown — то, что берёт API мессенджера из сообщения Composer. Голые ссылки сущностей не дают (мессенджер свяжет их сам); строка-заголовок — её текст в `bold`, пункт списка сохраняет маркер текстом (`- `, `3. `).",
     },
     {
       name: "getRichTextSource(value)",
       type: "(value: FormattedText) => string",
-      en: "The Markdown source of `{ text, entities }` — to edit a received or stored text in Composer or `Textarea formatting`. Text that would read as markup is escaped (`\\*`); an italic or underline inside a word, which the subset cannot hold, is dropped and its text kept.",
-      ru: "Исходник Markdown из `{ text, entities }` — чтобы править полученный или сохранённый текст в Composer или `Textarea formatting`. Текст, который читался бы как разметка, экранируется (`\\*`); курсив или подчёркивание внутри слова подмножество не держит — формат снимается, текст остаётся.",
+      en: "The Markdown source of `{ text, entities }` — to edit a received or stored text in Composer or `Textarea formatting`. Text that would read as markup is escaped (`\\*`, `\\#`, `\\-`, `3\\.` at a line's start); an italic or underline inside a word, which the subset cannot hold, is dropped and its text kept.",
+      ru: "Исходник Markdown из `{ text, entities }` — чтобы править полученный или сохранённый текст в Composer или `Textarea formatting`. Текст, который читался бы как разметка, экранируется (`\\*`, `\\#`, `\\-`, `3\\.` в начале строки); курсив или подчёркивание внутри слова подмножество не держит — формат снимается, текст остаётся.",
     },
   ],
   labels: labelRows(RICH_TEXT_LABELS, {
@@ -139,8 +145,12 @@ export const api: ComponentApi = {
         ru: 'Скрытый спойлер — `role="button"` с именем `labels.spoiler`; его слова скрыты от скринридера, пока его не открыли.',
       },
       {
-        en: 'Links take only http(s), `mailto:` and `tel:` addresses and open in a new tab (`rel="noopener noreferrer"`); markup is never parsed as HTML.',
-        ru: 'Ссылки — только http(s), `mailto:` и `tel:`, открываются в новой вкладке (`rel="noopener noreferrer"`); разметка никогда не разбирается как HTML.',
+        en: 'Links take only http(s), `mailto:` and `tel:` addresses, which open in a new tab (`rel="noopener noreferrer"`), and relative ones on the same origin, which open in the same tab (`//host` and `javascript:` stay text); markup is never parsed as HTML.',
+        ru: 'Ссылки — только http(s), `mailto:` и `tel:`, они открываются в новой вкладке (`rel="noopener noreferrer"`), и относительные адреса того же источника, они открываются в той же вкладке (`//host` и `javascript:` остаются текстом); разметка никогда не разбирается как HTML.',
+      },
+      {
+        en: "A heading line is a `<p>` holding a `<strong>`, not an `<h*>`: a text is not a section of the page and adds nothing to its outline. Lists are real `<ul>` / `<ol>` (`start` from the first number).",
+        ru: "Строка-заголовок — `<p>` со `<strong>`, не `<h*>`: текст — не раздел страницы и не меняет её структуру заголовков. Списки — настоящие `<ul>` / `<ol>` (`start` с первого номера).",
       },
     ],
   },

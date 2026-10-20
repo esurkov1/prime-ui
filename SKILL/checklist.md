@@ -103,7 +103,8 @@ checks.
 - [ ] An action apart from a dialog's answer («Выйти» on a profile) is `Drawer.Actions` / `Modal.Actions` inside the footer, at its start ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A chat about a record heads itself in two lines — `Chat.Title number` over `Chat.Badges` — and an always-open search is `Chat.Search persistent` ([messages](choosing.md#2-inside-a-category)).
 - [ ] A tile that is a link shows the kit's arrow, never one of mine; a value in words is `stat-text` ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
-- [ ] A record's fact tiles are `stat-text valueSize="l"` in every dialog of the app, no Typography inside `Card.Value`; a record card with a total ends in `Card.Footer divider="fill"` with `Card.Total` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
+- [ ] An object of a record (a video, an account, a session) is a card of one `Card.Header`: picture, title, one line of data, one action — two lines, never three ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
+- [ ] A record's fact tiles are `stat-text` at the default value size in every dialog of the app (`valueSize="l"` only for a lone total tile), no Typography inside `Card.Value`; a record card with a total ends in `Card.Footer divider="fill"` with `Card.Total` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
 - [ ] An on/off permission or setting is a `Switch`, a level per entity a `FieldList` of `Select`s, a set of values in a table cell `Badge.Group overflow="count"` ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 

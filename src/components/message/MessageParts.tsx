@@ -18,7 +18,7 @@ import { exitTimeoutMs } from "@/internal/motionTiming";
 import { hueOf } from "@/internal/palette";
 import palette from "@/internal/palette.module.css";
 import { RollingNumber } from "@/internal/RollingNumber";
-import type { TextEntity } from "@/internal/richText";
+import type { RichTextLinkClick, TextEntity } from "@/internal/richText";
 import { RichText } from "@/internal/richText";
 import type { PaletteColor } from "@/internal/states";
 
@@ -182,6 +182,7 @@ export type MessageTextProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
   children: React.ReactNode;
   entities?: readonly TextEntity[];
   plain?: boolean;
+  onLinkClick?: RichTextLinkClick;
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -192,6 +193,7 @@ export type MessageTextProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
 export function MessageText({
   entities,
   plain = false,
+  onLinkClick,
   className,
   children,
   ...rest
@@ -213,6 +215,7 @@ export function MessageText({
           end={spacer}
           highlight={highlight}
           labels={{ spoiler: labels.spoiler }}
+          onLinkClick={onLinkClick}
         />
       ) : (
         <p className={styles.paragraph}>
@@ -720,7 +723,10 @@ MessageReactions.displayName = "Message.Reactions";
 
 // ─── Menu ─────────────────────────────────────────────────────────────────────
 
-export type MessageMenuProps = Omit<DropdownContentProps, "side" | "align" | "matchTriggerWidth">;
+export type MessageMenuProps = Omit<
+  DropdownContentProps,
+  "side" | "align" | "matchTriggerWidth" | "width" | "maxRows"
+>;
 
 /**
  * The context menu of the message: your `Dropdown.Item`s (Ответить, Копировать, Переслать,

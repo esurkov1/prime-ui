@@ -664,6 +664,49 @@ describe("Message", () => {
     expect(screen.getByRole("link", { name: "Открыть счёт" })).toHaveFocus();
   });
 
+  it("never cuts a key: each holds its label's width in its own cell, and a full row wraps", () => {
+    render(
+      <Chat>
+        <Message.Root value="confirm" time="11:21">
+          <Message.Text>Создать задачу?</Message.Text>
+          <Message.Actions data-testid="row">
+            <Button.Root>Отмена</Button.Root>
+            <Button.Root tone="success">Подтвердить</Button.Root>
+          </Message.Actions>
+        </Message.Root>
+      </Chat>,
+    );
+    const row = screen.getByTestId("row");
+    const keys = screen.getAllByRole("button", { name: /Отмена|Подтвердить/ });
+    expect(row.children).toHaveLength(2);
+    for (const key of keys) expect(key.parentElement?.parentElement).toBe(row);
+    // The row's min-content rule: a key's cell is never narrower than its label (the key itself is
+    // `fullWidth` and gives way inside it); a row the message cannot hold wraps, the keys stack.
+    const SHEET = "src/components/message/Message.module.css";
+    expect(cssValue(cssRule(SHEET, ".actions"), "flex-wrap")).toBe("wrap");
+    expect(cssValue(cssRule(SHEET, ".key"), "min-inline-size")).toBe("fit-content");
+    expect(cssValue(cssRule(SHEET, ".key"), "flex")).toBe("1 1 0");
+  });
+
+  it("routes a relative link of the text through `onLinkClick`", () => {
+    const onLinkClick = vi.fn((_href: string, event: React.MouseEvent) => event.preventDefault());
+    render(
+      <Chat>
+        <Message.Root value="answer" time="11:20">
+          <Message.Text onLinkClick={onLinkClick}>
+            {"## Сделки\n- **Вектор** — [открыть](/sales/deals/12)"}
+          </Message.Text>
+        </Message.Root>
+      </Chat>,
+    );
+    const link = screen.getByRole("link", { name: "открыть" });
+    expect(link).not.toHaveAttribute("target");
+    expect(link.closest("li")).not.toBeNull();
+    fireEvent.click(link);
+    expect(onLinkClick).toHaveBeenCalledWith("/sales/deals/12", expect.anything());
+    expect(screen.getByText("Сделки").tagName).toBe("STRONG");
+  });
+
   it("draws an inline keyboard as Telegram does: one-line rows, soft keys, link mark, loading callbacks", async () => {
     let settle: () => void = () => {};
     const onConfirm = vi.fn(

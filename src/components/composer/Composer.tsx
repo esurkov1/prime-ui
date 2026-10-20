@@ -28,6 +28,7 @@ import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
+import { iconBoxClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import { type MediaKind, mediaKind } from "@/internal/mediaKind";
 import { useEnterOnAppear, usePartPresence } from "@/internal/partPresence";
@@ -1166,16 +1167,18 @@ function ComposerRoot({
                     </Button.Icon>
                   </Button.Root>
                 ) : null}
-                {/* The breathing dot; paused, a still pause glyph in its place. */}
+                {/* The breathing dot in the pause glyph's box; paused, the glyph in its place. */}
                 <GlyphSwap className={styles.status}>
                   {recorder.paused ? (
                     <Icon name="action.pause" size={stepDown(size)} animated={false} />
                   ) : (
                     <span
                       key="dot"
-                      className={cx(styles.dot, statusLoop.breathe)}
+                      className={cx(iconBoxClass(stepDown(size), undefined), styles.dotBox)}
                       aria-hidden="true"
-                    />
+                    >
+                      <span className={cx(styles.dot, statusLoop.breathe)} />
+                    </span>
                   )}
                 </GlyphSwap>
                 <span ref={timerRef} className={styles.timer} aria-hidden="true" />

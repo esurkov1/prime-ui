@@ -150,8 +150,8 @@ export const api: ComponentApi = {
     },
     {
       name: "BottomNav.Action",
-      en: '`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral; `solid` beside the flat bar, `glass` as tall as the floating capsule) for the screen\'s main action. Placed before the first item it stands at the start, otherwise at the end.',
-      ru: 'Круглая Button (`shape="circle"`, `l`, нейтральная; `solid` рядом с плоской полосой, `glass` высотой с плавающую капсулу) для главного действия экрана. Перед первым пунктом встаёт в начале, иначе в конце.',
+      en: '`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral; `solid` beside the flat bar, `glass` as tall as the floating capsule) for the screen\'s main action. At the start only as a direct child before the items; otherwise at the end.',
+      ru: 'Круглая Button (`shape="circle"`, `l`, нейтральная; `solid` рядом с плоской полосой, `glass` высотой с плавающую капсулу) для главного действия экрана. В начале — только прямым ребёнком перед пунктами, иначе в конце.',
       props: [
         {
           name: "aria-label",

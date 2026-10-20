@@ -8,6 +8,7 @@
 ## When to use
 - A text written with the formatting toolbar of `Composer` or `Textarea formatting` is shown somewhere other than a chat: a bot's settings, a template list, a card.
 - Text from users or bots that may carry `**bold**`, links or a `||spoiler||` and must be rendered safely.
+- An AI assistant's answer with short `# ` heading lines, `- ` / `1. ` lists and links to the product's screens by relative path (`/sales/deals/12`) → `onLinkClick` hands each press to the app's router (`event.preventDefault()`); never rewrite headings to `**bold**`, bullets to «•» or paths to absolute URLs.
 - A text stored as a messenger sends it — plain text and formatted ranges (Telegram `entities`, VK `format_data`) → `entities`: the text is never read as Markdown, so `**` in it stays text and a range may start inside a word.
 - Moving between the two forms: `getTextEntities(source)` turns a Composer message into `{ text, entities }` for the messenger's API; `getRichTextSource({ text, entities })` turns a stored text back into Markdown for the editor, escaping what would read as markup (`\*`).
 
@@ -26,6 +27,8 @@ import { getRichTextSource, getTextEntities, RichText, type TextEntity } from "p
 ```
 RichText         <div>; the source (or the plain text of `entities`) as children
 ├─ <p>           a run of text, line breaks kept; <strong> <em> <u> <s> <code> <a> inside
+├─ <p><strong>   a heading line ("# " to "###### "): a bold line, never an <h*>
+├─ <ul> / <ol>   "- " / "* " items, "1. " items (`start` from the first number); inline marks inside
 ├─ <blockquote>  lines starting with "> "
 └─ <pre>         fenced code
 ```
@@ -39,8 +42,9 @@ RichText         <div>; the source (or the plain text of `entities`) as children
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `string` | — (required) | The Markdown subset (`**`, `_`, `__`, `~~`, `\|\|`, code, links, `> ` quotes; `\*` escapes a mark), or with `entities` the plain text they format. |
+| `children` | `string` | — (required) | The Markdown subset (`**`, `_`, `__`, `~~`, `\|\|`, code, links, `> ` quotes, `# ` headings, `- ` / `* ` / `1. ` lists; `\*` escapes a mark), or with `entities` the plain text they format. |
 | `entities` | `readonly TextEntity[]` | — | The formatted ranges of a messenger's text (Telegram, VK): `children` is then plain text, never read as Markdown, and a range may start inside a word. Bare URLs in it still link. |
+| `onLinkClick` | `(href: string, event: MouseEvent<HTMLAnchorElement>) => void` | — | A press on a link with its address: call `event.preventDefault()` to open a relative one with the app's router. A press with ⌘, Ctrl, Shift, Alt or another button stays the browser's: no call. |
 | `labels` | `Partial<RichTextLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `id`, `data-*` and the other div attributes. |
 
@@ -54,7 +58,7 @@ One formatted range of a plain text, as messengers send it (Telegram `MessageEnt
 | `type` | `"bold" \| "italic" \| "underline" \| "strikethrough" \| "spoiler" \| "code" \| "pre" \| "link" \| "quote"` | — (required) | The format; `pre` and `quote` are blocks (the line breaks at their edges are theirs). A type the kit does not know shows its text. |
 | `offset` | `number` | — (required) | Start in UTF-16 code units (a JS string index, as in Telegram). |
 | `length` | `number` | — (required) | Length in UTF-16 code units; ranges nest and may cross (a crossing one is cut). |
-| `url` | `string` | — | The address of a `link`; without it the range itself is the address. Only http(s), `mailto:` and `tel:` link. |
+| `url` | `string` | — | The address of a `link`; without it the range itself is the address. Only http(s), `mailto:`, `tel:` and relative addresses on the same origin (`/path`, `./`, `../`, `?query`, `#hash`) link. |
 | `language` | `string` | — | The language of a `pre` block, kept through the conversions. |
 
 #### `FormattedText`
@@ -70,12 +74,12 @@ A plain text with its formatted ranges: what a messenger sends and takes.
 #### `getTextEntities(source)`
 `(source: string) => FormattedText`
 
-The plain `text` and `entities` of a Markdown source — what a messenger's API takes from a Composer message. Bare URLs make no entity (the messenger links them).
+The plain `text` and `entities` of a Markdown source — what a messenger's API takes from a Composer message. Bare URLs make no entity (the messenger links them); a heading line is its text in `bold`, a list item keeps its marker as text (`- `, `3. `).
 
 #### `getRichTextSource(value)`
 `(value: FormattedText) => string`
 
-The Markdown source of `{ text, entities }` — to edit a received or stored text in Composer or `Textarea formatting`. Text that would read as markup is escaped (`\*`); an italic or underline inside a word, which the subset cannot hold, is dropped and its text kept.
+The Markdown source of `{ text, entities }` — to edit a received or stored text in Composer or `Textarea formatting`. Text that would read as markup is escaped (`\*`, `\#`, `\-`, `3\.` at a line's start); an italic or underline inside a word, which the subset cannot hold, is dropped and its text kept.
 
 ## Variants
 One look: the type of its host. Wrap it in `Typography as="div"` to pick a text role.
@@ -87,7 +91,8 @@ One look: the type of its host. Wrap it in `Typography as="div"` to pick a text 
 | revealed spoiler | a press, `Enter` or `Space` | `data-state="revealed"`: the wash and the words cross-fade on the fade clock; one way, like a chat |
 
 ## Layout & spacing
-- Paragraphs, quotes and code blocks keep their line breaks and wrap anywhere, so a long address never widens the host; blocks stand 4px apart.
+- Paragraphs, quotes and code blocks keep their line breaks and wrap anywhere, so a long address never widens the host; blocks stand 4px apart, a heading line 8px below what precedes it.
+- A list's markers stand in a 20px start padding; its items stand line to line; a blank line between two items keeps one list.
 - A quote is a wash with an accent bar on its start edge; code is the mono face on a wash.
 - No size of its own: the root takes the font and color of its host.
 
@@ -105,7 +110,8 @@ One look: the type of its host. Wrap it in `Typography as="div"` to pick a text 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - A masked spoiler is a `role="button"` named `labels.spoiler`; its words are out of the accessibility tree until it is revealed.
-- Links take only http(s), `mailto:` and `tel:` addresses and open in a new tab (`rel="noopener noreferrer"`); markup is never parsed as HTML.
+- Links take only http(s), `mailto:` and `tel:` addresses, which open in a new tab (`rel="noopener noreferrer"`), and relative ones on the same origin, which open in the same tab (`//host` and `javascript:` stay text); markup is never parsed as HTML.
+- A heading line is a `<p>` holding a `<strong>`, not an `<h*>`: a text is not a section of the page and adds nothing to its outline. Lists are real `<ul>` / `<ol>` (`start` from the first number).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -119,11 +125,13 @@ One look: the type of its host. Wrap it in `Typography as="div"` to pick a text 
 |---|---|
 | [overview.tsx](examples/overview.tsx) | The welcome text of a support bot shown outside the chat: bold, a link, a quote, code and a spoiler from the chat's Markdown — `children`. |
 | [entities.tsx](examples/entities.tsx) | A bot's greeting stored as a messenger sends it — plain text with formatted ranges — shown with its stars kept as text — `entities`. |
+| [routed-links.tsx](examples/routed-links.tsx) | The assistant's weekly summary on a CRM page: a heading line, a bulleted and a numbered list, and links to the product's screens that the app routes in place — `children`, `onLinkClick`. |
 
 ## Mistakes
 - `dangerouslySetInnerHTML` with a Markdown library for a chat text → `RichText`: the same subset as the chat, never HTML.
 - A `Message.Root` with no time and no author only to render formatted text → `RichText`.
 - Sizing the text with a class on `RichText` → put it inside the host that sets the type.
+- Making relative product links absolute from `window.location.origin` so they link → write `/path`: it links in the same tab, and `onLinkClick` routes it without a reload.
 - Converting a messenger's entities to Markdown by hand, or showing a text `plain` because it may hold `**` → `entities`; for the editor, `getRichTextSource`.
 
 ## Related

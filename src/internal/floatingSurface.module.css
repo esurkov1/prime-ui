@@ -43,6 +43,25 @@
   max-width: var(--float-max-w, 100vw);
 }
 
+/* A fixed measure (`s`, `m`, `l`: FloatingPanel `width`) of 1.5, 2 and 2.5 panel minimums, never
+   wider than the viewport, and at least the trigger when the host asks for it (`--float-min-w`). */
+.surface:is([data-width="s"], [data-width="m"], [data-width="l"]) {
+  min-width: min(var(--float-min-w, var(--prime-space-0)), var(--float-max-w, 100vw));
+  max-width: var(--float-max-w, 100vw);
+}
+
+.surface[data-width="s"] {
+  width: calc(var(--prime-panel-min-width) * 1.5);
+}
+
+.surface[data-width="m"] {
+  width: calc(var(--prime-panel-min-width) * 2);
+}
+
+.surface[data-width="l"] {
+  width: calc(var(--prime-panel-min-width) * 2.5);
+}
+
 /* Every overlay shares one level; the DOM (open) order stacks them (tokens/primitives zIndex). */
 .layer {
   z-index: var(--prime-z-overlay);
@@ -57,11 +76,18 @@
  * `FloatingPanel` with `sheet`: a scrim, then a full-width bottom-sheet surface (internal/sheet)
  * holding the grab handle and the panel itself (`data-sheet`). The panel keeps its own classes
  * (menu, popover content) without the anchored surface, so it takes the sheet's width; menu-like
- * panels scroll inside the sheet's height (`--float-max-h`).
+ * panels scroll inside the sheet's height (`--float-max-h`), which keeps clear of the top inset
+ * (a notch, a host app's buttons: `--prime-safe-area-top`); the bottom padding clears the home
+ * indicator (`--prime-safe-area-bottom`).
  */
 
 .sheet {
-  --float-max-h: calc(100dvh - var(--prime-sheet-top-gap) - var(--prime-sheet-handle-area));
+  --float-max-h: calc(
+    100dvh -
+    var(--prime-sheet-top-gap) -
+    var(--prime-sheet-handle-area) -
+    var(--prime-safe-area-top)
+  );
   /* A list in a sheet uses the room it has, not the anchored panel's limit. */
   --prime-panel-max-height: var(--float-max-h);
 

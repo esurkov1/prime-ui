@@ -186,6 +186,12 @@
   overflow-wrap: anywhere;
 }
 
+/* The line-of-text value of `stat-text`: body-m (joined in TSX) at medium weight, so it reads as a
+   value beside the text; `.value.textValue` outranks the role class in any bundle order. */
+.value.textValue {
+  font-weight: var(--prime-font-weight-medium);
+}
+
 /* The text of a card that opens keeps clear of the arrow in the corner. */
 .root[data-mark] .label,
 .root[data-mark] .title,
@@ -203,8 +209,22 @@
   flex-shrink: 0;
 }
 
-.header > .value {
+.header > .value,
+.end > .value {
   text-align: end;
+}
+
+/*
+ * The end cell (TSX: every child of a `Card.Header` with a title, or of a `stat-text` tile, that is
+ * not a text part): one row of the consumer's controls, in order, 8 apart, centred on each other.
+ */
+.end {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+  min-width: 0;
 }
 
 /* A leading `Card.Icon` in the header grid (see the header grid below) spans both text rows. */
@@ -213,13 +233,15 @@
   grid-row: 1 / -1;
 }
 
-/* `panel` and `list`: the header is a zone with the side padding. */
+/* `panel` and `list`: the header is a zone with the side padding, its bottom padding equal to its
+   top — over the hairline that heads the content, over the footer, or over the card's edge when it
+   is alone. */
 .root[data-variant="panel"] > .header,
 .root[data-variant="list"] > .header {
   box-sizing: border-box;
   flex-shrink: 0;
   min-height: var(--prime-control-m-height);
-  padding: var(--prime-space-4) var(--card-pad) 0;
+  padding: var(--prime-space-4) var(--card-pad);
 }
 
 /* A KPI cluster — `mini` and every cell of `split`: the icon tile spans the label and the value
@@ -268,7 +290,7 @@
   font-weight: var(--prime-font-weight-medium);
 }
 
-/* The reference line of a KPI: quiet caption at the bottom of the tile. */
+/* The reference line of a KPI: body-s, muted, at the bottom of the tile. */
 .meta {
   min-width: 0;
   color: var(--prime-color-text-muted);
@@ -290,7 +312,7 @@
  * an absent part leaves no empty row and no extra gap; with a meta its row takes the free height,
  * so the meta still keeps to the bottom of the tile.
  */
-.root[data-variant="stat-text"]:has(> :not(.label, .value, .delta, .meta, .mark)) {
+.root[data-variant="stat-text"]:has(> .end) {
   --stat-rows-label: 0;
   --stat-rows-value: 0;
   --stat-rows-delta: 0;
@@ -327,7 +349,7 @@
   grid-column: text;
 }
 
-.root[data-variant="stat-text"] > :not(.label, .value, .delta, .meta, .mark) {
+.root[data-variant="stat-text"] > .end {
   grid-column: end;
   grid-row: 1 / -1;
   justify-self: end;
@@ -388,7 +410,7 @@
   grid-column: text;
 }
 
-.header > :not(.title, .description, .icon, .mark) {
+.header > .end {
   grid-column: end;
   grid-row: 1 / -1;
 }
@@ -537,11 +559,10 @@
   padding-bottom: 0;
 }
 
-/* Header followed by content: air above the hairline that heads the content (a chart right under
-   the header breaks the hairline run and stays edge-to-edge). */
-.root[data-variant="panel"] > .header:has(+ .body),
-.root[data-variant="list"] > .header:has(+ .list) {
-  padding-bottom: var(--prime-space-4);
+/* A chart right under the header breaks the hairline run and stays edge-to-edge: it brings its own
+   top spacing. */
+.root[data-variant="panel"] > .header:has(+ .media) {
+  padding-bottom: 0;
 }
 
 .root[data-variant="panel"] > .header + .body {
@@ -653,7 +674,8 @@
 
 /* The `stat-trend` headline (heading-l, joined in TSX) follows the card's width: heading-m in a
    narrow tile, display-s in a wide one. The three roles share weight and tracking, so only the
-   size and the line height move (`.value.headline` outranks the role class in any order). */
+   size and the line height move (`.value.headline` outranks the role class in any order). A
+   `valueSize` fixes the step instead: no `.headline`, the role class alone. */
 @container (max-width: 20rem) {
   .value.headline {
     font-size: var(--prime-text-heading-m-size);
@@ -674,12 +696,18 @@
   }
 }
 
-/* A narrow `stat-text` tile keeps its text whole: the action drops under it, at the start. */
+/* A narrow `stat-text` tile keeps its text whole: the end row drops under it (see «A dropped end
+   row» below). */
 @container (max-width: 20rem) {
-  .root[data-variant="stat-text"] > :not(.label, .value, .delta, .meta, .mark) {
+  .root[data-variant="stat-text"] > .end {
     grid-column: 1 / -1;
     grid-row: auto;
-    justify-self: start;
+    justify-self: stretch;
+    justify-content: flex-start;
+  }
+
+  .root[data-variant="stat-text"] > .end > :is(button, a):not([data-icon-only]) {
+    flex: 1 1 auto;
   }
 }
 
@@ -710,10 +738,22 @@
     flex-wrap: wrap;
   }
 
-  /* A header grid (a description or an icon): its control drops under the text. */
-  .header > :not(.title, .description, .icon, .mark) {
-    grid-column: text;
+  /*
+   * A dropped end row: in a header grid (a description or an icon) the end row drops under the
+   * text and runs from the text column to the end edge. Its buttons and links are the card's
+   * actions, so they share the whole content width — a touch target as wide as the card, like the
+   * actions of a sheet; an icon-only button (`data-icon-only`) keeps its square, and anything else
+   * (a Switch is a `<label>`, a caption, a badge) keeps its own size at the start. Picked by
+   * element, not by kit component.
+   */
+  .header > .end {
+    grid-column: text / -1;
     grid-row: auto;
-    justify-self: start;
+    justify-self: stretch;
+    justify-content: flex-start;
+  }
+
+  .header > .end > :is(button, a):not([data-icon-only]) {
+    flex: 1 1 auto;
   }
 }

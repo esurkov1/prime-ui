@@ -1,8 +1,11 @@
 import * as React from "react";
 
 import { Divider } from "@/components/divider/Divider";
+import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Kbd } from "@/components/kbd/Kbd";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import {
   type AnchorPoint,
   DEFAULT_ALIGN,
@@ -11,15 +14,35 @@ import {
   type PositionSide,
 } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
+import { AUTOFILL_OFF } from "@/internal/autofill";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { fieldTierClass } from "@/internal/fieldClasses";
+import { fieldInputTextClass, fieldTierClass } from "@/internal/fieldClasses";
+import { highlightChildren } from "@/internal/HighlightMatch";
 import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
+import { useLabels } from "@/internal/labels";
+import {
+  handleListboxKeyDown,
+  isComposingKey,
+  type ListboxRegistry,
+  revealHighlighted,
+  type Store,
+  useCreateStore,
+  useListboxItem,
+  useListboxRegistry,
+  useListboxView,
+  useStoreSlice,
+} from "@/internal/listbox";
 import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
-import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
+import { nodeText } from "@/internal/nodeText";
+import {
+  FloatingPanel,
+  FloatingTrigger,
+  type PanelMeasure,
+} from "@/internal/overlay/FloatingPanel";
 import { useAnchorName } from "@/internal/overlay/useAnchorName";
 import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
@@ -31,6 +54,18 @@ import textTone from "@/internal/textTone.module.css";
 
 import styles from "./Dropdown.module.css";
 
+export type DropdownLabels = {
+  /** Default placeholder and accessible name of `Dropdown.Search`. */
+  search: string;
+  /** Shown under the search while no item matches the query. */
+  empty: string;
+};
+
+export const DROPDOWN_LABELS: DropdownLabels = {
+  search: "Поиск",
+  empty: "Ничего не найдено",
+};
+
 type DropdownContextValue = {
   isOpen: boolean;
   setOpen: (open: boolean | ((open: boolean) => boolean)) => void;
@@ -40,6 +75,7 @@ type DropdownContextValue = {
   closeOnOutsideClick: boolean;
   closeOnEscape: boolean;
   anchorPoint: AnchorPoint | null;
+  labels: DropdownLabels;
 };
 
 const [DropdownProvider, useDropdownContext] =
@@ -52,6 +88,7 @@ export type DropdownRootProps = {
   closeOnOutsideClick?: boolean;
   closeOnEscape?: boolean;
   anchorPoint?: AnchorPoint | null;
+  labels?: Partial<DropdownLabels>;
   children: React.ReactNode;
 };
 
@@ -62,9 +99,11 @@ function DropdownRoot({
   closeOnOutsideClick = true,
   closeOnEscape = true,
   anchorPoint = null,
+  labels: labelsProp,
   children,
 }: DropdownRootProps) {
   const [isOpen, setOpen] = useOpenState({ open, defaultOpen, onOpenChange });
+  const labels = useLabels(DROPDOWN_LABELS, labelsProp);
   const id = React.useId();
   const triggerRef = React.useRef<HTMLElement | null>(null);
 
@@ -78,8 +117,9 @@ function DropdownRoot({
       closeOnOutsideClick,
       closeOnEscape,
       anchorPoint,
+      labels,
     }),
-    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape, anchorPoint],
+    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape, anchorPoint, labels],
   );
 
   return <DropdownProvider value={value}>{children}</DropdownProvider>;
@@ -124,7 +164,10 @@ function DropdownAnchor({ children }: DropdownAnchorProps) {
 DropdownAnchor.displayName = "Dropdown.Anchor";
 
 const ENABLED_ITEM =
-  ':is([role="menuitem"], [role="menuitemcheckbox"]):not([data-disabled="true"])';
+  ':is([role="menuitem"], [role="menuitemcheckbox"]):not([data-disabled="true"], [hidden])';
+
+/** The field `Dropdown.Search` renders: focus lands on it when the menu opens. */
+const SEARCH_FIELD = "[data-dropdown-search]";
 
 /** Arrow keys, Home and End move focus between the enabled items, wrapping around. */
 function moveFocus(event: React.KeyboardEvent<HTMLElement>) {
@@ -136,29 +179,78 @@ function moveFocus(event: React.KeyboardEvent<HTMLElement>) {
   items[next]?.focus();
 }
 
+/**
+ * The menu's own state: the query of `Dropdown.Search`, the items it leaves on screen (the
+ * listbox registry: matches, persistent items, the empty state) and, while there is a search,
+ * the highlighted item (`aria-activedescendant` of the field; focus stays in it).
+ */
+type DropdownMenuContextValue = {
+  searchable: boolean;
+  query: string;
+  setQuery: (query: string) => void;
+  /** The query has text: items filter, separators step aside. */
+  searching: boolean;
+  registry: ListboxRegistry;
+  highlight: Store<string | undefined>;
+  listRef: React.RefObject<HTMLElement | null>;
+};
+
+const [DropdownMenuProvider, useDropdownMenuContext] =
+  createComponentContext<DropdownMenuContextValue>("Dropdown.Content");
+
+/** The members of a `Dropdown.Group`: the group hides while a query leaves none of them. */
+const DropdownGroupContext = React.createContext<Set<string> | null>(null);
+
+/** The shown, enabled items of the list in their order: what the highlight walks. */
+function navigableItems(list: HTMLElement | null): HTMLElement[] {
+  return list ? Array.from(list.querySelectorAll<HTMLElement>(ENABLED_ITEM)) : [];
+}
+
 export type DropdownContentProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> & {
   side?: PositionSide;
   align?: PositionAlign;
   size?: ControlSize;
+  width?: "auto" | PanelMeasure;
+  maxRows?: number;
   matchTriggerWidth?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
+
+const isSearchPart = (node: React.ReactNode) =>
+  React.isValidElement(node) && node.type === DropdownSearch;
 
 function DropdownContent({
   side = DEFAULT_SIDE,
   align = DEFAULT_ALIGN,
   size = OVERLAY_CONTENT_SIZE,
+  width = "auto",
+  maxRows,
   matchTriggerWidth = false,
   className,
+  style,
   children,
   onKeyDown,
   ...rest
 }: DropdownContentProps) {
-  const { isOpen, setOpen, triggerRef, menuId, closeOnOutsideClick, closeOnEscape, anchorPoint } =
-    useDropdownContext("Dropdown.Content");
+  const {
+    isOpen,
+    setOpen,
+    triggerRef,
+    menuId,
+    closeOnOutsideClick,
+    closeOnEscape,
+    anchorPoint,
+    labels,
+  } = useDropdownContext("Dropdown.Content");
 
-  // WAI-ARIA menu button: focus goes to the first item; Escape, a pick and Tab return it to the
-  // trigger (Tab then moves on); an outside press leaves focus where the pointer put it.
+  const nodes = React.Children.toArray(children);
+  const search = nodes.find(isSearchPart);
+  const searchable = search !== undefined;
+  const items = searchable ? nodes.filter((node) => !isSearchPart(node)) : children;
+
+  // WAI-ARIA menu button: focus goes to the first item (the search field when there is one);
+  // Escape, a pick and Tab return it to the trigger (Tab then moves on); an outside press leaves
+  // focus where the pointer put it.
   const floating = useFloatingLayer({
     open: isOpen,
     onOpenChange: setOpen,
@@ -169,83 +261,344 @@ function DropdownContent({
     matchAnchorWidth: matchTriggerWidth,
     closeOnEscape,
     closeOnOutsideClick,
-    focusOnOpen: ENABLED_ITEM,
+    focusOnOpen: searchable ? SEARCH_FIELD : ENABLED_ITEM,
     tabExit: "always",
     sheet: true,
   });
   const name = useAnchorName(isOpen, false, triggerRef);
 
+  const [query, setQuery] = React.useState("");
+  const registry = useListboxRegistry();
+  const highlight = useCreateStore<string | undefined>(undefined);
+  const listRef = React.useRef<HTMLElement | null>(null);
+  const searching = searchable && query.trim() !== "";
+  const view = useListboxView(registry, query, searching);
+
+  // Every opening starts with an empty query.
+  React.useLayoutEffect(() => {
+    if (isOpen) setQuery("");
+  }, [isOpen]);
+
+  // The highlight follows the query to its first match (an item that stays whatever the query —
+  // «Новый чат» — only when nothing matches), and stays on screen while the list changes.
+  const lastQuery = React.useRef(query);
+  const matchCount = view.matchCount;
+  React.useLayoutEffect(() => {
+    if (!searchable || !isOpen || !floating.mounted) return;
+    const shown = navigableItems(listRef.current);
+    const current = highlight.get();
+    const queryChanged = lastQuery.current !== query;
+    lastQuery.current = query;
+    if (!queryChanged && current !== undefined && shown.some((item) => item.id === current)) return;
+    const match =
+      searching && matchCount > 0
+        ? shown.find((item) => !item.hasAttribute("data-persistent"))
+        : null;
+    highlight.set((match ?? shown[0])?.id);
+  }, [searchable, isOpen, floating.mounted, query, searching, matchCount, highlight]);
+
+  const menuContext = React.useMemo(
+    () => ({ searchable, query, setQuery, searching, registry, highlight, listRef }),
+    [searchable, query, searching, registry, highlight],
+  );
+
+  const rows =
+    maxRows !== undefined && maxRows > 0
+      ? {
+          "data-rows": "",
+          style: { ...style, "--menu-rows": Math.floor(maxRows) } as React.CSSProperties,
+        }
+      : { style };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    onKeyDown?.(event);
+    // The search field drives the highlight itself; focus never leaves it for an item.
+    if (!event.defaultPrevented && !(event.target as Element).matches(SEARCH_FIELD)) {
+      moveFocus(event);
+    }
+  };
+
+  if (!searchable) {
+    return (
+      <DropdownMenuProvider value={menuContext}>
+        <FloatingPanel
+          {...rest}
+          {...name}
+          {...rows}
+          floating={floating}
+          size={size}
+          width={width}
+          scroll
+          id={menuId}
+          role="menu"
+          className={cx(fieldTierClass, menu.tier, menu.menu, className)}
+          onKeyDown={handleKeyDown}
+        >
+          {children}
+        </FloatingPanel>
+      </DropdownMenuProvider>
+    );
+  }
+
+  // With a search the panel holds the field, the scrolling menu under it and the empty state.
   return (
-    <FloatingPanel
-      {...rest}
-      {...name}
-      floating={floating}
-      size={size}
-      scroll
-      id={menuId}
-      role="menu"
-      className={cx(fieldTierClass, menu.tier, menu.menu, className)}
-      onKeyDown={(event) => {
-        onKeyDown?.(event);
-        if (!event.defaultPrevented) moveFocus(event);
-      }}
-    >
-      {children}
-    </FloatingPanel>
+    <DropdownMenuProvider value={menuContext}>
+      <FloatingPanel
+        {...rest}
+        {...rows}
+        floating={floating}
+        size={size}
+        width={width}
+        className={cx(fieldTierClass, menu.tier, menu.menu, menu.searchPanel, className)}
+        onKeyDown={handleKeyDown}
+      >
+        {search}
+        <ScrollContainer
+          {...name}
+          ref={listRef}
+          id={menuId}
+          role="menu"
+          edges="shadow"
+          className={menu.panelList}
+          hidden={view.visible.size === 0 ? true : undefined}
+        >
+          {items}
+        </ScrollContainer>
+        {searching && view.matchCount === 0 ? (
+          <EmptyPage.Root layout="compact" size={size} role="status">
+            <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
+          </EmptyPage.Root>
+        ) : null}
+      </FloatingPanel>
+    </DropdownMenuProvider>
   );
 }
 DropdownContent.displayName = "Dropdown.Content";
 
-export type DropdownItemProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "type" | "role" | "onSelect"
+export type DropdownSearchProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "size" | "type" | "role" | "value" | "defaultValue"
 > & {
-  onSelect?: () => void;
-  disabled?: boolean;
-  tone?: Extract<Tone, "neutral" | "danger">;
-  asChild?: boolean;
-  /** The item element: `<button>`, or the `asChild` element. */
-  ref?: React.Ref<HTMLButtonElement>;
+  ref?: React.Ref<HTMLInputElement>;
 };
 
 /**
- * Lays out an item's content: leading `ItemIcon`s, the label, a `Dropdown.ItemDescription` under it
- * and a trailing `ItemShortcut`. With a description the label names the item (`aria-labelledby`)
- * and the description describes it (`aria-describedby`), so the reason under a disabled item is
- * read with it, not as part of its name.
+ * The search row at the top of the menu: a search icon and the query field. Focus lands here on
+ * open and stays here: the arrows move the highlight over the shown items, Enter runs the
+ * highlighted one; Space, Home and End edit the text. It is the permanent focus of the panel, so
+ * it draws no ring (foundation §7).
  */
-function useItemContent(children: React.ReactNode) {
+function DropdownSearch({
+  className,
+  placeholder,
+  onChange,
+  onKeyDown,
+  "aria-label": ariaLabel,
+  ...rest
+}: DropdownSearchProps) {
+  const { labels, menuId } = useDropdownContext("Dropdown.Search");
+  const { query, setQuery, highlight, listRef } = useDropdownMenuContext("Dropdown.Search");
+  const highlighted = useStoreSlice(highlight, (id) => id);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented || isComposingKey(event)) return;
+    // In the field Space, Home and End edit the text.
+    if ([" ", "Home", "End"].includes(event.key)) return;
+    const ids = navigableItems(listRef.current).map((item) => item.id);
+    const moved = handleListboxKeyDown(event, {
+      ids,
+      highlight,
+      // The item's own activation: `onSelect` and close, a toggle, a link's navigation.
+      activate: (id) => document.getElementById(id)?.click(),
+    });
+    if (moved !== null) revealHighlighted(document.getElementById(moved));
+  };
+
+  return (
+    <div className={cx(menu.searchRow, menu.panelSearch, fieldInputTextClass)}>
+      <Icon name="action.search" size="s" />
+      <input
+        {...rest}
+        type="search"
+        placeholder={placeholder ?? labels.search}
+        aria-label={ariaLabel ?? (rest["aria-labelledby"] ? undefined : labels.search)}
+        aria-controls={menuId}
+        aria-activedescendant={highlighted}
+        {...AUTOFILL_OFF}
+        autoCorrect="off"
+        spellCheck={false}
+        data-dropdown-search=""
+        className={cx(menu.searchInput, className)}
+        value={query}
+        onChange={(event) => {
+          onChange?.(event);
+          setQuery(event.target.value);
+        }}
+        onKeyDown={handleKeyDown}
+      />
+    </div>
+  );
+}
+DropdownSearch.displayName = "Dropdown.Search";
+
+/** What a search does to an item (`Dropdown.Item`, `Dropdown.CheckboxItem`). */
+type SearchItemProps = {
+  keywords?: string;
+  persistent?: boolean;
+};
+
+export type DropdownItemProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "role" | "onSelect"
+> &
+  SearchItemProps & {
+    onSelect?: () => void;
+    disabled?: boolean;
+    tone?: Extract<Tone, "neutral" | "danger">;
+    asChild?: boolean;
+    /** The item element: `<button>`, or the `asChild` element. */
+    ref?: React.Ref<HTMLButtonElement>;
+  };
+
+const isType = (node: React.ReactNode, type: unknown) =>
+  React.isValidElement(node) && node.type === type;
+
+/**
+ * Lays out an item's content: leading `ItemIcon`s, the label (it truncates first), a
+ * `Dropdown.ItemDescription` under it, then a trailing `ItemMeta` and `ItemShortcut`. With a
+ * description or a meta the label names the item (`aria-labelledby`) and they describe it
+ * (`aria-describedby`): the reason under a disabled item, the time of a thread are read with it,
+ * not as part of its name. While a query is typed the matching part of the label and the
+ * description is marked.
+ */
+function useItemContent(children: React.ReactNode, query: string) {
   const labelId = React.useId();
   const descriptionId = React.useId();
+  const metaId = React.useId();
   const nodes = React.Children.toArray(children);
-  const isType = (node: React.ReactNode, type: unknown) =>
-    React.isValidElement(node) && node.type === type;
-  const description = nodes.filter((node) => isType(node, DropdownItemDescription));
-  if (description.length === 0) return { content: children, aria: null };
   const leading = nodes.filter((node) => isType(node, DropdownItemIcon));
-  const trailing = nodes.filter((node) => isType(node, DropdownItemShortcut));
+  const description = nodes.filter((node) => isType(node, DropdownItemDescription));
+  const meta = nodes.filter((node) => isType(node, DropdownItemMeta));
+  const shortcut = nodes.filter((node) => isType(node, DropdownItemShortcut));
   const label = nodes.filter(
     (node) =>
-      !isType(node, DropdownItemDescription) &&
-      !isType(node, DropdownItemIcon) &&
-      !isType(node, DropdownItemShortcut),
+      !leading.includes(node) &&
+      !description.includes(node) &&
+      !meta.includes(node) &&
+      !shortcut.includes(node),
+  );
+  const text = `${nodeText(label)} ${nodeText(description)}`;
+  const labelNode = highlightChildren(label, query);
+
+  if (description.length === 0 && meta.length === 0) {
+    return {
+      text,
+      aria: null,
+      content: (
+        <>
+          {leading}
+          <span className={styles.itemLabel}>{labelNode}</span>
+          {shortcut}
+        </>
+      ),
+    };
+  }
+  const described = [description.length > 0 && descriptionId, meta.length > 0 && metaId];
+  const labelSpan = (
+    <span id={labelId} className={styles.itemLabel}>
+      {labelNode}
+    </span>
   );
   return {
+    text,
+    aria: {
+      "aria-labelledby": labelId,
+      "aria-describedby": described.filter(Boolean).join(" "),
+    },
     content: (
       <>
         {leading}
-        <span className={styles.itemBody}>
-          <span id={labelId} className={styles.itemLabel}>
-            {label}
+        {description.length > 0 ? (
+          <span className={styles.itemBody}>
+            {labelSpan}
+            <span id={descriptionId} className={styles.itemSlot}>
+              {description.map((node) =>
+                React.isValidElement<{ children?: React.ReactNode }>(node)
+                  ? React.cloneElement(
+                      node,
+                      undefined,
+                      highlightChildren(node.props.children, query),
+                    )
+                  : node,
+              )}
+            </span>
           </span>
-          <span id={descriptionId} className={styles.itemDescriptionSlot}>
-            {description}
+        ) : (
+          labelSpan
+        )}
+        {meta.length > 0 ? (
+          <span id={metaId} className={styles.itemSlot}>
+            {meta}
           </span>
-        </span>
-        {trailing}
+        ) : null}
+        {shortcut}
       </>
     ),
-    aria: { "aria-labelledby": labelId, "aria-describedby": descriptionId },
+  };
+}
+
+/**
+ * An item of the menu as the search sees it: registered with its text (label, description,
+ * `keywords`), hidden while a query does not match it (a `persistent` item always shows), lit
+ * while highlighted from the search field, and its group told that it belongs there.
+ */
+function useSearchItem(
+  id: string,
+  text: string,
+  { keywords = "", persistent = false, disabled }: SearchItemProps & { disabled: boolean },
+) {
+  const { searchable, searching, query, registry, highlight } =
+    useDropdownMenuContext("Dropdown.Item");
+  const group = React.useContext(DropdownGroupContext);
+  const nodeRef = React.useRef<HTMLElement | null>(null);
+  const haystack = `${text} ${keywords}`.trim().toLocaleLowerCase();
+
+  useListboxItem(
+    registry,
+    id,
+    { label: text, haystack, disabled, persistent, onActivate: () => nodeRef.current?.click() },
+    nodeRef,
+  );
+  React.useLayoutEffect(() => {
+    if (!group) return;
+    group.add(id);
+    return () => {
+      group.delete(id);
+    };
+  }, [group, id]);
+
+  const { visible } = useListboxView(registry, query, searching);
+  const shown = !searching || visible.has(id);
+  const highlighted = useStoreSlice(highlight, (current) => searchable && current === id);
+
+  return {
+    nodeRef,
+    shown,
+    props: {
+      id,
+      hidden: shown ? undefined : true,
+      ...toDataAttributes({
+        highlighted: highlighted || undefined,
+        persistent: persistent || undefined,
+      }),
+      // The pointer moves the highlight too, so the keyboard goes on from where it is.
+      onPointerMove: (event: React.PointerEvent<HTMLElement>) => {
+        if (!event.defaultPrevented && searchable && shown && !disabled && !highlighted) {
+          highlight.set(id);
+        }
+      },
+    },
   };
 }
 
@@ -259,20 +612,29 @@ function DropdownItem({
   disabled = false,
   tone = "neutral",
   asChild = false,
+  keywords,
+  persistent,
+  id: idProp,
   className,
   onClick,
+  onPointerMove,
   children,
   ref,
   ...rest
 }: DropdownItemProps) {
   const { setOpen } = useDropdownContext("Dropdown.Item");
+  const { query } = useDropdownMenuContext("Dropdown.Item");
+  const autoId = React.useId();
   const child = asChild ? slotChild(children, "Dropdown.Item") : null;
-  const { content, aria } = useItemContent(child ? child.props.children : children);
+  const { content, aria, text } = useItemContent(child ? child.props.children : children, query);
+  const search = useSearchItem(idProp ?? autoId, text, { keywords, persistent, disabled });
+  const mergedRef = useMergedRefs(search.nodeRef, ref);
 
   const itemProps = {
     ...rest,
     ...aria,
-    ref,
+    ...search.props,
+    ref: mergedRef,
     role: "menuitem",
     tabIndex: -1,
     disabled,
@@ -285,6 +647,10 @@ function DropdownItem({
       className,
     ),
     ...toDataAttributes({ tone, disabled: disabled || undefined }),
+    onPointerMove: (event: React.PointerEvent<HTMLElement>) => {
+      onPointerMove?.(event as React.PointerEvent<HTMLButtonElement>);
+      search.props.onPointerMove(event);
+    },
     // Enter and Space reach here as the native click (Enter only on a link).
     onClick: (event: React.MouseEvent<HTMLElement>) => {
       onClick?.(event as React.MouseEvent<HTMLButtonElement>);
@@ -313,13 +679,14 @@ DropdownItem.displayName = "Dropdown.Item";
 export type DropdownCheckboxItemProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "role" | "onSelect" | "onChange" | "defaultChecked"
-> & {
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  ref?: React.Ref<HTMLButtonElement>;
-};
+> &
+  SearchItemProps & {
+    checked?: boolean;
+    defaultChecked?: boolean;
+    onCheckedChange?: (checked: boolean) => void;
+    disabled?: boolean;
+    ref?: React.Ref<HTMLButtonElement>;
+  };
 
 /**
  * A toggle inside the menu (show a column, turn a filter on, pick a view): the label where an item
@@ -331,8 +698,12 @@ function DropdownCheckboxItem({
   defaultChecked = false,
   onCheckedChange,
   disabled = false,
+  keywords,
+  persistent,
+  id: idProp,
   className,
   onClick,
+  onPointerMove,
   children,
   ref,
   ...rest
@@ -342,13 +713,18 @@ function DropdownCheckboxItem({
     defaultValue: defaultChecked,
     onChange: onCheckedChange,
   });
-  const { content, aria } = useItemContent(children);
+  const { query } = useDropdownMenuContext("Dropdown.CheckboxItem");
+  const autoId = React.useId();
+  const { content, aria, text } = useItemContent(children, query);
+  const search = useSearchItem(idProp ?? autoId, text, { keywords, persistent, disabled });
+  const mergedRef = useMergedRefs(search.nodeRef, ref);
 
   return (
     <InteractiveElement
       {...rest}
       {...aria}
-      ref={ref}
+      {...search.props}
+      ref={mergedRef}
       element="button"
       role="menuitemcheckbox"
       aria-checked={checked}
@@ -356,6 +732,10 @@ function DropdownCheckboxItem({
       disabled={disabled}
       className={cx(menu.item, menu.focusRow, styles.item, className)}
       {...toDataAttributes({ disabled: disabled || undefined, checked: checked || undefined })}
+      onPointerMove={(event) => {
+        onPointerMove?.(event as React.PointerEvent<HTMLButtonElement>);
+        search.props.onPointerMove(event);
+      }}
       onClick={(event) => {
         onClick?.(event as React.MouseEvent<HTMLButtonElement>);
         if (!event.defaultPrevented) setChecked(!checked);
@@ -395,6 +775,20 @@ function DropdownItemShortcut({ className, ...rest }: DropdownItemShortcutProps)
 }
 DropdownItemShortcut.displayName = "Dropdown.ItemShortcut";
 
+export type DropdownItemMetaProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+  children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * A muted meta at the end of an item, on the label's line (the time of a thread, a count): it
+ * never shrinks or wraps — the label truncates first. It describes the item; the label names it.
+ */
+function DropdownItemMeta({ className, ...rest }: DropdownItemMetaProps) {
+  return <span className={cx(menu.itemMeta, className)} {...rest} />;
+}
+DropdownItemMeta.displayName = "Dropdown.ItemMeta";
+
 export type DropdownItemDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "id"> & {
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
@@ -411,15 +805,27 @@ DropdownItemDescription.displayName = "Dropdown.ItemDescription";
 
 export type DropdownGroupProps = MenuGroupProps;
 
+/** A labelled group of items; hidden while a query leaves none of them. */
 function DropdownGroup(props: DropdownGroupProps) {
-  return <MenuGroup {...props} />;
+  const [members] = React.useState(() => new Set<string>());
+  const { registry, query, searching } = useDropdownMenuContext("Dropdown.Group");
+  // Re-renders when the items register or the query changes.
+  const { visible } = useListboxView(registry, query, searching);
+  const shown = !searching || [...members].some((id) => visible.has(id));
+  return (
+    <DropdownGroupContext.Provider value={members}>
+      <MenuGroup {...props} hidden={shown ? props.hidden : true} />
+    </DropdownGroupContext.Provider>
+  );
 }
 DropdownGroup.displayName = "Dropdown.Group";
 
 export type DropdownSeparatorProps = Omit<DivProps, "children">;
 
-/** A full-bleed hairline between items or groups. */
+/** A full-bleed hairline between items or groups; it steps aside while a query filters them. */
 function DropdownSeparator({ className, ...rest }: DropdownSeparatorProps) {
+  const { searching } = useDropdownMenuContext("Dropdown.Separator");
+  if (searching) return null;
   return <Divider {...rest} className={cx(menu.separator, className)} />;
 }
 DropdownSeparator.displayName = "Dropdown.Separator";
@@ -476,6 +882,7 @@ export const Dropdown = {
   Trigger: DropdownTrigger,
   Anchor: DropdownAnchor,
   Content: DropdownContent,
+  Search: DropdownSearch,
   Header: DropdownHeader,
   Title: DropdownTitle,
   Description: DropdownDescription,
@@ -484,6 +891,7 @@ export const Dropdown = {
   CheckboxItem: DropdownCheckboxItem,
   ItemIcon: DropdownItemIcon,
   ItemDescription: DropdownItemDescription,
+  ItemMeta: DropdownItemMeta,
   ItemShortcut: DropdownItemShortcut,
   Separator: DropdownSeparator,
 };

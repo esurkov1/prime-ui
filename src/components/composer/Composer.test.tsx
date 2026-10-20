@@ -5,8 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Modal } from "@/components/modal/Modal";
 import { type UploadItem, useUploadQueue } from "@/hooks/useUploadQueue";
 import { DisabledProvider } from "@/internal/disabledContext";
+import { cssRule, cssValue } from "@/test/css";
 import { Composer, type ComposerQueue } from "./Composer";
 import styles from "./Composer.module.css";
+
+const CSS = "src/components/composer/Composer.module.css";
 
 const field = () => screen.getByRole("textbox", { name: "Сообщение" });
 
@@ -914,6 +917,30 @@ describe("recording", () => {
     expect(screen.getByRole("button", { name: "Удалить запись" })).toBeInTheDocument();
     expect(form().querySelector("canvas")).not.toBeNull();
     expect(screen.getByRole("status")).toHaveTextContent("Идёт запись");
+  });
+
+  it("the locked bar gives the free width to the waveform, never to the status glyph", () => {
+    getUserMedia.mockImplementation(() => new Promise(() => {}));
+    render(<Composer.Root onSendVoice={vi.fn()} />);
+    fireEvent.pointerDown(recordButton(), { pointerId: 1, pointerType: "mouse", button: 0 });
+    const canvas = form().querySelector("canvas");
+    const status = form().querySelector(`.${styles.status}`);
+    expect(canvas).toHaveClass(styles.wave);
+    // delete · pause · dot · timer · waveform, in one row: the wave is last, after the timer.
+    expect(status?.parentElement).toBe(canvas?.parentElement);
+    expect(canvas?.previousElementSibling).toHaveClass(styles.timer);
+    expect(status?.nextElementSibling).toBe(canvas?.previousElementSibling);
+    // The dot sits in the pause glyph's box, so a pause moves nothing.
+    expect(status?.querySelector(`.${styles.dotBox} > .${styles.dot}`)).not.toBeNull();
+    // jsdom has no layout: the rules that size the row. A status box of the row's width (a
+    // glyph slot at 100%) pushed the timer and a zero-width waveform off the bar.
+    const wave = cssRule(CSS, ".wave");
+    expect(cssValue(wave, "flex")).toBe("1 1 auto");
+    expect(cssValue(wave, "min-width")).toBe("0");
+    const statusRule = cssRule(CSS, ".status");
+    expect(cssValue(statusRule, "flex")).toBe("none");
+    expect(statusRule.decls.map((decl) => decl.prop)).not.toContain("width");
+    expect(cssValue(cssRule(CSS, ".timer"), "flex")).toBe("none");
   });
 
   it("a click records hands-free; send hands over the voice message", async () => {

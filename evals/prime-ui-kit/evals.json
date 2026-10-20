@@ -454,10 +454,10 @@
     {
       "id": 36,
       "prompt": "В дровере сделки сверху сделай три плитки: «К оплате» (21 000 ₽, это долг), «Депозиты у нас» (5 000 ₽), «Ближайшая задача» (Выдать PCX 160 завтра). Ниже — карточка транспорта сделки с позициями аренды и доставки и итогом.",
-      "expected_output": "Three Card stat-text tiles with valueSize l, the debt with tone warning, the phrase in the same style as the numbers; no Typography inside Card.Value. The vehicle card has a Card.Header, line items in a DescriptionList align end inside Card.Body divider full, and a Card.Footer divider fill with the action, the task and Card.Total.",
+      "expected_output": "Three Card stat-text tiles at the default value size (no valueSize=\"l\" on a row of facts), the debt with tone warning, the phrase in the same style as the numbers; no Typography inside Card.Value. The vehicle card has a Card.Header, line items in a DescriptionList align end inside Card.Body divider full, and a Card.Footer divider fill with the action, the task and Card.Total.",
       "files": [],
       "expectations": [
-        "All three tiles are Card.Root variant=\"stat-text\" with valueSize=\"l\"; none puts a Typography inside Card.Value",
+        "All three tiles are Card.Root variant=\"stat-text\" without valueSize=\"l\" (the default size, one style for numbers and the phrase); none puts a Typography inside Card.Value",
         "«К оплате» has Card.Value tone=\"warning\" (or danger) by its meaning",
         "The vehicle card's line items are a DescriptionList.Root align=\"end\" inside Card.Body divider=\"full\"",
         "The vehicle card's footer is Card.Footer divider=\"fill\" with the total in Card.Total (Card.Value inside), at the end of the row"

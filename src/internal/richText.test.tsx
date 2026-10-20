@@ -80,6 +80,125 @@ describe("RichText markup", () => {
   });
 });
 
+/**
+ * Whether each click reached the document unprevented (the browser would follow the link); the
+ * listener then stops the navigation jsdom cannot do.
+ */
+function followedClicks() {
+  const seen: boolean[] = [];
+  const listen = (event: MouseEvent) => {
+    seen.push(!event.defaultPrevented);
+    event.preventDefault();
+  };
+  window.addEventListener("click", listen);
+  return {
+    stop: () => {
+      window.removeEventListener("click", listen);
+      return seen;
+    },
+  };
+}
+
+describe("RichText headings, lists and relative links", () => {
+  it("reads a heading line only at a line's start, as a bold paragraph, never an h tag", () => {
+    expect(markup("## Итоги квартала\nВыручка выросла")).toBe(
+      "<p><strong>Итоги квартала</strong></p><p>Выручка выросла</p>",
+    );
+    expect(markup("Задача #12 и ## не заголовок\n#тег")).toBe(
+      "<p>Задача #12 и ## не заголовок\n#тег</p>",
+    );
+    const { container } = render(<RichText labels={LABELS} source="# Сделки" />);
+    expect(container.querySelector("h1, h2, h3, h4, h5, h6, [role='heading']")).toBeNull();
+  });
+
+  it("reads `- ` and `* ` bullets and `1. ` numbers as lists, a `-` mid-line as text", () => {
+    expect(markup("Открыто:\n- Вектор\n- Альфа\nИтого 2 - всё")).toBe(
+      "<p>Открыто:</p><ul><li>Вектор</li><li>Альфа</li></ul><p>Итого 2 - всё</p>",
+    );
+    expect(markup("* один\n* два")).toBe("<ul><li>один</li><li>два</li></ul>");
+    expect(markup("-5 °C и --- и -")).toBe("<p>-5 °C и --- и -</p>");
+    expect(markup("- а\n* б\n1. в")).toBe(
+      "<ul><li>а</li></ul><ul><li>б</li></ul><ol><li>в</li></ol>",
+    );
+  });
+
+  it("starts a numbered list at its first number and keeps a blank line inside one list", () => {
+    const { container } = render(
+      <RichText labels={LABELS} source={"3. Счёт\n\n4. Акт\n9. Отгрузка"} />,
+    );
+    const list = container.querySelector("ol");
+    expect(list).toHaveAttribute("start", "3");
+    expect(list?.querySelectorAll("li")).toHaveLength(3);
+    const first = render(<RichText labels={LABELS} source="1. Счёт" />).container;
+    expect(first.querySelector("ol")).not.toHaveAttribute("start");
+  });
+
+  it("renders emphasis and links inside items and headings", () => {
+    expect(markup("# Сделка **№ 12**\n- **Вектор** _в работе_\n- [открыть](/sales/deals/12)")).toBe(
+      "<p><strong>Сделка <strong>№ 12</strong></strong></p>" +
+        "<ul><li><strong>Вектор</strong> <em>в работе</em></li>" +
+        '<li><a href="/sales/deals/12">открыть</a></li></ul>',
+    );
+  });
+
+  it("puts `end` at the end of the last item", () => {
+    const { container } = render(
+      <RichText labels={LABELS} source={"- раз\n- два"} end={<i data-end="" />} />,
+    );
+    expect(container.querySelector("li:last-child")?.lastElementChild).toHaveAttribute("data-end");
+    expect(container.querySelectorAll("p")).toHaveLength(0);
+  });
+
+  it("links relative addresses on the same origin only", () => {
+    expect(markup("[a](/sales/deals/12) [b](./x) [c](../y) [d](#итог) [e](?tab=1)")).toBe(
+      '<p><a href="/sales/deals/12">a</a> <a href="./x">b</a> <a href="../y">c</a> ' +
+        '<a href="#итог">d</a> <a href="?tab=1">e</a></p>',
+    );
+    for (const unsafe of ["//evil.app/x", "/\\evil.app", "javascript:alert(1)", "deals/12"]) {
+      expect(markup(`[x](${unsafe})`)).toBe(`<p>[x](${unsafe})</p>`);
+    }
+  });
+
+  it("opens a relative link in the same tab and an absolute one in a new tab", () => {
+    const { getByRole } = render(
+      <RichText labels={LABELS} source="[сделка](/sales/deals/12) и [сайт](https://prime.app)" />,
+    );
+    const inside = getByRole("link", { name: "сделка" });
+    expect(inside).not.toHaveAttribute("target");
+    expect(inside).not.toHaveAttribute("rel");
+    expect(getByRole("link", { name: "сайт" })).toHaveAttribute("target", "_blank");
+  });
+
+  it("calls `onLinkClick` with the address; a modified press is the browser's", () => {
+    const routed: string[] = [];
+    const { getByRole } = render(
+      <RichText
+        labels={LABELS}
+        source="[сделка](/sales/deals/12)"
+        onLinkClick={(href, event) => {
+          routed.push(href);
+          event.preventDefault();
+        }}
+      />,
+    );
+    const followed = followedClicks();
+    const link = getByRole("link", { name: "сделка" });
+    fireEvent.click(link);
+    expect(routed).toEqual(["/sales/deals/12"]);
+    fireEvent.click(link, { metaKey: true });
+    fireEvent.click(link, { ctrlKey: true });
+    expect(routed).toEqual(["/sales/deals/12"]);
+    expect(followed.stop()).toEqual([false, true, true]);
+  });
+
+  it("follows the link without `onLinkClick`", () => {
+    const { getByRole } = render(<RichText labels={LABELS} source="[сделка](/sales/deals/12)" />);
+    const followed = followedClicks();
+    fireEvent.click(getByRole("link"));
+    expect(followed.stop()).toEqual([true]);
+  });
+});
+
 describe("RichText", () => {
   it("renders elements, never HTML", () => {
     const { container } = render(
@@ -234,6 +353,25 @@ describe("parseRichText", () => {
   });
 });
 
+describe("getTextEntities of headings and lists", () => {
+  it("writes a heading as its text in bold and keeps list markers as text", () => {
+    expect(getTextEntities("# Итог\n- **Вектор**\n3. Альфа\n4. Бета")).toEqual({
+      text: "Итог\n- Вектор\n3. Альфа\n4. Бета",
+      entities: [
+        { type: "bold", offset: 0, length: 4 },
+        { type: "bold", offset: 7, length: 6 },
+      ],
+    });
+  });
+
+  it("keeps a relative link's address", () => {
+    expect(getTextEntities("[сделка](/sales/deals/12)")).toEqual({
+      text: "сделка",
+      entities: [{ type: "link", offset: 0, length: 6, url: "/sales/deals/12" }],
+    });
+  });
+});
+
 describe("entities", () => {
   it("nest, and one that crosses another's end is cut", () => {
     expect(
@@ -293,6 +431,14 @@ describe("getRichTextSource", () => {
       { type: "pre", offset: 21, length: 6, language: "sh" },
     ];
     expect(roundTrip(text, entities)).toEqual({ text, entities });
+  });
+
+  it("escapes text lines that would read as a heading or a list item", () => {
+    expect(getRichTextSource({ text: "# 12\n- раз\n* два\n3. три\n#тег - да", entities: [] })).toBe(
+      "\\# 12\n\\- раз\n\\* два\n3\\. три\n#тег - да",
+    );
+    const text = "## итог\n- раз\n10. десять";
+    expect(roundTrip(text, [])).toEqual({ text, entities: [] });
   });
 
   it("drops an italic it cannot hold inside a word, keeping the text", () => {

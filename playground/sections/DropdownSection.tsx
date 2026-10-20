@@ -8,7 +8,7 @@ export const page: ComponentPageConfig = {
     segment: "dropdown",
     label: "Dropdown",
     summary: "Выпадающее меню действий",
-    keywords: ["выпадающее меню", "меню", "dropdown", "open", "onOpenChange"],
+    keywords: ["выпадающее меню", "меню", "dropdown", "поиск в меню", "open", "onOpenChange"],
     icon: ListChecks,
     order: 3,
   },
@@ -77,6 +77,12 @@ export const page: ComponentPageConfig = {
       title: "Длинный список",
       description:
         "Проектов больше, чем помещается: список с группами прокручивается внутри панели, высота ограничена местом у триггера — `Dropdown.Group`.",
+    },
+    {
+      scenario: "search",
+      title: "Поиск",
+      description:
+        "Чаты ассистента: «Новый чат» над длинным списком тем со временем, поиск по ним, постоянная ширина и высота в двенадцать строк — `Dropdown.Search`, `Dropdown.ItemMeta`, `persistent`, `width`, `maxRows`.",
     },
     {
       slot: "dismiss",

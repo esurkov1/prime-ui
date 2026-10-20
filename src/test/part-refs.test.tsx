@@ -36,6 +36,7 @@ import {
   Datepicker,
   Dnd,
   Drawer,
+  Dropdown,
   EmptyPage,
   ExampleFrame,
   FieldList,
@@ -359,6 +360,38 @@ const CASES: Case[] = [
     "Datepicker.Panel",
     "DIV",
     (ref) => <Datepicker.Panel ref={ref} data-testid="part" mode="single" />,
+  ],
+  [
+    "Dropdown.Item",
+    "BUTTON",
+    (ref) => (
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Действия</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item ref={ref} data-testid="part">
+            Переименовать
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>
+    ),
+  ],
+  [
+    "Dropdown.CheckboxItem",
+    "BUTTON",
+    (ref) => (
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Колонки</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.CheckboxItem ref={ref} data-testid="part">
+            Сумма
+          </Dropdown.CheckboxItem>
+        </Dropdown.Content>
+      </Dropdown.Root>
+    ),
   ],
   [
     "CommandMenu.List",

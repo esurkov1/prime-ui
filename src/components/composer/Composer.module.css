@@ -194,10 +194,19 @@
   background: var(--prime-color-danger-default);
 }
 
-/* The dot, or — paused — a still pause glyph in the same hue, swapped in place (`GlyphSwap`). */
+/*
+ * The dot, or — paused — a still pause glyph in the same hue, swapped in place (`GlyphSwap`). The
+ * dot sits in the glyph's box (`.dotBox`), so the timer and the waveform never move on a pause;
+ * the box keeps its glyph's width and the waveform takes the rest.
+ */
 .status {
   flex: none;
   color: var(--prime-color-danger-default);
+}
+
+.dotBox {
+  display: inline-grid;
+  place-items: center;
 }
 
 /* `0:09,2`: tabular digits keep the width while the time runs. */

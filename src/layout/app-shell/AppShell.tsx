@@ -1,9 +1,15 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 
+import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { useEnterOnAppear } from "@/internal/partPresence";
+import { isPart } from "@/internal/parts";
 
 import styles from "./AppShell.module.css";
 
@@ -55,6 +61,11 @@ export function useAppShellNavPublisher(): PublishNav | null {
   return React.useContext(PublishContext);
 }
 
+/** Where the shell's floating actions stand: the corner of its bottom dock (`null` until mounted). */
+type FabDock = { dock: HTMLElement | null };
+
+const [FabDockProvider, useFabDock] = createComponentContext<FabDock>("AppShell");
+
 /**
  * Starts a frame of its own inside a shell: a preview of a screen (`ExampleFrame`) is not the
  * page, so a Sidebar in it and the menu button of its top bar stay in the preview instead of
@@ -63,7 +74,9 @@ export function useAppShellNavPublisher(): PublishNav | null {
 export function AppShellBoundary({ children }: { children?: React.ReactNode }) {
   return (
     <PublishContext.Provider value={null}>
-      <NavContext.Provider value={null}>{children}</NavContext.Provider>
+      <NavContext.Provider value={null}>
+        <FabDockProvider value={null}>{children}</FabDockProvider>
+      </NavContext.Provider>
     </PublishContext.Provider>
   );
 }
@@ -88,8 +101,10 @@ AppShellNav.displayName = "AppShell.Nav";
 /**
  * Grid: navigation column | content panel. Everything that is not `AppShell.Nav` goes into the
  * content panel — `AppShell.Main` with the page, and the phone footer — which is the page itself
- * (the layer around the shell): cards on it are the next layer. The root owns the navigation
- * state the Sidebar publishes.
+ * (the layer around the shell): cards on it are the next layer. The panel ends in the dock, a
+ * sticky bottom zone that holds the footer and, above it, the corner where `AppShell.Fab` stands
+ * (wherever in the shell it is rendered). The root owns the navigation state the Sidebar
+ * publishes.
  */
 function AppShellRoot({ fillViewport = false, className, children, ...rest }: AppShellRootProps) {
   const [nav, setNav] = React.useState<AppShellNavState | null>(null);
@@ -98,27 +113,41 @@ function AppShellRoot({ fillViewport = false, className, children, ...rest }: Ap
     [],
   );
 
+  const [dock, setDock] = React.useState<HTMLDivElement | null>(null);
+  const fabDock = React.useMemo(() => ({ dock }), [dock]);
+
   const items = React.Children.toArray(children);
-  const isNav = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === AppShellNav;
-  const navColumn = items.filter(isNav);
-  const panel = items.filter((child) => !isNav(child));
+  const navColumn = items.filter((child) => isPart(child, AppShellNav));
+  const footer = items.filter((child) => isPart(child, AppShellFooter));
+  const panel = items.filter(
+    (child) => !isPart(child, AppShellNav) && !isPart(child, AppShellFooter),
+  );
 
   return (
     <PublishContext.Provider value={publishNav}>
       <NavContext.Provider value={nav}>
-        <div
-          {...rest}
-          className={cx(styles.root, className)}
-          {...toDataAttributes({
-            "fill-viewport": fillViewport || undefined,
-            nav: navColumn.length > 0 || undefined,
-            "off-canvas": nav?.offCanvas || undefined,
-          })}
-        >
-          {navColumn}
-          <div className={styles.panel}>{panel}</div>
-        </div>
+        <FabDockProvider value={fabDock}>
+          <div
+            {...rest}
+            className={cx(styles.root, className)}
+            {...toDataAttributes({
+              "fill-viewport": fillViewport || undefined,
+              nav: navColumn.length > 0 || undefined,
+              "off-canvas": nav?.offCanvas || undefined,
+            })}
+          >
+            {navColumn}
+            <div className={styles.panel}>
+              {panel}
+              {/* After main: the floating actions come after the page in the focus order, before
+                the phone navigation. */}
+              <div className={styles.dock}>
+                <div ref={setDock} className={styles.fabs} />
+                {footer}
+              </div>
+            </div>
+          </div>
+        </FabDockProvider>
       </NavContext.Provider>
     </PublishContext.Provider>
   );
@@ -129,11 +158,47 @@ export type AppShellFooterProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Bottom bar of the content panel (`BottomNav` on a narrow shell). Sticky. */
+/** Bottom bar of the content panel (`BottomNav` on a narrow shell), in the sticky dock. */
 function AppShellFooter({ className, ...rest }: AppShellFooterProps) {
   return <div {...rest} className={cx(styles.footer, className)} />;
 }
 AppShellFooter.displayName = "AppShell.Footer";
+
+export type AppShellFabProps = Omit<React.ComponentPropsWithoutRef<"button">, "children"> & {
+  children: React.ReactNode;
+  "aria-label": string;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/**
+ * The app's floating main action (an assistant, a quick create): a `Button shape="circle"` (`xl`,
+ * solid neutral, the look of `BottomNav.Action`) that stands by itself in the bottom end corner of
+ * the panel — above the footer bar or the floating BottomNav capsule, at the page gutter when no
+ * bar is on screen, inside the safe area. It renders into the shell's dock from anywhere inside
+ * `AppShell.Root` (a page may bring its own), so it sits over the page and its sticky parts and
+ * under every overlay. Enters only when it appears on a shell already shown.
+ */
+function AppShellFab({ className, children, ...rest }: AppShellFabProps) {
+  const { dock } = useFabDock("AppShell.Fab");
+  const appear = useEnterOnAppear<HTMLDivElement>();
+  if (!dock) return null;
+  return createPortal(
+    <div ref={appear.ref} className={cx(styles.fab, appear.entering && enterMotion.enter)}>
+      <Button.Root
+        {...rest}
+        shape="circle"
+        size="xl"
+        variant="solid"
+        tone="neutral"
+        className={className}
+      >
+        <Button.Icon>{children}</Button.Icon>
+      </Button.Root>
+    </div>,
+    dock,
+  );
+}
+AppShellFab.displayName = "AppShell.Fab";
 
 export type AppShellMainProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
@@ -207,5 +272,6 @@ export const AppShell = {
   Nav: AppShellNav,
   Main: AppShellMain,
   Footer: AppShellFooter,
+  Fab: AppShellFab,
   Template: AppShellTemplate,
 };

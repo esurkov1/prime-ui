@@ -26,13 +26,22 @@
   --modal-width: var(--prime-modal-width-xl);
 }
 
-/* Centred in the viewport, its height by content up to the viewport less the padding. */
+/*
+ * Centred in the viewport, its height by content up to the viewport less the margin. The margin on
+ * each side is the viewport padding, or the safe-area inset there (`--prime-safe-area-*`: the
+ * notch, the home indicator, a host app's buttons) when that is larger.
+ */
 .content:not([data-sheet]) {
+  --modal-gap-top: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-top));
+  --modal-gap-right: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-right));
+  --modal-gap-bottom: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-bottom));
+  --modal-gap-left: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-left));
+
   position: fixed;
-  inset: 0;
-  width: min(calc(100% - 2 * var(--prime-modal-viewport-padding)), var(--modal-width));
+  inset: var(--modal-gap-top) var(--modal-gap-right) var(--modal-gap-bottom) var(--modal-gap-left);
+  width: min(calc(100% - var(--modal-gap-left) - var(--modal-gap-right)), var(--modal-width));
   height: fit-content;
-  max-height: calc(100dvh - 2 * var(--prime-modal-viewport-padding));
+  max-height: calc(100dvh - var(--modal-gap-top) - var(--modal-gap-bottom));
   margin: auto;
   border-radius: var(--prime-modal-radius);
   box-shadow: var(--prime-shadow-modal);
@@ -40,9 +49,13 @@
 
 /* Near the top: the panel hangs from a fixed line and grows downward. */
 .content[data-placement="top"] {
-  --modal-top: clamp(var(--prime-modal-viewport-padding), 12vh, var(--prime-space-24));
+  --modal-top: max(
+    clamp(var(--prime-modal-viewport-padding), 12vh, var(--prime-space-24)),
+    var(--prime-safe-area-top)
+  );
 
-  max-height: calc(100dvh - var(--modal-top) - var(--prime-modal-viewport-padding));
+  inset-block-start: 0;
+  max-height: calc(100dvh - var(--modal-top) - var(--modal-gap-bottom));
   margin-block: var(--modal-top) auto;
 }
 

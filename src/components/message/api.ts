@@ -238,8 +238,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Text",
-      en: "`ref` → `HTMLDivElement`. The text: a string renders the Markdown subset the Composer writes as elements, never as HTML (`plain` shows it as is; with `entities` it is plain text those ranges format). Marks the matches of the chat's search.",
-      ru: "Текст: строка с разметкой, которую пишет Composer, рисуется элементами, никогда не HTML (`plain` показывает её как есть; с `entities` это простой текст, который размечают диапазоны). Выделяет совпадения поиска чата.",
+      en: "`ref` → `HTMLDivElement`. The text: a string renders its Markdown subset (see RichText) as elements, never as HTML; `plain` shows it as is, with `entities` it is plain text those ranges format. Marks the matches of the chat's search.",
+      ru: "Текст: строка рисует своё подмножество Markdown (см. RichText) элементами, никогда не HTML; `plain` показывает её как есть, с `entities` это простой текст, который размечают диапазоны. Выделяет совпадения поиска чата.",
       props: [
         {
           name: "entities",
@@ -253,6 +253,12 @@ export const api: ComponentApi = {
           default: "false",
           en: "Render a string as is, without its Markdown or `entities`.",
           ru: "Показать строку как есть, без разметки и `entities`.",
+        },
+        {
+          name: "onLinkClick",
+          type: "(href: string, event: MouseEvent<HTMLAnchorElement>) => void",
+          en: "A press on a link of the text with its address: call `event.preventDefault()` to open a relative one (`/sales/deals/12`) with the app's router. A press with a modifier stays the browser's.",
+          ru: "Нажатие на ссылку текста с её адресом: `event.preventDefault()` — и относительный адрес (`/sales/deals/12`) открывает роутер приложения. Нажатие с модификатором остаётся браузеру.",
         },
         {
           name: "children",
@@ -312,8 +318,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Actions",
-      en: "`ref` → `HTMLDivElement`. A bot's inline keyboard row under the bubble: `Button.Root` keys (`soft` `neutral` by default) share one line, long labels ellipsize. A link key gets a corner mark: ↗ out of the product, a window into it; a promise from `onClick` keeps a key loading.",
-      ru: "Ряд встроенной клавиатуры бота под пузырём: кнопки `Button.Root` (по умолчанию `soft` `neutral`) делят строку поровну, длинные подписи обрезаются. У ссылки одна метка в углу: ↗ — наружу, окно — внутрь продукта; кнопка, чей `onClick` вернул промис, грузится, пока он не завершится.",
+      en: "`ref` → `HTMLDivElement`. A bot's inline keyboard row under the bubble: `Button.Root` keys (`soft` `neutral` by default) share it equally, never narrower than their labels; a row wider than the message stacks. A link key is marked; a promise from `onClick` keeps it loading.",
+      ru: "Ряд встроенной клавиатуры бота под пузырём: кнопки `Button.Root` (по умолчанию `soft` `neutral`) делят его поровну и не уже своих подписей; ряд шире сообщения встаёт столбиком. У ссылки метка в углу; кнопка, чей `onClick` вернул промис, грузится.",
       props: [
         {
           name: "…rest",
@@ -337,7 +343,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: 'Omit<DropdownContentProps, "side" | "align" | "matchTriggerWidth">',
+          type: 'Omit<DropdownContentProps, "side" | "align" | "matchTriggerWidth" | "width" | "maxRows">',
           en: "`children` (the items), `className`.",
           ru: "`children` (пункты), `className`.",
         },

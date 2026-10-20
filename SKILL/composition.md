@@ -1248,11 +1248,36 @@ an arrow of your own in the label.
 The facts of a record (in its dialog, its page, its card in a list) read the same everywhere in an
 app: one look per kind of block, never a weight per screen.
 
-- **Fact tiles** — «К оплате», «Депозиты у нас», «Ближайшая задача», «LTV»: a row of
-  `Card.Root variant="stat-text" valueSize="l"` with `Card.Label`, `Card.Value` (`tone` by its
-  meaning) and an optional `Card.Meta`. The value is one step above the text and bold, a number
-  and a phrase alike, in every tile of the row and in every dialog of the app. Never a
-  `Typography` inside `Card.Value` to make it bigger: the loading Skeleton then has the wrong height.
+- **Fact tiles** — «К оплате», «Депозиты у нас», «Ближайшая задача», «LTV», «t.me/…», «Последний
+  вход 20 окт, 07:44»: a row of `Card.Root variant="stat-text"` at the default value size, with
+  `Card.Label`, `Card.Value` (`tone` by its meaning) and an optional `Card.Meta`. The value is body-m
+  medium, a number, a phrase and a link alike, in every tile of the row and in every dialog of the
+  app: a larger value breaks the drawer's structure as soon as a fact is a phrase. `valueSize="l"`
+  only for a single total tile that stands alone, never for a row of facts. Never a `Typography`
+  inside `Card.Value` to change its size: the loading Skeleton then has the wrong height.
+- **Type of the blocks of a record.** Two families, each with one set of sizes everywhere in the
+  app — the kit sets them, so never a `Typography` variant of your own inside these parts:
+
+  | Block | Part | Role (size / line, weight) |
+  |---|---|---|
+  | Fact tiles at the top (`stat-text`) | `Card.Label` · `Card.Value` · `Card.Meta` | body-s 13/20 · body-m 14/20 medium · body-s 13/20 muted |
+  | KPI numbers at the top (`stat-trend valueSize="m"`) | `Card.Label` · `Card.Value` · `Card.Delta` | body-s 13/20 · heading-m 24/32 semibold · body-s 13/20 |
+  | Every other card (status, object, deposit, bill) | `Card.Title` · `Card.Description` | title-s 14/20 semibold · body-s 13/20 secondary |
+  | Line items in a card | `DescriptionList` / `FieldList` rows | field label 13/20 · field text 14/20 |
+  | A card's total | `Card.Total` (`Card.Meta` over `Card.Value`) | body-s 13/20 muted · title-m 16/24 semibold |
+
+  The top row reads first and stands a step above the cards under it; the cards share one title
+  and one secondary line, so a drawer of five cards reads as one list.
+- **KPIs of a record** (counts and amounts with a change, in a dialog): `stat-trend` with
+  `valueSize="m"`, so a row of two and a row of four in one drawer keep one size — never a layout
+  bent to make the widths match. Without `valueSize` the value follows the tile's width, which is for
+  a dashboard grid.
+- **An object of the record** (the video at hand-over, a connected channel account, a session, the
+  current term): a card of one `Card.Header` — its picture first (`Card.Icon` with a `Thumbnail`,
+  an `Avatar`, a `ProgressCircle` or an icon tile), then two lines: `Card.Title` names the object,
+  `Card.Description` gives one line of data («20 окт, 09:21 · Евгений Сурков»), and its one action
+  at the end. Two lines, never a third: a label above the title repeats the section heading. The
+  kit pads a header with nothing under it evenly, so no padding of your own.
 - **A record card with a total** (a vehicle of a deal, a payment, an invoice): the head is a
   `Card.Header` — its mark first (`Card.Icon` with the record's picture or a `ProgressCircle` term
   ring), `Card.Title` with `Card.Link` when the card opens the record (the kit centres its arrow on
@@ -1263,7 +1288,7 @@ app: one look per kind of block, never a weight per screen.
   over `Card.Value`). See [record-totals](../src/components/card/examples/record-totals.tsx).
 
 ```tsx partial
-// bad — the value made bigger by hand, a weight of its own per drawer
+// bad — the value restyled by hand, a weight of its own per drawer
 <Card.Root variant="stat-text">
   <Card.Label>К оплате</Card.Label>
   <Card.Value>
@@ -1273,8 +1298,8 @@ app: one look per kind of block, never a weight per screen.
 ```
 
 ```tsx good
-// good — the kit's larger value: the same in every tile, the Skeleton in its height
-<Card.Root variant="stat-text" valueSize="l">
+// good — the kit's value: the same in every tile, the Skeleton in its height
+<Card.Root variant="stat-text">
   <Card.Label>К оплате</Card.Label>
   <Card.Value tone="warning">21 000 ₽</Card.Value>
 </Card.Root>

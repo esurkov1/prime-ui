@@ -1,10 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
 import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
+import { Icon } from "@/icons";
 import hairline from "@/internal/hairline.module.css";
 import textRole from "@/internal/textRole.module.css";
 import { cssRule, cssValue } from "@/test/css";
@@ -483,28 +486,197 @@ describe("Card", () => {
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 
-  it("stat-text puts an action at the end of the row, centred on the text", () => {
+  it("stat-text puts its actions in one end row, in order, centred on the text", () => {
     const CSS = "src/components/card/Card.module.css";
-    const grid = cssRule(
-      CSS,
-      '.root[data-variant="stat-text"]:has(> :not(.label, .value, .delta, .meta, .mark))',
-    );
+    const grid = cssRule(CSS, '.root[data-variant="stat-text"]:has(> .end)');
     expect(cssValue(grid, "display")).toBe("grid");
     expect(cssValue(grid, "align-items")).toBe("center");
-    const end = cssRule(
-      CSS,
-      '.root[data-variant="stat-text"] > :not(.label, .value, .delta, .meta, .mark)',
-    );
+    const end = cssRule(CSS, '.root[data-variant="stat-text"] > .end');
     expect(cssValue(end, "grid-column")).toBe("end");
     expect(cssValue(end, "grid-row")).toBe("1 / -1");
+    const row = cssRule(CSS, ".end");
+    expect(cssValue(row, "display")).toBe("flex");
+    expect(cssValue(row, "gap")).toBe("var(--prime-space-2)");
+    const ref = React.createRef<HTMLButtonElement>();
     render(
-      <Card.Root variant="stat-text">
-        <Card.Label>Выдан</Card.Label>
-        <Card.Value>14 октября, 12:40</Card.Value>
-        <button type="button">Отменить</button>
+      <Card.Root variant="stat-text" data-testid="tile">
+        <Card.Label>Депозит</Card.Label>
+        <Card.Value>300 $</Card.Value>
+        <Card.Meta>наличные</Card.Meta>
+        <Button.Root variant="soft" ref={ref} className="own">
+          Вернуть
+        </Button.Root>
+        <Button.Root aria-label="Исправить">
+          <Button.Icon>
+            <Icon name="action.edit" />
+          </Button.Icon>
+        </Button.Root>
       </Card.Root>,
     );
-    expect(screen.getByRole("button", { name: "Отменить" })).toBeInTheDocument();
+    const back = screen.getByRole("button", { name: "Вернуть" });
+    const edit = screen.getByRole("button", { name: "Исправить" });
+    const cell = back.parentElement as HTMLElement;
+    expect(cell).toHaveClass(styles.end);
+    expect(cell.parentElement).toBe(screen.getByTestId("tile"));
+    expect([...cell.children]).toEqual([back, edit]);
+    // The children pass as they are: their class and ref stay theirs.
+    expect(back).toHaveClass("own");
+    expect(ref.current).toBe(back);
+    expect(screen.getByText("Депозит").parentElement).toBe(screen.getByTestId("tile"));
+    // The meta is the secondary line of the card: body-s, as a `Card.Description`.
+    expect(screen.getByText("наличные")).toHaveClass(textRole.bodyS);
+  });
+
+  it("a header with a title puts what follows it in one end row; a stat-trend lead row stays", () => {
+    render(
+      <>
+        <Card.Root>
+          <Card.Header data-testid="header">
+            <Card.Title>300 $</Card.Title>
+            <Card.Description>наличные</Card.Description>
+            <Button.Root>Вернуть</Button.Root>
+            <Button.Root aria-label="Исправить">
+              <Button.Icon>
+                <Icon name="action.edit" />
+              </Button.Icon>
+            </Button.Root>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root variant="stat-trend">
+          <Card.Header data-testid="lead">
+            <Badge.Root>SLA</Badge.Root>
+            <Card.Value>99,95%</Card.Value>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    const header = screen.getByTestId("header");
+    const cell = header.lastElementChild as HTMLElement;
+    expect(cell).toHaveClass(styles.end);
+    expect([...cell.children]).toEqual([
+      screen.getByRole("button", { name: "Вернуть" }),
+      screen.getByRole("button", { name: "Исправить" }),
+    ]);
+    expect(screen.getByRole("heading", { name: "300 $" }).parentElement).toBe(header);
+    expect(screen.getByTestId("lead").querySelector(`.${styles.end}`)).toBeNull();
+  });
+
+  it("a dropped end row runs to the end edge; its buttons share the width, an icon-only keeps its square", () => {
+    const CSS = "src/components/card/Card.module.css";
+    const header = ["@container (max-width: 22rem)"];
+    const tile = ["@container (max-width: 20rem)"];
+    for (const [selector, parents, column] of [
+      [".header > .end", header, "text / -1"],
+      ['.root[data-variant="stat-text"] > .end', tile, "1 / -1"],
+    ] as const) {
+      const rule = cssRule(CSS, selector, [...parents]);
+      expect(cssValue(rule, "grid-column")).toBe(column);
+      expect(cssValue(rule, "justify-self")).toBe("stretch");
+      expect(cssValue(rule, "justify-content")).toBe("flex-start");
+    }
+    // Buttons and links share the free width; a Switch label or a caption keeps its size.
+    for (const [selector, parents] of [
+      [".header > .end > :is(button, a):not([data-icon-only])", header],
+      ['.root[data-variant="stat-text"] > .end > :is(button, a):not([data-icon-only])', tile],
+    ] as const) {
+      expect(cssValue(cssRule(CSS, selector, [...parents]), "flex")).toBe("1 1 auto");
+    }
+    render(
+      <Button.Root aria-label="Исправить" data-testid="icon">
+        <Button.Icon>
+          <Icon name="action.edit" />
+        </Button.Icon>
+      </Button.Root>,
+    );
+    // The icon-only button is told apart by its own DOM state.
+    expect(screen.getByTestId("icon")).toHaveAttribute("data-icon-only");
+  });
+
+  it("a panel or list header pads its bottom as its top; only a chart right under it takes none", () => {
+    const CSS = "src/components/card/Card.module.css";
+    const zone = cssRule(
+      CSS,
+      '.root[data-variant="panel"] > .header, .root[data-variant="list"] > .header',
+    );
+    // Alone, before the footer (any divider), the body or the list — in a flat card too.
+    expect(cssValue(zone, "padding")).toBe("var(--prime-space-4) var(--card-pad)");
+    expect(
+      cssValue(
+        cssRule(CSS, '.root[data-variant="panel"] > .header:has(+ .media)'),
+        "padding-bottom",
+      ),
+    ).toBe("0");
+    render(
+      <>
+        <Card.Root flat data-testid="flat">
+          <Card.Header data-testid="alone">
+            <Card.Title>Telegram</Card.Title>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root variant="list">
+          <Card.Header data-testid="over-footer">
+            <Card.Title>События</Card.Title>
+          </Card.Header>
+          <Card.Footer divider="fill">
+            <button type="button">Все события</button>
+          </Card.Footer>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("flat")).toHaveAttribute("data-flat", "true");
+    expect(screen.getByTestId("alone")).toHaveClass(styles.header);
+    expect(screen.getByTestId("over-footer").nextElementSibling).toHaveClass(styles.footer);
+  });
+
+  it("a stat-text value is body-m at medium weight by default; l is title-m", () => {
+    const rule = cssRule("src/components/card/Card.module.css", ".value.textValue");
+    expect(cssValue(rule, "font-weight")).toBe("var(--prime-font-weight-medium)");
+    render(
+      <>
+        <Card.Root variant="stat-text">
+          <Card.Value data-testid="m">Выдать PCX 160</Card.Value>
+          <Card.Footer>
+            <Card.Total>
+              <Card.Value data-testid="total">21 000 ₽</Card.Value>
+            </Card.Total>
+          </Card.Footer>
+        </Card.Root>
+        <Card.Root variant="stat-text" valueSize="l">
+          <Card.Value data-testid="l">256 000 ₽</Card.Value>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("m")).toHaveClass(textRole.bodyM, styles.textValue);
+    expect(screen.getByTestId("l")).toHaveClass(textRole.titleM);
+    expect(screen.getByTestId("l")).not.toHaveClass(styles.textValue);
+    expect(screen.getByTestId("total")).not.toHaveClass(styles.textValue);
+  });
+
+  it("stat-trend follows the card width unless valueSize fixes the step", () => {
+    render(
+      <>
+        <Card.Root variant="stat-trend">
+          <Card.Value data-testid="auto">128 400 ₽</Card.Value>
+        </Card.Root>
+        <Card.Root variant="stat-trend" valueSize="m">
+          <Card.Value data-testid="m">92 %</Card.Value>
+        </Card.Root>
+        <Card.Root variant="stat-trend" valueSize="l" loading>
+          <Card.Value data-testid="l">14</Card.Value>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("auto")).toHaveClass(textRole.headingL, styles.headline);
+    expect(screen.getByTestId("m")).toHaveClass(textRole.headingM);
+    expect(screen.getByTestId("m")).not.toHaveClass(styles.headline);
+    // The loading Skeleton (`1lh`) keeps the fixed step's height.
+    expect(screen.getByTestId("l")).toHaveClass(textRole.headingL);
+    expect(screen.getByTestId("l")).not.toHaveClass(styles.headline);
+    expect(screen.getByTestId("l")).toHaveAttribute("data-loading", "true");
+    const css = "src/components/card/Card.module.css";
+    expect(
+      cssValue(cssRule(css, ".value.headline", ["@container (max-width: 20rem)"]), "font-size"),
+    ).toBe("var(--prime-text-heading-m-size)");
   });
 
   it("a card that is a link shows the transition arrow; a button card does not", () => {

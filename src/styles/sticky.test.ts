@@ -22,7 +22,7 @@ function walk(dir: string): string[] {
 const EXEMPT: Record<string, string> = {
   "internal/sticky.module.css": "the sticky surface itself: the seam cover the others join",
   "layout/app-shell/AppShell.module.css":
-    "the nav column and the footer hold their own surfaces and stick to the window, not to a scroller edge with content under it",
+    "the nav column and the bottom dock (the footer, the floating actions) hold their own surfaces and stick to the window, not to a scroller edge with content under it",
   "components/button-group/ButtonGroup.module.css":
     "the sticky part is the transparent invalid ring laid over the row, not a surface with content under it",
   "components/chat/Chat.module.css":

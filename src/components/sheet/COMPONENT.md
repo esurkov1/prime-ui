@@ -215,7 +215,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
   - A question or a form keeps a plain header: its title and description wrap; only `Sheet.Badges` or a `number` make it a record header.
 - A form's action apart from its submit pair: `Sheet.Actions` inside `Sheet.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
 - The content is the sheet's own, across its width: `Datepicker.Panel` or a column of actions straight in `Sheet.Body` — never a Card or a padded box inside it.
-- Zone padding `--prime-sheet-padding`, width `--prime-sheet-width`. The bottom-sheet surface (`src/internal/sheet.module.css`, shared with a Modal and the floating layers on a phone) gives the height by content up to the top gap, the rounded top, the handle strip and the bottom safe-area inset below the content.
+- Zone padding `--prime-sheet-padding`, width `--prime-sheet-width`. The bottom-sheet surface (`src/internal/sheet.module.css`, shared with a Modal and the floating layers on a phone) gives the height by content up to the top gap under the top safe-area inset (`--prime-safe-area-top`), the rounded top, the handle strip and the bottom safe-area inset below the content.
 - Only the body scrolls; header and footer stay in place.
 - Tabs in the header: a `Tabs.List` inside `Sheet.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.

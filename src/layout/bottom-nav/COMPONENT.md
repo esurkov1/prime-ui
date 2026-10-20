@@ -76,7 +76,7 @@ BottomNav.Root                 <nav>, safe-area inset below; the bar is a switch
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other span attributes. |
 
 ### BottomNav.Action
-`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral; `solid` beside the flat bar, `glass` as tall as the floating capsule) for the screen's main action. Placed before the first item it stands at the start, otherwise at the end.
+`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral; `solid` beside the flat bar, `glass` as tall as the floating capsule) for the screen's main action. At the start only as a direct child before the items; otherwise at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -172,6 +172,7 @@ Motion: the color of the icon and the label and the flat pill change over `fast`
 - A floating bar outside a positioned container → it sits at the bottom of the nearest positioned ancestor; put it in `AppShell.Footer`.
 - An action as an item («Создать» among the sections) → items navigate; put the screen's one main action in `BottomNav.Action` beside the bar, the rest in the page's top bar.
 - `BottomNav.Action` without `aria-label` → the button has no name; it is required.
+- A `BottomNav.Action` inside a component of your own placed before the items → it stands at the end; an action at the start is a direct child of `BottomNav.Root`.
 - The bar outside `AppShell.Footer` (in Main, Root or `position: fixed` on the page) → it never leaves and shows next to the Sidebar on a desktop; put it in `AppShell.Footer` (or the Template `footer` prop).
 - Hiding the bar with your own media query → the shell already hides the footer while the Sidebar rail is on screen.
 

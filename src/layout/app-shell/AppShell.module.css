@@ -80,15 +80,94 @@
 }
 
 /*
- * The footer brings no padding of its own: BottomNav keeps the safe-area inset. It holds the phone
- * navigation, so it shows only while the shell has no navigation column on screen (see below).
+ * The dock: the sticky bottom zone of the panel, after main — the footer and, above it, the corner
+ * of the floating actions. Last in the panel and on the sticky layer, it stays over the page and
+ * its sticky top bar; the panel is isolated, so every overlay (and its scrim) covers it.
  */
-.footer {
-  display: var(--shell-footer-display, block);
+.dock {
+  /* How far above the dock's top edge the floating actions stand: the page gutter over the
+     bottom safe area while no bar is on screen (the dock is 0 high). */
+  --shell-fab-lift: calc(var(--prime-layout-gutter) + var(--prime-safe-area-bottom));
+  --shell-fab-end: var(--prime-layout-gutter);
+
   position: sticky;
   bottom: 0;
   z-index: var(--prime-z-sticky);
   flex: none;
+  min-width: 0;
+}
+
+/* A flat bar: the dock is the bar (its safe-area inset included); the actions stand a gutter
+   above it. */
+.dock:has(> .footer) {
+  --shell-fab-lift: var(--prime-layout-gutter);
+}
+
+/* A floating capsule (the dock is 0 high): the actions clear the capsule, its inset and the safe
+   area, and line up with its end edge. The capsule's height follows BottomNav (icons only,
+   the touch row). */
+.dock:has(> .footer > [data-floating="true"]) {
+  --shell-capsule: var(--prime-bottom-nav-floating-height);
+  --shell-fab-lift: calc(
+    var(--prime-bottom-nav-floating-inset) *
+    2 +
+    var(--shell-capsule) +
+    var(--prime-safe-area-bottom)
+  );
+  --shell-fab-end: var(--prime-bottom-nav-floating-inset);
+}
+
+.dock:has(> .footer > [data-floating="true"][data-icon-only="true"]) {
+  --shell-capsule: var(--prime-bottom-nav-floating-icon-only-height);
+}
+
+@media (pointer: coarse) {
+  .dock:has(> .footer > [data-floating="true"]) {
+    --shell-capsule: max(
+      var(--prime-bottom-nav-floating-height),
+      calc(var(--prime-control-touch-target) + 2 * var(--prime-bottom-nav-floating-padding))
+    );
+  }
+
+  .dock:has(> .footer > [data-floating="true"][data-icon-only="true"]) {
+    --shell-capsule: max(
+      var(--prime-bottom-nav-floating-icon-only-height),
+      calc(var(--prime-control-touch-target) + 2 * var(--prime-bottom-nav-floating-padding))
+    );
+  }
+}
+
+/* The corner of the floating actions: a column at the bottom end, above the dock; the gaps around
+   the disks pass taps through to the page. */
+.fabs {
+  position: absolute;
+  inset-inline-end: calc(var(--shell-fab-end) + var(--prime-safe-area-right));
+  bottom: calc(100% + var(--shell-fab-lift));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--prime-space-3);
+  pointer-events: none;
+}
+
+/* A disk over the page: the overlay lift, and it pops in when it appears later. */
+.fab {
+  --enter-scale: var(--prime-motion-scale-pop);
+
+  display: flex;
+  border-radius: var(--prime-radius-full);
+  box-shadow: var(--prime-shadow-overlay);
+  pointer-events: auto;
+}
+
+/*
+ * The footer brings no padding of its own: BottomNav keeps the safe-area inset. It holds the phone
+ * navigation, so it shows only while the shell has no navigation column on screen (see below).
+ * The dock sticks; the footer is the floating capsule's containing block.
+ */
+.footer {
+  display: var(--shell-footer-display, block);
+  position: relative;
   min-width: 0;
 }
 
@@ -135,7 +214,7 @@
   height: 0;
 }
 
-.panel:has(> .footer > [data-floating="true"]) {
+.panel:has(> .dock > .footer > [data-floating="true"]) {
   --shell-floating-end: calc(
     (
       var(--prime-space-16) +
@@ -157,4 +236,10 @@
 .root[data-nav="true"]:not([data-off-canvas]) {
   --shell-floating-scale: 0;
   --shell-footer-display: none;
+}
+
+/* No bar on screen beside the rail: the floating actions stand in the corner at the page gutter. */
+.root[data-nav="true"]:not([data-off-canvas]) > .panel > .dock {
+  --shell-fab-lift: calc(var(--prime-layout-gutter) + var(--prime-safe-area-bottom));
+  --shell-fab-end: var(--prime-layout-gutter);
 }

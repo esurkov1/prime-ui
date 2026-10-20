@@ -1,4 +1,4 @@
-/** A bot's message with an inline keyboard: one-line rows whose keys share the row equally, a coloured key with an icon that loads while its promise runs, links marked by where they lead: a page of the product or another site — `Message.Actions`, `tone`, `Button.Icon`, `asChild`. */
+/** A bot's message with an inline keyboard: rows whose keys share the row equally and stack when the message is too narrow for their labels, a coloured key with an icon that loads while its promise runs, links marked by where they lead: a page of the product or another site — `Message.Actions`, `tone`, `Button.Icon`, `asChild`. */
 import { Button, Icon, Message } from "prime-ui-kit";
 import * as React from "react";
 

@@ -43,6 +43,31 @@
   --menu-inset: var(--prime-space-2);
 }
 
+/*
+ * A height of `--menu-rows` rows (Dropdown `maxRows`, written in TSX): the row height times the
+ * count and the panel padding; a group heading or a separator takes part of it. With a search row
+ * on top the rows come under it. In a bottom sheet the list uses the room it has.
+ */
+.menu[data-rows]:not([data-sheet]) {
+  max-height: min(
+    calc(var(--menu-rows) * var(--menu-item-h) + 2 * var(--prime-panel-padding)),
+    var(--float-max-h, 100dvh)
+  );
+}
+
+.menu[data-rows]:not([data-sheet]):has(> .panelSearch) {
+  max-height: min(
+    calc(
+      (var(--menu-rows) + 1) *
+      var(--menu-item-h) +
+      4 *
+      var(--prime-panel-padding) +
+      var(--prime-border-width)
+    ),
+    var(--float-max-h, 100dvh)
+  );
+}
+
 /* ─── Row ────────────────────────────────────────────────────────────────── */
 
 /* Highlight is a fill only: keyboard-driven, high-frequency (foundation §7 rule 1). */
@@ -159,6 +184,22 @@
   color: var(--prime-color-text-disabled);
 }
 
+/* A muted meta at the end of a row, on the label's line (the time of a thread): one line that
+   never shrinks — the label truncates first. The tier's description text, figures in columns. */
+.itemMeta {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  color: var(--prime-color-text-muted);
+  font-size: var(--menu-desc);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--menu-desc-lh);
+  white-space: nowrap;
+}
+
+.item[data-disabled="true"] .itemMeta {
+  color: var(--prime-color-text-disabled);
+}
+
 /* Trailing key hint (a Kbd): pushed to the end of the row. */
 .shortcut {
   margin-inline-start: auto;
@@ -268,6 +309,39 @@
 
 .searchInput::placeholder {
   color: var(--prime-color-text-placeholder);
+}
+
+/*
+ * A panel with a search row on top (Dropdown.Search): the row stays, the list under it scrolls.
+ * The row spans the panel's padding (full bleed, its hairline edge to edge) at the tier row height.
+ */
+.searchPanel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelSearch {
+  gap: var(--field-gap);
+  height: var(--menu-item-h);
+  margin: calc(var(--prime-panel-padding) * -1) calc(var(--menu-inset) * -1)
+    var(--prime-panel-padding);
+  padding-block: var(--prime-panel-padding);
+  padding-inline: calc(var(--menu-inset) + var(--prime-panel-item-padding-x));
+  box-sizing: content-box;
+}
+
+.panelList {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  outline: none;
+}
+
+/* Nothing left to show (the empty state stands instead): `hidden` must win over `display`. */
+.panelList[hidden] {
+  display: none;
 }
 
 /* ─── Loading rows / load more ───────────────────────────────────────────── */

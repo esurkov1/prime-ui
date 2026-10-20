@@ -270,12 +270,12 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
   - A question or a form keeps a plain header: its title and description wrap; only `Modal.Badges` or a `number` make it a record header.
 - An action apart from the main pair («Удалить» of a record, «Выйти»): `Modal.Actions` inside `Modal.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
 - Dialog padding `--prime-modal-padding` (24) on every zone; header 24 top / 20 bottom, body 20 with a 16 gap between blocks, footer 20 top / 24 bottom.
-- Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
+- Centred dialog: the margin on each side is max(`--prime-modal-viewport-padding`, the safe-area inset there, `--prime-safe-area-*`); max height = the viewport minus the top and bottom margins; only the body scrolls.
 - Tabs in the header: a `Tabs.List` inside `Modal.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside take the floating layer's fill; a card inside is the next layer (`floating-1`), a flat tile. Group fields with a 20 gap.
 - Titled groups of a long body: `Modal.Section label` — an `<h3>` under the dialog's `<h2>` title, an optional `description`, a `Modal.Actions` at the end of its heading row; content 16 below, sections 32 apart — directly in the body, in a `Tabs.Panel` or in a form, with no spacing wrapper of your own. A group of fields is a `Fieldset`.
 - Narrow viewport (< 640px), `placement="center"`: the shared bottom-sheet surface (`src/internal/sheet.module.css`) — full width, rounded top, a grab handle strip on top while it swipes, up to the sheet top gap high, the bottom safe-area inset below the content.
-- `placement="top"`: the dialog hangs from a line 12% of the viewport down (between `--prime-modal-viewport-padding` and `--prime-space-24`) and grows downward.
+- `placement="top"`: the dialog hangs from a line 12% of the viewport down (between `--prime-modal-viewport-padding` and `--prime-space-24`, never above the top safe-area inset) and grows downward.
 
 ## Accessibility
 

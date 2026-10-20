@@ -8,7 +8,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
-import { splitParts } from "@/internal/parts";
+import { flattenChildren, splitParts } from "@/internal/parts";
 import press from "@/internal/press.module.css";
 import { useSwapIn } from "@/internal/RegionSwap";
 import rowLink from "@/internal/rowLink.module.css";
@@ -50,8 +50,11 @@ const VariantContext = React.createContext<CardVariant | null>(null);
  * record's one-line note; a value in `Card.Total` is its total.
  */
 const ZoneContext = React.createContext<"header" | "footer" | "total" | null>(null);
-/** The step of a `stat-text` value: body-m medium (`m`) or title-m (`l`). */
-const ValueSizeContext = React.createContext<CardValueSize>("m");
+/**
+ * The fixed step of a KPI value: in `stat-text` body-m medium (`m`, also when unset) or title-m
+ * (`l`); in `stat-trend` heading-m (`m`) or heading-l (`l`), unset — it follows the card's width.
+ */
+const ValueSizeContext = React.createContext<CardValueSize | undefined>(undefined);
 /** The card's data is loading: the value, delta and meta show Skeletons in their geometry. */
 const LoadingContext = React.createContext(false);
 /** `Card.Link` tells the root it stretches over the card (the root then opens as a whole). */
@@ -98,9 +101,44 @@ function useZoned(): boolean {
   return variant === "panel" || variant === "list";
 }
 
+/**
+ * The end cell of a row (`Card.Header`, a `stat-text` tile): every child that is not one of the
+ * row's own parts — a button, a switch, a caption — goes, in order, into one cell the kit lays out
+ * as a row, so two actions stand side by side with no wrapper of the consumer's. The children are
+ * passed as they are (their `className` and `ref` untouched).
+ */
+function withEndCell(children: React.ReactNode, own: React.ElementType[]): React.ReactNode {
+  const { parts, rest } = splitParts(flattenChildren(children), ...own);
+  if (rest.length === 0) return children;
+  return (
+    <>
+      {parts}
+      <div className={styles.end}>{rest}</div>
+    </>
+  );
+}
+
+/** The parts of a `stat-text` tile that are not its action: its text and the card's zones. */
+const STAT_TEXT_OWN: React.ElementType[] = [
+  CardLabel,
+  CardValue,
+  CardDelta,
+  CardMeta,
+  CardIcon,
+  CardHeader,
+  CardBody,
+  CardMedia,
+  CardFooter,
+  CardList,
+  CardLink,
+];
+
+/** The text parts of a `Card.Header` with a title: everything else is its end. */
+const HEADER_TEXT: React.ElementType[] = [CardIcon, CardTitle, CardDescription];
+
 function CardRoot({
   variant = "panel",
-  valueSize = "m",
+  valueSize,
   flat = false,
   loading = false,
   asChild = false,
@@ -115,6 +153,9 @@ function CardRoot({
   const link = child ? isLinkElement(child) : false;
   const mark = stretched || link;
   const place = React.useMemo(() => ({ mark, headed, setHeaded }), [mark, headed]);
+  // `stat-text`: the action (anything besides the text parts) goes into one end cell.
+  const arrange = (inner: React.ReactNode) =>
+    variant === "stat-text" ? withEndCell(inner, STAT_TEXT_OWN) : inner;
   const content = (inner: React.ReactNode) => (
     <VariantContext.Provider value={variant}>
       <ValueSizeContext.Provider value={valueSize}>
@@ -151,7 +192,7 @@ function CardRoot({
           undefined,
           content(
             <>
-              {child.props.children}
+              {arrange(child.props.children)}
               {link && !headed ? <LinkMark /> : null}
             </>,
           ),
@@ -159,7 +200,7 @@ function CardRoot({
       </Slot>
     );
   }
-  return <div {...rootProps}>{content(children)}</div>;
+  return <div {...rootProps}>{content(arrange(children))}</div>;
 }
 CardRoot.displayName = "Card.Root";
 
@@ -210,12 +251,17 @@ export type CardHeaderProps = DivProps;
 
 /**
  * The top row: an optional `Card.Icon` first, then the title (and its description), anything after
- * it (a control, a quiet caption) at the end. In a card that opens it holds the transition arrow,
+ * it (a control, a quiet caption) in one end cell, in a row. In a card that opens it holds the transition arrow,
  * at its end and centred on its height.
  */
 function CardHeader({ className, children, ...rest }: CardHeaderProps) {
   const zoned = useZoned();
   const { mark, setHeaded } = React.useContext(MarkContext);
+  // A header with a title puts what follows it into one end cell; the `stat-trend` lead row (a
+  // badge or an icon beside a value) keeps its two children as they are.
+  const titled = flattenChildren(children).some(
+    (child) => React.isValidElement(child) && HEADER_TEXT.includes(child.type as React.ElementType),
+  );
   React.useLayoutEffect(() => {
     setHeaded(true);
     return () => setHeaded(false);
@@ -223,7 +269,7 @@ function CardHeader({ className, children, ...rest }: CardHeaderProps) {
   return (
     <ZoneContext.Provider value="header">
       <div className={cx(styles.header, zoned && hairline.between, className)} {...rest}>
-        {children}
+        {titled ? withEndCell(children, HEADER_TEXT) : children}
         {mark ? <LinkMark /> : null}
       </div>
     </ZoneContext.Provider>
@@ -393,21 +439,22 @@ function CardValue({ tone, className, children, ...rest }: CardValueProps) {
   const zone = React.useContext(ZoneContext);
   const inHeader = zone === "header";
   // `stat-trend`: the value is the tile's headline (a step smaller beside a lead in the header
-  // row); the headline follows the card's width (`.headline`).
-  // `stat-text`: the value is a line of text, a number or a phrase alike — body-m medium, or
-  // title-m with `valueSize="l"`.
+  // row); unset, the headline follows the card's width (`.headline`), `valueSize` fixes its step.
+  // `stat-text`: the value is a line of text, a number or a phrase alike — body-m medium
+  // (`.textValue`), or title-m with `valueSize="l"`.
   // In `Card.Total` the value is the record's total (title-m).
+  const textValue = variant === "stat-text" && zone !== "total" && valueSize !== "l";
   const role =
     zone === "total" || (variant === "stat-text" && valueSize === "l")
       ? textRole.titleM
-      : variant === "stat-text"
+      : textValue
         ? textRole.bodyM
         : variant !== "stat-trend"
           ? textRole.titleL
-          : inHeader
+          : inHeader || valueSize === "m"
             ? textRole.headingM
             : textRole.headingL;
-  const headline = variant === "stat-trend" && !inHeader;
+  const headline = variant === "stat-trend" && !inHeader && valueSize === undefined;
   const part = useLoadingPart(
     <Skeleton shape="block" className={styles.valueSkeleton} />,
     children,
@@ -420,6 +467,7 @@ function CardValue({ tone, className, children, ...rest }: CardValueProps) {
         role,
         styles.value,
         headline && styles.headline,
+        textValue && styles.textValue,
         tone && textTone.tone,
         part.className,
         className,
@@ -459,23 +507,17 @@ export type CardMetaProps = SpanProps & {
 };
 
 /**
- * The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; it sits at the
+ * The reference line of a KPI («Лидов 120 · сделок 18»): body-s, muted, tabular; it sits at the
  * bottom of the tile, so tiles in a row line their meta up. In `Card.Total` it is the total's state.
  */
 function CardMeta({ tone, className, children, ...rest }: CardMetaProps) {
-  const part = useLoadingPart(<Skeleton size="xs" className={styles.metaSkeleton} />, children);
+  const part = useLoadingPart(<Skeleton size="s" className={styles.metaSkeleton} />, children);
   // The status ink is the shared text tone; `neutral` keeps the muted ink of `.meta`.
   return (
     <span
       key={part.key}
       {...rest}
-      className={cx(
-        textRole.caption,
-        styles.meta,
-        tone && textTone.tone,
-        part.className,
-        className,
-      )}
+      className={cx(textRole.bodyS, styles.meta, tone && textTone.tone, part.className, className)}
       data-tone={tone}
       data-loading={part["data-loading"]}
     >

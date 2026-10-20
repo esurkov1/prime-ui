@@ -57,6 +57,7 @@ export const EVENTS = new Set([
   "onReachEnd",
   "onReorder",
   "onRowClick",
+  "onLinkClick", // a press on a link of a rich text (the app routes a relative address)
   "onItemOpen", // opens an item of a board or a schedule
   "onComplete", // every cell of a code is filled
   "onDragStart",

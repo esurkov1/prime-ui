@@ -7,8 +7,8 @@ import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden
 import press from "@/internal/press.module.css";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 import { cssRule, cssValue } from "@/test/css";
-
 import { BottomNav } from "./BottomNav";
+import styles from "./BottomNav.module.css";
 
 function Nav({ onSelect = () => {} }: { onSelect?: (id: string) => void }) {
   return (
@@ -203,13 +203,38 @@ describe("BottomNav", () => {
     const nav = screen.getByRole("navigation");
     const action = screen.getByRole("button", { name: "Новый заказ" });
     expect(action).toHaveAttribute("type", "button");
-    expect(nav.lastElementChild).toBe(action);
+    expect(nav).toContainElement(action);
+    expect(action.closest(`.${styles.bar}`)).toBeNull();
     await user.tab();
     await user.tab();
     await user.tab();
     expect(action).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(onCreate).toHaveBeenCalledTimes(1);
+  });
+
+  it("an action inside a component of the consumer's own still stands at the bar's end", () => {
+    function AssistantAction() {
+      return (
+        <BottomNav.Action aria-label="Ассистент">
+          <svg />
+        </BottomNav.Action>
+      );
+    }
+    render(
+      <BottomNav.Root floating>
+        <BottomNav.Item current>Главная</BottomNav.Item>
+        <BottomNav.Item>Заказы</BottomNav.Item>
+        <AssistantAction />
+      </BottomNav.Root>,
+    );
+    const action = screen.getByRole("button", { name: "Ассистент" });
+    expect(action.closest(`.${styles.bar}`)).toBeNull();
+    expect(action.parentElement).toHaveClass(styles.actionSlot);
+    expect(action).toHaveAttribute("data-variant", "glass");
+    expect(
+      cssValue(cssRule("src/layout/bottom-nav/BottomNav.module.css", ".actionSlot"), "display"),
+    ).toBe("contents");
   });
 
   it("a disabled item ignores clicks", () => {

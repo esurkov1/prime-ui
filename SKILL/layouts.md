@@ -125,6 +125,11 @@ Phone navigation for 2–6 main sections is a `BottomNav.Root` in `AppShell.Foot
 your own media query. The shell hides the footer while the Sidebar rail is on screen and shows it
 while the Sidebar is off-canvas, so the bar and the rail never appear together.
 
+An app-wide floating action (the assistant, a quick create) is `AppShell.Fab` anywhere inside
+`AppShell.Root` (an `aria-label` and the glyph as its child) — never a `position: fixed` wrapper
+around a circle Button: it stands in the corner by itself, above the BottomNav and the safe area,
+and goes under the scrim of every overlay.
+
 Next.js App Router: the package is marked `"use client"`, but a server component cannot dot into it
 (`<Button.Root>`) or pass it callbacks. Put the frame and every screen in a file that starts with
 `"use client"` and render them from `app/layout.tsx` and the pages; import `bundle.css` in the root
