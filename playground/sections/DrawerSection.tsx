@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Детали заказа рядом со списком: три зоны любой панели — шапка с кнопкой закрытия, тело только для чтения и футер с «Закрыть» и главным действием — `Drawer.Trigger`, `Drawer.Body`, `Drawer.Footer`.",
+        "Детали заказа рядом со списком: три зоны любой панели — шапка с кнопкой закрытия, тело только для чтения и футер с главным действием — `Drawer.Trigger`, `Drawer.Body`, `Drawer.Footer`.",
     },
     {
       slot: "structure",
@@ -48,7 +48,7 @@ export const page: ComponentPageConfig = {
       scenario: "footer-actions",
       title: "Действие в начале подвала",
       description:
-        "Панель профиля: «Выйти» стоит отдельно в начале подвала, главная пара — в конце; на телефоне столбиком оно идёт первым, а главное действие — последним — `Drawer.Footer`, `Drawer.Actions`.",
+        "Панель профиля: «Выйти» стоит отдельно в начале подвала, главное действие — в конце; на телефоне столбиком «Выйти» идёт первым, а главное действие — последним — `Drawer.Footer`, `Drawer.Actions`.",
     },
     {
       scenario: "client-card",

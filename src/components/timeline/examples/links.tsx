@@ -1,5 +1,5 @@
 /** Rows that open something: an operation page by a link or by your router link through the slot, a receipt in place by a button; one Tab stop each with a focus ring — `href`, `asChild`, `onClick`. */
-import { Button, Drawer, Timeline } from "prime-ui-kit";
+import { Drawer, Timeline } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -55,13 +55,6 @@ export default function TimelineLinksExample() {
               Чек от {WASH.date} · {WASH.value}
             </Drawer.Description>
           </Drawer.Header>
-          <Drawer.Footer>
-            <Drawer.Close>
-              <Button.Root variant="soft" tone="neutral">
-                Закрыть
-              </Button.Root>
-            </Drawer.Close>
-          </Drawer.Footer>
         </Drawer.Content>
       </Drawer.Root>
     </>

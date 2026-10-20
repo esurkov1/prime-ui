@@ -49,13 +49,6 @@ export default function CardRecordLinkExample() {
             <Modal.Title>Залог · 15 000 ₽</Modal.Title>
             <Modal.Description>Принят наличными 14 октября, вернуть при сдаче.</Modal.Description>
           </Modal.Header>
-          <Modal.Footer>
-            <Modal.Close>
-              <Button.Root variant="soft" tone="neutral">
-                Закрыть
-              </Button.Root>
-            </Modal.Close>
-          </Modal.Footer>
         </Modal.Content>
       </Modal.Root>
     </div>

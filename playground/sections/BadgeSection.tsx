@@ -88,6 +88,12 @@ export const page: ComponentPageConfig = {
         "Ответственный за задачу — чипом человека, который открывает команду: аватар перед именем, а без ответственного на его месте контурный «Назначить» — `Badge.Avatar`, `Dropdown.Trigger`, `variant`.",
     },
     {
+      scenario: "person-details",
+      title: "Человек в две строки",
+      description:
+        "Люди договора в две строки: имя и под ним должность или почта, аватар на обе строки; согласующий открывает команду, чтобы выбрать другого — `Badge.Description`, `Badge.Avatar`, `Dropdown.Trigger`.",
+    },
+    {
       scenario: "square",
       title: "Квадратная плитка",
       description:

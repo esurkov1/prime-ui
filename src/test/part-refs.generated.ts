@@ -18,6 +18,7 @@ export const PART_REFS = {
   "Badge.Group": ["HTMLDivElement"],
   "Badge.Icon": ["HTMLSpanElement"],
   "Badge.Avatar": ["HTMLSpanElement"],
+  "Badge.Description": ["HTMLSpanElement"],
   "Badge.Dot": ["HTMLSpanElement"],
   "Badge.Action": ["HTMLButtonElement"],
   "Banner.Root": ["HTMLDivElement"],

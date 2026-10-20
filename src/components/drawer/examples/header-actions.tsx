@@ -132,13 +132,6 @@ export default function DrawerHeaderActionsExample() {
             <DescriptionList.Item label="Даты">{LEAD.dates}</DescriptionList.Item>
           </DescriptionList.Root>
         </Drawer.Body>
-        <Drawer.Footer>
-          <Drawer.Close>
-            <Button.Root variant="soft" tone="neutral">
-              Закрыть
-            </Button.Root>
-          </Drawer.Close>
-        </Drawer.Footer>
       </Drawer.Content>
     </Drawer.Root>
   );

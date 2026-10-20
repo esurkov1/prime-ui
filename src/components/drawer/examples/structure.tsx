@@ -23,11 +23,9 @@ export default function DrawerStructureExample() {
           </Typography>
         </Drawer.Body>
         <Drawer.Footer layout="fill">
-          <Drawer.Close>
-            <Button.Root variant="soft" tone="neutral">
-              Понятно
-            </Button.Root>
-          </Drawer.Close>
+          <Button.Root variant="soft" tone="neutral">
+            Открыть отчёт
+          </Button.Root>
         </Drawer.Footer>
       </Drawer.Content>
     </Drawer.Root>

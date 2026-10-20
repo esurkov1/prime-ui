@@ -100,8 +100,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Avatar` (a person's chip), one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge.",
-          ru: "Текст, `Badge.Dot`, `Badge.Icon`, один `Badge.Avatar` (чип человека), один `Badge.Action`. Только `Badge.Icon` (без удаления и действия) — квадратный бейдж-иконка.",
+          en: "Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Avatar` (a person's chip), one `Badge.Description` (a second line), one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge.",
+          ru: "Текст, `Badge.Dot`, `Badge.Icon`, один `Badge.Avatar` (чип человека), один `Badge.Description` (вторая строка), один `Badge.Action`. Только `Badge.Icon` (без удаления и действия) — квадратный бейдж-иконка.",
         },
         {
           name: "…rest",
@@ -172,8 +172,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Avatar",
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` leading a person's chip (an assignee): the `Avatar.Root` inside takes the chip tier's size, 2 px inside its height (`2xs` at `xs`/`s`, `xs` at `m`, `s` at `l`/`xl`); the chip becomes a pill, the name is its text.",
-      ru: "`<span>` с `aria-hidden` в начале чипа человека (исполнитель, автор): `Avatar.Root` внутри берёт размер по ярусу чипа, на 2 px внутри его высоты (`2xs` 16 при `xs` и `s`, `xs` 20 при `m`, `s` 24 при `l` и `xl`), а чип становится пилюлей. Текстом остаётся имя рядом.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` leading a person's chip (an assignee): the `Avatar.Root` inside takes the chip tier's size, 2 px inside its height; with `Badge.Description` it spans both lines. The chip keeps its corners; the name is its text.",
+      ru: "`<span>` с `aria-hidden` в начале чипа человека (исполнитель, автор): `Avatar.Root` внутри берёт размер по ярусу чипа, на 2 px внутри его высоты; с `Badge.Description` — на обе строки. Углы чипа не меняются; текстом остаётся имя рядом.",
       props: [
         {
           name: "children",
@@ -185,6 +185,26 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
+      ],
+    },
+    {
+      name: "Badge.Description",
+      en: "`ref` → `HTMLSpanElement`. A `<span>`, the second line of a chip under its text (a role, an e-mail): quieter, ellipsized. With it the chip stands on two lines and a `Badge.Avatar` spans both; the accessible name reads the text, then it.",
+      ru: "`<span>`, вторая строка чипа под текстом (должность, почта): тише, с многоточием. С ней чип встаёт в две строки, а `Badge.Avatar` — на обе; доступное имя читает текст, затем её.",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "The detail text.",
+          ru: "Текст строки.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
           en: "`className` and the other span attributes.",
           ru: "`className` и остальные атрибуты span.",
         },

@@ -96,14 +96,13 @@
 }
 
 /*
- * A person's chip (`Badge.Avatar`): a pill, the avatar at its start 2 px inside the chip's height
- * (flush in the 16 tier; the size is the slot's, `chipAvatarSize`), the same air on its end side.
+ * A person's chip (`Badge.Avatar`): the chip's own corners, the avatar at its start 2 px inside the
+ * chip's height (flush in the 16 tier; the size is the slot's, `chipAvatarSize.line`), the same air
+ * on its end side.
  */
 .root[data-avatar="true"] {
   --badge-avatar: var(--prime-avatar-xs);
   --badge-pad-start: calc((var(--chip-h) - var(--badge-avatar)) / 2);
-
-  border-radius: var(--prime-radius-full);
 }
 
 .root[data-avatar="true"]:is([data-tier="xs"], [data-tier="s"]) {
@@ -118,6 +117,46 @@
   display: inline-flex;
   flex-shrink: 0;
   margin-inline-end: var(--badge-pad-start);
+}
+
+/*
+ * Two lines (`Badge.Description`): the text and the detail under it, each a line of the tier; the
+ * chip grows to them (40 up to `m`, 48 from `l`), corners stay the tier's. The avatar spans both
+ * lines (`chipAvatarSize.stacked`), 4 px inside the chip on every side it touches.
+ */
+.root[data-stacked="true"] {
+  height: auto;
+}
+
+.root[data-stacked="true"][data-avatar="true"] {
+  --badge-pad-start: var(--prime-space-1);
+}
+
+.root[data-stacked="true"] .avatar {
+  margin-inline-end: var(--prime-space-1);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-block: var(--prime-space-1);
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--chip-gap);
+  min-width: 0;
+}
+
+.description {
+  min-width: 0;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--badge-fg) var(--prime-tint-heavy), transparent);
+  font-weight: var(--prime-font-weight-regular);
+  text-overflow: ellipsis;
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* ─── Status tones: the role colors in the badge's color slots ──────────── */

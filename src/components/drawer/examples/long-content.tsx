@@ -27,11 +27,6 @@ export default function DrawerLongContentExample() {
           ))}
         </Drawer.Body>
         <Drawer.Footer>
-          <Drawer.Close>
-            <Button.Root variant="soft" tone="neutral">
-              Закрыть
-            </Button.Root>
-          </Drawer.Close>
           <Button.Root>Экспорт</Button.Root>
         </Drawer.Footer>
       </Drawer.Content>

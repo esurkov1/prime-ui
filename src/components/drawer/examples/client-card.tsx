@@ -61,11 +61,6 @@ export default function DrawerClientCardExample() {
           </Drawer.Section>
         </Drawer.Body>
         <Drawer.Footer>
-          <Drawer.Close>
-            <Button.Root variant="soft" tone="neutral">
-              Закрыть
-            </Button.Root>
-          </Drawer.Close>
           <Button.Root>Написать</Button.Root>
         </Drawer.Footer>
       </Drawer.Content>

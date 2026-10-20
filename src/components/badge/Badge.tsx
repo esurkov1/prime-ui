@@ -79,6 +79,11 @@ export type BadgeAvatarProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "chil
   ref?: React.Ref<HTMLSpanElement>;
 };
 
+export type BadgeDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
+  children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
 export type BadgeDotProps = {
   color?: PaletteColor;
   className?: string;
@@ -119,6 +124,9 @@ export type BadgeGroupProps = React.HTMLAttributes<HTMLDivElement> & {
 
 /** The `size` of the `Badge.Group` around a badge: the tier of every badge in it. */
 const GroupSizeContext = React.createContext<ControlSize | undefined>(undefined);
+
+/** A chip with `Badge.Description` stands on two lines: its avatar spans both. */
+const StackedContext = React.createContext(false);
 
 const isText = (item: React.ReactNode): item is string | number =>
   typeof item === "string" || typeof item === "number";
@@ -229,18 +237,35 @@ function BadgeRoot({
 
   // Badge.Action lives at the end of the badge, outside the text body; one per badge.
   const { parts: actions, rest: other } = splitParts<BadgeActionProps>(children, BadgeAction);
-  // A person's avatar leads the chip, whatever order it is written in; the chip turns into a pill.
-  const { parts: avatars, rest: parts } = splitParts<BadgeAvatarProps>(other, BadgeAvatar);
+  // A person's avatar leads the chip, whatever order it is written in.
+  const { parts: avatars, rest: named } = splitParts<BadgeAvatarProps>(other, BadgeAvatar);
   const avatar = avatars[0] ?? null;
+  // A detail line under the name (a role, an e-mail) makes the chip two lines high.
+  const { parts: descriptions, rest: parts } = splitParts<BadgeDescriptionProps>(
+    named,
+    BadgeDescription,
+  );
+  const description = descriptions[0] ?? null;
+  const stacked = description !== null;
+  // Two lines: the name and the description, one block between the avatar and the chevron. The
+  // hidden comma keeps the two apart in the accessible name («Анна Котова, Юрист»).
+  const lines = stacked ? (
+    <span key="lines" className={styles.lines}>
+      <span className={styles.name}>{wrapText(parts)}</span>
+      <VisuallyHidden>,</VisuallyHidden> {description}
+    </span>
+  ) : null;
   // A trigger badge shows the chevron of an opener at its end, turned by the layer's open state.
-  const content = trigger
-    ? [
-        ...parts,
-        <BadgeIcon key="trigger-chevron" className={styles.chevron}>
-          <Icon name="nav.chevronDown" />
-        </BadgeIcon>,
-      ]
-    : parts;
+  const content = [
+    ...(lines ? [lines] : parts),
+    ...(trigger
+      ? [
+          <BadgeIcon key="trigger-chevron" className={styles.chevron}>
+            <Icon name="nav.chevronDown" />
+          </BadgeIcon>,
+        ]
+      : []),
+  ];
   const actionElement = actions[0] ?? null;
   const trailing = Boolean(onRemove || actionElement);
   const iconOnly =
@@ -258,17 +283,19 @@ function BadgeRoot({
   const textOnly = !trailing && !toggle && !trigger && !avatar && edges.children.every(isText);
   const body = (
     <ControlSizeProvider value={tier}>
-      {typeof children === "number" ? (
-        // A count rolls its digits to the new value (foundation §7 rule 8).
-        <RollingNumber>{children}</RollingNumber>
-      ) : textOnly ? (
-        edges.children
-      ) : (
-        <>
-          {avatar}
-          {wrapText(edges.children)}
-        </>
-      )}
+      <StackedContext value={stacked}>
+        {typeof children === "number" ? (
+          // A count rolls its digits to the new value (foundation §7 rule 8).
+          <RollingNumber>{children}</RollingNumber>
+        ) : textOnly ? (
+          edges.children
+        ) : (
+          <>
+            {avatar}
+            {wrapText(edges.children)}
+          </>
+        )}
+      </StackedContext>
     </ControlSizeProvider>
   );
 
@@ -299,6 +326,7 @@ function BadgeRoot({
         "text-only": (textOnly && edges.children.length > 0) || undefined,
         "icon-start": edges.start || undefined,
         avatar: avatar ? true : undefined,
+        stacked: stacked || undefined,
         "icon-end": edges.end || undefined,
         removable: onRemove ? true : undefined,
         pending: busy || undefined,
@@ -377,12 +405,15 @@ BadgeIcon.displayName = "Badge.Icon";
 
 /**
  * The person of a chip (an assignee, an author): an `Avatar.Root` — or your component that renders
- * one — at the start, sized by the chip (internal/mediaSlot: 2 px inside its height). Decorative:
- * the name beside it is the text.
+ * one — at the start, sized by the chip (internal/mediaSlot: 2 px inside a one-line chip's height,
+ * both text lines of a chip with `Badge.Description`). Decorative: the name beside it is the text.
  */
 function BadgeAvatar({ children, className, ...rest }: BadgeAvatarProps) {
   const tier = useOptionalControlSize() ?? "m";
-  const { provide } = useMediaSlotHost({ avatar: chipAvatarSize[tier] });
+  const stacked = React.useContext(StackedContext);
+  const { provide } = useMediaSlotHost({
+    avatar: chipAvatarSize[stacked ? "stacked" : "line"][tier],
+  });
   return (
     <span {...rest} className={cx(styles.avatar, className)} aria-hidden="true">
       {provide(children)}
@@ -391,6 +422,16 @@ function BadgeAvatar({ children, className, ...rest }: BadgeAvatarProps) {
 }
 
 BadgeAvatar.displayName = "Badge.Avatar";
+
+/**
+ * The second line of a chip under its text (a person's role, e-mail or department): quieter, one
+ * line, ellipsized. Its presence makes the chip two lines high.
+ */
+function BadgeDescription({ className, ...rest }: BadgeDescriptionProps) {
+  return <span {...rest} className={cx(styles.description, className)} />;
+}
+
+BadgeDescription.displayName = "Badge.Description";
 
 /**
  * A status dot in the current text color, or in the solid step of a palette hue (`color`). Inside
@@ -577,6 +618,7 @@ export const Badge = {
   Group: BadgeGroup,
   Icon: BadgeIcon,
   Avatar: BadgeAvatar,
+  Description: BadgeDescription,
   Dot: BadgeDot,
   Action: BadgeAction,
 };

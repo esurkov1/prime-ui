@@ -101,11 +101,6 @@ export default function ModalEnterKeyExample() {
               </Input.Wrapper>
             </Input.Root>
           </Modal.Body>
-          <Modal.Footer>
-            <Modal.Close>
-              <Button.Root>Готово</Button.Root>
-            </Modal.Close>
-          </Modal.Footer>
         </Modal.Content>
       </Modal.Root>
     </>

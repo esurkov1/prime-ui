@@ -9,7 +9,7 @@
 - Status of a row in a table or list («Оплачен», «Просрочен») — `tone`; a category («Бета», a team, a tag) — `color`.
 - Counters inside buttons and fields («Входящие 12», «−25%»).
 - A workflow state with a leading dot (`Badge.Dot`).
-- A person on a record (an assignee, an author) — `Badge.Avatar`, a picker inside a `Dropdown.Trigger`.
+- A person on a record (an assignee, an author) — `Badge.Avatar`, a picker inside a `Dropdown.Trigger`; with a detail line under the name (a role, an e-mail) — `Badge.Description`.
 - A selected value, keyword or applied filter the user can remove (`onRemove`).
 - Values in a filter panel that toggle on press and hide with a hover action (the `pressed` triad, `Badge.Action`).
 - A short code as a square tile (a file format «PDF») — `shape="square"`.
@@ -30,9 +30,10 @@ import { Badge } from "prime-ui-kit";
 ## Anatomy
 ```
 Badge.Root          <span>: fill, tier dimensions
-├─ Badge.Avatar     a person's chip: the Avatar.Root at the start, 2 px inside the height; the chip is a pill
+├─ Badge.Avatar     a person's chip: the Avatar.Root at the start, 2 px inside the height; the chip keeps its corners
 ├─ [start segment]  Badge.Icon or Badge.Dot at the start edge: full height, mark centred
 ├─ body             text, Badge.Dot, inline Badge.Icon
+│  └─ Badge.Description  the second line under the text: the chip stands on two lines, the avatar spans both
 │                   (a toggle <button> with the pressed triad, or the opener inside a `Dropdown.Trigger`; a <span> with a trailing segment; none when read-only)
 ├─ Badge.Action     optional end segment revealed on hover / focus (always shown on touch screens)
 └─ remove segment   with onRemove: full height, the whole end is the hit area (Icon action.close)
@@ -65,7 +66,7 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 | `disabled` | `boolean` | — | Muted look for every variant, `aria-disabled`; the body button, remove and action get native `disabled`. |
 | `className` | `string` | — | Class on the badge. |
 | `labels` | `Partial<BadgeLabels>` | — | Built-in strings, see Labels. |
-| `children` | `ReactNode` | — | Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Avatar` (a person's chip), one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge. |
+| `children` | `ReactNode` | — | Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Avatar` (a person's chip), one `Badge.Description` (a second line), one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "onClick" \| "color">` | — | `aria-label` (an icon-only badge named by it is an image) and the other span attributes; no `onClick` — a pressable chip is the toggle. |
 
 ### Badge.Group
@@ -88,12 +89,20 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
 ### Badge.Avatar
-`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` leading a person's chip (an assignee): the `Avatar.Root` inside takes the chip tier's size, 2 px inside its height (`2xs` at `xs`/`s`, `xs` at `m`, `s` at `l`/`xl`); the chip becomes a pill, the name is its text.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` leading a person's chip (an assignee): the `Avatar.Root` inside takes the chip tier's size, 2 px inside its height; with `Badge.Description` it spans both lines. The chip keeps its corners; the name is its text.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | An `Avatar.Root` (photo or initials), also inside your own component; no `size` — the slot sets it. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
+
+### Badge.Description
+`ref` → `HTMLSpanElement`. A `<span>`, the second line of a chip under its text (a role, an e-mail): quieter, ellipsized. With it the chip stands on two lines and a `Badge.Avatar` spans both; the accessible name reads the text, then it.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The detail text. |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Badge.Dot
 `ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier.
@@ -187,7 +196,8 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | toggle / pressed | the `pressed` / `defaultPressed` / `onPressedChange` triad | `data-pressable`, `aria-pressed` on the body; on adds `data-pressed` and the selected look (accent soft), gliding in and out (`fast`); hover washes a step of the badge's text color over its fill |
 | action | `Badge.Action` | `data-action="reveal" \| "persistent"`; the text slides and the segment fades in over `fast` |
 | disabled | `disabled` | `data-disabled`, `aria-disabled`; inner buttons disabled, no hover wash |
-| person | a `Badge.Avatar` child | `data-avatar` on the root: a pill (`radius-full`), the avatar first whatever the order, its `data-size` the chip's (`chipAvatarSize`: `2xs` · `2xs` · `xs` · `s` · `s`); the avatar's box is `aria-hidden` |
+| person | a `Badge.Avatar` child | `data-avatar` on the root: the tier's corners like every badge, the avatar first whatever the order, its `data-size` the chip's (`chipAvatarSize.line`: `2xs` · `2xs` · `xs` · `s` · `s`); the avatar's box is `aria-hidden` |
+| two lines | a `Badge.Description` child | `data-stacked` on the root: the text and the description stack (40 high up to `m`, 48 at `l` / `xl`), the tier's corners stay; the avatar spans both lines (`chipAvatarSize.stacked`: `m` · `m` · `m` · `l` · `l`); a hidden comma joins the two in the accessible name |
 | icon-only, named | only `Badge.Icon` children and `aria-label` | `role="img"` with that name |
 | count | a number as the only child | the digits roll to the new value when the number changes |
 | overflowed | `Badge.Group overflow="count"`, the badge does not fit the row | `data-overflowed` on the badge (out of the flow, `visibility: hidden`); the group's `data-overflow="count"`; re-measured on every resize of the row or a badge (`useResizeEffect`), the «+N» text from `labels.more` |
@@ -201,6 +211,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - Several badges in a row: `Badge.Group` — it wraps, badges 8 apart (4 at the `xs` and `s` tiers).
 - `overflow="count"` fits the container, not the viewport: a DataTable cell, a 320px column. At least the first badge stays; when it alone does not fit it ellipsizes.
 - A person's chip (`Badge.Avatar`): the avatar keeps the same 2 px from the top, the bottom and the start (flush in the 16 tier), and as much again before the name.
+- Two lines (`Badge.Description`): each line is the tier's line height, 4 above and below; the avatar sits 4 from the top, the bottom and the start, 8 before the text; both lines ellipsize on their own.
 - In a list row the badge is the trailing column; the title column gets `min-width: 0` and an ellipsis.
 
 ## Accessibility
@@ -254,6 +265,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | [filter-values.tsx](examples/filter-values.tsx) | Filter values as toggles with a hide action that slides in without changing the width — `pressed`, `onPressedChange`, `Badge.Action`, `persistent`. |
 | [trigger.tsx](examples/trigger.tsx) | The stage of a deal as a badge that opens the stage picker: the chevron turns while the menu is open, the badge takes the picked stage's color — `Badge.Root`, `Dropdown.Trigger`, `color`. |
 | [assignee.tsx](examples/assignee.tsx) | The assignee of a task as a person's chip that opens the team: the avatar leads the name, and with nobody assigned an outline call to assign stands in its place — `Badge.Avatar`, `Dropdown.Trigger`, `variant`. |
+| [person-details.tsx](examples/person-details.tsx) | The people of a contract on two lines: the name and the e-mail or role under it, the avatar spanning both; the approver opens the team to pick another — `Badge.Description`, `Badge.Avatar`, `Dropdown.Trigger`. |
 | [square.tsx](examples/square.tsx) | File formats as square tiles of text, large enough for three letters; the hue sorts them by kind — `shape`, `size`, `color`. |
 | [full-width.tsx](examples/full-width.tsx) | The next step of a record as a plate across its card, the text centred — `fullWidth`, `tone`. |
 | [tag-row.tsx](examples/tag-row.tsx) | The tags of a client as one value: the row wraps in a narrow column and keeps one gap between badges — `Badge.Group`, `size`. |
@@ -272,6 +284,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - A row of badges in a hand-made flex wrapper with its own gap → `Badge.Group`.
 - A set of values in a table cell that wraps and grows the row, or a hand-made «+N» → `Badge.Group overflow="count"`.
 - `onRemove` together with `Badge.Action` → one end segment per badge.
+- A person's role or e-mail as a second badge, a `·` in the text or a hand-made two-line chip → `Badge.Description`.
 - An `Avatar.Root` with its own `size` inside a badge, or in a `Badge.Icon` → put it in `Badge.Avatar` without `size`: the chip sizes it.
 - Removing the badge from your list first and putting it back when the request fails → return the request's promise and remove it after it succeeds; the badge waits meanwhile.
 

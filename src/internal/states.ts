@@ -53,17 +53,16 @@ export const tierMappings = {
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
 
 /**
- * The Avatar of a chip (`Badge.Avatar`): the circle 2 px inside the chip's height, flush in the
- * smallest (chip 16 · 20 · 24 · 28 · 32 → avatar 16 · 16 · 20 · 24 · 24). A chip is lower than
- * any control, so the avatar scale goes one size under `xs`.
+ * The Avatar of a chip (`Badge.Avatar`). `line` — a one-line chip: the circle 2 px inside the
+ * chip's height, flush in the smallest (chip 16 · 20 · 24 · 28 · 32 → avatar 16 · 16 · 20 · 24 ·
+ * 24); a chip is lower than any control, so the scale goes one size under `xs`. `stacked` — a chip
+ * with `Badge.Description`: the circle spans its two text lines (16 + 16 up to `m`, 20 + 20 from
+ * `l` → avatar 32 · 32 · 32 · 40 · 40), not a step of the chip tier.
  */
 export const chipAvatarSize = {
-  xs: "2xs",
-  s: "2xs",
-  m: "xs",
-  l: "s",
-  xl: "s",
-} as const satisfies Record<ControlSize, "2xs" | ControlSize>;
+  line: { xs: "2xs", s: "2xs", m: "xs", l: "s", xl: "s" },
+  stacked: { xs: "m", s: "m", m: "m", l: "l", xl: "l" },
+} as const satisfies Record<"line" | "stacked", Record<ControlSize, "2xs" | ControlSize>>;
 
 /** Visual treatment. */
 export const variants = ["solid", "soft", "outline", "ghost"] as const;

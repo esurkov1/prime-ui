@@ -29,6 +29,7 @@ export { Avatar } from "./avatar/Avatar";
 export type {
   BadgeActionProps,
   BadgeAvatarProps,
+  BadgeDescriptionProps,
   BadgeDotProps,
   BadgeGroupLabels,
   BadgeGroupProps,

@@ -676,11 +676,6 @@ export default function GanttScreenExample() {
                 ) : null}
               </Drawer.Body>
               <Drawer.Footer>
-                <Drawer.Close>
-                  <Button.Root variant="soft" tone="neutral">
-                    Закрыть
-                  </Button.Root>
-                </Drawer.Close>
                 {detail && !detail.readOnly ? (
                   <ConfirmDialog.Root
                     title={`Снять задачу «${detail.label}»?`}

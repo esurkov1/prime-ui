@@ -37,7 +37,7 @@ Drawer.Root                    state and dismiss policy (no DOM)
    │  └─ Drawer.Icon           optional: tone tile around an Icon, or a picture, 40, centred on lines 1–2
    ├─ Drawer.Body              the only scrolling zone (ScrollContainer)
    │  └─ Drawer.Section        <section>: <h3> label, description, Drawer.Actions at the heading's end
-   └─ Drawer.Footer            always: Close or Cancel + the main action, primary last
+   └─ Drawer.Footer            when there is something to do: Cancel + submit, the record's action; drawn only with content
       ├─ Drawer.Actions        the start group: an action apart from the main pair
       ├─ Drawer.Meta           <p>, muted status at the start
       └─ Drawer.Close          clones its child; closes on click
@@ -140,7 +140,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content and an optional `Drawer.Actions`), `className` and the other attributes of the `<section>`. |
 
 ### Drawer.Footer
-`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last; at the start an optional `Drawer.Actions` (an action apart from the main pair) and `Meta`. Stacked, the start comes first and the primary stays last.
+`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, only while it holds something (it enters and closes up in place); at the start an optional `Drawer.Actions` (an action apart) and `Meta`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -231,12 +231,11 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
   - end — `Drawer.Actions`: first one switcher that applies to the whole open tab (a `SegmentedControl` — the text language RU / EN; a `Datepicker` — the period, the same one as on the page), then the buttons — ghost icon buttons, each named and with a Tooltip, and a ⋯ Dropdown for the rest — all at the close button's tier, centred on line 1. A switcher that applies only to some tabs is rendered only on them. Each child stands in a cell that keeps its place: another control in the same place (`{tab === "text" ? <SegmentedControl.Root … /> : <Datepicker.Root … />}`) cross-fades inside its cell while the cell's width glides from its start edge, and a control rendered on some tabs only rises in and closes up — the ⋯ and the close button never move, the title never jumps.
   - `Drawer.Icon` is optional and stands before the text, centred on lines 1–2: a glyph on the tone tile for a setting or a notice, or a picture (`Avatar.Root`, `Thumbnail.Root`) with no tile at 40 px. A record header usually goes without it: the name leads.
   - A question or a form keeps a plain header: a title that wraps and a description that wraps under it; only `Drawer.Badges` or a `number` make it a record header.
-- A drawer has three zones: `Drawer.Header` (title, the × close button), `Drawer.Body` (the content, the only zone that scrolls) and `Drawer.Footer` (the actions). The footer is not optional decoration — it is where the drawer is finished:
-  - read-only details: `Drawer.Close` around `<Button.Root variant="soft" tone="neutral">Закрыть</Button.Root>`, plus the record's main action (solid, last) when it has one;
+- A drawer has three zones: `Drawer.Header` (title, the × close button), `Drawer.Body` (the content, the only zone that scrolls) and `Drawer.Footer` (the actions). The footer is there only when the drawer has something to do; with nothing in it the kit does not draw it, and it rises in and closes up in place as its actions come and go (a save shown while the form is dirty):
+  - read-only details: no footer — the header × closes; the record's main action (solid) alone when it has one. Never a footer «Закрыть»: it repeats the ×;
   - a form: «Отмена» (`Drawer.Close`, soft neutral) and the submit button (solid, last; `type="submit" form={formId}`), `Drawer.Meta` for «Есть несохранённые изменения»;
   - one acknowledgement: `<Drawer.Footer layout="fill">`;
   - an action apart from the main pair («Выйти»; deleting the record goes in the header's «⋯» through a ConfirmDialog): `Drawer.Actions` inside the footer puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
-  Both the header × and the footer button stay: the × is the quick way out at the top, the footer is the end of the reading or editing path, where the hand already is.
 - Zone padding `--prime-drawer-padding`; hairlines between header, body and footer.
 - Full viewport height; only the body scrolls, with its own side padding.
 - Tabs in the header: a `Tabs.List` inside `Drawer.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
@@ -281,12 +280,12 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Order details next to the list: the three zones of every drawer — a header with a close button, a read-only body and a footer with Close and the main action — `Drawer.Trigger`, `Drawer.Body`, `Drawer.Footer`. |
+| [overview.tsx](examples/overview.tsx) | Order details next to the list: the three zones of every drawer — a header with a close button, a read-only body and a footer with the main action — `Drawer.Trigger`, `Drawer.Body`, `Drawer.Footer`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile in the header and one full-width action in the footer — `Drawer.Icon`, `Drawer.Footer`, `layout`. |
 | [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
 | [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters, rounded only on the edge facing the page — `side`. |
 | [header-actions.tsx](examples/header-actions.tsx) | The one header of a record: the name with its number, one line of data under it, then the badges — the status and the assignee as pickers, the other statuses after them — and only buttons at the end — `Drawer.Title`, `number`, `Drawer.Description`, `Drawer.Badges`, `Badge.Avatar`, `Drawer.Actions`. |
-| [footer-actions.tsx](examples/footer-actions.tsx) | A profile panel: Sign out stands apart at the start of the footer, the main pair keeps the end; on a phone the column puts it first and the primary last — `Drawer.Footer`, `Drawer.Actions`. |
+| [footer-actions.tsx](examples/footer-actions.tsx) | A profile panel: Sign out stands apart at the start of the footer, the main action keeps the end; on a phone the column puts it first and the main action last — `Drawer.Footer`, `Drawer.Actions`. |
 | [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details in titled sections, one with its own action — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`. |
 | [tab-switcher.tsx](examples/tab-switcher.tsx) | A model card with tabs: one switcher for the whole open tab stands in the header before ⋯ — the text language on the description tab, the period on the analytics tab, whose two self-titled charts the panel spaces by itself — `Drawer.Actions`, `Tabs.Root`, `Tabs.Panel`. |
 | [loading.tsx](examples/loading.tsx) | A record card that opens before its data arrives: the title and the status come from the list row, the line of data between them and the body hold their place in skeletons, then the data fades in — `Drawer.Description`, `loading`. |
@@ -299,7 +298,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [screen.tsx](examples/screen.tsx) | A create form in a Drawer opened from the primary action in its top bar: grouped fields, errors on submit with focus on the first invalid field, a loading submit, a toast and the new row in the list — `Drawer.Trigger`, `Drawer.Guard`. |
 
 ## Mistakes
-- A drawer without `Drawer.Footer` → add one: «Закрыть» for details, «Отмена» + the submit button for a form. The header × alone is not the end of the panel.
+- «Закрыть» in `Drawer.Footer` → remove it: the header × closes the drawer; a footer holds only what the drawer does (Cancel + submit, the record's action), or the drawer has none.
 - Save or Cancel buttons at the end of the body, or in the header → they go in `Drawer.Footer`, which stays in place while the body scrolls.
 - A delete confirmation in a Drawer → use ConfirmDialog.
 - A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Drawer.Section label` with `Drawer.Actions`.

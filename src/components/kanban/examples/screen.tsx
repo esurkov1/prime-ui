@@ -517,11 +517,6 @@ export default function KanbanScreenExample() {
                 ) : null}
               </Drawer.Body>
               <Drawer.Footer>
-                <Drawer.Close>
-                  <Button.Root variant="soft" tone="neutral">
-                    Закрыть
-                  </Button.Root>
-                </Drawer.Close>
                 <Dropdown.Root>
                   <Dropdown.Trigger>
                     <Button.Root variant="soft" tone="neutral" disabled={saving}>

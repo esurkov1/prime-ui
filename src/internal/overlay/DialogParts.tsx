@@ -26,11 +26,13 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import hairline from "@/internal/hairline.module.css";
+import { hasContent } from "@/internal/hasContent";
 import { iconBoxStyles } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
+import { usePartPresence } from "@/internal/partPresence";
 import { splitParts } from "@/internal/parts";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { RowCells } from "@/internal/rowCells";
@@ -909,19 +911,26 @@ export type DialogFooterProps = React.HTMLAttributes<HTMLElement> & {
 };
 
 /**
- * Actions in DOM order, primary last. Stacks full width when the dialog is narrower than 360px.
+ * Actions in DOM order, primary last; with nothing in it the footer is not drawn. Stacks full width when the dialog is narrower than 360px.
  * An `Actions` holds the start group (an action apart from the main pair) and a `Meta` the status
  * text, both at the start; the buttons then move as one row at the end: when the line runs short
  * the start goes above them first, so the buttons never split over two lines while there is room
  * for them in one. Stacked, the start comes first and the primary stays last.
  */
-export function DialogFooter({ layout, className, children, ...rest }: DialogFooterProps) {
+export function DialogFooter({ layout, className, children, ref, ...rest }: DialogFooterProps) {
   const { footerLayout } = useDialogShell("Footer");
+  // The footer is there only while it holds something: a save that comes with a change enters
+  // with its footer, and the footer closes up in place when its last action goes.
+  const present = hasContent(children);
+  const presence = usePartPresence<HTMLElement>({ present, axis: "block" });
+  const mergedRef = useMergedRefs(presence.ref, ref);
   const { parts: start, rest: other } = splitParts(children, DialogActions);
   const { parts: meta, rest: actions } = splitParts(other, DialogMeta);
+  if (!present) return null;
   return (
     <footer
-      className={cx(hairline.top, styles.footer, className)}
+      ref={mergedRef}
+      className={cx(hairline.top, styles.footer, presence.className, className)}
       data-layout={layout ?? footerLayout}
       {...rest}
     >

@@ -310,8 +310,8 @@ export function dialogParts(
     ...(section ? [dialogSectionPart(name)] : []),
     {
       name: `${name}.Footer`,
-      en: `\`ref\` → \`HTMLElement\`. Renders \`<footer>\` with the actions, primary last; at the start an optional \`${name}.Actions\` (an action apart from the main pair) and \`Meta\`. Stacked, the start comes first and the primary stays last.`,
-      ru: `Рисует \`<footer>\` с действиями, главное последним; в начале необязательные \`${name}.Actions\` (действие отдельно от главной пары) и \`Meta\`. Столбиком начало идёт первым, главное — последним.`,
+      en: `\`ref\` → \`HTMLElement\`. Renders \`<footer>\` with the actions, primary last, only while it holds something (it enters and closes up in place); at the start an optional \`${name}.Actions\` (an action apart) and \`Meta\`.`,
+      ru: `Рисует \`<footer>\` с действиями, главное последним, только пока в нём что-то есть (появляется и схлопывается на месте); в начале необязательные \`${name}.Actions\` (отдельное действие) и \`Meta\`.`,
       props: [
         {
           name: "layout",

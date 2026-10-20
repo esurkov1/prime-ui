@@ -101,11 +101,6 @@ export default function TabsInDrawerExample() {
           </Drawer.Body>
         </Tabs.Root>
         <Drawer.Footer>
-          <Drawer.Close>
-            <Button.Root variant="soft" tone="neutral">
-              Закрыть
-            </Button.Root>
-          </Drawer.Close>
           <Button.Root>Изменить заказ</Button.Root>
         </Drawer.Footer>
       </Drawer.Content>

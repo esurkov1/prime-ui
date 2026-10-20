@@ -127,7 +127,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
 
 ### Sheet.Footer
-`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last; at the start an optional `Sheet.Actions` (an action apart from the main pair) and `Meta`. Stacked, the start comes first and the primary stays last.
+`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, only while it holds something (it enters and closes up in place); at the start an optional `Sheet.Actions` (an action apart) and `Meta`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

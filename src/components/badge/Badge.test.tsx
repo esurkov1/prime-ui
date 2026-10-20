@@ -8,7 +8,7 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import fieldTier from "@/internal/fieldTier.module.css";
 import type { PaletteColor } from "@/internal/states";
-import { cssRule, cssValue } from "@/test/css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 import { Badge } from "./Badge";
 import styles from "./Badge.module.css";
 
@@ -701,7 +701,7 @@ describe("Badge.Avatar", () => {
     </Badge.Root>
   );
 
-  it("leads the chip, hidden from assistive tech, and makes it a pill", () => {
+  it("leads the chip, hidden from assistive tech, and keeps the chip's corners", () => {
     render(<Person />);
     const root = badgeOf("Анна Котова");
     expect(root).toHaveAttribute("data-avatar", "true");
@@ -709,9 +709,13 @@ describe("Badge.Avatar", () => {
     expect(slot).toHaveClass(styles.avatar);
     expect(slot).toHaveAttribute("aria-hidden", "true");
     expect(root).toHaveTextContent("АКАнна Котова");
-    expect(cssValue(cssRule(CSS, '.root[data-avatar="true"]'), "border-radius")).toBe(
-      "var(--prime-radius-full)",
+    // Every badge is one shape: no person's or two-line chip sets corners of its own.
+    const radii = cssRules(CSS).filter(
+      (rule) =>
+        /data-(avatar|stacked)/.test(rule.selector) &&
+        rule.decls.some(({ prop }) => prop === "border-radius"),
     );
+    expect(radii).toEqual([]);
   });
 
   it("sizes the avatar by the chip tier, 2 px inside its height", () => {
@@ -782,5 +786,106 @@ describe("Badge.Avatar", () => {
     expect(await screen.findByRole("tooltip")).toHaveTextContent(/^Анна Котова$/);
     rect.mockRestore();
     client.mockRestore();
+  });
+});
+
+describe("Badge.Description", () => {
+  const Person = ({ size }: { size?: "xs" | "s" | "m" | "l" | "xl" }) => (
+    <Badge.Root size={size}>
+      <Badge.Avatar>
+        <Avatar.Root color="purple">
+          <Avatar.Fallback>АК</Avatar.Fallback>
+        </Avatar.Root>
+      </Badge.Avatar>
+      Анна Котова
+      <Badge.Description>Юрист · Договорной отдел</Badge.Description>
+    </Badge.Root>
+  );
+
+  it("stands the chip on two lines: the name, then the description under it", () => {
+    render(<Person />);
+    const root = badgeOf("Анна Котова");
+    expect(root).toHaveAttribute("data-stacked", "true");
+    const description = screen.getByText("Юрист · Договорной отдел");
+    expect(description).toHaveClass(styles.description);
+    const lines = description.closest(`.${styles.lines}`);
+    expect(lines?.firstElementChild).toHaveClass(styles.name);
+    expect(lines?.firstElementChild).toHaveTextContent(/^Анна Котова$/);
+    expect(cssValue(cssRule(CSS, '.root[data-stacked="true"]'), "height")).toBe("auto");
+  });
+
+  it("is off without the part: a one-line chip", () => {
+    render(<Badge.Root>Анна Котова</Badge.Root>);
+    expect(badgeOf("Анна Котова")).not.toHaveAttribute("data-stacked");
+  });
+
+  it("sizes the avatar to span both lines", () => {
+    const expected = { xs: "m", s: "m", m: "m", l: "l", xl: "l" } as const;
+    for (const [tier, size] of Object.entries(expected)) {
+      const { unmount } = render(<Person size={tier as keyof typeof expected} />);
+      expect(screen.getByText("АК").closest("[data-color]")).toHaveAttribute("data-size", size);
+      unmount();
+    }
+  });
+
+  it("forwards className, attributes and ref to its span", () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Badge.Root>
+        Анна Котова
+        <Badge.Description ref={ref} className="extra" data-testid="detail">
+          Юрист
+        </Badge.Description>
+      </Badge.Root>,
+    );
+    const detail = screen.getByTestId("detail");
+    expect(ref.current).toBe(detail);
+    expect(detail).toHaveClass("extra", styles.description);
+  });
+
+  it("is a picker named by the name and the description, opened with the keyboard", async () => {
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <Badge.Root>
+            <Badge.Avatar>
+              <Avatar.Root>
+                <Avatar.Fallback>АК</Avatar.Fallback>
+              </Avatar.Root>
+            </Badge.Avatar>
+            Анна Котова
+            <Badge.Description>Юрист · Договорной отдел</Badge.Description>
+          </Badge.Root>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Илья Соколов</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Анна Котова, Юрист · Договорной отдел" });
+    expect(button.parentElement).toHaveAttribute("data-icon-end", "true");
+    button.focus();
+    await user.keyboard("{Enter}");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("menuitem", { name: "Илья Соколов" })).toBeInTheDocument();
+  });
+
+  it("keeps Badge.Action at the end of a two-line chip", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <Badge.Root>
+        Анна Котова
+        <Badge.Description>Юрист</Badge.Description>
+        <Badge.Action label="Убрать Анну Котову" onClick={onClick} />
+      </Badge.Root>,
+    );
+    const root = badgeOf("Анна Котова");
+    expect(root).toHaveAttribute("data-stacked", "true");
+    expect(root?.lastElementChild).toBe(screen.getByRole("button", { name: "Убрать Анну Котову" }));
+    await user.tab();
+    await user.keyboard("{Enter}");
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });

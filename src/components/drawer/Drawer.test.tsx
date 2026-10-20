@@ -54,7 +54,7 @@ function BasicDrawer({
         </Drawer.Body>
         <Drawer.Footer data-testid="footer">
           <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral">
+            <Button.Root variant="soft" tone="neutral">
               Cancel
             </Button.Root>
           </Drawer.Close>
@@ -64,6 +64,38 @@ function BasicDrawer({
     </Drawer.Root>
   );
 }
+
+describe("Drawer.Footer presence", () => {
+  function DirtyDrawer({ dirty }: { dirty: boolean }) {
+    return (
+      <Drawer.Root defaultOpen>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>Заказ № 1042</Drawer.Title>
+          </Drawer.Header>
+          <Drawer.Body>
+            <p>Поля заказа</p>
+          </Drawer.Body>
+          <Drawer.Footer data-testid="footer">
+            {dirty ? <Button.Root>Сохранить</Button.Root> : null}
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer.Root>
+    );
+  }
+
+  it("draws no footer while it holds nothing, and enters with its first action", () => {
+    withMotion();
+    const { rerender } = render(<DirtyDrawer dirty={false} />);
+    expect(screen.queryByTestId("footer")).not.toBeInTheDocument();
+    rerender(<DirtyDrawer dirty />);
+    const footer = screen.getByTestId("footer");
+    expect(footer).toContainElement(screen.getByRole("button", { name: "Сохранить" }));
+    expect(footer).toHaveClass(enterMotion.enter);
+    rerender(<DirtyDrawer dirty={false} />);
+    expect(screen.queryByTestId("footer")).not.toBeInTheDocument();
+  });
+});
 
 function openDrawer() {
   fireEvent.click(screen.getByRole("button", { name: "Open" }));

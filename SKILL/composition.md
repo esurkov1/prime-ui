@@ -383,7 +383,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 - **One primary per area** (the page, card, dialog, form): `solid`, last in its row.
 - **A button with text always has a fill.** Every other labelled button — secondary, «Отмена»,
-  «Закрыть», revert, «+ Транспорт» under a list — is `soft` + `tone="neutral"` (`tone="danger"` for a
+  revert, «+ Транспорт» under a list — is `soft` + `tone="neutral"` (`tone="danger"` for a
   destructive one), wherever it stands: a page header, a card, a dialog footer, under a list. A
   button without fill is an icon-only `ghost` (`aria-label` + `Tooltip`) in a dialog header, a table
   cell, a row or a toolbar. Buttons have no outline: `variant="outline"` is not for product screens.
@@ -400,7 +400,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 </Button.Root>
 <Drawer.Footer>
   <Drawer.Close>
-    <Button.Root variant="outline" tone="neutral">Закрыть</Button.Root>
+    <Button.Root variant="outline" tone="neutral">Отмена</Button.Root>
   </Drawer.Close>
 </Drawer.Footer>
 ```
@@ -415,7 +415,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 </Button.Root>
 <Drawer.Footer>
   <Drawer.Close>
-    <Button.Root variant="soft" tone="neutral">Закрыть</Button.Root>
+    <Button.Root variant="soft" tone="neutral">Отмена</Button.Root>
   </Drawer.Close>
 </Drawer.Footer>
 ```
@@ -423,7 +423,10 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
-- A dialog footer is the dialog's answer: Cancel and the primary. Deleting the record the dialog
+- A dialog footer is the dialog's answer: Cancel and the primary, or the record's one action. It
+  never repeats the header ×: no «Закрыть» in a footer — a drawer of read-only details has no
+  footer at all, and the kit draws none while `X.Footer` is empty, so a save shown while the form is
+  dirty brings its footer with it. Deleting the record the dialog
   edits is not a third footer button: it stands in `Modal.Actions` / `Drawer.Actions` of the header
   by the menu threshold below, confirmed by a `ConfirmDialog`.
 - An empty state's action replaces the header's primary, it does not duplicate it.
