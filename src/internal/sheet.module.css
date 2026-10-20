@@ -50,7 +50,7 @@
   min-height: 0;
   max-height: calc(100dvh - var(--prime-sheet-top-gap));
   margin: 0 auto;
-  padding-block-end: env(safe-area-inset-bottom);
+  padding-block-end: var(--prime-safe-area-bottom);
   border-radius: var(--prime-sheet-radius) var(--prime-sheet-radius) 0 0;
   background: var(--prime-color-layer-current);
   box-shadow:

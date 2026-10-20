@@ -88,6 +88,21 @@ describe("generated token styles", () => {
     expect(offenders).toEqual([]);
   });
 
+  // An app sets the container's insets once (`--prime-safe-area-*`, a Telegram Mini App in full
+  // screen): a part that read `env()` itself would stay under the host's header.
+  it("reads env(safe-area-inset-*) only in globals.css, through --prime-safe-area-*", () => {
+    const globals = read("globals.css");
+    for (const side of ["top", "right", "bottom", "left"]) {
+      expect(globals, side).toContain(
+        `--prime-safe-area-${side}: env(safe-area-inset-${side}, var(--prime-space-0));`,
+      );
+    }
+    const offenders = walk("src", /\.css$/)
+      .filter((file) => file !== "src/styles/globals.css")
+      .filter((file) => readRepo(file).includes("safe-area-inset"));
+    expect(offenders).toEqual([]);
+  });
+
   it("maps every palette hue in internal/palette", () => {
     const css = readFileSync(
       path.resolve(process.cwd(), "src/internal/palette.module.css"),

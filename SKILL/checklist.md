@@ -92,6 +92,8 @@ checks.
 - [ ] An empty list of cards is `EmptyPage size="s"` in a `Card.Root` in the list's place, the add button under it ([an empty list of cards](composition.md#an-empty-list-of-cards)).
 - [ ] A dialog footer holds Cancel and the primary only, never a «Закрыть» beside the header ×; read-only details have no footer; deleting the edited record stands in the header's actions ([actions](composition.md#6-actions)).
 - [ ] One secondary action is an icon button with a Tooltip; a «⋯» menu holds two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
+- [ ] A record's dialog header shows up to five actions as icon buttons with Tooltips, «⋯» only beyond; a destructive one asks or holds ([actions of a record](composition.md#actions-of-a-record)).
+- [ ] A record's footer appears with a change: «Отменить изменения» + «Сохранить»; a create form: «Отмена» + «Создать» ([actions](composition.md#6-actions)).
 - [ ] An entity has one drawer opened from everywhere; permissions lock fields and hide tabs and actions; header actions act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A record's dialog header is three lines in this order: `Title` with its `number`, one line of `Description` text, `Badges` (the status and assignee pickers first, «Назначить» when nobody is) over the body; no badge or number in the description, no status in `Actions` ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A record drawer is one form with one «Сохранить» in its footer while dirty and `Drawer.Guard`; no save per section, no unsaved-status text ([a record in a drawer](composition.md#a-record-in-a-drawer)).
@@ -101,6 +103,7 @@ checks.
 - [ ] An action apart from a dialog's answer («Выйти» on a profile) is `Drawer.Actions` / `Modal.Actions` inside the footer, at its start ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A chat about a record heads itself in two lines — `Chat.Title number` over `Chat.Badges` — and an always-open search is `Chat.Search persistent` ([messages](choosing.md#2-inside-a-category)).
 - [ ] A tile that is a link shows the kit's arrow, never one of mine; a value in words is `stat-text` ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
+- [ ] A record's fact tiles are `stat-text valueSize="l"` in every dialog of the app, no Typography inside `Card.Value`; a record card with a total ends in `Card.Footer divider="fill"` with `Card.Total` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
 - [ ] An on/off permission or setting is a `Switch`, a level per entity a `FieldList` of `Select`s, a set of values in a table cell `Badge.Group overflow="count"` ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 

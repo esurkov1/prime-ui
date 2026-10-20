@@ -118,6 +118,8 @@ Every word on screen must carry something the person does not see already.
 
 - **A label once per column, not per row.** Records in rows have their headings above the first
   row only (`FieldList` draws them and names every field by its heading for screen readers).
+  Rows whose values name themselves («Аренда: 20 окт → 2 нояб», «1 200 ₽») take
+  `FieldList stackedLabels={false}`, so a phone does not repeat the headings over every stacked row.
 - **No numbered labels.** «Преимущество 1», «Преимущество 2» repeat the heading and count what the
   list already counts. The list label names the rows.
 - **No label that repeats its heading.** A field «Цена» inside the section «Цена» needs no label of

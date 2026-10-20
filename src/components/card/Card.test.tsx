@@ -3,9 +3,14 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
+import { Badge } from "@/components/badge/Badge";
+import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
+import hairline from "@/internal/hairline.module.css";
+import textRole from "@/internal/textRole.module.css";
 import { cssRule, cssValue } from "@/test/css";
 
 import { Card } from "./Card";
+import styles from "./Card.module.css";
 
 describe("Card", () => {
   it("renders mini variant with an icon, label and value straight in the root", () => {
@@ -208,6 +213,156 @@ describe("Card", () => {
     expect(icon).not.toHaveAttribute("data-media");
   });
 
+  it("a ProgressCircle in Card.Icon is the record's state ring: no tile, its own size, its own name", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Icon data-testid="icon">
+            <ProgressCircle value={0} color="yellow" aria-label="Бронь: до выдачи 17 д">
+              17 д
+            </ProgressCircle>
+          </Card.Icon>
+          <Card.Title>Honda PCX 160</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("data-media", "true");
+    expect(icon).not.toHaveAttribute("aria-hidden");
+    expect(icon).not.toHaveAttribute("data-tone");
+    const ring = screen.getByRole("progressbar", { name: "Бронь: до выдачи 17 д" });
+    expect(ring.closest("[data-size]")).toHaveAttribute("data-size", "m");
+  });
+
+  it("a footer with a total is a record's row: the note's dot first, its text cut, the total at the end", () => {
+    render(
+      <Card.Root>
+        <Card.Body>Позиции</Card.Body>
+        <Card.Footer divider="full">
+          <button type="button">Выдан</button>
+          <Card.Description data-testid="note">
+            <Badge.Dot color="yellow" data-testid="dot" />
+            Выдать 6 нояб · Банг Тао
+          </Card.Description>
+          <Card.Total data-testid="total">
+            <Card.Meta tone="warning" data-testid="due">
+              к оплате 6 400 ฿
+            </Card.Meta>
+            <Card.Value data-testid="value">26 400 ฿</Card.Value>
+          </Card.Total>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    const note = screen.getByTestId("note");
+    expect(note.firstElementChild).toBe(screen.getByTestId("dot"));
+    expect(note.lastElementChild).toHaveTextContent("Выдать 6 нояб · Банг Тао");
+    expect(note.lastElementChild).not.toBe(screen.getByTestId("dot"));
+    expect(screen.getByTestId("value")).toHaveClass(textRole.titleM);
+    expect(screen.getByTestId("due")).toHaveAttribute("data-tone", "warning");
+    expect(screen.getByTestId("total").firstElementChild).toBe(screen.getByTestId("due"));
+
+    const css = "src/components/card/Card.module.css";
+    expect(cssValue(cssRule(css, ".footer:has(> .total)"), "flex-wrap")).toBe("nowrap");
+    expect(cssValue(cssRule(css, ".total"), "margin-inline-start")).toBe("auto");
+    expect(cssValue(cssRule(css, ".total"), "justify-items")).toBe("end");
+    expect(cssValue(cssRule(css, ".noteText"), "text-overflow")).toBe("ellipsis");
+  });
+
+  it("a value straight in a footer keeps its template role; the total's is title-m", () => {
+    render(
+      <Card.Root>
+        <Card.Footer>
+          <Card.Value data-testid="value">26 400 ฿</Card.Value>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("value")).toHaveClass(textRole.titleL);
+  });
+
+  it("divider=fill sets the footer on the next layer of the ladder, with no line", () => {
+    render(
+      <Card.Root data-testid="card">
+        <Card.Body>Позиции</Card.Body>
+        <Card.Footer divider="fill" data-testid="footer">
+          <Card.Root data-testid="inner">Вложенная</Card.Root>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    const footer = screen.getByTestId("footer");
+    expect(screen.getByTestId("card")).toHaveAttribute("data-depth", "1");
+    expect(footer).toHaveAttribute("data-depth", "2");
+    expect(footer).toHaveAttribute("data-divider", "fill");
+    expect(footer).not.toHaveClass(hairline.top);
+    // A surface inside the footer counts its depth from the footer's layer.
+    expect(screen.getByTestId("inner")).toHaveAttribute("data-depth", "3");
+    const rule = cssRule("src/components/card/Card.module.css", '.footer[data-divider="fill"]');
+    expect(cssValue(rule, "background")).toBe("var(--prime-color-layer-current)");
+  });
+
+  it('valueSize="l" sets a stat-text value a step larger, a number and a phrase alike', () => {
+    render(
+      <>
+        <Card.Root variant="stat-text" valueSize="l">
+          <Card.Label>К оплате</Card.Label>
+          <Card.Value data-testid="number">21 000 ₽</Card.Value>
+        </Card.Root>
+        <Card.Root variant="stat-text">
+          <Card.Label>Ближайшая задача</Card.Label>
+          <Card.Value data-testid="phrase">Выдать PCX 160</Card.Value>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("number")).toHaveClass(textRole.titleM);
+    expect(screen.getByTestId("phrase")).toHaveClass(textRole.bodyM);
+  });
+
+  it("a link card with a header puts its arrow in the header, centred on its height", () => {
+    const { container } = render(
+      <Card.Root>
+        <Card.Header data-testid="header">
+          <Card.Title>
+            <Card.Link href="#866">Сделка #866</Card.Link>
+          </Card.Title>
+          <Card.Description>Аренда PCX 160 · 15 дн.</Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const marks = container.querySelectorAll(`.${styles.mark}`);
+    expect(marks).toHaveLength(1);
+    expect(marks[0]?.parentElement).toBe(screen.getByTestId("header"));
+    expect(
+      screen.getByRole("link", { name: "Сделка #866" }).querySelector(`.${styles.mark}`),
+    ).toBeNull();
+    const rule = cssRule("src/components/card/Card.module.css", ".header > .mark");
+    expect(cssValue(rule, "inset-block-start")).toBe("auto");
+    expect(cssValue(rule, "align-self")).toBe("center");
+  });
+
+  it("a link card without a header keeps the arrow in the link, in the top corner", () => {
+    render(
+      <Card.Root>
+        <Card.Body>
+          <Card.Link href="#866">Сделка #866</Card.Link>
+        </Card.Body>
+      </Card.Root>,
+    );
+    expect(
+      screen.getByRole("link", { name: "Сделка #866" }).querySelector(`.${styles.mark}`),
+    ).not.toBeNull();
+  });
+
+  it("a description outside the footer keeps its children as they are", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Honda PCX 160</Card.Title>
+          <Card.Description data-testid="description">@a.sokolova</Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("description").children).toHaveLength(0);
+  });
+
   it("CSS: a Card.Icon leads the header grid and spans the title and description rows", () => {
     const grid = cssRule("src/components/card/Card.module.css", ".header:has(> .icon)");
     expect(cssValue(grid, "grid-template-columns")).toBe(
@@ -280,8 +435,8 @@ describe("Card", () => {
     const link = screen.getByRole("link", { name: "Honda PCX" });
     expect(card).toHaveAttribute("data-link", "true");
     expect(link).toHaveAttribute("data-row-link");
-    // The kit draws the transition arrow; the card keeps one tab stop for the link.
-    expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    // The kit draws the transition arrow (in the header); the card keeps one tab stop for the link.
+    expect(card.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     expect(card.className).toMatch(/host/);
     expect(cssValue(cssRule("src/components/card/Card.module.css", ".link::after"), "inset")).toBe(
       "0",
@@ -316,7 +471,7 @@ describe("Card", () => {
     const link = screen.getByRole("button", { name: "Залог" });
     expect(screen.getByTestId("card")).toHaveAttribute("data-link", "true");
     expect(link).toHaveAttribute("data-row-link");
-    expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("card").querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     // The host never raises its own link: the `::after` is laid out by the card, not the button.
     expect(cssValue(cssRule("src/components/card/Card.module.css", ".link"), "border")).toBe("0");
     await userEvent.tab();

@@ -58,6 +58,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `getLabel` | `(item: T) => string` | — | The row's own text (its title field) for the remove button, the handle, the menu button and move announcements; else the row number. |
 | `getLocked` | `(item: T) => boolean` | — | Pinned rows: the remove stays in its place, off, and says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it. In the menu every item is off. |
 | `reorderable` | `boolean` | `false` | Rows move: with `rowActions="buttons"` by a handle that ends the row, after the remove button (drag, a touch hold, Alt + ↑ / ↓); with `"menu"` by its items «Выше» and «Ниже» and Alt + ↑ / ↓ on the menu button. |
+| `stackedLabels` | `boolean` | `true` | Stacked rows (under 30rem) show each field's column heading as its label. `false` for values that name themselves («Аренда: 20 окт → 2 нояб»): no labels, the headings stay the fields' names. |
 | `rowActions` | `"buttons" \| "menu"` | `"buttons"` | How a row offers its actions: `buttons` — a remove button «×» and, with `reorderable`, the handle after it; `menu` — one «⋯» button whose menu moves the row up or down and removes it. |
 | `variant` | `"plain" \| "surface"` | `"plain"` | Look of the list: `plain` — the rows on the host surface; `surface` — the rows on a fill of their own, one step up the surface ladder, with side padding. |
 | `min` | `number` | `0` | The fewest rows: at this count the remove buttons are disabled. |
@@ -103,6 +104,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `createItem` | the add button under the rows, aligned with the first column | the person grows the list | — |
 | `min` · `max` | remove buttons off at `min`; the add button closes up at `max` and comes back when a row leaves — no limit text of its own, a limit the person should know goes in `hint` | the record count is bounded | `0` · — |
 | `renderTotals` | a row of totals under the rows over a faint line, each on its column, aligned as the column's field text; «Итого» in the first cell without a total | the rows add up (shares, amounts, hours) | — |
+| `stackedLabels` | `true`: once the rows stack, each field shows its column heading above it; `false`: the stacked rows show no labels, the headings stay the fields' hidden names | `false` when the values name themselves («Аренда: 20 окт → 2 нояб», «1 200 ₽»); keep `true` for generic fields («Параметр», «Значение») | `true` |
 
 **Combinations**
 - Recommended: `label` on the list (or a `Fieldset` legend around it), one heading per column, a `getLabel` from the title field, an `addLabel` that says what is added.
@@ -120,7 +122,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | hover | the pointer over a row of a `surface` list (`(hover: hover)` only; a `plain` row has no fill of its own) | the whole row takes the field fill (`--prime-color-fill-muted`) and its fields the surface fill (`--prime-color-layer-current`) |
 | invalid | `error` (the list), a field's own `error` | the list's message under the add row; a field's under the field in its row |
 | disabled | `disabled` (or a disabled Fieldset) | `data-disabled="true"` on the frame; fields, handles, buttons and menu buttons disabled through the kit's disabled context |
-| stacked | container narrower than 30rem | heading row hidden; the compact columns, the first field and the actions on the first line, every other field on a line of its own with its label shown; `data-stack` on the body keeps the first field at least 160 wide: `actions` when it is too narrow beside the actions (they end the second line, after the next field), `main` when it is too narrow even without them (it takes the full width under the compact columns and the actions); each total on its own line after its column name |
+| stacked | container narrower than 30rem | heading row hidden; the compact columns, the first field and the actions on the first line, every other field on a line of its own with its label shown (none with `stackedLabels={false}`, and the lines stand 12 apart); `data-stack` on the body keeps the first field at least 160 wide: `actions` when it is too narrow beside the actions (they end the second line, after the next field), `main` when it is too narrow even without them (it takes the full width under the compact columns and the actions); each total on its own line after its column name |
 | saving | a promise from `onValueChange` | the rows show the new list, `aria-busy="true"` on the `<ol>`; a reject brings the owner's list back |
 | rows come and go | the add button, a remove, a menu move, a new `value` | a row the data adds rises in once (`enterMotion`), a removed one closes up in place and the rows below glide up (`listPresence`); a row the menu moves glides to its place (`useFlipList`); the heading row rises in with the first row and closes up with the last (`partPresence`); the first render stays still |
 
@@ -151,7 +153,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - The rows are an `<ol role="list">` named by the list `label` (`aria-labelledby`); the list gives each row its position, and the role keeps it under `list-style: none` in WebKit.
 - The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.
 - The `<ol>` is described by the list's `hint` and `error` (`aria-describedby`), which speak for every row.
-- In a narrow container the heading row goes and each field's label shows above it.
+- In a narrow container the heading row goes and each field's label shows above it; with `stackedLabels={false}` the labels stay hidden and still name the fields.
 - With `rowActions="menu"` the row's «⋯» button opens a `role="menu"` (Dropdown) named «Действия: {row}»; it lists Alt + ↑ / ↓ in `aria-keyshortcuts`, and a move says the row's new place in a polite live region.
 - The totals row (`renderTotals`) is a `group` named by `labels.totals`; each total is read after its column heading.
 - The remove button is «Удалить: {row}», the handle «Переместить: {row}»: the row's name from `getLabel`, else its number.
@@ -188,6 +190,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [errors.tsx](examples/errors.tsx) | Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field; a `*` after a heading marks a required column — `error`, `required`. |
 | [totals.tsx](examples/totals.tsx) | A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts, each ending where its fields end their numbers — `renderTotals`, `width`. |
 | [saving.tsx](examples/saving.tsx) | Removing a recipient is saved on the server: the row leaves at once and comes back with the reason if the server refuses — `onValueChange`, `error`. |
+| [named-rows.tsx](examples/named-rows.tsx) | A rental bill in a 320 px column whose lines name themselves: each line keeps its item and its remove button on the first line and its amount under it, with no labels, while every field is still named by its column — `stackedLabels`. |
 | [states.tsx](examples/states.tsx) | The same list editable and disabled while the request saves it: fields, handles and buttons turn off together — `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the lines: it sums them under the list and puts the saved lines back on reset — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | Specs of a plan in a 320 px column: the headings give way, the icon, its color and the name keep the first line, and the value takes the line under it with the remove button and the handle, each field with its own label — `columns`, `width`. |
@@ -205,6 +208,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A «⋯» menu or a «−» drawn by hand next to the rows → `rowActions`; a Card drawn around the list to set it apart from the form → `variant="surface"`.
 - `rowActions="menu"` on a two-column list a person reorders all day → the buttons: the handle and «×» in sight are one gesture, the menu is three.
 - `aria-label` written on every field in a cell → none: the column heading names the field.
+- «Позиция» / «Сумма» above every field of every stacked row when the values already say what they are («Аренда: 20 окт → 2 нояб», «1 200 ₽») → `stackedLabels={false}`; never an empty column `label` to hide them, which leaves the fields unnamed.
 - `createItem` dropped by hand once nothing is left to add (every section picked) → `max`: the add button leaves at the limit by itself; a limit the person should know is a `hint` («Не больше трёх получателей»), never a count beside the button.
 - A grip, a remove button and an add button drawn by hand around a `.map()` of fields → FieldList.
 - A total under the list typed by hand in a line of text, or a DataTable of fields to get a totals row → `renderTotals`.

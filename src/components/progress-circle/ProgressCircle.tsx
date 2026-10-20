@@ -5,6 +5,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
+import { useMediaSlotSize } from "@/internal/mediaSlot";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
@@ -170,7 +171,8 @@ export function ProgressCircle(props: ProgressCircleProps) {
     ...rest
   } = props;
   const descriptionId = React.useId();
-  const { size, provide } = useHostTier(sizeProp);
+  // In a mark slot (`Card.Icon`) the ring stands for the record's state: the tile gives way.
+  const { size, provide } = useHostTier(useMediaSlotSize("ring") ?? sizeProp);
   const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
   const isText = typeof children === "string" || typeof children === "number";
   const showInner = !loading && children != null && children !== false && size !== "xs";

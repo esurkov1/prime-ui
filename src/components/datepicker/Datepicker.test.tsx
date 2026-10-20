@@ -422,6 +422,53 @@ describe("Datepicker.Root", () => {
     ).toBeInTheDocument();
   });
 
+  it("labels.rangeValue writes a range with both ends; an open start keeps labels.until", () => {
+    const today = new Date(2026, 9, 7);
+    const labels = { rangeValue: "{from} → {to}" };
+    const { rerender } = render(
+      <Datepicker.Root
+        mode="range"
+        value={{ from: new Date(2026, 9, 20), to: new Date(2026, 10, 2) }}
+        today={today}
+        valuePrefix="Аренда:"
+        labels={labels}
+        aria-label="Срок"
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Срок: Аренда: 20 окт → 2 нояб" }),
+    ).toBeInTheDocument();
+    rerender(
+      <Datepicker.Root
+        mode="range"
+        value={{ from: null, to: new Date(2026, 10, 2) }}
+        today={today}
+        labels={labels}
+        aria-label="Срок"
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Срок: до 2 нояб" })).toBeInTheDocument();
+  });
+
+  it("draws a leading glyph only with Datepicker.TriggerIcon; Enter still opens", async () => {
+    const { rerender } = render(<Datepicker.Root mode="single" aria-label="Дата" />);
+    const trigger = screen.getByRole("button", { name: /Дата/ });
+    // Without the part: the chevron alone.
+    expect(trigger.querySelectorAll("svg")).toHaveLength(1);
+    rerender(
+      <Datepicker.Root mode="single" aria-label="Дата">
+        <Datepicker.TriggerIcon data-testid="glyph" />
+      </Datepicker.Root>,
+    );
+    const glyph = screen.getByTestId("glyph");
+    expect(glyph).toHaveAttribute("aria-hidden", "true");
+    expect(glyph.querySelector("svg")).not.toBeNull();
+    expect(trigger.firstElementChild).toBe(glyph);
+    trigger.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
   it("opening the popover focuses the picked day", async () => {
     render(
       <Datepicker.Root

@@ -121,7 +121,7 @@ const absence = (id: string, label: string, from: number, to: number): Assignmen
   kind: "absence",
   client: null,
   color: "purple",
-  readOnly: true,
+  edit: "none",
   start: at(from),
   end: at(to),
 });
@@ -676,7 +676,7 @@ export default function GanttScreenExample() {
                 ) : null}
               </Drawer.Body>
               <Drawer.Footer>
-                {detail && !detail.readOnly ? (
+                {detail && detail.edit !== "none" ? (
                   <ConfirmDialog.Root
                     title={`Снять задачу «${detail.label}»?`}
                     description={`${selected?.person.name} освободится на эти дни. Задачу можно будет назначить заново.`}

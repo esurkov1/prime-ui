@@ -35,6 +35,8 @@ Card.Root variant="split"        Body(cell × 2: any element, e.g. <div> with Ic
 Card.Root variant="cta"          Title · Description · Footer
 Card.Root variant="list"         Header(Title, …trailing) · List(ListItem …)
 Card.Root variant="cover"        Media · Body(Title, Description) · Footer
+Card.Root … Footer(…actions, Description?, Total(Meta?, Value))
+                                 a record's row: actions · note · total at the end
 Card.Root … Title > Link         a stretched link (an <a>, or asChild a <button> that opens a window):
                                  the card opens from anywhere, its own buttons stay
 Card.Root asChild                <a> or <button> (the only child) holding the parts of any template
@@ -50,13 +52,14 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `variant` | `"panel" \| "mini" \| "stat-trend" \| "stat-text" \| "split" \| "cta" \| "list" \| "cover"` | `"panel"` | Structural template: titled block with zones (`panel`), KPI tiles (`stat-text` for a value that is a line of text, with an action at the end of the row), a call to action, a list or a cover tile. |
+| `valueSize` | `"m" \| "l"` | `"m"` | The step of a `stat-text` value, a number or a phrase alike: `m` — body-m medium, `l` — title-m, a step above the text (the fact tiles of a record). The loading Skeleton takes the same height. |
 | `flat` | `boolean` | `false` | No raised shadow: a flat tile for dense grids. |
 | `loading` | `boolean` | `false` | The KPI is loading: `Card.Value`, `Card.Delta` and `Card.Meta` show a Skeleton in their own geometry and the root sets `aria-busy`; the data fades in when it arrives. Labels and titles stay. |
 | `asChild` | `boolean` | `false` | The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring, a link draws the arrow. No interactive inside: see `Card.Link`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
 ### Card.Link
-`ref` → `HTMLAnchorElement`. The stretched link around the title: a click anywhere on the card opens it, it is the one tab stop, the card's own buttons stay above it. The card draws the transition arrow.
+`ref` → `HTMLAnchorElement`. The stretched link around the title: a click anywhere on the card opens it, it is the one tab stop, the card's own buttons stay above it. The card draws the arrow: at the end of `Card.Header`, centred on it, or in the top corner.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -79,7 +82,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Description
-`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; inside `Card.Header` it stacks under the title.
+`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; in `Card.Header` it stacks under the title; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -101,15 +104,22 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Footer
-`ref` → `HTMLDivElement`. The bottom row of buttons, wrapping: right-aligned under a faint hairline in `panel` and `list`, under a full-width hairline in `cta`.
+`ref` → `HTMLDivElement`. The bottom row of buttons: right-aligned under a faint hairline in `panel` and `list`, under a full one in `cta`. A record's row: the actions, the note (`Card.Description`), `Card.Total` at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `divider` | `"full"` | — | A line above the zone that runs edge to edge, in any template, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset hairline of `panel` / `list` and the full one of `cta`). |
+| `divider` | `"full" \| "fill"` | — | How the zone stands off the one above: `full` — a line edge to edge in the `Divider` ink; `fill` — no line, the zone on the next layer out to the card's edges (a record's footer). Without it: the template's hairline. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.Total
+`ref` → `HTMLDivElement`. The total of a record at the end of `Card.Footer`: a `Card.Value` (title-m, tabular) with an optional `Card.Meta` above it, the total's state («к оплате 21 000 ₽», «оплачено») in a `tone`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Icon
-`ref` → `HTMLDivElement`. The 40px accent tile of one icon: beside the label and value in `mini` and a `split` cell, first in `Card.Header`. An `Avatar.Root` or `Thumbnail.Root` inside (also in a wrapper) is the record's picture: no tile, 40px, `aria-hidden`.
+`ref` → `HTMLDivElement`. The 40px accent tile of one icon, first in `Card.Header`. An `Avatar.Root` or `Thumbnail.Root` inside (also in a wrapper) is the record's picture: no tile, 40px, `aria-hidden`; a `ProgressCircle` its state ring: no tile, its own size and name.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -123,7 +133,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Value
-`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width; body-m medium in `stat-text`.
+`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -139,10 +149,11 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Meta
-`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; under the value.
+`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; under the value; in `Card.Total` the total's state above it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | — | The ink by meaning (an amount due is `warning`, paid `success`); without it the line is muted. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.List · Card.ListItem
@@ -170,11 +181,18 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `full` | the zone's top line runs edge to edge in any template, in the `Divider` ink (`border-subtle`), so it reads in both themes; the zone lines of `panel` / `list` / `cta` stay faint | a zone line wider than the card padding | |
+| `fill` (Footer) | no line: the footer is a zone on the next layer of the ladder (`data-depth`, `--prime-color-layer-current`), out to the card's edges and its bottom radius, the card padding on every side | the footer of a record or an invoice: its action, task and total | |
 
-### tone (Delta · Value)
+### valueSize (Root, `stat-text`)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `neutral` | `text-secondary` (Delta), the primary ink (Value) | a change or a value with no good/bad meaning | yes (Delta) |
+| `m` | the value body-m medium, the same size as the text | a summary tile with a phrase beside other text | yes |
+| `l` | the value title-m, a step above the text, a number and a phrase alike; the loading Skeleton takes its height | the fact tiles of a record («К оплате», «Ближайшая задача», «LTV») | |
+
+### tone (Delta · Value · Meta)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `neutral` | `text-secondary` (Delta), the primary ink (Value), muted (Meta) | a change or a value with no good/bad meaning | yes (Delta) |
 | `success` | `success-text` | the change is good, a payment | |
 | `warning` | `warning-text` | the change needs attention | |
 | `danger` | `danger-text` | the change is bad | |
@@ -192,8 +210,9 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | template | `variant` | `data-variant` |
 | flat | `flat` | `data-flat` |
 | loading | `loading` | `aria-busy` on the root; `data-loading` on `Card.Value`, `Card.Delta`, `Card.Meta`, each holding a `Skeleton`; on `false` the data fades in (`useSwapIn`, foundation §1 rule 7) |
-| depth | nesting: one above the nearest surface (the page and the AppShell panel are 0) | `data-depth` (`1`–`4`, `floating-1`/`floating-2` inside a floating layer); the fill is `--prime-color-layer-current`, the shadow only at depth 1 |
-| card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem (a header control under its description), the `stat-trend` value changes at 20rem / 36rem, a `stat-text` action drops under the text below 20rem |
+| depth | nesting: one above the nearest surface (the page and the AppShell panel are 0) | `data-depth` (`1`–`4`, `floating-1`/`floating-2` inside a floating layer); the fill is `--prime-color-layer-current`, the shadow only at depth 1; a `divider="fill"` footer takes the next depth the same way |
+| link arrow | `Card.Link` or `asChild` with a link | the kit's arrow, `aria-hidden`: the last child of `Card.Header` (at its end, centred on its height), or in the top corner of a card without a header |
+| card width | container queries | a record footer puts its note on its own line below 30rem, `split` stacks below 22rem, `Header` wraps below 22rem (a header control under its description), the `stat-trend` value changes at 20rem / 36rem, a `stat-text` action drops under the text below 20rem |
 | hover | `asChild`, a fine pointer | the fill stays (a whole surface never changes its fill, foundation §8); the shadow lifts to `--prime-shadow-overlay` over `fast` |
 | press | `asChild`, `:active` | `scale(--prime-motion-press-scale)` over `fast`; reduced motion keeps it still |
 | focus | `asChild`, `:focus-visible` | the focus ring outside the card |
@@ -203,11 +222,13 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 ## Layout & spacing
 - Cards on a page: one `Page.Grid` with a `Page.Cell span` per card (16 on both axes, the cards of a row share one height); a grid inside one block is the block's own intrinsic `auto-fill` grid on the tile width of the layout tokens (a lone card keeps its column width), gap `--prime-space-4`.
 - Radius `--prime-card-radius`, no border. In `panel` and `list` the `Header` is a padded zone with a faint inset hairline below; in `stat-trend` it can pair a leading Badge or icon with a compact `Card.Value`.
-- Padding `--prime-card-padding-m` (20); a `Body` that opens the card (no `Header` or `Media` above) has it on all four sides; `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
+- Padding `--prime-card-padding-m` (20); a `Body` that opens the card (no `Header` or `Media` above) has it on all four sides, and so does a `Footer` under a hairline (`panel`, `list`, `cta`, `divider="full"`) — a zone of its own, its buttons and total in its middle; `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
 - Long values wrap; labels truncate, except in a `mini` tile and a `split` cell, where a label beside the icon wraps instead; a chart SVG needs a CSS height.
 - In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper. A `Card.Description` in the header stacks under the title, 4 apart; the control stays at the end, centred on both lines.
-- A `Card.Icon` in a `Header` leads the row, 12 before the title, centred on the title and the description: the accent tile, or the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own wrapper component, with no tile; it takes 40 px whatever size it was given — for a card about one person or object (a linked account, a contact).
+- A `Card.Icon` in a `Header` leads the row, 12 before the title, centred on the title and the description: the accent tile, or the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own wrapper component, with no tile; it takes 40 px whatever size it was given — for a card about one person or object (a linked account, a contact). A `ProgressCircle` in it is the record's state ring (the term of a rental): no tile, its own diameter (48 at `m`), and it keeps its name for assistive tech.
+- A record's footer: `Card.Total` at the end of the row holds the total — a `Card.Value` (title-m, tabular, a `tone` if it is due) with an optional `Card.Meta` above it, its state («к оплате 21 000 ₽», «оплачено») in a `tone`, both aligned to the end; a `Card.Description` is the note between the actions and the total — a `Badge.Dot` first, the text cut to one line; below 30rem of the card's width the note takes its own line above the actions and the total. `divider="fill"` sets the footer on its own fill instead of a line. Line items with amounts above it are a `DescriptionList align="end"` in a `Card.Body`.
+- The transition arrow of a card that opens stands at the end of its `Card.Header`, centred on the header's height (a two-line head with a picture or a ring included); the title keeps clear of it. Without a header it stands in the top corner.
 - `stat-text` with an action: put the Button straight into the root after the text parts — the tile becomes two columns, the label, value and meta in the first, the action at its own size at the end, centred on the text (no wrapper, no layout of your own in `Card.Body`).
 - `Card.Link` is an `<a>` with `href`; a record that opens in place (a window, a drawer) takes `asChild` with a `<button>` — it stretches over the card the same way, with the same arrow and focus ring.
 - `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up; in `mini` and a `split` cell it sits in the text column under the value.
@@ -247,7 +268,8 @@ No `labels`.
 | [person-header.tsx](examples/person-header.tsx) | A linked Telegram account in an employee card: the avatar leads the header, the handle stands under the name and the unlink button sits at the end — `Card.Icon`, `Avatar.Root`, `Card.Description`. |
 | [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
 | [record-link.tsx](examples/record-link.tsx) | A transport card that opens its record from anywhere and keeps its own button, a full-width line above the action row, and a deposit card that opens its window in place — `Card.Link`, `asChild`, `Card.Footer`, `divider`. |
-| [text-values.tsx](examples/text-values.tsx) | Summary tiles whose value is a line of text, one of them in a tone — `variant`, `stat-text`, `tone`. |
+| [record-totals.tsx](examples/record-totals.tsx) | A rental unit of a deal: its term ring leads the header beside the arrow, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`. |
+| [text-values.tsx](examples/text-values.tsx) | Summary tiles whose value is a line of text a step larger than the label, a phrase and a number alike, one of them in a tone — `variant`, `stat-text`, `valueSize`, `tone`. |
 | [text-action.tsx](examples/text-action.tsx) | Summary tiles of a rental with the action of each step at the end of the row — `stat-text`, `Card.Value`, `Card.Meta`. |
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
@@ -269,8 +291,11 @@ No `labels`.
 - A `Card.Body` with a hand-laid row of label, value and button in a `stat-text` tile → the Button straight in the root, after `Card.Meta`.
 - A `?modal=…` link to open a window from a card → `Card.Link asChild` with a `<button>`.
 - The reference figures written into `Card.Delta` or `Card.Label` → `Card.Meta`.
+- A hand-laid grid of action, task and total in `Card.Footer` → the Button, a `Card.Description` (with a `Badge.Dot`) and a `Card.Total` straight in the footer.
+- A `Typography variant="title-m"` inside `Card.Value` of a `stat-text` tile → `valueSize="l"` on the root (the Skeleton then keeps the value's height).
+- A footer painted with your own background → `Card.Footer divider="fill"`.
 - Skeletons placed by hand inside `Card.Value` → `Card.Root loading`; keep the parts mounted while loading so each holds its place.
 
 ## Related
-- **Built from:** [Skeleton](../skeleton/COMPONENT.md), `Icon` (the transition arrow), `internal/rowLink` (the stretched link), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Card.Icon`)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`Badge.Dot` of a footer note), [Skeleton](../skeleton/COMPONENT.md), `Icon` (the transition arrow), `internal/rowLink` (the stretched link), `internal/mediaSlot` (a record's Avatar, Thumbnail or ProgressCircle in `Card.Icon`), `internal/parts` (the dot of a footer note)
 - **See also:** [Page](../../layout/page/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Sparkline](../sparkline/COMPONENT.md) (a trend with its total inside a `panel`), [ChartFrame](../chart-frame/COMPONENT.md) (a full chart with legend and states)

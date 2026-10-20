@@ -209,8 +209,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemTitle",
-      en: "`ref` → `HTMLSpanElement`. The card title: medium body text, up to three lines. With a tail — `number`, an `Avatar.Root` child (the owner, last) — one row: the name cut with an ellipsis, the tail never shrinks.",
-      ru: "Заголовок карточки: средний текст, до трёх строк. С хвостом — `number`, дочерний `Avatar.Root` (ответственный, последним) — одна строка: имя обрезается многоточием, хвост не сжимается.",
+      en: "`ref` → `HTMLSpanElement`. The card title: medium body text, up to three lines. With a tail — `number`, an `Avatar.Root` child (the owner, also inside a fragment) — one row: the name cut with an ellipsis, then the number, the owner last; the tail never shrinks.",
+      ru: "Заголовок карточки: средний текст, до трёх строк. С хвостом — `number`, дочерний `Avatar.Root` (ответственный, в том числе внутри фрагмента) — одна строка: имя обрезается многоточием, затем номер, ответственный последним; хвост не сжимается.",
       props: [
         {
           name: "number",

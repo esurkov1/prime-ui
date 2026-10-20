@@ -53,7 +53,7 @@ under them → its `renderTotals`.
 | several of many, shown as tags, with search / creation | TagSelect (`Select.Root multiple` when tags are not needed) |
 | narrowing a list or table by several fields, with search and show / hide | SmartFilter |
 | an approximate number in a range | Slider (exact number → Input) |
-| a date or a period | Datepicker |
+| a date or a period | Datepicker; among select-like fields (a bill line) without `Datepicker.TriggerIcon`, its range written by `labels.rangeValue` («{from} → {to}») |
 | a time of day without a date | Input with `Input.Field type="time"` (a date with a time → Datepicker `withTime`) |
 | a color from a fixed palette in a form or dialog | ColorSwatches (inline grid, default choice) |
 | a compact color next to a field or in a list row | ColorPresets (trigger + popover palette; `allowCustom` when any hex is valid too) |

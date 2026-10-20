@@ -107,7 +107,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Kanban.ItemTitle
-`ref` → `HTMLSpanElement`. The card title: medium body text, up to three lines. With a tail — `number`, an `Avatar.Root` child (the owner, last) — one row: the name cut with an ellipsis, the tail never shrinks.
+`ref` → `HTMLSpanElement`. The card title: medium body text, up to three lines. With a tail — `number`, an `Avatar.Root` child (the owner, also inside a fragment) — one row: the name cut with an ellipsis, then the number, the owner last; the tail never shrinks.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -202,7 +202,7 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 | `loading` | skeleton cards in the card geometry, no counts | the first load or a refresh | `false` |
 | `loadingColumns` | placeholder columns (a Skeleton title, Skeleton cards) while `loading` and `columns` is empty | the stages themselves come from the server | `3` |
 | `disabled` | cards do not drag, Alt + arrows do nothing | read-only boards, no permission | `false` |
-| `number` (`Kanban.ItemTitle`) | the title is one row: the name cut with an ellipsis, the muted number and an owner `Avatar.Root` child at the end | a record's card: a deal, an order, a booking | — |
+| `number` (`Kanban.ItemTitle`) | the title is one row: the name cut with an ellipsis first, then the muted number, an owner `Avatar.Root` child (also inside a fragment) last | a record's card: a deal, an order, a booking | — |
 
 ## States
 | State | Driven by | DOM |
@@ -332,6 +332,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - Applying a move in `onValueChange` and then undoing it yourself when the request fails → return the request's promise and apply `value` only after it succeeds; the board keeps the card in place meanwhile and glides it back on a rejection.
 - A hand-drawn `Divider` and gaps between groups of card parts → `Kanban.ItemSection`; it drops an empty zone and its line by itself.
 - The record number or the owner in `Kanban.ItemHeader` above a one-line title → `Kanban.ItemTitle number` with an `Avatar.Root` child.
+- A hand-made row of a truncated name, a number caption and the owner inside `Kanban.ItemTitle` → `Kanban.ItemTitle number` with the `Avatar.Root` as a child (a fragment around it is fine).
 - Your own row of a ring and two text lines for a vehicle or a room → `Kanban.ItemResource`.
 - The board's view in `DataTableColumnsMenu` or a hand-made Dropdown → `KanbanFieldsMenu`.
 - Drag as the only way to change a status → keep a status field or a menu in the card details too.

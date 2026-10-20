@@ -112,6 +112,16 @@
 }
 
 /*
+ * In a card with a `Card.Header` the arrow is the header's own child: out of the flow, at the end
+ * edge, and — its block position left to the header's alignment (the static position) — centred on
+ * the header's height, a two-line head included.
+ */
+.header > .mark {
+  inset-block-start: auto;
+  align-self: center;
+}
+
+/*
  * The stretched link: its box is the whole card, over the content; the card's controls stand above.
  * A `<button>` in its place (a record that opens in a window) reads as the same text.
  */
@@ -378,18 +388,19 @@
   grid-column: text;
 }
 
-.header > :not(.title, .description, .icon) {
+.header > :not(.title, .description, .icon, .mark) {
   grid-column: end;
   grid-row: 1 / -1;
 }
 
-/* The record's picture (`Avatar.Root`, `Thumbnail.Root`) has no tile: the picture is the mark. */
+/* The record's picture (`Avatar.Root`, `Thumbnail.Root`) or its state ring (`ProgressCircle`, at
+   its own diameter) has no tile: it is the mark. */
 .icon[data-media="true"] {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   min-width: var(--prime-space-10);
-  height: var(--prime-space-10);
+  min-height: var(--prime-space-10);
 }
 
 .body {
@@ -441,6 +452,58 @@
   padding-top: var(--prime-space-2);
 }
 
+/*
+ * The footer of a record: `Card.Total` at the end of the row at its own width (its state, a
+ * `Card.Meta`, small above the number); a `Card.Description` is its note — a status dot first, the
+ * text cut to one line in the free width between the actions and the total. One line, centred in
+ * the zone.
+ */
+.footer:has(> .total) {
+  flex-wrap: nowrap;
+  gap: var(--prime-space-2) var(--prime-space-3);
+}
+
+.total {
+  display: grid;
+  flex-shrink: 0;
+  justify-items: end;
+  margin-inline-start: auto;
+  text-align: end;
+}
+
+/*
+ * `divider="fill"`: the footer is a zone on the next layer of the ladder (`data-depth` joined in
+ * TSX, so its controls read that layer's context variables), out to the card's edges and its
+ * bottom radius, no line, the card padding on every side.
+ */
+.footer[data-divider="fill"] {
+  border-end-start-radius: var(--prime-card-radius);
+  border-end-end-radius: var(--prime-card-radius);
+  background: var(--prime-color-layer-current);
+}
+
+/* In a template with padding on the root the fill steps out over it to the card's edges. */
+.root:is([data-variant="cta"], [data-variant="stat-trend"], [data-variant="stat-text"])
+> .footer[data-divider="fill"] {
+  width: auto;
+  margin: 0 calc(var(--card-pad) * -1) calc(var(--card-pad) * -1);
+}
+
+.footer > .description {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.noteText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* ---------- mini with media ---------- */
 
 /* A `Card.Media` in `mini` (a sparkline, a fill level) is a full-width bottom slot. */
@@ -485,17 +548,19 @@
   padding-top: var(--prime-space-4);
 }
 
-/* Content before the footer keeps the same 16px above the hairline as the footer has below it. */
+/* Content before the footer keeps 16 above the hairline; the footer under it is a zone of its own
+   (below). */
 .root[data-variant="panel"] > .body:has(+ .footer),
 .root[data-variant="list"] > .list:has(+ .footer) {
   padding-bottom: var(--prime-space-4);
 }
 
-/* The footer of a zoned card: faint hairline above, same side padding, buttons at the end. */
+/* The footer of a zoned card: faint hairline above, buttons at the end. A zone under its own line,
+   it has the card padding on every side, so its content sits in its middle. */
 .root[data-variant="panel"] > .footer,
 .root[data-variant="list"] > .footer {
   justify-content: flex-end;
-  padding: var(--prime-space-4) var(--card-pad) var(--card-pad);
+  padding: var(--card-pad);
 }
 
 /* ---------- list ---------- */
@@ -522,7 +587,7 @@
 .root[data-variant="cta"] > .footer {
   --hairline-inset: 0%;
 
-  padding-top: var(--prime-space-4);
+  padding-top: var(--card-pad);
 }
 
 /* ---------- split ---------- */
@@ -575,6 +640,15 @@
   padding: var(--card-gap) var(--card-pad) var(--card-pad);
 }
 
+/* A footer under a full-width line is a zone in any template: the card padding above it too. */
+.root > .footer[data-divider="full"] {
+  padding-top: var(--card-pad);
+}
+
+.root > .footer[data-divider="fill"] {
+  padding: var(--card-pad);
+}
+
 /* ---------- Responsive (own width; container = the card, so only descendants adapt) ---------- */
 
 /* The `stat-trend` headline (heading-l, joined in TSX) follows the card's width: heading-m in a
@@ -584,6 +658,19 @@
   .value.headline {
     font-size: var(--prime-text-heading-m-size);
     line-height: var(--prime-text-heading-m-line-height);
+  }
+}
+
+/* A narrow record footer keeps its note readable: the note takes its own line above the actions
+   and the total. */
+@container (max-width: 30rem) {
+  .footer:has(> .total):has(> .description) {
+    flex-wrap: wrap;
+  }
+
+  .footer:has(> .total) > .description {
+    flex-basis: 100%;
+    order: -1;
   }
 }
 
@@ -624,7 +711,7 @@
   }
 
   /* A header grid (a description or an icon): its control drops under the text. */
-  .header > :not(.title, .description, .icon) {
+  .header > :not(.title, .description, .icon, .mark) {
     grid-column: text;
     grid-row: auto;
     justify-self: start;

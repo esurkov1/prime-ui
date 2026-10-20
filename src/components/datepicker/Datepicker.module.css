@@ -32,8 +32,12 @@
   width: 100%;
 }
 
+/* The leading glyph (`Datepicker.TriggerIcon`, a span with a kit Icon) and the chevron. */
 .triggerIcon {
+  display: inline-flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   color: var(--prime-color-text-muted);
 }
 

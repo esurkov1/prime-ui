@@ -32,7 +32,8 @@ import {
 
 ## Anatomy
 ```
-Datepicker.Root             field frame: label · field button (calendar icon, value, chevron) · hint / error
+Datepicker.Root             field frame: label · field button (TriggerIcon?, value, chevron) · hint / error
+├─ Datepicker.TriggerIcon   optional leading glyph (the calendar, or its children)
 └─ Popover                  the calendar panel
 Datepicker.Panel            the same calendar without a field, the host's own content (no card)
 
@@ -47,7 +48,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Datepicker.Root
-`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option.
+`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with the value and a chevron, a leading `Datepicker.TriggerIcon` when given) that opens the calendar panel in a Popover. Takes every calendar option.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -55,6 +56,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `value` | `Date \| null  ·  DatepickerRange` | — | Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set. |
 | `defaultValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Initial value, uncontrolled. |
 | `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
+| `children` | `ReactNode` | — | `Datepicker.TriggerIcon` — the leading glyph of the field button; without it the field shows only the value and the chevron, like a `Select`. |
 | `open` | `boolean` | — | Controlled visibility of the panel. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Field click, Escape, an outside press or an applied value. |
@@ -91,6 +93,13 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `weekStartsOn` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | `1` | First day of the week (1 — Monday). |
 | `labels` | `Partial<DatepickerLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
+
+### Datepicker.TriggerIcon
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with the leading glyph of the field button at the tier icon size, before the value: the calendar by default.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (another `Icon` in place of the calendar), `className` and the other span attributes. |
 
 ### Datepicker.Panel
 `ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option.
@@ -141,6 +150,13 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 | `single` | one picked day with an accent fill | one date | |
 | `range` | accent edges and a soft band between them, a preview band while picking the end | periods | |
 
+### Structure
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| no `Datepicker.TriggerIcon` | the value and the chevron, like a `Select` field | a field whose label or prefix already says it is a date; a row of select-like fields (a bill line) | yes |
+| `<Datepicker.TriggerIcon />` | a muted calendar glyph before the value | a lone date field in a toolbar or a filter row | |
+| `Datepicker.TriggerIcon` with an `Icon` child | that glyph in place of the calendar | the date of a specific event (a delivery, a reminder) | |
+
 ### months
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -179,6 +195,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 
 ## Layout & spacing
 - The field fits its text by default (`width: fit-content`, max 100%); in forms use `fullWidth`.
+- Field button: `Datepicker.TriggerIcon` (when given) · `valuePrefix` and the value · the chevron, the field padding between them, as in a `Select` trigger. A range reads `labels.rangeValue` («6 окт — 3 нояб»; `"{from} → {to}"` for an arrow).
 - Label → field: the tier `label-gap`; field → field in a form: the gap of a label-less `Fieldset`.
 - `align="auto"`: a field near the end of the screen lines up the popover's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
 - Months gap `--prime-space-6`. `Datepicker.Panel` has no fill, padding or radius — the host is its container; it shows 1–2 months by the host's width with day columns spread across it. An embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works in a 320 px column.
@@ -227,6 +244,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 | `timeEnd` | `"Время конца"` | Name of the end time input. |
 | `time` | `"Время"` | Name of the time input of a single date. |
 | `until` | `"до"` | Prefix of a range without a start: «до 6 окт». |
+| `rangeValue` | `"{from} — {to}"` | Field text of a range with both ends, `{from}` and `{to}` the formatted days: «6 окт — 3 нояб», or «6 окт → 3 нояб» with `{from} → {to}`. |
 | `presetsGroup` | `"Период"` | Accessible name of the presets group (no visible heading). |
 | `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
 | `required` | `"обязательное поле"` | Read after the field name of a `required` field: its trigger is a button, which takes no `aria-required`. |
@@ -238,9 +256,11 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the field is 28 to 48 px high, the day cell of the panel 24 to 40 px — `size`. |
 | [states.tsx](examples/states.tsx) | An empty field with the default placeholder, a filled, a disabled and an invalid one, and one whose focus shows without the ring — `disabled`, `invalid`, `focusRing`. |
 | [validation.tsx](examples/validation.tsx) | A leave period checked live: the error shakes in, names the broken rule and leaves once the period fits; an optional return date — `required`, `hint`, `error`, `optional`. |
+| [with-icon.tsx](examples/with-icon.tsx) | A leading glyph before the value: none by default, the calendar, or another icon in its place — `Datepicker.TriggerIcon`. |
 | [range-presets.tsx](examples/range-presets.tsx) | A report period: presets aside, two months, a step prompt, time fields with Reset / Apply, no future days; Reset returns the current month and the panel lines up with the field's end — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`, `resetValue`, `align`. |
 | [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in a card: the card is its container, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
 | [yearless.tsx](examples/yearless.tsx) | An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. |
+| [rental-term.tsx](examples/rental-term.tsx) | A rental term in a bill line: the kind is part of the value, the range reads with an arrow and the field has no glyph, like a select beside it — `valuePrefix`, `labels`. |
 | [locale.tsx](examples/locale.tsx) | A delivery window on a partner portal in English: month and weekday names from the date-fns locale, the week from Sunday and the system texts translated — `locale`, `weekStartsOn`, `labels`. |
 | [deadline.tsx](examples/deadline.tsx) | A document's expiry date whose hint counts the days left and takes the status tone — `hint`, `hintTone`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A shift period with a footer: the calendar keeps the draft on a press beside it and closes by Escape, Reset or Apply — `closeOnOutsideClick`, `closeOnEscape`. |
@@ -256,8 +276,10 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 - `presets` on `mode="single"` → presets work only for ranges.
 - `hint` for the calendar step line → `hint` is the field hint; the step line is `prompt`.
 - A status badge inside the field → put a Badge next to the field or use `hint`.
+- An own range text («20 окт → 2 нояб») built with `formatDatepickerValue` and string replacing → set `labels.rangeValue`; the field text and its accessible name follow it.
+- Hiding the calendar glyph with CSS → it is a part: leave out `Datepicker.TriggerIcon`.
 - Converting values to UTC inside the component → values are wall-clock dates; convert in the app.
 
 ## Related
-- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, presets, Reset / Apply), [ScrollContainer](../scroll-container/COMPONENT.md) (the presets row when narrow), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
+- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, presets, Reset / Apply), [ScrollContainer](../scroll-container/COMPONENT.md) (the presets row when narrow), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (the TriggerIcon calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

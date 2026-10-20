@@ -63,6 +63,8 @@ export type DatepickerLabels = {
   time: string;
   /** Prefix of a range without a start: «до 6 окт». */
   until: string;
+  /** Field text of a range with both ends: `{from}`, `{to}`. */
+  rangeValue: string;
   /** Accessible name of the presets group. */
   presetsGroup: string;
   /** Muted marker after the field label when `optional`. */
@@ -87,6 +89,7 @@ export const DATEPICKER_LABELS: DatepickerLabels = {
   timeEnd: "Время конца",
   time: "Время",
   until: "до",
+  rangeValue: "{from} — {to}",
   presetsGroup: "Период",
   optional: "необязательно",
   required: "обязательное поле",

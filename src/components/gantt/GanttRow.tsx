@@ -16,6 +16,7 @@ import { stepDown } from "@/internal/states";
 import styles from "./Gantt.module.css";
 import { GanttBarView } from "./GanttBar";
 import {
+  barEdit,
   daysBetween,
   formatSpan,
   type GanttBar,
@@ -103,6 +104,7 @@ export type GanttRowProps = {
   editableAtAll: boolean;
   creatable: boolean;
   hintId: string;
+  endHintId: string;
   createHintId: string;
 };
 
@@ -137,6 +139,7 @@ function GanttRowView({
   editableAtAll,
   creatable,
   hintId,
+  endHintId,
   createHintId,
 }: GanttRowProps) {
   const barTier = stepDown(useControlSize(undefined));
@@ -251,6 +254,7 @@ function GanttRowView({
           const x = daysBetween(start, dates.start);
           const span = Math.max(daysBetween(dates.start, dates.end), 1);
           const pinned = pending.has(bar.id) || dragging.has(bar.id) || tabStop === bar.id;
+          const edit = editableAtAll && !pending.has(bar.id) ? barEdit(bar, dates) : "none";
           if (windowed && !pinned && (x + span < windowFrom || x > windowTo)) return null;
           return (
             <GanttBarView
@@ -264,10 +268,10 @@ function GanttRowView({
               nameFor={(shown) => ctx.nameFor(bar, shown)}
               formatDuration={ctx.formatDuration}
               renderTip={renderBarTooltip ? () => renderBarTooltip(bar, row) : undefined}
-              editable={editableAtAll && !bar.readOnly && !pending.has(bar.id)}
+              edit={edit}
               pending={pending.has(bar.id)}
               active={tabStop === bar.id}
-              hintId={hintId}
+              hintId={edit === "end" ? endHintId : hintId}
               dayPx={ctx.dayPx}
               direction={ctx.direction}
               scrollLeft={ctx.scrollLeft}

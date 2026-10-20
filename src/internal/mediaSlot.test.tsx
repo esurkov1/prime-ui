@@ -57,6 +57,35 @@ describe("mediaSlot", () => {
     expect(screen.getByTestId("thumbnail")).toHaveAttribute("data-size", "own");
   });
 
+  it("a ring reports itself as a named mark and keeps its own size", () => {
+    function NamedHost({ children }: { children: React.ReactNode }) {
+      const { media, named, provide } = useMediaSlotHost();
+      return (
+        <div data-testid="host" data-media={media || undefined} data-named={named || undefined}>
+          {provide(children)}
+        </div>
+      );
+    }
+    function Ring() {
+      return <span data-testid="ring" data-size={useMediaSlotSize("ring") ?? "own"} />;
+    }
+    const { rerender } = render(
+      <NamedHost>
+        <Ring />
+      </NamedHost>,
+    );
+    expect(screen.getByTestId("host")).toHaveAttribute("data-media", "true");
+    expect(screen.getByTestId("host")).toHaveAttribute("data-named", "true");
+    expect(screen.getByTestId("ring")).toHaveAttribute("data-size", "own");
+    rerender(
+      <NamedHost>
+        <Picture kind="avatar" />
+      </NamedHost>,
+    );
+    expect(screen.getByTestId("host")).toHaveAttribute("data-media", "true");
+    expect(screen.getByTestId("host")).not.toHaveAttribute("data-named");
+  });
+
   it("is no media slot without a picture, and stops being one when it leaves", () => {
     const { rerender } = render(
       <Host>

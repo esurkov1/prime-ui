@@ -526,6 +526,24 @@ describe("DataTable", () => {
     );
   });
 
+  it("a truncated value of a fixed column fits inside the cell padding: the column stays its width", () => {
+    const truncColumns: DataTableColumn<Row>[] = [
+      { id: "name", header: "Name", accessor: "name", truncate: true, width: "16rem" },
+      { id: "score", header: "Score", accessor: "score", truncate: true, maxWidth: "6rem" },
+    ];
+    render(
+      <DataTable
+        rows={[{ id: 1, name: "Очень длинное название позиции", score: 1 }]}
+        columns={truncColumns}
+        paging="none"
+      />,
+    );
+    const name = screen.getByText("Очень длинное название позиции");
+    expect(name.style.maxWidth).toBe("calc(16rem - var(--dt-cell-inset))");
+    expect(name.closest("td")?.style.width).toBe("16rem");
+    expect(screen.getByText("1").style.maxWidth).toBe("calc(6rem - var(--dt-cell-inset))");
+  });
+
   it("renders toolbar slot", () => {
     render(<DataTable rows={rows.slice(0, 1)} columns={columns} toolbar={<span>Фильтры</span>} />);
     expect(screen.getByText("Фильтры")).toBeInTheDocument();

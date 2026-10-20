@@ -48,7 +48,7 @@ const PEOPLE: Person[] = [
         start: day(7, 13),
         end: day(7, 27),
         color: "purple",
-        readOnly: true,
+        edit: "none",
       },
     ],
   },
@@ -310,6 +310,106 @@ describe("Gantt", () => {
     fireEvent.keyDown(bar(/^Аудит склада/), { key: "ArrowRight", shiftKey: true });
     expect(bar(/^Аудит склада/)).not.toHaveAttribute("aria-describedby");
     expect(onBarChange).not.toHaveBeenCalled();
+  });
+
+  it("lets a bar with edit end change only its end: no move, no start grip, end keys only", () => {
+    vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: Element,
+    ) {
+      const width = this.getAttribute("aria-label") === "Шкала времени" ? 280 : 0;
+      return { width, height: 0, left: 0, right: width, top: 0, bottom: 0 } as DOMRect;
+    });
+    const rental: GanttBar = {
+      id: "r1",
+      label: "Аренда",
+      start: day(7, 6),
+      end: day(7, 11),
+      edit: "end",
+    };
+    const handover: GanttBar = {
+      id: "r2",
+      label: "Передача",
+      start: day(7, 20),
+      end: day(7, 20),
+      edit: "end",
+    };
+    const fleet: Person[] = [{ id: "e1", name: "E-101", bars: [rental, handover] }];
+    const onBarChange = vi.fn();
+    render(
+      <Chart rows={fleet} range={{ start: day(7, 6), end: day(8, 3) }} onBarChange={onBarChange} />,
+    );
+    const node = bar(/^Аренда/);
+    expect(node).toHaveAttribute("data-editable", "end");
+    expect(node.getAttribute("aria-keyshortcuts")).not.toMatch(/(^| )Shift\+Arrow/);
+    expect(node).toHaveAccessibleDescription(/^Ctrl \+ Shift \+ стрелки меняют окончание/);
+    expect(node.querySelector('[data-handle="start"]')).toBeNull();
+    // Shift + arrows (with or without Alt) would move the start: nothing happens.
+    fireEvent.keyDown(node, { key: "ArrowRight", shiftKey: true });
+    fireEvent.keyDown(node, { key: "ArrowLeft", shiftKey: true, altKey: true });
+    expect(onBarChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(node, { key: "ArrowRight", shiftKey: true, ctrlKey: true });
+    expect(onBarChange).toHaveBeenLastCalledWith(
+      { start: day(7, 6), end: day(7, 12) },
+      rental,
+      fleet[0],
+    );
+    // The body does not drag: a press and a move leave it where it is.
+    fireEvent.pointerDown(node, { clientX: 20, button: 0, pointerType: "mouse" });
+    fireEvent.pointerMove(node, { clientX: 60, pointerType: "mouse" });
+    expect(node).not.toHaveAttribute("data-dragging");
+    fireEvent.pointerUp(node, { clientX: 60, pointerType: "mouse" });
+    expect(onBarChange).toHaveBeenCalledTimes(1);
+    // The end grip resizes.
+    const grip = node.querySelector('[data-handle="end"]') as Element;
+    fireEvent.pointerDown(grip, { clientX: 50, button: 0, pointerType: "mouse" });
+    fireEvent.pointerMove(node, { clientX: 70, pointerType: "mouse" });
+    expect(node).toHaveAttribute("data-dragging", "end");
+    fireEvent.pointerUp(node, { clientX: 70, pointerType: "mouse" });
+    expect(onBarChange).toHaveBeenLastCalledWith(
+      { start: day(7, 6), end: day(7, 13) },
+      rental,
+      fleet[0],
+    );
+    expect(onBarChange).toHaveBeenCalledTimes(2);
+    // A milestone has no end of its own: with edit end it stays put.
+    const milestone = bar(/^Передача/);
+    expect(milestone).not.toHaveAttribute("data-editable");
+    expect(milestone).not.toHaveAttribute("aria-keyshortcuts");
+    fireEvent.keyDown(milestone, { key: "ArrowRight", shiftKey: true, ctrlKey: true });
+    expect(onBarChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("on touch, a bar with edit end is not picked up by a long press", () => {
+    vi.useFakeTimers();
+    try {
+      mockLayout(28);
+      const rental: GanttBar = {
+        id: "r1",
+        label: "Аренда",
+        start: day(7, 6),
+        end: day(7, 11),
+        edit: "end",
+      };
+      const onBarChange = vi.fn();
+      render(
+        <Chart
+          rows={[{ id: "e1", name: "E-101", bars: [rental] }]}
+          range={{ start: day(7, 6), end: day(8, 3) }}
+          onBarChange={onBarChange}
+        />,
+      );
+      const node = bar(/^Аренда/);
+      fireEvent.pointerDown(node, { clientX: 20, button: 0, pointerType: "touch" });
+      act(() => {
+        vi.advanceTimersByTime(500);
+      });
+      fireEvent.pointerMove(node, { clientX: 60, pointerType: "touch" });
+      expect(node).not.toHaveAttribute("data-dragging");
+      fireEvent.pointerUp(node, { clientX: 60, pointerType: "touch" });
+      expect(onBarChange).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("drags a bar by whole days and does not select it", () => {

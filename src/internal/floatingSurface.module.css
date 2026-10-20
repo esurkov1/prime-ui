@@ -65,7 +65,7 @@
   /* A list in a sheet uses the room it has, not the anchored panel's limit. */
   --prime-panel-max-height: var(--float-max-h);
 
-  padding-block-end: max(var(--prime-space-2), env(safe-area-inset-bottom));
+  padding-block-end: max(var(--prime-space-2), var(--prime-safe-area-bottom));
   font-family: var(--prime-font-family-sans);
 }
 

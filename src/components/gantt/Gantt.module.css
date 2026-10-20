@@ -718,7 +718,8 @@
   pointer-events: none;
 }
 
-.bar[data-editable="true"]:not([data-milestone]) {
+/* Only a bar that may move takes the grab cursor; an end-only bar keeps it on its end grip. */
+.bar[data-editable="all"]:not([data-milestone]) {
   cursor: grab;
 }
 

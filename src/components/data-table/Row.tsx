@@ -35,6 +35,18 @@ export function columnSizeProps<Row>(column: DataTableColumn<Row>) {
   };
 }
 
+/** The cell's inline padding and divider, set by `DataTable.module.css` on every cell. */
+const CELL_INSET = "--dt-cell-inset";
+
+/**
+ * The widest a `truncate` value may be: the column's `maxWidth` (or `width`) less the cell's own
+ * inline padding and divider (`--dt-cell-inset`), so the cell — border-box — holds that length.
+ */
+function truncateMaxWidth<Row>(column: DataTableColumn<Row>) {
+  const length = column.maxWidth ?? column.width;
+  return length ? `calc(${length} - var(${CELL_INSET}))` : undefined;
+}
+
 function renderCell<Row>(row: Row, column: DataTableColumn<Row>, withTitle: boolean) {
   const value = column.cell ? undefined : columnValue(row, column);
   const content = column.cell ? column.cell(row) : value == null ? "—" : String(value);
@@ -42,7 +54,7 @@ function renderCell<Row>(row: Row, column: DataTableColumn<Row>, withTitle: bool
   return (
     <span
       className={styles.truncate}
-      style={{ maxWidth: column.maxWidth ?? column.width }}
+      style={{ maxWidth: truncateMaxWidth(column) }}
       title={
         withTitle && (typeof content === "string" || typeof content === "number")
           ? String(content)

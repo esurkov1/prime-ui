@@ -22,7 +22,7 @@ const COURIERS: Courier[] = [
     initials: "МЛ",
     bars: [
       { id: "l-1", label: "Север", start: at(1), end: at(4), color: "green" },
-      { id: "l-2", label: "Отпуск", start: at(7), end: at(14), color: "purple", readOnly: true },
+      { id: "l-2", label: "Отпуск", start: at(7), end: at(14), color: "purple", edit: "none" },
     ],
   },
   {

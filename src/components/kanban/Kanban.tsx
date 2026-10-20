@@ -21,7 +21,7 @@ import { formatLabel } from "@/internal/formatLabel";
 import hairline from "@/internal/hairline.module.css";
 import { hasContent } from "@/internal/hasContent";
 import { namedRole } from "@/internal/namedRole";
-import { splitParts } from "@/internal/parts";
+import { flattenChildren, splitParts } from "@/internal/parts";
 import { isPlainClick, opensRow } from "@/internal/rowLink";
 import rowLink from "@/internal/rowLink.module.css";
 import type { PaletteColor } from "@/internal/states";
@@ -952,11 +952,11 @@ export type KanbanItemTitleProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 /**
  * The card title: medium body text, wraps up to three lines. With a tail — the record's `number`,
- * an `Avatar.Root` child (the owner) — it is one row: the name cut with an ellipsis, the tail at
- * the end, never shrunk.
+ * an `Avatar.Root` child (the owner, found inside fragments too) — it is one row: the name cut with
+ * an ellipsis, then the number, the owner last, never shrunk.
  */
 function KanbanItemTitle({ number, className, children, ...rest }: KanbanItemTitleProps) {
-  const { parts: avatars, rest: text } = splitParts(children, Avatar.Root);
+  const { parts: avatars, rest: text } = splitParts(flattenChildren(children), Avatar.Root);
   const hasNumber = hasContent(number);
   if (!hasNumber && avatars.length === 0) {
     return (

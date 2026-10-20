@@ -450,6 +450,25 @@ describe("Notification", () => {
       expect(countdown(motion).animation.playState).toBe("running");
     });
 
+    it("stops the line where it is on screen, not where a lagging clock says", () => {
+      const now = vi.spyOn(performance, "now").mockReturnValue(1000);
+      const motion = renderTimed();
+      const list = screen.getByRole("list", { name: "Уведомления сверху справа" });
+      // 400 ms of real time; the clock's own `currentTime` (the main thread) still reads 0.
+      now.mockReturnValue(1400);
+      fireEvent.mouseEnter(list);
+      const clock = countdown(motion);
+      expect(clock.animation.playState).toBe("paused");
+      expect(clock.animation.currentTime).toBe(400);
+      // Resumed at 400, another 200 ms on screen: the next pause stops at 600.
+      fireEvent.mouseLeave(list);
+      advance(100);
+      now.mockReturnValue(1600);
+      fireEvent.mouseEnter(list);
+      expect(clock.animation.currentTime).toBe(600);
+      now.mockRestore();
+    });
+
     it("pauses while the document is hidden and resumes where it stopped", () => {
       const motion = renderTimed();
       setVisibility("hidden");

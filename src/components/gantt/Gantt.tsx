@@ -44,6 +44,7 @@ import { GanttRow, type GanttRowContext, type GanttGhost as Ghost } from "./Gant
 import {
   applyEdit,
   assignLanes,
+  barEdit,
   daysBetween,
   formatDay,
   type GanttBar,
@@ -93,6 +94,8 @@ export type GanttLabels = {
   progress: string;
   /** Description of an editable bar: the editing keys. */
   editHint: string;
+  /** Description of a bar whose `edit` is `end`: the keys that change its end. */
+  editEndHint: string;
   /** Duration of a bar in the tooltip; `{days}` is its number of days. */
   duration: string;
   /** Announced when `onBarChange` rejects and the bar returns to its dates. */
@@ -122,6 +125,8 @@ export const GANTT_LABELS: GanttLabels = {
   progress: "выполнено {progress}%",
   editHint:
     "Shift + стрелки сдвигают на день, Ctrl + Shift + стрелки меняют окончание на день; с Alt — на неделю или месяц масштаба",
+  editEndHint:
+    "Ctrl + Shift + стрелки меняют окончание на день; с Alt — на неделю или месяц масштаба",
   duration: "{days} дн.",
   changeFailed: "Сроки не изменены: {label}",
   newBar: "Новая задача",
@@ -247,6 +252,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   /** Rendered focusable cells by navigation id: bars and row headers. */
   const cellNodes = React.useRef(new Map<string, HTMLElement>());
   const hintId = React.useId();
+  const endHintId = React.useId();
   const createHintId = React.useId();
 
   // Keyed by the day value: a new Date object for the same day keeps the axis.
@@ -346,7 +352,9 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   };
 
   const shownDates = (bar: GanttBar): GanttDates => pending.get(bar.id) ?? bar;
-  const isEditable = (bar: GanttBar) => editableAtAll && !bar.readOnly && !pending.has(bar.id);
+  /** The edits a bar takes now: none while the chart is still or the bar's change is pending. */
+  const editOf = (bar: GanttBar) =>
+    editableAtAll && !pending.has(bar.id) ? barEdit(bar, shownDates(bar)) : "none";
 
   // ─── Creating ───
   const [ghosts, setGhosts] = React.useState<ReadonlyMap<React.Key, Ghost>>(new Map());
@@ -815,9 +823,10 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       const found = findBar(id);
       if (!found) return;
       event.preventDefault();
-      if (!isEditable(found.bar)) return;
+      const allowed = editOf(found.bar);
       // A day per press at every zoom; with Alt, the zoom's unit (a week, a month).
       const edit: GanttEdit = ctrl ? "end" : "move";
+      if (allowed === "none" || (allowed === "end" && edit !== "end")) return;
       const unit: GanttScale = event.altKey ? scale : "day";
       const dates = applyEdit(shownDates(found.bar), edit, forward ? 1 : -1, unit);
       commit(found.bar, found.item.row, dates, true);
@@ -1422,6 +1431,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           editableAtAll={editableAtAll}
           creatable={creatable}
           hintId={hintId}
+          endHintId={endHintId}
           createHintId={createHintId}
         />
       );
@@ -1583,7 +1593,12 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             </ScrollContainer>
           </div>
 
-          {editableAtAll ? <VisuallyHidden id={hintId}>{labels.editHint}</VisuallyHidden> : null}
+          {editableAtAll ? (
+            <>
+              <VisuallyHidden id={hintId}>{labels.editHint}</VisuallyHidden>
+              <VisuallyHidden id={endHintId}>{labels.editEndHint}</VisuallyHidden>
+            </>
+          ) : null}
           {creatable ? (
             <VisuallyHidden id={createHintId}>{labels.createHint}</VisuallyHidden>
           ) : null}

@@ -239,10 +239,17 @@ function CardView({
  * The countdown line: a linear clock of the toast's `duration` on the compositor (no per-frame
  * JS). It stops in place while `paused` and resumes from there; the toast expires when it runs
  * out. Reduced motion keeps it: it is the time left, not a motion.
+ *
+ * The compositor draws the line by real time, while the animation's own `currentTime` follows the
+ * main thread's frames, which lag behind it while the page is busy (the stack expanding under the
+ * pointer). Paused at that `currentTime`, the line would jump back; it is paused at the real time
+ * elapsed since it last started, where it is on screen.
  */
 function CountdownLine({ duration, paused, onEnd }: Countdown) {
   const lineRef = React.useRef<HTMLSpanElement>(null);
   const clockRef = React.useRef<Animation | null>(null);
+  /** `performance.now()` minus the time the line has run: the real start of its current run. */
+  const startedAtRef = React.useRef(0);
   const latest = React.useRef({ paused, onEnd });
   React.useLayoutEffect(() => {
     latest.current = { paused, onEnd };
@@ -257,6 +264,7 @@ function CountdownLine({ duration, paused, onEnd }: Countdown) {
       easing: "linear",
       fill: "forwards",
     });
+    startedAtRef.current = performance.now();
     if (latest.current.paused) clock.pause();
     clock.onfinish = () => latest.current.onEnd();
     clockRef.current = clock;
@@ -269,9 +277,16 @@ function CountdownLine({ duration, paused, onEnd }: Countdown) {
   React.useLayoutEffect(() => {
     const clock = clockRef.current;
     if (!clock) return;
-    if (paused) clock.pause();
-    else clock.play();
-  }, [paused]);
+    if (paused) {
+      if (clock.playState !== "running") return;
+      const elapsed = Math.min(duration, performance.now() - startedAtRef.current);
+      clock.pause();
+      clock.currentTime = elapsed;
+    } else if (clock.playState === "paused") {
+      startedAtRef.current = performance.now() - Number(clock.currentTime ?? 0);
+      clock.play();
+    }
+  }, [paused, duration]);
 
   return <span ref={lineRef} className={styles.progressValue} />;
 }

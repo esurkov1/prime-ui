@@ -135,10 +135,16 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Datepicker.Root",
-      en: "`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option.",
-      ru: "Поле (подпись, подсказка или ошибка, кнопка поля с иконкой календаря, значение и шеврон), которое открывает панель календаря в Popover. Принимает все параметры календаря.",
+      en: "`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with the value and a chevron, a leading `Datepicker.TriggerIcon` when given) that opens the calendar panel in a Popover. Takes every calendar option.",
+      ru: "Поле (подпись, подсказка или ошибка, кнопка поля со значением и шевроном, впереди `Datepicker.TriggerIcon`, если передан), которое открывает панель календаря в Popover. Принимает все параметры календаря.",
       props: [
         ...VALUE_PROPS,
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "`Datepicker.TriggerIcon` — the leading glyph of the field button; without it the field shows only the value and the chevron, like a `Select`.",
+          ru: "`Datepicker.TriggerIcon` — ведущий глиф кнопки поля; без него поле показывает только значение и шеврон, как `Select`.",
+        },
         {
           name: "open",
           type: "boolean",
@@ -286,6 +292,19 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Datepicker.TriggerIcon",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with the leading glyph of the field button at the tier icon size, before the value: the calendar by default.",
+      ru: "`<span>` с ведущим глифом кнопки поля размера иконки яруса, `aria-hidden`, перед значением: по умолчанию календарь.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (another `Icon` in place of the calendar), `className` and the other span attributes.",
+          ru: "`children` (другая `Icon` вместо календаря), `className` и остальные атрибуты span.",
+        },
+      ],
+    },
+    {
       name: "Datepicker.Panel",
       en: "`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option.",
       ru: "Календарь без поля как собственный контент хоста (шторка Drawer, Card); 1–2 месяца по ширине хоста. Принимает `mode`, тройку значения и все параметры календаря.",
@@ -343,6 +362,10 @@ export const api: ComponentApi = {
     until: {
       en: "Prefix of a range without a start: «до 6 окт».",
       ru: "Префикс периода без начала: «до 6 окт».",
+    },
+    rangeValue: {
+      en: "Field text of a range with both ends, `{from}` and `{to}` the formatted days: «6 окт — 3 нояб», or «6 окт → 3 нояб» with `{from} → {to}`.",
+      ru: "Текст поля для периода с обоими концами, `{from}` и `{to}` — отформатированные дни: «6 окт — 3 нояб», или «6 окт → 3 нояб» с `{from} → {to}`.",
     },
     presetsGroup: {
       en: "Accessible name of the presets group (no visible heading).",

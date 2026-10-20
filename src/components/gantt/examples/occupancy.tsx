@@ -1,4 +1,4 @@
-/** Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `readOnly`. */
+/** Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `edit`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Avatar, Gantt, type GanttBar, type GanttDates, Typography } from "prime-ui-kit";
 import * as React from "react";
@@ -33,7 +33,7 @@ const TEAM: Person[] = [
         start: at(14),
         end: at(24),
         color: "purple",
-        readOnly: true,
+        edit: "none",
       },
     ],
   },
@@ -61,7 +61,7 @@ const TEAM: Person[] = [
         start: at(-1),
         end: at(3),
         tone: "warning",
-        readOnly: true,
+        edit: "none",
       },
       { id: "b-2", label: "Макеты кабинета", start: at(3), end: at(15), color: "pink" },
     ],
@@ -81,7 +81,10 @@ function saveDates(person: Person, dates: GanttDates, bar: GanttBar) {
   return new Promise<void>((resolve, reject) => {
     const clash = person.bars.some(
       (other) =>
-        other.id !== bar.id && other.readOnly && dates.start < other.end && other.start < dates.end,
+        other.id !== bar.id &&
+        other.edit === "none" &&
+        dates.start < other.end &&
+        other.start < dates.end,
     );
     window.setTimeout(
       () => (clash ? reject(new Error("Пересекается с отпуском")) : resolve()),

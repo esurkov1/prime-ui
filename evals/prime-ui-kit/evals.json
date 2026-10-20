@@ -427,6 +427,41 @@
         "The empty vehicle list is EmptyPage.Root size=\"s\" inside Card.Root (Card.Body) where the cards go, not a line of Typography text and not a card with the add button inside it",
         "The add button for vehicles stands under the list (outside the empty card) and reads «Транспорт» beside action.add, without «Добавить»"
       ]
+    },
+    {
+      "id": 34,
+      "prompt": "Сделай дровер редактирования клиента (имя, телефон, компания) и дровер создания нового клиента.",
+      "expected_output": "The edit drawer has no footer until a field changes; with changes its footer holds «Отменить изменения» (puts the form back, the drawer stays open) and «Сохранить». The create drawer's footer is «Отмена» + «Создать». No «Закрыть» in any footer.",
+      "files": [],
+      "expectations": [
+        "The edit drawer renders Drawer.Footer content only while the form is dirty (e.g. `{dirty ? … : null}`), not a permanent footer",
+        "With changes, the edit footer has a soft neutral «Отменить изменения» that resets the form to the saved values without closing the drawer, then the primary «Сохранить»",
+        "The create drawer's footer is «Отмена» (Drawer.Close, soft neutral) + «Создать» (solid, last)",
+        "No footer holds a «Закрыть» button"
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "В шапке дровера сделки нужны действия: отметить как спам, нецелевое, удалить сделку.",
+      "expected_output": "Each action is an icon-only ghost Button in a Tooltip in Drawer.Actions before the ×, no «⋯» menu; delete is tone danger and asks through ConfirmDialog (or holdToConfirm if easy to redo).",
+      "files": [],
+      "expectations": [
+        "Drawer.Actions holds three icon-only Button.Root elements, each with an aria-label and inside Tooltip.Trigger with Tooltip.Content",
+        "There is no Dropdown «⋯» for these three actions",
+        "The delete button is tone=\"danger\" and runs only through ConfirmDialog (ConfirmDialog.Trigger) or holdToConfirm with onConfirm, never a plain onClick"
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "В дровере сделки сверху сделай три плитки: «К оплате» (21 000 ₽, это долг), «Депозиты у нас» (5 000 ₽), «Ближайшая задача» (Выдать PCX 160 завтра). Ниже — карточка транспорта сделки с позициями аренды и доставки и итогом.",
+      "expected_output": "Three Card stat-text tiles with valueSize l, the debt with tone warning, the phrase in the same style as the numbers; no Typography inside Card.Value. The vehicle card has a Card.Header, line items in a DescriptionList align end inside Card.Body divider full, and a Card.Footer divider fill with the action, the task and Card.Total.",
+      "files": [],
+      "expectations": [
+        "All three tiles are Card.Root variant=\"stat-text\" with valueSize=\"l\"; none puts a Typography inside Card.Value",
+        "«К оплате» has Card.Value tone=\"warning\" (or danger) by its meaning",
+        "The vehicle card's line items are a DescriptionList.Root align=\"end\" inside Card.Body divider=\"full\"",
+        "The vehicle card's footer is Card.Footer divider=\"fill\" with the total in Card.Total (Card.Value inside), at the end of the row"
+      ]
     }
   ]
 }

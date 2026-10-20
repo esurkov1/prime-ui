@@ -15,6 +15,13 @@ export const api: ComponentApi = {
           ru: "Шаблон: блок с зонами (`panel`), плитки KPI (`stat-text` — значение-строка текста, с действием в конце строки), призыв к действию, список или плитка с обложкой.",
         },
         {
+          name: "valueSize",
+          type: '"m" | "l"',
+          default: '"m"',
+          en: "The step of a `stat-text` value, a number or a phrase alike: `m` — body-m medium, `l` — title-m, a step above the text (the fact tiles of a record). The loading Skeleton takes the same height.",
+          ru: "Ступень значения `stat-text`, число и фраза одинаково: `m` — body-m medium, `l` — title-m, на шаг крупнее текста (плитки фактов записи). Skeleton загрузки — той же высоты.",
+        },
+        {
           name: "flat",
           type: "boolean",
           default: "false",
@@ -45,8 +52,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Link",
-      en: "`ref` → `HTMLAnchorElement`. The stretched link around the title: a click anywhere on the card opens it, it is the one tab stop, the card's own buttons stay above it. The card draws the transition arrow.",
-      ru: "Растянутая ссылка вокруг заголовка: клик в любом месте карточки открывает её, это единственная остановка Tab, кнопки карточки остаются поверх. Карточка рисует стрелку перехода.",
+      en: "`ref` → `HTMLAnchorElement`. The stretched link around the title: a click anywhere on the card opens it, it is the one tab stop, the card's own buttons stay above it. The card draws the arrow: at the end of `Card.Header`, centred on it, or in the top corner.",
+      ru: "Растянутая ссылка вокруг заголовка: клик в любом месте карточки открывает её, это единственная остановка Tab, кнопки карточки остаются поверх. Карточка рисует стрелку: в конце `Card.Header` по его центру или в верхнем углу.",
       props: [
         {
           name: "asChild",
@@ -98,8 +105,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Description",
-      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; inside `Card.Header` it stacks under the title.",
-      ru: "Вторичный текст (`<p>`, body-s): под заголовком `cta` и `cover`, под шапкой `stat-trend`; внутри `Card.Header` встаёт под заголовком.",
+      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; in `Card.Header` it stacks under the title; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.",
+      ru: "Вторичный текст (`<p>`, body-s): под заголовком `cta` и `cover`, под шапкой `stat-trend`; в `Card.Header` встаёт под заголовком; в `Card.Footer` — заметка: сначала `Badge.Dot`, текст в одну строку.",
       props: [
         {
           name: "…rest",
@@ -143,14 +150,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Footer",
-      en: "`ref` → `HTMLDivElement`. The bottom row of buttons, wrapping: right-aligned under a faint hairline in `panel` and `list`, under a full-width hairline in `cta`.",
-      ru: "Нижний ряд кнопок с переносом: справа под тонкой линией в `panel` и `list`, под линией во всю ширину в `cta`.",
+      en: "`ref` → `HTMLDivElement`. The bottom row of buttons: right-aligned under a faint hairline in `panel` and `list`, under a full one in `cta`. A record's row: the actions, the note (`Card.Description`), `Card.Total` at the end.",
+      ru: "Нижний ряд кнопок: справа под тонкой линией в `panel` и `list`, под линией во всю ширину в `cta`. Строка записи: действия, заметка (`Card.Description`), `Card.Total` у края.",
       props: [
         {
           name: "divider",
-          type: '"full"',
-          en: "A line above the zone that runs edge to edge, in any template, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset hairline of `panel` / `list` and the full one of `cta`).",
-          ru: "Линия над зоной во всю ширину в любом шаблоне, цветом `Divider` (`border-subtle`), чтобы читалась в обеих темах (без неё: едва заметная линия с отступом в `panel` / `list` и во всю ширину в `cta`).",
+          type: '"full" | "fill"',
+          en: "How the zone stands off the one above: `full` — a line edge to edge in the `Divider` ink; `fill` — no line, the zone on the next layer out to the card's edges (a record's footer). Without it: the template's hairline.",
+          ru: "Чем зона отделена от верхней: `full` — линия во всю ширину цветом `Divider`; `fill` — без линии, зона на следующем слое лестницы до краёв карточки (подвал записи, счёта). Без него — линия шаблона.",
         },
         {
           name: "…rest",
@@ -161,9 +168,22 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Card.Total",
+      en: "`ref` → `HTMLDivElement`. The total of a record at the end of `Card.Footer`: a `Card.Value` (title-m, tabular) with an optional `Card.Meta` above it, the total's state («к оплате 21 000 ₽», «оплачено») in a `tone`.",
+      ru: "Итог записи у края `Card.Footer`: `Card.Value` (title-m, табличные цифры) и необязательная `Card.Meta` над ним — состояние итога («к оплате 21 000 ₽», «оплачено») в тоне `tone`.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLElement>",
+          en: "`children`, `className` and the other attributes of the element.",
+          ru: "`children`, `className` и остальные атрибуты элемента.",
+        },
+      ],
+    },
+    {
       name: "Card.Icon",
-      en: "`ref` → `HTMLDivElement`. The 40px accent tile of one icon: beside the label and value in `mini` and a `split` cell, first in `Card.Header`. An `Avatar.Root` or `Thumbnail.Root` inside (also in a wrapper) is the record's picture: no tile, 40px, `aria-hidden`.",
-      ru: "Плашка 40px с акцентом для одной иконки: рядом с подписью и значением в `mini` и ячейке `split`, первой в `Card.Header`. `Avatar.Root` или `Thumbnail.Root` внутри (и в обёртке) — изображение записи: без плашки, 40px, `aria-hidden`.",
+      en: "`ref` → `HTMLDivElement`. The 40px accent tile of one icon, first in `Card.Header`. An `Avatar.Root` or `Thumbnail.Root` inside (also in a wrapper) is the record's picture: no tile, 40px, `aria-hidden`; a `ProgressCircle` its state ring: no tile, its own size and name.",
+      ru: "Плашка 40px с акцентом для одной иконки, первой в `Card.Header`. `Avatar.Root` или `Thumbnail.Root` внутри (и в обёртке) — изображение записи: без плашки, 40px, `aria-hidden`; `ProgressCircle` — кольцо состояния: без плашки, свой размер и имя.",
       props: [
         {
           name: "…rest",
@@ -188,8 +208,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Value",
-      en: "`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width; body-m medium in `stat-text`.",
-      ru: "Значение метрики: табличные цифры, размер по шаблону и ширине карточки; в `stat-text` — body-m medium.",
+      en: '`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`.',
+      ru: 'Значение метрики: табличные цифры, размер по шаблону и ширине карточки; в `stat-text` — body-m medium (title-m с `valueSize="l"`); в `Card.Total` — title-m.',
       props: [
         {
           name: "tone",
@@ -227,9 +247,15 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Meta",
-      en: "`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; under the value.",
-      ru: "Справочная строка KPI («Лидов 120 · сделок 18»): caption, приглушённый, табличные цифры; под значением.",
+      en: "`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; under the value; in `Card.Total` the total's state above it.",
+      ru: "Справочная строка KPI («Лидов 120 · сделок 18»): caption, приглушённый, табличные цифры; под значением; в `Card.Total` — состояние итога над ним.",
       props: [
+        {
+          name: "tone",
+          type: '"neutral" | "success" | "warning" | "danger"',
+          en: "The ink by meaning (an amount due is `warning`, paid `success`); without it the line is muted.",
+          ru: "Цвет по смыслу (к оплате — `warning`, оплачено — `success`); без него строка приглушена.",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",

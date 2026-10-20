@@ -39,6 +39,11 @@ export const page: ComponentPageConfig = {
         "Период отпуска проверяется на лету: ошибка встряхивает поле, называет нарушенное правило и уходит, когда период подходит; необязательная дата выхода — `required`, `hint`, `error`, `optional`.",
     },
     {
+      slot: "with-icon",
+      description:
+        "Ведущий глиф перед значением: по умолчанию его нет, календарь или другая иконка на его месте — `Datepicker.TriggerIcon`.",
+    },
+    {
       scenario: "range-presets",
       title: "Период с пресетами",
       description:
@@ -55,6 +60,12 @@ export const page: ComponentPageConfig = {
       title: "Ежегодная дата",
       description:
         "Ежегодное изменение цены: день и месяц без года, префикс значения и занятые дни отключены — `yearless`, `valuePrefix`, `isDayDisabled`.",
+    },
+    {
+      scenario: "rental-term",
+      title: "Срок в строке счёта",
+      description:
+        "Срок аренды в строке счёта: вид срока — часть значения, период читается через стрелку, у поля нет глифа, как у Select рядом — `valuePrefix`, `labels`.",
     },
     {
       scenario: "locale",

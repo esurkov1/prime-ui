@@ -14,6 +14,7 @@ import {
   daysBetween,
   formatSpan,
   type GanttBar,
+  type GanttBarEdit,
   type GanttDates,
   type GanttEdit,
   type GanttScale,
@@ -23,16 +24,25 @@ import {
   unitDays,
 } from "./ganttModel";
 
-const EDIT_SHORTCUTS = [
-  "Shift+ArrowLeft",
-  "Shift+ArrowRight",
-  "Shift+Alt+ArrowLeft",
-  "Shift+Alt+ArrowRight",
+const END_SHORTCUTS = [
   "Control+Shift+ArrowLeft",
   "Control+Shift+ArrowRight",
   "Control+Shift+Alt+ArrowLeft",
   "Control+Shift+Alt+ArrowRight",
-].join(" ");
+];
+
+/** The editing keys a bar announces: moving only when it may move. */
+const SHORTCUTS: Record<GanttBarEdit, string | undefined> = {
+  all: [
+    "Shift+ArrowLeft",
+    "Shift+ArrowRight",
+    "Shift+Alt+ArrowLeft",
+    "Shift+Alt+ArrowRight",
+    ...END_SHORTCUTS,
+  ].join(" "),
+  end: END_SHORTCUTS.join(" "),
+  none: undefined,
+};
 
 export type GanttBarViewProps = {
   bar: GanttBar;
@@ -49,11 +59,12 @@ export type GanttBarViewProps = {
   formatDuration: (days: number) => string;
   /** `renderBarTooltip`: extra tooltip content under the dates line. */
   renderTip?: () => React.ReactNode;
-  editable: boolean;
+  /** The edits the bar takes now (`none` while the chart is still or the change is pending). */
+  edit: GanttBarEdit;
   pending: boolean;
   /** The roving tab stop of the chart. */
   active: boolean;
-  /** Id of the hidden «how to edit» hint. */
+  /** Id of the hidden «how to edit» hint for `edit`. */
   hintId?: string;
   /** Length of one day in px, measured on the axis. */
   dayPx: () => number;
@@ -86,7 +97,8 @@ type DragState = { edit: GanttEdit; raw: number; steps: number; unit: GanttScale
  * pointer drags the body (move) or a grip (start / end): the bar follows the pointer exactly, the
  * dates snap to whole days (to the zoom's unit with Alt) with hysteresis, a guide marks the snapped
  * edge at the week and month zoom, and the tooltip shows the new dates. Release commits through
- * `onCommit`; Escape or a cancelled pointer drops it. On touch a long press picks the bar up.
+ * `onCommit`; Escape or a cancelled pointer drops it. On touch a long press picks the bar up. A bar
+ * whose `edit` is `end` has only the end grip, and its body does not move.
  */
 export function GanttBarView({
   bar,
@@ -98,7 +110,7 @@ export function GanttBarView({
   nameFor,
   formatDuration,
   renderTip,
-  editable,
+  edit,
   pending,
   active,
   hintId,
@@ -114,6 +126,7 @@ export function GanttBarView({
   onDragChange,
   barRef,
 }: GanttBarViewProps) {
+  const editable = edit !== "none";
   const [tipOpen, setTipOpen] = React.useState(false);
   React.useEffect(() => {
     if (!tipOpen) return;
@@ -213,6 +226,8 @@ export function GanttBarView({
     if (!editable || pending || event.button !== 0) return;
     const handle = (event.target as HTMLElement).closest<HTMLElement>("[data-handle]")?.dataset
       .handle as GanttEdit | undefined;
+    // Only the end grip of a bar that may not move: its body stays (and selects on click).
+    if (edit === "end" && handle !== "end") return;
     const node = event.currentTarget;
     const pointerId = event.pointerId;
     const waitForPress = event.pointerType === "touch" && !handle;
@@ -309,7 +324,7 @@ export function GanttBarView({
             }
             aria-label={nameFor(shown)}
             aria-describedby={editable ? hintId : undefined}
-            aria-keyshortcuts={editable ? EDIT_SHORTCUTS : undefined}
+            aria-keyshortcuts={SHORTCUTS[edit]}
             aria-busy={pending || undefined}
             data-gantt-bar=""
             data-nav-id={bar.id}
@@ -321,7 +336,7 @@ export function GanttBarView({
               color: bar.tone ? undefined : (bar.color ?? "blue"),
               tone: bar.tone,
               milestone: milestone || undefined,
-              editable: editable || undefined,
+              editable: editable ? edit : undefined,
               pending: pending || undefined,
               dragging: drag ? drag.edit : undefined,
               progress: progress === undefined ? undefined : true,
@@ -358,7 +373,9 @@ export function GanttBarView({
             </span>
             {editable && !milestone ? (
               <>
-                <span className={styles.handle} data-handle="start" aria-hidden="true" />
+                {edit === "all" ? (
+                  <span className={styles.handle} data-handle="start" aria-hidden="true" />
+                ) : null}
                 <span className={styles.handle} data-handle="end" aria-hidden="true" />
               </>
             ) : null}

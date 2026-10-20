@@ -87,6 +87,13 @@ export const api: ComponentApi = {
           ru: 'Строки переносятся: при `rowActions="buttons"` за ручку в самом конце строки, после кнопки удаления (перетаскивание, удержание, Alt + ↑ / ↓); при `"menu"` пунктами «Выше» и «Ниже» и Alt + ↑ / ↓ на кнопке меню.',
         },
         {
+          name: "stackedLabels",
+          type: "boolean",
+          default: "true",
+          en: "Stacked rows (under 30rem) show each field's column heading as its label. `false` for values that name themselves («Аренда: 20 окт → 2 нояб»): no labels, the headings stay the fields' names.",
+          ru: "Сложенные строки (уже 30rem) показывают заголовок столбца подписью поля. `false` — для значений, что называют себя сами («Аренда: 20 окт → 2 нояб»): без подписей, заголовки остаются именами полей.",
+        },
+        {
           name: "rowActions",
           type: '"buttons" | "menu"',
           default: '"buttons"',
@@ -245,8 +252,8 @@ export const api: ComponentApi = {
         ru: "`<ol>` описан `hint` и `error` списка (`aria-describedby`): они относятся ко всем строкам.",
       },
       {
-        en: "In a narrow container the heading row goes and each field's label shows above it.",
-        ru: "В узком контейнере заголовки уходят, и подпись каждого поля показывается над ним.",
+        en: "In a narrow container the heading row goes and each field's label shows above it; with `stackedLabels={false}` the labels stay hidden and still name the fields.",
+        ru: "В узком контейнере заголовки уходят, и подпись каждого поля показывается над ним; при `stackedLabels={false}` подписи остаются скрытыми и по-прежнему называют поля.",
       },
       {
         en: 'With `rowActions="menu"` the row\'s «⋯» button opens a `role="menu"` (Dropdown) named «Действия: {row}»; it lists Alt + ↑ / ↓ in `aria-keyshortcuts`, and a move says the row\'s new place in a polite live region.',

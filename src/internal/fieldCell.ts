@@ -13,7 +13,8 @@ export type FieldCell = {
   label: string;
   /**
    * `wide` — hidden while the column heading is on screen, shown when the rows stack; `always` —
-   * a one-column list, named by the list's own label, shows none in either layout.
+   * shown in neither layout: a one-column list, named by the list's own label, or a list whose
+   * values name themselves (`stackedLabels={false}`).
    */
   hidden: "wide" | "always";
   /** The column is required: the field in the cell is required too (`useFieldFrame`). */

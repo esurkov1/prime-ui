@@ -8,10 +8,10 @@
 
 .root {
   --viewer-inset: var(--prime-media-viewer-inset);
-  --viewer-top: calc(env(safe-area-inset-top) + var(--viewer-inset));
-  --viewer-bottom: calc(env(safe-area-inset-bottom) + var(--viewer-inset));
-  --viewer-start: calc(env(safe-area-inset-left) + var(--viewer-inset));
-  --viewer-end: calc(env(safe-area-inset-right) + var(--viewer-inset));
+  --viewer-top: calc(var(--prime-safe-area-top) + var(--viewer-inset));
+  --viewer-bottom: calc(var(--prime-safe-area-bottom) + var(--viewer-inset));
+  --viewer-start: calc(var(--prime-safe-area-left) + var(--viewer-inset));
+  --viewer-end: calc(var(--prime-safe-area-right) + var(--viewer-inset));
   /* Where the bottom bar stands: over the filmstrip when there is one. */
   --viewer-above-strip: var(--viewer-bottom);
 

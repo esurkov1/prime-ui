@@ -70,6 +70,7 @@ export type {
   CardDeltaProps,
   CardDescriptionProps,
   CardDivider,
+  CardFooterDivider,
   CardFooterProps,
   CardHeaderProps,
   CardHeadingLevel,
@@ -82,7 +83,9 @@ export type {
   CardMetaProps,
   CardRootProps,
   CardTitleProps,
+  CardTotalProps,
   CardValueProps,
+  CardValueSize,
   CardVariant,
 } from "./card/Card";
 export { Card } from "./card/Card";
@@ -237,6 +240,7 @@ export type {
   DatepickerPreset,
   DatepickerRange,
   DatepickerRootProps,
+  DatepickerTriggerIconProps,
   WeekStart,
 } from "./datepicker/Datepicker";
 export {

@@ -9,7 +9,7 @@
  * The column headings stand once above the rows; the fields inside carry them as hidden labels
  * (`fieldCell`). In a narrow container (`prime-field-list`, < 30rem) the heading row goes, a row
  * puts its compact columns, its first field and its actions on the first line and the rest under
- * them, and each field shows its label (FieldFrame).
+ * them, and each field shows its label (FieldFrame) unless `stackedLabels={false}`.
  *
  * Spacing and lines: on a surface the rows keep room around a line between them. A plain list on one
  * line per record stands its rows one gap apart (`--prime-space-2`, half a row's padding on each
@@ -259,10 +259,15 @@
     grid-column: calc(var(--fl-end-column) + 1);
   }
 
-  /* The actions stand on the line of the fields, under their labels; a one-column row shows no
-     label, so they stay on the middle of its field. */
-  .record:not([data-single]) > :is(.grip, .end) {
+  /* The actions stand on the line of the fields, under their labels; a row that shows no labels
+     (one column, `stackedLabels={false}`) keeps them on the middle of its field. */
+  .record:not([data-unlabelled]) > :is(.grip, .end) {
     margin-block-start: calc(var(--fl-label-lh) + var(--fl-label-gap));
+  }
+
+  /* Without labels the lines of a record stand one column gap apart, as its fields do side by side. */
+  .record[data-unlabelled] {
+    row-gap: var(--prime-space-3);
   }
 
   /* `data-stack="actions"`: the main field keeps the first line to its end; the actions end the

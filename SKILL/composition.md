@@ -423,12 +423,39 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
-- A dialog footer is the dialog's answer: Cancel and the primary, or the record's one action. It
-  never repeats the header ×: no «Закрыть» in a footer — a drawer of read-only details has no
-  footer at all, and the kit draws none while `X.Footer` is empty, so a save shown while the form is
-  dirty brings its footer with it. Deleting the record the dialog
-  edits is not a third footer button: it stands in `Modal.Actions` / `Drawer.Actions` of the header
-  by the menu threshold below, confirmed by a `ConfirmDialog`.
+- A dialog footer is the dialog's answer, and it has one shape for every kind of dialog:
+  | Dialog | Footer |
+  |---|---|
+  | a record, nothing changed | none — the kit draws no `X.Footer` while it is empty |
+  | a record with changes | «Отменить изменения» (puts the form back to the saved values, the dialog stays open) + «Сохранить» |
+  | a create form | «Отмена» (closes) + «Создать» |
+  | a record's one action (read-only) | that action alone |
+
+  It never repeats the header ×: no «Закрыть» in a footer. Deleting the record the dialog edits is
+  not a third footer button: it stands in `Modal.Actions` / `Drawer.Actions` of the header
+  ([actions of a record](#actions-of-a-record)), confirmed by a `ConfirmDialog`.
+
+```tsx partial
+// bad — while editing, the only way back is to close the drawer
+<Drawer.Footer>{dirty ? <Button.Root type="submit">Сохранить</Button.Root> : null}</Drawer.Footer>
+```
+
+```tsx good
+// declare: const dirty: boolean
+// declare: const revert: () => void
+// good — a change brings its answer: revert in place or save; no changes, no footer
+<Drawer.Footer>
+  {dirty ? (
+    <>
+      <Button.Root variant="soft" tone="neutral" onClick={revert}>
+        Отменить изменения
+      </Button.Root>
+      <Button.Root type="submit">Сохранить</Button.Root>
+    </>
+  ) : null}
+</Drawer.Footer>
+```
+
 - An empty state's action replaces the header's primary, it does not duplicate it.
 - Destructive: `tone="danger"`; a standalone trigger is `soft`, in a menu it is the last item, the
   confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
@@ -448,6 +475,61 @@ place — a page or dialog header, a table row, a card, a list row:
 A ⋯ with one item hides the only action behind a second press and a guess. Nothing else decides:
 not the density of the row, not the number of its columns, not the room left for later actions. A
 row of a `FieldList` follows the same count ([forms](#7-forms)).
+
+### Actions of a record
+
+The header of a record's dialog is the exception to the count above: the record's actions are what
+the person opened it for, so each stays in sight. Up to five — spam, not a target, copy, delete — are
+icon-only ghost `Button.Root`s, each in a `Tooltip.Trigger`, in `Drawer.Actions` / `Modal.Actions`
+before the ×; a «⋯» `Dropdown` only gathers the sixth and later. On a phone the kit moves them under
+the title by itself — never fold them into a «⋯» for the width. A destructive one either asks
+(`ConfirmDialog.Trigger` around it) or, when it is easy to redo by hand, holds
+(`holdToConfirm` with the action in `onConfirm`) — never a delete that runs on a plain press.
+
+```tsx partial
+// bad — three actions of the record behind a guess
+<Drawer.Actions>
+  <Dropdown.Root>
+    <Dropdown.Trigger>
+      <Button.Root variant="ghost" tone="neutral" aria-label="Другие действия">…</Button.Root>
+    </Dropdown.Trigger>
+    <Dropdown.Content>
+      <Dropdown.Item>Спам</Dropdown.Item>
+      <Dropdown.Item>Нецелевое</Dropdown.Item>
+      <Dropdown.Item tone="danger">Удалить</Dropdown.Item>
+    </Dropdown.Content>
+  </Dropdown.Root>
+</Drawer.Actions>
+```
+
+```tsx good
+// declare: const remove: () => Promise<void>
+// good — each action in sight, named by its tooltip; the delete asks
+<Drawer.Actions>
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      <Button.Root variant="ghost" tone="neutral" aria-label="Отметить как спам">…</Button.Root>
+    </Tooltip.Trigger>
+    <Tooltip.Content>Отметить как спам</Tooltip.Content>
+  </Tooltip.Root>
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      <Button.Root variant="ghost" tone="neutral" aria-label="Нецелевое обращение">…</Button.Root>
+    </Tooltip.Trigger>
+    <Tooltip.Content>Нецелевое обращение</Tooltip.Content>
+  </Tooltip.Root>
+  <ConfirmDialog.Root title="Удалить сделку?" confirmLabel="Удалить" onConfirm={remove}>
+    <Tooltip.Root>
+      <ConfirmDialog.Trigger>
+        <Tooltip.Trigger>
+          <Button.Root variant="ghost" tone="danger" aria-label="Удалить сделку">…</Button.Root>
+        </Tooltip.Trigger>
+      </ConfirmDialog.Trigger>
+      <Tooltip.Content>Удалить сделку</Tooltip.Content>
+    </Tooltip.Root>
+  </ConfirmDialog.Root>
+</Drawer.Actions>
+```
 
 ```tsx partial
 // bad — a menu for the one thing this header can do
@@ -852,14 +934,15 @@ wherever it opens:
   (the channel, «Ждёт человека», «VIP»). The header sizes the badges (no `size`) and keeps them on
   one row, the rest behind «+N». The header places the lines in this order whatever the order in
   code; write them in it anyway. `Drawer.Actions` hold only buttons that act on this
-  record: ghost icon Buttons, each in a `Tooltip.Trigger`, counted by
-  [the menu threshold](#a-menu-from-two-actions), centred on line 1 before the ×; on a phone one
-  icon button and the ⋯ beside the × keep the three lines whole. A Badge in `Drawer.Actions` is a
+  record: ghost icon Buttons, each in a `Tooltip.Trigger`, up to five in sight
+  ([actions of a record](#actions-of-a-record)), centred on line 1 before the ×; on a phone the kit
+  moves them under the title. A Badge in `Drawer.Actions` is a
   status in the wrong place; a way to another place (a section, a list) is no header action — a
   link in the body beside the data it leads to, or nothing. `Drawer.Icon` (a tone tile, or the
   record's picture at 40) is optional and a record header goes without it: the name leads.
 - **One form, one save.** Every editable field of every tab is one form, and its submit is the one
-  «Сохранить» of `Drawer.Footer`, shown while the form is dirty, with `Drawer.Guard` (`dirty`,
+  «Сохранить» of `Drawer.Footer`, shown while the form is dirty beside «Отменить изменения» (the
+  form goes back to the saved values, the drawer stays open), with `Drawer.Guard` (`dirty`,
   `busy`). No save per section or tab, no «Есть несохранённые изменения» in `Drawer.Meta`: the save
   button and the guard already say it. Actions that work at once — turn sign-in on, send a link,
   end the other sessions — are buttons beside what they change and never wait for the save. After
@@ -1160,6 +1243,43 @@ A tile whose value is words, not a number («Выдать PCX 160», «Заяв�
 with the link, or `Card.Link` when the card holds its own buttons): the kit draws its arrow — never
 an arrow of your own in the label.
 
+### Tiles and cards of a record
+
+The facts of a record (in its dialog, its page, its card in a list) read the same everywhere in an
+app: one look per kind of block, never a weight per screen.
+
+- **Fact tiles** — «К оплате», «Депозиты у нас», «Ближайшая задача», «LTV»: a row of
+  `Card.Root variant="stat-text" valueSize="l"` with `Card.Label`, `Card.Value` (`tone` by its
+  meaning) and an optional `Card.Meta`. The value is one step above the text and bold, a number
+  and a phrase alike, in every tile of the row and in every dialog of the app. Never a
+  `Typography` inside `Card.Value` to make it bigger: the loading Skeleton then has the wrong height.
+- **A record card with a total** (a vehicle of a deal, a payment, an invoice): the head is a
+  `Card.Header` — its mark first (`Card.Icon` with the record's picture or a `ProgressCircle` term
+  ring), `Card.Title` with `Card.Link` when the card opens the record (the kit centres its arrow on
+  the head), the statuses in `Card.Description`; the line items are a
+  `DescriptionList.Root align="end"` in `Card.Body divider="full"`; the footer is
+  `Card.Footer divider="fill"`: the action first, then `Card.Description` with a `Badge.Dot` and
+  the task, then `Card.Total` at the end edge (`Card.Meta tone` for its state, «к оплате 6 400 ฿»,
+  over `Card.Value`). See [record-totals](../src/components/card/examples/record-totals.tsx).
+
+```tsx partial
+// bad — the value made bigger by hand, a weight of its own per drawer
+<Card.Root variant="stat-text">
+  <Card.Label>К оплате</Card.Label>
+  <Card.Value>
+    <Typography as="span" variant="title-m">21 000 ₽</Typography>
+  </Card.Value>
+</Card.Root>
+```
+
+```tsx good
+// good — the kit's larger value: the same in every tile, the Skeleton in its height
+<Card.Root variant="stat-text" valueSize="l">
+  <Card.Label>К оплате</Card.Label>
+  <Card.Value tone="warning">21 000 ₽</Card.Value>
+</Card.Root>
+```
+
 ## Screen rules
 
 What each screen in [the index](#screens) demonstrates — keep these when you start from it.
@@ -1319,7 +1439,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The page titles itself in its top bar: `Page.Title` with a `Page.Description` that carries data («Сотрудников: 9 из 9»).
 - A `fill` page: `Gantt scrollHeight="fill"` takes the free height — the header and the first column stick inside the chart, the page never scrolls sideways.
 - `SmartFilter.Root` wraps the page: search with the role and client filter and teams (a `SegmentedControl` with counts) in `Page.Tools`, the primary action «Назначить» in `Page.Actions`, the active filters `SmartFilter.Chips` in `Page.Chips`. Zoom and «Сегодня» are built into `Gantt` — never add your own.
-- A row is a person: `renderRowAvatar` with an `Avatar`, `renderRow` with the name and role; on a narrow chart the column keeps only the avatar. Overlapping works lay themselves out in lanes, an absence is a `readOnly` bar, a milestone has `start` equal to `end`.
+- A row is a person: `renderRowAvatar` with an `Avatar`, `renderRow` with the name and role; on a narrow chart the column keeps only the avatar. Overlapping works lay themselves out in lanes, an absence is a bar with `edit: "none"`, work already under way (an issued rental) `edit: "end"` — only its end moves; never a move refused in `onBarChange` to fake a fixed start; a milestone has `start` equal to `end`.
 - `onBarChange` returns a promise and changes the data only after the service answers: while it runs the bar is busy; a refusal (work on an absence) is `notify` and `throw`, and the bar returns to its previous dates by itself.
 - `onBarCreate`: a range drawn on an empty place holds a busy draft while a `Modal` with `Modal.Guard busy` asks for the name and the client; saving adds the bar and resolves the promise, cancel rejects it — the draft dissolves. Work over an absence is refused at once.
 - The legend of client hues is a row of `Badge.Root color` with `Badge.Dot` in the chart's `toolbar`; `renderBarTooltip` names the client in the tooltip under the dates, so the client reads not only by color.

@@ -233,11 +233,11 @@ export const api: ComponentApi = {
           ru: "Доля выполнения, `0…1`: более плотная заливка от начала полосы; процент попадает в подсказку и имя.",
         },
         {
-          name: "readOnly",
-          type: "boolean",
-          default: "false",
-          en: "This bar cannot be moved or resized (a public holiday, a closed phase).",
-          ru: "Эту полосу нельзя сдвинуть или растянуть (праздник, закрытый этап).",
+          name: "edit",
+          type: '"all" | "end" | "none"',
+          default: '"all"',
+          en: "Which dates a person may change: `all` — move and both edges; `end` — only the end (a rental already issued): no move, no start grip, only Ctrl + Shift + arrows, and a milestone stays put; `none` — nothing (a public holiday, a closed phase).",
+          ru: "Какие даты можно менять: `all` — перенос и оба края; `end` — только окончание (уже выданная аренда): без переноса и ручки начала, только Ctrl + Shift + стрелки, а веха стоит на месте; `none` — ничего (праздник, закрытый этап).",
         },
       ],
     },
@@ -271,6 +271,10 @@ export const api: ComponentApi = {
     editHint: {
       en: "Description of an editable bar: the editing keys.",
       ru: "Описание редактируемой полосы: клавиши правки.",
+    },
+    editEndHint: {
+      en: "Description of a bar with `edit` `end`: the keys that change its end.",
+      ru: "Описание полосы с `edit` `end`: клавиши, меняющие окончание.",
     },
     duration: {
       en: "Duration of a bar in its tooltip («5 – 18 октября · 14 дн.»).",
@@ -327,8 +331,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Shift + ← · Shift + →",
-        en: "Moves the bar by one day, at every zoom.",
-        ru: "Сдвигает полосу на один день при любом масштабе.",
+        en: "Moves the bar by one day, at every zoom; a bar with `edit` `end` does not move.",
+        ru: "Сдвигает полосу на один день при любом масштабе; полоса с `edit` `end` не сдвигается.",
       },
       {
         keys: "Shift + Alt + ← · Shift + Alt + →",
@@ -366,8 +370,8 @@ export const api: ComponentApi = {
         ru: "Полоса — `<button>` с именем «Задача: 6 июля 2026 — 10 июля 2026» (с «выполнено 50%», если есть прогресс); веха — «Релиз: 20 июля 2026». Подсказка с датами открывается при наведении и при фокусе и закрывается, как только график прокручивается (полоса прокрутки, колесо, касание); следующее наведение или фокус открывают её снова. Она указывает на видимую часть полосы и остаётся внутри шкалы времени, не заходя на колонку подписей и шапку; полоса, видимая меньше чем на `--prime-space-6`, подсказки не показывает.",
       },
       {
-        en: "An editable bar has `aria-keyshortcuts` and is described by `labels.editHint`; the new dates after an editing key are announced in a polite status, a refused change with `labels.changeFailed`.",
-        ru: "Редактируемая полоса описана `labels.editHint` и `aria-keyshortcuts`; новые даты после клавиш объявляются вежливым статусом, отказ — `labels.changeFailed`.",
+        en: "An editable bar has `aria-keyshortcuts` and is described by `labels.editHint`; a bar with `edit` `end` lists only the end keys and is described by `labels.editEndHint`. The new dates after an editing key are announced in a polite status, a refused change with `labels.changeFailed`.",
+        ru: "Редактируемая полоса описана `labels.editHint` и `aria-keyshortcuts`; полоса с `edit` `end` перечисляет только клавиши окончания и описана `labels.editEndHint`. Новые даты после клавиш объявляются вежливым статусом, отказ — `labels.changeFailed`.",
       },
       {
         en: "While `onBarChange` runs the bar and the grid are `aria-busy`. Loading without rows hides the skeletons and announces `labels.loading`.",

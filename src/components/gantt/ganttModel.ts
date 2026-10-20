@@ -40,9 +40,21 @@ export type GanttBar = GanttDates & {
   tone?: Tone;
   /** Share done, `0…1`: a stronger fill from the start of the bar. */
   progress?: number;
-  /** This bar cannot be moved or resized (a public holiday, a closed phase). */
-  readOnly?: boolean;
+  /**
+   * Which dates a person may change: `all` (move and both edges), `end` (only the end: a rental
+   * already under way), `none` (a public holiday, a closed phase). Default `all`.
+   */
+  edit?: GanttBarEdit;
 };
+
+/** The edits a bar allows: every edit, only its end, or none. */
+export type GanttBarEdit = "all" | "end" | "none";
+
+/** The edits a bar at `dates` allows: a milestone has no end of its own, so `end` leaves it still. */
+export function barEdit(bar: Pick<GanttBar, "edit">, dates: GanttDates): GanttBarEdit {
+  const edit = bar.edit ?? "all";
+  return edit === "end" && isMilestone(dates) ? "none" : edit;
+}
 
 export const SCALES: readonly GanttScale[] = ["day", "week", "month"];
 

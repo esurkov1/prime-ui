@@ -172,12 +172,12 @@ One column of `columns`: data, not a part.
 | `hideHeader` | `boolean` | `false` | `header` names the column for assistive tech only (an action column): the head cell looks empty. |
 | `description` | `string` | — | What the column means: an info glyph after the header opens it as a tooltip; the header cell is described by it (`aria-describedby`). |
 | `numeric` | `boolean` | — | Tabular figures, no wrapping, end alignment unless `align` is set. |
-| `truncate` | `boolean` | — | One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |
+| `truncate` | `boolean` | — | One line with an ellipsis; the cell holds `maxWidth` (or `width`) exactly, the value fits inside its padding; string values get a `title`. |
 | `grow` | `boolean` | — | Takes the free width; the table then fills its container. Its cells fit the width they get: text wraps, `truncate` ellipsizes, a `Badge.Group` with `overflow="count"` shows «+N». It never gets narrower than its header or `minWidth`: below that the table scrolls instead of cells overlapping. |
 | `hideable` | `boolean` | `true` | The column can be hidden through `hiddenColumns` and `columnsMenu`; `false` for the key column that names the row and for the row-actions column. |
 | `reorderable` | `boolean` | `true` | The column moves when columns reorder (`columnOrder`); `false` holds its place: no column moves past it, the chooser shows a lock. A `hideHeader` column and a pinned first or last column (`stickyFirstColumn`, `stickyLastColumn`) hold theirs too. |
 | `scale` | `boolean \| { min?: number; max?: number }` | — | Heatmap: each cell is shaded by its numeric value on the five-step chart scale. `true` spans the column's minimum to maximum over all rows; `{ min, max }` fixes either end. |
-| `width · minWidth · maxWidth` | `string` | — | CSS sizes of the column (`"14rem"`). |
+| `width · minWidth · maxWidth` | `string` | — | CSS sizes of the column (`"14rem"`), the cell padding included. |
 
 ## Variants
 
@@ -269,7 +269,7 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | `showRange` | «Показано 1–5 из 23» on the left of the footer, with more than one page or with infinite scroll | the count matters to the task (a register people page through, a server list with a total) | `false` |
 | `fullWidth` | spans the container; `false` = content width | `false` for short lookup tables in wide layouts | `true` |
 | column `numeric` | tabular figures, end-aligned, no wrap | numbers, money | — |
-| column `truncate` | one line with an ellipsis and a `title` | long names in narrow columns | — |
+| column `truncate` | one line with an ellipsis and a `title`; the column holds its `width` / `maxWidth` exactly, the value fits inside the cell padding | long names in narrow columns | — |
 | column `description` | an info glyph after the header; its tooltip holds the text, the header cell is described by it | a header that needs a word more («Маржа», an event type) | — |
 | column `scale` | each cell shaded by its value on the five-step chart scale, the value kept in the cell | a heatmap: counts by person × month, load by day | — |
 
@@ -416,7 +416,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [column-order.tsx](examples/column-order.tsx) | Orders whose columns a manager puts in place by dragging a header — it moves alone and the gap opens among the headers where it lands — or with Alt + ← / →, and shows, hides and reorders in the chooser over the row menu; the order number stays first and the row menu last, and the choice outlives a reload — `columnOrder`, `onColumnOrderChange`, `reorderable`, `columnsMenu`, `hiddenColumns`. |
 | [infinite-scroll.tsx](examples/infinite-scroll.tsx) | An audit log that reveals loaded rows in batches and then asks the server for more — `paging`, `infiniteBatchSize`, `hasMore`, `loadingMore`, `onLoadMore`. |
 | [server.tsx](examples/server.tsx) | A CRM deal list the server sorts, pages and searches, with its tools in its own row — search, filter and column chooser, the active filters under them; a new search returns to page 1, and the footer counts the deals shown out of the total — `source`, `rowCount`, `showRange`, `sort`, `page`, `loading`, `toolbar`, `toolbarChips`. |
-| [fill-height.tsx](examples/fill-height.tsx) | An audit log that fills the height of its panel and loads older entries while scrolling; the status shows while the request is pending — `scrollHeight`, `paging`, `onLoadMore`. |
+| [fill-height.tsx](examples/fill-height.tsx) | An audit log that fills the height of its panel and loads older entries while scrolling; the status shows while the request is pending, and a long detail stays on one line in a fixed column that keeps its width as rows scroll in — `scrollHeight`, `paging`, `onLoadMore`, `truncate`, `width`. |
 | [states.tsx](examples/states.tsx) | Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `loadError`. |
 | [controlled.tsx](examples/controlled.tsx) | Sort, page and the column choice owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`, `hiddenColumns`, `onHiddenColumnsChange`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320 px support queue: columns scroll inside the table with the first one pinned, the column chooser stays in reach above it, the footer reflows and the pager turns compact — `stickyFirstColumn`, `DataTableColumnsMenu`, `size`. |
@@ -425,6 +425,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 ## Mistakes
 - No `getRowKey` with `selectable`, expansion or sorting → selection follows positions, not records.
 - Numbers in a plain column → set `numeric` (alignment and tabular figures).
+- Subtracting the cell padding from a column's `maxWidth` by hand so a long value does not widen it → `width` (or `maxWidth`) + `truncate`; the value fits inside the padding.
 - An explanation squeezed into the header text, or a hand-made icon with a Tooltip inside `header` → `description`.
 - A custom «Ничего не найдено» row inside `rows` → use `empty`.
 - A spinner instead of rows → use `loading` (the skeleton keeps the head and the layout).

@@ -84,7 +84,7 @@ One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclu
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"blue"` | Palette hue of a category (project, team, kind of absence). |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | — | Status color (done, at risk, overdue); wins over `color`. |
 | `progress` | `number` | — | Share done, `0…1`: a stronger fill from the start of the bar; the percentage joins the tooltip and the name. |
-| `readOnly` | `boolean` | `false` | This bar cannot be moved or resized (a public holiday, a closed phase). |
+| `edit` | `"all" \| "end" \| "none"` | `"all"` | Which dates a person may change: `all` — move and both edges; `end` — only the end (a rental already issued): no move, no start grip, only Ctrl + Shift + arrows, and a milestone stays put; `none` — nothing (a public holiday, a closed phase). |
 
 ## Variants
 
@@ -117,11 +117,17 @@ One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclu
 
 A `tone` wins over `color`. Say the status in the label too, never only by color.
 
+### edit (GanttBar)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `all` | a grab cursor on the body, grips at both ends; every editing key | a phase, a booking, planned work | yes |
+| `end` | no grab cursor, a grip only at the end; only Ctrl + Shift + arrows; a milestone stays put | a rental already issued, work already started: the start is history | |
+| `none` | no grips, no editing keys; still selects and shows its tooltip | a vacation, a public holiday, a closed phase | |
+
 ### Flags
 | Flag | Effect |
 |---|---|
 | `readOnly` | No moving or resizing anywhere; bars still select and show their tooltip. |
-| `GanttBar.readOnly` | One bar stays put (a vacation, a holiday); no grips, no editing keys. |
 | `loading` | Skeleton rows without data; with rows the grid is `aria-busy`. |
 
 ## States
@@ -133,7 +139,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | milestone | `start` equal to `end` | `data-milestone`: a diamond on its day, the label beside it |
 | label beside | the label does not fit the bar (measured) | `data-label="inside" \| "outside" \| "hidden"` (beside the bar when there is room, else hidden; the name and the tooltip keep it) |
 | progress | `progress` | `data-progress`, `--progress` |
-| editable | `onBarChange`, not `readOnly` | `data-editable`, grips at both ends, `aria-keyshortcuts`, `aria-describedby` → `labels.editHint` |
+| editable | `onBarChange`, not `readOnly`, `GanttBar.edit` | `data-editable="all"`: grips at both ends, `aria-keyshortcuts`, `aria-describedby` → `labels.editHint`; `data-editable="end"`: the end grip only, the end keys in `aria-keyshortcuts`, `aria-describedby` → `labels.editEndHint`; `edit` `none`: no `data-editable` |
 | dragging | a pointer drag | `data-dragging="move \| start \| end"`: the bar lifts and follows the pointer exactly; the dates snap to whole days (with Alt to the zoom's unit) with hysteresis, a faint accent guide marks the snapped edge at the week and month zoom, the tooltip shows the dates and the duration («5 – 18 октября · 14 дн.»); on release the bar glides to the snapped days |
 | creating | drawing on empty space, `onBarCreate` pending or refused | a ghost bar in its future lane: accent outline with a dates tooltip while drawn (`data-state="drawing"`), a pulsing Skeleton while pending; on resolve the bar you added stands where the ghost stood, on reject the ghost fades out (`leaving`) |
 | pending | `onBarChange` returned a Promise | `data-pending`, `aria-busy`, a Spinner; reject → the bar glides back |
@@ -169,7 +175,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | `↑` · `↓` | From a bar, the bar nearest in time in the row above / below (rows without bars are skipped); from a row header, the next row's header, empty rows too. |
 | `Home` · `End` | First / last bar of the row; with Ctrl, of the chart. |
 | `Enter` · `Space` | On a bar: opens its record (`onItemOpen`). On a row header: opens the row (`onRowClick`) or follows its link (`getRowHref`). |
-| `Shift + ←` · `Shift + →` | Moves the bar by one day, at every zoom. |
+| `Shift + ←` · `Shift + →` | Moves the bar by one day, at every zoom; a bar with `edit` `end` does not move. |
 | `Shift + Alt + ←` · `Shift + Alt + →` | Moves the bar by the zoom's unit (a week, a month). |
 | `Ctrl + Shift + ←` · `Ctrl + Shift + →` | Shortens / lengthens the bar by one day (⌘ on macOS); it stops at one day. |
 | `Ctrl + Shift + Alt + ←` · `Ctrl + Shift + Alt + →` | Shortens / lengthens the bar by the zoom's unit. |
@@ -181,7 +187,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 
 - A `role="grid"` named by `aria-label`: a header row of `columnheader`s (the first column and the time axis named `labels.timeline`), then a row per record with a `rowheader` (the row name) and a `gridcell` holding its bars. A grid because the bars are navigated in two dimensions: moving between rows, a screen reader announces the row.
 - A bar is a `<button>` named «Задача: 6 июля 2026 — 10 июля 2026» (with «выполнено 50%» when it has progress); a milestone «Релиз: 20 июля 2026». The Tooltip with the dates opens on hover and on focus and closes as soon as the chart scrolls (scrollbar, wheel, touch); the next hover or focus opens it again. It points at the visible part of the bar and stays inside the timeline, never over the label column or the header; a bar with less than `--prime-space-6` in view shows none.
-- An editable bar has `aria-keyshortcuts` and is described by `labels.editHint`; the new dates after an editing key are announced in a polite status, a refused change with `labels.changeFailed`.
+- An editable bar has `aria-keyshortcuts` and is described by `labels.editHint`; a bar with `edit` `end` lists only the end keys and is described by `labels.editEndHint`. The new dates after an editing key are announced in a polite status, a refused change with `labels.changeFailed`.
 - While `onBarChange` runs the bar and the grid are `aria-busy`. Loading without rows hides the skeletons and announces `labels.loading`.
 - The axis tiers, weekends and the today line are `aria-hidden`: the dates live in the bar names.
 - A row header is a focusable cell; with `onBarCreate` it is described by `labels.createHint` and has `aria-keyshortcuts="N"`. A new bar is announced, a refused one with `labels.createFailed`; the ghost is `aria-hidden`.
@@ -204,6 +210,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | `milestone` | `"{label}: {date}"` | Accessible name of a milestone. |
 | `progress` | `"выполнено {progress}%"` | Added to a bar's name when it has `progress`. |
 | `editHint` | `"Shift + стрелки сдвигают на день, Ctrl + Shift + стрелки меняют окончание на день; с Alt — на неделю или месяц масштаба"` | Description of an editable bar: the editing keys. |
+| `editEndHint` | `"Ctrl + Shift + стрелки меняют окончание на день; с Alt — на неделю или месяц масштаба"` | Description of a bar with `edit` `end`: the keys that change its end. |
 | `duration` | `"{days} дн."` | Duration of a bar in its tooltip («5 – 18 октября · 14 дн.»). |
 | `changeFailed` | `"Сроки не изменены: {label}"` | Announced when `onBarChange` rejects and the bar returns to its dates. |
 | `newBar` | `"Новая задача"` | Label of the ghost of a bar being created and of its announcement. |
@@ -218,7 +225,8 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | [overview.tsx](examples/overview.tsx) | A project plan: work streams with phases, progress and a launch milestone that move and stretch by pointer or keyboard — `getRowBars`, `onBarChange`. |
 | [variants.tsx](examples/variants.tsx) | Bars colored by category with palette hues, and by status with tones that win over the hue — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier: one-lane rows from 28 to 52 px, bars, header and toolbar controls of the tier — `size`. |
-| [occupancy.tsx](examples/occupancy.tsx) | Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `readOnly`. |
+| [occupancy.tsx](examples/occupancy.tsx) | Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `edit`. |
+| [rentals.tsx](examples/rentals.tsx) | A fleet calendar: an issued rental changes only its end, a booking moves and changes both edges, a service day stays put — `edit`, `onBarChange`. |
 | [large.tsx](examples/large.tsx) | Two thousand people over two years stay fast: only the rows and days in view are rendered, keyboard focus reaches any row, and new bars are drawn on empty space — `rows`, `range`, `scrollHeight`, `onBarCreate`. |
 | [row-link.tsx](examples/row-link.tsx) | A team by client: each row header is a link to the person's profile that a plain click opens in place, each tooltip adds the client and the planned hours under the dates, and a legend of client hues stands in the toolbar — `getRowHref`, `onRowClick`, `renderBarTooltip`. |
 | [states.tsx](examples/states.tsx) | Skeleton rows in the chart's geometry while it loads, an empty period and a report you may only look at, its today line on the report day — `loading`, `empty`, `readOnly`, `today`. |

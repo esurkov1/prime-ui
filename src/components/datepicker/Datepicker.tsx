@@ -1,5 +1,6 @@
 import { format, startOfDay } from "date-fns";
 import { ru } from "date-fns/locale";
+import type * as React from "react";
 
 import { Popover } from "@/components/popover/Popover";
 import { DEFAULT_ALIGN, type PositionAlign } from "@/hooks/usePosition";
@@ -15,8 +16,10 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
+import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { useOpenState } from "@/internal/overlay/useOpenState";
+import { splitParts } from "@/internal/parts";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Datepicker.module.css";
@@ -48,7 +51,7 @@ export {
   YEARLESS_YEAR,
 } from "./datepickerModel";
 
-/** Text of a value as the field shows it (preset name, «6 окт — 3 нояб», time when needed). */
+/** Text of a value as the field shows it (preset name, `labels.rangeValue`, time when needed). */
 export function formatDatepickerValue(
   props: CalendarOptions &
     ({ mode: "range"; value: DatepickerRange } | { mode: "single"; value: Date | null }),
@@ -77,7 +80,10 @@ export function formatDatepickerValue(
   const toText = `${formatDayShort(lastDay, today, locale)}${time(to)}`;
   if (!from || !fromDay) return `${props.labels?.until ?? DATEPICKER_LABELS.until} ${toText}`;
   if (wholeDays && sameDay(fromDay, lastDay)) return formatDayShort(fromDay, today, locale);
-  return `${formatDayShort(fromDay, today, locale)}${time(from)} — ${toText}`;
+  return formatLabel(props.labels?.rangeValue ?? DATEPICKER_LABELS.rangeValue, {
+    from: `${formatDayShort(fromDay, today, locale)}${time(from)}`,
+    to: toText,
+  });
 }
 
 /**
@@ -108,6 +114,7 @@ export type DatepickerRootProps = DatepickerPanelProps &
     "aria-label"?: string;
     "aria-labelledby"?: string;
     "aria-describedby"?: string;
+    children?: React.ReactNode;
   };
 
 /** Form values of a `name`d field: one for a single date, `from` and `to` for a range. */
@@ -153,8 +160,12 @@ function DatepickerRoot(props: DatepickerRootProps) {
     "aria-label": ariaLabel,
     "aria-labelledby": ariaLabelledBy,
     "aria-describedby": ariaDescribedBy,
+    children,
     ...other
   } = props;
+  // The trigger's leading glyph is a part: without `Datepicker.TriggerIcon` the field reads as a
+  // select (value + chevron), as `Select.Trigger` without `Select.TriggerIcon`.
+  const triggerIcon = splitParts(children, DatepickerTriggerIcon).parts[0] ?? null;
   const { options, rest } = splitCalendarOptions(other);
   const tier = useHostTier(sizeProp);
   const { size } = tier;
@@ -212,7 +223,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
               "focus-ring": focusRing,
             })}
           >
-            <Icon name="field.calendar" className={styles.triggerIcon} />
+            {triggerIcon}
             <span id={textId} className={styles.triggerLabel}>
               {text}
             </span>
@@ -242,7 +253,22 @@ function DatepickerRoot(props: DatepickerRootProps) {
 }
 DatepickerRoot.displayName = "Datepicker.Root";
 
+export type DatepickerTriggerIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/** A leading glyph in the field before the value (decorative): the calendar unless children give another. */
+function DatepickerTriggerIcon({ className, children, ...rest }: DatepickerTriggerIconProps) {
+  return (
+    <span aria-hidden="true" {...rest} className={cx(styles.triggerIcon, className)}>
+      {children ?? <Icon name="field.calendar" />}
+    </span>
+  );
+}
+DatepickerTriggerIcon.displayName = "Datepicker.TriggerIcon";
+
 export const Datepicker = {
   Root: DatepickerRoot,
+  TriggerIcon: DatepickerTriggerIcon,
   Panel: DatepickerPanel,
 };

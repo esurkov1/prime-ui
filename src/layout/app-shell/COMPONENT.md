@@ -133,6 +133,7 @@ The navigation of the nearest `AppShell.Root` for a trigger outside the rail (a 
 - Footer: no padding of its own (BottomNav keeps the bottom safe-area inset), sticky at the bottom, `z-index: --prime-z-sticky`.
 - A floating BottomNav (`floating`) in the footer: the footer takes no height, the capsule overlays the page, and Main keeps extra bottom room (the capsule height and the safe-area inset) so its last line never ends up under it.
 - The panel is the page (layer 0 of the surface ladder, gray in light): fields on it take the page fill, a Card inside is layer 1 — white in light with the raised whisper — and cards in cards go deeper.
+- Safe-area insets: the frame and every edge part of the kit (the page's top bar, BottomNav, the floating BottomNav room in Main, bottom sheets, Notification zones, MediaViewer) read the container's outer insets from `--prime-safe-area-*` (`top`, `right`, `bottom`, `left`), declared once on `:root` with `env(safe-area-inset-*)` as the value. An app whose host draws over the web view and reports the insets its own way sets those four variables on `:root` once, after the kit's styles; nothing else changes.
 
 ## Accessibility
 
@@ -168,6 +169,22 @@ No `labels`.
 - BottomNav anywhere but `AppShell.Footer` → it stays next to the Sidebar rail on a desktop; the footer is what leaves while the rail is on screen.
 - `AppShell.Template` in a router app without `scrollResetKey` → a new page opens at the old scroll position; pass the pathname.
 - A hand-wired menu state shared by the Sidebar, a menu button and a BottomNav «Ещё» → the Sidebar publishes it to the shell: the page's `Page.TopBar` draws the menu button, other triggers read `useAppShellNav()`.
+- A Telegram Mini App in full screen (`requestFullscreen()`) left on `env(safe-area-inset-*)` → Telegram's header covers the page's top bar, because Telegram reports the insets as `--tg-safe-area-inset-*` (the device) and `--tg-content-safe-area-inset-*` (its own controls) on `<html>`. Map them onto the kit's insets once, in the app's stylesheet after the kit's:
+
+  ```css
+  :root {
+    --prime-safe-area-top: max(
+      env(safe-area-inset-top, 0px),
+      calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px))
+    );
+    --prime-safe-area-bottom: max(
+      env(safe-area-inset-bottom, 0px),
+      calc(var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px))
+    );
+    --prime-safe-area-left: max(env(safe-area-inset-left, 0px), var(--tg-safe-area-inset-left, 0px));
+    --prime-safe-area-right: max(env(safe-area-inset-right, 0px), var(--tg-safe-area-inset-right, 0px));
+  }
+  ```
 
 ## Related
 - **Built from:** [ScrollContainer](../../components/scroll-container/COMPONENT.md)

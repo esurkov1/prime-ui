@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
@@ -7,6 +8,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
+import { splitParts } from "@/internal/parts";
 import press from "@/internal/press.module.css";
 import { useSwapIn } from "@/internal/RegionSwap";
 import rowLink from "@/internal/rowLink.module.css";
@@ -31,8 +33,11 @@ export type CardVariant =
   | "list"
   | "cover";
 
+export type CardValueSize = "m" | "l";
+
 export type CardRootProps = DivProps & {
   variant?: CardVariant;
+  valueSize?: CardValueSize;
   flat?: boolean;
   loading?: boolean;
   asChild?: boolean;
@@ -40,12 +45,27 @@ export type CardRootProps = DivProps & {
 
 /** The template of the card around a part: it picks the part's text role and zone hairlines. */
 const VariantContext = React.createContext<CardVariant | null>(null);
-/** Whether a part sits in `Card.Header` (a header-row value is a step smaller). */
-const HeaderContext = React.createContext(false);
+/**
+ * The zone a part sits in: a header-row value is a step smaller; a footer description is the
+ * record's one-line note; a value in `Card.Total` is its total.
+ */
+const ZoneContext = React.createContext<"header" | "footer" | "total" | null>(null);
+/** The step of a `stat-text` value: body-m medium (`m`) or title-m (`l`). */
+const ValueSizeContext = React.createContext<CardValueSize>("m");
 /** The card's data is loading: the value, delta and meta show Skeletons in their geometry. */
 const LoadingContext = React.createContext(false);
 /** `Card.Link` tells the root it stretches over the card (the root then opens as a whole). */
 const StretchedLinkContext = React.createContext<(stretched: boolean) => void>(() => {});
+/**
+ * Where the transition arrow of a card that opens stands: with a `Card.Header` it is the header's
+ * (at its end, centred on its height), otherwise the card's top corner. `mark` — the card opens.
+ */
+type MarkPlace = { mark: boolean; headed: boolean; setHeaded: (headed: boolean) => void };
+const MarkContext = React.createContext<MarkPlace>({
+  mark: false,
+  headed: false,
+  setHeaded: () => {},
+});
 
 /** The arrow of a card that is a link: the kit draws it itself, its gesture plays on hover. */
 function LinkMark() {
@@ -80,6 +100,7 @@ function useZoned(): boolean {
 
 function CardRoot({
   variant = "panel",
+  valueSize = "m",
   flat = false,
   loading = false,
   asChild = false,
@@ -89,15 +110,24 @@ function CardRoot({
 }: CardRootProps) {
   const depth = useNestedSurfaceDepth();
   const [stretched, setStretched] = React.useState(false);
+  const [headed, setHeaded] = React.useState(false);
+  const child = asChild ? slotChild(children, "Card.Root") : null;
+  const link = child ? isLinkElement(child) : false;
+  const mark = stretched || link;
+  const place = React.useMemo(() => ({ mark, headed, setHeaded }), [mark, headed]);
   const content = (inner: React.ReactNode) => (
     <VariantContext.Provider value={variant}>
-      <HeaderContext.Provider value={false}>
-        <LoadingContext.Provider value={loading}>
-          <StretchedLinkContext.Provider value={setStretched}>
-            <SurfaceDepthProvider value={depth}>{inner}</SurfaceDepthProvider>
-          </StretchedLinkContext.Provider>
-        </LoadingContext.Provider>
-      </HeaderContext.Provider>
+      <ValueSizeContext.Provider value={valueSize}>
+        <ZoneContext.Provider value={null}>
+          <LoadingContext.Provider value={loading}>
+            <StretchedLinkContext.Provider value={setStretched}>
+              <MarkContext.Provider value={place}>
+                <SurfaceDepthProvider value={depth}>{inner}</SurfaceDepthProvider>
+              </MarkContext.Provider>
+            </StretchedLinkContext.Provider>
+          </LoadingContext.Provider>
+        </ZoneContext.Provider>
+      </ValueSizeContext.Provider>
     </VariantContext.Provider>
   );
   const rootProps = {
@@ -113,9 +143,7 @@ function CardRoot({
     }),
   };
 
-  if (asChild) {
-    const child = slotChild(children, "Card.Root");
-    const link = isLinkElement(child);
+  if (child) {
     return (
       <Slot {...rootProps} data-mark={link || undefined}>
         {React.cloneElement(
@@ -124,7 +152,7 @@ function CardRoot({
           content(
             <>
               {child.props.children}
-              {link ? <LinkMark /> : null}
+              {link && !headed ? <LinkMark /> : null}
             </>,
           ),
         )}
@@ -147,10 +175,12 @@ export type CardLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
  */
 function CardLink({ asChild = false, className, children, ...rest }: CardLinkProps) {
   const setStretched = React.useContext(StretchedLinkContext);
+  const { headed } = React.useContext(MarkContext);
   React.useLayoutEffect(() => {
     setStretched(true);
     return () => setStretched(false);
   }, [setStretched]);
+  const mark = headed ? null : <LinkMark />;
   const props = { ...rest, className: cx(styles.link, className), "data-row-link": "" };
   if (asChild) {
     const child = slotChild(children, "Card.Link");
@@ -161,7 +191,7 @@ function CardLink({ asChild = false, className, children, ...rest }: CardLinkPro
           undefined,
           <>
             {child.props.children}
-            <LinkMark />
+            {mark}
           </>,
         )}
       </Slot>
@@ -170,7 +200,7 @@ function CardLink({ asChild = false, className, children, ...rest }: CardLinkPro
   return (
     <a {...props}>
       {children}
-      <LinkMark />
+      {mark}
     </a>
   );
 }
@@ -180,14 +210,23 @@ export type CardHeaderProps = DivProps;
 
 /**
  * The top row: an optional `Card.Icon` first, then the title (and its description), anything after
- * it (a control, a quiet caption) at the end.
+ * it (a control, a quiet caption) at the end. In a card that opens it holds the transition arrow,
+ * at its end and centred on its height.
  */
-function CardHeader({ className, ...rest }: CardHeaderProps) {
+function CardHeader({ className, children, ...rest }: CardHeaderProps) {
   const zoned = useZoned();
+  const { mark, setHeaded } = React.useContext(MarkContext);
+  React.useLayoutEffect(() => {
+    setHeaded(true);
+    return () => setHeaded(false);
+  }, [setHeaded]);
   return (
-    <HeaderContext.Provider value={true}>
-      <div className={cx(styles.header, zoned && hairline.between, className)} {...rest} />
-    </HeaderContext.Provider>
+    <ZoneContext.Provider value="header">
+      <div className={cx(styles.header, zoned && hairline.between, className)} {...rest}>
+        {children}
+        {mark ? <LinkMark /> : null}
+      </div>
+    </ZoneContext.Provider>
   );
 }
 CardHeader.displayName = "Card.Header";
@@ -210,8 +249,24 @@ export type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & 
   ref?: React.Ref<HTMLParagraphElement>;
 };
 
-function CardDescription({ className, ...rest }: CardDescriptionProps) {
-  return <p className={cx(textRole.bodyS, styles.description, className)} {...rest} />;
+function CardDescription({ className, children, ...rest }: CardDescriptionProps) {
+  const inFooter = React.useContext(ZoneContext) === "footer";
+  // In the footer it is the record's note: a status dot first, the text cut to one line.
+  const { parts: dots, rest: text } = inFooter
+    ? splitParts(children, Badge.Dot)
+    : { parts: [], rest: [children] };
+  return (
+    <p className={cx(textRole.bodyS, styles.description, className)} {...rest}>
+      {inFooter ? (
+        <>
+          {dots}
+          <span className={styles.noteText}>{text}</span>
+        </>
+      ) : (
+        children
+      )}
+    </p>
+  );
 }
 CardDescription.displayName = "Card.Description";
 
@@ -245,22 +300,57 @@ function CardMedia({ className, ...rest }: CardMediaProps) {
 }
 CardMedia.displayName = "Card.Media";
 
-export type CardFooterProps = DivProps & { divider?: CardDivider };
+export type CardFooterDivider = CardDivider | "fill";
 
-/** The bottom row of buttons: under a hairline in the zoned templates and in `cta`. */
+export type CardFooterProps = DivProps & { divider?: CardFooterDivider };
+
+/**
+ * The bottom row of buttons: under a hairline in the zoned templates and in `cta`. With
+ * `divider="fill"` it is a zone on the next layer of the ladder, out to the card's edges, no line.
+ * The row of a record: the actions, the note (`Card.Description`) and `Card.Total` at the end.
+ */
 function CardFooter({ divider, className, ...rest }: CardFooterProps) {
   const variant = React.useContext(VariantContext);
+  const fill = divider === "fill";
+  const depth = useNestedSurfaceDepth();
   const ruled =
-    divider !== undefined || variant === "panel" || variant === "list" || variant === "cta";
-  return (
+    divider === "full" ||
+    (divider === undefined && (variant === "panel" || variant === "list" || variant === "cta"));
+  const footer = (
     <div
-      className={cx(styles.footer, ruled && hairline.top, divider && hairline.subtle, className)}
+      className={cx(
+        styles.footer,
+        ruled && hairline.top,
+        divider === "full" && hairline.subtle,
+        className,
+      )}
       data-divider={divider}
+      data-depth={fill ? depth : undefined}
       {...rest}
     />
   );
+  return (
+    <ZoneContext.Provider value="footer">
+      {fill ? <SurfaceDepthProvider value={depth}>{footer}</SurfaceDepthProvider> : footer}
+    </ZoneContext.Provider>
+  );
 }
 CardFooter.displayName = "Card.Footer";
+
+export type CardTotalProps = DivProps;
+
+/**
+ * The total of a record at the end of `Card.Footer`: a `Card.Value` (title-m, tabular) with an
+ * optional `Card.Meta` above it — its state («к оплате 21 000 ₽», «оплачено») in a `tone`.
+ */
+function CardTotal({ className, ...rest }: CardTotalProps) {
+  return (
+    <ZoneContext.Provider value="total">
+      <div className={cx(styles.total, className)} {...rest} />
+    </ZoneContext.Provider>
+  );
+}
+CardTotal.displayName = "Card.Total";
 
 export type CardIconProps = DivProps;
 
@@ -270,10 +360,11 @@ export type CardIconProps = DivProps;
  * box. In `Card.Header` it leads, before the title and its description.
  */
 function CardIcon({ className, children, ...rest }: CardIconProps) {
-  const { media, provide } = useMediaSlotHost();
+  const { media, named, provide } = useMediaSlotHost();
   return (
     <div
-      aria-hidden={media ? true : undefined}
+      // A picture repeats the title; a ring (`ProgressCircle`) tells the record's state by its name.
+      aria-hidden={media && !named ? true : undefined}
       {...rest}
       className={cx(!media && iconBoxStyles.tile, !media && iconSlotClass, styles.icon, className)}
       data-tone={media ? undefined : "accent"}
@@ -298,18 +389,24 @@ export type CardValueProps = SpanProps & {
 
 function CardValue({ tone, className, children, ...rest }: CardValueProps) {
   const variant = React.useContext(VariantContext);
-  const inHeader = React.useContext(HeaderContext);
+  const valueSize = React.useContext(ValueSizeContext);
+  const zone = React.useContext(ZoneContext);
+  const inHeader = zone === "header";
   // `stat-trend`: the value is the tile's headline (a step smaller beside a lead in the header
   // row); the headline follows the card's width (`.headline`).
-  // `stat-text`: the value is a line of text (body-m, medium), not a number.
+  // `stat-text`: the value is a line of text, a number or a phrase alike — body-m medium, or
+  // title-m with `valueSize="l"`.
+  // In `Card.Total` the value is the record's total (title-m).
   const role =
-    variant === "stat-text"
-      ? textRole.bodyM
-      : variant !== "stat-trend"
-        ? textRole.titleL
-        : inHeader
-          ? textRole.headingM
-          : textRole.headingL;
+    zone === "total" || (variant === "stat-text" && valueSize === "l")
+      ? textRole.titleM
+      : variant === "stat-text"
+        ? textRole.bodyM
+        : variant !== "stat-trend"
+          ? textRole.titleL
+          : inHeader
+            ? textRole.headingM
+            : textRole.headingL;
   const headline = variant === "stat-trend" && !inHeader;
   const part = useLoadingPart(
     <Skeleton shape="block" className={styles.valueSkeleton} />,
@@ -357,19 +454,29 @@ function CardDelta({ className, tone = "neutral", children, ...rest }: CardDelta
 }
 CardDelta.displayName = "Card.Delta";
 
-export type CardMetaProps = SpanProps;
+export type CardMetaProps = SpanProps & {
+  tone?: Extract<Tone, "neutral" | "success" | "warning" | "danger">;
+};
 
 /**
  * The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; it sits at the
- * bottom of the tile, so tiles in a row line their meta up.
+ * bottom of the tile, so tiles in a row line their meta up. In `Card.Total` it is the total's state.
  */
-function CardMeta({ className, children, ...rest }: CardMetaProps) {
+function CardMeta({ tone, className, children, ...rest }: CardMetaProps) {
   const part = useLoadingPart(<Skeleton size="xs" className={styles.metaSkeleton} />, children);
+  // The status ink is the shared text tone; `neutral` keeps the muted ink of `.meta`.
   return (
     <span
       key={part.key}
       {...rest}
-      className={cx(textRole.caption, styles.meta, part.className, className)}
+      className={cx(
+        textRole.caption,
+        styles.meta,
+        tone && textTone.tone,
+        part.className,
+        className,
+      )}
+      data-tone={tone}
       data-loading={part["data-loading"]}
     >
       {part.children}
@@ -414,6 +521,7 @@ export const Card = {
   Body: CardBody,
   Media: CardMedia,
   Footer: CardFooter,
+  Total: CardTotal,
   Link: CardLink,
   Icon: CardIcon,
   Label: CardLabel,

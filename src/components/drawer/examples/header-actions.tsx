@@ -109,21 +109,26 @@ export default function DrawerHeaderActionsExample() {
               </Tooltip.Trigger>
               <Tooltip.Content>Диалог</Tooltip.Content>
             </Tooltip.Root>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                <Button.Root variant="ghost" tone="neutral" aria-label="Действия с заявкой">
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="ghost" tone="neutral" aria-label="Скопировать ссылку">
                   <Button.Icon>
-                    <Icon name="action.more" />
+                    <Icon name="action.copy" />
                   </Button.Icon>
                 </Button.Root>
-              </Dropdown.Trigger>
-              <Dropdown.Content>
-                <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
-                <Dropdown.Item>Объединить с другой заявкой</Dropdown.Item>
-                <Dropdown.Separator />
-                <Dropdown.Item tone="danger">Удалить заявку</Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Скопировать ссылку</Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="ghost" tone="danger" aria-label="Удалить заявку">
+                  <Button.Icon>
+                    <Icon name="action.delete" />
+                  </Button.Icon>
+                </Button.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Удалить заявку</Tooltip.Content>
+            </Tooltip.Root>
           </Drawer.Actions>
         </Drawer.Header>
         <Drawer.Body>

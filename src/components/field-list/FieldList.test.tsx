@@ -8,6 +8,7 @@ import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
+import frame from "@/internal/FieldFrame.module.css";
 import hairline from "@/internal/hairline.module.css";
 import { cssRule, cssValue } from "@/test/css";
 
@@ -127,6 +128,41 @@ describe("FieldList", () => {
     expect(screen.getAllByRole("textbox", { name: "Услуга" })).toHaveLength(2);
     expect(screen.getAllByRole("textbox", { name: "Цена" })).toHaveLength(2);
     expect(screen.getAllByRole("textbox", { name: "Услуга" })[0]).toHaveValue("Внедрение");
+  });
+
+  it("shows each field's column label once the rows stack, unless stackedLabels is false", () => {
+    const narrow = ["@container (width < 30rem)"];
+    const FRAME_CSS = "src/internal/FieldFrame.module.css";
+    // The one rule that shows a cell's label: the stacked query, on the `cellLabel` class.
+    expect(cssValue(cssRule(FRAME_CSS, ".label.cellLabel", narrow), "position")).toBe("static");
+    const labelsOf = () =>
+      screen
+        .getAllByText(/^(Услуга|Цена)$/)
+        .filter((node) => !node.closest("[aria-hidden='true']"));
+    const { unmount } = render(<Lines />);
+    for (const label of labelsOf()) expect(label).toHaveClass(frame.cellLabel);
+    for (const row of Array.from(rowsOf())) expect(row).not.toHaveAttribute("data-unlabelled");
+    unmount();
+
+    render(<Lines stackedLabels={false} />);
+    const labels = labelsOf();
+    expect(labels).toHaveLength(4);
+    for (const label of labels) expect(label).not.toHaveClass(frame.cellLabel);
+    // The names stay: every field is still named by its column.
+    expect(screen.getAllByRole("textbox", { name: "Услуга" })).toHaveLength(2);
+    expect(screen.getAllByRole("textbox", { name: "Цена" })).toHaveLength(2);
+    // A stacked row without labels keeps its actions on the middle of its first field.
+    for (const row of Array.from(rowsOf())) expect(row).toHaveAttribute("data-unlabelled");
+    const stacked = ["@container prime-field-list (width < 30rem)"];
+    expect(
+      cssValue(
+        cssRule(CSS, ".record:not([data-unlabelled]) > :is(.grip, .end)", stacked),
+        "margin-block-start",
+      ),
+    ).toBe("calc(var(--fl-label-lh) + var(--fl-label-gap))");
+    expect(cssValue(cssRule(CSS, ".record[data-unlabelled]", stacked), "row-gap")).toBe(
+      "var(--prime-space-3)",
+    );
   });
 
   it("keeps a field's own label as its name and still hides it on wide rows", () => {

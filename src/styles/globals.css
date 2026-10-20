@@ -262,8 +262,16 @@ textarea:disabled::placeholder {
  *   icon-size       the glyph size a host gives the icons inside it (a Button, a Badge, a menu row
  *                   sets it from its tier; `internal/iconBox`, an Icon without `size`, reads it);
  *                   unset (`initial`) everywhere else, so an icon takes the nearest control tier
+ *   safe-area-*     the outer insets of the app's container (notch, home indicator, a host app's
+ *                   header over a full-screen web view); the one place the kit reads
+ *                   `env(safe-area-inset-*)`. An app that knows better (a Telegram Mini App in full
+ *                   screen) sets them on `:root`, and every edge part of the kit follows
  */
 :root {
+  --prime-safe-area-top: env(safe-area-inset-top, var(--prime-space-0));
+  --prime-safe-area-right: env(safe-area-inset-right, var(--prime-space-0));
+  --prime-safe-area-bottom: env(safe-area-inset-bottom, var(--prime-space-0));
+  --prime-safe-area-left: env(safe-area-inset-left, var(--prime-space-0));
   --prime-layout-gutter: var(--prime-layout-gutter-s);
   --prime-bleed-inline: var(--prime-space-0);
   --prime-control-height: initial;

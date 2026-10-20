@@ -119,6 +119,7 @@ export type FieldListProps<T extends object> = Omit<FieldRootDomProps, "onChange
   getLabel?: (item: T) => string;
   getLocked?: (item: T) => boolean;
   reorderable?: boolean;
+  stackedLabels?: boolean;
   rowActions?: FieldListRowActions;
   variant?: FieldListVariant;
   min?: number;
@@ -254,7 +255,8 @@ const mainMinWidth = () =>
  * An editable list of records of the same shape: one row per record on one grid, the column
  * headings shown once above the rows, the row's actions at its end (a remove button and a handle,
  * or one menu), an add button under them and pinned rows. In a narrow container a row keeps its
- * first fields and its actions on one line and puts the rest under them, each with its label.
+ * first fields and its actions on one line and puts the rest under them, each with its label
+ * (`stackedLabels`).
  */
 export function FieldList<T extends object>({
   value: valueProp,
@@ -269,6 +271,7 @@ export function FieldList<T extends object>({
   getLabel,
   getLocked,
   reorderable = false,
+  stackedLabels = true,
   rowActions = "buttons",
   variant = "plain",
   min = 0,
@@ -337,6 +340,9 @@ export function FieldList<T extends object>({
   // The handle is the move of the buttons mode; the menu carries its own moves.
   const grip = reorderable && !menu;
   const single = columns.length === 1;
+  // A cell's field shows its column heading only once the rows stack, and only when the list asks
+  // for it: a one-column list and a list whose values name themselves keep the names read, unseen.
+  const cellLabels = single || !stackedLabels ? "always" : "wide";
   const places = placesOf(columns);
   const leadCount = places.filter((place) => place === "lead").length;
   const template = [
@@ -635,7 +641,7 @@ export function FieldList<T extends object>({
               <FieldCellContext
                 // biome-ignore lint/suspicious/noArrayIndexKey: a cell is its column
                 key={column}
-                value={cellValue(heading?.label ?? "", single, Boolean(heading?.required))}
+                value={cellValue(heading?.label ?? "", cellLabels, Boolean(heading?.required))}
               >
                 <div
                   className={styles.cell}
@@ -687,6 +693,7 @@ export function FieldList<T extends object>({
       "data-fl-row": id,
       "data-locked": locked || undefined,
       "data-single": single || undefined,
+      "data-unlabelled": cellLabels === "always" || undefined,
     };
     return grip ? (
       <Dnd.SortableItem key={id} id={id} locked={locked} {...rowProps}>
@@ -862,11 +869,11 @@ FieldList.displayName = "FieldList";
 const cellValues = new Map<string, FieldCell>();
 
 /** One stable context value per heading, so the cells do not re-render the fields for nothing. */
-function cellValue(label: string, single: boolean, required: boolean): FieldCell {
-  const key = `${single ? "1" : "n"}:${required ? "r" : "o"}:${label}`;
+function cellValue(label: string, hidden: FieldCell["hidden"], required: boolean): FieldCell {
+  const key = `${hidden}:${required ? "r" : "o"}:${label}`;
   let value = cellValues.get(key);
   if (!value) {
-    value = { label, hidden: single ? "always" : "wide", required };
+    value = { label, hidden, required };
     cellValues.set(key, value);
   }
   return value;

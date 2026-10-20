@@ -308,6 +308,7 @@
 /* One sort indicator per sortable column, always at the end edge of the head cell. */
 
 .headCell {
+  box-sizing: border-box;
   height: var(--dt-head-height);
   padding: 0 var(--dt-pad-x);
   --sticky-bg: var(--dt-head-bg);
@@ -494,6 +495,10 @@
 }
 
 .cell {
+  /* A column's `width` is the whole cell, paddings and divider included, with or without a reset;
+     `--dt-cell-inset` is what the cell takes from it — a `truncate` value fits the rest. */
+  box-sizing: border-box;
+  --dt-cell-inset: calc(2 * var(--dt-pad-x) + var(--dt-column-divider-width));
   /* A table cell's height is a minimum: content taller than one line grows the row. */
   height: var(--dt-row-height);
   padding: var(--dt-pad-y) var(--dt-pad-x);
@@ -612,6 +617,13 @@
 
 /* Sub-rows: the first content cell is indented by depth. */
 .row[data-level] > .cell[data-first-column="true"] {
+  --dt-cell-inset: calc(
+    2 *
+    var(--dt-pad-x) +
+    var(--dt-depth) *
+    var(--dt-indent) +
+    var(--dt-column-divider-width)
+  );
   padding-inline-start: calc(var(--dt-pad-x) + var(--dt-depth) * var(--dt-indent));
 }
 

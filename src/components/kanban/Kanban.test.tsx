@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dnd } from "@/components/dnd/Dnd";
 import { DRAG_HOLD_MS } from "@/internal/longPress";
-import { cssRule, cssValue } from "@/test/css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 import { withMotion } from "@/test/motion";
 
 import { Kanban, type KanbanColumn, type KanbanMove, type KanbanValue } from "./Kanban";
@@ -1076,6 +1076,38 @@ describe("rich card parts", () => {
     expect(parts[0]).toHaveTextContent("Bilal Rahman");
     expect(parts[1]).toHaveTextContent("#866");
     expect(parts[2]).toHaveTextContent("ЕС");
+  });
+
+  it("an owner passed in a fragment still ends the row, after the number", () => {
+    render(
+      <RichBoard>
+        <Kanban.ItemTitle number="#863" data-testid="title">
+          Bilal Rahman
+          {[
+            <React.Fragment key="owner">
+              <Avatar.Root size="s" aria-label="Евгений Смирнов">
+                <Avatar.Fallback>ЕС</Avatar.Fallback>
+              </Avatar.Root>
+            </React.Fragment>,
+          ]}
+        </Kanban.ItemTitle>
+      </RichBoard>,
+    );
+    const parts = Array.from(screen.getByTestId("title").children);
+    expect(parts).toHaveLength(3);
+    expect(parts[0]).toHaveTextContent(/^Bilal Rahman$/);
+    expect(parts[1]).toHaveTextContent(/^#863$/);
+    expect(parts[2]).toHaveTextContent(/^ЕС$/);
+    // The row shows the DOM order: nothing in the stylesheet reorders its parts.
+    const reorders = cssRules("src/components/kanban/Kanban.module.css").filter(
+      (rule) =>
+        /itemTitle|itemNumber/.test(rule.selector) &&
+        rule.decls.some(
+          (decl) =>
+            decl.prop === "order" || (decl.prop === "flex-direction" && /reverse/.test(decl.value)),
+        ),
+    );
+    expect(reorders).toEqual([]);
   });
 
   it("a plain title keeps its single element", () => {

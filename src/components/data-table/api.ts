@@ -612,8 +612,8 @@ export const api: ComponentApi = {
         {
           name: "truncate",
           type: "boolean",
-          en: "One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`.",
-          ru: "Одна строка с многоточием; ширина из `maxWidth` (или `width`); строковые значения получают `title`.",
+          en: "One line with an ellipsis; the cell holds `maxWidth` (or `width`) exactly, the value fits inside its padding; string values get a `title`.",
+          ru: "Одна строка с многоточием; ячейка держит ровно `maxWidth` (или `width`), значение укладывается внутрь её отступов; строковые значения получают `title`.",
         },
         {
           name: "grow",
@@ -644,8 +644,8 @@ export const api: ComponentApi = {
         {
           name: "width · minWidth · maxWidth",
           type: "string",
-          en: 'CSS sizes of the column (`"14rem"`).',
-          ru: 'CSS-размеры колонки (`"14rem"`).',
+          en: 'CSS sizes of the column (`"14rem"`), the cell padding included.',
+          ru: 'CSS-размеры колонки (`"14rem"`), отступы ячейки входят в них.',
         },
       ],
     },

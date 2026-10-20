@@ -1,4 +1,4 @@
-/** A model card with tabs: one switcher for the whole open tab stands in the header before ⋯ — the text language on the description tab, the period on the analytics tab, whose two self-titled charts the panel spaces by itself — `Drawer.Actions`, `Tabs.Root`, `Tabs.Panel`. */
+/** A model card with tabs: one switcher for the whole open tab stands in the header before the record's icon buttons — the text language on the description tab, the period on the analytics tab, whose two self-titled charts the panel spaces by itself — `Drawer.Actions`, `Tabs.Root`, `Tabs.Panel`. */
 import {
   Button,
   Card,
@@ -7,12 +7,12 @@ import {
   DEFAULT_DATEPICKER_PRESETS,
   DescriptionList,
   Drawer,
-  Dropdown,
   Icon,
   SegmentedControl,
   Sparkline,
   type SparklinePoint,
   Tabs,
+  Tooltip,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -91,19 +91,26 @@ export default function DrawerTabSwitcherExample() {
                   align="end"
                 />
               )}
-              <Dropdown.Root>
-                <Dropdown.Trigger>
-                  <Button.Root variant="ghost" tone="neutral" aria-label="Действия с моделью">
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Button.Root variant="ghost" tone="neutral" aria-label="Дублировать модель">
                     <Button.Icon>
-                      <Icon name="action.more" />
+                      <Icon name="action.copy" />
                     </Button.Icon>
                   </Button.Root>
-                </Dropdown.Trigger>
-                <Dropdown.Content>
-                  <Dropdown.Item>Дублировать</Dropdown.Item>
-                  <Dropdown.Item>Снять с продажи</Dropdown.Item>
-                </Dropdown.Content>
-              </Dropdown.Root>
+                </Tooltip.Trigger>
+                <Tooltip.Content>Дублировать модель</Tooltip.Content>
+              </Tooltip.Root>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Button.Root variant="ghost" tone="neutral" aria-label="Снять с продажи">
+                    <Button.Icon>
+                      <Icon name="action.powerOff" />
+                    </Button.Icon>
+                  </Button.Root>
+                </Tooltip.Trigger>
+                <Tooltip.Content>Снять с продажи</Tooltip.Content>
+              </Tooltip.Root>
             </Drawer.Actions>
             <Tabs.List aria-label={MODEL.name}>
               <Tabs.Item value="description">Описание</Tabs.Item>
