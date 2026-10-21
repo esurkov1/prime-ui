@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
+import { Avatar } from "@/components/avatar/Avatar";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import textTone from "@/internal/textTone.module.css";
@@ -57,6 +58,39 @@ function DropdownWithOnSelect({
 // ─── Render ───────────────────────────────────────────────────────────────────
 
 describe("Dropdown", () => {
+  it("picks a person: the avatar at the row's media size, the chosen one checked with a mark", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <button type="button">Ответственный</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item selected>
+            <Avatar.Root data-testid="avatar">
+              <Avatar.Fallback>ЕС</Avatar.Fallback>
+            </Avatar.Root>
+            Евгений Сурков
+          </Dropdown.Item>
+          <Dropdown.Item selected={false} onSelect={onSelect}>
+            Анна Котова
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    await user.click(screen.getByRole("button", { name: "Ответственный" }));
+    const chosen = screen.getByRole("menuitemradio", { name: "Евгений Сурков" });
+    expect(chosen).toHaveAttribute("aria-checked", "true");
+    expect(chosen.querySelector("svg")).not.toBeNull();
+    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "s");
+    expect(screen.getByTestId("avatar")).toHaveAttribute("aria-hidden", "true");
+    const other = screen.getByRole("menuitemradio", { name: "Анна Котова" });
+    expect(other).toHaveAttribute("aria-checked", "false");
+    await user.click(other);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
   it("renders trigger, menu is not present initially", () => {
     render(<BasicDropdown />);
     expect(screen.getByRole("button", { name: "Open" })).toBeInTheDocument();

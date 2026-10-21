@@ -73,6 +73,12 @@ export const page: ComponentPageConfig = {
         "Выбор колонок: пункты-переключатели с галочкой в конце не закрывают меню, ключевую колонку не скрыть — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`.",
     },
     {
+      scenario: "person-choice",
+      title: "Выбор человека",
+      description:
+        "Ответственный за сделку из команды: строка начинается с аватара в размере ряда, у выбранного — галочка — `selected`, `Avatar.Root`.",
+    },
+    {
       scenario: "long-list",
       title: "Длинный список",
       description:

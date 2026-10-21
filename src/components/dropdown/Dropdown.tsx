@@ -1,9 +1,11 @@
 import * as React from "react";
 
+import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
 import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Kbd } from "@/components/kbd/Kbd";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import {
@@ -15,6 +17,7 @@ import {
 } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { AUTOFILL_OFF } from "@/internal/autofill";
+import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -48,7 +51,7 @@ import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFl
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot, type SlotPartProps, slotChild } from "@/internal/slot";
-import { type ControlSize, OVERLAY_CONTENT_SIZE, type Tone } from "@/internal/states";
+import { type ControlSize, OVERLAY_CONTENT_SIZE, type Tone, tierMappings } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
 
@@ -454,6 +457,7 @@ export type DropdownItemProps = Omit<
 > &
   SearchItemProps & {
     onSelect?: () => void;
+    selected?: boolean;
     disabled?: boolean;
     tone?: Extract<Tone, "neutral" | "danger">;
     asChild?: boolean;
@@ -476,8 +480,23 @@ function useItemContent(children: React.ReactNode, query: string) {
   const labelId = React.useId();
   const descriptionId = React.useId();
   const metaId = React.useId();
-  const nodes = React.Children.toArray(children);
-  const leading = nodes.filter((node) => isType(node, DropdownItemIcon));
+  const tier = useOptionalControlSize() ?? OVERLAY_CONTENT_SIZE;
+  // A person's or an object's picture leads the row at the row's media size, decorative: the label
+  // names the item.
+  const nodes = React.Children.toArray(children).map((node) =>
+    React.isValidElement<AvatarRootProps | ThumbnailRootProps>(node) &&
+    (node.type === Avatar.Root || node.type === Thumbnail.Root)
+      ? React.cloneElement(node, {
+          size: node.props.size ?? tierMappings.rowMedia[tier],
+          className: cx(styles.media, node.props.className),
+          "aria-hidden": true,
+        } as Partial<AvatarRootProps & ThumbnailRootProps>)
+      : node,
+  );
+  const leading = nodes.filter(
+    (node) =>
+      isType(node, DropdownItemIcon) || isType(node, Avatar.Root) || isType(node, Thumbnail.Root),
+  );
   const description = nodes.filter((node) => isType(node, DropdownItemDescription));
   const meta = nodes.filter((node) => isType(node, DropdownItemMeta));
   const shortcut = nodes.filter((node) => isType(node, DropdownItemShortcut));
@@ -609,6 +628,7 @@ function useSearchItem(
  */
 function DropdownItem({
   onSelect,
+  selected,
   disabled = false,
   tone = "neutral",
   asChild = false,
@@ -635,7 +655,9 @@ function DropdownItem({
     ...aria,
     ...search.props,
     ref: mergedRef,
-    role: "menuitem",
+    // A choice of one (a person, a status): the chosen item is checked, the others are not.
+    role: selected === undefined ? "menuitem" : "menuitemradio",
+    "aria-checked": selected,
     tabIndex: -1,
     disabled,
     // A danger row takes its ink from the tone ladder; a disabled row keeps the disabled ink.
@@ -646,7 +668,11 @@ function DropdownItem({
       styles.item,
       className,
     ),
-    ...toDataAttributes({ tone, disabled: disabled || undefined }),
+    ...toDataAttributes({
+      tone,
+      disabled: disabled || undefined,
+      checked: selected || undefined,
+    }),
     onPointerMove: (event: React.PointerEvent<HTMLElement>) => {
       onPointerMove?.(event as React.PointerEvent<HTMLButtonElement>);
       search.props.onPointerMove(event);
@@ -660,17 +686,31 @@ function DropdownItem({
     },
   };
 
+  const check =
+    selected === undefined ? null : (
+      <span className={menu.check} aria-hidden="true">
+        {selected ? <Icon name="action.check" /> : null}
+      </span>
+    );
   if (child) {
     // A link keeps its native click: a modified click opens a new tab and the menu still closes.
     return (
       <InteractiveElement {...itemProps} element="slot">
-        {React.cloneElement(child, undefined, content)}
+        {React.cloneElement(
+          child,
+          undefined,
+          <>
+            {content}
+            {check}
+          </>,
+        )}
       </InteractiveElement>
     );
   }
   return (
     <InteractiveElement {...itemProps} element="button">
       {content}
+      {check}
     </InteractiveElement>
   );
 }

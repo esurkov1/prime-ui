@@ -38,7 +38,14 @@ export default function BadgeAssigneeExample() {
         </Dropdown.Trigger>
         <Dropdown.Content>
           {TEAM.map((item) => (
-            <Dropdown.Item key={item.id} onSelect={() => setMemberId(item.id)}>
+            <Dropdown.Item
+              key={item.id}
+              selected={item.id === memberId}
+              onSelect={() => setMemberId(item.id)}
+            >
+              <Avatar.Root color={item.color}>
+                <Avatar.Fallback>{item.initials}</Avatar.Fallback>
+              </Avatar.Root>
               {item.name}
             </Dropdown.Item>
           ))}

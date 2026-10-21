@@ -82,3 +82,8 @@
 a.item {
   text-decoration: none;
 }
+
+/* A person's or an object's picture leading an item (`Avatar.Root`, `Thumbnail.Root`), at the row's media size. */
+.media {
+  flex-shrink: 0;
+}

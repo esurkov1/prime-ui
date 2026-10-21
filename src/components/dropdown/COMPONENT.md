@@ -96,6 +96,7 @@ No DOM: clone the single child and merge `ref`. Trigger toggles the menu on a cl
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onSelect` | `() => void` | — | The action of the item. |
+| `selected` | `boolean` | — | A choice of one (a person, a status): the item becomes `role="menuitemradio"` with `aria-checked`, the chosen one gets a check at the end. Set it on every item of the choice. |
 | `disabled` | `boolean` | `false` | Muted and `disabled` (a link item: `aria-disabled`), skipped by the arrow keys; no handler runs, the item's own `onClick` included. |
 | `tone` | `"neutral" \| "danger"` | `"neutral"` | `danger`: destructive action — danger text, icon and hover fill. |
 | `asChild` | `boolean` | `false` | The item is its single child link (`<a href>`, a router `Link`), so Cmd / Ctrl-click and «open in a new tab» work; the pick still closes the menu. |
@@ -227,6 +228,7 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape and a press outside close the menu; `false` turns that way off |
 | side | `side` and the room next to the trigger | `data-side` (resolved) |
 | size | `size` on Content | `data-size` |
+| chosen | `selected` on every item of a choice of one | `role="menuitemradio"`, `aria-checked`, `data-checked` and the `action.check` mark at the end of the chosen item; an `Avatar.Root` / `Thumbnail.Root` child leads the row at the row's media size, `aria-hidden` |
 | item hover / focus | a hovering pointer, arrow keys | subtle fill (danger-soft for `danger`), no movement; a tap leaves no hover fill |
 | item disabled | `disabled` | native `disabled` (a link item `aria-disabled="true"`), `data-disabled="true"`; no handler runs |
 | item tone | `tone` | `data-tone` |
@@ -296,6 +298,7 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 | [context-menu.tsx](examples/context-menu.tsx) | A right-click on a deal opens its menu at the pointer, and Escape or a pick returns focus to that row — `anchorPoint`, `Dropdown.Anchor`. |
 | [match-trigger-width.tsx](examples/match-trigger-width.tsx) | Under a full-width button the menu is at least as wide as the trigger — `matchTriggerWidth`. |
 | [checkbox-items.tsx](examples/checkbox-items.tsx) | A column chooser: toggles in the menu keep it open, the key column cannot be hidden — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`. |
+| [person-choice.tsx](examples/person-choice.tsx) | The assignee of a deal picked from the team: each row leads with the person's avatar at the row's size, and the chosen one carries a check — `selected`, `Avatar.Root`. |
 | [long-list.tsx](examples/long-list.tsx) | More projects than fit: the grouped list scrolls inside the panel, capped by the room next to the trigger — `Dropdown.Group`. |
 | [search.tsx](examples/search.tsx) | Chats of the assistant: a new-chat action above a long list of threads with their time, a search over them, a fixed width and a height of twelve rows — `Dropdown.Search`, `Dropdown.ItemMeta`, `persistent`, `width`, `maxRows`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An onboarding step keeps the menu open on an outside press and on Escape until an item is picked — `closeOnOutsideClick`, `closeOnEscape`. |
@@ -316,5 +319,5 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 - An action above a searched list that disappears while typing → mark it `persistent`.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), [EmptyPage](../empty-page/COMPONENT.md) (the empty state of `Search`), `Icon` (`action.check` of `CheckboxItem`, `action.search` of `Search`)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (sized as an item's picture), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), [EmptyPage](../empty-page/COMPONENT.md) (the empty state of `Search`), `Icon` (`action.check` of `CheckboxItem` and a `selected` item, `action.search` of `Search`)
 - **See also:** [Select](../select/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md)

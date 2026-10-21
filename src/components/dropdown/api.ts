@@ -163,6 +163,12 @@ export const api: ComponentApi = {
           ru: "Действие пункта.",
         },
         {
+          name: "selected",
+          type: "boolean",
+          en: 'A choice of one (a person, a status): the item becomes `role="menuitemradio"` with `aria-checked`, the chosen one gets a check at the end. Set it on every item of the choice.',
+          ru: 'Выбор одного (человек, статус): пункт становится `role="menuitemradio"` с `aria-checked`, у выбранного — галочка в конце. Ставится на все пункты выбора.',
+        },
+        {
           name: "disabled",
           type: "boolean",
           default: "false",
