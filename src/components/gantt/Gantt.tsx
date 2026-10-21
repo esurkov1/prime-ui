@@ -572,7 +572,6 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
    */
   const moveTo = (next: TimeView, sync: boolean, rest = false) => {
     intent.current = next;
-    moved.current = true;
     const view = shown();
     const laid = sceneRef.current;
     if (view.dayPx !== laid.dayPx || (rest && laid.kind !== "wide")) {
@@ -652,8 +651,6 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   // ─── The first view, a new width or axis: the scene is laid out around the intent ───
   const placed = React.useRef(false);
-  /** The view was moved (a pan, a zoom, a glide) before the chart had its width: keep it. */
-  const moved = React.useRef(false);
   const laidRange = React.useRef(range.start.getTime());
   /** The width and the axis the scene stands on: a new one lays it out again. */
   const axisKey = `${axisWidth}:${totalDays}:${steps.max}:${range.start.getTime()}`;
@@ -661,10 +658,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   const placeLatest = React.useRef(() => {});
   placeLatest.current = () => {
     const startTime = range.start.getTime();
-    if (!placed.current && moved.current && intent.current) {
-      // Moved before the width came: that view is the person's, never replaced by the first one.
-      placed.current = axisWidth > 0;
-    } else if (!placed.current) {
+    if (!placed.current) {
       // The first view: today a third into the axis. A chart with no width yet (a hidden tab, a
       // lazy panel) takes it when it gets one.
       const dayPx = clampZoom(zoomTarget, boundsRef.current);
