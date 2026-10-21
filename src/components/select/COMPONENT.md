@@ -61,7 +61,7 @@ an icon) goes inside `Select.ItemMeta`.
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Select.Root
-`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query. Inside `Input.Wrapper` it is the box's start segment instead: no frame, the trigger named by `aria-label` and the value.
+`ref` → `HTMLDivElement`. The field frame (label · control · support row) holding the value, the open state and the query. In `Input.Wrapper` the box's start segment: no frame, the trigger named by `aria-label` and the value — as a `status` one with no `label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -96,6 +96,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `name` | `string` | — | Form field name: hidden inputs submit the value (`""` while empty; one input per value with `multiple`). |
 | `placeholder` | `string` | — | Text in the trigger while nothing is picked. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier: trigger height, padding, text; the list rows, the label and the hint follow it. Without it the tier of its host (a form, a panel with a size), else `m`. |
+| `variant` | `"field" \| "status"` | `"field"` | `field` — the field trigger. `status` — a chip in the picked option's `color` (gray with none) with a chevron, as wide as its content: a status picked in a row. |
 | `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `id` | `string` | — | Id of the trigger; generated when omitted. |
 | `labels` | `Partial<SelectLabels>` | — | Built-in strings, see Labels. |
@@ -142,6 +143,7 @@ an icon) goes inside `Select.ItemMeta`.
 |---|---|---|---|
 | `value` | `string` | — (required) | Value of the option. |
 | `label` | `string` | — | Text in the trigger and for typeahead; defaults to `Select.ItemText`, then the plain text. |
+| `color` | `PaletteColor` | — | The option's hue: its text and icon in the hue's ink, the highlight a wash of it; a `status` trigger takes it when picked. |
 | `keywords` | `string` | — | Extra words for the search. |
 | `disabled` | `boolean` | `false` | Muted, skipped by the keyboard, not selectable. |
 | `children` | `ReactNode` | — (required) | Text, or `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root` as direct children. |
@@ -181,7 +183,13 @@ an icon) goes inside `Select.ItemMeta`.
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "onSelect" \| "role" \| "id" \| "children">` | — | `className` and the other attributes of the row. |
 
 ## Variants
-No `variant` or `tone`. The trigger is the field look (fill, inset control border, tier radius); the panel is the shared floating surface with menu rows.
+### variant
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `field` | the field look (fill, inset control border, tier radius), full width | a value in a form or a filter | yes |
+| `status` | a chip in the picked option's `color` (soft fill and text ink of a Badge of that hue; gray with none) with the chevron in its ink, at the chip tier of `size`, as wide as its content | a status picked in place — at the end of a row beside its buttons, in a record header | |
+
+The panel is the shared floating surface with menu rows; an option with `color` draws its text and icon in the hue's ink and its highlight as the hue's wash. Text carries the value: the hue never stands alone.
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -215,6 +223,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | State | Driven by | DOM |
 |---|---|---|
 | empty | no value | `data-placeholder="true"` on Value, placeholder color |
+| status hue | `variant="status"` and the picked option's `color` | trigger `data-variant="status"`, `data-color`, `data-tier`; the hue glides in (`base`) — an optimistic pick at once, a refused save back; hover and press a step deeper (fill and ink, 4.5:1 kept) |
 | open | `open` / `defaultOpen` / click / arrows | trigger `data-state="open"`, `aria-expanded`; panel `data-state`, `data-side`; chevron turns 180° |
 | invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the trigger; error text below; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"` |
@@ -322,6 +331,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A labelled field with a placeholder; picking an option closes the list and shows its label — `label`, `placeholder`. |
+| [variants.tsx](examples/variants.tsx) | The field trigger and the status chip side by side — `variant`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the label, the list rows and the hint take the tier of the field — `size`. |
 | [states.tsx](examples/states.tsx) | A default field next to a disabled, a loading, an invalid one, a list with nothing in it and a field whose focus shows without the ring — `disabled`, `loading`, `invalid`, `labels`, `focusRing`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
@@ -335,6 +345,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [saving.tsx](examples/saving.tsx) | A choice that saves on the server at once: the picked value shows with a spinner on the trigger, and a refused save rolls it back and says why — `onValueChange`, `error`. |
 | [rich-options.tsx](examples/rich-options.tsx) | Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. |
 | [people.tsx](examples/people.tsx) | People in the rows and the trigger: an avatar sized to the tier before the name, a role badge after it — `Avatar.Root`, `Badge.Root`, `renderValue`. |
+| [status.tsx](examples/status.tsx) | The step of a deposit picked in its row: the options in their status hues, the trigger a chip in the picked one, and a save that keeps the new hue or rolls it back — `variant`, `color`. |
 | [currency.tsx](examples/currency.tsx) | The currency of a deposit: the currency's sign before each option and in the trigger, while the amount elsewhere keeps its code — `Select.ItemIcon`, `Select.TriggerIcon`. |
 | [icon-only.tsx](examples/icon-only.tsx) | An icon picker as wide as its glyph: the trigger holds only the picked icon and the chevron, the value is still read aloud — `Select.TriggerIcon`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A filter list that stays open while the person looks beside it: only Escape, the trigger or Tab close it — `closeOnOutsideClick`, `closeOnEscape`. |

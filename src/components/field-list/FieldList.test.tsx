@@ -113,6 +113,35 @@ function Lines({
 const rowsOf = () => screen.getByRole("list", { name: "Позиции счёта" }).children;
 
 describe("FieldList", () => {
+  it("hides the heading row with hideHeadings and keeps the column names on the fields", () => {
+    render(
+      <FieldList
+        label="Ссылки"
+        columns={[{ label: "Название" }, { label: "Ссылка" }]}
+        hideHeadings
+        defaultValue={[{ id: "a", title: "Бриф", url: "https://x.ru" }]}
+        getId={(item) => item.id}
+        renderItem={(item) => (
+          <>
+            <Input.Root>
+              <Input.Wrapper>
+                <Input.Field defaultValue={item.title} />
+              </Input.Wrapper>
+            </Input.Root>
+            <Input.Root>
+              <Input.Wrapper>
+                <Input.Field defaultValue={item.url} />
+              </Input.Wrapper>
+            </Input.Root>
+          </>
+        )}
+      />,
+    );
+    const shown = screen.queryAllByText("Название").filter((node) => node.closest("[aria-hidden]"));
+    expect(shown).toHaveLength(0);
+    expect(screen.getByRole("textbox", { name: "Ссылка" })).toHaveValue("https://x.ru");
+  });
+
   it("draws the headings once, hidden from assistive tech, above an ordered list of rows", () => {
     render(<Lines />);
     const list = screen.getByRole("list", { name: "Позиции счёта" });

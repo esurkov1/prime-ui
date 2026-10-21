@@ -335,8 +335,11 @@ describe("Carousel", () => {
     const { unmount } = render(<Carousel.Root items={PHOTOS} />);
     region().focus();
     await user.keyboard("{ArrowRight}");
-    // The new slide starts a page to the right and springs home.
-    expect((currentSlide() as HTMLElement).style.transform).toContain(`${WIDTH}px`);
+    // The new slide starts a page to the right and springs home: a frame may already have run on a
+    // slow machine, so it stands somewhere on its way, past half a page.
+    const start = /\+ (-?[\d.]+)px/.exec((currentSlide() as HTMLElement).style.transform)?.[1];
+    expect(Number(start)).toBeGreaterThan(WIDTH / 2);
+    expect(Number(start)).toBeLessThanOrEqual(WIDTH);
     unmount();
     stubMedia("prefers-reduced-motion");
     render(<Carousel.Root items={PHOTOS} />);

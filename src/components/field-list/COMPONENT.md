@@ -59,6 +59,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `getLocked` | `(item: T) => boolean` | — | Pinned rows: the remove stays in its place, off, and says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it. In the menu every item is off. |
 | `reorderable` | `boolean` | `false` | Rows move: with `rowActions="buttons"` by a handle that ends the row, after the remove button (drag, a touch hold, Alt + ↑ / ↓); with `"menu"` by its items «Выше» and «Ниже» and Alt + ↑ / ↓ on the menu button. |
 | `stackedLabels` | `boolean` | `true` | Stacked rows (under 30rem) show each field's column heading as its label. `false` for values that name themselves («Аренда: 20 окт → 2 нояб»): no labels, the headings stay the fields' names. |
+| `hideHeadings` | `boolean` | `false` | No heading row above the rows, for fields that name themselves (a placeholder, a value); each field keeps its column heading as its accessible name. |
 | `rowActions` | `"buttons" \| "menu"` | `"buttons"` | How a row offers its actions: `buttons` — a remove button «×» and, with `reorderable`, the handle after it; `menu` — one «⋯» button whose menu moves the row up or down and removes it. |
 | `variant` | `"plain" \| "surface"` | `"plain"` | Look of the list: `plain` — the rows on the host surface; `surface` — the rows on a fill of their own, one step up the surface ladder, with side padding. |
 | `min` | `number` | `0` | The fewest rows: at this count the remove buttons are disabled. |
@@ -105,6 +106,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `min` · `max` | remove buttons off at `min`; the add button closes up at `max` and comes back when a row leaves — no limit text of its own, a limit the person should know goes in `hint` | the record count is bounded | `0` · — |
 | `renderTotals` | a row of totals under the rows over a faint line, each on its column, aligned as the column's field text; «Итого» in the first cell without a total | the rows add up (shares, amounts, hours) | — |
 | `stackedLabels` | `true`: once the rows stack, each field shows its column heading above it; `false`: the stacked rows show no labels, the headings stay the fields' hidden names | `false` when the values name themselves («Аренда: 20 окт → 2 нояб», «1 200 ₽»); keep `true` for generic fields («Параметр», «Значение») | `true` |
+| `hideHeadings` | no heading row above the rows; the fields keep the column headings as their hidden names | the fields name themselves (a placeholder «https://», a value) and a heading row would only repeat them | `false` |
 
 **Combinations**
 - Recommended: `label` on the list (or a `Fieldset` legend around it), one heading per column, a `getLabel` from the title field, an `addLabel` that says what is added.
@@ -192,6 +194,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [totals.tsx](examples/totals.tsx) | A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts, each ending where its fields end their numbers — `renderTotals`, `width`. |
 | [saving.tsx](examples/saving.tsx) | Removing a recipient is saved on the server: the row leaves at once and comes back with the reason if the server refuses — `onValueChange`, `error`. |
 | [named-rows.tsx](examples/named-rows.tsx) | A rental bill in a 320 px column whose lines name themselves: each line keeps its item and its remove button on the first line and its amount under it, with no labels, while every field is still named by its column — `stackedLabels`. |
+| [hidden-headings.tsx](examples/hidden-headings.tsx) | The links of a project, where each field names itself by its placeholder: no heading row above the rows, the column names still read to assistive tech — `hideHeadings`. |
 | [grouped.tsx](examples/grouped.tsx) | A rental bill kept in groups by type: a new line and a line whose type changes take their place in their group, and the rows below glide aside to make room — `value`, `onValueChange`, `createItem`. |
 | [states.tsx](examples/states.tsx) | The same list editable and disabled while the request saves it: fields, handles and buttons turn off together — `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the lines: it sums them under the list and puts the saved lines back on reset — `value`, `onValueChange`. |

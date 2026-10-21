@@ -14,6 +14,7 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
+import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -43,6 +44,7 @@ import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
+import palette from "@/internal/palette.module.css";
 import { usePartPresence } from "@/internal/partPresence";
 import { RegionSwap } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
@@ -65,6 +67,7 @@ import {
   type SelectContextValue,
   type SelectLabels,
   SelectProvider,
+  type SelectVariant,
   useSelectContext,
 } from "./selectContext";
 
@@ -76,7 +79,7 @@ export type {
   SelectItemProps,
   SelectItemTextProps,
 } from "./SelectItem";
-export type { SelectLabels } from "./selectContext";
+export type { SelectLabels, SelectVariant } from "./selectContext";
 
 export const SELECT_LABELS: SelectLabels = {
   search: "Поиск",
@@ -94,6 +97,7 @@ type SelectRootBase = FieldRootDomProps &
   FieldFrameProps &
   FieldFocusRingProps & {
     size?: ControlSize;
+    variant?: SelectVariant;
     disabled?: boolean;
     placeholder?: string;
     invalid?: boolean;
@@ -139,6 +143,7 @@ export type SelectRootProps = SelectRootBase & (SelectSingleProps | SelectMultip
 function SelectRoot(props: SelectRootProps) {
   const {
     size: sizeProp,
+    variant = "field",
     label,
     required = false,
     optional,
@@ -235,6 +240,9 @@ function SelectRoot(props: SelectRootProps) {
     [inSegment, ariaLabel],
   );
 
+  // A status chip stands in a row with no label of its own: the root's `aria-label` names it.
+  const statusLabel = variant === "status" && !label ? ariaLabel : undefined;
+
   // Closing (also from outside, through `open`) resets the search.
   const wasOpenRef = React.useRef(isOpen);
   React.useEffect(() => {
@@ -265,6 +273,7 @@ function SelectRoot(props: SelectRootProps) {
   const context = React.useMemo<SelectContextValue>(
     () => ({
       size,
+      variant,
       invalid: ids.invalid,
       focusRing,
       required: ids.required,
@@ -297,9 +306,11 @@ function SelectRoot(props: SelectRootProps) {
       triggerRef,
       labels,
       segment,
+      statusLabel,
     }),
     [
       size,
+      variant,
       ids.invalid,
       ids.controlId,
       ids.describedBy,
@@ -330,6 +341,7 @@ function SelectRoot(props: SelectRootProps) {
       setQuery,
       labels,
       segment,
+      statusLabel,
     ],
   );
 
@@ -361,7 +373,7 @@ function SelectRoot(props: SelectRootProps) {
   return tier.provide(
     <FieldFrame
       {...rest}
-      aria-label={ariaLabel}
+      aria-label={statusLabel === undefined ? ariaLabel : undefined}
       size={size}
       ids={ids}
       label={label}
@@ -420,16 +432,18 @@ function SelectTrigger({
     labels,
     registry,
     segment,
+    variant,
+    statusLabel,
   } = useSelectContext();
   const mergedRef = useMergedRefs(triggerRef, ref);
+  // `status`: a chip in the picked option's hue (gray with none), at the chip tier of the size.
+  const status = variant === "status" && !segment;
+  const hue = status && selected.length > 0 ? registry.colorOf(selected[0]) : undefined;
   // A segment is named by the root's `aria-label` with the picked value after it.
   useListboxView(registry);
   const valueText = selected.map(registry.labelOf).join(", ");
-  const segmentName = segment?.label
-    ? valueText
-      ? `${segment.label}: ${valueText}`
-      : segment.label
-    : undefined;
+  const ownName = segment?.label ?? statusLabel;
+  const segmentName = ownName ? (valueText ? `${ownName}: ${valueText}` : ownName) : undefined;
   // Only a `Select.TriggerIcon`, no `Select.Value`: a compact trigger (the glyph and the chevron)
   // for a dense row; the value is still spoken from a hidden `Select.Value`.
   const parts = React.Children.toArray(children);
@@ -459,7 +473,11 @@ function SelectTrigger({
       aria-label={segmentName ?? rest["aria-label"]}
       disabled={disabled}
       className={cx(
-        segment ? styles.segmentTrigger : cx(fieldTriggerClass, styles.trigger),
+        segment
+          ? styles.segmentTrigger
+          : status
+            ? cx(palette.hue, chipTier.tier, styles.statusTrigger)
+            : cx(fieldTriggerClass, styles.trigger),
         className,
       )}
       onClick={(event) => {
@@ -488,6 +506,9 @@ function SelectTrigger({
         "focus-ring": focusRing,
         "icon-only": iconOnly || undefined,
         segment: segment ? true : undefined,
+        variant: status ? "status" : undefined,
+        color: hue,
+        tier: status ? size : undefined,
       })}
     >
       <span className={styles.triggerMain}>

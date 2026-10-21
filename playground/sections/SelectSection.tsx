@@ -34,6 +34,10 @@ export const page: ComponentPageConfig = {
         "Поле с подписью и плейсхолдером; выбор пункта закрывает список и показывает подпись — `label`, `placeholder`.",
     },
     {
+      slot: "variants",
+      description: "Поле и чип статуса рядом — `variant`.",
+    },
+    {
       slot: "sizes",
       description: "Все ярусы; подпись, строки списка и подсказка берут ярус поля — `size`.",
     },
@@ -105,6 +109,12 @@ export const page: ComponentPageConfig = {
       title: "Люди",
       description:
         "Люди в строках и триггере: аватар по ярусу перед именем, бейдж роли после него — `Avatar.Root`, `Badge.Root`, `renderValue`.",
+    },
+    {
+      scenario: "status",
+      title: "Статус",
+      description:
+        "Шаг депозита в его строке: пункты цветами статусов, поле — чип цвета выбранного, а сохранение оставляет новый цвет или откатывает его — `variant`, `color`.",
     },
     {
       scenario: "currency",

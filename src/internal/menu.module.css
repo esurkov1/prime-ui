@@ -160,6 +160,11 @@
   color: var(--prime-color-text-muted);
 }
 
+/* A row in a palette hue (`data-color`, a Select status option): its icon takes the row's ink. */
+.item[data-color]:not([data-disabled="true"]) .itemIcon {
+  color: inherit;
+}
+
 .item[data-disabled="true"] .itemIcon {
   color: var(--prime-color-text-disabled);
 }

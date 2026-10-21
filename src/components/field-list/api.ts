@@ -94,6 +94,13 @@ export const api: ComponentApi = {
           ru: "Сложенные строки (уже 30rem) показывают заголовок столбца подписью поля. `false` — для значений, что называют себя сами («Аренда: 20 окт → 2 нояб»): без подписей, заголовки остаются именами полей.",
         },
         {
+          name: "hideHeadings",
+          type: "boolean",
+          default: "false",
+          en: "No heading row above the rows, for fields that name themselves (a placeholder, a value); each field keeps its column heading as its accessible name.",
+          ru: "Без строки заголовков над строками — для полей, что называют себя сами (плейсхолдер, значение); имя поля для доступности — по-прежнему заголовок столбца.",
+        },
+        {
           name: "rowActions",
           type: '"buttons" | "menu"',
           default: '"buttons"',

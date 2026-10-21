@@ -23,8 +23,12 @@ export type SelectLabels = {
 
 export const normalize = (text: string) => text.trim().toLocaleLowerCase();
 
+/** `field`: the field trigger. `status`: a chip in the picked option's hue with a chevron. */
+export type SelectVariant = "field" | "status";
+
 export type SelectContextValue = {
   size: ControlSize;
+  variant: SelectVariant;
   invalid: boolean;
   focusRing: boolean | undefined;
   required: boolean;
@@ -66,6 +70,8 @@ export type SelectContextValue = {
    * named by the root's `aria-label` and the picked value.
    */
   segment: { label: string | undefined } | null;
+  /** A `status` select with no visible `label`: the root's `aria-label` names its trigger. */
+  statusLabel: string | undefined;
 };
 
 export const [SelectProvider, useSelectContext] =

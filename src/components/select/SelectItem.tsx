@@ -13,7 +13,8 @@ import { iconSlotClass } from "@/internal/iconBox";
 import { optionDomId, useListboxItem, useStoreSlice } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { nodeText } from "@/internal/nodeText";
-import { type ControlSize, stepDown, tierMappings } from "@/internal/states";
+import palette from "@/internal/palette.module.css";
+import { type ControlSize, type PaletteColor, stepDown, tierMappings } from "@/internal/states";
 
 import styles from "./Select.module.css";
 import { normalize, useSelectContext } from "./selectContext";
@@ -160,6 +161,7 @@ export type SelectItemProps = Omit<
 > & {
   value: string;
   label?: string;
+  color?: PaletteColor;
   keywords?: string;
   disabled?: boolean;
   children: React.ReactNode;
@@ -169,6 +171,7 @@ export type SelectItemProps = Omit<
 export function SelectItem({
   value,
   label,
+  color,
   keywords,
   disabled = false,
   className,
@@ -192,7 +195,7 @@ export function SelectItem({
   useListboxItem(
     registry,
     value,
-    { label: resolvedLabel, haystack, disabled, onActivate: () => pick(value) },
+    { label: resolvedLabel, haystack, disabled, color, onActivate: () => pick(value) },
     nodeRef,
   );
 
@@ -209,7 +212,7 @@ export function SelectItem({
       role="option"
       aria-selected={isSelected}
       aria-disabled={disabled || undefined}
-      className={cx(menu.item, styles.item, className)}
+      className={cx(menu.item, styles.item, color !== undefined && palette.hue, className)}
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) registry.activate(value);
@@ -224,6 +227,7 @@ export function SelectItem({
         highlighted: isHighlighted,
         disabled,
         rich: parts.rich || undefined,
+        color,
       })}
     >
       {multiple ? (

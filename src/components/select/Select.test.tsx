@@ -59,6 +59,36 @@ function BasicSelect({
 // ─── Select (composable) ─────────────────────────────────────────────────────
 
 describe("Select (composable)", () => {
+  it("a status select is a chip in the picked option's hue, its options in theirs", async () => {
+    const user = userEvent.setup();
+    render(
+      <Select.Root variant="status" aria-label="Шаг депозита" defaultValue="held">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="pending">Не взят</Select.Item>
+          <Select.Item value="held" color="green">
+            Принят
+          </Select.Item>
+          <Select.Item value="returned" color="blue">
+            Возвращён
+          </Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole("combobox", { name: "Шаг депозита: Принят" });
+    await user.click(trigger);
+    expect(screen.getByRole("option", { name: "Возвращён" })).toHaveAttribute("data-color", "blue");
+    expect(screen.getByRole("option", { name: "Не взят" })).not.toHaveAttribute("data-color");
+    expect(trigger).toHaveAttribute("data-variant", "status");
+    expect(trigger).toHaveAttribute("data-color", "green");
+    expect(trigger).toHaveAttribute("data-tier", "m");
+    await user.click(screen.getByRole("option", { name: "Не взят" }));
+    expect(trigger).not.toHaveAttribute("data-color");
+    expect(trigger).toHaveTextContent("Не взят");
+  });
+
   it("renders trigger with placeholder when no value selected", () => {
     render(<BasicSelect />);
     expect(screen.getByRole("combobox")).toBeInTheDocument();

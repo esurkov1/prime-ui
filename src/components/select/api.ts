@@ -13,8 +13,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Select.Root",
-      en: "`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query. Inside `Input.Wrapper` it is the box's start segment instead: no frame, the trigger named by `aria-label` and the value.",
-      ru: "Рамка поля (строка подписи · контрол · строка поддержки); хранит значение, открытие и поисковый запрос. Внутри `Input.Wrapper` — начальный сегмент поля: без рамки, триггер назван `aria-label` и значением.",
+      en: "`ref` → `HTMLDivElement`. The field frame (label · control · support row) holding the value, the open state and the query. In `Input.Wrapper` the box's start segment: no frame, the trigger named by `aria-label` and the value — as a `status` one with no `label`.",
+      ru: "Рамка поля (подпись · контрол · строка поддержки); хранит значение, открытие и запрос. В `Input.Wrapper` — начальный сегмент поля: без рамки, триггер назван `aria-label` и значением — как `status` без `label`.",
       props: [
         {
           name: "value",
@@ -212,6 +212,13 @@ export const api: ComponentApi = {
           ru: "Ярус поля: высота, отступы, текст; строки списка, подпись и подсказка следуют ему. Без него — ярус контейнера (форма, панель с размером), иначе `m`.",
         },
         {
+          name: "variant",
+          type: '"field" | "status"',
+          default: '"field"',
+          en: "`field` — the field trigger. `status` — a chip in the picked option's `color` (gray with none) with a chevron, as wide as its content: a status picked in a row.",
+          ru: "`field` — поле. `status` — чип цвета выбранного пункта (`color`, без него — серый) со стрелкой, шириной по содержимому: выбор статуса в строке.",
+        },
+        {
           name: "focusRing",
           type: "boolean",
           default: "true",
@@ -341,6 +348,12 @@ export const api: ComponentApi = {
           type: "string",
           en: "Text in the trigger and for typeahead; defaults to `Select.ItemText`, then the plain text.",
           ru: "Текст в триггере и для набора с клавиатуры; по умолчанию — `Select.ItemText` или текст пункта.",
+        },
+        {
+          name: "color",
+          type: "PaletteColor",
+          en: "The option's hue: its text and icon in the hue's ink, the highlight a wash of it; a `status` trigger takes it when picked.",
+          ru: "Цвет пункта: текст и иконка цветом палитры, подсветка — её тинтом; триггер `status` берёт его, когда пункт выбран.",
         },
         {
           name: "keywords",

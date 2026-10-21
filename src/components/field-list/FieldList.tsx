@@ -120,6 +120,7 @@ export type FieldListProps<T extends object> = Omit<FieldRootDomProps, "onChange
   getLocked?: (item: T) => boolean;
   reorderable?: boolean;
   stackedLabels?: boolean;
+  hideHeadings?: boolean;
   rowActions?: FieldListRowActions;
   variant?: FieldListVariant;
   min?: number;
@@ -272,6 +273,7 @@ export function FieldList<T extends object>({
   getLocked,
   reorderable = false,
   stackedLabels = true,
+  hideHeadings = false,
   rowActions = "buttons",
   variant = "plain",
   min = 0,
@@ -370,8 +372,9 @@ export function FieldList<T extends object>({
     "--fl-main-column": leadCount + 1,
     "--fl-end-column": leadCount + 2,
   } as React.CSSProperties;
-  // The heading row comes with the first row and leaves with the last one.
-  const hasHead = items.length > 0 && !single;
+  // The heading row comes with the first row and leaves with the last one; `hideHeadings` drops it
+  // (the fields keep the column names as their accessible names).
+  const hasHead = items.length > 0 && !single && !hideHeadings;
   const head = usePartPresence<HTMLDivElement>({ present: hasHead, axis: "block" });
   const totalCells = renderTotals && items.length > 0 ? totalsOf(renderTotals(items)) : null;
   if (totalCells && totalCells.length !== columns.length)

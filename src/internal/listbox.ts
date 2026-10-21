@@ -64,6 +64,8 @@ type ListboxItem = {
   disabled?: boolean;
   /** Shown whatever the query, after the matches (create from the query, an action row). */
   persistent?: boolean;
+  /** The item's palette hue (a status option), kept like the label for the closed trigger. */
+  color?: string;
   /** What Enter on the highlighted item and a click on it do. */
   onActivate: () => void;
 };
@@ -87,6 +89,8 @@ export type ListboxRegistry = {
   activate: (id: string) => boolean;
   /** The item's label, kept after it unmounts (the trigger of a closed list); else the id. */
   labelOf: (id: string) => string;
+  /** The item's palette hue, kept after it unmounts; `undefined` when it has none. */
+  colorOf: (id: string) => string | undefined;
   /** The item's element, to bring the highlight into view. */
   nodeOf: (id: string) => Element | null;
   /** The items a query leaves on screen; the same object until an item or the query changes. */
@@ -132,6 +136,7 @@ function createListboxRegistry(): ListboxRegistry {
       return true;
     },
     labelOf: (id) => entries.get(id)?.label ?? id,
+    colorOf: (id) => entries.get(id)?.color,
     nodeOf: (id) => entries.get(id)?.node() ?? null,
     view(query, filter) {
       const key = `${filter ? "f" : "a"}:${query}`;
@@ -186,15 +191,15 @@ export function useListboxItem(
   React.useLayoutEffect(() => {
     activateRef.current = item.onActivate;
   });
-  const { label, haystack, disabled = false, persistent = false } = item;
+  const { label, haystack, disabled = false, persistent = false, color } = item;
   React.useLayoutEffect(
     () =>
       registry.register(
         id,
-        { label, haystack, disabled, persistent, onActivate: () => activateRef.current() },
+        { label, haystack, disabled, persistent, color, onActivate: () => activateRef.current() },
         () => nodeRef?.current ?? null,
       ),
-    [registry, id, label, haystack, disabled, persistent, nodeRef],
+    [registry, id, label, haystack, disabled, persistent, color, nodeRef],
   );
 }
 

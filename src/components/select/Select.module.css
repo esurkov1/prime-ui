@@ -319,3 +319,98 @@
 .segmentTrigger[data-state="open"] .chevron > svg {
   transform: rotate(180deg);
 }
+
+/* ─── Status (`variant="status"`) ────────────────────────────────────────────
+ * The trigger is a chip in the picked option's hue (`internal/palette` `.hue` with `data-color`,
+ * gray with none) at the chip tier of the select's size (`internal/chipTier` `.tier`): the soft
+ * fill and text ink of a Badge of that hue, with the chevron in the same ink. Hover and press take
+ * the fill a step deeper and the ink a `--prime-tint-hover` toward the primary text, so they keep 4.5:1
+ * (`src/styles/palette-contrast.test.ts`). As wide as its
+ * content, so it stands at the end of a row beside buttons. A new pick glides its colors in (an
+ * optimistic pick at once, a refused save back); hover and press take a step of its ink.
+ */
+.statusTrigger {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  align-self: flex-start;
+  max-width: 100%;
+  margin: 0;
+  border: 0;
+  background-color: var(--hue-soft);
+  color: var(--hue-text);
+  font-family: inherit;
+  font-weight: var(--prime-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.statusTrigger .triggerMain {
+  gap: var(--chip-gap);
+}
+
+.statusTrigger .chevron {
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+  color: inherit;
+}
+
+@media (hover: hover) {
+  .statusTrigger:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: color-mix(in srgb, var(--hue-text) var(--prime-tint-faint), var(--hue-soft));
+    color: color-mix(
+      in srgb,
+      var(--prime-color-text-primary) var(--prime-tint-hover),
+      var(--hue-text)
+    );
+  }
+}
+
+.statusTrigger:active:not(:disabled),
+.statusTrigger[data-state="open"] {
+  background-color: color-mix(in srgb, var(--hue-text) var(--prime-tint-faint), var(--hue-soft));
+  color: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-hover),
+    var(--hue-text)
+  );
+}
+
+.statusTrigger:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.statusTrigger:disabled {
+  background-color: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* An option with a hue (`color`): its text and icon in the hue's ink, the highlight and the press a
+   wash of the hue — the fill of a Badge of that hue. */
+.item[data-color]:not([data-disabled="true"]) {
+  color: var(--hue-text);
+}
+
+.item[data-color] :is(.itemDescription, .itemMeta) {
+  color: inherit;
+}
+
+.item[data-color][data-highlighted="true"] {
+  background: var(--hue-soft);
+}
+
+.item[data-color]:active:not([data-disabled="true"]) {
+  background: color-mix(in srgb, var(--hue-text) var(--prime-tint-faint), var(--hue-soft));
+  color: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-hover),
+    var(--hue-text)
+  );
+}
