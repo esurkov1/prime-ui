@@ -671,6 +671,40 @@ describe("Card", () => {
     expect(screen.getByTestId("zone")).toHaveAttribute("data-state", "open");
   });
 
+  it("a list first in the card has the same padding above as below", () => {
+    const rule = cssRule(
+      "src/components/card/Card.module.css",
+      ".header + .list, .list:first-child",
+    );
+    expect(cssValue(rule, "padding-top")).toBe("var(--prime-space-2)");
+  });
+
+  it("a row's folded zone rendered by the consumer's own component stands under the row", () => {
+    function HoldForm({ open }: { open: boolean }) {
+      return (
+        <Card.ListItemContent open={open} data-testid="hold">
+          Форма удержания
+        </Card.ListItemContent>
+      );
+    }
+    render(
+      <Card.Root variant="list">
+        <Card.List>
+          <Card.ListItem data-testid="row">
+            <Card.Title>300 $</Card.Title>
+            <Button.Root>Вернуть</Button.Root>
+            <HoldForm open />
+          </Card.ListItem>
+        </Card.List>
+      </Card.Root>,
+    );
+    const row = screen.getByTestId("row");
+    const head = row.firstElementChild as HTMLElement;
+    expect(head).not.toContainElement(screen.getByTestId("hold"));
+    expect(row.lastElementChild).toContainElement(screen.getByTestId("hold"));
+    expect(row).toHaveClass(hairline.between, hairline.subtle);
+  });
+
   it("a badge in a description lays the line out as a row, whatever component renders it", () => {
     function OwnerBadge() {
       return (
@@ -978,7 +1012,10 @@ describe("Card", () => {
     expect(screen.getByTestId("footer").className).not.toMatch(/subtle/);
     expect(
       cssValue(
-        cssRule("src/internal/hairline.module.css", ".top.subtle, .bottom.subtle"),
+        cssRule(
+          "src/internal/hairline.module.css",
+          ".top.subtle, .bottom.subtle, .between + .between.subtle",
+        ),
         "background-image",
       ),
     ).toContain("--prime-color-border-subtle");

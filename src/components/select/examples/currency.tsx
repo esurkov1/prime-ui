@@ -1,4 +1,4 @@
-/** The currency of a deposit: a coin with the sign before each option and in the trigger, while the amount elsewhere keeps its code — `Select.ItemIcon`, `Select.TriggerIcon`. */
+/** The currency of a deposit: the currency's sign before each option and in the trigger, while the amount elsewhere keeps its code — `Select.ItemIcon`, `Select.TriggerIcon`. */
 import { Icon, type IconName, Select } from "prime-ui-kit";
 import * as React from "react";
 

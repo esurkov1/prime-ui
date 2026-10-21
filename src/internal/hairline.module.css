@@ -32,10 +32,12 @@
   background-position: center bottom;
 }
 
-/* `.subtle` beside `.top` / `.bottom`: a line the consumer asked for (a `divider` prop) is drawn in
-   the `Divider` ink, so it reads in both themes; the zone lines of a surface stay faint. */
+/* `.subtle` beside `.top` / `.bottom` / `.between`: a line the consumer asked for (a `divider` prop,
+   the rows of a card's list) is drawn in the `Divider` ink, so it reads in both themes; the zone
+   lines of a surface stay faint. */
 .top.subtle,
-.bottom.subtle {
+.bottom.subtle,
+.between + .between.subtle {
   background-image: linear-gradient(
     var(--prime-color-border-subtle),
     var(--prime-color-border-subtle)

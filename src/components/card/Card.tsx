@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 
 import { Badge } from "@/components/badge/Badge";
 import { Skeleton } from "@/components/skeleton/Skeleton";
@@ -585,30 +586,40 @@ export type CardListItemProps = React.HTMLAttributes<HTMLLIElement> & {
  * else in one end cell (the row's actions) — and a `Card.ListItemContent` folds open under it.
  */
 function CardListItem({ className, children, ...rest }: CardListItemProps) {
+  // The zone under a record row: `Card.ListItemContent` renders into it from wherever it stands in
+  // the row's tree (straight in the row or inside the consumer's own form component).
+  const [zone, setZone] = React.useState<HTMLDivElement | null>(null);
   const items = flattenChildren(children);
   const record = items.some(
     (child) => React.isValidElement(child) && HEADER_TEXT.includes(child.type as React.ElementType),
   );
+  const rowClass = cx(
+    textRole.bodyM,
+    styles.listItem,
+    hairline.between,
+    hairline.subtle,
+    className,
+  );
   if (!record) {
     return (
-      <li className={cx(textRole.bodyM, styles.listItem, hairline.between, className)} {...rest}>
+      <li className={rowClass} {...rest}>
         {children}
       </li>
     );
   }
-  const { parts: contents, rest: head } = splitParts(items, CardListItemContent);
   return (
-    <li
-      className={cx(textRole.bodyM, styles.listItem, hairline.between, className)}
-      data-record=""
-      {...rest}
-    >
-      <div className={styles.header}>{withEndCell(head, HEADER_TEXT)}</div>
-      {contents}
+    <li className={rowClass} data-record="" {...rest}>
+      <ListItemZoneContext.Provider value={zone}>
+        <div className={styles.header}>{withEndCell(items, HEADER_TEXT)}</div>
+      </ListItemZoneContext.Provider>
+      <div ref={setZone} />
     </li>
   );
 }
 CardListItem.displayName = "Card.ListItem";
+
+/** The element a record row keeps under itself for its `Card.ListItemContent`. */
+const ListItemZoneContext = React.createContext<HTMLDivElement | null>(null);
 
 export type CardListItemContentProps = DivProps & {
   open: boolean;
@@ -625,13 +636,16 @@ function CardListItemContent({
   ref,
   ...rest
 }: CardListItemContentProps) {
-  return (
+  const zone = React.useContext(ListItemZoneContext);
+  const content = (
     <Disclosure open={open} className={className} ref={ref} {...rest}>
       <ZoneContext.Provider value="item">
         <div className={styles.listItemContent}>{children}</div>
       </ZoneContext.Provider>
     </Disclosure>
   );
+  // Under its row, a full row wide, never in the row's cell of actions.
+  return zone ? createPortal(content, zone) : null;
 }
 CardListItemContent.displayName = "Card.ListItemContent";
 

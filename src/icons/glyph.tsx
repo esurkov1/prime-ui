@@ -166,16 +166,10 @@ export function defineBrandGlyph(slug: string, d: string, box: 18 | 20): Glyph {
 }
 
 /**
- * Defines a currency coin, drawn by the kit (Lucide has the dollar coin only): the ring of Lucide
- * `circle-dollar-sign` and the currency's sign stroked inside, within the 7–17 box, which pops into
- * place as its gesture — the same look and motion as the dollar coin. Call once at module level.
+ * Defines a currency sign Lucide lacks (the baht, Tether's ₮, USD Coin), drawn by the kit in
+ * Lucide's manner — stroked on the 24 grid, as large as Lucide's `dollar-sign` — that pops into
+ * place like it. Call once at module level.
  */
-export function defineCoinGlyph(code: string, sign: React.ReactNode): Glyph {
-  return defineGlyph(
-    `kit:coin-${code}`,
-    <>
-      <circle cx="12" cy="12" r="10" />
-      <g data-motion="pop">{sign}</g>
-    </>,
-  );
+export function defineSignGlyph(code: string, body: React.ReactNode): Glyph {
+  return defineGlyph(`kit:sign-${code}`, <g data-motion="pop">{body}</g>);
 }

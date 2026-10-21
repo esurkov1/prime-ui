@@ -631,7 +631,8 @@
   list-style: none;
 }
 
-.header + .list {
+.header + .list,
+.list:first-child {
   padding-top: var(--prime-space-2);
 }
 
@@ -644,6 +645,11 @@
 /* A record row (TSX: a `Card.Title` inside): the header's anatomy, 16 above and below. */
 .listItem[data-record] {
   padding-block: var(--prime-space-4);
+}
+
+/* An end cell left empty (a row whose only extra child is its folded zone, rendered under it). */
+.end:empty {
+  display: none;
 }
 
 /* The zone a record row folds open: 16 under the row, its footer's buttons at the end. */

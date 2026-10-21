@@ -110,7 +110,7 @@ export const page: ComponentPageConfig = {
       scenario: "currency",
       title: "Валюта",
       description:
-        "Валюта депозита: монета со знаком перед каждым вариантом и в триггере, а сумма в остальном тексте остаётся с кодом — `Select.ItemIcon`, `Select.TriggerIcon`.",
+        "Валюта депозита: знак валюты перед каждым вариантом и в триггере, а сумма в остальном тексте остаётся с кодом — `Select.ItemIcon`, `Select.TriggerIcon`.",
     },
     {
       scenario: "icon-only",

@@ -23,24 +23,20 @@ import { ChevronsUpDown } from "./glyphs/chevrons-up-down";
 import { Circle } from "./glyphs/circle";
 import { CircleAlert } from "./glyphs/circle-alert";
 import { CircleCheck } from "./glyphs/circle-check";
-import { CircleDollarSign } from "./glyphs/circle-dollar-sign";
 import { CircleX } from "./glyphs/circle-x";
 import { Clock } from "./glyphs/clock";
 import { CloudOff } from "./glyphs/cloud-off";
 import { CloudUpload } from "./glyphs/cloud-upload";
 import { Code } from "./glyphs/code";
 import { CodeXml } from "./glyphs/code-xml";
-import { CoinBaht } from "./glyphs/coin-baht";
-import { CoinEuro } from "./glyphs/coin-euro";
-import { CoinRuble } from "./glyphs/coin-ruble";
-import { CoinTether } from "./glyphs/coin-tether";
-import { CoinUsdc } from "./glyphs/coin-usdc";
 import { Columns3 } from "./glyphs/columns-3";
 import { Copy } from "./glyphs/copy";
 import { Crown } from "./glyphs/crown";
 import { Disc } from "./glyphs/disc";
+import { DollarSign } from "./glyphs/dollar-sign";
 import { Download } from "./glyphs/download";
 import { Ellipsis } from "./glyphs/ellipsis";
+import { Euro } from "./glyphs/euro";
 import { ExternalLink } from "./glyphs/external-link";
 import { Eye } from "./glyphs/eye";
 import { EyeOff } from "./glyphs/eye-off";
@@ -96,11 +92,15 @@ import { Receipt } from "./glyphs/receipt";
 import { RefreshCw } from "./glyphs/refresh-cw";
 import { Reply } from "./glyphs/reply";
 import { Rocket } from "./glyphs/rocket";
+import { RussianRuble } from "./glyphs/russian-ruble";
 import { Scale } from "./glyphs/scale";
 import { Search } from "./glyphs/search";
 import { Send } from "./glyphs/send";
 import { Settings } from "./glyphs/settings";
 import { ShoppingCart } from "./glyphs/shopping-cart";
+import { SignBaht } from "./glyphs/sign-baht";
+import { SignTether } from "./glyphs/sign-tether";
+import { SignUsdc } from "./glyphs/sign-usdc";
 import { Smartphone } from "./glyphs/smartphone";
 import { SmilePlus } from "./glyphs/smile-plus";
 import { SquarePen } from "./glyphs/square-pen";
@@ -250,14 +250,14 @@ export const iconRegistry = {
   "object.user": UserRound,
   "object.users": Users,
   "object.wallet": Wallet,
-  // Currencies: a coin with the sign, for a choice of currency (a picker, a select); in text the
+  // Currencies: the sign, for a choice of currency (a picker, a select); in text the
   // currency stays its code or sign («100 USDT», «300 $»).
-  "currency.baht": CoinBaht,
-  "currency.dollar": CircleDollarSign,
-  "currency.euro": CoinEuro,
-  "currency.ruble": CoinRuble,
-  "currency.usdc": CoinUsdc,
-  "currency.usdt": CoinTether,
+  "currency.baht": SignBaht,
+  "currency.dollar": DollarSign,
+  "currency.euro": Euro,
+  "currency.ruble": RussianRuble,
+  "currency.usdc": SignUsdc,
+  "currency.usdt": SignTether,
   "sort.ascending": ArrowUp,
   "sort.descending": ArrowDown,
   "sort.none": ArrowUpDown,
