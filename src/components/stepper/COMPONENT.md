@@ -126,7 +126,7 @@ Derive statuses from `value`; set `status="danger"` only on the failing step; di
 
 Root attributes: `data-orientation`, `data-size`. Uncontrolled (`defaultValue`) clicks still select items.
 
-Motion: a status change fades the indicator's fill, color and halo over `base` and cross-fades its glyph (number ⇄ check ⇄ danger mark); the row fill and text color change over `fast`; press scales the step to `--prime-motion-press-scale` (the kit press). Under reduced motion the press does not scale and the glyph only fades.
+Motion: a status change fades the indicator's fill, color and halo over `base` and cross-fades its glyph (number ⇄ check ⇄ danger mark); the row fill and text color change over `fast`; press gives the step in by `--prime-motion-press-distance` (the kit press). Under reduced motion the press does not scale and the glyph only fades.
 
 ## Layout & spacing
 - The root is a size container (`inline-size: 100%`): give it a definite width, a shrink-wrapped parent collapses it.

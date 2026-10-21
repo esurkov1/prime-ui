@@ -4,7 +4,7 @@ import { useResizeEffect } from "@/hooks/useElementSize";
 import { CheckMark } from "@/internal/CheckMark";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { gridIndex } from "@/internal/rovingFocus";
 import type { PaletteColor } from "@/internal/states";
 

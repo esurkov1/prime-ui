@@ -192,7 +192,8 @@ export default function CardRecordDrawerExample() {
           <Card.Root>
             <Card.Header>
               <Card.Title as="h4">
-                <Badge.Root color="green">У нас</Badge.Root> {DEPOSIT.amount}
+                <Badge.Root color="green">У нас</Badge.Root>
+                {DEPOSIT.amount}
               </Card.Title>
               <Card.Description>{DEPOSIT.details}</Card.Description>
               <Button.Root variant="soft" tone="neutral">
@@ -200,7 +201,7 @@ export default function CardRecordDrawerExample() {
               </Button.Root>
               <Tooltip.Root>
                 <Tooltip.Trigger>
-                  <Button.Root variant="ghost" tone="neutral" aria-label="Исправить депозит">
+                  <Button.Root variant="soft" tone="neutral" aria-label="Исправить депозит">
                     <Button.Icon>
                       <Icon name="action.edit" />
                     </Button.Icon>

@@ -7,7 +7,7 @@ import { hasContent } from "@/internal/hasContent";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import palette from "@/internal/palette.module.css";
 import { isPart, splitParts } from "@/internal/parts";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";

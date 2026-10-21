@@ -68,7 +68,7 @@ export default function GanttRentalsExample() {
   return (
     <Gantt
       aria-label="Календарь парка"
-      defaultScale="day"
+      defaultZoom="day"
       today={TODAY}
       rows={fleet}
       getRowKey={(vehicle) => vehicle.id}

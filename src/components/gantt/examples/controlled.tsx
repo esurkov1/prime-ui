@@ -1,6 +1,6 @@
-/** The zoom owned by the page: presets in the toolbar and the built-in switch change one state — `scale`, `onScaleChange`. */
+/** The zoom owned by the page: its presets, the selector and a pinch change one state — `zoom`, `onZoomChange`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
-import { Button, Gantt, type GanttBar, type GanttScale } from "prime-ui-kit";
+import { Button, Gantt, type GanttBar, type GanttZoom } from "prime-ui-kit";
 import * as React from "react";
 
 type Phase = { id: string; name: string; bars: GanttBar[] };
@@ -38,31 +38,31 @@ const ROADMAP: Phase[] = [
   },
 ];
 
-const PRESETS: { scale: GanttScale; label: string }[] = [
-  { scale: "day", label: "Спринт" },
-  { scale: "week", label: "Квартал" },
-  { scale: "month", label: "Год" },
+const PRESETS: { zoom: GanttZoom; label: string }[] = [
+  { zoom: "day", label: "Спринт" },
+  { zoom: "week", label: "Квартал" },
+  { zoom: "month", label: "Год" },
 ];
 
 export default function GanttControlledExample() {
-  const [scale, setScale] = React.useState<GanttScale>("week");
+  const [zoom, setZoom] = React.useState<GanttZoom>("week");
 
   return (
     <Gantt
       aria-label="Дорожная карта"
-      scale={scale}
-      onScaleChange={setScale}
+      zoom={zoom}
+      onZoomChange={setZoom}
       rows={ROADMAP}
       getRowKey={(phase) => phase.id}
       getRowLabel={(phase) => phase.name}
       getRowBars={(phase) => phase.bars}
       toolbar={PRESETS.map((preset) => (
         <Button.Root
-          key={preset.scale}
+          key={preset.label}
           variant="soft"
           tone="neutral"
-          pressed={scale === preset.scale}
-          onClick={() => setScale(preset.scale)}
+          pressed={zoom === preset.zoom}
+          onClick={() => setZoom(preset.zoom)}
         >
           {preset.label}
         </Button.Root>

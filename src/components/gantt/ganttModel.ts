@@ -1,7 +1,7 @@
 import {
   addDays,
   addMonths,
-  addWeeks,
+  addYears,
   differenceInCalendarDays,
   format,
   isSameMonth,
@@ -11,7 +11,6 @@ import {
   min as minDate,
   startOfDay,
   startOfMonth,
-  startOfWeek,
   startOfYear,
 } from "date-fns";
 
@@ -19,11 +18,24 @@ import type { PaletteColor, Tone } from "@/internal/states";
 
 /**
  * Gantt logic without time zones: every date is a calendar day (local midnight), like Datepicker.
- * Geometry is in days from the range start; CSS turns days into length (`--gantt-day`).
+ * Geometry is in days from the range start; the time core turns days into px (`timeCore`).
  */
 
-/** Zoom of the time axis: one column per day, week or month. */
-export type GanttScale = "day" | "week" | "month";
+/**
+ * A step of the time axis, always on the calendar's own boundaries, so steps nest and a month's
+ * or a year's start is always a tick: `every` days counted from each month's 1st (1, 8, 15, 22,
+ * 29 — the last cell of a month runs short), `every` months from January, `every` years.
+ */
+export type TimeStep = { family: "day" | "month" | "year"; every: number };
+
+/** One day: the step of every edit without Alt and of the grid once days are wide enough. */
+export const DAY_STEP: TimeStep = { family: "day", every: 1 };
+
+/** A named zoom of the selector: a day, a week or a month in view per cell. */
+export type GanttZoomPreset = "day" | "week" | "month";
+
+/** The zoom of the time axis: a preset, or the length of a day in px (a pinch, the wheel, a key). */
+export type GanttZoom = GanttZoomPreset | number;
 
 /** A time span. `end` is exclusive: a one-day task on 3 July ends on 4 July. */
 export type GanttDates = { start: Date; end: Date };
@@ -34,8 +46,10 @@ export type GanttBar = GanttDates & {
   id: string;
   /** Text inside the bar (beside it when the bar is too short) and in its accessible name. */
   label: string;
-  /** Palette hue for a category. Default `blue`. */
+  /** Palette hue. Default: the hue of its `category`, else `blue`. */
   color?: PaletteColor;
+  /** Id of the bar's `GanttCategory`: its hue, its legend entry, and hidden with it. */
+  category?: string;
   /** Status color; wins over `color`. */
   tone?: Tone;
   /** Share done, `0…1`: a stronger fill from the start of the bar. */
@@ -47,6 +61,16 @@ export type GanttBar = GanttDates & {
   edit?: GanttBarEdit;
 };
 
+/** A kind of bar (rentals, bookings, service): a legend entry and a choice of «what to show». */
+export type GanttCategory = {
+  /** Stable id: `GanttBar.category` and `hiddenCategories` refer to it. */
+  id: string;
+  /** Text of its legend entry and of its item in `GanttCategoriesMenu`. */
+  label: string;
+  /** Palette hue of its bars and its legend dot. Default `blue`. */
+  color?: PaletteColor;
+};
+
 /** The edits a bar allows: every edit, only its end, or none. */
 export type GanttBarEdit = "all" | "end" | "none";
 
@@ -56,34 +80,68 @@ export function barEdit(bar: Pick<GanttBar, "edit">, dates: GanttDates): GanttBa
   return edit === "end" && isMilestone(dates) ? "none" : edit;
 }
 
-export const SCALES: readonly GanttScale[] = ["day", "week", "month"];
+/** Empty room before the first and after the last bar (and today), in months. */
+const PAD_MONTHS = 1;
 
-/** Days of one snapping step per scale (a month varies; its steps go through `shiftDate`). */
-const UNIT_DAYS: Record<GanttScale, number> = { day: 1, week: 7, month: 30.44 };
+/** Shortest default axis, in months: room to zoom out to a year. */
+const MIN_MONTHS = 12;
 
-/** Empty room before the first and after the last bar (and today), in scale units. */
-const PAD_UNITS: Record<GanttScale, number> = { day: 7, week: 2, month: 1 };
-
-/** Shortest axis per scale, in scale units, so a short plan still fills a few screens of the scale. */
-const MIN_UNITS: Record<GanttScale, number> = { day: 35, week: 14, month: 12 };
-
-export function unitDays(scale: GanttScale): number {
-  return UNIT_DAYS[scale];
+/** Days in a step, on average (months and years vary; steps go through `stepShift`). */
+export function stepDays(step: TimeStep): number {
+  if (step.family === "day") return step.every;
+  return step.every * (step.family === "month" ? 30.44 : 365.25);
 }
 
-/** `date` moved by `steps` units of the scale (whole days, weeks or calendar months). */
-export function shiftDate(date: Date, steps: number, scale: GanttScale): Date {
+/** The tick of `step` at or before `date`: where the cell that holds `date` starts. */
+export function stepStart(date: Date, step: TimeStep): Date {
+  const day = startOfDay(date);
+  if (step.family === "day") {
+    const offset = day.getDate() - 1;
+    return addDays(startOfMonth(day), offset - (offset % step.every));
+  }
+  if (step.family === "month") {
+    const year = startOfYear(day);
+    return addMonths(year, day.getMonth() - (day.getMonth() % step.every));
+  }
+  const year = day.getFullYear();
+  return new Date(year - (((year % step.every) + step.every) % step.every), 0, 1);
+}
+
+/** The tick after the one at or before `date`: a day step ends a cell at the next month's 1st. */
+function nextTick(date: Date, step: TimeStep): Date {
+  const start = stepStart(date, step);
+  if (step.family === "day") {
+    const next = addDays(start, step.every);
+    const month = addMonths(startOfMonth(start), 1);
+    return next < month ? next : month;
+  }
+  return step.family === "month" ? addMonths(start, step.every) : addYears(start, step.every);
+}
+
+/**
+ * `date` moved by `steps` ticks of `step`: forward to each next tick, back to each tick before.
+ * A day step of one day is `addDays`; on a tick it is a whole cell at a time.
+ */
+export function stepShift(date: Date, steps: number, step: TimeStep): Date {
   if (steps === 0) return date;
-  if (scale === "day") return addDays(date, steps);
-  if (scale === "week") return addWeeks(date, steps);
-  return addMonths(date, steps);
+  if (step.family === "day" && step.every === 1) return addDays(date, steps);
+  let at = date;
+  for (let count = 0; count < Math.abs(steps); count++) {
+    at = steps > 0 ? nextTick(at, step) : stepStart(addDays(at, -1), step);
+  }
+  return at;
 }
 
-/** Start of the scale unit holding `date`: the day, the Monday of its week, the 1st of its month. */
-export function unitStart(date: Date, scale: GanttScale): Date {
-  if (scale === "day") return startOfDay(date);
-  if (scale === "week") return startOfWeek(date, { weekStartsOn: 1 });
-  return startOfMonth(date);
+/**
+ * The tick of `step` nearest to `day` (days from `origin`, fractional), as days from `origin`:
+ * where a gesture lands on the grid it sees.
+ */
+function nearestLine(origin: Date, day: number, step: TimeStep): number {
+  if (step.family === "day" && step.every === 1) return Math.round(day);
+  const before = stepStart(addDays(origin, Math.floor(day)), step);
+  const from = daysBetween(origin, before);
+  const to = daysBetween(origin, nextTick(before, step));
+  return day - from <= to - day ? from : to;
 }
 
 /** Days between two calendar dates (`b − a`). */
@@ -96,129 +154,28 @@ export function isMilestone(dates: GanttDates): boolean {
 }
 
 /**
- * The axis: `range` when given (snapped to whole units), otherwise every bar and today with
- * `PAD_UNITS` of room on both sides, at least `MIN_UNITS` long.
+ * The axis: `range` when given (whole days, as given), otherwise every bar and today with a month
+ * of room on both sides, from the 1st of a month, at least `MIN_MONTHS` long — one axis for every
+ * zoom, so a zoom never moves the days under the view.
  */
 export function resolveRange(
   bars: readonly GanttDates[],
   today: Date,
-  scale: GanttScale,
   range?: GanttDates,
 ): GanttDates {
-  let from: Date;
-  let to: Date;
   if (range) {
-    from = range.start;
-    to = range.end;
-  } else {
-    const starts = [today, ...bars.map((bar) => bar.start)];
-    const ends = [addDays(today, 1), ...bars.map((bar) => bar.end)];
-    from = shiftDate(minDate(starts), -PAD_UNITS[scale], scale);
-    to = shiftDate(maxDate(ends), PAD_UNITS[scale], scale);
+    const start = startOfDay(range.start);
+    const end = startOfDay(range.end);
+    return { start, end: end > start ? end : addDays(start, 1) };
   }
-  const start = unitStart(from, scale);
-  let end = unitStart(to, scale);
-  if (end < to) end = shiftDate(end, 1, scale);
-  if (!range) {
-    const shortest = shiftDate(start, MIN_UNITS[scale], scale);
-    if (end < shortest) end = shortest;
-  }
-  return { start, end };
-}
-
-/** A cell of a header tier, in days from the range start. */
-export type GanttHeaderCell = {
-  key: string;
-  x: number;
-  span: number;
-  text: string;
-  /** Saturday or Sunday (day scale). */
-  weekend?: boolean;
-  /** The cell holds today. */
-  today?: boolean;
-  /** Bottom tier: the first cell of a new upper period (a month, a year) after the first. */
-  boundary?: boolean;
-};
-
-function isWeekend(date: Date): boolean {
-  const day = date.getDay();
-  return day === 0 || day === 6;
-}
-
-const NEXT_UNIT: Record<GanttScale, (date: Date) => Date> = {
-  day: (date) => addDays(date, 1),
-  week: (date) => addWeeks(date, 1),
-  month: (date) => addMonths(date, 1),
-};
-
-/**
- * The upper period a bottom cell belongs to: the month of a day; the month of a week's Thursday
- * (ISO: a week belongs to the month that holds most of it); the year of a month.
- */
-const PERIOD_OF: Record<GanttScale, (start: Date) => Date> = {
-  day: (start) => startOfMonth(start),
-  week: (start) => startOfMonth(addDays(start, 3)),
-  month: (start) => startOfYear(start),
-};
-
-/**
- * The two header tiers of a scale: days under months, weeks under months, months under years.
- * The upper tier is built from whole bottom cells — a month label at the week zoom starts at the
- * first week of that month, never inside a column — and the bottom cell that opens a new period is
- * marked `boundary`.
- */
-export function headerTiers(
-  scale: GanttScale,
-  range: GanttDates,
-  today: Date,
-  locale: Locale,
-): { top: GanttHeaderCell[]; bottom: GanttHeaderCell[] } {
-  const next = NEXT_UNIT[scale];
-  const bottom: GanttHeaderCell[] = [];
-  const top: GanttHeaderCell[] = [];
-  let period: number | null = null;
-  for (let cursor = range.start; cursor < range.end; cursor = next(cursor)) {
-    const to = minDate([next(cursor), range.end]);
-    const last = addDays(to, -1);
-    const x = daysBetween(range.start, cursor);
-    const span = daysBetween(cursor, to);
-    const periodStart = PERIOD_OF[scale](cursor);
-    const opens = periodStart.getTime() !== period;
-    bottom.push({
-      key: cursor.toISOString(),
-      x,
-      span,
-      text:
-        scale === "day"
-          ? format(cursor, "d")
-          : scale === "week"
-            ? `${format(cursor, "d")}–${format(last, "d")}`
-            : format(cursor, "LLLL", { locale }),
-      weekend: scale === "day" ? isWeekend(cursor) : undefined,
-      today: today >= cursor && today < to ? true : undefined,
-      boundary: opens && period !== null ? true : undefined,
-    });
-    if (opens) {
-      period = periodStart.getTime();
-      top.push({
-        key: periodStart.toISOString(),
-        x,
-        span,
-        text: format(periodStart, scale === "month" ? "yyyy" : "MM.yyyy", { locale }),
-      });
-    } else {
-      top[top.length - 1].span += span;
-    }
-  }
-  return { top, bottom };
-}
-
-/**
- * Offset of the week pattern (weekend washes) from the range start, in days: the Monday on or
- * before the start, so the repeating week tile lines up with the calendar. Zero or negative.
- */
-export function weekOffset(range: GanttDates): number {
-  return -((range.start.getDay() + 6) % 7);
+  const starts = [today, ...bars.map((bar) => bar.start)];
+  const ends = [addDays(today, 1), ...bars.map((bar) => bar.end)];
+  const start = startOfMonth(addMonths(minDate(starts), -PAD_MONTHS));
+  const to = addMonths(maxDate(ends), PAD_MONTHS);
+  let end = startOfMonth(to);
+  if (end < to) end = addMonths(end, 1);
+  const shortest = addMonths(start, MIN_MONTHS);
+  return { start, end: end < shortest ? shortest : end };
 }
 
 /**
@@ -253,28 +210,49 @@ export function assignLanes(bars: readonly GanttBar[]): {
 export type GanttEdit = "move" | "start" | "end";
 
 /**
- * The dates after `steps` steps of `edit`, a step being one `unit`: a day (the editing precision
- * at every zoom), or the zoom's week / month for a coarse step.
- * A resize clamps at the opposite edge: a bar is never shorter than one day and never flips; a
- * milestone only moves.
+ * The dates after `steps` steps of `edit`, a step being one tick of `step`: a day (the keyboard's
+ * precision at every zoom), or the head's step with Alt. A move takes the start to the tick and
+ * keeps the length; a resize clamps at the opposite edge: a bar is never shorter than one day and
+ * never flips; a milestone only moves.
  */
 export function applyEdit(
   dates: GanttDates,
   edit: GanttEdit,
   steps: number,
-  unit: GanttScale,
+  step: TimeStep,
 ): GanttDates {
   if (edit === "move" || isMilestone(dates)) {
-    return { start: shiftDate(dates.start, steps, unit), end: shiftDate(dates.end, steps, unit) };
+    const start = stepShift(dates.start, steps, step);
+    return { start, end: addDays(dates.end, daysBetween(dates.start, start)) };
   }
   if (edit === "start") {
-    const start = shiftDate(dates.start, steps, unit);
+    const start = stepShift(dates.start, steps, step);
     const latest = addDays(dates.end, -1);
     return { start: start > latest ? latest : start, end: dates.end };
   }
-  const end = shiftDate(dates.end, steps, unit);
+  const end = stepShift(dates.end, steps, step);
   const earliest = addDays(dates.start, 1);
   return { start: dates.start, end: end < earliest ? earliest : end };
+}
+
+/**
+ * The dates a pointer drag of `raw` days (fractional) lands on with Alt: the edge it moves — the
+ * start for a move — goes to the tick of `step` (the head's) nearest to where the pointer took it.
+ * What you see is what you land on. Clamped as `applyEdit` is.
+ */
+export function snapEdit(
+  dates: GanttDates,
+  edit: GanttEdit,
+  raw: number,
+  step: TimeStep,
+  origin: Date,
+): GanttDates {
+  const x = daysBetween(origin, dates.start);
+  if (edit === "end" && !isMilestone(dates)) {
+    const end = x + daysBetween(dates.start, dates.end);
+    return applyEdit(dates, "end", nearestLine(origin, end + raw, step) - end, DAY_STEP);
+  }
+  return applyEdit(dates, edit, nearestLine(origin, x + raw, step) - x, DAY_STEP);
 }
 
 /**

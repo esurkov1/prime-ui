@@ -37,21 +37,21 @@ export const api: ComponentApi = {
         {
           name: "search",
           type: "string",
-          en: "Search text, controlled.",
-          ru: "Текст поиска, управляемо.",
+          en: "The query the list is searched by, controlled: the field's text while typing, then the pinned query of the search chip.",
+          ru: "Запрос, по которому ищется список, управляемо: текст поля при вводе, затем закреплённый запрос тега поиска.",
         },
         {
           name: "defaultSearch",
           type: "string",
           default: '""',
-          en: "Initial search text, uncontrolled.",
-          ru: "Начальный текст поиска без контроля.",
+          en: "Initial query, uncontrolled; a non-empty one starts pinned as the search chip.",
+          ru: "Начальный запрос без контроля; непустой сразу закреплён тегом поиска.",
         },
         {
           name: "onSearchChange",
           type: "(search: string) => void",
-          en: "Every keystroke; debounce in the owner when it asks a server.",
-          ru: "Каждое нажатие; при запросах к серверу ставьте задержку у владельца.",
+          en: "Every keystroke while no query is pinned, then on Enter only when the query changes, and on the chip's ×; debounce in the owner when it asks a server.",
+          ru: "Каждое нажатие, пока запрос не закреплён, затем по Enter — только при новом запросе, и по × тега; при запросах к серверу ставьте задержку у владельца.",
         },
         {
           name: "size",
@@ -84,8 +84,8 @@ export const api: ComponentApi = {
     },
     {
       name: "SmartFilter.Toolbar",
-      en: "`ref` → `HTMLDivElement`. A `<div>`: the search Input first, then the filter Button (a count Badge while filters apply), which shows only its icon and count when the search would get too little room; the anchor of the panel, a flush Popover.",
-      ru: "`<div>`: сначала поле поиска, затем кнопка фильтра (Badge-счётчик при фильтрах), которая оставляет только иконку и счётчик, когда поиску не хватает места; якорь панели — Popover без внутренних отступов.",
+      en: "`ref` → `HTMLDivElement`. A `<div>`: the search Input, then the filter — a Button beside it or a section at the field's end — with a count Badge; only its icon and count when narrow. Empty `fields` — the search alone. The anchor of the panel, a flush Popover.",
+      ru: "`<div>`: поле поиска, затем фильтр — кнопка рядом или секция в конце поля — с Badge-счётчиком; в узкой ширине только иконка и счётчик. Пустые `fields` — только поиск. Якорь панели — Popover без внутренних отступов.",
       props: [
         {
           name: "searchable",
@@ -93,6 +93,13 @@ export const api: ComponentApi = {
           default: "true",
           en: "The search input. `false` — the filter button alone; the panel opens at its own width (24rem at most) and lists every field.",
           ru: "Поле поиска. `false` — только кнопка фильтра; панель открывается своей ширины (не шире 24rem) и показывает все поля.",
+        },
+        {
+          name: "layout",
+          type: '"split" | "combined"',
+          default: '"split"',
+          en: "Where the filter stands: `split` — a Button beside the search; `combined` — a section at the end of the search field, after a faint line, always shown. Needs `searchable`: without it, the plain button.",
+          ru: "Где стоит фильтр: `split` — кнопка рядом с поиском; `combined` — секция в конце поля поиска после тонкого разделителя, видна всегда. Нужен `searchable`: без него — обычная кнопка.",
         },
         {
           name: "…rest",
@@ -104,8 +111,8 @@ export const api: ComponentApi = {
     },
     {
       name: "SmartFilter.Chips",
-      en: "`ref` → `HTMLDivElement`. A `<div>` of applied filters as removable Badges with «+ Фильтр» and «Сбросить все»; renders nothing without filters.",
-      ru: "`<div>` с применёнными фильтрами — удаляемыми Badge — и кнопками «+ Фильтр», «Сбросить все»; без фильтров ничего не рендерит.",
+      en: "`ref` → `HTMLDivElement`. A `<div>`: the pinned search first, then the applied filters, as removable Badges, with «+ Фильтр» and «Сбросить все»; renders nothing without either.",
+      ru: "`<div>`: сначала закреплённый поиск, затем применённые фильтры — удаляемые Badge — и кнопки «+ Фильтр», «Сбросить все»; без них ничего не рендерит.",
       props: [
         {
           name: "…rest",
@@ -207,6 +214,20 @@ export const api: ComponentApi = {
       ru: "Плейсхолдер и имя поиска.",
     },
     clearSearch: { en: "Name of the search clear button.", ru: "Имя кнопки очистки поиска." },
+    searchChip: {
+      en: "Text of the search chip, the pinned query.",
+      ru: "Текст тега поиска — закреплённый запрос.",
+      part: "SmartFilter.Chips",
+    },
+    removeSearch: {
+      en: "Name of the search chip's remove button.",
+      ru: "Имя кнопки удаления тега поиска.",
+      part: "SmartFilter.Chips",
+    },
+    searchCommitted: {
+      en: "Announced when Enter pins a query.",
+      ru: "Объявляется, когда Enter закрепляет запрос.",
+    },
     searchText: {
       en: "The text search row while typing.",
       ru: "Строка текстового поиска при вводе.",
@@ -221,7 +242,10 @@ export const api: ComponentApi = {
     },
     more: { en: "Collapsed values of a field.", ru: "Свёрнутые значения поля." },
     add: { en: "Chips row: opens the panel.", ru: "Ряд тегов: открывает панель." },
-    clearAll: { en: "Chips row: clears every field.", ru: "Ряд тегов: сбрасывает все поля." },
+    clearAll: {
+      en: "Chips row: clears every field and the search.",
+      ru: "Ряд тегов: сбрасывает все поля и поиск.",
+    },
     showValue: { en: "Title of a value.", ru: "Подсказка значения." },
     hideValue: { en: "Name of the «−» of a value.", ru: "Имя «−» у значения." },
     unhideValue: { en: "Name of the «−» of a hidden value.", ru: "Имя «−» у скрытого значения." },
@@ -258,6 +282,23 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
+        en: "From the search to the filter control — the button beside it, or the section at the field's end (`combined`).",
+        ru: "Из поиска к фильтру — кнопке рядом или секции в конце поля (`combined`).",
+        native: true,
+      },
+      {
+        keys: "Enter · Space",
+        en: "On the filter control, opens or closes the panel.",
+        ru: "На фильтре открывают или закрывают панель.",
+        native: true,
+      },
+      {
+        keys: "Escape",
+        en: "In the panel, closes it and returns focus to the filter control.",
+        ru: "В панели закрывает её и возвращает фокус на фильтр.",
+      },
+      {
+        keys: "Tab",
         en: "Moves through the panel values and their «−» (shown on focus).",
         ru: "Переходит по значениям панели и их «−» (появляется при фокусе).",
       },
@@ -268,15 +309,24 @@ export const api: ComponentApi = {
       },
       { keys: "Shift + Enter", en: "Hides the value.", ru: "Скрывает значение." },
       {
-        keys: "Enter · Escape",
-        en: "In the search, close the panel.",
-        ru: "В поле поиска закрывают панель.",
+        keys: "Enter",
+        en: "In the search, pins the typed query as the search chip and empties the field (the panel stays for the filters); in an empty field, closes the panel.",
+        ru: "В поле поиска закрепляет запрос тегом поиска и очищает поле (панель остаётся для фильтров); в пустом поле закрывает панель.",
+      },
+      {
+        keys: "Escape",
+        en: "In the search, clears the typed text (never the pinned query); in an empty field, closes the panel.",
+        ru: "В поле поиска стирает набранный текст (не закреплённый запрос); в пустом поле закрывает панель.",
       },
     ],
     aria: [
       {
-        en: 'The filter button has `aria-expanded` and `aria-haspopup="dialog"`; the panel is a non-modal `role="dialog"` named by a visually hidden `labels.filter` title.',
-        ru: 'Кнопка фильтра — `aria-expanded`, `aria-haspopup="dialog"`; панель — немодальный `role="dialog"` со скрытым заголовком `labels.filter`.',
+        en: "A pinned query is said by a polite live region (`labels.searchCommitted`); the search chip's × is named by `labels.removeSearch` («Убрать поиск «Евгений»»).",
+        ru: "Закреплённый запрос объявляется вежливой live-областью (`labels.searchCommitted`); × тега поиска называется `labels.removeSearch` («Убрать поиск «Евгений»»).",
+      },
+      {
+        en: 'The filter control — the button, or the field\'s section (a `<button>` after the search input, never inside it) — has `aria-expanded` and `aria-haspopup="dialog"` and is named by `labels.filter` and the count; the panel is a non-modal `role="dialog"` named by a visually hidden `labels.filter` title.',
+        ru: 'Фильтр — кнопка или секция поля (`<button>` после поля ввода, не внутри него) — `aria-expanded`, `aria-haspopup="dialog"`, имя из `labels.filter` и счётчика; панель — немодальный `role="dialog"` со скрытым заголовком `labels.filter`.',
       },
       {
         en: "Values are toggle buttons with `aria-pressed`; the «−» has its own name (`labels.hideValue` / `labels.unhideValue`); a hidden value carries the «НЕ» text, so meaning is never in color alone.",

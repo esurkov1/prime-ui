@@ -83,7 +83,7 @@ Decided by the items, not a prop: the number of items and their ratios.
 |---|---|---|
 | loading | an image that has not loaded | the Thumbnail's own placeholder in the tile's final box; nothing moves when it loads |
 | video near the view | a video tile entering the view | the `<video preload="metadata">` mounts and shows its first frame; the length comes from the item's `duration` first, then from the metadata |
-| pressed | a press on a tile (pointer, or Enter / Space held) | the whole album gives in a little (`:active` on the root, `--prime-motion-press-scale`, `fast`); inside a message the bubble presses instead |
+| pressed | a press on a tile (pointer, or Enter / Space held) | the whole album gives in a little (`:active` on the root, `--prime-motion-press-distance`, `fast`); inside a message the bubble presses instead |
 | on its way | an item's `transfer` before `done` | the picture dims under the transfer disk; a video's play mark fades out of the middle and back once the transfer is done |
 | open | `open` · `defaultOpen` · a tile | `MediaViewer` shows the album at `index`, flying out of the tile and back into it on close |
 | transferring | `transfer` `queued` / `loading` on an item | the picture dims to 0.6 under the shared transfer disk with its progress ring (an indeterminate arc while `transferProgress` is left out; `transferDirection` changes only the words); pressing the disk cancels; the play mark gives way (`fast`) |

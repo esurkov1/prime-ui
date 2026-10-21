@@ -1072,22 +1072,6 @@ tbody + tbody > .groupRow > .groupCell {
   inset-inline-end: var(--dt-handle-w);
 }
 
-/* The column chooser with `columnOrder`: a Dnd.Sortable list, a grip at the end of each item. */
-.chooserList {
-  --dnd-sortable-gap: var(--prime-space-0);
-}
-
-.chooserItem {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-1);
-}
-
-.chooserCheck {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 /* ---------- Column reordering (`columnOrder`) ---------- */
 
 /* A header that moves its column is a Dnd sortable item (the head row is a `Dnd.Sortable as="tr"`):

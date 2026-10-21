@@ -338,15 +338,15 @@ export const api: ComponentApi = {
     },
     {
       name: "KanbanFieldsMenu",
-      en: "`ref` → `HTMLButtonElement`. The view of a board's cards, for the page's tools beside the filter: a soft Button «Вид» opening a menu of the card fields to show and «По умолчанию». The cards read the same `hiddenFields`.",
-      ru: "Вид карточек доски, для инструментов страницы рядом с фильтром: мягкая кнопка «Вид» открывает меню полей карточки и «По умолчанию». Карточки читают те же `hiddenFields`.",
+      en: "`ref` → `HTMLButtonElement`. The view of a board's cards, for the page's tools: the kit's one view trigger (the columns icon, «Вид», the count of shown fields), a check item per card field and «По умолчанию» once changed. The cards read the same `hiddenFields`.",
+      ru: "Вид карточек доски, для инструментов страницы: единая кнопка вида кита (иконка колонок, «Вид», число показанных полей), пункт-флажок на каждое поле и «По умолчанию» после изменения. Карточки читают те же `hiddenFields`.",
       props: [
         {
           name: "fields",
           type: "readonly KanbanField[]",
           required: true,
-          en: "The card fields a person may hide: `{ id, label }`, in menu order.",
-          ru: "Поля карточки, которые можно скрыть: `{ id, label }`, в порядке меню.",
+          en: "The card fields a person may hide or move: `{ id, label, group? }`, in default order; fields with a `group` stand under that heading instead of `labels.fields`.",
+          ru: "Поля карточки, которые можно скрыть или переставить: `{ id, label, group? }`, в порядке по умолчанию; поля с `group` стоят под этим заголовком вместо `labels.fields`.",
         },
         {
           name: "hiddenFields",
@@ -366,6 +366,24 @@ export const api: ComponentApi = {
           type: "(hiddenFields: readonly string[]) => void",
           en: "A field was shown or hidden, or the default view put back.",
           ru: "Поле показали или скрыли, или вернули вид по умолчанию.",
+        },
+        {
+          name: "fieldOrder",
+          type: "readonly string[]",
+          en: "Ids of the fields in the order the cards draw them (controlled). Any of the triad turns the items into sortable lists: a grip, Alt + ↑ / ↓, a field moves within its group.",
+          ru: "Id полей в порядке, в котором их рисуют карточки (управляемо). Любой из тройки делает пункты сортируемыми: ручка, Alt + ↑ / ↓, поле движется внутри своей группы.",
+        },
+        {
+          name: "defaultFieldOrder",
+          type: "readonly string[]",
+          en: "The initial order (uncontrolled); `[]` starts in the order of `fields`, which «По умолчанию» puts back.",
+          ru: "Начальный порядок (неуправляемо); `[]` — в порядке `fields`, который возвращает «По умолчанию».",
+        },
+        {
+          name: "onFieldOrderChange",
+          type: "(fieldOrder: readonly string[]) => void",
+          en: "A field was moved, or «По умолчанию» put the order of `fields` back: the new order of every field. Render the card parts in it.",
+          ru: "Поле переставили или «По умолчанию» вернул порядок `fields`: новый порядок всех полей. Рисуйте части карточки в нём.",
         },
         {
           name: "size",
@@ -430,8 +448,13 @@ export const api: ComponentApi = {
         part: "KanbanFieldsMenu",
       },
       reset: {
-        en: "The item that puts `defaultHiddenFields` back.",
-        ru: "Пункт, который возвращает `defaultHiddenFields`.",
+        en: "The item that puts `defaultHiddenFields` and the order of `fields` back.",
+        ru: "Пункт, который возвращает `defaultHiddenFields` и порядок `fields`.",
+        part: "KanbanFieldsMenu",
+      },
+      reorderField: {
+        en: "Name of a field's grip (`fieldOrder`); `{label}` is the field's label.",
+        ru: "Имя ручки поля (`fieldOrder`); `{label}` — подпись поля.",
         part: "KanbanFieldsMenu",
       },
     }),
@@ -450,8 +473,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Alt + ↑ · Alt + ↓",
-        en: "Moves the card one place inside its column.",
-        ru: "Сдвигает карточку на одно место внутри колонки.",
+        en: "Moves the card one place inside its column. In `KanbanFieldsMenu` with `fieldOrder`: moves the focused field one place within its group, the focus staying on it.",
+        ru: "Сдвигает карточку на одно место внутри колонки. В `KanbanFieldsMenu` с `fieldOrder` — сдвигает поле в фокусе на одно место внутри группы, фокус остаётся на нём.",
       },
       {
         keys: "Alt + ← · Alt + →",
@@ -496,6 +519,10 @@ export const api: ComponentApi = {
       {
         en: "A board named by `aria-label` or `aria-labelledby` is a `group` with that name; an unnamed one has no role.",
         ru: "Доска с `aria-label` или `aria-labelledby` — это `group` с этим именем; без имени роли нет.",
+      },
+      {
+        en: "`KanbanFieldsMenu` is a menu button named by its text and count («Вид 4»); its items are a group named `labels.fields` of `menuitemcheckbox` with `aria-checked`.",
+        ru: "`KanbanFieldsMenu` — кнопка меню с именем из текста и числа («Вид 4»); пункты — группа `labels.fields` из `menuitemcheckbox` с `aria-checked`.",
       },
       {
         en: "While loading the root has `aria-busy`; skeletons are hidden from assistive tech.",

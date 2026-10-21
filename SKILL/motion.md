@@ -14,7 +14,7 @@ Use the component and the motion comes with it. Never re-animate these with your
 
 | You need | The kit does it | How you get it |
 |---|---|---|
-| Press feedback | every pressable control scales to 0.98 (0.96 icon-only) | any `Button`, chip, item |
+| Press feedback | every pressable gives in by the same 2px at its edges (1px icon-only), a chip and a long bar alike | any `Button`, chip, item |
 | Icons that feel alive | every kit icon plays its own gesture once when its host (button, link, tab, menu item, option, row) is hovered or pressed; never on keyboard focus, disabled, or under reduced motion | `<Icon name>`, `prime-ui-kit/icons` glyphs, `createIcon` (a soft pop); `animated={false}` to keep one still |
 | A button whose label changes («Сохранить» → «Сохранено», «Продолжить» → «Подтвердить») | the new label flows in letter by letter, the width glides; digits-only changes stay in place | change the `Button.Root` text children |
 | A long action from a button (download, export) | a fill grows inside the button | `Button.Root progress={0…1}`, the number in the label |
@@ -40,7 +40,7 @@ Use the component and the motion comes with it. Never re-animate these with your
 | Drag | the carried piece lifts, its neighbours glide apart, the drop glides into place; while its save runs the piece stays still and its grip turns busy, and a refused save glides it back — across columns too | `Dnd`, `Kanban` cards and columns, DataTable and `List` `onReorder`, `FileUpload` tiles |
 | A setting saved on the server | the thumb moves at once and a spinner turns inside it (a slider thumb dims); a refused save glides it back | `Switch` (`onCheckedChange` returns a Promise, or `loading`), `Slider` (`onCommit`) |
 | A chip or a file row removed | it waits dimmed with a spinner on its ×; once gone it fades and closes up, the next ones glide into its place; refused, it stays | `Badge` `onRemove`, `FileUpload` `onValueChange`, TagSelect chips |
-| A schedule bar moved, stretched or drawn | the bar lifts and steps by whole days under the pointer with a dates tooltip; a drawn bar is a ghost that turns into a pulsing Skeleton while `onBarCreate` runs; a refused change glides back, a refused bar fades out; the zoom cross-fades around the day in the middle | `Gantt` (`onBarChange`, `onBarCreate`, `scale`) |
+| A schedule bar moved, stretched or drawn | the bar lifts and steps by whole days under the pointer with a dates tooltip; a drawn bar is a ghost that turns into a pulsing Skeleton while `onBarCreate` runs; a refused change glides back, a refused bar fades out; on an empty place a phantom bar steps by units under the pointer and grows into the drawn range; the zoom follows the hand — a pinch, a modifier wheel or a drag along the dates, anchored at the pointer — and settles onto a preset it ends near | `Gantt` (`onBarChange`, `onBarCreate`, `zoom`) |
 | Messages | a message new at the end floats up a little and fades in; the first render, history loaded above and rows scrolled into view never move; a jumped-to message stays bright while the others step back; «печатает…», reactions, selection and the ticks move by themselves ([Chat → States](../src/components/chat/COMPONENT.md#states), [Message → States](../src/components/message/COMPONENT.md#states)) | `Chat` (`selected`, `search`, `typing`, `jumpTo`, `Chat.Pinned`), `Message` (`onReactionToggle`, `Message.Typing`, `Message.Reply target`) |
 | Writing a message | the send glyph turns into place as text appears; the reply / edit bar enters; a paused recording stills its dot into a pause glyph and freezes the timer and the waveform; the recording bar cross-fades over the field inside the row's height, the hint slides and fades with the finger, the dot breathes and the live waveform follows the voice; the formatting toolbar fades in over a selection | `Composer` |
 | Playing a voice message | the waveform fills as it plays and is the seek slider; play and pause cross-fade; the speed label flows into the next rate | `VoicePlayer` |
@@ -96,7 +96,7 @@ short: movement runs on `--prime-motion-duration-xfast · fast · base · slow` 
 `--prime-motion-fade-xfast · fast · base · slow` group; sizes you start from or pass through come
 from the `--prime-motion-scale-*` ladder.
 
-Under `prefers-reduced-motion` the movement durations and stagger go to 0 and the press scale to 1
+Under `prefers-reduced-motion` the movement durations, stagger and the press go to 0
 globally — token-based CSS honours it for free. Fades stay: a transition on the
 `--prime-motion-fade-*` group still eases a state in instead of flipping it, and a loading loop
 (`--prime-motion-loop`) keeps running, slower. Anything you drive from JS checks the media query

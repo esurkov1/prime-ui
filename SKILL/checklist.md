@@ -88,7 +88,10 @@ checks.
 - [ ] Record properties, uploads, a chat, an album and a schedule are the kit's components ([choosing](choosing.md#2-inside-a-category)).
 
 ## Hierarchy
+- [ ] A card of fields under a section heading (`Drawer.Section`, `Page.Section`) has no `Card.Header` — one heading per block ([surfaces](composition.md#4-surfaces)).
+- [ ] Search and filter take the shape the screen needs: `combined` in a daily list's toolbar, the split button where it must be found, the button alone or the search alone by the data ([where the filters go](composition.md#where-the-filters-go)).
 - [ ] One primary action per area, last in its row; every other button with text is `soft` neutral, `ghost` only icon-only, no `outline` button ([actions](composition.md#6-actions)).
+- [ ] An icon-only button beside fields or `soft` buttons is `soft` neutral at their height; `ghost` only among unfilled neighbours: a dialog header, a table cell, a chat header ([icon button fill](composition.md#an-icon-button-takes-its-neighbours-fill)).
 - [ ] An empty list of cards is `EmptyPage size="s"` in a `Card.Root` in the list's place, the add button under it ([an empty list of cards](composition.md#an-empty-list-of-cards)).
 - [ ] A dialog footer holds Cancel and the primary only, never a «Закрыть» beside the header ×; read-only details have no footer; deleting the edited record stands in the header's actions ([actions](composition.md#6-actions)).
 - [ ] One secondary action is an icon button with a Tooltip; a «⋯» menu holds two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).

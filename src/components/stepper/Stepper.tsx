@@ -10,7 +10,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import type { ControlSize } from "@/internal/states";
 import { touchTargetClass, touchTargetRowClass } from "@/internal/touchTarget";
 

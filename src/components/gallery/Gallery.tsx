@@ -13,7 +13,7 @@ import { useLabels } from "@/internal/labels";
 import { MediaPlayMark } from "@/internal/mediaDisk";
 import pill from "@/internal/mediaPill.module.css";
 import { useMessagePart } from "@/internal/messagePart";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import textRole from "@/internal/textRole.module.css";
 import {
   TRANSFER_LABELS,

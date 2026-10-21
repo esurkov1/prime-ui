@@ -285,7 +285,7 @@ describe("DataTable column chooser with columnOrder", () => {
     );
     await user.click(screen.getByRole("button", { name: "Колонки" }));
     const menu = screen.getByRole("menu");
-    expect(within(menu).getByRole("group", { name: "Показывать" })).toBeInTheDocument();
+    expect(within(menu).getByRole("group", { name: "В таблице" })).toBeInTheDocument();
     const items = within(menu).getAllByRole("menuitemcheckbox");
     expect(items.map((item) => item.textContent)).toEqual([
       "Сумма",
@@ -328,7 +328,7 @@ describe("DataTable column chooser with columnOrder", () => {
     expect(screen.getByRole("menuitemcheckbox", { name: "Сумма" })).toHaveFocus();
   });
 
-  it("«Исходный порядок» puts the order of `columns` back; off while it is that order", async () => {
+  it("«По умолчанию» comes once the order changes and puts the order of `columns` back", async () => {
     const user = userEvent.setup();
     const onColumnOrderChange = vi.fn();
     render(
@@ -340,13 +340,14 @@ describe("DataTable column chooser with columnOrder", () => {
       />,
     );
     await user.click(screen.getByRole("button", { name: "Колонки" }));
-    expect(screen.getByRole("menuitem", { name: "Исходный порядок" })).toBeDisabled();
+    expect(screen.queryByRole("menuitem", { name: "По умолчанию" })).toBeNull();
     await user.keyboard("{Escape}");
     act(() => grip("Сумма").focus());
     await user.keyboard("{Alt>}{ArrowLeft}{/Alt}");
     expect(headOrder()).toEqual(["id", "client", "total", "status", "actions"]);
     await user.click(screen.getByRole("button", { name: "Колонки" }));
-    await user.click(screen.getByRole("menuitem", { name: "Исходный порядок" }));
+    act(() => screen.getByRole("menuitem", { name: "По умолчанию" }).focus());
+    await user.keyboard("{Enter}");
     expect(onColumnOrderChange).toHaveBeenLastCalledWith([
       "id",
       "client",
@@ -362,7 +363,7 @@ describe("DataTable column chooser with columnOrder", () => {
     render(<Invoices columns={WITH_ACTIONS} columnsMenu />);
     await user.click(screen.getByRole("button", { name: "Колонки" }));
     expect(screen.queryByRole("button", { name: /Переместить колонку/ })).toBeNull();
-    expect(screen.queryByRole("menuitem", { name: "Исходный порядок" })).toBeNull();
+    expect(screen.queryByRole("menuitem", { name: "По умолчанию" })).toBeNull();
   });
 
   it("stands only in the head of the row-actions column: without one it renders nothing and warns", () => {
@@ -382,6 +383,7 @@ describe("DataTableColumnsMenu", () => {
         <DataTableColumnsMenu
           columns={COLUMNS}
           hiddenColumns={hidden}
+          defaultHiddenColumns={["status"]}
           onHiddenColumnsChange={setHidden}
           columnOrder={order}
           onColumnOrderChange={reorder ? setOrder : undefined}
@@ -394,19 +396,37 @@ describe("DataTableColumnsMenu", () => {
   it("a labelled soft button with the count of shown columns, bound to the table's state", async () => {
     const user = userEvent.setup();
     render(<Page />);
-    const trigger = screen.getByRole("button", { name: "Колонки 3" });
+    const trigger = screen.getByRole("button", { name: "Вид 3" });
     expect(trigger).toHaveAttribute("data-variant", "soft");
     await user.click(trigger);
-    expect(screen.getByRole("group", { name: "Показывать" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "В таблице" })).toBeInTheDocument();
     await user.click(screen.getByRole("menuitemcheckbox", { name: "Статус" }));
     expect(headOrder()).toEqual(["id", "client", "status", "total"]);
-    expect(screen.getByRole("button", { name: "Колонки 4" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Вид 4" })).toBeInTheDocument();
+  });
+
+  it("«По умолчанию» comes with a change and puts `defaultHiddenColumns` and the order back from the keyboard", async () => {
+    const user = userEvent.setup();
+    render(<Page />);
+    const trigger = screen.getByRole("button", { name: "Вид 3" });
+    act(() => trigger.focus());
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("menuitem", { name: "По умолчанию" })).toBeNull();
+    act(() => screen.getByRole("menuitemcheckbox", { name: "Статус" }).focus());
+    await user.keyboard(" ");
+    act(() => screen.getByRole("menuitemcheckbox", { name: "Счёт" }).focus());
+    await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    expect(headOrder()).toEqual(["client", "id", "status", "total"]);
+    act(() => screen.getByRole("menuitem", { name: "По умолчанию" }).focus());
+    await user.keyboard("{Enter}");
+    expect(headOrder()).toEqual(["id", "client", "total"]);
+    expect(screen.getByRole("button", { name: "Вид 3" })).toBeInTheDocument();
   });
 
   it("Alt + ↑ / ↓ on an item reorders the table's columns", async () => {
     const user = userEvent.setup();
     render(<Page />);
-    await user.click(screen.getByRole("button", { name: "Колонки 3" }));
+    await user.click(screen.getByRole("button", { name: "Вид 3" }));
     act(() => screen.getByRole("menuitemcheckbox", { name: "Счёт" }).focus());
     await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
     expect(headOrder()).toEqual(["client", "id", "total"]);
@@ -416,7 +436,7 @@ describe("DataTableColumnsMenu", () => {
   it("without `onColumnOrderChange` it only shows and hides", async () => {
     const user = userEvent.setup();
     render(<Page reorder={false} />);
-    await user.click(screen.getByRole("button", { name: "Колонки 3" }));
+    await user.click(screen.getByRole("button", { name: "Вид 3" }));
     expect(screen.queryByRole("button", { name: /Переместить колонку/ })).toBeNull();
   });
 });

@@ -55,6 +55,7 @@ export const darkThemeOverrides = {
       inverse: "{color.gray.925}",
     },
     border: {
+      whisper: "{color.gray.875}",
       faint: "{color.gray.850}",
       /** One step above raised (875) so hairlines stay visible on floating layers too. */
       subtle: "{color.gray.800}",

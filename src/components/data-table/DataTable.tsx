@@ -22,6 +22,7 @@ import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { ToolCell, ToolChips, ToolRow } from "@/internal/ToolRow";
 import { useFlipList } from "@/internal/useFlipList";
+import { sameIds } from "@/internal/ViewMenu";
 import { ColumnsMenu, type ColumnsMenuReorder, lockedInChooser } from "./ColumnsMenu";
 import { orderColumns, placeColumn } from "./columnOrder";
 import styles from "./DataTable.module.css";
@@ -80,10 +81,8 @@ export type DataTableLabels = {
   columns: string;
   /** The heading of the column chooser's list of columns. */
   showColumns: string;
-  /** The column chooser item that shows every column again. */
-  showAllColumns: string;
-  /** The column chooser item that puts the order of `columns` back (`columnOrder`). */
-  resetColumnOrder: string;
+  /** The column chooser item that puts the default hidden columns and the order of `columns` back. */
+  resetColumns: string;
   /** `aria-label` of a column's grip in the column chooser (`columnOrder`); `{label}` is its header. */
   reorderColumn: string;
   /** `aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`. */
@@ -111,9 +110,8 @@ export const DATA_TABLE_LABELS: DataTableLabels = {
   expand: "Развернуть строку {label}",
   collapse: "Свернуть строку {label}",
   columns: "Колонки",
-  showColumns: "Показывать",
-  showAllColumns: "Показать все",
-  resetColumnOrder: "Исходный порядок",
+  showColumns: "В таблице",
+  resetColumns: "По умолчанию",
   reorderColumn: "Переместить колонку {label}",
   reorderRow: "Переместить строку {label}",
   reorderSorted: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
@@ -941,25 +939,31 @@ export function DataTable<Row>({
       : "";
   const loadingMoreText = !hasError && infinite && infiniteRows.loading ? labels.loadingMore : "";
 
-  const defaultOrder = allColumns.map((column) => column.id).join("\u0000");
+  const defaultOrder = allColumns.map((column) => column.id);
   const menuReorder: ColumnsMenuReorder | null = reorderColumns
     ? {
         locked: lockedColumns,
         // Dnd holds the locked items and announces the item's new place in the menu itself.
         onReorder: (id, beforeId) =>
           setOrderState(moveBefore(orderIds, id, beforeId, (each) => each)),
-        reset:
-          orderIds.join("\u0000") === defaultOrder
-            ? null
-            : () => setOrderState(allColumns.map((column) => column.id)),
       }
     : null;
+  const orderChanged = reorderColumns && orderIds.join("\u0000") !== defaultOrder.join("\u0000");
+  const menuReset =
+    sameIds(hiddenIds, defaultHiddenColumns) && !orderChanged
+      ? null
+      : () => {
+          if (!sameIds(hiddenIds, defaultHiddenColumns)) setHiddenIds([...defaultHiddenColumns]);
+          if (orderChanged) setOrderState(defaultOrder);
+        };
   const columnsMenuTrigger = menuInHead ? (
     <ColumnsMenu
       columns={orderedColumns as DataTableColumn<never>[]}
       hidden={hiddenSet}
       setHidden={setHiddenIds}
       reorder={menuReorder}
+      reset={menuReset}
+      name={labels.columns}
       labels={labels}
       // A control in the head sits one tier below the table, like the controls in its cells.
       size={stepDown(size)}

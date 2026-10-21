@@ -1,4 +1,4 @@
-/** A 320 px column: the search shrinks next to the filter button and the tags wrap under them — `size`. */
+/** A 320 px column, as on a phone: both shapes go compact — the search beside an icon-only filter button with its count, or one field whose filter section keeps only its icon; the tags wrap under them — `size`, `layout`. */
 import { SmartFilter, type SmartFilterField } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -32,6 +32,9 @@ export default function SmartFilterNarrowExample() {
       <SmartFilter.Root fields={FIELDS} size="s" defaultValue={APPLIED}>
         <SmartFilter.Toolbar />
         <SmartFilter.Chips />
+      </SmartFilter.Root>
+      <SmartFilter.Root fields={FIELDS} size="s" defaultValue={APPLIED}>
+        <SmartFilter.Toolbar layout="combined" />
       </SmartFilter.Root>
     </div>
   );

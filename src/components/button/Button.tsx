@@ -13,7 +13,7 @@ import { InteractiveElement } from "@/internal/interactiveElement";
 import { MorphText } from "@/internal/MorphText";
 import mediaPill from "@/internal/mediaPill.module.css";
 import { readCssDurationMs } from "@/internal/motionTiming";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { Ring } from "@/internal/ring";
 import { slotChild } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";

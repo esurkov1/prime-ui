@@ -20,7 +20,7 @@ import pill from "@/internal/mediaPill.module.css";
 import { useMediaSession } from "@/internal/mediaSession";
 import { useMediaSlotSize } from "@/internal/mediaSlot";
 import palette from "@/internal/palette.module.css";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { Slot } from "@/internal/slot";
 import { type ControlSize, compactTier, type PaletteColor } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";

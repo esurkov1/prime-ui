@@ -1,10 +1,13 @@
 /*
  * Gantt — Graphite.
- * A layer of the ladder (card radius, no border): a toolbar, then one scroll viewport with a sticky
- * two-tier header and a sticky first column. The time axis is drawn in days: `--gantt-day` is the
- * length of a day for the zoom and tier, and every cell, line and bar is placed with
- * `calc(<days> * var(--gantt-day))` from the custom properties `--x`, `--span`, `--lane` set in TSX.
- * Weekends are a faint wash, column lines faint hairlines, today an accent line with a chip.
+ * A layer of the ladder (card radius, no border): a toolbar, then one vertical scroll viewport with
+ * a sticky head row. Time is not scrolled by the browser: it is the time core's (`timeCore.ts`).
+ * The head labels, the backdrop (weekends, lines, today) and every row's track hold a `.layer` laid
+ * out from the scene's origin — every part placed in px by the one placement, `toPx` — and slid
+ * together by one transform written onto each layer. The time column of each row clips its layer.
+ * One even surface: one family of faint hairlines at one weight (a line every day, or the head's
+ * step), weekends a barely-there wash only where a day reads as a column, today an accent line
+ * with today's flag.
  *
  * Text comes from the field tier table: the root carries the chart tier (`fieldTierClass`: row
  * text, header labels), each row's track one tier down (bar text). Bar and header-row heights are
@@ -12,8 +15,6 @@
  */
 
 .root {
-  --gantt-day: var(--prime-space-4);
-  --gantt-dir: 1;
   --gantt-label-w: calc(var(--prime-space-24) * 2);
   --gantt-pad-x: var(--prime-space-3);
   --gantt-pad-y: var(--prime-space-2);
@@ -21,9 +22,10 @@
   --gantt-lane-gap: var(--prime-space-1);
   --gantt-bar-radius: var(--prime-radius-s);
   --gantt-bar-pad-x: var(--prime-space-2);
-  --gantt-tier-h: var(--prime-space-7);
+  /* The one head row: the zoom selector over the names, the dates over the axis. */
+  --gantt-head-h: calc(var(--prime-space-12) + var(--prime-space-1));
 
-  /* One step off the surface for the head, as DataTable; the sticky column keeps the surface. */
+  /* One step off the surface for the head, as DataTable; the first column keeps the surface. */
   --gantt-surface: var(--prime-color-layer-current);
   --gantt-head-bg: var(--prime-color-field-bg-hover);
   --gantt-divider: var(--prime-border-width) solid var(--prime-color-border-subtle);
@@ -31,9 +33,7 @@
   --gantt-column-edge-depth: var(--prime-space-2);
   --gantt-edge-dir: to right;
 
-  --gantt-z-column: var(--prime-z-above);
   --gantt-z-head: var(--prime-z-top);
-  --gantt-z-corner: var(--prime-z-cover);
 
   container-type: inline-size;
   display: flex;
@@ -50,7 +50,6 @@
 }
 
 .root:dir(rtl) {
-  --gantt-dir: -1;
   --gantt-edge-dir: to left;
 }
 
@@ -62,7 +61,7 @@
   --gantt-pad-y: var(--prime-space-1);
   --gantt-bar-radius: var(--prime-radius-xs);
   --gantt-bar-pad-x: var(--prime-space-1);
-  --gantt-tier-h: var(--prime-space-6);
+  --gantt-head-h: var(--prime-space-10);
 }
 
 .root[data-size="xs"] {
@@ -78,7 +77,7 @@
   --gantt-pad-x: var(--prime-space-4);
   --gantt-bar-radius: var(--prime-radius-m);
   --gantt-bar-pad-x: var(--prime-space-3);
-  --gantt-tier-h: var(--prime-space-8);
+  --gantt-head-h: var(--prime-space-14);
 }
 
 .root[data-size="l"] {
@@ -90,33 +89,26 @@
   --gantt-bar-h: calc(var(--prime-space-8) + var(--prime-space-1));
 }
 
-/* Length of a day per zoom: a day column fits its number, a week its range, a month its name. */
-.root[data-scale="day"] {
-  --gantt-day: var(--prime-space-10);
+/*
+ * The zoom's presets per tier, px a day (a day cell fits «Пн 12», a week «Ноя 2–8», a month its
+ * name), and its top stop: the time camera reads them (TSX). The zoom itself is continuous — a
+ * pinch, the wheel or a key land anywhere between.
+ */
+.root {
+  --gantt-day-day: var(--prime-space-10);
+  --gantt-day-week: var(--prime-space-4);
+  --gantt-day-month: var(--prime-space-1);
+  --gantt-day-max: var(--prime-space-24);
 }
 
-.root[data-scale="week"] {
-  --gantt-day: var(--prime-space-4);
+.root:is([data-size="xs"], [data-size="s"]) {
+  --gantt-day-day: var(--prime-space-8);
+  --gantt-day-week: var(--prime-space-3);
 }
 
-.root[data-scale="month"] {
-  --gantt-day: var(--prime-space-1);
-}
-
-.root[data-scale="day"]:is([data-size="xs"], [data-size="s"]) {
-  --gantt-day: var(--prime-space-8);
-}
-
-.root[data-scale="day"]:is([data-size="l"], [data-size="xl"]) {
-  --gantt-day: var(--prime-space-12);
-}
-
-.root[data-scale="week"]:is([data-size="xs"], [data-size="s"]) {
-  --gantt-day: var(--prime-space-3);
-}
-
-.root[data-scale="week"]:is([data-size="l"], [data-size="xl"]) {
-  --gantt-day: var(--prime-space-5);
+.root:is([data-size="l"], [data-size="xl"]) {
+  --gantt-day-day: var(--prime-space-12);
+  --gantt-day-week: var(--prime-space-5);
 }
 
 /* ---------- Toolbar ---------- */
@@ -142,6 +134,23 @@
   width: 100%;
   padding: 0;
   isolation: isolate;
+  /* The browser keeps the vertical finger (the rows scroll natively); a sideways finger and two
+     fingers are the chart's: a slide and a pinch of its time, never the page's zoom. */
+  touch-action: pan-y;
+  /* A long press picks a bar up or draws one: no callout over it. */
+  -webkit-touch-callout: none;
+}
+
+/*
+ * Where a press is a gesture — the dates (a drag zooms and slides), the rows' time (a bar moved, a
+ * bar drawn, a slide) — nothing selects. The names stay selectable: a drag there is the browser's.
+ */
+.axis,
+.track,
+.bar,
+.ghost {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .root[data-scroll-height="fill"] {
@@ -156,7 +165,7 @@
   min-height: 0;
 }
 
-/* End edge cue while more of the axis is to the end (the sticky column draws the start one). */
+/* End edge cue while more of the axis is to the end (the first column draws the start one). */
 .frame::after {
   content: "";
   position: absolute;
@@ -179,23 +188,33 @@
 }
 
 .grid {
-  /* The whole axis, set from its length: rows, the head fill and every line span it wherever the
-     chart is scrolled. A max-content width is not enough: engines leave a fixed flex-basis out of
-     it, and the fills stopped at the viewport. */
-  --gantt-axis-w: calc(var(--gantt-days) * var(--gantt-day));
-
   display: flex;
   flex-direction: column;
-  width: max(100%, calc(var(--gantt-label-w) + var(--gantt-axis-w)));
+  width: 100%;
+}
+
+/*
+ * A time layer: laid out from the scene's origin across a few screens (its width is the scene's,
+ * TSX) and slid by the transform the time core writes onto it. A 3D transform from the first write
+ * on, so it holds its composited layer from the start of a gesture to its end.
+ */
+.layer {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
 }
 
 /* ---------- Head ---------- */
 
-/* Sticks through `stickySurfaceClass` (joined in TSX), which also lets it go on a short screen. */
+/*
+ * One row, sticky through `stickySurfaceClass` (joined in TSX), which also lets it go on a short
+ * screen: the zoom selector in the corner, then the dates — the quiet tier.
+ */
 .head {
   z-index: var(--gantt-z-head);
   display: flex;
   width: 100%;
+  height: var(--gantt-head-h);
   --sticky-bg: var(--gantt-head-bg);
 
   background: var(--gantt-head-bg);
@@ -205,151 +224,182 @@
 }
 
 .corner {
-  position: sticky;
-  inset-inline-start: 0;
-  z-index: var(--gantt-z-corner);
+  position: relative;
+  z-index: var(--prime-z-raised);
   display: flex;
   flex: none;
-  align-items: flex-end;
+  align-items: center;
   width: var(--gantt-label-w);
   min-width: 0;
-  padding: var(--prime-space-1) var(--gantt-pad-x);
+  padding-inline: var(--gantt-pad-x);
   background: var(--gantt-head-bg);
-  font-weight: var(--prime-font-weight-medium);
 }
 
-.cornerText {
-  overflow: hidden;
-  min-width: 0;
-  padding-block-end: calc((var(--gantt-tier-h) - var(--field-label-lh)) / 2 - var(--prime-space-1));
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* As wide as its value, never wider than the column. */
+.zoomSelect {
+  width: auto;
+  max-width: 100%;
 }
 
+/* A drag along the dates zooms (down closer, up back) and slides the view. */
 .axis {
   position: relative;
-  flex: none;
-  width: var(--gantt-axis-w);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: clip;
+  cursor: ew-resize;
 }
 
-/* The time labels are quiet mono figures; the today line and its flag pass over them. */
-.tier {
-  position: relative;
-  height: var(--gantt-tier-h);
+/*
+ * The dates, one quiet row like a ruler (`timeHead`): ticks at the foot on the grid's lines, at the
+ * grid's strengths, taller for a coarser unit; the labels of ONE step after their ticks. Regular
+ * figures of the sans in tabular width, muted; a month's or a year's name semibold in the primary
+ * text; today accent text with a small accent dot after it. No pills, no cells. Places and fades
+ * are the time core's (inline), never a transition.
+ */
+.labels {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
   color: var(--prime-color-text-muted);
-  font-family: var(--prime-font-family-mono);
   font-variant-numeric: tabular-nums;
 }
 
-.tierCell {
+/* What the step is chosen by: every text the head may show, measured once, never seen. */
+.sampler {
   position: absolute;
-  inset-block: 0;
-  inset-inline-start: calc(var(--x) * var(--gantt-day));
+  inset-block-start: 0;
+  inset-inline-start: 0;
   display: flex;
-  align-items: center;
-  width: calc(var(--span) * var(--gantt-day));
-  padding-inline: var(--prime-space-2);
-}
-
-/*
- * Upper tier: a period (month, year) is told by its label alone — no lines, so nothing cuts a cell
- * below. The label is sticky inside its span: it rides the start of the visible axis while its
- * period is on screen and leaves with the period's last cell, never over the next label.
- */
-.tier:first-child {
-  /* Quieter than any text role: a reference mark behind the data, never a heading. */
-  color: color-mix(in srgb, var(--prime-color-text-disabled) var(--prime-tint-strong), transparent);
-}
-
-/* A month or a year keeps its name in view while its cell scrolls under the first column. */
-.tierText {
-  position: sticky;
-  inset-inline-start: calc(var(--gantt-label-w) + var(--prime-space-2));
-  overflow: hidden;
-  min-width: 0;
-  text-overflow: ellipsis;
+  visibility: hidden;
+  pointer-events: none;
   white-space: nowrap;
 }
 
-/* Lower tier: faint hairlines between cells; the cell that opens a period a step stronger. */
-.tier[data-tier="bottom"] .tierCell {
-  justify-content: center;
-  padding-inline: 0;
-  border-inline-start: var(--prime-border-width) solid var(--prime-color-border-faint);
+/* A tick: the grid's own line at the foot of the head, as faint — the head is the top of the grid. */
+.tick {
+  position: absolute;
+  inset-block-end: 0;
+  width: var(--prime-border-width);
+  height: var(--prime-space-2);
+  background: var(--gantt-line);
 }
 
-.tier[data-tier="bottom"] .tierCell[data-boundary="true"] {
-  border-inline-start-color: var(--prime-color-border-subtle);
+/* One step's labels: a layer of their own, so a step change cross-fades them as a whole. */
+.headStep {
+  position: absolute;
+  inset: 0;
 }
 
-.root[data-scale="month"] .tier[data-tier="bottom"] .tierCell,
-.root[data-scale="week"] .tier[data-tier="bottom"] .tierCell {
-  justify-content: flex-start;
-  padding-inline: var(--prime-space-2);
+.headLabel {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  display: flex;
+  gap: var(--prime-space-1);
+  align-items: center;
+  white-space: nowrap;
+  /* A label that gives way fades by the room left, in step with the camera: never a transition,
+     which would lag behind a sweeping boundary and show under it. */
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.tier[data-tier="bottom"] .tierText {
-  position: static;
+/* A boundary always stands: over the ordinary labels and the ticks, on the head's own fill. */
+.headLabel[data-boundary] {
+  z-index: var(--prime-z-raised);
+  padding-inline-end: var(--prime-space-1);
+  background: var(--gantt-head-bg);
 }
 
-.tierCell[data-weekend="true"] {
-  color: var(--prime-color-text-disabled);
+/* Stuck at the start edge it names the month you are in: the day's number steps aside. */
+.headLabel[data-stuck] [data-role="number"] {
+  display: none;
 }
 
-/* Today's cell: its text on a solid accent pill over the today line, as in a calendar. */
-.tierCell[data-today="true"] .tierText {
-  position: relative;
-  inset-inline-start: auto;
-  z-index: var(--prime-z-above);
-  /* The kit's chip radius, not a pill: one digit reads as a small rectangle, wider than tall. */
-  padding-inline: var(--prime-space-2);
-  border-radius: var(--prime-badge-s-radius);
-  background: var(--prime-color-accent-default);
-  color: var(--prime-color-accent-fg);
-  font-weight: var(--prime-font-weight-medium);
-  text-align: center;
+.headLabel[data-stuck] [data-role="name"] {
+  text-transform: capitalize;
+}
+
+.headText {
+  flex: none;
+}
+
+.headText[data-strong] {
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-semibold);
 }
 
 /*
- * Today: a flag in the top tier and a line down through the bottom tier into the rows. Both lie
- * over the time labels (the flag simply covers a month name); today's date pill lies over the line.
+ * Today: the chart's today line (the start of today's cell) runs on through the head, and from it
+ * a small solid pill says the date — today's own label, its text where the plain label's is; a
+ * neighbour gives way only when the pill reaches it; kept whole inside the axis by the time core.
  */
-.todayMark {
+.todayPill {
   position: absolute;
   inset-block: 0;
-  inset-inline-start: calc(var(--x) * var(--gantt-day));
+  z-index: var(--prime-z-above);
+  display: flex;
+  align-items: center;
+}
+
+/* The flag: the today line's colour, square on the line's side, rounded at its free end; its text
+   in the head labels' own type, so «21» reads exactly as the plain label it replaces. */
+.todayFlag {
+  display: flex;
+  align-items: center;
+  height: var(--prime-space-5);
+  padding-inline: var(--prime-space-1) var(--prime-space-2);
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  border-start-end-radius: var(--prime-radius-s);
+  border-end-end-radius: var(--prime-radius-s);
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+  font-weight: var(--prime-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * Today off screen: «‹ Сегодня» at the start edge of the dates, «Сегодня ›» at the end, over the
+ * head row. It rises in and closes up with the part presence motion (TSX).
+ */
+.todayJump {
+  position: absolute;
+  inset-block-start: 0;
   z-index: var(--prime-z-raised);
-  width: 0;
+  display: flex;
+  align-items: center;
+  height: var(--gantt-head-h);
+  padding-inline: var(--prime-space-2);
+  background: var(--gantt-head-bg);
+}
+
+/* The dates fade into it instead of being cut. */
+.todayJump::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: var(--gantt-edge-depth);
   pointer-events: none;
 }
 
-.todayMark::after {
-  content: "";
-  position: absolute;
-  inset-block: calc(var(--gantt-tier-h) / 2) 0;
-  inset-inline-start: calc(var(--prime-border-width) * -1);
-  width: calc(var(--prime-border-width) * 2);
-  background: var(--prime-color-accent-default);
+.todayJump[data-edge="start"] {
+  inset-inline-start: var(--gantt-label-w);
 }
 
-.todayChip {
-  position: absolute;
-  top: calc((var(--gantt-tier-h) - var(--prime-badge-m-height)) / 2);
-  /* A flag on the line: it starts at the line and its square corner sits on it. */
-  inset-inline-start: calc(var(--prime-border-width) * -1);
-  z-index: var(--prime-z-raised);
-  display: inline-flex;
-  align-items: center;
-  height: var(--prime-badge-m-height);
-  padding-inline: var(--prime-badge-m-padding-x);
-  border-radius: var(--prime-badge-m-radius);
-  background: var(--prime-color-accent-default);
-  color: var(--prime-color-accent-fg);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--prime-badge-m-text-size);
-  font-weight: var(--prime-font-weight-medium);
-  white-space: nowrap;
-  border-end-start-radius: 0;
+.todayJump[data-edge="start"]::before {
+  inset-inline-start: 100%;
+  background: linear-gradient(var(--gantt-edge-dir), var(--gantt-head-bg), transparent);
+}
+
+.todayJump[data-edge="end"] {
+  inset-inline-end: 0;
+}
+
+.todayJump[data-edge="end"]::before {
+  inset-inline-end: 100%;
+  background: linear-gradient(var(--gantt-edge-dir), transparent, var(--gantt-head-bg));
 }
 
 /* ---------- Body ---------- */
@@ -361,75 +411,76 @@
 }
 
 /*
- * The background is two patterns, not an element per day, so a multi-year axis costs nothing:
- * weekends are a week tile (Monday-aligned through `--gantt-week-offset`) with the last two days
- * washed; column lines are a tile of one unit with a faint hairline at its start. The month zoom
- * has months of different lengths: its lines, and the stronger line where a period starts, are
- * elements (`.gridLine`), rendered only near the view.
+ * The backdrop: one time layer under every row — the weekend washes, the grid lines, the today
+ * line — clipped to the time column. While rows are virtualized it is as tall as the visible rows
+ * and sticks under the head, so a chart of thousands of rows composites one screen of it.
  */
-.backdropWash,
-.backdropLines {
+.backdrop {
   position: absolute;
   inset-block: 0;
-  inset-inline-start: var(--gantt-label-w);
-  width: var(--gantt-axis-w);
+  inset-inline: var(--gantt-label-w) 0;
+  overflow: clip;
   pointer-events: none;
 }
 
-.root:not([data-scale="month"]) .backdropWash {
-  background-image: linear-gradient(
-    var(--gantt-edge-dir),
-    transparent calc(5 * var(--gantt-day)),
-    var(--prime-color-fill-faint) 0
-  );
-  background-position: calc(var(--gantt-week-offset) * var(--gantt-day)) 0;
-  background-size: calc(7 * var(--gantt-day)) 100%;
+.body[data-state="rows"] > .backdrop {
+  position: sticky;
+  inset-block-start: var(--gantt-head-h);
+  inset-inline: auto;
+  flex: none;
+  /* In the flow it takes no room from anything: the rows stand absolutely, the body's height is
+     theirs. */
+  height: min(var(--gantt-view-h), var(--rows-height));
+  margin-inline-start: var(--gantt-label-w);
 }
 
-.root:not([data-scale="month"]) .backdropLines {
-  --gantt-line-tile: var(--gantt-day);
-
-  background-image: linear-gradient(
-    var(--gantt-edge-dir),
-    var(--prime-color-border-faint) var(--prime-border-width),
-    transparent 0
-  );
-  background-size: var(--gantt-line-tile) 100%;
+/* The overlay (today's line) lies over the backdrop's own box, above the rows. */
+.overlay {
+  z-index: var(--prime-z-raised);
 }
 
-.root[data-scale="week"] .backdropLines {
-  --gantt-line-tile: calc(7 * var(--gantt-day));
+.body[data-state="rows"] > .overlay {
+  margin-block-start: calc(min(var(--gantt-view-h), var(--rows-height)) * -1);
 }
 
-.root:dir(rtl):not([data-scale="month"]) .backdropWash {
-  background-position: right calc(var(--gantt-week-offset) * var(--gantt-day)) top 0;
+/*
+ * Lines and washes: every line one weight (`timeLadder` draws one family at a time); weekends the
+ * kit's faintest fill, only from 16 px a day — no other fill on the chart.
+ */
+.root {
+  --gantt-line: var(--prime-color-border-whisper);
 }
 
-.root:dir(rtl):not([data-scale="month"]) .backdropLines {
-  background-position: right 0 top 0;
+.weekends {
+  position: absolute;
+  inset: 0;
+}
+
+.weekend {
+  position: absolute;
+  inset-block: 0;
+  background: var(--prime-color-fill-faint);
 }
 
 .gridLine,
 .todayLine {
   position: absolute;
   inset-block: 0;
-  inset-inline-start: calc(var(--x) * var(--gantt-day));
 }
 
 .gridLine {
   width: var(--prime-border-width);
-  background: var(--prime-color-border-faint);
-}
-
-/* A new month (day and week zoom) or year (month zoom) starts on a slightly stronger line. */
-.gridLine[data-boundary="true"] {
-  background: var(--prime-color-border-subtle);
+  background: var(--gantt-line);
 }
 
 /* While loading, the column lines and the today line lie over the skeleton bars, so they stay
    whole; the weekend wash stays under them, so a bar keeps one even fill. */
-.body[data-state="loading"] .backdropLines {
+.body[data-state="loading"] .backdrop {
   z-index: var(--prime-z-raised);
+}
+
+.body[data-state="loading"] .weekends {
+  display: none;
 }
 
 .todayLine {
@@ -448,7 +499,8 @@
     (var(--lanes) - 1) *
     var(--gantt-lane-gap)
   );
-  border-block-start: var(--gantt-divider);
+  /* The grid's own weight: the rows part as quietly as the day lines cross them. */
+  border-block-start: var(--prime-border-width) solid var(--gantt-line);
 }
 
 /* Rows are virtualized: the body has the height of every row, each rendered row stands at its top. */
@@ -463,9 +515,8 @@
 }
 
 .rowHeader {
-  position: sticky;
-  inset-inline-start: 0;
-  z-index: var(--gantt-z-column);
+  position: relative;
+  z-index: var(--prime-z-raised);
   display: flex;
   flex: none;
   align-items: center;
@@ -487,8 +538,8 @@
 
 /*
  * A header that opens its row (`onRowClick`, `getRowHref`): a pointer cursor and, under a mouse, a
- * wash under the content. The wash is an inset shadow over the opaque surface (the header must
- * stay opaque over the axis); its spread, the column width, covers the whole header.
+ * wash under the content. The wash is an inset shadow over the opaque surface; its spread, the
+ * column width, covers the whole header.
  */
 .rowHeader[data-clickable] {
   cursor: pointer;
@@ -523,7 +574,7 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-/* Start edge cue: a short soft shadow from the column's end edge over the scrolled axis. */
+/* Start edge cue: a short soft shadow from the column's end edge over the slid axis. */
 .rowHeader::after,
 .corner::after {
   content: "";
@@ -568,12 +619,13 @@
   text-overflow: ellipsis;
 }
 
+/* The time column of a row: it clips the row's time layer (`overflow: clip`, never a scroller —
+   a focused bar must not scroll it). */
 .track {
   position: relative;
-  /* Drags and drawing on the axis never select text. */
-  user-select: none;
-  flex: none;
-  width: var(--gantt-axis-w);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: clip;
 }
 
 /* ---------- Bars ---------- */
@@ -582,7 +634,6 @@
   --bar-bg: var(--hue-soft);
   --bar-fg: var(--hue-text);
   --bar-solid: var(--hue-solid);
-  --bar-press: 1;
 
   position: absolute;
   inset-block-start: calc(
@@ -590,16 +641,15 @@
     var(--lane) *
     (var(--gantt-bar-h) + var(--gantt-lane-gap))
   );
-  inset-inline-start: 0;
   display: flex;
   align-items: center;
   gap: var(--prime-space-1);
   box-sizing: border-box;
-  width: calc(var(--span) * var(--gantt-day));
   height: var(--gantt-bar-h);
   margin: 0;
-  padding-block: 0;
-  padding-inline: var(--gantt-bar-pad-x);
+  /* No padding: a bar is exactly as wide as its dates even at a few px a day; the label keeps the
+     room on its own margins. */
+  padding: 0;
   border: 0;
   border-radius: var(--gantt-bar-radius);
   background: var(--bar-bg);
@@ -612,16 +662,15 @@
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
-  transform: translateX(calc(var(--x) * var(--gantt-day) * var(--gantt-dir)))
-    scale(var(--bar-press));
   /*
-   * A changed bar glides to its dates (emphasized · base): a drop, a keyboard step, a refused change
-   * gliding back. The width moves with it on a resize — an absolutely placed bar reflows nothing
-   * around it, and a scale would stretch its label and corners.
+   * The place and the length are the time core's (inline `inset-inline-start` / `width`, the pixel
+   * of the grid line) and change with every frame of a zoom, never through a transition — a bar
+   * that eased after the grid would float over it. A change of dates glides in TSX (a WAAPI
+   * `translate` + `width`). The press is the kit's (`press`, joined in TSX): its edges give by
+   * the same few px on a day's bar and a year's, through the `scale` property.
    */
   transition:
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
@@ -686,28 +735,25 @@
   }
 }
 
-.bar:active:not([data-dragging], [data-pending="true"]) {
-  --bar-press: var(--prime-motion-press-scale);
+/* Picked up, it follows the hand at its own size (pending, `aria-busy` keeps the press away). */
+.bar[data-gantt-bar][data-dragging]:active {
+  scale: none;
 }
 
 /*
- * Direct manipulation: while dragged, the bar follows the pointer exactly (no easing on its place
- * or size) and stays lifted; on release it glides to the whole day it snapped to.
+ * Direct manipulation: while dragged, the bar follows the pointer exactly and stays lifted; on
+ * release it glides to the whole day it snapped to.
  */
 .bar[data-dragging] {
   z-index: var(--prime-z-raised);
   box-shadow: var(--prime-shadow-overlay);
   cursor: grabbing;
-  transition:
-    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* Where a dragged edge lands at the week and month zoom: a faint accent tick on the snapped day. */
+/* Where a dragged edge lands where the grid draws no days: a faint accent tick on the snapped day. */
 .dayGuide {
   position: absolute;
   inset-block: 0;
-  inset-inline-start: calc(var(--x) * var(--gantt-day));
   width: calc(var(--prime-border-width) * 2);
   margin-inline-start: calc(var(--prime-border-width) * -1);
   background: color-mix(
@@ -730,27 +776,51 @@
 
 .spinner {
   flex: none;
+  margin-inline-start: var(--gantt-bar-pad-x);
 }
 
-/* As wide as its text, so it can slide along a bar scrolled under the pinned column. */
+/*
+ * As wide as its text, so it can slide along a bar cut by the start edge of the axis. Its margins
+ * are the bar's padding: on a bar narrower than them they overflow unpainted, the bar keeps its
+ * width.
+ */
 .label {
   overflow: hidden;
   flex: 0 1 auto;
   min-width: 0;
+  margin-inline: var(--gantt-bar-pad-x);
   text-overflow: ellipsis;
   transform: translateX(var(--label-shift, 0));
+}
+
+.spinner + .label {
+  margin-inline-start: 0;
 }
 
 /* Too short for its text (measured): the label sits after the bar in the primary text color. */
 .bar[data-label="outside"] .label {
   position: absolute;
   inset-inline-start: calc(100% + var(--prime-space-2));
+  margin-inline: 0;
   overflow: visible;
   color: var(--prime-color-text-primary);
   pointer-events: none;
 }
 
-/* No room beside it either: the tooltip and the accessible name carry the label. */
+/*
+ * No room beside it either: the label stays inside, start-aligned as on a bar it fits, and runs out
+ * under the bar's end behind a short fade — no ellipsis. The tooltip and the name carry it whole.
+ */
+.bar[data-label="clipped"] .label {
+  text-overflow: clip;
+  mask-image: linear-gradient(
+    var(--gantt-edge-dir),
+    currentColor calc(100% - var(--prime-space-3)),
+    transparent
+  );
+}
+
+/* A milestone with no room beside it: the tooltip and the accessible name carry the label. */
 .bar[data-label="hidden"] .label {
   position: absolute;
   visibility: hidden;
@@ -759,13 +829,8 @@
 /* Milestone: a diamond on its day, the label beside it. */
 .bar[data-milestone] {
   justify-content: center;
-  width: var(--gantt-bar-h);
   padding: 0;
   background: transparent;
-  transform: translateX(
-      calc(((var(--x) + 0.5) * var(--gantt-day) - var(--gantt-bar-h) / 2) * var(--gantt-dir))
-    )
-    scale(var(--bar-press));
 }
 
 .diamond {
@@ -779,6 +844,7 @@
 .bar[data-milestone] .label {
   position: absolute;
   inset-inline-start: calc(100% + var(--prime-space-1));
+  margin-inline: 0;
   overflow: visible;
   color: var(--prime-color-text-primary);
   pointer-events: none;
@@ -841,35 +907,18 @@
 
 /* ---------- Creating ---------- */
 
-/* Empty space that takes a new bar: a crosshair, and on hover a faint cell with a «+». */
+/* Empty space that takes a new bar: a crosshair, and the phantom of the bar a press would create. */
 .track[data-creatable] {
   cursor: crosshair;
 }
 
-.createCell {
-  position: absolute;
-  inset-block: calc(var(--prime-border-width) * -1) 0;
-  inset-inline-start: calc(var(--x) * var(--gantt-day));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(var(--span) * var(--gantt-day));
-  background: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-muted);
-  pointer-events: none;
-}
-
-@media (hover: none) {
-  .createCell {
-    display: none;
-  }
-}
-
 /*
- * The bar being created: an accent outline of a bar while it is drawn (the tooltip says its dates),
- * a pulsing Skeleton fill while `onBarCreate` runs, fading out on a refusal. On success the real
- * bar renders in the same place and lane, so nothing flashes. Its width follows the drag like a
- * bar's resize: a scale would stretch the outline and the dates.
+ * The bar being created, one element throughout: a phantom in a real bar's height, radius and lane
+ * — a faint accent wash with a faint ring, a «+» and the label when it fits — one unit of the zoom
+ * under the mouse, stepping by units with a short glide (TSX); pressed and dragged it grows into
+ * the drawn range (the tooltip says its dates); a pulsing Skeleton fill while `onBarCreate` runs,
+ * fading out on a refusal. On success the real bar renders in the same place and lane, so nothing
+ * flashes. Placed by the time core like a bar.
  */
 .ghost {
   position: absolute;
@@ -878,33 +927,49 @@
     var(--lane) *
     (var(--gantt-bar-h) + var(--gantt-lane-gap))
   );
-  inset-inline-start: 0;
+  /* A label that does not fit beside the «+» wraps onto a second line, clipped: only the «+» stays. */
   display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
   align-items: center;
+  justify-content: center;
+  column-gap: var(--prime-space-1);
   overflow: hidden;
   box-sizing: border-box;
-  width: calc(var(--span) * var(--gantt-day));
   height: var(--gantt-bar-h);
-  padding-inline: var(--gantt-bar-pad-x);
+  /* No padding: exactly as wide as its days; the label keeps its room on its margins. */
+  padding: 0;
   border-radius: var(--gantt-bar-radius);
-  background: var(--prime-color-accent-soft);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-accent-default);
+  background: color-mix(
+    in oklab,
+    var(--prime-color-accent-default) var(--prime-tint-faint),
+    transparent
+  );
+  box-shadow: inset 0 0 0 var(--prime-border-width)
+    color-mix(in oklab, var(--prime-color-accent-default) var(--prime-tint-line), transparent);
   color: var(--prime-color-accent-text);
   font-size: var(--field-text);
   font-weight: var(--prime-font-weight-medium);
   line-height: var(--field-lh);
   white-space: nowrap;
   pointer-events: none;
-  transform: translateX(calc(var(--x) * var(--gantt-day) * var(--gantt-dir)));
-  transition:
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    width var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
   outline: none;
 }
 
 .ghost[data-state="leaving"] {
   opacity: 0;
+}
+
+/* Pressed and drawn: a real bar of the default hue, its length in days inside. */
+.ghost[data-look="bar"] {
+  justify-content: flex-start;
+  background: var(--hue-soft);
+  box-shadow: none;
+  color: var(--hue-text);
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
 }
 
 .ghostBusy {
@@ -916,11 +981,21 @@
   border-radius: inherit;
 }
 
+.ghostIcon,
 .ghostLabel {
   position: relative;
-  overflow: hidden;
-  min-width: 0;
-  text-overflow: ellipsis;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: var(--gantt-bar-h);
+}
+
+.ghostIcon {
+  --prime-icon-size: var(--field-icon);
+}
+
+.ghost[data-look="bar"] .ghostLabel {
+  margin-inline: var(--gantt-bar-pad-x);
 }
 
 /* ---------- Tooltip ---------- */
@@ -953,13 +1028,10 @@
 .skeletonBar {
   position: absolute;
   inset-block-start: var(--gantt-pad-y);
-  inset-inline-start: 0;
-  width: calc(var(--span) * var(--gantt-day));
   max-width: none;
   height: var(--gantt-bar-h);
   min-height: 0;
   border-radius: var(--gantt-bar-radius);
-  transform: translateX(calc(var(--x) * var(--gantt-day) * var(--gantt-dir)));
 }
 
 .emptyRow {
@@ -967,12 +1039,9 @@
   border-block-start: var(--gantt-divider);
 }
 
-/* The message stays in the visible part of the viewport however far the axis is scrolled. */
 .emptyCell {
-  position: sticky;
-  inset-inline-start: 0;
   box-sizing: border-box;
-  width: 100cqi;
+  width: 100%;
   padding: var(--prime-space-6) var(--gantt-pad-x);
 }
 
@@ -995,8 +1064,12 @@
     --gantt-label-w: calc(var(--prime-avatar-m) + 2 * var(--gantt-pad-x));
   }
 
-  .root[data-avatar] .rowLabel,
-  .root[data-avatar] .cornerText {
+  .root[data-avatar] .rowLabel {
     display: none;
+  }
+
+  /* The selector's icon-only trigger takes the column's whole width. */
+  .root[data-avatar] .corner {
+    padding-inline: var(--prime-space-1);
   }
 }

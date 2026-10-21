@@ -462,6 +462,28 @@
         "The vehicle card's line items are a DescriptionList.Root align=\"end\" inside Card.Body divider=\"full\"",
         "The vehicle card's footer is Card.Footer divider=\"fill\" with the total in Card.Total (Card.Value inside), at the end of the row"
       ]
+    },
+    {
+      "id": 37,
+      "prompt": "В дровере профиля добавь секцию «Смена пароля»: текущий пароль, новый пароль, кнопка «Сменить пароль».",
+      "expected_output": "A Drawer.Section «Смена пароля» (with an optional description) holding a Card.Root with one Card.Body of the fields and the button; the card has no Card.Header repeating the section's title.",
+      "files": [],
+      "expectations": [
+        "The block is a Drawer.Section with label «Смена пароля»",
+        "The card inside has no Card.Header and no Card.Title repeating «Смена пароля»: the fields sit in one Card.Body",
+        "The fields are Input.Root with labels above them, the password fields of type password"
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "Добавь в карточку счёта строки позиций с удалением и кнопку изменения депозита рядом с «Вернуть».",
+      "expected_output": "The bill lines are a FieldList inside the card (its row «×» is the kit's soft neutral button at the field height, no hand-made remove buttons); the deposit card header has a soft neutral «Вернуть» and beside it a soft neutral icon-only edit button with aria-label and a Tooltip, at the same height. Ghost icon buttons appear only in a dialog header or a table cell.",
+      "files": [],
+      "expectations": [
+        "The bill lines are a FieldList (its own remove «×»), not a .map() of fields with a hand-made remove Button after each",
+        "The deposit edit button is icon-only Button.Root variant=\"soft\" tone=\"neutral\" with an aria-label, beside the soft neutral «Вернуть» and without its own size (the same height)",
+        "No icon-only Button with variant=\"ghost\" stands beside a filled field, Select or soft button; ghost appears only in a dialog header's actions or a table cell"
+      ]
     }
   ]
 }

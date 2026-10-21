@@ -1,5 +1,6 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { DATA_TABLE_LABELS } from "./DataTable";
+import { DATA_TABLE_COLUMNS_MENU_LABELS } from "./DataTableColumnsMenu";
 
 export const api: ComponentApi = {
   parts: [
@@ -49,8 +50,8 @@ export const api: ComponentApi = {
         {
           name: "onColumnOrderChange",
           type: "(columnOrder: string[]) => void",
-          en: "The order changed: a header dropped, a keyboard move, a chooser grip or «Исходный порядок». The kit stores nothing: keep it with `hiddenColumns` and pass it back.",
-          ru: "Порядок изменился: заголовок отпустили, ход с клавиатуры, ручка в выборе колонок или «Исходный порядок». Кит ничего не хранит: сохраните его вместе с `hiddenColumns` и передайте обратно.",
+          en: "The order changed: a header dropped, a keyboard move, a chooser grip or «По умолчанию». The kit stores nothing: keep it with `hiddenColumns` and pass it back.",
+          ru: "Порядок изменился: заголовок отпустили, ход с клавиатуры, ручка в выборе колонок или «По умолчанию». Кит ничего не хранит: сохраните его вместе с `hiddenColumns` и передайте обратно.",
         },
         {
           name: "columnsMenu",
@@ -465,8 +466,8 @@ export const api: ComponentApi = {
     },
     {
       name: "DataTableColumnsMenu",
-      en: "Generic `DataTableColumnsMenu<Row>`; `ref` → `HTMLButtonElement`. The column chooser outside the table, for the page's tools: a soft Button «Колонки» with the count of shown columns, opening the same menu as `columnsMenu`. Bound to the table's state.",
-      ru: "Выбор колонок вне таблицы, для инструментов страницы: мягкая кнопка «Колонки» с числом показанных колонок, открывает то же меню, что `columnsMenu`. Связан с состоянием таблицы.",
+      en: "Generic `DataTableColumnsMenu<Row>`; `ref` → `HTMLButtonElement`. The column chooser outside the table, for its tools: the kit's one view trigger (the columns icon, «Вид», the count of shown columns) opening the same menu as `columnsMenu`. Bound to the table's state.",
+      ru: "Выбор колонок вне таблицы, для её инструментов: единая кнопка вида кита (иконка колонок, «Вид», число показанных колонок) открывает то же меню, что `columnsMenu`. Связан с состоянием таблицы.",
       props: [
         {
           name: "columns",
@@ -483,11 +484,18 @@ export const api: ComponentApi = {
           ru: "Скрытые колонки: тот же список, что читает `hiddenColumns` таблицы.",
         },
         {
+          name: "defaultHiddenColumns",
+          type: "string[]",
+          default: "[]",
+          en: "The default view: the hidden columns «По умолчанию» puts back (with the order of `columns`).",
+          ru: "Вид по умолчанию: скрытые колонки, которые возвращает «По умолчанию» (вместе с порядком `columns`).",
+        },
+        {
           name: "onHiddenColumnsChange",
           type: "(hiddenColumns: string[]) => void",
           required: true,
-          en: "A column was shown or hidden, or «Показать все».",
-          ru: "Колонку показали или скрыли, или нажали «Показать все».",
+          en: "A column was shown or hidden, or «По умолчанию» put `defaultHiddenColumns` back.",
+          ru: "Колонку показали или скрыли, или «По умолчанию» вернул `defaultHiddenColumns`.",
         },
         {
           name: "columnOrder",
@@ -498,8 +506,8 @@ export const api: ComponentApi = {
         {
           name: "onColumnOrderChange",
           type: "(columnOrder: string[]) => void",
-          en: "Turns the items into a sortable list (a grip, Alt + ↑ / ↓) with «Исходный порядок»; the new order of every column.",
-          ru: "Делает пункты сортируемым списком (ручка, Alt + ↑ / ↓) с «Исходный порядок»; новый порядок всех колонок.",
+          en: "Turns the items into a sortable list (a grip, Alt + ↑ / ↓); «По умолчанию» puts the order of `columns` back too. The new order of every column.",
+          ru: "Делает пункты сортируемым списком (ручка, Alt + ↑ / ↓); «По умолчанию» возвращает и порядок `columns`. Новый порядок всех колонок.",
         },
         {
           name: "size",
@@ -511,8 +519,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<DataTableColumnsMenuLabels>",
-          en: "The chooser's strings: `columns`, `showColumns`, `showAllColumns`, `resetColumnOrder`, `reorderColumn`.",
-          ru: "Строки выбора: `columns`, `showColumns`, `showAllColumns`, `resetColumnOrder`, `reorderColumn`.",
+          en: "The chooser's strings: `view`, `showColumns`, `resetColumns`, `reorderColumn`.",
+          ru: "Строки выбора: `view`, `showColumns`, `resetColumns`, `reorderColumn`.",
         },
         {
           name: "…rest",
@@ -650,89 +658,97 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: labelRows(DATA_TABLE_LABELS, {
-    loading: {
-      en: "Screen-reader status while skeleton rows are shown.",
-      ru: "Статус для скринридера, пока видны скелетоны.",
-    },
-    empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
-    range: {
-      en: "Footer range line with `showRange`; `{from}`, `{to}`, `{total}` are replaced.",
-      ru: "Строка диапазона в подвале при `showRange`; `{from}`, `{to}`, `{total}` заменяются.",
-    },
-    loadingMore: {
-      en: "Footer status while more rows load (`loadingMore` or a pending `onLoadMore`); announced politely.",
-      ru: "Статус в подвале, пока догружаются строки (`loadingMore` или незавершённый `onLoadMore`); объявляется вежливо.",
-    },
-    selectAll: {
-      en: "Name of the head «select all» checkbox.",
-      ru: "Имя флажка «выбрать все» в шапке.",
-    },
-    selectRow: {
-      en: "Name of a row checkbox; `{label}` is `getRowLabel(row)`, empty without it.",
-      ru: "Имя флажка строки; `{label}` — `getRowLabel(row)`, без него пусто.",
-    },
-    selectedCount: {
-      en: "Polite announcement after the selection changes.",
-      ru: "Вежливое объявление после смены выбора.",
-    },
-    selectionActions: {
-      en: "Text of the menu button of the actions on the selected rows; its name adds the count.",
-      ru: "Текст кнопки меню действий над выбранными строками; к её имени добавляется счётчик.",
-    },
-    clearSelection: {
-      en: "The first item of the selection actions menu: clears the selection.",
-      ru: "Первый пункт меню действий над выбором: снимает выбор.",
-    },
-    expand: {
-      en: "Name of the toggle of a collapsed row.",
-      ru: "Имя переключателя свёрнутой строки.",
-    },
-    collapse: {
-      en: "Name of the toggle of an expanded row.",
-      ru: "Имя переключателя раскрытой строки.",
-    },
-    columns: {
-      en: "Name and tooltip of the icon trigger (`columnsMenu`), the text of `DataTableColumnsMenu`; `{shown}` and `{total}` are column counts.",
-      ru: "Имя и подсказка кнопки-иконки (`columnsMenu`), текст `DataTableColumnsMenu`; `{shown}` и `{total}` — число колонок.",
-    },
-    showColumns: {
-      en: "The heading of the chooser's list of columns.",
-      ru: "Заголовок списка колонок в выборе.",
-    },
-    showAllColumns: {
-      en: "The column chooser item that shows every column again.",
-      ru: "Пункт выбора колонок, который возвращает все колонки.",
-    },
-    resetColumnOrder: {
-      en: "The column chooser item that puts the order of `columns` back (`columnOrder`).",
-      ru: "Пункт выбора колонок, который возвращает порядок `columns` (`columnOrder`).",
-    },
-    reorderColumn: {
-      en: "Name of a column's grip in the column chooser (`columnOrder`); `{label}` is its header.",
-      ru: "Имя ручки колонки в выборе колонок (`columnOrder`); `{label}` — её заголовок.",
-    },
-    reorderRow: {
-      en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`.",
-      ru: "`aria-label` ручки строки (`onReorder`); `{label}` — `getRowLabel(row)`.",
-    },
-    reorderSorted: {
-      en: "Tooltip of the disabled handles while the table is sorted by a column.",
-      ru: "Подсказка неактивных ручек, пока таблица отсортирована по колонке.",
-    },
-    expandGroup: {
-      en: "Name of the toggle of a collapsed group; `{group}` is the group key.",
-      ru: "Имя переключателя свёрнутой группы; `{group}` — ключ группы.",
-    },
-    collapseGroup: {
-      en: "Name of the toggle of an expanded group; `{group}` is the group key.",
-      ru: "Имя переключателя развёрнутой группы; `{group}` — ключ группы.",
-    },
-    columnInfo: {
-      en: "Name of the info glyph of a column with a `description`; the tooltip holds the text.",
-      ru: "Имя значка колонки с `description`; текст — в подсказке.",
-    },
-  }),
+  labels: [
+    ...labelRows(DATA_TABLE_LABELS, {
+      loading: {
+        en: "Screen-reader status while skeleton rows are shown.",
+        ru: "Статус для скринридера, пока видны скелетоны.",
+      },
+      empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
+      range: {
+        en: "Footer range line with `showRange`; `{from}`, `{to}`, `{total}` are replaced.",
+        ru: "Строка диапазона в подвале при `showRange`; `{from}`, `{to}`, `{total}` заменяются.",
+      },
+      loadingMore: {
+        en: "Footer status while more rows load (`loadingMore` or a pending `onLoadMore`); announced politely.",
+        ru: "Статус в подвале, пока догружаются строки (`loadingMore` или незавершённый `onLoadMore`); объявляется вежливо.",
+      },
+      selectAll: {
+        en: "Name of the head «select all» checkbox.",
+        ru: "Имя флажка «выбрать все» в шапке.",
+      },
+      selectRow: {
+        en: "Name of a row checkbox; `{label}` is `getRowLabel(row)`, empty without it.",
+        ru: "Имя флажка строки; `{label}` — `getRowLabel(row)`, без него пусто.",
+      },
+      selectedCount: {
+        en: "Polite announcement after the selection changes.",
+        ru: "Вежливое объявление после смены выбора.",
+      },
+      selectionActions: {
+        en: "Text of the menu button of the actions on the selected rows; its name adds the count.",
+        ru: "Текст кнопки меню действий над выбранными строками; к её имени добавляется счётчик.",
+      },
+      clearSelection: {
+        en: "The first item of the selection actions menu: clears the selection.",
+        ru: "Первый пункт меню действий над выбором: снимает выбор.",
+      },
+      expand: {
+        en: "Name of the toggle of a collapsed row.",
+        ru: "Имя переключателя свёрнутой строки.",
+      },
+      collapse: {
+        en: "Name of the toggle of an expanded row.",
+        ru: "Имя переключателя раскрытой строки.",
+      },
+      columns: {
+        en: "Name and tooltip of the icon trigger (`columnsMenu`); `{shown}` and `{total}` are column counts.",
+        ru: "Имя и подсказка кнопки-иконки (`columnsMenu`); `{shown}` и `{total}` — число колонок.",
+      },
+      showColumns: {
+        en: "The heading of the chooser's list of columns.",
+        ru: "Заголовок списка колонок в выборе.",
+      },
+      resetColumns: {
+        en: "The column chooser item that puts the default hidden columns and the order of `columns` back; shown only while the view differs.",
+        ru: "Пункт выбора колонок, который возвращает скрытые по умолчанию колонки и порядок `columns`; виден, только пока вид отличается.",
+      },
+      reorderColumn: {
+        en: "Name of a column's grip in the column chooser (`columnOrder`); `{label}` is its header.",
+        ru: "Имя ручки колонки в выборе колонок (`columnOrder`); `{label}` — её заголовок.",
+      },
+      reorderRow: {
+        en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`.",
+        ru: "`aria-label` ручки строки (`onReorder`); `{label}` — `getRowLabel(row)`.",
+      },
+      reorderSorted: {
+        en: "Tooltip of the disabled handles while the table is sorted by a column.",
+        ru: "Подсказка неактивных ручек, пока таблица отсортирована по колонке.",
+      },
+      expandGroup: {
+        en: "Name of the toggle of a collapsed group; `{group}` is the group key.",
+        ru: "Имя переключателя свёрнутой группы; `{group}` — ключ группы.",
+      },
+      collapseGroup: {
+        en: "Name of the toggle of an expanded group; `{group}` is the group key.",
+        ru: "Имя переключателя развёрнутой группы; `{group}` — ключ группы.",
+      },
+      columnInfo: {
+        en: "Name of the info glyph of a column with a `description`; the tooltip holds the text.",
+        ru: "Имя значка колонки с `description`; текст — в подсказке.",
+      },
+    }),
+    ...labelRows(
+      { view: DATA_TABLE_COLUMNS_MENU_LABELS.view },
+      {
+        view: {
+          en: "Text of the trigger of `DataTableColumnsMenu`.",
+          ru: "Текст кнопки `DataTableColumnsMenu`.",
+          part: "DataTableColumnsMenu",
+        },
+      },
+    ),
+  ],
   accessibility: {
     keyboard: [
       {

@@ -29,7 +29,7 @@
   cursor: pointer;
   transition:
     background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
@@ -38,9 +38,7 @@
   }
 }
 
-.main:active {
-  transform: scale(var(--prime-motion-press-scale));
-}
+/* The press is `press.press`, joined in TSX. */
 
 .main:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);

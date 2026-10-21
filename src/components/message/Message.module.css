@@ -356,16 +356,13 @@
 }
 
 /* A press on a part that opens something (a picture's tile): the whole message gives in a little,
-   as one surface — never the part alone inside the bubble's clip. */
+   as one surface — never the part alone inside the bubble's clip (`press.pressHeld`, joined in
+   TSX, held by `holdPress`). */
 .column {
   transition:
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     filter var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.column[data-pressed] {
-  scale: var(--prime-motion-press-scale);
 }
 
 [data-message-list][data-selecting] .root:not([data-selected]) > :is(.gutter, .column, .retry),
@@ -487,7 +484,7 @@
   text-align: start;
   transition:
     background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* In an outgoing bubble the quote takes the bubble's accent, whoever wrote the original. */
@@ -505,9 +502,7 @@ button.reply {
   }
 }
 
-button.reply:active {
-  transform: scale(var(--prime-motion-press-scale));
-}
+/* A quote that jumps gives under a press: `press.press`, joined in TSX. */
 
 button.reply:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
@@ -787,7 +782,7 @@ button.reply:focus-visible {
   transition:
     --msg-chip-fill var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /*
@@ -820,9 +815,7 @@ button.reply:focus-visible {
   }
 }
 
-.reaction:not(:disabled):active {
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
+/* The press is `press.pressCompact`, joined in TSX. */
 
 .reaction:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
@@ -928,15 +921,6 @@ button.reply:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .column[data-pressed] {
-    scale: none;
-  }
-
-  .reaction:active,
-  button.reply:active {
-    transform: none;
-  }
-
   /* No blink (its clock is zero): the others stand back (the list lets a jump's go after a
      moment). */
   [data-message-list][data-pointing]

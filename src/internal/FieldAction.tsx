@@ -68,6 +68,34 @@ export function FieldActionButton({
   );
 }
 
+type FieldSectionButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/**
+ * A labelled section at a field's end (the filter section after a search): the same segment as
+ * `FieldActionButton` — full field height, hover wash, press, inset focus ring, touch hit area — but
+ * as wide as its content (an icon, a text, a count) and named by it, parted from what comes before
+ * by its own faint start line.
+ */
+export function FieldSectionButton({
+  className,
+  type = "button",
+  ref,
+  ...rest
+}: FieldSectionButtonProps) {
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      type={type}
+      className={cx(fieldActionClass, styles.section, className)}
+      data-field-action=""
+      data-field-section=""
+    />
+  );
+}
+
 type CopyState = "idle" | "copied" | "error";
 
 /** How long the copy button says «copied» / «error» before it returns to «copy». */

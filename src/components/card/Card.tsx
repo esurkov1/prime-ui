@@ -8,8 +8,8 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
-import { flattenChildren, splitParts } from "@/internal/parts";
-import press from "@/internal/press.module.css";
+import { flattenChildren, isPart, splitParts } from "@/internal/parts";
+import { press } from "@/internal/press";
 import { useSwapIn } from "@/internal/RegionSwap";
 import rowLink from "@/internal/rowLink.module.css";
 import { Slot, slotChild } from "@/internal/slot";
@@ -284,10 +284,25 @@ export type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
   ref?: React.Ref<HTMLHeadingElement>;
 };
 
-function CardTitle({ as: Tag = "h3", className, ...rest }: CardTitleProps) {
+/**
+ * A `Badge.Root` straight in a title or a value («[У нас] 300 $», «Клиент [300 $]») stands beside
+ * the text on its line, a chip gap apart: the element lays its children out in a row (`.badged`).
+ */
+function hasBadge(children: React.ReactNode): boolean {
+  return flattenChildren(children).some((child) => isPart(child, Badge.Root));
+}
+
+function CardTitle({ as: Tag = "h3", className, children, ...rest }: CardTitleProps) {
   // The call to action leads with a step larger title.
   const role = React.useContext(VariantContext) === "cta" ? textRole.titleM : textRole.titleS;
-  return <Tag className={cx(role, styles.title, className)} {...rest} />;
+  return (
+    <Tag
+      className={cx(role, styles.title, hasBadge(children) && styles.badged, className)}
+      {...rest}
+    >
+      {children}
+    </Tag>
+  );
 }
 CardTitle.displayName = "Card.Title";
 
@@ -468,6 +483,7 @@ function CardValue({ tone, className, children, ...rest }: CardValueProps) {
         styles.value,
         headline && styles.headline,
         textValue && styles.textValue,
+        hasBadge(part.children) && styles.badged,
         tone && textTone.tone,
         part.className,
         className,

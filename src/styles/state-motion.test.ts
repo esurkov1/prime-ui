@@ -25,15 +25,22 @@ describe("state motion", () => {
        */
       const transitions = new Map<string, Set<string>>();
       for (const rule of rules) {
-        if (!/^(\.[\w-]+\s+)*\.[\w-]+$/.test(rule.selector)) continue;
-        const key = rule.selector.split(/\s+/).at(-1) ?? rule.selector;
+        // A zero-specificity default for several classes (`:where(.press, .pressHeld)`) is the
+        // base rule of each.
+        const where = /^:where\(((?:\.[\w-]+,\s*)*\.[\w-]+)\)$/.exec(rule.selector);
+        if (!where && !/^(\.[\w-]+\s+)*\.[\w-]+$/.test(rule.selector)) continue;
+        const keys = where
+          ? (where[1] ?? "").split(/,\s*/)
+          : [rule.selector.split(/\s+/).at(-1) ?? rule.selector];
         for (const decl of rule.decls) {
           if (decl.prop !== "transition" && decl.prop !== "transition-property") continue;
           const names = decl.value
             .split(",")
             .map((item) => item.trim().split(/\s+/)[0] ?? "")
             .filter(Boolean);
-          transitions.set(key, new Set([...(transitions.get(key) ?? []), ...names]));
+          for (const key of keys) {
+            transitions.set(key, new Set([...(transitions.get(key) ?? []), ...names]));
+          }
         }
       }
       for (const rule of rules) {

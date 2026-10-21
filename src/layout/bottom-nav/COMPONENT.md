@@ -108,7 +108,7 @@ Without flags the bar is flat at the screen edge on the surface, with a faint to
 |---|---|---|
 | current | `current` or a router link setting `aria-current` | `aria-current="page"` on the item; flat, its glyph on a `fill-muted` pill |
 | held | a `Page.Guard` that is `busy` or `dirty` on the page | a press on an item stops before it navigates (a router link included); `dirty` asks first, then repeats it |
-| pressed | pointer down | the glyph scales to `--prime-motion-press-scale-compact` (`internal/press`), flat and floating |
+| pressed | pointer down | the glyph gives in by the compact press distance (`internal/press`), flat and floating |
 | overflow | items wider than the bar | the items scroll inside the bar with faded edges; no label is cut |
 | focus | keyboard | focus ring inside the item edge |
 | disabled | `disabled` | `disabled` / `aria-disabled`, `data-disabled` |

@@ -88,8 +88,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Title",
-      en: "`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s; title-m in `cta`).",
-      ru: "Заголовок карточки (`<h3>`, title-s; в `cta` — title-m).",
+      en: "`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s; title-m in `cta`). A `Badge.Root` inside stands beside the text, 8 apart, centred on its line.",
+      ru: "Заголовок карточки (`<h3>`, title-s; в `cta` — title-m). `Badge.Root` внутри стоит рядом с текстом, через 8, по центру строки.",
       props: [
         {
           name: "as",
@@ -211,8 +211,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Value",
-      en: '`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width, or fixed by `valueSize`; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`.',
-      ru: 'Значение метрики: табличные цифры, размер по шаблону и ширине карточки или фиксированный через `valueSize`; в `stat-text` — body-m medium (title-m с `valueSize="l"`); в `Card.Total` — title-m.',
+      en: '`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width, or fixed by `valueSize`; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`. A `Badge.Root` inside stands beside the text, 8 apart.',
+      ru: 'Значение метрики: табличные цифры, размер по шаблону и ширине карточки или фиксированный через `valueSize`; в `stat-text` — body-m medium (title-m с `valueSize="l"`); в `Card.Total` — title-m. `Badge.Root` внутри стоит рядом с текстом, через 8.',
       props: [
         {
           name: "tone",

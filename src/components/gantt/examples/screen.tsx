@@ -1,4 +1,4 @@
-/** A team schedule as a work screen: the title with the people shown and a toolbar with search, filters, team sections and the primary action in its top bar over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`. */
+/** A team schedule as a work screen: the title with the people shown and a toolbar with search, filters, team sections and the primary action in its top bar over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer; the clients are categories with a legend and a view menu beside the search — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`, `categories`, `GanttCategoriesMenu`. */
 import {
   Avatar,
   Badge,
@@ -11,6 +11,8 @@ import {
   Fieldset,
   Gantt,
   type GanttBar,
+  GanttCategoriesMenu,
+  type GanttCategory,
   type GanttDates,
   Icon,
   Input,
@@ -67,6 +69,13 @@ const CLIENTS: Record<ClientId, { name: string; color: Hue }> = {
   kvartal: { name: "ООО «Зелёный квартал»", color: "pink" },
 };
 
+/** The clients as categories of bars: their hue on the bars, the legend, and «Вид». */
+const CLIENT_CATEGORIES: GanttCategory[] = (Object.keys(CLIENTS) as ClientId[]).map((client) => ({
+  id: client,
+  label: CLIENTS[client].name,
+  color: CLIENTS[client].color,
+}));
+
 const KIND: Record<Kind, string> = {
   project: "Работа по проекту",
   duty: "Внутренняя задача",
@@ -98,7 +107,7 @@ const project = (
   label,
   kind: "project",
   client,
-  color: CLIENTS[client].color,
+  category: client,
   start: at(from),
   end: at(to),
   progress,
@@ -109,6 +118,7 @@ const milestone = (id: string, label: string, client: ClientId, day: number): As
   label,
   kind: "milestone",
   client,
+  category: client,
   tone: "accent",
   start: at(day),
   end: at(day),
@@ -282,6 +292,7 @@ export default function GanttScreenExample() {
   const [team, setTeam] = React.useState("all");
   const [filter, setFilter] = React.useState<SmartFilterValue>({});
   const [search, setSearch] = React.useState("");
+  const [hiddenClients, setHiddenClients] = React.useState<readonly string[]>([]);
   const [selected, setSelected] = React.useState<{ bar: Assignment; person: Person } | null>(null);
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [draft, setDraft] = React.useState<Draft | null>(null);
@@ -412,7 +423,7 @@ export default function GanttScreenExample() {
         label: title,
         kind: "project",
         client,
-        color: CLIENTS[client].color,
+        category: client,
         ...dates,
       },
     ]);
@@ -471,6 +482,12 @@ export default function GanttScreenExample() {
               ))}
             </SegmentedControl.Root>
             <SmartFilter.Toolbar />
+            <GanttCategoriesMenu
+              categories={CLIENT_CATEGORIES}
+              hiddenCategories={hiddenClients}
+              onHiddenCategoriesChange={setHiddenClients}
+              labels={{ categories: "Клиенты" }}
+            />
           </Page.Tools>
           <Page.Actions>
             <Button.Root
@@ -493,7 +510,7 @@ export default function GanttScreenExample() {
           <Gantt<Person, Assignment>
             aria-label="Загрузка команды внедрения"
             className={styles.chart}
-            defaultScale="day"
+            defaultZoom="day"
             scrollHeight="fill"
             loading={loading}
             rows={loading ? [] : rows}
@@ -522,17 +539,9 @@ export default function GanttScreenExample() {
               setDetailOpen(true);
             }}
             renderBarTooltip={(bar) => (bar.client ? CLIENTS[bar.client].name : KIND[bar.kind])}
-            toolbar={
-              <>
-                {/* The legend of client hues: the bar's hue repeats its client, the tooltip names it. */}
-                {(Object.keys(CLIENTS) as ClientId[]).map((client) => (
-                  <Badge.Root key={client} color={CLIENTS[client].color}>
-                    <Badge.Dot />
-                    {CLIENTS[client].name}
-                  </Badge.Root>
-                ))}
-              </>
-            }
+            // The legend of client hues: the bar's hue repeats its client, the tooltip names it.
+            categories={CLIENT_CATEGORIES}
+            hiddenCategories={hiddenClients}
             empty={
               <EmptyPage.Root size="s" role="status" aria-labelledby="schedule-empty">
                 <EmptyPage.Icon>

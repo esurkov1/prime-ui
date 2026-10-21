@@ -74,7 +74,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Title
-`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s; title-m in `cta`).
+`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s; title-m in `cta`). A `Badge.Root` inside stands beside the text, 8 apart, centred on its line.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -133,7 +133,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Value
-`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width, or fixed by `valueSize`; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`.
+`ref` → `HTMLSpanElement`. The metric value: tabular, sized by the template and the card width, or fixed by `valueSize`; body-m medium in `stat-text` (title-m with `valueSize="l"`); title-m in `Card.Total`. A `Badge.Root` inside stands beside the text, 8 apart.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -215,7 +215,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | link arrow | `Card.Link` or `asChild` with a link | the kit's arrow, `aria-hidden`: the last child of `Card.Header` (at its end, centred on its height), or in the top corner of a card without a header |
 | card width | container queries | a record footer puts its note on its own line below 30rem, `split` stacks below 22rem, `Header` wraps below 22rem (a header control under its description, from the text column to the end edge), the `stat-trend` value changes at 20rem / 36rem (unless `valueSize` fixes it), a `stat-text` action drops under the text below 20rem; the dropped end row's buttons and links share the whole content width, an icon-only button keeps its square |
 | hover | `asChild`, a fine pointer | the fill stays (a whole surface never changes its fill, foundation §8); the shadow lifts to `--prime-shadow-overlay` over `fast` |
-| press | `asChild`, `:active` | `scale(--prime-motion-press-scale)` over `fast`; reduced motion keeps it still |
+| press | `asChild`, `:active` | the edges give in by `--prime-motion-press-distance` at any card size (the kit press) over `fast`; reduced motion keeps it still |
 | focus | `asChild`, `:focus-visible` | the focus ring outside the card |
 
 Without `asChild` a card is static: no hover, focus or press of its own. With it: `data-interactive` on the element.
@@ -232,6 +232,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 - The transition arrow of a card that opens stands at the end of its `Card.Header`, centred on the header's height (a two-line head with a picture or a ring included); the title keeps clear of it. Without a header it stands in the top corner.
 - `stat-text` with an action: put the Buttons straight into the root after the text parts — the tile becomes two columns, the label, value and meta in the first, the actions in one end row at their own size, 8 apart, centred on the text (no wrapper, no layout of your own in `Card.Body`).
 - A narrow card (a phone): the end row drops onto its own row under the text — in a `Card.Header` with a description or an icon below 22rem, in a `stat-text` tile below 20rem — and runs from the text column to the end edge: its buttons and links share the whole content width, an icon-only button keeps its square, and a Switch, a caption or a badge keeps its own size at the start.
+- A `Badge.Root` straight in a `Card.Title` or a `Card.Value` («[У нас] 300 $», «Клиент [300 $]») stands before or after the text on its line, centred on it, 8 apart (the gap of `Badge.Group`), at its own chip size; the text wraps in its own box. No space or wrapper of yours.
 - `Card.Link` is an `<a>` with `href`; a record that opens in place (a window, a drawer) takes `asChild` with a `<button>` — it stretches over the card the same way, with the same arrow and focus ring.
 - `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up; in `mini` and a `split` cell it sits in the text column under the value.
 
@@ -300,6 +301,7 @@ No `labels`.
 - A hand-laid grid of action, task and total in `Card.Footer` → the Button, a `Card.Description` (with a `Badge.Dot`) and a `Card.Total` straight in the footer.
 - A `Typography` inside `Card.Value` of a `stat-text` tile → the default value for a fact tile, `valueSize="l"` on the root for a step larger (the Skeleton then keeps the value's height).
 - Tiles of one row at different value sizes → one `valueSize` for the row.
+- A space or a flex wrapper of your own between a Badge and the text in a `Card.Title` or `Card.Value` → the Badge straight beside the text: the kit sets the gap.
 - `stat-trend` KPIs in a drawer laid out in rows of one count only so their values match → `valueSize="m"` on each tile: a row of two and a row of four keep one size.
 - A footer painted with your own background → `Card.Footer divider="fill"`.
 - Skeletons placed by hand inside `Card.Value` → `Card.Root loading`; keep the parts mounted while loading so each holds its place.

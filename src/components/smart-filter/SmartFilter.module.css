@@ -35,6 +35,14 @@
 }
 
 /*
+ * Combined: the filter is the field's last section, a field segment (`internal/FieldAction`) the
+ * full inner height with its own faint start line.
+ */
+.filterSection {
+  flex: none;
+}
+
+/*
  * The panel is a flush Popover: every section is a full-width row and Dividers between them run
  * edge to edge. Each row carries the side padding itself.
  */

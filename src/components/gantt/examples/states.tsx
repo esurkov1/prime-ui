@@ -26,7 +26,7 @@ const NO_VEHICLES: Vehicle[] = [];
 const REPORT_DAY = at(2);
 
 const chartProps = {
-  defaultScale: "day",
+  defaultZoom: "day",
   getRowKey: (vehicle: Vehicle) => vehicle.id,
   getRowLabel: (vehicle: Vehicle) => vehicle.name,
   getRowBars: (vehicle: Vehicle) => vehicle.bars,

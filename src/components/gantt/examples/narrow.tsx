@@ -1,4 +1,4 @@
-/** At 360 px the first column keeps only the avatars, the toolbar moves to its own row and the axis scrolls under the pinned column — `renderRowAvatar`. */
+/** At 360 px the first column keeps only the avatars, the zoom selector over them only its glyph, and the axis beside it slides under a finger and pinches — `renderRowAvatar`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Avatar, Gantt, type GanttBar } from "prime-ui-kit";
 
@@ -38,7 +38,7 @@ export default function GanttNarrowExample() {
     <div className={styles.narrow}>
       <Gantt
         aria-label="Смены курьеров"
-        defaultScale="day"
+        defaultZoom="day"
         rows={COURIERS}
         getRowKey={(courier) => courier.id}
         getRowLabel={(courier) => courier.name}

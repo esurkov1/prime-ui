@@ -12,7 +12,7 @@ import { formatNumber } from "@/internal/formatNumber";
 import { useLabels } from "@/internal/labels";
 import { HUE_CHART } from "@/internal/palette";
 import type { TagRef } from "@/internal/polymorphic";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import { rovingIndex } from "@/internal/rovingFocus";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";

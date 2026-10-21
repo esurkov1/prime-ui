@@ -206,6 +206,7 @@ export const PART_REFS = {
   "FileUpload.ItemProgress": ["HTMLDivElement"],
   Gallery: ["HTMLDivElement"],
   Gantt: ["HTMLDivElement"],
+  GanttCategoriesMenu: ["HTMLButtonElement"],
   "Hint.Root": ["HTMLParagraphElement"],
   "Hint.Icon": ["HTMLSpanElement"],
   "Input.Root": ["HTMLDivElement"],

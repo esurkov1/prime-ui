@@ -132,6 +132,8 @@ export const semanticTokens = {
       inverse: "{color.white}",
     },
     border: {
+      /** The quietest line: a dense grid read through its content (a schedule's day and row lines). */
+      whisper: "{color.gray.50}",
       /** Zone separators inside floating layers (dialog header/footer): only just visible. */
       faint: "{color.gray.75}",
       /** Hairline separators: dividers, table rows. Barely visible by design. */
@@ -478,8 +480,15 @@ export const semanticTokens = {
     loop: "{duration.570}",
     /** Blur that hides a change of shape while two states swap in place (icon → check, letters). */
     blur: "2px",
-    /** `:active` scale of pressable controls; `compact` for icon-only and small targets. */
+    /**
+     * The press (`internal/press`): `distance` is how far the edges of a pressable give in,
+     * whatever its size — the scale is worked out from the element's longer side on the press.
+     * `compact` for icon-only and small targets. `scale` / `scaleCompact` stand in for a press
+     * that was not measured.
+     */
     press: {
+      distance: "2px",
+      distanceCompact: "1px",
       scale: "0.98",
       scaleCompact: "0.96",
     },

@@ -8,6 +8,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { useEnterOnAppear } from "@/internal/partPresence";
+import { press } from "@/internal/press";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 
@@ -98,7 +99,7 @@ export function ChatPinned({
       <div {...rest} className={cx(styles.root, chatStyles.pinned, className)} data-depth={depth}>
         <button
           type="button"
-          className={cx(touchTargetBlockClass, styles.main)}
+          className={cx(touchTargetBlockClass, styles.main, press.press)}
           onClick={() => {
             jump(current.value);
             onSelect?.(current.value);

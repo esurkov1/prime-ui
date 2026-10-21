@@ -29,7 +29,7 @@ import { nodeText } from "@/internal/nodeText";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { RowAction } from "@/internal/RowAction";
 import { rovingIndex } from "@/internal/rovingFocus";
 import sheet from "@/internal/sheet.module.css";

@@ -12,7 +12,7 @@ import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import { leaveGuardCapture } from "@/internal/leaveGuard";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import {
   endIndicatorGlide,

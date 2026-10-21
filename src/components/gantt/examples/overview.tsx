@@ -1,6 +1,6 @@
 /** A project plan: work streams with phases, progress and a launch milestone that move and stretch by pointer or keyboard — `getRowBars`, `onBarChange`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
-import { Gantt, type GanttBar, type GanttDates, Typography } from "prime-ui-kit";
+import { Gantt, type GanttBar, type GanttDates } from "prime-ui-kit";
 import * as React from "react";
 
 type Stream = { id: string; name: string; bars: GanttBar[] };
@@ -72,11 +72,6 @@ export default function GanttOverviewExample() {
       getRowLabel={(stream) => stream.name}
       getRowBars={(stream) => stream.bars}
       onBarChange={moveBar}
-      toolbar={
-        <Typography as="h3" variant="title-s">
-          Личный кабинет 2.0
-        </Typography>
-      }
     />
   );
 }

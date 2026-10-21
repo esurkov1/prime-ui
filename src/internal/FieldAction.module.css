@@ -39,6 +39,36 @@
   background: var(--prime-color-fill-subtle-active);
 }
 
+/*
+ * A labelled section (`FieldSectionButton`): as wide as its content with the field padding on both
+ * sides, in the field's text; it closes the gap before it and draws its own faint start line, inset
+ * by the tier gap. The line is a translucent tint, not a Divider: a Divider is drawn for a
+ * surface (`border-subtle` on the layer) and vanishes on the field fill; the tint reads on every
+ * fill of the ladder in both themes.
+ */
+.section {
+  position: relative;
+  gap: var(--field-gap);
+  width: auto;
+  padding-inline: var(--field-px);
+  margin-inline-start: calc(var(--field-gap) * -1);
+  color: var(--prime-color-text-secondary);
+  font: inherit;
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  white-space: nowrap;
+}
+
+.section::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--field-gap);
+  inset-inline-start: 0;
+  width: var(--prime-border-width);
+  background: var(--prime-color-fill-subtle-active);
+  pointer-events: none;
+}
+
 .action:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);

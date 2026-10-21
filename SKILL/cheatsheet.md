@@ -17,7 +17,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Set `size` on the root (`Input.Root size="s"`, `Select.Root size="s"`) — not on `Input.Field` or `Select.Trigger`.
 - One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit.
 - Inside a sized host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave the kit controls without `size` — the host passes its tier ([the host tier](api-contract.md#size-and-the-host-tier)).
-- A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="soft" tone="neutral">` (an icon-only one `variant="ghost"`).
+- A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="soft" tone="neutral">` (an icon-only one `variant="ghost"` among text, `soft` beside a soft button).
 
 ## Structure
 
@@ -71,7 +71,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Every glyph from the kit, in this order: a semantic `<Icon name="action.add" />` ([names](api-contract.md#icons)); else the full animated set `import { ArchiveIcon } from "prime-ui-kit/icons"` → `<ArchiveIcon />` (Lucide name + `Icon`); only a glyph neither has → `const IconTractor = createIcon(Tractor)` once, then `<IconTractor />` — not `import { Plus } from "lucide-react"` in JSX, another icon library or an inline `<svg>`.
 - Kit icons animate by themselves: the gesture plays when their button, link, tab, menu item or row is hovered or pressed — not your own hover rotate or spin on an icon. `animated={false}` only for a glyph repeated in every row of a long list.
 - Put icons into the part: `<Button.Icon>`, `<Input.Icon side="start">`, `<Sidebar.ItemIcon>`, `<Dropdown.ItemIcon>`, `<EmptyPage.Icon>` — not an `icon` prop (only data arrays such as `notify()` take `icon`).
-- Icon-only button: `<Button.Root variant="ghost" tone="neutral" aria-label="Удалить">` with a `Tooltip` — not an unnamed icon.
+- Icon-only button: `<Button.Root variant="ghost" tone="neutral" aria-label="Удалить">` with a `Tooltip` — not an unnamed icon; `ghost` only where its neighbours have no fill (a dialog header, a table cell), `variant="soft"` at their height beside fields and soft buttons ([icon button fill](composition.md#an-icon-button-takes-its-neighbours-fill)).
 - `lucide-react` only through `createIcon`, for a glyph missing from both `<Icon name>` and `prime-ui-kit/icons` — not for `Plus`, `Search`, `Bell`, `Settings`…
 
 ## Buttons and actions

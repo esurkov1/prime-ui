@@ -17,6 +17,7 @@ import { defineMessagePart, useMessageHighlight, useMessagePart } from "@/intern
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { hueOf } from "@/internal/palette";
 import palette from "@/internal/palette.module.css";
+import { press } from "@/internal/press";
 import { RollingNumber } from "@/internal/RollingNumber";
 import type { RichTextLinkClick, TextEntity } from "@/internal/richText";
 import { RichText } from "@/internal/richText";
@@ -301,6 +302,7 @@ export function MessageReply({
   return onClick || target !== undefined ? (
     <InteractiveElement
       {...props}
+      className={cx(props.className, press.press)}
       element="button"
       onClick={(event) => {
         if (target !== undefined) reveal(target, true);
@@ -643,7 +645,7 @@ function ReactionChip({ reaction, labels, pending, toggle }: ReactionChipProps) 
         data-message-chip=""
         data-morph-pop=""
         data-reaction={emoji}
-        className={styles.reaction}
+        className={cx(styles.reaction, press.pressCompact)}
         aria-label={reactionName(reaction, labels)}
         aria-pressed={reaction.selected ?? false}
         aria-busy={pending || undefined}

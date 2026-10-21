@@ -350,13 +350,20 @@ export type { GalleryItem, GalleryLabels, GalleryProps } from "./gallery/Gallery
 export { Gallery } from "./gallery/Gallery";
 export type {
   GanttBar,
+  GanttCategory,
   GanttDates,
   GanttLabels,
   GanttProps,
   GanttRowClickEvent,
-  GanttScale,
+  GanttZoom,
+  GanttZoomPreset,
 } from "./gantt/Gantt";
 export { Gantt } from "./gantt/Gantt";
+export type {
+  GanttCategoriesMenuLabels,
+  GanttCategoriesMenuProps,
+} from "./gantt/GanttCategoriesMenu";
+export { GanttCategoriesMenu } from "./gantt/GanttCategoriesMenu";
 export type { HintIconProps, HintRootProps } from "./hint/Hint";
 export { Hint } from "./hint/Hint";
 export type {

@@ -186,6 +186,19 @@
   overflow-wrap: anywhere;
 }
 
+/* A Badge straight in a title or a value (TSX: `hasBadge`): it stands beside the text, centred on
+   the text line, the chip gap of `Badge.Group` apart; the text keeps wrapping in its own box. */
+.badged {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.header > .value.badged,
+.end > .value.badged {
+  justify-content: flex-end;
+}
+
 /* The line-of-text value of `stat-text`: body-m (joined in TSX) at medium weight, so it reads as a
    value beside the text; `.value.textValue` outranks the role class in any bundle order. */
 .value.textValue {

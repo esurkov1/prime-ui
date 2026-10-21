@@ -113,7 +113,7 @@ Do not mix action segments and toggle segments in one group, and do not put the 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| hover / press | pointer | hover `fill-muted-hover` + primary text; a press scales the segment to `--prime-motion-press-scale` (`-compact` for icon-only segments, `internal/press`) and keeps its fill; disabled never scales |
+| hover / press | pointer | hover `fill-muted-hover` + primary text; a press gives the segment in by `--prime-motion-press-distance` (`-compact` for icon-only segments, `internal/press`) and keeps its fill; disabled never scales |
 | pressed | `pressed` | `aria-pressed` (the look is styled from it), `data-state="active" \| "inactive"` |
 | disabled | `disabled` on an Item, or a disabled `Fieldset` around the group | native `:disabled`: `fill-muted` + `text-disabled`, `cursor: not-allowed` |
 | focus-visible | keyboard | in a row the ring is inside the segment (the row scrolls, it clips); in a column the outer ring; the segment is raised above its neighbours |

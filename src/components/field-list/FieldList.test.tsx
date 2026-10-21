@@ -552,6 +552,26 @@ describe("FieldList", () => {
     for (const row of Array.from(rowsOf())) expect(row).toHaveAttribute("data-size", "s");
   });
 
+  it("ends a row on a filled edge: the «×» and the «⋯» are soft neutral at the row's field tier", () => {
+    const { rerender } = render(
+      <ControlSizeProvider value="l">
+        <Lines />
+      </ControlSizeProvider>,
+    );
+    const remove = screen.getByRole("button", { name: "Удалить: «Внедрение»" });
+    expect(remove).toHaveAttribute("data-variant", "soft");
+    expect(remove).toHaveAttribute("data-tone", "neutral");
+    expect(remove).toHaveAttribute("data-size", "l");
+    rerender(
+      <ControlSizeProvider value="l">
+        <Lines rowActions="menu" reorderable />
+      </ControlSizeProvider>,
+    );
+    const more = screen.getByRole("button", { name: "Действия: «Внедрение»" });
+    expect(more).toHaveAttribute("data-variant", "soft");
+    expect(more).toHaveAttribute("data-size", "l");
+  });
+
   it("disables every field and button", () => {
     render(<Lines disabled reorderable />);
     for (const field of screen.getAllByRole("textbox")) expect(field).toBeDisabled();

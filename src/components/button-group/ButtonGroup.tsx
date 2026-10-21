@@ -14,7 +14,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
 import { iconLayout } from "@/internal/iconLayout";
 import { useLabels } from "@/internal/labels";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import type { ControlSize } from "@/internal/states";
 

@@ -8,7 +8,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { type FieldIds, FieldSupport, useErrorShake, useLeavingError } from "@/internal/FieldFrame";
 import { fieldTierClass } from "@/internal/fieldClasses";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import type { CheckState, ControlSize } from "@/internal/states";
 import { touchTargetClass } from "@/internal/touchTarget";
 

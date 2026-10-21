@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Icon } from "@/icons";
 
-import { FieldActionButton, FieldCopyButton } from "./FieldAction";
+import { FieldActionButton, FieldCopyButton, FieldSectionButton } from "./FieldAction";
 
 const LABELS = { copy: "Копировать", copied: "Скопировано", copyError: "Не удалось скопировать" };
 
@@ -74,5 +74,23 @@ describe("FieldCopyButton", () => {
     });
     expect(screen.getByRole("status")).toHaveTextContent("Не удалось скопировать");
     vi.unstubAllGlobals();
+  });
+});
+
+describe("FieldSectionButton", () => {
+  it("is a field segment named by its content, with no tooltip", () => {
+    render(
+      <FieldSectionButton aria-expanded={false}>
+        <Icon name="action.filter" />
+        Фильтр
+      </FieldSectionButton>,
+    );
+    const button = screen.getByRole("button", { name: "Фильтр" });
+    expect(button).toHaveAttribute("type", "button");
+    expect(button).toHaveAttribute("data-field-action", "");
+    expect(button).toHaveAttribute("data-field-section", "");
+    expect(button).not.toHaveAttribute("aria-label");
+    fireEvent.focus(button);
+    expect(screen.queryByRole("tooltip")).toBeNull();
   });
 });

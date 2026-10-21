@@ -83,7 +83,7 @@ export default function GanttLargeExample() {
   return (
     <Gantt
       aria-label="Загрузка компании"
-      defaultScale="day"
+      defaultZoom="day"
       range={RANGE}
       scrollHeight={480}
       rows={team}

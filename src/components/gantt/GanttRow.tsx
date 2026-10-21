@@ -10,25 +10,31 @@ import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import palette from "@/internal/palette.module.css";
 import { isPlainClick, opensRow } from "@/internal/rowLink";
-import { stepDown } from "@/internal/states";
+import { type PaletteColor, stepDown } from "@/internal/states";
 
 import styles from "./Gantt.module.css";
-import { GanttBarView } from "./GanttBar";
+import { GanttBarView, useDateGlide } from "./GanttBar";
 import {
   barEdit,
   daysBetween,
   formatSpan,
   type GanttBar,
   type GanttDates,
-  type GanttScale,
+  type TimeStep,
 } from "./ganttModel";
+import { type TimeScene, toPx } from "./timeCore";
 
-/** A bar being created: drawn by the pointer, waiting for `onBarCreate`, or fading after a refusal. */
+/**
+ * A bar being created: the phantom a press would create (under the mouse, at the `N` slot of a
+ * focused row header), drawn by the pointer, waiting for `onBarCreate`, or fading after a refusal.
+ * One element from the phantom on: a drawing grows from it.
+ */
 export type GanttGhost = {
   id: string;
   dates: GanttDates;
-  status: "drawing" | "pending" | "leaving";
+  status: "phantom" | "drawing" | "pending" | "leaving";
 };
 
 export type GanttTrackEvent =
@@ -46,6 +52,8 @@ export type GanttTrackEvent =
  */
 export type GanttRowContext = {
   register: (id: string) => React.RefCallback<HTMLElement>;
+  /** The ref of a row's time layer: the chart's slide moves it with the head and the grid. */
+  layer: (node: HTMLElement | null) => (() => void) | undefined;
   focus: (id: string) => void;
   open: (barId: string, rowIndex: number) => void;
   /** `onRowClick` of the row at `rowIndex`. */
@@ -55,15 +63,19 @@ export type GanttRowContext = {
   ) => void;
   commit: (barId: string, rowIndex: number, dates: GanttDates) => void;
   nameFor: (bar: GanttBar, dates: GanttDates) => string;
+  /** The hue of a bar's category (`categories`). */
+  categoryColor: (bar: GanttBar) => PaletteColor | undefined;
   formatDuration: (days: number) => string;
   track: (event: GanttTrackEvent, rowIndex: number, native: React.SyntheticEvent) => void;
   registerTip: (id: string, close: (() => void) | null) => void;
   /** Whether enough of the cell is visible on the timeline for a tooltip to point at it. */
   canShowTip: (id: string) => boolean;
   onDragChange: (id: string, dragging: boolean) => void;
-  dayPx: () => number;
   direction: () => 1 | -1;
-  scrollLeft: () => number;
+  /** The day at the start of the view now (`timeCore`). */
+  viewStart: () => number;
+  /** A touch pointer a bar or a drawing holds: the chart does not slide under it. */
+  claimPointer: (pointerId: number, held: boolean) => void;
   autoScroll: { follow: (clientX: number, onScrolled: () => void) => void; stop: () => void };
 };
 
@@ -89,15 +101,16 @@ export type GanttRowProps = {
   clickable: boolean;
   ghost: GanttGhost | undefined;
   ghostLane: number;
-  hover: { x: number; span: number } | null;
   /** The chart's tab stop when it is in this row, else `null`. */
   tabStop: string | null;
   pending: ReadonlyMap<string, GanttDates>;
   dragging: ReadonlySet<string>;
-  /** Visible time window in days (`from` > `to` — no window yet: render every bar). */
-  windowFrom: number;
-  windowTo: number;
-  scale: GanttScale;
+  /** What is laid out (`timeCore`): bars outside it are not rendered. */
+  scene: TimeScene;
+  /** The bar height, px: a milestone's box. */
+  barH: number;
+  /** The grid's coarse step: what a drag with Alt lands on (see `GanttBarView`). */
+  snap: TimeStep;
   rangeStart: number;
   locale: Locale;
   newBarLabel: string;
@@ -126,13 +139,12 @@ function GanttRowView({
   clickable,
   ghost,
   ghostLane,
-  hover,
   tabStop,
   pending,
   dragging,
-  windowFrom,
-  windowTo,
-  scale,
+  scene,
+  barH,
+  snap,
   rangeStart,
   locale,
   newBarLabel,
@@ -144,7 +156,6 @@ function GanttRowView({
 }: GanttRowProps) {
   const barTier = stepDown(useControlSize(undefined));
   const start = new Date(rangeStart);
-  const windowed = windowFrom <= windowTo;
   const on = (event: GanttTrackEvent) => (native: React.SyntheticEvent) =>
     ctx.track(event, index, native);
 
@@ -240,85 +251,147 @@ function GanttRowView({
         onContextMenu={creatable ? on("contextMenu") : undefined}
         onDoubleClick={creatable ? on("doubleClick") : undefined}
       >
-        {hover && !ghost ? (
-          <span
-            className={cx(styles.createCell, enterMotion.enterFade)}
-            style={{ "--x": hover.x, "--span": hover.span } as React.CSSProperties}
-            aria-hidden="true"
-          >
-            <Icon name="action.add" animated={false} />
-          </span>
-        ) : null}
-        {bars.map((bar) => {
-          const dates = pending.get(bar.id) ?? bar;
-          const x = daysBetween(start, dates.start);
-          const span = Math.max(daysBetween(dates.start, dates.end), 1);
-          const pinned = pending.has(bar.id) || dragging.has(bar.id) || tabStop === bar.id;
-          const edit = editableAtAll && !pending.has(bar.id) ? barEdit(bar, dates) : "none";
-          if (windowed && !pinned && (x + span < windowFrom || x > windowTo)) return null;
-          return (
-            <GanttBarView
-              key={bar.id}
-              bar={bar}
-              dates={dates}
-              x={x}
-              lane={lanes.get(bar.id) ?? 0}
-              scale={scale}
+        {/* The row's time layer: laid out from the scene's origin, slid with the head and grid. */}
+        <div
+          ref={ctx.layer}
+          className={styles.layer}
+          data-gantt-layer=""
+          style={{ width: `${scene.widthPx}px` }}
+        >
+          {bars.map((bar) => {
+            const dates = pending.get(bar.id) ?? bar;
+            const x = daysBetween(start, dates.start);
+            const span = Math.max(daysBetween(dates.start, dates.end), 1);
+            const pinned = pending.has(bar.id) || dragging.has(bar.id) || tabStop === bar.id;
+            const edit = editableAtAll && !pending.has(bar.id) ? barEdit(bar, dates) : "none";
+            if (!pinned && (x + span < scene.from || x > scene.to)) return null;
+            return (
+              <GanttBarView
+                key={bar.id}
+                bar={bar}
+                categoryColor={ctx.categoryColor(bar)}
+                dates={dates}
+                x={x}
+                lane={lanes.get(bar.id) ?? 0}
+                scene={scene}
+                barH={barH}
+                snap={snap}
+                locale={locale}
+                nameFor={(shown) => ctx.nameFor(bar, shown)}
+                formatDuration={ctx.formatDuration}
+                renderTip={renderBarTooltip ? () => renderBarTooltip(bar, row) : undefined}
+                edit={edit}
+                pending={pending.has(bar.id)}
+                active={tabStop === bar.id}
+                hintId={edit === "end" ? endHintId : hintId}
+                direction={ctx.direction}
+                viewStart={ctx.viewStart}
+                claimPointer={ctx.claimPointer}
+                autoScroll={ctx.autoScroll}
+                onActivate={() => ctx.open(bar.id, index)}
+                onFocusBar={() => ctx.focus(bar.id)}
+                onTipChange={ctx.registerTip}
+                canShowTip={ctx.canShowTip}
+                onCommit={(next) => ctx.commit(bar.id, index, next)}
+                onDragChange={ctx.onDragChange}
+                barRef={ctx.register(bar.id)}
+              />
+            );
+          })}
+          {ghost ? (
+            <GanttGhostView
+              ghost={ghost}
+              lane={ghostLane}
+              start={start}
+              scene={scene}
               locale={locale}
-              nameFor={(shown) => ctx.nameFor(bar, shown)}
-              formatDuration={ctx.formatDuration}
-              renderTip={renderBarTooltip ? () => renderBarTooltip(bar, row) : undefined}
-              edit={edit}
-              pending={pending.has(bar.id)}
-              active={tabStop === bar.id}
-              hintId={edit === "end" ? endHintId : hintId}
-              dayPx={ctx.dayPx}
+              label={newBarLabel}
               direction={ctx.direction}
-              scrollLeft={ctx.scrollLeft}
-              autoScroll={ctx.autoScroll}
-              onActivate={() => ctx.open(bar.id, index)}
-              onFocusBar={() => ctx.focus(bar.id)}
-              onTipChange={ctx.registerTip}
-              canShowTip={ctx.canShowTip}
-              onCommit={(next) => ctx.commit(bar.id, index, next)}
-              onDragChange={ctx.onDragChange}
-              barRef={ctx.register(bar.id)}
+              formatDuration={ctx.formatDuration}
             />
-          );
-        })}
-        {ghost ? (
-          <Tooltip.Root open={ghost.status === "drawing"}>
-            <Tooltip.Trigger>
-              <span
-                tabIndex={-1}
-                className={styles.ghost}
-                data-state={ghost.status}
-                aria-hidden="true"
-                style={
-                  {
-                    "--x": daysBetween(start, ghost.dates.start),
-                    "--span": daysBetween(ghost.dates.start, ghost.dates.end),
-                    "--lane": ghostLane,
-                  } as React.CSSProperties
-                }
-              >
-                {ghost.status === "pending" ? (
-                  <Skeleton shape="block" className={styles.ghostBusy} />
-                ) : null}
-                <span className={styles.ghostLabel}>{newBarLabel}</span>
-              </span>
-            </Tooltip.Trigger>
-            <Tooltip.Content>
-              <span className={styles.tipTitle}>{newBarLabel}</span>
-              <span className={styles.tipMeta}>
-                {formatSpan(ghost.dates, locale)} ·{" "}
-                {ctx.formatDuration(daysBetween(ghost.dates.start, ghost.dates.end))}
-              </span>
-            </Tooltip.Content>
-          </Tooltip.Root>
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * The bar being created, one element throughout. Hovered (or picked up by a long press, or at the
+ * `N` slot) it is the phantom: a faint accent wash with «+» and «Новая задача», one unit of the
+ * finest drawn line, stepping with a short glide (`useDateGlide`). Pressed and dragged it is a
+ * real bar in the default hue — its length in days inside, its dates in the tooltip — growing and
+ * shrinking by whole days either way; pending it pulses; refused or dropped it fades out.
+ */
+function GanttGhostView({
+  ghost,
+  lane,
+  start,
+  scene,
+  locale,
+  label,
+  direction,
+  formatDuration,
+}: {
+  ghost: GanttGhost;
+  lane: number;
+  start: Date;
+  scene: TimeScene;
+  locale: Locale;
+  label: string;
+  direction: () => 1 | -1;
+  formatDuration: (days: number) => string;
+}) {
+  const ref = React.useRef<HTMLSpanElement>(null);
+  const x = daysBetween(start, ghost.dates.start);
+  const span = daysBetween(ghost.dates.start, ghost.dates.end);
+  const left = toPx(x, scene);
+  const width = toPx(x + span, scene) - left;
+  useDateGlide(ref, { left, width }, scene, false, direction, "fast");
+  const phantom = ghost.status === "phantom";
+  return (
+    <Tooltip.Root open={ghost.status === "drawing"}>
+      <Tooltip.Trigger>
+        <span
+          ref={ref}
+          tabIndex={-1}
+          className={cx(styles.ghost, !phantom && palette.hue, enterMotion.enterFade)}
+          data-state={ghost.status}
+          data-look={phantom ? "phantom" : "bar"}
+          data-color={phantom ? undefined : "blue"}
+          data-x={x}
+          data-span={span}
+          aria-hidden="true"
+          style={
+            {
+              insetInlineStart: `${left}px`,
+              width: `${width}px`,
+              "--lane": lane,
+            } as React.CSSProperties
+          }
+        >
+          {ghost.status === "pending" ? (
+            <Skeleton shape="block" className={styles.ghostBusy} />
+          ) : null}
+          {phantom ? (
+            <>
+              <span className={styles.ghostIcon}>
+                <Icon name="action.add" animated={false} />
+              </span>
+              <span className={styles.ghostLabel}>{label}</span>
+            </>
+          ) : (
+            <span className={styles.ghostLabel}>{formatDuration(span)}</span>
+          )}
+        </span>
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        <span className={styles.tipTitle}>{label}</span>
+        <span className={styles.tipMeta}>
+          {formatSpan(ghost.dates, locale)} · {formatDuration(span)}
+        </span>
+      </Tooltip.Content>
+    </Tooltip.Root>
   );
 }
 

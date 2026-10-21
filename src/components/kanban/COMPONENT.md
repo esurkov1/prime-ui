@@ -52,7 +52,7 @@ Kanban.Root                          board: horizontal strip of columns, its own
             ├─ Kanban.ItemBadges     wrapping row of Badge (a Badge.Group)
             └─ Kanban.ItemFooter     row: Kanban.ItemCount … at the start, text cut, the last child (assignee, date) at the end
                └─ Kanban.ItemCount   icon + number (an icon alone: the channel)
-KanbanFieldsMenu                     soft Button «Вид» + Dropdown: «На карточке» check items · «По умолчанию»; in Page.Tools beside the filter
+KanbanFieldsMenu                     the kit's view trigger (columns icon · «Вид» · count Badge) + Dropdown: «На карточке» (or `group`) check items, a grip each with `fieldOrder` · «По умолчанию» once changed; in Page.Tools beside the filter
 ```
 Columns and cards are application data (`columns`, `items`); the board state is where each card stands: `value` maps a column id to its card ids in order, and `columnOrder` is the order of the columns. A card in flight is drawn by Dnd as a lifted clone; the column under it opens a gap where it lands.
 
@@ -167,14 +167,17 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### KanbanFieldsMenu
-`ref` → `HTMLButtonElement`. The view of a board's cards, for the page's tools beside the filter: a soft Button «Вид» opening a menu of the card fields to show and «По умолчанию». The cards read the same `hiddenFields`.
+`ref` → `HTMLButtonElement`. The view of a board's cards, for the page's tools: the kit's one view trigger (the columns icon, «Вид», the count of shown fields), a check item per card field and «По умолчанию» once changed. The cards read the same `hiddenFields`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `fields` | `readonly KanbanField[]` | — (required) | The card fields a person may hide: `{ id, label }`, in menu order. |
+| `fields` | `readonly KanbanField[]` | — (required) | The card fields a person may hide or move: `{ id, label, group? }`, in default order; fields with a `group` stand under that heading instead of `labels.fields`. |
 | `hiddenFields` | `readonly string[]` | — | Ids of the hidden fields (controlled). |
 | `defaultHiddenFields` | `readonly string[]` | `[]` | The default view: the initial hidden fields (uncontrolled) and what «По умолчанию» puts back. |
 | `onHiddenFieldsChange` | `(hiddenFields: readonly string[]) => void` | — | A field was shown or hidden, or the default view put back. |
+| `fieldOrder` | `readonly string[]` | — | Ids of the fields in the order the cards draw them (controlled). Any of the triad turns the items into sortable lists: a grip, Alt + ↑ / ↓, a field moves within its group. |
+| `defaultFieldOrder` | `readonly string[]` | — | The initial order (uncontrolled); `[]` starts in the order of `fields`, which «По умолчанию» puts back. |
+| `onFieldOrderChange` | `(fieldOrder: readonly string[]) => void` | — | A field was moved, or «По умолчанию» put the order of `fields` back: the new order of every field. Render the card parts in it. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the trigger and the menu. |
 | `labels` | `Partial<KanbanFieldsMenuLabels>` | — | The menu's strings: `view`, `fields`, `reset`. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "type">` | — | `className` and the other attributes of the trigger button. |
@@ -241,7 +244,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - Rich cards group their parts in `Kanban.ItemSection` zones: parts inside a zone stand `--prime-space-2` apart, zones `--prime-space-3` off a faint line between them (`hairline.between`, `--prime-color-border-faint`); a zone with nothing in it is not drawn and leaves no line. A `Badge fullWidth` plate (the next step) goes first in its zone; facts in a row stand `--prime-space-1` apart.
 - `Kanban.ItemResource`: its mark (kit marks take the `s` tier: a `ProgressCircle` 32 with a short text «18 д») `--prime-space-3` from a body-s medium name over a muted caption, both cut with an ellipsis.
 - `Kanban.ItemHeader` and `Kanban.ItemFooter` cut text with an ellipsis and never shrink their last child, so a long source never pushes the date onto a second line.
-- `KanbanFieldsMenu` holds only the view of the board's cards (not a table's columns): the page decides which parts each card renders from `hiddenFields`.
+- `KanbanFieldsMenu` holds only the view of the board's cards (not a table's columns): the page decides which parts each card renders from `hiddenFields`. Its trigger is the kit's one view trigger — the same soft neutral Button with the `view.columns` icon, «Вид» and the count of shown items as `DataTableColumnsMenu` and `GanttCategoriesMenu` — so a page that switches board ↔ list ↔ schedule keeps one «Вид» in one place, each view's own menu behind it. «По умолчанию» appears (with its separator) only while the view differs from the default (`defaultHiddenFields`, the order of `fields`) and puts both back. With any of the `fieldOrder` triad the items are a `Dnd.Sortable` list per group, a grip ending each item (a held press drags on touch), Alt + ↑ / ↓ on the focused item moves it; a field with a `group` stands under that heading and moves only within it. The cards are yours, so the page renders their parts in `fieldOrder` (`[]` is the order of `fields`) and skips `hiddenFields`.
 - Header actions get the `s` tier; inside a card, kit controls take the `m` host tier (a `Badge` is `s`). Pick a small `Avatar` (`size="s"`).
 
 ## Accessibility
@@ -253,7 +256,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 |---|---|
 | `Tab` | Moves through the cards, column by column. |
 | `Enter` · `Space` | Opens the focused card (`onItemOpen`) or follows its link (`getItemHref`). |
-| `Alt + ↑` · `Alt + ↓` | Moves the card one place inside its column. |
+| `Alt + ↑` · `Alt + ↓` | Moves the card one place inside its column. In `KanbanFieldsMenu` with `fieldOrder`: moves the focused field one place within its group, the focus staying on it. |
 | `Alt + ←` · `Alt + →` | On a card: moves it to the neighbouring column at the same row (or its end). On a column grip: moves the column one place. Focus follows. The direction follows the writing direction (`dir="rtl"`: ← goes forward). |
 | `Escape` | Cancels a drag in flight. |
 
@@ -268,6 +271,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemOpen` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.
 - Touch: a drag starts after a hold; a finger that moves first scrolls the board.
 - A board named by `aria-label` or `aria-labelledby` is a `group` with that name; an unnamed one has no role.
+- `KanbanFieldsMenu` is a menu button named by its text and count («Вид 4»); its items are a group named `labels.fields` of `menuitemcheckbox` with `aria-checked`.
 - While loading the root has `aria-busy`; skeletons are hidden from assistive tech.
 - While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech, a column's busy grip says so itself); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).
 
@@ -294,7 +298,8 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 |---|---|---|
 | `view` | `"Вид"` | Text of the trigger. |
 | `fields` | `"На карточке"` | Heading of the group of card fields. |
-| `reset` | `"По умолчанию"` | The item that puts `defaultHiddenFields` back. |
+| `reset` | `"По умолчанию"` | The item that puts `defaultHiddenFields` and the order of `fields` back. |
+| `reorderField` | `"Переместить поле {label}"` | Name of a field's grip (`fieldOrder`); `{label}` is the field's label. |
 
 ## Examples
 | Example | Shows |
@@ -304,6 +309,8 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [structure.tsx](examples/structure.tsx) | Cards take only the parts they need: a title alone, a meta line, labels, a footer with counts and an assignee — `Kanban.ItemTitle`, `Kanban.ItemDescription`, `Kanban.ItemBadges`, `Kanban.ItemFooter`, `Kanban.ItemCount`. |
 | [cards.tsx](examples/cards.tsx) | Three kinds of cards on one board: a plain note, a ticket with a header row of key and priority, a design task with a cover — `Kanban.ItemHeader`, `Thumbnail`, `Kanban.ItemFooter`. |
 | [deal-cards.tsx](examples/deal-cards.tsx) | Rental deals as rich cards: a title row with the number and the owner, the vehicles with their terms, the next step as a plate, the facts, the source; the view menu hides card fields — `Kanban.ItemSection`, `Kanban.ItemTitle`, `Kanban.ItemResource`, `Kanban.ItemFact`, `KanbanFieldsMenu`. |
+| [field-order.tsx](examples/field-order.tsx) | Project tasks whose view menu shows, hides and reorders the card fields: a grip drags a field (a held press on touch), Alt + ↑ / ↓ moves the focused one, and every card draws its parts in that order — `KanbanFieldsMenu`, `fieldOrder`, `onFieldOrderChange`, `hiddenFields`. |
+| [field-groups.tsx](examples/field-groups.tsx) | Rental deals whose view menu groups the card fields by zone of the card: each group has its heading, a field moves only within its group, and each zone of a card draws its shown fields in their order — `KanbanFieldsMenu`, `fields`, `fieldOrder`, `Kanban.ItemSection`. |
 | [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule, its columns drawn as wells so each reads as a bounded queue: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`, `variant`. |
 | [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures in two lines under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
 | [column-groups.tsx](examples/column-groups.tsx) | A deal board whose stages stand in phases, each phase titled over its columns, and a stage moves only within its phase — `columnGroups`, `reorderableColumns`, `columnOrder`, `onColumnOrderChange`. |
@@ -313,7 +320,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry, and placeholder columns before the columns arrive; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `loadingColumns`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The placement lives in the parent: every move arrives with its source, target and position to save, and a button resets the board — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page — `Kanban.Root`, `columns`. |
-| [screen.tsx](examples/screen.tsx) | A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in its top bar, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. |
+| [screen.tsx](examples/screen.tsx) | A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, one view menu for the view shown, the board / list switch and the one primary action in its top bar, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`, `KanbanFieldsMenu`, `DataTableColumnsMenu`. |
 
 ## Mistakes
 - Returning something other than `Kanban.Item` from `renderItem` → the card does not drag and Alt + arrows do nothing.
@@ -338,5 +345,5 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - Drag as the only way to change a status → keep a status field or a menu in the card details too.
 
 ## Related
-- **Built from:** [Dnd](../dnd/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Dnd](../dnd/COMPONENT.md), [Badge](../badge/COMPONENT.md) (the column count, the view trigger's count), [Avatar](../avatar/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md); `ViewMenu` (`KanbanFieldsMenu`: the kit's one view trigger and menu)
 - **See also:** [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [Timeline](../timeline/COMPONENT.md), [Gantt](../gantt/COMPONENT.md)

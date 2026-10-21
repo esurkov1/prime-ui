@@ -1,7 +1,7 @@
 import surface from "./fieldSurface.module.css";
 import tier from "./fieldTier.module.css";
 import trigger from "./fieldTrigger.module.css";
-import press from "./press.module.css";
+import { press } from "./press";
 import { touchTargetBlockClass } from "./touchTarget";
 
 /** Fill, hover, focus fill + ring, invalid and disabled of a field box (`fieldSurface.module.css`). */

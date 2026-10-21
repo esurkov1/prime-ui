@@ -1159,11 +1159,19 @@ describe("KanbanFieldsMenu", () => {
     { id: "source", label: "Источник" },
   ];
 
+  it("is the kit's view trigger: «Вид» with the count of shown fields", () => {
+    render(<KanbanFieldsMenu fields={FIELDS} defaultHiddenFields={["source"]} />);
+    const trigger = screen.getByRole("button", { name: "Вид 1" });
+    expect(trigger).toHaveAttribute("data-variant", "soft");
+    expect(trigger).toHaveAttribute("data-tone", "neutral");
+    expect(trigger).toHaveTextContent("Вид1");
+  });
+
   it("opens from the keyboard and hides a field with Enter", async () => {
     const onHiddenFieldsChange = vi.fn();
     const user = userEvent.setup();
     render(<KanbanFieldsMenu fields={FIELDS} onHiddenFieldsChange={onHiddenFieldsChange} />);
-    const trigger = screen.getByRole("button", { name: "Вид" });
+    const trigger = screen.getByRole("button", { name: "Вид 2" });
     act(() => trigger.focus());
     await user.keyboard("{Enter}");
     const item = await screen.findByRole("menuitemcheckbox", { name: "Источник" });
@@ -1172,9 +1180,10 @@ describe("KanbanFieldsMenu", () => {
     act(() => item.focus());
     await user.keyboard("{Enter}");
     expect(onHiddenFieldsChange).toHaveBeenLastCalledWith(["source"]);
+    expect(screen.getByRole("button", { name: "Вид 1" })).toBeInTheDocument();
   });
 
-  it("«По умолчанию» puts the default hidden fields back and is off while they are shown", async () => {
+  it("«По умолчанию» comes only with a change and puts the default hidden fields back", async () => {
     const user = userEvent.setup();
     function View() {
       const [hidden, setHidden] = React.useState<readonly string[]>(["vehicles", "source"]);
@@ -1188,11 +1197,11 @@ describe("KanbanFieldsMenu", () => {
       );
     }
     render(<View />);
-    await user.click(screen.getByRole("button", { name: "Вид" }));
-    const reset = await screen.findByRole("menuitem", { name: "По умолчанию" });
-    expect(reset).not.toHaveAttribute("aria-disabled", "true");
-    await user.click(reset);
-    await user.click(screen.getByRole("button", { name: "Вид" }));
+    act(() => screen.getByRole("button", { name: "Вид 0" }).focus());
+    await user.keyboard("{Enter}");
+    act(() => screen.getByRole("menuitem", { name: "По умолчанию" }).focus());
+    await user.keyboard("{Enter}");
+    await user.click(screen.getByRole("button", { name: "Вид 1" }));
     expect(await screen.findByRole("menuitemcheckbox", { name: "Транспорт" })).toHaveAttribute(
       "aria-checked",
       "true",
@@ -1201,7 +1210,60 @@ describe("KanbanFieldsMenu", () => {
       "aria-checked",
       "false",
     );
-    expect(screen.getByRole("menuitem", { name: "По умолчанию" })).toBeDisabled();
+    expect(screen.queryByRole("menuitem", { name: "По умолчанию" })).toBeNull();
+  });
+});
+
+describe("KanbanFieldsMenu order", () => {
+  const FIELDS = [
+    { id: "vehicles", label: "Транспорт", group: "Сделка" },
+    { id: "step", label: "Следующий шаг", group: "Сделка" },
+    { id: "total", label: "Сумма", group: "Деньги" },
+    { id: "deposit", label: "Депозит", group: "Деньги" },
+  ];
+
+  function Board() {
+    const [order, setOrder] = React.useState<readonly string[]>([]);
+    return (
+      <>
+        <KanbanFieldsMenu fields={FIELDS} fieldOrder={order} onFieldOrderChange={setOrder} />
+        <output data-testid="order">{order.join(",")}</output>
+      </>
+    );
+  }
+
+  it("groups the fields under their headings, each with a grip", async () => {
+    const user = userEvent.setup();
+    render(<Board />);
+    await user.click(screen.getByRole("button", { name: "Вид 4" }));
+    expect(screen.getByRole("group", { name: "Сделка" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Деньги" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Переместить поле Депозит" })).toBeInTheDocument();
+  });
+
+  it("Alt + ↓ moves the focused field within its group; «По умолчанию» puts the order back", async () => {
+    const user = userEvent.setup();
+    render(<Board />);
+    act(() => screen.getByRole("button", { name: "Вид 4" }).focus());
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("menuitem", { name: "По умолчанию" })).toBeNull();
+    act(() => screen.getByRole("menuitemcheckbox", { name: "Транспорт" }).focus());
+    await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    expect(screen.getByTestId("order")).toHaveTextContent("step,vehicles,total,deposit");
+    expect(screen.getByRole("menuitemcheckbox", { name: "Транспорт" })).toHaveFocus();
+    // The last of its group stays: a field never leaves its group.
+    await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    expect(screen.getByTestId("order")).toHaveTextContent("step,vehicles,total,deposit");
+    act(() => screen.getByRole("menuitem", { name: "По умолчанию" }).focus());
+    await user.keyboard("{Enter}");
+    expect(screen.getByTestId("order")).toHaveTextContent("vehicles,step,total,deposit");
+  });
+
+  it("without the triad the fields only show and hide", async () => {
+    const user = userEvent.setup();
+    render(<KanbanFieldsMenu fields={FIELDS} />);
+    await user.click(screen.getByRole("button", { name: "Вид 4" }));
+    expect(screen.queryByRole("button", { name: /Переместить поле/ })).toBeNull();
   });
 });
 

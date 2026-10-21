@@ -119,7 +119,7 @@ export default function GanttOccupancyExample() {
   return (
     <Gantt
       aria-label="Загрузка команды"
-      defaultScale="day"
+      defaultZoom="day"
       rows={team}
       getRowKey={(person) => person.id}
       getRowLabel={(person) => person.name}

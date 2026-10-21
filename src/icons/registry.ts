@@ -272,7 +272,7 @@ export const iconRegistry = {
   "theme.dark": Moon,
   "theme.light": Sun,
   "view.code": CodeXml,
-  /** Which columns a table shows (the DataTable columns menu). */
+  /** What a view shows: the kit's view menu (columns, card fields, chart categories). */
   "view.columns": Columns3,
   "view.preview": Eye,
   "viewport.desktop": Monitor,

@@ -1,14 +1,15 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { GANTT_LABELS } from "./Gantt";
+import { GANTT_CATEGORIES_MENU_LABELS } from "./GanttCategoriesMenu";
 
-const SCALE = '"day" | "week" | "month"';
+const ZOOM = '"day" | "week" | "month" | number';
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Gantt",
-      en: '`ref` → `HTMLDivElement` (the surface). A schedule: a toolbar with the zoom and «Сегодня», then a `role="grid"` of rows with bars on a time axis. `aria-label` / `aria-labelledby` name the grid; the other attributes go to the surface.',
-      ru: 'График: панель с масштабом и «Сегодня», под ней `role="grid"` строк с полосами на шкале времени. `aria-label` / `aria-labelledby` называют сетку, остальные атрибуты уходят на поверхность.',
+      en: '`ref` → `HTMLDivElement` (the surface). A schedule: rows with bars on a time axis in a `role="grid"`, under one head row — the zoom selector, then the dates. A pinch, the wheel and `+` / `−` zoom; a swipe slides. `aria-label` names the grid; other attributes go to the surface.',
+      ru: 'График: строки с полосами на шкале времени в `role="grid"` под одной строкой шапки — селектор масштаба и даты. Щипок, колесо и `+` / `−` меняют масштаб вокруг руки; жест вбок сдвигает шкалу. `aria-label` называет сетку; остальные атрибуты уходят на поверхность.',
       props: [
         {
           name: "rows",
@@ -69,36 +70,48 @@ export const api: ComponentApi = {
           ru: "Дополнительные строки подсказки полосы (клиент, часы, ответственный) — под её названием и строкой дат; они остаются всегда: даты и длительность — то, что полоса значит на шкале.",
         },
         {
-          name: "scale",
-          type: SCALE,
-          en: "Zoom, controlled: a column per day (months over days), per week (months over weeks) or per month (years over months).",
-          ru: "Масштаб, управляемый: колонка на день (месяцы над днями), на неделю (месяцы над неделями) или на месяц (годы над месяцами).",
+          name: "categories",
+          type: "readonly GanttCategory[]",
+          en: "Kinds of bars (rentals, bookings, service), in legend order: a bar with a `category` takes its hue, and the toolbar shows the legend — a Badge with the dot of each shown category, after your `toolbar` content.",
+          ru: "Виды полос (аренды, брони, сервис) в порядке легенды: полоса с `category` берёт их оттенок, а панель показывает легенду — Badge с точкой каждой показанной категории, после содержимого `toolbar`.",
         },
         {
-          name: "defaultScale",
-          type: SCALE,
+          name: "hiddenCategories",
+          type: "readonly string[]",
+          en: "Ids of the hidden categories (`GanttCategoriesMenu` changes them): their bars are not drawn and their legend entries close up; the time axis keeps its span.",
+          ru: "Id скрытых категорий (их меняет `GanttCategoriesMenu`): их полосы не рисуются, а пункты легенды схлопываются; шкала времени сохраняет свой охват.",
+        },
+        {
+          name: "zoom",
+          type: ZOOM,
+          en: "Zoom, controlled: a preset of the selector (`day`, `week`, `month`), or the length of a day in px a gesture or a key left between them (the selector reads «Свой»), held between the whole axis in view and the top step.",
+          ru: "Масштаб, управляемый: пресет селектора (`day`, `week`, `month`) или длина дня в px, оставленная жестом или клавишей между ними (селектор пишет «Свой»), — между всей шкалой в поле зрения и верхним шагом.",
+        },
+        {
+          name: "defaultZoom",
+          type: ZOOM,
           default: '"week"',
           en: "Initial zoom, uncontrolled.",
           ru: "Начальный масштаб, неуправляемый.",
         },
         {
-          name: "onScaleChange",
-          type: "(scale: GanttScale) => void",
-          en: "The zoom switch changed. The day in the middle of the view stays in the middle.",
-          ru: "Переключили масштаб. День в середине видимой части остаётся в середине.",
+          name: "onZoomChange",
+          type: "(zoom: GanttZoom) => void",
+          en: "The zoom changed: a preset from the selector (the day in the middle stays in the middle), or where a gesture or a key left it (the day under the hand stays under it) — a preset when it ended within 8% of one.",
+          ru: "Масштаб изменился: пресет из селектора (день в середине остаётся в середине) или там, где его оставили жест или клавиша (день под рукой остаётся под ней), — пресет, если закончили в пределах 8% от него.",
         },
         {
           name: "range",
           type: "{ start: Date; end: Date }",
-          en: "The time axis, snapped to whole units. Default: every bar and today with room on both sides (a week of days, two weeks, a month), at least 35 days / 14 weeks / 12 months.",
-          ru: "Шкала времени, выровненная по целым единицам. По умолчанию — все полосы и сегодня с запасом по краям (неделя дней, две недели, месяц), не меньше 35 дней / 14 недель / 12 месяцев.",
+          en: "The time axis, in whole days. Default: every bar and today with a month of room on both sides, from the 1st of a month, at least 12 months — one axis for every zoom.",
+          ru: "Шкала времени в целых днях. По умолчанию — все полосы и сегодня с месяцем запаса по краям, от 1-го числа, не меньше 12 месяцев — одна шкала для любого масштаба.",
         },
         {
           name: "today",
           type: "Date",
           defaultNote: { en: "today", ru: "сегодня" },
-          en: "The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it.",
-          ru: "День линии «сегодня»; график открывается с ним на трети ширины, а «Сегодня» прокручивает к нему.",
+          en: "The day of the today line and of today's flag in the head; the chart opens with it a third into the view, and once the view slides away «Сегодня» at that edge of the head glides back to it.",
+          ru: "День линии «сегодня» и её флажка с датой в шапке; график открывается с ним на трети ширины, а когда шкалу сдвинули, «Сегодня» у того края шапки плавно возвращает к нему.",
         },
         {
           name: "locale",
@@ -111,8 +124,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Tier of rows, bars, header and toolbar controls: one-lane rows 28 · 32 · 44 · 48 · 52 px; a day is 32 · 40 · 48 px wide at `day`; bar text one tier down. Without it the tier of its host, else `m`.",
-          ru: "Ярус строк, полос, шапки и контролов панели: строка в одну дорожку 28 · 32 · 44 · 48 · 52 px; день шириной 32 · 40 · 48 px при `day`; текст полос на ярус меньше. Без него — ярус контейнера, иначе `m`.",
+          en: "Tier of rows, bars and the head: one-lane rows 28 · 32 · 44 · 48 · 52 px, the zoom presets of the tier; bar text, the selector and «Сегодня» one tier down. Without it the host's tier, else `m`.",
+          ru: "Ярус строк, полос и шапки: строка в одну дорожку 28 · 32 · 44 · 48 · 52 px, пресеты масштаба яруса; текст полос, селектор и «Сегодня» на ярус меньше. Без него — ярус контейнера, иначе `m`.",
         },
         {
           name: "readOnly",
@@ -137,8 +150,8 @@ export const api: ComponentApi = {
         {
           name: "toolbar",
           type: "ReactNode",
-          en: "Content at the start of the toolbar (title, a legend, filters), kept together in the free room; «Сегодня» and the zoom keep their width at its end, and on a narrow chart they take the next line, the zoom filling it.",
-          ru: "Содержимое в начале панели (заголовок, легенда, фильтры) — вместе, в свободном месте; «Сегодня» и масштаб стоят в конце по своей ширине, а на узком графике уходят на следующую строку, и масштаб её заполняет.",
+          en: "Your tools (search, «Вид», a filter) on a row above the chart, before the legend of `categories`; the row is there only when it has something to show.",
+          ru: "Ваши инструменты (поиск, «Вид», фильтр) в строке над графиком, перед легендой `categories`; строка есть, только когда ей есть что показать.",
         },
         {
           name: "scrollHeight",
@@ -175,6 +188,58 @@ export const api: ComponentApi = {
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
           en: "`aria-label` (the grid's name), `className` and the other div attributes.",
           ru: "`aria-label` (имя сетки), `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "GanttCategoriesMenu",
+      en: "`ref` → `HTMLButtonElement`. The view of a chart, for the page's tools: the kit's one view trigger (the columns icon, «Вид», the count of shown categories), a check item per category and «По умолчанию» once changed. The chart reads the same `hiddenCategories`.",
+      ru: "Вид графика, для инструментов страницы: единая кнопка вида кита (иконка колонок, «Вид», число показанных категорий), пункт-флажок на каждую категорию и «По умолчанию» после изменения. График читает те же `hiddenCategories`.",
+      props: [
+        {
+          name: "categories",
+          type: "readonly GanttCategory[]",
+          required: true,
+          en: "The chart's `categories`, in menu order.",
+          ru: "`categories` графика, в порядке меню.",
+        },
+        {
+          name: "hiddenCategories",
+          type: "readonly string[]",
+          en: "Ids of the hidden categories (controlled).",
+          ru: "Id скрытых категорий (управляемо).",
+        },
+        {
+          name: "defaultHiddenCategories",
+          type: "readonly string[]",
+          default: "[]",
+          en: "The default view: the initial hidden categories (uncontrolled) and what «По умолчанию» puts back.",
+          ru: "Вид по умолчанию: скрытые категории в начале (неуправляемо) и то, что возвращает «По умолчанию».",
+        },
+        {
+          name: "onHiddenCategoriesChange",
+          type: "(hiddenCategories: readonly string[]) => void",
+          en: "A category was shown or hidden, or the default view put back.",
+          ru: "Категорию показали или скрыли, или вернули вид по умолчанию.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+          en: "Tier of the trigger and the menu.",
+          ru: "Ярус кнопки и меню.",
+        },
+        {
+          name: "labels",
+          type: "Partial<GanttCategoriesMenuLabels>",
+          en: "The menu's strings: `view`, `categories`, `reset`.",
+          ru: "Строки меню: `view`, `categories`, `reset`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type">',
+          en: "`className` and the other attributes of the trigger button.",
+          ru: "`className` и остальные атрибуты кнопки.",
         },
       ],
     },
@@ -216,9 +281,18 @@ export const api: ComponentApi = {
         {
           name: "color",
           type: '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"',
-          default: '"blue"',
-          en: "Palette hue of a category (project, team, kind of absence).",
-          ru: "Оттенок палитры для категории (проект, команда, вид отсутствия).",
+          defaultNote: {
+            en: 'the hue of its `category`, else `"blue"`',
+            ru: 'оттенок её `category`, иначе `"blue"`',
+          },
+          en: "Palette hue of the bar (a project, a team, a kind of absence).",
+          ru: "Оттенок палитры полосы (проект, команда, вид отсутствия).",
+        },
+        {
+          name: "category",
+          type: "string",
+          en: "Id of its `GanttCategory`: the bar takes its hue and leaves with it (`hiddenCategories`).",
+          ru: "Id её `GanttCategory`: полоса берёт её оттенок и скрывается вместе с ней (`hiddenCategories`).",
         },
         {
           name: "tone",
@@ -241,67 +315,133 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "GanttCategory",
+      en: "One entry of `categories`: a kind of bar, a legend entry and an item of `GanttCategoriesMenu`.",
+      ru: "Одна запись `categories`: вид полосы, пункт легенды и пункт `GanttCategoriesMenu`.",
+      fields: [
+        {
+          name: "id",
+          type: "string",
+          required: true,
+          en: "Stable id: `GanttBar.category` and `hiddenCategories` refer to it.",
+          ru: "Стабильный id: на него ссылаются `GanttBar.category` и `hiddenCategories`.",
+        },
+        {
+          name: "label",
+          type: "string",
+          required: true,
+          en: "Text of its legend entry and of its menu item.",
+          ru: "Текст пункта легенды и пункта меню.",
+        },
+        {
+          name: "color",
+          type: '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"',
+          default: '"blue"',
+          en: "Palette hue of its bars and its legend dot.",
+          ru: "Оттенок палитры её полос и точки в легенде.",
+        },
+      ],
+    },
   ],
-  labels: labelRows(GANTT_LABELS, {
-    rowsHeader: { en: "Heading of the first column.", ru: "Заголовок первой колонки." },
-    timeline: {
-      en: "Accessible name of the time axis column.",
-      ru: "Доступное имя колонки шкалы.",
-    },
-    scale: {
-      en: "Accessible name of the zoom switch.",
-      ru: "Доступное имя переключателя масштаба.",
-    },
-    day: { en: "Zoom segment: days.", ru: "Сегмент масштаба: дни." },
-    week: { en: "Zoom segment: weeks.", ru: "Сегмент масштаба: недели." },
-    month: { en: "Zoom segment: months.", ru: "Сегмент масштаба: месяцы." },
-    today: {
-      en: "The button that scrolls to today and the chip on the today line.",
-      ru: "Кнопка прокрутки к сегодняшнему дню и метка на его линии.",
-    },
-    bar: {
-      en: "Accessible name of a bar; `{start}` and `{end}` are its first and last day, spoken in full.",
-      ru: "Доступное имя полосы; `{start}` и `{end}` — первый и последний день полностью.",
-    },
-    milestone: { en: "Accessible name of a milestone.", ru: "Доступное имя вехи." },
-    progress: {
-      en: "Added to a bar's name when it has `progress`.",
-      ru: "Добавляется к имени полосы с `progress`.",
-    },
-    editHint: {
-      en: "Description of an editable bar: the editing keys.",
-      ru: "Описание редактируемой полосы: клавиши правки.",
-    },
-    editEndHint: {
-      en: "Description of a bar with `edit` `end`: the keys that change its end.",
-      ru: "Описание полосы с `edit` `end`: клавиши, меняющие окончание.",
-    },
-    duration: {
-      en: "Duration of a bar in its tooltip («5 – 18 октября · 14 дн.»).",
-      ru: "Длительность полосы в подсказке («5 – 18 октября · 14 дн.»).",
-    },
-    changeFailed: {
-      en: "Announced when `onBarChange` rejects and the bar returns to its dates.",
-      ru: "Озвучивается, когда `onBarChange` отклонён и полоса вернулась к своим датам.",
-    },
-    newBar: {
-      en: "Label of the ghost of a bar being created and of its announcement.",
-      ru: "Подпись призрака создаваемой полосы и её объявления.",
-    },
-    createHint: {
-      en: "Description of a row header when bars can be created.",
-      ru: "Описание заголовка строки, когда полосы можно создавать.",
-    },
-    createFailed: {
-      en: "Announced when `onBarCreate` rejects and the ghost fades out.",
-      ru: "Озвучивается, когда `onBarCreate` отклонён и призрак тает.",
-    },
-    loading: {
-      en: "Screen-reader status while skeleton rows are shown.",
-      ru: "Статус для скринридера, пока видны скелетоны.",
-    },
-    empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
-  }),
+  labels: [
+    ...labelRows(GANTT_LABELS, {
+      rowsHeader: {
+        en: "Accessible name of the first column; its head holds the zoom selector.",
+        ru: "Доступное имя первой колонки; в её шапке стоит селектор масштаба.",
+      },
+      timeline: {
+        en: "Accessible name of the time axis column.",
+        ru: "Доступное имя колонки шкалы.",
+      },
+      zoom: {
+        en: "Accessible name of the zoom selector.",
+        ru: "Доступное имя селектора масштаба.",
+      },
+      day: { en: "Zoom preset: a day a column.", ru: "Пресет масштаба: колонка на день." },
+      week: { en: "Zoom preset: weeks.", ru: "Пресет масштаба: недели." },
+      month: { en: "Zoom preset: months.", ru: "Пресет масштаба: месяцы." },
+      customZoom: {
+        en: "The selector's text for a zoom between the presets.",
+        ru: "Текст селектора для масштаба между пресетами.",
+      },
+      zoomChanged: {
+        en: "Announced when a gesture or a key changes the zoom; `{zoom}` is the selector's text.",
+        ru: "Озвучивается, когда жест или клавиша меняют масштаб; `{zoom}` — текст селектора.",
+      },
+      today: {
+        en: "Text of the button that brings today back into view.",
+        ru: "Текст кнопки, которая возвращает к сегодняшнему дню.",
+      },
+      toToday: {
+        en: "Accessible name of that button.",
+        ru: "Доступное имя этой кнопки.",
+      },
+      todayIs: {
+        en: "Description of the time axis: today's date, spoken in full (the flag on the today line is `aria-hidden`).",
+        ru: "Описание шкалы времени: сегодняшняя дата полностью (флажок на линии «сегодня» скрыт, `aria-hidden`).",
+      },
+      bar: {
+        en: "Accessible name of a bar; `{start}` and `{end}` are its first and last day, spoken in full.",
+        ru: "Доступное имя полосы; `{start}` и `{end}` — первый и последний день полностью.",
+      },
+      milestone: { en: "Accessible name of a milestone.", ru: "Доступное имя вехи." },
+      progress: {
+        en: "Added to a bar's name when it has `progress`.",
+        ru: "Добавляется к имени полосы с `progress`.",
+      },
+      editHint: {
+        en: "Description of an editable bar: the editing keys.",
+        ru: "Описание редактируемой полосы: клавиши правки.",
+      },
+      editEndHint: {
+        en: "Description of a bar with `edit` `end`: the keys that change its end.",
+        ru: "Описание полосы с `edit` `end`: клавиши, меняющие окончание.",
+      },
+      duration: {
+        en: "Duration of a bar in its tooltip («5 – 18 октября · 14 дн.»).",
+        ru: "Длительность полосы в подсказке («5 – 18 октября · 14 дн.»).",
+      },
+      changeFailed: {
+        en: "Announced when `onBarChange` rejects and the bar returns to its dates.",
+        ru: "Озвучивается, когда `onBarChange` отклонён и полоса вернулась к своим датам.",
+      },
+      newBar: {
+        en: "Label of the ghost of a bar being created and of its announcement.",
+        ru: "Подпись призрака создаваемой полосы и её объявления.",
+      },
+      createHint: {
+        en: "Description of a row header when bars can be created.",
+        ru: "Описание заголовка строки, когда полосы можно создавать.",
+      },
+      createFailed: {
+        en: "Announced when `onBarCreate` rejects and the ghost fades out.",
+        ru: "Озвучивается, когда `onBarCreate` отклонён и призрак тает.",
+      },
+      loading: {
+        en: "Screen-reader status while skeleton rows are shown.",
+        ru: "Статус для скринридера, пока видны скелетоны.",
+      },
+      empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
+      legend: {
+        en: "Accessible name of the legend of `categories`.",
+        ru: "Доступное имя легенды `categories`.",
+      },
+    }),
+    ...labelRows(GANTT_CATEGORIES_MENU_LABELS, {
+      view: { en: "Text of the trigger.", ru: "Текст кнопки.", part: "GanttCategoriesMenu" },
+      categories: {
+        en: "Heading of the group of categories.",
+        ru: "Заголовок группы категорий.",
+        part: "GanttCategoriesMenu",
+      },
+      reset: {
+        en: "The item that puts `defaultHiddenCategories` back.",
+        ru: "Пункт, который возвращает `defaultHiddenCategories`.",
+        part: "GanttCategoriesMenu",
+      },
+    }),
+  ],
   accessibility: {
     keyboard: [
       {
@@ -311,8 +451,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "← · →",
-        en: "Along the row: its header, then its bars in time order. A row off screen is rendered and scrolled into view.",
-        ru: "По строке: заголовок строки, затем полосы по времени. Строки вне экрана дорисовываются и прокручиваются в поле зрения.",
+        en: "Along the row: its header, then its bars in time order. A row or a bar off screen is rendered and brought into view.",
+        ru: "По строке: заголовок строки, затем полосы по времени. Строки и полосы вне экрана дорисовываются и попадают в поле зрения.",
       },
       {
         keys: "↑ · ↓",
@@ -336,8 +476,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Shift + Alt + ← · Shift + Alt + →",
-        en: "Moves the bar by the zoom's unit (a week, a month).",
-        ru: "Сдвигает полосу на единицу масштаба (неделю, месяц).",
+        en: "Moves the bar to the next / previous tick of the head's step (1, 8, 15… of a month; a month) — as a drag with Alt lands on it.",
+        ru: "Сдвигает полосу к следующей / предыдущей отметке шага шапки (1, 8, 15… число месяца; месяц), как перетаскивание с Alt.",
       },
       {
         keys: "Ctrl + Shift + ← · Ctrl + Shift + →",
@@ -346,13 +486,18 @@ export const api: ComponentApi = {
       },
       {
         keys: "Ctrl + Shift + Alt + ← · Ctrl + Shift + Alt + →",
-        en: "Shortens / lengthens the bar by the zoom's unit.",
-        ru: "Укорачивает / удлиняет полосу на единицу масштаба.",
+        en: "Shortens / lengthens the bar to a tick of the head's step.",
+        ru: "Укорачивает / удлиняет полосу до отметки шага шапки.",
       },
       {
         keys: "N",
-        en: "Creates a one-unit bar (`onBarCreate`): at today on a row header, right after the bar on a bar.",
-        ru: "Создаёт полосу в одну единицу масштаба (`onBarCreate`): на заголовке строки — на сегодня, на полосе — сразу после неё.",
+        en: "Creates a bar of one cell of the phantom — a cell of the grid, a day whenever days are drawn (`onBarCreate`): at today on a row header — its phantom shows there while the header has focus — right after the bar on a bar.",
+        ru: "Создаёт полосу в одну клетку фантома — клетку сетки, день, когда дни видны (`onBarCreate`): на заголовке строки — на сегодня, там же виден её фантом, пока заголовок в фокусе, — на полосе — сразу после неё.",
+      },
+      {
+        keys: "+ · -",
+        en: "Zooms in / out around the middle of the view, a step a press; the selector reads «Свой» between the presets.",
+        ru: "Приближает / отдаляет вокруг середины видимой части, шаг за нажатие; между пресетами селектор пишет «Свой».",
       },
       {
         keys: "Escape",
@@ -366,8 +511,8 @@ export const api: ComponentApi = {
         ru: '`role="grid"` с именем из `aria-label`: строка шапки с `columnheader` («Название» и шкала с именем `labels.timeline`), в каждой строке `rowheader` с именем строки и `gridcell` с полосами. Сетка выбрана ради двумерной навигации: при переходе между строками скринридер называет строку.',
       },
       {
-        en: "A bar is a `<button>` named «Задача: 6 июля 2026 — 10 июля 2026» (with «выполнено 50%» when it has progress); a milestone «Релиз: 20 июля 2026». The Tooltip with the dates opens on hover and on focus and closes as soon as the chart scrolls (scrollbar, wheel, touch); the next hover or focus opens it again. It points at the visible part of the bar and stays inside the timeline, never over the label column or the header; a bar with less than `--prime-space-6` in view shows none.",
-        ru: "Полоса — `<button>` с именем «Задача: 6 июля 2026 — 10 июля 2026» (с «выполнено 50%», если есть прогресс); веха — «Релиз: 20 июля 2026». Подсказка с датами открывается при наведении и при фокусе и закрывается, как только график прокручивается (полоса прокрутки, колесо, касание); следующее наведение или фокус открывают её снова. Она указывает на видимую часть полосы и остаётся внутри шкалы времени, не заходя на колонку подписей и шапку; полоса, видимая меньше чем на `--prime-space-6`, подсказки не показывает.",
+        en: "A bar is a `<button>` named «Задача: 6 июля 2026 — 10 июля 2026» (with «выполнено 50%» when it has progress); a milestone «Релиз: 20 июля 2026». The Tooltip with the dates opens on hover and on focus and closes as soon as the chart moves (a slide, a zoom, the scrollbar, a touch); the next hover or focus opens it again. It points at the visible part of the bar and stays inside the timeline, never over the label column or the header; a bar with less than `--prime-space-6` in view shows none.",
+        ru: "Полоса — `<button>` с именем «Задача: 6 июля 2026 — 10 июля 2026» (с «выполнено 50%», если есть прогресс); веха — «Релиз: 20 июля 2026». Подсказка с датами открывается при наведении и при фокусе и закрывается, как только график сдвигается (сдвиг, масштаб, полоса прокрутки, касание); следующее наведение или фокус открывают её снова. Она указывает на видимую часть полосы и остаётся внутри шкалы времени, не заходя на колонку подписей и шапку; полоса, видимая меньше чем на `--prime-space-6`, подсказки не показывает.",
       },
       {
         en: "An editable bar has `aria-keyshortcuts` and is described by `labels.editHint`; a bar with `edit` `end` lists only the end keys and is described by `labels.editEndHint`. The new dates after an editing key are announced in a polite status, a refused change with `labels.changeFailed`.",
@@ -378,8 +523,8 @@ export const api: ComponentApi = {
         ru: "Пока `onBarChange` выполняется, полоса и сетка `aria-busy`; при загрузке без строк скелетоны скрыты, а статус `labels.loading` объявляется.",
       },
       {
-        en: "The axis tiers, weekends and the today line are `aria-hidden`: the dates live in the bar names.",
-        ru: "Шапка шкалы, выходные и линия «сегодня» скрыты (`aria-hidden`): даты есть в именах полос.",
+        en: "The dates of the head, weekends, the grid lines and the today line are `aria-hidden`: the dates live in the bar names.",
+        ru: "Даты шапки, выходные, линии сетки и линия «сегодня» скрыты (`aria-hidden`): даты есть в именах полос.",
       },
       {
         en: 'A row header is a focusable cell; with `onBarCreate` it is described by `labels.createHint` and has `aria-keyshortcuts="N"`. A new bar is announced, a refused one with `labels.createFailed`; the ghost is `aria-hidden`.',
@@ -388,6 +533,14 @@ export const api: ComponentApi = {
       {
         en: "With `getRowHref` the header's stop in the grid is a real `<a>` named by the row's content inside the `rowheader`: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work, Space follows it like Enter, and the arrows rove from it as from any cell. With `onRowClick` alone the header itself opens the row by a click, Enter or Space; a click on a control inside it never does.",
         ru: "С `getRowHref` остановка заголовка в сетке — настоящая ссылка `<a>` с именем строки внутри `rowheader`; с `onRowClick` сам заголовок открывает строку кликом, Enter и Space.",
+      },
+      {
+        en: "The legend of `categories` is a `group` named `labels.legend`; each entry says its category in words beside the dot. `GanttCategoriesMenu` is a menu button named by its text and count («Вид 4»); its items are a group named `labels.categories` of `menuitemcheckbox` with `aria-checked`.",
+        ru: "Легенда `categories` — `group` с именем `labels.legend`; каждый пункт называет категорию словами рядом с точкой. `GanttCategoriesMenu` — кнопка меню с именем из текста и числа («Вид 4»); пункты — группа `labels.categories` из `menuitemcheckbox` с `aria-checked`.",
+      },
+      {
+        en: "The zoom selector is a `Select` named `labels.zoom` in the head of the first column (a `columnheader` named `labels.rowsHeader`). A gesture or `+` / `−` that changes the zoom announces the selector's text with `labels.zoomChanged` in the polite status. Once today is slid out of view, a `Button` named `labels.toToday` («‹ Сегодня» / «Сегодня ›», pointing at it) at that edge of the head brings it back.",
+        ru: "Селектор масштаба — `Select` с именем `labels.zoom` в шапке первой колонки (`columnheader` с именем `labels.rowsHeader`). Жест или `+` / `−`, изменившие масштаб, объявляют текст селектора вежливым статусом `labels.zoomChanged`. Когда сегодняшний день сдвинут из вида, `Button` с именем `labels.toToday` («‹ Сегодня» / «Сегодня ›», указывая на него) у того края шапки возвращает к нему.",
       },
       {
         en: "Rows are virtualized: only the rows in view are in the DOM, while `aria-rowcount` on the grid and `aria-rowindex` on each row keep the full count.",

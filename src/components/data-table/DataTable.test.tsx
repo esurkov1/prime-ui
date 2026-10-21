@@ -1644,9 +1644,10 @@ describe("DataTable columns menu", () => {
     await user.click(screen.getByRole("menuitemcheckbox", { name: "Клиент" }));
     expect(onHiddenColumnsChange).toHaveBeenLastCalledWith(["client"]);
     expect(screen.queryByRole("columnheader", { name: "Клиент" })).toBeNull();
-    await user.click(screen.getByRole("menuitem", { name: "Показать все" }));
-    expect(onHiddenColumnsChange).toHaveBeenLastCalledWith([]);
+    await user.click(screen.getByRole("menuitem", { name: "По умолчанию" }));
+    expect(onHiddenColumnsChange).toHaveBeenLastCalledWith(["city"]);
     expect(screen.getByRole("columnheader", { name: "Клиент" })).toBeInTheDocument();
+    expect(screen.queryByRole("columnheader", { name: "Город" })).toBeNull();
   });
 
   it("never hides the last visible column; the trigger text takes {shown} and {total}", async () => {

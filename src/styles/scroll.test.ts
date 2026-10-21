@@ -81,6 +81,8 @@ const CANCELLING_WHEEL: Record<string, string> = {
   "internal/overlay/useContainScroll.ts": "an open floating layer keeps the page under it still",
   "components/media-viewer/MediaViewer.tsx": "the filmstrip of a full-screen layer",
   "components/media-viewer/viewerEngine.ts": "zoom and pan of a full-screen layer",
+  "components/gantt/timeGesture.ts":
+    "the chart's time camera: a zoom wheel, and a sideways swipe decided at its first event; a vertical wheel scrolls",
 };
 
 const BLOCK_CONTAIN_CSS = /\boverscroll-behavior(?:-block|-y)?\s*:\s*[^;]*\b(?:contain|none)\b/;

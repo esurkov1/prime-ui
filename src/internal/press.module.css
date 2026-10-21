@@ -1,19 +1,25 @@
 /*
- * Press feedback (foundation §7 rule 6): a pressable gives under the pointer — `scale` to
- * `--prime-motion-press-scale` (`-compact` for icon-only and small targets) over `fast`, and back
- * by the same transition on release. Reduced motion sets both scales to 1. Disabled, read-only,
- * loading and busy never scale, nor anything inside a disabled or read-only host.
+ * Press feedback (foundation §7 rule 6): a pressable gives under the pointer — its edges come in by
+ * `--prime-motion-press-distance` (`-compact` for icon-only and small targets) over `fast`, and back
+ * by the same transition on release, the same few pixels on a chip, a card or a long bar. The give
+ * is a `scale`, which CSS cannot work out from the element's own box: `press.ts` measures the
+ * element on the press and writes `--press-scale` on it (1 − 2 · distance / longer side). A press
+ * it did not measure falls back to `--prime-motion-press-scale` (`-compact`). Reduced motion sets
+ * the distances to 0 and both scales to 1. Disabled, read-only, loading and busy never scale, nor
+ * anything inside a disabled or read-only host.
  *
  *   .press / .pressCompact          on the element that is pressed and gives
  *   .pressHost + .pressPart /
  *   .pressHost + .pressPartCompact  the host is pressed, a part inside it gives (the box of a
  *                                   checkbox row, the glyph of a nav item)
+ *   .pressHeld                      gives while `data-pressed` is set by `holdPress` (a surface a
+ *                                   part inside it presses: a message under its picture tile)
  *
  * The individual `scale` property composes with any `transform` of the host. The default
  * `transition` has zero specificity, so a host that declares its own wins in any bundle order and
  * lists `scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard)` in it too.
  */
-:where(.press, .pressCompact, .pressPart, .pressPartCompact) {
+:where(.press, .pressCompact, .pressPart, .pressPartCompact, .pressHeld) {
   transition: scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -27,7 +33,7 @@
     [aria-busy="true"],
     :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
   ) {
-  scale: var(--prime-motion-press-scale);
+  scale: var(--press-scale, var(--prime-motion-press-scale));
 }
 
 .pressCompact:active:not(
@@ -40,7 +46,7 @@
     [aria-busy="true"],
     :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
   ) {
-  scale: var(--prime-motion-press-scale-compact);
+  scale: var(--press-scale, var(--prime-motion-press-scale-compact));
 }
 
 .pressHost:active:not(
@@ -54,7 +60,7 @@
     :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
   )
   .pressPart {
-  scale: var(--prime-motion-press-scale);
+  scale: var(--press-scale, var(--prime-motion-press-scale));
 }
 
 .pressHost:active:not(
@@ -68,5 +74,9 @@
     :is(:disabled, [aria-disabled="true"], [data-disabled="true"], [data-readonly="true"]) *
   )
   .pressPartCompact {
-  scale: var(--prime-motion-press-scale-compact);
+  scale: var(--press-scale, var(--prime-motion-press-scale-compact));
+}
+
+.pressHeld[data-pressed] {
+  scale: var(--press-scale, var(--prime-motion-press-scale));
 }

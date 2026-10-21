@@ -22,7 +22,7 @@ import {
   useMediaPlayer,
 } from "@/internal/mediaPlayer";
 import { defineMessagePart, useInMessage, useMessagePart } from "@/internal/messagePart";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { Ring } from "@/internal/ring";
 import { nextSurfaceDepth, useSurfaceDepth } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";

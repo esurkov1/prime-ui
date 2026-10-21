@@ -592,6 +592,42 @@ describe("Card", () => {
     expect(screen.getByTestId("icon")).toHaveAttribute("data-icon-only");
   });
 
+  it("a Badge in a title or a value stands beside the text, a chip gap apart", () => {
+    const rule = cssRule("src/components/card/Card.module.css", ".badged");
+    expect(cssValue(rule, "display")).toBe("flex");
+    expect(cssValue(rule, "align-items")).toBe("center");
+    expect(cssValue(rule, "gap")).toBe("var(--prime-space-2)");
+    render(
+      <>
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>
+              <Badge.Root color="green">У нас</Badge.Root>
+              300 $
+            </Card.Title>
+            <Card.Description>наличные</Card.Description>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root variant="stat-text">
+          <Card.Label>Текущая аренда</Card.Label>
+          <Card.Value data-testid="value">
+            Клиент
+            <Badge.Root>300 $</Badge.Root>
+          </Card.Value>
+          <Card.Meta>до 21 нояб</Card.Meta>
+        </Card.Root>
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>Без бейджа</Card.Title>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByRole("heading", { name: /300 \$/ })).toHaveClass(styles.badged);
+    expect(screen.getByTestId("value")).toHaveClass(styles.badged);
+    expect(screen.getByRole("heading", { name: "Без бейджа" })).not.toHaveClass(styles.badged);
+  });
+
   it("a panel or list header pads its bottom as its top; only a chart right under it takes none", () => {
     const CSS = "src/components/card/Card.module.css";
     const zone = cssRule(

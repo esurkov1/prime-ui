@@ -1,4 +1,4 @@
-/** A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in its top bar, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. */
+/** A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, one view menu for the view shown, the board / list switch and the one primary action in its top bar, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`, `KanbanFieldsMenu`, `DataTableColumnsMenu`. */
 import {
   Avatar,
   Badge,
@@ -6,6 +6,7 @@ import {
   Crossfade,
   DataTable,
   type DataTableColumn,
+  DataTableColumnsMenu,
   DescriptionList,
   Drawer,
   Dropdown,
@@ -13,6 +14,8 @@ import {
   Icon,
   Kanban,
   type KanbanColumn,
+  type KanbanField,
+  KanbanFieldsMenu,
   type KanbanValue,
   matchesSmartFilter,
   Page,
@@ -180,6 +183,12 @@ const FIELDS: SmartFilterField[] = [
   },
 ];
 
+/** What a deal card may show besides its company: the person picks it in «Вид». */
+const CARD_FIELDS: KanbanField[] = [
+  { id: "terms", label: "Сумма и срок" },
+  { id: "owner", label: "Ответственный" },
+];
+
 const LOAD_MS = 900;
 const SAVE_MS = 800;
 
@@ -235,6 +244,7 @@ const COLUMNS: DataTableColumn<DealRow>[] = [
     header: "Компания",
     accessor: "company",
     sortable: true,
+    hideable: false,
     minWidth: "14rem",
     cell: (row) => (
       <span className={styles.company}>
@@ -283,6 +293,9 @@ export default function KanbanScreenExample() {
   const { notify } = useNotifications();
   const [loading, setLoading] = React.useState(true);
   const [view, setView] = React.useState("board");
+  // One «Вид» per view: what the cards show on the board, the columns in the list.
+  const [hiddenFields, setHiddenFields] = React.useState<readonly string[]>([]);
+  const [hiddenColumns, setHiddenColumns] = React.useState<string[]>([]);
   const [filter, setFilter] = React.useState<SmartFilterValue>({});
   const [search, setSearch] = React.useState("");
   const [placement, setPlacement] = React.useState(PLACEMENT);
@@ -374,6 +387,19 @@ export default function KanbanScreenExample() {
           </Page.Heading>
           <Page.Tools aria-label="Сделки">
             <SmartFilter.Toolbar />
+            {view === "board" ? (
+              <KanbanFieldsMenu
+                fields={CARD_FIELDS}
+                hiddenFields={hiddenFields}
+                onHiddenFieldsChange={setHiddenFields}
+              />
+            ) : (
+              <DataTableColumnsMenu
+                columns={COLUMNS}
+                hiddenColumns={hiddenColumns}
+                onHiddenColumnsChange={setHiddenColumns}
+              />
+            )}
             <SegmentedControl.Root value={view} onValueChange={setView} aria-label="Вид">
               <SegmentedControl.Item value="board">
                 <SegmentedControl.Icon>
@@ -431,16 +457,21 @@ export default function KanbanScreenExample() {
                 renderItem={(item) => (
                   <Kanban.Item>
                     <Kanban.ItemTitle>{item.company}</Kanban.ItemTitle>
-                    <Kanban.ItemDescription>
-                      {RUBLES.format(item.amount)} · до {DAY.format(new Date(item.due))}
-                    </Kanban.ItemDescription>
-                    <Kanban.ItemFooter>{ownerAvatar(item.owner)}</Kanban.ItemFooter>
+                    {hiddenFields.includes("terms") ? null : (
+                      <Kanban.ItemDescription>
+                        {RUBLES.format(item.amount)} · до {DAY.format(new Date(item.due))}
+                      </Kanban.ItemDescription>
+                    )}
+                    {hiddenFields.includes("owner") ? null : (
+                      <Kanban.ItemFooter>{ownerAvatar(item.owner)}</Kanban.ItemFooter>
+                    )}
                   </Kanban.Item>
                 )}
               />
             ) : (
               <DataTable
                 columns={COLUMNS}
+                hiddenColumns={hiddenColumns}
                 rows={loading ? [] : rows}
                 loading={loading}
                 getRowKey={(row) => row.id}

@@ -30,6 +30,7 @@ import {
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { useEnterOnAppear, usePartPresence } from "@/internal/partPresence";
 import { flattenChildren } from "@/internal/parts";
+import { holdPress, press } from "@/internal/press";
 import statusLoop from "@/internal/statusLoop.module.css";
 import {
   type SurfaceDepth,
@@ -731,9 +732,7 @@ function MessageRoot({
   // caption, its tail and reactions, one surface.
   const pressMessage = React.useCallback((pressed: boolean) => {
     const column = columnRef.current;
-    if (!column) return;
-    if (pressed) column.dataset.pressed = "";
-    else delete column.dataset.pressed;
+    if (column) holdPress(column, pressed);
   }, []);
   const carrier = React.useMemo<MessagePartContextValue>(
     () => ({ spacer, overlay, neutralDepth, memory, holdPosition, press: pressMessage }),
@@ -836,7 +835,7 @@ function MessageRoot({
     // row's empty width: a long hover, a long press, a right click and a double tap start here.
     <div
       ref={columnRef}
-      className={cx(styles.column, statusLoop.blink)}
+      className={cx(styles.column, statusLoop.blink, press.pressHeld)}
       data-message-column=""
       data-actions={hasActions || undefined}
       onPointerEnter={(event) => {

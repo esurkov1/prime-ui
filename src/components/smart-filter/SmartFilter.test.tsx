@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_DATEPICKER_PRESETS } from "@/components/datepicker/Datepicker";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -360,8 +360,13 @@ describe("SmartFilter", () => {
     expect(within(dialog).getByRole("button", { name: "GET" })).toBeInTheDocument();
     expect(within(dialog).queryByRole("button", { name: "POST" })).toBeNull();
     expect(within(dialog).getByText(/Сервис, Состояние — нет совпадений/)).toBeInTheDocument();
+    // The row pins the query: a chip, the field empty and focused, the panel kept for filters.
     await user.click(within(dialog).getByText("Искать «ge»"));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(within(chips() as HTMLElement).getByText("Поиск: ge")).toBeInTheDocument();
+    expect(screen.getByRole("searchbox", { name: "Поиск" })).toHaveValue("");
+    expect(screen.getByRole("searchbox", { name: "Поиск" })).toHaveFocus();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(onSearch).toHaveBeenLastCalledWith("ge");
   });
 
   it("Enter and Escape in the search close the panel", async () => {
@@ -624,5 +629,311 @@ describe("SmartFilter.Toolbar compact button", () => {
     const button = filterButton();
     expect(button).not.toHaveAttribute("aria-label");
     expect(button).toHaveTextContent("1");
+  });
+});
+
+describe("SmartFilter.Toolbar layout", () => {
+  const section = () => screen.getByRole("button", { name: /^Фильтр/ });
+  /** The combined toolbar at a width (jsdom lays out nothing: the toolbar reports `width`). */
+  function renderCombined(value: SmartFilterValue = {}, width = 600) {
+    const spy = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return this.dataset.slot === "smart-filter-toolbar" ? width : 0;
+    });
+    const offset = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+    const result = render(
+      <SmartFilter.Root fields={FIELDS} defaultValue={value}>
+        <SmartFilter.Toolbar layout="combined" />
+      </SmartFilter.Root>,
+    );
+    spy.mockRestore();
+    offset.mockRestore();
+    return result;
+  }
+
+  it("combined: the filter is a section of the search field, after the input, always shown", () => {
+    renderCombined();
+    const field = screen.getByRole("searchbox", { name: "Поиск" });
+    const button = section();
+    expect(button).toHaveAttribute("data-field-section", "");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(button).toHaveAttribute("aria-haspopup", "dialog");
+    expect(button).toHaveTextContent("Фильтр");
+    expect(button).not.toHaveAttribute("aria-label");
+    // One frame: the section sits beside the input inside the same wrapper, never inside it.
+    expect(button.parentElement).toBe(field.parentElement);
+    expect(field.compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+  });
+
+  it("combined: the clear «×» comes with the text, before the divider", async () => {
+    const user = userEvent.setup();
+    renderCombined();
+    await user.type(screen.getByRole("searchbox"), "GET");
+    const clear = screen.getByRole("button", { name: "Очистить поиск" });
+    expect(clear.nextElementSibling).toBe(section());
+    expect(
+      clear.compareDocumentPosition(section()) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("combined: Tab reaches the section after the search, Enter and Space open, Escape closes", async () => {
+    const user = userEvent.setup();
+    renderCombined();
+    await user.tab();
+    expect(screen.getByRole("searchbox")).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).toBeNull();
+    await user.tab();
+    expect(section()).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("dialog", { name: "Фильтр" })).toBeInTheDocument();
+    expect(section()).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard("{Escape}");
+    await act(async () => {});
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(section()).toHaveFocus();
+    await user.keyboard(" ");
+    expect(screen.getByRole("dialog", { name: "Фильтр" })).toBeInTheDocument();
+  });
+
+  it("combined: the count Badge joins the name while filters apply", () => {
+    renderCombined({ service: { include: ["billing"], exclude: [] } });
+    expect(section()).not.toHaveAttribute("aria-label");
+    expect(section()).toHaveAccessibleName(/^Фильтр\s*1$/);
+  });
+
+  it("combined without a search is the plain filter button", () => {
+    render(
+      <SmartFilter.Root fields={FIELDS}>
+        <SmartFilter.Toolbar layout="combined" searchable={false} />
+      </SmartFilter.Root>,
+    );
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(section()).not.toHaveAttribute("data-field-section");
+  });
+
+  it("empty fields leave only the search, in either layout", () => {
+    render(
+      <SmartFilter.Root fields={[]}>
+        <SmartFilter.Toolbar layout="combined" />
+      </SmartFilter.Root>,
+    );
+    expect(screen.getByRole("searchbox")).toBeInTheDocument();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("combined: a narrow toolbar keeps the section to its icon, named «Фильтр»", () => {
+    renderCombined({}, 200);
+    const button = section();
+    expect(button).toHaveAttribute("aria-label", "Фильтр");
+    expect(button).toHaveAttribute("data-icon-only", "true");
+    expect(button).not.toHaveTextContent("Фильтр");
+  });
+});
+
+describe("SmartFilter search chip", () => {
+  const field = () => screen.getByRole("searchbox", { name: "Поиск" });
+  const searchChip = () => document.querySelector('[data-slot="smart-filter-chips"] [data-search]');
+
+  it("Enter pins the typed query as the first chip and empties the field, which keeps the focus", async () => {
+    const onSearch = vi.fn();
+    render(<Harness initial={{ method: { include: ["GET"], exclude: [] } }} onSearch={onSearch} />);
+    const user = userEvent.setup();
+    await user.click(field());
+    await user.keyboard("Евгений");
+    expect(onSearch).toHaveBeenLastCalledWith("Евгений");
+    const calls = onSearch.mock.calls.length;
+    await user.keyboard("{Enter}");
+    expect(field()).toHaveValue("");
+    expect(field()).toHaveFocus();
+    // The query was already live: pinning it asks nothing new of the owner.
+    expect(onSearch).toHaveBeenCalledTimes(calls);
+    const row = chips() as HTMLElement;
+    expect(row.firstElementChild).toBe(searchChip());
+    expect(searchChip()).toHaveTextContent("Поиск: Евгений");
+    expect(within(row).getByText("Метод: GET")).toBeInTheDocument();
+    expect(screen.getByText("Поиск «Евгений» добавлен к фильтрам")).toBeInTheDocument();
+    // The panel stays for the filters.
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("typing after a pin finds values without touching the query; Enter replaces it", async () => {
+    const onSearch = vi.fn();
+    render(<Harness onSearch={onSearch} />);
+    const user = userEvent.setup();
+    await user.click(field());
+    await user.keyboard("Евгений{Enter}");
+    onSearch.mockClear();
+    await user.keyboard("ge");
+    expect(onSearch).not.toHaveBeenCalled();
+    expect(searchChip()).toHaveTextContent("Поиск: Евгений");
+    expect(
+      within(screen.getByRole("dialog")).getByRole("button", { name: "GET" }),
+    ).toBeInTheDocument();
+    // Escape clears only the typed text.
+    await user.keyboard("{Escape}");
+    expect(field()).toHaveValue("");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(searchChip()).toHaveTextContent("Поиск: Евгений");
+    await user.keyboard("Иван{Enter}");
+    expect(onSearch).toHaveBeenCalledTimes(1);
+    expect(onSearch).toHaveBeenLastCalledWith("Иван");
+    expect(searchChip()).toHaveTextContent("Поиск: Иван");
+  });
+
+  it("the chip's × clears the search; «Сбросить все» clears it with the filters", async () => {
+    const onSearch = vi.fn();
+    const onValue = vi.fn();
+    render(
+      <Harness
+        initial={{ method: { include: ["GET"], exclude: [] } }}
+        onSearch={onSearch}
+        onValue={onValue}
+      />,
+    );
+    const user = userEvent.setup();
+    await user.click(field());
+    await user.keyboard("Евгений{Enter}");
+    await user.click(screen.getByRole("button", { name: "Убрать поиск «Евгений»" }));
+    expect(onSearch).toHaveBeenLastCalledWith("");
+    expect(searchChip()).toBeNull();
+    await user.click(field());
+    await user.keyboard("Иван{Enter}");
+    await user.click(screen.getByRole("button", { name: "Сбросить все" }));
+    expect(onSearch).toHaveBeenLastCalledWith("");
+    expect(onValue).toHaveBeenLastCalledWith({});
+    expect(chips()).toBeNull();
+  });
+
+  it("Enter in an empty field closes the panel and pins nothing", async () => {
+    const onSearch = vi.fn();
+    render(<Harness onSearch={onSearch} />);
+    const user = userEvent.setup();
+    await user.click(field());
+    await user.keyboard("   {Enter}");
+    expect(searchChip()).toBeNull();
+    expect(onSearch).not.toHaveBeenCalledWith("   ".trim() || "x");
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("a search-only toolbar pins the query too", async () => {
+    render(
+      <SmartFilter.Root fields={[]}>
+        <SmartFilter.Toolbar />
+        <SmartFilter.Chips />
+      </SmartFilter.Root>,
+    );
+    const user = userEvent.setup();
+    await user.click(field());
+    await user.keyboard("Евгений{Enter}");
+    expect(searchChip()).toHaveTextContent("Поиск: Евгений");
+    expect(field()).toHaveValue("");
+  });
+
+  it("a query set from outside stands as the chip", () => {
+    render(
+      <SmartFilter.Root fields={FIELDS} defaultSearch="Евгений">
+        <SmartFilter.Toolbar layout="combined" />
+        <SmartFilter.Chips />
+      </SmartFilter.Root>,
+    );
+    expect(field()).toHaveValue("");
+    expect(searchChip()).toHaveTextContent("Поиск: Евгений");
+  });
+});
+
+describe("SmartFilter.Toolbar fit near the threshold", () => {
+  // The search keeps 18rem (288px) beside a 100px labelled button: the threshold is 388px.
+  let resize: (() => void) | null = null;
+  class FakeResizeObserver {
+    constructor(callback: () => void) {
+      resize = callback;
+    }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+
+  /**
+   * A toolbar whose width follows its own form (a host laid out by content): `labelled` wide with
+   * the label, `compact` wide with the icon. Returns the flips of the form and the width setter.
+   */
+  function renderAt(width: { labelled: number; compact: number }) {
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+    const size = { ...width };
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      if (this.dataset.slot !== "smart-filter-toolbar") return 0;
+      return this.dataset.compact === "true" ? size.compact : size.labelled;
+    });
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      if (this.tagName !== "BUTTON") return 0;
+      return this.closest('[data-compact="true"]') ? 40 : 100;
+    });
+    const flips: string[] = [];
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        flips.push((record.target as HTMLElement).dataset.compact ?? "labelled");
+      }
+    });
+    render(
+      <SmartFilter.Root fields={FIELDS}>
+        <SmartFilter.Toolbar />
+      </SmartFilter.Root>,
+    );
+    const toolbar = document.querySelector('[data-slot="smart-filter-toolbar"]') as HTMLElement;
+    observer.observe(toolbar, { attributeFilter: ["data-compact"] });
+    const takeFlips = () => {
+      for (const record of observer.takeRecords()) {
+        flips.push((record.target as HTMLElement).dataset.compact ?? "labelled");
+      }
+      return flips.splice(0);
+    };
+    const resizeTo = (next: { labelled: number; compact: number }) => {
+      Object.assign(size, next);
+      act(() => resize?.());
+    };
+    return { toolbar, takeFlips, resizeTo };
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    resize = null;
+  });
+
+  it("a toolbar that grows by the label's own width settles in one update", () => {
+    const { toolbar, takeFlips, resizeTo } = renderAt({ labelled: 600, compact: 600 });
+    expect(toolbar).not.toHaveAttribute("data-compact");
+    // At the threshold: 380 with the label, 400 with the icon (it gains 20, the label adds 60).
+    resizeTo({ labelled: 380, compact: 400 });
+    expect(toolbar).toHaveAttribute("data-compact", "true");
+    expect(takeFlips().length).toBeLessThanOrEqual(2);
+    act(() => resize?.());
+    expect(takeFlips()).toEqual([]);
+  });
+
+  it("a host whose width jumps past the label settles after one bounce, never looping", () => {
+    const { toolbar, takeFlips, resizeTo } = renderAt({ labelled: 600, compact: 600 });
+    resizeTo({ labelled: 380, compact: 470 });
+    expect(toolbar).toHaveAttribute("data-compact", "true");
+    expect(takeFlips().length).toBeLessThanOrEqual(3);
+    act(() => resize?.());
+    act(() => resize?.());
+    expect(takeFlips()).toEqual([]);
+  });
+
+  it("narrows to the icon and widens back to the label", () => {
+    const { toolbar, takeFlips, resizeTo } = renderAt({ labelled: 600, compact: 600 });
+    resizeTo({ labelled: 300, compact: 300 });
+    expect(toolbar).toHaveAttribute("data-compact", "true");
+    resizeTo({ labelled: 700, compact: 700 });
+    expect(toolbar).not.toHaveAttribute("data-compact");
+    expect(takeFlips().length).toBeLessThanOrEqual(2);
   });
 });

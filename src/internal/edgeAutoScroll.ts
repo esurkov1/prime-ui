@@ -91,6 +91,7 @@ function autoScrollStep(
   elapsedMs: number,
   axes: ScrollAxes,
   insets: ((container: HTMLElement) => EdgeInsets | undefined) | undefined,
+  panX: ((dx: number) => boolean) | undefined,
 ): boolean {
   for (const container of containers) {
     const edges = edgesOf(container, insets?.(container));
@@ -105,15 +106,18 @@ function autoScrollStep(
         ? (edgeSpeed(edges.bottom - point.y) - edgeSpeed(point.y - edges.top)) * elapsedMs
         : 0;
     const dx =
-      axes.x && can.x
+      axes.x && (panX || can.x)
         ? (edgeSpeed(edges.right - point.x) - edgeSpeed(point.x - edges.left)) * elapsedMs
         : 0;
     if (dy === 0 && dx === 0) continue;
     const beforeTop = container.scrollTop;
     const beforeLeft = container.scrollLeft;
     container.scrollTop = beforeTop + dy;
-    container.scrollLeft = beforeLeft + dx;
-    if (container.scrollTop !== beforeTop || container.scrollLeft !== beforeLeft) return true;
+    const panned = panX !== undefined && dx !== 0 && panX(dx);
+    if (!panX) container.scrollLeft = beforeLeft + dx;
+    if (panned || container.scrollTop !== beforeTop || container.scrollLeft !== beforeLeft) {
+      return true;
+    }
   }
   return false;
 }
@@ -125,6 +129,12 @@ type EdgeAutoScrollOptions = {
   axes?: ScrollAxes;
   /** Where a scroller's zones start (a pinned column), read every frame. */
   insets?: (container: HTMLElement) => EdgeInsets | undefined;
+  /**
+   * A sideways axis the host moves itself instead of a box's `scrollLeft` (the Gantt's time
+   * camera): the step along x in physical px (positive toward the right edge), measured from the
+   * scrollers' edges; returns whether anything moved.
+   */
+  panX?: (dx: number) => boolean;
   /** Something scrolled under the pointer: the gesture re-reads what it is over. */
   onScrolled: () => void;
 };
@@ -145,7 +155,7 @@ export type EdgeAutoScroll = {
  * until the pointer moves again.
  */
 export function createEdgeAutoScroll(options: EdgeAutoScrollOptions): EdgeAutoScroll {
-  const { axes = BOTH, insets, onScrolled } = options;
+  const { axes = BOTH, insets, panX, onScrolled } = options;
   let scrollers = options.scrollers;
   let point: EdgePoint | null = null;
   let frame = 0;
@@ -156,7 +166,7 @@ export function createEdgeAutoScroll(options: EdgeAutoScrollOptions): EdgeAutoSc
     if (!point) return;
     const elapsed = last ? Math.min(now - last, MAX_FRAME_MS) : 16;
     last = now;
-    if (!autoScrollStep(scrollers, point, elapsed, axes, insets)) {
+    if (!autoScrollStep(scrollers, point, elapsed, axes, insets, panX)) {
       last = 0;
       return;
     }

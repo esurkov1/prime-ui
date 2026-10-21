@@ -89,15 +89,15 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `solid` + `danger` | danger fill, danger-fg text | confirming a destructive action in a dialog | |
 | `solid` + `success` | success fill, success-fg text; a button turning success glides its fill over `fast` | an action that is done: «Оплачено», «Отправлено» | |
 | `soft` + `accent` | `accent-soft` fill, accent text | secondary but highlighted action | |
-| `soft` + `neutral` | translucent `fill-subtle` wash, primary text | every secondary text action: Cancel, Close, Back, Reset, Filters | |
+| `soft` + `neutral` | translucent `fill-subtle` wash, primary text | every secondary text action: Cancel, Close, Back, Reset, Filters; an icon-only button beside filled neighbours (the remove «×» after a row of fields, an edit icon after a soft button) | |
 | `soft` + `danger` | `danger-soft` fill, danger text | secondary destructive text action (Delete in a footer, a trigger that opens a confirm) | |
 | `soft` / `outline` / `ghost` + `success` | `success-soft` fill or wash, success text | a quieter done state next to other actions | |
 | `outline` + `accent` | transparent, 1px `border-default` inset line, accent text | not for product screens: a text action takes a fill (`soft`) | |
 | `outline` + `neutral` | transparent, 1px inset line, primary text | not for product screens: Cancel, Close and Back are `soft` neutral | |
 | `outline` + `danger` | 1px inset line, danger text, `danger-soft` on hover | not for product screens: a destructive trigger is `soft` danger | |
 | `ghost` + `accent` | transparent, accent text, `fill-subtle` on hover | an icon-only accent action | |
-| `ghost` + `neutral` | transparent, secondary text → primary on hover | icon-only buttons (toolbars, dialog headers, table cells, rows); a text button always has a fill | |
-| `ghost` + `danger` | transparent, danger text, `danger-soft` on hover | an icon-only destructive action (a row's delete) | |
+| `ghost` + `neutral` | transparent, secondary text → primary on hover | an icon-only button among unfilled neighbours (a dialog header, a table cell among text, a chat header, a toolbar of ghost tools, inline in text); beside fields or soft buttons it is `soft`; a text button always has a fill | |
+| `ghost` + `danger` | transparent, danger text, `danger-soft` on hover | an icon-only destructive action among unfilled neighbours (a dialog header's delete) | |
 | `ghost` + `inherit` | transparent, the host's text color, a `currentColor` wash on hover / press | close or icon action on a colored host (solid Banner, accent strip) | |
 | `soft` + `inherit` | `currentColor` wash fill, the host's text color | a labelled action on a colored host | |
 | `outline` + `inherit` | 1px inset line in a `currentColor` wash, the host's text color | not for product screens: a labelled action on a colored host is `soft` | |
@@ -124,7 +124,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `square` | the tier's radius; with only `Button.Icon`, a square | every labelled button, toolbar icon buttons | yes |
-| `circle` | a disk: width = the tier height, full radius; the focus ring, the touch area and the press (`press-scale-compact`, 0.96) follow the circle; `progress` draws a ring along the inner edge in the glyph's color | play / download / cancel / retry disks, a floating main action; only `Button.Icon` inside, `aria-label` required | |
+| `circle` | a disk: width = the tier height, full radius; the focus ring, the touch area and the press (`press-distance-compact`, 1px) follow the circle; `progress` draws a ring along the inner edge in the glyph's color | play / download / cancel / retry disks, a floating main action; only `Button.Icon` inside, `aria-label` required | |
 
 ### density
 | Value | Looks like | Use when | Default |
@@ -148,12 +148,12 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | `pressed` / `defaultPressed` | on: accent soft fill and accent text over any variant; off: the variant's own look | a single toggle (favourite, pin, «show archived») | — (not a toggle) |
 | `current` | the selected look, `aria-current="page"` | the current page of a set (page numbers) | off |
 
-**Hierarchy:** one primary (`solid accent`) per area, the rest neutral `soft` — a button with visible text always has a fill; `ghost` is for icon-only buttons and `outline` stays off product screens; a destructive action is `tone="danger"` and sits apart (start of the footer). Avoid two `solid accent` buttons side by side and `tone="danger"` for non-destructive actions.
+**Hierarchy:** one primary (`solid accent`) per area, the rest neutral `soft` — a button with visible text always has a fill; `ghost` is for icon-only buttons among unfilled neighbours (beside fields or soft buttons an icon button is `soft` too, at their height) and `outline` stays off product screens; a destructive action is `tone="danger"` and sits apart (start of the footer). Avoid two `solid accent` buttons side by side and `tone="danger"` for non-destructive actions.
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| hover / active | pointer | hover fill per variant; press gives to `--prime-motion-press-scale` (`-compact` on a circle) through the shared `internal/press`; not while disabled, loading or busy |
+| hover / active | pointer | hover fill per variant; press gives the edges in by `--prime-motion-press-distance` (`-compact` icon-only and on a circle) through the shared `internal/press`; not while disabled, loading or busy |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset`; `tone="inherit"` draws it in `currentColor` |
 | disabled | `disabled`, or a disabled `Fieldset` around it | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
 | loading | `loading` (native `<button>`) | `data-loading="true"`, native `disabled`, `aria-busy="true"`, colors kept (busy, not unavailable), no hover or press; the leading (or only) icon's glyph cross-fades into a `Spinner` (`aria-hidden`) and back, otherwise the spinner is centered over the hidden label (`data-loading-overlay="true"`) |

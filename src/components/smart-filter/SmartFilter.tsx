@@ -23,6 +23,7 @@ import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { FieldSectionButton } from "@/internal/FieldAction";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch, matchIndex } from "@/internal/HighlightMatch";
 import { useLabels } from "@/internal/labels";
@@ -132,6 +133,12 @@ export type SmartFilterLabels = {
   searchPlaceholder: string;
   /** `aria-label` of the search clear button. */
   clearSearch: string;
+  /** Text of the search chip, the pinned query. */
+  searchChip: string;
+  /** `aria-label` of the search chip's remove button. */
+  removeSearch: string;
+  /** Announced when a query is pinned. */
+  searchCommitted: string;
   /** The first row of the panel while typing. */
   searchText: string;
   /** Fields with no matches while typing. */
@@ -176,6 +183,9 @@ export const SMART_FILTER_LABELS: SmartFilterLabels = {
   filter: "Фильтр",
   searchPlaceholder: "Поиск",
   clearSearch: "Очистить поиск",
+  searchChip: "Поиск: {query}",
+  removeSearch: "Убрать поиск «{query}»",
+  searchCommitted: "Поиск «{query}» добавлен к фильтрам",
   searchText: "Искать «{query}»",
   noMatches: "{fields} — нет совпадений",
   reset: "Сбросить",
@@ -232,8 +242,21 @@ type Ctx = {
   total: number;
   open: boolean;
   setOpen: (open: boolean) => void;
+  /** The query the list is searched by (the `search` triad). */
   search: string;
-  setSearch: (search: string) => void;
+  /** The text in the field. */
+  draft: string;
+  /** A query is pinned: it stands as the search chip and the field's text no longer drives it. */
+  pinned: boolean;
+  /** Typing: the field's text; it drives `search` live while no query is pinned. */
+  typeDraft: (text: string) => void;
+  /** Enter / the «Искать» row: the field's text becomes the pinned query, the field empties. */
+  commitSearch: () => void;
+  /** The search chip's ×: no query. */
+  clearSearch: () => void;
+  /** The last pinned query, said by the toolbar's live region. */
+  announced: string;
+  fieldRef: React.RefObject<HTMLInputElement | null>;
   labels: SmartFilterLabels;
   size: ControlSize;
   collapsedLimit: number;
@@ -287,20 +310,51 @@ function SmartFilterRoot({
     onChange: onSearchChange,
   });
   const [open, setOpen] = React.useState(false);
+  const [draft, setDraft] = React.useState("");
+  const [announced, setAnnounced] = React.useState("");
+  const fieldRef = React.useRef<HTMLInputElement>(null);
+  // The search changed from outside (a saved view) while the field followed it: the new query is
+  // pinned, the field empties.
+  const [seen, setSeen] = React.useState(text);
+  if (seen !== text) {
+    setSeen(text);
+    if (draft === seen && draft !== text) setDraft("");
+  }
+  const pinned = text !== "" && text !== draft;
 
   const context: Ctx = {
     fields,
     value: current,
     setEntry: (key, entry) => setCurrent((prev) => withFieldValue(prev, key, entry)),
-    clearAll: () =>
+    clearAll: () => {
       setCurrent((prev) =>
         fields.reduce((next, field) => withFieldValue(next, field.key, undefined), prev),
-      ),
+      );
+      setDraft("");
+      if (text !== "") setText("");
+    },
     total: fields.reduce((n, field) => n + entrySize(current[field.key]), 0),
     open,
     setOpen,
     search: text,
-    setSearch: setText,
+    draft,
+    pinned,
+    typeDraft: (next) => {
+      setDraft(next);
+      if (!pinned && next !== text) setText(next);
+    },
+    commitSearch: () => {
+      const query = draft.trim();
+      if (query === "") return;
+      setDraft("");
+      if (query !== text) setText(query);
+      setAnnounced(formatLabel(mergedLabels.searchCommitted, { query }));
+    },
+    clearSearch: () => {
+      if (text !== "") setText("");
+    },
+    announced,
+    fieldRef,
     labels: mergedLabels,
     size,
     collapsedLimit,
@@ -317,18 +371,29 @@ function SmartFilterRoot({
 SmartFilterRoot.displayName = "SmartFilter.Root";
 
 // ---------------------------------------------------------------------------------------------
-// Toolbar: filter button + search; the anchor of the panel
+// Toolbar: filter button + search, or one field with a filter section; the anchor of the panel
 // ---------------------------------------------------------------------------------------------
 
 export type SmartFilterToolbarProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   searchable?: boolean;
+  layout?: "split" | "combined";
   ref?: React.Ref<HTMLDivElement>;
 };
 
 /**
- * Whether the filter button beside the search shows only its icon (and the count): when the
- * toolbar is narrower than the search's least width plus the labelled button, so the search keeps
- * its row instead of wrapping under the button. The labelled width is read while it shows.
+ * Whether the filter control — the button beside the search or the field's section — shows only
+ * its icon (and the count): when the search would keep less than 18rem beside the labelled
+ * control. On a phone (320–430) both shapes are compact, so the search keeps its row and its room;
+ * from a tablet column up the label returns.
+ *
+ * The toolbar's width can depend on its own form (a tool row or a top bar that lays out by
+ * content), so the fit never flips on itself:
+ * - the labelled width is read while it shows and kept; going back to it takes the room it needs
+ *   plus what the label adds over the icon (hysteresis), so a toolbar that grows by the label's
+ *   own width stays put;
+ * - a return to the label that does not hold (the next measure is compact again) marks that width:
+ *   the form stays compact until the toolbar is wider than it, so a host whose width moves more
+ *   than that settles after one bounce instead of looping.
  */
 function useCompactFilter(
   enabled: boolean,
@@ -339,6 +404,10 @@ function useCompactFilter(
   const labelled = React.useRef(0);
   const current = React.useRef(compact);
   current.current = compact;
+  // The width at which the label was last brought back, while that return is unconfirmed.
+  const tried = React.useRef<number | null>(null);
+  // A width at which the label came back and did not hold: no return at or below it.
+  const bounced = React.useRef(0);
 
   const fit = React.useCallback(() => {
     const toolbar = toolbarRef.current;
@@ -346,10 +415,23 @@ function useCompactFilter(
       setCompact(false);
       return;
     }
-    if (!current.current && buttonRef.current) labelled.current = buttonRef.current.offsetWidth;
+    const button = buttonRef.current;
+    const width = toolbar.clientWidth;
     const gap = Number.parseFloat(getComputedStyle(toolbar).columnGap) || 0;
-    const search = readCssLengthPx("--prime-space-24", 96) * 1.5;
-    setCompact(toolbar.clientWidth < search + gap + labelled.current);
+    const search = readCssLengthPx("--prime-space-24", 96) * 3;
+    if (!current.current) {
+      if (button) labelled.current = button.offsetWidth;
+      const fits = width >= search + gap + labelled.current;
+      if (!fits && tried.current !== null) bounced.current = tried.current;
+      tried.current = null;
+      if (!fits) setCompact(true);
+      return;
+    }
+    const gain = Math.max(0, labelled.current - (button?.offsetWidth ?? 0));
+    if (width >= search + gap + labelled.current + gain && width > bounced.current) {
+      tried.current = width;
+      setCompact(false);
+    }
   }, [enabled, toolbarRef, buttonRef]);
 
   React.useLayoutEffect(fit);
@@ -359,16 +441,49 @@ function useCompactFilter(
 
 function SmartFilterToolbar({
   searchable = true,
+  layout = "split",
   className,
   ref,
   ...rest
 }: SmartFilterToolbarProps) {
-  const { fields, total, open, setOpen, search, setSearch, labels, size } = useSmartFilter();
+  const {
+    fields,
+    total,
+    open,
+    setOpen,
+    draft,
+    typeDraft,
+    commitSearch,
+    announced,
+    fieldRef,
+    labels,
+    size,
+  } = useSmartFilter();
   const hasFilters = fields.length > 0;
+  // Without a search there is no field to hold the section: the filter stays a button.
+  const combined = layout === "combined" && searchable && hasFilters;
   const toolbarRef = React.useRef<HTMLDivElement>(null);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const mergedRef = useMergedRefs(toolbarRef, ref);
   const compact = useCompactFilter(searchable && hasFilters, toolbarRef, buttonRef);
+
+  // The filter control, a button or the field's section alike: the glyph, the label (only its name
+  // when compact), the count while filters apply.
+  const filterProps = {
+    ref: buttonRef,
+    "aria-label": compact && total === 0 ? labels.filter : undefined,
+    "aria-expanded": open,
+    "aria-haspopup": "dialog" as const,
+    onClick: () => setOpen(!open),
+  };
+  const filterLabel = compact ? (
+    total > 0 ? (
+      <VisuallyHidden>{labels.filter}</VisuallyHidden>
+    ) : null
+  ) : (
+    labels.filter
+  );
+  const filterCount = total > 0 ? <Badge.Root color="blue">{total}</Badge.Root> : null;
 
   return (
     <>
@@ -378,6 +493,7 @@ function SmartFilterToolbar({
           ref={mergedRef}
           className={cx(styles.toolbar, className)}
           data-slot="smart-filter-toolbar"
+          data-layout={combined ? "combined" : undefined}
           data-searchable={searchable ? undefined : "false"}
           data-compact={compact ? "true" : undefined}
         >
@@ -392,45 +508,65 @@ function SmartFilterToolbar({
                   <Icon name="action.search" tone="secondary" />
                 </Input.Icon>
                 <Input.Field
+                  ref={fieldRef}
                   type="search"
                   aria-label={labels.searchPlaceholder}
                   placeholder={labels.searchPlaceholder}
-                  value={search}
-                  onValueChange={setSearch}
+                  value={draft}
+                  onValueChange={typeDraft}
                   onFocus={() => hasFilters && setOpen(true)}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === "Escape") setOpen(false);
+                    if (event.key === "Enter") {
+                      // A typed query is pinned as a chip and the panel stays for the filters;
+                      // Enter in an empty field is done: the panel closes.
+                      if (draft.trim() === "") setOpen(false);
+                      else commitSearch();
+                    }
+                    if (event.key === "Escape") {
+                      // The first Escape clears the text (never a pinned query), the next one
+                      // closes the panel.
+                      if (draft === "") setOpen(false);
+                      else {
+                        event.preventDefault();
+                        typeDraft("");
+                      }
+                    }
                   }}
                 />
-                {search.length > 0 && <Input.ClearButton onClick={() => setSearch("")} />}
+                {draft.length > 0 && <Input.ClearButton onClick={() => typeDraft("")} />}
+                {/* The filter section closes the field, always there: the field reads as search
+                    and filters at rest; only the clear before its line comes and goes. */}
+                {combined && (
+                  <FieldSectionButton
+                    {...filterProps}
+                    className={styles.filterSection}
+                    data-icon-only={compact && total === 0 ? "true" : undefined}
+                  >
+                    <Icon name="action.filter" />
+                    {filterLabel}
+                    {filterCount}
+                  </FieldSectionButton>
+                )}
               </Input.Wrapper>
             </Input.Root>
           )}
-          {hasFilters && (
+          {hasFilters && !combined && (
             <Button.Root
-              ref={buttonRef}
+              {...filterProps}
               variant="soft"
               tone="neutral"
               size={size}
               className={styles.filterButton}
-              aria-label={compact && total === 0 ? labels.filter : undefined}
-              aria-expanded={open}
-              aria-haspopup="dialog"
-              onClick={() => setOpen(!open)}
             >
               <Button.Icon>
                 <Icon name="action.filter" />
               </Button.Icon>
-              {compact ? (
-                total > 0 ? (
-                  <VisuallyHidden>{labels.filter}</VisuallyHidden>
-                ) : null
-              ) : (
-                labels.filter
-              )}
-              {total > 0 && <Badge.Root color="blue">{total}</Badge.Root>}
+              {filterLabel}
+              {filterCount}
             </Button.Root>
           )}
+          {/* Mounted with the toolbar, so a pinned query is announced as it is pinned. */}
+          {searchable && <VisuallyHidden live="polite">{announced}</VisuallyHidden>}
         </div>
       </Popover.Anchor>
       {hasFilters && (
@@ -463,13 +599,14 @@ function Panel({ searchable }: { searchable: boolean }) {
     setEntry,
     total,
     clearAll,
-    setOpen,
-    search,
+    draft,
+    commitSearch,
+    fieldRef,
     labels,
     size,
     collapsedLimit,
   } = useSmartFilter();
-  const query = searchable ? search.trim() : "";
+  const query = searchable ? draft.trim() : "";
   const footer = usePartPresence<HTMLDivElement>({ present: total > 0, axis: "block" });
   const leaveFooter = footer.ref;
   const footerRef = React.useCallback(
@@ -500,7 +637,11 @@ function Panel({ searchable }: { searchable: boolean }) {
             tone="neutral"
             size={size}
             fullWidth
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              // The query is pinned; the field takes the focus back for the next filter.
+              commitSearch();
+              fieldRef.current?.focus();
+            }}
           >
             <Button.Icon>
               <Icon name="action.search" />
@@ -830,14 +971,30 @@ export type SmartFilterChipsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The applied filters as removable tags, with "add" and "clear all". Renders nothing without filters. */
+/**
+ * The pinned search and the applied filters as removable tags, with "add" and "clear all". Renders
+ * nothing without either.
+ */
 function SmartFilterChips({ className, ref, ...rest }: SmartFilterChipsProps) {
-  const { fields, value, setEntry, total, clearAll, setOpen, setSearch, labels, size } =
-    useSmartFilter();
-  // The row rises in with the first filter and closes up in place with the last.
-  const presence = usePartPresence<HTMLDivElement>({ present: total > 0, axis: "block" });
+  const {
+    fields,
+    value,
+    setEntry,
+    total,
+    clearAll,
+    setOpen,
+    search,
+    pinned,
+    typeDraft,
+    clearSearch,
+    labels,
+    size,
+  } = useSmartFilter();
+  const shown = total > 0 || pinned;
+  // The row rises in with the first chip and closes up in place with the last.
+  const presence = usePartPresence<HTMLDivElement>({ present: shown, axis: "block" });
   const mergedRef = useMergedRefs(presence.ref, ref);
-  if (total === 0) return null;
+  if (!shown) return null;
   const tagSize = tagSizeOf(size);
 
   const chip = (key: string, text: string, negated: boolean, onRemove: () => void) => (
@@ -860,6 +1017,21 @@ function SmartFilterChips({ className, ref, ...rest }: SmartFilterChipsProps) {
       className={cx(styles.chips, presence.className, className)}
       data-slot="smart-filter-chips"
     >
+      {/* The pinned query first: the search reads as the first condition of the filters. */}
+      {pinned ? (
+        <Badge.Root
+          size={tagSize}
+          color="blue"
+          labels={{ remove: formatLabel(labels.removeSearch, { query: search }) }}
+          onRemove={clearSearch}
+          data-search=""
+        >
+          <Badge.Icon>
+            <Icon name="action.search" />
+          </Badge.Icon>
+          {formatLabel(labels.searchChip, { query: search })}
+        </Badge.Root>
+      ) : null}
       {fields.flatMap((field) => {
         const entry = value[field.key];
         if (!entry) return [];
@@ -900,7 +1072,7 @@ function SmartFilterChips({ className, ref, ...rest }: SmartFilterChipsProps) {
         <button
           type="button"
           onClick={() => {
-            setSearch("");
+            typeDraft("");
             setOpen(true);
           }}
         >

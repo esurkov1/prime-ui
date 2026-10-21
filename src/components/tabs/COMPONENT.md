@@ -183,7 +183,7 @@ Avoid icons or descriptions on only some tabs (uneven rows; without an icon on e
 |---|---|---|
 | active | `value` / `defaultValue` | item `aria-selected="true"`, `data-state="active"`, `tabIndex=0`; others `data-state="inactive"`, `tabIndex=-1` |
 | hover | pointer | text → primary; the folder shape in `fill-faint`, under the folder |
-| pressed | pointer down | the tab content scales to `--prime-motion-press-scale-compact` (`internal/press`) |
+| pressed | pointer down | the tab content gives in by the compact press distance (`internal/press`) |
 | focus-visible | keyboard | the tab draws an inset ring in its own shape, above the folder; the focused panel draws the outer ring |
 | disabled | `disabled` on Item | native `disabled`, `data-disabled="true"`, `text-disabled`; a removable tab loses its close button |
 | removable | `onRemove` on Item | item wrapper `data-removable="true"`, close button, tab `aria-keyshortcuts="Delete"` |

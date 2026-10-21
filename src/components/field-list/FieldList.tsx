@@ -559,7 +559,7 @@ export function FieldList<T extends object>({
         <Dropdown.Root>
           <Dropdown.Trigger>
             <Button.Root
-              variant="ghost"
+              variant="soft"
               tone="neutral"
               aria-label={formatLabel(labels.actions, { row: name })}
               aria-keyshortcuts={reorderable ? MOVE_KEYS : undefined}
@@ -609,9 +609,11 @@ export function FieldList<T extends object>({
         </Dropdown.Root>
       );
     } else {
+      // The row's action takes the fill of the fields beside it: the row ends on a filled edge, as
+      // it starts, and reads as one block; the menu button of `rowActions="menu"` does the same.
       const removeButton = (
         <Button.Root
-          variant="ghost"
+          variant="soft"
           tone="neutral"
           aria-label={formatLabel(labels.remove, { row: name })}
           disabled={removeOff}

@@ -130,6 +130,32 @@ describe("edgeAutoScroll", () => {
     mirrored.stop();
   });
 
+  it("hands the sideways step to a host that moves its own axis (panX)", () => {
+    // A box that never scrolls sideways (the Gantt's rows): its edges still start the zones.
+    const rows = scroller("hidden", "auto", "ltr", 400);
+    const steps: number[] = [];
+    const camera = createEdgeAutoScroll({
+      scrollers: [rows],
+      axes: { x: true, y: false },
+      insets: () => ({ inlineStart: 100 }),
+      panX: (dx) => {
+        steps.push(dx);
+        return true;
+      },
+      onScrolled: () => {},
+    });
+    camera.follow({ x: 399, y: 100 });
+    frames(2);
+    expect(steps.length).toBeGreaterThan(0);
+    expect(steps.every((dx) => dx > 0)).toBe(true);
+    expect(rows.scrollLeft).toBe(0);
+    steps.length = 0;
+    camera.follow({ x: 101, y: 100 });
+    frames(2);
+    expect(steps.every((dx) => dx < 0)).toBe(true);
+    camera.stop();
+  });
+
   it("finds the boxes a gesture may scroll, innermost first", () => {
     const outer = scroller("hidden", "auto");
     const inner = scroller("auto", "hidden");

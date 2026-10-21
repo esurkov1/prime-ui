@@ -53,10 +53,10 @@ DataTable                           card-fill block, radius 12, clips its conten
 └── footer (when it has something)  Pagination · range «Показано 1–5 из 23» (`showRange`) · «Догружаем строки…» while more rows load
 ```
 ```
-DataTableColumnsMenu                the column chooser outside the table, for the page's tools
-├── soft Button                     view.columns icon · labels.columns · Badge with the count of shown columns
-└── Dropdown                        a «Показывать» group of check items (with onColumnOrderChange a Dnd.Sortable list,
-                                    a grip ends each item) · «Показать все» · «Исходный порядок»
+DataTableColumnsMenu                the column chooser outside the table, for the table's tools
+├── soft Button                     the kit's view trigger: view.columns icon · «Вид» (labels.view) · Badge with the count of shown columns
+└── Dropdown                        a «В таблице» group of check items (with onColumnOrderChange a Dnd.Sortable list,
+                                    a grip ends each item) · «По умолчанию» while the view differs from the default
 ```
 Columns are data (`DataTableColumn<Row>[]`), not child parts; the table has no parts. The column chooser has one place per table: the `columnsMenu` flag puts it in the head of the row-actions column; a table without one gets `DataTableColumnsMenu` beside the table's other tools in its `toolbar`, bound to the same `hiddenColumns` / `columnOrder` state; never alone in a `toolbar`.
 
@@ -75,7 +75,7 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `onHiddenColumnsChange` | `(hiddenColumns: string[]) => void` | — | The hidden ids changed (`columnsMenu`). The kit stores nothing: keep the list (local storage, the user's settings) and pass it back to restore the choice. |
 | `columnOrder` | `string[]` | — | Column ids in screen order, hidden ones keeping their place, controlled. Any prop of this triad makes columns reorder: a header drag (the body stays until the drop), Alt + ← / → on a header, grips in the column chooser. |
 | `defaultColumnOrder` | `string[]` | — | Initial column order, uncontrolled; `[]` — the order of `columns`, reorderable. |
-| `onColumnOrderChange` | `(columnOrder: string[]) => void` | — | The order changed: a header dropped, a keyboard move, a chooser grip or «Исходный порядок». The kit stores nothing: keep it with `hiddenColumns` and pass it back. |
+| `onColumnOrderChange` | `(columnOrder: string[]) => void` | — | The order changed: a header dropped, a keyboard move, a chooser grip or «По умолчанию». The kit stores nothing: keep it with `hiddenColumns` and pass it back. |
 | `columnsMenu` | `boolean` | `false` | The column chooser in the head of the row-actions column (the last one, `hideHeader`); reorders with `columnOrder`. Without that column it renders nothing and warns: use `DataTableColumnsMenu` in the page's tools. |
 | `rows` | `Row[]` | — (required) | Data; sorted in memory when a sort is set. With `source="server"` — the page (or the loaded batches) as the server returned it. |
 | `source` | `"client" \| "server"` | `"client"` | Who sorts and pages the rows. `client`: the table sorts `rows` and slices pages. `server`: `rows` is one page, already sorted; `sort` / `page` changes are the request, `rowCount` drives Pagination. |
@@ -140,17 +140,18 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other attributes of the root `<div>`. |
 
 ### DataTableColumnsMenu
-Generic `DataTableColumnsMenu<Row>`; `ref` → `HTMLButtonElement`. The column chooser outside the table, for the page's tools: a soft Button «Колонки» with the count of shown columns, opening the same menu as `columnsMenu`. Bound to the table's state.
+Generic `DataTableColumnsMenu<Row>`; `ref` → `HTMLButtonElement`. The column chooser outside the table, for its tools: the kit's one view trigger (the columns icon, «Вид», the count of shown columns) opening the same menu as `columnsMenu`. Bound to the table's state.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `columns` | `DataTableColumn<Row>[]` | — (required) | The table's `columns`, in the order of the code. |
 | `hiddenColumns` | `string[]` | — (required) | The ids the table hides: the same list its `hiddenColumns` reads. |
-| `onHiddenColumnsChange` | `(hiddenColumns: string[]) => void` | — (required) | A column was shown or hidden, or «Показать все». |
+| `defaultHiddenColumns` | `string[]` | `[]` | The default view: the hidden columns «По умолчанию» puts back (with the order of `columns`). |
+| `onHiddenColumnsChange` | `(hiddenColumns: string[]) => void` | — (required) | A column was shown or hidden, or «По умолчанию» put `defaultHiddenColumns` back. |
 | `columnOrder` | `string[]` | — | The table's `columnOrder`. |
-| `onColumnOrderChange` | `(columnOrder: string[]) => void` | — | Turns the items into a sortable list (a grip, Alt + ↑ / ↓) with «Исходный порядок»; the new order of every column. |
+| `onColumnOrderChange` | `(columnOrder: string[]) => void` | — | Turns the items into a sortable list (a grip, Alt + ↑ / ↓); «По умолчанию» puts the order of `columns` back too. The new order of every column. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the trigger and the menu. |
-| `labels` | `Partial<DataTableColumnsMenuLabels>` | — | The chooser's strings: `columns`, `showColumns`, `showAllColumns`, `resetColumnOrder`, `reorderColumn`. |
+| `labels` | `Partial<DataTableColumnsMenuLabels>` | — | The chooser's strings: `view`, `showColumns`, `resetColumns`, `reorderColumn`. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "type">` | — | `className` and the other attributes of the trigger button. |
 
 ### Types
@@ -263,7 +264,7 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | `collapsedGroups` · `defaultCollapsedGroups` · `onCollapsedGroupsChange` | any of the three makes groups fold: a chevron toggle leads each group header, a collapsed group shows its header alone | long grouped tables where people work one group at a time; `defaultCollapsedGroups={[]}` starts with every group open | off |
 | `columnsMenu` | an icon-only ghost Button (`view.columns`) in the head cell of the row-actions column (the last column, `hideHeader`), lined up with the ⋯ under it; it opens the column chooser. Without that column nothing renders and the table warns | a table with row actions and more columns than a narrow screen holds; without row actions, `DataTableColumnsMenu` in the page's tools | `false` |
 | column `hideable` | `false`: the column stays even when listed in `hiddenColumns`; checked and disabled in the column chooser | the key column that names the row, the row-actions column | `true` |
-| `columnOrder` · `defaultColumnOrder` · `onColumnOrderChange` | any of the three makes columns reorder: a press that moves on a header carries the header alone (a finger holds still) while the body stays, Alt + ← / → on the header, grips in the column chooser plus «Исходный порядок» | tables people arrange for themselves; `defaultColumnOrder={[]}` starts in the order of `columns` | off |
+| `columnOrder` · `defaultColumnOrder` · `onColumnOrderChange` | any of the three makes columns reorder: a press that moves on a header carries the header alone (a finger holds still) while the body stays, Alt + ← / → on the header, grips in the column chooser; «По умолчанию» puts the order of `columns` back | tables people arrange for themselves; `defaultColumnOrder={[]}` starts in the order of `columns` | off |
 | column `reorderable` | `false`: the column holds its place — its header carries nothing, no column moves past it, the chooser shows a lock. A `hideHeader` column and a pinned first / last column hold theirs too | the key column, a total that must stay last | `true` |
 | `showHeader` | head row shown | off only for self-explanatory key/value tables | `true` |
 | `showRange` | «Показано 1–5 из 23» on the left of the footer, with more than one page or with infinite scroll | the count matters to the task (a register people page through, a server list with a total) | `false` |
@@ -318,9 +319,9 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - While columns are hidden past an edge, that edge shows a `--prime-space-4` shadow (`--prime-color-bg-edge-shadow`) over the content; it takes no space and follows RTL. With `stickyFirstColumn` the start shadow falls from the pinned column's end edge; with `stickyLastColumn` the end shadow falls from the pinned column's start edge. With `stickyHeader` the pinned head cells hold both corners.
 - Layers, bottom to top: every cell that scrolls · the pinned columns (lead cells, the first and the last column, the end grip cell) · sticky group headers · the sticky head · the corners (head cells pinned to a column edge). Each cell keeps what it holds inside its own layer, so a control in a scrolled cell — a Switch, an icon Button, a focus ring — always passes under the pinned columns and the head, whatever its own stacking. A head label truncates inside its cell and never runs under the next one.
 - Fewer columns, less scrolling: offer the column chooser (the key column and the row-actions column `hideable: false`). The kit stores nothing: keep `onHiddenColumnsChange`'s list where the app keeps settings and pass it back as `hiddenColumns`. Never hide columns silently by width.
-- The column chooser has one place per table. Over the row actions (`columnsMenu`): an icon-only ghost neutral Button one tier below the table (the `view.columns` icon; `labels.columns` is its name and its Tooltip) in the head cell of the row-actions column (the last visible column, `hideHeader`), lined up with the ⋯ buttons under it, sticking with that column under `stickyLastColumn`. Without row actions: `DataTableColumnsMenu` in the table's `toolbar` — a soft neutral Button with the icon, `labels.columns` and a Badge with the count of shown columns, at the host tier — bound to the same `hiddenColumns` (and `columnOrder`) state the table reads. Both open the same Dropdown: a `labels.showColumns` group heading over one check item per column (the check at the end).
+- The column chooser has one place per table. Over the row actions (`columnsMenu`): an icon-only ghost neutral Button one tier below the table (the `view.columns` icon; `labels.columns` is its name and its Tooltip) in the head cell of the row-actions column (the last visible column, `hideHeader`), lined up with the ⋯ buttons under it, sticking with that column under `stickyLastColumn`. Without row actions: `DataTableColumnsMenu` in the table's `toolbar` — the kit's one view trigger, a soft neutral Button with the icon, «Вид» (`labels.view`) and a Badge with the count of shown columns, at the host tier, the same as `KanbanFieldsMenu` and `GanttCategoriesMenu` (a page that switches table ↔ board ↔ schedule keeps one «Вид» in one place) — bound to the same `hiddenColumns` (and `columnOrder`) state the table reads. Both open the same Dropdown: a `labels.showColumns` group heading over one check item per column (the check at the end).
 - Reorderable rows: the grip is the fixed `xs` `Dnd.Handle`. At the end it takes a trailing cell (the grip plus the end padding), after the row actions; at the start a leading cell before the checkboxes (the first column's padding is the gap to it). Rows that are their own grip (`row`) add no cell.
-- Reorderable columns move only between the columns that hold their place: the selection, toggle, grip and trailing cells never move, a pinned first or last column stays at its edge, a `hideHeader` (row actions) or `reorderable: false` column keeps its slot. A hidden column keeps its slot in `columnOrder` too, so showing it again puts it back where it was. Keep `columnOrder` with `hiddenColumns` where the app keeps settings. The chooser's Dropdown opens below (lined up with the trigger's end edge over the row actions), lists every column in table order and ends with `labels.showAllColumns` (and `labels.resetColumnOrder` with `columnOrder`); a `hideable: false` column stays checked and disabled, and the last visible column cannot be hidden. With `columnOrder` the items are a `Dnd.Sortable` list, a grip (or a lock) ending each item after its check mark.
+- Reorderable columns move only between the columns that hold their place: the selection, toggle, grip and trailing cells never move, a pinned first or last column stays at its edge, a `hideHeader` (row actions) or `reorderable: false` column keeps its slot. A hidden column keeps its slot in `columnOrder` too, so showing it again puts it back where it was. Keep `columnOrder` with `hiddenColumns` where the app keeps settings. The chooser's Dropdown opens below (lined up with the trigger's end edge over the row actions), lists every column in table order and, while the view differs from the default (`defaultHiddenColumns`, the order of `columns`), ends with `labels.resetColumns` («По умолчанию»), which puts both back — it rises in with the first change and closes up when the view is the default again; a `hideable: false` column stays checked and disabled, and the last visible column cannot be hidden. With `columnOrder` the items are a `Dnd.Sortable` list, a grip (or a lock) ending each item after its check mark.
 - Row height per `size` is public: `--prime-table-row-height-xs` · `-s` · `-m` · `-l` · `-xl` (36 · 36 · 44 · 52 · 52). A placeholder outside the table that stands in its geometry (a heatmap, a matrix skeleton) uses the same token.
 - A row that opens keeps controls out of its key cell (that cell is the link); controls in other cells stand above the row's link. Mark a custom widget with `data-row-click-ignore`.
 - Group headers: the name at the start, totals at the end (`renderGroupHeader` returns both, the kit lays them out across the visible width), head-tier text in `text-secondary`, row height = the head height. With collapsible groups the chevron toggle (the expand toggle's ghost Button) leads the header at the cell padding.
@@ -368,6 +369,8 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+#### DataTable
+
 | Key | Default | Used for |
 |---|---|---|
 | `loading` | `"Загрузка данных…"` | Screen-reader status while skeleton rows are shown. |
@@ -381,16 +384,21 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | `clearSelection` | `"Снять выбор"` | The first item of the selection actions menu: clears the selection. |
 | `expand` | `"Развернуть строку {label}"` | Name of the toggle of a collapsed row. |
 | `collapse` | `"Свернуть строку {label}"` | Name of the toggle of an expanded row. |
-| `columns` | `"Колонки"` | Name and tooltip of the icon trigger (`columnsMenu`), the text of `DataTableColumnsMenu`; `{shown}` and `{total}` are column counts. |
-| `showColumns` | `"Показывать"` | The heading of the chooser's list of columns. |
-| `showAllColumns` | `"Показать все"` | The column chooser item that shows every column again. |
-| `resetColumnOrder` | `"Исходный порядок"` | The column chooser item that puts the order of `columns` back (`columnOrder`). |
+| `columns` | `"Колонки"` | Name and tooltip of the icon trigger (`columnsMenu`); `{shown}` and `{total}` are column counts. |
+| `showColumns` | `"В таблице"` | The heading of the chooser's list of columns. |
+| `resetColumns` | `"По умолчанию"` | The column chooser item that puts the default hidden columns and the order of `columns` back; shown only while the view differs. |
 | `reorderColumn` | `"Переместить колонку {label}"` | Name of a column's grip in the column chooser (`columnOrder`); `{label}` is its header. |
 | `reorderRow` | `"Переместить строку {label}"` | `aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`. |
 | `reorderSorted` | `"Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки"` | Tooltip of the disabled handles while the table is sorted by a column. |
 | `expandGroup` | `"Развернуть группу {group}"` | Name of the toggle of a collapsed group; `{group}` is the group key. |
 | `collapseGroup` | `"Свернуть группу {group}"` | Name of the toggle of an expanded group; `{group}` is the group key. |
 | `columnInfo` | `"Пояснение"` | Name of the info glyph of a column with a `description`; the tooltip holds the text. |
+
+#### DataTableColumnsMenu
+
+| Key | Default | Used for |
+|---|---|---|
+| `view` | `"Вид"` | Text of the trigger of `DataTableColumnsMenu`. |
 
 ## Examples
 | Example | Shows |
@@ -413,6 +421,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [reorder.tsx](examples/reorder.tsx) | Pipeline stages put in order by a grip at the end of the row, at its start or by the whole row, or with Alt + ↑ / ↓; each move is saved with a spinner in its grip, and sorting by a column turns reordering off — `onReorder`, `reorderHandle`, `getRowLabel`. |
 | [groups.tsx](examples/groups.tsx) | Payments grouped by month with the month's total in its header row; headers stay on top while their rows scroll, a past month folds away — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`, `defaultCollapsedGroups`. |
 | [columns-visibility.tsx](examples/columns-visibility.tsx) | Orders without a row-actions column: the column chooser stands in the tools above the table with the count of shown columns; the choice outlives a reload in local storage, the order number always stays — `DataTableColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. |
+| [view-order.tsx](examples/view-order.tsx) | Orders whose view menu shows, hides and reorders the columns: a grip at the end of each item drags it (a held press on touch), Alt + ↑ / ↓ moves the focused one, and the reset item puts the default columns and their order back — `DataTableColumnsMenu`, `columnOrder`, `onColumnOrderChange`, `defaultHiddenColumns`. |
 | [column-order.tsx](examples/column-order.tsx) | Orders whose columns a manager puts in place by dragging a header — it moves alone and the gap opens among the headers where it lands — or with Alt + ← / →, and shows, hides and reorders in the chooser over the row menu; the order number stays first and the row menu last, and the choice outlives a reload — `columnOrder`, `onColumnOrderChange`, `reorderable`, `columnsMenu`, `hiddenColumns`. |
 | [infinite-scroll.tsx](examples/infinite-scroll.tsx) | An audit log that reveals loaded rows in batches and then asks the server for more — `paging`, `infiniteBatchSize`, `hasMore`, `loadingMore`, `onLoadMore`. |
 | [server.tsx](examples/server.tsx) | A CRM deal list the server sorts, pages and searches, with its tools in its own row — search, filter and column chooser, the active filters under them; a new search returns to page 1, and the footer counts the deals shown out of the total — `source`, `rowCount`, `showRange`, `sort`, `page`, `loading`, `toolbar`, `toolbarChips`. |
@@ -441,7 +450,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - A long table in a `scrollHeight` window without `stickyHeader` → the head scrolls away.
 - `paging="none"` for hundreds of rows → use `pages` or `infinite`.
 - Dropping columns below a breakpoint → people lose data without knowing it; offer the column chooser.
-- A hand-built column chooser from Dropdown items → `columnsMenu` over the row actions, else `DataTableColumnsMenu` (key column, last visible column, «Показать все», reorder built in).
+- A hand-built column chooser from Dropdown items → `columnsMenu` over the row actions, else `DataTableColumnsMenu` (key column, last visible column, «По умолчанию», reorder built in).
 - `columnsMenu` on a table without a row-actions column → nothing renders and the table warns; put `DataTableColumnsMenu` beside the table's other tools in its `toolbar`, bound to the same `hiddenColumns`.
 - A toolbar with one button (the column chooser, «Экспорт», «Создать») → a whole row above the table for one control; the chooser stands over the row actions or beside the table's search, the page's actions go to `Page.Actions`.
 - The table's search, filter, chips or column chooser in the page's bar (`Page.Tools`, `Page.Chips`) → they read as filters of the whole page and part from the table they filter; put them in the table's `toolbar` / `toolbarChips`, also when the table is the whole page, and keep the bar for the title, sections or a view, the period that drives every block and the actions.
@@ -463,5 +472,5 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - A new search that keeps the current page → set `page` to 1 together with the search.
 
 ## Related
-- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (the column chooser, the selection actions menu), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Spinner](../spinner/COMPONENT.md) (the footer status while more rows load), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`; `columnOrder`: the head row as a `Dnd.Sortable as="tr"`, the chooser's `Dnd.Sortable` list, `Dnd.Handle`, the lock), [Badge](../badge/COMPONENT.md) (the count on `DataTableColumnsMenu` and on the selection actions menu), [Tooltip](../tooltip/COMPONENT.md) (handle hint, a column `description`, the column chooser), Icon (sort arrows, the info glyph of a column `description`, the expand chevron, the column chooser trigger); `useVirtualRows` (the window of a long body); `useFlipList` (the head cells glide to an order set from outside the head row); `enterMotion` (the moved column fades in); `ToolRow` (the `toolbar` row, the selection actions cell and the `toolbarChips` line) with [SmartFilter](../smart-filter/COMPONENT.md), [Input](../input/COMPONENT.md) and [Typography](../typography/COMPONENT.md) (what grows in the tool row), [SegmentedControl](../segmented-control/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md) and [Select](../select/COMPONENT.md) (what fills a short line; the first two get `fullWidth`); `partPresence` (the selection actions menu and the tools row it brings enter and close up)
+- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (the column chooser, the selection actions menu), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Spinner](../spinner/COMPONENT.md) (the footer status while more rows load), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`; `columnOrder`: the head row as a `Dnd.Sortable as="tr"`, the chooser's `Dnd.Sortable` list, `Dnd.Handle`, the lock), [Badge](../badge/COMPONENT.md) (the count on `DataTableColumnsMenu` and on the selection actions menu), [Tooltip](../tooltip/COMPONENT.md) (handle hint, a column `description`, the column chooser), Icon (sort arrows, the info glyph of a column `description`, the expand chevron, the column chooser trigger); `useVirtualRows` (the window of a long body); `useFlipList` (the head cells glide to an order set from outside the head row); `enterMotion` (the moved column fades in); `ToolRow` (the `toolbar` row, the selection actions cell and the `toolbarChips` line) with [SmartFilter](../smart-filter/COMPONENT.md), [Input](../input/COMPONENT.md) and [Typography](../typography/COMPONENT.md) (what grows in the tool row), [SegmentedControl](../segmented-control/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md) and [Select](../select/COMPONENT.md) (what fills a short line; the first two get `fullWidth`); `partPresence` (the selection actions menu and the tools row it brings enter and close up); `ViewMenu` (the kit's one view trigger and menu, shared with `KanbanFieldsMenu` and `GanttCategoriesMenu`)
 - **See also:** [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"` in a cell), [SmartFilter](../smart-filter/COMPONENT.md), [Page](../../layout/page/COMPONENT.md) (`Page.Tools`, `Page.Chips`), [Gantt](../gantt/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)

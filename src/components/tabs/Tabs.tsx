@@ -23,7 +23,7 @@ import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import { useEnterOnAppear } from "@/internal/partPresence";
 import { labelPlainText, useTextPartId, useTextParts } from "@/internal/parts";
-import press from "@/internal/press.module.css";
+import { press } from "@/internal/press";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import {

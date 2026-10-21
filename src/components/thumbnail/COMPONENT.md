@@ -134,7 +134,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | frame | props | `data-size`, `data-ratio`, `data-color`, `data-variant`, `data-full-width`, `data-ring` |
 | video loading | `Thumbnail.Video` mounted | `data-status="loading"` until the first frame (`loadeddata`) — with a `poster`, until its metadata (`loadedmetadata`) — then `loaded`; `error` falls back like an image |
 | video still / playing | no `controls`, not looping | a play mark in the centre (from `m`): the still media disk (`internal/mediaDisk`) — the look and size of the shade circle Button over media (the control `l` height, a glyph of half of it, `--prime-color-media-disk` under `--prime-media-disk-blur`), at 60% of a lower frame's height; it fades and shrinks away while the video plays (`data-shown="false"`) and comes back on a pause. The duration at the end corner (from `l` and `fullWidth`) is the media pill (`internal/mediaPill`) |
-| hover / press / focus | `asChild` or selectable | `data-interactive`: lift on `--prime-shadow-overlay` (`@media (hover: hover)`), the kit's press (`--prime-motion-press-scale`, `fast`), focus ring |
+| hover / press / focus | `asChild` or selectable | `data-interactive`: lift on `--prime-shadow-overlay` (`@media (hover: hover)`), the kit's press (`--prime-motion-press-distance`, `fast`), focus ring |
 | selected | `checked` · `defaultChecked` | `aria-checked="true"`, `data-checked="true"`: an accent ring over the picture and a checked indicator; the indicator is always shown, never hover-only |
 
 ## Layout & spacing

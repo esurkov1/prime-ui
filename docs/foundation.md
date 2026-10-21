@@ -295,7 +295,8 @@ Motion tokens:
 | `--prime-motion-easing-standard` | ease-in-out | moving on screen, color/fill |
 | `--prime-motion-easing-emphasized` | decisive start, long soft landing, no overshoot | state gliding into place: thumbs, indicators, checkmarks; with `base` |
 | `--prime-motion-stagger` | 80 ms | step of a staggered first render |
-| `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | `:active` scale; compact for icon-only and small targets |
+| `--prime-motion-press-distance` / `-compact` | 2px / 1px | how far a pressable's edges give in on any size (compact for icon-only and small targets) |
+| `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | fallback for a press that wasn't measured |
 | `--prime-motion-loop` | 570 ms | period unit of a loading loop (Spinner: one turn in 3 units, 6 under reduced motion) |
 | `--prime-motion-blur` | 2px | hides a change of shape while two states swap in place (icon → check, letters) |
 | `--prime-motion-fade-xfast` | 150 ms | opacity and color feedback on dense rows, cells, options |
@@ -317,8 +318,8 @@ Motion tokens:
 | `--prime-motion-scale-pulse` | 2 | a ring that spreads out of a live mark and fades |
 
 Under `prefers-reduced-motion` `globals.css` sets the movement clocks — `xfast`, `fast`, `base`,
-`slow`, `stagger` and the message-morph duration — to `--prime-motion-instant` and both press scales
-to 1; JS animations must also check it. Two kinds of motion are information and keep a clock that
+`slow`, `stagger` and the message-morph duration — to `--prime-motion-instant` and both press distances
+to 0; JS animations must also check it. Two kinds of motion are information and keep a clock that
 reduced motion does not zero: opacity and color feedback (a fade, a fill or color change of state)
 reads the `--prime-motion-fade-*` group, so a state still eases in instead of flipping; a loading
 loop reads `--prime-motion-loop` and only slows down. A gesture time (`--prime-motion-hold-confirm`)
@@ -348,8 +349,10 @@ Every component is designed with its micro-animations, not only its static state
    - **row fold** — a part that folds open or closed animates `grid-template-rows` 0fr ↔ 1fr
      (`Disclosure`: Accordion, DataTable expanded rows);
    - **text width** — a label that morphs into another text glides its `width` (`MorphText`).
-6. **Press.** Every pressable control: `:active` → `scale(var(--prime-motion-press-scale))`
-   (`-compact` for icon-only and small targets), over `fast`, `transform` only. Release returns by the same transition. Disabled and loading never scale.
+6. **Press.** Every pressable control gives in by the same distance whatever its size: `:active` →
+   `scale(var(--press-scale))`, where `src/internal/press` measures the pressed box and sets
+   `1 − 2 · --prime-motion-press-distance / its longer side` (`-compact` for icon-only and small
+   targets), over `fast`, `transform` only. Release returns by the same transition. Disabled and loading never scale.
 7. **Never from nothing.** Entrances start from `opacity: 0` + a small offset (`--prime-space-1/2`) or
    `scale(0.96–0.98)`, never `scale(0)`. Popovers/menus grow from the trigger (`transform-origin` follows
    `data-side`; Tooltip from its arrow tip); modals stay centered. Layers anchored to a screen edge
@@ -404,7 +407,7 @@ should stay still, and say so in a CSS comment only when the omission is non-obv
 | State | Recipe |
 |---|---|
 | hover | filled: `-hover` token (`fill-muted-hover`, `field-bg-hover`: one more ladder step away from the host); ghost, stroke and rows inside a padded container: `--prime-color-fill-subtle`; a surface or a row that reaches its surface's edge: see "Hover on a surface" below |
-| active | filled: same as hover + `transform: scale(var(--prime-motion-press-scale))`; ghost: `fill-subtle-active` (+ the same press scale on pressable controls, see Motion) |
+| active | filled: same as hover + the press (`scale(var(--press-scale))`, see Motion); ghost: `fill-subtle-active` (+ the same press scale on pressable controls, see Motion) |
 | focus-visible | the focus ring (§7) |
 | selected | `accent-soft` bg + `accent-text`, or check icon in `accent-text` |
 | disabled | `fill-muted`/`field-bg-disabled` bg, `text-disabled` color, no shadow, `cursor: not-allowed` |

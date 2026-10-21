@@ -1,0 +1,15 @@
+/* The view menu items that reorder (`viewMenuSortable`): a Dnd.Sortable list per group, a grip at the end of each item. */
+.list {
+  --dnd-sortable-gap: var(--prime-space-0);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.check {
+  flex: 1 1 auto;
+  min-width: 0;
+}

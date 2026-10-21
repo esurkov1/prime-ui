@@ -84,8 +84,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ### rowActions
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `buttons` | a ghost «×» at the row's end and, with `reorderable`, the grip after it; a pinned row: «×» off, then the lock | every list: one action (remove) or remove and move, any number of columns | yes |
-| `menu` | one ghost «⋯» per row; its Dropdown holds «Выше», «Ниже» (with `reorderable`), a separator and «Удалить» (danger) | a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag; never without `reorderable` | |
+| `buttons` | a soft «×» at the row's end, as tall as the fields and, with `reorderable`, the grip after it; a pinned row: «×» off, then the lock | every list: one action (remove) or remove and move, any number of columns | yes |
+| `menu` | one soft «⋯» per row, as tall as the fields; its Dropdown holds «Выше», «Ниже» (with `reorderable`), a separator and «Удалить» (danger) | a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag; never without `reorderable` | |
 
 ### width (column)
 | Value | Looks like | Use when | Default |
@@ -131,6 +131,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - On `surface` rows stand edge to edge, 8 of padding above and below their fields, and a faint line parts two rows (`hairline`), inset by the side padding, none above the first row. A `plain` list on one line per record draws no lines: its rows stand one gap apart (8, `--prime-space-2`: 4 of padding above and below each), the air between the fields parts them, and its headings keep 8 above the first row's fields. Columns 12 apart (`--prime-space-3`).
 - `plain`: side padding 0. `surface`: the sheet's fill (`--prime-color-layer-current` at its `data-depth`), radius `--prime-radius-l`, 12 of side padding on every row and 12 above the headings and under the last row.
 - A `compact` column is measured: its track is the widest of its controls, its heading and its total, so the gaps between columns are all 12.
+- The «×» and the «⋯» are `soft` neutral icon buttons of the row's tier: a square as tall as the fields, one column gap (12) after the last field, so the row starts on a field's fill and ends on the button's — one block, its end edge as far from the host's end as its start is from the host's start. The handle and the lock are a grip, not a press target: they stay without a fill.
 - The remove button, the menu button, the handle and the lock stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
 - The totals row stands under the last row over a faint line; a total's text sits where its column's field text does: at the start, or at the end for a field that ends its number there (an `Input` with `inputMode="decimal"` and an end `Input.InlineAffix`). Stacked, every total ends its line.
 - The add button lines up with the sheet's start, 12 under it.

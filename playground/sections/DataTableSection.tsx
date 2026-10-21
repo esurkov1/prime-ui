@@ -124,6 +124,12 @@ export const page: ComponentPageConfig = {
         "Заказы без колонки действий: выбор колонок стоит в инструментах над таблицей с числом показанных колонок; выбор переживает перезагрузку в local storage, номер заказа остаётся всегда — `DataTableColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`.",
     },
     {
+      scenario: "view-order",
+      title: "Вид с порядком колонок",
+      description:
+        "Кнопка «Вид» над заказами показывает, скрывает и переставляет колонки: ручка в конце пункта тянет его (на касании — после удержания), Alt + ↑ / ↓ сдвигает пункт в фокусе, а пункт сброса возвращает колонки и порядок по умолчанию — `DataTableColumnsMenu`, `columnOrder`, `onColumnOrderChange`, `defaultHiddenColumns`.",
+    },
+    {
       scenario: "column-order",
       title: "Порядок колонок",
       description:

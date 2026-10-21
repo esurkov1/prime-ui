@@ -1,4 +1,4 @@
-/** Every tier: one-lane rows from 28 to 52 px, bars, header and toolbar controls of the tier — `size`. */
+/** Every tier: one-lane rows from 28 to 52 px, bars, the head row and its selector, and the zoom presets of the tier — `size`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Gantt, type GanttBar, Typography } from "prime-ui-kit";
 
@@ -31,7 +31,7 @@ export default function GanttSizesExample() {
             <Gantt
               aria-label={`Бронирования, ${size}`}
               size={size}
-              defaultScale="day"
+              defaultZoom="day"
               rows={ROOMS}
               getRowKey={(room) => room.id}
               getRowLabel={(room) => room.name}

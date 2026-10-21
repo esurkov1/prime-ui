@@ -80,6 +80,7 @@
   --prime-color-border-default: var(--prime-ref-color-gray-150);
   --prime-color-border-faint: var(--prime-ref-color-gray-75);
   --prime-color-border-subtle: var(--prime-ref-color-gray-100);
+  --prime-color-border-whisper: var(--prime-ref-color-gray-50);
   --prime-color-chart-1: var(--prime-ref-color-cobalt-600);
   --prime-color-chart-2: var(--prime-ref-color-chart-light-orange);
   --prime-color-chart-3: var(--prime-ref-color-chart-light-teal);
@@ -400,6 +401,8 @@
   --prime-motion-instant: var(--prime-ref-duration-0);
   --prime-motion-loop: var(--prime-ref-duration-570);
   --prime-motion-never: var(--prime-ref-duration-never);
+  --prime-motion-press-distance: 2px;
+  --prime-motion-press-distance-compact: 1px;
   --prime-motion-press-scale: 0.98;
   --prime-motion-press-scale-compact: 0.96;
   --prime-motion-scale-burst: 1.4;

@@ -365,6 +365,39 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 </Card.Root>
 ```
 
+- **One heading per block.** Under a heading that already names it — a `Drawer.Section` /
+  `Modal.Section` label, a `Page.Section` — the card of fields has no `Card.Header`: its fields go in
+  one `Card.Body`. A `Card.Header` with a title (and an icon, a description) only when nothing above
+  the card names it. Two headings for one block say the same thing twice.
+
+```tsx partial
+// bad — the section names it, the card names it again
+<Drawer.Section label="Смена пароля" description="Пароль от 8 символов">
+  <Card.Root>
+    <Card.Header>
+      <Card.Title>Смена пароля</Card.Title>
+      <Card.Description>Пароль от 8 символов</Card.Description>
+    </Card.Header>
+    <Card.Body>…</Card.Body>
+  </Card.Root>
+</Drawer.Section>
+```
+
+```tsx good
+// good — the section heading names it; the card holds only the fields
+<Drawer.Section label="Смена пароля" description="Пароль от 8 символов">
+  <Card.Root>
+    <Card.Body>
+      <Input.Root label="Новый пароль">
+        <Input.Wrapper>
+          <Input.Field type="password" name="password" />
+        </Input.Wrapper>
+      </Input.Root>
+    </Card.Body>
+  </Card.Root>
+</Drawer.Section>
+```
+
 - `DataTable` is already a filled block — never inside a Card; a card in a card only as
   [the next layer, sparingly](foundations.md#card-in-a-card). No borders around blocks; `Divider`
   only inside a block (list rows, a form and its footer).
@@ -385,8 +418,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - **A button with text always has a fill.** Every other labelled button — secondary, «Отмена»,
   revert, «+ Транспорт» under a list — is `soft` + `tone="neutral"` (`tone="danger"` for a
   destructive one), wherever it stands: a page header, a card, a dialog footer, under a list. A
-  button without fill is an icon-only `ghost` (`aria-label` + `Tooltip`) in a dialog header, a table
-  cell, a row or a toolbar. Buttons have no outline: `variant="outline"` is not for product screens.
+  button without fill is an icon-only `ghost` (`aria-label` + `Tooltip`) among neighbours without a
+  fill ([below](#an-icon-button-takes-its-neighbours-fill)). Buttons have no outline: `variant="outline"` is not for product screens.
   A text with no fill reads as a caption, an outline as a disabled field — the fill is what says
   «press me», and its strength says how much.
 
@@ -461,6 +494,73 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
 - Going somewhere is a link (`LinkButton`, `Button.Root asChild` + `<a>`), doing something is a Button.
   One action — one label on the whole screen.
+
+### An icon button takes its neighbours' fill
+
+An icon-only button that ends or sits inside a row of filled things — fields, `soft` buttons, a
+filled segment — is `variant="soft" tone="neutral"` at their height (the host tier gives it: no
+`size` beside fields of the same tier), so the row starts and ends on a filled edge and reads as
+one block. A `ghost` icon there leaves its glyph floating in air: the row seems to end at the last
+field, and its end no longer mirrors its start against the card's padding. A remove «×» stays
+neutral: the danger is in the action, not in the look. `ghost` stays where the neighbours have no
+fill: a dialog header's actions beside the ×, a table cell among text, a chat header, a toolbar of
+ghost tools, a button inline in text; over media it is `shade`. A `FieldList` draws its row «×» and
+«⋯» this way itself.
+
+```tsx partial
+// bad — the edit icon floats after a filled «Вернуть»; a hand-made line ends on a bare glyph
+<Card.Header>
+  <Card.Title>300 $</Card.Title>
+  <Button.Root variant="soft" tone="neutral">Вернуть</Button.Root>
+  <Button.Root variant="ghost" tone="neutral" aria-label="Исправить депозит">
+    <Button.Icon>
+      <Icon name="action.edit" />
+    </Button.Icon>
+  </Button.Root>
+</Card.Header>
+<div className={styles.line}>
+  <Input.Root label="Сумма">…</Input.Root>
+  <Button.Root variant="ghost" tone="neutral" aria-label="Удалить позицию">
+    <Button.Icon>
+      <Icon name="action.close" />
+    </Button.Icon>
+  </Button.Root>
+</div>
+```
+
+```tsx good
+// declare: const lines: { id: string; price: string }[]
+// declare: const setLines: (lines: { id: string; price: string }[]) => void
+// good — the edit icon takes the fill of «Вернуть»; the lines are a FieldList, whose «×» is soft
+<>
+  <Card.Header>
+    <Card.Title>300 $</Card.Title>
+    <Button.Root variant="soft" tone="neutral">Вернуть</Button.Root>
+    <Button.Root variant="soft" tone="neutral" aria-label="Исправить депозит">
+      <Button.Icon>
+        <Icon name="action.edit" />
+      </Button.Icon>
+    </Button.Root>
+  </Card.Header>
+  <FieldList
+    aria-label="Позиции счёта"
+    columns={[{ label: "Сумма" }]}
+    value={lines}
+    onValueChange={setLines}
+    getId={(line) => line.id}
+    renderItem={(line, row) => (
+      <Input.Root>
+        <Input.Wrapper>
+          <Input.Field
+            value={line.price}
+            onChange={(event) => row.update({ price: event.target.value })}
+          />
+        </Input.Wrapper>
+      </Input.Root>
+    )}
+  />
+</>
+```
 
 ### A menu from two actions
 
@@ -631,6 +731,21 @@ drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-
   column a `date-range` field (its `calendar` with the presets of the domain), free text the
   search. A search alone (`fields={[]}`) only for records with no such column. The value lives in
   the URL ([nothing to guess](ux.md#6-nothing-to-guess)).
+- **The shape of the search and the filter** (`SmartFilter.Toolbar`):
+
+  | Shape | Written as | Use when |
+  |---|---|---|
+  | One field: search with the filter section at its end | `layout="combined"` | a list's or a table's own toolbar used every day, 1–4 filter fields: a separate button would only repeat what the field says |
+  | Search and a «Фильтр» button beside it | the default (`layout="split"`) | the filter must be found at a glance: a page opened now and then or for the first time, many filter fields, a `Page.Tools` row where it lines up with other tool buttons |
+  | The filter button alone | `searchable={false}` | the page already has its search elsewhere, or the data has no text search |
+  | The search alone | `fields={[]}` | records with no column of a closed set yet; it grows filters without a rebuild |
+
+  Search and filters work together: Enter pins the typed query as the first chip («Поиск: Евгений»),
+  the field empties for the next filter, and the rows stay when they contain `search` AND pass
+  `matchesSmartFilter` for every field — never a «search» chip of your own, never the field's text
+  read from the DOM.
+  On a phone every shape goes compact by itself — the button and the section keep only the icon
+  and the count — so the search keeps its row; never an icon-only filter of your own beside it.
 - Both rows are one tool row of the kit: written in reading order, a search takes the free room,
   switchers and buttons keep their width at the end, and a short row wraps by itself — pass the
   controls as they are, never inside a flex wrapper of your own.
@@ -1427,7 +1542,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - Stage totals are in `renderColumnMeta` («2 сделки · 3 575 000 ₽»), the stage color is the column's `color`.
 - A deal opens through `onItemOpen` of `Kanban.Root` (click, Enter, Space; never after a drag) in a `Drawer` with a `DescriptionList`; no `onClick` / `onKeyDown` of your own on the card; a deal with its own page — `getItemHref`. The stage change is available in the panel too — dragging is not the only way; `Drawer.Guard busy` holds the panel while saving.
 - A record's card, when it carries more than a title: zones of parts in `Kanban.ItemSection` (the kit draws the faint line between zones and drops an empty zone) — the name row `Kanban.ItemTitle number` with the owner `Avatar.Root` inside it; the units it holds `Kanban.ItemResource` (a `ProgressCircle` of the term with a short text, «18 д»); the one next step a `Badge fullWidth` first in its zone; facts `Kanban.ItemFact` (an `Icon` and a caption, a toned `Typography` span for a debt); the source and its date `Kanban.ItemFooter`. No `Divider`, gaps or truncation of your own — [Kanban](../src/components/kanban/COMPONENT.md), example `deal-cards`.
-- Which parts the cards show is the person's choice: `KanbanFieldsMenu` («Вид») in `Page.Tools` beside the filter, shown only with the board; the page renders each part by `hiddenFields`. Never the table's `DataTableColumnsMenu` or a hand-made Dropdown for it.
+- What a view shows is one «Вид» in `Page.Tools` beside the search, the same button for every view of the data — `KanbanFieldsMenu` with the board (the page renders each part by `hiddenFields`), `DataTableColumnsMenu` with the table, `GanttCategoriesMenu` with a schedule (its `categories` draw the legend, `hiddenCategories` hide bars and legend entries together); never a hand-made Dropdown or a renamed `labels` workaround.
 - Every deal goes to `items` and `value`, however many: the columns draw only the cards in view — never slice a column by hand.
 - The first load is `loading` on `Kanban` and `DataTable`: skeletons in the geometry of cards and rows. Stages that come from the server too: `loading` with empty `columns` draws `loadingColumns` placeholder columns — never a board skeleton of your own beside the `Kanban`.
 
