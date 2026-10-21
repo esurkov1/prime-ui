@@ -7,6 +7,7 @@ export const ICON_GROUPS = [
   { id: "field", label: "Поля" },
   { id: "format", label: "Форматирование" },
   { id: "object", label: "Объекты" },
+  { id: "currency", label: "Валюты" },
   { id: "sort", label: "Сортировка" },
   { id: "status", label: "Статусы" },
   { id: "theme", label: "Тема" },
@@ -464,6 +465,30 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
   "object.wallet": {
     meaning: "Кошелёк, баланс, платежи",
     keywords: ["кошелёк", "деньги", "оплата", "баланс", "wallet", "money", "payment", "balance"],
+  },
+  "currency.baht": {
+    meaning: "Тайский бат — в выборе валюты",
+    keywords: ["бат", "валюта", "деньги", "baht", "thb", "currency"],
+  },
+  "currency.dollar": {
+    meaning: "Доллар — в выборе валюты",
+    keywords: ["доллар", "валюта", "деньги", "dollar", "usd", "currency"],
+  },
+  "currency.euro": {
+    meaning: "Евро — в выборе валюты",
+    keywords: ["евро", "валюта", "деньги", "euro", "eur", "currency"],
+  },
+  "currency.ruble": {
+    meaning: "Рубль — в выборе валюты",
+    keywords: ["рубль", "валюта", "деньги", "ruble", "rub", "currency"],
+  },
+  "currency.usdc": {
+    meaning: "USDC — в выборе валюты",
+    keywords: ["usdc", "стейблкоин", "крипта", "валюта", "stablecoin", "crypto", "currency"],
+  },
+  "currency.usdt": {
+    meaning: "USDT (Tether) — в выборе валюты",
+    keywords: ["usdt", "tether", "тезер", "стейблкоин", "крипта", "валюта", "crypto", "currency"],
   },
   "sort.ascending": {
     meaning: "Сортировка по возрастанию",

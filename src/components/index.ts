@@ -77,6 +77,7 @@ export type {
   CardIconProps,
   CardLabelProps,
   CardLinkProps,
+  CardListItemContentProps,
   CardListItemProps,
   CardListProps,
   CardMediaProps,

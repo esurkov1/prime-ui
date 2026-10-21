@@ -23,12 +23,18 @@ import { ChevronsUpDown } from "./glyphs/chevrons-up-down";
 import { Circle } from "./glyphs/circle";
 import { CircleAlert } from "./glyphs/circle-alert";
 import { CircleCheck } from "./glyphs/circle-check";
+import { CircleDollarSign } from "./glyphs/circle-dollar-sign";
 import { CircleX } from "./glyphs/circle-x";
 import { Clock } from "./glyphs/clock";
 import { CloudOff } from "./glyphs/cloud-off";
 import { CloudUpload } from "./glyphs/cloud-upload";
 import { Code } from "./glyphs/code";
 import { CodeXml } from "./glyphs/code-xml";
+import { CoinBaht } from "./glyphs/coin-baht";
+import { CoinEuro } from "./glyphs/coin-euro";
+import { CoinRuble } from "./glyphs/coin-ruble";
+import { CoinTether } from "./glyphs/coin-tether";
+import { CoinUsdc } from "./glyphs/coin-usdc";
 import { Columns3 } from "./glyphs/columns-3";
 import { Copy } from "./glyphs/copy";
 import { Crown } from "./glyphs/crown";
@@ -244,6 +250,14 @@ export const iconRegistry = {
   "object.user": UserRound,
   "object.users": Users,
   "object.wallet": Wallet,
+  // Currencies: a coin with the sign, for a choice of currency (a picker, a select); in text the
+  // currency stays its code or sign («100 USDT», «300 $»).
+  "currency.baht": CoinBaht,
+  "currency.dollar": CircleDollarSign,
+  "currency.euro": CoinEuro,
+  "currency.ruble": CoinRuble,
+  "currency.usdc": CoinUsdc,
+  "currency.usdt": CoinTether,
   "sort.ascending": ArrowUp,
   "sort.descending": ArrowDown,
   "sort.none": ArrowUpDown,

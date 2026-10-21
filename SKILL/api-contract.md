@@ -381,6 +381,7 @@ crumb of your own.
 - `field.*`: `calendar`, `email`, `password.show`, `password.hide`;
 - `format.*`: `bold`, `code`, `italic`, `link`, `list`, `quote`, `spoiler`, `strikethrough`, `underline`;
 - `object.*`: `activity`, `bell`, `bike`, `book`, `cart`, `chart`, `crown`, `disc`, `document`, `file`, `fuel`, `funnel`, `globe`, `bot`, `headset`, `image`, `inbox`, `key`, `mapPin`, `megaphone`, `message`, `motorbike`, `package`, `phone`, `receipt`, `rocket`, `scale`, `storage`, `tasks`, `trophy`, `truck`, `user`, `users`, `wallet`;
+- `currency.*`: `baht`, `dollar`, `euro`, `ruble`, `usdc`, `usdt`;
 - `sort.*`: `ascending`, `descending`, `none`;
 - `status.*`: `danger`, `emailSent`, `failed`, `favorite`, `info`, `locked`, `muted`, `sound`, `offline`, `pending`, `read`, `sent`, `success`, `trendUp`, `warning`;
 - `theme.*`: `dark`, `light`;

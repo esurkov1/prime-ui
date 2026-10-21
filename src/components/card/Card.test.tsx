@@ -629,6 +629,48 @@ describe("Card", () => {
     expect(screen.getByRole("heading", { name: "Без бейджа" })).not.toHaveClass(styles.badged);
   });
 
+  it("a record row lays out like the header: its actions in the end cell, a zone folding under it", () => {
+    const { rerender } = render(
+      <Card.Root variant="list">
+        <Card.List>
+          <Card.ListItem data-testid="row">
+            <Card.Title>
+              <Badge.Root>У нас</Badge.Root>300 $
+            </Card.Title>
+            <Card.Description>Наличные · принят 8 окт</Card.Description>
+            <Button.Root>Вернуть</Button.Root>
+            <Card.ListItemContent open={false} data-testid="zone">
+              Форма
+            </Card.ListItemContent>
+          </Card.ListItem>
+          <Card.ListItem data-testid="plain">Просто строка</Card.ListItem>
+        </Card.List>
+      </Card.Root>,
+    );
+    const row = screen.getByTestId("row");
+    expect(row).toHaveAttribute("data-record");
+    const head = row.firstElementChild as HTMLElement;
+    expect(head).toHaveClass(styles.header);
+    expect(head.querySelector(`.${styles.end}`)).toContainElement(
+      screen.getByRole("button", { name: "Вернуть" }),
+    );
+    expect(screen.getByTestId("zone")).toHaveAttribute("data-state", "closed");
+    expect(screen.getByTestId("plain")).not.toHaveAttribute("data-record");
+    rerender(
+      <Card.Root variant="list">
+        <Card.List>
+          <Card.ListItem>
+            <Card.Title>300 $</Card.Title>
+            <Card.ListItemContent open data-testid="zone">
+              Форма
+            </Card.ListItemContent>
+          </Card.ListItem>
+        </Card.List>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("zone")).toHaveAttribute("data-state", "open");
+  });
+
   it("a badge in a description lays the line out as a row, whatever component renders it", () => {
     function OwnerBadge() {
       return (

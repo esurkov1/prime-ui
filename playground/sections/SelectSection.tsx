@@ -107,6 +107,12 @@ export const page: ComponentPageConfig = {
         "Люди в строках и триггере: аватар по ярусу перед именем, бейдж роли после него — `Avatar.Root`, `Badge.Root`, `renderValue`.",
     },
     {
+      scenario: "currency",
+      title: "Валюта",
+      description:
+        "Валюта депозита: монета со знаком перед каждым вариантом и в триггере, а сумма в остальном тексте остаётся с кодом — `Select.ItemIcon`, `Select.TriggerIcon`.",
+    },
+    {
       scenario: "icon-only",
       title: "Только иконка",
       description:

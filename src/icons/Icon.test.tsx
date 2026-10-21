@@ -201,10 +201,13 @@ describe("icon gestures", () => {
     expect(screen.getByTestId("bike")).toHaveAttribute("data-icon-motion", "generic");
   });
 
-  it("draws every registry glyph from a Lucide source, and only brand.* from Simple Icons", () => {
+  it("draws every registry glyph from a Lucide source, only brand.* from Simple Icons and only currency coins by the kit", () => {
     for (const [name, glyph] of Object.entries(iconRegistry)) {
       if (name.startsWith("brand.")) {
         expect(glyph.source, name).toMatch(/^simple-icons:[a-z0-9]+$/);
+      } else if (glyph.source.startsWith("kit:")) {
+        expect(name, glyph.source).toMatch(/^currency\./);
+        expect(glyph.source, name).toMatch(/^kit:coin-[a-z]+$/);
       } else {
         expect((lucide as Record<string, unknown>)[glyph.source], name).toBeDefined();
       }
@@ -237,7 +240,20 @@ describe("glyph drawings", () => {
     Object.values(exports).map((glyph): [string, Glyph] => [file.replace(/^.*\//, ""), glyph]),
   );
 
-  const lucideGlyphs = glyphs.filter(([, glyph]) => !glyph.source.startsWith("simple-icons:"));
+  const lucideGlyphs = glyphs.filter(([, glyph]) => !/^(simple-icons|kit):/.test(glyph.source));
+  const coinGlyphs = glyphs.filter(([, glyph]) => glyph.source.startsWith("kit:coin-"));
+
+  it.each(coinGlyphs)("%s is the dollar coin's ring with a sign that pops", (_, Glyph) => {
+    const svg = render(<Glyph />).container.querySelector("svg");
+    const ring = svg?.querySelector(":scope > circle");
+    expect([ring?.getAttribute("cx"), ring?.getAttribute("cy"), ring?.getAttribute("r")]).toEqual([
+      "12",
+      "12",
+      "10",
+    ]);
+    expect(svg?.querySelectorAll("[data-motion]")).toHaveLength(1);
+    expect(svg?.querySelector(":scope > g")?.getAttribute("data-motion")).toBe("pop");
+  });
   const brandGlyphs = glyphs.filter(([, glyph]) => glyph.source.startsWith("simple-icons:"));
 
   it("reads the brand marks", () => {

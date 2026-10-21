@@ -13,6 +13,7 @@
 - An activity list (`list`), a call to action (`cta`), a tile with an image on top (`cover`).
 - A catalogue of records with photos — fleet units, listings: a `cover` card with a `Carousel` in `Card.Media`, its status and plate on the photos, the record's badges in the body and its term with a bar in the footer, the whole card opening the record (`Card.Link`).
 - A task of a record with its assignee — a rental's return, an order's delivery: the term in `Card.Title` («Вернуть 10 дек · через 50 дн.»), the assignee picker (a `Badge.Root` with `Badge.Avatar` in a `Dropdown.Trigger`) first in `Card.Description` and the facts after it, the actions at the header's end. One secondary action is a labelled `soft` button beside the primary; two or more gather behind one `action.more` button, the destructive one last. The person is named once — never in the text and again in the picker.
+- Several records of one kind inside one card — the deposits of a rental, the payments of an invoice: `Card.List` of record rows (`Card.ListItem` with `Card.Title` — a state badge and the amount — one `Card.Description` line and the row's actions at its end), hairlines between them; an action that needs a form (a return with a hold) folds a `Card.ListItemContent` open under its row with a `Card.Footer` of its buttons. Never a card per record in a stack.
 - A tile that is itself the way to its details — a KPI that opens its report, a project tile (`asChild` with a link or a button).
 
 ## When not to use
@@ -36,6 +37,7 @@ Card.Root variant="stat-text"    Label · Value (a line of text) · Meta? · …
 Card.Root variant="split"        Body(cell × 2: any element, e.g. <div> with Icon · Label · Value)
 Card.Root variant="cta"          Title · Description · Footer
 Card.Root variant="list"         Header(Title, …trailing) · List(ListItem …)
+  record row                     ListItem(Icon?, Title, Description, …actions) · ListItemContent open (…, Footer)
 Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 Card.Root … Footer(…actions, Description?, Total(Meta?, Value))
                                  a record's row: actions · note · total at the end
@@ -160,11 +162,19 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.List · Card.ListItem
-`ref` → `HTMLUListElement` / `HTMLLIElement`. The `list` template: a `<ul>` of `<li>` rows with faint hairlines between them; head it with `Card.Header`.
+`ref` → `HTMLUListElement` / `HTMLLIElement`. A `<ul>` of `<li>` rows, faint hairlines between them. A row with `Card.Title` is a record row laid out like `Card.Header`: its actions at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
+### Card.ListItemContent
+`ref` → `HTMLDivElement`. The zone under a record row that folds open in place (a form its action opens); a `Card.Footer` inside holds its buttons at the end.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `open` | `boolean` | — (required) | Unfolds the zone (height and fade, reduced motion honoured); closed, it folds away. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ## Variants
 
@@ -289,6 +299,7 @@ No `labels`.
 | [record-totals.tsx](examples/record-totals.tsx) | A rental unit of a deal: its term ring leads the header beside the arrow, its state and deposit badges stand under the title, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`. |
 | [assignment.tsx](examples/assignment.tsx) | A rental's return with its assignee: the term in the title, the assignee picker first in the line under it, and the one secondary action as a labelled button beside the primary — `Card.Title`, `Card.Description`, `Badge.Avatar`, `Dropdown.Trigger`. |
 | [assignment-menu.tsx](examples/assignment-menu.tsx) | A rental's return with its assignee and several secondary actions: the primary stays in sight, the rest gather in one menu with the destructive one last — `Card.Description`, `Badge.Avatar`, `Dropdown.Trigger`, `action.more`. |
+| [record-rows.tsx](examples/record-rows.tsx) | The deposits of a rental in one card: a row per deposit with its state badge and amount over one line of detail, the step's action and an edit button at the end, and a return with a hold folding open under its row — `Card.List`, `Card.ListItem`, `Card.ListItemContent`. |
 | [drawer-kpis.tsx](examples/drawer-kpis.tsx) | A record's KPIs in a drawer-width column, two and four to a row, every value one fixed size — `stat-trend`, `valueSize`. |
 | [text-values.tsx](examples/text-values.tsx) | Fact tiles whose value is a line of text in one style, a phrase and a number alike, one of them in a tone — `variant`, `stat-text`, `tone`. |
 | [text-action.tsx](examples/text-action.tsx) | Summary tiles of a rental with the action of each step at the end of the row — `stat-text`, `Card.Value`, `Card.Meta`. |

@@ -335,6 +335,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [saving.tsx](examples/saving.tsx) | A choice that saves on the server at once: the picked value shows with a spinner on the trigger, and a refused save rolls it back and says why — `onValueChange`, `error`. |
 | [rich-options.tsx](examples/rich-options.tsx) | Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. |
 | [people.tsx](examples/people.tsx) | People in the rows and the trigger: an avatar sized to the tier before the name, a role badge after it — `Avatar.Root`, `Badge.Root`, `renderValue`. |
+| [currency.tsx](examples/currency.tsx) | The currency of a deposit: a coin with the sign before each option and in the trigger, while the amount elsewhere keeps its code — `Select.ItemIcon`, `Select.TriggerIcon`. |
 | [icon-only.tsx](examples/icon-only.tsx) | An icon picker as wide as its glyph: the trigger holds only the picked icon and the chevron, the value is still read aloud — `Select.TriggerIcon`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A filter list that stays open while the person looks beside it: only Escape, the trigger or Tab close it — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field and a button resets it — `value`, `onValueChange`. |

@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Icon } from "@/icons";
 import { useHostTier, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { Disclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
 import hairline from "@/internal/hairline.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
@@ -51,7 +52,7 @@ const VariantContext = React.createContext<CardVariant | null>(null);
  * The zone a part sits in: a header-row value is a step smaller; a footer description is the
  * record's one-line note; a value in `Card.Total` is its total.
  */
-const ZoneContext = React.createContext<"header" | "footer" | "total" | null>(null);
+const ZoneContext = React.createContext<"header" | "footer" | "total" | "item" | null>(null);
 /**
  * The fixed step of a KPI value: in `stat-text` body-m medium (`m`, also when unset) or title-m
  * (`l`); in `stat-trend` heading-m (`m`) or heading-l (`l`), unset — it follows the card's width.
@@ -382,11 +383,15 @@ export type CardFooterProps = DivProps & { divider?: CardFooterDivider };
  */
 function CardFooter({ divider, className, ...rest }: CardFooterProps) {
   const variant = React.useContext(VariantContext);
+  // The buttons of a row's folded zone close its form: no line of the card's zones above them.
+  const inItem = React.useContext(ZoneContext) === "item";
   const fill = divider === "fill";
   const depth = useNestedSurfaceDepth();
   const ruled =
     divider === "full" ||
-    (divider === undefined && (variant === "panel" || variant === "list" || variant === "cta"));
+    (divider === undefined &&
+      !inItem &&
+      (variant === "panel" || variant === "list" || variant === "cta"));
   const footer = (
     <div
       className={cx(
@@ -574,12 +579,61 @@ export type CardListItemProps = React.HTMLAttributes<HTMLLIElement> & {
   ref?: React.Ref<HTMLLIElement>;
 };
 
-function CardListItem({ className, ...rest }: CardListItemProps) {
+/**
+ * A row of the list. With a `Card.Title` (or a `Card.Description`, a `Card.Icon`) it is a record
+ * row laid out like `Card.Header` — the icon, the title over one line of description, everything
+ * else in one end cell (the row's actions) — and a `Card.ListItemContent` folds open under it.
+ */
+function CardListItem({ className, children, ...rest }: CardListItemProps) {
+  const items = flattenChildren(children);
+  const record = items.some(
+    (child) => React.isValidElement(child) && HEADER_TEXT.includes(child.type as React.ElementType),
+  );
+  if (!record) {
+    return (
+      <li className={cx(textRole.bodyM, styles.listItem, hairline.between, className)} {...rest}>
+        {children}
+      </li>
+    );
+  }
+  const { parts: contents, rest: head } = splitParts(items, CardListItemContent);
   return (
-    <li className={cx(textRole.bodyM, styles.listItem, hairline.between, className)} {...rest} />
+    <li
+      className={cx(textRole.bodyM, styles.listItem, hairline.between, className)}
+      data-record=""
+      {...rest}
+    >
+      <div className={styles.header}>{withEndCell(head, HEADER_TEXT)}</div>
+      {contents}
+    </li>
   );
 }
 CardListItem.displayName = "Card.ListItem";
+
+export type CardListItemContentProps = DivProps & {
+  open: boolean;
+};
+
+/**
+ * The zone under a record row that folds open in place (a form the row's action opens: «Вернуть с
+ * удержанием»): its content, then a `Card.Footer` whose buttons stand at the end.
+ */
+function CardListItemContent({
+  open,
+  className,
+  children,
+  ref,
+  ...rest
+}: CardListItemContentProps) {
+  return (
+    <Disclosure open={open} className={className} ref={ref} {...rest}>
+      <ZoneContext.Provider value="item">
+        <div className={styles.listItemContent}>{children}</div>
+      </ZoneContext.Provider>
+    </Disclosure>
+  );
+}
+CardListItemContent.displayName = "Card.ListItemContent";
 
 export const Card = {
   Root: CardRoot,
@@ -598,4 +652,5 @@ export const Card = {
   Meta: CardMeta,
   List: CardList,
   ListItem: CardListItem,
+  ListItemContent: CardListItemContent,
 };

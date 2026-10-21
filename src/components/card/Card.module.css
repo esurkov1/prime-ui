@@ -641,6 +641,24 @@
   overflow-wrap: anywhere;
 }
 
+/* A record row (TSX: a `Card.Title` inside): the header's anatomy, 16 above and below. */
+.listItem[data-record] {
+  padding-block: var(--prime-space-4);
+}
+
+/* The zone a record row folds open: 16 under the row, its footer's buttons at the end. */
+.listItemContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  padding-top: var(--prime-space-4);
+}
+
+.listItemContent > .footer {
+  justify-content: flex-end;
+  padding-top: 0;
+}
+
 /* ---------- cta ---------- */
 
 /* Title + text is the header, the footer sits under a full-width hairline. */

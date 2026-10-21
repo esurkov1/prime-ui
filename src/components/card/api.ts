@@ -276,14 +276,34 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.List · Card.ListItem",
-      en: "`ref` → `HTMLUListElement` / `HTMLLIElement`. The `list` template: a `<ul>` of `<li>` rows with faint hairlines between them; head it with `Card.Header`.",
-      ru: "Шаблон `list`: `<ul>` из строк `<li>` с тонкими линиями между ними; шапка — `Card.Header`.",
+      en: "`ref` → `HTMLUListElement` / `HTMLLIElement`. A `<ul>` of `<li>` rows, faint hairlines between them. A row with `Card.Title` is a record row laid out like `Card.Header`: its actions at the end.",
+      ru: "`<ul>` из строк `<li>`, между ними тонкие линии. Строка с `Card.Title` — строка записи с раскладкой `Card.Header`: её действия в конце.",
       props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
           en: "`children`, `className` and the other attributes of the element.",
           ru: "`children`, `className` и остальные атрибуты элемента.",
+        },
+      ],
+    },
+    {
+      name: "Card.ListItemContent",
+      en: "`ref` → `HTMLDivElement`. The zone under a record row that folds open in place (a form its action opens); a `Card.Footer` inside holds its buttons at the end.",
+      ru: "Зона под строкой записи, раскрывающаяся на месте (форма, которую открывает её действие); `Card.Footer` внутри держит кнопки в конце.",
+      props: [
+        {
+          name: "open",
+          type: "boolean",
+          required: true,
+          en: "Unfolds the zone (height and fade, reduced motion honoured); closed, it folds away.",
+          ru: "Раскрывает зону (высота и проявление, с учётом reduced motion); закрытая — сворачивается.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
         },
       ],
     },

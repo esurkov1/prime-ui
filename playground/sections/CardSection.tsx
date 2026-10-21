@@ -82,6 +82,12 @@ export const page: ComponentPageConfig = {
         "Возврат аренды с ответственным и несколькими второстепенными действиями: главное на виду, остальные собраны в одно меню, разрушительное — последним — `Card.Description`, `Badge.Avatar`, `Dropdown.Trigger`, `action.more`.",
     },
     {
+      scenario: "record-rows",
+      title: "Строки записей",
+      description:
+        "Депозиты аренды в одной карточке: строка на депозит с бейджем состояния и суммой над строкой пояснения, действие шага и правка в конце, а возврат с удержанием раскрывается формой под своей строкой — `Card.List`, `Card.ListItem`, `Card.ListItemContent`.",
+    },
+    {
       scenario: "drawer-kpis",
       title: "KPI в панели",
       description:
