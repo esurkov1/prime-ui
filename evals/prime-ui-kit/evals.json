@@ -508,6 +508,18 @@
         "The term («через 50 дн.») is in Card.Title, not a separate badge",
         "The primary return action is the last button; the single secondary action is a labelled soft neutral Button, not a lone «⋯» menu"
       ]
+    },
+    {
+      "id": 41,
+      "prompt": "В шапке сделки добавь кнопку «В архив». Архивировать не сразу: дай 5 секунд, чтобы передумать.",
+      "expected_output": "The «В архив» button turns into a Button.Root countdown={5} labelled «Отменить» in the same place; the archive request runs in onConfirm, onClick cancels; no setTimeout of its own and no undo Notification.",
+      "files": [],
+      "expectations": [
+        "The undo window is Button.Root with countdown (about 5 seconds), not a hand-made setTimeout or a number in the label",
+        "The archive action is in onConfirm; onClick of the counting button cancels",
+        "No Notification with «Отменить» for the same action",
+        "The counting button stands where «В архив» was, labelled «Отменить»"
+      ]
     }
   ]
 }

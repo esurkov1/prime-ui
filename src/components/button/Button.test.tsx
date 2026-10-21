@@ -14,6 +14,40 @@ import styles from "./Button.module.css";
 const CSS = "src/components/button/Button.module.css";
 
 describe("Button", () => {
+  it("counts down: the fill runs, the seconds tick, the end runs the action, a press cancels", () => {
+    vi.useFakeTimers();
+    const onEnd = vi.fn();
+    const onClick = vi.fn();
+    render(
+      <Button.Root countdown={3} onConfirm={onEnd} onClick={onClick}>
+        Отменить
+      </Button.Root>,
+    );
+    const button = screen.getByRole("button", { name: /Отменить/ });
+    expect(button).toHaveAccessibleDescription(
+      "Действие выполнится через 3 с, нажмите, чтобы отменить",
+    );
+    expect(button).toHaveTextContent("Отменить3");
+    act(() => vi.advanceTimersByTime(1100));
+    expect(button).toHaveTextContent("Отменить2");
+    expect(button).toHaveAttribute("data-countdown", "running");
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    act(() => vi.advanceTimersByTime(2000));
+    expect(onEnd).toHaveBeenCalledTimes(1);
+    expect(button).toHaveAttribute("data-countdown", "done");
+    vi.useRealTimers();
+  });
+
+  it("puts the countdown seconds before the label with countdownPlacement start", () => {
+    render(
+      <Button.Root countdown={5} countdownPlacement="start">
+        Отменить
+      </Button.Root>,
+    );
+    expect(screen.getByRole("button", { name: /Отменить/ })).toHaveTextContent("5Отменить");
+  });
+
   it("takes the host tier without its own size; an explicit size wins", () => {
     render(
       <ControlSizeProvider value="s">

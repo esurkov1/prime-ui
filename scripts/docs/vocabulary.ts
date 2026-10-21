@@ -46,7 +46,7 @@ export const EVENTS = new Set([
   "onRemove", // takes a value out of a selection
   "onDelete", // destroys an entity
   "onDismiss", // closes a message (Banner, Notification)
-  "onConfirm", // a confirmed destructive or held action
+  "onConfirm", // a confirmed destructive or held action, or a countdown run out
   "onCommit", // a field's value is committed (blur, Enter, release)
   "onRetry", // retries a failed load or transfer
   "onCancel", // cancels a transfer

@@ -104,8 +104,21 @@ export const api: ComponentApi = {
         {
           name: "onConfirm",
           type: "() => void | Promise<void>",
-          en: "Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return the request's promise to keep the button `loading` until it settles.",
-          ru: "Срабатывает, когда удержание `holdToConfirm` дошло до конца; действие пишите сюда, а не в `onClick`. Верните промис запроса — кнопка будет в `loading`, пока он не завершится.",
+          en: "Fires when a `holdToConfirm` press completes or a `countdown` runs out: the action goes here, not in `onClick`. A promise keeps a held button `loading` until it settles.",
+          ru: "Срабатывает, когда удержание `holdToConfirm` дошло до конца или истёк `countdown`: действие пишите сюда, а не в `onClick`. Промис держит удержанную кнопку в `loading`.",
+        },
+        {
+          name: "countdown",
+          type: "number",
+          en: "Seconds before the action runs by itself (an undo window): the button fills over them and counts them down; `onConfirm` at the end, a press is `onClick` — the cancel.",
+          ru: "Секунды, через которые действие выполнится само (окно отмены): кнопка заливается и отсчитывает их; в конце `onConfirm`, нажатие — `onClick`, отмена.",
+        },
+        {
+          name: "countdownPlacement",
+          type: '"start" | "end"',
+          default: '"end"',
+          en: "Where the `countdown` seconds stand: `end` — in a badge after the label, `start` — before it.",
+          ru: "Где стоят секунды `countdown`: `end` — в бейдже после текста, `start` — перед ним.",
         },
         {
           name: "labels",
@@ -177,6 +190,10 @@ export const api: ComponentApi = {
     holdHint: {
       en: "Description of a `holdToConfirm` button for assistive tech (`aria-describedby`).",
       ru: "Описание кнопки `holdToConfirm` для скринридеров (`aria-describedby`).",
+    },
+    countdownHint: {
+      en: "Description of a `countdown` button (`aria-describedby`): when the action runs and that a press cancels it; `{seconds}` is the count.",
+      ru: "Описание кнопки `countdown` (`aria-describedby`): когда выполнится действие и что нажатие его отменит; `{seconds}` — длина отсчёта.",
     },
   }),
   accessibility: {

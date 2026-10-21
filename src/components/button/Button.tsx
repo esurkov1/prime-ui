@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Badge } from "@/components/badge/Badge";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
@@ -6,6 +7,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { formatLabel } from "@/internal/formatLabel";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconSlotClass } from "@/internal/iconBox";
 import { iconLayout } from "@/internal/iconLayout";
@@ -14,6 +16,7 @@ import { MorphText } from "@/internal/MorphText";
 import mediaPill from "@/internal/mediaPill.module.css";
 import { readCssDurationMs } from "@/internal/motionTiming";
 import { press } from "@/internal/press";
+import { RollingNumber } from "@/internal/RollingNumber";
 import { Ring } from "@/internal/ring";
 import { slotChild } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
@@ -54,6 +57,8 @@ type ButtonElementProps =
       progress?: number | null;
       holdToConfirm?: boolean;
       onConfirm?: () => void | Promise<void>;
+      countdown?: number;
+      countdownPlacement?: "start" | "end";
       labels?: Partial<ButtonLabels>;
     }
   | {
@@ -61,6 +66,8 @@ type ButtonElementProps =
       progress?: never;
       holdToConfirm?: never;
       onConfirm?: never;
+      countdown?: never;
+      countdownPlacement?: never;
       labels?: never;
       children: React.ReactElement;
     };
@@ -68,9 +75,61 @@ type ButtonElementProps =
 export type ButtonLabels = {
   /** Description of a hold-to-confirm button for assistive tech. */
   holdHint: string;
+  /** Description of a counting-down button; `{seconds}` is the whole count. */
+  countdownHint: string;
 };
 
-export const BUTTON_LABELS: ButtonLabels = { holdHint: "Удерживайте, чтобы подтвердить" };
+export const BUTTON_LABELS: ButtonLabels = {
+  holdHint: "Удерживайте, чтобы подтвердить",
+  countdownHint: "Действие выполнится через {seconds} с, нажмите, чтобы отменить",
+};
+
+/** `ready`: the empty fill laid out; `running`: filling over the count; `done`: the count ran out. */
+type CountdownPhase = "idle" | "ready" | "running" | "done";
+
+/**
+ * A count of `seconds` that starts when it is set (and again when it changes): the fill runs for
+ * the whole count, the seconds left tick down beside the label, and `onEnd` fires when it runs
+ * out. Removing `seconds` stops it (the fill fades). A clock, not a decoration: reduced motion
+ * keeps it.
+ */
+function useCountdown(seconds: number | undefined, onEnd: (() => void) | undefined) {
+  const [phase, setPhase] = React.useState<CountdownPhase>("idle");
+  const [left, setLeft] = React.useState(0);
+  const end = React.useRef(onEnd);
+  end.current = onEnd;
+
+  React.useEffect(() => {
+    if (seconds === undefined || seconds <= 0) {
+      setPhase("idle");
+      return;
+    }
+    const total = seconds * 1000;
+    const start = performance.now();
+    setPhase("ready");
+    setLeft(Math.ceil(seconds));
+    // The empty fill is laid out first, then the run starts from it.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setPhase("running"));
+    });
+    const tick = setInterval(() => {
+      setLeft(Math.max(1, Math.ceil((total - (performance.now() - start)) / 1000)));
+    }, 200);
+    const timer = setTimeout(() => {
+      clearInterval(tick);
+      setLeft(0);
+      setPhase("done");
+      end.current?.();
+    }, total);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearInterval(tick);
+      clearTimeout(timer);
+    };
+  }, [seconds]);
+
+  return { phase, left };
+}
 
 /** `cancel`: released before the end — the fill rolls back; `idle` after `done` only fades. */
 type HoldPhase = "idle" | "holding" | "confirming" | "done" | "cancel";
@@ -191,6 +250,8 @@ function ButtonRoot({
   progress,
   holdToConfirm = false,
   onConfirm,
+  countdown,
+  countdownPlacement = "end",
   labels,
   disabled: disabledProp,
   asChild = false,
@@ -209,6 +270,8 @@ function ButtonRoot({
     ButtonIcon,
   );
   const hold = useHoldToConfirm(holdToConfirm && !disabled && !loadingProp, onConfirm);
+  const count = useCountdown(disabled ? undefined : countdown, onConfirm);
+  const counting = count.phase !== "idle";
   // A toggle when any part of the pressed triad is given; an ordinary action otherwise.
   const toggle =
     pressedProp !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
@@ -229,7 +292,7 @@ function ButtonRoot({
   // The fill (square) or the ring (circle) stays mounted once used, so its exit can play: the
   // ring fades at the last share it drew.
   const [fillUsed, setFillUsed] = React.useState(false);
-  if (((inProgress && !circle) || holdToConfirm) && !fillUsed) setFillUsed(true);
+  if (((inProgress && !circle) || holdToConfirm || counting) && !fillUsed) setFillUsed(true);
   const [ringShare, setRingShare] = React.useState<number | null | undefined>(undefined);
   if (circle && inProgress && progress !== ringShare) setRingShare(progress);
   const dataAttrs = toDataAttributes({
@@ -252,6 +315,7 @@ function ButtonRoot({
     "loading-overlay": (spinner && !spinnerInIcon) || undefined,
     progress: (inProgress && progress !== null && !circle) || undefined,
     hold: holdToConfirm ? hold.phase : undefined,
+    countdown: counting ? count.phase : undefined,
   });
   const classes = cx(
     fieldTierClass,
@@ -345,9 +409,18 @@ function ButtonRoot({
         },
       }
     : null;
-  const describedBy = holdToConfirm
+  const hinted = holdToConfirm || counting;
+  const describedBy = hinted
     ? cx(rest["aria-describedby"], hintId) || undefined
     : rest["aria-describedby"];
+  const texts = { ...BUTTON_LABELS, ...labels };
+  // The seconds left in a chip beside the label (`countdownPlacement`), rolling down; the
+  // description names the whole count once.
+  const counter = (
+    <Badge.Root className={styles.countdown} aria-hidden="true">
+      <RollingNumber>{String(count.left)}</RollingNumber>
+    </Badge.Root>
+  );
 
   const button = (
     <button
@@ -367,7 +440,9 @@ function ButtonRoot({
               ...rest.style,
               "--btn-progress": progress !== null ? Math.min(1, Math.max(0, progress)) : undefined,
             } as React.CSSProperties)
-          : rest.style
+          : counting
+            ? ({ ...rest.style, "--btn-countdown": `${countdown ?? 0}s` } as React.CSSProperties)
+            : rest.style
       }
       {...dataAttrs}
     >
@@ -388,16 +463,22 @@ function ButtonRoot({
         {spinner && !spinnerInIcon ? (
           <Spinner className={styles.spinner} aria-hidden="true" />
         ) : null}
+        {counting && countdownPlacement === "start" ? counter : null}
         {morphLabels(withBusyGlyph(children, spinnerInIcon))}
+        {counting && countdownPlacement === "end" ? counter : null}
       </ControlSizeProvider>
     </button>
   );
-  if (!holdToConfirm) return button;
+  if (!hinted) return button;
   // The hint sits beside the button: inside it would become part of the button's name.
   return (
     <>
       {button}
-      <VisuallyHidden id={hintId}>{{ ...BUTTON_LABELS, ...labels }.holdHint}</VisuallyHidden>
+      <VisuallyHidden id={hintId}>
+        {holdToConfirm
+          ? texts.holdHint
+          : formatLabel(texts.countdownHint, { seconds: String(countdown ?? 0) })}
+      </VisuallyHidden>
     </>
   );
 }

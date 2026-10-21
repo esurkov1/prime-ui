@@ -310,7 +310,7 @@ export const api: ComponentApi = {
           ru: "Своё содержимое; по умолчанию иконка пипетки.",
         },
         {
-          name: "fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · labels",
+          name: "fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · countdown · countdownPlacement · labels",
           type: "ButtonRootProps",
           en: "As on `Button.Root`.",
           ru: "Как у `Button.Root`.",
@@ -593,6 +593,11 @@ export const api: ComponentApi = {
       holdHint: {
         en: "Description of the button with `holdToConfirm`.",
         ru: "Описание кнопки с `holdToConfirm`.",
+        part: "ColorPicker.EyeDropperButton",
+      },
+      countdownHint: {
+        en: "Description of the button with `countdown`; `{seconds}` is the count.",
+        ru: "Описание кнопки с `countdown`; `{seconds}` — длина отсчёта.",
         part: "ColorPicker.EyeDropperButton",
       },
     }),

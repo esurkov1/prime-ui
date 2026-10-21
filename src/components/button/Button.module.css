@@ -498,6 +498,37 @@
   transition: translate var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
+/* A countdown (`countdown`) is a clock like the hold: the same dense wash, filling linearly over
+   the whole count from the empty plate laid out first; run out, it stays full. Removed, it fades
+   where it is (the base rule). */
+.root[data-countdown] .fill {
+  background: color-mix(in srgb, var(--btn-fg) var(--prime-tint-line), transparent);
+}
+
+.root[data-countdown="ready"] .fill {
+  opacity: 1;
+  transition: none;
+}
+
+.root[data-countdown="running"] .fill {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    translate var(--btn-countdown) linear,
+    opacity var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+.root[data-countdown="done"] .fill {
+  opacity: 1;
+  translate: 0 0;
+  transition: none;
+}
+
+/* The seconds left: a chip before or after the label (`countdownPlacement`), in figures of one width so the button never jitters. */
+.countdown {
+  font-variant-numeric: tabular-nums;
+}
+
 /* The ring of a circle's `progress` (`internal/ring`, line weight): along the inner edge in the
    glyph's color over a 32% track of it, always turning. Gone (`progress` removed) it fades where
    it is and its turn pauses, so it never snaps back while fading. */

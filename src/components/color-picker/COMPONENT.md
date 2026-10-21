@@ -175,7 +175,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — | Custom content; default is the pipette icon. |
-| `fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · labels` | `ButtonRootProps` | — | As on `Button.Root`. |
+| `fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · countdown · countdownPlacement · labels` | `ButtonRootProps` | — | As on `Button.Root`. |
 | `…rest` | `Omit<ButtonRootProps, "variant" \| "tone" \| "size" \| "aria-label" \| "shape" \| "asChild">` | — | `onClick`, `className` and the other button attributes. |
 
 ### ColorPresets.Root
@@ -352,6 +352,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | Key | Default | Used for |
 |---|---|---|
 | `holdHint` | `"Удерживайте, чтобы подтвердить"` | Description of the button with `holdToConfirm`. |
+| `countdownHint` | `"Действие выполнится через {seconds} с, нажмите, чтобы отменить"` | Description of the button with `countdown`; `{seconds}` is the count. |
 
 #### ColorPresets.Root
 

@@ -280,10 +280,14 @@ Pick the lightest step that keeps the person safe ([choosing.md](choosing.md) ha
 | The action | The step |
 |---|---|
 | Reversible, frequent (remove a row, archive, move) | do it at once, «Отменить» in a `Notification` (`action`, commit in `onDismiss`) |
+| Reversible, started from a button that stays in place (archive from a record's header, send, mark done) | `Button.Root countdown={5}`: the button turns into «Отменить», fills and counts down; the action in `onConfirm`, the press cancels |
 | One standalone action that is easy to redo by hand | `Button.Root holdToConfirm` |
 | Irreversible loss of work, or an outward action that cannot be called back once it leaves the product (an invoice or a message sent to a client, a payment) | `ConfirmDialog` that names the thing and the consequence |
 | Bulk destructive | `ConfirmDialog` that names the count («Удалить 12 счетов?») |
 | Leaving a form with changes | `Modal.Guard` / `Drawer.Guard dirty`; a form that is the page — `Page.Guard dirty` |
+
+The countdown keeps the undo where the eye already is; the notification is for an item that leaves the
+screen (a removed row). Never both for one action, never a countdown on an irreversible step.
 
 A confirm on every action trains people to click through it; the one that mattered is then missed.
 Which button starts each step and how the confirm behaves:
