@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ColorPresets } from "@/components/color-picker/ColorPresets";
 import { Input } from "@/components/input/Input";
@@ -898,5 +898,163 @@ describe("FieldList", () => {
     expect(row.style.getPropertyValue("--fl-columns")).toBe(
       "minmax(0, 1fr) var(--fl-xs) var(--fl-end)",
     );
+  });
+
+  describe("glide", () => {
+    const ROW = 40;
+    /** The keyed elements each `animate` call ran on, with its keyframes. */
+    let glides: { node: HTMLElement; frames: Keyframe[] }[];
+
+    beforeEach(() => {
+      glides = [];
+      // jsdom lays nothing out: the rows stack in document order, everything else is one box.
+      vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        const rows = Array.from(
+          this.parentElement?.querySelectorAll(":scope > [data-fl-row]:not([data-leaving])") ?? [],
+        );
+        const index = this.dataset.flRow === undefined ? -1 : rows.indexOf(this);
+        const top = Math.max(index, 0) * ROW;
+        const height = index < 0 ? 400 : ROW;
+        return {
+          left: 0,
+          top,
+          right: 400,
+          bottom: top + height,
+          width: 400,
+          height,
+          x: 0,
+          y: top,
+          toJSON: () => ({}),
+        } as DOMRect;
+      });
+      HTMLElement.prototype.animate = function (this: HTMLElement, frames: Keyframe[]) {
+        glides.push({ node: this, frames });
+        return { addEventListener: () => {}, cancel: () => {} } as unknown as Animation;
+      } as HTMLElement["animate"];
+      // Motion on: the test setup prefers reduced motion.
+      vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+    });
+    afterEach(() => {
+      vi.restoreAllMocks();
+      vi.unstubAllGlobals();
+      delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+    });
+
+    const moves = () =>
+      glides
+        .filter(
+          ({ node }) => node.dataset.flRow !== undefined && !node.hasAttribute("data-leaving"),
+        )
+        .map(({ node, frames }) => [node.dataset.flRow, frames[0]?.transform]);
+
+    function Bill({ lines, ...rest }: Partial<FieldListProps<Line>> & { lines: Line[] }) {
+      return (
+        <FieldList
+          label="Позиции счёта"
+          columns={COLUMNS}
+          value={lines}
+          getId={(line) => line.id}
+          getLabel={(line) => line.service}
+          renderItem={(line) => (
+            <>
+              <Input.Root>
+                <Input.Wrapper>
+                  <Input.Field value={line.service} readOnly />
+                </Input.Wrapper>
+              </Input.Root>
+              <Input.Root>
+                <Input.Wrapper>
+                  <Input.Field value={line.price} readOnly />
+                </Input.Wrapper>
+              </Input.Root>
+            </>
+          )}
+          {...rest}
+        />
+      );
+    }
+
+    const TERM: Line = { id: "term", service: "Продление", price: "4000" };
+    const BILL: Line[] = [
+      { id: "rent", service: "Аренда", price: "18200" },
+      { id: "delivery", service: "Доставка", price: "1500" },
+      { id: "helmet", service: "Шлем", price: "2600" },
+    ];
+
+    it("a row added in the middle rises in at its place while the rows below glide down", () => {
+      const view = render(<Bill lines={BILL} />);
+      expect(moves()).toEqual([]);
+      view.rerender(<Bill lines={[BILL[0] as Line, TERM, ...BILL.slice(1)]} />);
+      expect(moves()).toEqual([
+        ["delivery", `translate(0px, ${-ROW}px)`],
+        ["helmet", `translate(0px, ${-ROW}px)`],
+      ]);
+      expect(rowsOf()[1]).toHaveClass(enterMotion.enter);
+    });
+
+    it("a new order from the owner glides every row that moved", () => {
+      const view = render(<Bill lines={BILL} />);
+      view.rerender(<Bill lines={[BILL[2], BILL[0], BILL[1]] as Line[]} />);
+      expect(moves()).toEqual([
+        ["helmet", `translate(0px, ${2 * ROW}px)`],
+        ["rent", `translate(0px, ${-ROW}px)`],
+        ["delivery", `translate(0px, ${-ROW}px)`],
+      ]);
+    });
+
+    it("a removed row closes up and the rows below follow it, with no glide of their own", async () => {
+      const view = render(<Bill lines={BILL} />);
+      view.rerender(<Bill lines={[BILL[0], BILL[2]] as Line[]} />);
+      await act(async () => {});
+      expect(moves()).toEqual([]);
+      const ghost = glides.find(({ node }) => node.hasAttribute("data-leaving"));
+      expect(ghost?.node.dataset.flRow).toBe("delivery");
+    });
+
+    it("keeps focus on the focused field through the glide", () => {
+      const view = render(<Bill lines={BILL} />);
+      const helmet = screen.getAllByDisplayValue("Шлем")[0] as HTMLInputElement;
+      helmet.focus();
+      view.rerender(<Bill lines={[BILL[0] as Line, TERM, ...BILL.slice(1)]} />);
+      expect(document.activeElement).toBe(helmet);
+    });
+
+    it("nothing glides under reduced motion", () => {
+      vi.stubGlobal("matchMedia", (query: string) => ({ matches: true, media: query }));
+      const view = render(<Bill lines={BILL} />);
+      view.rerender(<Bill lines={[BILL[0] as Line, TERM, ...BILL.slice(1)]} />);
+      expect(glides).toEqual([]);
+    });
+
+    it("a reorderable list glides an insert from the owner like any list", () => {
+      const view = render(<Bill lines={BILL} reorderable />);
+      view.rerender(<Bill lines={[BILL[0] as Line, TERM, ...BILL.slice(1)]} reorderable />);
+      expect(moves()).toEqual([
+        ["delivery", `translate(0px, ${-ROW}px)`],
+        ["helmet", `translate(0px, ${-ROW}px)`],
+      ]);
+    });
+
+    it("a handle's move glides once: Dnd glides it, the list only takes the new order", async () => {
+      const user = userEvent.setup();
+      function Sortable() {
+        const [lines, setLines] = React.useState(BILL);
+        return <Bill lines={lines} onValueChange={setLines} reorderable />;
+      }
+      render(<Sortable />);
+      await user.click(screen.getByRole("button", { name: "Переместить: «Аренда»" }));
+      await user.keyboard("{Alt>}{ArrowDown}{/Alt}");
+      expect(screen.getAllByRole("listitem").map((row) => row.dataset.flRow)).toEqual([
+        "delivery",
+        "rent",
+        "helmet",
+      ]);
+      expect(moves()).toEqual([
+        ["delivery", `translate(0px, ${ROW}px)`],
+        ["rent", `translate(0px, ${-ROW}px)`],
+      ]);
+    });
   });
 });

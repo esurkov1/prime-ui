@@ -243,6 +243,7 @@ export type GanttProps<Row, Bar extends GanttBar = GanttBar> = Omit<
   renderBarTooltip?: (bar: Bar, row: Row) => React.ReactNode;
   categories?: readonly GanttCategory[];
   hiddenCategories?: readonly string[];
+  legend?: boolean;
   zoom?: GanttZoom;
   defaultZoom?: GanttZoom;
   onZoomChange?: (zoom: GanttZoom) => void;
@@ -356,6 +357,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   onRowClick,
   renderBarTooltip,
   categories,
+  legend = false,
   hiddenCategories = NO_IDS,
   zoom: zoomProp,
   defaultZoom = "week",
@@ -438,11 +440,12 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     () => new Map((categories ?? []).map((category) => [category.id, category.color])),
     [categories],
   );
+  // The legend is optional UI: on only when asked; the hues and the hiding work without it.
   const legendCategories = React.useMemo(() => {
-    if (!categories) return null;
+    if (!categories || !legend) return null;
     const hidden = new Set(hiddenKey ? hiddenKey.split("\u0000") : []);
     return categories.filter((category) => !hidden.has(category.id));
-  }, [categories, hiddenKey]);
+  }, [categories, legend, hiddenKey]);
   const barsKey = React.useMemo(() => {
     let min = Number.POSITIVE_INFINITY;
     let max = Number.NEGATIVE_INFINITY;

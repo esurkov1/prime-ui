@@ -43,6 +43,8 @@ export type ChartFrameSeries = {
   color?: PaletteColor;
   /** Summary of the series in the legend (a total over the period). */
   value?: number;
+  /** Display of this series' values; the root's `formatValue` for a series without its own. */
+  formatValue?: (value: number) => string;
 };
 
 /** A series as the plot draws it: the resolved color as a CSS value and its visibility. */
@@ -53,6 +55,8 @@ export type ChartFramePlotSeries = {
   color: string;
   /** Turned off in the legend: keep the mark mounted with `data-hidden="true"` so it fades out. */
   hidden: boolean;
+  /** The series' own `formatValue`, else the root's: the ticks of the axis this series stands on. */
+  formatValue: (value: number) => string;
 };
 
 /** What `ChartFrame.Plot` hands `renderPlot`: the measured box and every series in order. */
@@ -177,8 +181,9 @@ function ChartFrameRoot({
         color: seriesColor(item, index),
         hidden: hidden.includes(item.id),
         value: item.value,
+        formatValue: item.formatValue ?? formatValue,
       })),
-    [series, hidden],
+    [series, hidden, formatValue],
   );
 
   const toggle = React.useCallback(
@@ -218,7 +223,6 @@ function ChartFrameRoot({
         <HiddenTable
           rows={rows}
           series={resolved}
-          formatValue={formatValue}
           category={context.labels.category}
           titleId={hasTitle ? titleId : undefined}
         />
@@ -367,7 +371,13 @@ function ChartFramePlot({
         ? renderPlot({
             width: size.width,
             height: size.height,
-            series: series.map(({ id, label, color, hidden }) => ({ id, label, color, hidden })),
+            series: series.map(({ id, label, color, hidden, formatValue }) => ({
+              id,
+              label,
+              color,
+              hidden,
+              formatValue,
+            })),
           })
         : null
       : children;
@@ -434,7 +444,7 @@ export type ChartFrameLegendProps = React.HTMLAttributes<HTMLUListElement> & {
  * hidden series keeps its place and color: its swatch turns hollow and its name quiet.
  */
 function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLegendProps) {
-  const { state, series, toggle, formatValue, labels } = useChartFrame("ChartFrame.Legend");
+  const { state, series, toggle, labels } = useChartFrame("ChartFrame.Legend");
   const [focusIndex, setFocusIndex] = React.useState(0);
   const buttons = React.useRef<Array<HTMLButtonElement | null>>([]);
   const loading = state === "loading";
@@ -480,7 +490,7 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
                 />
               ) : (
                 <span key={valueSwap.key} className={cx(styles.legendValue, valueSwap.className)}>
-                  {formatValue(item.value)}
+                  {item.formatValue(item.value)}
                 </span>
               )
             ) : null}
@@ -557,7 +567,7 @@ function ChartFrameTooltip({ label, items, point, className, ...rest }: ChartFra
         id: item.id,
         label: entry?.label ?? item.id,
         color: entry?.color ?? chartColors.other,
-        value: item.value,
+        value: (entry?.formatValue ?? formatValue)(item.value),
       },
     ];
   });
@@ -583,7 +593,7 @@ function ChartFrameTooltip({ label, items, point, className, ...rest }: ChartFra
                 style={{ "--chart-frame-swatch": row.color } as React.CSSProperties}
               />
               <span className={styles.tooltipName}>{row.label}</span>
-              <span className={styles.tooltipValue}>{formatValue(row.value)}</span>
+              <span className={styles.tooltipValue}>{row.value}</span>
             </li>
           ))}
         </ul>
@@ -596,7 +606,6 @@ ChartFrameTooltip.displayName = "ChartFrame.Tooltip";
 type HiddenTableProps = {
   rows: ChartFrameRow[];
   series: ResolvedSeries[];
-  formatValue: (value: number) => string;
   category: string;
   titleId: string | undefined;
 };
@@ -606,7 +615,7 @@ type HiddenTableProps = {
  * shown series, named by the chart title. Present only while the data is ready. A visible table is
  * a `DataTable`.
  */
-function HiddenTable({ rows, series, formatValue, category, titleId }: HiddenTableProps) {
+function HiddenTable({ rows, series, category, titleId }: HiddenTableProps) {
   const columns = series.filter((item) => !item.hidden);
   return (
     <table aria-labelledby={titleId} className={visuallyHiddenClass}>
@@ -626,7 +635,9 @@ function HiddenTable({ rows, series, formatValue, category, titleId }: HiddenTab
             <th scope="row">{row.label}</th>
             {columns.map((column) => {
               const value = row.values[column.id];
-              return <td key={column.id}>{value === undefined ? "—" : formatValue(value)}</td>;
+              return (
+                <td key={column.id}>{value === undefined ? "—" : column.formatValue(value)}</td>
+              );
             })}
           </tr>
         ))}

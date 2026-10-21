@@ -97,8 +97,20 @@ describe("ChartFrame", () => {
       width: 480,
       height: 240,
       series: [
-        { id: "new", label: "Новые клиенты", color: "var(--prime-color-chart-1)", hidden: false },
-        { id: "renewals", label: "Продления", color: "var(--prime-color-chart-3)", hidden: true },
+        {
+          id: "new",
+          label: "Новые клиенты",
+          color: "var(--prime-color-chart-1)",
+          hidden: false,
+          formatValue: expect.any(Function),
+        },
+        {
+          id: "renewals",
+          label: "Продления",
+          color: "var(--prime-color-chart-3)",
+          hidden: true,
+          formatValue: expect.any(Function),
+        },
       ],
     });
     act(() => observers[0]?.(320, 160));
@@ -355,6 +367,59 @@ describe("ChartFrame", () => {
     // The next point shows it again.
     rerender(<Floating point={{ x: 60, y: 100 }} />);
     expect(open()).toHaveTextContent("Неделя 41");
+  });
+
+  it("a series' own formatValue reaches the legend, the tooltip, the table and renderPlot", () => {
+    const formatBaht = (value: number) => `${value} ฿`;
+    const formatRentals = (value: number) => `${value} аренд`;
+    const mixed: ChartFrameSeries[] = [
+      { id: "revenue", label: "Выручка", value: 360 },
+      { id: "rentals", label: "Аренды", value: 125, formatValue: formatRentals },
+    ];
+    const renderPlot = vi.fn((area: ChartFramePlotArea) => (
+      <svg data-testid="plot" aria-hidden="true">
+        {area.series.map((s) => (
+          <text key={s.id}>{s.formatValue(40)}</text>
+        ))}
+      </svg>
+    ));
+    render(
+      <ChartFrame.Root
+        series={mixed}
+        formatValue={formatBaht}
+        rows={[{ label: "окт", values: { revenue: 72, rentals: 31 } }]}
+      >
+        <ChartFrame.Title>Выручка и аренды</ChartFrame.Title>
+        <ChartFrame.Plot renderPlot={renderPlot} />
+        <ChartFrame.Legend />
+        <ChartFrame.Tooltip
+          label="Октябрь"
+          items={[
+            { id: "revenue", value: 72 },
+            { id: "rentals", value: 31 },
+          ]}
+        />
+      </ChartFrame.Root>,
+    );
+    const legend = within(screen.getByRole("list", { name: "Ряды графика" }));
+    expect(legend.getByRole("button", { name: /Выручка/ })).toHaveTextContent("360 ฿");
+    expect(legend.getByRole("button", { name: /Аренды/ })).toHaveTextContent("125 аренд");
+
+    const tooltip = within(screen.getByText("Октябрь").parentElement as HTMLElement);
+    expect(tooltip.getByText("72 ฿")).toBeInTheDocument();
+    expect(tooltip.getByText("31 аренд")).toBeInTheDocument();
+
+    const table = screen.getByRole("table", { name: "Выручка и аренды" });
+    expect(
+      within(table)
+        .getAllByRole("cell")
+        .map((td) => td.textContent),
+    ).toEqual(["72 ฿", "31 аренд"]);
+
+    // The axis of each series formats its ticks the series' way.
+    const plot = screen.getByTestId("plot");
+    expect(within(plot).getByText("40 ฿")).toBeInTheDocument();
+    expect(within(plot).getByText("40 аренд")).toBeInTheDocument();
   });
 
   it("renders a self-sizing chart from children", () => {

@@ -1,4 +1,4 @@
-/** A team by client: each row header is a link to the person's profile that a plain click opens in place, each tooltip adds the client and the planned hours under the dates, and the clients are categories: their hues colour the bars and stand in the legend — `getRowHref`, `onRowClick`, `renderBarTooltip`, `categories`. */
+/** A team by client: each row header is a link to the person's profile that a plain click opens in place, each tooltip adds the client and the planned hours under the dates, and the clients are categories: their hues colour the bars and stand in the legend — `getRowHref`, `onRowClick`, `renderBarTooltip`, `categories`, `legend`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Gantt, type GanttBar, type GanttCategory, Typography } from "prime-ui-kit";
 import * as React from "react";
@@ -82,6 +82,7 @@ export default function GanttRowLinkExample() {
       }}
       renderBarTooltip={(bar) => `${CLIENT_NAME.get(bar.client)} · ${bar.hours} ч по плану`}
       categories={CLIENTS}
+      legend
       toolbar={
         <Typography as="span" variant="body-s" tone="muted" aria-live="polite">
           {opened ? `Открыт профиль: ${opened}` : "Нажмите на имя, чтобы открыть профиль"}

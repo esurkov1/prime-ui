@@ -72,14 +72,21 @@ export const api: ComponentApi = {
         {
           name: "categories",
           type: "readonly GanttCategory[]",
-          en: "Kinds of bars (rentals, bookings, service), in legend order: a bar with a `category` takes its hue, and the toolbar shows the legend — a Badge with the dot of each shown category, after your `toolbar` content.",
-          ru: "Виды полос (аренды, брони, сервис) в порядке легенды: полоса с `category` берёт их оттенок, а панель показывает легенду — Badge с точкой каждой показанной категории, после содержимого `toolbar`.",
+          en: "Kinds of bars (rentals, bookings, service), in menu order: a bar with a `category` takes its hue, `hiddenCategories` hide its bars; `legend` lists them above the chart.",
+          ru: "Виды полос (аренды, брони, сервис) в порядке меню: полоса с `category` берёт их оттенок, `hiddenCategories` скрывают её полосы; `legend` перечисляет их над графиком.",
         },
         {
           name: "hiddenCategories",
           type: "readonly string[]",
           en: "Ids of the hidden categories (`GanttCategoriesMenu` changes them): their bars are not drawn and their legend entries close up; the time axis keeps its span.",
           ru: "Id скрытых категорий (их меняет `GanttCategoriesMenu`): их полосы не рисуются, а пункты легенды схлопываются; шкала времени сохраняет свой охват.",
+        },
+        {
+          name: "legend",
+          type: "boolean",
+          default: "false",
+          en: "Shows the legend of `categories` on the row above the chart — a Badge with the dot of each shown category, after your `toolbar` content. Off: the hues and the hiding work alone.",
+          ru: "Показывает легенду `categories` в строке над графиком — Badge с точкой каждой показанной категории, после содержимого `toolbar`. Без неё оттенки и скрытие работают сами.",
         },
         {
           name: "zoom",
@@ -150,8 +157,8 @@ export const api: ComponentApi = {
         {
           name: "toolbar",
           type: "ReactNode",
-          en: "Your tools (search, «Вид», a filter) on a row above the chart, before the legend of `categories`; the row is there only when it has something to show.",
-          ru: "Ваши инструменты (поиск, «Вид», фильтр) в строке над графиком, перед легендой `categories`; строка есть, только когда ей есть что показать.",
+          en: "Your tools (search, «Вид», a filter) on a row above the chart, before the `legend`; the row is there only with `toolbar` or `legend`.",
+          ru: "Ваши инструменты (поиск, «Вид», фильтр) в строке над графиком, перед `legend`; строка есть, только с `toolbar` или `legend`.",
         },
         {
           name: "scrollHeight",

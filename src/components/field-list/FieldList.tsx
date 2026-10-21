@@ -208,7 +208,7 @@ const FOCUSABLE = "input, textarea, select, button, [tabindex]:not([tabindex='-1
 /** The keys that move a row from its menu button (`rowActions="menu"`), as Dnd's handle takes them. */
 const MOVE_KEYS = "Alt+ArrowUp Alt+ArrowDown";
 
-/** The rows that glide when the menu moves one: the list's own rows, not one closing up. */
+/** The rows that glide when the list changes: the list's own rows, not one closing up. */
 const flipRows = (list: HTMLElement) =>
   list.querySelectorAll<HTMLElement>(":scope > li[data-fl-row]:not([data-leaving])");
 const flipRowKey = (row: HTMLElement) => row.dataset.flRow;
@@ -451,14 +451,25 @@ export function FieldList<T extends object>({
   // The container crossing the stacking width, or a font arriving, changes the cells' widths.
   useResizeEffect(bodyRef, measureCompact);
 
-  // A move from the menu glides the rows to their new order (Dnd glides its own).
-  const [listElement, setListElement] = React.useState<HTMLOListElement | null>(null);
+  // Any change of the rows' set or order the presence asks to glide (a row added in the middle, a
+  // move from the menu, a new order from the owner) glides the rows from where they stood; a plain
+  // removal leaves it to the closing row, which the rows below follow. A drag or a handle's keys
+  // is Dnd's own glide: that order change only takes the new baseline here.
+  const [listElement, setListElement] = React.useState<HTMLElement | null>(null);
+  const order = keys.join("\u0000");
+  const dragOrder = React.useRef<string | null>(null);
+  const flip = React.useRef({ presence: presence.settle, settle: 0 });
+  if (flip.current.presence !== presence.settle) {
+    flip.current.presence = presence.settle;
+    if (order !== dragOrder.current) flip.current.settle += 1;
+  }
+  if (order !== dragOrder.current) dragOrder.current = null;
   useFlipList({
-    container: reorderable && !grip ? listElement : null,
+    container: listElement,
     nodes: flipRows,
     keyOf: flipRowKey,
-    layoutKey: keys.join("\u0000"),
-    settle: presence.settle,
+    layoutKey: order,
+    settle: flip.current.settle,
   });
 
   React.useLayoutEffect(() => {
@@ -755,8 +766,13 @@ export function FieldList<T extends object>({
             items={items}
             getId={getId}
             getLabel={(item) => rowName(item, items.indexOf(item))}
+            ref={setListElement}
             onReorder={(id, beforeId) =>
-              setItems((current) => moveBefore(current, id, beforeId, getId))
+              setItems((current) => {
+                const next = moveBefore(current, id, beforeId, getId);
+                dragOrder.current = next.map(getId).join("\u0000");
+                return next;
+              })
             }
             renderItem={renderRow}
           />

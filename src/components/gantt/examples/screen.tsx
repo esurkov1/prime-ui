@@ -1,4 +1,4 @@
-/** A team schedule as a work screen: the title with the people shown and a toolbar with search, filters, team sections and the primary action in its top bar over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer; the clients are categories with a legend and a view menu beside the search — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`, `categories`, `GanttCategoriesMenu`. */
+/** A team schedule as a work screen: the title with the people shown and a toolbar with search, filters, team sections and the primary action in its top bar over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer; the clients are categories with a legend and a view menu beside the search — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`, `categories`, `legend`, `GanttCategoriesMenu`. */
 import {
   Avatar,
   Badge,
@@ -541,6 +541,7 @@ export default function GanttScreenExample() {
             renderBarTooltip={(bar) => (bar.client ? CLIENTS[bar.client].name : KIND[bar.kind])}
             // The legend of client hues: the bar's hue repeats its client, the tooltip names it.
             categories={CLIENT_CATEGORIES}
+            legend
             hiddenCategories={hiddenClients}
             empty={
               <EmptyPage.Root size="s" role="status" aria-labelledby="schedule-empty">

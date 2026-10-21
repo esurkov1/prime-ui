@@ -19,8 +19,8 @@ export const api: ComponentApi = {
           name: "series",
           type: "ChartFrameSeries[]",
           default: "[]",
-          en: "The series in drawing order, `{ id, label, color?, value? }`: legend entries, tooltip rows, table columns and `renderPlot` colors. `color` is a palette hue; `value` is the legend summary.",
-          ru: "Ряды в порядке отрисовки, `{ id, label, color?, value? }`: записи легенды, строки подсказки, столбцы таблицы и цвета для `renderPlot`. `color` — оттенок палитры; `value` — итог в легенде.",
+          en: "The series in drawing order, `{ id, label, color?, value?, formatValue? }`: legend entries, tooltip rows, table columns. `color` is a palette hue, `value` the legend summary, `formatValue` its own value display.",
+          ru: "Ряды в порядке отрисовки, `{ id, label, color?, value?, formatValue? }`: записи легенды, строки подсказки, столбцы таблицы. `color` — оттенок палитры, `value` — итог в легенде, `formatValue` — свой вид значений.",
         },
         {
           name: "rows",
@@ -52,8 +52,8 @@ export const api: ComponentApi = {
           name: "formatValue",
           type: "(value: number) => string",
           defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
-          en: "Display of a value in the legend, the tooltip and the table («8,4 млн ₽»).",
-          ru: "Вид значения в легенде, подсказке и таблице («8,4 млн ₽»).",
+          en: "Display of a value in the legend, the tooltip and the table («8,4 млн ₽») for every series without its own `formatValue`.",
+          ru: "Вид значения в легенде, подсказке и таблице («8,4 млн ₽») для каждого ряда без своего `formatValue`.",
         },
         {
           name: "onRetry",
@@ -182,8 +182,8 @@ export const api: ComponentApi = {
         {
           name: "renderPlot",
           type: "(area: ChartFramePlotArea) => ReactNode",
-          en: "Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden }` — for libraries that need explicit sizes (Chart.js, visx).",
-          ru: "Рисует график по измеренным `{ width, height }` со всеми рядами `{ id, label, color, hidden }` — для библиотек, которым нужны явные размеры (Chart.js, visx).",
+          en: "Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden, formatValue }` (its axis ticks) — for libraries that need explicit sizes (Chart.js, visx).",
+          ru: "Рисует график по измеренным `{ width, height }` со всеми рядами `{ id, label, color, hidden, formatValue }` (подписи его оси) — для библиотек с явными размерами (Chart.js, visx).",
         },
         {
           name: "children",
@@ -234,8 +234,8 @@ export const api: ComponentApi = {
           name: "items",
           type: "ChartFrameTooltipItem[]",
           required: true,
-          en: "`{ id, value }` per series at that point; name and color come from the root's series, rows of hidden series are left out, values go through `formatValue`.",
-          ru: "`{ id, value }` для каждого ряда в точке; название и цвет берутся из рядов корня, строки скрытых рядов пропускаются, значения проходят через `formatValue`.",
+          en: "`{ id, value }` per series at that point; name and color come from the root's series, rows of hidden series are left out, values go through the series' `formatValue`.",
+          ru: "`{ id, value }` для каждого ряда в точке; название и цвет берутся из рядов корня, строки скрытых рядов пропускаются, значения проходят через `formatValue` ряда.",
         },
         {
           name: "point",
@@ -298,8 +298,8 @@ export const api: ComponentApi = {
         ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан; список легенды назван `labels.legend`. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
       },
       {
-        en: "The root renders `rows` as a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.",
-        ru: "Корень выводит `rows` визуально скрытой таблицей с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд, значения через `formatValue`.",
+        en: "The root renders `rows` as a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through each series' `formatValue`.",
+        ru: "Корень выводит `rows` визуально скрытой таблицей с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд, значения через `formatValue` своего ряда.",
       },
       {
         en: "A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.",

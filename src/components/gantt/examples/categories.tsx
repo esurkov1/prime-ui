@@ -1,4 +1,4 @@
-/** A fleet calendar by kind of bar: rentals, bookings and service share a legend and a view menu that hides a kind from the chart and from the legend at once — `categories`, `hiddenCategories`, `GanttCategoriesMenu`. */
+/** A fleet calendar by kind of bar: rentals, bookings and service share a legend and a view menu that hides a kind from the chart and from the legend at once — `categories`, `legend`, `hiddenCategories`, `GanttCategoriesMenu`. */
 import { addDays, startOfToday } from "date-fns";
 import { Gantt, type GanttBar, GanttCategoriesMenu, type GanttCategory } from "prime-ui-kit";
 import * as React from "react";
@@ -61,6 +61,7 @@ export default function GanttCategoriesExample() {
       getRowLabel={(vehicle) => vehicle.name}
       getRowBars={(vehicle) => vehicle.bars}
       categories={CATEGORIES}
+      legend
       hiddenCategories={hiddenCategories}
       toolbar={
         <GanttCategoriesMenu

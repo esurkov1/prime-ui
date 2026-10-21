@@ -731,7 +731,7 @@ const CATEGORIZED: Person[] = PEOPLE.map((person) => ({
 
 describe("Gantt categories", () => {
   it("colours a bar by its category unless it has a hue or a tone, and lists them in a legend", () => {
-    render(<Chart rows={CATEGORIZED} categories={CATEGORIES} />);
+    render(<Chart rows={CATEGORIZED} categories={CATEGORIES} legend />);
     expect(bar(/^Аудит склада/)).toHaveAttribute("data-color", "teal");
     expect(bar(/^Отпуск/)).toHaveAttribute("data-color", "purple");
     expect(bar(/^Отчёт/)).toHaveAttribute("data-tone", "warning");
@@ -741,12 +741,23 @@ describe("Gantt categories", () => {
   });
 
   it("has no legend without categories", () => {
-    render(<Chart />);
+    render(<Chart legend />);
     expect(screen.queryByRole("group", { name: "Обозначения" })).toBeNull();
   });
 
+  it("keeps the hues and the hiding of categories without the legend, which is off by default", () => {
+    const { container } = render(
+      <Chart rows={CATEGORIZED} categories={CATEGORIES} hiddenCategories={["away"]} />,
+    );
+    expect(screen.queryByRole("group", { name: "Обозначения" })).toBeNull();
+    // No legend and no toolbar: no tool row above the chart at all.
+    expect(container.querySelector(`.${styles.toolbar}`)).toBeNull();
+    expect(bar(/^Аудит склада/)).toHaveAttribute("data-color", "teal");
+    expect(screen.queryByRole("button", { name: /^Отпуск/ })).toBeNull();
+  });
+
   it("leaves out the bars and the legend entry of a hidden category; the lanes close up", () => {
-    render(<Chart rows={CATEGORIZED} categories={CATEGORIES} hiddenCategories={["work"]} />);
+    render(<Chart rows={CATEGORIZED} categories={CATEGORIES} legend hiddenCategories={["work"]} />);
     expect(screen.queryByRole("button", { name: /^Аудит склада/ })).toBeNull();
     expect(bar(/^Отпуск/)).toBeInTheDocument();
     const anna = screen.getByRole("rowheader", { name: "Анна Котова" }).parentElement;
@@ -767,7 +778,7 @@ describe("Gantt categories", () => {
             hiddenCategories={hidden}
             onHiddenCategoriesChange={setHidden}
           />
-          <Chart rows={CATEGORIZED} categories={CATEGORIES} hiddenCategories={hidden} />
+          <Chart rows={CATEGORIZED} categories={CATEGORIES} legend hiddenCategories={hidden} />
         </>
       );
     }

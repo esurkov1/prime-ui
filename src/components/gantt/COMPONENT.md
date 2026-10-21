@@ -32,7 +32,7 @@ import {
 ## Anatomy
 ```
 Gantt                          surface (layer of the ladder), size container
-├─ toolbar                     only with `toolbar` or `categories`: the kit's tool row of your content and the legend
+├─ toolbar                     only with `toolbar` or `legend`: the kit's tool row of your content and the legend
 ├─ «Сегодня»                   Button at the edge of the head where today went off screen
 └─ viewport                    ScrollContainer, rows scroll up and down; time is the camera's: pinch, Ctrl / ⌘ + wheel, a sideways wheel, one finger
    └─ role="grid"
@@ -61,8 +61,9 @@ GanttCategoriesMenu            the kit's view trigger (columns icon · «Вид�
 | `getRowHref` | `(row: Row) => string` | — | The row header is a link: a real `<a>` fills the first column and is the row's stop in the grid, so a click, ⌘/Ctrl-click, a middle click and «open in new tab» work on it; Space follows it like Enter. |
 | `onRowClick` | `(row: Row, event: GanttRowClickEvent) => void` | — | Opens a row in place (a profile in a Drawer): a click on its header, Enter or Space; never from a control inside it. With `getRowHref` it gets plain clicks: `event.preventDefault()` routes in the app. |
 | `renderBarTooltip` | `(bar: Bar, row: Row) => ReactNode` | — | Extra lines of a bar's tooltip (a client, hours, an owner), under its title and the dates line — those always stay, the dates and the duration are what the bar means on the axis. |
-| `categories` | `readonly GanttCategory[]` | — | Kinds of bars (rentals, bookings, service), in legend order: a bar with a `category` takes its hue, and the toolbar shows the legend — a Badge with the dot of each shown category, after your `toolbar` content. |
+| `categories` | `readonly GanttCategory[]` | — | Kinds of bars (rentals, bookings, service), in menu order: a bar with a `category` takes its hue, `hiddenCategories` hide its bars; `legend` lists them above the chart. |
 | `hiddenCategories` | `readonly string[]` | — | Ids of the hidden categories (`GanttCategoriesMenu` changes them): their bars are not drawn and their legend entries close up; the time axis keeps its span. |
+| `legend` | `boolean` | `false` | Shows the legend of `categories` on the row above the chart — a Badge with the dot of each shown category, after your `toolbar` content. Off: the hues and the hiding work alone. |
 | `zoom` | `"day" \| "week" \| "month" \| number` | — | Zoom, controlled: a preset of the selector (`day`, `week`, `month`), or the length of a day in px a gesture or a key left between them (the selector reads «Свой»), held between the whole axis in view and the top step. |
 | `defaultZoom` | `"day" \| "week" \| "month" \| number` | `"week"` | Initial zoom, uncontrolled. |
 | `onZoomChange` | `(zoom: GanttZoom) => void` | — | The zoom changed: a preset from the selector (the day in the middle stays in the middle), or where a gesture or a key left it (the day under the hand stays under it) — a preset when it ended within 8% of one. |
@@ -73,7 +74,7 @@ GanttCategoriesMenu            the kit's view trigger (columns icon · «Вид�
 | `readOnly` | `boolean` | `false` | No moving, resizing or creating; bars still select and show their dates. |
 | `loading` | `boolean` | `false` | Without rows — skeleton rows in the chart's geometry and a status for screen readers; with rows they stay and the grid is `aria-busy`. |
 | `empty` | `ReactNode` | — | Empty-state content when `rows` is empty; a string goes into a compact `EmptyPage`. Defaults to `labels.empty`. |
-| `toolbar` | `ReactNode` | — | Your tools (search, «Вид», a filter) on a row above the chart, before the legend of `categories`; the row is there only when it has something to show. |
+| `toolbar` | `ReactNode` | — | Your tools (search, «Вид», a filter) on a row above the chart, before the `legend`; the row is there only with `toolbar` or `legend`. |
 | `scrollHeight` | `number \| "fill"` | — | Max height of the viewport in px, so the header sticks while rows scroll; `"fill"` — no taller than its flex / grid parent: as tall as its rows, scrolling them inside beyond it. |
 | `onItemOpen` | `(bar: Bar, row: Row) => void` | — | A bar was activated (click, Enter, Space): open its record. A drag never opens it. |
 | `onBarChange` | `(dates: GanttDates, bar: Bar, row: Row) => void \| Promise<void>` | — | New dates of a bar after a drag or an editing key — update your data. A returned Promise keeps the bar busy at the new dates; a rejection glides it back. Without it bars cannot be edited. |
@@ -175,6 +176,7 @@ The main bars (`m`, `l`) pack first, then `s` below them, each by start. A lane 
 |---|---|
 | `readOnly` | No moving or resizing anywhere; bars still select and show their tooltip. |
 | `loading` | Skeleton rows without data; with rows the grid is `aria-busy`. |
+| `legend` | The legend of `categories` on the row above the chart. Off by default: the hues and the hiding (`hiddenCategories`, `GanttCategoriesMenu`) work without it — say the kind in the bar's label and tooltip. |
 
 ## States
 | State | Driven by | DOM |
@@ -211,7 +213,7 @@ The main bars (`m`, `l`) pack first, then `s` below them, each by start. A lane 
 - Editing precision: a move, a resize and a drawing land on whole days at every zoom — held with hysteresis so a few px a day never jitter — and the tooltip says the exact dates and days; hold Alt to land on the ticks of the head's step (the 1st, 8th, 15th…; the 1sts of months). The keys move by a day at every zoom; with Alt from tick to tick. A bar is at least one day long: a resize past the opposite edge stops there and never flips. On touch a finger held on a bar picks it up, then it drags like a pointer.
 - Creating: on empty space the cursor is a crosshair and the phantom of the bar a press would create stands under it — a day whenever day lines are drawn. Press and drag across a row: the phantom turns into a real bar of whole days, either way from the pressed day; or double-click (long-press on touch) for one phantom cell; a drag after the long press draws on. A press let go where it began creates nothing. Without `onBarCreate` (or with `readOnly`) nothing can be created and empty space shows no create cursor or phantom. Near the edges of the axis a drag, a resize and a drawing slide the view.
 - Tooltip: the bar's title, then its dates · duration · progress; `renderBarTooltip` adds lines under them (a client, planned hours) and never replaces them — the dates are what the bar means on the axis, and the same tooltip shows the new dates while dragging.
-- A legend of bar colours is `categories`: the chart draws a `Badge.Group` named `labels.legend` of `Badge.Root color` + `Badge.Dot` with the category name, one per shown category, after your `toolbar` content, on the row above the chart (the row is there only with a `toolbar` or `categories`). A bar with a `category` takes its hue unless it has a `color` or a `tone` of its own. Say the category in the bar label or the tooltip too, never only by colour.
+- A legend of bar colours is `categories` with `legend`: the chart draws a `Badge.Group` named `labels.legend` of `Badge.Root color` + `Badge.Dot` with the category name, one per shown category, after your `toolbar` content, on the row above the chart (the row is there only with a `toolbar` or `categories`). A bar with a `category` takes its hue unless it has a `color` or a `tone` of its own. Say the category in the bar label or the tooltip too, never only by colour.
 - What the chart shows is the person's choice: `GanttCategoriesMenu` («Вид») in the page's tools beside the search, bound to the same `hiddenCategories` the chart reads — the kit's one view trigger, the same soft neutral Button with the `view.columns` icon, «Вид» and the count of shown items as `DataTableColumnsMenu` and `KanbanFieldsMenu`, so a page that switches table ↔ board ↔ schedule keeps one «Вид» in one place. «По умолчанию» appears only while the view differs from `defaultHiddenCategories`. A bar without a `category` is always shown.
 - The default axis covers every bar and today with a month of room on both sides, from the 1st of a month, at least a year — one axis for every zoom; pass `range` for a fixed period.
 - The chart opens with today a third into the view (once it has a width); «Сегодня», the zoom and the arrow keys move only the chart's own view, never the page.
@@ -301,12 +303,12 @@ The main bars (`m`, `l`) pack first, then `s` below them, each by start. A lane 
 | [occupancy.tsx](examples/occupancy.tsx) | Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `edit`. |
 | [rentals.tsx](examples/rentals.tsx) | A fleet calendar: an issued rental changes only its end, a booking moves and changes both edges, a long booking is a two-line bar with its deposit, documents and an inspection are short bars in a lane under the main ones, a new booking is drawn in a free lane — `edit`, `height`, `description`, `onBarChange`, `onBarCreate`. |
 | [large.tsx](examples/large.tsx) | Two thousand people over two years stay fast: only the rows and days in view are rendered, keyboard focus reaches any row, bars move and stretch and new ones are drawn on empty space — `rows`, `range`, `scrollHeight`, `onBarChange`, `onBarCreate`. |
-| [row-link.tsx](examples/row-link.tsx) | A team by client: each row header is a link to the person's profile that a plain click opens in place, each tooltip adds the client and the planned hours under the dates, and the clients are categories: their hues colour the bars and stand in the legend — `getRowHref`, `onRowClick`, `renderBarTooltip`, `categories`. |
-| [categories.tsx](examples/categories.tsx) | A fleet calendar by kind of bar: rentals, bookings and service share a legend and a view menu that hides a kind from the chart and from the legend at once — `categories`, `hiddenCategories`, `GanttCategoriesMenu`. |
+| [row-link.tsx](examples/row-link.tsx) | A team by client: each row header is a link to the person's profile that a plain click opens in place, each tooltip adds the client and the planned hours under the dates, and the clients are categories: their hues colour the bars and stand in the legend — `getRowHref`, `onRowClick`, `renderBarTooltip`, `categories`, `legend`. |
+| [categories.tsx](examples/categories.tsx) | A fleet calendar by kind of bar: rentals, bookings and service share a legend and a view menu that hides a kind from the chart and from the legend at once — `categories`, `legend`, `hiddenCategories`, `GanttCategoriesMenu`. |
 | [states.tsx](examples/states.tsx) | Skeleton rows in the chart's geometry while it loads, an empty period and a report you may only look at, its today line on the report day — `loading`, `empty`, `readOnly`, `today`. |
 | [controlled.tsx](examples/controlled.tsx) | The zoom owned by the page: its presets, the selector and a pinch change one state — `zoom`, `onZoomChange`. |
 | [narrow.tsx](examples/narrow.tsx) | At 360 px the first column keeps only the avatars, the zoom selector over them only its glyph, and the axis beside it slides under a finger and pinches — `renderRowAvatar`. |
-| [screen.tsx](examples/screen.tsx) | A team schedule as a work screen: the title with the people shown and a toolbar with search, filters, team sections and the primary action in its top bar over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer; the clients are categories with a legend and a view menu beside the search — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`, `categories`, `GanttCategoriesMenu`. |
+| [screen.tsx](examples/screen.tsx) | A team schedule as a work screen: the title with the people shown and a toolbar with search, filters, team sections and the primary action in its top bar over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer; the clients are categories with a legend and a view menu beside the search — `scrollHeight`, `onBarChange`, `onBarCreate`, `onItemOpen`, `categories`, `legend`, `GanttCategoriesMenu`. |
 
 ## Mistakes
 - Updating the rows before the request succeeds (optimistic) → the chart cannot glide back on reject; update them when `onBarChange` resolves, or before you resolve it.
@@ -320,7 +322,8 @@ The main bars (`m`, `l`) pack first, then `s` below them, each by start. A lane 
 - Reading `scrollLeft` of the chart to know what is in view → time is not scrolled; `range`, `today` and the zoom say what the chart shows.
 - A title or a zoom switch in `toolbar` → the chart is named by `aria-label` and the page's heading; the zoom is the selector in its head, a pinch and the wheel.
 - Saving the zoom as a preset only → `onZoomChange` also reports a number (a day's length in px) when a gesture leaves it between presets; keep the value as given.
-- A legend of `Badge`s in `toolbar` and bars filtered by hand in `getRowBars` → `categories` with `hiddenCategories`: the chart hides the bars and their legend entries together.
+- A legend of `Badge`s in `toolbar` and bars filtered by hand in `getRowBars` → `categories` with `legend` and `hiddenCategories`: the chart hides the bars and their legend entries together.
+- Bars filtered by hand to hide a kind without a legend → `categories` and `hiddenCategories` without `legend`: the hues and the «Вид» menu work, no legend row.
 - A hand-made Dropdown of check items for what the chart shows → `GanttCategoriesMenu`, the same «Вид» as the table's and the board's.
 
 ## Related
