@@ -552,19 +552,34 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-/*
- * A header that opens its row (`onRowClick`, `getRowHref`): a pointer cursor and, under a mouse, a
- * wash under the content. The wash is an inset shadow over the opaque surface; its spread, the
- * column width, covers the whole header.
- */
+/* A header that opens its row (`onRowClick`, `getRowHref`): a pointer cursor. */
 .rowHeader[data-clickable] {
   cursor: pointer;
 }
 
+/*
+ * The row under the pointer — its name or its track, over a bar or empty days — and the row of the
+ * keyboard's focus take one quiet wash across both sides, so a name and its bars read as one line:
+ * the table rows' hover fill (DataTable). On the header an inset shadow over its opaque surface
+ * (its spread, the column width, covers it); on the track a fill over the grid and the weekends,
+ * under the bars (their own fill is opaque) and the today line. Pure CSS: a hover renders nothing.
+ */
 @media (hover: hover) {
-  .rowHeader[data-clickable]:hover {
+  .row:hover > .rowHeader {
     box-shadow: inset 0 0 0 var(--gantt-label-w) var(--prime-color-fill-subtle-active);
   }
+
+  .row:hover .track {
+    background-color: var(--prime-color-fill-subtle-active);
+  }
+}
+
+.row:has(:focus-visible) > .rowHeader {
+  box-shadow: inset 0 0 0 var(--gantt-label-w) var(--prime-color-fill-subtle-active);
+}
+
+.row:has(:focus-visible) .track {
+  background-color: var(--prime-color-fill-subtle-active);
 }
 
 /* `getRowHref`: the link holds the header's content and its hit area fills the header. */
@@ -641,6 +656,8 @@
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
+  /* The row's hover / focus wash (above) fades in and out with the table rows'. */
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
   overflow: clip;
 }
 

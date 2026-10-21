@@ -196,7 +196,8 @@ The main bars (`m`, `l`) pack first, then `s` below them, each by start. A lane 
 | pending | `onBarChange` returned a Promise | `data-pending`, `aria-busy`, a Spinner; reject → the bar glides back |
 | loading | `loading` without rows | Skeleton rows with one or two bars each in a real bar's height, radius and lane, under the column and today lines; `aria-busy`, status `labels.loading`; data cross-fades in |
 | empty | `rows` empty | a compact `EmptyPage` (`empty` or `labels.empty`), cross-faded in |
-| row opens | `onRowClick` / `getRowHref` | `data-clickable` on the row header: a pointer cursor and a hover wash under its content (an inset shadow over the opaque header, faded both ways); with `getRowHref` the content is an `<a>` whose hit area fills the header |
+| row hover | the pointer over the row (its name, its track, a bar or empty days); the keyboard's focus in it (`:focus-visible`) | the whole row takes the table rows' wash (`--prime-color-fill-subtle-active`) across both sides — an inset shadow on the opaque name cell, a fill on the track over the grid and under the bars and the today line; hover only under `(hover: hover)`, fading both ways; pure CSS, no render |
+| row opens | `onRowClick` / `getRowHref` | `data-clickable` on the row header: a pointer cursor; with `getRowHref` the content is an `<a>` whose hit area fills the header |
 | axis cut | the view hides days at an edge | `data-overflow-start` / `data-overflow-end`: an edge shadow from the first column / at the end |
 
 ## Layout & spacing

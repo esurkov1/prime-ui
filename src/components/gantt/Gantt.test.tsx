@@ -2087,3 +2087,49 @@ describe("Gantt scrollHeight fill", () => {
     expect(cssValue(inner, "flex")).toBe("0 1 auto");
   });
 });
+
+describe("Gantt row hover", () => {
+  const file = "src/components/gantt/Gantt.module.css";
+
+  it("washes the whole row under the pointer, only where there is hover, with the table rows' fill", () => {
+    for (const selector of [".row:hover > .rowHeader", ".row:hover .track"]) {
+      // Only under a pointer that hovers: nothing on touch.
+      const rule = cssRule(file, selector, ["@media (hover: hover)"]);
+      const value = rule.decls.map((decl) => decl.value).join(" ");
+      expect(value).toContain("var(--prime-color-fill-subtle-active)");
+    }
+  });
+
+  it("washes the row of the keyboard's focus the same way", () => {
+    for (const selector of [
+      ".row:has(:focus-visible) > .rowHeader",
+      ".row:has(:focus-visible) .track",
+    ]) {
+      const value = cssRule(file, selector)
+        .decls.map((decl) => decl.value)
+        .join(" ");
+      expect(value).toContain("var(--prime-color-fill-subtle-active)");
+    }
+  });
+
+  it("renders nothing for a hover: the wash is the stylesheet's alone", () => {
+    render(<Chart />);
+    const row = screen.getByRole("rowheader", { name: "Анна Котова" }).parentElement as HTMLElement;
+    const changes: MutationRecord[] = [];
+    const observer = new MutationObserver((records) => changes.push(...records));
+    observer.observe(row.closest("[role='grid']") as HTMLElement, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+    });
+    for (const target of [row, row.lastElementChild as HTMLElement, bar(/^Аудит склада/)]) {
+      fireEvent.pointerOver(target, { pointerType: "mouse" });
+      fireEvent.pointerEnter(target, { pointerType: "mouse" });
+      fireEvent.pointerMove(target, { pointerType: "mouse", clientX: 40 });
+      fireEvent.pointerLeave(target, { pointerType: "mouse" });
+    }
+    changes.push(...observer.takeRecords());
+    observer.disconnect();
+    expect(changes).toHaveLength(0);
+  });
+});
