@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Sparkline",
-      en: '`ref` → `HTMLDivElement` (the root). A headline (title · date, value · change) over an area, line or bar chart; the chart is a `role="slider"` that picks a point, a tooltip beside the pointer shows the value and date. The change hides when a percentage means nothing.',
-      ru: 'Заголовок (название · дата, значение · изменение) над заливкой, линией или столбиками; график — `role="slider"`, выбирающий точку, подсказка у курсора показывает значение и дату. Изменение скрыто, когда процент бессмысленен.',
+      en: '`ref` → `HTMLDivElement` (the root). A headline (title · date, value · change) over an area, line or bar chart; the chart is a `role="slider"` that picks a point, and the headline follows it. The change hides when a percentage means nothing.',
+      ru: 'Заголовок (название · дата, значение · изменение) над заливкой, линией или столбиками; график — `role="slider"`, выбирающий точку, заголовок следует за ней. Изменение скрыто, когда процент бессмысленен.',
       props: [
         {
           name: "data",
@@ -40,8 +40,8 @@ export const api: ComponentApi = {
           name: "layout",
           type: '"default" | "compact"',
           default: '"default"',
-          en: "`default` — the headline over the plot of its `size`; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the scrubbed point shows in the tooltip and `aria-valuetext`.",
-          ru: "`default` — заголовок над графиком высоты `size`; `compact` — только график высотой с контрол `xs` и точкой покоя, для ячейки DataTable; выбранная точка — в подсказке и `aria-valuetext`.",
+          en: "`default` — the headline over the plot of its `size`; `compact` — the plot alone at an `xs` control height for a DataTable cell; its point shows in a tooltip (only here) and `aria-valuetext`.",
+          ru: "`default` — заголовок над графиком высоты `size`; `compact` — только график высотой с контрол `xs`, для ячейки DataTable; точка — в подсказке (только здесь) и `aria-valuetext`.",
         },
         {
           name: "size",
@@ -53,8 +53,8 @@ export const api: ComponentApi = {
         {
           name: "point",
           type: "number | null",
-          en: "Index of the scrubbed point, `null` at rest. One `point` and `onPointChange` on sparklines of one axis: a scrub on any moves the cursor and headline of all; the tooltip stays with the chart scrubbed.",
-          ru: "Индекс выбранной точки, `null` в покое. Один `point` и `onPointChange` на графики одной оси: ведение по любому двигает курсор и заголовок у всех; подсказка — у графика под указателем.",
+          en: "Index of the scrubbed point, `null` at rest. One `point` and `onPointChange` on sparklines of one axis: a scrub on any moves the cursor and headline of all.",
+          ru: "Индекс выбранной точки, `null` в покое. Один `point` и `onPointChange` на графики одной оси: ведение по любому двигает курсор и заголовок у всех.",
         },
         {
           name: "defaultPoint",
@@ -145,8 +145,8 @@ export const api: ComponentApi = {
           name: "formatValue",
           type: "(value: number) => string",
           defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
-          en: "Display of a value in the headline, the tooltip, the reference description and the spoken point («312 400 ₽»).",
-          ru: "Вид значения в заголовке, подсказке, описании ориентира и в озвучке точки («312 400 ₽»).",
+          en: "Display of a value in the headline, the compact tooltip, the reference description and the spoken point («312 400 ₽»).",
+          ru: "Вид значения в заголовке, подсказке компактного графика, описании ориентира и в озвучке точки («312 400 ₽»).",
         },
         {
           name: "labels",
@@ -200,8 +200,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Escape",
-        en: "Hides the tooltip and returns the headline to rest.",
-        ru: "Прячет подсказку и возвращает заголовок в покой.",
+        en: "Returns the headline to rest (and hides the compact tooltip).",
+        ru: "Возвращает заголовок в покой (и прячет подсказку компактного графика).",
       },
     ],
     aria: [
@@ -226,8 +226,8 @@ export const api: ComponentApi = {
         ru: '`layout="compact"`: видимого заголовка нет, `label` — только имя слайдера, значение точки — в `aria-valuetext`.',
       },
       {
-        en: "The tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.",
-        ru: "Подсказка — `aria-hidden`: она повторяет `aria-valuetext` для зрячих. График несёт `data-row-click-ignore` (и он слайдер), поэтому указатель и клавиши на нём не открывают строку DataTable.",
+        en: "The compact tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.",
+        ru: "Подсказка компактного графика — `aria-hidden`: она повторяет `aria-valuetext` для зрячих. График несёт `data-row-click-ignore` (и он слайдер), поэтому указатель и клавиши на нём не открывают строку DataTable.",
       },
     ],
   },

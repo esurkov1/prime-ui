@@ -40,7 +40,7 @@ Sparkline              <div>; the headline and the chart; aria-busy while loadin
 │  └─ bars:            zero line (chart axis) + a slot per point with its bar (aria-hidden)
 └─ reference text      hidden; describes the slider (aria-describedby)
 loading:               Skeletons of the date, the value line and the plot
-tooltip:               the kit chart tooltip (date · value) right of the pointer, portaled to <body>, aria-hidden
+tooltip (compact):     the kit chart tooltip (date · value) right of the pointer, portaled to <body>, aria-hidden
 compact:               the plot alone (no head, no value row); loading — the plot Skeleton
 ```
 
@@ -49,7 +49,7 @@ compact:               the plot alone (no head, no value row); loading — the p
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Sparkline
-`ref` → `HTMLDivElement` (the root). A headline (title · date, value · change) over an area, line or bar chart; the chart is a `role="slider"` that picks a point, a tooltip beside the pointer shows the value and date. The change hides when a percentage means nothing.
+`ref` → `HTMLDivElement` (the root). A headline (title · date, value · change) over an area, line or bar chart; the chart is a `role="slider"` that picks a point, and the headline follows it. The change hides when a percentage means nothing.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -57,9 +57,9 @@ compact:               the plot alone (no head, no value row); loading — the p
 | `label` | `string` | — (required) | Visible title above the value and the accessible name of the chart; with `layout="compact"` only the accessible name. |
 | `variant` | `"area" \| "line" \| "bars"` | `"area"` | `area` — a line over an accent gradient that fades to the bottom; `line` — the line alone, for many trends side by side; `bars` — a bar per point standing on a zero line: up when positive, down (danger) when negative. |
 | `curve` | `"smooth" \| "linear" \| "step"` | `"smooth"` | Shape of the line (`area`, `line`): `smooth` — a monotone cubic through every point that never overshoots a peak or a trough; `linear` — straight segments; `step` — a level per point, changing halfway between points. |
-| `layout` | `"default" \| "compact"` | `"default"` | `default` — the headline over the plot of its `size`; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the scrubbed point shows in the tooltip and `aria-valuetext`. |
+| `layout` | `"default" \| "compact"` | `"default"` | `default` — the headline over the plot of its `size`; `compact` — the plot alone at an `xs` control height for a DataTable cell; its point shows in a tooltip (only here) and `aria-valuetext`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Plot height 40 · 48 · 80 · 96 · 128 px and the value's type; the Skeletons match. `s` fits a KPI tile in a row of four; `compact` keeps the `xs` height. |
-| `point` | `number \| null` | — | Index of the scrubbed point, `null` at rest. One `point` and `onPointChange` on sparklines of one axis: a scrub on any moves the cursor and headline of all; the tooltip stays with the chart scrubbed. |
+| `point` | `number \| null` | — | Index of the scrubbed point, `null` at rest. One `point` and `onPointChange` on sparklines of one axis: a scrub on any moves the cursor and headline of all. |
 | `defaultPoint` | `number \| null` | `null` | The scrubbed point at mount (uncontrolled). |
 | `onPointChange` | `(point: number \| null) => void` | — | Called with the point index while scrubbing (pointer, touch, arrow keys) and with `null` when the chart returns to rest. |
 | `change` | `"previous" \| "first" \| "none"` | `"none"` | What the change badge of a shown point compares it with: `previous` — the point before it; `first` — the first point with a value (the change over the period); `none` — no badge (`compareTo` still badges the rest). |
@@ -73,7 +73,7 @@ compact:               the plot alone (no head, no value row); loading — the p
 | `max` | `number` | — | The value axis reaches up to at least this value; data above widens the scale. |
 | `reference` | `number` | — | A dashed horizontal line at this value — a plan, a target, an average; the scale holds it and the chart is described by `labels.reference`. |
 | `loading` | `boolean` | `false` | The series is on its way: Skeletons of the date, the value and the plot that cross-fade into the data; the title stays, the root is `aria-busy` and the chart is not focusable yet. |
-| `formatValue` | `(value: number) => string` | Russian digit groups | Display of a value in the headline, the tooltip, the reference description and the spoken point («312 400 ₽»). |
+| `formatValue` | `(value: number) => string` | Russian digit groups | Display of a value in the headline, the compact tooltip, the reference description and the spoken point («312 400 ₽»). |
 | `labels` | `Partial<SparklineLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root. |
 
@@ -156,10 +156,10 @@ Put it in a `Card` for a dashboard tile.
 | State | Driven by | DOM |
 |---|---|---|
 | at rest | `summary`, `highlight`, `value`, `compareTo` | the latest point or `highlight` (`latest`), or the period total / mean / own `value` with the period as date and no dot (`sum` / `average` / `value`, cursor `data-hidden`); the badge compares with `compareTo` when given; the value rolls its digits when `data` changes or scrubbing ends |
-| scrubbing | pointer, touch or the arrow keys | `data-scrubbing` on the root; the guide and the tooltip (`data-state="open"`, date · value, right of the pointer at its height, left of it only where the right has no room in the viewport; from the keyboard beside the point at mid-height) fade in (`fast`), the cursor (or the bar under the pointer) and the headline follow with no easing (direct manipulation), digits change in place |
+| scrubbing | pointer, touch or the arrow keys | `data-scrubbing` on the root; the guide (and in `compact` the tooltip: `data-state="open"`, date · value, right of the pointer at its height, left of it only where the right has no room in the viewport; from the keyboard beside the point at mid-height) fade in (`fast`), the cursor (or the bar under the pointer) and the headline follow with no easing (direct manipulation), digits change in place |
 | keyboard | arrows, Home, End on the focused plot | `aria-valuenow` / `aria-valuetext`, `data-scrubbing`; the cursor moves to the point at once (keyboard steps are high-frequency); in `bars` the current bar keeps its fill, the others go quiet (`fast` opacity) |
-| settle | pointer leaves, touch ends, focus leaves | back to the point at rest; the tooltip fades out (`fast`) |
-| following | `point` set by another chart of the group (`point` / `onPointChange` shared) | `data-scrubbing`; the guide, the dot and the headline at that point, no tooltip — the tooltip belongs to the chart under the pointer or the keys; `null` returns every chart to rest |
+| settle | pointer leaves, touch ends, focus leaves | back to the point at rest; the compact tooltip fades out (`fast`) |
+| following | `point` set by another chart of the group (`point` / `onPointChange` shared) | `data-scrubbing`; the guide, the dot and the headline at that point (a compact tooltip only on the chart under the pointer or the keys); `null` returns every chart to rest |
 | change hidden | `change="none"`, nothing to compare with, a missing value, or (`percent`) a base of 0 or a sign flip | no change Badge: the measure would mean nothing |
 | no change | a change that rounds to zero | the change Badge is `neutral`, without an arrow |
 | no data | a point with `value: null` | the line breaks (a point alone between gaps is a dot), no bar; shown, the value reads `labels.empty` (`data-empty`, muted) and the dot fades out, the guide marks the point |
@@ -175,7 +175,7 @@ Put it in a `Card` for a dashboard tile.
 - When the value row does not fit (a narrow card), the change badge wraps under the value.
 - On a head narrower than 20rem (a phone card) the date takes its own line under the title, which wraps instead of being cut; the break follows the width only, so a date that changes while scrubbing never moves it.
 - `layout="compact"` fits a DataTable row of any tier (plot and dot within an `xs` control height) and takes the cell width, at least `--prime-space-24`; give the column a `width` for an even plot per row. Put the number next to it in its own column: the compact plot shows a value only in its tooltip while scrubbed.
-- The tooltip is the kit's chart tooltip, placed like every anchored layer (`usePosition`): right of the pointer at its height, on the left only where the right has no room in the viewport — crossing the middle never moves it; from the keyboard right of the point at mid-height. Portaled, so a card or a table scroller never clips it.
+- The tooltip is the compact plot's only (the headline shows the point otherwise), the kit's chart tooltip, placed like every anchored layer (`usePosition`): right of the pointer at its height, on the left only where the right has no room in the viewport — crossing the middle never moves it; from the keyboard right of the point at mid-height. Portaled, so a card or a table scroller never clips it.
 
 ## Accessibility
 
@@ -187,7 +187,7 @@ Put it in a `Card` for a dashboard tile.
 | `←` · `→` · `↓` · `↑` | Previous or next point: `←` / `↓` back, `→` / `↑` forward, as on a slider. |
 | `Home` · `End` | First or last point. |
 | `Tab` | Focuses the chart; leaving focus returns the headline to rest (`summary`, `highlight`). |
-| `Escape` | Hides the tooltip and returns the headline to rest. |
+| `Escape` | Returns the headline to rest (and hides the compact tooltip). |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -197,7 +197,7 @@ Put it in a `Card` for a dashboard tile.
 - The change carries a sign and an arrow, never color alone (a zero change is a neutral badge with no arrow); a negative bar goes down, not only red.
 - While `loading` the root is `aria-busy` and the chart is not in the tab order yet.
 - `layout="compact"`: no visible title; `label` is only the slider's name, the point still goes to `aria-valuetext`.
-- The tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.
+- The compact tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -225,13 +225,13 @@ Put it in a `Card` for a dashboard tile.
 | [own-value.tsx](examples/own-value.tsx) | Unique clients in dialogs: the period's own count is neither the sum nor the mean of the days, so the card passes it with the previous period's count — `value`, `compareTo`. |
 | [gaps.tsx](examples/gaps.tsx) | Daily API requests with days the collector was down: the line breaks over a missing day and the headline says there is no data — `data`, `labels`. |
 | [period.tsx](examples/period.tsx) | Another period swaps the series: the line cross-fades in and the headline digits roll to the new total — `data`, `summary`. |
-| [controlled.tsx](examples/controlled.tsx) | The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the headline of all, the tooltip stays with the tile under the pointer, and each tile opens its section — `point`, `onPointChange`, `size`. |
+| [controlled.tsx](examples/controlled.tsx) | The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the headline of all, no tooltip repeats the headlines, and each tile opens its section — `point`, `onPointChange`, `size`. |
 
 ## Mistakes
 - A new array on every render (`data={rows.map(...)}` inline) → the line cross-fades on every render; memoize the series.
 - Formatting inside `label` of a point («312 400 ₽») → the point label is its name («8 окт»); format values with `formatValue`.
 - A Sparkline without a container width (inside an inline flex row) → give it a width or put it in a `Card`.
-- A Tooltip or a chart library tooltip wrapped around the chart → Sparkline draws its own beside the pointer.
+- A Tooltip or a chart library tooltip wrapped around the chart → the headline follows the point; a compact plot draws its own tooltip.
 - A daily flow (revenue per day) with the latest day in the headline → `summary="sum"`: the card is about the period; pass `compareTo` for its change.
 - A missing day as `0` → the line dives to zero; pass `value: null`, the line breaks and the headline says there is no data.
 - Compact sparklines in a column, each on its own scale, when rows must be compared by size → pass the column's `min` / `max` to every row.

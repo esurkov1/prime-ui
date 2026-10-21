@@ -1,4 +1,4 @@
-/** The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the headline of all, the tooltip stays with the tile under the pointer, and each tile opens its section — `point`, `onPointChange`, `size`. */
+/** The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the headline of all, no tooltip repeats the headlines, and each tile opens its section — `point`, `onPointChange`, `size`. */
 import { Card, Sparkline, type SparklinePoint } from "prime-ui-kit";
 import * as React from "react";
 

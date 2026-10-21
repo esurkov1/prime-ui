@@ -171,9 +171,9 @@ function latestPresent(data: SparklinePoint[]): number {
  * total or mean — `summary`, or its own `value`), its change and its date or period. Scrubbing (pointer, touch, or the arrow keys on the chart) shows any point; the
  * header follows instantly, the trend arrow turns, and leaving glides back to the point at rest.
  * The line is a monotone curve (`curve`), `null` values break it; `bars` draw signed values from a
- * zero line; a tooltip beside the scrubbed point shows its value and date. `layout="compact"` is
- * the plot alone (a table cell). The scrubbed point is a triad (`point`), so several sparklines of
- * one axis follow one cursor: the tooltip stays with the chart under the pointer or the keys.
+ * zero line. `layout="compact"` is the plot alone (a table cell): with no headline to follow the
+ * point, a tooltip beside it shows its value and date. The scrubbed point is a triad (`point`), so
+ * several sparklines of one axis follow one cursor; a compact tooltip stays with the chart scrubbed.
  */
 export function Sparkline({
   data,
@@ -356,7 +356,7 @@ export function Sparkline({
   // Beside the pointer; from the keyboard beside the point, at the middle of the plot.
   const plotNode = plotRef.current;
   const tooltipPoint: AnchorPoint | null =
-    active === null || !point || !leading
+    !compact || active === null || !point || !leading
       ? null
       : (pointer ??
         (plotNode ? { x: x(index) * plotNode.offsetWidth, y: plotNode.offsetHeight / 2 } : null));
@@ -446,6 +446,12 @@ export function Sparkline({
             }}
             onPointerCancel={() => setActive(null)}
             onKeyDown={(event) => {
+              if (event.key === "Escape" && active !== null && !compact) {
+                // The compact tooltip dismisses itself (and the point) on Escape.
+                event.preventDefault();
+                setActive(null);
+                return;
+              }
               const next =
                 event.key === "ArrowLeft" || event.key === "ArrowDown"
                   ? index - 1
@@ -534,14 +540,17 @@ export function Sparkline({
           {formatLabel(labels.reference, { value: formatValue(reference) })}
         </span>
       ) : null}
-      <ChartTooltip
-        anchorRef={plotRef}
-        point={tooltipPoint}
-        label={point?.label}
-        onDismiss={() => setActive(null)}
-      >
-        <span className={styles.tooltipValue}>{valueText}</span>
-      </ChartTooltip>
+      {/* The headline already shows the point: only the compact plot, which has none, needs a tooltip. */}
+      {compact ? (
+        <ChartTooltip
+          anchorRef={plotRef}
+          point={tooltipPoint}
+          label={point?.label}
+          onDismiss={() => setActive(null)}
+        >
+          <span className={styles.tooltipValue}>{valueText}</span>
+        </ChartTooltip>
+      ) : null}
     </div>,
   );
 }

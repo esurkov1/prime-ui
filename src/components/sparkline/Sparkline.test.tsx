@@ -35,7 +35,7 @@ describe("Sparkline", () => {
     plot().focus();
     fireEvent.keyDown(plot(), { key: "ArrowLeft" });
     expect(plot()).toHaveAttribute("aria-valuenow", "1");
-    expect(screen.getAllByText("7 окт")).toHaveLength(2); // the headline date and the tooltip
+    expect(screen.getAllByText("7 окт")).toHaveLength(1); // the headline date; no tooltip repeats it
     expect(screen.getByText("+10%")).toBeInTheDocument();
     fireEvent.keyDown(plot(), { key: "Home" });
     expect(plot()).toHaveAttribute("aria-valuenow", "0");
@@ -282,7 +282,7 @@ describe("Sparkline", () => {
     expect(plot()).toHaveAttribute("aria-valuenow", "2");
     fireEvent.keyDown(plot(), { key: "End" });
     expect(plot()).toHaveAttribute("aria-valuetext", "9 окт: Нет данных");
-    expect(screen.getAllByText("Нет данных")).toHaveLength(2);
+    expect(screen.getAllByText("Нет данных")).toHaveLength(1);
     expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
   });
 
@@ -312,8 +312,10 @@ describe("Sparkline", () => {
     expect(Number(cursor?.style.getPropertyValue("--sparkline-y"))).toBeCloseTo(0.505, 3);
   });
 
-  it("shows a tooltip beside the scrubbed point and hides it when scrubbing ends", () => {
-    render(<Sparkline data={DATA} label="Выручка" formatValue={(v) => `${v} ₽`} />);
+  it("shows a tooltip beside the scrubbed point of a compact plot and hides it when scrubbing ends", () => {
+    render(
+      <Sparkline data={DATA} label="Выручка" layout="compact" formatValue={(v) => `${v} ₽`} />,
+    );
     const tooltip = () => document.body.querySelector("[data-depth='floating'][data-state='open']");
     expect(tooltip()).toBeNull();
     fireEvent.keyDown(plot(), { key: "Home" });
@@ -325,7 +327,7 @@ describe("Sparkline", () => {
     expect(tooltip()).toBeNull();
   });
 
-  it("leads a group through a shared point: cursor and headline on all, the tooltip on the lead", async () => {
+  it("leads a group through a shared point: cursor and headline on all, no tooltip", async () => {
     const user = userEvent.setup();
     const onPointChange = vi.fn();
     function Group() {
@@ -358,7 +360,7 @@ describe("Sparkline", () => {
     expect(leads).toHaveAttribute("aria-valuenow", "0");
     expect(bookings).toHaveAttribute("aria-valuenow", "0");
     expect(bookings.closest("[data-scrubbing]")).not.toBeNull();
-    expect(tooltips()).toHaveLength(1);
+    expect(tooltips()).toHaveLength(0); // the headlines show the point
     await user.keyboard("{ArrowRight}");
     expect(bookings).toHaveAttribute("aria-valuetext", "7 окт: 330");
     await user.tab();
@@ -386,7 +388,7 @@ describe("Sparkline", () => {
     expect(
       document.body.querySelector("[data-depth='floating'][data-state='open']"),
     ).toHaveTextContent("8 окт297");
-    rerender(<Sparkline data={DATA} label="Выручка" variant="bars" />);
+    rerender(<Sparkline data={DATA} label="Выручка" layout="compact" variant="bars" />);
     fireEvent.keyDown(plot(), { key: "Home" });
     expect(
       document.body.querySelector("[data-depth='floating'][data-state='open']"),
@@ -490,7 +492,7 @@ describe("Sparkline", () => {
 
   it("places the tooltip right of the pointer at its height and keeps the side past the middle", () => {
     document.documentElement.style.setProperty("--prime-space-4", "16px");
-    render(<Sparkline data={DATA} label="Выручка" />);
+    render(<Sparkline data={DATA} label="Выручка" layout="compact" />);
     const area = plot();
     area.getBoundingClientRect = () =>
       ({ left: 100, width: 200, top: 100, height: 80, right: 300, bottom: 180 }) as DOMRect;
@@ -510,8 +512,18 @@ describe("Sparkline", () => {
     document.documentElement.style.removeProperty("--prime-space-4");
   });
 
-  it("hides the tooltip on Escape until the pointer moves on", () => {
+  it("returns the headline to rest on Escape, with no tooltip over the default plot", () => {
     render(<Sparkline data={DATA} label="Выручка" />);
+    plot().focus();
+    fireEvent.keyDown(plot(), { key: "Home" });
+    expect(plot()).toHaveAttribute("aria-valuenow", "0");
+    expect(document.body.querySelector("[data-depth='floating'][data-state='open']")).toBeNull();
+    fireEvent.keyDown(plot(), { key: "Escape" });
+    expect(plot()).toHaveAttribute("aria-valuenow", "2");
+  });
+
+  it("hides the compact tooltip on Escape until the pointer moves on", () => {
+    render(<Sparkline data={DATA} label="Выручка" layout="compact" />);
     const area = plot();
     area.getBoundingClientRect = () =>
       ({ left: 0, width: 200, top: 0, height: 80, right: 200, bottom: 80 }) as DOMRect;
