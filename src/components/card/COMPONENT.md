@@ -82,7 +82,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Description
-`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; in `Card.Header` it stacks under the title; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.
+`ref` → `HTMLDivElement`. Secondary text (body-s): under the title of `cta` and `cover` or the header of `stat-trend`; in `Card.Header` under the title, badges inside in a wrapping row; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -232,6 +232,7 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 - The transition arrow of a card that opens stands at the end of its `Card.Header`, centred on the header's height (a two-line head with a picture or a ring included); the title keeps clear of it. Without a header it stands in the top corner.
 - `stat-text` with an action: put the Buttons straight into the root after the text parts — the tile becomes two columns, the label, value and meta in the first, the actions in one end row at their own size, 8 apart, centred on the text (no wrapper, no layout of your own in `Card.Body`).
 - A narrow card (a phone): the end row drops onto its own row under the text — in a `Card.Header` with a description or an icon below 22rem, in a `stat-text` tile below 20rem — and runs from the text column to the end edge: its buttons and links share the whole content width, an icon-only button keeps its square, and a Switch, a caption or a badge keeps its own size at the start.
+- Badges under the title of a record (its state, its deposit) go straight into the header's `Card.Description` — `Badge.Root` children or a `Badge.Group`: they stand in a wrapping row, 8 apart, centred with any text beside them. The description is a `<div>`, so a `Badge.Group` inside it is valid markup.
 - A `Badge.Root` straight in a `Card.Title` or a `Card.Value` («[У нас] 300 $», «Клиент [300 $]») stands before or after the text on its line, centred on it, 8 apart (the gap of `Badge.Group`), at its own chip size; the text wraps in its own box. No space or wrapper of yours.
 - `Card.Link` is an `<a>` with `href`; a record that opens in place (a window, a drawer) takes `asChild` with a `<button>` — it stretches over the card the same way, with the same arrow and focus ring.
 - `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up; in `mini` and a `split` cell it sits in the text column under the value.
@@ -271,7 +272,7 @@ No `labels`.
 | [person-header.tsx](examples/person-header.tsx) | A linked Telegram account in an employee card: the avatar leads the header, the handle stands under the name and the unlink button sits at the end — `Card.Icon`, `Avatar.Root`, `Card.Description`. |
 | [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
 | [record-link.tsx](examples/record-link.tsx) | A transport card that opens its record from anywhere and keeps its own button, a full-width line above the action row, and a deposit card that opens its window in place — `Card.Link`, `asChild`, `Card.Footer`, `divider`. |
-| [record-totals.tsx](examples/record-totals.tsx) | A rental unit of a deal: its term ring leads the header beside the arrow, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`. |
+| [record-totals.tsx](examples/record-totals.tsx) | A rental unit of a deal: its term ring leads the header beside the arrow, its state and deposit badges stand under the title, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`. |
 | [drawer-kpis.tsx](examples/drawer-kpis.tsx) | A record's KPIs in a drawer-width column, two and four to a row, every value one fixed size — `stat-trend`, `valueSize`. |
 | [text-values.tsx](examples/text-values.tsx) | Fact tiles whose value is a line of text in one style, a phrase and a number alike, one of them in a tone — `variant`, `stat-text`, `tone`. |
 | [text-action.tsx](examples/text-action.tsx) | Summary tiles of a rental with the action of each step at the end of the row — `stat-text`, `Card.Value`, `Card.Meta`. |
@@ -301,6 +302,7 @@ No `labels`.
 - A hand-laid grid of action, task and total in `Card.Footer` → the Button, a `Card.Description` (with a `Badge.Dot`) and a `Card.Total` straight in the footer.
 - A `Typography` inside `Card.Value` of a `stat-text` tile → the default value for a fact tile, `valueSize="l"` on the root for a step larger (the Skeleton then keeps the value's height).
 - Tiles of one row at different value sizes → one `valueSize` for the row.
+- Badges in the header's `Card.Description` spaced by hand or wrapped in your own row → the badges straight in the description.
 - A space or a flex wrapper of your own between a Badge and the text in a `Card.Title` or `Card.Value` → the Badge straight beside the text: the kit sets the gap.
 - `stat-trend` KPIs in a drawer laid out in rows of one count only so their values match → `valueSize="m"` on each tile: a row of two and a row of four keep one size.
 - A footer painted with your own background → `Card.Footer divider="fill"`.

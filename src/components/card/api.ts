@@ -108,8 +108,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Description",
-      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; in `Card.Header` it stacks under the title; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.",
-      ru: "Вторичный текст (`<p>`, body-s): под заголовком `cta` и `cover`, под шапкой `stat-trend`; в `Card.Header` встаёт под заголовком; в `Card.Footer` — заметка: сначала `Badge.Dot`, текст в одну строку.",
+      en: "`ref` → `HTMLDivElement`. Secondary text (body-s): under the title of `cta` and `cover` or the header of `stat-trend`; in `Card.Header` under the title, badges inside in a wrapping row; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.",
+      ru: "Вторичный текст (body-s): под заголовком `cta` и `cover` или шапкой `stat-trend`; в `Card.Header` — под заголовком, бейджи внутри — переносимым рядом; в `Card.Footer` — заметка: сначала `Badge.Dot`, текст в одну строку.",
       props: [
         {
           name: "…rest",

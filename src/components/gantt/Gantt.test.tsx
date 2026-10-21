@@ -2055,3 +2055,24 @@ describe("Gantt with many rows", () => {
     }
   });
 });
+
+describe("Gantt scrollHeight fill", () => {
+  it("is no taller than its parent: sized to its rows, shrinking to the free height, never growing", () => {
+    render(<Chart scrollHeight="fill" />);
+    expect(screen.getByRole("grid").closest("[data-scroll-height]")).toHaveAttribute(
+      "data-scroll-height",
+      "fill",
+    );
+    const file = "src/components/gantt/Gantt.module.css";
+    const root = cssRule(file, '.root[data-scroll-height="fill"]');
+    expect(cssValue(root, "flex")).toBe("0 1 auto");
+    expect(cssValue(root, "max-height")).toBe("100%");
+    expect(cssValue(root, "min-height")).toBe("0");
+    expect(root.decls.some((decl) => decl.prop === "height")).toBe(false);
+    const inner = cssRule(
+      file,
+      '.root[data-scroll-height="fill"] .frame,\n.root[data-scroll-height="fill"] .viewport',
+    );
+    expect(cssValue(inner, "flex")).toBe("0 1 auto");
+  });
+});

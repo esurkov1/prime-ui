@@ -39,7 +39,7 @@ export const PART_REFS = {
   "Card.Link": ["HTMLAnchorElement"],
   "Card.Header": ["HTMLDivElement"],
   "Card.Title": ["HTMLHeadingElement"],
-  "Card.Description": ["HTMLParagraphElement"],
+  "Card.Description": ["HTMLDivElement"],
   "Card.Body": ["HTMLDivElement"],
   "Card.Media": ["HTMLDivElement"],
   "Card.Footer": ["HTMLDivElement"],

@@ -384,11 +384,13 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   screen renders the whole frame). `Page.Title` is the page's only `<h1>`, inside `Page.Heading`
   with a `Page.Description` that carries data and, on a nested record, a `Breadcrumb.Root` path
   that ends in the title on one line. Work screens (lists, boards, chats) and overviews put their groups in
-  `Page.TopBar`: `Page.Heading`, `Page.Tools` (the page's own sections, view, a shared period;
-  search and filter only on pages without a table), `Page.Actions` (every button of the page, each
+  `Page.TopBar`: `Page.Heading`, `Page.Tools` (the page's own sections, view, a shared period,
+  and on a section page its search, «Фильтр» and «Вид»), `Page.Actions` (every button of the page, each
   with an icon, the primary last) and `Page.Chips`; a filtered page wraps `Page.Root` in
-  `SmartFilter.Root`. A DataTable's search, filter, «Колонки» and selection menu always sit in its
-  own `toolbar` (chips in `toolbarChips`), even when the table is the whole page. Document pages (settings, long forms) put
+  `SmartFilter.Root`. On a section page (mainly one set of records: a table, a board, a calendar)
+  the search, «Фильтр» and «Вид» sit in `Page.Tools`, the chips in `Page.Chips`, and the table has
+  no `toolbar` of its own; a table block among other blocks (a drawer, a dashboard) keeps its tools
+  in its own `toolbar` (chips in `toolbarChips`); selection actions always stay with the table. Document pages (settings, long forms) put
   `Page.Header` (`Page.Heading` + `Page.Actions`) in the flow, optionally under a
   `Page.TopBar collapse` with a path; overviews (dashboards, analytics) title themselves in
   `Page.TopBar` like work screens, with their tools and buttons beside the heading. Never two titles; never no h1 —

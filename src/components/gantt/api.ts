@@ -156,8 +156,8 @@ export const api: ComponentApi = {
         {
           name: "scrollHeight",
           type: 'number | "fill"',
-          en: 'Max height of the viewport in px, so the header sticks while rows scroll; `"fill"` — the chart takes its flex / grid parent\'s height.',
-          ru: 'Максимальная высота области прокрутки в px, чтобы шапка держалась при прокрутке строк; `"fill"` — график берёт высоту flex / grid-родителя.',
+          en: 'Max height of the viewport in px, so the header sticks while rows scroll; `"fill"` — no taller than its flex / grid parent: as tall as its rows, scrolling them inside beyond it.',
+          ru: 'Максимальная высота области прокрутки в px, чтобы шапка держалась при прокрутке строк; `"fill"` — не выше flex / grid-родителя: по высоте строк, дальше строки прокручиваются внутри.',
         },
         {
           name: "onItemOpen",

@@ -1726,8 +1726,20 @@ describe("DataTable fill height and row tokens", () => {
     expect(viewport.style.maxHeight).toBe("");
   });
 
-  it("CSS: the filling table stretches in its parent; every size reads its row token", () => {
-    expect(cssValue(cssRule(CSS, '.root[data-scroll-height="fill"]'), "flex")).toBe("1 1 0%");
+  it("CSS: the filling table sizes to its rows and stops at its parent; every size reads its row token", () => {
+    // No taller than the parent: a short table ends at its last row, never an empty box under it.
+    const fill = cssRule(CSS, '.root[data-scroll-height="fill"]');
+    expect(cssValue(fill, "flex")).toBe("0 1 auto");
+    expect(cssValue(fill, "align-self")).toBe("start");
+    expect(cssValue(fill, "max-height")).toBe("100%");
+    expect(cssValue(fill, "min-height")).toBe("0");
+    expect(fill.decls.some((decl) => decl.prop === "height")).toBe(false);
+    const inner = cssRule(
+      CSS,
+      '.root[data-scroll-height="fill"] .frame, .root[data-scroll-height="fill"] .viewport',
+    );
+    expect(cssValue(inner, "flex")).toBe("0 1 auto");
+    expect(cssValue(inner, "min-height")).toBe("0");
     for (const size of ["xs", "s", "l", "xl"]) {
       expect(cssValue(cssRule(CSS, `.root[data-size="${size}"]`), "--dt-row-height")).toBe(
         `var(--prime-table-row-height-${size})`,

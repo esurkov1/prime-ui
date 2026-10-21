@@ -1,4 +1,4 @@
-/** A rental unit of a deal: its term ring leads the header beside the arrow, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`. */
+/** A rental unit of a deal: its term ring leads the header beside the arrow, its state and deposit badges stand under the title, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`. */
 import { Badge, Button, Card, DescriptionList, ProgressCircle, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -8,6 +8,7 @@ const UNIT = {
   plate: "ภก 5678",
   href: "#rental-5678",
   daysToPickUp: 17,
+  deposit: "150 $",
   total: "26 400 ฿",
   due: "к оплате 6 400 ฿",
   task: "Выдать 6 нояб · Банг Тао",
@@ -43,6 +44,7 @@ export default function CardRecordTotalsExample() {
           </Card.Title>
           <Card.Description>
             <Badge.Root color="yellow">Бронь</Badge.Root>
+            <Badge.Root color="green">{`Депозит ${UNIT.deposit}`}</Badge.Root>
           </Card.Description>
         </Card.Header>
         <Card.Body divider="full">

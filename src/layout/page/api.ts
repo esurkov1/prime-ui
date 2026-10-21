@@ -127,8 +127,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Tools",
-      en: "`ref` → `HTMLDivElement`. What acts on the whole page: sub-page links, view, a shared period, a filter over several views (a table's tools go in its `toolbar`). In the heading row before the buttons while they fit, else on a line of their own. Named, a `group`.",
-      ru: "То, что действует на всю страницу: ссылки подстраниц, вид, общий период, фильтр над несколькими видами (инструменты таблицы — в её `toolbar`). В строке заголовка перед кнопками, пока помещаются, иначе своей строкой. С именем — `group`.",
+      en: "`ref` → `HTMLDivElement`. What acts on the whole page: sub-page links, view, a shared period, a filter over views, a section page's table tools (a table block: its `toolbar`). In the heading row before the buttons while they fit, else on a line of their own. Named, a `group`.",
+      ru: "То, что действует на всю страницу: ссылки подстраниц, вид, общий период, фильтр над видами, инструменты таблицы страницы раздела (таблица-блок — в своём `toolbar`). В строке заголовка перед кнопками, пока помещаются, иначе своей строкой. С именем — `group`.",
       props: [divRest({ en: "`children` (kit controls)", ru: "`children` (контролы кита)" })],
     },
     {

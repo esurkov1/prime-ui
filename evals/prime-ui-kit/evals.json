@@ -484,6 +484,18 @@
         "The deposit edit button is icon-only Button.Root variant=\"soft\" tone=\"neutral\" with an aria-label, beside the soft neutral «Вернуть» and without its own size (the same height)",
         "No icon-only Button with variant=\"ghost\" stands beside a filled field, Select or soft button; ghost appears only in a dialog header's actions or a table cell"
       ]
+    },
+    {
+      "id": 39,
+      "prompt": "Сделай раздел «Клиенты»: таблица клиентов с поиском, фильтром по статусу и менеджеру, выбором колонок и кнопкой «+ Клиент».",
+      "expected_output": "A section page: Page.Root wrapped in SmartFilter.Root; Page.TopBar with the heading, SmartFilter.Toolbar and DataTableColumnsMenu («Вид») in Page.Tools, SmartFilter.Chips in Page.Chips, «+ Клиент» in Page.Actions; the DataTable has no toolbar / toolbarChips.",
+      "files": [],
+      "expectations": [
+        "SmartFilter.Root wraps Page.Root, and SmartFilter.Toolbar sits in Page.Tools",
+        "The column chooser (DataTableColumnsMenu) is in Page.Tools beside the search, not in the table",
+        "SmartFilter.Chips is in Page.Chips",
+        "The DataTable has no toolbar or toolbarChips prop"
+      ]
     }
   ]
 }

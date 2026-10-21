@@ -628,6 +628,51 @@ describe("Card", () => {
     expect(screen.getByRole("heading", { name: "Без бейджа" })).not.toHaveClass(styles.badged);
   });
 
+  it("badges in a header description stand in a wrapping row; a Badge.Group inside is valid", () => {
+    const rule = cssRule("src/components/card/Card.module.css", ".badgeRow");
+    expect(cssValue(rule, "display")).toBe("flex");
+    expect(cssValue(rule, "flex-wrap")).toBe("wrap");
+    expect(cssValue(rule, "align-items")).toBe("center");
+    expect(cssValue(rule, "gap")).toBe("var(--prime-space-2)");
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    render(
+      <>
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>Honda PCX 160</Card.Title>
+            <Card.Description data-testid="badges">
+              <Badge.Root color="yellow">Бронь</Badge.Root>
+              <Badge.Root color="green">Депозит 150 $</Badge.Root>
+            </Card.Description>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>Yamaha NMAX</Card.Title>
+            <Card.Description data-testid="group">
+              <Badge.Group>
+                <Badge.Root>Выдан</Badge.Root>
+              </Badge.Group>
+            </Card.Description>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>Без бейджей</Card.Title>
+            <Card.Description data-testid="text">Банг Тао</Card.Description>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
+    const badges = screen.getByTestId("badges");
+    expect(badges.tagName).toBe("DIV");
+    expect(badges).toHaveClass(styles.description, styles.badgeRow);
+    expect(screen.getByTestId("group")).toHaveClass(styles.badgeRow);
+    expect(screen.getByTestId("text")).not.toHaveClass(styles.badgeRow);
+  });
+
   it("a panel or list header pads its bottom as its top; only a chart right under it takes none", () => {
     const CSS = "src/components/card/Card.module.css";
     const zone = cssRule(

@@ -171,6 +171,15 @@
   overflow-wrap: anywhere;
 }
 
+/* Badges in a description (TSX: a `Badge.Root` or `Badge.Group` child): a wrapping row, text and
+   badges centred on the line, the gap of `Badge.Group`. */
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
 .label {
   max-width: 100%;
   overflow: hidden;

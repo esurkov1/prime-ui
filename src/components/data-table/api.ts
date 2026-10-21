@@ -189,8 +189,8 @@ export const api: ComponentApi = {
         {
           name: "toolbar",
           type: "ReactNode",
-          en: "The table's own tools row — search, filter, `DataTableColumnsMenu`, a view; two or more, as direct children or a fragment (a wrapper component is one cell). Laid out as `Page.Tools`.",
-          ru: "Своя строка инструментов таблицы — поиск, фильтр, `DataTableColumnsMenu`, вид; два и больше, напрямую или фрагментом (своя обёртка — одна ячейка). Раскладка как у `Page.Tools`.",
+          en: "Tools row of a table block among other blocks — search, filter, `DataTableColumnsMenu`; two or more, as children or a fragment. Laid out as `Page.Tools`; a section page puts them in `Page.Tools`.",
+          ru: "Строка инструментов таблицы-блока среди других блоков — поиск, фильтр, `DataTableColumnsMenu`; два и больше, детьми или фрагментом. Раскладка как у `Page.Tools`; страница раздела ставит их в `Page.Tools`.",
         },
         {
           name: "renderSelectionActions",
@@ -201,8 +201,8 @@ export const api: ComponentApi = {
         {
           name: "toolbarChips",
           type: "ReactNode",
-          en: "The applied filters (`SmartFilter.Chips`) on a line under the `toolbar`, gone while empty; `SmartFilter.Root` wraps the DataTable.",
-          ru: "Применённые фильтры (`SmartFilter.Chips`) строкой под `toolbar`, пока пусто — без места; `SmartFilter.Root` оборачивает DataTable.",
+          en: "The applied filters (`SmartFilter.Chips`) on a line under the `toolbar`, gone while empty; `SmartFilter.Root` wraps the DataTable. A page that is mainly the table puts them in `Page.Chips`.",
+          ru: "Применённые фильтры (`SmartFilter.Chips`) строкой под `toolbar`, пока пусто — без места; `SmartFilter.Root` оборачивает DataTable. Страница, которая в основном и есть таблица, ставит их в `Page.Chips`.",
         },
         {
           name: "selectable",
@@ -314,8 +314,8 @@ export const api: ComponentApi = {
             en: '`360` with `paging="infinite"`, else none',
             ru: '`360` при `paging="infinite"`, иначе нет',
           },
-          en: 'Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of its flex / grid parent (or a sized block), the rows scroll inside, infinite paging follows it.',
-          ru: 'Максимальная высота области прокрутки (число — px); `"fill"` — таблица занимает высоту flex / grid-родителя (или блока с высотой), строки прокручиваются внутри, бесконечная прокрутка работает в ней.',
+          en: 'Max height of the scroll viewport (number = px); `"fill"` — no taller than its flex / grid parent: a short table ends at its last row, a long one stops at the free height and scrolls inside.',
+          ru: 'Максимальная высота области прокрутки (число — px); `"fill"` — не выше flex / grid-родителя: короткая таблица кончается последней строкой, длинная упирается в свободную высоту и прокручивается.',
         },
         {
           name: "stickyHeader",

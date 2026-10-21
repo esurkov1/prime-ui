@@ -169,15 +169,21 @@
   user-select: none;
 }
 
+/*
+ * `fill`: no taller than the parent. The chart sizes to its rows and stops at the free height of
+ * its flex / grid / sized parent, scrolling its rows inside beyond it — a short chart leaves no
+ * empty box under its rows.
+ */
 .root[data-scroll-height="fill"] {
-  flex: 1 1 0%;
-  height: 100%;
+  flex: 0 1 auto;
+  align-self: start;
   min-height: 0;
+  max-height: 100%;
 }
 
 .root[data-scroll-height="fill"] .frame,
 .root[data-scroll-height="fill"] .viewport {
-  flex: 1 1 0%;
+  flex: 0 1 auto;
   min-height: 0;
 }
 

@@ -13,10 +13,10 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 
 | Screen | Main component | File | Shows |
 |---|---|---|---|
-| [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, export and one primary action in the page's top bar; the table's SmartFilter search and filters in its own `toolbar`, the chips under it, the column chooser over the row menu; statuses, pages, filtered empty state |
+| [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, export and one primary action in the page's top bar; its SmartFilter search and filters and «Вид» in `Page.Tools`, the chips in `Page.Chips`, the table without a toolbar; statuses, pages, filtered empty state |
 | [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | a nested record: the path ending in the title, status and due date and the record's actions by weight in the top bar; main column + side column of Cards, Timeline |
 | [Settings page](#settings-page) | page | [screen.tsx](../src/layout/page/examples/screen.tsx) | the path in a collapsing top bar, the large title in the flow, a card with its own header per section, form with its own save, Switches that apply at once, danger zone with a confirm |
-| [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts and the Drawer trigger in the top bar, the search in the table's toolbar; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
+| [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts and the Drawer trigger in the top bar, the search in `Page.Tools`; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
 | [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title and a line of description in `Page.Heading`, «Сохранить тариф» in `Page.Actions`, both in a `Page.Header` in the flow; a plan card edited in card sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
 | [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | an overview titled in its `Page.TopBar`: the title + a line of data, the period switch and the report; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
 | [Screen states](#screen-states) | crossfade | [screen.tsx](../src/components/crossfade/examples/screen.tsx) | title + the statement date in `Page.TopBar`, page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
@@ -709,15 +709,16 @@ the title by itself — never fold them into a «⋯» for the width. A destruct
 A control stands with what it changes. Ask of each one: what does it narrow or switch? (In a
 drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-in-a-drawer).)
 
-- **One table** — its search and filter fields, their chips, its column chooser and the actions on
-  its selected rows belong to the `DataTable`, on every page: the page that is only this table, a
-  page with KPI cards above it, a page whose sections switch between tables. `SmartFilter.Root`
-  wraps the `DataTable`; `SmartFilter.Toolbar` goes in its `toolbar` (with a `DataTableColumnsMenu`
-  when the table has no row-actions column to carry `columnsMenu`), `SmartFilter.Chips` in its
-  `toolbarChips`, the selection menu comes from `renderSelectionActions`
-  ([server.tsx](../src/components/data-table/examples/server.tsx), [the list page](#list-page)).
-  The tools then stay put when the page grows a block or another section, and every table of the
-  app reads the same.
+- **A section page** — a page that is mainly one set of records (clients, deals, the fleet), shown
+  as a table, a board or a calendar: its search, «Фильтр» and «Вид» stand in the page's top bar,
+  `Page.Tools` (`SmartFilter.Root` wraps `Page.Root`, `SmartFilter.Toolbar` and the view's menu —
+  `DataTableColumnsMenu`, `KanbanFieldsMenu`, `GanttCategoriesMenu` — in `Page.Tools`), the filter
+  chips in `Page.Chips`, and the table has no `toolbar` of its own. The tools then stand in the same
+  place on every section page and in every view of the set, and never jump when the view switches.
+  The actions on selected rows stay with the table (`renderSelectionActions`).
+- **A table block among other blocks** — a table inside a drawer, on a dashboard, a section of a
+  record page: its tools belong to the `DataTable` (`toolbar`, `toolbarChips`), so they stay with
+  the block they filter.
 - **The whole page** — `Page.TopBar`: the heading with its line of data, the page's sections (a
   `SegmentedControl`; of links, `SegmentedControl.Item asChild`, when each section is a route of its
   own — «Сотрудники» / «Роли»), a view switch, a period that drives several blocks, the page's
@@ -1429,7 +1430,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [data-table/examples/screen.tsx](../src/components/data-table/examples/screen.tsx)
 
 - A work screen titles itself in its `Page.TopBar`: `Page.Title` is the only heading, its `Page.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; there is no second header in the flow.
-- The search and filters narrow the table, so they are the table's: `SmartFilter.Toolbar` in its `toolbar`, `SmartFilter.Chips` in its `toolbarChips`, the column chooser over the row menu (`columnsMenu`); the bar keeps the heading, export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. A KPI row added above changes nothing in the table's tools.
+- It is a section page, so its search, «Фильтр» and «Вид» stand in `Page.Tools` (`SmartFilter.Root` around `Page.Root`), the chips in `Page.Chips`, and the table has no `toolbar` — the same place as on every other section; the bar also keeps the heading, export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. A KPI row added above changes nothing in the table's tools.
 - A status is a `Badge` read from one map of the app (`STATUS`); an invoice's statuses are judgements, so each wears a `tone` — the text carries the meaning, the tone repeats it ([one status map](foundations.md#one-status-map)).
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s` in the last column (`hideHeader`), pinned to the end edge with `stickyLastColumn` so they stay in reach while the columns scroll: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.

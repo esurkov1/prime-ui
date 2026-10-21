@@ -387,8 +387,20 @@ function contentOffenders(dir: string, file: string, source: string): string[] {
       }
     }
   }
+  // A section page — a screen that is mainly one table, no other blocks — puts the table's search,
+  // filter and «Вид» in `Page.Tools` and the chips in `Page.Chips`: the tools stand in one place on
+  // every section page and in every view. The table keeps only its selection actions.
+  if (
+    file.endsWith("/screen.tsx") &&
+    /<Page\.Root\b/.test(body) &&
+    (body.match(/<DataTable\b/g) ?? []).length === 1 &&
+    !/<(Page\.Grid|Page\.Section|Card\.Root)\b/.test(body) &&
+    (dataTableToolbars(body).length > 0 || /<DataTable\b[^>]*\stoolbarChips=/.test(body))
+  ) {
+    offenders.push(`${file}: a section page's table with its own toolbar (Page.Tools, Page.Chips)`);
+  }
   // The header chooser stands only over a row-actions column; without one, the table's toolbar or
-  // the tools of a page that is the table hold `DataTableColumnsMenu`.
+  // the tools of a section page hold `DataTableColumnsMenu`.
   if (/<DataTable\b[^>]*\scolumnsMenu\b/.test(body) && !/hideHeader:\s*true/.test(body)) {
     offenders.push(`${file}: columnsMenu without a row-actions column (DataTableColumnsMenu)`);
   }

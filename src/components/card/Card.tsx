@@ -306,9 +306,7 @@ function CardTitle({ as: Tag = "h3", className, children, ...rest }: CardTitlePr
 }
 CardTitle.displayName = "Card.Title";
 
-export type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & {
-  ref?: React.Ref<HTMLParagraphElement>;
-};
+export type CardDescriptionProps = DivProps;
 
 function CardDescription({ className, children, ...rest }: CardDescriptionProps) {
   const inFooter = React.useContext(ZoneContext) === "footer";
@@ -316,8 +314,18 @@ function CardDescription({ className, children, ...rest }: CardDescriptionProps)
   const { parts: dots, rest: text } = inFooter
     ? splitParts(children, Badge.Dot)
     : { parts: [], rest: [children] };
+  // A `<div>`, so a `Badge.Group` (a `<div>`) is valid inside it; badges straight in it (the state
+  // and the deposit of a record under its title) stand in a wrapping row, the chip gap apart.
+  const badges =
+    !inFooter &&
+    flattenChildren(children).some(
+      (child) => isPart(child, Badge.Root) || isPart(child, Badge.Group),
+    );
   return (
-    <p className={cx(textRole.bodyS, styles.description, className)} {...rest}>
+    <div
+      className={cx(textRole.bodyS, styles.description, badges && styles.badgeRow, className)}
+      {...rest}
+    >
       {inFooter ? (
         <>
           {dots}
@@ -326,7 +334,7 @@ function CardDescription({ className, children, ...rest }: CardDescriptionProps)
       ) : (
         children
       )}
-    </p>
+    </div>
   );
 }
 CardDescription.displayName = "Card.Description";

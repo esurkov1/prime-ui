@@ -1,10 +1,11 @@
-/** A list page: the title, a line of figures and the one primary action in its top bar, search and filters in the table's own tools row, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. */
+/** A section page: the title, a line of figures, the search, filters and view menu, export and the one primary action in its top bar with the filter chips under them, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`, `DataTableColumnsMenu`. */
 import {
   Avatar,
   Badge,
   Button,
   DataTable,
   type DataTableColumn,
+  DataTableColumnsMenu,
   Dropdown,
   EmptyPage,
   Icon,
@@ -270,6 +271,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
 export default function DataTableScreenExample() {
   const [filter, setFilter] = React.useState<SmartFilterValue>({});
   const [search, setSearch] = React.useState("");
+  const [hiddenColumns, setHiddenColumns] = React.useState<string[]>([]);
 
   const query = search.trim().toLowerCase();
   const rows = INVOICES.filter(
@@ -293,14 +295,23 @@ export default function DataTableScreenExample() {
       onSearchChange={setSearch}
     >
       <Page.Root>
-        {/* A work screen titles itself in its top bar: the only h1, a line of figures under it,
-            export and the one primary action. The table's search and filters stand in its own
-            tools row, next to what they filter. */}
+        {/* A section page — mainly one table — titles itself in its top bar: the only h1, a line
+            of figures under it, the table's search, filters and view, export and the one primary
+            action, the chips under them. The tools stand where they stand on every section page;
+            the table keeps only its selection actions. */}
         <Page.TopBar>
           <Page.Heading>
             <Page.Title>Счета</Page.Title>
             <Page.Description>{SUMMARY}</Page.Description>
           </Page.Heading>
+          <Page.Tools aria-label="Счета">
+            <SmartFilter.Toolbar />
+            <DataTableColumnsMenu
+              columns={COLUMNS}
+              hiddenColumns={hiddenColumns}
+              onHiddenColumnsChange={setHiddenColumns}
+            />
+          </Page.Tools>
           <Page.Actions>
             <Button.Root variant="soft" tone="neutral">
               <Button.Icon>
@@ -315,19 +326,20 @@ export default function DataTableScreenExample() {
               Счёт
             </Button.Root>
           </Page.Actions>
+          <Page.Chips>
+            <SmartFilter.Chips />
+          </Page.Chips>
         </Page.TopBar>
         <Page.Body>
           <DataTable
             columns={COLUMNS}
+            hiddenColumns={hiddenColumns}
             rows={rows}
             getRowKey={(row) => row.id}
             getRowLabel={(row) => `Счёт ${row.id}`}
             pageSize={6}
             stickyFirstColumn
             stickyLastColumn
-            columnsMenu
-            toolbar={<SmartFilter.Toolbar />}
-            toolbarChips={<SmartFilter.Chips />}
             defaultSort={{ columnId: "due", order: "desc" }}
             empty={
               <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">

@@ -157,17 +157,20 @@
   isolation: isolate;
 }
 
-/* `scrollHeight="fill"`: the root takes the height of its flex / grid parent (or a sized block),
-   the viewport takes what the toolbar and the footer leave and scrolls the rows. */
+/* `scrollHeight="fill"`: no taller than its flex / grid parent (or a sized block). The root sizes
+   to its rows and stops at the parent's free height — a short table ends at its last row, a long
+   one scrolls inside: the viewport gives up what the toolbar and the footer keep. `align-self:
+   start` keeps a grid cell or a flex row from stretching it. */
 .root[data-scroll-height="fill"] {
-  flex: 1 1 0%;
-  height: 100%;
+  flex: 0 1 auto;
+  align-self: start;
+  max-height: 100%;
   min-height: 0;
 }
 
 .root[data-scroll-height="fill"] .frame,
 .root[data-scroll-height="fill"] .viewport {
-  flex: 1 1 0%;
+  flex: 0 1 auto;
   min-height: 0;
 }
 
