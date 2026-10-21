@@ -28,6 +28,10 @@ export const page: ComponentPageConfig = {
       description: "Одна неделя заливкой, голой линией и столбиками от нуля — `variant`.",
     },
     {
+      slot: "sizes",
+      description: "Одна неделя заказов на каждом ярусе, от графика 40 px до 128 px — `size`.",
+    },
+    {
       slot: "states",
       description:
         "Пока ряд загружается, дата, значение и график — Skeleton на своих местах; название остаётся — `loading`.",
@@ -79,6 +83,11 @@ export const page: ComponentPageConfig = {
       title: "Смена периода",
       description:
         "Другой период меняет ряд: линия проявляется заново, цифры заголовка докручиваются до новой суммы — `data`, `summary`.",
+    },
+    {
+      slot: "controlled",
+      description:
+        "KPI-плитки дашборда идут за одним курсором: ведение по любой двигает точку и заголовок у всех, подсказка — только у плитки под указателем, а каждая плитка открывает свой раздел — `point`, `onPointChange`, `size`.",
     },
   ],
   api,

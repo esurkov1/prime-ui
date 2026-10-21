@@ -222,6 +222,12 @@
   padding-inline-end: var(--prime-space-6);
 }
 
+/* A headless card that opens hands the arrow's room to the content it holds (a Sparkline's head). */
+.root[data-mark]:not(:has(> .header)),
+.root[data-link]:not(:has(> .header)) {
+  --corner-mark-room: var(--prime-space-6);
+}
+
 /* Everything after the title (a control, a caption, a header-row value) keeps its size at the end. */
 .header > .title {
   flex: 1 1 auto;

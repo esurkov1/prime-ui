@@ -8,6 +8,10 @@
  * (RegionSwap; the series swap fills the plot).
  */
 .root {
+  --sparkline-h: var(--prime-space-20);
+  --sparkline-value-size: var(--prime-text-heading-m-size);
+  --sparkline-value-line: var(--prime-text-heading-m-line-height);
+
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-1);
@@ -15,6 +19,34 @@
   width: 100%;
   min-width: 0;
   font-family: var(--prime-font-family-sans);
+}
+
+/*
+ * The tier (`size`) sets the plot's height and the value's type: `s` is a KPI tile in a row of
+ * four, `m` a dashboard card, `l` a chart that leads its panel. The Skeletons take the same height.
+ */
+.root[data-size="xs"] {
+  --sparkline-h: var(--prime-space-10);
+  --sparkline-value-size: var(--prime-text-heading-s-size);
+  --sparkline-value-line: var(--prime-text-heading-s-line-height);
+}
+
+.root[data-size="s"] {
+  --sparkline-h: var(--prime-space-12);
+  --sparkline-value-size: var(--prime-text-heading-s-size);
+  --sparkline-value-line: var(--prime-text-heading-s-line-height);
+}
+
+.root[data-size="l"] {
+  --sparkline-h: var(--prime-space-24);
+  --sparkline-value-size: var(--prime-text-heading-l-size);
+  --sparkline-value-line: var(--prime-text-heading-l-line-height);
+}
+
+.root[data-size="xl"] {
+  --sparkline-h: calc(var(--prime-space-16) * 2);
+  --sparkline-value-size: var(--prime-text-heading-l-size);
+  --sparkline-value-line: var(--prime-text-heading-l-line-height);
 }
 
 /* The title and the date share a line; on a narrow head (below 20rem, a phone card) the date takes
@@ -28,6 +60,8 @@
   justify-content: space-between;
   gap: var(--prime-space-0) var(--prime-space-3);
   min-width: 0;
+  /* A host's corner mark (the arrow of a Card that opens) keeps the date clear of it. */
+  padding-inline-end: var(--corner-mark-room, 0);
   font-size: var(--prime-text-body-s-size);
   line-height: var(--prime-text-body-s-line-height);
   color: var(--prime-color-text-secondary);
@@ -62,8 +96,8 @@
 }
 
 .value {
-  font-size: var(--prime-text-heading-m-size);
-  line-height: var(--prime-text-heading-m-line-height);
+  font-size: var(--sparkline-value-size);
+  line-height: var(--sparkline-value-line);
   font-weight: var(--prime-font-weight-semibold);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -89,7 +123,6 @@
 /* The plot: inset by the dot's radius so the cursor at either end is never clipped. */
 .plot {
   --sparkline-dot: var(--prime-space-2);
-  --sparkline-h: var(--prime-space-20);
 
   position: relative;
   container-type: inline-size;
@@ -309,13 +342,13 @@
 
 .valueSkeleton {
   width: calc(var(--prime-space-24) * 1.5);
-  height: var(--prime-text-heading-m-line-height);
+  height: var(--sparkline-value-line);
   min-height: 0;
   border-radius: var(--prime-radius-s);
 }
 
 .plotSkeleton {
-  height: var(--prime-space-20);
+  height: var(--sparkline-h);
   min-height: 0;
   margin-block-start: var(--prime-space-2);
   border-radius: var(--prime-radius-s);

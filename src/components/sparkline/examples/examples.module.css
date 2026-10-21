@@ -23,3 +23,11 @@
   flex-direction: column;
   gap: var(--prime-space-4);
 }
+
+/* controlled: a row of KPI tiles, as many per line as fit. */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--prime-layout-tile-min-width), 1fr));
+  gap: var(--prime-space-4);
+  width: 100%;
+}

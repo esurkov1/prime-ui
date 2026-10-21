@@ -1,6 +1,8 @@
 import * as React from "react";
+import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
@@ -8,6 +10,7 @@ import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { RollingNumber } from "@/internal/RollingNumber";
+import type { ControlSize } from "@/internal/states";
 
 import { Badge } from "../badge/Badge";
 import { Skeleton } from "../skeleton/Skeleton";
@@ -110,6 +113,10 @@ export type SparklineProps = Omit<React.HTMLAttributes<HTMLDivElement>, "childre
     variant?: SparklineVariant;
     curve?: SparklineCurve;
     layout?: SparklineLayout;
+    size?: ControlSize;
+    point?: number | null;
+    defaultPoint?: number | null;
+    onPointChange?: (point: number | null) => void;
     change?: SparklineChange;
     changeUnit?: SparklineChangeUnit;
     better?: SparklineBetter;
@@ -165,7 +172,8 @@ function latestPresent(data: SparklinePoint[]): number {
  * header follows instantly, the trend arrow turns, and leaving glides back to the point at rest.
  * The line is a monotone curve (`curve`), `null` values break it; `bars` draw signed values from a
  * zero line; a tooltip beside the scrubbed point shows its value and date. `layout="compact"` is
- * the plot alone (a table cell).
+ * the plot alone (a table cell). The scrubbed point is a triad (`point`), so several sparklines of
+ * one axis follow one cursor: the tooltip stays with the chart under the pointer or the keys.
  */
 export function Sparkline({
   data,
@@ -173,6 +181,10 @@ export function Sparkline({
   variant = "area",
   curve = "smooth",
   layout = "default",
+  size: sizeProp,
+  point: pointProp,
+  defaultPoint = null,
+  onPointChange,
   change = "none",
   changeUnit = "percent",
   better = "higher",
@@ -198,7 +210,19 @@ export function Sparkline({
     highlight !== undefined && highlight >= 0 && highlight <= last
       ? Math.floor(highlight)
       : latestPresent(data);
-  const [active, setActive] = React.useState<number | null>(null);
+  const tier = useHostTier(sizeProp);
+  const [active, setActiveValue] = useControllableState<number | null>({
+    value: pointProp,
+    defaultValue: defaultPoint,
+    onChange: onPointChange,
+  });
+  // The chart a person scrubs leads: only it shows the tooltip; a chart that follows a shared
+  // `point` shows the cursor and the headline alone.
+  const [leading, setLeading] = React.useState(false);
+  const setActive = (next: number | null) => {
+    setLeading(next !== null);
+    setActiveValue(next);
+  };
   const index = active === null ? restIndex : Math.min(active, last);
   const atRest = active === null;
   const point = data[index];
@@ -332,12 +356,12 @@ export function Sparkline({
   // Beside the pointer; from the keyboard beside the point, at the middle of the plot.
   const plotNode = plotRef.current;
   const tooltipPoint: AnchorPoint | null =
-    active === null || !point
+    active === null || !point || !leading
       ? null
       : (pointer ??
         (plotNode ? { x: x(index) * plotNode.offsetWidth, y: plotNode.offsetHeight / 2 } : null));
 
-  return (
+  return tier.provide(
     <div
       {...rest}
       ref={ref}
@@ -346,7 +370,7 @@ export function Sparkline({
       data-scrubbing={active !== null || undefined}
       data-variant={variant}
       data-layout={layoutAttr}
-      data-size={compact ? "xs" : undefined}
+      data-size={compact ? "xs" : tier.size}
       aria-busy={loading || undefined}
     >
       {compact ? null : (
@@ -518,6 +542,6 @@ export function Sparkline({
       >
         <span className={styles.tooltipValue}>{valueText}</span>
       </ChartTooltip>
-    </div>
+    </div>,
   );
 }

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { DataTable } from "@/components/data-table/DataTable";
@@ -322,6 +323,61 @@ describe("Sparkline", () => {
     expect(tooltip()).toHaveTextContent("7 окт330 ₽");
     fireEvent.blur(plot());
     expect(tooltip()).toBeNull();
+  });
+
+  it("leads a group through a shared point: cursor and headline on all, the tooltip on the lead", async () => {
+    const user = userEvent.setup();
+    const onPointChange = vi.fn();
+    function Group() {
+      const [point, setPoint] = React.useState<number | null>(null);
+      return (
+        <>
+          {["Лиды", "Брони"].map((label) => (
+            <Sparkline
+              key={label}
+              data={DATA}
+              label={label}
+              point={point}
+              onPointChange={(next) => {
+                setPoint(next);
+                onPointChange(next);
+              }}
+            />
+          ))}
+        </>
+      );
+    }
+    render(<Group />);
+    const leads = screen.getByRole("slider", { name: "Лиды" });
+    const bookings = screen.getByRole("slider", { name: "Брони" });
+    const tooltips = () =>
+      document.body.querySelectorAll("[data-depth='floating'][data-state='open']");
+    await user.tab();
+    await user.keyboard("{Home}");
+    expect(onPointChange).toHaveBeenLastCalledWith(0);
+    expect(leads).toHaveAttribute("aria-valuenow", "0");
+    expect(bookings).toHaveAttribute("aria-valuenow", "0");
+    expect(bookings.closest("[data-scrubbing]")).not.toBeNull();
+    expect(tooltips()).toHaveLength(1);
+    await user.keyboard("{ArrowRight}");
+    expect(bookings).toHaveAttribute("aria-valuetext", "7 окт: 330");
+    await user.tab();
+    expect(onPointChange).toHaveBeenLastCalledWith(null);
+    expect(bookings).toHaveAttribute("aria-valuenow", "2");
+    expect(tooltips()).toHaveLength(0);
+  });
+
+  it("rests on a controlled point and sizes the plot by its tier", () => {
+    const { container, rerender } = render(<Sparkline data={DATA} label="Выручка" point={1} />);
+    expect(plot()).toHaveAttribute("aria-valuenow", "1");
+    expect(container.firstElementChild).toHaveAttribute("data-size", "m");
+    rerender(<Sparkline data={DATA} label="Выручка" size="s" defaultPoint={0} />);
+    expect(container.firstElementChild).toHaveAttribute("data-size", "s");
+    const css = "src/components/sparkline/Sparkline.module.css";
+    expect(cssValue(cssRule(css, '.root[data-size="s"]'), "--sparkline-h")).toBe(
+      "var(--prime-space-12)",
+    );
+    expect(cssValue(cssRule(css, ".plotSkeleton"), "height")).toBe("var(--sparkline-h)");
   });
 
   it("shows the tooltip in compact and over bars", () => {

@@ -37,6 +37,9 @@ const PUBLIC_HOOKS = [
   // The page's edge air: the host of a page (AppShell.Main, a preview stage) hands it the side
   // gutter and the top air (Page COMPONENT.md, Layout & spacing).
   /^--page-(gutter|top)$/,
+  // The room of a host's corner mark: a headless Card that opens keeps the head of the content
+  // it holds (a Sparkline's date) clear of its arrow (Card COMPONENT.md, Layout & spacing).
+  /^--corner-mark-room$/,
 ];
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);

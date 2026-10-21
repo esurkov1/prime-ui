@@ -16,6 +16,7 @@
 - A series with missing days — a collector that was down (`value: null` breaks the line).
 - A metric where growth is bad — response time, costs, bounce rate (`better="lower"`); a share in percent whose change is in percentage points (`changeUnit="points"`).
 - A period value that is neither the sum nor the mean of the days — a median, unique clients (`value`, `compareTo`).
+- A row of KPI tiles over one period that follow one cursor (`point`, `onPointChange`, `size="s"`), each tile opening its section (`Card.Link`).
 
 ## When not to use
 - Exact values on axes, several series, or a legend → a full chart library on the kit's chart palette (`chartColors`); Sparkline has no axes.
@@ -56,7 +57,11 @@ compact:               the plot alone (no head, no value row); loading — the p
 | `label` | `string` | — (required) | Visible title above the value and the accessible name of the chart; with `layout="compact"` only the accessible name. |
 | `variant` | `"area" \| "line" \| "bars"` | `"area"` | `area` — a line over an accent gradient that fades to the bottom; `line` — the line alone, for many trends side by side; `bars` — a bar per point standing on a zero line: up when positive, down (danger) when negative. |
 | `curve` | `"smooth" \| "linear" \| "step"` | `"smooth"` | Shape of the line (`area`, `line`): `smooth` — a monotone cubic through every point that never overshoots a peak or a trough; `linear` — straight segments; `step` — a level per point, changing halfway between points. |
-| `layout` | `"default" \| "compact"` | `"default"` | `default` — the headline over an 80 px plot; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the scrubbed point shows in the tooltip and `aria-valuetext`. |
+| `layout` | `"default" \| "compact"` | `"default"` | `default` — the headline over the plot of its `size`; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the scrubbed point shows in the tooltip and `aria-valuetext`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Plot height 40 · 48 · 80 · 96 · 128 px and the value's type; the Skeletons match. `s` fits a KPI tile in a row of four; `compact` keeps the `xs` height. |
+| `point` | `number \| null` | — | Index of the scrubbed point, `null` at rest. One `point` and `onPointChange` on sparklines of one axis: a scrub on any moves the cursor and headline of all; the tooltip stays with the chart scrubbed. |
+| `defaultPoint` | `number \| null` | `null` | The scrubbed point at mount (uncontrolled). |
+| `onPointChange` | `(point: number \| null) => void` | — | Called with the point index while scrubbing (pointer, touch, arrow keys) and with `null` when the chart returns to rest. |
 | `change` | `"previous" \| "first" \| "none"` | `"none"` | What the change badge of a shown point compares it with: `previous` — the point before it; `first` — the first point with a value (the change over the period); `none` — no badge (`compareTo` still badges the rest). |
 | `changeUnit` | `"percent" \| "points"` | `"percent"` | How the change badge measures: `percent` — the relative change («+12%»); `points` — the difference, for a share in percent (`labels.points`, «+0,5 п. п.»). A zero change is neutral, no arrow. |
 | `better` | `"higher" \| "lower"` | `"higher"` | Which way of the change is good: `higher` — growth is `success`, a fall `danger` (revenue, orders); `lower` — a fall is `success`, growth `danger` (response time, costs, bounce rate). The arrow always follows the sign. |
@@ -120,10 +125,21 @@ Scrubbing always shows the point under the pointer; leaving returns to the summa
 
 A period value that is neither the sum nor the mean of the points (a median, unique clients over the period) is passed as `value` (in place of `summary`): the headline rests on it like on a sum, with the period as its date and no dot; `compareTo` is the same value for the previous period.
 
+### size
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `xs` | a 40 px plot, heading-s value | a tile in a dense side panel | |
+| `s` | a 48 px plot, heading-s value | a KPI tile in a row of four | |
+| `m` | an 80 px plot, heading-m value | a dashboard card | the host tier, else yes |
+| `l` | a 96 px plot, heading-l value | the chart that leads its panel | |
+| `xl` | a 128 px plot, heading-l value | a detail page header | |
+
+The Skeletons of `loading` take the same heights. `layout="compact"` keeps the `xs` control height whatever the tier.
+
 ### layout
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `default` | the headline (title · date, value · change) over an 80 px plot | a dashboard tile, a page header | yes |
+| `default` | the headline (title · date, value · change) over the plot of its `size` | a dashboard tile, a page header | yes |
 | `compact` | the plot alone at the height of an `xs` control (28 px), the dot on the point at rest; scrubbing shows the guide and the tooltip; at least 96 px wide | a DataTable cell or a list row: one trend per record next to its name or total | |
 
 ### Flags
@@ -143,6 +159,7 @@ Put it in a `Card` for a dashboard tile.
 | scrubbing | pointer, touch or the arrow keys | `data-scrubbing` on the root; the guide and the tooltip (`data-state="open"`, date · value, right of the pointer at its height, left of it only where the right has no room in the viewport; from the keyboard beside the point at mid-height) fade in (`fast`), the cursor (or the bar under the pointer) and the headline follow with no easing (direct manipulation), digits change in place |
 | keyboard | arrows, Home, End on the focused plot | `aria-valuenow` / `aria-valuetext`, `data-scrubbing`; the cursor moves to the point at once (keyboard steps are high-frequency); in `bars` the current bar keeps its fill, the others go quiet (`fast` opacity) |
 | settle | pointer leaves, touch ends, focus leaves | back to the point at rest; the tooltip fades out (`fast`) |
+| following | `point` set by another chart of the group (`point` / `onPointChange` shared) | `data-scrubbing`; the guide, the dot and the headline at that point, no tooltip — the tooltip belongs to the chart under the pointer or the keys; `null` returns every chart to rest |
 | change hidden | `change="none"`, nothing to compare with, a missing value, or (`percent`) a base of 0 or a sign flip | no change Badge: the measure would mean nothing |
 | no change | a change that rounds to zero | the change Badge is `neutral`, without an arrow |
 | no data | a point with `value: null` | the line breaks (a point alone between gaps is a dot), no bar; shown, the value reads `labels.empty` (`data-empty`, muted) and the dot fades out, the guide marks the point |
@@ -151,9 +168,10 @@ Put it in a `Card` for a dashboard tile.
 | loading | `loading` | `aria-busy` on the root; Skeletons in place of the date, the value and the plot; no slider until the data comes; the data cross-fades in |
 
 ## Layout & spacing
-- Takes the width of its container; the plot is 80 px high and inset by the dot radius so the cursor is never clipped. The smooth curve never leaves the plot: a monotone cubic does not overshoot the extremes.
+- Takes the width of its container; the plot is as high as its `size` (80 px at `m`) and inset by the dot radius so the cursor is never clipped. The smooth curve never leaves the plot: a monotone cubic does not overshoot the extremes.
 - Bars share the width equally, 4 px apart; the zero line sits where 0 falls on the scale (the bottom when every value is positive).
 - In a dashboard, wrap it in `Card.Root` + `Card.Body`; several cards go in a grid.
+- A tile that opens: `Card.Link` with an `aria-label` and no text beside `Card.Body`. The link stretches over the card and the plot (a slider) stands above it, so a scrub never opens the tile; the card's arrow sits in the corner and the head keeps its date clear of it.
 - When the value row does not fit (a narrow card), the change badge wraps under the value.
 - On a head narrower than 20rem (a phone card) the date takes its own line under the title, which wraps instead of being cut; the break follows the width only, so a date that changes while scrubbing never moves it.
 - `layout="compact"` fits a DataTable row of any tier (plot and dot within an `xs` control height) and takes the cell width, at least `--prime-space-24`; give the column a `width` for an even plot per row. Put the number next to it in its own column: the compact plot shows a value only in its tooltip while scrubbed.
@@ -197,6 +215,7 @@ Put it in a `Card` for a dashboard tile.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Revenue for 30 days in a dashboard card: at rest the total for the period against the previous 30 days, drag across the chart to see a day — `data`, `label`, `summary`, `compareTo`, `formatValue`. |
 | [variants.tsx](examples/variants.tsx) | The same week as an area, a bare line and bars from zero — `variant`. |
+| [sizes.tsx](examples/sizes.tsx) | One week of orders at every tier, from a 40 px plot to a 128 px one — `size`. |
 | [states.tsx](examples/states.tsx) | While the series loads the date, the value and the plot are Skeletons in their own places; the title stays — `loading`. |
 | [compact.tsx](examples/compact.tsx) | Revenue by month per client in a list: the plot alone at a row's height with the dot on the current month, scrubbing shows the month in a tooltip, the label is the chart's accessible name — `layout`, `label`. |
 | [signed-bars.tsx](examples/signed-bars.tsx) | Monthly profit with a sign: losses go below the zero line, the current month rests highlighted and any bar shows its value under the pointer or the arrows — `variant`, `highlight`. |
@@ -206,6 +225,7 @@ Put it in a `Card` for a dashboard tile.
 | [own-value.tsx](examples/own-value.tsx) | Unique clients in dialogs: the period's own count is neither the sum nor the mean of the days, so the card passes it with the previous period's count — `value`, `compareTo`. |
 | [gaps.tsx](examples/gaps.tsx) | Daily API requests with days the collector was down: the line breaks over a missing day and the headline says there is no data — `data`, `labels`. |
 | [period.tsx](examples/period.tsx) | Another period swaps the series: the line cross-fades in and the headline digits roll to the new total — `data`, `summary`. |
+| [controlled.tsx](examples/controlled.tsx) | The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the headline of all, the tooltip stays with the tile under the pointer, and each tile opens its section — `point`, `onPointChange`, `size`. |
 
 ## Mistakes
 - A new array on every render (`data={rows.map(...)}` inline) → the line cross-fades on every render; memoize the series.
@@ -221,6 +241,9 @@ Put it in a `Card` for a dashboard tile.
 - A median or a unique count forced into `summary="sum"` / `"average"`, or a chart dropped for it → pass the period's own `value` with `compareTo`.
 - A grey box while the series loads → `loading`.
 - A full Sparkline squeezed into a table cell, or its headline hidden with CSS → `layout="compact"`.
+- A row of KPI tiles too tall with an 80 px plot, or `--sparkline-h` set from outside → `size="s"`.
+- KPI tiles of one period scrubbed one by one → share `point` and `onPointChange`.
+- A tile with a Sparkline made a link with `Card asChild` + `<a>` → a slider inside a link; use `Card.Link` with an `aria-label`.
 
 ## Related
 - **Built from:** [Badge](../badge/COMPONENT.md) (change), [Skeleton](../skeleton/COMPONENT.md) (loading), `Icon` (trend arrow), `ChartTooltip` (the chart tooltip shared with ChartFrame), [ScrollContainer](../scroll-container/COMPONENT.md) (the tooltip's floating panel)
