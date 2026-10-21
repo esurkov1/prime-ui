@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
+import { Button } from "@/components/button/Button";
+import { Card } from "@/components/card/Card";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -217,6 +219,29 @@ describe("Badge", () => {
     const el = badgeOf("ctx");
     expect(el).toHaveAttribute("data-size", "m");
     expect(el).toHaveAttribute("data-tier", "s");
+  });
+
+  it("on a card takes the card's tier as is, inside a control on it one step down", () => {
+    render(
+      <>
+        <Card.Root size="s">
+          <Card.Body>
+            <Badge.Root>dense</Badge.Root>
+            <Button.Root>
+              Входящие <Badge.Root>12</Badge.Root>
+            </Button.Root>
+          </Card.Body>
+        </Card.Root>
+        <Card.Root>
+          <Card.Body>
+            <Badge.Root>plain</Badge.Root>
+          </Card.Body>
+        </Card.Root>
+      </>,
+    );
+    expect(badgeOf("dense")).toHaveAttribute("data-tier", "s");
+    expect(badgeOf("12")).toHaveAttribute("data-tier", "xs");
+    expect(badgeOf("plain")).toHaveAttribute("data-tier", "m");
   });
 
   it("explicit size wins over context", () => {

@@ -3,6 +3,7 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Icon } from "@/icons";
+import { useHostTier, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import hairline from "@/internal/hairline.module.css";
@@ -13,7 +14,7 @@ import { press } from "@/internal/press";
 import { useSwapIn } from "@/internal/RegionSwap";
 import rowLink from "@/internal/rowLink.module.css";
 import { Slot, slotChild } from "@/internal/slot";
-import type { Tone } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
@@ -36,6 +37,7 @@ export type CardVariant =
 export type CardValueSize = "m" | "l";
 
 export type CardRootProps = DivProps & {
+  size?: ControlSize;
   variant?: CardVariant;
   valueSize?: CardValueSize;
   flat?: boolean;
@@ -137,6 +139,7 @@ const STAT_TEXT_OWN: React.ElementType[] = [
 const HEADER_TEXT: React.ElementType[] = [CardIcon, CardTitle, CardDescription];
 
 function CardRoot({
+  size,
   variant = "panel",
   valueSize,
   flat = false,
@@ -147,6 +150,12 @@ function CardRoot({
   ...rest
 }: CardRootProps) {
   const depth = useNestedSurfaceDepth();
+  // The tier sets the card's padding; the controls inside take it. A card with no `size` of its
+  // own and no sized host provides nothing, so its badges keep their standalone tier.
+  const tier = useHostTier(size, "surface");
+  const hosted = useOptionalControlSize() !== undefined;
+  const sized = (inner: React.ReactElement) =>
+    size !== undefined || hosted ? tier.provide(inner) : inner;
   const [stretched, setStretched] = React.useState(false);
   const [headed, setHeaded] = React.useState(false);
   const child = asChild ? slotChild(children, "Card.Root") : null;
@@ -163,7 +172,7 @@ function CardRoot({
           <LoadingContext.Provider value={loading}>
             <StretchedLinkContext.Provider value={setStretched}>
               <MarkContext.Provider value={place}>
-                <SurfaceDepthProvider value={depth}>{inner}</SurfaceDepthProvider>
+                <SurfaceDepthProvider value={depth}>{sized(<>{inner}</>)}</SurfaceDepthProvider>
               </MarkContext.Provider>
             </StretchedLinkContext.Provider>
           </LoadingContext.Provider>
@@ -177,6 +186,7 @@ function CardRoot({
     className: cx(styles.root, asChild && press.press, stretched && rowLink.host, className),
     "data-depth": depth,
     ...toDataAttributes({
+      size: tier.size,
       variant,
       flat: flat || undefined,
       interactive: asChild || undefined,
@@ -308,6 +318,20 @@ CardTitle.displayName = "Card.Title";
 
 export type CardDescriptionProps = DivProps;
 
+/**
+ * Whether a badge stands in the description: straight in it, or as the one element a slot or a
+ * state-only root draws (an assignee picker: `Dropdown.Root` › `Dropdown.Trigger` › `Badge.Root`).
+ * Only component elements are entered — a DOM element is a cell of its own.
+ */
+function drawsBadge(children: React.ReactNode, depth = 0): boolean {
+  return flattenChildren(children).some((child) => {
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) return false;
+    const { type, props } = child;
+    if (isPart(child, Badge.Root) || isPart(child, Badge.Group)) return true;
+    return depth < 2 && typeof type !== "string" && drawsBadge(props.children, depth + 1);
+  });
+}
+
 function CardDescription({ className, children, ...rest }: CardDescriptionProps) {
   const inFooter = React.useContext(ZoneContext) === "footer";
   // In the footer it is the record's note: a status dot first, the text cut to one line.
@@ -316,11 +340,7 @@ function CardDescription({ className, children, ...rest }: CardDescriptionProps)
     : { parts: [], rest: [children] };
   // A `<div>`, so a `Badge.Group` (a `<div>`) is valid inside it; badges straight in it (the state
   // and the deposit of a record under its title) stand in a wrapping row, the chip gap apart.
-  const badges =
-    !inFooter &&
-    flattenChildren(children).some(
-      (child) => isPart(child, Badge.Root) || isPart(child, Badge.Group),
-    );
+  const badges = !inFooter && drawsBadge(children);
   return (
     <div
       className={cx(textRole.bodyS, styles.description, badges && styles.badgeRow, className)}

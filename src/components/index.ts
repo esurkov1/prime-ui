@@ -90,6 +90,15 @@ export type {
 } from "./card/Card";
 export { Card } from "./card/Card";
 export type {
+  CarouselItem,
+  CarouselLabels,
+  CarouselOverlayPlacement,
+  CarouselOverlayProps,
+  CarouselRatio,
+  CarouselRootProps,
+} from "./carousel/Carousel";
+export { Carousel } from "./carousel/Carousel";
+export type {
   ChartFrameActionsProps,
   ChartFrameDeltaProps,
   ChartFrameDescriptionProps,

@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 79 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 80 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -242,6 +242,7 @@ accessibility, examples and common mistakes.
 | [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | The kit's one chip: a static label for a status, category or count, a removable value or applied filter, and a pressable toggle with a hover action — in a palette color. |
 | [**Avatar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) | A round photo of a person or organization with an initials or icon fallback, a presence dot and overlapping groups. |
 | [**Thumbnail**](https://github.com/esurkov1/prime-ui/blob/main/src/components/thumbnail/COMPONENT.md) | A preview of an object — product, vehicle, file, cover, video — at a fixed aspect ratio, with a colored icon fallback; it can open the object or be selected. |
+| [**Carousel**](https://github.com/esurkov1/prime-ui/blob/main/src/components/carousel/COMPONENT.md) | Photos and videos of one record in one box of a fixed ratio: a finger or a mouse drag swipes them, the dots, the arrows and the keys step. |
 | [**Kbd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. |
 | [**Card**](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. |
 | [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pages or infinite scroll, row selection, row groups, rows that open a record, a column chooser, nested rows and loading / empty / error states. |

@@ -22,12 +22,11 @@ import { motionDurationMs } from "@/internal/motionTiming";
 import { captureOpener } from "@/internal/overlay/focus";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import { Portal } from "@/internal/Portal";
+import { clamp, fitBox, pageWindow, type Size } from "@/internal/physics";
 import { swallowNextClick } from "@/internal/swallowNextClick";
 import textRole from "@/internal/textRole.module.css";
-
 import styles from "./MediaViewer.module.css";
 import { findItemMedia, originShape } from "./originShape";
-import { clamp, fitBox, pageWindow, type Size } from "./physics";
 import type { MediaViewerItem, MediaViewerLabels } from "./types";
 import { type Sound, type VideoControls, ViewerVideo } from "./ViewerVideo";
 import { type GestureKind, ViewerEngine, type ViewerOrigin } from "./viewerEngine";

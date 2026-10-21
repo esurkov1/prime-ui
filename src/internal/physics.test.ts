@@ -16,7 +16,7 @@ import {
   zoomAbout,
 } from "./physics";
 
-describe("media viewer physics", () => {
+describe("page track physics", () => {
   it("fits a box inside the area by its ratio", () => {
     expect(fitBox(2, { width: 1000, height: 1000 })).toEqual({ width: 1000, height: 500 });
     expect(fitBox(0.5, { width: 1000, height: 1000 })).toEqual({ width: 500, height: 1000 });

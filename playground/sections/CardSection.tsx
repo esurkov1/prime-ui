@@ -29,6 +29,11 @@ export const page: ComponentPageConfig = {
         "Шаблоны KPI: плашка с иконкой и значением, бейдж со значением в строке шапки и крупное значение с изменением во всех тонах и справочной строкой, и значение-строка текста на обеих ступенях — `variant`, `Card.Delta`, `tone`, `Card.Meta`, `valueSize`.",
     },
     {
+      slot: "sizes",
+      description:
+        "Карточка записи на каждом ярусе: отступы шагают 16 · 20 · 24, кнопка внутри берёт ярус, текст держит свои роли — `size`.",
+    },
+    {
       scenario: "kpi-media",
       title: "Метрика с графиком",
       description:
@@ -65,6 +70,18 @@ export const page: ComponentPageConfig = {
         "Единица аренды в сделке: кольцо срока открывает шапку рядом со стрелкой, бейджи состояния и депозита стоят под заголовком, позиции с суммами стоят под линией во всю ширину, а подвал на своей заливке держит действие, следующую задачу и итог с его состоянием у края — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`.",
     },
     {
+      scenario: "assignment",
+      title: "Задача с ответственным",
+      description:
+        "Возврат аренды с ответственным: срок в заголовке, выбор ответственного первым в строке под ним, одно второстепенное действие — кнопкой с подписью рядом с главной — `Card.Title`, `Card.Description`, `Badge.Avatar`, `Dropdown.Trigger`.",
+    },
+    {
+      scenario: "assignment-menu",
+      title: "Задача с ответственным и меню",
+      description:
+        "Возврат аренды с ответственным и несколькими второстепенными действиями: главное на виду, остальные собраны в одно меню, разрушительное — последним — `Card.Description`, `Badge.Avatar`, `Dropdown.Trigger`, `action.more`.",
+    },
+    {
       scenario: "drawer-kpis",
       title: "KPI в панели",
       description:
@@ -99,6 +116,13 @@ export const page: ComponentPageConfig = {
       title: "Контентные шаблоны",
       description:
         "Призыв к действию, список событий и плитка кампании с обложкой — `Card.Footer`, `Card.List`, `Card.Media`.",
+    },
+    {
+      scenario: "catalogue",
+      title: "Каталог транспорта",
+      layout: "full",
+      description:
+        "Каталог парка: фото единицы — обложка, на них статус и госномер, под ними модель и место, остальные бейджи переносятся, а срок с полосой держится у низа карточки, которая открывает единицу целиком, на плотном ярусе — `cover`, `size`, `Card.Media`, `Card.Link`, `Card.Footer`, `Card.Meta`.",
     },
     {
       scenario: "flat",

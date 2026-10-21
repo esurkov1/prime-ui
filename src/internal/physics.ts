@@ -1,20 +1,21 @@
 /**
- * The physics of the media viewer, pure and frame-rate independent: the spring that settles every
- * released gesture, the iOS momentum of a pan, the rubber band past an edge, and the geometry of
- * zooming about a point. Lengths are px, times ms, velocities px/ms.
+ * The physics of a swiped page track (MediaViewer, Carousel), pure and frame-rate independent: the
+ * spring that settles every released gesture, the iOS momentum of a pan, the rubber band past an
+ * edge, which way a released page turns, and the geometry of zooming about a point. Lengths are px,
+ * times ms, velocities px/ms.
  */
 
 export type Point = { x: number; y: number };
 export type Size = { width: number; height: number };
 
 /** A damped spring, mass 1. Stiffness in 1/s², damping in 1/s. */
-export type SpringConfig = { stiffness: number; damping: number };
+type SpringConfig = { stiffness: number; damping: number };
 
 /** Settles a released gesture: quick, with a trace of overshoot after a fast flick. */
 export const SETTLE_SPRING: SpringConfig = { stiffness: 320, damping: 34 };
 
 /** iOS `UIScrollView.DecelerationRate.normal`: the share of velocity kept per ms. */
-export const DECELERATION_RATE = 0.998;
+const DECELERATION_RATE = 0.998;
 
 /** The rubber band constant of iOS: how stiffly content resists past its edge. */
 const RUBBER_BAND = 0.55;
@@ -74,6 +75,11 @@ export function rubberClamp(value: number, min: number, max: number, dimension: 
   if (value > max) return max + rubberBand(value - max, dimension);
   return value;
 }
+
+/** Share of the page width past which a release turns the page. */
+export const PAGE_DISTANCE = 0.5;
+/** A flick faster than this (px/ms) turns the page from any distance. */
+export const PAGE_FLICK = 0.3;
 
 /** How many pages on each side of the current one stay mounted and painted, ready to slide in. */
 export const PAGE_RADIUS = 2;
@@ -153,7 +159,7 @@ export function coverScale(box: Size, area: Size): number {
 }
 
 /** `cubic-bezier(x1, y1, x2, y2)` as a function of time 0…1 (Newton, then bisection). */
-export function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
+function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
   const a = (p1: number, p2: number) => 1 - 3 * p2 + 3 * p1;
   const b = (p1: number, p2: number) => 3 * p2 - 6 * p1;
   const c = (p1: number) => 3 * p1;

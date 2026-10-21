@@ -8,6 +8,13 @@ export const api: ComponentApi = {
       ru: "Поверхность на слой выше окружающей, без обводки, и контейнер размера; `variant` выбирает раскладку частей.",
       props: [
         {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "The card's tier: its padding (`--prime-card-padding-s` 16 at `xs` · `s`, `-m` 20, `-l` 24 at `l` · `xl`) and the tier of the controls inside; the type roles stay.",
+          ru: "Ярус карточки: её отступы (`--prime-card-padding-s` 16 при `xs` · `s`, `-m` 20, `-l` 24 при `l` · `xl`) и ярус контролов внутри; текстовые роли не меняются.",
+        },
+        {
           name: "variant",
           type: '"panel" | "mini" | "stat-trend" | "stat-text" | "split" | "cta" | "list" | "cover"',
           default: '"panel"',
@@ -108,8 +115,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Description",
-      en: "`ref` → `HTMLDivElement`. Secondary text (body-s): under the title of `cta` and `cover` or the header of `stat-trend`; in `Card.Header` under the title, badges inside in a wrapping row; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.",
-      ru: "Вторичный текст (body-s): под заголовком `cta` и `cover` или шапкой `stat-trend`; в `Card.Header` — под заголовком, бейджи внутри — переносимым рядом; в `Card.Footer` — заметка: сначала `Badge.Dot`, текст в одну строку.",
+      en: "`ref` → `HTMLDivElement`. Secondary text (body-s): under the title of `cta`, `cover` or the head of `stat-trend`; in `Card.Header` under the title, badges inside (a picker too) in a wrapping row; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.",
+      ru: "Вторичный текст (body-s): под заголовком `cta` и `cover` или шапкой `stat-trend`; в `Card.Header` — под заголовком, бейджи внутри (и выбор) — переносимым рядом; в `Card.Footer` — заметка: сначала `Badge.Dot`, текст в одну строку.",
       props: [
         {
           name: "…rest",

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
+import { Dropdown } from "@/components/dropdown/Dropdown";
 import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
 import { Icon } from "@/icons";
 import hairline from "@/internal/hairline.module.css";
@@ -628,6 +629,28 @@ describe("Card", () => {
     expect(screen.getByRole("heading", { name: "Без бейджа" })).not.toHaveClass(styles.badged);
   });
 
+  it("an assignee picker in a description lays the line out as a row, the facts after it", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Вернуть 10 дек · через 50 дн.</Card.Title>
+          <Card.Description data-testid="assigned">
+            <Dropdown.Root>
+              <Dropdown.Trigger>
+                <Badge.Root aria-label="Ответственный: Евгений Сурков">Евгений Сурков</Badge.Root>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                <Dropdown.Item>Анна Котова</Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Root>
+            выдан 21 окт, 15:43
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("assigned")).toHaveClass(styles.badgeRow);
+  });
+
   it("badges in a header description stand in a wrapping row; a Badge.Group inside is valid", () => {
     const rule = cssRule("src/components/card/Card.module.css", ".badgeRow");
     expect(cssValue(rule, "display")).toBe("flex");
@@ -671,6 +694,68 @@ describe("Card", () => {
     expect(badges).toHaveClass(styles.description, styles.badgeRow);
     expect(screen.getByTestId("group")).toHaveClass(styles.badgeRow);
     expect(screen.getByTestId("text")).not.toHaveClass(styles.badgeRow);
+  });
+
+  it("a cover of photos that opens its record draws no arrow and keeps the title's width", () => {
+    const CSS = "src/components/card/Card.module.css";
+    expect(
+      cssValue(cssRule(CSS, '.root[data-variant="cover"]:has(> .media) .mark'), "display"),
+    ).toBe("none");
+    expect(
+      cssValue(
+        cssRule(CSS, '.root[data-variant="cover"]:has(> .media) .title'),
+        "padding-inline-end",
+      ),
+    ).toBe("0");
+    render(
+      <Card.Root variant="cover" data-testid="tile">
+        <Card.Media>
+          <img src="unit.jpg" alt="" />
+        </Card.Media>
+        <Card.Body>
+          <Card.Title>
+            <Card.Link href="#unit">Honda PCX 160</Card.Link>
+          </Card.Title>
+        </Card.Body>
+        <Card.Footer>
+          <Card.Meta>Простой 2 дн.</Card.Meta>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    // The whole card still opens the record through its stretched link.
+    expect(screen.getByTestId("tile")).toHaveAttribute("data-link", "true");
+    expect(screen.getByRole("link", { name: "Honda PCX 160" })).toHaveAttribute("href", "#unit");
+  });
+
+  it("size sets the padding tier and gives the controls inside the tier; unsized it gives none", () => {
+    const CSS = "src/components/card/Card.module.css";
+    expect(
+      cssValue(cssRule(CSS, '.root:is([data-size="xs"], [data-size="s"])'), "--card-pad"),
+    ).toBe("var(--prime-card-padding-s)");
+    expect(
+      cssValue(cssRule(CSS, '.root:is([data-size="l"], [data-size="xl"])'), "--card-pad"),
+    ).toBe("var(--prime-card-padding-l)");
+    render(
+      <>
+        <Card.Root size="s" data-testid="dense">
+          <Card.Header>
+            <Card.Title>Каталог</Card.Title>
+            <Button.Root data-testid="dense-button">Открыть</Button.Root>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root data-testid="plain">
+          <Card.Header>
+            <Card.Title>Сводка</Card.Title>
+            <Badge.Root data-testid="plain-badge">Новый</Badge.Root>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("dense")).toHaveAttribute("data-size", "s");
+    expect(screen.getByTestId("dense-button")).toHaveAttribute("data-size", "s");
+    expect(screen.getByTestId("plain")).toHaveAttribute("data-size", "m");
+    // No tier of its own and no host: a badge keeps its standalone tier.
+    expect(screen.getByTestId("plain-badge")).toHaveAttribute("data-tier", "m");
   });
 
   it("a panel or list header pads its bottom as its top; only a chart right under it takes none", () => {

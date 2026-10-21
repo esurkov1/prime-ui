@@ -12,6 +12,8 @@ import {
   coverScale,
   decayVelocity,
   emphasized,
+  PAGE_DISTANCE,
+  PAGE_FLICK,
   PAGE_RADIUS,
   type Point,
   pageOffset,
@@ -27,7 +29,7 @@ import {
   springSettled,
   stepSpring,
   zoomAbout,
-} from "./physics";
+} from "@/internal/physics";
 
 /** A page of the viewer as the DOM has it: its slide, the box that zooms and its fitted size. */
 export type ViewerSlot = {
@@ -115,10 +117,6 @@ const DOUBLE_TAP_MS = 280;
 const DOUBLE_TAP_PX = 32;
 /** A press held longer is not a tap. */
 const TAP_MS = 400;
-/** Share of the page width past which a release turns the page. */
-const PAGE_DISTANCE = 0.5;
-/** A flick faster than this (px/ms) turns the page from any distance. */
-const PAGE_FLICK = 0.3;
 /** Share of the stage height past which a vertical release closes. */
 const DISMISS_DISTANCE = 0.12;
 const DISMISS_FLICK = 0.45;

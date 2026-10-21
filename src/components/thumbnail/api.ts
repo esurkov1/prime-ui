@@ -16,7 +16,7 @@ export const api: ComponentApi = {
         },
         {
           name: "ratio",
-          type: '"1:1" | "4:3" | "3:2" | "16:9" | "3:4"',
+          type: '"1:1" | "4:3" | "3:2" | "16:10" | "16:9" | "3:4"',
           default: '"1:1"',
           en: "Aspect ratio, width ÷ height.",
           ru: "Соотношение сторон, ширина ÷ высота.",

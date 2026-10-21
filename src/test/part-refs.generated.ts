@@ -51,6 +51,8 @@ export const PART_REFS = {
   "Card.Meta": ["HTMLSpanElement"],
   "Card.List": ["HTMLUListElement"],
   "Card.ListItem": ["HTMLLIElement"],
+  "Carousel.Root": ["HTMLElement"],
+  "Carousel.Overlay": ["HTMLDivElement"],
   "ChartFrame.Root": ["HTMLElement"],
   "ChartFrame.Header": ["HTMLDivElement"],
   "ChartFrame.Title": ["HTMLHeadingElement"],

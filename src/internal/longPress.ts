@@ -18,6 +18,11 @@ export const DRAG_HOLD_MS = 280;
 export const PRESS_SLOP_PX = 8;
 /** Pointer travel (px) that turns a mouse or pen press into a drag: past the tremor of a click. */
 export const DRAG_THRESHOLD_PX = 4;
+/**
+ * How long after it mounts a host waits before it follows a hovering mouse (a Carousel's scrub): a
+ * cursor that rests where the page appears (a reload) has not chosen anything yet.
+ */
+export const HOVER_SETTLE_MS = 180;
 
 type LongPressPoint = { x: number; y: number };
 

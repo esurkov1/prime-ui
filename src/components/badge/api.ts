@@ -31,8 +31,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          en: "Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down; outside a control it is `m`.",
-          ru: "Ярус бейджа, высота 16 · 20 · 24 · 28 · 32 px. Без него внутри контрола — на ступень ниже, вне контрола — `m`.",
+          en: "Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down, a sized surface (a `Card.Root` with `size`) as is; outside both it is `m`.",
+          ru: "Ярус бейджа, высота 16 · 20 · 24 · 28 · 32 px. Без него внутри контрола — на ступень ниже, на поверхности с ярусом (`Card.Root` с `size`) — её ярус, иначе — `m`.",
         },
         {
           name: "shape",

@@ -496,6 +496,18 @@
         "SmartFilter.Chips is in Page.Chips",
         "The DataTable has no toolbar or toolbarChips prop"
       ]
+    },
+    {
+      "id": 40,
+      "prompt": "В карточке аренды покажи блок выдачи: вернуть 10 декабря (через 50 дней), выдан 21 октября в 15:43, ответственный — Евгений Сурков (можно сменить), кнопки «Отменить выдачу» и «Возврат».",
+      "expected_output": "A Card.Root with one Card.Header: Card.Title «Вернуть 10 дек · через 50 дн.», Card.Description with the assignee picker (Badge.Root + Badge.Avatar in Dropdown.Trigger) first and «выдан 21 окт, 15:43» after it, a soft neutral «Отменить» button and the primary «Принять возврат» last.",
+      "files": [],
+      "expectations": [
+        "The assignee's name appears once: only in the picker, not also in the text line",
+        "The assignee picker is a Badge.Root with Badge.Avatar inside Dropdown.Trigger, first in Card.Description",
+        "The term («через 50 дн.») is in Card.Title, not a separate badge",
+        "The primary return action is the last button; the single secondary action is a labelled soft neutral Button, not a lone «⋯» menu"
+      ]
     }
   ]
 }

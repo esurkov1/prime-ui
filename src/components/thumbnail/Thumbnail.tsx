@@ -28,7 +28,7 @@ import textRole from "@/internal/textRole.module.css";
 import styles from "./Thumbnail.module.css";
 
 /** Width ÷ height. `1:1` square · `4:3` / `3:2` photo · `16:9` wide cover · `3:4` portrait. */
-export type ThumbnailRatio = "1:1" | "4:3" | "3:2" | "16:9" | "3:4";
+export type ThumbnailRatio = "1:1" | "4:3" | "3:2" | "16:10" | "16:9" | "3:4";
 
 const slot = createImageSlot("Thumbnail", { image: styles.image, fallback: styles.fallback });
 

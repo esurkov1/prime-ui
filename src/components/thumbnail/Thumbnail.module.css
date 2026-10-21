@@ -84,6 +84,10 @@
   --thumb-ratio: 3 / 2;
 }
 
+.root[data-ratio="16:10"] {
+  --thumb-ratio: 16 / 10;
+}
+
 .root[data-ratio="16:9"] {
   --thumb-ratio: 16 / 9;
 }

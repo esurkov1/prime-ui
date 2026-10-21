@@ -1,0 +1,345 @@
+/*
+ * Carousel — photos (and videos) of one record in one box of a fixed ratio, as wide as its
+ * container. The slides are laid over each other and placed from TS (`carouselTrack.ts`: a
+ * transform per slide, written once per frame, the dots' pill in the same frame); the dots, the
+ * arrows and the overlays stand on the media. The media shade (`internal/mediaPill`, joined in
+ * TSX) is the one ground of everything on the picture: the fade under the bottom line, the pills,
+ * the shade buttons.
+ *
+ * Layers, bottom to top: a slide (its media, its fade, its own corners) · the carousel's corners
+ * and the dots · the arrows. The four corners stand the same inset from the edges; the dots are
+ * centred on the bottom line between the two bottom corners.
+ */
+.root {
+  --carousel-ratio: 4 / 3;
+  --carousel-inset: var(--prime-space-3);
+  --carousel-dot: calc(var(--prime-space-1) * 1.5);
+
+  position: relative;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: var(--carousel-ratio);
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-fill-muted);
+  /* The page keeps its vertical scroll; a sideways move is the carousel's. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.root[data-opens="true"] {
+  cursor: pointer;
+}
+
+.root[data-ratio="1:1"] {
+  --carousel-ratio: 1;
+}
+
+.root[data-ratio="3:2"] {
+  --carousel-ratio: 3 / 2;
+}
+
+.root[data-ratio="16:10"] {
+  --carousel-ratio: 16 / 10;
+}
+
+.root[data-ratio="16:9"] {
+  --carousel-ratio: 16 / 9;
+}
+
+.root[data-ratio="3:4"] {
+  --carousel-ratio: 3 / 4;
+}
+
+.viewport {
+  position: absolute;
+  inset: 0;
+  z-index: var(--prime-z-base);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter);
+}
+
+.media[data-status="loading"] {
+  opacity: 0;
+}
+
+.media[data-status="error"] {
+  display: none;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fallback {
+  --prime-icon-size: var(--prime-icon-xl);
+
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-muted);
+}
+
+/* ─── A video slide ─────────────────────────────────────────────────────── */
+
+.play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
+/* ─── On the media ──────────────────────────────────────────────────────── */
+
+/* The fade under the bottom line, on each slide (under the slide's own corners), with the dots. */
+.shade {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: var(--prime-space-12);
+  pointer-events: none;
+}
+
+/*
+ * The corners: a layer over the media with a top and a bottom edge. Each edge is a grid of its
+ * start and its end corner sharing the width; the bottom one holds the dots centred between them
+ * (a slide's layer keeps their room, `--carousel-dots-size`). A corner is one row of its overlays,
+ * a Badge.Group gap apart, nearest the corner first (an end corner runs from the end); one that
+ * does not fit beside the ones before it steps aside (`data-hidden`, from TS), and extra rows run
+ * away from the edge, unseen. A slide's corner continues the carousel's row: it starts past what
+ * the carousel's corner takes (`--carousel-taken-<placement>`, from TS). The layers let the swipe
+ * and the scrub through to the slides; their own controls take presses.
+ */
+.layer {
+  position: absolute;
+  inset: var(--carousel-inset);
+  pointer-events: none;
+}
+
+.layer[data-layer="carousel"] {
+  z-index: var(--prime-z-above);
+}
+
+.edge {
+  position: absolute;
+  inset-inline: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--prime-space-2);
+  align-items: center;
+}
+
+.edge[data-edge="top"] {
+  inset-block-start: 0;
+  align-items: start;
+}
+
+.edge[data-edge="bottom"] {
+  inset-block-end: 0;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+
+/* `share` (TS, `edgeSplit`): each corner's track grows to what its row needs, a corner whose
+   opposite is empty takes the whole edge (no gap beside nothing), two that do not fit give way
+   evenly. `half` keeps the halves above: the dots centred on the bottom edge, or an edge where the
+   carousel's and a slide's overlays both stand. */
+.edge[data-split="share"] {
+  grid-template-columns: minmax(0, auto) minmax(0, auto);
+}
+
+.edge[data-split="share"]:has(> .corner:empty) {
+  column-gap: var(--prime-space-0);
+}
+
+.corner {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-inline-size: 0;
+}
+
+.corner[data-placement$="end"] {
+  flex-direction: row-reverse;
+}
+
+.edge[data-edge="top"] > .corner[data-placement="top-end"],
+.edge[data-edge="bottom"] > .corner[data-placement="bottom-end"] {
+  grid-column: -2;
+}
+
+.edge[data-edge="bottom"] > .corner {
+  flex-wrap: wrap-reverse;
+}
+
+.layer[data-layer="slide"] .corner[data-placement="top-start"] {
+  padding-inline-start: var(--carousel-taken-top-start, var(--prime-space-0));
+}
+
+.layer[data-layer="slide"] .corner[data-placement="top-end"] {
+  padding-inline-end: var(--carousel-taken-top-end, var(--prime-space-0));
+}
+
+.layer[data-layer="slide"] .corner[data-placement="bottom-start"] {
+  padding-inline-start: var(--carousel-taken-bottom-start, var(--prime-space-0));
+}
+
+.layer[data-layer="slide"] .corner[data-placement="bottom-end"] {
+  padding-inline-end: var(--carousel-taken-bottom-end, var(--prime-space-0));
+}
+
+.corner > [data-hidden="true"] {
+  visibility: hidden;
+}
+
+.overlay,
+.bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-1);
+  max-inline-size: 100%;
+}
+
+.bar:empty {
+  display: none;
+}
+
+.overlay :where(a[href], button, input, select, textarea, [tabindex]),
+.bar :where(button) {
+  pointer-events: auto;
+}
+
+/* A slide's layer keeps the room of the dots between its bottom corners. */
+.dotsRoom {
+  inline-size: var(--carousel-dots-size, var(--prime-space-0));
+}
+
+/* The arrows show with the pointer over the box or the focus in it; a touch screen shows them. */
+.arrow {
+  position: absolute;
+  z-index: var(--prime-z-top);
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  opacity: 0;
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.previous {
+  inset-inline-start: var(--prime-space-2);
+}
+
+.next {
+  inset-inline-end: var(--prime-space-2);
+}
+
+.root:focus-within .arrow {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .root:hover .arrow {
+    opacity: 1;
+  }
+}
+
+@media (hover: none) {
+  .arrow {
+    opacity: 1;
+  }
+}
+
+/* The dots: one per slide, centred on the bottom line; the current one is the pill the track
+   moves frame by frame (its offset and width written from TS). */
+.dots {
+  position: relative;
+  display: flex;
+  align-items: center;
+  block-size: var(--prime-space-6);
+  pointer-events: auto;
+}
+
+.indicator {
+  position: absolute;
+  inset-block-start: calc(50% - var(--carousel-dot) / 2);
+  /* Physical: the track writes its offset from the row's left edge. */
+  left: 0;
+  z-index: var(--prime-z-raised);
+  block-size: var(--carousel-dot);
+  border-radius: var(--prime-radius-full);
+  background: currentColor;
+  pointer-events: none;
+}
+
+.dot {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  inline-size: var(--prime-space-4);
+  block-size: var(--carousel-dot);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-radius-full);
+  background: none;
+  cursor: pointer;
+}
+
+.mark {
+  inline-size: var(--carousel-dot);
+  block-size: var(--carousel-dot);
+  border-radius: var(--prime-radius-full);
+  background: currentColor;
+  transition:
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* The current dot is the one the pill stands on: pressing it changes nothing. */
+.dot[aria-current="true"] {
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dot:hover .mark {
+    scale: var(--prime-motion-scale-hover);
+  }
+}
+
+.dot:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}

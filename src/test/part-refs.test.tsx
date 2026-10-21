@@ -26,6 +26,7 @@ import {
   Breadcrumb,
   Button,
   Card,
+  Carousel,
   ChartFrame,
   Chat,
   ChatList,
@@ -869,6 +870,11 @@ const CASES: Case[] = [
         </CommandMenu.List>
       </CommandMenu.Root>
     ),
+  ],
+  [
+    "Carousel.Root",
+    "SECTION",
+    (ref) => <Carousel.Root ref={ref} data-testid="part" items={[{ src: "/dock.jpg" }]} />,
   ],
   [
     "Gallery",

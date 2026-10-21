@@ -1394,6 +1394,15 @@ app: one look per kind of block, never a weight per screen.
   `Card.Description` gives one line of data («20 окт, 09:21 · Евгений Сурков»), and its one action
   at the end. Two lines, never a third: a label above the title repeats the section heading. The
   kit pads a header with nothing under it evenly, so no padding of your own.
+- **A task of the record with its assignee** (a return, a delivery, a call back): a card of one
+  `Card.Header`. `Card.Title` is the task with its term («Вернуть 10 дек · через 50 дн.»);
+  `Card.Description` starts with the assignee picker — a `Badge.Root` with `Badge.Avatar` in a
+  `Dropdown.Trigger`, as in the Card example `assignment` — and then the facts («выдан 21 окт,
+  15:43»). The person is named once: «Выдан 21 окт · Евгений Сурков · [Евгений Сурков ▾]» repeats
+  the name and leaves a dangling «·»; the picker first and the facts after it say the same in one
+  line. The actions stand at the header's end, the primary last: one secondary action is a labelled
+  `soft` button («Отменить», example `assignment`), two or more gather behind `action.more`
+  (example `assignment-menu`) — [a menu from two actions](#a-menu-from-two-actions).
 - **A record card with a total** (a vehicle of a deal, a payment, an invoice): the head is a
   `Card.Header` — its mark first (`Card.Icon` with the record's picture or a `ProgressCircle` term
   ring), `Card.Title` with `Card.Link` when the card opens the record (the kit centres its arrow on

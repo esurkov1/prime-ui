@@ -1,0 +1,33 @@
+/* overview.tsx, video.tsx, controlled.tsx: the box of a card in a catalogue grid. */
+.frame {
+  inline-size: 100%;
+  max-inline-size: var(--prime-layout-form-width-s);
+}
+
+/* card-cover.tsx: the vehicle card at the width of a catalogue tile. */
+.card {
+  inline-size: 100%;
+  max-inline-size: var(--prime-layout-form-width-s);
+}
+
+/* scrub.tsx: a catalogue grid of cards. */
+.catalogue {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--prime-layout-tile-min-width), 1fr));
+  gap: var(--prime-space-4);
+  inline-size: 100%;
+}
+
+/* controlled.tsx: the thumbnails that pick the photo, in a row under the carousel. */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--prime-space-2);
+  margin-block-start: var(--prime-space-3);
+}
+
+/* narrow.tsx: a phone-wide column. */
+.narrow {
+  inline-size: 100%;
+  max-inline-size: var(--prime-layout-narrow-width);
+}

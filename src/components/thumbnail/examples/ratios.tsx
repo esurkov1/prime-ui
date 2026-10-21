@@ -3,7 +3,7 @@ import { Icon, Thumbnail, type ThumbnailRatio, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const RATIOS: ThumbnailRatio[] = ["1:1", "4:3", "3:2", "16:9", "3:4"];
+const RATIOS: ThumbnailRatio[] = ["1:1", "4:3", "3:2", "16:10", "16:9", "3:4"];
 
 export default function ThumbnailRatiosExample() {
   return (

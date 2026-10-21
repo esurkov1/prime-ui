@@ -55,7 +55,7 @@ Badge.Group         <div>: a row of Badge.Root, one value; `size` sets every bad
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` without `tone` | Palette hue: a category (a team, a tag); the text carries the meaning. Not together with `tone`. |
 | `tone` | `"neutral" \| "success" \| "warning" \| "danger" \| "info"` | — | A status in the role colors (paid, overdue, failed); `neutral` is the gray hue. Not together with `color`. |
 | `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | Treatment. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down; outside a control it is `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down, a sized surface (a `Card.Root` with `size`) as is; outside both it is `m`. |
 | `shape` | `"chip" \| "square"` | `"chip"` | `square` — a tile as wide as it is tall, the text centred: a file format («PDF»), a short code. |
 | `fullWidth` | `boolean` | `false` | A plate as wide as its container, the text centred: the one next step of a record on its card («Выдать завтра в 06:00»). |
 | `onRemove` | `() => void \| Promise<void>` | — | Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays. |
@@ -165,10 +165,10 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 |---|---|---|---|
 | `xs` | 16px high, text 12, icon 12 | inside `xs` / `s` controls | |
 | `s` | 20px high, text 12, icon 12 | inside `m` controls (inherited automatically) | |
-| `m` | 24px high, text 12, icon 14 | standalone labels in tables and lists | yes (outside controls) |
+| `m` | 24px high, text 12, icon 14 | standalone labels in tables and lists | yes (outside controls and sized surfaces) |
 | `l` | 28px high, text 13, icon 16 | next to section titles | |
 | `xl` | 32px high, text 14, icon 16 | large headers | |
-| — (omitted) | one tier below the surrounding control | inside Button, Input, Tabs | yes (inside controls) |
+| — (omitted) | one tier below the surrounding control; on a sized surface (a `Card.Root` with `size`, or inside a sized host) its tier as is | inside Button, Input, Tabs; on a card | yes (inside controls and on surfaces) |
 
 ### overflow (Badge.Group)
 | Value | Looks like | Use when | Default |
@@ -187,7 +187,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | State | Driven by | DOM |
 |---|---|---|
 | hue / treatment | `color` or `tone`, `variant` | `data-color` (a hue, or gray for `neutral`), `data-tone`, `data-variant` (always set); `data-shape="square"` for a tile, `data-full-width` for a plate |
-| size | `size`, else the control, else `m` | `data-size`, `data-tier` (visual tier) |
+| size | `size`, else the host — a control one tier down, a surface (Card) as is — else `m` | `data-size`, `data-tier` (visual tier) |
 | icon segments | edge `Badge.Icon` / `Badge.Dot`, icon-only | `data-icon-start`, `data-icon-end`, `data-icon-only` |
 | plain text | read-only, text children only | `data-text-only`: the root is one block box that ellipsizes; otherwise each text run sits in its own block span |
 | removable | `onRemove` | `data-removable`; the remove segment takes a `fill-subtle-active` wash on hover |
@@ -281,6 +281,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 - Several removable badges with the default «Удалить» → pass `labels.remove` with the badge text.
 - A colored badge with no text → keep a word; color alone is not a signal.
 - An explicit `size` inside a control → drop it; the badge takes the tier one step down.
+- An explicit `size` on the badges of a sized card → drop it; they take the card's tier.
 - A row of badges in a hand-made flex wrapper with its own gap → `Badge.Group`.
 - A set of values in a table cell that wraps and grows the row, or a hand-made «+N» → `Badge.Group overflow="count"`.
 - `onRemove` together with `Badge.Action` → one end segment per badge.
