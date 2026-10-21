@@ -314,6 +314,8 @@ function BadgeRoot({
       )}
       aria-disabled={disabled || undefined}
       aria-busy={busy || undefined}
+      // A host lays its line out as a row around a badge, whoever renders it (`Card.Description`).
+      data-badge=""
       {...toDataAttributes({
         color: hue,
         tone,
@@ -591,6 +593,7 @@ function BadgeGroup({
         // A named group is a `group` for assistive tech; an unnamed one is plain layout.
         role={namedRole(rest, "group")}
         className={cx(styles.group, className)}
+        data-badge=""
         data-tier={tier}
         data-overflow={overflow}
       >

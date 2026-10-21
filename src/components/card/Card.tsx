@@ -318,34 +318,16 @@ CardTitle.displayName = "Card.Title";
 
 export type CardDescriptionProps = DivProps;
 
-/**
- * Whether a badge stands in the description: straight in it, or as the one element a slot or a
- * state-only root draws (an assignee picker: `Dropdown.Root` › `Dropdown.Trigger` › `Badge.Root`).
- * Only component elements are entered — a DOM element is a cell of its own.
- */
-function drawsBadge(children: React.ReactNode, depth = 0): boolean {
-  return flattenChildren(children).some((child) => {
-    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) return false;
-    const { type, props } = child;
-    if (isPart(child, Badge.Root) || isPart(child, Badge.Group)) return true;
-    return depth < 2 && typeof type !== "string" && drawsBadge(props.children, depth + 1);
-  });
-}
-
 function CardDescription({ className, children, ...rest }: CardDescriptionProps) {
   const inFooter = React.useContext(ZoneContext) === "footer";
   // In the footer it is the record's note: a status dot first, the text cut to one line.
   const { parts: dots, rest: text } = inFooter
     ? splitParts(children, Badge.Dot)
     : { parts: [], rest: [children] };
-  // A `<div>`, so a `Badge.Group` (a `<div>`) is valid inside it; badges straight in it (the state
-  // and the deposit of a record under its title) stand in a wrapping row, the chip gap apart.
-  const badges = !inFooter && drawsBadge(children);
+  // A `<div>`, so a `Badge.Group` (a `<div>`) is valid inside it; badges in it (the state and the
+  // deposit of a record, an assignee picker — whoever renders them) stand in a wrapping row (CSS).
   return (
-    <div
-      className={cx(textRole.bodyS, styles.description, badges && styles.badgeRow, className)}
-      {...rest}
-    >
+    <div className={cx(textRole.bodyS, styles.description, className)} {...rest}>
       {inFooter ? (
         <>
           {dots}

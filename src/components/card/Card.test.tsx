@@ -629,6 +629,33 @@ describe("Card", () => {
     expect(screen.getByRole("heading", { name: "Без бейджа" })).not.toHaveClass(styles.badged);
   });
 
+  it("a badge in a description lays the line out as a row, whatever component renders it", () => {
+    function OwnerBadge() {
+      return (
+        <Dropdown.Root>
+          <Dropdown.Trigger>
+            <Badge.Root aria-label="Исполнитель: Анна Котова">Анна Котова</Badge.Root>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item>Илья Соколов</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+      );
+    }
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Продлить страховку</Card.Title>
+          <Card.Description data-testid="owned">
+            <OwnerBadge />
+            истёк 2 дн. назад
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("owned").querySelector(":scope > [data-badge]")).not.toBeNull();
+  });
+
   it("an assignee picker in a description lays the line out as a row, the facts after it", () => {
     render(
       <Card.Root>
@@ -648,11 +675,11 @@ describe("Card", () => {
         </Card.Header>
       </Card.Root>,
     );
-    expect(screen.getByTestId("assigned")).toHaveClass(styles.badgeRow);
+    expect(screen.getByTestId("assigned").querySelector(":scope > [data-badge]")).not.toBeNull();
   });
 
   it("badges in a header description stand in a wrapping row; a Badge.Group inside is valid", () => {
-    const rule = cssRule("src/components/card/Card.module.css", ".badgeRow");
+    const rule = cssRule("src/components/card/Card.module.css", ".description:has(> [data-badge])");
     expect(cssValue(rule, "display")).toBe("flex");
     expect(cssValue(rule, "flex-wrap")).toBe("wrap");
     expect(cssValue(rule, "align-items")).toBe("center");
@@ -691,9 +718,10 @@ describe("Card", () => {
     error.mockRestore();
     const badges = screen.getByTestId("badges");
     expect(badges.tagName).toBe("DIV");
-    expect(badges).toHaveClass(styles.description, styles.badgeRow);
-    expect(screen.getByTestId("group")).toHaveClass(styles.badgeRow);
-    expect(screen.getByTestId("text")).not.toHaveClass(styles.badgeRow);
+    expect(badges).toHaveClass(styles.description);
+    expect(badges.querySelectorAll(":scope > [data-badge]")).toHaveLength(2);
+    expect(screen.getByTestId("group").querySelector(":scope > [data-badge]")).not.toBeNull();
+    expect(screen.getByTestId("text").querySelector(":scope > [data-badge]")).toBeNull();
   });
 
   it("a cover of photos that opens its record draws no arrow and keeps the title's width", () => {

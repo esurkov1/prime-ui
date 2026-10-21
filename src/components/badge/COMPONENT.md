@@ -186,6 +186,7 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
+| badge | always | `data-badge` on `Badge.Root` and `Badge.Group`: a host lays its line out as a row around a badge, whoever renders it (`Card.Description`) |
 | hue / treatment | `color` or `tone`, `variant` | `data-color` (a hue, or gray for `neutral`), `data-tone`, `data-variant` (always set); `data-shape="square"` for a tile, `data-full-width` for a plate |
 | size | `size`, else the host — a control one tier down, a surface (Card) as is — else `m` | `data-size`, `data-tier` (visual tier) |
 | icon segments | edge `Badge.Icon` / `Badge.Dot`, icon-only | `data-icon-start`, `data-icon-end`, `data-icon-only` |

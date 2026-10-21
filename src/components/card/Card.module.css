@@ -181,9 +181,10 @@
   overflow-wrap: anywhere;
 }
 
-/* Badges in a description (TSX: a `Badge.Root` or `Badge.Group` child): a wrapping row, text and
-   badges centred on the line, the gap of `Badge.Group`. */
-.badgeRow {
+/* Badges in a description (a `Badge.Root` or `Badge.Group` in its markup, whatever component
+   renders it — `data-badge`): a wrapping row, text and badges centred on the line, the gap of
+   `Badge.Group`. A footer note keeps its own line. */
+.description:has(> [data-badge]) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
