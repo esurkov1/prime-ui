@@ -169,7 +169,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.ListItemContent
-`ref` → `HTMLDivElement`. The zone under a record row that folds open in place (a form its action opens); a `Card.Footer` inside holds its buttons at the end.
+`ref` → `HTMLDivElement`. The zone under its `Card.ListItem` (any row) that folds open in place, rendered from anywhere inside the row; a `Card.Footer` holds its buttons at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

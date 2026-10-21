@@ -289,8 +289,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.ListItemContent",
-      en: "`ref` → `HTMLDivElement`. The zone under a record row that folds open in place (a form its action opens); a `Card.Footer` inside holds its buttons at the end.",
-      ru: "Зона под строкой записи, раскрывающаяся на месте (форма, которую открывает её действие); `Card.Footer` внутри держит кнопки в конце.",
+      en: "`ref` → `HTMLDivElement`. The zone under its `Card.ListItem` (any row) that folds open in place, rendered from anywhere inside the row; a `Card.Footer` holds its buttons at the end.",
+      ru: "Зона под своей `Card.ListItem` (любой строкой), раскрывающаяся на месте, откуда бы ни рендерилась внутри строки; `Card.Footer` держит кнопки в конце.",
       props: [
         {
           name: "open",

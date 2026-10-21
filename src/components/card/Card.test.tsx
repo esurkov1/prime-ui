@@ -679,6 +679,27 @@ describe("Card", () => {
     expect(cssValue(rule, "padding-top")).toBe("var(--prime-space-2)");
   });
 
+  it("a row of fields folds its zone open under it too; outside a row the zone says so", () => {
+    render(
+      <Card.Root variant="list">
+        <Card.List>
+          <Card.ListItem data-testid="row">
+            Поля строки
+            <Card.ListItemContent open data-testid="zone">
+              Форма
+            </Card.ListItemContent>
+          </Card.ListItem>
+        </Card.List>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("row").lastElementChild).toContainElement(screen.getByTestId("zone"));
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<Card.ListItemContent open>Форма</Card.ListItemContent>)).toThrow(
+      "Card.ListItemContent must be rendered inside Card.ListItem",
+    );
+    error.mockRestore();
+  });
+
   it("a row's folded zone rendered by the consumer's own component stands under the row", () => {
     function HoldForm({ open }: { open: boolean }) {
       return (

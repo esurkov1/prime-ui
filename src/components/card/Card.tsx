@@ -603,7 +603,8 @@ function CardListItem({ className, children, ...rest }: CardListItemProps) {
   if (!record) {
     return (
       <li className={rowClass} {...rest}>
-        {children}
+        <ListItemZoneContext.Provider value={zone}>{children}</ListItemZoneContext.Provider>
+        <div ref={setZone} />
       </li>
     );
   }
@@ -619,7 +620,7 @@ function CardListItem({ className, children, ...rest }: CardListItemProps) {
 CardListItem.displayName = "Card.ListItem";
 
 /** The element a record row keeps under itself for its `Card.ListItemContent`. */
-const ListItemZoneContext = React.createContext<HTMLDivElement | null>(null);
+const ListItemZoneContext = React.createContext<HTMLDivElement | null | undefined>(undefined);
 
 export type CardListItemContentProps = DivProps & {
   open: boolean;
@@ -637,6 +638,9 @@ function CardListItemContent({
   ...rest
 }: CardListItemContentProps) {
   const zone = React.useContext(ListItemZoneContext);
+  if (zone === undefined) {
+    throw new Error("Card.ListItemContent must be rendered inside Card.ListItem");
+  }
   const content = (
     <Disclosure open={open} className={className} ref={ref} {...rest}>
       <ZoneContext.Provider value="item">
