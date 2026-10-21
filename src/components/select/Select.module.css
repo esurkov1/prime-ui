@@ -12,6 +12,12 @@
   --sel-desc: var(--prime-text-body-s-size);
   --sel-desc-lh: var(--prime-text-body-s-line-height);
   width: 100%;
+  /* The field's own fades, plus the ink of a picked option's hue gliding in. */
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* Icon-only trigger (a `Select.TriggerIcon` and no `Select.Value`): as wide as the glyph and the
@@ -390,6 +396,42 @@
   background-color: var(--prime-color-fill-muted);
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
+}
+
+/* The field trigger with a picked option in a hue (`color`): its fill and text are the hue's soft
+   fill and ink, the chevron in the ink; hover, press and an open panel a step deeper, like the
+   status chip. The control border gives way to the fill; an invalid ring stays. */
+.trigger[data-color]:not(:disabled) {
+  background-color: var(--hue-soft);
+  color: var(--hue-text);
+}
+
+.trigger[data-color]:not(:disabled, [aria-invalid="true"]) {
+  box-shadow: none;
+}
+
+.trigger[data-color]:not(:disabled) :is(.value, .chevron, .triggerIcon) {
+  color: inherit;
+}
+
+@media (hover: hover) {
+  .trigger[data-color]:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: color-mix(in srgb, var(--hue-text) var(--prime-tint-faint), var(--hue-soft));
+    color: color-mix(
+      in srgb,
+      var(--prime-color-text-primary) var(--prime-tint-hover),
+      var(--hue-text)
+    );
+  }
+}
+
+.trigger[data-color][data-state="open"]:not(:disabled) {
+  background-color: color-mix(in srgb, var(--hue-text) var(--prime-tint-faint), var(--hue-soft));
+  color: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-hover),
+    var(--hue-text)
+  );
 }
 
 /* An option with a hue (`color`): its text and icon in the hue's ink, the highlight and the press a

@@ -96,7 +96,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `name` | `string` | — | Form field name: hidden inputs submit the value (`""` while empty; one input per value with `multiple`). |
 | `placeholder` | `string` | — | Text in the trigger while nothing is picked. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier: trigger height, padding, text; the list rows, the label and the hint follow it. Without it the tier of its host (a form, a panel with a size), else `m`. |
-| `variant` | `"field" \| "status"` | `"field"` | `field` — the field trigger. `status` — a chip in the picked option's `color` (gray with none) with a chevron, as wide as its content: a status picked in a row. |
+| `variant` | `"field" \| "status"` | `"field"` | `field` — the field trigger, in the picked option's `color` if it has one. `status` — a chip in the picked option's `color` (gray with none) with a chevron, as wide as its content: a status picked in a row. |
 | `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `id` | `string` | — | Id of the trigger; generated when omitted. |
 | `labels` | `Partial<SelectLabels>` | — | Built-in strings, see Labels. |
@@ -186,7 +186,7 @@ an icon) goes inside `Select.ItemMeta`.
 ### variant
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `field` | the field look (fill, inset control border, tier radius), full width | a value in a form or a filter | yes |
+| `field` | the field look (fill, inset control border, tier radius), full width; a picked option with `color` paints it in the hue's soft fill and ink (the chevron too, hover a step deeper) | a value in a form or a filter | yes |
 | `status` | a chip in the picked option's `color` (soft fill and text ink of a Badge of that hue; gray with none) with the chevron in its ink, at the chip tier of `size`, as wide as its content | a status picked in place — at the end of a row beside its buttons, in a record header | |
 
 The panel is the shared floating surface with menu rows; an option with `color` draws its text and icon in the hue's ink and its highlight as the hue's wash. Text carries the value: the hue never stands alone.

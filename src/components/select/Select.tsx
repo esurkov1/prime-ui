@@ -434,11 +434,14 @@ function SelectTrigger({
     segment,
     variant,
     statusLabel,
+    multiple,
   } = useSelectContext();
   const mergedRef = useMergedRefs(triggerRef, ref);
-  // `status`: a chip in the picked option's hue (gray with none), at the chip tier of the size.
+  // The picked option's hue paints the trigger: the field's fill, or the `status` chip (gray with
+  // none), at the chip tier of the size.
   const status = variant === "status" && !segment;
-  const hue = status && selected.length > 0 ? registry.colorOf(selected[0]) : undefined;
+  const hue =
+    !segment && !multiple && selected.length > 0 ? registry.colorOf(selected[0]) : undefined;
   // A segment is named by the root's `aria-label` with the picked value after it.
   useListboxView(registry);
   const valueText = selected.map(registry.labelOf).join(", ");
@@ -477,7 +480,7 @@ function SelectTrigger({
           ? styles.segmentTrigger
           : status
             ? cx(palette.hue, chipTier.tier, styles.statusTrigger)
-            : cx(fieldTriggerClass, styles.trigger),
+            : cx(fieldTriggerClass, styles.trigger, hue !== undefined && palette.hue),
         className,
       )}
       onClick={(event) => {

@@ -89,6 +89,24 @@ describe("Select (composable)", () => {
     expect(trigger).toHaveTextContent("Не взят");
   });
 
+  it("paints the field trigger in the picked option's hue", () => {
+    render(
+      <Select.Root label="Шаг депозита" defaultValue="held">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="held" color="green">
+            Принят
+          </Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole("combobox", { name: "Шаг депозита" });
+    expect(trigger).toHaveAttribute("data-color", "green");
+    expect(trigger).not.toHaveAttribute("data-variant");
+  });
+
   it("renders trigger with placeholder when no value selected", () => {
     render(<BasicSelect />);
     expect(screen.getByRole("combobox")).toBeInTheDocument();
