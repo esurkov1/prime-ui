@@ -9,7 +9,9 @@ import { shiftPx, type TimeScene } from "./timeCore";
  * Per layer, never one inherited custom property on the chart: a custom property tells the engine
  * that every node under it may have changed (Lumen measured 92 ms of style a frame against 1.4 ms
  * for the same movement written onto the layers), and `transform` dirties only the layer it is on.
- * An unchanged value is not written at all.
+ * A 2D `translate`, never `translate3d`: a 3D transform makes every row's layer a composited
+ * layer, and the page re-layerizes all of them on every frame (measured: the cost of a pan on a
+ * page of charts). An unchanged value is not written at all.
  */
 export type TimeSlide = {
   /** The ref callback of a layer laid out from the scene's origin. */
@@ -38,7 +40,7 @@ export function createTimeSlide(onWrite: (start: number, scene: TimeScene) => vo
 
   const transform = () => {
     const px = scene ? shiftPx(start, scene) * dir : 0;
-    return `translate3d(${px}px, 0, 0)`;
+    return `translate(${px}px)`;
   };
   const paint = (node: HTMLElement, value: string) => {
     if (layers.get(node) === value) return;

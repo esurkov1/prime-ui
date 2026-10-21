@@ -110,6 +110,8 @@ One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclu
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | — | Status color (done, at risk, overdue); wins over `color`. |
 | `progress` | `number` | — | Share done, `0…1`: a stronger fill from the start of the bar; the percentage joins the tooltip and the name. |
 | `edit` | `"all" \| "end" \| "none"` | `"all"` | Which dates a person may change: `all` — move and both edges; `end` — only the end (a rental already issued): no move, no start grip, only Ctrl + Shift + arrows, and a milestone stays put; `none` — nothing (a public holiday, a closed phase). |
+| `height` | `"s" \| "m" \| "l"` | `"m"` | The bar's height, on the tier letters: `m` — the one-line bar, the label inside; `l` — a caption line taller, the label and `description` on two lines (a long booking); `s` — a step shorter, a caption label inside (documents, a check). The main bars (`m`, `l`) pack first, then `s` below them; a lane is as tall as its tallest bar; the root `size` scales all three. |
+| `description` | `string` | — | The secondary text: the second line of an `l` bar; on every bar it joins the tooltip and the accessible name. |
 
 #### `GanttCategory`
 One entry of `categories`: a kind of bar, a legend entry and an item of `GanttCategoriesMenu`.
@@ -159,6 +161,15 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | `end` | no grab cursor, a grip only at the end; only Ctrl + Shift + arrows; a milestone stays put | a rental already issued, work already started: the start is history | |
 | `none` | no grips, no editing keys; still selects and shows its tooltip | a vacation, a public holiday, a closed phase | |
 
+### height (GanttBar)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `m` | a lane of the tier's bar height (28 px at `m`), the label inside | the bars the chart is about: rentals, bookings, phases | yes |
+| `l` | a lane a caption line taller (44 px at `m`): the label, and `description` on a second line in the caption role | a long or key bar whose secondary fact matters on sight: a booking with its deposit | |
+| `s` | a lane a step shorter (20 px at `m`), a caption label inside | an auxiliary task beside the main ones: documents, a check, an inspection | |
+
+The main bars (`m`, `l`) pack first, then `s` below them, each by start. A lane is as tall as its tallest bar (an `m` bar stands centred in an `l` lane); the three heights follow the root `size`. `description` is on every bar's tooltip and name; only `l` draws it.
+
 ### Flags
 | Flag | Effect |
 |---|---|
@@ -195,7 +206,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - Sliding: a sideways wheel or trackpad swipe, Shift + wheel, one finger sideways and a drag along the dates slide the view with the hand; a sideways swipe is the chart's from its first event (the browser never takes it for «back»), a vertical one stays the page's. There is no sideways scrollbar.
 - Nothing selects where a press is a gesture — the dates, the rows' time, bars, the drawn bar (`user-select: none`, no touch callout); the names stay selectable.
 - Touch: one finger up and down scrolls the rows natively, sideways slides the view (`touch-action: pan-y`); two fingers are the chart's pinch, never the page's zoom, and cancel a long press or a drag one of them began. A slide has no momentum.
-- Virtualization: rows render only in view (plus an overscan) at offsets computed from their lanes and corrected by measuring, so the total height and the scrollbar stay exact; dates, lines, weekends and bars render only inside the scene laid out around the view. A focused, dragged, pending or new bar stays rendered wherever the view stands.
+- Virtualization: rows render only in view (plus an overscan) at offsets computed from their lanes and corrected by measuring, so the total height and the scrollbar stay exact; dates, lines, weekends and bars render only inside the scene laid out around the view. A focused, dragged, pending or new bar stays rendered wherever the view stands. Off screen the whole chart is skipped by the browser (`content-visibility: auto`, keeping its last height), so a page of several charts composites only those in view; the time layers slide by a 2D `translate`, never a composited layer per row. A bar paints the chart surface under its tint, so the grid and the weekends never show through it.
 - Editing precision: a move, a resize and a drawing land on whole days at every zoom — held with hysteresis so a few px a day never jitter — and the tooltip says the exact dates and days; hold Alt to land on the ticks of the head's step (the 1st, 8th, 15th…; the 1sts of months). The keys move by a day at every zoom; with Alt from tick to tick. A bar is at least one day long: a resize past the opposite edge stops there and never flips. On touch a finger held on a bar picks it up, then it drags like a pointer.
 - Creating: on empty space the cursor is a crosshair and the phantom of the bar a press would create stands under it — a day whenever day lines are drawn. Press and drag across a row: the phantom turns into a real bar of whole days, either way from the pressed day; or double-click (long-press on touch) for one phantom cell; a drag after the long press draws on. A press let go where it began creates nothing. Without `onBarCreate` (or with `readOnly`) nothing can be created and empty space shows no create cursor or phantom. Near the edges of the axis a drag, a resize and a drawing slide the view.
 - Tooltip: the bar's title, then its dates · duration · progress; `renderBarTooltip` adds lines under them (a client, planned hours) and never replaces them — the dates are what the bar means on the axis, and the same tooltip shows the new dates while dragging.
@@ -203,7 +214,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - What the chart shows is the person's choice: `GanttCategoriesMenu` («Вид») in the page's tools beside the search, bound to the same `hiddenCategories` the chart reads — the kit's one view trigger, the same soft neutral Button with the `view.columns` icon, «Вид» and the count of shown items as `DataTableColumnsMenu` and `KanbanFieldsMenu`, so a page that switches table ↔ board ↔ schedule keeps one «Вид» in one place. «По умолчанию» appears only while the view differs from `defaultHiddenCategories`. A bar without a `category` is always shown.
 - The default axis covers every bar and today with a month of room on both sides, from the 1st of a month, at least a year — one axis for every zoom; pass `range` for a fixed period.
 - The chart opens with today a third into the view (once it has a width); «Сегодня», the zoom and the arrow keys move only the chart's own view, never the page.
-- A row grows by a lane for every overlapping bar: lanes are packed greedily by start date.
+- A row grows by a lane for every overlapping bar: lanes are packed greedily by start date (then end, then order), from the row's real bars only — the main bars (`m`, `l`) first, then `s` below them (`height`), each lane as tall as its tallest bar; a shorter bar stands centred in a taller lane. The phantom and a drawing are `m` bars and stand only in a main lane. Nothing a pointer does moves them: the phantom stands in the lane under the pointer when that lane is free over its days, else it does not show (no other lane, no reflow); a drawn bar stays in the pressed lane while it is free, else takes the first free lane, else stays — the row keeps its height while hovering, drawing and dragging. Only a created bar may add a lane, once, on release (pending); a moved bar re-packs when its new dates arrive.
 - Dates are calendar days; `end` is exclusive, so a one-day task on 3 July is `{ start: 3 July, end: 4 July }`.
 
 ## Accessibility
@@ -287,8 +298,8 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | [variants.tsx](examples/variants.tsx) | Bars colored by category with palette hues, and by status with tones that win over the hue — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier: one-lane rows from 28 to 52 px, bars, the head row and its selector, and the zoom presets of the tier — `size`. |
 | [occupancy.tsx](examples/occupancy.tsx) | Team occupancy by day: people with avatars, projects that overlap into lanes, locked vacations, a saved move held busy and a conflicting one gliding back, new work drawn on a free day — `renderRowAvatar`, `renderRow`, `onBarChange`, `onBarCreate`, `onItemOpen`, `edit`. |
-| [rentals.tsx](examples/rentals.tsx) | A fleet calendar: an issued rental changes only its end, a booking moves and changes both edges, a service day stays put — `edit`, `onBarChange`. |
-| [large.tsx](examples/large.tsx) | Two thousand people over two years stay fast: only the rows and days in view are rendered, keyboard focus reaches any row, and new bars are drawn on empty space — `rows`, `range`, `scrollHeight`, `onBarCreate`. |
+| [rentals.tsx](examples/rentals.tsx) | A fleet calendar: an issued rental changes only its end, a booking moves and changes both edges, a long booking is a two-line bar with its deposit, documents and an inspection are short bars in a lane under the main ones, a new booking is drawn in a free lane — `edit`, `height`, `description`, `onBarChange`, `onBarCreate`. |
+| [large.tsx](examples/large.tsx) | Two thousand people over two years stay fast: only the rows and days in view are rendered, keyboard focus reaches any row, bars move and stretch and new ones are drawn on empty space — `rows`, `range`, `scrollHeight`, `onBarChange`, `onBarCreate`. |
 | [row-link.tsx](examples/row-link.tsx) | A team by client: each row header is a link to the person's profile that a plain click opens in place, each tooltip adds the client and the planned hours under the dates, and the clients are categories: their hues colour the bars and stand in the legend — `getRowHref`, `onRowClick`, `renderBarTooltip`, `categories`. |
 | [categories.tsx](examples/categories.tsx) | A fleet calendar by kind of bar: rentals, bookings and service share a legend and a view menu that hides a kind from the chart and from the legend at once — `categories`, `hiddenCategories`, `GanttCategoriesMenu`. |
 | [states.tsx](examples/states.tsx) | Skeleton rows in the chart's geometry while it loads, an empty period and a report you may only look at, its today line on the report day — `loading`, `empty`, `readOnly`, `today`. |

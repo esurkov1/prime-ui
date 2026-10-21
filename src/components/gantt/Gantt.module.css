@@ -19,6 +19,16 @@
   --gantt-pad-x: var(--prime-space-3);
   --gantt-pad-y: var(--prime-space-2);
   --gantt-bar-h: var(--prime-space-7);
+  /*
+   * The bar heights, from the tier's bar height (`m`): `l` a caption line taller (a second line),
+   * `s` a step shorter, never under a caption line. A lane is as tall as its tallest bar; JS reads
+   * them off `.laneProbe`.
+   */
+  --gantt-bar-l-h: calc(var(--gantt-bar-h) + var(--prime-space-4));
+  --gantt-bar-s-h: max(
+    calc(var(--gantt-bar-h) - var(--prime-space-2)),
+    var(--prime-text-caption-line-height)
+  );
   --gantt-lane-gap: var(--prime-space-1);
   --gantt-bar-radius: var(--prime-radius-s);
   --gantt-bar-pad-x: var(--prime-space-2);
@@ -36,6 +46,12 @@
   --gantt-z-head: var(--prime-z-top);
 
   container-type: inline-size;
+  /*
+   * Off screen the chart is not painted at all, so a page of several charts composites only the
+   * ones in view (every repaint re-layerizes the whole page); it keeps its last height meanwhile.
+   */
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto calc(var(--prime-space-24) * 4);
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -489,16 +505,10 @@
   background: var(--prime-color-accent-default);
 }
 
+/* A row is as tall as its lanes, each as tall as its look (`--row-h`, from `laneTops` in TSX). */
 .row {
   display: flex;
-  min-height: calc(
-    2 *
-    var(--gantt-pad-y) +
-    var(--lanes) *
-    var(--gantt-bar-h) +
-    (var(--lanes) - 1) *
-    var(--gantt-lane-gap)
-  );
+  min-height: var(--row-h);
   /* The grid's own weight: the rows part as quietly as the day lines cross them. */
   border-block-start: var(--prime-border-width) solid var(--gantt-line);
 }
@@ -635,12 +645,8 @@
   --bar-fg: var(--hue-text);
   --bar-solid: var(--hue-solid);
 
+  /* The top is its lane's (inline, from TSX): lanes stack by their looks' heights. */
   position: absolute;
-  inset-block-start: calc(
-    var(--gantt-pad-y) +
-    var(--lane) *
-    (var(--gantt-bar-h) + var(--gantt-lane-gap))
-  );
   display: flex;
   align-items: center;
   gap: var(--prime-space-1);
@@ -652,7 +658,12 @@
   padding: 0;
   border: 0;
   border-radius: var(--gantt-bar-radius);
-  background: var(--bar-bg);
+  /*
+   * The tint is see-through (a soft hue mixed with transparent in the dark theme), so the bar paints
+   * the chart's surface under it: the grid and the weekend washes never show through a bar.
+   */
+  background-color: var(--gantt-surface);
+  background-image: linear-gradient(var(--bar-bg), var(--bar-bg));
   color: var(--bar-fg);
   font: inherit;
   /* The track's tier (one under the chart). */
@@ -678,7 +689,7 @@
 .bar[data-progress="true"] {
   --bar-progress: color-mix(in oklab, var(--bar-solid) var(--prime-tint-line), var(--bar-bg));
 
-  background: linear-gradient(
+  background-image: linear-gradient(
     var(--gantt-edge-dir),
     var(--bar-progress) var(--progress),
     var(--bar-bg) var(--progress)
@@ -790,7 +801,8 @@
   min-width: 0;
   margin-inline: var(--gantt-bar-pad-x);
   text-overflow: ellipsis;
-  transform: translateX(var(--label-shift, 0));
+  /* No transform until a cut start shifts it: an idle label adds no layer to composite. */
+  translate: var(--label-shift, none);
 }
 
 .spinner + .label {
@@ -857,6 +869,54 @@
 }
 
 /* Grips at both ends resize the bar; a short line shows on hover, always on touch. */
+/*
+ * Bar heights. `l`: the label and its description on two lines; `s`: a short bar with a caption
+ * label (joined in TSX). `m` is the bar above.
+ */
+.bar[data-height="l"] {
+  height: var(--gantt-bar-l-h);
+}
+
+.bar[data-height="l"] .label {
+  display: flex;
+  flex-direction: column;
+}
+
+.labelLine {
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.bar[data-height="s"] {
+  height: var(--gantt-bar-s-h);
+}
+
+/* The probe of the lane heights: one box per bar height, never seen. */
+.laneProbe {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: flex;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.laneProbe > [data-height] {
+  width: var(--prime-border-width);
+}
+
+.laneProbe > [data-height="s"] {
+  height: var(--gantt-bar-s-h);
+}
+
+.laneProbe > [data-height="m"] {
+  height: var(--gantt-bar-h);
+}
+
+.laneProbe > [data-height="l"] {
+  height: var(--gantt-bar-l-h);
+}
+
 .handle {
   position: absolute;
   inset-block: 0;
@@ -922,11 +982,6 @@
  */
 .ghost {
   position: absolute;
-  inset-block-start: calc(
-    var(--gantt-pad-y) +
-    var(--lane) *
-    (var(--gantt-bar-h) + var(--gantt-lane-gap))
-  );
   /* A label that does not fit beside the «+» wraps onto a second line, clipped: only the «+» stays. */
   display: flex;
   flex-wrap: wrap;
@@ -964,7 +1019,9 @@
 /* Pressed and drawn: a real bar of the default hue, its length in days inside. */
 .ghost[data-look="bar"] {
   justify-content: flex-start;
-  background: var(--hue-soft);
+  /* Over the surface, as a bar: the grid never shows through it. */
+  background-color: var(--gantt-surface);
+  background-image: linear-gradient(var(--hue-soft), var(--hue-soft));
   box-shadow: none;
   color: var(--hue-text);
   transition:

@@ -21,7 +21,11 @@ import {
   daysBetween,
   formatSpan,
   type GanttBar,
+  type GanttBarHeight,
   type GanttDates,
+  type LaneHeights,
+  lanesHeight,
+  laneTops,
   type TimeStep,
 } from "./ganttModel";
 import { type TimeScene, toPx } from "./timeCore";
@@ -35,6 +39,8 @@ export type GanttGhost = {
   id: string;
   dates: GanttDates;
   status: "phantom" | "drawing" | "pending" | "leaving";
+  /** The lane asked for: under the pointer, pressed (`placeGhost` decides where it stands). */
+  lane?: number;
 };
 
 export type GanttTrackEvent =
@@ -87,7 +93,11 @@ export type GanttRowProps = {
   label: string;
   bars: readonly GanttBar[];
   lanes: ReadonlyMap<string, number>;
-  laneCount: number;
+  /** Each lane's look (`assignLanes`): a lane is as tall as its look's height. */
+  looks: readonly GanttBarHeight[];
+  heights: LaneHeights;
+  padY: number;
+  laneGap: number;
   top: number;
   measureRef: (node: HTMLElement | null) => void;
   /** The row's data and the first-column renderers (stable while the chart's props are). */
@@ -107,8 +117,6 @@ export type GanttRowProps = {
   dragging: ReadonlySet<string>;
   /** What is laid out (`timeCore`): bars outside it are not rendered. */
   scene: TimeScene;
-  /** The bar height, px: a milestone's box. */
-  barH: number;
   /** The grid's coarse step: what a drag with Alt lands on (see `GanttBarView`). */
   snap: TimeStep;
   rangeStart: number;
@@ -128,7 +136,10 @@ function GanttRowView({
   label,
   bars,
   lanes,
-  laneCount,
+  looks,
+  heights,
+  padY,
+  laneGap,
   top,
   measureRef,
   row,
@@ -143,7 +154,6 @@ function GanttRowView({
   pending,
   dragging,
   scene,
-  barH,
   snap,
   rangeStart,
   locale,
@@ -156,6 +166,13 @@ function GanttRowView({
 }: GanttRowProps) {
   const barTier = stepDown(useControlSize(undefined));
   const start = new Date(rangeStart);
+  const tops = React.useMemo(
+    () => laneTops(looks, heights, padY, laneGap),
+    [looks, heights, padY, laneGap],
+  );
+  /** A bar's top in its lane, px: centred in a lane taller than it (a default bar by a large). */
+  const topOf = (lane: number, height: GanttBarHeight) =>
+    (tops[lane] ?? padY) + ((heights[looks[lane] ?? "m"] ?? 0) - heights[height]) / 2;
   const on = (event: GanttTrackEvent) => (native: React.SyntheticEvent) =>
     ctx.track(event, index, native);
 
@@ -180,7 +197,12 @@ function GanttRowView({
       role="row"
       aria-rowindex={index + 2}
       className={styles.row}
-      style={{ "--lanes": laneCount, "--row-top": `${top}px` } as React.CSSProperties}
+      style={
+        {
+          "--row-h": `${lanesHeight(looks, heights, padY, laneGap)}px`,
+          "--row-top": `${top}px`,
+        } as React.CSSProperties
+      }
     >
       {href === undefined ? (
         <div
@@ -273,8 +295,9 @@ function GanttRowView({
                 dates={dates}
                 x={x}
                 lane={lanes.get(bar.id) ?? 0}
+                top={topOf(lanes.get(bar.id) ?? 0, bar.height ?? "m")}
                 scene={scene}
-                barH={barH}
+                barH={heights[bar.height ?? "m"]}
                 snap={snap}
                 locale={locale}
                 nameFor={(shown) => ctx.nameFor(bar, shown)}
@@ -301,7 +324,7 @@ function GanttRowView({
           {ghost ? (
             <GanttGhostView
               ghost={ghost}
-              lane={ghostLane}
+              top={topOf(ghostLane, "m")}
               start={start}
               scene={scene}
               locale={locale}
@@ -325,7 +348,7 @@ function GanttRowView({
  */
 function GanttGhostView({
   ghost,
-  lane,
+  top,
   start,
   scene,
   locale,
@@ -334,7 +357,8 @@ function GanttGhostView({
   formatDuration,
 }: {
   ghost: GanttGhost;
-  lane: number;
+  /** Its top in the row, px: the lane it stands in. */
+  top: number;
   start: Date;
   scene: TimeScene;
   locale: Locale;
@@ -366,7 +390,7 @@ function GanttGhostView({
             {
               insetInlineStart: `${left}px`,
               width: `${width}px`,
-              "--lane": lane,
+              insetBlockStart: `${top}px`,
             } as React.CSSProperties
           }
         >

@@ -11,6 +11,8 @@ import { type MotionDurationToken, motionTiming } from "@/internal/motionTiming"
 import palette from "@/internal/palette.module.css";
 import { press } from "@/internal/press";
 import type { PaletteColor } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
+import { touchTargetBlockClass } from "@/internal/touchTarget";
 
 import styles from "./Gantt.module.css";
 import {
@@ -105,6 +107,8 @@ export type GanttBarViewProps = {
   /** Days from the range start to `dates.start`. */
   x: number;
   lane: number;
+  /** Its top in the row, px: its lane's, centred in a taller lane. */
+  top: number;
   /** The scene the bar is laid out in (`timeCore`): `toPx` places it. */
   scene: TimeScene;
   /** A milestone's box, px: the bar height. */
@@ -166,6 +170,7 @@ export function GanttBarView({
   dates,
   x,
   lane,
+  top,
   scene,
   barH,
   snap,
@@ -219,6 +224,7 @@ export function GanttBarView({
 
   const shown = drag ? drag.landed : dates;
   const milestone = isMilestone(shown);
+  const height = bar.height ?? "m";
   // Geometry: the snapped dates at rest; while dragging, the pointer itself (clamped to one day).
   const baseSpan = isMilestone(dates) ? 0 : daysBetween(dates.start, dates.end);
   let shownX = x;
@@ -392,12 +398,18 @@ export function GanttBarView({
             ref={setNode}
             type="button"
             tabIndex={active ? 0 : -1}
-            className={cx(palette.hue, press.press, styles.bar)}
+            className={cx(
+              palette.hue,
+              press.press,
+              // A short bar keeps a finger-sized hit area on touch, grown in height only.
+              height === "s" && touchTargetBlockClass,
+              styles.bar,
+            )}
             style={
               {
                 insetInlineStart: `${left}px`,
                 width: `${width}px`,
-                "--lane": lane,
+                insetBlockStart: `${top}px`,
                 "--progress": progress === undefined ? undefined : `${progress}%`,
               } as React.CSSProperties
             }
@@ -413,6 +425,7 @@ export function GanttBarView({
             data-left={left}
             data-right={left + width}
             data-lane={lane}
+            data-height={height}
             {...toDataAttributes({
               color: bar.tone ? undefined : (bar.color ?? categoryColor ?? "blue"),
               tone: bar.tone,
@@ -450,8 +463,23 @@ export function GanttBarView({
           >
             {milestone ? <span className={styles.diamond} aria-hidden="true" /> : null}
             {pending ? <Spinner size="xs" className={styles.spinner} aria-hidden="true" /> : null}
-            <span className={styles.label} data-gantt-label="" aria-hidden="true">
-              {bar.label}
+            <span
+              className={cx(styles.label, height === "s" && textRole.caption)}
+              data-gantt-label=""
+              aria-hidden="true"
+            >
+              {height === "l" ? (
+                <>
+                  <span className={styles.labelLine}>{bar.label}</span>
+                  {bar.description ? (
+                    <span className={cx(textRole.caption, styles.labelLine)}>
+                      {bar.description}
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                bar.label
+              )}
             </span>
             {editable && !milestone ? (
               <>
@@ -466,6 +494,7 @@ export function GanttBarView({
         {tipMounted ? (
           <Tooltip.Content>
             <span className={styles.tipTitle}>{bar.label}</span>
+            {bar.description ? <span className={styles.tipMeta}>{bar.description}</span> : null}
             <span className={styles.tipMeta}>
               {formatSpan(shown, locale)}
               {milestone ? null : ` · ${formatDuration(daysBetween(shown.start, shown.end))}`}

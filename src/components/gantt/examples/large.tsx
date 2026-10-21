@@ -1,4 +1,4 @@
-/** Two thousand people over two years stay fast: only the rows and days in view are rendered, keyboard focus reaches any row, and new bars are drawn on empty space — `rows`, `range`, `scrollHeight`, `onBarCreate`. */
+/** Two thousand people over two years stay fast: only the rows and days in view are rendered, keyboard focus reaches any row, bars move and stretch and new ones are drawn on empty space — `rows`, `range`, `scrollHeight`, `onBarChange`, `onBarCreate`. */
 import { addDays, startOfToday, startOfYear } from "date-fns";
 import { Gantt, type GanttBar, type GanttDates } from "prime-ui-kit";
 import * as React from "react";
@@ -80,6 +80,20 @@ export default function GanttLargeExample() {
       ),
     );
 
+  const changeDates = (dates: GanttDates, bar: GanttBar) =>
+    setTeam((people) =>
+      people.map((item) =>
+        item.bars.some((other) => other.id === bar.id)
+          ? {
+              ...item,
+              bars: item.bars.map((other) =>
+                other.id === bar.id ? { ...other, ...dates } : other,
+              ),
+            }
+          : item,
+      ),
+    );
+
   return (
     <Gantt
       aria-label="Загрузка компании"
@@ -90,6 +104,7 @@ export default function GanttLargeExample() {
       getRowKey={(person) => person.id}
       getRowLabel={(person) => person.name}
       getRowBars={(person) => person.bars}
+      onBarChange={changeDates}
       onBarCreate={addBar}
     />
   );

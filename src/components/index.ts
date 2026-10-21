@@ -350,6 +350,7 @@ export type { GalleryItem, GalleryLabels, GalleryProps } from "./gallery/Gallery
 export { Gallery } from "./gallery/Gallery";
 export type {
   GanttBar,
+  GanttBarHeight,
   GanttCategory,
   GanttDates,
   GanttLabels,

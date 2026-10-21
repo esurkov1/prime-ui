@@ -16,7 +16,10 @@ import {
   assignLanes,
   DAY_STEP,
   formatSpan,
+  lanesHeight,
+  laneTops,
   navigate,
+  placeGhost,
   resolveRange,
   snapEdit,
   snapHysteresis,
@@ -91,8 +94,8 @@ afterEach(() => {
 
 describe("ganttModel", () => {
   it("stacks overlapping bars into lanes and lets a free lane take the next bar", () => {
-    const { lanes, count } = assignLanes(PEOPLE[0].bars);
-    expect(count).toBe(2);
+    const { lanes, looks } = assignLanes(PEOPLE[0].bars);
+    expect(looks).toEqual(["m", "m"]);
     expect(lanes.get("a1")).toBe(0);
     expect(lanes.get("a2")).toBe(1);
     expect(lanes.get("a3")).toBe(0);
@@ -188,10 +191,11 @@ describe("Gantt", () => {
 
   it("puts overlapping bars on separate lanes and grows the row", () => {
     render(<Chart />);
-    expect(bar(/^Аудит склада/).style.getPropertyValue("--lane")).toBe("0");
-    expect(bar(/^Отчёт/).style.getPropertyValue("--lane")).toBe("1");
+    // Lane tops: the row's padding, then a lane of the bar height and the lane gap.
+    expect(bar(/^Аудит склада/).style.insetBlockStart).toBe("8px");
+    expect(bar(/^Отчёт/).style.insetBlockStart).toBe("40px");
     const row = screen.getByRole("rowheader", { name: "Анна Котова" }).parentElement;
-    expect(row?.style.getPropertyValue("--lanes")).toBe("2");
+    expect(row?.style.getPropertyValue("--row-h")).toBe("76px");
   });
 
   it("colors bars by palette hue or by status tone", () => {
@@ -746,7 +750,7 @@ describe("Gantt categories", () => {
     expect(screen.queryByRole("button", { name: /^Аудит склада/ })).toBeNull();
     expect(bar(/^Отпуск/)).toBeInTheDocument();
     const anna = screen.getByRole("rowheader", { name: "Анна Котова" }).parentElement;
-    expect(anna?.style.getPropertyValue("--lanes")).toBe("1");
+    expect(anna?.style.getPropertyValue("--row-h")).toBe("44px");
     const legend = screen.getByRole("group", { name: "Обозначения" });
     expect(within(legend).queryByText("Работа")).toBeNull();
     expect(within(legend).getByText("Отсутствие")).toBeInTheDocument();
@@ -869,7 +873,7 @@ describe("Gantt creating", () => {
     expect(shown).toHaveTextContent("Новая задача");
     expect(shown?.getAttribute("data-x")).toBe("2");
     expect(shown?.getAttribute("data-span")).toBe("1");
-    expect(shown?.style.getPropertyValue("--lane")).toBe("0");
+    expect(shown?.style.insetBlockStart).toBe("8px");
     // Within the same day it stays; the next day steps it, the same element.
     fireEvent.pointerMove(row, { clientX: 112, pointerType: "mouse" });
     expect(phantom()?.getAttribute("data-x")).toBe("2");
@@ -1017,7 +1021,7 @@ const backdropLayer = () => document.querySelector(`.${styles.backdrop} > .${sty
 const view = () => {
   const layer = backdropLayer() as HTMLElement;
   const dayPx = Number(layer.dataset.dayPx);
-  const shift = Number(/translate3d\((-?[\d.e+-]+)px/.exec(layer.style.transform)?.[1] ?? 0);
+  const shift = Number(/translate\((-?[\d.e+-]+)px/.exec(layer.style.transform)?.[1] ?? 0);
   return { dayPx, start: Number(layer.dataset.origin) - shift / dayPx };
 };
 const dayLength = () => view().dayPx;
@@ -1796,5 +1800,258 @@ describe("Gantt head: today's pill and no selection", () => {
     expect(
       cssRule(file, ".rowHeader").decls.some((decl) => decl.prop.endsWith("user-select")),
     ).toBe(false);
+  });
+});
+
+describe("Gantt lanes: a pointer never moves them", () => {
+  // Lane 0: a rental, then a booking from the 10th; lane 1: documents under the rental.
+  const FLEET: Person[] = [
+    {
+      id: "pcx",
+      name: "Скутер Honda PCX 160",
+      bars: [
+        { id: "rent", label: "Евгений", start: day(7, 6), end: day(7, 10) },
+        { id: "docs", label: "Документы", start: day(7, 7), end: day(7, 9) },
+        { id: "book", label: "Бронь · Waikl", start: day(7, 10), end: day(7, 16) },
+      ],
+    },
+  ];
+  const lanesOf = () =>
+    [...document.querySelectorAll<HTMLElement>("[data-gantt-bar]")].map(
+      (node) => `${node.dataset.barId}:${node.dataset.lane}:${node.style.insetBlockStart}`,
+    );
+  const ghost = () => document.querySelector<HTMLElement>(`.${styles.ghost}`);
+  /** At 20 px a day from 6 July: lane 0 at y 10, lane 1 at y 42. */
+  const LANE_Y = [10, 42];
+
+  it("keeps every bar's lane and the row's height while the phantom sweeps lane 2", () => {
+    mockLayout();
+    render(<Chart rows={FLEET} defaultZoom={20} range={RANGE} onBarCreate={() => {}} />);
+    const row = track("Скутер Honda PCX 160");
+    const height = row.closest("[role='row']")?.getAttribute("style");
+    const before = lanesOf();
+    expect(before).toEqual(["rent:0:8px", "docs:1:40px", "book:0:8px"]);
+    for (let step = 0; step < 30; step++) {
+      fireEvent.pointerMove(row, {
+        clientX: 10 + step * 20,
+        clientY: LANE_Y[1],
+        pointerType: "mouse",
+      });
+      expect(lanesOf(), `at ${step}`).toEqual(before);
+      expect(row.closest("[role='row']")?.getAttribute("style")).toBe(height);
+      const shown = ghost();
+      // The documents hold the 7th and the 8th of lane 1: there, no phantom; elsewhere in lane 1.
+      if (step === 1 || step === 2) expect(shown, `at ${step}`).toBeNull();
+      else expect(shown?.style.insetBlockStart, `at ${step}`).toBe("40px");
+    }
+  });
+
+  it("shows the phantom only in the free lane under the pointer, never another", () => {
+    mockLayout();
+    render(<Chart rows={FLEET} defaultZoom={20} range={RANGE} onBarCreate={() => {}} />);
+    const row = track("Скутер Honda PCX 160");
+    // Under the booking in lane 0 (the 12th): taken — nothing, though lane 1 is free there.
+    fireEvent.pointerMove(row, { clientX: 130, clientY: LANE_Y[0], pointerType: "mouse" });
+    expect(ghost()).toBeNull();
+    fireEvent.pointerMove(row, { clientX: 130, clientY: LANE_Y[1], pointerType: "mouse" });
+    expect(ghost()?.style.insetBlockStart).toBe("40px");
+    expect(ghost()?.dataset.x).toBe("6");
+  });
+
+  it("draws in the pressed lane while it is free, else in the first free lane; the row keeps its height", () => {
+    mockLayout();
+    const onBarCreate = vi.fn();
+    render(<Chart rows={FLEET} defaultZoom={20} range={RANGE} onBarCreate={onBarCreate} />);
+    const row = track("Скутер Honda PCX 160");
+    const height = row.closest("[role='row']")?.getAttribute("style");
+    const before = lanesOf();
+    // Pressed in lane 0 on the 12th, over the booking: drawn in lane 1, the first free one.
+    fireEvent.pointerDown(row, {
+      clientX: 130,
+      clientY: LANE_Y[0],
+      button: 0,
+      pointerType: "mouse",
+    });
+    for (const clientX of [150, 170, 190]) {
+      fireEvent.pointerMove(row, { clientX, clientY: LANE_Y[0], pointerType: "mouse" });
+      expect(ghost()?.style.insetBlockStart).toBe("40px");
+      expect(lanesOf()).toEqual(before);
+      expect(row.closest("[role='row']")?.getAttribute("style")).toBe(height);
+    }
+    fireEvent.pointerUp(row, { clientX: 190, clientY: LANE_Y[0], pointerType: "mouse" });
+    expect(onBarCreate).toHaveBeenCalledWith({ start: day(7, 12), end: day(7, 16) }, FLEET[0]);
+  });
+
+  it("places a ghost by the real bars' lanes alone", () => {
+    const bars = FLEET[0].bars;
+    const { lanes, looks } = assignLanes(bars);
+    const row = { bars, lanes, looks };
+    const lane = (place: ReturnType<typeof placeGhost>) =>
+      place && [place.lane, place.looks.length];
+    const dates = { start: day(7, 11), end: day(7, 12) };
+    expect(lane(placeGhost(row, { dates, status: "phantom", lane: 1 }))).toEqual([1, 2]);
+    expect(placeGhost(row, { dates, status: "phantom", lane: 0 })).toBeNull();
+    expect(lane(placeGhost(row, { dates, status: "drawing", lane: 0 }))).toEqual([1, 2]);
+    // Over both lanes: a drawing stays where it was pressed; a pending bar takes a new lane, once.
+    const wide = { start: day(7, 7), end: day(7, 12) };
+    expect(lane(placeGhost(row, { dates: wide, status: "drawing", lane: 0 }))).toEqual([0, 2]);
+    expect(lane(placeGhost(row, { dates: wide, status: "pending", lane: 0 }))).toEqual([2, 3]);
+    // The lanes are stable: the same bars in another order pack the same way.
+    expect(assignLanes([...bars].reverse()).lanes).toEqual(lanes);
+  });
+});
+
+describe("Gantt bar heights", () => {
+  const FLEET: Person[] = [
+    {
+      id: "pcx",
+      name: "Скутер Honda PCX 160",
+      bars: [
+        { id: "rent", label: "Евгений", start: day(7, 6), end: day(7, 8) },
+        {
+          id: "long",
+          label: "Бронь · Waikl",
+          description: "Клиент · 300 $ депозит",
+          start: day(7, 8),
+          end: day(7, 20),
+          height: "l",
+        },
+        { id: "docs", label: "Документы", start: day(7, 6), end: day(7, 9), height: "s" },
+        { id: "check", label: "Страховка", start: day(7, 9), end: day(7, 11), height: "s" },
+        { id: "late", label: "Продление", start: day(7, 7), end: day(7, 10) },
+      ],
+    },
+  ];
+
+  it("packs the main bars first, then s below them; a lane is as tall as its tallest bar", () => {
+    const { lanes, looks } = assignLanes(FLEET[0].bars);
+    // «Евгений» and the long booking share lane 0, which the booking makes an l lane.
+    expect(looks).toEqual(["l", "m", "s"]);
+    expect(Object.fromEntries(lanes)).toEqual({ rent: 0, long: 0, late: 1, docs: 2, check: 2 });
+    const heights = { s: 20, m: 28, l: 44 };
+    expect(laneTops(looks, heights, 8, 4)).toEqual([8, 56, 88]);
+    expect(lanesHeight(looks, heights, 8, 4)).toBe(116);
+    // An m lane and an s lane are shorter than two m lanes.
+    expect(lanesHeight(["m", "s"], heights, 8, 4)).toBeLessThan(
+      lanesHeight(["m", "m"], heights, 8, 4),
+    );
+  });
+
+  it("stacks the lanes by their heights, centres a shorter bar, and sizes the row from them", () => {
+    mockLayout();
+    render(<Chart rows={FLEET} defaultZoom={40} range={RANGE} />);
+    const top = (name: RegExp) => bar(name).style.insetBlockStart;
+    // An m bar centred in the l lane: 8 + (44 − 28) / 2.
+    expect(top(/^Евгений/)).toBe("16px");
+    expect(top(/^Бронь · Waikl/)).toBe("8px");
+    expect(top(/^Продление/)).toBe("56px");
+    expect(top(/^Документы/)).toBe("88px");
+    expect(bar(/^Документы/)).toHaveAttribute("data-height", "s");
+    expect(bar(/^Бронь · Waikl/)).toHaveAttribute("data-height", "l");
+    const row = bar(/^Документы/).closest<HTMLElement>("[role='row']");
+    expect(row?.style.getPropertyValue("--row-h")).toBe("116px");
+  });
+
+  it("shows an l bar's description on its second line, and every bar's in its name", () => {
+    mockLayout();
+    render(<Chart rows={FLEET} defaultZoom={40} range={RANGE} />);
+    const long = bar(/^Бронь · Waikl/);
+    expect(long.querySelector("[data-gantt-label]")).toHaveTextContent(
+      "Бронь · WaiklКлиент · 300 $ депозит",
+    );
+    expect(long).toHaveAccessibleName(/^Бронь · Waikl, Клиент · 300 \$ депозит: 8 июля 2026/);
+    // An s bar's label is inside it, in the caption role.
+    expect(bar(/^Документы/).querySelector("[data-gantt-label]")).toHaveTextContent("Документы");
+  });
+
+  it("edits every height by the keys", () => {
+    const onBarChange = vi.fn();
+    render(<Chart rows={FLEET} defaultZoom={40} range={RANGE} onBarChange={onBarChange} />);
+    for (const [name, id] of [
+      [/^Бронь · Waikl/, "long"],
+      [/^Продление/, "late"],
+      [/^Документы/, "docs"],
+    ] as const) {
+      fireEvent.keyDown(bar(name), { key: "ArrowRight", shiftKey: true });
+      expect(onBarChange.mock.lastCall?.[1]).toMatchObject({ id });
+    }
+  });
+
+  it("places the phantom only in a main lane: an s lane holds none", () => {
+    const { lanes, looks } = assignLanes(FLEET[0].bars);
+    const row = { bars: FLEET[0].bars, lanes, looks };
+    const dates = { start: day(7, 25), end: day(7, 26) };
+    expect(placeGhost(row, { dates, status: "phantom", lane: 2 })).toBeNull();
+    expect(placeGhost(row, { dates, status: "phantom", lane: 1 })?.lane).toBe(1);
+    // A pending bar with no free main lane takes a new one after the main lanes: s steps down.
+    const wide = { start: day(7, 6), end: day(7, 25) };
+    const place = placeGhost(row, { dates: wide, status: "pending", lane: 0 });
+    expect(place?.lane).toBe(2);
+    expect(place?.looks).toEqual(["l", "m", "m", "s"]);
+    expect(place?.lanes.get("docs")).toBe(3);
+  });
+});
+
+describe("Gantt with many rows", () => {
+  const MANY: Person[] = Array.from({ length: 400 }, (_, index) => ({
+    id: `p-${index}`,
+    name: `Сотрудник ${index + 1}`,
+    bars: [{ id: `b-${index}`, label: `Задача ${index + 1}`, start: day(7, 8), end: day(7, 12) }],
+  }));
+  const scroller = () =>
+    screen.getByRole("grid", { name: "Загрузка команды" }).parentElement as HTMLElement;
+  const drag = (node: HTMLElement) => {
+    fireEvent.pointerDown(node, { clientX: 100, button: 0, pointerType: "mouse" });
+    fireEvent.pointerMove(node, { clientX: 160, pointerType: "mouse" });
+    fireEvent.pointerUp(node, { clientX: 160, pointerType: "mouse" });
+  };
+
+  it("drags a bar of the first screen and one of a row rendered after a scroll", async () => {
+    mockLayout();
+    const onBarChange = vi.fn();
+    render(<Chart rows={MANY} defaultZoom={20} range={RANGE} onBarChange={onBarChange} />);
+    // Rows are virtualized: the last row is not in the DOM until the view gets there.
+    expect(screen.queryByRole("button", { name: /^Задача 400:/ })).toBeNull();
+    drag(bar(/^Задача 1:/));
+    expect(onBarChange).toHaveBeenLastCalledWith(
+      { start: day(7, 11), end: day(7, 15) },
+      MANY[0].bars[0],
+      MANY[0],
+    );
+    act(() => {
+      scroller().scrollTop = 399 * 45;
+      fireEvent.scroll(scroller());
+    });
+    // The rows of the new view render in the next frame.
+    drag(await screen.findByRole("button", { name: /^Задача 400:/ }));
+    expect(onBarChange).toHaveBeenLastCalledWith(
+      { start: day(7, 11), end: day(7, 15) },
+      MANY[399].bars[0],
+      MANY[399],
+    );
+  });
+
+  it("keeps the grid under every bar and paints a bar over the surface, never see-through", () => {
+    mockLayout();
+    render(<Chart rows={MANY} defaultZoom={40} range={RANGE} />);
+    // The grid's layer comes first in the body and holds no stacking of its own; rows follow it.
+    const body = bar(/^Задача 1:/).closest(`.${styles.body}`) as HTMLElement;
+    const backdrop = body.querySelector(`.${styles.backdrop}:not(.${styles.overlay})`);
+    expect(body.firstElementChild).toBe(backdrop);
+    const file = "src/components/gantt/Gantt.module.css";
+    const sets = (selector: string, prop: string) =>
+      cssRule(file, selector).decls.some((decl) => decl.prop === prop);
+    expect(sets(".backdrop", "z-index")).toBe(false);
+    // The tint lies over the chart's surface, so the lines never show through a bar.
+    const barRule = cssRule(file, ".bar");
+    expect(cssValue(barRule, "background-color")).toBe("var(--gantt-surface)");
+    expect(cssValue(barRule, "background-image")).toBe(
+      "linear-gradient(var(--bar-bg), var(--bar-bg))",
+    );
+    expect(sets(".bar", "background")).toBe(false);
+    // No bar rule takes the surface away with the `background` shorthand (a milestone draws none).
+    for (const selector of ['.bar[data-progress="true"]', '.bar[data-tone="neutral"]']) {
+      expect(sets(selector, "background")).toBe(false);
+    }
   });
 });

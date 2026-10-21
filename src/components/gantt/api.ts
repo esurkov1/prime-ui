@@ -313,6 +313,19 @@ export const api: ComponentApi = {
           en: "Which dates a person may change: `all` — move and both edges; `end` — only the end (a rental already issued): no move, no start grip, only Ctrl + Shift + arrows, and a milestone stays put; `none` — nothing (a public holiday, a closed phase).",
           ru: "Какие даты можно менять: `all` — перенос и оба края; `end` — только окончание (уже выданная аренда): без переноса и ручки начала, только Ctrl + Shift + стрелки, а веха стоит на месте; `none` — ничего (праздник, закрытый этап).",
         },
+        {
+          name: "height",
+          type: '"s" | "m" | "l"',
+          default: '"m"',
+          en: "The bar's height, on the tier letters: `m` — the one-line bar, the label inside; `l` — a caption line taller, the label and `description` on two lines (a long booking); `s` — a step shorter, a caption label inside (documents, a check). The main bars (`m`, `l`) pack first, then `s` below them; a lane is as tall as its tallest bar; the root `size` scales all three.",
+          ru: "Высота полосы, буквами ступеней: `m` — полоса в одну строку, подпись внутри; `l` — на строку подписи выше, подпись и `description` в две строки (длинная бронь); `s` — на ступень ниже, мелкая подпись внутри (документы, проверка). Сначала укладываются основные полосы (`m`, `l`), под ними `s`; дорожка высотой с самую высокую полосу в ней; все три масштабирует `size` корня.",
+        },
+        {
+          name: "description",
+          type: "string",
+          en: "The secondary text: the second line of an `l` bar; on every bar it joins the tooltip and the accessible name.",
+          ru: "Второстепенный текст: вторая строка полосы `l`; у любой полосы он попадает в подсказку и доступное имя.",
+        },
       ],
     },
     {

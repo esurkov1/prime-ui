@@ -51,11 +51,13 @@ import { GanttRow, type GanttRowContext, type GanttGhost as Ghost } from "./Gant
 import {
   applyEdit,
   assignLanes,
+  BAR_HEIGHTS,
   barEdit,
   DAY_STEP,
   daysBetween,
   formatDay,
   type GanttBar,
+  type GanttBarHeight,
   type GanttCategory,
   type GanttDates,
   type GanttEdit,
@@ -63,7 +65,11 @@ import {
   type GanttZoom,
   type GanttZoomPreset,
   isMilestone,
+  type LaneHeights,
+  lanesHeight,
+  laneTops,
   navigate,
+  placeGhost,
   resolveRange,
   sameDates,
   snapHysteresis,
@@ -113,6 +119,7 @@ import { createTimeSlide } from "./timeSlide";
 
 export type {
   GanttBar,
+  GanttBarHeight,
   GanttCategory,
   GanttDates,
   GanttZoom,
@@ -120,6 +127,24 @@ export type {
 } from "./ganttModel";
 
 const PRESETS: readonly GanttZoomPreset[] = ["day", "week", "month"];
+
+/** A row without bars: one default lane. */
+const DEFAULT_LOOKS: readonly GanttBarHeight[] = ["m"];
+
+/**
+ * The height of a lane of each bar height, read from the stylesheet's probe (`.laneProbe`): the
+ * heights are the tier's tokens and their sums, which only layout resolves. Unmeasured (no layout
+ * yet, a test), the defaults of the `m` tier.
+ */
+function measureLanes(probe: Element | null): LaneHeights {
+  const heights = { ...FALLBACK_GEOMETRY.heights };
+  for (const bar of BAR_HEIGHTS) {
+    const node = probe?.querySelector<HTMLElement>(`[data-height="${bar}"]`);
+    const height = node?.getBoundingClientRect().height ?? 0;
+    if (height > 0) heights[bar] = height;
+  }
+  return heights;
+}
 
 /** What opened a row: a click on its header, or Enter / Space on the focused header. */
 export type GanttRowClickEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
@@ -254,7 +279,16 @@ const SKELETON_ROWS: readonly (readonly (readonly [number, number])[])[] = [
 ];
 
 /** Row geometry before the stylesheet can be read (jsdom, first render): the `m` tier. */
-const FALLBACK_GEOMETRY = { padY: 8, barH: 28, laneGap: 4, border: 1, labelGap: 8, step: 4 };
+const FALLBACK_GEOMETRY = {
+  padY: 8,
+  barH: 28,
+  laneGap: 4,
+  border: 1,
+  labelGap: 8,
+  step: 4,
+  /** A lane of each bar height, px: measured from the stylesheet (`.laneProbe`). */
+  heights: { s: 20, m: 28, l: 44 } as LaneHeights,
+};
 /** The zoom's presets and its top stop, px a day, before the stylesheet can be read: the `m` tier. */
 const FALLBACK_STEPS: ZoomSteps = { day: 40, week: 16, month: 4, max: 96 };
 /** The head's label size at the `m` tier, px: the ladder's label room is measured against it. */
@@ -298,8 +332,10 @@ type RowModel<Row, Bar> = {
   bars: Bar[];
   /** Every bar of the row: the time axis spans them all, so hiding a category never moves it. */
   allBars: Bar[];
+  /** Lanes from its real bars only (`assignLanes`): never from a phantom, a drawing or a drag. */
   lanes: Map<string, number>;
-  laneCount: number;
+  /** Each lane's height: its tallest bar's (`m` in an empty row). */
+  looks: GanttBarHeight[];
 };
 
 /**
@@ -386,7 +422,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
         hidden.size === 0
           ? allBars
           : allBars.filter((bar) => bar.category === undefined || !hidden.has(bar.category));
-      const { lanes, count } = assignLanes(bars);
+      const { lanes, looks } = assignLanes(bars);
       return {
         row,
         key: getRowKey(row),
@@ -394,7 +430,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
         bars,
         allBars,
         lanes,
-        laneCount: count,
+        looks,
       };
     });
   }, [rows, getRowBars, getRowKey, getRowLabel, hiddenKey]);
@@ -451,6 +487,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       border: readCssLengthPx("--prime-border-width", FALLBACK_GEOMETRY.border, root),
       labelGap: readCssLengthPx("--prime-space-2", FALLBACK_GEOMETRY.labelGap, root),
       step: readCssLengthPx("--prime-space-1", FALLBACK_GEOMETRY.step, root),
+      heights: measureLanes(root.querySelector(`.${styles.laneProbe}`)),
     };
     setGeometry((prev) =>
       prev.padY === next.padY &&
@@ -458,7 +495,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       prev.laneGap === next.laneGap &&
       prev.border === next.border &&
       prev.labelGap === next.labelGap &&
-      prev.step === next.step
+      prev.step === next.step &&
+      BAR_HEIGHTS.every((bar) => prev.heights[bar] === next.heights[bar])
         ? prev
         : next,
     );
@@ -710,11 +748,13 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   const creatable = !readOnly && !loading && onBarCreate !== undefined;
 
   const nameFor = React.useCallback(
-    (bar: Pick<GanttBar, "label" | "progress">, dates: GanttDates) => {
+    (bar: Pick<GanttBar, "label" | "progress" | "description">, dates: GanttDates) => {
+      // The secondary text joins the label: on every bar, the name says it.
+      const label = bar.description ? `${bar.label}, ${bar.description}` : bar.label;
       const name = isMilestone(dates)
-        ? formatLabel(labels.milestone, { label: bar.label, date: formatDay(dates.start, locale) })
+        ? formatLabel(labels.milestone, { label, date: formatDay(dates.start, locale) })
         : formatLabel(labels.bar, {
-            label: bar.label,
+            label,
             start: formatDay(dates.start, locale),
             end: formatDay(addDays(dates.end, -1), locale),
           });
@@ -870,7 +910,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       const width = todayPillWidth.current;
       const view = boundsRef.current.widthPx || laid.widthPx;
       const at = todayInRange ? todayPill(line, width, windowPx, view, inset, gap) : null;
-      const transform = at ? `translate3d(${(at.x - line) * dir}px, 0, 0)` : "";
+      const transform = at ? `translate(${(at.x - line) * dir}px)` : "";
       if (pill.style.transform !== transform) pill.style.transform = transform;
       const shown = at ? "" : "0";
       if (pill.style.opacity !== shown) pill.style.opacity = shown;
@@ -887,7 +927,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     stuck.current = node ?? null;
     let stuckBox: { x: number; width: number } | null = null;
     if (node && sticky && head) {
-      const transform = `translate3d(${(sticky.x - head.placed[sticky.index].x) * dir}px, 0, 0)`;
+      const transform = `translate(${(sticky.x - head.placed[sticky.index].x) * dir}px)`;
       if (node.style.transform !== transform) node.style.transform = transform;
       node.dataset.stuck = "";
       // Its number steps aside while stuck: it covers its name, and the edge before it.
@@ -950,7 +990,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     });
   }, []);
 
-  const create = (item: RowModel<Row, Bar>, dates: GanttDates) => {
+  const create = (item: RowModel<Row, Bar>, dates: GanttDates, lane?: number) => {
     if (!onBarCreate) return;
     const id = `ghost-${++ghostSeq.current}`;
     const result = onBarCreate(dates, item.row);
@@ -959,7 +999,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       setGhost(item.key, null);
       return;
     }
-    setGhost(item.key, { id, dates, status: "pending" });
+    setGhost(item.key, { id, dates, status: "pending", lane });
     const drop = () =>
       setGhosts((prev) => {
         if (prev.get(item.key)?.id !== id) return prev;
@@ -974,7 +1014,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
         setAnnouncement(labels.createFailed);
         setGhosts((prev) => {
           if (prev.get(item.key)?.id !== id) return prev;
-          return new Map(prev).set(item.key, { id, dates, status: "leaving" });
+          return new Map(prev).set(item.key, { id, dates, status: "leaving", lane });
         });
         window.setTimeout(drop, prefersReducedMotion() ? 0 : exitTimeoutMs("fast"));
       },
@@ -1032,14 +1072,17 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     [edgeScroll],
   );
 
-  /** Lanes of a row with its ghost: a bar being created takes the lane it will land in. */
-  const lanesOf = (item: RowModel<Row, Bar>, ghost: Ghost | undefined) => {
-    if (!ghost) return { lanes: item.lanes, count: item.laneCount, ghostLane: -1 };
-    const { lanes, count } = assignLanes([
-      ...item.bars,
-      { id: ghost.id, label: "", ...ghost.dates },
-    ]);
-    return { lanes, count, ghostLane: lanes.get(ghost.id) ?? 0 };
+  /** Where a row's ghost stands (`placeGhost`), the bars at the dates they show now. */
+  const ghostPlace = (item: RowModel<Row, Bar>, ghost: Ghost) =>
+    placeGhost(item, ghost, shownDates);
+  /** The lane under `clientY` in a row's track, each lane taking half the gaps around it. */
+  const laneUnder = (track: HTMLElement, clientY: number, looks: readonly GanttBarHeight[]) => {
+    const y = clientY - track.getBoundingClientRect().top;
+    const tops = laneTops(looks, geometry.heights, geometry.padY, geometry.laneGap);
+    const lane = tops.findIndex(
+      (top, index) => y < top + geometry.heights[looks[index]] + geometry.laneGap / 2,
+    );
+    return lane === -1 ? looks.length - 1 : lane;
   };
 
   // ─── Keyboard: roving focus over row headers and bars ───
@@ -1113,36 +1156,34 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     if (index !== undefined) pinnedRows.push(index);
   }
   const rowHeightOf = React.useCallback(
-    (lanes: number) =>
-      2 * geometry.padY + lanes * geometry.barH + (lanes - 1) * geometry.laneGap + geometry.border,
+    (looks: readonly GanttBarHeight[]) =>
+      lanesHeight(looks, geometry.heights, geometry.padY, geometry.laneGap) + geometry.border,
     [geometry],
   );
   const getKey = React.useCallback((index: number) => model[index]?.key ?? index, [model]);
-  const ghostLanes = React.useMemo(() => {
-    const result = new Map<React.Key, number>();
+  /** A row's lanes as they stand: its own, or with the new lane a pending bar takes. */
+  const ghostLooks = React.useMemo(() => {
+    const result = new Map<React.Key, readonly GanttBarHeight[]>();
     for (const [key, ghost] of ghosts) {
       const index = keyIndex.get(key);
       if (index === undefined) continue;
-      const item = model[index];
-      result.set(
-        key,
-        assignLanes([...item.bars, { id: ghost.id, label: "", ...ghost.dates }]).count,
-      );
+      const place = placeGhost(model[index], ghost, (bar) => pending.get(bar.id) ?? bar);
+      if (place && place.looks !== model[index].looks) result.set(key, place.looks);
     }
     return result;
-  }, [ghosts, keyIndex, model]);
+  }, [ghosts, keyIndex, model, pending]);
   const lanesAt = React.useCallback(
-    (index: number) => {
+    (index: number): readonly GanttBarHeight[] => {
       const item = model[index];
-      return item ? (ghostLanes.get(item.key) ?? item.laneCount) : 1;
+      return item ? (ghostLooks.get(item.key) ?? item.looks) : DEFAULT_LOOKS;
     },
-    [model, ghostLanes],
+    [model, ghostLooks],
   );
   const estimateSize = React.useCallback(
     (index: number) => rowHeightOf(lanesAt(index)),
     [rowHeightOf, lanesAt],
   );
-  const getGroup = React.useCallback((index: number) => lanesAt(index), [lanesAt]);
+  const getGroup = React.useCallback((index: number) => lanesAt(index).join(), [lanesAt]);
   const virtual = useVirtualRows({
     count: model.length,
     scrollRef,
@@ -1355,6 +1396,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     row: React.Key;
     x: number;
     span: number;
+    /** The lane under the pointer: the phantom shows there or nowhere. */
+    lane: number;
   } | null>(null);
   /** The day under the pointer in a track, fractional, inside the axis. */
   const dayAt = (track: HTMLElement, clientX: number): number | null => {
@@ -1376,6 +1419,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     alt: boolean;
     /** The day pressed. */
     anchor: number;
+    /** The lane pressed: the drawn bar stands there while it is free. */
+    lane: number;
     /** The day the pointer stands on, held by the hysteresis. */
     edge: number | null;
     moved: boolean;
@@ -1423,6 +1468,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       id: current.id,
       dates: datesOf({ x: start, span: end - start }),
       status: "drawing",
+      lane: current.lane,
     });
   };
   /** A ghost that leaves: it fades out (at once under reduced motion), then is gone. */
@@ -1448,7 +1494,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     const ghost = ghosts.get(current.item.key);
     if (!ghost || ghost.id !== current.id) return;
     // Escape or a cancelled pointer: nothing is created, the drawn bar fades out.
-    if (commitIt) create(current.item, ghost.dates);
+    if (commitIt)
+      create(current.item, ghost.dates, placeGhost(current.item, ghost, shownDates)?.lane);
     else dropGhost(current.item.key, ghost);
   };
 
@@ -1483,6 +1530,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             if (!cell) return;
             const track = event.currentTarget;
             const anchor = Math.floor(dayAt(track, event.clientX) ?? 0);
+            const lane = laneUnder(track, event.clientY, item.looks);
             const start = (touch: boolean) => ({
               item,
               track,
@@ -1491,6 +1539,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
               clientX: event.clientX,
               alt: event.altKey,
               anchor,
+              lane,
               edge: anchor,
               moved: touch,
               touch,
@@ -1505,7 +1554,12 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
                 drawing.current = current;
                 claimPointer(pointerId, true);
                 track.setPointerCapture?.(pointerId);
-                setGhost(item.key, { id: current.id, dates: datesOf(cell), status: "phantom" });
+                setGhost(item.key, {
+                  id: current.id,
+                  dates: datesOf(cell),
+                  status: "phantom",
+                  lane,
+                });
               };
               longPress.handlers.onPointerDown(event);
               return;
@@ -1537,13 +1591,15 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
               return;
             }
             const cell = cellAt(event.currentTarget, event.clientX);
+            const lane = laneUnder(event.currentTarget, event.clientY, item.looks);
             if (
               cell &&
               (hoverCell?.row !== item.key ||
                 hoverCell.x !== cell.x ||
-                hoverCell.span !== cell.span)
+                hoverCell.span !== cell.span ||
+                hoverCell.lane !== lane)
             ) {
-              setHoverCell({ row: item.key, ...cell });
+              setHoverCell({ row: item.key, ...cell, lane });
             }
           },
           onPointerUp: (event: React.PointerEvent<HTMLDivElement>) => {
@@ -1564,7 +1620,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => {
             if (!onEmpty(event)) return;
             const cell = cellAt(event.currentTarget, event.clientX);
-            if (cell) create(item, datesOf(cell));
+            const lane = laneUnder(event.currentTarget, event.clientY, item.looks);
+            if (cell) create(item, datesOf(cell), lane);
           },
         }
       : {};
@@ -1588,7 +1645,8 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       if (node.dataset.ganttBar === undefined) continue;
       const label = node.querySelector<HTMLElement>("[data-gantt-label]");
       if (!label) continue;
-      const text = label.textContent ?? "";
+      // A width per bar height: an `s` bar's caption label is narrower than the same text in an `m`.
+      const text = `${node.dataset.height}\u0000${label.textContent ?? ""}`;
       let width = cache.widths.get(text);
       if (width === undefined) {
         width = label.scrollWidth;
@@ -1691,7 +1749,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
       if (node.dataset.label === "inside" && widthPx > 0) {
         const left = Number(node.dataset.left);
         const text = node.querySelector("[data-gantt-label]")?.textContent ?? "";
-        const width = textCache.current.widths.get(text) ?? 0;
+        const width = textCache.current.widths.get(`${node.dataset.height}\u0000${text}`) ?? 0;
         const room = Number(node.dataset.right) - left - 2 * pad - width;
         shift = Math.min(Math.max(window - left, 0), Math.max(room, 0));
       }
@@ -1944,18 +2002,23 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
    */
   const phantomOf = (item: RowModel<Row, Bar>): Ghost | undefined => {
     let dates: GanttDates | undefined;
-    if (hoverCell?.row === item.key) dates = datesOf(hoverCell);
-    else if (keyboardRow === rowNavId(item.key)) dates = keyboardSlot(keyboardRow)?.dates;
-    return dates ? { id: PHANTOM_ID, dates, status: "phantom" } : undefined;
+    let lane: number | undefined;
+    if (hoverCell?.row === item.key) {
+      dates = datesOf(hoverCell);
+      lane = hoverCell.lane;
+    } else if (keyboardRow === rowNavId(item.key)) dates = keyboardSlot(keyboardRow)?.dates;
+    return dates ? { id: PHANTOM_ID, dates, status: "phantom", lane } : undefined;
   };
 
   let body: React.ReactNode;
   if (bodyState === "loading") {
     const unit = stepDays(step);
     const origin = todayInRange ? todayX : 0;
+    const rowH = lanesHeight(DEFAULT_LOOKS, geometry.heights, geometry.padY, geometry.laneGap);
+    const skeletonRow = { "--row-h": `${rowH}px` } as React.CSSProperties;
     body = SKELETON_ROWS.map((bars, index) => (
       // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
-      <div key={index} className={styles.row} style={{ "--lanes": 1 } as React.CSSProperties}>
+      <div key={index} className={styles.row} style={skeletonRow}>
         <div className={styles.rowHeader}>
           {hasAvatar ? (
             <span className={styles.rowAvatar}>
@@ -2005,13 +2068,13 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     body = virtual.rows.map(({ index, start }) => {
       const item = model[index];
       const drawn = ghosts.get(item.key);
-      let ghost = drawn ?? phantomOf(item);
-      let { lanes, count, ghostLane } = lanesOf(item, ghost);
-      // A phantom never grows its row: where the unit has no free lane, it does not show.
-      if (!drawn && ghost && count > item.laneCount) {
-        ghost = undefined;
-        ({ lanes, count, ghostLane } = lanesOf(item, undefined));
-      }
+      const asked = drawn ?? phantomOf(item);
+      // The lanes are the real bars': a ghost only finds its place among them (`placeGhost`).
+      const place = asked ? ghostPlace(item, asked) : null;
+      const ghost = place ? asked : undefined;
+      const lanes = place?.lanes ?? item.lanes;
+      const looks = place?.looks ?? item.looks;
+      const ghostLane = place?.lane ?? -1;
       return (
         <GanttRow
           key={item.key}
@@ -2022,7 +2085,10 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           label={item.label}
           bars={item.bars}
           lanes={lanes}
-          laneCount={count}
+          looks={looks}
+          heights={geometry.heights}
+          padY={geometry.padY}
+          laneGap={geometry.laneGap}
           top={start}
           measureRef={virtual.measure(index)}
           row={item.row}
@@ -2039,7 +2105,6 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           pending={pending}
           dragging={dragging}
           scene={scene}
-          barH={geometry.barH}
           snap={snap}
           rangeStart={range.start.getTime()}
           locale={locale}
@@ -2087,6 +2152,12 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             "scroll-height": fillHeight ? "fill" : undefined,
           })}
         >
+          {/* A lane of each bar height, never seen: the heights the rows stack lanes by. */}
+          <span className={styles.laneProbe} aria-hidden="true">
+            {BAR_HEIGHTS.map((bar) => (
+              <span key={bar} data-height={bar} />
+            ))}
+          </span>
           {(toolbar != null && toolbar !== false) || legendCategories ? (
             <GanttToolbar toolbar={toolbar} legend={legendCategories} labels={labels} />
           ) : null}

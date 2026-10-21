@@ -1,4 +1,4 @@
-/** A fleet calendar: an issued rental changes only its end, a booking moves and changes both edges, a service day stays put — `edit`, `onBarChange`. */
+/** A fleet calendar: an issued rental changes only its end, a booking moves and changes both edges, a long booking is a two-line bar with its deposit, documents and an inspection are short bars in a lane under the main ones, a new booking is drawn in a free lane — `edit`, `height`, `description`, `onBarChange`, `onBarCreate`. */
 import { addDays, startOfToday } from "date-fns";
 import { Gantt, type GanttBar, type GanttDates } from "prime-ui-kit";
 import * as React from "react";
@@ -48,6 +48,34 @@ const FLEET: Vehicle[] = [
     ],
   },
   {
+    id: "pcx-160",
+    name: "Скутер Honda PCX 160",
+    bars: [
+      issued("r-3", "Евгений", -2, 3),
+      {
+        ...booking("b-4", "Waikl", 3, 12),
+        description: "Клиент · 300 $ депозит",
+        height: "l",
+      },
+      {
+        id: "d-1",
+        label: "Документы · регистрация",
+        start: at(-1),
+        end: at(2),
+        color: "purple",
+        height: "s",
+      },
+      {
+        id: "s-2",
+        label: "Техосмотр",
+        start: at(12),
+        end: at(14),
+        color: "orange",
+        height: "s",
+      },
+    ],
+  },
+  {
     id: "s-201",
     name: "Самокат S-201",
     bars: [issued("r-2", "Ковалёв", -1, 2), booking("b-3", "ООО «Доставка 24»", 3, 12)],
@@ -65,6 +93,26 @@ export default function GanttRentalsExample() {
       })),
     );
 
+  const addBooking = (dates: GanttDates, vehicle: Vehicle) =>
+    setFleet((vehicles) =>
+      vehicles.map((other) =>
+        other.id === vehicle.id
+          ? {
+              ...other,
+              bars: [
+                ...other.bars,
+                {
+                  id: `${other.id}-${other.bars.length + 1}`,
+                  label: "Бронь · новая",
+                  ...dates,
+                  color: "blue",
+                },
+              ],
+            }
+          : other,
+      ),
+    );
+
   return (
     <Gantt
       aria-label="Календарь парка"
@@ -75,6 +123,7 @@ export default function GanttRentalsExample() {
       getRowLabel={(vehicle) => vehicle.name}
       getRowBars={(vehicle) => vehicle.bars}
       onBarChange={changeDates}
+      onBarCreate={addBooking}
     />
   );
 }

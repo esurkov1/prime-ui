@@ -59,7 +59,29 @@ export type GanttBar = GanttDates & {
    * already under way), `none` (a public holiday, a closed phase). Default `all`.
    */
   edit?: GanttBarEdit;
+  /**
+   * The bar's height, on the tier letters: `m` — the one-line bar; `l` — two lines, the label and
+   * `description`; `s` — a short bar with a caption label, for an auxiliary task (documents, a
+   * check). The root `size` scales all three. Default `m`.
+   */
+  height?: GanttBarHeight;
+  /** The secondary text: the second line of an `l` bar; on every bar in its tooltip and name. */
+  description?: string;
 };
+
+/** A bar's height, on the kit's tier letters: short, one line, two lines. */
+export type GanttBarHeight = "s" | "m" | "l";
+
+/** Every bar height, from the shortest: what the chart measures a lane of each by. */
+export const BAR_HEIGHTS: readonly GanttBarHeight[] = ["s", "m", "l"];
+
+/** The lane groups, packed in this order: the main bars (`m`, `l`), then the auxiliary `s`. */
+function laneGroup(height: GanttBarHeight): number {
+  return height === "s" ? 1 : 0;
+}
+
+/** The height of a lane of each bar height, px (the chart measures them from its tokens). */
+export type LaneHeights = Record<GanttBarHeight, number>;
 
 /** A kind of bar (rentals, bookings, service): a legend entry and a choice of «what to show». */
 export type GanttCategory = {
@@ -178,32 +200,144 @@ export function resolveRange(
   return { start, end: end < shortest ? shortest : end };
 }
 
+/** The days a bar takes in its lane: a milestone takes its day. */
+function laneSpan(bar: GanttDates): [number, number] {
+  const start = bar.start.getTime();
+  return [start, Math.max(bar.end.getTime(), addDays(bar.start, 1).getTime())];
+}
+
 /**
- * Lanes of one row: bars that overlap in time go to separate lanes, each bar to the first lane
- * that is free at its start. A milestone takes its day. Returns the lane per bar id and the count.
+ * Lanes of one row, from its real bars only — never a phantom, a drawing or a drag, so nothing a
+ * pointer does reshuffles them. The main bars (`m`, `l`) pack first, then the auxiliary `s` below
+ * them; within a group, bars sorted by start, then end, then their order (a stable sort) go to the
+ * first lane free at their start. A milestone takes its day. Returns the lane per bar id and each
+ * lane's height: its tallest bar's (a main lane with an `l` bar is `l`); one `m` lane when the row
+ * is empty.
  */
 export function assignLanes(bars: readonly GanttBar[]): {
   lanes: Map<string, number>;
-  count: number;
+  looks: GanttBarHeight[];
 } {
-  const sorted = [...bars].sort(
-    (a, b) => a.start.getTime() - b.start.getTime() || a.end.getTime() - b.end.getTime(),
-  );
-  const laneEnds: number[] = [];
   const lanes = new Map<string, number>();
-  for (const bar of sorted) {
-    const start = bar.start.getTime();
-    const end = Math.max(bar.end.getTime(), addDays(bar.start, 1).getTime());
-    let lane = laneEnds.findIndex((laneEnd) => laneEnd <= start);
-    if (lane === -1) {
-      lane = laneEnds.length;
-      laneEnds.push(end);
-    } else {
-      laneEnds[lane] = end;
+  const looks: GanttBarHeight[] = [];
+  for (const group of [0, 1]) {
+    const sorted = bars
+      .filter((bar) => laneGroup(bar.height ?? "m") === group)
+      .sort((a, b) => a.start.getTime() - b.start.getTime() || a.end.getTime() - b.end.getTime());
+    const first = looks.length;
+    const laneEnds: number[] = [];
+    for (const bar of sorted) {
+      const [start, end] = laneSpan(bar);
+      let lane = laneEnds.findIndex((laneEnd) => laneEnd <= start);
+      if (lane === -1) {
+        lane = laneEnds.length;
+        laneEnds.push(end);
+        looks.push(bar.height ?? "m");
+      } else {
+        laneEnds[lane] = end;
+        if (bar.height === "l") looks[first + lane] = "l";
+      }
+      lanes.set(bar.id, first + lane);
     }
-    lanes.set(bar.id, lane);
   }
-  return { lanes, count: Math.max(1, laneEnds.length) };
+  if (looks.length === 0) looks.push("m");
+  return { lanes, looks };
+}
+
+/** The top of every lane in a row, px: lanes stand one under another, each as tall as its look. */
+export function laneTops(
+  looks: readonly GanttBarHeight[],
+  heights: LaneHeights,
+  padY: number,
+  gap: number,
+): number[] {
+  const tops: number[] = [];
+  let top = padY;
+  for (const look of looks) {
+    tops.push(top);
+    top += heights[look] + gap;
+  }
+  return tops;
+}
+
+/** The height of a row's lanes with their padding, px (the row's own line not counted). */
+export function lanesHeight(
+  looks: readonly GanttBarHeight[],
+  heights: LaneHeights,
+  padY: number,
+  gap: number,
+): number {
+  return looks.reduce((sum, look) => sum + heights[look], 2 * padY + (looks.length - 1) * gap);
+}
+
+/** Whether `lane` holds no bar over `dates` (each bar at `datesOf(bar)`, where it shows now). */
+export function laneFree(
+  bars: readonly GanttBar[],
+  lanes: ReadonlyMap<string, number>,
+  lane: number,
+  dates: GanttDates,
+  datesOf: (bar: GanttBar) => GanttDates = (bar) => bar,
+): boolean {
+  const [start, end] = laneSpan(dates);
+  return bars.every((bar) => {
+    if (lanes.get(bar.id) !== lane) return true;
+    const [from, to] = laneSpan(datesOf(bar));
+    return to <= start || from >= end;
+  });
+}
+
+/** A bar being created, as the lanes of its row see it. */
+export type GhostLaneRequest = {
+  dates: GanttDates;
+  status: "phantom" | "drawing" | "pending" | "leaving";
+  /** The lane it was asked for: under the pointer, pressed; none at the `N` slot. */
+  lane?: number;
+};
+
+/**
+ * Where a row's ghost stands — the row's lanes are its real bars' and never move for it. A ghost
+ * is an `m` bar, so only a main lane (`m`, `l`) holds it. The phantom: the
+ * lane asked for (under the pointer) when it is free over its days, else nothing — no other lane,
+ * no reflow; unasked (the `N` slot), the first free lane. A drawing: the lane asked for while it is
+ * free over the drawn days, else the first free lane, else it stays in a main lane — the row keeps
+ * its height. Pending, or fading after a refusal: the same, else a new lane after the main ones
+ * (the auxiliary lanes step down by one) — the one re-pack, once. `null`: it does not show.
+ */
+export function placeGhost(
+  row: {
+    bars: readonly GanttBar[];
+    lanes: ReadonlyMap<string, number>;
+    looks: readonly GanttBarHeight[];
+  },
+  ghost: GhostLaneRequest,
+  datesOf: (bar: GanttBar) => GanttDates = (bar) => bar,
+): {
+  lane: number;
+  lanes: ReadonlyMap<string, number>;
+  looks: readonly GanttBarHeight[];
+} | null {
+  const { bars, lanes, looks } = row;
+  const main = (lane: number) => looks[lane] !== undefined && laneGroup(looks[lane]) === 0;
+  const free = (lane: number) => main(lane) && laneFree(bars, lanes, lane, ghost.dates, datesOf);
+  const at = (lane: number) => ({ lane, lanes, looks });
+  const asked = ghost.lane;
+  if (asked !== undefined && free(asked)) return at(asked);
+  if (ghost.status === "phantom" && asked !== undefined) return null;
+  const first = looks.findIndex((_, lane) => free(lane));
+  if (first !== -1) return at(first);
+  if (ghost.status === "phantom") return null;
+  if (ghost.status === "drawing") {
+    const home = asked !== undefined && main(asked) ? asked : looks.findIndex((_, l) => main(l));
+    if (home !== -1) return at(home);
+  }
+  const lane = looks.filter((_, index) => main(index)).length;
+  const moved = new Map<string, number>();
+  for (const [id, index] of lanes) moved.set(id, index >= lane ? index + 1 : index);
+  return {
+    lane,
+    lanes: moved,
+    looks: [...looks.slice(0, lane), "m", ...looks.slice(lane)],
+  };
 }
 
 /** What a pointer or a key changes: the whole bar, its start or its end. */
