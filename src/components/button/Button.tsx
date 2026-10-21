@@ -59,6 +59,7 @@ type ButtonElementProps =
       onConfirm?: () => void | Promise<void>;
       countdown?: number;
       countdownPlacement?: "start" | "end";
+      countdownMode?: "undo" | "delay";
       labels?: Partial<ButtonLabels>;
     }
   | {
@@ -68,6 +69,7 @@ type ButtonElementProps =
       onConfirm?: never;
       countdown?: never;
       countdownPlacement?: never;
+      countdownMode?: never;
       labels?: never;
       children: React.ReactElement;
     };
@@ -75,13 +77,16 @@ type ButtonElementProps =
 export type ButtonLabels = {
   /** Description of a hold-to-confirm button for assistive tech. */
   holdHint: string;
-  /** Description of a counting-down button; `{seconds}` is the whole count. */
+  /** Description of a `delay` countdown: the action waits; `{seconds}` is the whole count. */
   countdownHint: string;
+  /** Description of an `undo` countdown: the action is done, a press undoes it; `{seconds}`. */
+  undoHint: string;
 };
 
 export const BUTTON_LABELS: ButtonLabels = {
   holdHint: "Удерживайте, чтобы подтвердить",
   countdownHint: "Действие выполнится через {seconds} с, нажмите, чтобы отменить",
+  undoHint: "Действие выполнено, отменить можно ещё {seconds} с",
 };
 
 /** `ready`: the empty fill laid out; `running`: filling over the count; `done`: the count ran out. */
@@ -252,6 +257,7 @@ function ButtonRoot({
   onConfirm,
   countdown,
   countdownPlacement = "end",
+  countdownMode = "undo",
   labels,
   disabled: disabledProp,
   asChild = false,
@@ -477,7 +483,9 @@ function ButtonRoot({
       <VisuallyHidden id={hintId}>
         {holdToConfirm
           ? texts.holdHint
-          : formatLabel(texts.countdownHint, { seconds: String(countdown ?? 0) })}
+          : formatLabel(countdownMode === "delay" ? texts.countdownHint : texts.undoHint, {
+              seconds: String(countdown ?? 0),
+            })}
       </VisuallyHidden>
     </>
   );

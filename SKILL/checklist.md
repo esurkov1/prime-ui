@@ -39,7 +39,7 @@ checks.
 - [ ] Money, numbers and dates go through `Intl` with `ru-RU`, in Russian typography ([words](ux.md#4-words)).
 - [ ] The friction of every action matches the cost of a mistake ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
 - [ ] A form in a dialog holds its dismiss with `Modal.Guard` / `Drawer.Guard`, a form that is the page with `Page.Guard` ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
-- [ ] A reversible action from a button that stays in place waits behind `countdown` with the action in `onConfirm`, not a hand-made timer or a second undo toast ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
+- [ ] A reversible action from a button that stays in place gets a `countdown` undo window (an outward one `countdownMode="delay"`, the action in `onConfirm`), not a hand-made timer or a second undo toast ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
 - [ ] A disabled control says why when the reason is off screen; an action without permission is hidden ([nothing to guess](ux.md#6-nothing-to-guess)).
 - [ ] A request a value starts — a simulated one too — is cancelled when the value changes again ([nothing to guess](ux.md#6-nothing-to-guess)).
 - [ ] Tabs, filters, search, page and the open record are in the URL ([nothing to guess](ux.md#6-nothing-to-guess)).

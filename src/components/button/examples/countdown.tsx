@@ -1,4 +1,4 @@
-/** An undo window: archiving a deal turns the button into a cancel that fills over five seconds, the seconds left in a chip after the label; a press cancels, the end archives — `countdown`, `onConfirm`. */
+/** A delayed action: archiving a deal waits five seconds behind a cancel that fills and counts them down; a press cancels, the end archives — `countdown`, `countdownMode`, `onConfirm`. */
 import { Button, Icon } from "prime-ui-kit";
 import * as React from "react";
 
@@ -13,6 +13,7 @@ export default function ButtonCountdownExample() {
         variant="soft"
         tone="neutral"
         countdown={5}
+        countdownMode="delay"
         onConfirm={() => setStep("archived")}
         onClick={() => setStep("idle")}
       >

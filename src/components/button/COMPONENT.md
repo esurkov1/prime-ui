@@ -10,7 +10,7 @@
 - Async actions: `loading` shows a spinner, blocks clicks and keeps the width; when it ends, a new label («Сохранено») flows in.
 - Long actions with known progress (downloads, exports): `progress` fills the button itself.
 - Destructive actions without a dialog: `holdToConfirm` needs a held press.
-- An action that is easy to undo but should not run at once (archive, send, remove from a list): `countdown` — the button turns into «Отменить», fills over the seconds and counts them down; a press cancels, the end runs the action (`onConfirm`).
+- An action that is cheap to take back (mark done, archive, move, send): `countdown` — the button turns into «Отменить», fills over the seconds and counts them down. By default (`countdownMode="undo"`) the action has already run and a press undoes it; with `countdownMode="delay"` it waits and `onConfirm` runs it at the end, a press cancels.
 - Compact toolbars: icon-only buttons (only `Button.Icon` inside) are square.
 - Round icon actions — the disk is the control (play, download, cancel or retry of a transfer, a floating main action): `shape="circle"`; over a picture or a video, `variant="shade"`. A transfer it can cancel shows its share as the circle's `progress` ring.
 - Action-styled navigation: `asChild` with an `<a>` or a router link; the current page of a set (page numbers) is `current`.
@@ -24,7 +24,8 @@ How an action with a consequence or a wait behaves — pick by what happens if t
 | a request that answers within seconds (save, send a form) | `loading` (or return the promise from `onConfirm`) | the person waits; nothing to cancel |
 | a long transfer with a known share (download, export, upload) | `progress` (a circle's ring with `shape="circle"`) | the share is the information; a press cancels |
 | a destructive action, final, in place (delete a file, revoke access) | `holdToConfirm` + `onConfirm` | a deliberate gesture instead of a dialog; letting go early does nothing |
-| an action that can wait a few seconds and is cheap to take back (archive, move, mark done, send a message) | `countdown` (5 s) + `onConfirm`; the press is the cancel | the action runs by itself unless the person stops it — no dialog, no undo afterwards |
+| an action that is cheap to take back and should show its result at once (mark done, move, change a status) | `countdown` (5 s, `countdownMode="undo"`, the default): the action runs now, a press undoes it | the result is on screen at once; the window keeps the way back in reach |
+| an action that should not leave until the person had a moment (send a message, archive a deal, notify a client) | `countdown` (5 s) with `countdownMode="delay"`: `onConfirm` runs it at the end, a press cancels | nothing leaves the product until the window closes — no undo afterwards |
 | a destructive action with details to read or a consequence to explain (delete a client with 12 deals) | [ConfirmDialog](../confirm-dialog/COMPONENT.md) | the text explains what will be lost |
 
 A countdown is not for an irreversible step the person must confirm (that is `holdToConfirm` or a ConfirmDialog), nor for a long wait (that is `progress`). Keep it about 5 seconds: short enough not to block the flow, long enough to reach the button. The counting button keeps the place and the size of the button it replaced: put it where the action was, label it «Отменить».
@@ -76,8 +77,9 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `current` | `boolean` | `false` | The current page of a set (a page number): `aria-current="page"` and the selected look. A router link with its own `aria-current` gets the same look. |
 | `progress` | `number \| null` | — | Progress of a long action, `0…1`; `null` — the share is unknown. Sets `aria-busy`, stays pressable (to cancel); a square fills from the start edge, a circle draws a ring. Remove the prop when done. |
 | `holdToConfirm` | `boolean` | `false` | The action needs a held press (pointer, `Space` or `Enter`): the fill runs for 1.2 s, then `onConfirm` fires; releasing earlier rolls it back. |
-| `onConfirm` | `() => void \| Promise<void>` | — | Fires when a `holdToConfirm` press completes or a `countdown` runs out: the action goes here, not in `onClick`. A promise keeps a held button `loading` until it settles. |
-| `countdown` | `number` | — | Seconds before the action runs by itself (an undo window): the button fills over them and counts them down; `onConfirm` at the end, a press is `onClick` — the cancel. |
+| `onConfirm` | `() => void \| Promise<void>` | — | Fires when a `holdToConfirm` press completes or a `countdown` runs out: the action (or, in `undo` mode, the window's end) goes here, not in `onClick`. A promise keeps a held button `loading` until it settles. |
+| `countdown` | `number` | — | Seconds of an undo window: the button fills over them and counts them down; a press is `onClick`, the end `onConfirm` — what they mean is `countdownMode`. |
+| `countdownMode` | `"undo" \| "delay"` | `"undo"` | `undo` — the action is already done: the `countdown` is the window to undo it (`onClick`), `onConfirm` closes it. `delay` — the action waits: `onConfirm` runs it at the end, a press cancels. |
 | `countdownPlacement` | `"start" \| "end"` | `"end"` | Where the `countdown` seconds stand: `end` — in a badge after the label, `start` — before it. |
 | `labels` | `Partial<ButtonLabels>` | — | Built-in strings, see Labels. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element (a link) instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`; `progress` and `holdToConfirm` need a `<button>`. |
@@ -155,6 +157,12 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | `center` | content centred | every button | yes |
 | `start` | content from the start edge | a column of choices or actions (`fullWidth` rows, presets) | |
 
+### countdownMode
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `undo` | the same counting button; its description: «Действие выполнено, отменить можно ещё N с» | the action ran at once; a press undoes it, `onConfirm` closes the window | yes |
+| `delay` | the same counting button; its description: «Действие выполнится через N с, нажмите, чтобы отменить» | the action waits; `onConfirm` runs it at the end, a press cancels | |
+
 ### countdownPlacement
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -185,7 +193,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | glyph change | a new icon in `Button.Icon` (another `name`) | the old glyph shrinks to 0.6 and fades, the new one grows in (`fast`) and plays its gesture once; reduced motion swaps at once |
 | holding | `holdToConfirm` + a held pointer, `Space` or `Enter` | `data-hold="holding"`: the fill runs linearly for 1.2 s (kept under reduced motion — it is a gesture clock), then `onConfirm` and `data-hold="done"` (on release the fill fades in place, `data-hold="idle"`); releasing, leaving the button or losing focus earlier → `data-hold="cancel"`, the fill rolls back (`fast` · exit) |
 | confirming | `onConfirm` returned a pending promise | `data-hold="confirming"`: the full fill stays, the button is `loading` (spinner, `aria-busy`, disabled) even after the release; resolve → `data-hold="idle"`, the fill fades; reject → `data-hold="cancel"`, the fill rolls back (say why with a notification) |
-| counting down | `countdown` (seconds) | `data-countdown="running"`: the fill runs linearly over the whole count (kept under reduced motion — a clock), the seconds left in a `Badge` after the label (before it with `countdownPlacement="start"`) (rolling, tabular figures), the hint `labels.countdownHint` in `aria-describedby`; a press is `onClick`; run out → `onConfirm`, `data-countdown="done"` with the fill full; `countdown` removed → the fill fades in place |
+| counting down | `countdown` (seconds) | `data-countdown="running"`: the fill runs linearly over the whole count (kept under reduced motion — a clock), the seconds left in a `Badge` after the label (before it with `countdownPlacement="start"`) (rolling, tabular figures), the hint in `aria-describedby` (`labels.undoHint`, `labels.countdownHint` with `countdownMode="delay"`); a press is `onClick`; run out → `onConfirm`, `data-countdown="done"` with the fill full; `countdown` removed → the fill fades in place |
 | label change | new text children | the old letters leave upward, the new ones rise from below one short step apart (`base` · emphasized, blur `--prime-motion-blur`) while the width glides; digits-only changes and reduced motion change in place |
 | pressed | `pressed`, or `defaultPressed` flipped by a press | `aria-pressed="true" \| "false"`; on adds `data-pressed="true"` and the selected fill (accent soft), which glides in and out with the color transition (`fast`); `onPressedChange` gets the new state |
 | current | `current` | `aria-current="page"`, `data-current="true"`, the selected fill |
@@ -228,7 +236,8 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `
 | Key | Default | Used for |
 |---|---|---|
 | `holdHint` | `"Удерживайте, чтобы подтвердить"` | Description of a `holdToConfirm` button for assistive tech (`aria-describedby`). |
-| `countdownHint` | `"Действие выполнится через {seconds} с, нажмите, чтобы отменить"` | Description of a `countdown` button (`aria-describedby`): when the action runs and that a press cancels it; `{seconds}` is the count. |
+| `countdownHint` | `"Действие выполнится через {seconds} с, нажмите, чтобы отменить"` | Description of a `countdownMode="delay"` button (`aria-describedby`): when the action runs and that a press cancels it; `{seconds}` is the count. |
+| `undoHint` | `"Действие выполнено, отменить можно ещё {seconds} с"` | Description of a `countdownMode="undo"` button (`aria-describedby`): the action is done and a press undoes it for `{seconds}` s. |
 
 ## Examples
 | Example | Shows |
@@ -245,7 +254,8 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `
 | [density.tsx](examples/density.tsx) | Page numbers stay square and the current one takes the selected look; a speed chip sits inside a caption line — `density`, `current`. |
 | [align.tsx](examples/align.tsx) | A column of export actions reads from the start edge, every row the full width — `align`, `fullWidth`. |
 | [hold-to-confirm.tsx](examples/hold-to-confirm.tsx) | A destructive action that needs a held press; letting go early rolls the fill back and does nothing, and the delete request keeps the button loading until the server answers — `holdToConfirm`, `onConfirm`. |
-| [countdown.tsx](examples/countdown.tsx) | An undo window: archiving a deal turns the button into a cancel that fills over five seconds, the seconds left in a chip after the label; a press cancels, the end archives — `countdown`, `onConfirm`. |
+| [undo.tsx](examples/undo.tsx) | An undo window: marking a task done happens at once, and the button turns into a cancel that fills over five seconds; a press undoes it, the end closes the window — `countdown`, `onConfirm`. |
+| [countdown.tsx](examples/countdown.tsx) | A delayed action: archiving a deal waits five seconds behind a cancel that fills and counts them down; a press cancels, the end archives — `countdown`, `countdownMode`, `onConfirm`. |
 | [label-morph.tsx](examples/label-morph.tsx) | A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `loading`, `tone`. |
 | [on-colored-host.tsx](examples/on-colored-host.tsx) | Actions on a solid banner take its text color: the action and the dismissal beside it, both soft — `tone="inherit"`. |
 | [as-child.tsx](examples/as-child.tsx) | The button look on a real link; a disabled link blocks navigation — `asChild`, `disabled`. |
@@ -265,7 +275,8 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `
 - Submit button without `type="submit"` → the default is `"button"` and will not submit.
 - A destructive `holdToConfirm` action in `onClick` → it fires on any click; put it in `onConfirm`.
 - An undo window built by hand (a `setTimeout`, a toast with «Отменить», a number in the label) → `countdown` with `onConfirm`; the press is the cancel in `onClick`.
-- The action of a `countdown` button in `onClick` → `onClick` is the cancel; the action goes in `onConfirm`.
+- The action of a `countdown` button in `onClick` → `onClick` is the cancel (the undo); a delayed action goes in `onConfirm` with `countdownMode="delay"`.
+- An outward action (a message, an invoice) run at once behind an `undo` countdown → it has already left; `countdownMode="delay"` so it leaves only when the window closes.
 - `countdown` on an irreversible step («Удалить навсегда») → `holdToConfirm` or a ConfirmDialog: an action that runs by itself must be cheap to take back.
 - A round disk drawn by hand (`border-radius: 50%` on a `<button>`, an own ring around it) → `shape="circle"`, with `progress` for the ring.
 - A disk over media recolored with a dark CSS fill → `variant="shade"`.

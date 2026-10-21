@@ -310,7 +310,7 @@ export const api: ComponentApi = {
           ru: "Своё содержимое; по умолчанию иконка пипетки.",
         },
         {
-          name: "fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · countdown · countdownPlacement · labels",
+          name: "fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · countdown · countdownMode · countdownPlacement · labels",
           type: "ButtonRootProps",
           en: "As on `Button.Root`.",
           ru: "Как у `Button.Root`.",
@@ -598,6 +598,11 @@ export const api: ComponentApi = {
       countdownHint: {
         en: "Description of the button with `countdown`; `{seconds}` is the count.",
         ru: "Описание кнопки с `countdown`; `{seconds}` — длина отсчёта.",
+        part: "ColorPicker.EyeDropperButton",
+      },
+      undoHint: {
+        en: "Description of the button with an `undo` `countdown`; `{seconds}` is the count.",
+        ru: "Описание кнопки с `countdown` в режиме `undo`; `{seconds}` — длина отсчёта.",
         part: "ColorPicker.EyeDropperButton",
       },
     }),

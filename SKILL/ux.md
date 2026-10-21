@@ -280,7 +280,8 @@ Pick the lightest step that keeps the person safe ([choosing.md](choosing.md) ha
 | The action | The step |
 |---|---|
 | Reversible, frequent (remove a row, archive, move) | do it at once, «Отменить» in a `Notification` (`action`, commit in `onDismiss`) |
-| Reversible, started from a button that stays in place (archive from a record's header, send, mark done) | `Button.Root countdown={5}`: the button turns into «Отменить», fills and counts down; the action in `onConfirm`, the press cancels |
+| Reversible, started from a button that stays in place (mark done, archive from a record's header) | `Button.Root countdown={5}`: the action runs at once, the button turns into «Отменить», fills and counts down; the press undoes it |
+| Outward but worth a moment to take back (send a message, notify a client) | `Button.Root countdown={5} countdownMode="delay"`: it leaves in `onConfirm` when the window closes; the press cancels |
 | One standalone action that is easy to redo by hand | `Button.Root holdToConfirm` |
 | Irreversible loss of work, or an outward action that cannot be called back once it leaves the product (an invoice or a message sent to a client, a payment) | `ConfirmDialog` that names the thing and the consequence |
 | Bulk destructive | `ConfirmDialog` that names the count («Удалить 12 счетов?») |

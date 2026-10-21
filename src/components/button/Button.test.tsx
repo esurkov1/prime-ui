@@ -19,7 +19,7 @@ describe("Button", () => {
     const onEnd = vi.fn();
     const onClick = vi.fn();
     render(
-      <Button.Root countdown={3} onConfirm={onEnd} onClick={onClick}>
+      <Button.Root countdown={3} countdownMode="delay" onConfirm={onEnd} onClick={onClick}>
         Отменить
       </Button.Root>,
     );
@@ -37,6 +37,13 @@ describe("Button", () => {
     expect(onEnd).toHaveBeenCalledTimes(1);
     expect(button).toHaveAttribute("data-countdown", "done");
     vi.useRealTimers();
+  });
+
+  it("an undo countdown, the default, says the action is done and a press undoes it", () => {
+    render(<Button.Root countdown={5}>Отменить</Button.Root>);
+    expect(screen.getByRole("button", { name: /Отменить/ })).toHaveAccessibleDescription(
+      "Действие выполнено, отменить можно ещё 5 с",
+    );
   });
 
   it("puts the countdown seconds before the label with countdownPlacement start", () => {

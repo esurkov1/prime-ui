@@ -104,14 +104,21 @@ export const api: ComponentApi = {
         {
           name: "onConfirm",
           type: "() => void | Promise<void>",
-          en: "Fires when a `holdToConfirm` press completes or a `countdown` runs out: the action goes here, not in `onClick`. A promise keeps a held button `loading` until it settles.",
-          ru: "Срабатывает, когда удержание `holdToConfirm` дошло до конца или истёк `countdown`: действие пишите сюда, а не в `onClick`. Промис держит удержанную кнопку в `loading`.",
+          en: "Fires when a `holdToConfirm` press completes or a `countdown` runs out: the action (or, in `undo` mode, the window's end) goes here, not in `onClick`. A promise keeps a held button `loading` until it settles.",
+          ru: "Срабатывает, когда удержание `holdToConfirm` дошло до конца или истёк `countdown`: действие (в режиме `undo` — конец окна) пишите сюда, а не в `onClick`. Промис держит удержанную кнопку в `loading`.",
         },
         {
           name: "countdown",
           type: "number",
-          en: "Seconds before the action runs by itself (an undo window): the button fills over them and counts them down; `onConfirm` at the end, a press is `onClick` — the cancel.",
-          ru: "Секунды, через которые действие выполнится само (окно отмены): кнопка заливается и отсчитывает их; в конце `onConfirm`, нажатие — `onClick`, отмена.",
+          en: "Seconds of an undo window: the button fills over them and counts them down; a press is `onClick`, the end `onConfirm` — what they mean is `countdownMode`.",
+          ru: "Секунды окна отмены: кнопка заливается и отсчитывает их; нажатие — `onClick`, конец — `onConfirm`, их смысл задаёт `countdownMode`.",
+        },
+        {
+          name: "countdownMode",
+          type: '"undo" | "delay"',
+          default: '"undo"',
+          en: "`undo` — the action is already done: the `countdown` is the window to undo it (`onClick`), `onConfirm` closes it. `delay` — the action waits: `onConfirm` runs it at the end, a press cancels.",
+          ru: "`undo` — действие уже выполнено: `countdown` — окно, чтобы его откатить (`onClick`), `onConfirm` закрывает окно. `delay` — действие ждёт: `onConfirm` выполняет его в конце, нажатие отменяет.",
         },
         {
           name: "countdownPlacement",
@@ -192,8 +199,12 @@ export const api: ComponentApi = {
       ru: "Описание кнопки `holdToConfirm` для скринридеров (`aria-describedby`).",
     },
     countdownHint: {
-      en: "Description of a `countdown` button (`aria-describedby`): when the action runs and that a press cancels it; `{seconds}` is the count.",
-      ru: "Описание кнопки `countdown` (`aria-describedby`): когда выполнится действие и что нажатие его отменит; `{seconds}` — длина отсчёта.",
+      en: 'Description of a `countdownMode="delay"` button (`aria-describedby`): when the action runs and that a press cancels it; `{seconds}` is the count.',
+      ru: 'Описание кнопки `countdownMode="delay"` (`aria-describedby`): когда выполнится действие и что нажатие его отменит; `{seconds}` — длина отсчёта.',
+    },
+    undoHint: {
+      en: 'Description of a `countdownMode="undo"` button (`aria-describedby`): the action is done and a press undoes it for `{seconds}` s.',
+      ru: 'Описание кнопки `countdownMode="undo"` (`aria-describedby`): действие выполнено, нажатие откатит его ещё `{seconds}` с.',
     },
   }),
   accessibility: {
