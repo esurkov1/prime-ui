@@ -1068,8 +1068,12 @@ describe("Gantt zoom keeps the moment in view", () => {
     cameraLayout();
     render(<Chart range={QUARTER} />);
     slideTo(600);
+    // A pan at rest settles onto a whole device pixel (≤ half a pixel): the day to keep is read
+    // after it, so a slow machine and a fast one compare the same view.
+    await new Promise((resolve) => setTimeout(resolve, 200));
     const chosen = dateAt(200);
-    expect(chosen).toBe(day(7, 21).getTime());
+    const settledPx = view().start * 40;
+    expect(Math.abs(chosen - day(7, 21).getTime())).toBeLessThan(DAY_MS / 40);
 
     // A preset glides the camera over a motion token: wait for it to settle, not for the click.
     await choose(user, "Неделя");
@@ -1079,7 +1083,7 @@ describe("Gantt zoom keeps the moment in view", () => {
     });
     await choose(user, "День");
     await waitFor(() => {
-      expect(view().start * 40).toBeCloseTo(600, 6);
+      expect(view().start * 40).toBeCloseTo(settledPx, 6);
       sameMoment(dateAt(200), chosen);
     });
   });
