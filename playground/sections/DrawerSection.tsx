@@ -57,6 +57,12 @@ export const page: ComponentPageConfig = {
         "Карточка клиента из списка: аватар контакта стоит в шапке вместо плашки с иконкой, ниже — реквизиты в разделах с заголовками, у одного своё действие — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`.",
     },
     {
+      scenario: "record-picture",
+      title: "Фото записи и бейджи",
+      description:
+        "Панель транспорта с фото в шапке: название и номер рядом с картинкой, строка данных под ними, а бейджи статусов начинаются под фото, от края шапки — `Drawer.Icon`, `Thumbnail.Root`, `Drawer.Badges`.",
+    },
+    {
       scenario: "tab-switcher",
       title: "Переключатель вкладки",
       description:

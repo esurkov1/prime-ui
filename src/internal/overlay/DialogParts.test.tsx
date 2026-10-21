@@ -79,6 +79,14 @@ function Dialog({
 }
 
 describe("DialogParts", () => {
+  it("starts the badges line under a record's picture, at the header's edge", () => {
+    const rule = cssRule(
+      "src/internal/overlay/DialogParts.module.css",
+      '.header:has(> .icon[data-media="true"]) > .badges',
+    );
+    expect(cssValue(rule, "grid-column")).toBe("1 / -1");
+  });
+
   it("names the dialog by its Title and describes it by its Description", () => {
     render(<Dialog />);
     const dialog = screen.getByRole("dialog", { name: "Счёт №1042" });

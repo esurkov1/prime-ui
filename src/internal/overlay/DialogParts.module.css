@@ -92,6 +92,13 @@
   grid-column: text / -1;
 }
 
+/* Under a record's picture (`Avatar.Root`, `Thumbnail.Root` in the icon) the badges start at the
+   header's start edge: the picture spans the title and the description, and the badges line runs
+   under it, a full row wide, instead of a strip indented by the picture. */
+.header:has(> .icon[data-media="true"]) > .badges {
+  grid-column: 1 / -1;
+}
+
 /* With a line under the title the parts hang from the top: the icon, the actions and the close
    button centre on the first lines, the text runs down. */
 .header[data-multiline="true"] {
