@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { addDays } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -1071,12 +1071,17 @@ describe("Gantt zoom keeps the moment in view", () => {
     const chosen = dateAt(200);
     expect(chosen).toBe(day(7, 21).getTime());
 
+    // A preset glides the camera over a motion token: wait for it to settle, not for the click.
     await choose(user, "Неделя");
-    expect(dayLength()).toBe(16);
-    sameMoment(dateAt(200), chosen);
+    await waitFor(() => {
+      expect(dayLength()).toBe(16);
+      sameMoment(dateAt(200), chosen);
+    });
     await choose(user, "День");
-    expect(view().start * 40).toBeCloseTo(600, 6);
-    sameMoment(dateAt(200), chosen);
+    await waitFor(() => {
+      expect(view().start * 40).toBeCloseTo(600, 6);
+      sameMoment(dateAt(200), chosen);
+    });
   });
 
   it("returns to the chosen day after a zoom where the whole axis fits", () => {
@@ -1357,9 +1362,12 @@ describe("Gantt today off screen", () => {
     // The start edge cue: more of the axis lies before the view.
     expect(root()).toHaveAttribute("data-overflow-start", "true");
     await user.click(jump);
-    expect(screen.queryByRole("button", { name: "К сегодня" })).toBeNull();
-    // Today (8 July) is a third into the visible axis again.
-    sameMoment(dateAt(400 / 3), day(7, 8).getTime() + DAY_MS / 2);
+    // The jump glides the camera over a motion token: wait for it to settle, not for the click.
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "К сегодня" })).toBeNull();
+      // Today (8 July) is a third into the visible axis again.
+      sameMoment(dateAt(400 / 3), day(7, 8).getTime() + DAY_MS / 2);
+    });
     slideTo(0);
     expect(screen.queryByRole("button", { name: "К сегодня" })).toBeNull();
     expect(root()).not.toHaveAttribute("data-overflow-start");
