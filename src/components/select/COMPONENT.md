@@ -189,6 +189,8 @@ an icon) goes inside `Select.ItemMeta`.
 | `field` | the field look (fill, inset control border, tier radius), full width; a picked option with `color` paints it in the hue's soft fill and ink (the chevron too, hover a step deeper) | a value in a form or a filter | yes |
 | `status` | a chip in the picked option's `color` (soft fill and text ink of a Badge of that hue; gray with none) with the chevron in its ink, at the chip tier of `size`, as wide as its content | a status picked in place — at the end of a row beside its buttons, in a record header | |
 
+A `status` select takes the chip scale (`size` `m` is 24, like a Badge): in a row with `xs` fields write `size="l"` (28), with `s` fields `size="xl"` (32).
+
 The panel is the shared floating surface with menu rows; an option with `color` draws its text and icon in the hue's ink and its highlight as the hue's wash. Text carries the value: the hue never stands alone.
 
 ### size

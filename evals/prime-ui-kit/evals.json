@@ -520,6 +520,17 @@
         "No Notification with «Отменить» for the same action",
         "The counting button stands where «В архив» was, labelled «Отменить»"
       ]
+    },
+    {
+      "id": 42,
+      "prompt": "В карточке проблемы транспорта под названием сделай строку: состояние (выбор: «Можно сдавать», «Нельзя сдавать»), исполнитель (выбор сотрудника) и срок (дата). Строка компактная, как у меток записи.",
+      "expected_output": "One row of the same height: the state is a Select variant=\"status\" with colored items and the person a Badge.Root in a Dropdown.Trigger, both size=\"l\", beside a Datepicker of size xs (28 = 28); or, at m and larger, every item is a field.",
+      "files": [],
+      "expectations": [
+        "The chips (status Select, the person's Badge) are size l when the date control is xs, so every item of the row is 28 px tall",
+        "No Badge of the default size (24) stands beside an xs field (28)",
+        "A row at control size m or larger uses fields for every item (a Select with Avatar items for the person), not chips"
+      ]
     }
   ]
 }

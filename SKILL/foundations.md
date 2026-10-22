@@ -56,6 +56,55 @@ gutters — do not add your own outer padding.
   cell heights in CSS. Column dividers and the sort icon position come from DataTable; do not restyle
   them.
 
+### Chips beside fields
+
+Chips (a `Badge`, a status `Select`) and controls (fields, buttons) have two height scales:
+
+| Size | xs | s | m | l | xl |
+|---|---|---|---|---|---|
+| Chip (`Badge`, `Select variant="status"`) | 16 | 20 | 24 | 28 | 32 |
+| Control (Input, Select, Datepicker, Button) | 28 | 32 | 36 | 40 | 48 |
+
+Which chip size a place takes:
+
+| Where the chip stands | Chip size |
+|---|---|
+| Inside a control (a count in a Button, a tag in an Input) | none — the kit takes one step down |
+| Alone as a mark: a status in a table cell, a tag in a list, the badges under a card's title | none — `m` (24), or the host's tier on a sized card |
+| A row of chips only: `X.Badges` of a dialog header, a record's labels | one size for the whole row (the kit's `m` in `X.Badges`) |
+| In one row with `xs` controls (a record line: state, person, date) | `l` — 28, as tall as the `xs` field |
+| In one row with `s` controls | `xl` — 32, as tall as the `s` field |
+| In one row with `m` or larger controls | no chip that tall: every item of the row is a field (a `Select` with `Avatar.Root` items for a person, a `Select` whose items have `color` for a status) |
+
+A chip that picks (`Badge.Root` in `Dropdown.Trigger`, `Select variant="status"`) takes the same size
+as a chip that only shows: set it on the chip, two steps above the controls of its row.
+
+```tsx good
+// good — a record line of xs controls: the chips are l (28), as tall as the xs fields
+<>
+  <Select.Root variant="status" size="l" aria-label="Состояние" defaultValue="ready">
+    <Select.Trigger>
+      <Select.Value />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="ready" color="green">Можно сдавать</Select.Item>
+      <Select.Item value="repair" color="red">В ремонте</Select.Item>
+    </Select.Content>
+  </Select.Root>
+  <Dropdown.Root>
+    <Dropdown.Trigger>
+      <Badge.Root size="l" aria-label="Исполнитель: Евгений Сурков">Евгений Сурков</Badge.Root>
+    </Dropdown.Trigger>
+    <Dropdown.Content>
+      <Dropdown.Item selected>Евгений Сурков</Dropdown.Item>
+    </Dropdown.Content>
+  </Dropdown.Root>
+  <Button.Root size="xs" variant="soft" tone="neutral">23 окт</Button.Root>
+</>
+```
+
+Bad: a `Select size="xs"` beside a `Badge` of the default size — 28 and 24 in one line, the row jumps.
+
 ## 4. Fill, not lines
 
 - Surfaces stand on one ladder: the page (layer 0) and four nested layers, each one lightness step

@@ -170,6 +170,8 @@ A status takes `tone`; a category takes `color`. The two never go together (the 
 | `xl` | 32px high, text 14, icon 16 | large headers | |
 | — (omitted) | one tier below the surrounding control; on a sized surface (a `Card.Root` with `size`, or inside a sized host) its tier as is | inside Button, Input, Tabs; on a card | yes (inside controls and on surfaces) |
 
+Beside controls in one row a chip is two sizes up: `l` (28) is as tall as an `xs` field, `xl` (32) as an `s` field; beside `m` and larger controls there is no chip that tall — make every item of the row a field.
+
 ### overflow (Badge.Group)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
