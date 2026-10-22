@@ -623,6 +623,12 @@
   padding: var(--card-pad);
 }
 
+/* A record's footer (`divider="fill"`): its actions lead from the start whether a total stands at
+   the end or not yet, so the first payment never moves the buttons. */
+.root:is([data-variant="panel"], [data-variant="list"]) > .footer[data-divider="fill"] {
+  justify-content: flex-start;
+}
+
 /* ---------- list ---------- */
 
 .list {
@@ -777,7 +783,9 @@
 /* A narrow `stat-text` tile keeps its text whole: the end row drops under it (see «A dropped end
    row» below). */
 @container (max-width: 20rem) {
-  .root[data-variant="stat-text"] > .end {
+  /* Only an end that holds more than icon buttons drops: an icon button (an edit pencil) is as
+     narrow as it gets and stays beside the text. */
+  .root[data-variant="stat-text"] > .end:has(> :not([data-icon-only])) {
     grid-column: 1 / -1;
     grid-row: auto;
     justify-self: stretch;

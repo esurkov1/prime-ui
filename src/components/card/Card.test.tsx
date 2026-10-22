@@ -17,6 +17,27 @@ import { Card } from "./Card";
 import styles from "./Card.module.css";
 
 describe("Card", () => {
+  it("a record footer leads with its actions without a total; a narrow fact tile keeps its icon button", () => {
+    const CSS = "src/components/card/Card.module.css";
+    expect(
+      cssValue(
+        cssRule(
+          CSS,
+          '.root:is([data-variant="panel"], [data-variant="list"]) > .footer[data-divider="fill"]',
+        ),
+        "justify-content",
+      ),
+    ).toBe("flex-start");
+    expect(
+      cssValue(
+        cssRule(CSS, '.root[data-variant="stat-text"] > .end:has(> :not([data-icon-only]))', [
+          "@container (max-width: 20rem)",
+        ]),
+        "grid-column",
+      ),
+    ).toBe("1 / -1");
+  });
+
   it("renders mini variant with an icon, label and value straight in the root", () => {
     render(
       <Card.Root variant="mini" data-testid="card">
@@ -568,7 +589,7 @@ describe("Card", () => {
     const tile = ["@container (max-width: 20rem)"];
     for (const [selector, parents, column] of [
       [".header > .end", header, "text / -1"],
-      ['.root[data-variant="stat-text"] > .end', tile, "1 / -1"],
+      ['.root[data-variant="stat-text"] > .end:has(> :not([data-icon-only]))', tile, "1 / -1"],
     ] as const) {
       const rule = cssRule(CSS, selector, [...parents]);
       expect(cssValue(rule, "grid-column")).toBe(column);
