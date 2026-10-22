@@ -1,16 +1,14 @@
 /*
- * Sparkline — a headline (title · date, value · change) over a line, area or bar chart. The line is
- * a monotone curve drawn in a stretched 0–100 viewBox with a non-scaling stroke; the cursor (guide
+ * Sparkline — a plot with no headline: a line, an area or bars and the lines of `series` with their
+ * legend. The line is a monotone curve drawn in a stretched 0–100 viewBox with a non-scaling stroke; the cursor (guide
  * + dot), lone points and the reference line are HTML over it, so dots stay round and dashes even
  * at any width. Scrubbing moves the cursor with the pointer at once (direct manipulation); when it
  * ends the cursor glides back to the point at rest (`base` · emphasized) and the guide fades out.
- * The trend arrow turns half a turn between up and down. Loading and a new series cross-fade in
+ * Loading and a new series cross-fade in
  * (RegionSwap; the series swap fills the plot).
  */
 .root {
   --sparkline-h: var(--prime-space-20);
-  --sparkline-value-size: var(--prime-text-heading-m-size);
-  --sparkline-value-line: var(--prime-text-heading-m-line-height);
 
   display: flex;
   flex-direction: column;
@@ -22,102 +20,23 @@
 }
 
 /*
- * The tier (`size`) sets the plot's height and the value's type: `s` is a KPI tile in a row of
- * four, `m` a dashboard card, `l` a chart that leads its panel. The Skeletons take the same height.
+ * The tier (`size`) sets the plot's height: `s` is a KPI tile in a row of four, `m` a dashboard
+ * card, `l` a chart that leads its panel. The Skeleton takes the same height.
  */
 .root[data-size="xs"] {
   --sparkline-h: var(--prime-space-10);
-  --sparkline-value-size: var(--prime-text-heading-s-size);
-  --sparkline-value-line: var(--prime-text-heading-s-line-height);
 }
 
 .root[data-size="s"] {
   --sparkline-h: var(--prime-space-12);
-  --sparkline-value-size: var(--prime-text-heading-s-size);
-  --sparkline-value-line: var(--prime-text-heading-s-line-height);
 }
 
 .root[data-size="l"] {
   --sparkline-h: var(--prime-space-24);
-  --sparkline-value-size: var(--prime-text-heading-l-size);
-  --sparkline-value-line: var(--prime-text-heading-l-line-height);
 }
 
 .root[data-size="xl"] {
   --sparkline-h: calc(var(--prime-space-16) * 2);
-  --sparkline-value-size: var(--prime-text-heading-l-size);
-  --sparkline-value-line: var(--prime-text-heading-l-line-height);
-}
-
-/* The title and the date share a line; on a narrow head (below 20rem, a phone card) the date takes
-   a line of its own under the title, so neither is cut. The break follows the head's width only, so
-   a date that changes while scrubbing never moves it. */
-.head {
-  container-type: inline-size;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--prime-space-0) var(--prime-space-3);
-  min-width: 0;
-  /* A host's corner mark (the arrow of a Card that opens) keeps the date clear of it. */
-  padding-inline-end: var(--corner-mark-room, 0);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  color: var(--prime-color-text-secondary);
-}
-
-.label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.date {
-  flex-shrink: 0;
-  font-variant-numeric: tabular-nums;
-}
-
-@container (max-width: 20rem) {
-  .label {
-    flex-basis: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-}
-
-.valueRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.value {
-  font-size: var(--sparkline-value-size);
-  line-height: var(--sparkline-value-line);
-  font-weight: var(--prime-font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-/* A point with no data: «Нет данных» in the value's place, quieter than a number. */
-.value[data-empty] {
-  color: var(--prime-color-text-muted);
-}
-
-.change {
-  flex-shrink: 0;
-}
-
-.trend {
-  transition: rotate var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
-}
-
-.trend[data-down] {
-  rotate: 180deg;
 }
 
 /* The plot: inset by the dot's radius so the cursor at either end is never clipped. */
@@ -127,12 +46,17 @@
   position: relative;
   container-type: inline-size;
   height: var(--sparkline-h);
-  margin-block-start: var(--prime-space-2);
   margin-inline: calc(var(--sparkline-dot) / 2);
   border-radius: var(--prime-radius-xs);
   touch-action: pan-y;
-  cursor: crosshair;
   outline: none;
+}
+
+/* The pointer always hits the plot itself, never the line, the area, a dot or a bar inside it: one
+   target, one cursor while scrubbing (a hover target that changes under a moving pointer makes the
+   browser pick the cursor again, and it flickers). */
+.plot * {
+  pointer-events: none;
 }
 
 .plot:focus-visible {
@@ -152,13 +76,31 @@
   overflow: visible;
 }
 
+/* A line's hue: the accent for the main series, `--sparkline-color` (a chart color) for a line of
+   `series`, set on its group. */
 .line {
   fill: none;
-  stroke: var(--prime-color-accent-default);
+  stroke: var(--sparkline-color, var(--prime-color-accent-default));
   stroke-width: calc(var(--prime-border-width) * 2);
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+}
+
+/* `dashed`: a plan, a forecast — long dashes. `dotted`: a previous period — round dots (a zero dash
+   with a round cap). */
+.line[data-line="dashed"] {
+  stroke-dasharray: var(--prime-space-2) var(--prime-space-1);
+}
+
+.line[data-line="dotted"] {
+  stroke-dasharray: 0 calc(var(--prime-border-width) * 4);
+}
+
+/* A period cut by the series' start or end (the current month so far): its stretch of the line is
+   dashed — the value is not the period's yet. */
+.line[data-cut] {
+  stroke-dasharray: var(--prime-space-1) var(--prime-space-1);
 }
 
 /* `area`: the accent fades from under the line to nothing at the bottom edge. */
@@ -167,12 +109,12 @@
 }
 
 .fadeTop {
-  stop-color: var(--prime-color-accent-default);
+  stop-color: var(--sparkline-color, var(--prime-color-accent-default));
   stop-opacity: 0.24;
 }
 
 .fadeBottom {
-  stop-color: var(--prime-color-accent-default);
+  stop-color: var(--sparkline-color, var(--prime-color-accent-default));
   stop-opacity: 0;
 }
 
@@ -185,7 +127,7 @@
   height: calc(var(--prime-border-width) * 4);
   margin: calc(var(--prime-border-width) * -2);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-accent-default);
+  background: var(--sparkline-color, var(--prime-color-accent-default));
 }
 
 /* `reference`: a plan or a target, a faint dashed line under the data. */
@@ -243,7 +185,8 @@
   margin: calc(var(--sparkline-dot) / -2);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-layer-current);
-  box-shadow: 0 0 0 calc(var(--prime-border-width) * 2) var(--prime-color-accent-default);
+  box-shadow: 0 0 0 calc(var(--prime-border-width) * 2)
+    var(--sparkline-color, var(--prime-color-accent-default));
   transform: translateY(calc(var(--sparkline-y) * var(--sparkline-h)));
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
@@ -274,6 +217,13 @@
   position: relative;
   display: flex;
   gap: var(--prime-space-1);
+}
+
+/* The lines of `series` over the bars: the drawing spans the bar row. */
+.bars > .drawing {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .baseline {
@@ -309,9 +259,21 @@
   background: var(--prime-color-danger-default);
 }
 
-/* Bars need no crosshair: the bar under the pointer is the cursor. */
-.root[data-variant="bars"] .plot {
-  cursor: default;
+/* A cut period's bar is hatched: the value is not the period's yet (its label names the days). */
+.slot[data-partial] .bar {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--prime-color-accent-default) 0 var(--prime-space-1),
+    var(--prime-color-accent-soft) var(--prime-space-1) calc(var(--prime-space-1) * 2)
+  );
+}
+
+.slot[data-partial] .bar[data-negative] {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--prime-color-danger-default) 0 var(--prime-space-1),
+    var(--prime-color-danger-soft) var(--prime-space-1) calc(var(--prime-space-1) * 2)
+  );
 }
 
 /*
@@ -329,33 +291,87 @@
   margin-block: calc(var(--sparkline-dot) / 2);
 }
 
+/*
+ * The legend of `series`: a swatch drawn like each line (solid, dashed, dotted; a bar for bars),
+ * its name and its value at the shown point. One line of small text that wraps on a narrow card.
+ */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-1) var(--prime-space-4);
+  margin: 0;
+  margin-block-start: var(--prime-space-2);
+  padding: 0;
+  list-style: none;
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  color: var(--prime-color-text-secondary);
+}
+
+/* In the compact tooltip: a row per line under the date. */
+.legend[data-in="tooltip"] {
+  flex-direction: column;
+  margin-block-start: 0;
+  color: inherit;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.swatch {
+  flex-shrink: 0;
+  width: var(--prime-space-3);
+  border-top: calc(var(--prime-border-width) * 2) solid
+    var(--sparkline-color, var(--prime-color-accent-default));
+}
+
+.swatch[data-line="dashed"] {
+  border-top-style: dashed;
+}
+
+.swatch[data-line="dotted"] {
+  border-top-style: dotted;
+}
+
+.swatch[data-line="bars"] {
+  height: var(--prime-space-2);
+  border-top: none;
+  border-radius: var(--prime-radius-xs) var(--prime-radius-xs) 0 0;
+  background: var(--prime-color-accent-default);
+}
+
+.legendLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendValue {
+  font-weight: var(--prime-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-color-text-primary);
+  white-space: nowrap;
+}
+
 /* The value in the chart tooltip (`ChartTooltip`): under the date, in the weight of a number. */
 .tooltipValue {
   font-weight: var(--prime-font-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
 
-/* Loading: the date, the value line and the plot as Skeletons of their own geometry. */
-.dateSkeleton {
-  width: var(--prime-space-16);
-}
-
-.valueSkeleton {
-  width: calc(var(--prime-space-24) * 1.5);
-  height: var(--sparkline-value-line);
-  min-height: 0;
-  border-radius: var(--prime-radius-s);
-}
-
+/* Loading: the plot as a Skeleton of its own geometry. */
 .plotSkeleton {
   height: var(--sparkline-h);
   min-height: 0;
-  margin-block-start: var(--prime-space-2);
   border-radius: var(--prime-radius-s);
 }
 
 /* Compact loading: the plot Skeleton at the compact plot's height. */
 .root[data-layout="compact"] .plotSkeleton {
   height: var(--field-h);
-  margin-block-start: 0;
 }

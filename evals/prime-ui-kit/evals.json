@@ -292,7 +292,7 @@
         "There is no Page.Header and no large title in the flow; Page.TopBar has no `collapse`",
         "The period control is in Page.Tools; «Экспорт» is a Button with a Button.Icon in Page.Actions",
         "Every tile is in one Page.Grid",
-        "If a Sparkline shows the conversion, it uses changeUnit=\"points\"; one showing the first-response time uses better=\"lower\"; the median is passed as `value`, not computed as a sum or average"
+        "If a Sparkline reading (useSparkline) shows the conversion, it uses changeUnit=\"points\"; one showing the first-response time uses better=\"lower\"; the median is passed as `value`, not computed as a sum or average"
       ]
     },
     {

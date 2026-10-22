@@ -87,7 +87,7 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
   of another module. It sets only the donors' public hooks — `--prime-icon-size`, `--ring-fill`,
   `--sticky-bg`, `--dnd-gap-*`, `--dnd-sortable-gap`, `--divider-bleed`, `--disclosure-*`,
   `--enter-*`, `--swatch-inline-size`, `--hairline-inset`, `--floating-width`, `--scroll-fade-depth`,
-  `--avatar-ring`, `--label-dimmed`, `--corner-mark-room` (`src/styles/donor-override.test.ts`). A mode the host needs is added to the donor (§2).
+  `--avatar-ring`, `--label-dimmed` (`src/styles/donor-override.test.ts`). A mode the host needs is added to the donor (§2).
 - Shared mechanics live in `src/internal` or `src/hooks`, never in a component folder: a component
   imports from another component folder only its PascalCase module or `types.ts`
   (`src/test/source-rules.test.ts`). Nothing is exported only for a test: a test reaches a module

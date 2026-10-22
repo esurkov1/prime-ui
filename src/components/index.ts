@@ -636,13 +636,27 @@ export {
   SmartFilter,
 } from "./smart-filter/SmartFilter";
 export type {
+  SparklineAggregate,
+  SparklineGrain,
   SparklineLabels,
   SparklineLayout,
+  SparklineLine,
   SparklinePoint,
   SparklineProps,
+  SparklineSeries,
   SparklineVariant,
 } from "./sparkline/Sparkline";
 export { Sparkline } from "./sparkline/Sparkline";
+export type {
+  SparklineBetter,
+  SparklineChange,
+  SparklineChangeUnit,
+  SparklinePlotProps,
+  SparklineReading,
+  SparklineSummary,
+  UseSparklineOptions,
+} from "./sparkline/useSparkline";
+export { useSparkline } from "./sparkline/useSparkline";
 export type { SpinnerLabels, SpinnerProps } from "./spinner/Spinner";
 export { Spinner } from "./spinner/Spinner";
 export type {

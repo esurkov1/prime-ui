@@ -1,4 +1,4 @@
-/** While the series loads the date, the value and the plot are Skeletons in their own places; the title stays — `loading`. */
+/** While the series loads the plot is a Skeleton of its own height that cross-fades into the data — `loading`. */
 import { Sparkline, type SparklinePoint, Typography } from "prime-ui-kit";
 
 const REVENUE: SparklinePoint[] = [

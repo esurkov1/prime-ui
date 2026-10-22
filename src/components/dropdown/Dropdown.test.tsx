@@ -91,6 +91,29 @@ describe("Dropdown", () => {
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
 
+  it("the arrow keys reach the items of a choice of one", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <button type="button">Шаг</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item selected>По дням</Dropdown.Item>
+          <Dropdown.Item selected={false} onSelect={onSelect}>
+            По неделям
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    screen.getByRole("button", { name: "Шаг" }).focus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("menuitemradio", { name: "По дням" })).toHaveFocus();
+    await user.keyboard("{ArrowDown}{Enter}");
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
   it("renders trigger, menu is not present initially", () => {
     render(<BasicDropdown />);
     expect(screen.getByRole("button", { name: "Open" })).toBeInTheDocument();

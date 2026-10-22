@@ -1,5 +1,5 @@
 /** Monthly profit with a sign: losses go below the zero line, the current month rests highlighted and any bar shows its value under the pointer or the arrows — `variant`, `highlight`. */
-import { Card, Sparkline, type SparklinePoint } from "prime-ui-kit";
+import { Card, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -25,17 +25,18 @@ const formatRubles = (value: number) =>
   `${value < 0 ? "−" : ""}${Math.abs(value).toLocaleString("ru-RU")} ₽`;
 
 export default function SparklineSignedBarsExample() {
+  const profit = useSparkline({
+    data: PROFIT,
+    highlight: CURRENT_MONTH,
+    formatValue: formatRubles,
+  });
+
   return (
-    <Card.Root className={styles.card}>
-      <Card.Body>
-        <Sparkline
-          data={PROFIT}
-          label="Прибыль по месяцам, 2026"
-          variant="bars"
-          highlight={CURRENT_MONTH}
-          formatValue={formatRubles}
-        />
-      </Card.Body>
+    <Card.Root variant="stat-trend" className={styles.card}>
+      <Card.Label>Прибыль, 2026</Card.Label>
+      <Card.Value>{profit.valueText}</Card.Value>
+      <Sparkline {...profit.plot} label="Прибыль по месяцам" variant="bars" />
+      <Card.Meta>{profit.date}</Card.Meta>
     </Card.Root>
   );
 }

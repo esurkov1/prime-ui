@@ -1,5 +1,5 @@
 /** A chart widget: a header with a short description and a period switch, and a Sparkline with the period total over its chart — `Card.Header`, `Card.Description`, `Card.Body`. */
-import { Card, SegmentedControl, Sparkline, type SparklinePoint } from "prime-ui-kit";
+import { Card, SegmentedControl, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -25,7 +25,7 @@ const REVENUE: Record<Period, SparklinePoint[]> = {
   ],
 };
 
-/** The same total for the period before: the badge at rest compares the headline with it. */
+/** The same total for the period before: the change at rest compares the total with it. */
 const PREVIOUS: Record<Period, number> = {
   week: 2_640_000,
   month: 12_900_000,
@@ -35,6 +35,12 @@ const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
 
 export default function CardPanelChartExample() {
   const [period, setPeriod] = React.useState<Period>("month");
+  const paid = useSparkline({
+    data: REVENUE[period],
+    summary: "sum",
+    compareTo: PREVIOUS[period],
+    formatValue: formatRubles,
+  });
 
   return (
     <div className={styles.panel}>
@@ -53,13 +59,11 @@ export default function CardPanelChartExample() {
           </SegmentedControl.Root>
         </Card.Header>
         <Card.Body>
-          <Sparkline
-            data={REVENUE[period]}
-            label="Оплачено за период"
-            summary="sum"
-            compareTo={PREVIOUS[period]}
-            formatValue={formatRubles}
-          />
+          <Card.Value>{paid.valueText}</Card.Value>
+          {paid.changeText ? (
+            <Card.Delta tone={paid.changeTone}>{paid.changeText}</Card.Delta>
+          ) : null}
+          <Sparkline {...paid.plot} label="Оплачено по дням" />
         </Card.Body>
       </Card.Root>
     </div>

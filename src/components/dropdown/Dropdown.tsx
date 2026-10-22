@@ -167,7 +167,7 @@ function DropdownAnchor({ children }: DropdownAnchorProps) {
 DropdownAnchor.displayName = "Dropdown.Anchor";
 
 const ENABLED_ITEM =
-  ':is([role="menuitem"], [role="menuitemcheckbox"]):not([data-disabled="true"], [hidden])';
+  ':is([role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]):not([data-disabled="true"], [hidden])';
 
 /** The field `Dropdown.Search` renders: focus lands on it when the menu opens. */
 const SEARCH_FIELD = "[data-dropdown-search]";

@@ -1,6 +1,7 @@
+import type { Locale } from "date-fns";
+import { ru } from "date-fns/locale";
 import * as React from "react";
 import { useControllableState } from "@/hooks/useControllableState";
-import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -9,71 +10,97 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { RegionSwap } from "@/internal/RegionSwap";
-import { RollingNumber } from "@/internal/RollingNumber";
-import type { ControlSize } from "@/internal/states";
+import type { ControlSize, PaletteColor } from "@/internal/states";
 
-import { Badge } from "../badge/Badge";
 import { Skeleton } from "../skeleton/Skeleton";
+import type { BucketAggregate, Grain } from "./buckets";
 import { pathsOf, type SparklineCurve, scaleOf, yOf } from "./geometry";
+import { latestPresent, useSeriesLines, useSeriesModel } from "./model";
 import styles from "./Sparkline.module.css";
 
 export type { SparklineCurve };
 
-export type SparklinePoint = {
-  /** Name of the point on the axis: a date, a week, a month («8 окт»). */
-  label: string;
-  /** `null`: no data for this point — the line breaks, the bar is absent. */
-  value: number | null;
-};
+/**
+ * A point of the series: named by its `label` («8 окт», a series ready as it is), or a day by its
+ * `date` (a `Date` or an ISO date «2026-10-08») — dated days fold into weeks, months or quarters
+ * (`grain`) and the kit names them.
+ */
+export type SparklinePoint =
+  | {
+      /** Name of the point on the axis: a date, a week, a month («8 окт»). */
+      label: string;
+      date?: never;
+      /** `null`: no data for this point — the line breaks, the bar is absent. */
+      value: number | null;
+    }
+  | {
+      /** The day of the point: a `Date` or an ISO date. */
+      date: Date | string;
+      label?: never;
+      /** `null`: no data for this day. */
+      value: number | null;
+    };
+
+/**
+ * The step of a dated series. `auto`: the finest step with at most 31 points (16 in `compact`) —
+ * a month by days, half a year by weeks, two and a half years by months, longer by quarters.
+ */
+export type SparklineGrain = "auto" | Grain;
+
+/**
+ * How the days of a dated point make its value: `sum` — a flow (revenue, orders per week);
+ * `average` — the mean of its days; `latest` — its last day, a level (MRR, a balance).
+ */
+export type SparklineAggregate = BucketAggregate;
 
 export type SparklineLabels = {
   /** Spoken value of the chosen point; `{label}` and `{value}` are replaced. */
   point: string;
-  /** The period of a `sum` / `average` / `value` headline at rest; `{first}` and `{last}` are point labels. */
+  /** The period of a reading at rest (`useSparkline`); `{first}` and `{last}` are its first and last day or point. */
   period: string;
   /** Shown and spoken in place of the value of a point with no data. */
   empty: string;
   /** Description of the reference line; `{value}` is replaced. */
   reference: string;
-  /** A change in percentage points (`changeUnit="points"`); `{value}` is the signed difference. */
+  /** A change in percentage points (`useSparkline`, `changeUnit="points"`); `{value}` is the signed difference. */
   points: string;
+  /** The name of a quarter point; `{quarter}` is its Roman number. */
+  quarter: string;
+  /** One line of a point with `series`; `{label}` and `{value}` are replaced. */
+  series: string;
+  /** The accessible name of the legend of `series`. */
+  legend: string;
 };
 
 /**
- * `area`: a line over a gradient that fades to the bottom. `line`: the line alone (many trends side
- * by side). `bars`: a bar per point from zero — up when positive, down when negative.
+ * How a line is drawn. `area`: over a gradient that fades to the bottom. `line`: the line alone.
+ * `dashed`: a dashed line (a plan, a forecast). `dotted`: a dotted line (a previous period).
  */
-export type SparklineVariant = "area" | "line" | "bars";
+export type SparklineLine = "area" | "line" | "dashed" | "dotted";
+
+/** A line of `variant` (`SparklineLine`), or `bars`: a bar per point from zero — up when positive, down when negative. */
+export type SparklineVariant = SparklineLine | "bars";
 
 /**
- * What the change badge compares the shown point with. `previous`: the point before it.
- * `first`: the first point of the series (the change over the period). `none`: no badge (the
- * default; `compareTo` still shows the change at rest).
+ * A line drawn with the main series on its scale (last year, a plan, another channel), named in
+ * the legend. Its points stand by position beside the main ones: the n-th with the n-th.
  */
-export type SparklineChange = "previous" | "first" | "none";
+export type SparklineSeries = {
+  /** Stable key of the line. */
+  id: string;
+  /** Its name in the legend, the tooltip and the spoken point. */
+  label: string;
+  /** Its points, `{ label, value }` or dated days folded by the main series' `grain`. */
+  data: SparklinePoint[];
+  /** Its chart hue; default: the next chart color after the main series' accent. */
+  color?: PaletteColor;
+  /** How it is drawn; default `line`. */
+  variant?: SparklineLine;
+};
 
 /**
- * What the headline shows at rest. `latest`: the latest point (or `highlight`) — a level such as
- * MRR, a price, a conversion. `sum`: the total of the period — a flow such as revenue or orders
- * per day. `average`: the mean of the period.
- */
-export type SparklineSummary = "latest" | "sum" | "average";
-
-/**
- * Which way of the change is good. `higher`: growth is green (revenue, orders). `lower`: a fall is
- * green and growth is red (response time, costs, bounce rate).
- */
-export type SparklineBetter = "higher" | "lower";
-
-/**
- * How the change badge measures. `percent`: the relative change. `points`: the difference of the
- * values, for a share already in percent (conversion 4,1% → 4,6% is «+0,5 п. п.»).
- */
-export type SparklineChangeUnit = "percent" | "points";
-
-/**
- * `default`: the headline (title · date, value · change) over the plot. `compact`: the plot alone at
- * the height of an `xs` control, for a table cell or a list row.
+ * `default`: the plot at the height of its `size`. `compact`: the plot at the height of an `xs`
+ * control with a tooltip for the point, for a table cell or a list row.
  */
 export type SparklineLayout = "default" | "compact";
 
@@ -83,100 +110,55 @@ export const SPARKLINE_LABELS: SparklineLabels = {
   empty: "Нет данных",
   reference: "Ориентир: {value}",
   points: "{value} п. п.",
+  quarter: "{quarter} кв.",
+  series: "{label}: {value}",
+  legend: "Линии графика",
 };
 
+/** Points of a dated series under `auto`: a plot of its size, and a table cell. */
+const GRAIN_LIMIT = { default: 31, compact: 16 } as const;
+
 const NUMBER = new Intl.NumberFormat("ru-RU");
-const CHANGE = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
 const formatNumber = (value: number) => NUMBER.format(value);
 
-type SparklineRest =
-  | {
-      summary?: "latest";
-      highlight?: number;
-      value?: never;
-    }
-  | {
-      summary: "sum" | "average";
-      highlight?: never;
-      value?: never;
-    }
-  | {
-      value: number | null;
-      summary?: never;
-      highlight?: never;
-    };
-
-export type SparklineProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> &
-  SparklineRest & {
-    data: SparklinePoint[];
-    label: string;
-    variant?: SparklineVariant;
-    curve?: SparklineCurve;
-    layout?: SparklineLayout;
-    size?: ControlSize;
-    point?: number | null;
-    defaultPoint?: number | null;
-    onPointChange?: (point: number | null) => void;
-    change?: SparklineChange;
-    changeUnit?: SparklineChangeUnit;
-    better?: SparklineBetter;
-    compareTo?: number;
-    min?: number;
-    max?: number;
-    reference?: number;
-    loading?: boolean;
-    formatValue?: (value: number) => string;
-    labels?: Partial<SparklineLabels>;
-    ref?: React.Ref<HTMLDivElement>;
-  };
+export type SparklineProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  data: SparklinePoint[];
+  series?: SparklineSeries[];
+  label: string;
+  variant?: SparklineVariant;
+  curve?: SparklineCurve;
+  layout?: SparklineLayout;
+  size?: ControlSize;
+  point?: number | null;
+  defaultPoint?: number | null;
+  onPointChange?: (point: number | null) => void;
+  highlight?: number | null;
+  grain?: SparklineGrain;
+  defaultGrain?: SparklineGrain;
+  onGrainChange?: (grain: SparklineGrain) => void;
+  aggregate?: SparklineAggregate;
+  locale?: Locale;
+  min?: number;
+  max?: number;
+  reference?: number;
+  loading?: boolean;
+  formatValue?: (value: number) => string;
+  labels?: Partial<SparklineLabels>;
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /**
- * Change of the shown point against the compared one; `null` when there is nothing to compare or the
- * measure means nothing.
- */
-function changeAt(
-  data: SparklinePoint[],
-  index: number,
-  mode: SparklineChange,
-  unit: SparklineChangeUnit,
-): number | null {
-  if (mode === "none") return null;
-  const from = mode === "first" ? data.findIndex((p) => p.value !== null) : index - 1;
-  if (from < 0 || from >= index) return null;
-  return changeOf(data[from].value, data[index].value, unit);
-}
-
-/**
- * `points`: the difference; `percent`: the relative change, `null` when a percentage means nothing
- * — the base is 0 or the sign flips. A value missing on either side is no change.
- */
-function changeOf(
-  base: number | null,
-  next: number | null,
-  unit: SparklineChangeUnit,
-): number | null {
-  if (base === null || next === null) return null;
-  if (unit === "points") return next - base;
-  if (base === 0 || (next !== 0 && Math.sign(base) !== Math.sign(next))) return null;
-  return ((next - base) / Math.abs(base)) * 100;
-}
-
-function latestPresent(data: SparklinePoint[]): number {
-  for (let i = data.length - 1; i >= 0; i--) if (data[i].value !== null) return i;
-  return data.length - 1;
-}
-
-/**
- * A small chart with its headline: the value at rest (the latest point, `highlight`, or the period's
- * total or mean — `summary`, or its own `value`), its change and its date or period. Scrubbing (pointer, touch, or the arrow keys on the chart) shows any point; the
- * header follows instantly, the trend arrow turns, and leaving glides back to the point at rest.
- * The line is a monotone curve (`curve`), `null` values break it; `bars` draw signed values from a
- * zero line. `layout="compact"` is the plot alone (a table cell): with no headline to follow the
- * point, a tooltip beside it shows its value and date. The scrubbed point is a triad (`point`), so
- * several sparklines of one axis follow one cursor; a compact tooltip stays with the chart scrubbed.
+ * A small chart with no headline of its own: a line, an area or bars, the lines of `series` beside
+ * it and their legend. Scrubbing (pointer, touch, or the arrow keys on the chart) picks a point —
+ * the `point` triad, which the headline a consumer lays out reads through `useSparkline`; leaving
+ * glides back to the point at rest (`highlight`). The line is a monotone curve (`curve`), `null`
+ * values break it; `bars` draw signed values from a zero line. `layout="compact"` fits a table cell:
+ * a tooltip beside the point shows its value and date. Several sparklines of one axis share
+ * `point`, so they follow one cursor; a compact tooltip stays with the chart scrubbed.
  */
 export function Sparkline({
   data,
+  series,
   label,
   variant = "area",
   curve = "smooth",
@@ -185,13 +167,12 @@ export function Sparkline({
   point: pointProp,
   defaultPoint = null,
   onPointChange,
-  change = "none",
-  changeUnit = "percent",
-  better = "higher",
-  summary = "latest",
-  value,
   highlight,
-  compareTo,
+  grain: grainProp,
+  defaultGrain,
+  onGrainChange,
+  aggregate = "latest",
+  locale = ru,
   min,
   max,
   reference,
@@ -203,13 +184,25 @@ export function Sparkline({
   ...rest
 }: SparklineProps) {
   const labels = useLabels(SPARKLINE_LABELS, labelsProp);
-  const last = data.length - 1;
   const bars = variant === "bars";
   const compact = layout === "compact";
+  const { bucketed, points, grain } = useSeriesModel({
+    data,
+    grain: grainProp,
+    defaultGrain,
+    onGrainChange,
+    aggregate,
+    locale,
+    quarterLabel: labels.quarter,
+    limit: GRAIN_LIMIT[layout],
+  });
+  const last = points.length - 1;
+  // `null`: the reading rests on the whole period (a total, a mean): no point is marked.
+  const marksRest = highlight !== null;
   const restIndex =
-    highlight !== undefined && highlight >= 0 && highlight <= last
+    typeof highlight === "number" && highlight >= 0 && highlight <= last
       ? Math.floor(highlight)
-      : latestPresent(data);
+      : latestPresent(points);
   const tier = useHostTier(sizeProp);
   const [active, setActiveValue] = useControllableState<number | null>({
     value: pointProp,
@@ -217,7 +210,7 @@ export function Sparkline({
     onChange: onPointChange,
   });
   // The chart a person scrubs leads: only it shows the tooltip; a chart that follows a shared
-  // `point` shows the cursor and the headline alone.
+  // `point` shows the cursor alone.
   const [leading, setLeading] = React.useState(false);
   const setActive = (next: number | null) => {
     setLeading(next !== null);
@@ -225,7 +218,7 @@ export function Sparkline({
   };
   const index = active === null ? restIndex : Math.min(active, last);
   const atRest = active === null;
-  const point = data[index];
+  const point = points[index];
   const plotRef = React.useRef<HTMLDivElement | null>(null);
   // The pointer over the plot (px from its corner): the tooltip follows it; `null` from the keys.
   const [pointer, setPointer] = React.useState<AnchorPoint | null>(null);
@@ -234,37 +227,60 @@ export function Sparkline({
   const gradientId = `sparkline-${referenceId.replace(/[^\w-]/g, "")}`;
 
   // A new series cross-fades its drawing in (foundation §7 rule 8); scrubbing never does.
-  const [series, setSeries] = React.useState({ data, version: 0 });
-  if (series.data !== data) setSeries({ data, version: series.version + 1 });
-  const version = series.data === data ? series.version : series.version + 1;
+  const [swap, setSwap] = React.useState({ points, extra: series, version: 0 });
+  const swapped = swap.points !== points || swap.extra !== series;
+  if (swapped) setSwap({ points, extra: series, version: swap.version + 1 });
+  const version = swapped ? swap.version + 1 : swap.version;
   const stateKey = loading ? "loading" : "data";
 
-  // Scale and paths once per series: scrubbing re-renders the cursor and the headline only.
+  const extra = useSeriesLines(series, points.length, grain, aggregate, locale, labels.quarter);
+
+  // Scale and paths once per series: scrubbing re-renders the cursor only.
   const geometry = React.useMemo(() => {
-    const values = data.map((p) => p.value);
-    const scale = scaleOf(values, [min, max, reference, bars ? 0 : undefined]);
-    const count = Math.max(data.length, 1);
-    const end = data.length - 1;
+    const values = points.map((p) => p.value);
+    const scale = scaleOf(
+      [...values, ...extra.flatMap((line) => line.values)],
+      [min, max, reference, bars ? 0 : undefined],
+    );
+    const count = Math.max(points.length, 1);
+    const end = points.length - 1;
     const x = (i: number) => (bars ? (i + 0.5) / count : end > 0 ? i / end : 0.5);
     const y = (value: number) => yOf(scale, value);
-    const present = values.filter((v): v is number => v !== null);
-    const total = present.reduce((sum, v) => sum + v, 0);
+    // A period cut by the series' start or end is drawn dashed: its value is not the period's yet
+    // (a line already dashed or dotted needs no mark).
+    const solid = variant === "area" || variant === "line";
+    const cutStart = solid && bucketed?.partial[0] && end > 0 ? x(1) : null;
+    const cutEnd = solid && bucketed?.partial[end] && end > 0 ? x(end - 1) : null;
+    const cut =
+      cutStart === null && cutEnd === null ? null : { from: cutStart ?? 0, to: cutEnd ?? 1 };
+    // Behind the main line, in the order given; the main one (not as bars) on top.
+    const lines = [
+      ...extra.map((line) => ({ ...line, cut: null, paths: pathsOf(line.values, x, y, curve) })),
+      ...(bars
+        ? []
+        : [
+            {
+              key: "",
+              values,
+              color: undefined as string | undefined,
+              variant: variant as SparklineLine,
+              cut,
+              paths: pathsOf(values, x, y, curve),
+            },
+          ]),
+    ];
     return {
-      values,
-      total,
-      mean: present.length ? total / present.length : null,
+      lines,
       x,
       y,
       zero: y(0),
       reference: reference === undefined ? null : y(reference),
-      paths: bars ? null : pathsOf(values, x, y, curve),
     };
-  }, [data, bars, curve, min, max, reference]);
+  }, [points, extra, bucketed, bars, variant, curve, min, max, reference]);
   const { x, y } = geometry;
 
   const drawing = React.useMemo(() => {
-    const { paths } = geometry;
-    if (!paths) return null;
+    if (!geometry.lines.length) return null;
     return (
       <div className={styles.drawing} aria-hidden="true">
         <svg
@@ -273,85 +289,100 @@ export function Sparkline({
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          {variant === "area" && paths.area ? (
-            <>
-              <defs>
-                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" className={styles.fadeTop} />
-                  <stop offset="1" className={styles.fadeBottom} />
-                </linearGradient>
-              </defs>
-              <path className={styles.area} d={paths.area} fill={`url(#${gradientId})`} />
-            </>
-          ) : null}
-          {paths.line ? <path className={styles.line} d={paths.line} /> : null}
+          {geometry.lines.map(({ key, color, variant: look, cut, paths }, i) => {
+            const id = `${gradientId}-${i}`;
+            return (
+              <g
+                key={key}
+                style={color ? ({ "--sparkline-color": color } as React.CSSProperties) : undefined}
+              >
+                {look === "area" && paths.area ? (
+                  <>
+                    <defs>
+                      <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" className={styles.fadeTop} />
+                        <stop offset="1" className={styles.fadeBottom} />
+                      </linearGradient>
+                    </defs>
+                    <path className={styles.area} d={paths.area} fill={`url(#${id})`} />
+                  </>
+                ) : null}
+                {paths.line && cut ? (
+                  <>
+                    <defs>
+                      <clipPath id={`${id}-whole`}>
+                        <rect
+                          x={cut.from * 100}
+                          y={-50}
+                          width={(cut.to - cut.from) * 100}
+                          height={200}
+                        />
+                      </clipPath>
+                      <clipPath id={`${id}-cut`}>
+                        <rect x={-50} y={-50} width={cut.from * 100 + 50} height={200} />
+                        <rect x={cut.to * 100} y={-50} width={150 - cut.to * 100} height={200} />
+                      </clipPath>
+                    </defs>
+                    <path className={styles.line} d={paths.line} clipPath={`url(#${id}-whole)`} />
+                    <path
+                      className={styles.line}
+                      data-cut=""
+                      d={paths.line}
+                      clipPath={`url(#${id}-cut)`}
+                    />
+                  </>
+                ) : paths.line ? (
+                  <path className={styles.line} data-line={look} d={paths.line} />
+                ) : null}
+              </g>
+            );
+          })}
         </svg>
-        {paths.lone.map((i) => (
-          <span
-            key={i}
-            className={styles.lone}
-            style={
-              {
-                "--sparkline-x": geometry.x(i),
-                "--sparkline-y": geometry.y(geometry.values[i] as number),
-              } as React.CSSProperties
-            }
-          />
-        ))}
+        {geometry.lines.flatMap(({ key, color, values, paths }) =>
+          paths.lone.map((i) => (
+            <span
+              key={`${key}-${i}`}
+              className={styles.lone}
+              style={
+                {
+                  "--sparkline-x": geometry.x(i),
+                  "--sparkline-y": geometry.y(values[i] as number),
+                  ...(color ? { "--sparkline-color": color } : null),
+                } as React.CSSProperties
+              }
+            />
+          )),
+        )}
       </div>
     );
-  }, [geometry, variant, gradientId]);
+  }, [geometry, gradientId]);
 
   const fromPointer = (event: React.PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const ratio = rect.width ? (event.clientX - rect.left) / rect.width : 1;
-    const next = bars ? Math.floor(ratio * data.length) : Math.round(ratio * last);
+    const next = bars ? Math.floor(ratio * points.length) : Math.round(ratio * last);
     setPointer({ x: event.clientX - rect.left, y: event.clientY - rect.top });
     setActive(Math.max(0, Math.min(last, next)));
   };
 
   const shownValue = point?.value ?? null;
   const valueText = shownValue === null ? labels.empty : formatValue(shownValue);
-  // A sum, a mean or the own value at rest stands for the whole period, not a point: no dot, the
-  // period as date.
-  const own = value !== undefined;
-  const aggregate = own
-    ? value
-    : summary === "sum" && data.length
-      ? geometry.total
-      : summary === "average"
-        ? geometry.mean
-        : null;
-  const restAggregate = atRest && (own || summary !== "latest");
-  const restValue = restAggregate ? aggregate : shownValue;
-  const headValue = restAggregate
-    ? aggregate === null
-      ? labels.empty
-      : formatValue(aggregate)
-    : valueText;
-  const headDate = restAggregate
-    ? formatLabel(labels.period, { first: data[0]?.label ?? "", last: data[last]?.label ?? "" })
-    : point?.label;
-  const delta = !point
-    ? null
-    : atRest && compareTo !== undefined
-      ? changeOf(compareTo, restValue, changeUnit)
-      : restAggregate
-        ? null
-        : changeAt(data, index, change, changeUnit);
-  // The change as shown (one decimal): a change that rounds to zero is no change — neutral, no arrow.
-  const shownDelta = delta === null ? null : Math.round(delta * 10) / 10;
-  const signed =
-    shownDelta === null
-      ? ""
-      : `${shownDelta > 0 ? "+" : shownDelta < 0 ? "−" : ""}${CHANGE.format(Math.abs(shownDelta))}`;
-  const deltaText =
-    changeUnit === "points" ? formatLabel(labels.points, { value: signed }) : `${signed}%`;
-  const deltaTone = !shownDelta
-    ? "neutral"
-    : shownDelta > 0 === (better === "higher")
-      ? "success"
-      : "danger";
+  // A reading of the whole period hides the dot at rest; the legend then gives each line's own
+  // total or mean, as its days fold (`aggregate`).
+  const restPeriod = atRest && !marksRest;
+  const lineTexts = extra.map((line) => {
+    const shown = !restPeriod
+      ? line.values[index]
+      : aggregate === "sum"
+        ? line.total
+        : aggregate === "average"
+          ? line.mean
+          : line.values[index];
+    return {
+      ...line,
+      text: shown === null || shown === undefined ? labels.empty : formatValue(shown),
+    };
+  });
   const layoutAttr = compact ? layout : undefined;
   // Beside the pointer; from the keyboard beside the point, at the middle of the plot.
   const plotNode = plotRef.current;
@@ -373,42 +404,6 @@ export function Sparkline({
       data-size={compact ? "xs" : tier.size}
       aria-busy={loading || undefined}
     >
-      {compact ? null : (
-        <>
-          <div className={styles.head}>
-            <span className={styles.label}>{label}</span>
-            <RegionSwap state={stateKey} className={styles.date}>
-              {loading ? (
-                <Skeleton shape="text" size="s" className={styles.dateSkeleton} />
-              ) : (
-                headDate
-              )}
-            </RegionSwap>
-          </div>
-          <RegionSwap state={stateKey}>
-            {loading ? (
-              <Skeleton shape="block" className={styles.valueSkeleton} />
-            ) : (
-              <div className={styles.valueRow}>
-                <span className={styles.value} data-empty={restValue === null || undefined}>
-                  {/* Scrubbing changes the value every move: plain digits; a settled value rolls. */}
-                  {atRest ? <RollingNumber>{headValue}</RollingNumber> : headValue}
-                </span>
-                {shownDelta !== null ? (
-                  <Badge.Root tone={deltaTone} className={styles.change}>
-                    {shownDelta !== 0 ? (
-                      <Badge.Icon className={styles.trend} data-down={shownDelta < 0 || undefined}>
-                        <Icon name="status.trendUp" />
-                      </Badge.Icon>
-                    ) : null}
-                    {deltaText}
-                  </Badge.Root>
-                ) : null}
-              </div>
-            )}
-          </RegionSwap>
-        </>
-      )}
       <RegionSwap state={stateKey}>
         {loading ? (
           <Skeleton shape="block" className={styles.plotSkeleton} />
@@ -429,8 +424,13 @@ export function Sparkline({
             aria-valuetext={
               point
                 ? formatLabel(labels.point, {
-                    label: headDate ?? "",
-                    value: restAggregate ? headValue : valueText,
+                    label: point.label,
+                    value: [
+                      valueText,
+                      ...lineTexts.map((line) =>
+                        formatLabel(labels.series, { label: line.label, value: line.text }),
+                      ),
+                    ].join("; "),
                   })
                 : undefined
             }
@@ -483,15 +483,16 @@ export function Sparkline({
                     className={styles.baseline}
                     style={{ "--sparkline-zero": geometry.zero } as React.CSSProperties}
                   />
-                  {data.map((p, i) => (
+                  {points.map((p, i) => (
                     <span
                       // biome-ignore lint/suspicious/noArrayIndexKey: one bar per point, in order
                       key={i}
                       className={styles.slot}
                       {...toDataAttributes({
                         current: i === index || undefined,
+                        partial: bucketed?.partial[i] || undefined,
                         quiet:
-                          (active !== null || highlight !== undefined) && i !== index
+                          (active !== null || typeof highlight === "number") && i !== index
                             ? true
                             : undefined,
                       })}
@@ -510,30 +511,56 @@ export function Sparkline({
                       )}
                     </span>
                   ))}
+                  {/* The lines of `series` over the bars. */}
+                  {drawing}
                 </div>
               ) : (
                 drawing
               )}
             </RegionSwap>
-            {point && !bars ? (
+            {point && geometry.lines.length ? (
               <span
                 className={styles.cursor}
-                data-hidden={restAggregate || undefined}
+                data-hidden={restPeriod || undefined}
                 aria-hidden="true"
-                style={
-                  {
-                    "--sparkline-x": x(index),
-                    "--sparkline-y": shownValue === null ? 0.5 : y(shownValue),
-                  } as React.CSSProperties
-                }
+                style={{ "--sparkline-x": x(index) } as React.CSSProperties}
               >
                 <span className={styles.guide} />
-                <span className={styles.dot} data-empty={shownValue === null || undefined} />
+                {geometry.lines.map((line) => {
+                  const at = line.values[index] ?? null;
+                  return (
+                    <span
+                      key={line.key}
+                      className={styles.dot}
+                      data-empty={at === null || undefined}
+                      style={
+                        {
+                          "--sparkline-y": at === null ? 0.5 : y(at),
+                          ...(line.color ? { "--sparkline-color": line.color } : null),
+                        } as React.CSSProperties
+                      }
+                    />
+                  );
+                })}
               </span>
             ) : null}
           </div>
         )}
       </RegionSwap>
+      {lineTexts.length && !compact ? (
+        // The names of the lines (meaning never by color alone) and their values at the point; the
+        // headline already gives the main one's. Not ChartFrame.Legend: that one toggles the series
+        // of its frame, these lines are not hidden.
+        // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+        <ul role="list" className={styles.legend} aria-label={labels.legend}>
+          <LegendItem label={label} variant={variant} />
+          {lineTexts.map((line) => (
+            <LegendItem key={line.key} label={line.label} variant={line.variant} color={line.color}>
+              {loading ? null : line.text}
+            </LegendItem>
+          ))}
+        </ul>
+      ) : null}
       {reference !== undefined ? (
         // Hidden text still feeds `aria-describedby` and is not read twice in the page flow.
         <span id={referenceId} hidden>
@@ -548,9 +575,54 @@ export function Sparkline({
           label={point?.label}
           onDismiss={() => setActive(null)}
         >
-          <span className={styles.tooltipValue}>{valueText}</span>
+          {lineTexts.length ? (
+            // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+            <ul role="list" className={styles.legend} data-in="tooltip">
+              <LegendItem label={label} variant={variant}>
+                {valueText}
+              </LegendItem>
+              {lineTexts.map((line) => (
+                <LegendItem
+                  key={line.key}
+                  label={line.label}
+                  variant={line.variant}
+                  color={line.color}
+                >
+                  {line.text}
+                </LegendItem>
+              ))}
+            </ul>
+          ) : (
+            <span className={styles.tooltipValue}>{valueText}</span>
+          )}
         </ChartTooltip>
       ) : null}
     </div>,
+  );
+}
+
+/** A line of the legend: a swatch drawn like the line, its name and, given, its value. */
+function LegendItem({
+  label,
+  variant,
+  color,
+  children,
+}: {
+  label: string;
+  variant: SparklineVariant;
+  color?: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <li
+      className={styles.legendItem}
+      style={color ? ({ "--sparkline-color": color } as React.CSSProperties) : undefined}
+    >
+      <span className={styles.swatch} data-line={variant} aria-hidden="true" />
+      <span className={styles.legendLabel}>{label}</span>
+      {children === undefined || children === null ? null : (
+        <span className={styles.legendValue}>{children}</span>
+      )}
+    </li>
   );
 }

@@ -13,6 +13,7 @@ import {
   type SparklinePoint,
   Tabs,
   Tooltip,
+  useSparkline,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -55,6 +56,8 @@ export default function DrawerTabSwitcherExample() {
   const [tab, setTab] = React.useState("description");
   const [lang, setLang] = React.useState<Lang>("ru");
   const [period, setPeriod] = React.useState<DatepickerRange>(ALL_TIME);
+  const sold = useSparkline({ data: SOLD, summary: "sum", formatValue: formatPieces });
+  const returned = useSparkline({ data: RETURNS, summary: "sum", formatValue: formatPieces });
 
   return (
     <Drawer.Root>
@@ -135,12 +138,8 @@ export default function DrawerTabSwitcherExample() {
                   <Card.Description>По месяцам, в штуках</Card.Description>
                 </Card.Header>
                 <Card.Body>
-                  <Sparkline
-                    data={SOLD}
-                    label="Продано за период"
-                    summary="sum"
-                    formatValue={formatPieces}
-                  />
+                  <Card.Value>{sold.valueText}</Card.Value>
+                  <Sparkline {...sold.plot} label="Продано по месяцам" />
                 </Card.Body>
               </Card.Root>
               <Card.Root variant="panel">
@@ -149,12 +148,8 @@ export default function DrawerTabSwitcherExample() {
                   <Card.Description>По месяцам, в штуках</Card.Description>
                 </Card.Header>
                 <Card.Body>
-                  <Sparkline
-                    data={RETURNS}
-                    label="Возвращено за период"
-                    summary="sum"
-                    formatValue={formatPieces}
-                  />
+                  <Card.Value>{returned.valueText}</Card.Value>
+                  <Sparkline {...returned.plot} label="Возвращено по месяцам" />
                 </Card.Body>
               </Card.Root>
             </Tabs.Panel>

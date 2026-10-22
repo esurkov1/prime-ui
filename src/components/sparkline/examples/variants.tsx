@@ -1,4 +1,4 @@
-/** The same week as an area, a bare line and bars from zero — `variant`. */
+/** The same week as an area, a bare line, a dashed and a dotted line and bars from zero — `variant`. */
 import { Sparkline, type SparklinePoint, Typography } from "prime-ui-kit";
 
 const ORDERS: SparklinePoint[] = [
@@ -11,7 +11,7 @@ const ORDERS: SparklinePoint[] = [
   { label: "8 окт", value: 52 },
 ];
 
-const VARIANTS = ["area", "line", "bars"] as const;
+const VARIANTS = ["area", "line", "dashed", "dotted", "bars"] as const;
 
 export default function SparklineVariantsExample() {
   return (

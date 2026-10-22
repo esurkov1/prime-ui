@@ -1352,8 +1352,8 @@ export function RevenuePanel() {
 ```
 
 For a plain KPI row use `Card.Root variant="stat-trend"` (Label · Value · Delta), each in a
-`Page.Cell span={3}` of the page's `Page.Grid` — see [the dashboard screen](../src/components/card/examples/screen.tsx). When the trend over days matters, put a
-`Sparkline` in the `Card.Body` instead: it brings the value and a line to scrub, the change with `compareTo`.
+`Page.Cell span={3}` of the page's `Page.Grid` — see [the dashboard screen](../src/components/card/examples/screen.tsx). When the trend over days matters, add a
+`Sparkline` to the tile: `useSparkline` gives its `Card.Value`, `Card.Delta` and `Card.Meta` (the change with `compareTo`), `{...reading.plot}` the line to scrub.
 A tile whose value is words, not a number («Выдать PCX 160», «Заявка в Mini App») →
 `variant="stat-text"`; a value with a meaning («к оплате» due, a payment made) → `Card.Value tone`
 (and `DescriptionList.Item tone` in a pair). A tile that leads somewhere is a link (`Card.Root asChild`
@@ -1503,7 +1503,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The period is a `SegmentedControl` in the bar's `Page.Tools` and the report a `soft` + `neutral` button with an icon in its `Page.Actions`: the period changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
 - Every tile of the screen is one `Page.Grid`: KPI `Card variant="stat-trend"` in `Page.Cell span={3}`, 16 px on both axes; `Card.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
 - Another period — other values: each KPI tile is wrapped in `Crossfade state={period}` and flows instead of blinking; a Crossfade right in a `Page.Cell` fills it, so the tiles of a row keep one height.
-- A trend over days is a `Sparkline` in a `Card` in a full-width cell: the period's sum (`summary`) and a line you can scrub with a finger; a new series appears by itself.
+- A trend over days is a `Sparkline` in a `Card` in a full-width cell: the card shows the period's sum from `useSparkline` (`summary`) over a line you can scrub with a finger; a new series appears by itself.
 - A chart with axes and several series is a `ChartFrame` in `Page.Cell span={8} rows={2}` beside two panels; `ChartFrame.Plot height="fill"` takes their height. A sized plot area (`renderPlot`), a legend that turns series off and a table for screen readers; series colors come from `series`, never your own.
 - Panels are `Card variant="panel"` with `Card.Title as="h2"` in `Card.Header` and quiet context on the right after the title (`caption` + `muted`).
 - Progress of one value is a `ProgressBar` with `label` and `showValue`; parts of a whole are `ProgressBar segments` with `legend` and `formatValue`: judgements wear `tone`, stages and categories `color` ([tone or color](foundations.md#tone-or-color)).

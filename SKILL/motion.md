@@ -31,7 +31,7 @@ Use the component and the motion comes with it. Never re-animate these with your
 | A one-time code | one focus ring glides between cells, digits fade in; while the server checks it the cells quiet down, success rolls across, a refused code clears and its reason shakes in | `DigitInput` (`onComplete` returns a Promise, or `success` / `error`) |
 | Steps of a whole | cells fill one after another | `ProgressBar steps value max` |
 | Progress | the fill slides | `ProgressBar`, `ProgressCircle` |
-| A trend card | scrub any point, the headline follows, the arrow turns, a new series cross-fades | `Sparkline` |
+| A trend card | scrub any point, the card's reading (`useSparkline`) follows, a new series cross-fades | `Sparkline` |
 | Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers, sheets and toasts come from their edge; a dialog, drawer or sheet leaves faster than it came, a small floating panel opens and closes on the same quick `fast` clock; the last content stays on screen while the exit plays | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `ConfirmDialog`, `Drawer`, `Sheet`, `MediaViewer`, notifications — the `Root` kept mounted |
 | Tooltips along a toolbar | the first waits, the next ones show at once | `Tooltip` (shared warm window) |
 | Toast stack | depth stack, expands on hover | `NotificationProvider` + `useNotifications` |
@@ -171,7 +171,7 @@ export function DeleteDraft({ onDelete }: { onDelete: () => void }) {
 in the middle of an empty card, never a flip, never a region that unfolds as the data comes
 ([the rule](foundations.md#11-state-changes-are-continuous)).
 
-**A metric that updates.** Put a number in a `Badge` or a `Sparkline` and change it: the digits roll.
+**A metric that updates.** Put a number in a `Badge` and change it: the digits roll.
 A number that changes by itself every frame (a running percentage) stays plain tabular text — rolling
 there is noise.
 

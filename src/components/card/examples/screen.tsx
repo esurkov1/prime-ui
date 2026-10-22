@@ -18,6 +18,7 @@ import {
   Sparkline,
   type SparklinePoint,
   Typography,
+  useSparkline,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -154,6 +155,11 @@ const COLUMNS: DataTableColumn<Payment>[] = [
 
 export default function CardScreenExample() {
   const [period, setPeriod] = React.useState<Period>("month");
+  const revenue = useSparkline({
+    data: REVENUE[period],
+    summary: "sum",
+    formatValue: formatRubles,
+  });
 
   return (
     <Page.Root>
@@ -203,12 +209,10 @@ export default function CardScreenExample() {
           <Page.Cell>
             <Card.Root variant="panel">
               <Card.Body>
-                <Sparkline
-                  data={REVENUE[period]}
-                  label="Выручка по дням"
-                  summary="sum"
-                  formatValue={formatRubles}
-                />
+                <Card.Label>Выручка за период</Card.Label>
+                <Card.Value>{revenue.valueText}</Card.Value>
+                <Sparkline {...revenue.plot} label="Выручка по дням" />
+                <Card.Meta>{revenue.date}</Card.Meta>
               </Card.Body>
             </Card.Root>
           </Page.Cell>
