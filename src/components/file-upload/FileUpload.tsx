@@ -975,13 +975,13 @@ function FileRow({
             {onRemove ? (
               <Button.Root
                 variant="ghost"
-                tone="neutral"
+                tone="danger"
                 aria-label={formatLabel(labels.remove, { name: file.name })}
                 loading={pending}
                 onClick={onRemove}
               >
                 <Button.Icon>
-                  <Icon name="action.close" />
+                  <Icon name="action.delete" />
                 </Button.Icon>
               </Button.Root>
             ) : null}

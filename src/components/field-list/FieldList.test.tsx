@@ -581,7 +581,7 @@ describe("FieldList", () => {
     for (const row of Array.from(rowsOf())) expect(row).toHaveAttribute("data-size", "s");
   });
 
-  it("ends a row on a filled edge: the «×» and the «⋯» are soft neutral at the row's field tier", () => {
+  it("ends a row on a filled edge: the trash is soft danger, the «⋯» soft neutral, at the row's field tier", () => {
     const { rerender } = render(
       <ControlSizeProvider value="l">
         <Lines />
@@ -589,7 +589,7 @@ describe("FieldList", () => {
     );
     const remove = screen.getByRole("button", { name: "Удалить: «Внедрение»" });
     expect(remove).toHaveAttribute("data-variant", "soft");
-    expect(remove).toHaveAttribute("data-tone", "neutral");
+    expect(remove).toHaveAttribute("data-tone", "danger");
     expect(remove).toHaveAttribute("data-size", "l");
     rerender(
       <ControlSizeProvider value="l">

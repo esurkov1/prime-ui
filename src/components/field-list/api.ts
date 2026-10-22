@@ -104,8 +104,8 @@ export const api: ComponentApi = {
           name: "rowActions",
           type: '"buttons" | "menu"',
           default: '"buttons"',
-          en: "How a row offers its actions: `buttons` — a remove button «×» and, with `reorderable`, the handle after it; `menu` — one «⋯» button whose menu moves the row up or down and removes it.",
-          ru: "Как строка даёт свои действия: `buttons` — кнопка удаления «×» и, с `reorderable`, ручка после неё; `menu` — одна кнопка «⋯», в её меню перенос выше или ниже и удаление.",
+          en: "How a row offers its actions: `buttons` — a remove button (trash) and, with `reorderable`, the handle after it; `menu` — one «⋯» button whose menu moves the row up or down and removes it.",
+          ru: "Как строка даёт свои действия: `buttons` — кнопка удаления (корзина) и, с `reorderable`, ручка после неё; `menu` — одна кнопка «⋯», в её меню перенос выше или ниже и удаление.",
         },
         {
           name: "variant",

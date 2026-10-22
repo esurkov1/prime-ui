@@ -26,7 +26,7 @@ checks.
 ## UX ([ux.md](ux.md))
 - [ ] I wrote the five-line brief before the JSX ([brief](ux.md#1-brief-before-code)).
 - [ ] Every entity is laid out by its shape: a record is one row or one block ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
-- [ ] A FieldList row shows its «×» in sight whatever its columns; `rowActions="menu"` only on a reorderable touch-first list; `variant` by the rule ([forms](composition.md#7-forms)).
+- [ ] A FieldList row shows its trash in sight whatever its columns; `rowActions="menu"` only on a reorderable touch-first list; `variant` by the rule ([forms](composition.md#7-forms)).
 - [ ] A section named after a set of records shows the records, with an action per row ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
 - [ ] Records of one kind are one list in their real order; rows the system fixes are `locked` in it, never a second section ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
 - [ ] Every heading names what nothing else names: no section over a block with its own title, no first block repeating its tab ([label economy](ux.md#3-label-economy)).

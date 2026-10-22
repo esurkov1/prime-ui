@@ -625,17 +625,18 @@ export function FieldList<T extends object>({
     } else {
       // The row's action takes the fill of the fields beside it: the row ends on a filled edge, as
       // it starts, and reads as one block; the menu button of `rowActions="menu"` does the same.
+      // It deletes, so it is the danger trash (a disabled one greys out).
       const removeButton = (
         <Button.Root
           variant="soft"
-          tone="neutral"
+          tone="danger"
           aria-label={formatLabel(labels.remove, { row: name })}
           disabled={removeOff}
           onClick={() => remove(id)}
           data-fl-action=""
         >
           <Button.Icon>
-            <Icon name="action.close" />
+            <Icon name="action.delete" />
           </Button.Icon>
         </Button.Root>
       );

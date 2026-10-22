@@ -9,7 +9,7 @@
 - A form part where a person adds, edits and removes several records of the same fields: invoice lines, contacts of a client, specs of a plan, recipients.
 - A base value with overrides (a price and its changes by month): the base is the first row, pinned with `getLocked`, each override is a row.
 - A list of short texts in the order a person sets (selling points, checklist items): one column, `reorderable`; each row ends with its remove button and its handle.
-- Every row shows its actions in sight — the remove «×» and, with `reorderable`, the grip after it — however many columns it has (the default `rowActions="buttons"`). `rowActions="menu"` only for a `reorderable` list on a touch-first screen, where «Выше» / «Ниже» in one «⋯» replace a drag; never for a list without `reorderable`, whose menu would hold one item.
+- Every row shows its actions in sight — the remove trash and, with `reorderable`, the grip after it — however many columns it has (the default `rowActions="buttons"`). `rowActions="menu"` only for a `reorderable` list on a touch-first screen, where «Выше» / «Ниже» in one «⋯» replace a drag; never for a list without `reorderable`, whose menu would hold one item.
 - Small attributes of a record beside its text (an icon, a color): `width="compact"` columns with an icon-only `Select` (`Select.TriggerIcon` and no `Select.Value`) and a `ColorPresets` swatch.
 
 ## When not to use
@@ -30,12 +30,12 @@ FieldList                    field frame: label · the list · hint / error
 ├─ sheet                     the rows on one grid (`variant="surface"`: a fill one step up the ladder)
 │  ├─ heading row            the column headings, once (aria-hidden; each field carries its heading as its label)
 │  ├─ <ol>                   the rows (Dnd.Sortable with `reorderable` and the buttons)
-│  │  └─ <li> row            [a cell per column] [end: × | ⋯] [grip: handle | lock]
+│  │  └─ <li> row            [a cell per column] [end: trash | ⋯] [grip: handle | lock]
 │  │     └─ cell             one kit field without `label`, named by its column heading
 │  └─ totals row             `renderTotals`: a group «Итого», a total per column on the same tracks
 └─ add row                   Button «addLabel» (leaves at `max`)
 ```
-A leaf: rows come from `value` through `renderItem`, which returns one element per column (a fragment). Every framed kit field (Input, Select, Datepicker, NativeSelect, ColorField…) in a cell takes its column heading as its label: read by screen readers, not shown while the heading row is on screen, shown above the field once the rows stack in a narrow container. `ColorPresets` takes it as the name of its trigger. Every row, a one-column row too, ends with the same slots: the remove «×» (or the «⋯» menu) and, with `reorderable` buttons, the grip after it — never a segment inside a field, where a «×» would read as «clear the text».
+A leaf: rows come from `value` through `renderItem`, which returns one element per column (a fragment). Every framed kit field (Input, Select, Datepicker, NativeSelect, ColorField…) in a cell takes its column heading as its label: read by screen readers, not shown while the heading row is on screen, shown above the field once the rows stack in a narrow container. `ColorPresets` takes it as the name of its trigger. Every row, a one-column row too, ends with the same slots: the remove trash (or the «⋯» menu) and, with `reorderable` buttons, the grip after it — never a segment inside a field, where a «×» would read as «clear the text».
 
 ## API
 
@@ -60,7 +60,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `reorderable` | `boolean` | `false` | Rows move: with `rowActions="buttons"` by a handle that ends the row, after the remove button (drag, a touch hold, Alt + ↑ / ↓); with `"menu"` by its items «Выше» and «Ниже» and Alt + ↑ / ↓ on the menu button. |
 | `stackedLabels` | `boolean` | `true` | Stacked rows (under 30rem) show each field's column heading as its label. `false` for values that name themselves («Аренда: 20 окт → 2 нояб»): no labels, the headings stay the fields' names. |
 | `hideHeadings` | `boolean` | `false` | No heading row above the rows, for fields that name themselves (a placeholder, a value); each field keeps its column heading as its accessible name. |
-| `rowActions` | `"buttons" \| "menu"` | `"buttons"` | How a row offers its actions: `buttons` — a remove button «×» and, with `reorderable`, the handle after it; `menu` — one «⋯» button whose menu moves the row up or down and removes it. |
+| `rowActions` | `"buttons" \| "menu"` | `"buttons"` | How a row offers its actions: `buttons` — a remove button (trash) and, with `reorderable`, the handle after it; `menu` — one «⋯» button whose menu moves the row up or down and removes it. |
 | `variant` | `"plain" \| "surface"` | `"plain"` | Look of the list: `plain` — the rows on the host surface; `surface` — the rows on a fill of their own, one step up the surface ladder, with side padding. |
 | `min` | `number` | `0` | The fewest rows: at this count the remove buttons are disabled. |
 | `max` | `number` | — | The most rows: at this count the add button closes up in place and comes back once a row is removed. The list says no limit text of its own; a limit the person should know goes in `hint`. |
@@ -85,7 +85,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ### rowActions
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `buttons` | a soft «×» at the row's end, as tall as the fields and, with `reorderable`, the grip after it; a pinned row: «×» off, then the lock | every list: one action (remove) or remove and move, any number of columns | yes |
+| `buttons` | a soft danger trash at the row's end (grey when off), as tall as the fields and, with `reorderable`, the grip after it; a pinned row: the trash off, then the lock | every list: one action (remove) or remove and move, any number of columns | yes |
 | `menu` | one soft «⋯» per row, as tall as the fields; its Dropdown holds «Выше», «Ниже» (with `reorderable`), a separator and «Удалить» (danger) | a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag; never without `reorderable` | |
 
 ### width (column)
@@ -129,11 +129,11 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | rows come and go | the add button, a remove, a menu move, a new `value` | a row the data adds rises in once (`enterMotion`), a removed one closes up in place and the rows below glide up (`listPresence`); any other change of the rows' set or order (a row added in the middle, a menu move, a new order in `value`) glides every row from where it stood (`useFlipList`), a drag leaves the glide to Dnd; still under reduced motion; the heading row rises in with the first row and closes up with the last (`partPresence`); the first render stays still |
 
 ## Layout & spacing
-- One grid for the list: every row, the heading row and the totals row share one track list `[columns] [end] [grip]`, so the columns line up like a table's; the end fits the row's «×» or «⋯» of the tier, the grip (with `reorderable` buttons) is one `xs` control wide (the handle or the lock) and ends the row on the inline-end side (on the left in RTL). Every row fills the same slots: a pinned row shows its remove off, never a hole.
+- One grid for the list: every row, the heading row and the totals row share one track list `[columns] [end] [grip]`, so the columns line up like a table's; the end fits the row's trash or «⋯» of the tier, the grip (with `reorderable` buttons) is one `xs` control wide (the handle or the lock) and ends the row on the inline-end side (on the left in RTL). Every row fills the same slots: a pinned row shows its remove off, never a hole.
 - On `surface` rows stand edge to edge, 8 of padding above and below their fields, and a faint line parts two rows (`hairline`), inset by the side padding, none above the first row. A `plain` list on one line per record draws no lines: its rows stand one gap apart (8, `--prime-space-2`: 4 of padding above and below each), the air between the fields parts them, and its headings keep 8 above the first row's fields. Columns 12 apart (`--prime-space-3`).
 - `plain`: side padding 0. `surface`: the sheet's fill (`--prime-color-layer-current` at its `data-depth`), radius `--prime-radius-l`, 12 of side padding on every row and 12 above the headings and under the last row.
 - A `compact` column is measured: its track is the widest of its controls, its heading and its total, so the gaps between columns are all 12.
-- The «×» and the «⋯» are `soft` neutral icon buttons of the row's tier: a square as tall as the fields, one column gap (12) after the last field, so the row starts on a field's fill and ends on the button's — one block, its end edge as far from the host's end as its start is from the host's start. The handle and the lock are a grip, not a press target: they stay without a fill.
+- The trash (`soft` danger: it deletes) and the «⋯» (`soft` neutral) are icon buttons of the row's tier: a square as tall as the fields, one column gap (12) after the last field, so the row starts on a field's fill and ends on the button's — one block, its end edge as far from the host's end as its start is from the host's start. The handle and the lock are a grip, not a press target: they stay without a fill.
 - The remove button, the menu button, the handle and the lock stand on the middle of the first line of fields, so a field's error under it grows the row downwards only.
 - The totals row stands under the last row over a faint line; a total's text sits where its column's field text does: at the start, or at the end for a field that ends its number there (an `Input` with `inputMode="decimal"` and an end `Input.InlineAffix`). Stacked, every total ends its line.
 - The add button lines up with the sheet's start, 12 under it.
@@ -211,7 +211,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A pinned row with an empty place where the others have a remove button → none to fix by hand: FieldList draws it off with `labels.lockedReason`; say the domain reason there («Базовую цену нельзя удалить»).
 - A remove «×» as an `Input.Action` inside a one-field row → none: a «×» in a field reads as «clear the text»; FieldList ends every row with its own remove.
 - A «⋯» menu or a «−» drawn by hand next to the rows → `rowActions`; a Card drawn around the list to set it apart from the form → `variant="surface"`.
-- `rowActions="menu"` on a two-column list a person reorders all day → the buttons: the handle and «×» in sight are one gesture, the menu is three.
+- `rowActions="menu"` on a two-column list a person reorders all day → the buttons: the handle and the trash in sight are one gesture, the menu is three.
 - `aria-label` written on every field in a cell → none: the column heading names the field.
 - «Позиция» / «Сумма» above every field of every stacked row when the values already say what they are («Аренда: 20 окт → 2 нояб», «1 200 ₽») → `stackedLabels={false}`; never an empty column `label` to hide them, which leaves the fields unnamed.
 - `createItem` dropped by hand once nothing is left to add (every section picked) → `max`: the add button leaves at the limit by itself; a limit the person should know is a `hint` («Не больше трёх получателей»), never a count beside the button.

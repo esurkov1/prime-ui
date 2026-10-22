@@ -148,11 +148,11 @@
     {
       "id": 12,
       "prompt": "В форме договора с клиентом добавь этапы оплаты: название этапа, срок в днях, доля в процентах. Этапы можно переставлять, аванс всегда первый. Рядом в той же карточке — поля «Валюта» и «Комментарий».",
-      "expected_output": "A FieldList of three columns with the default rowActions (the «×» and the grip in sight on every row — three columns are no reason for a menu), reorderable, the advance pinned by getLocked; variant=\"surface\" because the list stands among other fields of the card.",
+      "expected_output": "A FieldList of three columns with the default rowActions (the trash and the grip in sight on every row — three columns are no reason for a menu), reorderable, the advance pinned by getLocked; variant=\"surface\" because the list stands among other fields of the card.",
       "files": [],
       "expectations": [
         "The stages are a FieldList with reorderable and the advance pinned by getLocked",
-        "The rows keep the default rowActions=\"buttons\": the remove «×» and the grip in sight; no «⋯» menu chosen because the rows have three columns, no hand-made remove button",
+        "The rows keep the default rowActions=\"buttons\": the remove trash and the grip in sight; no «⋯» menu chosen because the rows have three columns, no hand-made remove button",
         "The list sets variant=\"surface\" so it reads apart from the other fields of the card, not a Card or a border drawn around it"
       ]
     },
@@ -222,11 +222,11 @@
     {
       "id": 18,
       "prompt": "Сделай редактор роли: название, описание, доступ к 13 разделам CRM (у каждого уровень: нет, просмотр, изменение, полный — и область: свои или все записи) и дополнительные права (экспорт, удаление, управление командой). В таблице ролей покажи, к каким разделам у роли есть доступ.",
-      "expected_output": "Access is a FieldList with Раздел · Уровень · Записи columns of Selects and «+ Раздел» (no row means no access), rows with the default «×» in sight; the extra permissions are Switches; in the roles table the sections are Badge.Group overflow=\"count\" in one line.",
+      "expected_output": "Access is a FieldList with Раздел · Уровень · Записи columns of Selects and «+ Раздел» (no row means no access), rows with the default trash in sight; the extra permissions are Switches; in the roles table the sections are Badge.Group overflow=\"count\" in one line.",
       "files": [],
       "expectations": [
         "Section access is a FieldList whose cells are Selects (section, level, scope), not thirteen captioned SegmentedControls",
-        "The FieldList keeps the default rowActions (an «×» per row), not rowActions=\"menu\" chosen for its three columns",
+        "The FieldList keeps the default rowActions (a trash per row), not rowActions=\"menu\" chosen for its three columns",
         "The extra permissions are Switch controls with their labels, not Checkboxes",
         "The roles table shows the sections as Badge.Group with overflow=\"count\", not a string joined by «·» with a hand-made «+5»"
       ]
@@ -477,10 +477,10 @@
     {
       "id": 38,
       "prompt": "Добавь в карточку счёта строки позиций с удалением и кнопку изменения депозита рядом с «Вернуть».",
-      "expected_output": "The bill lines are a FieldList inside the card (its row «×» is the kit's soft neutral button at the field height, no hand-made remove buttons); the deposit card header has a soft neutral «Вернуть» and beside it a soft neutral icon-only edit button with aria-label and a Tooltip, at the same height. Ghost icon buttons appear only in a dialog header or a table cell.",
+      "expected_output": "The bill lines are a FieldList inside the card (its row trash is the kit's soft danger button at the field height, no hand-made remove buttons); the deposit card header has a soft neutral «Вернуть» and beside it a soft neutral icon-only edit button with aria-label and a Tooltip, at the same height. Ghost icon buttons appear only in a dialog header or a table cell.",
       "files": [],
       "expectations": [
-        "The bill lines are a FieldList (its own remove «×»), not a .map() of fields with a hand-made remove Button after each",
+        "The bill lines are a FieldList (its own remove trash), not a .map() of fields with a hand-made remove Button after each",
         "The deposit edit button is icon-only Button.Root variant=\"soft\" tone=\"neutral\" with an aria-label, beside the soft neutral «Вернуть» and without its own size (the same height)",
         "No icon-only Button with variant=\"ghost\" stands beside a filled field, Select or soft button; ghost appears only in a dialog header's actions or a table cell"
       ]

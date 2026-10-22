@@ -501,10 +501,11 @@ An icon-only button that ends or sits inside a row of filled things — fields, 
 filled segment — is `variant="soft" tone="neutral"` at their height (the host tier gives it: no
 `size` beside fields of the same tier), so the row starts and ends on a filled edge and reads as
 one block. A `ghost` icon there leaves its glyph floating in air: the row seems to end at the last
-field, and its end no longer mirrors its start against the card's padding. A remove «×» stays
-neutral: the danger is in the action, not in the look. `ghost` stays where the neighbours have no
+field, and its end no longer mirrors its start against the card's padding. A remove that deletes is
+the trash (`action.delete`) in `soft` + `danger`: red while it can act, grey when disabled — never a
+«×», which reads as «close» or «clear». `ghost` stays where the neighbours have no
 fill: a dialog header's actions beside the ×, a table cell among text, a chat header, a toolbar of
-ghost tools, a button inline in text; over media it is `shade`. A `FieldList` draws its row «×» and
+ghost tools, a button inline in text; over media it is `shade`. A `FieldList` draws its row trash and
 «⋯» this way itself.
 
 ```tsx partial
@@ -531,7 +532,7 @@ ghost tools, a button inline in text; over media it is `shade`. A `FieldList` dr
 ```tsx good
 // declare: const lines: { id: string; price: string }[]
 // declare: const setLines: (lines: { id: string; price: string }[]) => void
-// good — the edit icon takes the fill of «Вернуть»; the lines are a FieldList, whose «×» is soft
+// good — the edit icon takes the fill of «Вернуть»; the lines are a FieldList, whose trash is soft danger
 <>
   <Card.Header>
     <Card.Title>300 $</Card.Title>
@@ -668,12 +669,12 @@ the title by itself — never fold them into a «⋯» for the width. A destruct
 - Records of one shape that a person adds, edits and removes are a `FieldList`: one row per record,
   the column headings once above the rows, small attributes (an icon, then its color) in `compact`
   columns. Never a label in every row, never numbered labels, never one record split over lines.
-  FieldList draws every row's actions itself — the remove «×» and the handle after it, a pinned
+  FieldList draws every row's actions itself — the remove trash and the handle after it, a pinned
   row's remove off with its reason (`labels.lockedReason`) — so never add your own. Its add button
   under the rows is the place for records filled in place; a list people pick from creates at its
   top ([where the create button goes](#where-the-create-button-goes)).
 - The row's actions (`rowActions`) follow [the menu threshold](#a-menu-from-two-actions): a row
-  that only removes shows its «×» (the default `"buttons"`, and the grip after it with
+  that only removes shows its trash (the default `"buttons"`, and the grip after it with
   `reorderable`), however many columns it has; `"menu"` — one «⋯» with «Выше», «Ниже», «Удалить» —
   only for a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag.
 - The look (`variant`): `"plain"` (default) when the list is the content of its card or section;
