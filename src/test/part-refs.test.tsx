@@ -21,6 +21,7 @@ import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import type * as colorPickerEntry from "@/color-picker";
 import {
+  Accordion,
   Badge,
   Banner,
   Breadcrumb,
@@ -240,6 +241,22 @@ const CASES: Case[] = [
     ),
   ],
   ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} data-testid="part" />],
+  [
+    "Accordion.Content",
+    "SECTION",
+    (ref) => (
+      <Accordion.Root>
+        <Accordion.Item value="a">
+          <Accordion.Header>
+            <Accordion.Trigger>Реквизиты</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content ref={ref} data-testid="part">
+            ИНН 7701234567
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>
+    ),
+  ],
   [
     "Banner.Root",
     "DIV",

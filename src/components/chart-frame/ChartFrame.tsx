@@ -450,6 +450,7 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
   const loading = state === "loading";
   // A legend value sits in a button (phrasing content only): it fades in place.
   const valueSwap = useSwapIn(loading ? "loading" : "data");
+  const valueLoading = valueSwap.state === "loading";
   const active = Math.min(focusIndex, Math.max(series.length - 1, 0));
 
   if (series.length === 0) return null;
@@ -481,7 +482,7 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
             />
             <span className={styles.legendLabel}>{item.label}</span>
             {item.value !== undefined ? (
-              loading ? (
+              valueLoading ? (
                 <Skeleton
                   key={valueSwap.key}
                   shape="text"

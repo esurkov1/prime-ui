@@ -715,9 +715,12 @@ export function DataTable<Row>({
   const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
   /* Body state swaps (loading → rows → empty / error) fade in place: rows cannot be laid over a
      table, so the body remounts under its state key and fades in; the first render, sorting and
-     paging stay still (same state). A replaced server page (`rowArrival.batch`) swaps the same way. */
+     paging stay still (same state). A replaced server page (`rowArrival.batch`) swaps the same way.
+     The body follows its state at once (no hold): a refresh with rows on screen keeps them. */
   const { key: bodyKey, className: swapClass } = useSwapIn(
     bodyState === "loading" ? bodyState : `${bodyState}-${rowArrival.batch}`,
+    undefined,
+    false,
   );
   // A row grip leads or ends its row (`reorderHandle`), or the row itself is the grip.
   const rowHandle = reorder.enabled ? reorderHandle : null;

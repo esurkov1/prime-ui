@@ -43,7 +43,7 @@ Crossfade          <div>; holds the region's height while it changes
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Crossfade
-`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and, between settled states, glides to the new height; still on the first render. Under reduced motion the old content goes at once and the height jumps.
+`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and, between settled states, glides from the height on screen to the new one; still on the first render. A state that turns back within the swap hold never shows.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -72,10 +72,12 @@ Crossfade has no variants: one treatment, keyed by `state`.
 | State | Driven by | DOM |
 |---|---|---|
 | first render | mount | one layer, `data-state="open"`, no motion |
-| swapping | `state` changes | previous layer `data-state="closed"`, `aria-hidden`, `inert`, absolutely placed, fades out over `fast` with `exit` easing and unmounts on `animationend` (timeout fallback), clipped to the root while it leaves (`data-swapping="true"`); the new layer fades in over `base` with `enter` easing |
+| held | `state` changes; a swap out of `"loading"` or back to a state still on screen does not wait | for the swap hold (120 ms, foundation §7 rule 8) root `data-held="true"` keeps the height on screen (`data-resizing="true"`), the old layer stays shown and the new one, already in the document, unseen; a `state` that turns back within it brings the old layer back as it was — no fade, no glide; another one replaces the waiting one unseen |
+| swapping | the hold is over | previous layer `data-state="closed"`, `aria-hidden`, `inert`, absolutely placed, fades out over `fast` with `exit` easing and unmounts once faded (timeout fallback), clipped to the root while it leaves (`data-swapping="true"`); the new layer fades in over `base` with `enter` easing. The fades run from the opacity on screen, over the part of the clock the distance takes |
+| reversing | `state` turns back to a state whose layer is still fading out | no hold: that layer takes its place again and fades back in from where it is, the other fades out from where it is, the height glides back from where it is — no restart, no dip |
 | loading swap | `state` changes into or out of `"loading"` | as swapping, but the new layer fades in over `fast` and the root takes the new height at once (no `data-resizing`) |
-| resizing | a swap between settled states, the new one of another height | root `data-resizing="true"`: height glides from the old to the new value over `base` with `standard` easing (a swap mid-glide starts from the height on screen), clipped with a `--prime-focus-space` margin, then returns to `auto` |
-| reduced motion | `prefers-reduced-motion: reduce` | the old layer goes before it is painted and the height does not glide; the new layer still fades in (the fade clock, foundation §7 rule 12) |
+| resizing | a swap between settled states, the new one more than 2px off the height on screen | root `data-resizing="true"`: height glides from the height on screen to the new one over `base` with `standard` easing (a swap mid-glide starts from where it is; new content that settles later — a part portalled in, an image — moves the target and the glide turns to it), clipped with a `--prime-focus-space` margin, then returns to `auto` |
+| reduced motion | `prefers-reduced-motion: reduce` | once the hold is over the old layer goes before it is painted and the height does not glide; the new layer still fades in (the fade clock, foundation §7 rule 12) |
 | focus handoff | focus was in the old state when `state` changed | focus moves into the new layer: its first tab stop, else the layer itself (`tabindex="-1"`); focus elsewhere stays |
 | empty | the current state renders nothing (`null`, `false`, `""`) | no current layer; once nothing is leaving the root is `:empty` and `display: none` — no box and no gap in its grid or flex parent |
 | filling | `fill` | `data-fill="true"`; the root is a one-cell grid (`flex: 1`, `height: 100%`, `min-height: 0`), layers stretch to it |
@@ -126,6 +128,7 @@ No `labels`.
 - `fill` around a card on a full-screen canvas (a sign-in page) → the card stretches to the canvas height; leave `fill` off and put the Crossfade around the card inside the canvas.
 - A loading state that renders nothing (`{loading ? null : <List />}`) → the region grows from zero when the data arrives; content that mounts already loaded appears in place, and a loading state is a `Skeleton` in the data's geometry.
 - A loading state under another key (`"pending"`, `"fetching"`) → the swap to data glides the height as if it were a settled state; name it `"loading"`.
+- Splitting empty ↔ list out of the Crossfade, or holding a removed record until the refetch, to stop the region folding → key `state` by the region's status; a status that turns back within the hold never moves, and a change inside one state (a row added or removed) moves only that row.
 - Rendering an optional block conditionally outside Crossfade (`{notice && <Banner />}`) → it pops in and out; keep the Crossfade and pass `null` when there is nothing to show.
 
 ## Related

@@ -90,12 +90,13 @@ function isLinkElement(child: React.ReactElement<Record<string, unknown>>): bool
  */
 function useLoadingPart(placeholder: React.ReactNode, children: React.ReactNode) {
   const loading = React.useContext(LoadingContext);
-  const swap = useSwapIn(loading ? "loading" : "data");
+  const swap = useSwapIn(loading ? "loading" : "data", children);
+  const shownLoading = swap.state === "loading";
   return {
     key: swap.key,
     className: swap.className,
-    "data-loading": loading || undefined,
-    children: loading ? placeholder : children,
+    "data-loading": shownLoading || undefined,
+    children: shownLoading ? placeholder : swap.content,
   };
 }
 

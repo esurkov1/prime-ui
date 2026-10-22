@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Crossfade",
-      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and, between settled states, glides to the new height; still on the first render. Under reduced motion the old content goes at once and the height jumps.",
-      ru: "Область, которая плавно сменяет содержимое при смене `state` и между устоявшимися состояниями мягко подстраивает высоту; на первом рендере неподвижна. При reduced motion старое содержимое уходит сразу и высота меняется скачком.",
+      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and, between settled states, glides from the height on screen to the new one; still on the first render. A state that turns back within the swap hold never shows.",
+      ru: "Область, которая плавно сменяет содержимое при смене `state` и между устоявшимися состояниями мягко подстраивает высоту; на первом рендере неподвижна. Состояние, вернувшееся за окно удержания смены, не показывается вовсе.",
       props: [
         {
           name: "state",

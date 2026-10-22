@@ -451,7 +451,8 @@ function CarouselRoot({
     if (opensRow(event)) onItemOpen(current);
   };
 
-  const swap = useSwapIn(loading ? "loading" : "data");
+  // The slides, the dots and the count follow `loading` together: the viewport swaps at once.
+  const swap = useSwapIn(loading ? "loading" : "data", undefined, false);
 
   // The carousel's overlays stand in their corners, in their order, nearest the corner first.
   const { parts: overlays, rest: others } = splitParts<CarouselOverlayProps>(

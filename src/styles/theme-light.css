@@ -416,6 +416,7 @@
   --prime-motion-scale-pulse: 2;
   --prime-motion-scale-settle: 0.9;
   --prime-motion-stagger: var(--prime-ref-duration-80);
+  --prime-motion-swap-hold: var(--prime-ref-duration-120);
   --prime-opacity-busy: 0.6;
   --prime-opacity-dim: 0.42;
   --prime-opacity-disabled: 0.5;

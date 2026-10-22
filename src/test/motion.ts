@@ -1,11 +1,14 @@
 /**
  * The shared motion harness of component tests. Tests run with `prefers-reduced-motion: reduce`
- * (`setup.ts`), so presence and swaps settle at once; a test that covers motion calls
- * `withMotion()` in its body or a `beforeEach` instead of stubbing `matchMedia` and
- * `Element.animate` by hand. Everything it installs is undone after the test (`restoreMocks` /
+ * (`setup.ts`), so presence settles at once and a region swap once its hold is over
+ * (`passSwapHold`); a test that covers motion calls `withMotion()` in its body or a `beforeEach`
+ * instead of stubbing `matchMedia` and `Element.animate` by hand. Everything it installs is undone after the test (`restoreMocks` /
  * `unstubGlobals` in `vitest.config.ts`, and its own `afterEach`).
  */
+import { act } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
+
+import { readCssDurationMs } from "@/internal/motionTiming";
 
 export type RecordedAnimation = {
   element: Element;
@@ -119,4 +122,14 @@ export function withMotion(): MotionHarness {
       for (const animation of animations) if (!animation.cancelled) animation.finish();
     },
   };
+}
+
+/**
+ * Waits out the hold of a region swap (`RegionSwap`, `--prime-motion-swap-hold`) under fake timers:
+ * the swap moves, and under reduced motion the old state is gone.
+ */
+export function passSwapHold() {
+  act(() => {
+    vi.advanceTimersByTime(readCssDurationMs("--prime-motion-swap-hold"));
+  });
 }

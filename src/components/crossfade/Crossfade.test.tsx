@@ -1,15 +1,18 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import swapMotion from "@/internal/swapMotion.module.css";
 import { cssRule, cssValue } from "@/test/css";
-import { withMotion } from "@/test/motion";
+import { passSwapHold, withMotion } from "@/test/motion";
 
 import { Crossfade } from "./Crossfade";
 import styles from "./Crossfade.module.css";
 
 const layerOf = (text: string) => screen.getByText(text).parentElement as HTMLElement;
+
+/** The opacity runs on a node: `[from, to]` each. */
+const fadesOn = (motion: ReturnType<typeof withMotion>, node: Element) =>
+  motion.on(node).map((run) => (run.keyframes as Keyframe[]).map((frame) => frame.opacity));
 
 describe("Crossfade", () => {
   it("is a plain region: the ref and the attributes reach its div", () => {
@@ -23,11 +26,11 @@ describe("Crossfade", () => {
     expect(ref.current).toHaveAttribute("aria-busy", "true");
     expect(ref.current).toHaveAttribute("aria-live", "polite");
     expect(ref.current).toHaveClass("panel");
-    expect(layerOf("Загрузка")).not.toHaveClass(swapMotion.swapIn);
   });
 
   it("cross-fades a new state: the old one leaves hidden from assistive tech and Tab", () => {
-    withMotion();
+    const motion = withMotion();
+    vi.useFakeTimers();
     const { rerender } = render(
       <Crossfade state="empty">
         <p>Пусто</p>
@@ -41,13 +44,15 @@ describe("Crossfade", () => {
     const leaving = layerOf("Пусто");
     expect(leaving).toHaveAttribute("aria-hidden", "true");
     expect(leaving).toHaveAttribute("inert");
-    expect(layerOf("Данные")).toHaveClass(swapMotion.swapIn);
-    fireEvent.animationEnd(leaving);
+    passSwapHold();
+    expect(fadesOn(motion, layerOf("Данные")).at(-1)).toEqual([0, 1]);
+    act(() => motion.finishAll());
     expect(screen.queryByText("Пусто")).toBeNull();
+    vi.useRealTimers();
   });
 
   it('the data replaces the "loading" skeleton in place: no height glide, a short fade', () => {
-    withMotion();
+    const motion = withMotion();
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
       this: HTMLElement,
     ) {
@@ -66,7 +71,8 @@ describe("Crossfade", () => {
     const root = container.firstElementChild as HTMLElement;
     expect(root).not.toHaveAttribute("data-resizing");
     expect(root.style.getPropertyValue("--swap-height")).toBe("");
-    expect(layerOf("Платежи")).toHaveClass(swapMotion.settleIn);
+    const fadeIn = motion.on(layerOf("Платежи")).at(-1);
+    expect((fadeIn?.options as KeyframeAnimationOptions).duration).toBe(230);
     vi.restoreAllMocks();
   });
 
@@ -96,7 +102,7 @@ describe("Crossfade", () => {
   });
 
   it("content that mounts already loaded appears in place: no height glide, no fade", () => {
-    withMotion();
+    const motion = withMotion();
     // A remounted tab with cached data: the region would glide from zero if it treated its
     // first state as a swap.
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
@@ -116,7 +122,7 @@ describe("Crossfade", () => {
     expect(root).not.toHaveAttribute("data-resizing");
     expect(root.style.getPropertyValue("--swap-height")).toBe("");
     expect(root.children).toHaveLength(1);
-    expect(layerOf("Уведомления")).not.toHaveClass(swapMotion.swapIn);
+    expect(motion.animations).toHaveLength(0);
   });
 
   it("spans its parent's inline size, also in a centring grid; a consumer class can override it", () => {

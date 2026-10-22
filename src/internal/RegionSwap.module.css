@@ -1,11 +1,11 @@
 /*
  * RegionSwap — a region that swaps its content between states (foundation §7 rule 8). The current
- * state is in flow and fades in (`swapMotion.swapIn`, `.settleIn` into or out of loading); the
- * previous one is laid over it, click-through, and fades out (`swapMotion.swapOut`). Between
- * settled states the root glides from the old size to the new one (base · standard, the "height
- * glide" exception of foundation §7 rule 5) through `--swap-size`, which the component sets only
- * while it glides, and returns to `auto`. A swap into or out of loading takes the new size at once
- * (`data-swapping` clips the old layer to it).
+ * state is in flow; the previous one is laid over it, click-through. Their fades are the
+ * component's own (WAAPI from the opacity on screen), so a swap that turns back reverses them in
+ * place. Between settled states the root glides from the size on screen to the new one (base ·
+ * standard, the "height glide" exception of foundation §7 rule 5) through `--swap-size`, which the
+ * component sets only while it holds or glides, and returns to `auto`. A swap into or out of
+ * loading takes the new size at once (`data-swapping` clips the old layer to it).
  *
  * `data-axis="block"` (a region): the height glides, the old state lies over the new one from the
  * top edge. `data-axis="inline"` (one cell of a row, `src/internal/rowCells`): the width glides, both
@@ -46,6 +46,8 @@
    in a scroller) keeps its scroll width. */
 .root[data-axis="block"][data-resizing="true"] {
   height: var(--swap-size);
+  /* The layer keeps its own height, not the root's: the glide follows what it measures. */
+  align-content: start;
   overflow-y: clip;
   overflow-clip-margin: var(--prime-focus-space);
 }

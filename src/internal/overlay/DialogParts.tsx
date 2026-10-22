@@ -565,7 +565,8 @@ export function DialogTitle({
   ...rest
 }: DialogTitleProps) {
   const { titleId, registerTitle } = useDialogShell("Title");
-  const swap = useSwapIn(loading ? "loading" : "data");
+  const swap = useSwapIn(loading ? "loading" : "data", children);
+  const shownLoading = swap.state === "loading";
   const nameRef = React.useRef<HTMLSpanElement>(null);
   useCutLineTitle(nameRef, rest.title);
   React.useLayoutEffect(() => {
@@ -577,15 +578,15 @@ export function DialogTitle({
       {...rest}
       key={swap.key}
       id={titleId}
-      aria-busy={loading || undefined}
+      aria-busy={shownLoading || undefined}
       className={cx(textRole.titleM, styles.title, swap.className, className)}
     >
-      {loading ? (
+      {shownLoading ? (
         <Skeleton size="l" className={styles.titleSkeleton} />
       ) : (
         <>
           <span ref={nameRef} className={styles.titleName}>
-            {children}
+            {swap.content}
           </span>
           {number !== undefined && number !== null ? (
             <>
@@ -616,12 +617,12 @@ export type DialogBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
  */
 export function DialogBadges({ loading = false, className, children, ...rest }: DialogBadgesProps) {
   const { registerBadges } = useDialogShell("Badges");
-  const swap = useSwapIn(loading ? "loading" : "data");
+  const swap = useSwapIn(loading ? "loading" : "data", children);
   React.useLayoutEffect(() => {
     registerBadges(true);
     return () => registerBadges(false);
   }, [registerBadges]);
-  if (loading) {
+  if (swap.state === "loading") {
     return (
       <div
         {...rest}
@@ -641,7 +642,7 @@ export function DialogBadges({ loading = false, className, children, ...rest }: 
       overflow="count"
       className={cx(styles.badges, swap.className, className)}
     >
-      {children}
+      {swap.content}
     </Badge.Group>
   );
 }
@@ -668,7 +669,8 @@ export function DialogDescription({
   ...rest
 }: DialogDescriptionProps) {
   const { descriptionId, registerDescription } = useDialogShell("Description");
-  const swap = useSwapIn(loading ? "loading" : "data");
+  const swap = useSwapIn(loading ? "loading" : "data", children);
+  const shownLoading = swap.state === "loading";
   const lineRef = React.useRef<HTMLParagraphElement>(null);
   const mergedRef = useMergedRefs(lineRef, ref);
   useCutLineTitle(lineRef, rest.title);
@@ -682,10 +684,10 @@ export function DialogDescription({
       ref={mergedRef}
       key={swap.key}
       id={descriptionId}
-      aria-busy={loading || undefined}
+      aria-busy={shownLoading || undefined}
       className={cx(textRole.bodyS, styles.description, swap.className, className)}
     >
-      {loading ? <Skeleton size="s" className={styles.descriptionSkeleton} /> : children}
+      {shownLoading ? <Skeleton size="s" className={styles.descriptionSkeleton} /> : swap.content}
     </p>
   );
 }

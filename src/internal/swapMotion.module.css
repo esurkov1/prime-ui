@@ -1,6 +1,7 @@
 /*
- * State swap motion (foundation §7 rule 8: two states replacing each other in place cross-fade),
- * the fades of `RegionSwap`. Opacity only — no shift, so a swapped region never moves and creates
+ * State swap motion (foundation §7 rule 8: two states replacing each other in place cross-fade):
+ * the fades of a swap in place (`useSwapIn`) and of the Gantt's bars. `RegionSwap` runs its own
+ * layer fades on the same clocks, from the opacity on screen. Opacity only — no shift, so a swapped region never moves and creates
  * no containing block. Between settled states enter takes the content-swap clock (`base`); a swap
  * into or out of loading (the Skeleton handing over to the data) is a short one (`fast`), so the
  * data replaces its placeholder rather than revealing itself. Exit is always `fast`. All are fade

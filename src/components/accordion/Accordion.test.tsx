@@ -1,8 +1,9 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { withMotion } from "@/test/motion";
 
 import { Accordion, type AccordionRootProps } from "./Accordion";
 
@@ -139,18 +140,61 @@ describe("Accordion", () => {
     expect(region).toHaveAttribute("aria-labelledby", triggerId);
   });
 
-  it("closed content is inert (out of the tab order and the a11y tree); open content is not", () => {
+  it("closed content stays findable: hidden until found, out of the tab order; open content is not", () => {
     renderAccordion();
     const trigger = screen.getByRole("button", { name: /Section 1/ });
     const contentId = trigger.getAttribute("aria-controls");
     const content = contentId ? document.getElementById(contentId) : null;
-    expect(content).toHaveAttribute("inert");
-    // `inert` already hides it; a second `aria-hidden` would only duplicate it.
+    const clip = content?.firstElementChild as HTMLElement;
+    // Settled closed: `hidden="until-found"` hides it from Tab and assistive tech, not from find.
+    expect(clip).toHaveAttribute("hidden", "until-found");
+    expect(content).not.toHaveAttribute("inert");
     expect(content).not.toHaveAttribute("aria-hidden");
     expect(content).toHaveAttribute("data-state", "closed");
     fireEvent.click(trigger);
+    expect(clip).not.toHaveAttribute("hidden");
     expect(content).not.toHaveAttribute("inert");
     expect(content).toHaveAttribute("data-state", "open");
+    fireEvent.click(trigger);
+    expect(clip).toHaveAttribute("hidden", "until-found");
+  });
+
+  it("is inert while it closes, then hidden until found", () => {
+    withMotion();
+    vi.useFakeTimers();
+    renderAccordion();
+    const trigger = screen.getByRole("button", { name: /Section 1/ });
+    const content = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+    const clip = content?.firstElementChild as HTMLElement;
+    act(() => {
+      vi.advanceTimersByTime(20);
+    });
+    fireEvent.click(trigger);
+    fireEvent.click(trigger);
+    expect(content).toHaveAttribute("inert");
+    expect(clip).not.toHaveAttribute("hidden");
+    act(() => {
+      content?.dispatchEvent(
+        Object.assign(new Event("transitionend"), { propertyName: "visibility" }),
+      );
+    });
+    expect(content).not.toHaveAttribute("inert");
+    expect(clip).toHaveAttribute("hidden", "until-found");
+    vi.useRealTimers();
+  });
+
+  it("find in page opens the item that holds the match, at once", () => {
+    renderAccordion();
+    const trigger = screen.getByRole("button", { name: /Section 1/ });
+    const content = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+    const clip = content?.firstElementChild as HTMLElement;
+    act(() => {
+      clip.dispatchEvent(new Event("beforematch"));
+    });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(content).toHaveAttribute("data-state", "open");
+    expect(content).not.toHaveAttribute("data-mounted");
+    expect(clip).not.toHaveAttribute("hidden");
   });
 
   it("Enter and Space on a focused trigger open and close the item", async () => {

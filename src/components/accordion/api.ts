@@ -155,8 +155,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Content",
-      en: "`ref` → `HTMLElement`. The `<section>` region; closed content is `inert` (out of the tab order and the accessibility tree). `className` goes to the padded inner block.",
-      ru: "Область `<section>`; закрытое содержимое `inert` (вне порядка Tab и дерева доступности). `className` попадает на внутренний блок с отступами.",
+      en: "`ref` → `HTMLElement`. The `<section>` region; closed content is out of the tab order and the accessibility tree but found by find in page, which opens its item. `className` goes to the padded inner block.",
+      ru: "Область `<section>`; закрытое содержимое вне порядка Tab и дерева доступности, но находится поиском по странице, который раскрывает его раздел. `className` попадает на внутренний блок с отступами.",
       props: [
         {
           name: "children",
@@ -193,8 +193,8 @@ export const api: ComponentApi = {
         ru: "Заголовок — нативная `<button>` внутри заголовка (`<h3>` или уровень из `as`) с `aria-expanded` и `aria-controls`.",
       },
       {
-        en: "The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.",
-        ru: "Содержимое — `<section>` с `aria-labelledby`; закрытое — `inert`: уходит из порядка Tab и дерева доступности.",
+        en: 'The panel is a `<section>` with `aria-labelledby`; closed content is `inert` while it closes, then `hidden="until-found"`: out of the tab order and the accessibility tree, yet find in page reaches it and opens the item at once.',
+        ru: 'Содержимое — `<section>` с `aria-labelledby`; закрытое — `inert`, пока закрывается, затем `hidden="until-found"`: вне порядка Tab и дерева доступности, но поиск по странице его находит и сразу раскрывает раздел.',
       },
       {
         en: "The chevron and `Accordion.Icon` are `aria-hidden`.",

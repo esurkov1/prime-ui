@@ -58,7 +58,8 @@ the state you pass — never from the shape of your markup:
   another control in the same place on the next): the two cross-fade where they stand and the place
   glides to the new size from the edge it holds to.
 - **A region changes state** (`Crossfade` `state`): loading hands over to the data in place; data,
-  empty, error and another record cross-fade and glide the height.
+  empty, error and another record cross-fade and glide the height; a status that turns back within
+  the swap hold (a quiet refetch) never moves.
 - **A layer opens or closes** (Modal, Drawer, Sheet, menus): only its panel and its scrim move;
   nothing inside replays the opening, and a drag copy lifted out of it flies still.
 

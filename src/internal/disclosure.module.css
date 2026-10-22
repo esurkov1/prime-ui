@@ -18,7 +18,7 @@
  *   --disclosure-height-open     the height opening: `duration easing delay` (default: the clock)
  *   --disclosure-height-close    the height closing (default: the closing clock)
  * Reduced motion zeroes the duration tokens: it opens and closes at once. Nothing moves before
- * `data-mounted` (one frame after mount, `useDisclosure`).
+ * `data-mounted` (one frame after mount, `useDisclosure`), nor in the frame find in page opens it.
  */
 .root {
   --disclosure-open-clock: var(--disclosure-duration, var(--prime-motion-duration-base))
@@ -37,6 +37,12 @@
 
 .root[data-state="open"] {
   grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+/* Closed under find in page: the clip is `hidden="until-found"` (its content skipped, out of the
+   accessibility tree), so the root stays visible for the browser to search it. */
+.root[data-findable] {
   visibility: visible;
 }
 

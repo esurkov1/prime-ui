@@ -5,7 +5,6 @@ import { withMotion } from "@/test/motion";
 
 import enterMotion from "./enterMotion.module.css";
 import { RowCells } from "./rowCells";
-import swapMotion from "./swapMotion.module.css";
 
 function Language() {
   return <button type="button">RU</button>;
@@ -34,7 +33,9 @@ const cells = () => [...screen.getByTestId("row").children] as HTMLElement[];
 
 describe("RowCells", () => {
   it("another control in the same place cross-fades inside the same cell, the rest stay", () => {
-    withMotion();
+    const motion = withMotion();
+    const fadesOn = (node: Element) =>
+      motion.on(node).map((run) => (run.keyframes as Keyframe[]).map((frame) => frame.opacity));
     const { rerender } = render(<Row tab="text" />);
     const [first, second] = cells();
     const more = screen.getByRole("button", { name: "Ещё" });
@@ -48,12 +49,12 @@ describe("RowCells", () => {
     expect(first).not.toHaveClass(enterMotion.enter);
     // The old control fades out over the new one inside the cell; the new one fades in.
     const leaving = screen.getByText("RU").parentElement as HTMLElement;
-    expect(leaving).toHaveClass(swapMotion.swapOut);
+    expect(fadesOn(leaving)).toEqual([[1, 0]]);
     expect(leaving).toHaveAttribute("inert");
-    expect(screen.getByText("Всё время").parentElement).toHaveClass(swapMotion.swapIn);
+    expect(fadesOn(screen.getByText("Всё время").parentElement as HTMLElement)).toEqual([[0, 1]]);
     // The control beyond the cell is untouched.
     expect(screen.getByRole("button", { name: "Ещё" })).toBe(more);
-    expect(more.parentElement).not.toHaveClass(swapMotion.swapIn);
+    expect(motion.on(more.parentElement as HTMLElement)).toHaveLength(0);
   });
 
   it("glides the cell's width from the old control's to the new one's", () => {

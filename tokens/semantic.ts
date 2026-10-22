@@ -535,6 +535,12 @@ export const semanticTokens = {
      */
     holdConfirm: "{duration.1200}",
     /**
+     * How long a region swap waits before it moves (`RegionSwap`, Crossfade): a state that turns
+     * back within it (a quiet refetch, an item gone for a moment) never shows a frame of motion. A
+     * settle window, not motion, so reduced motion keeps it.
+     */
+    swapHold: "{duration.120}",
+    /**
      * A clock stopped: the value `globals.css` gives the movement clocks under reduced motion and
      * every clock while a theme switches.
      */

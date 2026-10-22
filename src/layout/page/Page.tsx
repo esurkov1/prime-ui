@@ -633,7 +633,8 @@ function PageDescription({ loading = false, className, children, ...rest }: Page
   const store = place === "flow" ? page?.heading : undefined;
   // The line keeps its place while its data loads (a Skeleton in it), so the title beside it never
   // moves when the data arrives; the data then fades in under the same element.
-  const swap = useSwapIn(loading ? "loading" : "data");
+  const swap = useSwapIn(loading ? "loading" : "data", children);
+  const shownLoading = swap.state === "loading";
   React.useLayoutEffect(() => {
     store?.set({ description: loading ? null : children });
   });
@@ -643,7 +644,7 @@ function PageDescription({ loading = false, className, children, ...rest }: Page
     <p
       {...rest}
       key={swap.key}
-      aria-busy={loading || undefined}
+      aria-busy={shownLoading || undefined}
       className={cx(
         place === "bar" ? textRole.caption : textRole.bodyM,
         place === "bar" ? styles.barDescription : styles.description,
@@ -651,7 +652,7 @@ function PageDescription({ loading = false, className, children, ...rest }: Page
         className,
       )}
     >
-      {loading ? <Skeleton size="xs" className={styles.descriptionSkeleton} /> : children}
+      {shownLoading ? <Skeleton size="xs" className={styles.descriptionSkeleton} /> : swap.content}
     </p>
   );
 }

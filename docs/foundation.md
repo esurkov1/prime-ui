@@ -304,6 +304,7 @@ Motion tokens:
 | `--prime-motion-fade-base` | 380 ms | opacity and color feedback of dialogs, toggles, content swaps |
 | `--prime-motion-fade-slow` | 570 ms | opacity and color feedback of drawers, sheets |
 | `--prime-motion-hold-confirm` | 1200 ms | length of a hold-to-confirm press (Button `holdToConfirm`); a gesture time, not motion |
+| `--prime-motion-swap-hold` | 120 ms | how long a region swap waits before it moves: a state that turns back within it is never shown; a settle window, not motion |
 | `--prime-motion-instant` | 0 ms | a stopped clock: the value of the zeroed clocks |
 | `--prime-motion-never` | 600000 s | a clock that never runs out in a session: the browser's autofill paint of a field is pushed out of reach; never zeroed |
 | `--prime-motion-scale-mark` | 0.6 | start of a glyph or a dot drawn in place (a check, a swapped icon, a radio dot) |
@@ -343,9 +344,11 @@ Every component is designed with its micro-animations, not only its static state
    `padding`, `top/left`; never `transition: all` — list the properties. Where size must animate, prefer
    `transform` / `scale` (progress fills). The exceptions are a closed list, each with one engine,
    and `src/styles/motion-perf.test.ts` allows nothing else:
-   - **height glide** — a region that swaps its content between settled states glides to the new
-     height (`Crossfade`, the Notification stack); a swap into or out of loading never glides; a
-     cell of a row whose control is replaced by another glides its width the same way;
+   - **height glide** — a region that swaps its content between settled states glides from the
+     height on screen to the new one (`Crossfade`, the Notification stack), never through a smaller
+     or an old height, and only when they differ by more than 2px; an interrupted glide turns to the
+     new target from where it is; a swap into or out of loading never glides; a cell of a row whose
+     control is replaced by another glides its width the same way;
    - **row fold** — a part that folds open or closed animates `grid-template-rows` 0fr ↔ 1fr
      (`Disclosure`: Accordion, DataTable expanded rows);
    - **text width** — a label that morphs into another text glides its `width` (`MorphText`).
@@ -364,7 +367,13 @@ Every component is designed with its micro-animations, not only its static state
    the state `"loading"`: a `Skeleton` of the coming content, drawn from the first paint, which the
    data replaces in place — the height settles in one frame and the fade takes `fast`; only a swap
    between settled states fades on `base` and glides its height (principle 7). Nothing moves on the
-   first render of a region.
+   first render of a region. A region swap waits out `--prime-motion-swap-hold` before anything
+   moves (the data arriving out of loading does not wait): a state that turns back within it (a
+   quiet refetch, a record gone for a moment) is the old one again without a frame of motion, and
+   the new height is measured once the new content has settled. A swap that turns back to a state
+   still fading out reverses in place: both fades and the height continue from where they are. A change inside one state (a row
+   added, removed or edited) is no region swap: only that row moves (`useListPresence`,
+   `Disclosure`).
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
    for one-shot enter/exit (overlay presence, spinner, skeleton) and one-shot gestures (icons, rule 13;
    a field's error shake, rule 14).

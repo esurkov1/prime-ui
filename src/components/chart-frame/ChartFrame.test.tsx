@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { passSwapHold } from "@/test/motion";
 
 import {
   ChartFrame,
@@ -250,10 +251,13 @@ describe("ChartFrame", () => {
   });
 
   it("empty and error take the plot's place; the error retries", async () => {
+    vi.useFakeTimers();
     const onRetry = vi.fn(() => Promise.resolve());
     const { rerender } = render(<Frame state="empty" onRetry={onRetry} />);
     expect(screen.getByRole("status")).toHaveTextContent("Нет данных за период");
     rerender(<Frame state="error" onRetry={onRetry} />);
+    passSwapHold();
+    vi.useRealTimers();
     // The headline number is unknown after a failed load: a dash, not the last value.
     expect(screen.queryByText("8,4 млн ₽")).toBeNull();
     expect(screen.getByText("—")).toBeInTheDocument();

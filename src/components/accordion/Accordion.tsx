@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -236,25 +237,34 @@ export type AccordionContentProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-function AccordionContent({ className, children, ...rest }: AccordionContentProps) {
+function AccordionContent({ className, children, ref, ...rest }: AccordionContentProps) {
+  const { toggleItem } = useAccordionContext();
   const item = useAccordionItem();
   // The kit fold: the height glides and the body fades in place; `.content` sets its clocks. Its
-  // ref only serves `appear`, so the section keeps the consumer's ref.
-  const fold = useDisclosure({ open: item.open });
+  // root ref serves the close it waits for, so the section merges it with the consumer's ref. A
+  // closed section stays searchable: find in page opens it.
+  const fold = useDisclosure({
+    open: item.open,
+    onFound: item.disabled ? undefined : () => toggleItem(item.value),
+  });
+  const mergedRef = useMergedRefs<HTMLElement>(fold.root.ref, ref);
 
   return (
     <section
       {...rest}
       id={item.contentId}
       aria-labelledby={item.triggerId}
-      // `inert` takes closed content out of the tab order and the accessibility tree.
-      inert={!item.open}
+      ref={mergedRef}
+      // `inert` takes closing content out of the tab order and the accessibility tree; settled
+      // closed, `hidden="until-found"` on the clip does it and keeps it searchable.
+      inert={!item.open && !fold.findable}
       data-state={fold.root["data-state"]}
       data-mounted={fold.root["data-mounted"]}
+      data-findable={fold.root["data-findable"]}
       className={cx(fold.root.className, styles.content)}
     >
       {/* The padded inner block carries `className`. */}
-      <div className={fold.clip.className}>
+      <div ref={fold.clip.ref} className={fold.clip.className}>
         <div className={cx(styles.contentInner, className)}>{children}</div>
       </div>
     </section>

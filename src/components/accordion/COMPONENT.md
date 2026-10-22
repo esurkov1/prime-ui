@@ -85,7 +85,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Accordion.Content
-`ref` → `HTMLElement`. The `<section>` region; closed content is `inert` (out of the tab order and the accessibility tree). `className` goes to the padded inner block.
+`ref` → `HTMLElement`. The `<section>` region; closed content is out of the tab order and the accessibility tree but found by find in page, which opens its item. `className` goes to the padded inner block.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -121,7 +121,8 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| open / closed | `value` / `defaultValue` + `onValueChange` | `data-state="open" \| "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `inert` on a closed Content |
+| open / closed | `value` / `defaultValue` + `onValueChange` | `data-state="open" \| "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `inert` on a Content while it closes, then `hidden="until-found"` on its inner clip |
+| found in page | find in page matches text in a closed Content (`beforematch`) | the item opens at once (no fold motion in that frame), the browser scrolls to and marks the match |
 | disabled | `disabled` on Item | `data-disabled` on Item and Trigger, native `disabled`, `text-disabled`, `cursor: not-allowed` |
 | hover / active | pointer | trigger `fill-muted-hover` (two ladder steps off the accordion's layer, so it never lands on the host's color at the edges) / `fill-strong` |
 | focus-visible | keyboard | inset focus ring inside the trigger |
@@ -149,7 +150,7 @@ Root: `data-size`, `data-layout`. The panel is the kit fold (`Disclosure`): its 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - The trigger is a native `<button>` inside a heading (`<h3>`, or the level of `as`) with `aria-expanded` and `aria-controls`.
-- The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.
+- The panel is a `<section>` with `aria-labelledby`; closed content is `inert` while it closes, then `hidden="until-found"`: out of the tab order and the accessibility tree, yet find in page reaches it and opens the item at once.
 - The chevron and `Accordion.Icon` are `aria-hidden`.
 
 ### Labels
