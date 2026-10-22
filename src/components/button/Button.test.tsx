@@ -14,6 +14,15 @@ import styles from "./Button.module.css";
 const CSS = "src/components/button/Button.module.css";
 
 describe("Button", () => {
+  it("an icon-only soft danger keeps the neutral fill at rest and takes the danger wash on hover", () => {
+    const rule = cssRule(
+      "src/components/button/Button.module.css",
+      '.root[data-tone="danger"][data-variant="soft"][data-icon-only="true"]',
+    );
+    expect(cssValue(rule, "--btn-bg")).toBe("var(--prime-color-fill-subtle)");
+    expect(cssValue(rule, "--btn-bg-hover")).toBe("var(--prime-color-danger-soft)");
+  });
+
   it("counts down: the fill runs, the seconds tick, the end runs the action, a press cancels", () => {
     vi.useFakeTimers();
     const onEnd = vi.fn();

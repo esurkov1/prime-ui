@@ -502,8 +502,8 @@ filled segment — is `variant="soft" tone="neutral"` at their height (the host 
 `size` beside fields of the same tier), so the row starts and ends on a filled edge and reads as
 one block. A `ghost` icon there leaves its glyph floating in air: the row seems to end at the last
 field, and its end no longer mirrors its start against the card's padding. A remove that deletes is
-the trash (`action.delete`) in `soft` + `danger`: red while it can act, grey when disabled — never a
-«×», which reads as «close» or «clear». `ghost` stays where the neighbours have no
+the trash (`action.delete`) in `soft` + `danger`: the neighbours' neutral fill with a red glyph, the
+red wash on hover, grey when disabled — never a «×», which reads as «close» or «clear». `ghost` stays where the neighbours have no
 fill: a dialog header's actions beside the ×, a table cell among text, a chat header, a toolbar of
 ghost tools, a button inline in text; over media it is `shade`. A `FieldList` draws its row trash and
 «⋯» this way itself.

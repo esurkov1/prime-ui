@@ -85,7 +85,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 ### rowActions
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `buttons` | a soft danger trash at the row's end (grey when off), as tall as the fields and, with `reorderable`, the grip after it; a pinned row: the trash off, then the lock | every list: one action (remove) or remove and move, any number of columns | yes |
+| `buttons` | a trash at the row's end — the fields' fill, a red glyph, the red wash on hover (grey when off) — as tall as the fields and, with `reorderable`, the grip after it; a pinned row: the trash off, then the lock | every list: one action (remove) or remove and move, any number of columns | yes |
 | `menu` | one soft «⋯» per row, as tall as the fields; its Dropdown holds «Выше», «Ниже» (with `reorderable`), a separator and «Удалить» (danger) | a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag; never without `reorderable` | |
 
 ### width (column)

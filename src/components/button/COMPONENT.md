@@ -108,7 +108,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `solid` + `success` | success fill, success-fg text; a button turning success glides its fill over `fast` | an action that is done: «Оплачено», «Отправлено» | |
 | `soft` + `accent` | `accent-soft` fill, accent text | secondary but highlighted action | |
 | `soft` + `neutral` | translucent `fill-subtle` wash, primary text | every secondary text action: Cancel, Close, Back, Reset, Filters; an icon-only button beside filled neighbours (the remove «×» after a row of fields, an edit icon after a soft button) | |
-| `soft` + `danger` | `danger-soft` fill, danger text | secondary destructive text action (Delete in a footer, a trigger that opens a confirm) | |
+| `soft` + `danger` | `danger-soft` fill, danger text; icon-only: the neutral `fill-subtle` with a danger glyph, `danger-soft` on hover and press | secondary destructive text action (Delete in a footer, a trigger that opens a confirm); icon-only — a row's trash beside fields | |
 | `soft` / `outline` / `ghost` + `success` | `success-soft` fill or wash, success text | a quieter done state next to other actions | |
 | `outline` + `accent` | transparent, 1px `border-default` inset line, accent text | not for product screens: a text action takes a fill (`soft`) | |
 | `outline` + `neutral` | transparent, 1px inset line, primary text | not for product screens: Cancel, Close and Back are `soft` neutral | |

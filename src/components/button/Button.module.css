@@ -239,6 +239,19 @@
   --btn-fg: var(--prime-color-danger-text);
 }
 
+/* An icon-only soft danger (a row's trash beside fields): the neutral fill of its neighbours and a
+   danger glyph at rest, the danger wash on hover and press — the row stays one quiet block until the
+   pointer points at the delete. */
+.root[data-tone="danger"][data-variant="soft"][data-icon-only="true"] {
+  --btn-bg: var(--prime-color-fill-subtle);
+  --btn-bg-hover: var(--prime-color-danger-soft);
+  --btn-bg-active: color-mix(
+    in srgb,
+    var(--prime-color-danger-default) var(--prime-tint-soft),
+    var(--prime-color-danger-soft)
+  );
+}
+
 .root[data-tone="danger"][data-variant="outline"] {
   --btn-line: var(--prime-color-border-default);
   --btn-bg-hover: var(--prime-color-danger-soft);
