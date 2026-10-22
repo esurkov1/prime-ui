@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function CardOverviewExample() {
   return (
     <form className={styles.panel} onSubmit={(event) => event.preventDefault()}>
-      <Card.Root variant="panel">
+      <Card.Root>
         <Card.Header>
           <Card.Title>Профиль компании</Card.Title>
         </Card.Header>

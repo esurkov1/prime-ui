@@ -87,7 +87,7 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
   of another module. It sets only the donors' public hooks — `--prime-icon-size`, `--ring-fill`,
   `--sticky-bg`, `--dnd-gap-*`, `--dnd-sortable-gap`, `--divider-bleed`, `--disclosure-*`,
   `--enter-*`, `--swatch-inline-size`, `--hairline-inset`, `--floating-width`, `--scroll-fade-depth`,
-  `--avatar-ring`, `--label-dimmed` (`src/styles/donor-override.test.ts`). A mode the host needs is added to the donor (§2).
+  `--avatar-ring`, `--label-dimmed`, `--corner-mark-room` (`src/styles/donor-override.test.ts`). A mode the host needs is added to the donor (§2).
 - Shared mechanics live in `src/internal` or `src/hooks`, never in a component folder: a component
   imports from another component folder only its PascalCase module or `types.ts`
   (`src/test/source-rules.test.ts`). Nothing is exported only for a test: a test reaches a module
@@ -157,7 +157,7 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
 - A visible text label is `label`; a name only for assistive tech is the native `aria-label`, never
   `label`.
 - `asChild?: boolean` only on single interactive elements that may become a link or another element
-  (Button.Root, LinkButton, Sidebar.Item, Sidebar.Brand, BottomNav.Item, Breadcrumb.Item, SegmentedControl.Item, List.Item, ChatList.Item, Timeline.Item, Card.Root, Dropdown.Item, Input.Action, Textarea.Action, Thumbnail.Root). `as` only picks a semantic tag for non-interactive elements.
+  (Button.Root, LinkButton, Sidebar.Item, Sidebar.Brand, BottomNav.Item, Breadcrumb.Item, SegmentedControl.Item, List.Item, ChatList.Item, Timeline.Item, Card.Root, Kpi.Root, Dropdown.Item, Input.Action, Textarea.Action, Thumbnail.Root). `as` only picks a semantic tag for non-interactive elements.
 - Slots: an opener or closer the consumer supplies (`Modal.Trigger`, `Popover.Trigger`,
   `Dropdown.Anchor`, `X.Close`, `X.Confirm`) is a slot — no DOM, it clones one element child, merges
   its `ref` and handlers and takes no `className`. An opener the kit draws (the combobox of
@@ -362,6 +362,12 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   block is `Card.Root` — CSS only places it. The one exception is a component that draws no item
   look and leaves it to the consumer's class (Dnd): its examples paint that class
   (`PAINTED_EXAMPLES` in `src/test/docs-contract.test.ts`).
+- A row of cards (Kpi, Card tiles) is a grid on `--prime-layout-tile-min-width` (×1.5 for a KPI
+  or a card with a header) with `auto-fit`, never `auto-fill`: empty tracks collapse, so two or
+  three cards share the row instead of standing narrow at its start (`example-grids`). A scenario
+  of several cards side by side takes the `row` layout (`full` on a composite page) — the stack
+  stage is 640 wide. Galleries of
+  fixed tiles (thumbnails, files) keep `auto-fill`.
 - No inline `style={{}}`, no playground imports; the file copies into a consumer project unchanged.
 
 ### Examples vs screens — who shows what
@@ -430,7 +436,7 @@ export const page: ComponentPageConfig = {
 - **Kind** (the shape of the component, not its sidebar category): `primitive` · `control` · `field` ·
   `overlay` · `navigation` · `composite` · `layout` (primitive — Button, LinkButton, Badge, Avatar,
   Thumbnail, Kbd, Divider, Label, Hint, Fieldset, Typography, RichText, CodeBlock, ProgressBar, ProgressCircle, Spinner,
-  Skeleton, Banner, Sparkline, VisuallyHidden, Gallery; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup, VoicePlayer, VideoNote;
+  Skeleton, Banner, Sparkline, Kpi, VisuallyHidden, Gallery; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup, VoicePlayer, VideoNote;
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   ColorField, FileUpload; overlay — Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu,
   Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination, List; composite — DataTable, FieldList, Kanban,

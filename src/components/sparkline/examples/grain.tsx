@@ -1,9 +1,9 @@
 /** A year of daily revenue with a step switcher the card lays out from the reading: the current period is cut at today, hatched, and compared with the same days of the one before — `grains`, `setGrain`, `change`. */
 import {
   Button,
-  Card,
   Dropdown,
   Icon,
+  Kpi,
   Sparkline,
   type SparklinePoint,
   useSparkline,
@@ -33,40 +33,42 @@ export default function SparklineGrainExample() {
   const steps = revenue.grains.filter((step) => step !== "day");
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Выручка</Card.Label>
-      <Card.Value>{revenue.valueText}</Card.Value>
-      {revenue.changeText ? (
-        <Card.Delta tone={revenue.changeTone}>{revenue.changeText}</Card.Delta>
-      ) : null}
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <Button.Root
-            variant="ghost"
-            tone="neutral"
-            size="xs"
-            aria-label={`Шаг: ${STEPS[revenue.grain]}`}
-          >
-            {STEPS[revenue.grain]}
-            <Button.Icon>
-              <Icon name="nav.chevronDown" />
-            </Button.Icon>
-          </Button.Root>
-        </Dropdown.Trigger>
-        <Dropdown.Content side="bottom" align="start">
-          {steps.map((step) => (
-            <Dropdown.Item
-              key={step}
-              selected={step === revenue.grain}
-              onSelect={() => revenue.setGrain(step)}
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Выручка</Kpi.Title>
+      <Kpi.Period>{revenue.date}</Kpi.Period>
+      <Kpi.Actions>
+        <Dropdown.Root>
+          <Dropdown.Trigger>
+            <Button.Root
+              variant="ghost"
+              tone="neutral"
+              size="xs"
+              aria-label={`Шаг: ${STEPS[revenue.grain]}`}
             >
-              {STEPS[step]}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Content>
-      </Dropdown.Root>
-      <Sparkline {...revenue.plot} label="Выручка по периодам" variant="bars" />
-      <Card.Meta>{revenue.date}</Card.Meta>
-    </Card.Root>
+              {STEPS[revenue.grain]}
+              <Button.Icon>
+                <Icon name="nav.chevronDown" />
+              </Button.Icon>
+            </Button.Root>
+          </Dropdown.Trigger>
+          <Dropdown.Content side="bottom" align="end">
+            {steps.map((step) => (
+              <Dropdown.Item
+                key={step}
+                selected={step === revenue.grain}
+                onSelect={() => revenue.setGrain(step)}
+              >
+                {STEPS[step]}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Content>
+        </Dropdown.Root>
+      </Kpi.Actions>
+      <Kpi.Value>{revenue.valueText}</Kpi.Value>
+      <Kpi.Delta reading={revenue} />
+      <Kpi.Media>
+        <Sparkline {...revenue.plot} label="Выручка по периодам" variant="bars" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

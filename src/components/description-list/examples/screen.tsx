@@ -144,7 +144,7 @@ export default function DescriptionListScreenExample() {
             </DescriptionList.Root>
           </Page.Section>
           <aside className={styles.aside} aria-label="Клиент и история">
-            <Card.Root variant="panel">
+            <Card.Root>
               <Card.Header>
                 <Card.Title as="h2">Клиент</Card.Title>
               </Card.Header>
@@ -174,7 +174,7 @@ export default function DescriptionListScreenExample() {
                 </div>
               </Card.Body>
             </Card.Root>
-            <Card.Root variant="panel">
+            <Card.Root>
               <Card.Header>
                 <Card.Title as="h2">История</Card.Title>
               </Card.Header>

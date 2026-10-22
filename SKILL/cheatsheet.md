@@ -99,13 +99,14 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Cards and surfaces
 
-- `Card.Root` only for a bounded block with its own title: a KPI tile (`variant="stat-trend"`), a settings panel (`variant="panel"`), side facts — not around a whole section, a form field or a page.
+- A KPI tile is `<Kpi.Root>` — it is the card, never inside a `Card.Root` ([Kpi / Card](choosing.md#3-pairs-that-are-easy-to-confuse)).
+- `Card.Root` only for a bounded block with its own title: a settings panel (`Card.Header` + `Card.Body`), side facts — not around a whole section, a form field or a page. The zones lay the card out; there is no `variant`.
 - Never a `DataTable` inside a Card — the table is already a filled block; a card in a card only sparingly ([the rule](foundations.md#card-in-a-card)).
 - A titled panel (a settings section, a group of a long form) is `<Card.Root>` with `<Card.Header>` (`<Card.Title as="h2">`, `<Card.Description>`) stacked in the flow — never a heading column beside its panel ([a titled block](composition.md#4-surfaces)).
 - Section without a card: `<Page.Section label="…">` + the content (a link or button beside the heading in `Page.Actions`) — not a hand-made `<section>` + `Typography as="h2"` + own gap.
 - The tiles of a screen (KPI cards, charts, panels): one `<Page.Grid>` with a `<Page.Cell span>` per tile — not a grid per row (the rows would stand 24 apart instead of 16). A chart beside a panel is an 8 and a 4 written next to each other — the grid pairs them at mid widths; not 6 + 6 to dodge a hole.
-- A KPI tile whose figure loads: `<Card.Root variant="stat-trend" loading>` with its parts mounted — not Skeletons placed in `Card.Value` by hand.
-- A tile whose value is words: `variant="stat-text"` (a button in it stands at the end of the row by itself); a value with a judgement (due, paid): `<Card.Value tone>`; a tile that opens something: `Card.Root asChild` around the link, or `Card.Link` when the card holds buttons — the kit draws the arrow, never one of your own in the label ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
+- A KPI tile whose figure loads: `<Kpi.Root loading>` with its parts mounted — not Skeletons placed in `Kpi.Value` by hand.
+- A tile whose value is words: `<Kpi.Root valueSize="s">` (its buttons in `Kpi.Actions` at the end of the title row); a value with a judgement (due, paid): `<Kpi.Value tone>`; buttons of a card only in `Card.Actions` (the end of `Card.Header` or a record row) and `Card.Footer`; a tile that opens something: `Kpi.Root asChild` / `Card.Root asChild` around the link, or `Card.Link` when the card holds buttons — the kit draws the arrow, never one of your own in the label ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
 - Several tags or labels as one value (a client's tags): `<Badge.Group>` of `Badge.Root` — not a flex row with its own gap.
 - Depth from fill, not lines: no borders around blocks; `<Divider />` only inside a block.
 - Every scroll region is a `ScrollContainer` — never `overflow: auto` on a `div`: its hidden edges fade by themselves (`edges="shadow"` on a filled surface, `"none"` only for a page column), `scrollbar="hidden"` on strips, `snap` on strips of cards (it settles once the scroll ends; never `scroll-snap-type`), `lock` to hold a list still, `anchor="end"` for a log. Kit components already scroll through it; do not wrap them again.
@@ -326,7 +327,7 @@ export function InvoicesCard({ status, invoices, onRetry }: InvoicesCardProps) {
   const state = status === "ready" && invoices.length === 0 ? "empty" : status;
 
   return (
-    <Card.Root variant="panel">
+    <Card.Root>
       <Card.Header>
         <Card.Title as="h2">Неоплаченные счета</Card.Title>
       </Card.Header>

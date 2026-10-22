@@ -13,8 +13,10 @@ export function Panel({
   ...rest
 }: React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode }) {
   return (
-    <Card.Root {...rest} variant="cta" flat>
-      <div className={cx(s.panel, className)}>{children}</div>
+    <Card.Root {...rest} flat>
+      <Card.Body>
+        <div className={cx(s.panel, className)}>{children}</div>
+      </Card.Body>
     </Card.Root>
   );
 }

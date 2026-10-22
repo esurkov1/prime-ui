@@ -22,9 +22,11 @@ export default function ScrollContainerScrollbarExample() {
       <Card.Root role="region" className={styles.card} aria-label="Клиенты">
         <Card.Header>
           <Card.Title>Клиенты</Card.Title>
-          <Typography as="span" variant="caption" tone="muted">
-            thin
-          </Typography>
+          <Card.Actions>
+            <Typography as="span" variant="caption" tone="muted">
+              thin
+            </Typography>
+          </Card.Actions>
         </Card.Header>
         <ScrollContainer>
           <Card.List>
@@ -41,9 +43,11 @@ export default function ScrollContainerScrollbarExample() {
       <Card.Root role="region" className={styles.card} aria-label="Статусы заказов">
         <Card.Header>
           <Card.Title>Статусы заказов</Card.Title>
-          <Typography as="span" variant="caption" tone="muted">
-            hidden
-          </Typography>
+          <Card.Actions>
+            <Typography as="span" variant="caption" tone="muted">
+              hidden
+            </Typography>
+          </Card.Actions>
         </Card.Header>
         <ScrollContainer axis="horizontal" scrollbar="hidden">
           <div className={styles.strip}>

@@ -1,5 +1,5 @@
 /** Unique clients in dialogs: the period's own count is neither the sum nor the mean of the days, so the card passes it with the previous period's count — `value`, `compareTo`. */
-import { Card, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+import { Kpi, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -33,14 +33,14 @@ export default function SparklineOwnValueExample() {
   });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Клиенты в диалогах</Card.Label>
-      <Card.Value>{clients.valueText}</Card.Value>
-      {clients.changeText ? (
-        <Card.Delta tone={clients.changeTone}>{clients.changeText}</Card.Delta>
-      ) : null}
-      <Sparkline {...clients.plot} label="Клиенты по дням" />
-      <Card.Meta>{clients.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Клиенты в диалогах</Kpi.Title>
+      <Kpi.Period>{clients.date}</Kpi.Period>
+      <Kpi.Value>{clients.valueText}</Kpi.Value>
+      <Kpi.Delta reading={clients} />
+      <Kpi.Media>
+        <Sparkline {...clients.plot} label="Клиенты по дням" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

@@ -68,12 +68,14 @@ export default function SmartFilterCombinedExample() {
         <SmartFilter.Toolbar layout="combined" />
         <SmartFilter.Chips />
       </SmartFilter.Root>
-      <Card.Root variant="list">
+      <Card.Root>
         <Card.Header>
           <Card.Title>Заказы</Card.Title>
-          <Typography as="span" variant="caption" tone="muted">
-            {found.length} из {ORDERS.length}
-          </Typography>
+          <Card.Actions>
+            <Typography as="span" variant="caption" tone="muted">
+              {found.length} из {ORDERS.length}
+            </Typography>
+          </Card.Actions>
         </Card.Header>
         <Card.List>
           {found.map((order) => (

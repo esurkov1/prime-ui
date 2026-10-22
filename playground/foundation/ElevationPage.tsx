@@ -67,10 +67,12 @@ function LayerStack() {
     <div className={s.layerStage} data-depth={0} aria-hidden>
       <SurfaceDepthProvider value={0}>
         <LayerTag>слой 0 · страница</LayerTag>
-        <Card.Root variant="cta" className={s.layerCard}>
-          <LayerTag>слой 1 · карточка · shadow.raised</LayerTag>
-          <StaticField value="Квартальный отчёт" />
-          <StaticField value="Маркетинг" />
+        <Card.Root className={s.layerCard}>
+          <Card.Body>
+            <LayerTag>слой 1 · карточка · shadow.raised</LayerTag>
+            <StaticField value="Квартальный отчёт" />
+            <StaticField value="Маркетинг" />
+          </Card.Body>
         </Card.Root>
         <div className={s.layerMenu} data-depth="floating">
           <LayerTag>floating · shadow.overlay</LayerTag>

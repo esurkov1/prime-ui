@@ -136,7 +136,7 @@ export default function FieldListScreenExample() {
       </Page.Header>
       <Page.Body>
         <form id={formId} noValidate onSubmit={save}>
-          <Card.Root variant="panel">
+          <Card.Root>
             <Card.Header>
               <Card.Title as="h2">Основное</Card.Title>
             </Card.Header>
@@ -158,7 +158,7 @@ export default function FieldListScreenExample() {
             </Card.Body>
           </Card.Root>
         </form>
-        <Card.Root variant="panel">
+        <Card.Root>
           <Card.Header>
             <Card.Title as="h2" id={specsTitleId}>
               Характеристики
@@ -236,7 +236,7 @@ export default function FieldListScreenExample() {
             />
           </Card.Body>
         </Card.Root>
-        <Card.Root variant="panel">
+        <Card.Root>
           <Card.Header>
             <Card.Title as="h2">Стоимость</Card.Title>
           </Card.Header>

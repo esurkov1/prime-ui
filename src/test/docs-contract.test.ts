@@ -841,6 +841,19 @@ describe("docs contract", () => {
       expect(offenders, "example-css").toEqual([]);
     });
 
+    it("a grid of cards collapses its empty tracks (example-grids)", () => {
+      // A row of cards on the tile width with `auto-fill` keeps empty tracks at its end: three
+      // cards stand narrow at the start of a wide stage. `auto-fit` collapses them, so the cards
+      // share the row. (Galleries of fixed tiles — thumbnails, files — keep `auto-fill`.)
+      const offenders = walk(`${rel}/examples`, /\.css$/).flatMap((file) =>
+        [...read(file).matchAll(/grid-template-columns:\s*repeat\(([^;]*);/g)]
+          .map((match) => match[1])
+          .filter((value) => /auto-fill/.test(value) && /--prime-layout-tile-min-width/.test(value))
+          .map(() => `${file}: a grid of cards on the tile width takes auto-fit, not auto-fill`),
+      );
+      expect(offenders, "example-grids").toEqual([]);
+    });
+
     const screenModule = screenModules[`../${base}/${dir}/examples/screen.tsx`];
     it.runIf(screenModule)("the screen renders a page with one h1", async () => {
       const { default: Screen } = await screenModule();

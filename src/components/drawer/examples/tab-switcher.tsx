@@ -1,13 +1,13 @@
 /** A model card with tabs: one switcher for the whole open tab stands in the header before the record's icon buttons — the text language on the description tab, the period on the analytics tab, whose two self-titled charts the panel spaces by itself — `Drawer.Actions`, `Tabs.Root`, `Tabs.Panel`. */
 import {
   Button,
-  Card,
   Datepicker,
   type DatepickerRange,
   DEFAULT_DATEPICKER_PRESETS,
   DescriptionList,
   Drawer,
   Icon,
+  Kpi,
   SegmentedControl,
   Sparkline,
   type SparklinePoint,
@@ -132,26 +132,22 @@ export default function DrawerTabSwitcherExample() {
               </DescriptionList.Root>
             </Tabs.Panel>
             <Tabs.Panel value="analytics">
-              <Card.Root variant="panel">
-                <Card.Header>
-                  <Card.Title>Продажи</Card.Title>
-                  <Card.Description>По месяцам, в штуках</Card.Description>
-                </Card.Header>
-                <Card.Body>
-                  <Card.Value>{sold.valueText}</Card.Value>
+              <Kpi.Root valueSize="m">
+                <Kpi.Title>Продажи</Kpi.Title>
+                <Kpi.Description>По месяцам, в штуках</Kpi.Description>
+                <Kpi.Value>{sold.valueText}</Kpi.Value>
+                <Kpi.Media>
                   <Sparkline {...sold.plot} label="Продано по месяцам" />
-                </Card.Body>
-              </Card.Root>
-              <Card.Root variant="panel">
-                <Card.Header>
-                  <Card.Title>Возвраты</Card.Title>
-                  <Card.Description>По месяцам, в штуках</Card.Description>
-                </Card.Header>
-                <Card.Body>
-                  <Card.Value>{returned.valueText}</Card.Value>
+                </Kpi.Media>
+              </Kpi.Root>
+              <Kpi.Root valueSize="m">
+                <Kpi.Title>Возвраты</Kpi.Title>
+                <Kpi.Description>По месяцам, в штуках</Kpi.Description>
+                <Kpi.Value>{returned.valueText}</Kpi.Value>
+                <Kpi.Media>
                   <Sparkline {...returned.plot} label="Возвращено по месяцам" />
-                </Card.Body>
-              </Card.Root>
+                </Kpi.Media>
+              </Kpi.Root>
             </Tabs.Panel>
           </Drawer.Body>
         </Tabs.Root>

@@ -1,5 +1,5 @@
 /** Daily API requests with days the collector was down: the line breaks over a missing day and the reading says there is no data — `data`, `labels`. */
-import { Card, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+import { Kpi, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -24,11 +24,13 @@ export default function SparklineGapsExample() {
   const requests = useSparkline({ data: REQUESTS, labels: LABELS });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Запросы к API в день</Card.Label>
-      <Card.Value>{requests.valueText}</Card.Value>
-      <Sparkline {...requests.plot} label="Запросы по дням" />
-      <Card.Meta>{requests.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Запросы к API в день</Kpi.Title>
+      <Kpi.Period>{requests.date}</Kpi.Period>
+      <Kpi.Value>{requests.valueText}</Kpi.Value>
+      <Kpi.Media>
+        <Sparkline {...requests.plot} label="Запросы по дням" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

@@ -165,7 +165,7 @@
         "The page's top bar holds the title, the date range (a Datepicker range in Page.Tools — it drives the cards and the table) and the add button in Page.Actions (action.add beside the text «Модель», not «Добавить модель») — nothing else",
         "The search and the filter (SmartFilter.Toolbar) and the column chooser (DataTableColumnsMenu) are in the DataTable toolbar, not in Page.Tools above the KPI cards",
         "The active filters (SmartFilter.Chips) are in the DataTable toolbarChips, not in Page.Chips, and SmartFilter.Root wraps the DataTable",
-        "The toolbar gets the controls as they are (no hand-made flex wrapper), and the KPI cards are Card tiles in one Page.Grid"
+        "The toolbar gets the controls as they are (no hand-made flex wrapper), and the KPI cards are Kpi.Root tiles in one Page.Grid"
       ]
     },
     {
@@ -250,7 +250,7 @@
       "files": [],
       "expectations": [
         "Each loading region renders a Skeleton in the geometry of its data (the same rows and lines) on the first render, not null, an empty box or a Spinner",
-        "The regions swap through Crossfade (or DataTable / Card.Root `loading`) with the loading state keyed \"loading\"",
+        "The regions swap through Crossfade (or DataTable / Kpi.Root `loading`) with the loading state keyed \"loading\"",
         "No own reveal of the data: no keyframes, transitions, staggered fade-ins, slide-ins or height animations written for the arrival of the data",
         "The page layout does not change height when the data arrives: the skeleton has the data's rows, gaps and line heights"
       ]
@@ -454,13 +454,13 @@
     {
       "id": 36,
       "prompt": "В дровере сделки сверху сделай три плитки: «К оплате» (21 000 ₽, это долг), «Депозиты у нас» (5 000 ₽), «Ближайшая задача» (Выдать PCX 160 завтра). Ниже — карточка транспорта сделки с позициями аренды и доставки и итогом.",
-      "expected_output": "Three Card stat-text tiles at the default value size (no valueSize=\"l\" on a row of facts), the debt with tone warning, the phrase in the same style as the numbers; no Typography inside Card.Value. The vehicle card has a Card.Header, line items in a DescriptionList align end inside Card.Body divider full, and a Card.Footer divider fill with the action, the task and Card.Total.",
+      "expected_output": "Three Kpi.Root valueSize=\"s\" tiles (no larger valueSize on a row of facts, no Card.Root around them), the debt with tone warning, the phrase in the same style as the numbers; no Typography inside Kpi.Value. The vehicle card has a Card.Header, line items in a DescriptionList align end inside Card.Body divider full, and a Card.Footer divider fill with the action, the task and Card.Total.",
       "files": [],
       "expectations": [
-        "All three tiles are Card.Root variant=\"stat-text\" without valueSize=\"l\" (the default size, one style for numbers and the phrase); none puts a Typography inside Card.Value",
-        "«К оплате» has Card.Value tone=\"warning\" (or danger) by its meaning",
+        "All three tiles are a Kpi.Root valueSize=\"s\" with no Card.Root around it (one style for numbers and the phrase, no valueSize=\"m\" or larger on the row); none puts a Typography inside Kpi.Value",
+        "«К оплате» has Kpi.Value tone=\"warning\" (or danger) by its meaning",
         "The vehicle card's line items are a DescriptionList.Root align=\"end\" inside Card.Body divider=\"full\"",
-        "The vehicle card's footer is Card.Footer divider=\"fill\" with the total in Card.Total (Card.Value inside), at the end of the row"
+        "The vehicle card's footer is Card.Footer divider=\"fill\" with the total in Card.Total (the amount as its children, its state in label), at the end of the row"
       ]
     },
     {
@@ -500,7 +500,7 @@
     {
       "id": 40,
       "prompt": "В карточке аренды покажи блок выдачи: вернуть 10 декабря (через 50 дней), выдан 21 октября в 15:43, ответственный — Евгений Сурков (можно сменить), кнопки «Отменить выдачу» и «Возврат».",
-      "expected_output": "A Card.Root with one Card.Header: Card.Title «Вернуть 10 дек · через 50 дн.», Card.Description with the assignee picker (Badge.Root + Badge.Avatar in Dropdown.Trigger) first and «выдан 21 окт, 15:43» after it, a soft neutral «Отменить» button and the primary «Принять возврат» last.",
+      "expected_output": "A Card.Root with one Card.Header: Card.Title «Вернуть 10 дек · через 50 дн.», Card.Description with the assignee picker (Badge.Root + Badge.Avatar in Dropdown.Trigger) first and «выдан 21 окт, 15:43» after it, and in Card.Actions at the header's end a soft neutral «Отменить» button and the primary «Принять возврат» last.",
       "files": [],
       "expectations": [
         "The assignee's name appears once: only in the picker, not also in the text line",
@@ -530,6 +530,19 @@
         "The chips (status Select, the person's Badge) are size l when the date control is xs, so every item of the row is 28 px tall",
         "No Badge of the default size (24) stands beside an xs field (28)",
         "A row at control size m or larger uses fields for every item (a Select with Avatar items for the person), not chips"
+      ]
+    },
+    {
+      "id": 43,
+      "prompt": "Сделай дашборд продаж: сверху три плитки — выручка, новые клиенты и средний чек, у каждой маленький график по дням за месяц и изменение к прошлому месяцу; при наведении на график плитка показывает день. Ниже блок «Последние сделки» списком с кнопкой «Все сделки».",
+      "expected_output": "Three Kpi.Root tiles in one Page.Grid, each laid out from useSparkline: Kpi.Title, Kpi.Period with the reading's date, Kpi.Value with valueText, <Kpi.Delta reading={…} /> and the Sparkline in Kpi.Media; the change against the previous month from compareTo, change=\"previous\" for a day while scrubbing. «Последние сделки» is a Card with Card.Header (Card.Title, the button in Card.Actions) and a Card.List.",
+      "files": [],
+      "expectations": [
+        "Every tile is a Kpi.Root, never a Card.Root with a label, a big number and a change laid out by hand, and never a Kpi.Root inside a Card.Root",
+        "The value, the change and the period come from useSparkline (valueText, Kpi.Delta reading, date in Kpi.Period) and the plot is <Sparkline {...reading.plot} /> in Kpi.Media, so scrubbing moves all three",
+        "The period of a tile is in Kpi.Period, not written into the title («Выручка за октябрь»)",
+        "The change and what it compares with are apart: the change in Kpi.Delta, «к сентябрю» in Kpi.Meta — never one string in the badge",
+        "«Последние сделки» is a Card (Card.Header with Card.Actions for «Все сделки», Card.List of the deals), not a Kpi"
       ]
     }
   ]

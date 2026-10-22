@@ -45,7 +45,7 @@ export default function PageLoadingExample() {
         </Page.Actions>
       </Page.TopBar>
       <Page.Body>
-        <Card.Root variant="list" aria-busy={loading || undefined}>
+        <Card.Root aria-busy={loading || undefined}>
           <Card.Body>
             <Crossfade state={loading ? "loading" : "data"}>
               {loading ? (

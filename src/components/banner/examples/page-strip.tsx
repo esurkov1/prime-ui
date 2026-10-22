@@ -22,7 +22,7 @@ export default function BannerPageStripExample() {
         </Banner.Content>
       </Banner.Root>
       <div className={styles.pageBody}>
-        <Card.Root variant="panel">
+        <Card.Root>
           <Card.Header>
             <Card.Title>Оплата</Card.Title>
           </Card.Header>

@@ -64,12 +64,14 @@ export default function SmartFilterSearchAndFiltersExample() {
         <SmartFilter.Toolbar layout="combined" />
         <SmartFilter.Chips />
       </SmartFilter.Root>
-      <Card.Root variant="list">
+      <Card.Root>
         <Card.Header>
           <Card.Title>Клиенты</Card.Title>
-          <Typography as="span" variant="caption" tone="muted">
-            {found.length} из {CLIENTS.length}
-          </Typography>
+          <Card.Actions>
+            <Typography as="span" variant="caption" tone="muted">
+              {found.length} из {CLIENTS.length}
+            </Typography>
+          </Card.Actions>
         </Card.Header>
         <Card.List>
           {found.map((client) => (

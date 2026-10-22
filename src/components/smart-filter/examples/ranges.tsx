@@ -100,12 +100,14 @@ export default function SmartFilterRangesExample() {
         <SmartFilter.Toolbar />
         <SmartFilter.Chips />
       </SmartFilter.Root>
-      <Card.Root variant="list">
+      <Card.Root>
         <Card.Header>
           <Card.Title>Сделки</Card.Title>
-          <Typography as="span" variant="caption" tone="muted">
-            {rows.length} из {DEALS.length}
-          </Typography>
+          <Card.Actions>
+            <Typography as="span" variant="caption" tone="muted">
+              {rows.length} из {DEALS.length}
+            </Typography>
+          </Card.Actions>
         </Card.Header>
         <Card.List>
           {rows.map((deal) => (

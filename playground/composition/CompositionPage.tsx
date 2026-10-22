@@ -78,7 +78,11 @@ const TYPE: Row[] = [
   { what: "основной текст, ячейки", value: "14", how: "`body-m`" },
   { what: "пояснение под заголовком", value: "14", how: '`body-m` + `tone="secondary"`' },
   { what: "мета, даты, подписи значений", value: "12", how: '`caption` + `tone="muted"`' },
-  { what: "главное число KPI", value: "—", how: "`Card.Value` (сам подстраивает размер)" },
+  {
+    what: "главное число KPI",
+    value: "30",
+    how: '`Kpi.Value` (`heading-l`; `valueSize="m"` в плотном ряду)',
+  },
 ];
 
 /** Every component page with a `screen` example: the screen's page, in the sidebar's spirit. */
@@ -252,9 +256,11 @@ export default function CompositionPage() {
         <Page.Grid>
           {SCREENS.map(({ page, nav, description }) => (
             <Page.Cell key={page.dir} span={4}>
-              <Card.Root variant="cta">
-                <Card.Title>{page.title}</Card.Title>
-                <Card.Description>{renderInlineCode(description)}</Card.Description>
+              <Card.Root>
+                <Card.Header>
+                  <Card.Title>{page.title}</Card.Title>
+                  <Card.Description>{renderInlineCode(description)}</Card.Description>
+                </Card.Header>
                 <Card.Footer>
                   <LinkButton
                     href={`/${nav.segment}`}

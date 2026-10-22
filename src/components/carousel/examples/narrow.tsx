@@ -14,7 +14,7 @@ const PHOTOS: CarouselItem[] = [
 export default function CarouselNarrowExample() {
   return (
     <div className={styles.narrow}>
-      <Card.Root variant="cover">
+      <Card.Root>
         <Card.Media>
           <Carousel.Root items={PHOTOS} ratio="1:1" aria-label="Фото Yamaha NMAX">
             <Carousel.Overlay placement="top-end">
@@ -22,10 +22,10 @@ export default function CarouselNarrowExample() {
             </Carousel.Overlay>
           </Carousel.Root>
         </Card.Media>
-        <Card.Body>
+        <Card.Header>
           <Card.Title>Yamaha NMAX 155</Card.Title>
           <Card.Description>Свободен с 24 октября</Card.Description>
-        </Card.Body>
+        </Card.Header>
       </Card.Root>
     </div>
   );

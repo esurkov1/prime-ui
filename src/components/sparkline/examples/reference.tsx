@@ -1,5 +1,5 @@
 /** Checkout conversion against its plan: a dashed reference line, the scale from zero to 5% and the change over the whole period in percentage points — `reference`, `min`, `max`, `change`, `changeUnit`. */
-import { Card, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+import { Kpi, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -27,21 +27,21 @@ export default function SparklineReferenceExample() {
   });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Конверсия оформления заказа</Card.Label>
-      <Card.Value>{conversion.valueText}</Card.Value>
-      {conversion.changeText ? (
-        <Card.Delta tone={conversion.changeTone}>{conversion.changeText}</Card.Delta>
-      ) : null}
-      <Sparkline
-        {...conversion.plot}
-        label="Конверсия по месяцам"
-        reference={PLAN}
-        min={0}
-        max={5}
-        labels={{ reference: "План: {value}" }}
-      />
-      <Card.Meta>{conversion.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Конверсия оформления заказа</Kpi.Title>
+      <Kpi.Period>{conversion.date}</Kpi.Period>
+      <Kpi.Value>{conversion.valueText}</Kpi.Value>
+      <Kpi.Delta reading={conversion} />
+      <Kpi.Media>
+        <Sparkline
+          {...conversion.plot}
+          label="Конверсия по месяцам"
+          reference={PLAN}
+          min={0}
+          max={5}
+          labels={{ reference: "План: {value}" }}
+        />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

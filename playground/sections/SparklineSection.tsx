@@ -106,6 +106,7 @@ export const page: ComponentPageConfig = {
     {
       scenario: "shared-grain",
       title: "Общий шаг",
+      layout: "row",
       description:
         "Один шаг на все KPI-плитки: переключатель над ними задаёт его, каждая плитка показывает последний период против прошлого — `grain`, `aggregate`, `change`.",
     },

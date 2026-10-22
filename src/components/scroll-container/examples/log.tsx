@@ -68,9 +68,11 @@ export default function ScrollContainerLogExample() {
     <Card.Root className={styles.log}>
       <Card.Header>
         <Card.Title>Обмен с 1С</Card.Title>
-        <Button.Root variant="soft" tone="neutral" onClick={receive}>
-          Новое событие
-        </Button.Root>
+        <Card.Actions>
+          <Button.Root variant="soft" tone="neutral" onClick={receive}>
+            Новое событие
+          </Button.Root>
+        </Card.Actions>
       </Card.Header>
       <ScrollContainer
         anchor="end"

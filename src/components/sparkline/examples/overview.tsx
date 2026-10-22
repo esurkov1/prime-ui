@@ -1,5 +1,5 @@
 /** Revenue for 30 days in a KPI card: the card lays out the reading — the total against the previous 30 days and the period — and the plot under it; drag across the plot to see a day — `useSparkline`, `summary`, `compareTo`, `formatValue`, `label`. */
-import { Card, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+import { Kpi, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -24,14 +24,14 @@ export default function SparklineOverviewExample() {
   });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Выручка за 30 дней</Card.Label>
-      <Card.Value>{revenue.valueText}</Card.Value>
-      {revenue.changeText ? (
-        <Card.Delta tone={revenue.changeTone}>{revenue.changeText}</Card.Delta>
-      ) : null}
-      <Sparkline {...revenue.plot} label="Выручка по дням" />
-      <Card.Meta>{revenue.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Выручка за 30 дней</Kpi.Title>
+      <Kpi.Period>{revenue.date}</Kpi.Period>
+      <Kpi.Value>{revenue.valueText}</Kpi.Value>
+      <Kpi.Delta reading={revenue} />
+      <Kpi.Media>
+        <Sparkline {...revenue.plot} label="Выручка по дням" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

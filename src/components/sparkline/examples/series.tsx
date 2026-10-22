@@ -1,6 +1,6 @@
 /** Revenue this year as an area against last year dotted and the plan dashed: each line has its color and look, the legend names them and gives their values at the point — `series`. */
 import {
-  Card,
+  Kpi,
   Sparkline,
   type SparklinePoint,
   type SparklineSeries,
@@ -40,11 +40,13 @@ export default function SparklineSeriesExample() {
   const revenue = useSparkline({ data: REVENUE, series: COMPARISON, formatValue: formatRubles });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Выручка по месяцам</Card.Label>
-      <Card.Value>{revenue.valueText}</Card.Value>
-      <Sparkline {...revenue.plot} label="2026" />
-      <Card.Meta>{revenue.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Выручка по месяцам</Kpi.Title>
+      <Kpi.Period>{revenue.date}</Kpi.Period>
+      <Kpi.Value>{revenue.valueText}</Kpi.Value>
+      <Kpi.Media>
+        <Sparkline {...revenue.plot} label="2026" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

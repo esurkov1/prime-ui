@@ -22,14 +22,16 @@ export default function ScrollContainerLockExample() {
     <Card.Root role="region" className={styles.card} aria-label="Очередь заказов">
       <Card.Header>
         <Card.Title>Очередь заказов</Card.Title>
-        <Button.Root
-          variant="soft"
-          tone="neutral"
-          pressed={reviewing}
-          onClick={() => setReviewing((current) => !current)}
-        >
-          {reviewing ? "Закрыть проверку" : "Проверить заказ"}
-        </Button.Root>
+        <Card.Actions>
+          <Button.Root
+            variant="soft"
+            tone="neutral"
+            pressed={reviewing}
+            onClick={() => setReviewing((current) => !current)}
+          >
+            {reviewing ? "Закрыть проверку" : "Проверить заказ"}
+          </Button.Root>
+        </Card.Actions>
       </Card.Header>
       <ScrollContainer lock={reviewing}>
         <Card.List>

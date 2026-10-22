@@ -326,7 +326,7 @@ A chart color does one job, and the job picks the colors:
 | `code` | 13/20 mono | identifiers, inline code |
 
 `variant` is required on `Typography`. Weights only 400/500/600. Numbers in tables, prices, dates:
-tabular (the kit does it in DataTable `numeric` columns and `Card.Value`; your own amounts take
+tabular (the kit does it in DataTable `numeric` columns, `Kpi.Value` and `Card.Total`; your own amounts take
 `font-variant-numeric: tabular-nums`). Reading text max width `--prime-layout-reading-max-width`
 (`Page.Root maxWidth="readable"`).
 

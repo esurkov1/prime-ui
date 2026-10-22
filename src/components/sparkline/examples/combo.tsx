@@ -1,6 +1,6 @@
 /** Revenue by month as bars with the plan as a dashed line over them, both on one scale and named in the legend — `variant`, `series`. */
 import {
-  Card,
+  Kpi,
   Sparkline,
   type SparklinePoint,
   type SparklineSeries,
@@ -37,14 +37,14 @@ export default function SparklineComboExample() {
   });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Выручка против плана</Card.Label>
-      <Card.Value>{revenue.valueText}</Card.Value>
-      {revenue.changeText ? (
-        <Card.Delta tone={revenue.changeTone}>{revenue.changeText}</Card.Delta>
-      ) : null}
-      <Sparkline {...revenue.plot} label="Выручка" variant="bars" />
-      <Card.Meta>{revenue.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Выручка против плана</Kpi.Title>
+      <Kpi.Period>{revenue.date}</Kpi.Period>
+      <Kpi.Value>{revenue.valueText}</Kpi.Value>
+      <Kpi.Delta reading={revenue} />
+      <Kpi.Media>
+        <Sparkline {...revenue.plot} label="Выручка" variant="bars" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

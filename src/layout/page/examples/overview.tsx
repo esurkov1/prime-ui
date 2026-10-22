@@ -37,7 +37,7 @@ export default function PageOverviewExample() {
               </Page.Actions>
             </Page.TopBar>
             <Page.Body>
-              <Card.Root variant="list">
+              <Card.Root>
                 <Card.List>
                   {ORDERS.map((order) => (
                     <Card.ListItem key={order.id}>

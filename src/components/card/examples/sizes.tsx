@@ -12,7 +12,9 @@ export default function CardSizesExample() {
             <Card.Header>
               <Card.Title>Ожидает выдачи</Card.Title>
               <Card.Description>10 окт, 08:00 · Аэропорт Пхукета</Card.Description>
-              <Button.Root>Выдан</Button.Root>
+              <Card.Actions>
+                <Button.Root>Выдан</Button.Root>
+              </Card.Actions>
             </Card.Header>
           </Card.Root>
           <Typography as="span" variant="caption" tone="muted">

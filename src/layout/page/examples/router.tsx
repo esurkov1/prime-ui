@@ -1,11 +1,11 @@
 /** A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the heading row before the buttons is their links and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. */
 import {
   Button,
-  Card,
   Crossfade,
   DataTable,
   type DataTableColumn,
   Icon,
+  Kpi,
   Page,
   SegmentedControl,
 } from "prime-ui-kit";
@@ -113,25 +113,34 @@ export default function PageRouterExample() {
               element={
                 <Page.Grid>
                   <Page.Cell span={4}>
-                    <Card.Root variant="stat-trend">
-                      <Card.Label>Диалогов</Card.Label>
-                      <Card.Value>1 280</Card.Value>
-                      <Card.Delta tone="success">+14% к сентябрю</Card.Delta>
-                    </Card.Root>
+                    <Kpi.Root>
+                      <Kpi.Title>Диалогов</Kpi.Title>
+                      <Kpi.Value>1 280</Kpi.Value>
+                      <Kpi.Delta value={14} tone="success">
+                        +14%
+                      </Kpi.Delta>
+                      <Kpi.Meta>к сентябрю</Kpi.Meta>
+                    </Kpi.Root>
                   </Page.Cell>
                   <Page.Cell span={4}>
-                    <Card.Root variant="stat-trend">
-                      <Card.Label>Первый ответ</Card.Label>
-                      <Card.Value>6 мин</Card.Value>
-                      <Card.Delta tone="success">на 2 мин быстрее</Card.Delta>
-                    </Card.Root>
+                    <Kpi.Root>
+                      <Kpi.Title>Первый ответ</Kpi.Title>
+                      <Kpi.Value>6 мин</Kpi.Value>
+                      <Kpi.Delta value={-2} tone="success">
+                        −2 мин
+                      </Kpi.Delta>
+                      <Kpi.Meta>к сентябрю</Kpi.Meta>
+                    </Kpi.Root>
                   </Page.Cell>
                   <Page.Cell span={4}>
-                    <Card.Root variant="stat-trend">
-                      <Card.Label>Без ответа</Card.Label>
-                      <Card.Value>23</Card.Value>
-                      <Card.Delta tone="danger">+5 за сутки</Card.Delta>
-                    </Card.Root>
+                    <Kpi.Root>
+                      <Kpi.Title>Без ответа</Kpi.Title>
+                      <Kpi.Value>23</Kpi.Value>
+                      <Kpi.Delta value={5} tone="danger">
+                        +5
+                      </Kpi.Delta>
+                      <Kpi.Meta>за сутки</Kpi.Meta>
+                    </Kpi.Root>
                   </Page.Cell>
                 </Page.Grid>
               }

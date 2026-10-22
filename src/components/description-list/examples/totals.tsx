@@ -12,7 +12,7 @@ const PAID = "−200 000 ₽";
 
 export default function DescriptionListTotalsExample() {
   return (
-    <Card.Root variant="panel" className={styles.column}>
+    <Card.Root className={styles.column}>
       <Card.Header>
         <Card.Title>Итого по счёту № 2026-0418</Card.Title>
       </Card.Header>

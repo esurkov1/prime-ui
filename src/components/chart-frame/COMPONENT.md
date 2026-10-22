@@ -11,10 +11,10 @@
 - A library that needs explicit `width` and `height` (Chart.js, visx, Recharts without `ResponsiveContainer`): `renderPlot` hands it the measured size.
 
 ## When not to use
-- A single number with its trend in a tile → [Sparkline](../sparkline/COMPONENT.md) (in a `Card`).
+- A single number with its trend in a tile → [Sparkline](../sparkline/COMPONENT.md) (in a `Kpi`).
 - Shares of a whole or a ranking → [ProgressBar](../progress-bar/COMPONENT.md) with `segments` or `layout="rows"`, [ProgressCircle](../progress-circle/COMPONENT.md).
 - Exact values to read, sort or compare row by row → [DataTable](../data-table/COMPONENT.md).
-- A KPI without a chart → [Card](../card/COMPONENT.md) `variant="stat-trend"`.
+- A KPI, with or without its trend line → [Kpi](../kpi/COMPONENT.md) (a Sparkline in `Kpi.Media`).
 
 ## Import
 ```tsx

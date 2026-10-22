@@ -44,23 +44,25 @@ export default function EmptyPageRegionErrorExample() {
     <Card.Root role="region" aria-labelledby="invoices-title" className={styles.region}>
       <Card.Header>
         <Card.Title id="invoices-title">Счета к оплате</Card.Title>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <Button.Root
-              variant="ghost"
-              tone="neutral"
-              size="s"
-              aria-label="Обновить счета"
-              disabled={state === "loading"}
-              onClick={() => setState("loading")}
-            >
-              <Button.Icon>
-                <Icon name="action.refresh" />
-              </Button.Icon>
-            </Button.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content>Обновить счета</Tooltip.Content>
-        </Tooltip.Root>
+        <Card.Actions>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <Button.Root
+                variant="ghost"
+                tone="neutral"
+                size="s"
+                aria-label="Обновить счета"
+                disabled={state === "loading"}
+                onClick={() => setState("loading")}
+              >
+                <Button.Icon>
+                  <Icon name="action.refresh" />
+                </Button.Icon>
+              </Button.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Обновить счета</Tooltip.Content>
+          </Tooltip.Root>
+        </Card.Actions>
       </Card.Header>
       <Card.Body>
         <Crossfade state={state} aria-busy={state === "loading"}>

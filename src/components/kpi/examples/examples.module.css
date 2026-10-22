@@ -1,0 +1,74 @@
+/* A row of KPI cards as a dashboard sets them: at least 18rem each, sharing the row; a phone stacks
+   them. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, calc(var(--prime-layout-tile-min-width) * 1.5)), 1fr)
+    );
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+/* Cards with a chart: a wider track (22.5–28rem), so the line has room to read. */
+.wide {
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(
+        min(100%, var(--prime-layout-narrow-width)),
+        calc(var(--prime-layout-narrow-width) * 1.25)
+      )
+    );
+  justify-content: center;
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+}
+
+/* Width probes for the container-query demo: 18rem and 40rem. */
+.w18 {
+  width: min(100%, calc(var(--prime-space-24) * 3));
+}
+
+.w40 {
+  width: min(100%, calc(var(--prime-space-20) * 8));
+}
+
+/* A drawer-width column of a record's figures (a size container: on a phone a row of four drops to two, a row of two to one). */
+.drawer {
+  container-type: inline-size;
+  display: grid;
+  gap: var(--prime-space-4);
+  width: min(100%, var(--prime-layout-form-width-m));
+  min-width: 0;
+}
+
+.pair,
+.quad {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+@container (min-width: 30rem) {
+  .quad {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 22rem) {
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

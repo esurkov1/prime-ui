@@ -89,7 +89,7 @@ export default function PageScreenExample() {
       </Page.Header>
       <Page.Body>
         <form noValidate onSubmit={save} onReset={() => setInnError(undefined)}>
-          <Card.Root variant="panel">
+          <Card.Root>
             <Card.Header>
               <Card.Title as="h2">Компания</Card.Title>
               <Card.Description>Попадают в счета, акты и письма клиентам.</Card.Description>
@@ -140,7 +140,7 @@ export default function PageScreenExample() {
           </Card.Root>
         </form>
 
-        <Card.Root variant="panel">
+        <Card.Root>
           <Card.Header>
             <Card.Title as="h2">Уведомления</Card.Title>
             <Card.Description>Включаются сразу, без сохранения.</Card.Description>
@@ -161,7 +161,7 @@ export default function PageScreenExample() {
           </Card.Body>
         </Card.Root>
 
-        <Card.Root variant="panel">
+        <Card.Root>
           <Card.Header>
             <Card.Title as="h2">Рабочее пространство</Card.Title>
             <Card.Description>Действия, которые нельзя отменить.</Card.Description>

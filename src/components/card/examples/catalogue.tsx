@@ -1,4 +1,4 @@
-/** A fleet catalogue: each unit's photos are the cover, its status and plate stand on them, the model and the place sit under them, the other badges wrap, and the term with its bar keeps to the bottom of the card, which opens the unit as a whole, at the dense tier — `cover`, `size`, `Card.Media`, `Card.Link`, `Card.Footer`, `Card.Meta`. */
+/** A fleet catalogue: each unit's photos are the cover, its status and plate stand on them, the model and the place sit under them, the other badges wrap, and the term with its bar keeps to the bottom of the card, which opens the unit as a whole, at the dense tier — `Card.Media`, `size`, `Card.Header`, `Card.Link`, `Card.Footer`. */
 import { Badge, Card, Carousel, type CarouselItem, ProgressBar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -76,9 +76,9 @@ const hrefOf = (unit: Unit) => `#unit-${unit.id}`;
 
 export default function CardCatalogueExample() {
   return (
-    <div className={styles.grid}>
+    <div className={styles.catalogue}>
       {UNITS.map((unit) => (
-        <Card.Root key={unit.id} variant="cover" size="s">
+        <Card.Root key={unit.id} size="s">
           <Card.Media>
             <Carousel.Root
               items={mediaOf(unit)}
@@ -98,7 +98,7 @@ export default function CardCatalogueExample() {
               </Carousel.Overlay>
             </Carousel.Root>
           </Card.Media>
-          <Card.Body>
+          <Card.Header>
             <Card.Title>
               <Card.Link href={hrefOf(unit)}>
                 {unit.model}
@@ -112,7 +112,9 @@ export default function CardCatalogueExample() {
                 {unit.details}
               </Typography>
             </Card.Description>
-            {unit.badges.length > 0 ? (
+          </Card.Header>
+          {unit.badges.length > 0 ? (
+            <Card.Body>
               <Badge.Group>
                 {unit.badges.map((badge) => (
                   <Badge.Root key={badge.label} tone={badge.tone}>
@@ -120,10 +122,17 @@ export default function CardCatalogueExample() {
                   </Badge.Root>
                 ))}
               </Badge.Group>
-            ) : null}
-          </Card.Body>
+            </Card.Body>
+          ) : null}
           <Card.Footer>
-            <Card.Meta tone={unit.term.overdue ? "danger" : undefined}>{unit.term.text}</Card.Meta>
+            <Typography
+              as="span"
+              variant="body-s"
+              tone={unit.term.overdue ? "danger" : "muted"}
+              numeric="tabular"
+            >
+              {unit.term.text}
+            </Typography>
             <ProgressBar
               size="xs"
               value={unit.term.progress}

@@ -26,7 +26,7 @@ export default function PageStructureExample() {
         </Page.Header>
         <Page.Body>
           <Page.Section label="Новые заказы" description="Сразу после оформления.">
-            <Card.Root variant="panel">
+            <Card.Root>
               <Card.Body>
                 <Typography variant="body-m" tone="secondary">
                   Письмо ответственному менеджеру и сводка в канал отдела продаж.

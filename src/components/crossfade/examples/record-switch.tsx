@@ -44,7 +44,7 @@ export default function CrossfadeRecordSwitchExample() {
         ))}
       </SegmentedControl.Root>
 
-      <Card.Root variant="panel">
+      <Card.Root>
         <Card.Body>
           <Crossfade state={client.id}>
             <DescriptionList.Root aria-label={client.name}>

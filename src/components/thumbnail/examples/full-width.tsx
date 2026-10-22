@@ -19,7 +19,7 @@ export default function ThumbnailFullWidthExample() {
   return (
     <div className={styles.grid}>
       {BIKES.map((bike) => (
-        <Card.Root key={bike.id} variant="panel">
+        <Card.Root key={bike.id}>
           <Card.Body>
             <div className={styles.cardContent}>
               <Thumbnail.Root ratio="16:9" color={bike.color} fullWidth>

@@ -11,7 +11,7 @@
 - Any short authentication step where one card holds a header, optional provider buttons, 1–5 fields and one primary action.
 
 ## When not to use
-- A settings or profile form on an app page → use [Card](../card/COMPONENT.md) `panel` with [Input](../input/COMPONENT.md) fields.
+- A settings or profile form on an app page → use [Card](../card/COMPONENT.md) (`Card.Header` + `Card.Body`) with [Input](../input/COMPONENT.md) fields.
 - A long multi-step wizard → use [Stepper](../stepper/COMPONENT.md) around regular forms.
 - The app frame (sidebar, header) → [AppShell](../../layout/app-shell/COMPONENT.md); a sign-in screen has none.
 

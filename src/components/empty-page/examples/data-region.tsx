@@ -8,9 +8,11 @@ export default function EmptyPageDataRegionExample() {
     <Card.Root role="region" aria-labelledby="orders-region-title" className={styles.region}>
       <Card.Header>
         <Card.Title id="orders-region-title">Заказы</Card.Title>
-        <Button.Root variant="soft" tone="neutral" size="s">
-          Импорт
-        </Button.Root>
+        <Card.Actions>
+          <Button.Root variant="soft" tone="neutral" size="s">
+            Импорт
+          </Button.Root>
+        </Card.Actions>
       </Card.Header>
       <EmptyPage.Root layout="fill" aria-labelledby="orders-empty-title">
         <EmptyPage.Icon tone="accent">

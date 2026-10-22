@@ -316,7 +316,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | body text, cells | `body-m` |
 | lead under a heading | `body-m` + `tone="secondary"` |
 | meta: dates, ids, labels of values | `caption` + `tone="muted"` |
-| the number that matters (KPI, total) | `Card.Value`, or `title-m` for a total row |
+| the number that matters (KPI, total) | `Kpi.Value`, or `Card.Total` for a record's total |
 
 - Headings descend without skipping levels. One page title.
 - Secondary text is a `tone`, never a custom color. Amounts and dates are tabular
@@ -329,8 +329,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - Inside the app the content panel is the page (layer 0 of the surface ladder); a `Card` on it is
   layer 1, and fields take the fill of the layer they sit on. The kit sets this by context — never
   set backgrounds ([the one exception](foundations.md#your-own-bounded-block)).
-- **Card when** the block stands alone and has its own title: a KPI tile, a settings panel, facts in a
-  side column, a chart. **No card when** the block is the only thing in its region: a section heading
+- **Card when** the block stands alone and has its own title: a settings panel, facts in a
+  side column (a KPI tile is a `Kpi`, the card itself). **No card when** the block is the only thing in its region: a section heading
   and the content are enough.
 - **A titled block stands in the flow, its heading inside it.** A panel with a title and a line of
   description (a settings section, a group of a long form) is a `Card.Root` whose `Card.Header`
@@ -344,13 +344,13 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
     <Typography as="h2" variant="title-m">Компания</Typography>
     <Typography tone="secondary">Попадают в счета и акты.</Typography>
   </div>
-  <Card.Root variant="panel">…</Card.Root>
+  <Card.Root>…</Card.Root>
 </div>
 ```
 
 ```tsx good
 // good — the card carries its own heading, stacked in the flow
-<Card.Root variant="panel">
+<Card.Root>
   <Card.Header>
     <Card.Title as="h2">Компания</Card.Title>
     <Card.Description>Попадают в счета и акты.</Card.Description>
@@ -453,7 +453,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 </Drawer.Footer>
 ```
 
-- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`; dialog actions in
+- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`, or in `Card.Actions` at the end of a `Card.Header` or a record row — nowhere else in a card; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
 - A dialog footer is the dialog's answer, and it has one shape for every kind of dialog:
@@ -512,12 +512,14 @@ ghost tools, a button inline in text; over media it is `shade`. A `FieldList` dr
 // bad — the edit icon floats after a filled «Вернуть»; a hand-made line ends on a bare glyph
 <Card.Header>
   <Card.Title>300 $</Card.Title>
-  <Button.Root variant="soft" tone="neutral">Вернуть</Button.Root>
-  <Button.Root variant="ghost" tone="neutral" aria-label="Исправить депозит">
-    <Button.Icon>
-      <Icon name="action.edit" />
-    </Button.Icon>
-  </Button.Root>
+  <Card.Actions>
+    <Button.Root variant="soft" tone="neutral">Вернуть</Button.Root>
+    <Button.Root variant="ghost" tone="neutral" aria-label="Исправить депозит">
+      <Button.Icon>
+        <Icon name="action.edit" />
+      </Button.Icon>
+    </Button.Root>
+  </Card.Actions>
 </Card.Header>
 <div className={styles.line}>
   <Input.Root label="Сумма">…</Input.Root>
@@ -536,12 +538,14 @@ ghost tools, a button inline in text; over media it is `shade`. A `FieldList` dr
 <>
   <Card.Header>
     <Card.Title>300 $</Card.Title>
-    <Button.Root variant="soft" tone="neutral">Вернуть</Button.Root>
-    <Button.Root variant="soft" tone="neutral" aria-label="Исправить депозит">
-      <Button.Icon>
-        <Icon name="action.edit" />
-      </Button.Icon>
-    </Button.Root>
+    <Card.Actions>
+      <Button.Root variant="soft" tone="neutral">Вернуть</Button.Root>
+      <Button.Root variant="soft" tone="neutral" aria-label="Исправить депозит">
+        <Button.Icon>
+          <Icon name="action.edit" />
+        </Button.Icon>
+      </Button.Root>
+    </Card.Actions>
   </Card.Header>
   <FieldList
     aria-label="Позиции счёта"
@@ -805,10 +809,10 @@ drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-
     <Page.Grid>
       {kpis.map((kpi) => (
         <Page.Cell key={kpi.label} span={3}>
-          <Card.Root variant="stat-trend">
-            <Card.Label>{kpi.label}</Card.Label>
-            <Card.Value>{kpi.value}</Card.Value>
-          </Card.Root>
+          <Kpi.Root>
+            <Kpi.Title>{kpi.label}</Kpi.Title>
+            <Kpi.Value>{kpi.value}</Kpi.Value>
+          </Kpi.Root>
         </Page.Cell>
       ))}
     </Page.Grid>
@@ -914,7 +918,7 @@ drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-
   (string → compact EmptyPage, or your own `EmptyPage size="s"` with «Сбросить фильтры»), `loadError`
   for a failed load. The head and toolbar stay.
 - Phones: the table scrolls inside itself, `stickyFirstColumn` keeps the key column; never let the page
-  scroll sideways. Short lists of objects can be `Card variant="list"` instead of a table.
+  scroll sideways. Short lists of objects can be a `Card.List` instead of a table.
 
 ### Where the create button goes
 
@@ -1302,7 +1306,7 @@ What makes a screen look generated, with bad → good code: [anti-slop.md](anti-
 Go down this ladder and stop at the first step that works.
 
 1. **Find it in the kit.** Search [components.md](components.md), then the Variants and Anatomy of the
-   closest component: Card has 7 templates, Input has icons / affixes / a clear button / a counter / a strength meter,
+   closest component: Card has zones, a cover, record rows and a total, Kpi a figure with its change, period, chart and actions, Input has icons / affixes / a clear button / a counter / a strength meter,
    Select has rich items and search, Dropdown has a profile header, DataTable has a toolbar slot, nested
    rows and a detail row (`renderExpanded`), Sparkline is a small trend chart, Kanban a status board.
 2. **Compose kit parts.** Put existing components together on a layout wrapper (CSS Module, `gap` on
@@ -1325,39 +1329,41 @@ Rules for your own component:
 
 ### Worked example: a metric panel with a period switch
 
-The kit has the metric templates; the switch is a composition: `Card.Root variant="panel"` + a
-SegmentedControl right after `Card.Title` in `Card.Header`, one tier down because it sits in the card's
-header row.
+The figure is a `Kpi`, and the switch is one of its parts: a SegmentedControl in `Kpi.Actions` at
+the end of the title row, one tier down because it shares the row with the title; the period it
+picks reads in `Kpi.Period` under the title.
 
 ```tsx
-import { Card, SegmentedControl } from "prime-ui-kit";
+import { Kpi, SegmentedControl } from "prime-ui-kit";
 
 export function RevenuePanel() {
   return (
-    <Card.Root variant="panel">
-      <Card.Header>
-        <Card.Title as="h2">Выручка</Card.Title>
+    <Kpi.Root>
+      <Kpi.Title>Выручка</Kpi.Title>
+      <Kpi.Period>Октябрь</Kpi.Period>
+      <Kpi.Actions>
         <SegmentedControl.Root size="s" defaultValue="month" aria-label="Период">
           <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
           <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
         </SegmentedControl.Root>
-      </Card.Header>
-      <Card.Body>
-        <Card.Value>4,2 млн ₽</Card.Value>
-        <Card.Delta tone="success">+18% к прошлому месяцу</Card.Delta>
-      </Card.Body>
-    </Card.Root>
+      </Kpi.Actions>
+      <Kpi.Value>4,2 млн ₽</Kpi.Value>
+      <Kpi.Delta value={18} tone="success">
+        +18%
+      </Kpi.Delta>
+      <Kpi.Meta>к сентябрю</Kpi.Meta>
+    </Kpi.Root>
   );
 }
 ```
 
-For a plain KPI row use `Card.Root variant="stat-trend"` (Label · Value · Delta), each in a
-`Page.Cell span={3}` of the page's `Page.Grid` — see [the dashboard screen](../src/components/card/examples/screen.tsx). When the trend over days matters, add a
-`Sparkline` to the tile: `useSparkline` gives its `Card.Value`, `Card.Delta` and `Card.Meta` (the change with `compareTo`), `{...reading.plot}` the line to scrub.
+For a plain KPI row put a `Kpi.Root` (Title · Value · Delta · Meta) in each `Page.Cell span={3}` of
+the page's `Page.Grid` — see [the dashboard screen](../src/components/card/examples/screen.tsx). When the trend over days matters, add a
+`Sparkline` in `Kpi.Media`: `useSparkline` gives its value, change and `Kpi.Period`, `{...reading.plot}` the line to scrub.
 A tile whose value is words, not a number («Выдать PCX 160», «Заявка в Mini App») →
-`variant="stat-text"`; a value with a meaning («к оплате» due, a payment made) → `Card.Value tone`
-(and `DescriptionList.Item tone` in a pair). A tile that leads somewhere is a link (`Card.Root asChild`
-with the link, or `Card.Link` when the card holds its own buttons): the kit draws its arrow — never
+`Kpi.Root valueSize="s"`, its buttons in `Kpi.Actions`; a value with a meaning («к оплате» due, a
+payment made) → `Kpi.Value tone` (and `DescriptionList.Item tone` in a pair). A tile that leads somewhere is a link (`Kpi.Root asChild`
+around the link, or `Card.Link` inside it when the tile holds its own buttons or a Sparkline): the kit draws its arrow — never
 an arrow of your own in the label.
 
 ### Tiles and cards of a record
@@ -1366,69 +1372,69 @@ The facts of a record (in its dialog, its page, its card in a list) read the sam
 app: one look per kind of block, never a weight per screen.
 
 - **Fact tiles** — «К оплате», «Депозиты у нас», «Ближайшая задача», «LTV», «t.me/…», «Последний
-  вход 20 окт, 07:44»: a row of `Card.Root variant="stat-text"` at the default value size, with
-  `Card.Label`, `Card.Value` (`tone` by its meaning) and an optional `Card.Meta`. The value is body-m
+  вход 20 окт, 07:44»: a row of `Kpi.Root valueSize="s"` tiles with `Kpi.Title`, `Kpi.Value`
+  (`tone` by its meaning) and an optional `Kpi.Meta`. The value is body-m
   medium, a number, a phrase and a link alike, in every tile of the row and in every dialog of the
-  app: a larger value breaks the drawer's structure as soon as a fact is a phrase. `valueSize="l"`
+  app: a larger value breaks the drawer's structure as soon as a fact is a phrase. `valueSize="m"`
   only for a single total tile that stands alone, never for a row of facts. Never a `Typography`
-  inside `Card.Value` to change its size: the loading Skeleton then has the wrong height.
+  inside `Kpi.Value` to change its size: the loading Skeleton then has the wrong height.
 - **Type of the blocks of a record.** Two families, each with one set of sizes everywhere in the
   app — the kit sets them, so never a `Typography` variant of your own inside these parts:
 
   | Block | Part | Role (size / line, weight) |
   |---|---|---|
-  | Fact tiles at the top (`stat-text`) | `Card.Label` · `Card.Value` · `Card.Meta` | body-s 13/20 · body-m 14/20 medium · body-s 13/20 muted |
-  | KPI numbers at the top (`stat-trend valueSize="m"`) | `Card.Label` · `Card.Value` · `Card.Delta` | body-s 13/20 · heading-m 24/32 semibold · body-s 13/20 |
+  | Fact tiles at the top (`Kpi.Root valueSize="s"`) | `Kpi.Title` · `Kpi.Value` · `Kpi.Meta` | title-s 14/20 semibold · body-m 14/20 medium · body-s 13/20 muted |
+  | KPI numbers at the top (`Kpi.Root valueSize="m"`) | `Kpi.Title` · `Kpi.Value` · `Kpi.Delta` | title-s 14/20 semibold · heading-m 24/32 semibold · a Badge `s` |
   | Every other card (status, object, deposit, bill) | `Card.Title` · `Card.Description` | title-s 14/20 semibold · body-s 13/20 secondary |
   | Line items in a card | `DescriptionList` / `FieldList` rows | field label 13/20 · field text 14/20 |
-  | A card's total | `Card.Total` (`Card.Meta` over `Card.Value`) | body-s 13/20 muted · title-m 16/24 semibold |
+  | A card's total | `Card.Total` (its `label` over the amount) | body-s 13/20 muted · title-m 16/24 semibold |
 
   The top row reads first and stands a step above the cards under it; the cards share one title
   and one secondary line, so a drawer of five cards reads as one list.
-- **KPIs of a record** (counts and amounts with a change, in a dialog): `stat-trend` with
+- **KPIs of a record** (counts and amounts with a change, in a dialog): `Kpi.Root` with
   `valueSize="m"`, so a row of two and a row of four in one drawer keep one size — never a layout
-  bent to make the widths match. Without `valueSize` the value follows the tile's width, which is for
-  a dashboard grid.
+  bent to make the widths match. The default `l` is for a dashboard grid.
 - **An object of the record** (the video at hand-over, a connected channel account, a session, the
   current term): a card of one `Card.Header` — its picture first (`Card.Icon` with a `Thumbnail`,
   an `Avatar`, a `ProgressCircle` or an icon tile), then two lines: `Card.Title` names the object,
   `Card.Description` gives one line of data («20 окт, 09:21 · Евгений Сурков»), and its one action
-  at the end. Two lines, never a third: a label above the title repeats the section heading. The
+  in `Card.Actions` at the end. Two lines, never a third: a label above the title repeats the section heading. The
   kit pads a header with nothing under it evenly, so no padding of your own.
 - **A task of the record with its assignee** (a return, a delivery, a call back): a card of one
   `Card.Header`. `Card.Title` is the task with its term («Вернуть 10 дек · через 50 дн.»);
   `Card.Description` starts with the assignee picker — a `Badge.Root` with `Badge.Avatar` in a
-  `Dropdown.Trigger`, as in the Card example `assignment` — and then the facts («выдан 21 окт,
-  15:43»). The person is named once: «Выдан 21 окт · Евгений Сурков · [Евгений Сурков ▾]» repeats
-  the name and leaves a dangling «·»; the picker first and the facts after it say the same in one
-  line. The actions stand at the header's end, the primary last: one secondary action is a labelled
-  `soft` button («Отменить», example `assignment`), two or more gather behind `action.more`
-  (example `assignment-menu`) — [a menu from two actions](#a-menu-from-two-actions).
+  `Dropdown.Trigger`, as in the Card example [actions](../src/components/card/examples/actions.tsx)
+  — and then the facts («выдан 21 окт, 15:43»). The person is named once: «Выдан 21 окт · Евгений
+  Сурков · [Евгений Сурков ▾]» repeats the name and leaves a dangling «·»; the picker first and the
+  facts after it say the same in one line. The actions stand in `Card.Actions` at the header's end,
+  the primary last: one secondary action is a labelled `soft` button («Отменить»), two or more
+  gather behind `action.more` (both in the same example) —
+  [a menu from two actions](#a-menu-from-two-actions).
 - **A record card with a total** (a vehicle of a deal, a payment, an invoice): the head is a
   `Card.Header` — its mark first (`Card.Icon` with the record's picture or a `ProgressCircle` term
   ring), `Card.Title` with `Card.Link` when the card opens the record (the kit centres its arrow on
   the head), the statuses in `Card.Description`; the line items are a
   `DescriptionList.Root align="end"` in `Card.Body divider="full"`; the footer is
   `Card.Footer divider="fill"`: the action first, then `Card.Description` with a `Badge.Dot` and
-  the task, then `Card.Total` at the end edge (`Card.Meta tone` for its state, «к оплате 6 400 ฿»,
-  over `Card.Value`). See [record-totals](../src/components/card/examples/record-totals.tsx).
+  the task, then `Card.Total` at the end edge (the amount, its state in `label` with a `tone`,
+  «к оплате 6 400 ฿»). See [record-totals](../src/components/card/examples/record-totals.tsx).
 
 ```tsx partial
 // bad — the value restyled by hand, a weight of its own per drawer
-<Card.Root variant="stat-text">
-  <Card.Label>К оплате</Card.Label>
-  <Card.Value>
+<Kpi.Root>
+  <Kpi.Title>К оплате</Kpi.Title>
+  <Kpi.Value>
     <Typography as="span" variant="title-m">21 000 ₽</Typography>
-  </Card.Value>
-</Card.Root>
+  </Kpi.Value>
+</Kpi.Root>
 ```
 
 ```tsx good
 // good — the kit's value: the same in every tile, the Skeleton in its height
-<Card.Root variant="stat-text">
-  <Card.Label>К оплате</Card.Label>
-  <Card.Value tone="warning">21 000 ₽</Card.Value>
-</Card.Root>
+<Kpi.Root valueSize="s">
+  <Kpi.Title>К оплате</Kpi.Title>
+  <Kpi.Value tone="warning">21 000 ₽</Kpi.Value>
+</Kpi.Root>
 ```
 
 ## Screen rules
@@ -1454,7 +1460,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The status is words next to the fact that matters now, in `Page.Description` («Отправлен · оплатить до 14 октября»), not a separate plate.
 - The record's actions are the bar's `Page.Actions`, by weight: one primary (`solid`, last), the secondary `soft` + `tone="neutral"`, each with an icon beside its label. Rare and destructive ones live in a `Dropdown` behind an `action.more` icon (also `soft`, so the button has a shape beside its neighbours); voiding is `tone="danger"` at the bottom of the menu.
 - Columns are a CSS module on flex-wrap without breakpoints: the main one grows, the side one holds ~18rem and drops below when the main one runs out of room.
-- A section without a frame is `Page.Section label`: an h2 heading 16 px above the table; `Card variant="panel"` only for standalone blocks of the side column. A table is already a filled block — never put it in a card.
+- A section without a frame is `Page.Section label`: an h2 heading 16 px above the table; a `Card` with its `Card.Header` only for standalone blocks of the side column. A table is already a filled block — never put it in a card.
 - «Label → value» pairs about the client are `DescriptionList.Root orientation="vertical"` with `DescriptionList.Item label`; amounts are tabular figures, the total is larger (`title-m`) and ends where the «Сумма» column ends (the table cell inset).
 - History is a `Timeline`: events top-down from the latest, dates in `Timeline.ItemMeta`; a row highlights on hover.
 
@@ -1463,7 +1469,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [page/examples/screen.tsx](../src/layout/page/examples/screen.tsx)
 
 - A document page: `Page.Root maxWidth="wide"`, the large `Page.Title` with a sentence of `Page.Description` in the `Page.Heading` of a `Page.Header` in the flow, and a `Page.TopBar collapse` whose `Page.Heading` holds only the path and repeats the title once it scrolls away.
-- A section is a `Card variant="panel"` with its own `Card.Header` (`Card.Title as="h2"` + a line of `Card.Description`), the cards stacked in the flow ([a titled block](#4-surfaces)).
+- A section is a `Card` with its own `Card.Header` (`Card.Title as="h2"` + a line of `Card.Description`), the cards stacked in the flow ([a titled block](#4-surfaces)).
 - The form wraps the whole `Card.Root` in `<form noValidate>`; the buttons are in `Card.Footer`: «Отменить изменения» `soft` + `neutral`, then the primary «Сохранить». While the request runs — `loading` on the button, and one `Fieldset disabled` turns the fields off; the form stays on screen, so success is the button text «Сохранено» for two seconds, without a notification.
 - Fields are 20 px apart; two short related fields side by side while there is width, with `align-items: start` and `reserveSupportRow`, so an error does not shift the neighbour.
 - An error comes through the field's `error` after submit, not while typing; a format hint goes in `hint`.
@@ -1501,11 +1507,11 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - An overview titles itself in its `Page.TopBar` like any screen of data: `Page.Title` «Обзор» with a `Page.Description` line of data (what and as of when) in `Page.Heading`, beside the page's tools and buttons; no header in the flow, the body starts with the tiles.
 - The period is a `SegmentedControl` in the bar's `Page.Tools` and the report a `soft` + `neutral` button with an icon in its `Page.Actions`: the period changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
-- Every tile of the screen is one `Page.Grid`: KPI `Card variant="stat-trend"` in `Page.Cell span={3}`, 16 px on both axes; `Card.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
+- Every tile of the screen is one `Page.Grid`: a `Kpi.Root` tile each in `Page.Cell span={3}`, 16 px on both axes; `Kpi.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
 - Another period — other values: each KPI tile is wrapped in `Crossfade state={period}` and flows instead of blinking; a Crossfade right in a `Page.Cell` fills it, so the tiles of a row keep one height.
-- A trend over days is a `Sparkline` in a `Card` in a full-width cell: the card shows the period's sum from `useSparkline` (`summary`) over a line you can scrub with a finger; a new series appears by itself.
+- A trend over days is a `Sparkline` in the `Kpi.Media` of a full-width `Kpi` tile: the tile shows the period's sum from `useSparkline` (`summary`) over a line you can scrub with a finger; a new series appears by itself.
 - A chart with axes and several series is a `ChartFrame` in `Page.Cell span={8} rows={2}` beside two panels; `ChartFrame.Plot height="fill"` takes their height. A sized plot area (`renderPlot`), a legend that turns series off and a table for screen readers; series colors come from `series`, never your own.
-- Panels are `Card variant="panel"` with `Card.Title as="h2"` in `Card.Header` and quiet context on the right after the title (`caption` + `muted`).
+- Panels are a `Card` with `Card.Title as="h2"` in `Card.Header` and quiet context on the right after the title, in `Card.Actions` (`caption` + `muted`).
 - Progress of one value is a `ProgressBar` with `label` and `showValue`; parts of a whole are `ProgressBar segments` with `legend` and `formatValue`: judgements wear `tone`, stages and categories `color` ([tone or color](foundations.md#tone-or-color)).
 - Tiles of one screen are 16 px apart (`Page.Grid`), page blocks 24 px (`Page.Body`), a new topic with a heading 40 px (`Page.Section`): proximity shows what is related.
 - A short list is a `DataTable paging="none"` in `Page.Section label` without a card; «Все счета» is a `LinkButton` in the section's `Page.Actions`: it is a way somewhere, not an action.

@@ -108,12 +108,14 @@ export default function CrossfadeScreenExample() {
 
           <Page.Grid>
             <Page.Cell span={6}>
-              <Card.Root variant="panel" aria-busy={status === "loading"}>
+              <Card.Root aria-busy={status === "loading"}>
                 <Card.Header>
                   <Card.Title as="h2">Остатки</Card.Title>
-                  <Typography as="span" variant="caption" tone="muted">
-                    {status === "ready" ? "на 7 октября" : "на 6 октября"}
-                  </Typography>
+                  <Card.Actions>
+                    <Typography as="span" variant="caption" tone="muted">
+                      {status === "ready" ? "на 7 октября" : "на 6 октября"}
+                    </Typography>
+                  </Card.Actions>
                 </Card.Header>
                 <Card.Body>
                   {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
@@ -136,7 +138,7 @@ export default function CrossfadeScreenExample() {
             </Page.Cell>
 
             <Page.Cell span={6}>
-              <Card.Root variant="panel">
+              <Card.Root>
                 <Card.Header>
                   <Card.Title as="h2">Правила разнесения</Card.Title>
                 </Card.Header>

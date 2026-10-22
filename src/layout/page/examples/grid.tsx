@@ -1,13 +1,13 @@
 /** A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `Page.Grid`, `Page.Cell`, `span`, `rows`. */
-import { Card, ChartFrame, type ChartFrameSeries, chartColors, Page } from "prime-ui-kit";
+import { ChartFrame, type ChartFrameSeries, chartColors, Kpi, Page } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 const KPIS = [
-  { label: "Выручка", value: "4,8 млн ₽", delta: "+12% к сентябрю", tone: "success" },
-  { label: "Заказы", value: "1 284", delta: "+6% к сентябрю", tone: "success" },
-  { label: "Средний чек", value: "3 740 ₽", delta: "−2% к сентябрю", tone: "danger" },
-  { label: "Возвраты", value: "1,8%", delta: "без изменений", tone: "neutral" },
+  { label: "Выручка", value: "4,8 млн ₽", change: 12, delta: "+12%", tone: "success" },
+  { label: "Заказы", value: "1 284", change: 6, delta: "+6%", tone: "success" },
+  { label: "Средний чек", value: "3 740 ₽", change: -2, delta: "−2%", tone: "danger" },
+  { label: "Возвраты", value: "1,8%", change: 0, delta: "0%", tone: "neutral" },
 ] as const;
 
 const SERIES: ChartFrameSeries[] = [{ id: "orders", label: "Заказы" }];
@@ -33,11 +33,14 @@ export default function PageGridExample() {
         <Page.Grid>
           {KPIS.map((kpi) => (
             <Page.Cell key={kpi.label} span={3}>
-              <Card.Root variant="stat-trend">
-                <Card.Label>{kpi.label}</Card.Label>
-                <Card.Value>{kpi.value}</Card.Value>
-                <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
-              </Card.Root>
+              <Kpi.Root>
+                <Kpi.Title>{kpi.label}</Kpi.Title>
+                <Kpi.Value>{kpi.value}</Kpi.Value>
+                <Kpi.Delta value={kpi.change} tone={kpi.tone}>
+                  {kpi.delta}
+                </Kpi.Delta>
+                <Kpi.Meta>к сентябрю</Kpi.Meta>
+              </Kpi.Root>
             </Page.Cell>
           ))}
           <Page.Cell span={8} rows={2}>
@@ -89,18 +92,21 @@ export default function PageGridExample() {
             </ChartFrame.Root>
           </Page.Cell>
           <Page.Cell span={4}>
-            <Card.Root variant="stat-trend">
-              <Card.Label>Новые клиенты</Card.Label>
-              <Card.Value>86</Card.Value>
-              <Card.Delta tone="success">+14 к сентябрю</Card.Delta>
-            </Card.Root>
+            <Kpi.Root>
+              <Kpi.Title>Новые клиенты</Kpi.Title>
+              <Kpi.Value>86</Kpi.Value>
+              <Kpi.Delta value={14} tone="success">
+                +14
+              </Kpi.Delta>
+              <Kpi.Meta>к сентябрю</Kpi.Meta>
+            </Kpi.Root>
           </Page.Cell>
           <Page.Cell span={4}>
-            <Card.Root variant="stat-trend">
-              <Card.Label>Ждут оплаты</Card.Label>
-              <Card.Value>312 400 ₽</Card.Value>
-              <Card.Delta tone="warning">7 счетов</Card.Delta>
-            </Card.Root>
+            <Kpi.Root>
+              <Kpi.Title>Ждут оплаты</Kpi.Title>
+              <Kpi.Value tone="warning">312 400 ₽</Kpi.Value>
+              <Kpi.Meta>7 счетов</Kpi.Meta>
+            </Kpi.Root>
           </Page.Cell>
         </Page.Grid>
       </Page.Body>

@@ -34,14 +34,14 @@ export default function CarouselScrubExample() {
   return (
     <div className={styles.catalogue}>
       {SCOOTERS.map((scooter) => (
-        <Card.Root key={scooter.id} variant="cover">
+        <Card.Root key={scooter.id}>
           <Card.Media>
             <Carousel.Root items={scooter.items} scrub aria-label={`Фото ${scooter.title}`} />
           </Card.Media>
-          <Card.Body>
+          <Card.Header>
             <Card.Title>{scooter.title}</Card.Title>
             <Card.Description>{scooter.price}</Card.Description>
-          </Card.Body>
+          </Card.Header>
         </Card.Root>
       ))}
     </div>

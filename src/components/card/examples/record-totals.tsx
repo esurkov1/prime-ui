@@ -1,4 +1,4 @@
-/** A rental unit of a deal: its term ring leads the header beside the arrow, its state and deposit badges stand under the title, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `Card.Meta`. */
+/** A rental unit of a deal: its term ring leads the header beside the arrow, its state and deposit badges stand under the title, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `label`, `tone`. */
 import { Badge, Button, Card, DescriptionList, ProgressCircle, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -64,9 +64,8 @@ export default function CardRecordTotalsExample() {
             <Badge.Dot color="yellow" />
             {UNIT.task}
           </Card.Description>
-          <Card.Total>
-            <Card.Meta tone="warning">{UNIT.due}</Card.Meta>
-            <Card.Value>{UNIT.total}</Card.Value>
+          <Card.Total label={UNIT.due} tone="warning">
+            {UNIT.total}
           </Card.Total>
         </Card.Footer>
       </Card.Root>

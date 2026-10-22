@@ -1,5 +1,5 @@
 /** One step for every KPI tile: the switcher above them sets it, each tile reads its latest period against the one before — `grain`, `aggregate`, `change`. */
-import { Card, SegmentedControl, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+import { Kpi, SegmentedControl, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -36,33 +36,33 @@ export default function SparklineSharedGrainExample() {
         <SegmentedControl.Item value="month">Месяцы</SegmentedControl.Item>
       </SegmentedControl.Root>
       <div className={styles.tiles}>
-        <Card.Root variant="stat-trend">
-          <Card.Label>Лиды</Card.Label>
-          <Card.Value>{leads.valueText}</Card.Value>
-          {leads.changeText ? (
-            <Card.Delta tone={leads.changeTone}>{leads.changeText}</Card.Delta>
-          ) : null}
-          <Sparkline {...leads.plot} label="Лиды" size="s" />
-          <Card.Meta>{leads.date}</Card.Meta>
-        </Card.Root>
-        <Card.Root variant="stat-trend">
-          <Card.Label>Брони</Card.Label>
-          <Card.Value>{bookings.valueText}</Card.Value>
-          {bookings.changeText ? (
-            <Card.Delta tone={bookings.changeTone}>{bookings.changeText}</Card.Delta>
-          ) : null}
-          <Sparkline {...bookings.plot} label="Брони" size="s" />
-          <Card.Meta>{bookings.date}</Card.Meta>
-        </Card.Root>
-        <Card.Root variant="stat-trend">
-          <Card.Label>Возвраты</Card.Label>
-          <Card.Value>{returns.valueText}</Card.Value>
-          {returns.changeText ? (
-            <Card.Delta tone={returns.changeTone}>{returns.changeText}</Card.Delta>
-          ) : null}
-          <Sparkline {...returns.plot} label="Возвраты" size="s" />
-          <Card.Meta>{returns.date}</Card.Meta>
-        </Card.Root>
+        <Kpi.Root>
+          <Kpi.Title>Лиды</Kpi.Title>
+          <Kpi.Period>{leads.date}</Kpi.Period>
+          <Kpi.Value>{leads.valueText}</Kpi.Value>
+          <Kpi.Delta reading={leads} />
+          <Kpi.Media>
+            <Sparkline {...leads.plot} label="Лиды" size="s" />
+          </Kpi.Media>
+        </Kpi.Root>
+        <Kpi.Root>
+          <Kpi.Title>Брони</Kpi.Title>
+          <Kpi.Period>{bookings.date}</Kpi.Period>
+          <Kpi.Value>{bookings.valueText}</Kpi.Value>
+          <Kpi.Delta reading={bookings} />
+          <Kpi.Media>
+            <Sparkline {...bookings.plot} label="Брони" size="s" />
+          </Kpi.Media>
+        </Kpi.Root>
+        <Kpi.Root>
+          <Kpi.Title>Возвраты</Kpi.Title>
+          <Kpi.Period>{returns.date}</Kpi.Period>
+          <Kpi.Value>{returns.valueText}</Kpi.Value>
+          <Kpi.Delta reading={returns} />
+          <Kpi.Media>
+            <Sparkline {...returns.plot} label="Возвраты" size="s" />
+          </Kpi.Media>
+        </Kpi.Root>
       </div>
     </>
   );

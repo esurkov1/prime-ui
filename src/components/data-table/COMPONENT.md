@@ -21,7 +21,7 @@
 - A log or a register that reaches down to the bottom of the page and scrolls inside, or ends at its last row when short (`scrollHeight="fill"`).
 
 ## When not to use
-- One or two KPIs → use [Card](../card/COMPONENT.md).
+- One or two KPIs → use [Kpi](../kpi/COMPONENT.md).
 - A short list of events without columns → use [Timeline](../timeline/COMPONENT.md).
 - Records whose start and end dates are compared on a calendar (occupancy, a project plan) → use [Gantt](../gantt/COMPONENT.md).
 - Work items moved by hand between statuses → use [Kanban](../kanban/COMPONENT.md).

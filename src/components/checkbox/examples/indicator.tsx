@@ -1,5 +1,5 @@
 /** The box alone on selectable tiles: the toggle button carries `aria-pressed`, the box only shows it — `Checkbox.Indicator`. */
-import { Card, Checkbox } from "prime-ui-kit";
+import { Checkbox, Kpi } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -23,13 +23,15 @@ export default function CheckboxIndicatorExample() {
       {MODULES.map((module) => {
         const pressed = selected.includes(module.value);
         return (
-          <Card.Root key={module.value} variant="mini" asChild>
+          <Kpi.Root key={module.value} valueSize="s" asChild>
             <button type="button" aria-pressed={pressed} onClick={() => toggle(module.value)}>
-              <Checkbox.Indicator checked={pressed} />
-              <Card.Label>{module.label}</Card.Label>
-              <Card.Meta>{module.price} в месяц</Card.Meta>
+              <Kpi.Title>{module.label}</Kpi.Title>
+              <Kpi.Actions>
+                <Checkbox.Indicator checked={pressed} />
+              </Kpi.Actions>
+              <Kpi.Value>{module.price} в месяц</Kpi.Value>
             </button>
-          </Card.Root>
+          </Kpi.Root>
         );
       })}
     </div>

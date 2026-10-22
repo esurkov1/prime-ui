@@ -7,6 +7,8 @@ import {
   Crossfade,
   Icon,
   type IconName,
+  Kpi,
+  type KpiTone,
   Page,
   Sidebar,
   Typography,
@@ -19,6 +21,14 @@ import styles from "./screen.module.css";
 type SectionId = "today" | "deals" | "clients" | "tasks" | "reports" | "settings";
 type Section = { id: SectionId; label: string; icon: IconName };
 type Row = { id: string; title: string; meta: string };
+type Figure = {
+  label: string;
+  value: string;
+  change: number | null;
+  delta: string;
+  meta?: string;
+  tone: KpiTone;
+};
 
 /** The main sections: the Sidebar's first group on a wide screen, the bar on a phone. */
 const MAIN: Section[] = [
@@ -39,11 +49,31 @@ const SECTIONS = [...MAIN, ...MORE];
 /** Open deals: an informational count, plain in the Sidebar. */
 const OPEN_DEALS = 12;
 
-const KPIS = [
-  { label: "Сделки в работе", value: "37", delta: "+4 за неделю", tone: "success" },
-  { label: "Выручка за октябрь", value: "4,8 млн ₽", delta: "+12% к сентябрю", tone: "success" },
-  { label: "Ждут ответа", value: "5 клиентов", delta: "2 дольше суток", tone: "danger" },
-] as const;
+const KPIS: Figure[] = [
+  {
+    label: "Сделки в работе",
+    value: "37",
+    change: 4,
+    delta: "+4",
+    meta: "за неделю",
+    tone: "success",
+  },
+  {
+    label: "Выручка за октябрь",
+    value: "4,8 млн ₽",
+    change: 12,
+    delta: "+12%",
+    meta: "к сентябрю",
+    tone: "success",
+  },
+  {
+    label: "Ждут ответа",
+    value: "5 клиентов",
+    change: null,
+    delta: "2 дольше суток",
+    tone: "danger",
+  },
+];
 
 const TASKS: Row[] = [
   { id: "t1", title: "Позвонить в ООО «Север» по договору поставки", meta: "10:30" },
@@ -206,15 +236,18 @@ export default function AppShellScreenExample() {
                 <Page.Grid>
                   {KPIS.map((kpi) => (
                     <Page.Cell key={kpi.label} span={4}>
-                      <Card.Root variant="stat-trend">
-                        <Card.Label>{kpi.label}</Card.Label>
-                        <Card.Value>{kpi.value}</Card.Value>
-                        <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
-                      </Card.Root>
+                      <Kpi.Root>
+                        <Kpi.Title>{kpi.label}</Kpi.Title>
+                        <Kpi.Value>{kpi.value}</Kpi.Value>
+                        <Kpi.Delta value={kpi.change} tone={kpi.tone}>
+                          {kpi.delta}
+                        </Kpi.Delta>
+                        {kpi.meta ? <Kpi.Meta>{kpi.meta}</Kpi.Meta> : null}
+                      </Kpi.Root>
                     </Page.Cell>
                   ))}
                 </Page.Grid>
-                <Card.Root variant="list">
+                <Card.Root>
                   <Card.Header>
                     <Card.Title as="h2">Задачи на сегодня</Card.Title>
                   </Card.Header>
@@ -238,7 +271,7 @@ export default function AppShellScreenExample() {
                 </Card.Root>
               </>
             ) : (
-              <Card.Root variant="list">
+              <Card.Root>
                 <Card.List>
                   {PAGES[current].rows.map((row) => (
                     <Card.ListItem key={row.id}>

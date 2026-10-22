@@ -1,5 +1,5 @@
 /** First response time by day, where a fall is good: growth paints the change red, a fall green — `better`, `summary`, `compareTo`. */
-import { Card, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+import { Kpi, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -38,14 +38,14 @@ export default function SparklineLowerIsBetterExample() {
   });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <Card.Label>Время первого ответа</Card.Label>
-      <Card.Value>{response.valueText}</Card.Value>
-      {response.changeText ? (
-        <Card.Delta tone={response.changeTone}>{response.changeText}</Card.Delta>
-      ) : null}
-      <Sparkline {...response.plot} label="Время первого ответа по дням" />
-      <Card.Meta>{response.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Время первого ответа</Kpi.Title>
+      <Kpi.Period>{response.date}</Kpi.Period>
+      <Kpi.Value>{response.valueText}</Kpi.Value>
+      <Kpi.Delta reading={response} />
+      <Kpi.Media>
+        <Sparkline {...response.plot} label="Время первого ответа по дням" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

@@ -16,7 +16,7 @@
 - Panels of one screen → use [Tabs](../tabs/COMPONENT.md).
 - Conversations of a messenger or an inbox (a preview, «печатает…», unread counts) → use [ChatList](../chat-list/COMPONENT.md).
 - Many records compared by columns, sorted, filtered or selected in bulk → use [DataTable](../data-table/COMPONENT.md).
-- A static list of facts inside a card (no selection, nothing opens) → use `Card.List` of [Card](../card/COMPONENT.md) `variant="list"`.
+- A static list of facts inside a card (no selection, nothing opens) → use `Card.List` of [Card](../card/COMPONENT.md).
 - Picking a value from options → use [Select](../select/COMPONENT.md) or [Radio](../radio/COMPONENT.md); a menu of commands → [Dropdown](../dropdown/COMPONENT.md).
 
 ## Import

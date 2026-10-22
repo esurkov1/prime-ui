@@ -195,7 +195,7 @@ The Skeleton of `loading` takes the same height. `layout="compact"` keeps the `x
 | `reference` | a dashed chart-axis line at the value | a plan, a target, an average | — |
 | `loading` | the plot Skeleton | the series is on its way | `false` |
 
-Put it in a `Card` for a dashboard tile: the card's `Card.Label`, `Card.Value`, `Card.Delta` (`changeTone`) and `Card.Meta` hold the reading.
+Put it in a [Kpi](../kpi/COMPONENT.md) for a dashboard tile: `Kpi.Value` (`valueText`), `<Kpi.Delta reading={…} />` (the change, its tone and arrow; none when there is no change) and `Kpi.Period` (`date`) hold the reading, the plot goes in `Kpi.Media`.
 
 ## States
 | State | Driven by | DOM |
@@ -216,8 +216,8 @@ Put it in a `Card` for a dashboard tile: the card's `Card.Label`, `Card.Value`, 
 ## Layout & spacing
 - Takes the width of its container; the plot is as high as its `size` (80 px at `m`) and inset by the dot radius so the cursor is never clipped. The smooth curve never leaves the plot: a monotone cubic does not overshoot the extremes.
 - Bars share the width equally, 4 px apart; the zero line sits where 0 falls on the scale (the bottom when every value is positive).
-- It draws no headline: the card lays out the reading of `useSparkline` (`Card.Label`, `Card.Value`, `Card.Delta`, `Card.Meta` in a `stat-trend` card) and places the plot where it wants it.
-- A tile that opens: `Card.Link` with an `aria-label`. The link stretches over the card and the plot (a slider) stands above it, so a scrub never opens the tile.
+- It draws no headline: the `Kpi` card lays out the reading of `useSparkline` (`Kpi.Title`, `Kpi.Period`, `Kpi.Value`, `Kpi.Delta`) and the plot in its `Kpi.Media`.
+- A tile that opens: `Card.Link` with an `aria-label` inside the `Kpi.Root`. The link stretches over the card and the plot (a slider) stands above it, so a scrub never opens the tile.
 - The pointer hits only the plot, never a line, a dot or a bar inside it: the cursor stays one arrow while scrubbing.
 - The legend of `series` wraps on a narrow card, 16 between lines, 8 between a swatch and its name.
 - `layout="compact"` fits a DataTable row of any tier (plot and dot within an `xs` control height) and takes the cell width, at least `--prime-space-24`; give the column a `width` for an even plot per row. Put the number next to it in its own column: the compact plot shows a value only in its tooltip while scrubbed.
@@ -302,8 +302,8 @@ Put it in a `Card` for a dashboard tile: the card's `Card.Label`, `Card.Value`, 
 - A current month compared with the whole previous month («−30%» on the 22nd) → dated points with `change="previous"`: a cut period compares with the same days.
 - A level (MRR, a balance) summed over a week → `aggregate="latest"` (the default with `summary="latest"`); a flow under a `latest` reading → `aggregate="sum"`.
 - A grain switcher in every tile of one dashboard → one `grain` for all from a switcher of the page.
-- A tile with a Sparkline made a link with `Card asChild` + `<a>` → a slider inside a link; use `Card.Link` with an `aria-label`.
+- A tile with a Sparkline made a link with `Kpi.Root asChild` + `<a>` → a slider inside a link; use `Card.Link` with an `aria-label`.
 
 ## Related
 - **Built from:** [Skeleton](../skeleton/COMPONENT.md) (loading), `ChartTooltip` (the chart tooltip shared with ChartFrame), [ScrollContainer](../scroll-container/COMPONENT.md) (the tooltip's floating panel)
-- **See also:** [ChartFrame](../chart-frame/COMPONENT.md), [DataTable](../data-table/COMPONENT.md) (a compact Sparkline per row), [Card](../card/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)
+- **See also:** [ChartFrame](../chart-frame/COMPONENT.md), [DataTable](../data-table/COMPONENT.md) (a compact Sparkline per row), [Kpi](../kpi/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

@@ -66,8 +66,8 @@ export type {
 } from "./button-group/ButtonGroup";
 export { ButtonGroup } from "./button-group/ButtonGroup";
 export type {
+  CardActionsProps,
   CardBodyProps,
-  CardDeltaProps,
   CardDescriptionProps,
   CardDivider,
   CardFooterDivider,
@@ -75,19 +75,15 @@ export type {
   CardHeaderProps,
   CardHeadingLevel,
   CardIconProps,
-  CardLabelProps,
   CardLinkProps,
   CardListItemContentProps,
   CardListItemProps,
   CardListProps,
   CardMediaProps,
-  CardMetaProps,
   CardRootProps,
   CardTitleProps,
   CardTotalProps,
-  CardValueProps,
-  CardValueSize,
-  CardVariant,
+  CardTotalTone,
 } from "./card/Card";
 export { Card } from "./card/Card";
 export type {
@@ -424,6 +420,23 @@ export type {
 export { KanbanFieldsMenu } from "./kanban/KanbanFieldsMenu";
 export type { KbdProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
+export type {
+  KpiActionsProps,
+  KpiDeltaProps,
+  KpiDeltaReading,
+  KpiDescriptionProps,
+  KpiGroupProps,
+  KpiIconProps,
+  KpiMediaProps,
+  KpiMetaProps,
+  KpiPeriodProps,
+  KpiRootProps,
+  KpiTitleProps,
+  KpiTone,
+  KpiValueProps,
+  KpiValueSize,
+} from "./kpi/Kpi";
+export { Kpi } from "./kpi/Kpi";
 export type {
   LabelDescriptionProps,
   LabelIconProps,

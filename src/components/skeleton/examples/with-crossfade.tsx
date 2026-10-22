@@ -40,7 +40,7 @@ export default function SkeletonWithCrossfadeExample() {
         <Tooltip.Content>Обновить</Tooltip.Content>
       </Tooltip.Root>
 
-      <Card.Root variant="panel">
+      <Card.Root>
         <Card.Header>
           <Card.Title as="h3">Поступления за сегодня</Card.Title>
         </Card.Header>

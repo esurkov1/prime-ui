@@ -13,7 +13,7 @@
 ## When not to use
 - Values the user edits → fields ([Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md)) in a form.
 - Many records with the same properties → [DataTable](../data-table/COMPONENT.md).
-- One headline number → [Card](../card/COMPONENT.md) `mini` / `stat-trend`.
+- One headline number → [Kpi](../kpi/COMPONENT.md).
 - A history of events → [Timeline](../timeline/COMPONENT.md).
 
 ## Import

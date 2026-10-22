@@ -13,9 +13,11 @@ export default function ScrollContainerVariantsExample() {
       <Card.Root role="region" className={styles.card} aria-label="Статусы заказов">
         <Card.Header>
           <Card.Title>Статусы заказов</Card.Title>
-          <Typography as="span" variant="caption" tone="muted">
-            horizontal
-          </Typography>
+          <Card.Actions>
+            <Typography as="span" variant="caption" tone="muted">
+              horizontal
+            </Typography>
+          </Card.Actions>
         </Card.Header>
         <ScrollContainer axis="horizontal">
           <div className={styles.strip}>
@@ -28,9 +30,11 @@ export default function ScrollContainerVariantsExample() {
       <Card.Root role="region" className={styles.card} aria-label="Расписание залов">
         <Card.Header>
           <Card.Title>Расписание залов</Card.Title>
-          <Typography as="span" variant="caption" tone="muted">
-            both
-          </Typography>
+          <Card.Actions>
+            <Typography as="span" variant="caption" tone="muted">
+              both
+            </Typography>
+          </Card.Actions>
         </Card.Header>
         <ScrollContainer
           axis="both"

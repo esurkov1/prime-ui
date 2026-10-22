@@ -62,7 +62,7 @@ export default function PageCollapseExample() {
             </Page.Header>
             <Page.Body>
               {SECTIONS.map((section) => (
-                <Card.Root key={section.id} variant="panel">
+                <Card.Root key={section.id}>
                   <Card.Header>
                     <Card.Title as="h2">{section.title}</Card.Title>
                   </Card.Header>

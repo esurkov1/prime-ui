@@ -17,7 +17,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Concept | API | Notes |
 |---|---|---|
 | Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`. An overlay's `Content` takes its own `size`: the width of a Modal or Drawer, the tier of a Popover, Dropdown or Tooltip. Without `size` a component takes [the host tier](#size-and-the-host-tier). |
-| Treatment | `variant` | `solid · soft · outline · ghost`; Button also takes `shade` (the media shade with a blur, a button over media); structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
+| Treatment | `variant` | `solid · soft · outline · ghost`; Button also takes `shade` (the media shade with a blur, a button over media); structural variants are component-specific (FileUpload `dashed \| solid`, Kanban `plain \| line \| well`). Card and Tabs have no variant: a card's zones lay it out. |
 | Meaning | `tone` | Button: `accent \| neutral \| success \| danger` (`success` for a done action), plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
 | Decoration | `color` | Badge, Avatar, Thumbnail, Icon, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `Sidebar.ItemCount` / `BottomNav.ItemCount`, `FileUpload.FormatBadge`, `Timeline.Item`, `Message.Author` / `Message.Reply` / `Message.Contact`; in data: TagSelect options, Kanban columns, Gantt bars. |
 | Validation | `invalid`, `hint`, `error` | Props, never parts. A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |

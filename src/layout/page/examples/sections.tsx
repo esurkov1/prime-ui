@@ -1,5 +1,5 @@
 /** A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading — `Page.Section`, `label`, `description`, `Page.Actions`. */
-import { Card, DataTable, type DataTableColumn, LinkButton, Page } from "prime-ui-kit";
+import { DataTable, type DataTableColumn, Kpi, LinkButton, Page } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -35,18 +35,21 @@ export default function PageSectionsExample() {
       <Page.Body>
         <Page.Grid>
           <Page.Cell span={6}>
-            <Card.Root variant="stat-trend">
-              <Card.Label>Выставлено</Card.Label>
-              <Card.Value>2,4 млн ₽</Card.Value>
-              <Card.Delta tone="success">+9% к сентябрю</Card.Delta>
-            </Card.Root>
+            <Kpi.Root>
+              <Kpi.Title>Выставлено</Kpi.Title>
+              <Kpi.Value>2,4 млн ₽</Kpi.Value>
+              <Kpi.Delta value={9} tone="success">
+                +9%
+              </Kpi.Delta>
+              <Kpi.Meta>к сентябрю</Kpi.Meta>
+            </Kpi.Root>
           </Page.Cell>
           <Page.Cell span={6}>
-            <Card.Root variant="stat-trend">
-              <Card.Label>Оплачено</Card.Label>
-              <Card.Value>1,9 млн ₽</Card.Value>
-              <Card.Delta tone="neutral">79% выставленного</Card.Delta>
-            </Card.Root>
+            <Kpi.Root>
+              <Kpi.Title>Оплачено</Kpi.Title>
+              <Kpi.Value>1,9 млн ₽</Kpi.Value>
+              <Kpi.Meta>79% выставленного</Kpi.Meta>
+            </Kpi.Root>
           </Page.Cell>
         </Page.Grid>
         <Page.Section label="Последние счета" description="Три последних за октябрь">

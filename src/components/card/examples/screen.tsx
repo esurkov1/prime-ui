@@ -10,6 +10,7 @@ import {
   DataTable,
   type DataTableColumn,
   Icon,
+  Kpi,
   LinkButton,
   Page,
   ProgressBar,
@@ -27,27 +28,51 @@ import styles from "./screen.module.css";
 type Period = "week" | "month" | "quarter";
 type Payment = { id: string; client: string; date: string; amount: number; late: boolean };
 
-const KPIS: Record<
-  Period,
-  { label: string; value: string; delta: string; tone: "success" | "danger" | "neutral" }[]
-> = {
+type KpiRow = {
+  title: string;
+  value: string;
+  change: number;
+  delta: string;
+  tone: "success" | "danger" | "neutral";
+};
+
+/** What every change of a period compares with: the period before, the same length. */
+const COMPARED: Record<Period, string> = {
+  week: "к прошлой неделе",
+  month: "к сентябрю",
+  quarter: "ко II кварталу",
+};
+
+const KPIS: Record<Period, KpiRow[]> = {
   week: [
-    { label: "Выручка", value: "2,1 млн ₽", delta: "+6% к прошлой неделе", tone: "success" },
-    { label: "Оплачено счетов", value: "54", delta: "+4", tone: "success" },
-    { label: "Средний чек", value: "38 900 ₽", delta: "без изменений", tone: "neutral" },
-    { label: "Просрочено", value: "1,2 млн ₽", delta: "+180 тыс. ₽", tone: "danger" },
+    { title: "Выручка", value: "2,1 млн ₽", change: 6, delta: "+6%", tone: "success" },
+    { title: "Оплачено счетов", value: "54", change: 4, delta: "+4", tone: "success" },
+    { title: "Средний чек", value: "38 900 ₽", change: 0, delta: "0%", tone: "neutral" },
+    { title: "Просрочено", value: "1,2 млн ₽", change: 180, delta: "+180 тыс. ₽", tone: "danger" },
   ],
   month: [
-    { label: "Выручка", value: "8,4 млн ₽", delta: "+12% к сентябрю", tone: "success" },
-    { label: "Оплачено счетов", value: "214", delta: "+17", tone: "success" },
-    { label: "Средний чек", value: "39 300 ₽", delta: "−3% к сентябрю", tone: "danger" },
-    { label: "Просрочено", value: "1,2 млн ₽", delta: "−340 тыс. ₽", tone: "success" },
+    { title: "Выручка", value: "8,4 млн ₽", change: 12, delta: "+12%", tone: "success" },
+    { title: "Оплачено счетов", value: "214", change: 17, delta: "+17", tone: "success" },
+    { title: "Средний чек", value: "39 300 ₽", change: -3, delta: "−3%", tone: "danger" },
+    {
+      title: "Просрочено",
+      value: "1,2 млн ₽",
+      change: -340,
+      delta: "−340 тыс. ₽",
+      tone: "success",
+    },
   ],
   quarter: [
-    { label: "Выручка", value: "24,6 млн ₽", delta: "+21% ко II кварталу", tone: "success" },
-    { label: "Оплачено счетов", value: "631", delta: "+88", tone: "success" },
-    { label: "Средний чек", value: "39 000 ₽", delta: "+1%", tone: "neutral" },
-    { label: "Просрочено", value: "1,2 млн ₽", delta: "−1,1 млн ₽", tone: "success" },
+    { title: "Выручка", value: "24,6 млн ₽", change: 21, delta: "+21%", tone: "success" },
+    { title: "Оплачено счетов", value: "631", change: 88, delta: "+88", tone: "success" },
+    { title: "Средний чек", value: "39 000 ₽", change: 1, delta: "+1%", tone: "neutral" },
+    {
+      title: "Просрочено",
+      value: "1,2 млн ₽",
+      change: -1100,
+      delta: "−1,1 млн ₽",
+      tone: "success",
+    },
   ],
 };
 
@@ -158,6 +183,7 @@ export default function CardScreenExample() {
   const revenue = useSparkline({
     data: REVENUE[period],
     summary: "sum",
+    change: "previous",
     formatValue: formatRubles,
   });
 
@@ -194,27 +220,32 @@ export default function CardScreenExample() {
         {/* One board: every tile of the screen in one grid, 16 apart on both axes. */}
         <Page.Grid>
           {KPIS[period].map((kpi) => (
-            <Page.Cell key={kpi.label} span={3}>
-              {/* Another period is another set of values: the tile cross-fades instead of flipping. */}
+            <Page.Cell key={kpi.title} span={3}>
+              {/* Another period is another set of values: the tile cross-fades instead of flipping.
+                  The period is the page's, set once in its bar: the cards do not repeat it. */}
               <Crossfade state={period}>
-                <Card.Root variant="stat-trend">
-                  <Card.Label>{kpi.label}</Card.Label>
-                  <Card.Value>{kpi.value}</Card.Value>
-                  <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
-                </Card.Root>
+                <Kpi.Root>
+                  <Kpi.Title>{kpi.title}</Kpi.Title>
+                  <Kpi.Value>{kpi.value}</Kpi.Value>
+                  <Kpi.Delta value={kpi.change} tone={kpi.tone}>
+                    {kpi.delta}
+                  </Kpi.Delta>
+                  <Kpi.Meta>{COMPARED[period]}</Kpi.Meta>
+                </Kpi.Root>
               </Crossfade>
             </Page.Cell>
           ))}
 
           <Page.Cell>
-            <Card.Root variant="panel">
-              <Card.Body>
-                <Card.Label>Выручка за период</Card.Label>
-                <Card.Value>{revenue.valueText}</Card.Value>
+            <Kpi.Root>
+              <Kpi.Title>Выручка по дням</Kpi.Title>
+              <Kpi.Period>{revenue.date}</Kpi.Period>
+              <Kpi.Value>{revenue.valueText}</Kpi.Value>
+              <Kpi.Delta reading={revenue} />
+              <Kpi.Media>
                 <Sparkline {...revenue.plot} label="Выручка по дням" />
-                <Card.Meta>{revenue.date}</Card.Meta>
-              </Card.Body>
-            </Card.Root>
+              </Kpi.Media>
+            </Kpi.Root>
           </Page.Cell>
 
           {/* The chart spans two rows beside the two panels and fills their height. */}
@@ -295,12 +326,14 @@ export default function CardScreenExample() {
           </Page.Cell>
 
           <Page.Cell span={4}>
-            <Card.Root variant="panel">
+            <Card.Root>
               <Card.Header>
                 <Card.Title as="h2">План продаж</Card.Title>
-                <Typography as="span" variant="caption" tone="muted">
-                  Октябрь
-                </Typography>
+                <Card.Actions>
+                  <Typography as="span" variant="caption" tone="muted">
+                    Октябрь
+                  </Typography>
+                </Card.Actions>
               </Card.Header>
               <Card.Body>
                 <div className={styles.bars}>
@@ -319,12 +352,14 @@ export default function CardScreenExample() {
           </Page.Cell>
 
           <Page.Cell span={4}>
-            <Card.Root variant="panel">
+            <Card.Root>
               <Card.Header>
                 <Card.Title as="h2">Дебиторка</Card.Title>
-                <Typography as="span" variant="caption" tone="muted">
-                  8,2 млн ₽
-                </Typography>
+                <Card.Actions>
+                  <Typography as="span" variant="caption" tone="muted">
+                    8,2 млн ₽
+                  </Typography>
+                </Card.Actions>
               </Card.Header>
               <Card.Body>
                 <ProgressBar

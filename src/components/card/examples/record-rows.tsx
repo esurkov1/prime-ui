@@ -1,4 +1,4 @@
-/** The deposits of a rental in one card: a row per deposit with its state badge and amount over one line of detail, the step's action and an edit button at the end, and a return with a hold folding open under its row — `Card.List`, `Card.ListItem`, `Card.ListItemContent`. */
+/** The deposits of a rental in one card: a row per deposit with its state badge and amount over one line of detail, the step's action and an edit button in its actions, and a return with a hold folding open under its row — `Card.List`, `Card.ListItem`, `Card.Actions`, `Card.ListItemContent`. */
 import { Badge, Button, Card, Dropdown, Icon, Input, Textarea } from "prime-ui-kit";
 import * as React from "react";
 
@@ -34,7 +34,7 @@ export default function CardRecordRowsExample() {
 
   return (
     <div className={styles.panel}>
-      <Card.Root variant="list">
+      <Card.Root>
         <Card.List>
           {DEPOSITS.map((deposit) => (
             <Card.ListItem key={deposit.id}>
@@ -45,38 +45,40 @@ export default function CardRecordRowsExample() {
                 {deposit.amount}
               </Card.Title>
               <Card.Description>{deposit.detail}</Card.Description>
-              {deposit.state === "held" ? (
-                <Dropdown.Root>
-                  <Dropdown.Trigger>
-                    <Button.Root variant="soft" tone="neutral">
-                      Вернуть
-                      <Button.Icon>
-                        <Icon name="nav.chevronDown" />
-                      </Button.Icon>
-                    </Button.Root>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content align="end">
-                    <Dropdown.Item>
-                      Полностью
-                      <Dropdown.ItemDescription>{`вернуть ${deposit.amount}`}</Dropdown.ItemDescription>
-                    </Dropdown.Item>
-                    <Dropdown.Item onSelect={() => setHoldId(deposit.id)}>
-                      С удержанием
-                      <Dropdown.ItemDescription>часть оставить себе</Dropdown.ItemDescription>
-                    </Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown.Root>
-              ) : null}
-              {deposit.state === "pending" ? (
-                <Button.Root variant="soft" tone="neutral">
-                  Принять
+              <Card.Actions>
+                {deposit.state === "held" ? (
+                  <Dropdown.Root>
+                    <Dropdown.Trigger>
+                      <Button.Root variant="soft" tone="neutral">
+                        Вернуть
+                        <Button.Icon>
+                          <Icon name="nav.chevronDown" />
+                        </Button.Icon>
+                      </Button.Root>
+                    </Dropdown.Trigger>
+                    <Dropdown.Content align="end">
+                      <Dropdown.Item>
+                        Полностью
+                        <Dropdown.ItemDescription>{`вернуть ${deposit.amount}`}</Dropdown.ItemDescription>
+                      </Dropdown.Item>
+                      <Dropdown.Item onSelect={() => setHoldId(deposit.id)}>
+                        С удержанием
+                        <Dropdown.ItemDescription>часть оставить себе</Dropdown.ItemDescription>
+                      </Dropdown.Item>
+                    </Dropdown.Content>
+                  </Dropdown.Root>
+                ) : null}
+                {deposit.state === "pending" ? (
+                  <Button.Root variant="soft" tone="neutral">
+                    Принять
+                  </Button.Root>
+                ) : null}
+                <Button.Root variant="soft" tone="neutral" aria-label="Изменить депозит">
+                  <Button.Icon>
+                    <Icon name="action.edit" />
+                  </Button.Icon>
                 </Button.Root>
-              ) : null}
-              <Button.Root variant="soft" tone="neutral" aria-label="Изменить депозит">
-                <Button.Icon>
-                  <Icon name="action.edit" />
-                </Button.Icon>
-              </Button.Root>
+              </Card.Actions>
               <Card.ListItemContent open={holdId === deposit.id}>
                 <Input.Root label="Вернуть клиенту">
                   <Input.Wrapper>

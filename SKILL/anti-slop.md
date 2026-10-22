@@ -236,7 +236,7 @@ The same for one value in several units — one heading, the fields in a row, th
 | `<span className={styles.key}>⌘</span>` | `<Kbd aria-label="Command">⌘</Kbd>` |
 | `<h2 className={styles.title}>` with custom font size | `<Typography as="h2" variant="title-m">` |
 | `<span className={styles.pill}>Новый</span>` | `<Badge.Root color="blue">Новый</Badge.Root>` |
-| `<div className={styles.box}>` with bg + radius | `<Card.Root variant="panel">` |
+| `<div className={styles.box}>` with bg + radius | `<Card.Root>` |
 | `<a className={styles.link}>` | `<LinkButton href="…">` |
 | a list of `<button>`s for navigation | links: `Sidebar.Item href` for the app's sections, `BottomNav.Item` on a phone, `List.Item asChild` around a link for the records of a list |
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |

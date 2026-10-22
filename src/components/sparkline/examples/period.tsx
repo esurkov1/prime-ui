@@ -1,5 +1,5 @@
 /** Another period swaps the days and the step follows them — a month by days, a quarter by weeks, a year by months; the line cross-fades in and the card reads the new total — `data`, `summary`. */
-import { Card, SegmentedControl, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+import { Kpi, SegmentedControl, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -29,20 +29,24 @@ export default function SparklinePeriodExample() {
   const orders = useSparkline({ data: SERIES[period], summary: "sum" });
 
   return (
-    <Card.Root variant="stat-trend" className={styles.card}>
-      <SegmentedControl.Root
-        value={period}
-        onValueChange={(value) => setPeriod(value as Period)}
-        aria-label="Период"
-      >
-        <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
-        <SegmentedControl.Item value="quarter">Квартал</SegmentedControl.Item>
-        <SegmentedControl.Item value="year">Год</SegmentedControl.Item>
-      </SegmentedControl.Root>
-      <Card.Label>Новые заказы</Card.Label>
-      <Card.Value>{orders.valueText}</Card.Value>
-      <Sparkline {...orders.plot} label="Новые заказы по периодам" />
-      <Card.Meta>{orders.date}</Card.Meta>
-    </Card.Root>
+    <Kpi.Root className={styles.card}>
+      <Kpi.Title>Новые заказы</Kpi.Title>
+      <Kpi.Period>{orders.date}</Kpi.Period>
+      <Kpi.Actions>
+        <SegmentedControl.Root
+          value={period}
+          onValueChange={(value) => setPeriod(value as Period)}
+          aria-label="Период"
+        >
+          <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+          <SegmentedControl.Item value="quarter">Квартал</SegmentedControl.Item>
+          <SegmentedControl.Item value="year">Год</SegmentedControl.Item>
+        </SegmentedControl.Root>
+      </Kpi.Actions>
+      <Kpi.Value>{orders.valueText}</Kpi.Value>
+      <Kpi.Media>
+        <Sparkline {...orders.plot} label="Новые заказы по периодам" />
+      </Kpi.Media>
+    </Kpi.Root>
   );
 }

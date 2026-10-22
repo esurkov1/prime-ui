@@ -19,6 +19,7 @@ checks.
 - [ ] Creating one of several kinds whose forms differ is a button with a `Dropdown` of kinds (grouped by family), a pick opens that kind's form; no choosing step and «Далее» inside a dialog ([a kind that leads to its own form](choosing.md#a-kind-that-leads-to-its-own-form)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 - [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
+- [ ] A card about one figure is a `Kpi.Root` with no `Card.Root` around it; a figure inside a record card is a `DescriptionList` or `Card.Total`, not a Kpi ([Kpi / Card](choosing.md#3-pairs-that-are-easy-to-confuse)).
 - [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
 - [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` beside the table's search; a DataTable `toolbar` holds the table's controls unwrapped, never a lone button ([controls of a table](composition.md#controls-of-a-table)).
 - [ ] A rich board card is made of the Kanban card parts (zones, title with number, resources, facts, a `fullWidth` next step), its hideable fields a `KanbanFieldsMenu` beside the filter, every card in `items` ([sales pipeline board](composition.md#sales-pipeline-board)).
@@ -107,10 +108,10 @@ checks.
 - [ ] A record dialog opens with its header and tabs at once: what the list row knows shows, only the unknown lines hold `loading` ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] An action apart from a dialog's answer («Выйти» on a profile) is `Drawer.Actions` / `Modal.Actions` inside the footer, at its start ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A chat about a record heads itself in two lines — `Chat.Title number` over `Chat.Badges` — and an always-open search is `Chat.Search persistent` ([messages](choosing.md#2-inside-a-category)).
-- [ ] A tile that is a link shows the kit's arrow, never one of mine; a value in words is `stat-text` ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
+- [ ] A tile that is a link shows the kit's arrow, never one of mine; a value in words is `Kpi.Root valueSize="s"` ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
 - [ ] A task card with an assignee names the person once: the picker first in `Card.Description`, the facts after it, the term in `Card.Title` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
-- [ ] An object of a record (a video, an account, a session) is a card of one `Card.Header`: picture, title, one line of data, one action — two lines, never three ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
-- [ ] A record's fact tiles are `stat-text` at the default value size in every dialog of the app (`valueSize="l"` only for a lone total tile), no Typography inside `Card.Value`; a record card with a total ends in `Card.Footer divider="fill"` with `Card.Total` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
+- [ ] An object of a record (a video, an account, a session) is a card of one `Card.Header`: picture, title, one line of data, one action in `Card.Actions` — two lines, never three ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
+- [ ] A record's fact tiles are `Kpi.Root valueSize="s"` in every dialog of the app (`valueSize="m"` for a record's figures in rows of two or four), no Typography inside `Kpi.Value`; a record card with a total ends in `Card.Footer divider="fill"` with `Card.Total` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
 - [ ] An on/off permission or setting is a `Switch`, a level per entity a `FieldList` of `Select`s, a set of values in a table cell `Badge.Group overflow="count"` ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 
@@ -122,7 +123,7 @@ checks.
 - [ ] Every region swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
 - [ ] Whatever loads shows its skeleton on the first render under the state `"loading"`, and the data takes its place without unfolding, sliding or growing from zero ([continuity](foundations.md#11-state-changes-are-continuous)).
 - [ ] A `Page.Description` that waits for data stays mounted with `loading`, so the title in the bar never jumps ([screen states](composition.md#screen-states)).
-- [ ] A KPI tile that waits for its figure is `Card.Root loading`, its parts mounted ([inside a category](choosing.md#2-inside-a-category)).
+- [ ] A KPI tile that waits for its figure is `Kpi.Root loading`, its parts mounted ([inside a category](choosing.md#2-inside-a-category)).
 - [ ] While a form saves, its submit is `loading` and its fields sit in a `Fieldset disabled` ([forms](api-contract.md#forms)).
 - [ ] A save that stays says «Сохранено» on its button, one that goes away notifies, a failure always shows ([feedback](composition.md#9-feedback)).
 - [ ] Overlays stay mounted and are driven by `open` only ([motion mistakes](motion.md#6-mistakes)).

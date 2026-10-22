@@ -1,5 +1,5 @@
 /** Revenue against the plan beside two KPI tiles: the plot takes the height of the stretched grid cell, and the plan line starts hidden until the legend turns it on — `height`, `defaultHiddenSeries`. */
-import { Card, ChartFrame, type ChartFrameSeries, chartColors, Page } from "prime-ui-kit";
+import { ChartFrame, type ChartFrameSeries, chartColors, Kpi, Page } from "prime-ui-kit";
 
 const SERIES: ChartFrameSeries[] = [
   { id: "fact", label: "Факт" },
@@ -98,19 +98,24 @@ export default function ChartFrameFillHeightExample() {
       </Page.Cell>
 
       <Page.Cell span={4}>
-        <Card.Root variant="stat-trend">
-          <Card.Label>Выполнение плана</Card.Label>
-          <Card.Value>96%</Card.Value>
-          <Card.Delta tone="warning">−4 п. п. за октябрь</Card.Delta>
-        </Card.Root>
+        <Kpi.Root>
+          <Kpi.Title>Выполнение плана</Kpi.Title>
+          <Kpi.Period>Октябрь</Kpi.Period>
+          <Kpi.Value>96%</Kpi.Value>
+          <Kpi.Delta value={-4} tone="warning">
+            −4 п. п.
+          </Kpi.Delta>
+          <Kpi.Meta>к сентябрю</Kpi.Meta>
+        </Kpi.Root>
       </Page.Cell>
 
       <Page.Cell span={4}>
-        <Card.Root variant="stat-trend">
-          <Card.Label>Прогноз на год</Card.Label>
-          <Card.Value>84 млн ₽</Card.Value>
-          <Card.Delta>План — 86 млн ₽</Card.Delta>
-        </Card.Root>
+        <Kpi.Root>
+          <Kpi.Title>Прогноз на год</Kpi.Title>
+          <Kpi.Period>2026</Kpi.Period>
+          <Kpi.Value>84 млн ₽</Kpi.Value>
+          <Kpi.Meta>План — 86 млн ₽</Kpi.Meta>
+        </Kpi.Root>
       </Page.Cell>
     </Page.Grid>
   );

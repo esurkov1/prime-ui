@@ -1,10 +1,10 @@
-/** A transport card that opens its record from anywhere and keeps its own button, a full-width line above the action row, and a deposit card that opens its window in place — `Card.Link`, `asChild`, `Card.Footer`, `divider`. */
+/** Cards that open: a transport card that opens its record from anywhere and keeps its own button under a full-width line, a deposit card that opens its window in place, and a project tile that is itself the link — `Card.Link`, `asChild`, `Card.Footer`, `divider`. */
 import { Badge, Button, Card, Icon, Modal } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-export default function CardRecordLinkExample() {
+export default function CardLinkExample() {
   const [depositOpen, setDepositOpen] = React.useState(false);
 
   return (
@@ -42,6 +42,14 @@ export default function CardRecordLinkExample() {
           <Card.Description>Принят наличными 14 октября</Card.Description>
           <Badge.Root color="green">Получен</Badge.Root>
         </Card.Body>
+      </Card.Root>
+      <Card.Root asChild>
+        <a href="#warehouse">
+          <Card.Header>
+            <Card.Title>Переезд склада</Card.Title>
+            <Card.Description>Проект · 12 задач, 4 открыты</Card.Description>
+          </Card.Header>
+        </a>
       </Card.Root>
       <Modal.Root open={depositOpen} onOpenChange={setDepositOpen}>
         <Modal.Content size="s">

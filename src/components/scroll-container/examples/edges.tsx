@@ -24,9 +24,11 @@ export default function ScrollContainerEdgesExample() {
         <Card.Root key={edges} role="region" className={styles.card} aria-label={`Лента: ${edges}`}>
           <Card.Header>
             <Card.Title>Лента событий</Card.Title>
-            <Typography as="span" variant="caption" tone="muted">
-              {edges}
-            </Typography>
+            <Card.Actions>
+              <Typography as="span" variant="caption" tone="muted">
+                {edges}
+              </Typography>
+            </Card.Actions>
           </Card.Header>
           <ScrollContainer edges={edges}>
             <Card.List>

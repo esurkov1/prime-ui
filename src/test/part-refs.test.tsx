@@ -499,10 +499,8 @@ const CASES: Case[] = [
     "Card.Root asChild",
     "A",
     (ref) => (
-      <Card.Root ref={ref} data-testid="part" asChild variant="mini">
-        <a href="#orders">
-          <Card.Label>Заказы</Card.Label>
-        </a>
+      <Card.Root ref={ref} data-testid="part" asChild>
+        <a href="#orders">Заказы</a>
       </Card.Root>
     ),
   ],

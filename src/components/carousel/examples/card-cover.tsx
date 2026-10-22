@@ -35,7 +35,7 @@ export default function CarouselCardCoverExample() {
 
   return (
     <div className={styles.card}>
-      <Card.Root variant="cover">
+      <Card.Root>
         <Card.Media>
           <Carousel.Root
             items={MEDIA}
@@ -71,10 +71,10 @@ export default function CarouselCardCoverExample() {
             </Carousel.Overlay>
           </Carousel.Root>
         </Card.Media>
-        <Card.Body>
+        <Card.Header>
           <Card.Title>Kia Rio, 2022</Card.Title>
           <Card.Description>Пробег 48 200 км · водитель Иван Петров</Card.Description>
-        </Card.Body>
+        </Card.Header>
       </Card.Root>
       <MediaViewer
         items={VIEWER}

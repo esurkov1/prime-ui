@@ -5,7 +5,7 @@ import styles from "./examples.module.css";
 
 export default function SkeletonOverviewExample() {
   return (
-    <Card.Root variant="panel" className={styles.card} aria-busy="true">
+    <Card.Root className={styles.card} aria-busy="true">
       <Card.Body>
         <div className={styles.content}>
           <Skeleton shape="block" className={styles.cover} />

@@ -37,7 +37,7 @@ export default function CrossfadeOverviewExample() {
         <SegmentedControl.Item value="error">Ошибка</SegmentedControl.Item>
       </SegmentedControl.Root>
 
-      <Card.Root variant="panel">
+      <Card.Root>
         <Card.Header>
           <Card.Title as="h3">Поступления за сегодня</Card.Title>
         </Card.Header>
