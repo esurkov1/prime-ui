@@ -60,6 +60,7 @@ checks.
 - [ ] A reorderable row's toggle leads it and the grip ends it; a plain settings row ends with its toggle ([list rows](composition.md#list-rows)).
 - [ ] Controls in table cells are one tier below the table; no CSS sets row or cell heights ([size axis](foundations.md#3-size-axis)).
 - [ ] A chip in one row with controls is two sizes up (`l` beside `xs`, `xl` beside `s`); beside `m` and larger the whole row is fields ([chips beside fields](foundations.md#chips-beside-fields)).
+- [ ] Marks of one row or list (avatar, thumbnail, ring, icon tile) have one diameter, matched by the scale, not the size name; no `size` on a mark in a mark slot ([marks side by side](foundations.md#marks-side-by-side)).
 - [ ] Icon-only buttons are square (round only for media and transfers) and named ([icons](api-contract.md#icons)).
 
 ## Text

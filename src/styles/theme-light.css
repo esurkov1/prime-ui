@@ -430,8 +430,6 @@
   --prime-panel-offset: var(--prime-ref-space-1);
   --prime-panel-padding: var(--prime-ref-space-1);
   --prime-panel-radius: var(--prime-ref-radius-12);
-  --prime-progress-circle-compact-line-height: var(--prime-ref-font-line-height-12);
-  --prime-progress-circle-compact-text-size: var(--prime-ref-font-size-10);
   --prime-radius-full: var(--prime-ref-radius-full);
   --prime-radius-l: var(--prime-ref-radius-12);
   --prime-radius-m: var(--prime-ref-radius-8);

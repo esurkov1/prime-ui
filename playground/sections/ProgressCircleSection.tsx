@@ -31,7 +31,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "sizes",
       description:
-        "Диаметр от 24 до 64 px; на `s` и `m` текст в центре компактный, на `xs` не рендерится — `size`.",
+        "Диаметр от 24 до 64 px, шкала аватарок; текст в центре — четверть диаметра, на `xs` не рендерится — `size`.",
     },
     {
       slot: "states",

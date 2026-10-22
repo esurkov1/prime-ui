@@ -15,9 +15,6 @@
   --pc-size: var(--prime-space-10);
   --pc-fill: var(--prime-color-accent-default);
   --pc-rest: var(--prime-color-fill-strong);
-  /* s and m (32, 40px): a short compact text («18 д», «75%») sits in the hole as a small mark. */
-  --pc-text-size: var(--prime-progress-circle-compact-text-size);
-  --pc-line-height: var(--prime-progress-circle-compact-line-height);
   --pc-icon-size: var(--prime-icon-m);
 
   font-family: var(--prime-font-family-sans);
@@ -73,15 +70,11 @@
 
 .root[data-size="l"] {
   --pc-size: var(--prime-space-12);
-  --pc-text-size: var(--prime-text-caption-size);
-  --pc-line-height: var(--prime-text-caption-line-height);
   --pc-icon-size: var(--prime-icon-l);
 }
 
 .root[data-size="xl"] {
   --pc-size: var(--prime-space-16);
-  --pc-text-size: var(--prime-text-title-s-size);
-  --pc-line-height: var(--prime-text-title-s-line-height);
   --pc-icon-size: var(--prime-icon-xl);
 }
 
@@ -162,7 +155,10 @@
   fill: var(--pc-fill);
 }
 
-/* Inner content: the hole of the ring (5/6 of the diameter). */
+/*
+ * Inner content: the hole of the ring (5/6 of the diameter). The text is a quarter of the diameter
+ * at every tier (s 8 · m 10 · l 12 · xl 16), as an Avatar's initials are a share of its circle.
+ */
 .inner {
   /* An icon in the centre: one step of the icon scale per ring tier (s 16 · m 20 · l 24 · xl 32). */
   --prime-icon-size: var(--pc-icon-size);
@@ -175,8 +171,8 @@
   width: calc(var(--pc-size) * 5 / 6);
   height: calc(var(--pc-size) * 5 / 6);
   overflow: hidden;
-  font-size: var(--pc-text-size);
-  line-height: var(--pc-line-height);
+  font-size: calc(var(--pc-size) * 0.25);
+  line-height: 1;
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
   text-align: center;

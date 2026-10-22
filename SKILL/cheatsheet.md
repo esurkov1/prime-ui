@@ -17,6 +17,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Set `size` on the root (`Input.Root size="s"`, `Select.Root size="s"`) — not on `Input.Field` or `Select.Trigger`.
 - One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit.
 - Inside a sized host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave the kit controls without `size` — the host passes its tier ([the host tier](api-contract.md#size-and-the-host-tier)).
+- Marks in one row match by diameter: an `Avatar` is one size name above a `ProgressCircle` or a `Thumbnail` (`<Avatar.Root size="l">` beside a default ring, both 40) ([marks side by side](foundations.md#marks-side-by-side)).
 - A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="soft" tone="neutral">` (an icon-only one `variant="ghost"` among text, `soft` beside a soft button).
 
 ## Structure

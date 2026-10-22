@@ -105,6 +105,44 @@ as a chip that only shows: set it on the chip, two steps above the controls of i
 
 Bad: a `Select size="xs"` beside a `Badge` of the default size — 28 and 24 in one line, the row jumps.
 
+### Marks side by side
+
+A mark is the round or square picture that leads a row or a card: an `Avatar`, a `Thumbnail`, a
+`ProgressCircle`, an icon tile. They share one diameter scale, but each names its steps from its own
+`m`, so marks of one row match by diameter, not by the size name:
+
+| Diameter | 24 | 32 | 40 | 48 | 64 |
+|---|---|---|---|---|---|
+| Avatar | `s` | `m` | `l` | `xl` | `2xl` |
+| Thumbnail (height) | `xs` | `s` | `m` | `l` | `xl` |
+| ProgressCircle | `xs` | `s` | `m` | `l` | `xl` |
+
+- In one row or one list, every mark has one diameter: an avatar `l` beside a ring `m`, never an
+  avatar `m` beside a ring `m` (32 and 40).
+- The mark slot of a card or a dialog header (`Card.Icon`, `Modal.Icon`, `Drawer.Icon`, `Sheet.Icon`)
+  is the 40 of the icon tile and sizes the mark in it: leave `size` off an Avatar, a Thumbnail or a
+  ProgressCircle there.
+- What is inside a mark is a share of its circle at every size, so a mark is the same picture scaled:
+  initials 2/5 of an avatar, a ring's text 1/4 of its diameter (8 · 10 · 12 · 16 from `s`), an icon
+  1/2. Never a `font-size` or a `Typography` inside a mark to change it.
+- A ring holds a short text («72%», «18 д») from `s` and nothing on `xs`; a longer one is a label
+  beside the ring. Below 40 an icon or a bare ring reads better than 8px text.
+
+```tsx good
+// good — one list row: the avatar l and the ring m are both 40
+<>
+  <Avatar.Root size="l" color="blue" aria-label="Анна Климова">
+    <Avatar.Fallback>АК</Avatar.Fallback>
+  </Avatar.Root>
+  <ProgressCircle value={72} aria-label="План месяца">
+    72%
+  </ProgressCircle>
+</>
+```
+
+Bad: `<Avatar.Root size="m">` beside a `ProgressCircle` of the default size — 32 and 40 in one
+column of marks, the list's left edge jumps.
+
 ## 4. Fill, not lines
 
 - Surfaces stand on one ladder: the page (layer 0) and four nested layers, each one lightness step
