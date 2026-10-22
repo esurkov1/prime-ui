@@ -45,8 +45,8 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host. |
-| `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`): an icon or a short text from `s` (compact on `s`: «18 д», «72%»), nothing on `xs`. A string or number also becomes `aria-valuetext`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Diameter 24 · 32 · 40 · 48 · 64 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host; in a mark slot (`Card.Icon`, a dialog's `Icon`) it is `m`, the 40 box of an avatar. |
+| `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`): an icon or a short text from `s` (compact on `s` and `m`: «18 д», «72%»), nothing on `xs`. A string or number also becomes `aria-valuetext`. |
 | `aria-label` | `string` | — | Accessible name of the ring (set on the svg). Always pass it. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton ring of the same diameter and stroke (and legend lines) that cross-fades into the data; the inner content waits, the root is `aria-busy`. |
 | `value` | `number \| null` | — | Value mode: the current value, clamped to `0…max`; it glides to a new value (`base`). `null` — under way, the share unknown: a quarter arc that always turns, no `aria-valuenow`. |
@@ -69,11 +69,11 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 |---|---|---|---|
 | `xs` | 24 diameter, no inner content | inline in text or table cells | |
 | `s` | 32 diameter, an icon 16 or a short compact text (10 / 12: «18 д», «72%») in the center | list rows, compact cards | |
-| `m` | 48 diameter, inner text 12/16, icon 20 | KPI tiles | the host tier, else `m` |
-| `l` | 64 diameter, inner text 16/24, icon 24 | dashboard cards | |
-| `xl` | 80 diameter, inner text 18/24, icon 32 | hero metrics, breakdowns | |
+| `m` | 40 diameter, inner text 10/12, icon 20 | KPI tiles, the mark slot of a card or dialog header (`Card.Icon`) | the host tier, else `m` |
+| `l` | 48 diameter, inner text 12/16, icon 24 | dashboard cards | |
+| `xl` | 64 diameter, inner text 14/20, icon 32 | hero metrics, breakdowns | |
 
-The stroke is always 1/12 of the diameter (the kit ring's `data` weight). These diameters are a data scale, separate from the control heights of a circle Button.
+The stroke is always 1/12 of the diameter (the kit ring's `data` weight). These diameters are the scale of an object's mark (the Thumbnail heights; a ring `m` is as large as an avatar `l` and the 40 icon tile), separate from the control heights of a circle Button.
 
 ### tone (value mode or each segment)
 | Value | Looks like | Use when | Default |
@@ -166,7 +166,7 @@ No keyboard interaction.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A plan ring with the percentage in the center, named for screen readers — `value`, `aria-label`. |
 | [variants.tsx](examples/variants.tsx) | Every arc color; the tone tells the outcome, not the progress — `tone`, `color`, `track`. |
-| [sizes.tsx](examples/sizes.tsx) | Diameters 24 to 80 px; the center text is compact on `s` and not rendered on `xs` — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Diameters 24 to 64 px; the center text is compact on `s` and `m` and not rendered on `xs` — `size`. |
 | [states.tsx](examples/states.tsx) | Loading is a Skeleton ring of the same diameter and stroke; the number in the centre waits for the data — `loading`. |
 | [inner-content.tsx](examples/inner-content.tsx) | The center holds a percentage, a count on its own scale or an icon — `children`, `max`. |
 | [under-way.tsx](examples/under-way.tsx) | An import whose share is not known yet turns a quarter arc, then fills and swaps its icon; a sync turns while its share grows — `value`, `spin`, `children`. |

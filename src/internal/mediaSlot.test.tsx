@@ -57,7 +57,7 @@ describe("mediaSlot", () => {
     expect(screen.getByTestId("thumbnail")).toHaveAttribute("data-size", "own");
   });
 
-  it("a ring reports itself as a named mark and keeps its own size", () => {
+  it("a ring reports itself as a named mark and takes the slot's box", () => {
     function NamedHost({ children }: { children: React.ReactNode }) {
       const { media, named, provide } = useMediaSlotHost();
       return (
@@ -76,7 +76,7 @@ describe("mediaSlot", () => {
     );
     expect(screen.getByTestId("host")).toHaveAttribute("data-media", "true");
     expect(screen.getByTestId("host")).toHaveAttribute("data-named", "true");
-    expect(screen.getByTestId("ring")).toHaveAttribute("data-size", "own");
+    expect(screen.getByTestId("ring")).toHaveAttribute("data-size", "m");
     rerender(
       <NamedHost>
         <Picture kind="avatar" />

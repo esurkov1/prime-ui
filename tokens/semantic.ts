@@ -978,7 +978,7 @@ export const semanticTokens = {
    * and text, padding and radius grow together, one step per tier.
    */
   progressCircle: {
-    /** The short text in the hole of an `s` ring (32): «18 д», «75%» at 10 / 12, clear of the ring. */
+    /** The short text in the hole of an `s` / `m` ring (32, 40): «18 д», «75%» at 10 / 12. */
     compactTextSize: "{font.size.10}",
     compactLineHeight: "{font.lineHeight.12}",
   },

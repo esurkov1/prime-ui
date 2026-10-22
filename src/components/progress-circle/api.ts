@@ -12,14 +12,14 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host.",
-          ru: "Диаметр 24 · 32 · 48 · 64 · 80 px; толщина — 1/12 диаметра. Без него кольцо берёт ярус хоста с размером.",
+          en: "Diameter 24 · 32 · 40 · 48 · 64 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host; in a mark slot (`Card.Icon`, a dialog's `Icon`) it is `m`, the 40 box of an avatar.",
+          ru: "Диаметр 24 · 32 · 40 · 48 · 64 px; толщина — 1/12 диаметра. Без него кольцо берёт ярус хоста с размером; в слоте знака (`Card.Icon`, `Icon` диалога) оно `m` — 40, как аватар.",
         },
         {
           name: "children",
           type: "ReactNode",
-          en: "Content in the center (number, percent, `Icon`): an icon or a short text from `s` (compact on `s`: «18 д», «72%»), nothing on `xs`. A string or number also becomes `aria-valuetext`.",
-          ru: "Содержимое в центре (число, процент, `Icon`): иконка или короткий текст — от `s` (на `s` компактный: «18 д», «72%»), на `xs` ничего. Строка или число становятся и `aria-valuetext`.",
+          en: "Content in the center (number, percent, `Icon`): an icon or a short text from `s` (compact on `s` and `m`: «18 д», «72%»), nothing on `xs`. A string or number also becomes `aria-valuetext`.",
+          ru: "Содержимое в центре (число, процент, `Icon`): иконка или короткий текст — от `s` (на `s` и `m` компактный: «18 д», «72%»), на `xs` ничего. Строка или число становятся и `aria-valuetext`.",
         },
         {
           name: "aria-label",

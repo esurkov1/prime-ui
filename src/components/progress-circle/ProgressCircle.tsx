@@ -171,7 +171,8 @@ export function ProgressCircle(props: ProgressCircleProps) {
     ...rest
   } = props;
   const descriptionId = React.useId();
-  // In a mark slot (`Card.Icon`) the ring stands for the record's state: the tile gives way.
+  // In a mark slot (`Card.Icon`) the ring stands for the record's state: the tile gives way and
+  // the ring takes its 40 box.
   const { size, provide } = useHostTier(useMediaSlotSize("ring") ?? sizeProp);
   const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
   const isText = typeof children === "string" || typeof children === "number";

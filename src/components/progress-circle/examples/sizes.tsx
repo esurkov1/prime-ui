@@ -1,4 +1,4 @@
-/** Diameters 24 to 80 px; the center text is compact on `s` and not rendered on `xs` — `size`. */
+/** Diameters 24 to 64 px; the center text is compact on `s` and `m` and not rendered on `xs` — `size`. */
 import { ProgressCircle, Typography } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;

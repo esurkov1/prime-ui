@@ -7,16 +7,17 @@
  * Segments mode: parts clockwise from the top with flat joints and round caps at both ends of the
  * filled share, or separate round arcs with `hairline`. A part is a full-length dash turned to its
  * start (`rotate`) and cut to its length (`stroke-dashoffset`), so weights glide on paint and the
- * compositor only.
+ * compositor only. The diameters are the scale of an object's mark (24 · 32 · 40 · 48 · 64, the
+ * Thumbnail heights), so an `m` ring stands in a 40 mark slot beside a 40 avatar or icon tile.
  */
 
 .root {
-  --pc-size: var(--prime-space-12);
+  --pc-size: var(--prime-space-10);
   --pc-fill: var(--prime-color-accent-default);
   --pc-rest: var(--prime-color-fill-strong);
-  /* m (48px): caption keeps «100%» clear of the ring. */
-  --pc-text-size: var(--prime-text-caption-size);
-  --pc-line-height: var(--prime-text-caption-line-height);
+  /* s and m (32, 40px): a short compact text («18 д», «75%») sits in the hole as a small mark. */
+  --pc-text-size: var(--prime-progress-circle-compact-text-size);
+  --pc-line-height: var(--prime-progress-circle-compact-line-height);
   --pc-icon-size: var(--prime-icon-m);
 
   font-family: var(--prime-font-family-sans);
@@ -67,23 +68,20 @@
 
 .root[data-size="s"] {
   --pc-size: var(--prime-space-8);
-  /* s (32px): a short compact text («18 д», «75%») fits the hole. */
-  --pc-text-size: var(--prime-progress-circle-compact-text-size);
-  --pc-line-height: var(--prime-progress-circle-compact-line-height);
   --pc-icon-size: var(--prime-icon-s);
 }
 
 .root[data-size="l"] {
-  --pc-size: var(--prime-space-16);
-  --pc-text-size: var(--prime-text-title-m-size);
-  --pc-line-height: var(--prime-text-title-m-line-height);
+  --pc-size: var(--prime-space-12);
+  --pc-text-size: var(--prime-text-caption-size);
+  --pc-line-height: var(--prime-text-caption-line-height);
   --pc-icon-size: var(--prime-icon-l);
 }
 
 .root[data-size="xl"] {
-  --pc-size: var(--prime-space-20);
-  --pc-text-size: var(--prime-text-title-l-size);
-  --pc-line-height: var(--prime-text-title-l-line-height);
+  --pc-size: var(--prime-space-16);
+  --pc-text-size: var(--prime-text-title-s-size);
+  --pc-line-height: var(--prime-text-title-s-line-height);
   --pc-icon-size: var(--prime-icon-xl);
 }
 

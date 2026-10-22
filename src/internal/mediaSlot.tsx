@@ -8,8 +8,9 @@
  * box passes its own sizes (`Badge.Avatar`: the avatar of the chip tier).
  *
  * A `ProgressCircle` is the record's state mark (the term of a rental): it reports itself too, so the
- * tile gives way, keeps its own size (a host gives a `ring` size only when it wants one) and keeps its
- * own name — `named` tells the host not to hide the slot from assistive tech, as it does a picture.
+ * tile gives way, takes the slot's box like a picture (a ring `m`, 40) and keeps its own name —
+ * `named` tells the host not to hide the slot from assistive tech, as it does a picture. A host
+ * that gives no `ring` size leaves the ring its own.
  */
 import * as React from "react";
 
@@ -31,8 +32,8 @@ const NAMED_KINDS: ReadonlySet<MediaKind> = new Set(["ring"]);
 
 const MediaSlotContext = React.createContext<MediaSlotValue | null>(null);
 
-/** The sizes a picture takes in the slot: the 40 box of the glyph tile. */
-const MEDIA_SLOT_SIZE: MediaSlotSizes = { avatar: "l", thumbnail: "m" };
+/** The sizes a mark takes in the slot: the 40 box of the glyph tile. */
+const MEDIA_SLOT_SIZE: MediaSlotSizes = { avatar: "l", thumbnail: "m", ring: "m" };
 
 /**
  * The host side: wraps the slot's children and tells whether a picture stands in it. Children
