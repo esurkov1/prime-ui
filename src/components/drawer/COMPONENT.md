@@ -8,7 +8,7 @@
 ## When to use
 - Editing settings or a record without leaving the page.
 - Filters or navigation on narrow screens (`side="left"`).
-- Read-only details of a list row (order, user, event), with its number by the name (`Drawer.Title number`), its context on the line under it (`Drawer.Description`), its status and assignee under that (`Drawer.Badges`) and a ⋯ menu in the header (`Drawer.Actions`).
+- Read-only details of a list row (order, user, event), with its number by the name (`Drawer.Title number`), its context on the line under it (`Drawer.Description`), its plain badges on the title's line (`Drawer.Badges`), its status and assignee as `Select`s under it (`Drawer.Fields`) and its actions (`Drawer.Actions`).
 - Long content (history, logs) that needs a tall scrolling area.
 
 ## When not to use
@@ -33,7 +33,8 @@ Drawer.Root                    state and dismiss policy (no DOM)
    │  ├─ Drawer.Title          <h2> name + muted `number`; `loading` holds it with a skeleton
    │  ├─ Drawer.Description    <p> text only, a `StatusDot` first allowed, one line with an ellipsis in a record header
    │  ├─ Drawer.Badges         one row of Badges after the title, chip tier s, extra folded into «+N»
-   │  ├─ Drawer.Actions        one tab-wide switcher or value picker (a Select), then buttons and a ⋯ Dropdown, at the dialog's tier
+   │  ├─ Drawer.Actions        one tab-wide switcher, then at most two icon buttons (three or more: a ⋯ Dropdown), at the dialog's tier
+   │  ├─ Drawer.Fields         the record's value pickers (Selects) as one row under the title row, tier xs, wraps when narrow
    │  └─ Drawer.Icon           optional: tone tile around an Icon, or a picture, 48
    ├─ Drawer.Body              the only scrolling zone (ScrollContainer)
    │  └─ Drawer.Section        <section>: <h3> label, description, Drawer.Actions at the heading's end
@@ -74,16 +75,23 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Drawer.Header
-`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each; a row too full drops `Actions` under the title, the close button stays on top.
+`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button], then the `Fields` row. One line each; a row too full drops `Actions` under the title, the close button stays on top.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost close button at the dialog's control tier, named by `labels.close`; disabled in place while a `Guard` is `busy`. |
-| `children` | `ReactNode` | — | Icon, Title, Description, Badges, Actions in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
+| `children` | `ReactNode` | — | Icon, Title, Description, Badges, Actions, Fields in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip under the `Fields`. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Drawer.Actions
-`ref` → `HTMLDivElement`. Header: a tab-wide switcher or picker (`SegmentedControl`, `Select`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight); at the end of a `Drawer.Section` heading. In `Drawer.Footer`: the start group.
+`ref` → `HTMLDivElement`. Header: a tab-wide switcher, then icon buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight); at the end of a `Drawer.Section` heading. Value pickers go in `Drawer.Fields`. In `Drawer.Footer`: the start group.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
+
+### Drawer.Fields
+`ref` → `HTMLDivElement`. The record's value pickers (`Select`s: status, assignee) as one row under the title row of `Header`, above a `Tabs.List`; tier `xs` by itself, each at its content width, the row wraps when narrow. Each picker has its own `aria-label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -116,7 +124,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Drawer.Badges
-`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Actions`.
+`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -219,21 +227,24 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 ## Layout & spacing
 - The header has one anatomy, the same in every modal, drawer and sheet and on a Card — the header row of the kit at frame `l` (title 16/24, description 14/20, mark 48), one line each; no line parts it from the body:
   ```
-  (mark)  Александра #678  [Telegram] [VIP] [+1]       [Статус ⌄] [Анна Котова ⌄] [⋯] [×]
+  (mark)  Александра #678  [Telegram] [VIP] [+1]                   [Диалог] [Удалить] [×]
           ● Новая · Аренда байка Пхукет · заявка 19 сент, 06:37
+          [Статус ⌄] [Анна Котова ⌄]
+          ────────── Tabs.List ──────────
   ```
   - `Drawer.Title`: the record's name, then its `number` muted («#678», «№ 1042»); `loading` holds it with a Skeleton while the name loads. The name ellipsizes, the number never does; both are the dialog's name.
   - `Drawer.Description` under the title: the record's context in plain text, one line with an ellipsis in a record header; a `StatusDot` may stand first for the record's state. The whole text stays the dialog's description. A number never goes here.
-  - `Drawer.Badges` after the title, on its line, 6 apart: one container for every badge of the record (a status, a channel, a counter — the meaning is the badge's `tone` or `color`), chip tier `s`. The title gives way to its text (or 8em) first, then what does not fit waits behind «+N», whose tooltip lists it. A picker of a status or a person is a `Select` in `Drawer.Actions`, never a badge.
+  - `Drawer.Badges` after the title, on its line, 6 apart: one container for every badge of the record (a status, a channel, a counter — the meaning is the badge's `tone` or `color`), chip tier `s`. The title gives way to its text (or 8em) first, then what does not fit waits behind «+N», whose tooltip lists it. A picker of a status or a person is a `Select` in `Drawer.Fields`, never a badge.
   - The header places the parts whatever the order in code; write them in the order Icon, Title, Badges, Description, Actions anyway.
-  - end — `Drawer.Actions`: first one switcher or value picker for the whole open tab (a `SegmentedControl`, a `Datepicker` period, a `Select` of the status or the assignee), then neutral buttons — icon buttons with a Tooltip — and a ⋯ Dropdown for the rest, all at the dialog's control tier (the close button's), centred on the title line. The title keeps a floor (its text, at most 8em): when the mark, the floor and the controls no longer fit one row, the whole row of `Drawer.Actions` drops to a line of its own under the title, starting at the row's start edge, and wraps only if it is wider than the panel; the × never moves, it stays at the top end. The kit does not move your buttons into a menu — on a phone keep one picker and the ⋯ and put the other buttons in the ⋯ `Dropdown` yourself; with a footer only the picker and «Ещё» stay in the header, the accent button stands in the footer, a danger action lives in «Ещё» behind a ConfirmDialog. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
+  - `Drawer.Fields`: the record's value pickers — the status, the assignee, the priority, kit `Select`s — as one row under the title row (under the description) and above a `Tabs.List`, a zone gap from what is above. Its controls take tier `xs` by themselves (write no `size`), each at its content width; on a narrow drawer the row wraps and no picker is wider than the drawer. The title row then holds only icon buttons and the ×. Every picker carries its own `aria-label` or `label`; the row has no name of its own. Header placement does not depend on the order in code.
+  - end — `Drawer.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then neutral buttons — icon buttons with a Tooltip, at most two; a danger one is `tone="danger"` behind a ConfirmDialog — and a ⋯ Dropdown only when there are three or more actions, all at the dialog's control tier (the close button's), centred on the title line. The title keeps a floor (its text, at most 8em): when the mark, the floor and the controls no longer fit one row, the whole row of `Drawer.Actions` drops to a line of its own under the title, starting at the row's start edge, and wraps only if it is wider than the panel; the × never moves, it stays at the top end. The kit does not move your buttons into a menu — on a phone put the extra buttons in the ⋯ `Dropdown` yourself; the accent button stands in the footer, never in the header. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
   - `Drawer.Icon` is optional, the header row's mark (48): a glyph on the tone tile, or a picture (`Avatar.Root`, `Thumbnail.Root`) with no tile.
   - A question or a form keeps a plain header: its title and description wrap; only an `Drawer.Icon`, `Drawer.Badges` or a `number` make it a record header, whose lines are one line each.
 - A drawer has three zones: `Drawer.Header` (title, the × close button), `Drawer.Body` (the content, the only zone that scrolls) and `Drawer.Footer` (the actions). The footer is there only when the drawer has something to do; with nothing in it the kit does not draw it, and it rises in and closes up in place as its actions come and go (a save shown while the form is dirty):
   - read-only details: no footer — the header × closes; the record's main action (solid) alone when it has one. Never a footer «Закрыть»: it repeats the ×;
   - a form: «Отмена» (`Drawer.Close`, soft neutral) and the submit button (solid, last; `type="submit" form={formId}`), `Drawer.Meta` for «Есть несохранённые изменения»;
   - one acknowledgement: `<Drawer.Footer layout="fill">`;
-  - an action apart from the main pair («Выйти»; deleting the record goes in the header's «⋯» through a ConfirmDialog): `Drawer.Actions` inside the footer puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
+  - an action apart from the main pair («Выйти»; deleting the record is a danger icon button of the header behind a ConfirmDialog): `Drawer.Actions` inside the footer puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
 - Zone padding `--prime-drawer-padding` (24, frame `l`); no lines between header, body and footer — air parts them, and the scrolled body fades under the header and the footer.
 - Full viewport height; only the body scrolls, with its own side padding.
 - Safe-area insets (`--prime-safe-area-*`): the fill runs to the screen edges, the content steps in — the first zone's top air and the last zone's bottom air become max(24, the top / bottom inset), the side padding on the screen edge (both sides below 640px) max(`--prime-drawer-padding`, the left / right inset).
@@ -241,7 +252,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Fields inside get the surface field fill.
 - Titled groups of the body (a record's contacts, its deals, its history): `Drawer.Section label` — an `<h3>` under the drawer's `<h2>` title, an optional `description`, a `Drawer.Actions` at the end of its heading row; content 16 below, sections 32 apart — directly in the body, in a `Tabs.Panel` or in a form, with no spacing wrapper of your own. A tab's blocks: a `Drawer.Section` with a label, or a self-titled block (a `ChartFrame`, a `Card` with its `Card.Title`) directly in the panel — a `Tabs.Panel` in the body stands its blocks 32 apart, the step between sections, by itself. A group of fields is a `Fieldset`; a page section is `Page.Section`.
 - With a `Drawer.Meta` the buttons stay one row: when the footer runs short the status goes above them first.
-- `Drawer.Actions` stay at the end of the title line while the title keeps its floor; when they do not fit they drop to a line of its own under the title and the × stays at the top end. On a phone keep them to one picker or icon button and the ⋯ (the rest goes into the ⋯ menu).
+- `Drawer.Actions` stay at the end of the title line while the title keeps its floor; when they do not fit they drop to a line of its own under the title and the × stays at the top end. The count of actions is one rule for every header: one or two are icon buttons with a Tooltip, three or more a ⋯ menu.
 - Opening a record: the header and its tabs come at once, the body as a `Skeleton` in the data's geometry. A record opened from a list row comes with the data the row already has (its title, often its status) at once, and only the rest loads (`Drawer.Description loading`); a record opened by a link knows only its id, so `Drawer.Title loading` and `Drawer.Badges loading` hold the title and the badges too. Read-only data swaps under a `Crossfade`; a form gets no `Crossfade` around it — its fields render once the record is there, so typing and focus are never cross-faded. Never a skeleton of your own in the header.
 - Focus on open lands on the panel itself, so a header action (a ⋯ with a Tooltip) is not focused and its tooltip does not pop up; a form that should start typing at once puts `autoFocus` on its first field.
 
@@ -283,7 +294,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile in the header and one full-width action in the footer — `Drawer.Icon`, `Drawer.Footer`, `layout`. |
 | [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
 | [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters, rounded only on the edge facing the page — `side`. |
-| [header-actions.tsx](examples/header-actions.tsx) | The one header of a record: the name with its number and its plain statuses on one line, a line of data under it, and at the end the status and the assignee as pickers, a button and the ⋯ menu — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Actions`, `Select.Root`. |
+| [header-actions.tsx](examples/header-actions.tsx) | The one header of a record: the name with its number and its plain statuses on one line, a line of data under it, the status and the assignee as a row of pickers under them, and in the title row only two icon buttons and the close — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Fields`, `Drawer.Actions`, `Select.Root`. |
 | [footer-actions.tsx](examples/footer-actions.tsx) | A profile panel: Sign out, a neutral button, stands apart at the start of the footer, the main action keeps the end; on a phone the column puts it first and the main action last — `Drawer.Footer`, `Drawer.Actions`. |
 | [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details in titled sections, one with its own action — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`. |
 | [record-picture.tsx](examples/record-picture.tsx) | A vehicle's panel headed by its photo: the name and the plate beside the picture, a line of data under them, and the status badges on the name's line, after the plate — `Drawer.Icon`, `Thumbnail.Root`, `Drawer.Badges`. |
@@ -308,15 +319,16 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - A start-side button («Выйти») put inside `Drawer.Meta` → `Drawer.Actions` inside `Drawer.Footer`; `Meta` is status text only.
 - Busy or unsaved state lifted out of the form into Root props → put `Drawer.Guard` next to the form, inside Content.
 - Clearing the record together with `open` and rendering a skeleton for «no record» → not needed: the panel keeps its last content while it slides out.
-- A status `Badge` in the header's `Drawer.Actions`, or inside `Drawer.Description` → put it in `Drawer.Badges`, after the title (or a `StatusDot` first in the description): the kit sizes it and keeps the row on one line.
+- A status `Badge` in the header's `Drawer.Fields`, or inside `Drawer.Description` → put it in `Drawer.Badges`, after the title (or a `StatusDot` first in the description): the kit sizes it and keeps the row on one line.
 - The badges above the text (a three-line header in the wrong order) → `Drawer.Title`, then `Drawer.Description`, then `Drawer.Badges`; the kit places them in that order whatever order they are written in.
 - The record number in `Drawer.Description` («Заявка #678 · …») or typed into the title text → `Drawer.Title number="#678"`: muted beside the name, never cut.
 - A long name wrapped onto two title lines, or a second description line → in a record header both are one line with an ellipsis; the whole text is in the dialog's name and description.
-- Four icon buttons and two pickers in `Drawer.Actions` of a narrow drawer → they drop to a second line, three lines at 320 px; keep one picker and the ⋯ in the header and move the other buttons into the ⋯ `Dropdown` — the kit moves nothing into a menu for you.
-- The status or the assignee as a `Badge` in a `Dropdown.Trigger` → a `Select` in `Drawer.Actions`, as tall as the buttons beside it.
-- The assignee picked from a custom menu of plain rows → a `Select` in `Drawer.Actions` with `Avatar.Root` in the trigger and the items.
+- Two pickers in `Drawer.Actions` beside the buttons (the second does not fit and drops into the body on a phone) → the pickers go in `Drawer.Fields`, under the description and above the tabs, tier `xs`; the title row keeps at most two icon buttons and the ×, a ⋯ `Dropdown` only from three actions — the kit moves nothing into a menu for you.
+- The status or the assignee as a `Badge` in a `Dropdown.Trigger` → a `Select` in `Drawer.Fields`.
+- The assignee picked from a custom menu of plain rows → a `Select` in `Drawer.Fields` with `Avatar.Root` in the trigger and the items.
+- `size="xs"` written on the `Select`s of `Drawer.Fields` → leave it out: the row provides tier `xs`.
 - A control that applies to the whole tab (the text language, the period) repeated in section headings or put in one section → one switcher in the header's `Drawer.Actions`, before the buttons, rendered only on the tabs it applies to.
-- A menu or a button as a custom child of the header text column → put it in `Drawer.Actions`.
+- A menu or a button as a custom child of the header text column → put it in `Drawer.Actions`; a row of pickers → `Drawer.Fields`.
 - A Badge with its own `size` in `Drawer.Badges` → leave `size` out: the row gives every header the same chip tier.
 - An avatar wrapped in its own box, or given its own `size`, in `Drawer.Icon` → pass the `Avatar.Root` (or your component that renders it) as it is: the slot drops the tile and sets its 48 px box.
 - Expecting Enter to submit via `Drawer.Confirm` → Drawer has no Confirm; use a `<form>` with a submit button.

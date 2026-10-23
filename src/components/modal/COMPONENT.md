@@ -32,7 +32,8 @@ Modal.Root                    state and dismiss policy (no DOM)
     │   ├── Modal.Title       <h2> name + muted `number`, names the dialog; `loading` holds it with a skeleton
     │   ├── Modal.Description <p> text, describes the dialog; one line in a record header, a `StatusDot` first allowed
     │   ├── Modal.Badges      one row of Badges after the title, chip tier s, extra folded into «+N»
-    │   ├── Modal.Actions     one tab-wide switcher or value picker (a Select), then buttons and a ⋯ Dropdown, at the dialog's tier
+    │   ├── Modal.Actions     one tab-wide switcher, then at most two icon buttons (three or more: a ⋯ Dropdown), at the dialog's tier
+    │   ├── Modal.Fields      the record's value pickers (Selects) as one row under the title row, tier xs, wraps when narrow
     │   └── Modal.Icon        optional: 48 tile with a tone fill, or a picture with no tile
     ├── Modal.Body            the only scrolling zone
     │   └── Modal.Section     <section>: <h3> label, description, Modal.Actions at the heading's end
@@ -77,16 +78,23 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Modal.Header
-`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each; a row too full drops `Actions` under the title, the close button stays on top.
+`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button], then the `Fields` row. One line each; a row too full drops `Actions` under the title, the close button stays on top.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost close button at the dialog's control tier, named by `labels.close`; disabled in place while a `Guard` is `busy`. |
-| `children` | `ReactNode` | — | Icon, Title, Description, Badges, Actions in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
+| `children` | `ReactNode` | — | Icon, Title, Description, Badges, Actions, Fields in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip under the `Fields`. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Modal.Actions
-`ref` → `HTMLDivElement`. Header: a tab-wide switcher or picker (`SegmentedControl`, `Select`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight); at the end of a `Modal.Section` heading. In `Modal.Footer`: the start group.
+`ref` → `HTMLDivElement`. Header: a tab-wide switcher, then icon buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight); at the end of a `Modal.Section` heading. Value pickers go in `Modal.Fields`. In `Modal.Footer`: the start group.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
+
+### Modal.Fields
+`ref` → `HTMLDivElement`. The record's value pickers (`Select`s: status, assignee) as one row under the title row of `Header`, above a `Tabs.List`; tier `xs` by itself, each at its content width, the row wraps when narrow. Each picker has its own `aria-label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -119,7 +127,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Modal.Badges
-`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Actions`.
+`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -256,14 +264,17 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 ## Layout & spacing
 - The header has one anatomy, the same in every modal, drawer and sheet and on a Card — the header row of the kit at frame `l` (title 16/24, description 14/20, mark 48), one line each; no line parts it from the body:
   ```
-  (mark)  Александра #678  [Telegram] [VIP] [+1]       [Статус ⌄] [Анна Котова ⌄] [⋯] [×]
+  (mark)  Александра #678  [Telegram] [VIP] [+1]                   [Диалог] [Удалить] [×]
           ● Новая · Аренда байка Пхукет · заявка 19 сент, 06:37
+          [Статус ⌄] [Анна Котова ⌄]
+          ────────── Tabs.List ──────────
   ```
   - `Modal.Title`: the record's name, then its `number` muted («#678», «№ 1042»); `loading` holds it with a Skeleton while the name loads. The name ellipsizes, the number never does; both are the dialog's name.
   - `Modal.Description` under the title: the record's context in plain text, one line with an ellipsis in a record header; a `StatusDot` may stand first for the record's state. The whole text stays the dialog's description. A number never goes here.
-  - `Modal.Badges` after the title, on its line, 6 apart: one container for every badge of the record (a status, a channel, a counter — the meaning is the badge's `tone` or `color`), chip tier `s`. The title gives way to its text (or 8em) first, then what does not fit waits behind «+N», whose tooltip lists it. A picker of a status or a person is a `Select` in `Modal.Actions`, never a badge.
+  - `Modal.Badges` after the title, on its line, 6 apart: one container for every badge of the record (a status, a channel, a counter — the meaning is the badge's `tone` or `color`), chip tier `s`. The title gives way to its text (or 8em) first, then what does not fit waits behind «+N», whose tooltip lists it. A picker of a status or a person is a `Select` in `Modal.Fields`, never a badge.
   - The header places the parts whatever the order in code; write them in the order Icon, Title, Badges, Description, Actions anyway.
-  - end — `Modal.Actions`: first one switcher or value picker for the whole open tab (a `SegmentedControl`, a `Datepicker` period, a `Select` of the status or the assignee), then neutral buttons — icon buttons with a Tooltip — and a ⋯ Dropdown for the rest, all at the dialog's control tier (the close button's), centred on the title line. The title keeps a floor (its text, at most 8em): when the mark, the floor and the controls no longer fit one row, the whole row of `Modal.Actions` drops to a line of its own under the title, starting at the row's start edge, and wraps only if it is wider than the dialog; the × never moves, it stays at the top end. The kit does not move your buttons into a menu — on a phone keep one picker and the ⋯ and put the other buttons in the ⋯ `Dropdown` yourself; with a footer only the picker and «Ещё» stay in the header, the accent button stands in the footer, a danger action lives in «Ещё» behind a ConfirmDialog. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
+  - `Modal.Fields`: the record's value pickers — the status, the assignee, the priority, kit `Select`s — as one row under the title row (under the description) and above a `Tabs.List`, a zone gap from what is above. Its controls take tier `xs` by themselves (write no `size`), each at its content width; on a narrow dialog the row wraps and no picker is wider than the dialog. The title row then holds only icon buttons and the ×. Every picker carries its own `aria-label` or `label`; the row has no name of its own. Header placement does not depend on the order in code.
+  - end — `Modal.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then neutral buttons — icon buttons with a Tooltip, at most two; a danger one is `tone="danger"` behind a ConfirmDialog — and a ⋯ Dropdown only when there are three or more actions, all at the dialog's control tier (the close button's), centred on the title line. The title keeps a floor (its text, at most 8em): when the mark, the floor and the controls no longer fit one row, the whole row of `Modal.Actions` drops to a line of its own under the title, starting at the row's start edge, and wraps only if it is wider than the dialog; the × never moves, it stays at the top end. The kit does not move your buttons into a menu — on a phone put the extra buttons in the ⋯ `Dropdown` yourself; the accent button stands in the footer, never in the header. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
   - `Modal.Icon` is optional, the header row's mark (48): a glyph on the tone tile, or a picture (`Avatar.Root`, `Thumbnail.Root`) with no tile.
   - A question or a form keeps a plain header: its title and description wrap; only an `Modal.Icon`, `Modal.Badges` or a `number` make it a record header, whose lines are one line each.
 - An action apart from the main pair («Удалить» of a record, «Выйти»): `Modal.Actions` inside `Modal.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
@@ -325,15 +336,15 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - A destructive confirm built as a Modal → use ConfirmDialog. A destructive step that needs input (type the name to delete) stays a Modal with `closeOnOutsideClick={false}`.
 - Primary action not in `Modal.Confirm` → Enter does nothing; wrap it. In a form, the `type="submit"` button is the primary and stays outside `Modal.Confirm`: Enter in a field submits the form.
 - Primary action first in the footer → put it last (DOM order is the visual order).
-- «Удалить» as a third footer button of an edit dialog → the footer is the dialog's answer (Cancel + the primary); deleting the record goes to the last `tone="danger"` item of a ⋯ `Dropdown` in `Modal.Actions`, confirmed by a ConfirmDialog.
+- «Удалить» as a third footer button of an edit dialog → the footer is the dialog's answer (Cancel + the primary); deleting the record is a `tone="danger"` icon button with a Tooltip in `Modal.Actions` (the last `tone="danger"` item of a ⋯ `Dropdown` from three actions), confirmed by a ConfirmDialog.
 - A wrapper with its own gap around `Modal.Section`s inside a `Tabs.Panel` or a form → not needed: sections keep 32 between them in any wrapper.
 - A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Modal.Section label` with `Modal.Actions`.
 - Busy or unsaved state lifted out of the form into Root props → put `Modal.Guard` next to the form, inside Content.
 - `key` or a conditional around `Modal.Root` to reset a form → the dialog unmounts at once, without its exit; keep the Root mounted and drive `open`.
-- A status `Badge` in the header's `Modal.Actions`, or inside `Modal.Description` → put it in `Modal.Badges`, after the title (or a `StatusDot` first in the description): the kit sizes it and keeps the row on one line.
+- A status `Badge` in the header's `Modal.Fields`, or inside `Modal.Description` → put it in `Modal.Badges`, after the title (or a `StatusDot` first in the description): the kit sizes it and keeps the row on one line.
 - The badges under the text, or the record number in `Modal.Description` → `Modal.Title number`, `Modal.Badges` after it on its line, `Modal.Description` under.
 - A long name wrapped onto two title lines in a record header → it is one line with an ellipsis; the whole name stays the dialog's name.
-- Four icon buttons and two pickers in `Modal.Actions` of a narrow dialog → they drop to a second line, three lines at 320 px; keep one picker and the ⋯ in the header and move the other buttons into the ⋯ `Dropdown` — the kit moves nothing into a menu for you.
+- Pickers of the record in `Modal.Actions` beside the buttons (they drop to a second line, three lines at 320 px) → the pickers go in `Modal.Fields`, under the description and above the tabs, tier `xs` (write no `size`); the title row keeps at most two icon buttons and the ×, a ⋯ `Dropdown` only from three actions — the kit moves nothing into a menu for you.
 - A control that applies to the whole tab (the text language, the period) repeated in section headings or put in one section → one switcher in the header's `Modal.Actions`, before the buttons, rendered only on the tabs it applies to.
 - A Badge with its own `size` in `Modal.Badges` → leave `size` out: the row gives every header the same chip tier.
 - A `Skeleton` placed by hand in `Modal.Title` or `Modal.Description` → their `loading`.

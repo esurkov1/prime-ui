@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -211,8 +211,8 @@ describe("TagSelect", () => {
     await user.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
     // One overlay z-index: the menu opened later is portaled after the list, so it is on top.
     const position = screen
-      .getByRole("listbox")
-      .compareDocumentPosition(screen.getByRole("dialog"));
+      .getAllByRole("listbox")[0]
+      ?.compareDocumentPosition(screen.getByRole("dialog")) as number;
     expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const name = screen.getByRole("textbox", { name: "Название тега" });
     await user.clear(name);
@@ -234,7 +234,7 @@ describe("TagSelect", () => {
     );
     fireEvent.focus(screen.getByRole("combobox"));
     fireEvent.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Красный/ }));
+    fireEvent.click(screen.getByRole("radio", { name: "Красный" }));
     const chip = document.querySelector('[data-chip-value="a"]') as HTMLElement;
     expect(chip).toHaveAttribute("data-color", "red");
     expect(screen.getByRole("button", { name: /Изменить тег Alpha/i })).toHaveAttribute(
@@ -279,7 +279,59 @@ describe("TagSelect", () => {
     fireEvent.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
     expect(screen.getByRole("button", { name: /^Удалить$/i })).toBeInTheDocument();
     expect(screen.queryByRole("textbox", { name: "Название тега" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Синий" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: "Синий" })).not.toBeInTheDocument();
+  });
+
+  it("the row menu: name field, then the color swatches, then the danger «Удалить» last", async () => {
+    const user = userEvent.setup();
+    const onOptionUpdate = vi.fn();
+    const onOptionDelete = vi.fn();
+    render(<BasicTagSelect onOptionUpdate={onOptionUpdate} onOptionDelete={onOptionDelete} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    const dialog = screen.getByRole("dialog");
+    const name = screen.getByRole("textbox", { name: "Название тега" });
+    const grid = screen.getByRole("radiogroup", { name: "Цвета" });
+    const remove = screen.getByRole("button", { name: /^Удалить$/ });
+    const follows = (a: Element, b: Element) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(dialog).toContainElement(grid);
+    expect(follows(name, grid)).toBe(true);
+    expect(follows(grid, remove)).toBe(true);
+    expect(remove).toHaveAttribute("data-tone", "danger");
+    const swatches = within(grid).getAllByRole("radio");
+    expect(swatches).toHaveLength(10);
+    // The chosen color is marked; one tab stop.
+    expect(screen.getByRole("radio", { name: "Синий" })).toBeChecked();
+    expect(swatches.filter((swatch) => swatch.tabIndex === 0)).toHaveLength(1);
+  });
+
+  it("the color grid: arrows move focus without picking, Home and End jump, Enter picks", async () => {
+    const user = userEvent.setup();
+    const onOptionUpdate = vi.fn();
+    render(<BasicTagSelect onOptionUpdate={onOptionUpdate} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    screen.getByRole("radio", { name: "Синий" }).focus();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("radio", { name: "Фиолетовый" })).toHaveFocus();
+    expect(onOptionUpdate).toHaveBeenLastCalledWith("a", { color: "purple" });
+    await user.keyboard("{Home}");
+    expect(screen.getByRole("radio", { name: "По умолчанию" })).toHaveFocus();
+    expect(onOptionUpdate).toHaveBeenLastCalledWith("a", { color: "gray" });
+    await user.keyboard("{End}");
+    expect(screen.getByRole("radio", { name: "Бирюзовый" })).toHaveFocus();
+    expect(onOptionUpdate).toHaveBeenLastCalledWith("a", { color: "teal" });
+  });
+
+  it("Escape closes the row menu from the color grid", async () => {
+    const user = userEvent.setup();
+    render(<BasicTagSelect onOptionUpdate={vi.fn()} />);
+    fireEvent.focus(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    screen.getByRole("radio", { name: "Синий" }).focus();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   describe("onOptionDelete returning a Promise", () => {

@@ -5,12 +5,12 @@ import {
   Card,
   Crossfade,
   DescriptionList,
-  Dropdown,
   Icon,
   Page,
   SegmentedControl,
   Skeleton,
   StatusDot,
+  Tooltip,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -182,19 +182,30 @@ export default function CardScreenExample() {
                       {order.date}
                     </Card.Description>
                     <Card.Actions>
-                      <Dropdown.Root>
-                        <Dropdown.Trigger>
-                          <Button.Root variant="soft" tone="neutral" aria-label="Ещё">
+                      <Tooltip.Root>
+                        <Tooltip.Trigger>
+                          <Button.Root
+                            variant="soft"
+                            tone="neutral"
+                            aria-label="Скопировать ссылку"
+                          >
                             <Button.Icon>
-                              <Icon name="action.more" />
+                              <Icon name="action.copy" />
                             </Button.Icon>
                           </Button.Root>
-                        </Dropdown.Trigger>
-                        <Dropdown.Content align="end">
-                          <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
-                          <Dropdown.Item>Скачать накладную</Dropdown.Item>
-                        </Dropdown.Content>
-                      </Dropdown.Root>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>Скопировать ссылку</Tooltip.Content>
+                      </Tooltip.Root>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger>
+                          <Button.Root variant="soft" tone="neutral" aria-label="Скачать накладную">
+                            <Button.Icon>
+                              <Icon name="action.download" />
+                            </Button.Icon>
+                          </Button.Root>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>Скачать накладную</Tooltip.Content>
+                      </Tooltip.Root>
                     </Card.Actions>
                   </Card.Header>
                   <Card.Body>

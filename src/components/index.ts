@@ -526,6 +526,7 @@ export type {
   ModalConfirmProps,
   ModalContentProps,
   ModalDescriptionProps,
+  ModalFieldsProps,
   ModalFooterProps,
   ModalGuardProps,
   ModalHeaderProps,

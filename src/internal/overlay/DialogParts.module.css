@@ -197,6 +197,24 @@
   max-width: 100%;
 }
 
+/* The record's pickers under the title row (the dialog's `Fields`, tier xs joined in TSX): one row,
+   a zone gap below the title row, each picker at its content width; the row wraps on a narrow
+   dialog and no picker is wider than it. */
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin-block-start: var(--frame-gap);
+}
+
+.fields > * {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
 /* The ghost icon-only close, at the end of the row, the glyph on the content edge, centred on the
    first line of the row. */
 .close {

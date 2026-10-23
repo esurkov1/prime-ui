@@ -207,7 +207,7 @@
     {
       "id": 17,
       "prompt": "Сделай карточку сотрудника в дровере с вкладками «Профиль», «Доступ», «Уведомления», «Безопасность», «История». Она открывается из таблицы «Команда», а свой аккаунт человек открывает из меню профиля в сайдбаре — там он может менять не всё. В «Безопасности» — сеансы на других устройствах. У приглашённого, но не вошедшего сотрудника можно только удалить приглашение.",
-      "expected_output": "One user drawer component opened from both places by id; permissions make fields readOnly and hide tabs and actions; the header is the record header — Drawer.Title with the name, Drawer.Badges on the title's line with the status and role badges, Drawer.Description with one line of text (no badge in the description), Drawer.Actions only with actions on the record — one action as an icon Button with a Tooltip, a ⋯ menu only from two; one form over all tabs with one «Сохранить» in Drawer.Footer shown while dirty and Drawer.Guard; the drawer loads all tab data, tabs keep their content (keepMounted where drafts live); «История» its own tab; «Сеансы» a List of sessions with an end per row.",
+      "expected_output": "One user drawer component opened from both places by id; permissions make fields readOnly and hide tabs and actions; the header is the record header — Drawer.Title with the name, Drawer.Badges on the title's line with the status and role badges, Drawer.Description with one line of text (no badge in the description), Drawer.Actions only with actions on the record — one or two actions as icon Buttons with Tooltips, a ⋯ menu only from three; one form over all tabs with one «Сохранить» in Drawer.Footer shown while dirty and Drawer.Guard; the drawer loads all tab data, tabs keep their content (keepMounted where drafts live); «История» its own tab; «Сеансы» a List of sessions with an end per row.",
       "files": [],
       "expectations": [
         "There is one drawer component for the user, used for the own account and for a team member; no second «Мой аккаунт» drawer",
@@ -373,16 +373,16 @@
     {
       "id": 30,
       "prompt": "Сделай карточку лида в CRM проката: открывается справа из списка заявок. В шапке — имя клиента и номер заявки, статус (можно сменить), ответственный менеджер (можно назначить или сменить), канал (Telegram, WhatsApp), метка «Ждёт человека» и VIP, откуда заявка и когда пришла. Справа в шапке — кнопка «Диалог» и меню действий.",
-      "expected_output": "A Drawer with the one record header in two lines: `Drawer.Title number=\"#…\"` with the client's name and `Drawer.Badges` on the same line (the channel, «Ждёт человека» and VIP, plain badges); `Drawer.Description` with one line of text (the source and the time) under it. `Drawer.Actions` at the end hold the status `Select` first, then the assignee `Select` (its items with an `Avatar.Root`; «Назначить» as the empty value), a ghost icon Button «Диалог» in a Tooltip and a ⋯ Dropdown.",
+      "expected_output": "A Drawer with the one record header in two lines: `Drawer.Title number=\"#…\"` with the client's name and `Drawer.Badges` on the same line (the channel, «Ждёт человека» and VIP, plain badges); `Drawer.Description` with one line of text (the source and the time) under it. `Drawer.Fields` under the description holds the status `Select` first, then the assignee `Select` (its items with an `Avatar.Root`; «Назначить» as the empty value); `Drawer.Actions` at the end of the title row holds the ghost icon Button «Диалог» in a Tooltip and, with the third action, a ⋯ Dropdown.",
       "files": [],
       "expectations": [
         "The lead number is the `number` prop of `Drawer.Title` (or `Modal.Title`), not part of the title text and not in `Drawer.Description`",
         "Every channel and label badge of the lead is inside `Drawer.Badges`, on the title's line; none is inside `Drawer.Description` or under the title",
-        "The status and the assignee are each a value `Select` in `Drawer.Actions` (no `size`), the status first; neither is a `Badge.Root` inside a `Dropdown.Trigger`, and there is no separate «Сменить статус» / «Назначить» button",
+        "The status and the assignee are each a value `Select` in `Drawer.Fields` (no `size`), the status first; neither is a `Badge.Root` inside a `Dropdown.Trigger`, and there is no separate «Сменить статус» / «Назначить» button",
         "The assigned manager is a `Select.Item` with an `Avatar.Root` without `size`; nobody assigned is the empty value «Назначить»",
         "`Drawer.Description` holds only text (no Badge, no number); no Badge has its own `size` in the header",
         "The header is the record header of the kit: no Divider or border under it",
-        "`Drawer.Actions` holds the two `Select`s, the «Диалог» icon Button with a Tooltip and a ⋯ Dropdown"
+        "`Drawer.Fields` holds the two `Select`s; `Drawer.Actions` holds the «Диалог» icon Button with a Tooltip and, with a third action, a ⋯ Dropdown — no picker in `Drawer.Actions`"
       ]
     },
     {
@@ -443,12 +443,12 @@
     {
       "id": 35,
       "prompt": "В шапке дровера сделки нужны действия: отметить как спам, нецелевое, удалить сделку.",
-      "expected_output": "Each action is an icon-only ghost Button in a Tooltip in Drawer.Actions before the ×, no «⋯» menu; delete is tone danger and asks through ConfirmDialog (or holdToConfirm if easy to redo).",
+      "expected_output": "Three actions are one «⋯» menu: in Drawer.Actions an icon Button in a Dropdown.Trigger, the spam and non-target items first, the delete item last with tone danger, opening a ConfirmDialog.",
       "files": [],
       "expectations": [
-        "Drawer.Actions holds three icon-only Button.Root elements, each with an aria-label and inside Tooltip.Trigger with Tooltip.Content",
-        "There is no Dropdown «⋯» for these three actions",
-        "The delete button is tone=\"danger\" and runs only through ConfirmDialog (ConfirmDialog.Trigger) or holdToConfirm with onConfirm, never a plain onClick"
+        "Drawer.Actions holds one «⋯» Dropdown with three items, not three icon buttons in a row",
+        "The delete is the last Dropdown.Item and is tone=\"danger\"",
+        "It runs only through ConfirmDialog (async onConfirm), never a plain onSelect"
       ]
     },
     {
@@ -549,14 +549,14 @@
     {
       "id": 44,
       "prompt": "Сделай карточку заказа в списке заказов: фото товара (три снимка), номер № 4821, статусы «Срочно» и «Опт», клиент ООО «Северный ветер», позиции заказа с суммами, итог 48 600 ₽, кнопки «Оплатить», «Скачать счёт» и «Удалить заказ». Строки позиций можно открыть и поправить.",
-      "expected_output": "One Card.Root: Card.Media with a Carousel of the three photos; Card.Header with Card.Title and Card.Badges after it (both statuses), Card.Description with the client, and only a «Ещё» Dropdown in Card.Actions; Card.Body with the lines (a List whose rows open as a whole, or a DescriptionList align end); Card.Footer with Card.Total at the start and Card.Actions at the end holding the primary «Оплатить» last. «Удалить заказ» is in «Ещё» behind a ConfirmDialog. No Divider between zones.",
+      "expected_output": "One Card.Root: Card.Media with a Carousel of the three photos; Card.Header with Card.Title and Card.Badges after it (both statuses), Card.Description with the client, and two neutral icon Buttons with Tooltips in Card.Actions («Скачать счёт» and a tone danger «Удалить заказ» behind a ConfirmDialog); Card.Body with the lines (a List whose rows open as a whole, or a DescriptionList align end); Card.Footer with Card.Total at the start and Card.Actions at the end holding the primary «Оплатить» last. No Divider between zones.",
       "files": [],
       "expectations": [
         "The photos are a Carousel.Root inside Card.Media, not an <img> or a Thumbnail drawn by hand",
         "The statuses are Badge.Root in Card.Badges inside Card.Header, not under the title and not in Card.Actions beside the buttons",
-        "Card.Header holds no accent (solid primary) button: its Card.Actions has only the «Ещё» menu",
+        "Card.Header holds no accent (solid primary) button: its Card.Actions has only the two neutral icon buttons, no «Ещё» menu for two actions",
         "The primary «Оплатить» is the last button, in Card.Actions of Card.Footer, with Card.Total at the start of the footer",
-        "«Удалить заказ» is a Dropdown.Item with tone danger confirmed by a ConfirmDialog, not a visible button",
+        "«Удалить заказ» is a tone=\"danger\" icon Button with a Tooltip confirmed by a ConfirmDialog, not an item of a one- or two-item menu",
         "No Divider and no divider prop between the header, the body and the footer",
         "The line rows have no pencil or edit button: a row opens as a whole (List.Item onClick or href)"
       ]
@@ -600,10 +600,10 @@
     {
       "id": 48,
       "prompt": "Сделай Drawer заявки: заголовок с номером #678, имя клиента, строка с данными, статус «Новая», ответственный Анна Котова — оба меняются прямо в шапке.",
-      "expected_output": "A Drawer.Header: Drawer.Title number, a one-line Drawer.Description, plain Drawer.Badges, and the status and the assignee as value Select.Root at the dialog's tier inside Drawer.Actions.",
+      "expected_output": "A Drawer.Header: Drawer.Title number, a one-line Drawer.Description, plain Drawer.Badges, and the status and the assignee as value Select.Root in Drawer.Fields under them.",
       "files": [],
       "expectations": [
-        "The status and the assignee are Select.Root in Drawer.Actions, not a Badge.Root inside a Dropdown.Trigger",
+        "The status and the assignee are Select.Root in Drawer.Fields (no size), not in Drawer.Actions and not a Badge.Root inside a Dropdown.Trigger",
         "Drawer.Badges holds only plain badges (channel, flag), not the two pickers",
         "The number is Drawer.Title number, not text in the description",
         "No static line under the header"
@@ -611,24 +611,26 @@
     },
     {
       "id": 49,
-      "prompt": "В шапке Drawer приглашения сотрудника единственное действие — «Удалить приглашение». Добавь его.",
-      "expected_output": "Drawer.Actions holds a «Ещё» icon Button in a Dropdown.Trigger with one danger item «Удалить приглашение» that opens a ConfirmDialog; the delete is not an icon button in sight.",
+      "prompt": "В шапке Drawer приглашения сотрудника единственное действие — «Удалить приглашение». Добавь его. Потом в шапке карточки клиента — два действия: «Копировать ссылку» и «В архив».",
+      "expected_output": "One or two actions are never behind «⋯»: in Drawer.Actions each is an icon-only Button with aria-label in a Tooltip; the destructive one (delete, archive) is tone danger and opens a ConfirmDialog (async onConfirm).",
       "files": [],
       "expectations": [
-        "The delete is the danger item of a «Ещё» Dropdown, even though it is the only action",
+        "The invitation's delete is a tone=\"danger\" icon Button.Root in a Tooltip in Drawer.Actions, not an item of a «Ещё» Dropdown",
         "It opens a ConfirmDialog (async onConfirm) and does not run on the first press",
-        "There is no stand-alone delete icon button in Drawer.Actions"
+        "The client's two actions are two icon Buttons with Tooltips, «В архив» tone danger behind a ConfirmDialog; there is no Dropdown with two items",
+        "A «⋯» Dropdown appears only when a header has three or more actions, with the destructive one last inside"
       ]
     },
     {
       "id": 50,
-      "prompt": "Шапка Drawer заказа: выбор статуса, выбор ответственного, кнопки «Диалог» и «Копировать», «Ещё». Drawer должен нормально выглядеть на телефоне 320px.",
-      "expected_output": "On a phone (useMediaQuery(COMPACT_QUERY)) the header keeps one picker and «Ещё»; the second picker and the other buttons move into the body, the footer or the «Ещё» menu by the screen's own code.",
+      "prompt": "Шапка Drawer заказа: выбор статуса, выбор ответственного, кнопки «Диалог» и «Копировать». Выбора два, а на телефоне 320px они не помещаются в строку заголовка. Владелец хочет оба выбора строкой под заголовком и описанием, перед вкладками; в строке заголовка — только иконки и ×.",
+      "expected_output": "Drawer.Fields under the description and above the Tabs.List holds the status Select and the assignee Select (no size, each with its own aria-label); Drawer.Actions in the title row holds only the two icon Buttons in Tooltips; nothing is moved into the body or a «Ещё» menu by useMediaQuery.",
       "files": [],
       "expectations": [
-        "The narrow variant is chosen with useMediaQuery(COMPACT_QUERY), not a window.matchMedia of its own",
-        "On a narrow surface the header shows one picker and «Ещё», not two pickers and several buttons",
-        "The screen does not rely on the kit to move buttons into «Ещё» by itself"
+        "Both pickers are Select.Root inside Drawer.Fields, none inside Drawer.Actions, none moved into Drawer.Body",
+        "The Selects carry no `size` (the row gives tier xs) and each has its own aria-label or label",
+        "Drawer.Actions holds only the icon Buttons «Диалог» and «Копировать», each in a Tooltip, and no «Ещё» menu for two actions",
+        "There is no useMediaQuery(COMPACT_QUERY) or matchMedia hiding a picker or moving it between the header and the body"
       ]
     }
   ]

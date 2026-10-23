@@ -1,4 +1,4 @@
-/** What a header holds: four marks, badges that fold into a count on a narrow card, and controls by zone — a more menu alone with a footer, neutral buttons and a menu without one, a value picker — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. */
+/** What a header holds: four marks, badges that fold into a count on a narrow card, and controls by their count — two icon buttons, a more menu from three actions, a value picker — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. */
 import {
   Avatar,
   Badge,
@@ -10,6 +10,7 @@ import {
   Select,
   StatusDot,
   Thumbnail,
+  Tooltip,
 } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -98,19 +99,26 @@ export default function CardHeaderExample() {
             <StatusDot tone="success">Действует</StatusDot>до 31 дек.
           </Card.Description>
           <Card.Actions>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                <Button.Root variant="soft" tone="neutral" aria-label="Ещё">
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="soft" tone="neutral" aria-label="Открыть договор">
                   <Button.Icon>
-                    <Icon name="action.more" />
+                    <Icon name="action.externalLink" />
                   </Button.Icon>
                 </Button.Root>
-              </Dropdown.Trigger>
-              <Dropdown.Content align="end">
-                <Dropdown.Item>Открыть договор</Dropdown.Item>
-                <Dropdown.Item>Скачать PDF</Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Открыть договор</Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="soft" tone="neutral" aria-label="Скачать PDF">
+                  <Button.Icon>
+                    <Icon name="action.download" />
+                  </Button.Icon>
+                </Button.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Скачать PDF</Tooltip.Content>
+            </Tooltip.Root>
           </Card.Actions>
         </Card.Header>
         <Card.Footer>
@@ -128,12 +136,6 @@ export default function CardHeaderExample() {
           <Card.Title>Команда продаж</Card.Title>
           <Card.Description>8 человек</Card.Description>
           <Card.Actions>
-            <Button.Root variant="soft" tone="neutral">
-              <Button.Icon>
-                <Icon name="action.add" />
-              </Button.Icon>
-              Пригласить
-            </Button.Root>
             <Dropdown.Root>
               <Dropdown.Trigger>
                 <Button.Root variant="soft" tone="neutral" aria-label="Ещё">
@@ -143,6 +145,7 @@ export default function CardHeaderExample() {
                 </Button.Root>
               </Dropdown.Trigger>
               <Dropdown.Content align="end">
+                <Dropdown.Item>Пригласить в команду</Dropdown.Item>
                 <Dropdown.Item>Настройки команды</Dropdown.Item>
                 <Dropdown.Item>Выгрузить список</Dropdown.Item>
               </Dropdown.Content>

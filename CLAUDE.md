@@ -219,7 +219,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a header row: mark, title + badges on one line, a one-line description (a `StatusDot` first), controls at the end; no line between zones | `src/internal/headerRow` (`HeaderRowContent`, `headerRowStyles`, `useTitleFloor`, `HeaderLineContent`; `data-lines`); the same users as `surfaceFrame`, and the record rows of List, ChatList, Timeline, Accordion |
 | a chip tier, icon box, text tone or text role | `src/internal/chipTier` (`useChipTier`), `iconBox`, `textTone`, `textRole` CSS modules |
 | a chip, tag, status, count | `Badge` (`Badge.Dot`, `Badge.Action`, `Badge.Avatar` for a person's chip) |
-| a record header in a dialog (Drawer, Modal, Sheet) | `X.Icon` mark, `X.Title number` with `X.Badges` on the same line (plain badges, fold into «+N»), a one-line `X.Description` (a `StatusDot` first allowed), `X.Actions` with a value `Select` for status / assignee (never `Badge.Root` in `Dropdown.Trigger`) and «Ещё» (danger behind `ConfirmDialog`) |
+| a record header in a dialog (Drawer, Modal, Sheet) | `X.Icon` mark, `X.Title number` with `X.Badges` on the same line (plain badges, fold into «+N»), a one-line `X.Description` (a `StatusDot` first allowed), `X.Fields` (under the title row, above tabs) with the value `Select`s for status / assignee (tier `xs` from the kit, own `aria-label`; never `Badge.Root` in `Dropdown.Trigger`), `X.Actions` in the title row with only icon buttons + Tooltip (one or two; «Ещё» from three actions, the danger one last; a danger action is `tone="danger"` behind `ConfirmDialog`) |
 | a status inside a line of text | `StatusDot` (dot + word) — never a hand-made dot or `Badge.Dot` + text |
 | a key hint | `Kbd` |
 | a separator | `Divider` |

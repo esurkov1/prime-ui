@@ -42,7 +42,7 @@ export const page: ComponentPageConfig = {
       scenario: "header-actions",
       title: "Шапка записи",
       description:
-        "Одна шапка записи: имя с номером и обычные статусы на одной строке, под ними строка данных, а в конце — статус и ответственный как выборы, кнопка и меню ⋯ — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Actions`, `Select.Root`.",
+        "Одна шапка записи: имя с номером и обычные статусы на одной строке, под ними строка данных, а статус и ответственный стоят строкой выборов под ними; в строке заголовка только две кнопки-иконки и крестик — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Fields`, `Drawer.Actions`, `Select.Root`.",
     },
     {
       scenario: "footer-actions",

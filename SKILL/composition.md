@@ -460,7 +460,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 </Drawer.Footer>
 ```
 
-- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Actions` of its `Card.Footer` (up to two, the primary last) or of its `Card.Header` (neutral buttons, a value picker, «Ещё»; never the primary) — nowhere else in a card, and none on a record row; dialog actions in
+- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Actions` of its `Card.Footer` (up to two, the primary last) or of its `Card.Header` (neutral actions by [the number of actions](#the-number-of-actions), a value picker; never the primary) — nowhere else in a card, and none on a record row; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
 - A dialog footer is the dialog's answer, and it has one shape for every kind of dialog:
@@ -473,7 +473,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
   It never repeats the header ×: no «Закрыть» in a footer. Deleting the record the dialog edits is
   not a third footer button: it stands in `Modal.Actions` / `Drawer.Actions` of the header
-  ([actions of a record](#actions-of-a-record)), confirmed by a `ConfirmDialog`.
+  ([the number of actions](#the-number-of-actions)), confirmed by a `ConfirmDialog`.
 
 ```tsx partial
 // bad — while editing, the only way back is to close the drawer
@@ -497,7 +497,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 ```
 
 - An empty state's action replaces the header's primary, it does not duplicate it.
-- Destructive: `tone="danger"`; a standalone trigger is `soft`, in a menu it is the last item, the
+- Destructive: `tone="danger"`; a standalone trigger is `soft` (an icon button in a header), in a
+  menu it is the last item ([the number of actions](#the-number-of-actions)), the
   confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
 - Going somewhere is a link (`LinkButton`, `Button.Root asChild` + `<a>`), doing something is a Button.
   One action — one label on the whole screen.
@@ -574,45 +575,36 @@ ghost tools, a button inline in text; over media it is `shade`. A `FieldList` dr
 </>
 ```
 
-### A menu from two actions
+### The number of actions
 
-An action that is alone stays in sight; a «⋯» only gathers. Count the secondary actions of one
-place — a page or dialog header, a table row, a card, a list row:
+One count decides the shape of the actions of every header — a dialog (Drawer, Modal, Sheet), a
+card, a chat, a page's record bar — and of a table row or a list row. A `Kpi` is the one exception:
+its slot holds one control, so two actions there are one menu ([one thing in the slot](#kpi-cards-on-a-screen)).
+Count the actions of one place, the destructive one included:
 
 | Actions | Shape |
 |---|---|
-| one | an icon-only `Button.Root` (`aria-label`) in a `Tooltip.Trigger` (`ghost` in a dialog header), or a labelled button where its row has room |
-| two or more | one `Dropdown` behind an `action.more` icon button — `soft` + `neutral` in a page header (a shape beside its neighbours), `ghost` in a dialog header, `ghost` size `s` in a table cell; destructive last, `tone="danger"` |
-| a destructive one in a header of a page, dialog or card, alone or among others | always the last item of «Ещё» (`tone="danger"`) with a `ConfirmDialog` — even when it is the only action, the menu stays |
+| one or two | each an icon-only `Button.Root` (`aria-label`) in a `Tooltip.Trigger` (`ghost` in a dialog header, `soft` + `neutral` in a card and a page bar), or a labelled button where its row has room; a destructive one is `tone="danger"` and asks through a `ConfirmDialog` |
+| three or more | one `Dropdown` behind an `action.more` icon button — `soft` + `neutral` in a page bar and a card (a shape beside its neighbours), `ghost` in a dialog header, `ghost` size `s` in a table cell; the destructive one last, `tone="danger"`, asking through a `ConfirmDialog` |
 
-A ⋯ with one harmless item hides the only action behind a second press and a guess. Nothing else
-decides: not the density of the row, not the number of its columns, not the room left for later
-actions. The one exception is a destructive action in a header: it is never one tap away, so it is
-never an icon of its own in sight — it sits behind «Ещё» and asks. A row of a `FieldList` follows
-the same count for its other actions, and its remove trash stays in sight ([forms](#7-forms)).
-
-### Actions of a record
-
-The header of a record's dialog is the exception to the count above: the record's actions are what
-the person opened it for, so each harmless one stays in sight. Up to five — spam, not a target,
-copy — are icon-only ghost `Button.Root`s, each in a `Tooltip.Trigger`, in `Drawer.Actions` /
-`Modal.Actions` before the ×; a «⋯» `Dropdown` only gathers the sixth and later. The destructive
-action (delete, archive for good) is never among them: it is the last item of «Ещё»
-(`tone="danger"`) behind a `ConfirmDialog` — even when it is the record's only action, so the
-header has «Ещё» with one item and nothing else. The header's width rules for a phone are in
-[a narrow header](responsive.md#a-narrow-header).
+A «⋯» with one or two items hides what the person opened the place for behind a second press and a
+guess. Nothing else decides: not the density of the row, not the number of its columns, not the
+room left for later actions, not that one of them is destructive — a danger icon button is red and
+asks, which is the protection. The kit moves nothing into a menu by itself, so on a phone the
+screen keeps the same count ([a narrow header](responsive.md#a-narrow-header)). A row of a
+`FieldList` follows the same count for its other actions, and its remove trash stays in sight
+([forms](#7-forms)).
 
 ```tsx partial
-// bad — three harmless actions behind a guess
+// bad — two harmless actions behind a guess; a lone «Удалить» hidden in a one-item «Ещё»
 <Drawer.Actions>
   <Dropdown.Root>
     <Dropdown.Trigger>
-      <Button.Root variant="ghost" tone="neutral" aria-label="Другие действия">…</Button.Root>
+      <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">…</Button.Root>
     </Dropdown.Trigger>
     <Dropdown.Content>
-      <Dropdown.Item>Спам</Dropdown.Item>
-      <Dropdown.Item>Нецелевое</Dropdown.Item>
       <Dropdown.Item>Копировать</Dropdown.Item>
+      <Dropdown.Item tone="danger">Удалить клиента</Dropdown.Item>
     </Dropdown.Content>
   </Dropdown.Root>
 </Drawer.Actions>
@@ -622,21 +614,43 @@ header has «Ещё» with one item and nothing else. The header's width rules f
 // declare: const remove: () => Promise<void>
 // declare: const deleting: boolean
 // declare: const setDeleting: (open: boolean) => void
-// good — each harmless action in sight, named by its tooltip; the delete behind «Ещё», asking
+// good — two actions, each in sight and named by its tooltip; the delete is danger and asks
 <>
 <Drawer.Actions>
   <Tooltip.Root>
     <Tooltip.Trigger>
-      <Button.Root variant="ghost" tone="neutral" aria-label="Отметить как спам">…</Button.Root>
+      <Button.Root variant="ghost" tone="neutral" aria-label="Скопировать ссылку">…</Button.Root>
     </Tooltip.Trigger>
-    <Tooltip.Content>Отметить как спам</Tooltip.Content>
+    <Tooltip.Content>Скопировать ссылку</Tooltip.Content>
   </Tooltip.Root>
   <Tooltip.Root>
     <Tooltip.Trigger>
-      <Button.Root variant="ghost" tone="neutral" aria-label="Нецелевое обращение">…</Button.Root>
+      <Button.Root
+        variant="ghost"
+        tone="danger"
+        aria-label="Удалить клиента"
+        onClick={() => setDeleting(true)}
+      >
+        …
+      </Button.Root>
     </Tooltip.Trigger>
-    <Tooltip.Content>Нецелевое обращение</Tooltip.Content>
+    <Tooltip.Content>Удалить клиента</Tooltip.Content>
   </Tooltip.Root>
+</Drawer.Actions>
+<ConfirmDialog.Root
+  open={deleting}
+  onOpenChange={setDeleting}
+  title="Удалить клиента?"
+  confirmLabel="Удалить"
+  onConfirm={remove}
+/>
+</>
+```
+
+```tsx good
+// declare: const setDeleting: (open: boolean) => void
+// good — three actions: the first two in a menu with the third, the destructive one last
+<Drawer.Actions>
   <Dropdown.Root>
     <Dropdown.Trigger>
       <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
@@ -646,36 +660,15 @@ header has «Ещё» with one item and nothing else. The header's width rules f
       </Button.Root>
     </Dropdown.Trigger>
     <Dropdown.Content>
+      <Dropdown.Item>Отметить как спам</Dropdown.Item>
+      <Dropdown.Item>Копировать</Dropdown.Item>
       <Dropdown.Item tone="danger" onSelect={() => setDeleting(true)}>
-        Удалить сделку
+        Удалить клиента
       </Dropdown.Item>
     </Dropdown.Content>
   </Dropdown.Root>
 </Drawer.Actions>
-<ConfirmDialog.Root
-  open={deleting}
-  onOpenChange={setDeleting}
-  title="Удалить сделку?"
-  confirmLabel="Удалить"
-  onConfirm={remove}
-/>
-</>
 ```
-
-```tsx partial
-// bad — the only action of the header is a destructive one, one tap from being gone
-<Drawer.Actions>
-  <Tooltip.Root>
-    <Tooltip.Trigger>
-      <Button.Root variant="ghost" tone="danger" aria-label="Удалить приглашение">…</Button.Root>
-    </Tooltip.Trigger>
-    <Tooltip.Content>Удалить приглашение</Tooltip.Content>
-  </Tooltip.Root>
-</Drawer.Actions>
-```
-
-The good half of that pair is the «Ещё» above: a menu with a single danger item is correct, because
-keeping a destructive action out of reach is what the menu is for.
 
 ## 7. Forms
 
@@ -691,7 +684,7 @@ keeping a destructive action out of reach is what the menu is for.
   reason through `getLockedReason(item)`; a record the server creates is `createItem` returning a
   Promise — a placeholder row holds the place, the key comes from the resolved item and focus goes
   into the row.
-- The row's actions (`rowActions`) follow [the menu threshold](#a-menu-from-two-actions): a row
+- The row's actions (`rowActions`) follow [the number of actions](#the-number-of-actions): a row
   that only removes shows its trash (the default `"buttons"`, and the grip after it with
   `reorderable`), however many columns it has; `"menu"` — one «⋯» with «Выше», «Ниже», «Удалить» —
   only for a `reorderable` list on a touch-first screen, where moving by the menu replaces a drag.
@@ -1100,13 +1093,17 @@ wherever it opens:
   line — the plain statuses (the channel, «Ждёт человека», «VIP»), one size, the rest behind «+N»;
   `Drawer.Description` is the record's context as one line of text («ООО «Северный ветер» ·
   1 240 000 ₽»), a `StatusDot` first when it carries a state — never a badge, never the number.
-  `Drawer.Actions` stand at the end: the status and the assignee are value `Select`s at the
-  dialog's control tier (never a `Badge.Root` in a `Dropdown.Trigger`; nobody assigned is the
-  empty value «Назначить»), then the buttons that act on this record, then «Ещё» (`action.more`)
-  with the danger action behind a `ConfirmDialog` ([actions of a record](#actions-of-a-record)).
-  The header places the parts whatever the order in code; write them in it anyway. A Badge in
-  `Drawer.Actions` is a status in the wrong place; a way to another place (a section, a list) is no
-  header action — a link in the body beside the data it leads to, or nothing.
+  `Drawer.Actions` stand at the end of that row and hold only the buttons that act on this record
+  ([the number of actions](#the-number-of-actions)): icon buttons with Tooltips, «Ещё»
+  (`action.more`) from three; the title row carries no picker.
+  `Drawer.Fields` is the row of the record's value pickers under the title row and the
+  description, above the tabs: the status and the assignee are value `Select`s (never a
+  `Badge.Root` in a `Dropdown.Trigger`; nobody assigned is the empty value «Назначить»), tier `xs`
+  by the kit — write no `size` — each with its own `aria-label`. Two pickers or three share the
+  row and wrap on a phone; none drops into the body. The header places the parts whatever the order
+  in code; write them in it anyway. A Badge in `Drawer.Actions` is a status in the wrong place; a
+  way to another place (a section, a list) is no header action — a link in the body beside the
+  data it leads to, or nothing.
 - **One form, one save.** Every editable field of every tab is one form, and its submit is the one
   «Сохранить» of `Drawer.Footer`, shown while the form is dirty beside «Отменить изменения» (the
   form goes back to the saved values, the drawer stays open), with `Drawer.Guard` (`dirty`,
@@ -1138,7 +1135,8 @@ wherever it opens:
   ([label economy](ux.md#3-label-economy)).
 
 ```tsx good
-// good — the record header: name and number, one line of data, plain badges, the two pickers as Selects in the actions
+// good — the record header: name and number, one line of data, plain badges, the icon button in the
+// title row, the two pickers as Selects in Fields under it
 // declare: const status: string
 // declare: const setStatus: (status: string) => void
 // declare: const assignee: string
@@ -1151,6 +1149,18 @@ wherever it opens:
     <Badge.Root tone="warning">Ждёт человека</Badge.Root>
   </Drawer.Badges>
   <Drawer.Actions>
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">
+          <Button.Icon>
+            <Icon name="object.message" />
+          </Button.Icon>
+        </Button.Root>
+      </Tooltip.Trigger>
+      <Tooltip.Content>Диалог</Tooltip.Content>
+    </Tooltip.Root>
+  </Drawer.Actions>
+  <Drawer.Fields>
     <Select.Root aria-label="Статус" value={status} onValueChange={setStatus}>
       <Select.Trigger>
         <Select.Value />
@@ -1170,17 +1180,7 @@ wherever it opens:
         <Select.Item value="sokolov">Илья Соколов</Select.Item>
       </Select.Content>
     </Select.Root>
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">
-          <Button.Icon>
-            <Icon name="object.message" />
-          </Button.Icon>
-        </Button.Root>
-      </Tooltip.Trigger>
-      <Tooltip.Content>Диалог</Tooltip.Content>
-    </Tooltip.Root>
-  </Drawer.Actions>
+  </Drawer.Fields>
 </Drawer.Header>
 ```
 
@@ -1229,19 +1229,36 @@ wherever it opens:
 </Drawer.Actions>
 ```
 
+```tsx partial
+// bad — both pickers in the title row beside the buttons: the second does not fit and drops into
+// the body on a phone
+<Drawer.Actions>
+  <Select.Root aria-label="Статус" defaultValue="new">…</Select.Root>
+  <Select.Root aria-label="Ответственный" defaultValue="kotova">…</Select.Root>
+  <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">…</Button.Root>
+</Drawer.Actions>
+```
+
 ```tsx good
-// good — each badge is its own picker; nobody assigned is an outline «Назначить» in the same place
+// good — the pickers are a row of their own under the title row; nobody assigned is the empty
+// value «Назначить»
+// declare: const assignee: string
 // declare: const setAssignee: (id: string) => void
-<Drawer.Badges>
-  <Dropdown.Root>
-    <Dropdown.Trigger>
-      <Badge.Root variant="outline">Назначить</Badge.Root>
-    </Dropdown.Trigger>
-    <Dropdown.Content>
-      <Dropdown.Item onSelect={() => setAssignee("kotova")}>Анна Котова</Dropdown.Item>
-    </Dropdown.Content>
-  </Dropdown.Root>
-</Drawer.Badges>
+<Drawer.Fields>
+  <Select.Root
+    aria-label="Ответственный"
+    placeholder="Назначить"
+    value={assignee}
+    onValueChange={setAssignee}
+  >
+    <Select.Trigger>
+      <Select.Value />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="kotova">Анна Котова</Select.Item>
+    </Select.Content>
+  </Select.Root>
+</Drawer.Fields>
 ```
 
 ```tsx partial
@@ -1391,8 +1408,8 @@ screen decides about it:
   a title or a note that does not fit is shortened, a value that does not fit takes the short form
   or a larger size — never a second line, a smaller font or a wider card.
 - **One thing in the slot.** `Kpi.Actions` holds one badge, menu or button (from M); two actions
-  are one menu ([a menu from two actions](#a-menu-from-two-actions)). The kit sizes the controls
-  inside the card, so they take no `size`.
+  are one menu, because the slot has room for one control. The kit sizes the controls inside the
+  card, so they take no `size`.
 - **A trend** is a `Sparkline` in `Kpi.Media`: `useSparkline` gives the value, the change
   (`Kpi.Delta reading`) and the date in `Kpi.Period`, `{...reading.plot}` the line to scrub.
 - **A card that opens** its report is `Kpi.Root asChild` around the link: the whole card lifts and
@@ -1487,7 +1504,7 @@ app: one look per kind of block, never a weight per screen.
   `Card.Description` gives the facts («выдан 21 окт, 15:43»); the assignee is a value `Select`
   (`Select.Item` with an `Avatar.Root`) in `Card.Actions` at the header's end,
   before the buttons. The person is named once: the picker, not the description. With no footer the
-  header holds neutral buttons, the picker and «Ещё»; the primary action of a card that has a
+  header holds neutral actions and the picker; the primary action of a card that has a
   footer stands in the footer, last ([the card's rules](../src/components/card/COMPONENT.md)).
 - **A record card with a total** (a vehicle of a deal, a payment, an invoice): the head is a
   `Card.Header` — its mark first (`Card.Icon` with the record's picture or a `ProgressCircle` term
@@ -1540,7 +1557,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - It is a section page, so its search, «Фильтр» and «Вид» stand in `Page.Tools` (`SmartFilter.Root` around `Page.Root`), the chips in `Page.Chips`, and the table has no `toolbar` — the same place as on every other section; the bar also keeps the heading, export (`soft` + `neutral`, an icon beside its label) and the one primary action (`solid`, last) in `Page.Actions`. A KPI row added above changes nothing in the table's tools.
 - A status is a `Badge` read from one map of the app (`STATUS`); an invoice's statuses are judgements, so each wears a `tone` — the text carries the meaning, the tone repeats it ([one status map](foundations.md#one-status-map)).
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
-- Row actions are a `Dropdown` behind an `action.more` icon of size `s` in the last column (`hideHeader`), pinned to the end edge with `stickyLastColumn` so they stay in reach while the columns scroll: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
+- Row actions sit in the last column (`hideHeader`), pinned to the end edge with `stickyLastColumn` so they stay in reach while the columns scroll: controls in cells are one tier below the table. They follow [the number of actions](#the-number-of-actions): one or two icon buttons of size `s`, from three a `Dropdown` behind an `action.more` icon with delete `tone="danger"` at the end of the menu.
 - Empty after a filter is the table's `empty` with `EmptyPage size="s"` and a «Сбросить фильтры» action; the header and the filters stay in place.
 
 ### Detail page
@@ -1549,7 +1566,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - A nested record titles itself in its `Page.TopBar`: `Page.Heading` holds the path up (`Breadcrumb.Root` with the list, «Счета») ending in `Page.Title` with the record's name on the same line; there is no second header in the flow. Top-level pages have no breadcrumb.
 - The status is words next to the fact that matters now, in `Page.Description` («Отправлен · оплатить до 14 октября»), not a separate plate.
-- The record's actions are the bar's `Page.Actions`, by weight: one primary (`solid`, last), the secondary `soft` + `tone="neutral"`, each with an icon beside its label. Rare and destructive ones live in a `Dropdown` behind an `action.more` icon (also `soft`, so the button has a shape beside its neighbours); voiding is `tone="danger"` at the bottom of the menu.
+- The record's actions are the bar's `Page.Actions`, by weight: one primary (`solid`, last), the secondary `soft` + `tone="neutral"`, each with an icon beside its label. The secondary ones follow [the number of actions](#the-number-of-actions): from three a `Dropdown` behind an `action.more` icon (also `soft`, so the button has a shape beside its neighbours), voiding `tone="danger"` at the bottom of the menu; fewer stay buttons, voiding among them `tone="danger"` behind a `ConfirmDialog`.
 - Columns are a CSS module on flex-wrap without breakpoints: the main one grows, the side one holds ~18rem and drops below when the main one runs out of room.
 - A section without a frame is `Page.Section label`: an h2 heading 16 px above the table; a `Card` with its `Card.Header` only for standalone blocks of the side column. A table is already a filled block — never put it in a card.
 - «Label → value» pairs about the client are `DescriptionList.Root orientation="vertical"` with `DescriptionList.Item label`; amounts are tabular figures, the total is larger (`title-m`) and ends where the «Сумма» column ends (the table cell inset).

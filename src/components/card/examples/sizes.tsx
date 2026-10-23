@@ -4,9 +4,9 @@ import {
   Button,
   Card,
   DescriptionList,
-  Dropdown,
   Icon,
   StatusDot,
+  Tooltip,
   Typography,
 } from "prime-ui-kit";
 
@@ -31,18 +31,16 @@ export default function CardSizesExample() {
                 ООО «Северный ветер»
               </Card.Description>
               <Card.Actions>
-                <Dropdown.Root>
-                  <Dropdown.Trigger>
-                    <Button.Root variant="soft" tone="neutral" aria-label="Ещё">
+                <Tooltip.Root>
+                  <Tooltip.Trigger>
+                    <Button.Root variant="soft" tone="neutral" aria-label="Открыть заказ">
                       <Button.Icon>
-                        <Icon name="action.more" />
+                        <Icon name="action.externalLink" />
                       </Button.Icon>
                     </Button.Root>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content align="end">
-                    <Dropdown.Item>Открыть заказ</Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown.Root>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>Открыть заказ</Tooltip.Content>
+                </Tooltip.Root>
               </Card.Actions>
             </Card.Header>
             <Card.Body>

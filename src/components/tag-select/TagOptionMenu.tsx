@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
+import { ColorSwatches } from "@/components/color-swatches/ColorSwatches";
 import { Divider } from "@/components/divider/Divider";
 import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
@@ -11,7 +11,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import menu from "@/internal/menu.module.css";
 import type { PaletteColor } from "@/internal/states";
-import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 
 import styles from "./TagSelect.module.css";
 
@@ -103,7 +103,7 @@ export function TagOptionMenu({
         </Button.Root>
       </Popover.Trigger>
       <Popover.Content size="s" flush className={styles.menuPanel}>
-        <div className={styles.menuBody}>
+        <div className={cx(fieldTierClass, menu.tier, styles.menuBody)} data-size="s">
           {onUpdate ? (
             <Input.Root size="s">
               <Input.Wrapper>
@@ -123,43 +123,37 @@ export function TagOptionMenu({
               </Input.Wrapper>
             </Input.Root>
           ) : null}
-          {onDelete ? (
-            <Button.Root
-              variant="soft"
-              tone="danger"
-              size="s"
-              className={styles.menuDelete}
-              onClick={() => {
-                onOpenChange(false);
-                onDelete(value);
-              }}
-            >
-              <Button.Icon>
-                <Icon name="action.delete" />
-              </Button.Icon>
-              {labels.delete}
-            </Button.Root>
-          ) : null}
           {onUpdate ? (
+            <ColorSwatches
+              mode="palette"
+              size="s"
+              palette={TAG_COLORS}
+              value={color}
+              aria-label={labels.colors}
+              labels={{ colorNames: labels.colorNames }}
+              className={styles.colorGrid}
+              onValueChange={(hue) => {
+                if (hue && hue !== color) onUpdate(value, { color: hue });
+              }}
+            />
+          ) : null}
+          {onDelete ? (
             <>
-              <Divider className={menu.separator} />
-              <div className={cx(textRole.caption, menu.groupLabel)}>{labels.colors}</div>
-              <div className={cx(fieldTierClass, menu.tier)} data-size="s">
-                {TAG_COLORS.map((hue) => (
-                  <button
-                    key={hue}
-                    type="button"
-                    aria-pressed={color === hue}
-                    className={cx(menu.item, styles.colorRow)}
-                    onClick={() => onUpdate(value, { color: hue })}
-                  >
-                    <Badge.Root color={hue}>{labels.colorNames[hue]}</Badge.Root>
-                    <span className={cx(menu.check, styles.colorCheck)} aria-hidden="true">
-                      <Icon name="action.check" />
-                    </span>
-                  </button>
-                ))}
-              </div>
+              {onUpdate ? <Divider className={menu.separator} /> : null}
+              <button
+                type="button"
+                data-tone="danger"
+                className={cx(menu.item, menu.focusRow, textTone.tone, menu.tonedRow)}
+                onClick={() => {
+                  onOpenChange(false);
+                  onDelete(value);
+                }}
+              >
+                <span className={menu.itemIcon} aria-hidden="true">
+                  <Icon name="action.delete" />
+                </span>
+                {labels.delete}
+              </button>
             </>
           ) : null}
         </div>

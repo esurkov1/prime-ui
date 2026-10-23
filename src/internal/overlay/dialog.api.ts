@@ -164,8 +164,8 @@ export function dialogParts(
   return [
     {
       name: `${name}.Header`,
-      en: "`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each; a row too full drops `Actions` under the title, the close button stays on top.",
-      ru: "`<header>` — строка шапки кита, фрейм `l`, без линии под ней: [Icon] [Title + Badges / Description] [Actions] [кнопка закрытия]. Каждое — в одну строку; у заголовка есть минимум (до 8em), тесная строка роняет `Actions` под него; кнопка закрытия остаётся наверху в конце.",
+      en: "`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button], then the `Fields` row. One line each; a row too full drops `Actions` under the title, the close button stays on top.",
+      ru: "`<header>` — строка шапки кита, фрейм `l`, без линии под ней: [Icon] [Title + Badges / Description] [Actions] [кнопка закрытия], затем ряд `Fields`. Каждое — в одну строку; у заголовка есть минимум (до 8em), тесная строка роняет `Actions` под него; закрытие остаётся наверху.",
       props: [
         {
           name: "showClose",
@@ -177,8 +177,8 @@ export function dialogParts(
         {
           name: "children",
           type: "ReactNode",
-          en: "Icon, Title, Description, Badges, Actions in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip.",
-          ru: "Icon, Title, Description, Badges, Actions в любом порядке; каждый встаёт на своё место. `Tabs.List` (с `Tabs.Root` вокруг шапки и тела) превращает шапку в полосу вкладок.",
+          en: "Icon, Title, Description, Badges, Actions, Fields in any order; each goes to its place. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip under the `Fields`.",
+          ru: "Icon, Title, Description, Badges, Actions, Fields в любом порядке; каждый встаёт на своё место. `Tabs.List` (с `Tabs.Root` вокруг шапки и тела) превращает шапку в полосу вкладок под `Fields`.",
         },
         {
           name: "…rest",
@@ -190,8 +190,21 @@ export function dialogParts(
     },
     {
       name: `${name}.Actions`,
-      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher or picker (\`SegmentedControl\`, \`Select\`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight)${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group.`,
-      ru: `Шапка: переключатель вкладки или выбор (\`SegmentedControl\`, \`Select\`), затем кнопки и меню ⋯, ярус диалога, в конце строки заголовка (под заголовком, когда не помещаются)${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале.`,
+      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher, then icon buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight)${section ? `; at the end of a \`${name}.Section\` heading` : ""}. Value pickers go in \`${name}.Fields\`. In \`${name}.Footer\`: the start group.`,
+      ru: `Шапка: переключатель вкладки, затем кнопки-иконки и меню ⋯, ярус диалога, в конце строки заголовка (под заголовком, когда не помещаются)${section ? `; в конце заголовка \`${name}.Section\`` : ""}. Выборы — в \`${name}.Fields\`. В \`${name}.Footer\` — группа в начале.`,
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className`, `children` and the other attributes of the row.",
+          ru: "`className`, `children` и остальные атрибуты ряда.",
+        },
+      ],
+    },
+    {
+      name: `${name}.Fields`,
+      en: "`ref` → `HTMLDivElement`. The record's value pickers (`Select`s: status, assignee) as one row under the title row of `Header`, above a `Tabs.List`; tier `xs` by itself, each at its content width, the row wraps when narrow. Each picker has its own `aria-label`.",
+      ru: "Выборы записи (`Select`: статус, ответственный) одной строкой под строкой заголовка `Header`, над `Tabs.List`; ярус `xs` задан сам, каждый по ширине содержимого, тесная строка переносится. У каждого выбора свой `aria-label`.",
       props: [
         {
           name: "…rest",
@@ -276,8 +289,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Badges`,
-      en: "`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Actions`.",
-      ru: "Бейджи после заголовка, на его строке: один `Badge.Group`, ярус чипов `s`, один ряд, остальное в «+N». Выбор статуса или человека — `Select` в `Actions`.",
+      en: "`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.",
+      ru: "Бейджи после заголовка, на его строке: один `Badge.Group`, ярус чипов `s`, один ряд, остальное в «+N». Выбор статуса или человека — `Select` в `Fields`.",
       props: [
         {
           name: "loading",

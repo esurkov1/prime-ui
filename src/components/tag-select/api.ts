@@ -240,7 +240,10 @@ export const api: ComponentApi = {
       ru: "Имя поля названия тега в меню.",
     },
     delete: { en: "Delete button in the menu.", ru: "Кнопка удаления в меню." },
-    colors: { en: "Heading of the color list in the menu.", ru: "Заголовок списка цветов в меню." },
+    colors: {
+      en: "Accessible name of the color swatch grid in the menu.",
+      ru: "Доступное имя сетки цветов в меню.",
+    },
     colorNames: {
       en: "Names of the palette colors in the menu, by `PaletteColor` key.",
       ru: "Названия цветов палитры в меню, по ключам `PaletteColor`.",
@@ -274,8 +277,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "ArrowLeft · ArrowRight",
-        en: "From the start of the input move focus over the tags and back to the input.",
-        ru: "Из начала поля переводят фокус по тегам и обратно в поле.",
+        en: "From the start of the input move focus over the tags and back to the input; in the row menu's color grid they move over the swatches and pick the color.",
+        ru: "Из начала поля переводят фокус по тегам и обратно в поле; в сетке цветов меню строки идут по кружкам и выбирают цвет.",
       },
       {
         keys: "Delete",
@@ -294,6 +297,10 @@ export const api: ComponentApi = {
       },
     ],
     aria: [
+      {
+        en: "The row menu's colors are a `ColorSwatches` radio group named by `labels.colors`; each swatch is a radio named by `labels.colorNames`, one tab stop.",
+        ru: "Цвета меню строки — радиогруппа `ColorSwatches` с именем `labels.colors`; каждый образец — радио с именем из `labels.colorNames`, одна точка Tab.",
+      },
       {
         en: 'The input is `role="combobox"` with `aria-expanded` and `aria-controls`; the list is `role="listbox"` with `aria-multiselectable`, options are `role="option"` with `aria-selected`.',
         ru: 'Поле ввода — `role="combobox"` с `aria-expanded` и `aria-controls`; список — `role="listbox"` с `aria-multiselectable`, опции — `role="option"` с `aria-selected`.',

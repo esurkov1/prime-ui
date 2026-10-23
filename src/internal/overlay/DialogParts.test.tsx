@@ -19,6 +19,7 @@ import {
   DialogBody,
   DialogClose,
   DialogDescription,
+  DialogFields,
   DialogFooter,
   DialogHeader,
   DialogIcon,
@@ -427,6 +428,90 @@ describe("DialogParts", () => {
     expect(row?.contains(close)).toBe(false);
     expect(close.parentElement).toBe(row?.parentElement);
     expect(actions).toHaveAttribute("data-zone", "header");
+  });
+
+  it("stands the Fields row under the title row and above a tab strip, whatever the order written", () => {
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader data-testid="header">
+            <div role="tablist" aria-label="Разделы" />
+            <DialogFields data-testid="fields">
+              <Select.Root aria-label="Статус" defaultValue="new">
+                <Select.Trigger>
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="new">Новая</Select.Item>
+                </Select.Content>
+              </Select.Root>
+              <Select.Root aria-label="Ответственный" defaultValue="kotova">
+                <Select.Trigger>
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="kotova">Анна Котова</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </DialogFields>
+            <DialogActions data-testid="actions">
+              <Button.Root aria-label="Диалог">1</Button.Root>
+            </DialogActions>
+            <DialogTitle>Александра</DialogTitle>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    const header = screen.getByTestId("header");
+    const fields = screen.getByTestId("fields");
+    const [row, second, third] = Array.from(header.children);
+    expect(row?.contains(screen.getByRole("heading", { name: "Александра" }))).toBe(true);
+    expect(row?.contains(screen.getByTestId("actions"))).toBe(true);
+    expect(second).toBe(fields);
+    expect(third).toBe(screen.getByRole("tablist"));
+    expect(fields).toHaveClass(styles.fields);
+    expect(fields.contains(screen.getByRole("button", { name: "Закрыть" }))).toBe(false);
+  });
+
+  it("gives the Fields controls tier xs and each picker its own name", () => {
+    render(
+      <Root defaultOpen>
+        <DialogPanel
+          kind="drawer"
+          panelClassName="panel"
+          swipe="never"
+          footerLayout="end"
+          controlSize="m"
+        >
+          <DialogHeader>
+            <DialogTitle>Александра</DialogTitle>
+            <DialogFields data-testid="fields">
+              <Select.Root aria-label="Статус" defaultValue="new">
+                <Select.Trigger>
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="new">Новая</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </DialogFields>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    expect(screen.getByTestId("fields")).toHaveAttribute("data-size", "xs");
+    expect(screen.getByRole("combobox")).toHaveAttribute("data-size", "xs");
+    expect(screen.getByRole("button", { name: "Закрыть" })).toHaveAttribute("data-size", "m");
+  });
+
+  it("wraps the Fields row on a narrow dialog, each picker at its own width, a zone gap below the title row", () => {
+    const fields = cssRule(CSS, ".fields");
+    expect(cssValue(fields, "display")).toBe("flex");
+    expect(cssValue(fields, "flex-wrap")).toBe("wrap");
+    expect(cssValue(fields, "margin-block-start")).toBe("var(--frame-gap)");
+    const cell = cssRule(CSS, ".fields > *");
+    expect(cssValue(cell, "flex")).toBe("0 1 auto");
+    expect(cssValue(cell, "max-width")).toBe("100%");
   });
 
   it("keeps 32 between sections in plain flow, adds 16 to a smaller gap and nothing to a 32 gap", () => {

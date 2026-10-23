@@ -137,8 +137,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Actions",
-      en: "`ref` → `HTMLDivElement`. The card's controls, the card's tier (xs · s · m · l · xl), as tall as its form fields. In the header: with a footer only «Ещё» and a picker, without one neutral buttons too; never an accent button. In the footer: up to two buttons, the accent one last.",
-      ru: "Контролы карточки того же яруса, что карточка (xs · s · m · l · xl), вровень с полями формы в ней. В шапке: с подвалом только «Ещё» и выбор значения, без него ещё нейтральные кнопки; акцентной кнопки нет. В подвале: до двух кнопок, акцентная последней.",
+      en: "`ref` → `HTMLDivElement`. The card's controls, the card's tier (xs · s · m · l · xl), as tall as its form fields. In the header: neutral actions (icon buttons, a ⋯ menu from three) and one picker; never an accent button. In the footer: up to two buttons, the accent one last.",
+      ru: "Контролы карточки того же яруса, что карточка (xs · s · m · l · xl), вровень с полями формы в ней. В шапке: нейтральные действия (кнопки-иконки, «⋯» с трёх) и не больше одного выбора; акцентной кнопки нет. В подвале: до двух кнопок, акцентная последней.",
       props: [
         {
           name: "fullWidth",

@@ -6,7 +6,7 @@
 > A filled surface that holds one entity — a record, a plan, a setting, a listing — as a cover, a header with its mark, title, badges and actions, a body and a footer, parted by air and never by lines.
 
 ## When to use
-- A record with its facts and actions — an order, a client, a contract: `Card.Header` (the mark, the title, `Card.Badges`, the state line, «Ещё») + `Card.Body` (label — value rows) + `Card.Footer` (`Card.Total` and the primary button).
+- A record with its facts and actions — an order, a client, a contract: `Card.Header` (the mark, the title, `Card.Badges`, the state line, its actions) + `Card.Body` (label — value rows) + `Card.Footer` (`Card.Total` and the primary button).
 - A catalogue tile with photos: `Card.Media` holding a `Carousel`, the status in `Card.Badges`, the price in the footer, the whole tile opening the record through `Card.Link`.
 - A choice among cards — a plan, a module, an extra: `asChild` with a `<button>`, `selected`, and `Card.Indicator` at the end of the header.
 - A setting: one switch is a one-line card (`Card.Icon`, `Card.Title`, a `Switch.Root` in `Card.Actions`); several are a group card with `Switch.Root fullWidth` rows in the body.
@@ -111,7 +111,7 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Card.Actions
-`ref` → `HTMLDivElement`. The card's controls, the card's tier (xs · s · m · l · xl), as tall as its form fields. In the header: with a footer only «Ещё» and a picker, without one neutral buttons too; never an accent button. In the footer: up to two buttons, the accent one last.
+`ref` → `HTMLDivElement`. The card's controls, the card's tier (xs · s · m · l · xl), as tall as its form fields. In the header: neutral actions (icon buttons, a ⋯ menu from three) and one picker; never an accent button. In the footer: up to two buttons, the accent one last.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -224,7 +224,7 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 
 - The card is a surface of the depth ladder: no border, no lines inside; zones are parted by air. It fills its grid cell and, in a row, cards stretch to one height while the footer keeps to the bottom.
 - Nothing wraps. Every header line and every body row is one line cut with an ellipsis.
-- The header gives way in this order: the title shrinks down to its floor (its own text or 8em) and the badges fold into «+N»; the title never goes below the floor. When the mark, the floor and the controls no longer fit one row, the controls drop under the title onto a line of their own, and wrap only if that line is narrower than they are. The kit does not shrink a picker or move buttons into «Ещё» by itself: the extra buttons going into «Ещё» is the consumer's choice, and on a narrow card a picker and the action belong in `Card.Footer`, which stacks.
+- The header gives way in this order: the title shrinks down to its floor (its own text or 8em) and the badges fold into «+N»; the title never goes below the floor. When the mark, the floor and the controls no longer fit one row, the controls drop under the title onto a line of their own, and wrap only if that line is narrower than they are. The kit does not shrink a picker or move buttons into «Ещё» by itself; a card has no `Fields` row, so its header holds one picker at the controls' tier, and a card with two pickers moves the second into `Card.Footer` (which stacks on a narrow card) or the body.
 - The footer has no line and no fill; it stands off the content by the card padding (more than the zone gap). One thing at the start, up to two buttons at the end with the accent one last; `fullWidth` only when nothing stands at the start.
 - A header with a description holds its controls at the top; a one-line header, or a card that is only its header, centres them on the title line.
 - In `Card.Body` a `List` stands on the content edge: the body sets the public hook `--list-bleed` and the rows reach past the list's edges by their own padding, so their text lines up with the rest of the body.
@@ -263,17 +263,17 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A record card: the mark, the title with its badges, a status line, a more menu, label — value rows and the total with one accent button — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`. |
+| [overview.tsx](examples/overview.tsx) | A record card: the mark, the title with its badges, a status line, two icon buttons, label — value rows and the total with one accent button — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`. |
 | [sizes.tsx](examples/sizes.tsx) | The same record card on the five steps: padding, radius, mark, text and the controls step together — `size`. |
 | [structure.tsx](examples/structure.tsx) | The zones a card has: a header alone, a header and a body, all three with a footer, and a pane with no zone where a list stands edge to edge — `Card.Header`, `Card.Body`, `Card.Footer`. |
-| [header.tsx](examples/header.tsx) | What a header holds: four marks, badges that fold into a count on a narrow card, and controls by zone — a more menu alone with a footer, neutral buttons and a menu without one, a value picker — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. |
+| [header.tsx](examples/header.tsx) | What a header holds: four marks, badges that fold into a count on a narrow card, and controls by their count — two icon buttons, a more menu from three actions, a value picker — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. |
 | [link.tsx](examples/link.tsx) | Cards that open: a link in the title stretches over the card while its own button stays its own, and a whole card is one link when nothing inside is a control — `Card.Link`, `asChild`. |
 | [body.tsx](examples/body.tsx) | What the body holds: label — value rows, a list of records that open, a form on kit fields and an empty state — `DescriptionList`, `List`, `Input.Root`, `EmptyPage`. |
 | [long-list.tsx](examples/long-list.tsx) | A long list in a card: the scroller shows six rows, loads the next batch near its end and holds the place of the new rows with skeleton lines — `ScrollContainer`, `onReachEnd`, `Skeleton`. |
 | [footer.tsx](examples/footer.tsx) | What the footer holds: the total and two buttons with the accent one last, an assignee picker as tall as the button beside it, a note with a term's progress, and buttons that share the width with nothing at the start — `Card.Total`, `Select.Root`, `Card.Note`, `progress`, `fullWidth`. |
 | [cover.tsx](examples/cover.tsx) | A cover is the kit's carousel: on top with the owner's avatar on its edge, a column at the start, and a cover that is still loading — `Card.Media`, `placement`, `ratio`, `dots`, `loading`. |
 | [choice.tsx](examples/choice.tsx) | Cards that are a choice: one tariff of three in a group of pressed buttons, and any number of extras, each card a button with its mark at the end — `Card.Indicator`, `selected`, `asChild`. |
-| [switch.tsx](examples/switch.tsx) | A switch in a card: one setting is a one-line card with the switch at its end, several settings are a group card with a more menu in the header and a switch per row — `Switch.Root`, `fullWidth`, `Card.Actions`. |
+| [switch.tsx](examples/switch.tsx) | A switch in a card: one setting is a one-line card with the switch at its end, several settings are a group card with two icon buttons in the header and a switch per row — `Switch.Root`, `fullWidth`, `Card.Actions`. |
 | [narrow.tsx](examples/narrow.tsx) | On a narrow card nothing wraps: the title gives way and the badges fold into a count, the footer buttons go under the total and share the width — `Card.Title`, `Card.Badges`, `Card.Footer`, `Card.Actions`. |
 | [screen.tsx](examples/screen.tsx) | An orders page of cards: the title with its line of data, the status filter and the new-order button in the top bar, one grid of record cards that cross-fades when the filter changes and loads as skeleton cards of the same geometry — `Page.TopBar`, `Crossfade`, `Skeleton`, `Card.Link`. |
 
@@ -286,7 +286,7 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 - A pencil or buttons on a record row of a list → the row opens as a whole, its value stands at the end; edit in the opened record.
 - A state badge inside the description (`Badge.Dot` beside the text) → a `StatusDot` first in `Card.Description`.
 - A list drawn from ghost buttons or a stack of cards per record → a `List` in `Card.Body`.
-- A switch beside «Ещё» in one row, in a header with a description, or in the footer → one switch is a one-line card with the switch in `Card.Actions`; several are a group card with `Switch.Root fullWidth` rows.
+- A switch beside the header's actions in one row, in a header with a description, or in the footer → one switch is a one-line card with the switch in `Card.Actions`; several are a group card with `Switch.Root fullWidth` rows.
 - A choice card whose inside holds buttons → the card is the `<button>` (`asChild`, `selected`) with `Card.Indicator`; controls go beside it.
 - A KPI laid out by hand in a card → [Kpi](../kpi/COMPONENT.md).
 - A hand-made term with a bar in the footer (an own wrapper around text and `ProgressBar`) → `Card.Note` with `progress`.

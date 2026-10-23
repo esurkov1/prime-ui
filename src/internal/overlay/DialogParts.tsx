@@ -661,7 +661,7 @@ export type DialogBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
  * the record (a status, a role, a counter — the meaning is the badge's `tone` or `color`). The kit
  * sizes them (frame `l`: chip tier `s`) and never wraps the row: once the title has given way to
  * its text, what does not fit folds into «+N» (`overflow="count"`), whose tooltip lists it. A
- * picker of a status or a person is not a badge: it is a `Select` in `Actions`. While the record
+ * picker of a status or a person is not a badge: it is a `Select` in `Fields`. While the record
  * loads (`loading`) a Skeleton holds the line, so the header never moves.
  */
 export function DialogBadges({ loading = false, className, children, ...rest }: DialogBadgesProps) {
@@ -765,8 +765,8 @@ export type DialogHeaderProps = React.HTMLAttributes<HTMLElement> & {
  * The header row of the surface (internal/headerRow), frame `l`: `[Icon] [Title + Badges /
  * Description] [Actions] [close]`, whatever order the parts are written in. One line each, nothing
  * wraps; the title gives way to its text before the badges fold into «+N». A header without a
- * description centres its controls on the title line. Anything else inside (a tab strip) closes
- * the header under the row.
+ * description centres its controls on the title line. The record's `Fields` stand under the row;
+ * anything else inside (a tab strip) closes the header under them.
  */
 export function DialogHeader({
   showClose = true,
@@ -783,12 +783,14 @@ export function DialogHeader({
   const badges = pick(DialogBadges);
   const description = pick(DialogDescription);
   const actions = pick(DialogActions);
+  const fields = pick(DialogFields);
   const own: React.ElementType[] = [
     DialogIcon,
     DialogTitle,
     DialogBadges,
     DialogDescription,
     DialogActions,
+    DialogFields,
   ];
   const extra = items.filter(
     (part) => !(React.isValidElement(part) && own.includes(part.type as React.ElementType)),
@@ -832,6 +834,7 @@ export function DialogHeader({
             </Button.Root>
           ) : null}
         </div>
+        {fields}
         {extra}
       </DialogHeaderContext>
     </header>
@@ -849,9 +852,9 @@ export type DialogActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 const DialogFooterContext = React.createContext(false);
 
 /**
- * The controls at the end of the header, before the close button: first one switcher or value
- * picker that applies to the whole open tab (a `SegmentedControl`, a `Datepicker` period, a `Select`
- * of the status or the assignee), then the buttons — neutral buttons (each named, with a Tooltip)
+ * The controls at the end of the header, before the close button: first one switcher that applies
+ * to the whole open tab (a `SegmentedControl`, a `Datepicker` period; the record's value pickers
+ * stand in `Fields`), then the buttons — neutral buttons (each named, with a Tooltip)
  * and a ⋯ Dropdown; with a footer the header keeps «Ещё» and the picker, the accent button stands
  * in the footer. They take the dialog's own control tier, the close button's, and sit on the
  * title's line. Each child stands in a cell held to the row's end (`RowCells`): another control in
@@ -885,6 +888,35 @@ export function DialogActions({ className, children, ...rest }: DialogActionsPro
   );
 }
 DialogActions.displayName = "Dialog.Actions";
+
+// ─── Fields (header) ──────────────────────────────────────────────────────────
+
+export type DialogFieldsProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * The record's value pickers (the status, the assignee, the priority — kit `Select`s) as one row
+ * under the title row of the header, a zone gap below it and above a tab strip. Its controls take
+ * tier `xs`, each at its content width; the row wraps when the dialog is narrower than they are
+ * together. The title row then holds only icon buttons, «Ещё» and the close button. It stands
+ * there whatever order the parts are written in; every picker carries its own name.
+ */
+export function DialogFields({ className, children, ref, ...rest }: DialogFieldsProps) {
+  useDialogShell("Fields");
+  const tier = useHostTier("xs");
+  return (
+    <div
+      {...rest}
+      ref={ref}
+      className={cx(fieldTierClass, styles.fields, className)}
+      data-size={tier.size}
+    >
+      {tier.provide(children)}
+    </div>
+  );
+}
+DialogFields.displayName = "Dialog.Fields";
 
 // ─── Body ─────────────────────────────────────────────────────────────────────
 

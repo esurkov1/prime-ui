@@ -119,12 +119,14 @@ screen that moves one elsewhere reads as built by hand.
 
 - **Status and role are `Card.Badges`, after the title on its line** — one container for every
   badge of the record, never under the title and never at the right beside the buttons.
-- **The header holds no accent button.** Beside a footer it holds «Ещё» and a value picker; the
-  accent action is the last button of the footer, and a danger action lives in «Ещё» behind a
-  `ConfirmDialog`.
+- **The header holds no accent button.** It holds neutral actions by
+  [the number of actions](composition.md#the-number-of-actions) and at most one value picker; the
+  accent action is the last button of the footer.
 - **A picker of a person or a status is a `Select` as tall as the buttons**, in `Card.Actions` or
   at the start of `Card.Footer` (both give their controls the buttons' tier) — never a Badge chip
-  that opens a menu. When a narrow footer stacks, the picker takes the full width like the buttons.
+  that opens a menu. A card has no `Fields` row: its header holds one picker at the controls' tier,
+  and a card with two pickers moves the second into the footer or the body. When a narrow footer
+  stacks, the picker takes the full width like the buttons.
 
 ```tsx partial
 // bad — the assignee is a chip, lower than the button beside it
@@ -166,7 +168,7 @@ screen that moves one elsewhere reads as built by hand.
 ```
 
 ```tsx good
-// good — the status after the title, «Ещё» in the header, the accent button last in the footer
+// good — the status after the title, the one action an icon button, the accent button last in the footer
 <Card.Root>
   <Card.Header>
     <Card.Title>Счёт № 2026-0418</Card.Title>
@@ -174,18 +176,16 @@ screen that moves one elsewhere reads as built by hand.
       <Badge.Root tone="warning">Ждёт оплаты</Badge.Root>
     </Card.Badges>
     <Card.Actions>
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <Button.Root variant="ghost" tone="neutral" aria-label="Скачать PDF">
             <Button.Icon>
-              <Icon name="action.more" />
+              <Icon name="action.download" />
             </Button.Icon>
           </Button.Root>
-        </Dropdown.Trigger>
-        <Dropdown.Content>
-          <Dropdown.Item>Скачать PDF</Dropdown.Item>
-        </Dropdown.Content>
-      </Dropdown.Root>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Скачать PDF</Tooltip.Content>
+      </Tooltip.Root>
     </Card.Actions>
   </Card.Header>
   <Card.Footer>
@@ -210,8 +210,8 @@ controls at the end. The rules below hold for all of them.
   does not fit folds whole into «+N».
 - **A status inside a line of text is a `StatusDot`** (the dot and its word, first in the
   description), never a hand-made dot and never `Badge.Dot` beside a text.
-- **A person or a status picker on a surface is a `Select` at the controls' tier** (in `X.Actions`
-  or at the start of the footer). A chip picker — `Select variant="status"`, a `Badge.Root` in a
+- **A person or a status picker on a surface is a `Select` at the controls' tier** (in `X.Fields` of a
+  dialog header, in `Card.Actions` or at the start of a footer). A chip picker — `Select variant="status"`, a `Badge.Root` in a
   `Dropdown.Trigger` — stays only in a dense row or a table cell.
 - **No static line between the zones of a surface** (a dialog's header and body, a chat header, a
   Kanban card, a banner): air separates them. A region that scrolls shows an edge cue while it is

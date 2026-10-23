@@ -1,4 +1,4 @@
-/** The one header of a record: the name with its number and its plain statuses on one line, a line of data under it, and at the end the status and the assignee as pickers, a button and the ⋯ menu — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Actions`, `Select.Root`. */
+/** The one header of a record: the name with its number and its plain statuses on one line, a line of data under it, the status and the assignee as a row of pickers under them, and in the title row only two icon buttons and the close — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Fields`, `Drawer.Actions`, `Select.Root`. */
 import {
   Avatar,
   Badge,
@@ -6,7 +6,6 @@ import {
   ConfirmDialog,
   DescriptionList,
   Drawer,
-  Dropdown,
   Icon,
   type PaletteColor,
   Select,
@@ -64,6 +63,33 @@ export default function DrawerHeaderActionsExample() {
           </Drawer.Badges>
           <Drawer.Description>{LEAD.summary}</Drawer.Description>
           <Drawer.Actions>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">
+                  <Button.Icon>
+                    <Icon name="object.message" />
+                  </Button.Icon>
+                </Button.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Диалог</Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root
+                  variant="ghost"
+                  tone="danger"
+                  aria-label="Удалить заявку"
+                  onClick={() => setDeleting(true)}
+                >
+                  <Button.Icon>
+                    <Icon name="action.delete" />
+                  </Button.Icon>
+                </Button.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Удалить заявку</Tooltip.Content>
+            </Tooltip.Root>
+          </Drawer.Actions>
+          <Drawer.Fields>
             <Select.Root aria-label="Статус" value={statusId} onValueChange={setStatusId}>
               <Select.Trigger>
                 <Select.Value />
@@ -102,33 +128,7 @@ export default function DrawerHeaderActionsExample() {
                 ))}
               </Select.Content>
             </Select.Root>
-            <Tooltip.Root>
-              <Tooltip.Trigger>
-                <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">
-                  <Button.Icon>
-                    <Icon name="object.message" />
-                  </Button.Icon>
-                </Button.Root>
-              </Tooltip.Trigger>
-              <Tooltip.Content>Диалог</Tooltip.Content>
-            </Tooltip.Root>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
-                  <Button.Icon>
-                    <Icon name="action.more" />
-                  </Button.Icon>
-                </Button.Root>
-              </Dropdown.Trigger>
-              <Dropdown.Content>
-                <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
-                <Dropdown.Separator />
-                <Dropdown.Item tone="danger" onSelect={() => setDeleting(true)}>
-                  Удалить заявку
-                </Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Root>
-          </Drawer.Actions>
+          </Drawer.Fields>
         </Drawer.Header>
         <Drawer.Body>
           <DescriptionList.Root>

@@ -1,5 +1,5 @@
-/** A switch in a card: one setting is a one-line card with the switch at its end, several settings are a group card with a more menu in the header and a switch per row — `Switch.Root`, `fullWidth`, `Card.Actions`. */
-import { Button, Card, Dropdown, Icon, Switch } from "prime-ui-kit";
+/** A switch in a card: one setting is a one-line card with the switch at its end, several settings are a group card with two icon buttons in the header and a switch per row — `Switch.Root`, `fullWidth`, `Card.Actions`. */
+import { Button, Card, Icon, Switch, Tooltip } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -21,19 +21,26 @@ export default function CardSwitchExample() {
         <Card.Header>
           <Card.Title>Письма клиентам</Card.Title>
           <Card.Actions>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                <Button.Root variant="soft" tone="neutral" aria-label="Ещё">
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="soft" tone="neutral" aria-label="Настройки писем">
                   <Button.Icon>
-                    <Icon name="action.more" />
+                    <Icon name="action.settings" />
                   </Button.Icon>
                 </Button.Root>
-              </Dropdown.Trigger>
-              <Dropdown.Content align="end">
-                <Dropdown.Item>Настройки писем</Dropdown.Item>
-                <Dropdown.Item>Сбросить к умолчанию</Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Настройки писем</Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button.Root variant="soft" tone="neutral" aria-label="Сбросить к умолчанию">
+                  <Button.Icon>
+                    <Icon name="action.refresh" />
+                  </Button.Icon>
+                </Button.Root>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Сбросить к умолчанию</Tooltip.Content>
+            </Tooltip.Root>
           </Card.Actions>
         </Card.Header>
         <Card.Body>

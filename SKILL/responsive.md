@@ -34,8 +34,7 @@ everything inside a page breaks by its container.
 | 1024–1279 | laptop | gutters 32 |
 | ≥ 1280 | desktop | extra columns or a side panel; tables and dashboards use every pixel |
 
-- A screen that switches its own structure at the kit's point (one picker instead of two, a list
-  instead of a table) reads `useMediaQuery(COMPACT_QUERY)`, not a `matchMedia` of its own.
+- A screen that switches its own structure at the kit's point (a list instead of a table) reads `useMediaQuery(COMPACT_QUERY)`, not a `matchMedia` of its own.
 - Write "below 640" as `@media (max-width: 639px)`, "from 640" as `@media (min-width: 640px)`.
 - CSS custom properties cannot be used inside media / container conditions: write the number.
 - Inside your own blocks prefer container queries: `container-type: inline-size` on the block,
@@ -274,13 +273,14 @@ images with `srcset` + `sizes` (Thumbnail and Avatar already reserve their box).
 The header row of a surface (Card, Drawer, Modal, Sheet, Chat, ChartFrame) gives way in a fixed
 order: the title shrinks to a floor (its own text, at most 8em), the badges fold into «+N», and when
 the controls no longer fit beside the title they drop, as one row, to a line of their own under it.
-A dialog's «×» never moves. The kit does not shrink a picker or move a button into «Ещё» — that is
-the screen's choice: on a narrow surface keep one picker and «Ещё», and move the second picker or
-action into the body or the footer. Read the kit's own point with `useMediaQuery(COMPACT_QUERY)`,
-never a `matchMedia` of your own ([hooks](api-contract.md#providers-and-helpers)).
+A dialog's «×» never moves. The kit does not move a button into «Ещё» — the count of the actions
+is the same on a phone as on a desk ([the number of actions](composition.md#the-number-of-actions)),
+and a record's pickers stand in `X.Fields`, which wraps on its own, so nothing is hidden or moved
+into the body by the screen.
 
 ```tsx partial
-// bad — two pickers and three buttons in a header of 320px: the controls drop to a second and a third line
+// bad — two pickers and three buttons in the title row of 320px: the controls drop to a second and
+// a third line, and the screen hides the pickers by hand
 <Drawer.Actions>
   <Select.Root aria-label="Статус">…</Select.Root>
   <Select.Root aria-label="Ответственный">…</Select.Root>
@@ -291,47 +291,25 @@ never a `matchMedia` of your own ([hooks](api-contract.md#providers-and-helpers)
 ```
 
 ```tsx good
-// declare: const compact: boolean
 // declare: const assignee: string
 // declare: const setAssignee: (id: string) => void
-// good — one picker and «Ещё» in the header; the second picker goes to the body on a phone
+// good — the title row holds the icon buttons, the pickers wrap in their own row on every width
 <>
   <Drawer.Actions>
-    {compact ? null : (
-      <Select.Root aria-label="Ответственный" value={assignee} onValueChange={setAssignee}>
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="kotova">Анна Котова</Select.Item>
-        </Select.Content>
-      </Select.Root>
-    )}
-    <Dropdown.Root>
-      <Dropdown.Trigger>
-        <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
-          <Button.Icon>
-            <Icon name="action.more" />
-          </Button.Icon>
-        </Button.Root>
-      </Dropdown.Trigger>
-      <Dropdown.Content>
-        <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown.Root>
+    <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">…</Button.Root>
+    <Button.Root variant="ghost" tone="neutral" aria-label="Копировать">…</Button.Root>
   </Drawer.Actions>
-  <Drawer.Body>
-    {compact ? (
-      <Select.Root aria-label="Ответственный" value={assignee} onValueChange={setAssignee}>
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="kotova">Анна Котова</Select.Item>
-        </Select.Content>
-      </Select.Root>
-    ) : null}
-  </Drawer.Body>
+  <Drawer.Fields>
+    <Select.Root aria-label="Статус" defaultValue="new">…</Select.Root>
+    <Select.Root aria-label="Ответственный" value={assignee} onValueChange={setAssignee}>
+      <Select.Trigger>
+        <Select.Value />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="kotova">Анна Котова</Select.Item>
+      </Select.Content>
+    </Select.Root>
+  </Drawer.Fields>
 </>
 ```
 

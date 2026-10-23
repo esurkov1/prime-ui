@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Типичная карточка записи: метка, название с бейджами, строка состояния и «Ещё» в шапке, строки «подпись — значение» в теле, итог и главная кнопка в подвале — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`.",
+        "Типичная карточка записи: метка, название с бейджами, строка состояния и две кнопки-иконки в шапке, строки «подпись — значение» в теле, итог и главная кнопка в подвале — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`.",
     },
     {
       slot: "sizes",
@@ -38,7 +38,7 @@ export const page: ComponentPageConfig = {
       title: "Шапка",
       layout: "full",
       description:
-        "Что держит шапка: четыре вида метки, бейджи, которые на узкой карточке сворачиваются в «+N», и контролы по зонам — только «Ещё» при подвале, кнопки и «Ещё» без него, выбор значения — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`.",
+        "Что держит шапка: четыре вида метки, бейджи, которые на узкой карточке сворачиваются в «+N», и контролы по числу — две кнопки-иконки, «Ещё» с трёх действий, выбор значения — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`.",
     },
     {
       scenario: "link",
@@ -85,7 +85,7 @@ export const page: ComponentPageConfig = {
       title: "Переключатель",
       layout: "full",
       description:
-        "Переключатель в карточке: одна настройка — карточка в одну строку с переключателем в конце, несколько настроек — групповая карточка с «Ещё» в шапке и переключателем в каждой строке — `Switch.Root`, `fullWidth`, `Card.Actions`.",
+        "Переключатель в карточке: одна настройка — карточка в одну строку с переключателем в конце, несколько настроек — групповая карточка с двумя кнопками-иконками в шапке и переключателем в каждой строке — `Switch.Root`, `fullWidth`, `Card.Actions`.",
     },
     {
       slot: "narrow",

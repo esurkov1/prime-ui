@@ -1,5 +1,5 @@
-/** A record card: the mark, the title with its badges, a status line, a more menu, label — value rows and the total with one accent button — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`. */
-import { Badge, Button, Card, DescriptionList, Dropdown, Icon, StatusDot } from "prime-ui-kit";
+/** A record card: the mark, the title with its badges, a status line, two icon buttons, label — value rows and the total with one accent button — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`. */
+import { Badge, Button, Card, DescriptionList, Icon, StatusDot, Tooltip } from "prime-ui-kit";
 
 export default function CardOverviewExample() {
   return (
@@ -18,19 +18,26 @@ export default function CardOverviewExample() {
           ООО «Северный ветер»
         </Card.Description>
         <Card.Actions>
-          <Dropdown.Root>
-            <Dropdown.Trigger>
-              <Button.Root variant="soft" tone="neutral" aria-label="Ещё">
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <Button.Root variant="soft" tone="neutral" aria-label="Открыть заказ">
                 <Button.Icon>
-                  <Icon name="action.more" />
+                  <Icon name="action.externalLink" />
                 </Button.Icon>
               </Button.Root>
-            </Dropdown.Trigger>
-            <Dropdown.Content align="end">
-              <Dropdown.Item>Открыть заказ</Dropdown.Item>
-              <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
-            </Dropdown.Content>
-          </Dropdown.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Открыть заказ</Tooltip.Content>
+          </Tooltip.Root>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <Button.Root variant="soft" tone="neutral" aria-label="Скопировать ссылку">
+                <Button.Icon>
+                  <Icon name="action.copy" />
+                </Button.Icon>
+              </Button.Root>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Скопировать ссылку</Tooltip.Content>
+          </Tooltip.Root>
         </Card.Actions>
       </Card.Header>
       <Card.Body>

@@ -74,7 +74,7 @@ export type TagSelectLabels = {
   name: string;
   /** Delete button in the menu. */
   delete: string;
-  /** Heading of the color list in the menu. */
+  /** Accessible name of the color swatch grid in the menu. */
   colors: string;
   /** Names of the palette colors in the menu. */
   colorNames: Record<PaletteColor, string>;

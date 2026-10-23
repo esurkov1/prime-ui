@@ -403,8 +403,8 @@ CardDescription.displayName = "Card.Description";
 export type CardActionsProps = DivProps & { fullWidth?: boolean };
 
 /**
- * The card's controls, the card's own tier: in the header — neutral buttons, a
- * value picker, «Ещё» (with a footer only «Ещё» and the picker); in the footer — up to two buttons,
+ * The card's controls, the card's own tier: in the header — neutral actions (icon buttons, a «Ещё»
+ * menu from three actions) and at most one value picker; in the footer — up to two buttons,
  * the accent one last, at the end or sharing the width (`fullWidth`).
  */
 function CardActions({ fullWidth = false, className, children, ...rest }: CardActionsProps) {

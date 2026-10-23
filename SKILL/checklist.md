@@ -59,7 +59,7 @@ checks.
 - [ ] Default size `m`; a tier changes for a whole region, never for one control ([the host tier](api-contract.md#size-and-the-host-tier)).
 - [ ] Every row of controls uses one size and its heights line up ([density](composition.md#5-density-and-size)).
 - [ ] A switch ends its row; reordering is a «Изменить порядок» / «Готово» mode where the switches leave and the grips take their place ([list rows](composition.md#list-rows)).
-- [ ] A destructive action is the last item of «Ещё» behind a `ConfirmDialog`, even when it is the only action; a «⋯» with one harmless item is still wrong ([a menu from two actions](composition.md#a-menu-from-two-actions)).
+- [ ] A destructive action is `tone="danger"` and asks through a `ConfirmDialog` — an icon button with a Tooltip among one or two actions, the last item of «Ещё» among three or more ([the number of actions](composition.md#the-number-of-actions)).
 - [ ] Controls in table cells are one tier below the table; no CSS sets row or cell heights ([size axis](foundations.md#3-size-axis)).
 - [ ] A chip in one row with controls is two sizes up (`l` beside `xs`, `xl` beside `s`); beside `m` and larger the whole row is fields ([chips beside fields](foundations.md#chips-beside-fields)).
 - [ ] Marks of one row or list (avatar, thumbnail, ring, icon tile) have one diameter, matched by the scale, not the size name; no `size` on a mark in a mark slot ([marks side by side](foundations.md#marks-side-by-side)).
@@ -100,8 +100,7 @@ checks.
 - [ ] An icon-only button beside fields or `soft` buttons is `soft` neutral at their height; `ghost` only among unfilled neighbours: a dialog header, a table cell, a chat header ([icon button fill](composition.md#an-icon-button-takes-its-neighbours-fill)).
 - [ ] An empty list of cards is `EmptyPage size="s"` in a `Card.Root` in the list's place, the add button under it ([an empty list of cards](composition.md#an-empty-list-of-cards)).
 - [ ] A dialog footer holds Cancel and the primary only, never a «Закрыть» beside the header ×; read-only details have no footer; deleting the edited record stands in the header's actions ([actions](composition.md#6-actions)).
-- [ ] One secondary action is an icon button with a Tooltip; a «⋯» menu holds two or more ([a menu from two actions](composition.md#a-menu-from-two-actions)).
-- [ ] A record's dialog header shows up to five actions as icon buttons with Tooltips, «⋯» only beyond; a destructive one asks or holds ([actions of a record](composition.md#actions-of-a-record)).
+- [ ] Every header (dialog, card, chat, page bar) and row shows one or two actions as icon buttons with Tooltips; a «⋯» menu appears only from three ([the number of actions](composition.md#the-number-of-actions)).
 - [ ] A record's footer appears with a change: «Отменить изменения» + «Сохранить»; a create form: «Отмена» + «Создать» ([actions](composition.md#6-actions)).
 - [ ] An entity has one drawer opened from everywhere; permissions lock fields and hide tabs and actions; header actions act on the record, never lead elsewhere ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A record's dialog header is three lines in this order: `Title` with its `number`, one line of `Description` text, `Badges` (the status and assignee pickers first, «Назначить» when nobody is) over the body; no badge or number in the description, no status in `Actions` ([a record in a drawer](composition.md#a-record-in-a-drawer)).
@@ -116,15 +115,15 @@ checks.
 - [ ] `Kpi.Meta` holds only new data (a plan, a threshold, a composition), never the period or the base of the change ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
 - [ ] S and M cards write a large sum short («8,7» + `Kpi.Unit` «млн ₽»), L and XL in full; the unit always in `Kpi.Unit` ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
 - [ ] A card's status and role badges are `Card.Badges` after the title — not under it, not beside the buttons ([a card's header](ux.md#a-cards-header-body-and-footer)).
-- [ ] A `Card.Header` holds no accent button: «Ещё» and a value picker beside a footer, the accent button last in `Card.Footer` ([a card's header](ux.md#a-cards-header-body-and-footer)).
+- [ ] A `Card.Header` holds no accent button and at most one value picker (a second moves to the footer or the body); the accent button is last in `Card.Footer` ([a card's header](ux.md#a-cards-header-body-and-footer)).
 - [ ] A person or status picker in a card is a `Select` as tall as the buttons, never a Badge chip ([a card's header](ux.md#a-cards-header-body-and-footer)).
 - [ ] A record row in a card opens as a whole — no pencil or button on it ([a card's header](ux.md#a-cards-header-body-and-footer)).
 - [ ] Badges stand after the title on its line in every header and record row, folding whole into «+N» — never under it ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
 - [ ] A status in a line of text is a `StatusDot`, not a hand-made dot or `Badge.Dot` beside a text ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
 - [ ] A chip picker (`Select variant="status"`, a `Badge.Root` in a `Dropdown.Trigger`) is only in a dense row or a table cell; on a surface it is a `Select` at the controls' tier ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
 - [ ] No static line between the zones of a surface; only a scrolled region shows an edge cue ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
-- [ ] A record's dialog header is the title with its number and badges on one line, a one-line description, and `Select` pickers and «Ещё» in its actions ([a record in a drawer](composition.md#a-record-in-a-drawer)).
-- [ ] On a narrow surface the header keeps one picker and «Ещё»; the second picker or action moves to the body or the footer by the screen's own choice, read from `useMediaQuery(COMPACT_QUERY)` ([a narrow header](responsive.md#a-narrow-header)).
+- [ ] A record's dialog header is the title with its number and badges on one line, a one-line description, the value `Select`s (status, assignee) in `X.Fields` under it above the tabs, and only icon buttons in `X.Actions` ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] On a narrow surface the header keeps the same actions and pickers: `X.Fields` wraps, nothing is moved into the body or «Ещё» by the screen ([a narrow header](responsive.md#a-narrow-header)).
 - [ ] A card draws no line between its zones, and its photo is a `Carousel` in `Card.Media` ([a card drawn by hand](anti-slop.md#3b-a-card-drawn-by-hand)).
 - [ ] A KPI made of parts names them in `Kpi.Legend` inside `Kpi.Footer`, never with the bar's `legend` in `Kpi.Media` ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
 - [ ] No text of a KPI card wraps or leaves it: a long title or note is shortened, never wrapped or the card widened ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).

@@ -31,7 +31,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 │   └── chevron
 └── list (portal)               role="listbox", multi-select
     ├── «Создать» row           with `creatable`: plus icon · labels.create · preview Badge
-    └── option row              Checkbox.Indicator · Badge [· «⋯» Button → Popover menu]; picked options first
+    └── option row              Checkbox.Indicator · Badge [· «⋯» Button → Popover menu: name field · ColorSwatches (palette hues) · pinned danger «Удалить» row]; picked options first
 ```
 
 ## API
@@ -91,7 +91,7 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `creatable` | a «Создать» row with the preview chip while the typed text is new | The dictionary is open | `false` |
-| `onOptionUpdate` / `onOptionDelete` | a «⋯» button on the highlighted row (always shown on touch screens) opening a rename / color / delete menu | Users keep their own tags | |
+| `onOptionUpdate` / `onOptionDelete` | a «⋯» button on the highlighted row (always shown on touch screens) opening a menu: name field, color swatches, then «Удалить» as a danger text row at the bottom | Users keep their own tags | |
 | `disabled` | disabled fill, muted chips, no list | The value is read-only in this context | `false` |
 | `closeOnOutsideClick` | `false`: the list stays open on a press beside the field; Escape and Tab still close it | The person reads the page while tagging | `true` |
 | `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by Tab or a press outside | `true` |
@@ -130,7 +130,7 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 | `Enter` | Tick or untick the highlighted option (the first one when nothing is highlighted); on the Create row, create the tag; in the row menu's name field, save the new name and close the menu. |
 | `Space` | Types a space: a tag may have several words. |
 | `Backspace` | In an empty input removes the last tag; on a tag removes it and focuses the previous tag. |
-| `ArrowLeft` · `ArrowRight` | From the start of the input move focus over the tags and back to the input. |
+| `ArrowLeft` · `ArrowRight` | From the start of the input move focus over the tags and back to the input; in the row menu's color grid they move over the swatches and pick the color. |
 | `Delete` | On a tag removes it; focus moves to the next tag, or to the input when none is left. |
 | `Shift+F10` · `ContextMenu` | With `onOptionUpdate` or `onOptionDelete`: opens the «⋯» menu of the highlighted row; Escape closes it. |
 | `Escape` | Closes the row «⋯» menu if it is open, otherwise the list. |
@@ -138,6 +138,7 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+- The row menu's colors are a `ColorSwatches` radio group named by `labels.colors`; each swatch is a radio named by `labels.colorNames`, one tab stop.
 - The input is `role="combobox"` with `aria-expanded` and `aria-controls`; the list is `role="listbox"` with `aria-multiselectable`, options are `role="option"` with `aria-selected`.
 - The highlight goes through `aria-activedescendant`; the checkbox in a row is decorative.
 - A removal is announced with `labels.removed` in a live region; the remove button is named by `labels.remove`.
@@ -158,7 +159,7 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 | `edit` | `"Изменить тег {label}"` | Accessible name of a row's «⋯» menu button. |
 | `name` | `"Название тега"` | Accessible name of the tag name field in the menu. |
 | `delete` | `"Удалить"` | Delete button in the menu. |
-| `colors` | `"Цвета"` | Heading of the color list in the menu. |
+| `colors` | `"Цвета"` | Accessible name of the color swatch grid in the menu. |
 | `colorNames` | `"По умолчанию · Красный · Оранжевый · Жёлтый · Зелёный · Синий · Фиолетовый · Розовый · Голубой · Бирюзовый"` | Names of the palette colors in the menu, by `PaletteColor` key. |
 | `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
 
@@ -187,5 +188,5 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 - Deleting a shared tag without asking, or restoring the value by hand after a cancelled confirmation → return a Promise from `onOptionDelete` that resolves on confirm and rejects on cancel; nothing changes until it resolves.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (chips, «+N»), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator`), [ScrollContainer](../scroll-container/COMPONENT.md) (chip row, list), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md), [Input](../input/COMPONENT.md) and [Divider](../divider/COMPONENT.md) (row menu), [VisuallyHidden](../visually-hidden/COMPONENT.md) («+N» name, removal announcement), `Icon` (chevron, plus, «⋯», delete), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame); `useVirtualRows` (the window of a long list)
+- **Built from:** [Badge](../badge/COMPONENT.md) (chips, «+N»), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator`), [ScrollContainer](../scroll-container/COMPONENT.md) (chip row, list), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md), [Input](../input/COMPONENT.md), [ColorSwatches](../color-swatches/COMPONENT.md) (colors) and [Divider](../divider/COMPONENT.md) (row menu), [VisuallyHidden](../visually-hidden/COMPONENT.md) («+N» name, removal announcement), `Icon` (chevron, plus, «⋯», delete), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame); `useVirtualRows` (the window of a long list)
 - **See also:** [Select](../select/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md)
