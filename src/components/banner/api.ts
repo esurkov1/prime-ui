@@ -26,8 +26,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
-          en: "Spacing, icon and title follow the control tier; the description is one step smaller. Without it the tier of the host.",
-          ru: "Отступы, иконка и заголовок по ярусу контрола; описание на ступень мельче. Без него — ярус хоста.",
+          en: "The surface frame of its tier (five steps): padding, radius, mark, title and description roles; the buttons take the same tier. Without it the tier of the host.",
+          ru: "Рамка поверхности своего яруса (пять ступеней): отступы, радиус, метка, роли заголовка и описания; кнопки берут тот же ярус. Без него — ярус хоста.",
         },
         {
           name: "placement",
@@ -40,7 +40,7 @@ export const api: ComponentApi = {
           name: "onDismiss",
           type: "() => void",
           en: "Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place; focus inside it moves to the next tab stop of the page.",
-          ru: "Рендерит кнопку закрытия (в углу или последней в `Banner.Actions`) и вызывается по клику; родитель убирает баннер — он схлопывается на месте, а фокус из него переходит к следующему элементу страницы.",
+          ru: "Рендерит кнопку закрытия (последней в `Banner.Actions` или одну в конце ряда) и вызывается по клику; родитель убирает баннер — он схлопывается на месте, а фокус из него переходит к следующему элементу страницы.",
         },
         {
           name: "labels",
@@ -58,8 +58,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Content",
-      en: "`ref` → `HTMLDivElement`. A `<div>` grid: icon on the first line, title over description, actions on the right (under the text below 36rem).",
-      ru: "Сетка `<div>`: иконка на первой строке, заголовок над описанием, действия справа (под текстом уже 36rem).",
+      en: "`ref` → `HTMLDivElement`. A `<div>` header row: the mark, the title over the description, the actions at the end (under the text below 36rem); with `onDismiss` and no `Banner.Actions` the close button stands alone at the end.",
+      ru: "Строка-шапка `<div>`: метка, заголовок над описанием, действия в конце (под текстом уже 36rem); с `onDismiss` без `Banner.Actions` кнопка закрытия стоит одна в конце.",
       props: [
         {
           name: "…rest",
@@ -71,8 +71,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Icon",
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding one `Icon`, one title line high, in the tone color.",
-      ru: "`<span>` с `aria-hidden` для одной `Icon` высотой в строку заголовка, цвета тона.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding one `Icon` in the frame's mark box, in the tone color.",
+      ru: "`<span>` с `aria-hidden` для одной `Icon` в квадрате метки рамки, цвета тона.",
       props: [
         {
           name: "…rest",
@@ -84,8 +84,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Title · Banner.Description",
-      en: "`ref` → `HTMLSpanElement`. `<span>` elements: the medium title and the secondary text, both capped at the reading width.",
-      ru: "Элементы `<span>`: заголовок и вторичный текст, оба ограничены шириной чтения.",
+      en: "`ref` → `HTMLSpanElement`. `<span>` elements: the title (one line, cut with an ellipsis) and the secondary text (wraps, capped at the reading width).",
+      ru: "Элементы `<span>`: заголовок (одна строка, с многоточием) и вторичный текст (переносится, ограничен шириной чтения).",
       props: [
         {
           name: "…rest",
@@ -97,8 +97,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Banner.Actions",
-      en: "`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button (in the corner below 36rem).",
-      ru: "Ряд кнопок `<div>`; с `onDismiss` кнопка закрытия становится последней квадратной кнопкой ряда (уже 36rem — в углу).",
+      en: "`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.",
+      ru: "Ряд кнопок `<div>`; с `onDismiss` кнопка закрытия становится последней квадратной кнопкой ряда.",
       props: [
         {
           name: "…rest",

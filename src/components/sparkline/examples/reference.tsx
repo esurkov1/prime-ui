@@ -16,7 +16,9 @@ const PLAN = 3;
 
 const PERCENT = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
 
-const formatPercent = (value: number) => `${PERCENT.format(value)}%`;
+const formatPercent = (value: number) => PERCENT.format(value);
+
+const LABELS = { reference: "План: {value}%" };
 
 export default function SparklineReferenceExample() {
   const conversion = useSparkline({
@@ -29,9 +31,12 @@ export default function SparklineReferenceExample() {
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Конверсия оформления заказа</Kpi.Title>
-      <Kpi.Period>{conversion.date}</Kpi.Period>
-      <Kpi.Value>{conversion.valueText}</Kpi.Value>
+      <Kpi.Value>
+        {conversion.valueText}
+        <Kpi.Unit>%</Kpi.Unit>
+      </Kpi.Value>
       <Kpi.Delta reading={conversion} />
+      <Kpi.Period>{conversion.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline
           {...conversion.plot}
@@ -39,7 +44,7 @@ export default function SparklineReferenceExample() {
           reference={PLAN}
           min={0}
           max={5}
-          labels={{ reference: "План: {value}" }}
+          labels={LABELS}
         />
       </Kpi.Media>
     </Kpi.Root>

@@ -8,7 +8,7 @@ export const page: ComponentPageConfig = {
     segment: "progress-circle",
     label: "Progress Circle",
     summary: "Круговой индикатор прогресса",
-    keywords: ["прогресс", "круг", "кольцо", "value"],
+    keywords: ["прогресс", "круг", "кольцо", "штрихи", "value"],
     icon: CircleGauge,
     order: 4,
   },
@@ -26,12 +26,12 @@ export const page: ComponentPageConfig = {
     {
       slot: "variants",
       description:
-        "Все цвета дуги; тон говорит об исходе, а не о прогрессе, цвет палитры — о статусе, бледная дорожка — `tone`, `color`, `track`.",
+        "Все виды кольца и все цвета дуги; тон говорит об исходе, а не о прогрессе, цвет палитры — о статусе, бледная дорожка — `variant`, `tone`, `color`, `track`.",
     },
     {
       slot: "sizes",
       description:
-        "Диаметр от 24 до 64 px, шкала аватарок; текст в центре — четверть диаметра, на `xs` не рендерится — `size`.",
+        "Диаметр от 24 до 96 px: шкала меток и `2xl` над ней; текст в центре — четверть диаметра, на `xs` не рендерится; штрихов тем больше, чем больше кольцо — `size`, `variant`.",
     },
     {
       slot: "states",
@@ -60,6 +60,12 @@ export const page: ComponentPageConfig = {
       title: "Легенда и цвета категорий",
       description:
         "Кольцо долей категорий с легендой рядом, в цветах категорий на графиках — `color`, `legend`, `formatValue`.",
+    },
+    {
+      scenario: "ticks",
+      title: "Штрихи",
+      description:
+        "Кольцо штрихами: доля плана в центре и доли каналов рядом с легендой — `variant`, `segments`, `legend`.",
     },
     {
       scenario: "on-color",

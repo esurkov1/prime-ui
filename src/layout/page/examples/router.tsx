@@ -119,17 +119,19 @@ export default function PageRouterExample() {
                       <Kpi.Delta value={14} tone="success">
                         +14%
                       </Kpi.Delta>
-                      <Kpi.Meta>к сентябрю</Kpi.Meta>
+                      <Kpi.Period>Октябрь</Kpi.Period>
                     </Kpi.Root>
                   </Page.Cell>
                   <Page.Cell span={4}>
                     <Kpi.Root>
                       <Kpi.Title>Первый ответ</Kpi.Title>
-                      <Kpi.Value>6 мин</Kpi.Value>
+                      <Kpi.Value>
+                        6<Kpi.Unit>мин</Kpi.Unit>
+                      </Kpi.Value>
                       <Kpi.Delta value={-2} tone="success">
                         −2 мин
                       </Kpi.Delta>
-                      <Kpi.Meta>к сентябрю</Kpi.Meta>
+                      <Kpi.Period>Октябрь</Kpi.Period>
                     </Kpi.Root>
                   </Page.Cell>
                   <Page.Cell span={4}>
@@ -139,7 +141,7 @@ export default function PageRouterExample() {
                       <Kpi.Delta value={5} tone="danger">
                         +5
                       </Kpi.Delta>
-                      <Kpi.Meta>за сутки</Kpi.Meta>
+                      <Kpi.Period>За сутки</Kpi.Period>
                     </Kpi.Root>
                   </Page.Cell>
                 </Page.Grid>

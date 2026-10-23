@@ -23,7 +23,6 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { highlightChildren } from "@/internal/HighlightMatch";
-import hairline from "@/internal/hairline.module.css";
 import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
@@ -213,19 +212,18 @@ function ChatListItemDescription(_props: ChatListItemDescriptionProps): React.Re
 }
 ChatListItemDescription.displayName = "ChatList.ItemDescription";
 
-export type ChatListItemStatusProps = React.HTMLAttributes<HTMLSpanElement> & {
-  ref?: React.Ref<HTMLSpanElement>;
+export type ChatListItemBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 /**
- * The status of the record behind the dialog (a deal stage, the state of an AI agent): its
- * `Badge.Root`s on a line of their own under the preview, one line, the rest behind «+N». Drawn by
- * `ChatList.Item`.
+ * The badges of the record behind the dialog (a deal stage, the state of an AI agent): its
+ * `Badge.Root`s after the name, on its line, the rest behind «+N». Drawn by `ChatList.Item`.
  */
-function ChatListItemStatus(_props: ChatListItemStatusProps): React.ReactNode {
+function ChatListItemBadges(_props: ChatListItemBadgesProps): React.ReactNode {
   return null;
 }
-ChatListItemStatus.displayName = "ChatList.ItemStatus";
+ChatListItemBadges.displayName = "ChatList.ItemBadges";
 
 export type ChatListItemMenuProps = Omit<
   DropdownContentProps,
@@ -247,7 +245,7 @@ type ItemParts = {
   text: React.ReactElement<ChatListItemTextProps> | null;
   glyphs: React.ReactElement<ChatListItemIconProps>[];
   description: React.ReactElement<ChatListItemDescriptionProps> | null;
-  status: React.ReactElement<ChatListItemStatusProps> | null;
+  status: React.ReactElement<ChatListItemBadgesProps> | null;
   menu: React.ReactElement<ChatListItemMenuProps> | null;
 };
 
@@ -268,7 +266,7 @@ function partsOf(children: React.ReactNode): ItemParts {
     } else if (isPart<ChatListItemTextProps>(node, ChatListItemText)) parts.text = node;
     else if (isPart<ChatListItemDescriptionProps>(node, ChatListItemDescription))
       parts.description = node;
-    else if (isPart<ChatListItemStatusProps>(node, ChatListItemStatus)) parts.status = node;
+    else if (isPart<ChatListItemBadgesProps>(node, ChatListItemBadges)) parts.status = node;
     else if (isPart<ChatListItemMenuProps>(node, ChatListItemMenu)) parts.menu = node;
   }
   return parts;
@@ -477,43 +475,35 @@ function ChatListItem({
       className={cx(styles.preview, descProps?.className)}
       data-shown={shown}
     >
-      {preview}
-      {draftText ? (
+      <span className={styles.layers}>
+        {preview}
+        {draftText ? (
+          <span
+            className={styles.layer}
+            data-layer="draft"
+            aria-hidden={shown !== "draft" || undefined}
+          >
+            <span className={styles.draft}>{labels.draft}</span> {draftText}
+          </span>
+        ) : null}
         <span
           className={styles.layer}
-          data-layer="draft"
-          aria-hidden={shown !== "draft" || undefined}
+          data-layer="typing"
+          aria-hidden={shown !== "typing" || undefined}
         >
-          <span className={styles.draft}>{labels.draft}</span> {draftText}
+          {typingText}
         </span>
-      ) : null}
-      <span
-        className={styles.layer}
-        data-layer="typing"
-        aria-hidden={shown !== "typing" || undefined}
-      >
-        {typingText}
       </span>
     </List.ItemDescription>
   ) : null;
 
-  const statusProps = parts.status?.props;
-  const statusLine = statusProps ? (
-    <List.ItemDescription
-      key="status"
-      {...statusProps}
-      className={cx(styles.record, statusProps.className)}
-    >
-      <Badge.Group size={compactTier(list.size)} overflow="count">
-        {statusProps.children}
-      </Badge.Group>
-    </List.ItemDescription>
-  ) : null;
+  const badgesProps = parts.status?.props;
+  const badgesPart = badgesProps ? <List.ItemBadges key="badges-line" {...badgesProps} /> : null;
 
   // ── counts ──
   // Beside two lines the cell stays even when empty: a count that goes closes up in place.
   const badges =
-    count || mention || pin || hasSecondLine || statusLine ? (
+    count || mention || pin || hasSecondLine ? (
       <List.ItemMeta key="badges" className={styles.badges}>
         {mention ? (
           <span ref={mentionPart.ref} className={cx(styles.pop, mentionPart.className)}>
@@ -550,8 +540,8 @@ function ChatListItem({
   const content = [
     avatarProps ? <List.ItemIcon key="avatar" {...avatarProps} /> : null,
     title,
+    badgesPart,
     secondLine,
-    statusLine,
     meta,
     badges,
   ];
@@ -570,7 +560,6 @@ function ChatListItem({
         unread: count || undefined,
         muted: muted || undefined,
         menu: hasMenu || undefined,
-        record: statusLine !== null || undefined,
       })}
       onClick={(event) => {
         // The long press that opened the menu is not a click on the row.
@@ -1001,7 +990,7 @@ function ChatListRoot<T>({
         {...toDataAttributes({ size })}
       >
         {searchable || actions.length > 0 ? (
-          <div className={cx(hairline.bottom, styles.head)}>
+          <div className={styles.head}>
             {searchable ? (
               <div className={styles.search}>
                 <Input.Root>
@@ -1073,6 +1062,6 @@ export const ChatList = {
   ItemIcon: ChatListItemIcon,
   ItemText: ChatListItemText,
   ItemDescription: ChatListItemDescription,
-  ItemStatus: ChatListItemStatus,
+  ItemBadges: ChatListItemBadges,
   ItemMenu: ChatListItemMenu,
 };

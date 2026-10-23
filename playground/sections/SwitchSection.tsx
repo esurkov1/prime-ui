@@ -38,6 +38,12 @@ export const page: ComponentPageConfig = {
         "Строка настроек: текст слева, дорожка без подписи справа — `aria-labelledby`, `aria-describedby`.",
     },
     {
+      scenario: "full-width",
+      title: "Строка настроек",
+      description:
+        "Строки настроек: текст слева, дорожка справа, у одной подсказка — `fullWidth`, `hint`.",
+    },
+    {
       scenario: "saving",
       title: "Сохранение на сервере",
       description:

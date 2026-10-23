@@ -1,0 +1,42 @@
+/*
+ * StatusDot — a dot of the tone before the word that names a state. Inline: it takes the type and
+ * the color of the text around it (a card's description, a table cell); the dot is centred on the
+ * line.
+ */
+
+.root {
+  --status-dot-fill: var(--prime-color-text-muted);
+
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--prime-space-1) * 1.5);
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.dot {
+  flex: none;
+  width: calc(var(--prime-space-1) * 1.5);
+  height: calc(var(--prime-space-1) * 1.5);
+  border-radius: var(--prime-radius-full);
+  background: var(--status-dot-fill);
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-tone="accent"] {
+  --status-dot-fill: var(--prime-color-accent-default);
+}
+
+.root[data-tone="success"] {
+  --status-dot-fill: var(--prime-color-success-default);
+}
+
+.root[data-tone="warning"] {
+  --status-dot-fill: var(--prime-color-warning-default);
+}
+
+.root[data-tone="danger"] {
+  --status-dot-fill: var(--prime-color-danger-default);
+}

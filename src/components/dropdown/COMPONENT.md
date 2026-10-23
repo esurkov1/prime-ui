@@ -306,6 +306,7 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 
 ## Mistakes
 - Using Dropdown to pick a form value → Select shows the value and works with forms.
+- A `Badge.Root` in `Dropdown.Trigger` to pick a person or a status in the header or footer of a surface → a `Select` at the surface's control tier; the chip trigger stays in a dense row or table cell.
 - An icon passed as a component (`as={Icon}`) → put the glyph inside `Dropdown.ItemIcon`.
 - A hand-written shortcut `<kbd>` → `Dropdown.ItemShortcut` (a Kbd at the end of the item).
 - `Dropdown.Group` with a separate heading element → pass the heading as `label`.

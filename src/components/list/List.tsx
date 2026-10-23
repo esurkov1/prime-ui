@@ -1,14 +1,16 @@
 import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
-import { Badge } from "@/components/badge/Badge";
+import { Badge, type BadgeGroupProps } from "@/components/badge/Badge";
 import { Dnd, DndLock } from "@/components/dnd/Dnd";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider, useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { HeaderLineContent, headerRowStyles, useTitleFloor } from "@/internal/headerRow";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
@@ -16,7 +18,7 @@ import { nodeText } from "@/internal/nodeText";
 import { usePartPresence } from "@/internal/partPresence";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { slotChild } from "@/internal/slot";
-import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
+import { type ControlSize, type PaletteColor, stepDown, tierMappings } from "@/internal/states";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./List.module.css";
@@ -164,6 +166,9 @@ function itemLabelOf(item: React.ReactElement<ListItemProps>): string {
 
 // ─── Parts of an item ─────────────────────────────────────────────────────────
 
+/** The row's title shares its line with `List.ItemBadges`. */
+const BadgedTitleContext = React.createContext(false);
+
 export type ListItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
@@ -201,19 +206,57 @@ export type ListItemTextProps = React.HTMLAttributes<HTMLSpanElement> & {
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** The primary line: one line, truncated with an ellipsis. */
-function ListItemText({ className, ...rest }: ListItemTextProps) {
-  return <span {...rest} className={cx(styles.text, className)} />;
+/**
+ * The primary line: one line, truncated with an ellipsis. Beside `List.ItemBadges` it gives way
+ * first, down to its own text or 8em, before the badges fold into «+N».
+ */
+function ListItemText({ className, ref, ...rest }: ListItemTextProps) {
+  const badged = React.useContext(BadgedTitleContext);
+  if (badged) return <BadgedText {...rest} ref={ref} className={className} />;
+  return <span {...rest} ref={ref} className={cx(styles.text, className)} />;
 }
 ListItemText.displayName = "List.ItemText";
+
+function BadgedText({ className, ref, ...rest }: ListItemTextProps) {
+  const own = React.useRef<HTMLSpanElement>(null);
+  const merged = useMergedRefs(own, ref);
+  useTitleFloor(own);
+  return <span {...rest} ref={merged} className={cx(styles.text, styles.badged, className)} />;
+}
+
+export type ListItemBadgesProps = Omit<BadgeGroupProps, "size" | "overflow">;
+
+/**
+ * The badges after the title, on its line: one container for every badge of the record (a status,
+ * a role — the meaning is the badge's `tone` or `color`). What does not fit folds into «+N».
+ */
+function ListItemBadges({ className, ...rest }: ListItemBadgesProps) {
+  const size = useControlSize(undefined);
+  return (
+    <Badge.Group
+      {...rest}
+      size={tierMappings.cardBadges[size]}
+      overflow="count"
+      className={cx(headerRowStyles.badges, className)}
+    />
+  );
+}
+ListItemBadges.displayName = "List.ItemBadges";
 
 export type ListItemDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** The second line (a preview, a status): muted, smaller, truncated. */
-function ListItemDescription({ className, ...rest }: ListItemDescriptionProps) {
-  return <span {...rest} className={cx(styles.description, className)} />;
+/**
+ * The second line (a preview, a state): muted, smaller, one line cut with an ellipsis. A
+ * `StatusDot` first states the record's state; the text after it follows a «·».
+ */
+function ListItemDescription({ className, children, ...rest }: ListItemDescriptionProps) {
+  return (
+    <span {...rest} className={cx(styles.description, headerRowStyles.description, className)}>
+      <HeaderLineContent>{children}</HeaderLineContent>
+    </span>
+  );
 }
 ListItemDescription.displayName = "List.ItemDescription";
 
@@ -280,6 +323,7 @@ function splitItemChildren(children: React.ReactNode) {
   const trail: React.ReactNode[] = [];
   let loose: React.ReactNode[] = [];
   let twoLines = false;
+  let badges: React.ReactNode = null;
 
   const flushLoose = () => {
     if (loose.length === 0) return;
@@ -302,6 +346,8 @@ function splitItemChildren(children: React.ReactNode) {
         );
     } else if (isPart(node, ListItemMeta) || isPart(node, ListItemCount)) {
       trail.push(node);
+    } else if (isPart(node, ListItemBadges)) {
+      badges = node;
     } else if (isPart(node, ListItemText) || isPart(node, ListItemDescription)) {
       flushLoose();
       if (isPart(node, ListItemDescription)) twoLines = true;
@@ -311,6 +357,19 @@ function splitItemChildren(children: React.ReactNode) {
     }
   }
   flushLoose();
+
+  // The badges join the title on one line.
+  const titleAt = body.findIndex(
+    (node) => React.isValidElement(node) && node.type !== ListItemDescription,
+  );
+  if (badges !== null && titleAt >= 0) {
+    body[titleAt] = (
+      <span key="title-row" className={headerRowStyles.titleRow}>
+        <BadgedTitleContext value={true}>{body[titleAt]}</BadgedTitleContext>
+        {badges}
+      </span>
+    );
+  }
 
   return (
     <>
@@ -506,6 +565,7 @@ export const List = {
   Item: ListItem,
   ItemIcon: ListItemIcon,
   ItemText: ListItemText,
+  ItemBadges: ListItemBadges,
   ItemDescription: ListItemDescription,
   ItemMeta: ListItemMeta,
   ItemCount: ListItemCount,

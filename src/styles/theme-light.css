@@ -59,7 +59,6 @@
   --prime-bottom-nav-label-line-height: var(--prime-ref-font-line-height-12);
   --prime-bottom-nav-label-size: var(--prime-ref-font-size-10);
   --prime-bottom-nav-padding-x: var(--prime-ref-space-2);
-  --prime-card-gap: var(--prime-ref-space-4);
   --prime-card-padding-l: var(--prime-ref-space-6);
   --prime-card-padding-m: var(--prime-ref-space-5);
   --prime-card-padding-s: var(--prime-ref-space-4);
@@ -539,6 +538,10 @@
   --prime-text-title-s-size: var(--prime-ref-font-size-14);
   --prime-text-title-s-tracking: var(--prime-ref-font-tracking-normal);
   --prime-text-title-s-weight: var(--prime-ref-font-weight-semibold);
+  --prime-text-title-xs-line-height: var(--prime-ref-font-line-height-16);
+  --prime-text-title-xs-size: var(--prime-ref-font-size-13);
+  --prime-text-title-xs-tracking: var(--prime-ref-font-tracking-normal);
+  --prime-text-title-xs-weight: var(--prime-ref-font-weight-semibold);
   --prime-thumbnail-l-height: var(--prime-ref-space-12);
   --prime-thumbnail-l-radius: var(--prime-ref-radius-8);
   --prime-thumbnail-m-height: var(--prime-ref-space-10);

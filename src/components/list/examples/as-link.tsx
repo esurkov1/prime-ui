@@ -12,26 +12,24 @@ const INVOICES = [
 export default function ListAsLinkExample() {
   return (
     <Card.Root className={styles.pane}>
-      <Card.Body>
-        <List.Root aria-label="Счета">
-          {INVOICES.map((invoice, index) => (
-            <List.Item key={invoice.id} href={`#invoice-${invoice.id}`} current={index === 0}>
-              <List.ItemText>Счёт № {invoice.id}</List.ItemText>
-              <List.ItemDescription>
-                {invoice.client} · {invoice.status}
-              </List.ItemDescription>
-              <List.ItemMeta>{invoice.amount}</List.ItemMeta>
-            </List.Item>
-          ))}
-          {/* A router link (`<Link to>`) goes in the same way; the row keeps its `href`. */}
-          <List.Item asChild>
-            <a href="#invoices-archive">
-              <List.ItemText>Архив счетов</List.ItemText>
-              <List.ItemDescription>Все счета за 2025 год</List.ItemDescription>
-            </a>
+      <List.Root aria-label="Счета">
+        {INVOICES.map((invoice, index) => (
+          <List.Item key={invoice.id} href={`#invoice-${invoice.id}`} current={index === 0}>
+            <List.ItemText>Счёт № {invoice.id}</List.ItemText>
+            <List.ItemDescription>
+              {invoice.client} · {invoice.status}
+            </List.ItemDescription>
+            <List.ItemMeta>{invoice.amount}</List.ItemMeta>
           </List.Item>
-        </List.Root>
-      </Card.Body>
+        ))}
+        {/* A router link (`<Link to>`) goes in the same way; the row keeps its `href`. */}
+        <List.Item asChild>
+          <a href="#invoices-archive">
+            <List.ItemText>Архив счетов</List.ItemText>
+            <List.ItemDescription>Все счета за 2025 год</List.ItemDescription>
+          </a>
+        </List.Item>
+      </List.Root>
     </Card.Root>
   );
 }

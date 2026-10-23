@@ -34,16 +34,22 @@ const COMPARISON: SparklineSeries[] = [
   },
 ];
 
-const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
+const THOUSANDS = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+/** An M card writes a sum short: thousands, the unit stands in `Kpi.Unit`. */
+const formatThousands = (value: number) => THOUSANDS.format(value / 1000);
 
 export default function SparklineSeriesExample() {
-  const revenue = useSparkline({ data: REVENUE, series: COMPARISON, formatValue: formatRubles });
+  const revenue = useSparkline({ data: REVENUE, series: COMPARISON, formatValue: formatThousands });
 
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Выручка по месяцам</Kpi.Title>
+      <Kpi.Value>
+        {revenue.valueText}
+        <Kpi.Unit>тыс. ₽</Kpi.Unit>
+      </Kpi.Value>
       <Kpi.Period>{revenue.date}</Kpi.Period>
-      <Kpi.Value>{revenue.valueText}</Kpi.Value>
       <Kpi.Media>
         <Sparkline {...revenue.plot} label="2026" />
       </Kpi.Media>

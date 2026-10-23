@@ -400,7 +400,14 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 - `DataTable` is already a filled block — never inside a Card; a card in a card only as
   [the next layer, sparingly](foundations.md#card-in-a-card). No borders around blocks; `Divider`
-  only inside a block (list rows, a form and its footer).
+  only inside a block (list rows) — a card's zones are parted by air, with no line under its header
+  or above its footer.
+- **A card is built from its parts, which stand where the kit puts them** (anatomy, sizes and what
+  goes in each zone: [Card](../src/components/card/COMPONENT.md)). One record is one card: a mark,
+  a title with its badges on its line, one line of new data, the buttons by weight. Cards of one
+  row are equal in height and share a size; the width comes from the grid
+  ([card grids](responsive.md#intrinsic-grids)). A card pairs with a list, never with a
+  fold-open form under a row: the form opens in a `Drawer` or a `Modal`.
 - Floating layers (menus, popovers, dialogs) come only from kit overlays.
 
 ## 5. Density and size
@@ -408,8 +415,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - `m` everywhere by default — omit `size`. Change the tier for a whole region, never for one control:
   a dense back-office table may be `s` with its toolbar; a sign-in card may be `l`.
 - One row = one size: everything in a toolbar or an actions row lines up.
-- A control nested in another component's row is one tier down: buttons and menus in table cells `s`,
-  a segmented switch in a card header `s`. A sized kit host ([the host tier](api-contract.md#size-and-the-host-tier))
+- A control nested in another component's row is one tier down: buttons and menus in table cells `s`.
+  The controls in the header and footer of a surface take the surface's own letter. A sized kit host ([the host tier](api-contract.md#size-and-the-host-tier))
   sizes the kit controls inside it itself.
 
 ## 6. Actions
@@ -453,7 +460,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 </Drawer.Footer>
 ```
 
-- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Footer`, or in `Card.Actions` at the end of a `Card.Header` or a record row — nowhere else in a card; dialog actions in
+- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Actions` of its `Card.Footer` (up to two, the primary last) or of its `Card.Header` (neutral buttons, a value picker, «Ещё»; never the primary) — nowhere else in a card, and none on a record row; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
 - A dialog footer is the dialog's answer, and it has one shape for every kind of dialog:
@@ -586,8 +593,8 @@ row of a `FieldList` follows the same count ([forms](#7-forms)).
 The header of a record's dialog is the exception to the count above: the record's actions are what
 the person opened it for, so each stays in sight. Up to five — spam, not a target, copy, delete — are
 icon-only ghost `Button.Root`s, each in a `Tooltip.Trigger`, in `Drawer.Actions` / `Modal.Actions`
-before the ×; a «⋯» `Dropdown` only gathers the sixth and later. On a phone the kit moves them under
-the title by itself — never fold them into a «⋯» for the width. A destructive one either asks
+before the ×; a «⋯» `Dropdown` only gathers the sixth and later. The header never wraps, so on a
+phone keep one picker or icon button and the «⋯» beside the ×. A destructive one either asks
 (`ConfirmDialog.Trigger` around it) or, when it is easy to redo by hand, holds
 (`holdToConfirm` with the action in `onConfirm`) — never a delete that runs on a plain press.
 
@@ -918,7 +925,7 @@ drawer, the open tab is a «what» too: [a control for the whole tab](#a-record-
   (string → compact EmptyPage, or your own `EmptyPage size="s"` with «Сбросить фильтры»), `loadError`
   for a failed load. The head and toolbar stay.
 - Phones: the table scrolls inside itself, `stickyFirstColumn` keeps the key column; never let the page
-  scroll sideways. Short lists of objects can be a `Card.List` instead of a table.
+  scroll sideways. Short lists of objects can be a `List` in a `Card.Body` instead of a table.
 
 ### Where the create button goes
 
@@ -1042,25 +1049,20 @@ wherever it opens:
   it), a tab the viewer may not see is not rendered, an action the viewer may not take is hidden. A
   second drawer for the same entity («Мой аккаунт» beside «Сотрудник») drifts apart from the first
   with every change.
-- **One record header** — the same in a Drawer, a Modal and a Sheet, three lines in this order.
-  Line 1 is `Drawer.Title`: the name, then the record's number as `number` («#678»), muted beside
-  it; the name ellipsizes, the number never does (`loading` while the name comes). Line 2 is
-  `Drawer.Description`, tight under the title: the record's context as one line of text
-  («ООО «Северный ветер» · 1 240 000 ₽», «Аренда байка Пхукет · заявка 19 сент, 06:37»), cut with an
-  ellipsis — never a badge, never the number. Line 3 is `Drawer.Badges`, the record's working
-  controls right over the body or the tabs: first the pickers — the status, then the assignee —
-  each a `Badge.Root` inside a `Dropdown.Trigger`; the assignee is a person's chip (`Badge.Avatar`
-  with the initials, then the name), and nobody assigned is
-  `<Badge.Root variant="outline">Назначить</Badge.Root>` in the same place; then the plain statuses
-  (the channel, «Ждёт человека», «VIP»). The header sizes the badges (no `size`) and keeps them on
-  one row, the rest behind «+N». The header places the lines in this order whatever the order in
-  code; write them in it anyway. `Drawer.Actions` hold only buttons that act on this
-  record: ghost icon Buttons, each in a `Tooltip.Trigger`, up to five in sight
-  ([actions of a record](#actions-of-a-record)), centred on line 1 before the ×; on a phone the kit
-  moves them under the title. A Badge in `Drawer.Actions` is a
-  status in the wrong place; a way to another place (a section, a list) is no header action — a
-  link in the body beside the data it leads to, or nothing. `Drawer.Icon` (a tone tile, or the
-  record's picture at 40) is optional and a record header goes without it: the name leads.
+- **One record header** — the same in a Drawer, a Modal and a Sheet: the header row of frame `l`,
+  one line each, no line under it. `Drawer.Icon` is the mark (a tone tile, or the record's picture);
+  `Drawer.Title` is the name with the record's number as `number` («#678», muted; the name
+  ellipsizes, the number never does, `loading` while the name comes) and `Drawer.Badges` on the same
+  line — the plain statuses (the channel, «Ждёт человека», «VIP»), one size, the rest behind «+N»;
+  `Drawer.Description` is the record's context as one line of text («ООО «Северный ветер» ·
+  1 240 000 ₽»), a `StatusDot` first when it carries a state — never a badge, never the number.
+  `Drawer.Actions` stand at the end: the status and the assignee are value `Select`s at the
+  dialog's control tier (never a `Badge.Root` in a `Dropdown.Trigger`; nobody assigned is the
+  empty value «Назначить»), then the buttons that act on this record, then «Ещё» (`action.more`)
+  with the danger action behind a `ConfirmDialog` ([actions of a record](#actions-of-a-record)).
+  The header places the parts whatever the order in code; write them in it anyway. A Badge in
+  `Drawer.Actions` is a status in the wrong place; a way to another place (a section, a list) is no
+  header action — a link in the body beside the data it leads to, or nothing.
 - **One form, one save.** Every editable field of every tab is one form, and its submit is the one
   «Сохранить» of `Drawer.Footer`, shown while the form is dirty beside «Отменить изменения» (the
   form goes back to the saved values, the drawer stays open), with `Drawer.Guard` (`dirty`,
@@ -1306,7 +1308,7 @@ What makes a screen look generated, with bad → good code: [anti-slop.md](anti-
 Go down this ladder and stop at the first step that works.
 
 1. **Find it in the kit.** Search [components.md](components.md), then the Variants and Anatomy of the
-   closest component: Card has zones, a cover, record rows and a total, Kpi a figure with its change, period, chart and actions, Input has icons / affixes / a clear button / a counter / a strength meter,
+   closest component: Card has zones, a cover, record rows and a total, Kpi a figure with its unit, change, period, chart or progress, legend and totals, Input has icons / affixes / a clear button / a counter / a strength meter,
    Select has rich items and search, Dropdown has a profile header, DataTable has a toolbar slot, nested
    rows and a detail row (`renderExpanded`), Sparkline is a small trend chart, Kanban a status board.
 2. **Compose kit parts.** Put existing components together on a layout wrapper (CSS Module, `gap` on
@@ -1327,73 +1329,115 @@ Rules for your own component:
 - **Threshold:** a pattern used twice becomes a component. Two things that look the same are one
   component with a variant, never two components or two hand-written copies.
 
-### Worked example: a metric panel with a period switch
+### KPI cards on a screen
 
-The figure is a `Kpi`, and the switch is one of its parts: a SegmentedControl in `Kpi.Actions` at
-the end of the title row, one tier down because it shares the row with the title; the period it
-picks reads in `Kpi.Period` under the title.
+A figure is a `Kpi.Root`, the card itself, in a `Page.Cell` of the page's `Page.Grid`; its size
+comes from how many figures share the row ([a figure: Kpi and its size](choosing.md#a-figure-kpi-and-its-size)),
+its parts and their places from [Kpi → Anatomy](../src/components/kpi/COMPONENT.md#anatomy). What a
+screen decides about it:
+
+- **The period stands once.** The head says what the figure is and holds no date; the period is
+  `Kpi.Period`, under the value. A row whose figures share one period — the switch in the page's
+  `Page.Tools`, the range in its `Page.Description` — sets it there once, and its cards drop
+  `Kpi.Period`. The period never goes into the title («Выручка за октябрь»), and the base of the
+  change follows from it, so no «к сентябрю» in the note.
+- **The note is new data.** `Kpi.Meta` carries a plan, a threshold or what the figure is made of
+  («план 9,5 млн ₽», «9 счетов · 4 клиента») — never the period again, never the change in words.
+- **The sum fits its size.** S and M write a large sum short — «8,7» with `Kpi.Unit` «млн ₽»; L and
+  XL write it in full — «8 704 000» with `Kpi.Unit` «₽». The unit is always `Kpi.Unit`, never typed
+  into the figure.
+- **Parts are explained in the footer.** A figure made of parts draws them as a `ProgressBar
+  variant="ticks"` in `Kpi.Media` and names them in `Kpi.Legend` inside `Kpi.Footer`; a target is a
+  plain `ProgressBar` line. Never the bar's own `legend` inside the card.
+- **Nothing wraps, nothing leaves the card.** Every text of a card is one line cut with an ellipsis;
+  a title or a note that does not fit is shortened, a value that does not fit takes the short form
+  or a larger size — never a second line, a smaller font or a wider card.
+- **One thing in the slot.** `Kpi.Actions` holds one badge, menu or button (from M); two actions
+  are one menu ([a menu from two actions](#a-menu-from-two-actions)). The kit sizes the controls
+  inside the card, so they take no `size`.
+- **A trend** is a `Sparkline` in `Kpi.Media`: `useSparkline` gives the value, the change
+  (`Kpi.Delta reading`) and the date in `Kpi.Period`, `{...reading.plot}` the line to scrub.
+- **A card that opens** its report is `Kpi.Root asChild` around the link: the whole card lifts and
+  presses, holds no `Kpi.Actions` and no arrow of your own. A card with a `Sparkline` opens through
+  `Kpi.Link` in its `Kpi.Title` instead: the link stretches over the card and the chart, a slider,
+  stays its own ([Sparkline → Mistakes](../src/components/sparkline/COMPONENT.md#mistakes)).
 
 ```tsx
-import { Kpi, SegmentedControl } from "prime-ui-kit";
+import { Kpi, Page, SegmentedControl } from "prime-ui-kit";
 
-export function RevenuePanel() {
+// The page's period is in its bar, so the cards carry no Kpi.Period and the notes no base.
+const FIGURES = [
+  { title: "Выручка", value: "8,7", unit: "млн ₽", change: 9.6, delta: "+9,6 %", tone: "success", meta: "план 9,5 млн ₽" },
+  { title: "Заказы", value: "204", unit: "", change: 2, delta: "+2 %", tone: "success", meta: "" },
+  { title: "Средний чек", value: "42 700", unit: "₽", change: 0, delta: "0 %", tone: "neutral", meta: "" },
+  { title: "Просрочено", value: "1,2", unit: "млн ₽", change: 180, delta: "+180 тыс. ₽", tone: "danger", meta: "9 счетов" },
+] as const;
+
+export function SalesOverview() {
   return (
-    <Kpi.Root>
-      <Kpi.Title>Выручка</Kpi.Title>
-      <Kpi.Period>Октябрь</Kpi.Period>
-      <Kpi.Actions>
-        <SegmentedControl.Root size="s" defaultValue="month" aria-label="Период">
-          <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
-          <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
-        </SegmentedControl.Root>
-      </Kpi.Actions>
-      <Kpi.Value>4,2 млн ₽</Kpi.Value>
-      <Kpi.Delta value={18} tone="success">
-        +18%
-      </Kpi.Delta>
-      <Kpi.Meta>к сентябрю</Kpi.Meta>
-    </Kpi.Root>
+    <Page.Root>
+      <Page.TopBar>
+        <Page.Heading>
+          <Page.Title>Продажи</Page.Title>
+          <Page.Description>1–22 октября · на 22 окт, 09:40</Page.Description>
+        </Page.Heading>
+        <Page.Tools aria-label="Продажи">
+          <SegmentedControl.Root defaultValue="month" aria-label="Период">
+            <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
+            <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
+          </SegmentedControl.Root>
+        </Page.Tools>
+      </Page.TopBar>
+      <Page.Body>
+        <Page.Grid>
+          {FIGURES.map((figure) => (
+            <Page.Cell key={figure.title} span={3}>
+              <Kpi.Root>
+                <Kpi.Title>{figure.title}</Kpi.Title>
+                <Kpi.Value>
+                  {figure.value}
+                  {figure.unit ? <Kpi.Unit>{figure.unit}</Kpi.Unit> : null}
+                </Kpi.Value>
+                <Kpi.Delta value={figure.change} tone={figure.tone}>
+                  {figure.delta}
+                </Kpi.Delta>
+                {figure.meta ? <Kpi.Meta>{figure.meta}</Kpi.Meta> : null}
+              </Kpi.Root>
+            </Page.Cell>
+          ))}
+        </Page.Grid>
+      </Page.Body>
+    </Page.Root>
   );
 }
 ```
-
-For a plain KPI row put a `Kpi.Root` (Title · Value · Delta · Meta) in each `Page.Cell span={3}` of
-the page's `Page.Grid` — see [the dashboard screen](../src/components/card/examples/screen.tsx). When the trend over days matters, add a
-`Sparkline` in `Kpi.Media`: `useSparkline` gives its value, change and `Kpi.Period`, `{...reading.plot}` the line to scrub.
-A tile whose value is words, not a number («Выдать PCX 160», «Заявка в Mini App») →
-`Kpi.Root valueSize="s"`, its buttons in `Kpi.Actions`; a value with a meaning («к оплате» due, a
-payment made) → `Kpi.Value tone` (and `DescriptionList.Item tone` in a pair). A tile that leads somewhere is a link (`Kpi.Root asChild`
-around the link, or `Card.Link` inside it when the tile holds its own buttons or a Sparkline): the kit draws its arrow — never
-an arrow of your own in the label.
 
 ### Tiles and cards of a record
 
 The facts of a record (in its dialog, its page, its card in a list) read the same everywhere in an
 app: one look per kind of block, never a weight per screen.
 
-- **Fact tiles** — «К оплате», «Депозиты у нас», «Ближайшая задача», «LTV», «t.me/…», «Последний
-  вход 20 окт, 07:44»: a row of `Kpi.Root valueSize="s"` tiles with `Kpi.Title`, `Kpi.Value`
-  (`tone` by its meaning) and an optional `Kpi.Meta`. The value is body-m
-  medium, a number, a phrase and a link alike, in every tile of the row and in every dialog of the
-  app: a larger value breaks the drawer's structure as soon as a fact is a phrase. `valueSize="m"`
-  only for a single total tile that stands alone, never for a row of facts. Never a `Typography`
-  inside `Kpi.Value` to change its size: the loading Skeleton then has the wrong height.
+- **Facts of a record** — «К оплате», «Депозиты у нас», «Ближайшая задача», «LTV», «t.me/…»,
+  «Последний вход 20 окт, 07:44»: label–value pairs of one `DescriptionList`, a number, a phrase
+  and a link alike in every dialog of the app, a judgement in `DescriptionList.Item tone` (due
+  `warning`, paid `success`). Never a row of `Kpi` cards for them: a Kpi is one figure with its
+  period and change, and a phrase in its value is cut on its one line. Never a `Typography`
+  inside a value to change its size.
 - **Type of the blocks of a record.** Two families, each with one set of sizes everywhere in the
   app — the kit sets them, so never a `Typography` variant of your own inside these parts:
 
   | Block | Part | Role (size / line, weight) |
   |---|---|---|
-  | Fact tiles at the top (`Kpi.Root valueSize="s"`) | `Kpi.Title` · `Kpi.Value` · `Kpi.Meta` | title-s 14/20 semibold · body-m 14/20 medium · body-s 13/20 muted |
-  | KPI numbers at the top (`Kpi.Root valueSize="m"`) | `Kpi.Title` · `Kpi.Value` · `Kpi.Delta` | title-s 14/20 semibold · heading-m 24/32 semibold · a Badge `s` |
-  | Every other card (status, object, deposit, bill) | `Card.Title` · `Card.Description` | title-s 14/20 semibold · body-s 13/20 secondary |
+  | KPI numbers at the top (`Kpi.Root` on the dialog's tier, `m`) | `Kpi.Title` · `Kpi.Value` · `Kpi.Delta` | 16/24 title weight · 24/32 tabular · a Badge 20 high |
+  | Every other card (status, object, deposit, bill) | `Card.Title` · `Card.Description` | title-m 16/24 semibold · body-s 13/20 secondary |
   | Line items in a card | `DescriptionList` / `FieldList` rows | field label 13/20 · field text 14/20 |
   | A card's total | `Card.Total` (its `label` over the amount) | body-s 13/20 muted · title-m 16/24 semibold |
 
   The top row reads first and stands a step above the cards under it; the cards share one title
   and one secondary line, so a drawer of five cards reads as one list.
-- **KPIs of a record** (counts and amounts with a change, in a dialog): `Kpi.Root` with
-  `valueSize="m"`, so a row of two and a row of four in one drawer keep one size — never a layout
-  bent to make the widths match. The default `l` is for a dashboard grid.
+- **KPIs of a record** (counts and amounts with a change, in a dialog): a `Kpi.Root` per figure
+  with no `size` — it takes the dialog's tier, so a row of two and a row of four in one drawer keep
+  one size; never a layout bent to make the widths match. `l` and `xl` are for a dashboard row.
 - **An object of the record** (the video at hand-over, a connected channel account, a session, the
   current term): a card of one `Card.Header` — its picture first (`Card.Icon` with a `Thumbnail`,
   an `Avatar`, a `ProgressCircle` or an icon tile), then two lines: `Card.Title` names the object,
@@ -1402,39 +1446,46 @@ app: one look per kind of block, never a weight per screen.
   kit pads a header with nothing under it evenly, so no padding of your own.
 - **A task of the record with its assignee** (a return, a delivery, a call back): a card of one
   `Card.Header`. `Card.Title` is the task with its term («Вернуть 10 дек · через 50 дн.»);
-  `Card.Description` starts with the assignee picker — a `Badge.Root` with `Badge.Avatar` in a
-  `Dropdown.Trigger`, as in the Card example [actions](../src/components/card/examples/actions.tsx)
-  — and then the facts («выдан 21 окт, 15:43»). The person is named once: «Выдан 21 окт · Евгений
-  Сурков · [Евгений Сурков ▾]» repeats the name and leaves a dangling «·»; the picker first and the
-  facts after it say the same in one line. The actions stand in `Card.Actions` at the header's end,
-  the primary last: one secondary action is a labelled `soft` button («Отменить»), two or more
-  gather behind `action.more` (both in the same example) —
-  [a menu from two actions](#a-menu-from-two-actions).
+  `Card.Description` gives the facts («выдан 21 окт, 15:43»); the assignee is a value `Select`
+  (`Select.Item` with an `Avatar.Root`) in `Card.Actions` at the header's end,
+  before the buttons. The person is named once: the picker, not the description. With no footer the
+  header holds neutral buttons, the picker and «Ещё»; the primary action of a card that has a
+  footer stands in the footer, last ([the card's rules](../src/components/card/COMPONENT.md)).
 - **A record card with a total** (a vehicle of a deal, a payment, an invoice): the head is a
   `Card.Header` — its mark first (`Card.Icon` with the record's picture or a `ProgressCircle` term
-  ring), `Card.Title` with `Card.Link` when the card opens the record (the kit centres its arrow on
-  the head), the statuses in `Card.Description`; the line items are a
-  `DescriptionList.Root align="end"` in `Card.Body divider="full"`; the footer is
-  `Card.Footer divider="fill"`: the action first, then `Card.Description` with a `Badge.Dot` and
-  the task, then `Card.Total` at the end edge (the amount, its state in `label` with a `tone`,
-  «к оплате 6 400 ฿»). See [record-totals](../src/components/card/examples/record-totals.tsx).
+  ring), `Card.Title` with `Card.Link` when the card opens the record, the statuses in
+  `Card.Badges` after the title, one line of new data in `Card.Description`; the line items are a
+  `DescriptionList.Root align="end"` in `Card.Body`; the footer has no line: `Card.Total` at its
+  start (the amount, its state in `label` with a `tone`, «к оплате 6 400 ฿») and the action in
+  `Card.Actions` at its end. A record row inside a card opens as a whole, with its value at the
+  right and no pencil or button on it.
+- **A card with a picture** (a catalogue unit, a campaign): `Card.Media` with a `Carousel`, even for
+  one photo; only what belongs to the photo stands on it (dots, arrows, the duration), while the
+  status and the number go to the header.
+- **A choice between cards** (a plan, a module): `Card.Root asChild selected` around a `<button>` —
+  `role="radio"` in a `role="radiogroup"` for one of several — with `Card.Indicator` at the end of
+  the header.
+- **Switches in a card**: one switch is a one-line card (`Card.Icon`, `Card.Title`, the `Switch`
+  in `Card.Actions`); several are a group card whose body is `Switch.Root fullWidth` rows.
 
 ```tsx partial
-// bad — the value restyled by hand, a weight of its own per drawer
+// bad — a record's facts as KPI cards: a phrase in a figure's place, a value restyled by hand
 <Kpi.Root>
-  <Kpi.Title>К оплате</Kpi.Title>
+  <Kpi.Title>Ближайшая задача</Kpi.Title>
   <Kpi.Value>
-    <Typography as="span" variant="title-m">21 000 ₽</Typography>
+    <Typography as="span" variant="body-m">Выдать PCX 160 завтра</Typography>
   </Kpi.Value>
 </Kpi.Root>
 ```
 
 ```tsx good
-// good — the kit's value: the same in every tile, the Skeleton in its height
-<Kpi.Root valueSize="s">
-  <Kpi.Title>К оплате</Kpi.Title>
-  <Kpi.Value tone="warning">21 000 ₽</Kpi.Value>
-</Kpi.Root>
+// good — the facts are label–value pairs: one type in every dialog, the judgement in the tone
+<DescriptionList.Root orientation="vertical">
+  <DescriptionList.Item label="К оплате" tone="warning">
+    21 000 ₽
+  </DescriptionList.Item>
+  <DescriptionList.Item label="Ближайшая задача">Выдать PCX 160 завтра</DescriptionList.Item>
+</DescriptionList.Root>
 ```
 
 ## Screen rules
@@ -1507,9 +1558,10 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - An overview titles itself in its `Page.TopBar` like any screen of data: `Page.Title` «Обзор» with a `Page.Description` line of data (what and as of when) in `Page.Heading`, beside the page's tools and buttons; no header in the flow, the body starts with the tiles.
 - The period is a `SegmentedControl` in the bar's `Page.Tools` and the report a `soft` + `neutral` button with an icon in its `Page.Actions`: the period changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
-- Every tile of the screen is one `Page.Grid`: a `Kpi.Root` tile each in `Page.Cell span={3}`, 16 px on both axes; `Kpi.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
+- Every tile of the screen is one `Page.Grid`: four M cards of one size, a `Kpi.Root` each in `Page.Cell span={3}`, 16 px on both axes; `Kpi.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
+- The period is the page's, set once in its bar: the four cards carry no `Kpi.Period`, and no `Kpi.Meta` names the base of the change — it follows from the period ([KPI cards on a screen](#kpi-cards-on-a-screen)).
 - Another period — other values: each KPI tile is wrapped in `Crossfade state={period}` and flows instead of blinking; a Crossfade right in a `Page.Cell` fills it, so the tiles of a row keep one height.
-- A trend over days is a `Sparkline` in the `Kpi.Media` of a full-width `Kpi` tile: the tile shows the period's sum from `useSparkline` (`summary`) over a line you can scrub with a finger; a new series appears by itself.
+- A trend over days is a `Sparkline` in the `Kpi.Media` of a full-width `Kpi` tile: the tile shows the period's sum from `useSparkline` (`summary`) over a line you can scrub with a finger, and its `Kpi.Period` follows the scrubbed day; a new series appears by itself.
 - A chart with axes and several series is a `ChartFrame` in `Page.Cell span={8} rows={2}` beside two panels; `ChartFrame.Plot height="fill"` takes their height. A sized plot area (`renderPlot`), a legend that turns series off and a table for screen readers; series colors come from `series`, never your own.
 - Panels are a `Card` with `Card.Title as="h2"` in `Card.Header` and quiet context on the right after the title, in `Card.Actions` (`caption` + `muted`).
 - Progress of one value is a `ProgressBar` with `label` and `showValue`; parts of a whole are `ProgressBar segments` with `legend` and `formatValue`: judgements wear `tone`, stages and categories `color` ([tone or color](foundations.md#tone-or-color)).
@@ -1558,7 +1610,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The placement of deals is `value` as `{ [stage]: id[] }`; `onValueChange` returns the request's promise and applies `value` only after the answer; a server refusal returns the card to its place.
 - Stage totals are in `renderColumnMeta` («2 сделки · 3 575 000 ₽»), the stage color is the column's `color`.
 - A deal opens through `onItemOpen` of `Kanban.Root` (click, Enter, Space; never after a drag) in a `Drawer` with a `DescriptionList`; no `onClick` / `onKeyDown` of your own on the card; a deal with its own page — `getItemHref`. The stage change is available in the panel too — dragging is not the only way; `Drawer.Guard busy` holds the panel while saving.
-- A record's card, when it carries more than a title: zones of parts in `Kanban.ItemSection` (the kit draws the faint line between zones and drops an empty zone) — the name row `Kanban.ItemTitle number` with the owner `Avatar.Root` inside it; the units it holds `Kanban.ItemResource` (a `ProgressCircle` of the term with a short text, «18 д»); the one next step a `Badge fullWidth` first in its zone; facts `Kanban.ItemFact` (an `Icon` and a caption, a toned `Typography` span for a debt); the source and its date `Kanban.ItemFooter`. No `Divider`, gaps or truncation of your own — [Kanban](../src/components/kanban/COMPONENT.md), example `deal-cards`.
+- A record's card, when it carries more than a title: zones of parts in `Kanban.ItemSection` (the zones stand apart by air, no line, and an empty zone is not drawn) — the name row `Kanban.ItemTitle number` with the owner `Avatar.Root` inside it; the units it holds `Kanban.ItemResource` (a `ProgressCircle` of the term with a short text, «18 д»); the one next step a `Badge fullWidth` first in its zone; facts `Kanban.ItemFact` (an `Icon` and a caption, a toned `Typography` span for a debt); the source and its date `Kanban.ItemFooter`. No `Divider`, gaps or truncation of your own — [Kanban](../src/components/kanban/COMPONENT.md), example `deal-cards`.
 - What a view shows is one «Вид» in `Page.Tools` beside the search, the same button for every view of the data — `KanbanFieldsMenu` with the board (the page renders each part by `hiddenFields`), `DataTableColumnsMenu` with the table, `GanttCategoriesMenu` with a schedule (`categories` colour the bars and `hiddenCategories` hide them; a legend row only with `legend`, when the bars' words don't explain their colours); never a hand-made Dropdown or a renamed `labels` workaround.
 - Every deal goes to `items` and `value`, however many: the columns draw only the cards in view — never slice a column by hand.
 - The first load is `loading` on `Kanban` and `DataTable`: skeletons in the geometry of cards and rows. Stages that come from the server too: `loading` with empty `columns` draws `loadingColumns` placeholder columns — never a board skeleton of your own beside the `Kanban`.

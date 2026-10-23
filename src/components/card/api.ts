@@ -1,32 +1,39 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BADGE_GROUP_LABELS } from "../badge/Badge";
+
+const REST_DIV = {
+  name: "…rest",
+  type: "HTMLAttributes<HTMLDivElement>",
+  en: "`children`, `className` and the other div attributes.",
+  ru: "`children`, `className` и остальные атрибуты div.",
+};
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Card.Root",
-      en: "`ref` → `HTMLDivElement` (the `asChild` element). A surface one layer up, no border, a size container. Laid out by its zones: zones under faint lines; a cover when `Card.Media` leads; no zone — the content edge to edge.",
-      ru: "Поверхность на слой выше, без обводки, контейнер размера. Раскладку задают зоны: зоны под тонкими линиями; обложка, если первой идёт `Card.Media`; без зон — содержимое от края до края.",
+      en: "`ref` → `HTMLDivElement` (the `asChild` element). A card: one entity on a surface of the depth ladder, parted by air, never by lines. Its zones (`Card.Media`, `Card.Header`, `Card.Body`, `Card.Footer`) stand a zone gap apart; with none it is a pane, content edge to edge.",
+      ru: "Карточка: одна сущность на поверхности лестницы глубины, части разделены воздухом, а не линиями. Зоны (`Card.Media`, `Card.Header`, `Card.Body`, `Card.Footer`) стоят на шаг зоны друг от друга; без них это панель, содержимое от края до края.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "The card's tier: its padding (`--prime-card-padding-s` 16 at `xs` · `s`, `-m` 20, `-l` 24 at `l` · `xl`) and the tier of the controls inside; the type roles stay.",
-          ru: "Ярус карточки: её отступы (`--prime-card-padding-s` 16 при `xs` · `s`, `-m` 20, `-l` 24 при `l` · `xl`) и ярус контролов внутри; текстовые роли не меняются.",
+          en: "One of five steps of metrics: `xs` (padding 12), `s` (16), `m` (20), `l` (24), `xl` (28) with the type, the mark and the controls inside. The width comes from the grid, not from the size.",
+          ru: "Одна из пяти ступеней мер: `xs` (отступ 12), `s` (16), `m` (20), `l` (24), `xl` (28) вместе с текстом, меткой и контролами внутри. Ширину задаёт сетка, не размер.",
         },
         {
-          name: "flat",
+          name: "selected",
           type: "boolean",
-          default: "false",
-          en: "No raised shadow: a flat tile for dense grids.",
-          ru: "Без тени: плоская плитка для плотных сеток.",
+          en: 'The card is chosen: a 2 px accent ring, `Card.Indicator` checked. With `asChild` the element carries the state: `aria-pressed`, or `aria-checked` when it has `role="radio"` or `role="checkbox"`.',
+          ru: 'Карточка выбрана: акцентное кольцо 2 px, `Card.Indicator` отмечен. С `asChild` состояние несёт элемент: `aria-pressed`, а при `role="radio"` или `role="checkbox"` — `aria-checked`.',
         },
         {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: "The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring, a link draws the arrow. No interactive inside: see `Card.Link`.",
-          ru: "Вся карточка — одна ссылка или кнопка: передайте этот элемент единственным ребёнком с частями внутри; он получает наведение, нажатие и кольцо фокуса, ссылка рисует стрелку. Интерактива внутри нет: см. `Card.Link`.",
+          en: "The whole card is one link or button (a choice card): pass that element as the only child with the parts inside it. Nothing interactive goes inside; for a card with its own controls use `Card.Link`.",
+          ru: "Вся карточка — одна ссылка или кнопка (карточка выбора): передайте этот элемент единственным ребёнком с частями внутри. Интерактива внутри нет; для карточки со своими контролами — `Card.Link`.",
         },
         {
           name: "…rest",
@@ -37,242 +44,218 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Card.Header",
-      en: "`ref` → `HTMLDivElement`. The top zone: an optional `Card.Icon`, `Card.Title` with an optional `Card.Description` under it, `Card.Actions` at the end. Wraps below 22rem.",
-      ru: "Верхняя зона: необязательная `Card.Icon`, `Card.Title` с необязательным `Card.Description` под ним, `Card.Actions` в конце. Уже 22rem переносится.",
+      name: "Card.Media",
+      en: "`ref` → `HTMLDivElement`. The cover: the kit `Carousel` (one photo or several), edge to edge, in its own ratio. Only what belongs to the photo stands on it (dots, arrows, `Carousel.Overlay`); status and number go to the header.",
+      ru: "Обложка: `Carousel` кита (одно фото или несколько) от края до края в своём соотношении сторон. На фото стоит только то, что к нему относится (точки, стрелки, `Carousel.Overlay`); статус и номер уходят в шапку.",
       props: [
         {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
+          name: "placement",
+          type: '"top" | "start"',
+          default: '"top"',
+          en: "`top` — over the zones, full width. `start` — from 30rem a column of 40% at the start, the card's full height; narrower it stands on top.",
+          ru: "`top` — над зонами во всю ширину. `start` — от 30rem колонка в 40% в начале на всю высоту карточки; уже — стоит сверху.",
         },
+        REST_DIV,
       ],
+    },
+    {
+      name: "Card.Header",
+      en: "`ref` → `HTMLDivElement`. The top zone. Its parts take their places whatever the order: `Card.Icon`, the title with `Card.Badges` and `Card.Description` under it, then `Card.Actions` or `Card.Indicator` at the end. Only the title is required.",
+      ru: "Верхняя зона. Части стоят на своих местах в любом порядке: `Card.Icon`, название с `Card.Badges` и `Card.Description` под ним, затем `Card.Actions` или `Card.Indicator` в конце. Обязательно только название.",
+      props: [REST_DIV],
     },
     {
       name: "Card.Icon",
-      en: "`ref` → `HTMLDivElement`. The mark leading `Card.Header` or a record row: a 40px accent tile of one icon. An `Avatar.Root` or `Thumbnail.Root` inside is the record's picture (no tile, `aria-hidden`); a `ProgressCircle` its state ring (no tile, its own name).",
-      ru: "Метка в начале `Card.Header` или строки записи: плашка 40px с акцентом для одной иконки. `Avatar.Root` или `Thumbnail.Root` внутри — изображение записи (без плашки, `aria-hidden`); `ProgressCircle` — кольцо состояния (без плашки, со своим именем).",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
+      en: "`ref` → `HTMLDivElement`. The mark leading `Card.Header` (32 · 32 · 40 · 48 · 56): an accent icon tile, or a picture or ring, no tile. A step smaller beside a `Switch`; under a top cover, on its edge.",
+      ru: "Метка в начале `Card.Header` (32 · 32 · 40 · 48 · 56): акцентная плитка одной иконки, картинка записи или кольцо без плитки. Рядом с `Switch` на ступень меньше; под верхней обложкой — аватар на её кромке.",
+      props: [REST_DIV],
     },
     {
       name: "Card.Title",
-      en: "`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s). A `Badge.Root` inside stands beside the text, 8 apart, centred on its line.",
-      ru: "Заголовок карточки (`<h3>`, title-s). `Badge.Root` внутри стоит рядом с текстом, через 8, по центру строки.",
+      en: "`ref` → `HTMLHeadingElement`. What the card is about: one line, cut with an ellipsis. Beside `Card.Badges` it gives way first, down to its own text or 8em, before the badges fold into «+N». 13/16 · 13/16 · 14/20 · 16/24 · 18/24 by size.",
+      ru: "О чём карточка: одна строка с обрезкой многоточием. Рядом с `Card.Badges` уступает первым, до своего текста или 8em, и только потом бейджи сворачиваются в «+N». 13/16 · 13/16 · 14/20 · 16/24 · 18/24 по размеру.",
       props: [
         {
           name: "as",
-          type: '"h2" | "h3" | "h4"',
+          type: '"h2" | "h3" | "h4" | "span"',
           default: '"h3"',
-          en: "Heading level that fits the page outline; the look does not change.",
-          ru: "Уровень заголовка по структуре страницы; вид не меняется.",
+          en: "The element: the heading level that fits the page outline, or `span` when the card is no heading.",
+          ru: "Элемент: уровень заголовка по структуре страницы или `span`, когда карточка не заголовок.",
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
-    },
-    {
-      name: "Card.Description",
-      en: "`ref` → `HTMLDivElement`. Secondary text (body-s): under the title, badges inside (a picker too) in a wrapping row; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.",
-      ru: "Вторичный текст (body-s): под заголовком, бейджи внутри (и выбор) — переносимым рядом; в `Card.Footer` — заметка: сначала `Badge.Dot`, текст в одну строку.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
-    },
-    {
-      name: "Card.Actions",
-      en: "`ref` → `HTMLDivElement`. The end of `Card.Header` or of a record row: buttons, a switch, a period switch or a quiet caption, 8 apart, centred on the text. Below 22rem it drops under the text; icon buttons only stay beside it.",
-      ru: "Конец `Card.Header` или строки записи: кнопки, переключатель, выбор периода или тихая подпись, через 8, по центру текста. Уже 22rem уходит под текст; одни иконочные кнопки остаются рядом.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
-    },
-    {
-      name: "Card.Body",
-      en: "`ref` → `HTMLDivElement`. The padded content zone (gap 16): fields, a chart, a `DescriptionList`.",
-      ru: "Зона содержимого с отступами (gap 16): поля, график, `DescriptionList`.",
-      props: [
-        {
-          name: "divider",
-          type: '"full"',
-          en: "A line above the zone that runs edge to edge, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset zone line).",
-          ru: "Линия над зоной во всю ширину, цветом `Divider` (`border-subtle`), чтобы читалась в обеих темах (без него: едва заметная линия зоны с отступом).",
-        },
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
-    },
-    {
-      name: "Card.Media",
-      en: "`ref` → `HTMLDivElement`. A picture or a chart, edge to edge: first in the card it is the 128–192px cover on top and the zones under it draw no lines; under the header or the body it is a chart. A chart SVG needs a CSS height.",
-      ru: "Картинка или график от края до края: первой в карточке — обложка 128–192px сверху, и зоны под ней без линий; под шапкой или телом — график. SVG графика нужна высота в CSS.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
-    },
-    {
-      name: "Card.List · Card.ListItem",
-      en: "`ref` → `HTMLUListElement` / `HTMLLIElement`. A `<ul>` of `<li>` rows, faint hairlines between them. A row with `Card.Title` is a record row laid out like `Card.Header`: `Card.Icon`, the title over its description, `Card.Actions` at the end.",
-      ru: "`<ul>` из строк `<li>`, между ними тонкие линии. Строка с `Card.Title` — строка записи с раскладкой `Card.Header`: `Card.Icon`, заголовок над описанием, `Card.Actions` в конце.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
-    },
-    {
-      name: "Card.ListItemContent",
-      en: "`ref` → `HTMLDivElement`. The zone under its `Card.ListItem` (any row) that folds open in place, rendered from anywhere inside the row; a `Card.Footer` holds its buttons at the end.",
-      ru: "Зона под своей `Card.ListItem` (любой строкой), раскрывающаяся на месте, откуда бы ни рендерилась внутри строки; `Card.Footer` держит кнопки в конце.",
-      props: [
-        {
-          name: "open",
-          type: "boolean",
-          required: true,
-          en: "Unfolds the zone (height and fade, reduced motion honoured); closed, it folds away.",
-          ru: "Раскрывает зону (высота и проявление, с учётом reduced motion); закрытая — сворачивается.",
-        },
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children`, `className` and the other div attributes.",
-          ru: "`children`, `className` и остальные атрибуты div.",
-        },
-      ],
-    },
-    {
-      name: "Card.Footer",
-      en: "`ref` → `HTMLDivElement`. The bottom row of buttons: at the end, under a faint hairline after zones. A record's row: the actions, the note (`Card.Description`), `Card.Total` at the end.",
-      ru: "Нижний ряд кнопок: в конце, под тонкой линией после зон. Строка записи: действия, заметка (`Card.Description`), `Card.Total` у края.",
-      props: [
-        {
-          name: "divider",
-          type: '"full" | "fill"',
-          en: "How the zone stands off the one above: `full` — a line edge to edge in the `Divider` ink; `fill` — no line, the zone on the next layer, its actions from the start (a record's footer). Without it: the faint zone line.",
-          ru: "Чем зона отделена от верхней: `full` — линия во всю ширину цветом `Divider`; `fill` — без линии, зона на следующем слое, действия с начала (подвал записи). Без него — тонкая линия зоны.",
-        },
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes of the element.",
-          ru: "`children`, `className` и остальные атрибуты элемента.",
-        },
-      ],
-    },
-    {
-      name: "Card.Total",
-      en: "`ref` → `HTMLDivElement`. The total of a record at the end of `Card.Footer`: the amount (title-m, tabular) with its state above it.",
-      ru: "Итог записи у края `Card.Footer`: сумма (title-m, табличные цифры) и её состояние над ней.",
-      props: [
-        {
-          name: "label",
-          type: "ReactNode",
-          en: "The total's state above the amount («к оплате 21 000 ₽», «оплачено»): body-s, muted.",
-          ru: "Состояние итога над суммой («к оплате 21 000 ₽», «оплачено»): body-s, приглушённое.",
-        },
-        {
-          name: "tone",
-          type: '"neutral" | "success" | "warning" | "danger"',
-          en: "The ink of the `label` by meaning (an amount due is `warning`, paid `success`).",
-          ru: "Цвет `label` по смыслу (к оплате — `warning`, оплачено — `success`).",
-        },
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (the amount), `className` and the other div attributes.",
-          ru: "`children` (сумма), `className` и остальные атрибуты div.",
+          type: "HTMLAttributes<HTMLHeadingElement>",
+          en: "`children`, `className` and the other heading attributes.",
+          ru: "`children`, `className` и остальные атрибуты заголовка.",
         },
       ],
     },
     {
       name: "Card.Link",
-      en: "`ref` → `HTMLAnchorElement`. The stretched link around the title: a click anywhere on the card opens it, it is the one tab stop, the card's own buttons stay above it. The card draws the arrow: at the end of `Card.Header`, centred on it, or in the top corner.",
-      ru: "Растянутая ссылка вокруг заголовка: клик в любом месте карточки открывает её, это единственная остановка Tab, кнопки карточки остаются поверх. Карточка рисует стрелку: в конце `Card.Header` по его центру или в верхнем углу.",
+      en: "`ref` → `HTMLAnchorElement`. Inside `Card.Title`: the link that opens the record. It stretches over the whole card and is the one tab stop, while the card's own controls stay above it. On hover the card lifts and the title is underlined; there is no arrow.",
+      ru: "Внутри `Card.Title`: ссылка, открывающая запись. Растягивается на всю карточку и даёт единственную остановку Tab, а контролы карточки остаются над ней. На наведение карточка приподнимается, название подчёркивается; стрелки нет.",
       props: [
         {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: "Render the single child element instead of the `<a>`: a router `Link`, or a `<button>` when the record opens in place (a window).",
-          ru: "Отрисовать единственный дочерний элемент вместо `<a>`: `Link` роутера или `<button>`, когда запись открывается на месте (в окне).",
+          en: "Render the router's link element instead of an `<a>`.",
+          ru: "Рендерить элемент-ссылку роутера вместо `<a>`.",
         },
         {
           name: "…rest",
           type: "AnchorHTMLAttributes<HTMLAnchorElement>",
-          en: "`href`, `className` and the other attributes of the link.",
-          ru: "`href`, `className` и остальные атрибуты ссылки.",
+          en: "`href`, `children`, `className` and the other anchor attributes.",
+          ru: "`href`, `children`, `className` и остальные атрибуты ссылки.",
         },
       ],
     },
+    {
+      name: "Card.Badges",
+      en: "`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: one container for every badge of the record (status, role, counter; the meaning is the `tone` or `color` of a badge). Badges are `xs` · `xs` · `xs` · `s` · `s` by card size; what does not fit folds into «+N».",
+      ru: "`Badge.Group` после названия, на его строке: один контейнер для всех бейджей записи (статус, роль, счётчик; смысл — это `tone` или `color` бейджа). Бейджи `xs` · `xs` · `xs` · `s` · `s` по размеру карточки, что не помещается, сворачивается в «+N».",
+      props: [
+        {
+          name: "labels",
+          type: "Partial<BadgeGroupLabels>",
+          en: "Built-in strings of the «+N» badge, see the `Badge.Group` labels.",
+          ru: "Системные строки бейджа «+N», см. подписи `Badge.Group`.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (the `Badge.Root`s), `className` and the other div attributes.",
+          ru: "`children` (`Badge.Root`), `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
+      name: "Card.Description",
+      en: "`ref` → `HTMLDivElement`. The line under the title: plain text with new data only, one line, cut with an ellipsis; 12/16 · 12/16 · 13/20 · 14/20 · 14/20. A `StatusDot` first states the record's state, and a «·» is put after it by itself.",
+      ru: "Строка под названием: простой текст только с новыми данными, одна строка с обрезкой; 12/16 · 12/16 · 13/20 · 14/20 · 14/20. `StatusDot` первым называет состояние записи, «·» после него ставится сам.",
+      props: [REST_DIV],
+    },
+    {
+      name: "Card.Actions",
+      en: "`ref` → `HTMLDivElement`. The card's controls, the card's tier (xs · s · m · l · xl), as tall as its form fields. In the header: with a footer only «Ещё» and a picker, without one neutral buttons too; never an accent button. In the footer: up to two buttons, the accent one last.",
+      ru: "Контролы карточки того же яруса, что карточка (xs · s · m · l · xl), вровень с полями формы в ней. В шапке: с подвалом только «Ещё» и выбор значения, без него ещё нейтральные кнопки; акцентной кнопки нет. В подвале: до двух кнопок, акцентная последней.",
+      props: [
+        {
+          name: "fullWidth",
+          type: "boolean",
+          default: "false",
+          en: "Footer only: the buttons share the footer's width. Use it when there is no start part.",
+          ru: "Только в подвале: кнопки делят ширину подвала. Нужен, когда слева ничего нет.",
+        },
+        REST_DIV,
+      ],
+    },
+    {
+      name: "Card.Indicator",
+      en: "`ref` → `HTMLSpanElement`. The choice mark at the end of the header: a radio circle or a checkbox, checked while the card is `selected`. It is `aria-hidden`; the card's own element carries the state.",
+      ru: "Метка выбора в конце шапки: круг радио или чекбокс, отмечен, пока карточка `selected`. Она `aria-hidden`; состояние несёт сам элемент карточки.",
+      props: [
+        {
+          name: "type",
+          type: '"radio" | "checkbox"',
+          required: true,
+          en: '`radio` — one of several (inside a `role="radiogroup"`), `checkbox` — any of several.',
+          ru: '`radio` — один из нескольких (внутри `role="radiogroup"`), `checkbox` — любые из нескольких.',
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
+      ],
+    },
+    {
+      name: "Card.Body",
+      en: '`ref` → `HTMLDivElement`. The content zone; its rows are parted by air, never lines: label — value rows (`DescriptionList` with `align="end"`), a `List` of records, a form, `Switch.Root` rows with `fullWidth`, a chart, a `ScrollContainer` of a long list, an `EmptyPage`.',
+      ru: 'Зона содержимого; строки разделены воздухом, не линиями: строки «подпись — значение» (`DescriptionList` с `align="end"`), `List` записей, форма, строки `Switch.Root` с `fullWidth`, график, `ScrollContainer` длинного списка, `EmptyPage`.',
+      props: [REST_DIV],
+    },
+    {
+      name: "Card.Footer",
+      en: "`ref` → `HTMLDivElement`. The bottom zone, no line and no fill, kept to the bottom of a stretched card: one thing at the start (`Card.Total`, an assignee picker, a note) and `Card.Actions` at the end. On a narrow card the buttons go under and share the width.",
+      ru: "Нижняя зона без линии и заливки, прижата к низу растянутой карточки: одно слева (`Card.Total`, выбор ответственного высотой с кнопку, пометка) и `Card.Actions` справа. На узкой карточке кнопки уходят вниз и делят ширину.",
+      props: [REST_DIV],
+    },
+    {
+      name: "Card.Total",
+      en: "`ref` → `HTMLDivElement`. At the start of the footer: the amount, tabular, with its state (`label`) above it.",
+      ru: "В начале подвала: сумма табличными цифрами, над ней её состояние (`label`).",
+      props: [
+        {
+          name: "label",
+          type: "ReactNode",
+          en: "The state of the amount («К оплате»), muted and coloured by `tone`.",
+          ru: "Состояние суммы («К оплате»), приглушённое и окрашенное по `tone`.",
+        },
+        {
+          name: "tone",
+          type: '"neutral" | "success" | "warning" | "danger"',
+          en: "The colour of `label` by meaning; the word says the meaning.",
+          ru: "Цвет `label` по смыслу; смысл говорит слово.",
+        },
+        REST_DIV,
+      ],
+    },
   ],
-  labels: [],
+  labels: labelRows(BADGE_GROUP_LABELS, {
+    more: {
+      en: "Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many.",
+      ru: "Видимый текст бейджа «+N» для не поместившихся бейджей; `{count}` — сколько их.",
+      part: "Card.Badges",
+    },
+    moreCount: {
+      en: "What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip.",
+      ru: "Что читают ассистивные технологии вместо видимого текста этого бейджа; `{count}` — сколько. Сами значения — в его подсказке.",
+      part: "Card.Badges",
+    },
+  }),
   accessibility: {
     keyboard: [
       {
         keys: "Tab",
-        en: "A card with `asChild` is one stop: focus lands on the whole link or button.",
-        ru: "Карточка с `asChild` — одна остановка: фокус на ссылке или кнопке целиком.",
+        en: "A card with `Card.Link` is one stop on the link; a card with `asChild` is one stop on its element; otherwise the stops are the controls in `Card.Actions`.",
+        ru: "Карточка с `Card.Link` — одна остановка на ссылке; карточка с `asChild` — одна остановка на её элементе; иначе остановки — контролы в `Card.Actions`.",
+        native: true,
       },
       {
-        keys: "Enter · Space",
-        en: "Opens the link (`Enter`) or presses the button (`Enter`, `Space`) of a card with `asChild`.",
-        ru: "Открывает ссылку (`Enter`) или нажимает кнопку (`Enter`, `Space`) карточки с `asChild`.",
+        keys: "Enter",
+        en: "Opens the card's link, or presses its button (`asChild`).",
+        ru: "Открывает ссылку карточки или нажимает её кнопку (`asChild`).",
+        native: true,
+      },
+      {
+        keys: "Space",
+        en: "Presses the button of a card with `asChild` (a choice card).",
+        ru: "Нажимает кнопку карточки с `asChild` (карточка выбора).",
         native: true,
       },
     ],
     aria: [
       {
-        en: "With `asChild` the card is the link or button itself; its name is the text of its parts. Nothing interactive may sit inside it — put row actions next to the card instead.",
-        ru: "С `asChild` карточка — сама ссылка или кнопка: её имя складывается из текста частей; внутри не должно быть других интерактивных элементов.",
+        en: "`Card.Title` is a heading (`h3` by default, `as` picks the level); with `Card.Link` the link inside it names the card.",
+        ru: "`Card.Title` — заголовок (по умолчанию `h3`, уровень задаёт `as`); с `Card.Link` карточку называет ссылка внутри него.",
       },
       {
-        en: "`Card.Link` is the card's one tab stop: an `<a>` named by the title, or, through `asChild`, a `<button>` (the record opens in a window) with the same name; the arrow is `aria-hidden`.",
-        ru: "`Card.Link` — единственная остановка Tab карточки: `<a>` с именем из заголовка или через `asChild` — `<button>` (запись открывается в окне) с тем же именем; стрелка — `aria-hidden`.",
+        en: "`Card.Link` stretches over the card with a pseudo-element, so the card is one link for a pointer and one tab stop for the keyboard; its focus ring is drawn on the card.",
+        ru: "`Card.Link` растягивается на карточку псевдоэлементом, поэтому для указателя карточка — одна ссылка, а для клавиатуры — одна остановка; кольцо фокуса рисуется на карточке.",
       },
       {
-        en: '`Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.',
-        ru: '`Card.Root` — обычный `<div>`; `role="region"` и `aria-labelledby` задавайте, только если блок заслуживает ориентира.',
+        en: 'A choice card is `Card.Root` with `asChild` and `selected` around a `<button>`: it gets `aria-pressed`, or `aria-checked` with `role="radio"` (inside a `role="radiogroup"`) or `role="checkbox"`. The `selected` ring never carries the meaning alone.',
+        ru: 'Карточка выбора — `Card.Root` с `asChild` и `selected` вокруг `<button>`: он получает `aria-pressed`, а с `role="radio"` (внутри `role="radiogroup"`) или `role="checkbox"` — `aria-checked`. Кольцо `selected` не несёт смысл в одиночку.',
       },
       {
-        en: '`Card.Title` renders `<h3>`; directly under the page title pass `as="h2"`.',
-        ru: '`Card.Title` — `<h3>`; прямо под заголовком страницы передайте `as="h2"`, чтобы не пропустить уровень.',
+        en: "`Card.Indicator` is `aria-hidden`: it repeats the state the element carries. A picture in `Card.Icon` is `aria-hidden` (it repeats the title), a `ProgressCircle` keeps its name.",
+        ru: "`Card.Indicator` — `aria-hidden`: он повторяет состояние, которое несёт элемент. Картинка в `Card.Icon` — `aria-hidden` (повторяет название), `ProgressCircle` сохраняет своё имя.",
       },
       {
-        en: "Decorative icons in `Card.Icon` and cover images in `Card.Media` get `aria-hidden`; controls in `Card.Actions` need their own names.",
-        ru: "Декоративные иконки в `Card.Icon` и обложки в `Card.Media` — `aria-hidden`; контролам в `Card.Actions` нужны свои имена.",
+        en: "The «·» after a `StatusDot` in `Card.Description` is `aria-hidden`; the state is the dot's word.",
+        ru: "«·» после `StatusDot` в `Card.Description` — `aria-hidden`; состояние говорит слово точки.",
       },
     ],
   },

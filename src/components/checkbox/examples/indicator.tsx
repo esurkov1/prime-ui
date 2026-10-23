@@ -1,5 +1,5 @@
-/** The box alone on selectable tiles: the toggle button carries `aria-pressed`, the box only shows it — `Checkbox.Indicator`. */
-import { Checkbox, Kpi } from "prime-ui-kit";
+/** The box alone on selectable tiles: `selected` on the card marks its toggle button and the box shows it — `Card.Indicator`, `selected`. */
+import { Card } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -23,15 +23,15 @@ export default function CheckboxIndicatorExample() {
       {MODULES.map((module) => {
         const pressed = selected.includes(module.value);
         return (
-          <Kpi.Root key={module.value} valueSize="s" asChild>
-            <button type="button" aria-pressed={pressed} onClick={() => toggle(module.value)}>
-              <Kpi.Title>{module.label}</Kpi.Title>
-              <Kpi.Actions>
-                <Checkbox.Indicator checked={pressed} />
-              </Kpi.Actions>
-              <Kpi.Value>{module.price} в месяц</Kpi.Value>
+          <Card.Root key={module.value} asChild selected={pressed}>
+            <button type="button" onClick={() => toggle(module.value)}>
+              <Card.Header>
+                <Card.Title>{module.label}</Card.Title>
+                <Card.Description>{module.price} в месяц</Card.Description>
+                <Card.Indicator type="checkbox" />
+              </Card.Header>
             </button>
-          </Kpi.Root>
+          </Card.Root>
         );
       })}
     </div>

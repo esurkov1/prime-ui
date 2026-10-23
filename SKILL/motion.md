@@ -27,9 +27,9 @@ Use the component and the motion comes with it. Never re-animate these with your
 | A chat message changes size (a reaction, a transcript, an edit, an upload state) | one stroke: the bubble glides to its new size with its parts, the time and the tail still ([Message → States](../src/components/message/COMPONENT.md#states)) | `Message.Root` (built in) |
 | A counter or a count | digits roll like an odometer | `Badge` with a number child, the `counter` of `Input` / `Textarea` |
 | A field with an error | the control shakes once, sharply, when the error arrives or changes; the label stays, the message drops in | `error` (or `invalid`) on any field, `Checkbox.Root`, `Switch.Root`, `Radio.Group` — not for an error the field mounts with |
-| Password strength | stepped bar fills cell by cell, the level word flows in | `Input.Root strength` |
+| Password strength | one front fills the stepped bar and empties it the same way, the level word flows in | `Input.Root strength` |
 | A one-time code | one focus ring glides between cells, digits fade in; while the server checks it the cells quiet down, success rolls across, a refused code clears and its reason shakes in | `DigitInput` (`onComplete` returns a Promise, or `success` / `error`) |
-| Steps of a whole | cells fill one after another | `ProgressBar steps value max` |
+| Steps or ticks of a whole | one front fills whole cells; a change caught mid-way goes on from where the front is | `ProgressBar` / `ProgressCircle` `variant="steps"` or `"ticks"` |
 | Progress | the fill slides | `ProgressBar`, `ProgressCircle` |
 | A trend card | scrub any point, the card's reading (`useSparkline`) follows, a new series cross-fades | `Sparkline` |
 | Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers, sheets and toasts come from their edge; a dialog, drawer or sheet leaves faster than it came, a small floating panel opens and closes on the same quick `fast` clock; the last content stays on screen while the exit plays | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `ConfirmDialog`, `Drawer`, `Sheet`, `MediaViewer`, notifications — the `Root` kept mounted |

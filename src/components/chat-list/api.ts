@@ -250,8 +250,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemStatus`, `ChatList.ItemMenu` — inside the child element with `asChild`.",
-          ru: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemStatus`, `ChatList.ItemMenu` — внутри дочернего элемента при `asChild`.",
+          en: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemBadges`, `ChatList.ItemMenu` — inside the child element with `asChild`.",
+          ru: "`ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemBadges`, `ChatList.ItemMenu` — внутри дочернего элемента при `asChild`.",
         },
         {
           name: "…rest",
@@ -295,21 +295,21 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "ChatList.ItemStatus",
-      en: "`ref` → `HTMLSpanElement`. The status of the record behind the dialog (a deal stage, an AI agent's state): its `Badge.Root`s on one line under the preview in the compact tier, the rest behind «+N»; they stay in a pane too narrow for the preview.",
-      ru: "Статус записи за диалогом (этап сделки, состояние AI-агента): его `Badge.Root` одной строкой под превью компактного яруса, остальные за «+N»; остаются в панели, где превью уже скрыто.",
+      name: "ChatList.ItemBadges",
+      en: "`ref` → `HTMLDivElement`. The badges of the record behind the dialog (a deal stage, an AI agent's state): its `Badge.Root`s after the name, on its line, in the compact tier, the rest behind «+N»; the name gives way first. They stay in a pane too narrow for the preview.",
+      ru: "Бейджи записи за диалогом (этап сделки, состояние AI-агента): её `Badge.Root` после имени, на его строке, компактного яруса, остальные за «+N»; имя уступает первым. Остаются в панели, где превью уже скрыто.",
       props: [
         {
           name: "children",
           type: "ReactNode",
-          en: "The `Badge.Root`s of the status: «Бронь» (`color`), «Ждёт человека» (`tone`).",
-          ru: "`Badge.Root` статуса: «Бронь» (`color`), «Ждёт человека» (`tone`).",
+          en: "The `Badge.Root`s of the record: «Бронь» (`color`), «Ждёт человека» (`tone`).",
+          ru: "`Badge.Root` записи: «Бронь» (`color`), «Ждёт человека» (`tone`).",
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLSpanElement>",
-          en: "`className` and the native attributes of the `span`.",
-          ru: "`className` и нативные атрибуты `span`.",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the native attributes of the `div`.",
+          ru: "`className` и нативные атрибуты `div`.",
         },
       ],
     },

@@ -346,7 +346,7 @@ function InputRoot({
           {children}
           {strength ? (
             <ProgressBar
-              steps
+              variant="steps"
               value={level}
               max={4}
               tone={levelTone ?? "neutral"}

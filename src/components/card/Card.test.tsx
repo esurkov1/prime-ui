@@ -1,831 +1,885 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
-import { Dropdown } from "@/components/dropdown/Dropdown";
 import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
+import { StatusDot } from "@/components/status-dot/StatusDot";
+import { Switch } from "@/components/switch/Switch";
 import { Icon } from "@/icons";
-import hairline from "@/internal/hairline.module.css";
-import textRole from "@/internal/textRole.module.css";
+import headerRow from "@/internal/headerRow.module.css";
+import rowLink from "@/internal/rowLink.module.css";
+import surfaceFrame from "@/internal/surfaceFrame.module.css";
 import { cssRule, cssValue } from "@/test/css";
 
 import { Card } from "./Card";
 import styles from "./Card.module.css";
 
 const CSS = "src/components/card/Card.module.css";
+const HEADER_CSS = "src/internal/headerRow.module.css";
 
-describe("Card", () => {
-  it("lays out by its zones: zoned, a cover when the media leads, bare content edge to edge", () => {
+describe("Card.Root", () => {
+  it("is a surface of the ladder with its own class and ref", () => {
+    const ref = React.createRef<HTMLDivElement>();
     render(
-      <>
-        <Card.Root data-testid="zoned">
-          <Card.Header>
-            <Card.Title>Выручка</Card.Title>
-          </Card.Header>
-          <Card.Body>Сводка</Card.Body>
-        </Card.Root>
-        <Card.Root data-testid="cover">
-          <Card.Media>
-            <img src="unit.jpg" alt="" />
-          </Card.Media>
-          <Card.Header>
-            <Card.Title>Honda PCX 160</Card.Title>
-          </Card.Header>
-        </Card.Root>
-        <Card.Root data-testid="bare">
-          <div>Лента чата</div>
-        </Card.Root>
-      </>,
-    );
-    expect(screen.getByTestId("zoned")).toHaveAttribute("data-layout", "zoned");
-    expect(screen.getByTestId("cover")).toHaveAttribute("data-layout", "cover");
-    expect(screen.getByTestId("bare")).toHaveAttribute("data-layout", "bare");
-    // Bare content pads itself: the card adds no padding of its own.
-    expect(() => cssRule(CSS, '.root[data-layout="bare"]')).toThrow();
-  });
-
-  it("renders a header, body, media and footer", () => {
-    render(
-      <Card.Root data-testid="panel-card">
+      <Card.Root ref={ref} data-testid="card" className="own">
         <Card.Header>
-          <Card.Title>Revenue</Card.Title>
-          <Card.Actions>
-            <button type="button">Period</button>
-          </Card.Actions>
+          <Card.Title>Выручка</Card.Title>
         </Card.Header>
-        <Card.Body>Intro</Card.Body>
-        <Card.Media>Plot</Card.Media>
-        <Card.Footer>
-          <button type="button">Save</button>
-        </Card.Footer>
       </Card.Root>,
     );
-    expect(screen.getByRole("heading", { name: "Revenue" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Period" })).toBeInTheDocument();
-    expect(screen.getByText("Intro")).toBeInTheDocument();
-    expect(screen.getByText("Plot")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+    const card = screen.getByTestId("card");
+    expect(card).toBe(ref.current);
+    expect(card).toHaveClass(styles.root, "own");
+    expect(card).toHaveAttribute("data-depth", "1");
+    expect(card).toHaveAttribute("data-size", "m");
+    expect(cssValue(cssRule(CSS, ".root"), "background")).toBe("var(--prime-color-layer-current)");
   });
 
-  it("renders a list of items", () => {
+  it("stands one step deeper inside another card", () => {
     render(
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>Events</Card.Title>
-        </Card.Header>
-        <Card.List>
-          <Card.ListItem>One</Card.ListItem>
-          <Card.ListItem>Two</Card.ListItem>
-        </Card.List>
-      </Card.Root>,
-    );
-    expect(screen.getByRole("list")).toHaveAttribute("role", "list");
-    expect(screen.getAllByRole("listitem")).toHaveLength(2);
-  });
-
-  it("titles render h3 by default, title-s, and take a heading level via as", () => {
-    render(
-      <Card.Root>
-        <Card.Header>
-          <Card.Title as="h2">Профиль</Card.Title>
-        </Card.Header>
+      <Card.Root data-testid="outer">
         <Card.Body>
-          <Card.Title>Тариф</Card.Title>
+          <Card.Root data-testid="inner">
+            <Card.Body>Накладная</Card.Body>
+          </Card.Root>
         </Card.Body>
       </Card.Root>,
     );
-    expect(screen.getByRole("heading", { level: 2, name: "Профиль" })).toHaveClass(textRole.titleS);
-    expect(screen.getByRole("heading", { level: 3, name: "Тариф" })).toBeInTheDocument();
+    expect(screen.getByTestId("outer")).toHaveAttribute("data-depth", "1");
+    expect(screen.getByTestId("inner")).toHaveAttribute("data-depth", "2");
   });
 
-  it("Card.Actions is the end of the header: in order, centred on the text, the consumer's own", () => {
-    const row = cssRule(CSS, ".actions");
-    expect(cssValue(row, "display")).toBe("flex");
-    expect(cssValue(row, "gap")).toBe("var(--prime-space-2)");
-    const end = cssRule(CSS, ".header > .actions");
-    expect(cssValue(end, "grid-column")).toBe("end");
-    expect(cssValue(end, "grid-row")).toBe("1 / -1");
+  it("has five sets of metrics, one per size", () => {
     render(
+      (["xs", "s", "m", "l", "xl"] as const).map((size) => (
+        <Card.Root key={size} size={size} data-testid={size}>
+          <Card.Body>Сводка</Card.Body>
+        </Card.Root>
+      )),
+    );
+    const sizes = ["xs", "s", "m", "l", "xl"].map((id) =>
+      screen.getByTestId(id).getAttribute("data-size"),
+    );
+    expect(sizes).toEqual(["xs", "s", "m", "l", "xl"]);
+    expect(sizes).toEqual(
+      ["xs", "s", "m", "l", "xl"].map((id) => screen.getByTestId(id).getAttribute("data-frame")),
+    );
+    expect(screen.getByTestId("m")).toHaveClass(surfaceFrame.frame);
+  });
+
+  it("takes the tier of the host around it", () => {
+    render(
+      <Card.Root size="l">
+        <Card.Body>
+          <Card.Root data-testid="inner">
+            <Card.Body>Накладная</Card.Body>
+          </Card.Root>
+        </Card.Body>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("inner")).toHaveAttribute("data-size", "l");
+  });
+
+  it("is a pane without a zone: no padding, content edge to edge", () => {
+    render(
+      <>
+        <Card.Root data-testid="pane">
+          <div>Лента чата</div>
+        </Card.Root>
+        <Card.Root data-testid="zoned">
+          <Card.Body>Сводка</Card.Body>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("pane")).toHaveAttribute("data-bare");
+    expect(screen.getByTestId("zoned")).not.toHaveAttribute("data-bare");
+    expect(cssValue(cssRule(CSS, ".root[data-bare]"), "gap")).toBe("0");
+    expect(cssValue(cssRule(CSS, '.root[data-cover="start"], .root[data-bare]'), "padding")).toBe(
+      "0",
+    );
+  });
+
+  it("marks a start cover as a split of the cover and the zones", () => {
+    render(
+      <Card.Root data-testid="card">
+        <Card.Media placement="start" data-testid="media">
+          <img src="unit.jpg" alt="" />
+        </Card.Media>
+        <Card.Header>
+          <Card.Title>Honda PCX 160</Card.Title>
+        </Card.Header>
+        <Card.Body>Пробег 12 000 км</Card.Body>
+      </Card.Root>,
+    );
+    const card = screen.getByTestId("card");
+    expect(card).toHaveAttribute("data-cover", "start");
+    const split = card.firstElementChild as HTMLElement;
+    expect(split).toHaveClass(styles.split);
+    expect(split.firstElementChild).toBe(screen.getByTestId("media"));
+    expect(screen.getByTestId("media")).toHaveAttribute("data-placement", "start");
+    const main = split.lastElementChild as HTMLElement;
+    expect(main).toHaveClass(styles.main);
+    expect(main).toContainElement(screen.getByRole("heading", { name: "Honda PCX 160" }));
+    expect(main).not.toContainElement(screen.getByTestId("media"));
+    // From 30rem a column as wide as the photo's ratio makes it; narrower it stays on top.
+    const column = cssRule(CSS, '.media[data-placement="start"]', ["@container"]);
+    expect(cssValue(column, "flex")).toBe(
+      "0 0 var(--card-cover-width, min(40%, var(--prime-layout-tile-min-width)))",
+    );
+  });
+
+  it("sizes a start cover by the zones' height and the photo's ratio, half the card at most", () => {
+    const height = vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(120);
+    const width = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(600);
+    const { rerender } = render(
       <Card.Root>
-        <Card.Header data-testid="header">
-          <Card.Title>300 $</Card.Title>
-          <Card.Description>наличные</Card.Description>
-          <Card.Actions data-testid="actions" className="own">
-            <Button.Root>Вернуть</Button.Root>
-            <Button.Root aria-label="Исправить">
-              <Button.Icon>
-                <Icon name="action.edit" />
-              </Button.Icon>
-            </Button.Root>
-          </Card.Actions>
+        <Card.Media placement="start" data-testid="media">
+          <div style={{ aspectRatio: "4 / 3" }} />
+        </Card.Media>
+        <Card.Header>
+          <Card.Title>Honda PCX 160</Card.Title>
         </Card.Header>
       </Card.Root>,
     );
-    const actions = screen.getByTestId("actions");
-    expect(actions).toHaveClass(styles.actions, "own");
-    expect(actions.parentElement).toBe(screen.getByTestId("header"));
-    expect([...actions.children]).toEqual([
-      screen.getByRole("button", { name: "Вернуть" }),
-      screen.getByRole("button", { name: "Исправить" }),
+    const media = screen.getByTestId("media");
+    expect(media.style.getPropertyValue("--card-cover-width")).toBe("160px");
+    width.mockReturnValue(200);
+    rerender(
+      <Card.Root>
+        <Card.Media placement="start" data-testid="media">
+          <div style={{ aspectRatio: "4 / 3" }} />
+        </Card.Media>
+        <Card.Header>
+          <Card.Title>Honda PCX 160</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(media.style.getPropertyValue("--card-cover-width")).toBe("100px");
+    height.mockRestore();
+    width.mockRestore();
+  });
+
+  it("puts a top cover first, edge to edge", () => {
+    render(
+      <Card.Root data-testid="card">
+        <Card.Media data-testid="media">
+          <img src="unit.jpg" alt="" />
+        </Card.Media>
+        <Card.Header>
+          <Card.Title>Honda PCX 160</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const card = screen.getByTestId("card");
+    expect(card).toHaveAttribute("data-cover", "top");
+    expect(card.firstElementChild).toBe(screen.getByTestId("media"));
+    expect(screen.getByTestId("media")).toHaveAttribute("data-placement", "top");
+    expect(card).not.toHaveAttribute("data-bare");
+  });
+});
+
+describe("Card.Header", () => {
+  function arranged(header: React.ReactNode) {
+    render(
+      <Card.Root>
+        <Card.Header data-testid="header">{header}</Card.Header>
+      </Card.Root>,
+    );
+    return screen.getByTestId("header");
+  }
+
+  it("arranges its parts whatever the order they are written in", () => {
+    const header = arranged(
+      <>
+        <Card.Actions data-testid="actions">
+          <Button.Root variant="ghost">Ещё</Button.Root>
+        </Card.Actions>
+        <Card.Description data-testid="description">Обновлён вчера</Card.Description>
+        <Card.Badges data-testid="badges">
+          <Badge.Root>В работе</Badge.Root>
+        </Card.Badges>
+        <Card.Title data-testid="title">Заказ 1042</Card.Title>
+        <Card.Icon data-testid="icon">
+          <Icon name="action.more" />
+        </Card.Icon>
+      </>,
+    );
+    const [icon, titles, actions] = [...header.children] as HTMLElement[];
+    expect(icon).toBe(screen.getByTestId("icon"));
+    expect(actions).toBe(screen.getByTestId("actions"));
+    const [titleRow, description] = [...titles.children] as HTMLElement[];
+    expect(titles).toHaveClass(headerRow.titles);
+    expect(description).toBe(screen.getByTestId("description"));
+    expect([...titleRow.children]).toEqual([
+      screen.getByTestId("title"),
+      screen.getByTestId("badges"),
     ]);
   });
 
-  it("dropped actions run to the end edge; their buttons share the width, icon buttons only stay", () => {
-    const narrow = ["@container (max-width: 22rem)"];
-    const rule = cssRule(CSS, ".header > .actions:has(> :not([data-icon-only]))", narrow);
-    expect(cssValue(rule, "grid-column")).toBe("text / -1");
-    expect(cssValue(rule, "justify-self")).toBe("stretch");
-    expect(cssValue(rule, "justify-content")).toBe("flex-start");
-    expect(
-      cssValue(
-        cssRule(CSS, ".header > .actions > :is(button, a):not([data-icon-only])", narrow),
-        "flex",
-      ),
-    ).toBe("1 1 auto");
-  });
-
-  it("becomes the link it wraps with asChild: one tab stop, parts inside, the root's attributes", async () => {
-    render(
-      <Card.Root asChild className="extra">
-        <a href="#orders">
-          <Card.Header>
-            <Card.Title>Заказы</Card.Title>
-            <Card.Description>128 за неделю</Card.Description>
-          </Card.Header>
-        </a>
-      </Card.Root>,
-    );
-    const link = screen.getByRole("link", { name: /Заказы\s*128/ });
-    expect(link).toHaveAttribute("href", "#orders");
-    expect(link).toHaveAttribute("data-interactive", "true");
-    expect(link).toHaveAttribute("data-layout", "zoned");
-    expect(link).toHaveAttribute("data-depth");
-    expect(link).toHaveClass("extra");
-  });
-
-  it("is one Tab stop with asChild: focus moves onto the whole link and on past it", async () => {
-    const user = userEvent.setup();
-    render(
+  it("puts the indicator at the end like the actions", () => {
+    const header = arranged(
       <>
-        <button type="button">До</button>
-        <Card.Root asChild>
-          <a href="#orders">
-            <Card.Header>
-              <Card.Title>Заказы</Card.Title>
-            </Card.Header>
-          </a>
-        </Card.Root>
-        <button type="button">После</button>
+        <Card.Indicator type="radio" data-testid="indicator" />
+        <Card.Title>Тариф «Команда»</Card.Title>
       </>,
     );
-    screen.getByRole("button", { name: "До" }).focus();
-    await user.tab();
-    expect(screen.getByRole("link", { name: /Заказы/ })).toHaveFocus();
-    await user.tab();
-    expect(screen.getByRole("button", { name: "После" })).toHaveFocus();
+    expect(header.lastElementChild).toBe(screen.getByTestId("indicator"));
   });
 
-  it("works as a button: Enter and Space activate it", async () => {
+  it("is one line without a description and two with it", () => {
+    render(
+      <>
+        <Card.Root>
+          <Card.Header data-testid="one">
+            <Card.Title>Заказ 1042</Card.Title>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root>
+          <Card.Header data-testid="two">
+            <Card.Title>Заказ 1043</Card.Title>
+            <Card.Description>Обновлён вчера</Card.Description>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("one")).toHaveAttribute("data-lines", "one");
+    expect(screen.getByTestId("two")).toHaveAttribute("data-lines", "two");
+    // The controls of a one-line header share the title's centre line.
+    expect(
+      cssValue(
+        cssRule(HEADER_CSS, '.header[data-lines="one"], .header:has(> .mark), .header:only-child'),
+        "align-items",
+      ),
+    ).toBe("center");
+  });
+});
+
+describe("Card.Icon", () => {
+  it("is an accent tile of one icon sized by the card: 32 · 32 · 40 · 48 · 56", () => {
+    render(
+      (["xs", "s", "m", "l", "xl"] as const).map((size) => (
+        <Card.Root key={size} size={size}>
+          <Card.Header>
+            <Card.Icon data-testid={size}>
+              <Icon name="action.more" />
+            </Card.Icon>
+            <Card.Title>Заказ</Card.Title>
+          </Card.Header>
+        </Card.Root>
+      )),
+    );
+    expect(
+      ["xs", "s", "m", "l", "xl"].map((id) => screen.getByTestId(id).getAttribute("data-size")),
+    ).toEqual(["xs", "xs", "s", "m", "l"]);
+    expect(screen.getByTestId("m")).toHaveAttribute("data-tone", "accent");
+    expect(screen.getByTestId("m")).not.toHaveAttribute("data-media");
+  });
+
+  it("is one step smaller on a one-line card with a switch (24 · 24 · 32 · 40 · 48)", () => {
+    render(
+      <>
+        <Card.Root size="m">
+          <Card.Header data-testid="row">
+            <Card.Icon data-testid="row-icon">
+              <Icon name="action.more" />
+            </Card.Icon>
+            <Card.Title>Уведомления</Card.Title>
+            <Card.Actions>
+              <Switch.Root aria-label="Уведомления" />
+            </Card.Actions>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root size="m">
+          <Card.Header data-testid="two">
+            <Card.Icon data-testid="two-icon">
+              <Icon name="action.more" />
+            </Card.Icon>
+            <Card.Title>Уведомления</Card.Title>
+            <Card.Description>Почта и мессенджеры</Card.Description>
+            <Card.Actions>
+              <Switch.Root aria-label="Уведомления" />
+            </Card.Actions>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root size="s">
+          <Card.Header>
+            <Card.Icon data-testid="row-s">
+              <Icon name="action.more" />
+            </Card.Icon>
+            <Card.Title>Уведомления</Card.Title>
+            <Card.Actions>
+              <Switch.Root aria-label="Уведомления" />
+            </Card.Actions>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("row")).toHaveAttribute("data-mark", "row");
+    expect(screen.getByTestId("row-icon")).toHaveAttribute("data-size", "xs");
+    expect(screen.getByTestId("row-s")).toHaveAttribute("data-size", "2xs");
+    // With a description the header holds two lines: the full mark.
+    expect(screen.getByTestId("two")).toHaveAttribute("data-mark", "header");
+    expect(screen.getByTestId("two-icon")).toHaveAttribute("data-size", "s");
+  });
+
+  it("takes a picture with no tile and hides it from assistive tech", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Icon data-testid="icon">
+            <Avatar.Root>АВ</Avatar.Root>
+          </Card.Icon>
+          <Card.Title>Анна Ветрова</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("data-media");
+    expect(icon).not.toHaveAttribute("data-tone");
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("keeps the name of a state ring", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Icon data-testid="icon">
+            <ProgressCircle value={40} aria-label="Выполнено 40%" />
+          </Card.Icon>
+          <Card.Title>Склад</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("data-media");
+    expect(icon).not.toHaveAttribute("aria-hidden");
+    expect(screen.getByRole("progressbar", { name: "Выполнено 40%" })).toBeInTheDocument();
+  });
+
+  it("is the owner's avatar on the edge of a top cover", () => {
+    render(
+      <>
+        <Card.Root>
+          <Card.Media>
+            <img src="unit.jpg" alt="" />
+          </Card.Media>
+          <Card.Header data-testid="covered">
+            <Card.Icon data-testid="edge">
+              <Avatar.Root>АВ</Avatar.Root>
+            </Card.Icon>
+            <Card.Title>Honda PCX 160</Card.Title>
+          </Card.Header>
+        </Card.Root>
+        <Card.Root>
+          <Card.Header data-testid="plain">
+            <Card.Icon data-testid="plain-icon">
+              <Avatar.Root>АВ</Avatar.Root>
+            </Card.Icon>
+            <Card.Title>Анна Ветрова</Card.Title>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("covered")).toHaveAttribute("data-edge");
+    expect(screen.getByTestId("edge")).toHaveAttribute("data-edge");
+    expect(screen.getByTestId("plain")).not.toHaveAttribute("data-edge");
+    expect(screen.getByTestId("plain-icon")).not.toHaveAttribute("data-edge");
+    expect(cssValue(cssRule(CSS, ".icon[data-edge]"), "flex-basis")).toBe("100%");
+  });
+});
+
+describe("Card.Title", () => {
+  it("is an h3 by default, with `as` for the outline, and one cut line", () => {
+    const ref = React.createRef<HTMLHeadingElement>();
+    render(
+      <Card.Root size="l">
+        <Card.Header>
+          <Card.Title ref={ref} className="own">
+            Заказ 1042
+          </Card.Title>
+        </Card.Header>
+        <Card.Header>
+          <Card.Title as="h2">Заказ 1043</Card.Title>
+          <Card.Title as="span">Заказ 1044</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByRole("heading", { name: "Заказ 1042", level: 3 })).toBe(ref.current);
+    expect(ref.current).toHaveClass(headerRow.title, "own");
+    expect(screen.getByRole("heading", { name: "Заказ 1043", level: 2 })).toBeInTheDocument();
+    expect(screen.getByText("Заказ 1044").tagName).toBe("SPAN");
+    const title = cssRule(HEADER_CSS, ".title");
+    expect(cssValue(title, "white-space")).toBe("nowrap");
+    expect(cssValue(title, "text-overflow")).toBe("ellipsis");
+  });
+
+  it("gives way to its badges first, down to its own text or 8em", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title data-testid="title">Заказ 1042</Card.Title>
+          <Card.Badges>
+            <Badge.Root>В работе</Badge.Root>
+          </Card.Badges>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("title").style.getPropertyValue("--header-title-min")).toMatch(/px$/);
+    expect(
+      cssValue(cssRule(HEADER_CSS, ".titleRow:has(> .badges) > .title"), "min-width"),
+    ).toContain("--header-title-min");
+  });
+});
+
+describe("Card.Badges", () => {
+  it("is one Badge.Group after the title with badges xs · xs · xs · s · s by card size", () => {
+    render(
+      (["xs", "s", "m", "l", "xl"] as const).map((size) => (
+        <Card.Root key={size} size={size}>
+          <Card.Header>
+            <Card.Title>Заказ</Card.Title>
+            <Card.Badges data-testid={`badges-${size}`}>
+              <Badge.Root data-testid={`badge-${size}`}>В работе</Badge.Root>
+            </Card.Badges>
+          </Card.Header>
+        </Card.Root>
+      )),
+    );
+    const sizes = ["xs", "s", "m", "l", "xl"].map((id) =>
+      screen.getByTestId(`badge-${id}`).getAttribute("data-size"),
+    );
+    expect(sizes).toEqual(["xs", "xs", "xs", "s", "s"]);
+    expect(screen.getByTestId("badges-m")).toHaveAttribute("data-overflow", "count");
+    expect(screen.getByTestId("badges-m")).toHaveClass(headerRow.badges);
+  });
+
+  it("folds into «+N» and keeps the consumer's ref and class", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Заказ</Card.Title>
+          <Card.Badges ref={ref} className="own">
+            <Badge.Root>В работе</Badge.Root>
+            <Badge.Root>Срочно</Badge.Root>
+          </Card.Badges>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(ref.current).toHaveClass("own");
+    // The «+N» badge is part of the group.
+    expect(within(ref.current as HTMLElement).getByText(/\+/)).toBeInTheDocument();
+  });
+});
+
+describe("Card.Description", () => {
+  it("is plain text in one cut line", () => {
+    render(
+      <Card.Root size="l">
+        <Card.Header>
+          <Card.Title>Заказ</Card.Title>
+          <Card.Description data-testid="description">Обновлён вчера</Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const description = screen.getByTestId("description");
+    expect(description).toHaveClass(headerRow.description);
+    expect(description).toHaveTextContent("Обновлён вчера");
+    expect(description.querySelector(`.${headerRow.separator}`)).toBeNull();
+    expect(cssValue(cssRule(HEADER_CSS, ".descriptionText"), "text-overflow")).toBe("ellipsis");
+  });
+
+  it("puts a quiet separator after a StatusDot", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Заказ</Card.Title>
+          <Card.Description data-testid="description">
+            Обновлён вчера
+            <StatusDot tone="success">Оплачен</StatusDot>
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const description = screen.getByTestId("description");
+    const [dot, separator, text] = [...description.children] as HTMLElement[];
+    expect(dot).toHaveTextContent("Оплачен");
+    expect(separator).toHaveAttribute("aria-hidden", "true");
+    expect(separator).toHaveTextContent("·");
+    expect(text).toHaveTextContent("Обновлён вчера");
+  });
+
+  it("has no separator when the state stands alone", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Заказ</Card.Title>
+          <Card.Description data-testid="description">
+            <StatusDot tone="warning">Ждёт оплаты</StatusDot>
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("description").querySelector(`.${headerRow.separator}`)).toBeNull();
+  });
+});
+
+describe("Card.Actions", () => {
+  it("gives its controls the card's own tier: xs · s · m · l · xl", () => {
+    render(
+      (["xs", "s", "m", "l", "xl"] as const).map((size) => (
+        <Card.Root key={size} size={size}>
+          <Card.Header>
+            <Card.Title>Заказ</Card.Title>
+            <Card.Actions>
+              <Button.Root variant="ghost" data-testid={size}>
+                Ещё
+              </Button.Root>
+            </Card.Actions>
+          </Card.Header>
+        </Card.Root>
+      )),
+    );
+    expect(
+      ["xs", "s", "m", "l", "xl"].map((id) => screen.getByTestId(id).getAttribute("data-size")),
+    ).toEqual(["xs", "s", "m", "l", "xl"]);
+  });
+
+  it("shares the footer's width only in the footer", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Заказ</Card.Title>
+          <Card.Actions fullWidth data-testid="header-actions">
+            <Button.Root variant="ghost">Ещё</Button.Root>
+          </Card.Actions>
+        </Card.Header>
+        <Card.Footer>
+          <Card.Actions fullWidth data-testid="footer-actions">
+            <Button.Root variant="soft">Отмена</Button.Root>
+            <Button.Root>Оплатить</Button.Root>
+          </Card.Actions>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("header-actions")).not.toHaveAttribute("data-full-width");
+    expect(screen.getByTestId("footer-actions")).toHaveAttribute("data-full-width");
+    expect(cssValue(cssRule(CSS, ".actions[data-full-width]"), "flex")).toBe("1 1 100%");
+  });
+
+  it("forwards its ref and class", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Card.Root>
+        <Card.Footer>
+          <Card.Actions ref={ref} className="own" />
+        </Card.Footer>
+      </Card.Root>,
+    );
+    expect(ref.current).toHaveClass(styles.actions, "own");
+  });
+});
+
+describe("Card.Indicator", () => {
+  it("follows `selected`: a radio circle", () => {
+    const { rerender } = render(
+      <Card.Root selected={false}>
+        <Card.Header>
+          <Card.Title>Тариф «Команда»</Card.Title>
+          <Card.Indicator type="radio" data-testid="indicator" />
+        </Card.Header>
+      </Card.Root>,
+    );
+    const indicator = screen.getByTestId("indicator");
+    expect(indicator).toHaveAttribute("aria-hidden", "true");
+    expect(indicator).toHaveAttribute("data-state", "unchecked");
+    rerender(
+      <Card.Root selected>
+        <Card.Header>
+          <Card.Title>Тариф «Команда»</Card.Title>
+          <Card.Indicator type="radio" data-testid="indicator" />
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("indicator")).toHaveAttribute("data-state", "checked");
+  });
+
+  it("follows `selected`: a checkbox, the card's own tier", () => {
+    render(
+      <>
+        <Card.Root selected size="l">
+          <Card.Header>
+            <Card.Title>Склад на Лесной</Card.Title>
+            <Card.Indicator type="checkbox" data-testid="checked" />
+          </Card.Header>
+        </Card.Root>
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>Склад на Речной</Card.Title>
+            <Card.Indicator type="checkbox" data-testid="unchecked" />
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByTestId("checked")).toHaveAttribute("data-state", "checked");
+    expect(screen.getByTestId("checked")).toHaveAttribute("data-size", "l");
+    expect(screen.getByTestId("unchecked")).toHaveAttribute("data-state", "unchecked");
+    expect(screen.getByTestId("unchecked")).toHaveAttribute("data-size", "m");
+  });
+
+  it("forwards its ref and class", () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Склад</Card.Title>
+          <Card.Indicator ref={ref} type="radio" className="own" />
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(ref.current).toHaveClass(styles.indicator, "own");
+  });
+});
+
+/** The role as a spread: the element is the consumer's own radio card. */
+const RADIO = { role: "radio" } as const;
+
+describe("a choice card", () => {
+  it("writes aria-pressed on its button from `selected`", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <Card.Root asChild selected data-testid="card">
+        <button type="button" onClick={onClick}>
+          <Card.Header>
+            <Card.Title as="span">Склад на Лесной</Card.Title>
+            <Card.Indicator type="checkbox" />
+          </Card.Header>
+        </button>
+      </Card.Root>,
+    );
+    const card = screen.getByRole("button", { name: "Склад на Лесной" });
+    expect(card).toBe(screen.getByTestId("card"));
+    expect(card).toHaveAttribute("aria-pressed", "true");
+    expect(card).toHaveAttribute("data-selected");
+    expect(card).toHaveAttribute("data-interactive");
+    await user.click(card);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("writes aria-checked on a radio or a checkbox element", () => {
+    render(
+      <div role="radiogroup" aria-label="Тариф">
+        <Card.Root asChild selected>
+          <button type="button" {...RADIO}>
+            <Card.Header>
+              <Card.Title as="span">Команда</Card.Title>
+              <Card.Indicator type="radio" />
+            </Card.Header>
+          </button>
+        </Card.Root>
+        <Card.Root asChild selected={false}>
+          <button type="button" {...RADIO}>
+            <Card.Header>
+              <Card.Title as="span">Бизнес</Card.Title>
+              <Card.Indicator type="radio" />
+            </Card.Header>
+          </button>
+        </Card.Root>
+      </div>,
+    );
+    expect(screen.getByRole("radio", { name: "Команда" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: "Бизнес" })).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByRole("radio", { name: "Бизнес" })).not.toHaveAttribute("aria-pressed");
+  });
+
+  it("leaves the state alone without `selected`", () => {
+    render(
+      <Card.Root asChild>
+        <button type="button">
+          <Card.Header>
+            <Card.Title as="span">Отчёт</Card.Title>
+          </Card.Header>
+        </button>
+      </Card.Root>,
+    );
+    const card = screen.getByRole("button", { name: "Отчёт" });
+    expect(card).not.toHaveAttribute("aria-pressed");
+    expect(card).not.toHaveAttribute("aria-checked");
+  });
+
+  it("is pressed with Enter and Space from the keyboard", async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
     render(
       <Card.Root asChild>
         <button type="button" onClick={onClick}>
           <Card.Header>
-            <Card.Title>Отчёт</Card.Title>
+            <Card.Title as="span">Отчёт</Card.Title>
           </Card.Header>
         </button>
       </Card.Root>,
     );
-    const button = screen.getByRole("button", { name: "Отчёт" });
-    button.focus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Отчёт" })).toHaveFocus();
     await user.keyboard("{Enter}");
     await user.keyboard(" ");
     expect(onClick).toHaveBeenCalledTimes(2);
   });
 
-  it("an avatar in Card.Icon is the record's picture: no tile, size l, hidden from assistive tech", () => {
+  it("draws the selected ring over the card, from the state the element carries", () => {
+    const chosen = cssRule(
+      CSS,
+      '.root:is([data-selected], [aria-pressed="true"], [aria-checked="true"])::after',
+    );
+    expect(cssValue(chosen, "box-shadow")).toContain("--prime-color-accent-default");
+    expect(cssValue(cssRule(CSS, ".root::after"), "pointer-events")).toBe("none");
+  });
+});
+
+describe("Card.Link", () => {
+  it("is the one link of the card and tells the root to open as a whole", async () => {
+    const user = userEvent.setup();
     render(
-      <Card.Root>
-        <Card.Header data-testid="header">
-          <Card.Icon data-testid="icon">
-            <Avatar.Root data-testid="avatar">
-              <Avatar.Fallback>АС</Avatar.Fallback>
-            </Avatar.Root>
-          </Card.Icon>
-          <Card.Title>Анна Соколова</Card.Title>
-          <Card.Description>@a.sokolova</Card.Description>
+      <Card.Root data-testid="card">
+        <Card.Header>
+          <Card.Title>
+            <Card.Link href="#order-1042">Заказ 1042</Card.Link>
+          </Card.Title>
           <Card.Actions>
-            <button type="button">Отвязать</button>
+            <Button.Root variant="ghost">Ещё</Button.Root>
           </Card.Actions>
         </Card.Header>
       </Card.Root>,
     );
-    const icon = screen.getByTestId("icon");
-    expect(icon).toHaveAttribute("data-media", "true");
-    expect(icon).toHaveAttribute("aria-hidden", "true");
-    expect(icon).not.toHaveAttribute("data-tone");
-    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "l");
-    expect(screen.getByRole("heading", { name: "Анна Соколова" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Отвязать" })).toBeInTheDocument();
+    const card = screen.getByTestId("card");
+    const link = screen.getByRole("link", { name: "Заказ 1042" });
+    expect(link).toHaveAttribute("href", "#order-1042");
+    expect(link).toHaveClass(styles.link);
+    expect(link).toHaveAttribute("data-row-link");
+    expect(card).toHaveAttribute("data-link");
+    expect(card).toHaveClass(rowLink.host);
+    expect(screen.getByRole("heading", { name: "Заказ 1042" })).toContainElement(link);
+    // The link is the first stop; Enter follows it.
+    await user.tab();
+    expect(link).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(window.location.hash).toBe("#order-1042");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Ещё" })).toHaveFocus();
   });
 
-  it("a glyph in Card.Icon keeps the accent tile", () => {
-    render(
-      <Card.Root>
-        <Card.Header>
-          <Card.Icon data-testid="icon" aria-hidden>
-            ×
-          </Card.Icon>
-          <Card.Title>Сессия</Card.Title>
-        </Card.Header>
-      </Card.Root>,
-    );
-    const icon = screen.getByTestId("icon");
-    expect(icon).toHaveAttribute("data-tone", "accent");
-    expect(icon).not.toHaveAttribute("data-media");
-  });
-
-  it("a ProgressCircle in Card.Icon is the record's state ring: no tile, the slot's 40, its own name", () => {
-    render(
-      <Card.Root size="s">
-        <Card.Header>
-          <Card.Icon data-testid="icon">
-            <ProgressCircle value={0} color="yellow" aria-label="Бронь: до выдачи 17 д">
-              17 д
-            </ProgressCircle>
-          </Card.Icon>
-          <Card.Title>Honda PCX 160</Card.Title>
-        </Card.Header>
-      </Card.Root>,
-    );
-    const icon = screen.getByTestId("icon");
-    expect(icon).toHaveAttribute("data-media", "true");
-    expect(icon).not.toHaveAttribute("aria-hidden");
-    expect(icon).not.toHaveAttribute("data-tone");
-    const ring = screen.getByRole("progressbar", { name: "Бронь: до выдачи 17 д" });
-    expect(ring.closest("[data-size]")).toHaveAttribute("data-size", "m");
-  });
-
-  it("a footer with a total is a record's row: the note's dot first, its text cut, the total at the end", () => {
-    render(
-      <Card.Root>
-        <Card.Body>Позиции</Card.Body>
-        <Card.Footer divider="full">
-          <button type="button">Выдан</button>
-          <Card.Description data-testid="note">
-            <Badge.Dot color="yellow" data-testid="dot" />
-            Выдать 6 нояб · Банг Тао
-          </Card.Description>
-          <Card.Total label="к оплате 6 400 ฿" tone="warning" data-testid="total">
-            26 400 ฿
-          </Card.Total>
-        </Card.Footer>
-      </Card.Root>,
-    );
-    const note = screen.getByTestId("note");
-    expect(note.firstElementChild).toBe(screen.getByTestId("dot"));
-    expect(note.lastElementChild).toHaveTextContent("Выдать 6 нояб · Банг Тао");
-    expect(note.lastElementChild).not.toBe(screen.getByTestId("dot"));
-    const total = screen.getByTestId("total");
-    const [label, value] = [...total.children];
-    expect(label).toHaveTextContent("к оплате 6 400 ฿");
-    expect(label).toHaveAttribute("data-tone", "warning");
-    expect(label).toHaveClass(textRole.bodyS);
-    expect(value).toHaveTextContent("26 400 ฿");
-    expect(value).toHaveClass(textRole.titleM);
-
-    expect(cssValue(cssRule(CSS, ".footer:has(> .total)"), "flex-wrap")).toBe("nowrap");
-    expect(cssValue(cssRule(CSS, ".total"), "margin-inline-start")).toBe("auto");
-    expect(cssValue(cssRule(CSS, ".total"), "justify-items")).toBe("end");
-    expect(cssValue(cssRule(CSS, ".noteText"), "text-overflow")).toBe("ellipsis");
-  });
-
-  it("a total without a label is the amount alone", () => {
-    render(
-      <Card.Root>
-        <Card.Footer>
-          <Card.Total data-testid="total">26 400 ฿</Card.Total>
-        </Card.Footer>
-      </Card.Root>,
-    );
-    expect(screen.getByTestId("total").children).toHaveLength(1);
-  });
-
-  it("divider=fill sets the footer on the next layer of the ladder, its actions from the start", () => {
-    render(
-      <Card.Root data-testid="card">
-        <Card.Body>Позиции</Card.Body>
-        <Card.Footer divider="fill" data-testid="footer">
-          <Card.Root data-testid="inner">Вложенная</Card.Root>
-        </Card.Footer>
-      </Card.Root>,
-    );
-    const footer = screen.getByTestId("footer");
-    expect(screen.getByTestId("card")).toHaveAttribute("data-depth", "1");
-    expect(footer).toHaveAttribute("data-depth", "2");
-    expect(footer).toHaveAttribute("data-divider", "fill");
-    expect(footer).not.toHaveClass(hairline.top);
-    // A surface inside the footer counts its depth from the footer's layer.
-    expect(screen.getByTestId("inner")).toHaveAttribute("data-depth", "3");
-    expect(cssValue(cssRule(CSS, '.footer[data-divider="fill"]'), "background")).toBe(
-      "var(--prime-color-layer-current)",
-    );
-    expect(
-      cssValue(
-        cssRule(CSS, '.root[data-layout="zoned"] > .footer[data-divider="fill"]'),
-        "justify-content",
-      ),
-    ).toBe("flex-start");
-  });
-
-  it("a link card with a header puts its arrow in the header, centred on its height", () => {
-    const { container } = render(
-      <Card.Root>
-        <Card.Header data-testid="header">
-          <Card.Title>
-            <Card.Link href="#866">Сделка #866</Card.Link>
-          </Card.Title>
-          <Card.Description>Аренда PCX 160 · 15 дн.</Card.Description>
-        </Card.Header>
-      </Card.Root>,
-    );
-    const marks = container.querySelectorAll(`.${styles.mark}`);
-    expect(marks).toHaveLength(1);
-    expect(marks[0]?.parentElement).toBe(screen.getByTestId("header"));
-    expect(
-      screen.getByRole("link", { name: "Сделка #866" }).querySelector(`.${styles.mark}`),
-    ).toBeNull();
-    const rule = cssRule(CSS, ".header > .mark");
-    expect(cssValue(rule, "inset-block-start")).toBe("auto");
-    expect(cssValue(rule, "align-self")).toBe("center");
-  });
-
-  it("a link card without a header keeps the arrow in the link and gives its room to the content", () => {
-    render(
-      <Card.Root>
-        <Card.Body>
-          <Card.Link href="#866">Сделка #866</Card.Link>
-        </Card.Body>
-      </Card.Root>,
-    );
-    expect(
-      screen.getByRole("link", { name: "Сделка #866" }).querySelector(`.${styles.mark}`),
-    ).not.toBeNull();
+  it("stretches over the card and shows the focus ring on the card", () => {
+    expect(cssValue(cssRule(CSS, ".link::after"), "inset")).toBe("0");
     expect(
       cssValue(
         cssRule(
           CSS,
-          ".root[data-mark]:not(:has(> .header)), .root[data-link]:not(:has(> .header))",
+          ".root[data-link]:has(.link:focus-visible), .root[data-interactive]:focus-visible",
         ),
-        "--corner-mark-room",
+        "outline",
       ),
-    ).toBe("var(--prime-space-6)");
+    ).toContain("--prime-color-focus-ring");
   });
 
-  it("a description outside the footer keeps its children as they are", () => {
-    render(
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>Honda PCX 160</Card.Title>
-          <Card.Description data-testid="description">@a.sokolova</Card.Description>
-        </Card.Header>
-      </Card.Root>,
-    );
-    expect(screen.getByTestId("description").children).toHaveLength(0);
-  });
-
-  it("CSS: a Card.Icon leads the header grid and spans the title and description rows", () => {
-    const grid = cssRule(CSS, ".header:has(> .icon)");
-    expect(cssValue(grid, "grid-template-columns")).toBe(
-      "[icon] auto [text] minmax(0, 1fr) [end] auto",
-    );
-    const icon = cssRule(CSS, ".header > .icon");
-    expect(cssValue(icon, "grid-column")).toBe("icon");
-    expect(cssValue(icon, "grid-row")).toBe("1 / -1");
-  });
-
-  it("Card.Link stretches over the card: the card opens as a whole, its button stays its own", async () => {
-    const onIssue = vi.fn();
-    render(
-      <Card.Root data-testid="card">
-        <Card.Header>
-          <Card.Title>
-            <Card.Link href="#pcx">Honda PCX</Card.Link>
-          </Card.Title>
-        </Card.Header>
-        <Card.Footer divider="full">
-          <button type="button" onClick={onIssue}>
-            Выдан
-          </button>
-        </Card.Footer>
-      </Card.Root>,
-    );
-    const card = screen.getByTestId("card");
-    const link = screen.getByRole("link", { name: "Honda PCX" });
-    expect(card).toHaveAttribute("data-link", "true");
-    expect(link).toHaveAttribute("data-row-link");
-    // The kit draws the transition arrow (in the header); the card keeps one tab stop for the link.
-    expect(card.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
-    expect(card.className).toMatch(/host/);
-    expect(cssValue(cssRule(CSS, ".link::after"), "inset")).toBe("0");
-    await userEvent.tab();
-    expect(link).toHaveFocus();
-    await userEvent.click(screen.getByRole("button", { name: "Выдан" }));
-    expect(onIssue).toHaveBeenCalledTimes(1);
-  });
-
-  it("Card.Link asChild takes a <button>: it stretches over the card and opens it in place", async () => {
-    const onOpen = vi.fn();
-    const onIssue = vi.fn();
+  it("renders the child element with asChild", () => {
+    const ref = React.createRef<HTMLAnchorElement>();
     render(
       <Card.Root data-testid="card">
         <Card.Header>
           <Card.Title>
             <Card.Link asChild>
-              <button type="button" onClick={onOpen}>
-                Залог
-              </button>
+              <a ref={ref} href="#orders">
+                Заказы
+              </a>
             </Card.Link>
           </Card.Title>
         </Card.Header>
-        <Card.Footer>
-          <button type="button" onClick={onIssue}>
-            Выдан
-          </button>
-        </Card.Footer>
       </Card.Root>,
     );
-    const link = screen.getByRole("button", { name: "Залог" });
-    expect(screen.getByTestId("card")).toHaveAttribute("data-link", "true");
-    expect(link).toHaveAttribute("data-row-link");
-    expect(screen.getByTestId("card").querySelector("svg")).toHaveAttribute("aria-hidden", "true");
-    // The host never raises its own link: the `::after` is laid out by the card, not the button.
-    expect(cssValue(cssRule(CSS, ".link"), "border")).toBe("0");
-    await userEvent.tab();
-    expect(link).toHaveFocus();
-    await userEvent.keyboard("{Enter}");
-    expect(onOpen).toHaveBeenCalledTimes(1);
-    await userEvent.click(screen.getByRole("button", { name: "Выдан" }));
-    expect(onIssue).toHaveBeenCalledTimes(1);
-    expect(onOpen).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("link", { name: "Заказы" })).toBe(ref.current);
+    expect(screen.getByTestId("card")).toHaveAttribute("data-link");
   });
 
-  it("a Badge in a title stands beside the text, a chip gap apart", () => {
-    const rule = cssRule(CSS, ".badged");
-    expect(cssValue(rule, "display")).toBe("flex");
-    expect(cssValue(rule, "align-items")).toBe("center");
-    expect(cssValue(rule, "gap")).toBe("var(--prime-space-2)");
-    render(
-      <>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title>
-              <Badge.Root color="green">У нас</Badge.Root>
-              300 $
-            </Card.Title>
-            <Card.Description>наличные</Card.Description>
-          </Card.Header>
-        </Card.Root>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title>Без бейджа</Card.Title>
-          </Card.Header>
-        </Card.Root>
-      </>,
-    );
-    expect(screen.getByRole("heading", { name: /300 \$/ })).toHaveClass(styles.badged);
-    expect(screen.getByRole("heading", { name: "Без бейджа" })).not.toHaveClass(styles.badged);
-  });
-
-  it("a record row lays out like the header: its Card.Actions at the end, a zone folding under it", () => {
+  it("gives the card back when the link leaves", () => {
     const { rerender } = render(
-      <Card.Root>
-        <Card.List>
-          <Card.ListItem data-testid="row">
-            <Card.Title>
-              <Badge.Root>У нас</Badge.Root>300 $
-            </Card.Title>
-            <Card.Description>Наличные · принят 8 окт</Card.Description>
-            <Card.Actions>
-              <Button.Root>Вернуть</Button.Root>
-            </Card.Actions>
-            <Card.ListItemContent open={false} data-testid="zone">
-              Форма
-            </Card.ListItemContent>
-          </Card.ListItem>
-          <Card.ListItem data-testid="plain">Просто строка</Card.ListItem>
-        </Card.List>
-      </Card.Root>,
-    );
-    const row = screen.getByTestId("row");
-    expect(row).toHaveAttribute("data-record");
-    const head = row.firstElementChild as HTMLElement;
-    expect(head).toHaveClass(styles.header);
-    expect(head.querySelector(`.${styles.actions}`)).toContainElement(
-      screen.getByRole("button", { name: "Вернуть" }),
-    );
-    expect(head).not.toContainElement(screen.getByTestId("zone"));
-    expect(screen.getByTestId("zone")).toHaveAttribute("data-state", "closed");
-    expect(screen.getByTestId("plain")).not.toHaveAttribute("data-record");
-    rerender(
-      <Card.Root>
-        <Card.List>
-          <Card.ListItem>
-            <Card.Title>300 $</Card.Title>
-            <Card.ListItemContent open data-testid="zone">
-              Форма
-            </Card.ListItemContent>
-          </Card.ListItem>
-        </Card.List>
-      </Card.Root>,
-    );
-    expect(screen.getByTestId("zone")).toHaveAttribute("data-state", "open");
-  });
-
-  it("a list first in the card has the same padding above as below", () => {
-    const rule = cssRule(CSS, ".header + .list, .list:first-child");
-    expect(cssValue(rule, "padding-top")).toBe("var(--prime-space-2)");
-  });
-
-  it("a row of fields folds its zone open under it too; outside a row the zone says so", () => {
-    render(
-      <Card.Root>
-        <Card.List>
-          <Card.ListItem data-testid="row">
-            Поля строки
-            <Card.ListItemContent open data-testid="zone">
-              Форма
-            </Card.ListItemContent>
-          </Card.ListItem>
-        </Card.List>
-      </Card.Root>,
-    );
-    expect(screen.getByTestId("row").lastElementChild).toContainElement(screen.getByTestId("zone"));
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(() => render(<Card.ListItemContent open>Форма</Card.ListItemContent>)).toThrow(
-      "Card.ListItemContent must be rendered inside Card.ListItem",
-    );
-    error.mockRestore();
-  });
-
-  it("a row's folded zone rendered by the consumer's own component stands under the row", () => {
-    function HoldForm({ open }: { open: boolean }) {
-      return (
-        <Card.ListItemContent open={open} data-testid="hold">
-          Форма удержания
-        </Card.ListItemContent>
-      );
-    }
-    render(
-      <Card.Root>
-        <Card.List>
-          <Card.ListItem data-testid="row">
-            <Card.Title>300 $</Card.Title>
-            <Card.Actions>
-              <Button.Root>Вернуть</Button.Root>
-            </Card.Actions>
-            <HoldForm open />
-          </Card.ListItem>
-        </Card.List>
-      </Card.Root>,
-    );
-    const row = screen.getByTestId("row");
-    const head = row.firstElementChild as HTMLElement;
-    expect(head).not.toContainElement(screen.getByTestId("hold"));
-    expect(row.lastElementChild).toContainElement(screen.getByTestId("hold"));
-    expect(row).toHaveClass(hairline.between, hairline.subtle);
-  });
-
-  it("a badge in a description lays the line out as a row, whatever component renders it", () => {
-    function OwnerBadge() {
-      return (
-        <Dropdown.Root>
-          <Dropdown.Trigger>
-            <Badge.Root aria-label="Исполнитель: Анна Котова">Анна Котова</Badge.Root>
-          </Dropdown.Trigger>
-          <Dropdown.Content>
-            <Dropdown.Item>Илья Соколов</Dropdown.Item>
-          </Dropdown.Content>
-        </Dropdown.Root>
-      );
-    }
-    render(
-      <Card.Root>
+      <Card.Root data-testid="card">
         <Card.Header>
-          <Card.Title>Продлить страховку</Card.Title>
-          <Card.Description data-testid="owned">
-            <OwnerBadge />
-            истёк 2 дн. назад
-          </Card.Description>
-        </Card.Header>
-      </Card.Root>,
-    );
-    expect(screen.getByTestId("owned").querySelector(":scope > [data-badge]")).not.toBeNull();
-  });
-
-  it("badges in a header description stand in a wrapping row; a Badge.Group inside is valid", () => {
-    const rule = cssRule(CSS, ".description:has(> [data-badge])");
-    expect(cssValue(rule, "display")).toBe("flex");
-    expect(cssValue(rule, "flex-wrap")).toBe("wrap");
-    expect(cssValue(rule, "align-items")).toBe("center");
-    expect(cssValue(rule, "gap")).toBe("var(--prime-space-2)");
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    render(
-      <>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title>Honda PCX 160</Card.Title>
-            <Card.Description data-testid="badges">
-              <Badge.Root color="yellow">Бронь</Badge.Root>
-              <Badge.Root color="green">Депозит 150 $</Badge.Root>
-            </Card.Description>
-          </Card.Header>
-        </Card.Root>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title>Yamaha NMAX</Card.Title>
-            <Card.Description data-testid="group">
-              <Badge.Group>
-                <Badge.Root>Выдан</Badge.Root>
-              </Badge.Group>
-            </Card.Description>
-          </Card.Header>
-        </Card.Root>
-        <Card.Root>
-          <Card.Header>
-            <Card.Title>Без бейджей</Card.Title>
-            <Card.Description data-testid="text">Банг Тао</Card.Description>
-          </Card.Header>
-        </Card.Root>
-      </>,
-    );
-    expect(error).not.toHaveBeenCalled();
-    error.mockRestore();
-    const badges = screen.getByTestId("badges");
-    expect(badges.tagName).toBe("DIV");
-    expect(badges).toHaveClass(styles.description);
-    expect(badges.querySelectorAll(":scope > [data-badge]")).toHaveLength(2);
-    expect(screen.getByTestId("group").querySelector(":scope > [data-badge]")).not.toBeNull();
-    expect(screen.getByTestId("text").querySelector(":scope > [data-badge]")).toBeNull();
-  });
-
-  it("a cover draws no zone lines; one that opens its record draws no arrow and keeps the title's width", () => {
-    expect(cssValue(cssRule(CSS, '.root[data-layout="cover"] .mark'), "display")).toBe("none");
-    expect(cssValue(cssRule(CSS, '.root[data-layout="cover"] .title'), "padding-inline-end")).toBe(
-      "0",
-    );
-    render(
-      <Card.Root data-testid="tile">
-        <Card.Media>
-          <img src="unit.jpg" alt="" />
-        </Card.Media>
-        <Card.Header data-testid="header">
           <Card.Title>
-            <Card.Link href="#unit">Honda PCX 160</Card.Link>
+            <Card.Link href="#orders">Заказы</Card.Link>
           </Card.Title>
         </Card.Header>
-        <Card.Body data-testid="body">Бейджи</Card.Body>
-        <Card.Footer data-testid="footer">Простой 2 дн.</Card.Footer>
       </Card.Root>,
     );
-    // The whole card still opens the record through its stretched link.
-    expect(screen.getByTestId("tile")).toHaveAttribute("data-link", "true");
-    expect(screen.getByRole("link", { name: "Honda PCX 160" })).toHaveAttribute("href", "#unit");
-    for (const id of ["header", "body"]) {
-      expect(screen.getByTestId(id)).not.toHaveClass(hairline.between);
-    }
-    expect(screen.getByTestId("footer")).not.toHaveClass(hairline.top);
-  });
-
-  it("size sets the padding tier and gives the controls inside the tier; unsized it gives none", () => {
-    expect(
-      cssValue(cssRule(CSS, '.root:is([data-size="xs"], [data-size="s"])'), "--card-pad"),
-    ).toBe("var(--prime-card-padding-s)");
-    expect(
-      cssValue(cssRule(CSS, '.root:is([data-size="l"], [data-size="xl"])'), "--card-pad"),
-    ).toBe("var(--prime-card-padding-l)");
-    render(
-      <>
-        <Card.Root size="s" data-testid="dense">
-          <Card.Header>
-            <Card.Title>Каталог</Card.Title>
-            <Card.Actions>
-              <Button.Root data-testid="dense-button">Открыть</Button.Root>
-            </Card.Actions>
-          </Card.Header>
-        </Card.Root>
-        <Card.Root data-testid="plain">
-          <Card.Header>
-            <Card.Title>Сводка</Card.Title>
-            <Card.Actions>
-              <Badge.Root data-testid="plain-badge">Новый</Badge.Root>
-            </Card.Actions>
-          </Card.Header>
-        </Card.Root>
-      </>,
-    );
-    expect(screen.getByTestId("dense")).toHaveAttribute("data-size", "s");
-    expect(screen.getByTestId("dense-button")).toHaveAttribute("data-size", "s");
-    expect(screen.getByTestId("plain")).toHaveAttribute("data-size", "m");
-    // No tier of its own and no host: a badge keeps its standalone tier.
-    expect(screen.getByTestId("plain-badge")).toHaveAttribute("data-tier", "m");
-  });
-
-  it("a zoned header pads its bottom as its top; only a chart right under it takes none", () => {
-    const zone = cssRule(CSS, '.root[data-layout="zoned"] > .header');
-    // Alone, before the footer (any divider), the body or the list — in a flat card too.
-    expect(cssValue(zone, "padding")).toBe("var(--prime-space-4) var(--card-pad)");
-    expect(
-      cssValue(
-        cssRule(CSS, '.root[data-layout="zoned"] > .header:has(+ .media)'),
-        "padding-bottom",
-      ),
-    ).toBe("0");
-    render(
-      <>
-        <Card.Root flat data-testid="flat">
-          <Card.Header data-testid="alone">
-            <Card.Title>Telegram</Card.Title>
-          </Card.Header>
-        </Card.Root>
-        <Card.Root>
-          <Card.Header data-testid="over-footer">
-            <Card.Title>События</Card.Title>
-          </Card.Header>
-          <Card.Footer divider="fill">
-            <button type="button">Все события</button>
-          </Card.Footer>
-        </Card.Root>
-      </>,
-    );
-    expect(screen.getByTestId("flat")).toHaveAttribute("data-flat", "true");
-    expect(screen.getByTestId("alone")).toHaveClass(styles.header, hairline.between);
-    expect(screen.getByTestId("over-footer").nextElementSibling).toHaveClass(styles.footer);
-  });
-
-  it("a card that is a link shows the transition arrow; a button card does not", () => {
-    const { rerender } = render(
-      <Card.Root asChild>
-        <a href="#x" data-testid="card">
-          Лиды
-        </a>
-      </Card.Root>,
-    );
-    expect(screen.getByTestId("card")).toHaveAttribute("data-mark", "true");
-    expect(screen.getByTestId("card").querySelector("svg")).not.toBeNull();
+    expect(screen.getByTestId("card")).toHaveAttribute("data-link");
     rerender(
-      <Card.Root asChild>
-        <button type="button" data-testid="card">
-          Лиды
-        </button>
+      <Card.Root data-testid="card">
+        <Card.Header>
+          <Card.Title>Заказы</Card.Title>
+        </Card.Header>
       </Card.Root>,
     );
-    expect(screen.getByTestId("card")).not.toHaveAttribute("data-mark");
-    expect(screen.getByTestId("card").querySelector("svg")).toBeNull();
+    expect(screen.getByTestId("card")).not.toHaveAttribute("data-link");
   });
+});
 
-  it("divider=full sets the zone hairline edge to edge on a footer of any layout", () => {
+describe("Card.Footer and Card.Total", () => {
+  it("keeps the footer to the bottom with the total at the start and no line", () => {
     render(
       <Card.Root>
-        <Card.Media>
-          <img src="unit.jpg" alt="" />
-        </Card.Media>
-        <Card.Footer divider="full" data-testid="footer">
-          x
+        <Card.Body>Позиции</Card.Body>
+        <Card.Footer data-testid="footer">
+          <Card.Actions data-testid="actions">
+            <Button.Root>Оплатить</Button.Root>
+          </Card.Actions>
+          <Card.Total label="К оплате" tone="warning" data-testid="total">
+            42 500 ₽
+          </Card.Total>
         </Card.Footer>
       </Card.Root>,
     );
     const footer = screen.getByTestId("footer");
-    expect(footer).toHaveAttribute("data-divider", "full");
-    expect(footer).toHaveClass(hairline.top);
+    const rule = cssRule(CSS, ".footer");
+    expect(cssValue(rule, "margin-top")).toBe("auto");
+    expect(rule.decls.some((decl) => decl.prop.startsWith("border"))).toBe(false);
+    const total = screen.getByTestId("total");
+    expect(footer).toContainElement(total);
+    const [label, value] = [...total.children] as HTMLElement[];
+    expect(label).toHaveTextContent("К оплате");
+    expect(label).toHaveAttribute("data-tone", "warning");
+    expect(value).toHaveTextContent("42 500 ₽");
+    expect(cssValue(cssRule(CSS, ".totalValue"), "font-variant-numeric")).toBe("tabular-nums");
   });
 
-  it("a divider the consumer asks for is drawn in the Divider ink; zone lines stay faint", () => {
+  it("shows the amount alone without a label", () => {
     render(
       <Card.Root>
-        <Card.Header data-testid="header">
-          <Card.Title>Транспорт</Card.Title>
-        </Card.Header>
-        <Card.Body divider="full" data-testid="body">
-          x
-        </Card.Body>
-        <Card.Footer data-testid="footer">y</Card.Footer>
+        <Card.Footer>
+          <Card.Total data-testid="total">42 500 ₽</Card.Total>
+        </Card.Footer>
       </Card.Root>,
     );
-    expect(screen.getByTestId("body")).toHaveClass(hairline.subtle);
-    expect(screen.getByTestId("footer")).not.toHaveClass(hairline.subtle);
-    expect(
-      cssValue(
-        cssRule(
-          "src/internal/hairline.module.css",
-          ".top.subtle, .bottom.subtle, .between + .between.subtle",
-        ),
-        "background-image",
-      ),
-    ).toContain("--prime-color-border-subtle");
+    expect(screen.getByTestId("total").children).toHaveLength(1);
+  });
+});
+
+describe("Card.Media and Card.Body", () => {
+  it("forward ref, class and attributes", () => {
+    const media = React.createRef<HTMLDivElement>();
+    const body = React.createRef<HTMLDivElement>();
+    render(
+      <Card.Root>
+        <Card.Media ref={media} className="own" data-testid="media" />
+        <Card.Body ref={body} className="own" data-testid="body" />
+      </Card.Root>,
+    );
+    expect(media.current).toBe(screen.getByTestId("media"));
+    expect(media.current).toHaveClass(styles.media, "own");
+    expect(body.current).toBe(screen.getByTestId("body"));
+    expect(body.current).toHaveClass(styles.body, "own");
   });
 });

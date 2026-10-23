@@ -88,9 +88,9 @@
   white-space: nowrap;
 }
 
-/* The caption role comes from textRole. */
-.itemDescription {
-  color: var(--prime-color-text-muted);
+/* The description takes the tier's text from `menu.itemDescription`; the title above it is medium. */
+.itemText > .itemLabel:not(:only-child) {
+  font-weight: var(--prime-font-weight-medium);
 }
 
 /* ─── Footer with key hints ─────────────────────────────────────────────── */

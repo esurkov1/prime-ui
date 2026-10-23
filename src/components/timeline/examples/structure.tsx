@@ -1,5 +1,5 @@
-/** A service history with intervals between events, a caption on the right of a gap, two meta lines under a repair and a second value line — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`. */
-import { Timeline } from "prime-ui-kit";
+/** A service history with intervals between events, a caption on the right of a gap, two meta lines under a repair, a badge after its title with a state in the meta, and a second value line — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`, `Timeline.ItemBadges`, `StatusDot`. */
+import { Badge, StatusDot, Timeline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -33,10 +33,16 @@ export default function TimelineStructureExample() {
         <Timeline.Gap>55 дней · 2 200 км без обслуживания</Timeline.Gap>
         <Timeline.Item color="red">
           <Timeline.ItemTitle>Ремонт: замена ремня</Timeline.ItemTitle>
+          <Timeline.ItemBadges>
+            <Badge.Root tone="warning">Гарантия</Badge.Root>
+          </Timeline.ItemBadges>
           <Timeline.ItemMeta>
             <strong>07.06.26</strong> · 12 100 км
           </Timeline.ItemMeta>
-          <Timeline.ItemMeta>Мастер Олег Смирнов · гарантия 6 месяцев</Timeline.ItemMeta>
+          <Timeline.ItemMeta>
+            <StatusDot tone="success">Выполнен</StatusDot>
+            Мастер Олег Смирнов · гарантия 6 месяцев
+          </Timeline.ItemMeta>
           <Timeline.ItemValue>
             2 800 ₽<Timeline.ItemMeta>Ремонт</Timeline.ItemMeta>
           </Timeline.ItemValue>

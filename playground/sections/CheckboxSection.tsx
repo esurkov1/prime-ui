@@ -43,7 +43,7 @@ export const page: ComponentPageConfig = {
       scenario: "indicator",
       title: "Индикатор на плитке выбора",
       description:
-        "Только квадрат на плитках выбора: кнопка-переключатель несёт `aria-pressed`, квадрат лишь показывает его — `Checkbox.Indicator`.",
+        "Только квадрат на плитках выбора: `selected` на карточке отмечает её кнопку-переключатель, а квадрат лишь показывает это — `Card.Indicator`, `selected`.",
     },
     {
       slot: "controlled",

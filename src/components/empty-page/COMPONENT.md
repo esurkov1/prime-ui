@@ -89,9 +89,11 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` · `s` | small tile, title-s, compact padding | inside cards, tables, side panels | |
-| `m` | 48px tile, title-m, body-m description | regions and pages | yes |
-| `l` · `xl` | large tile, title-l / heading-s, roomy padding | whole empty pages, onboarding | |
+| `xs` | 32px tile, 13/16 title, 12/16 description, compact padding | dense side panels | |
+| `s` | 40px tile, 13/16 title, 12/16 description | inside cards, tables | |
+| `m` | 48px tile, 14/20 title, 13/20 description | regions and pages | yes |
+| `l` | 56px tile, 16/24 title, 14/20 description, roomy padding | whole empty pages | |
+| `xl` | 64px tile, 18/24 title, 14/20 description, widest padding | onboarding | |
 
 ### layout
 | Value | Looks like | Use when | Default |

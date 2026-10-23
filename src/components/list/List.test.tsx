@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { moveBefore } from "@/components/dnd/useSortableList";
+import { StatusDot } from "@/components/status-dot/StatusDot";
 import { Switch } from "@/components/switch/Switch";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -692,7 +693,7 @@ describe("List onReorder", () => {
     );
     const row = screen.getByRole("button", { name: /Нет оплаты/ });
     expect(screen.getByText("Нет оплаты")).toHaveClass(styles.text ?? "");
-    expect(screen.getByText("Счёт № 4821")).toHaveClass(styles.description ?? "");
+    expect(screen.getByText("Счёт № 4821").parentElement).toHaveClass(styles.description ?? "");
     expect(screen.getByText("вчера")).toHaveClass(styles.meta ?? "");
     expect(row).not.toContainElement(screen.getByRole("button", { name: "Закрыть" }));
   });
@@ -738,5 +739,29 @@ describe("List onReorder", () => {
         "width",
       ),
     ).toBe("var(--field-icon)");
+  });
+
+  it("puts the badges on the title's line and a StatusDot first in the description", () => {
+    render(
+      <List.Root aria-label="Обращения">
+        <List.Item onClick={() => {}}>
+          <List.ItemText>Счёт без НДС</List.ItemText>
+          <List.ItemBadges data-testid="badges">
+            <Badge.Root tone="danger">Срочно</Badge.Root>
+          </List.ItemBadges>
+          <List.ItemDescription>
+            <StatusDot tone="warning">Ждёт ответа</StatusDot>
+            ООО «Гранит»
+          </List.ItemDescription>
+        </List.Item>
+      </List.Root>,
+    );
+    const title = screen.getByText("Счёт без НДС");
+    const badges = screen.getByTestId("badges");
+    expect(badges.parentElement).toBe(title.parentElement);
+    expect(title.compareDocumentPosition(badges) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const description = screen.getByText("ООО «Гранит»").parentElement;
+    expect(description?.firstElementChild).toHaveTextContent("Ждёт ответа");
+    expect(description).toHaveTextContent("Ждёт ответа·ООО «Гранит»");
   });
 });

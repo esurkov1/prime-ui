@@ -8,7 +8,7 @@
  */
 
 .root {
-  --lf-pad: var(--prime-card-padding-l);
+  --lf-pad: var(--frame-pad);
   --lf-gap: var(--prime-space-8);
   --lf-field-gap: var(--prime-space-5);
   --lf-logo: var(--prime-space-12);
@@ -34,7 +34,6 @@
 
 .root[data-size="xs"],
 .root[data-size="s"] {
-  --lf-pad: var(--prime-card-padding-s);
   --lf-gap: var(--prime-space-6);
   --lf-field-gap: var(--prime-space-4);
   --lf-logo: var(--prime-space-10);
@@ -42,13 +41,11 @@
 }
 
 .root[data-size="l"] {
-  --lf-pad: var(--prime-space-8);
   --lf-gap: var(--prime-space-10);
   --lf-logo: var(--prime-space-14);
 }
 
 .root[data-size="xl"] {
-  --lf-pad: var(--prime-space-10);
   --lf-gap: var(--prime-space-10);
   --lf-field-gap: var(--prime-space-6);
   --lf-logo: var(--prime-space-16);
@@ -95,6 +92,14 @@
   margin: 0;
 }
 
+.title {
+  color: var(--prime-color-text-primary);
+}
+
+.quiet {
+  color: var(--prime-color-text-secondary);
+}
+
 .body {
   display: flex;
   flex-direction: column;
@@ -132,8 +137,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  column-gap: var(--prime-space-4);
-  row-gap: var(--prime-space-1);
   text-align: start;
 }
 
@@ -149,6 +152,11 @@
 .root[data-align="start"] .logo {
   grid-column: 1;
   grid-row: 1 / span 2;
+}
+
+.root[data-align="start"] .header {
+  column-gap: var(--prime-space-3);
+  row-gap: var(--frame-lines-gap);
 }
 
 .root[data-align="start"] .footer {

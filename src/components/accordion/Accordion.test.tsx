@@ -2,6 +2,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { Badge } from "@/components/badge/Badge";
+import { StatusDot } from "@/components/status-dot/StatusDot";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { withMotion } from "@/test/motion";
 
@@ -406,5 +408,34 @@ describe("Accordion", () => {
     );
     expect(screen.getByTestId("lead").parentElement).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("button", { name: "Section A" })).toBeInTheDocument();
+  });
+
+  it("lays the trigger out as a header row: mark, title with badges, description, chevron", () => {
+    render(
+      <Accordion.Root>
+        <Accordion.Item value="a">
+          <Accordion.Header>
+            <Accordion.Trigger>
+              <Accordion.Icon>
+                <svg data-testid="mark" />
+              </Accordion.Icon>
+              Доставка
+              <Accordion.Badges data-testid="badges">
+                <Badge.Root tone="success">Включена</Badge.Root>
+              </Accordion.Badges>
+              <Accordion.Description>
+                <StatusDot tone="success">Активна</StatusDot>3 способа
+              </Accordion.Description>
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Тело</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: /Доставка/ });
+    const title = screen.getByText("Доставка");
+    expect(screen.getByTestId("badges").parentElement).toBe(title.parentElement);
+    expect(trigger.firstElementChild).toContainElement(screen.getByTestId("mark"));
+    expect(screen.getByText("3 способа").parentElement).toHaveTextContent("Активна·3 способа");
   });
 });

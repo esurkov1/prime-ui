@@ -26,22 +26,28 @@ const PLAN: SparklineSeries[] = [
   },
 ];
 
-const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
+const THOUSANDS = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+/** An M card writes a sum short: thousands, the unit stands in `Kpi.Unit`. */
+const formatThousands = (value: number) => THOUSANDS.format(value / 1000);
 
 export default function SparklineComboExample() {
   const revenue = useSparkline({
     data: REVENUE,
     series: PLAN,
     change: "previous",
-    formatValue: formatRubles,
+    formatValue: formatThousands,
   });
 
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Выручка против плана</Kpi.Title>
-      <Kpi.Period>{revenue.date}</Kpi.Period>
-      <Kpi.Value>{revenue.valueText}</Kpi.Value>
+      <Kpi.Value>
+        {revenue.valueText}
+        <Kpi.Unit>тыс. ₽</Kpi.Unit>
+      </Kpi.Value>
       <Kpi.Delta reading={revenue} />
+      <Kpi.Period>{revenue.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline {...revenue.plot} label="Выручка" variant="bars" />
       </Kpi.Media>

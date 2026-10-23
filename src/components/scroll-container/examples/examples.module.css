@@ -19,31 +19,19 @@
 
 /* log.tsx: title, the scrolling entries in a fixed-height card. */
 .log {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
   width: min(100%, calc(var(--prime-space-24) * 4));
   height: calc(var(--prime-space-24) * 3.5);
 }
 
-.entries {
-  min-height: 0;
-}
-
 /* Older entries loading: lines in the entries' geometry, at the top where they will appear. */
 .older {
-  margin: 0 var(--prime-space-4) var(--prime-space-2);
+  margin-block-end: var(--prime-space-2);
 }
 
 .strip {
   display: flex;
   gap: var(--prime-space-2);
   width: max-content;
-  padding: var(--prime-space-3) var(--prime-space-4);
-}
-
-/* Two-axis scroller: the side padding lives on the scrolling element itself (foundation §7). */
-.canvas {
-  padding: var(--prime-space-3) var(--prime-space-4);
 }
 
 .grid {
@@ -78,5 +66,5 @@
   flex-direction: column;
   gap: var(--prime-space-1);
   margin: 0;
-  padding: var(--prime-space-3);
+  padding: 0;
 }

@@ -1,4 +1,4 @@
-/** A conversation with a client as a record header of two lines: the avatar, the name with its number over a line of badges — the stage and the assignee as pickers, the AI's state beside them — and at the end the AI switch, search and ⋯ — `Chat.Title`, `number`, `Chat.Badges`, `Chat.Actions`. */
+/** A conversation with a client as a record header of two lines: the avatar, the name with its number and a badge on one line, the AI's state and the owner under it, and at the end the stage picker, the AI switch, search and ⋯ — `Chat.Title`, `number`, `Chat.Badges`, `Chat.Description`, `Chat.Actions`. */
 import {
   Avatar,
   Badge,
@@ -9,20 +9,22 @@ import {
   Icon,
   Message,
   type PaletteColor,
+  Select,
+  StatusDot,
   Tooltip,
 } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-type Stage = { id: string; title: string; tone: "info" | "warning" | "success" | "neutral" };
+type Stage = { id: string; title: string };
 type Manager = { id: string; name: string; initials: string; color: PaletteColor };
 
 const STAGES: Stage[] = [
-  { id: "new", title: "Новая", tone: "info" },
-  { id: "progress", title: "В работе", tone: "warning" },
-  { id: "paid", title: "Оплачено", tone: "success" },
-  { id: "closed", title: "Закрыта", tone: "neutral" },
+  { id: "new", title: "Новая" },
+  { id: "progress", title: "В работе" },
+  { id: "paid", title: "Оплачено" },
+  { id: "closed", title: "Закрыта" },
 ];
 
 const MANAGERS: Manager[] = [
@@ -36,7 +38,6 @@ export default function ChatHeaderExample() {
   const [stageId, setStageId] = React.useState("progress");
   const [managerId, setManagerId] = React.useState<string | null>("kotova");
   const [ai, setAi] = React.useState(true);
-  const stage = STAGES.find((item) => item.id === stageId) ?? STAGES[0];
   const manager = MANAGERS.find((item) => item.id === managerId);
 
   return (
@@ -48,53 +49,27 @@ export default function ChatHeaderExample() {
           </Avatar.Root>
           <Chat.Title number={CLIENT.number}>{CLIENT.name}</Chat.Title>
           <Chat.Badges>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                <Badge.Root tone={stage?.tone} aria-label={`Этап: ${stage?.title}`}>
-                  {stage?.title}
-                </Badge.Root>
-              </Dropdown.Trigger>
-              <Dropdown.Content>
-                {STAGES.map((item) => (
-                  <Dropdown.Item key={item.id} onSelect={() => setStageId(item.id)}>
-                    {item.title}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Content>
-            </Dropdown.Root>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                {manager ? (
-                  <Badge.Root aria-label={`Ответственный: ${manager.name}`}>
-                    <Badge.Avatar>
-                      <Avatar.Root color={manager.color}>
-                        <Avatar.Fallback>{manager.initials}</Avatar.Fallback>
-                      </Avatar.Root>
-                    </Badge.Avatar>
-                    {manager.name}
-                  </Badge.Root>
-                ) : (
-                  <Badge.Root variant="outline">Назначить</Badge.Root>
-                )}
-              </Dropdown.Trigger>
-              <Dropdown.Content>
-                {MANAGERS.map((item) => (
-                  <Dropdown.Item key={item.id} onSelect={() => setManagerId(item.id)}>
-                    {item.name}
-                  </Dropdown.Item>
-                ))}
-                <Dropdown.Separator />
-                <Dropdown.Item onSelect={() => setManagerId(null)}>
-                  Снять ответственного
-                </Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Root>
-            <Badge.Root tone={ai ? "info" : "neutral"}>
-              <Badge.Dot />
-              {ai ? "AI отвечает" : "AI выключен"}
-            </Badge.Root>
+            <Badge.Root tone="warning">Счёт просрочен</Badge.Root>
           </Chat.Badges>
+          <Chat.Description>
+            <StatusDot tone={ai ? "accent" : "neutral"}>
+              {ai ? "AI отвечает" : "AI выключен"}
+            </StatusDot>
+            {manager ? `Отвечает ${manager.name}` : "Не назначен"}
+          </Chat.Description>
           <Chat.Actions>
+            <Select.Root value={stageId} onValueChange={setStageId}>
+              <Select.Trigger aria-label="Этап">
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                {STAGES.map((item) => (
+                  <Select.Item key={item.id} value={item.id}>
+                    {item.title}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
             <Tooltip.Root>
               <Tooltip.Trigger>
                 <Button.Root
@@ -121,6 +96,12 @@ export default function ChatHeaderExample() {
                 </Button.Root>
               </Dropdown.Trigger>
               <Dropdown.Content>
+                {MANAGERS.map((item) => (
+                  <Dropdown.Item key={item.id} onSelect={() => setManagerId(item.id)}>
+                    Передать: {item.name}
+                  </Dropdown.Item>
+                ))}
+                <Dropdown.Separator />
                 <Dropdown.Item>Открыть сделку</Dropdown.Item>
                 <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
                 <Dropdown.Separator />

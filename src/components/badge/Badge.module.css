@@ -538,8 +538,7 @@
 }
 
 /* `overflow="count"`: one line, as many badges as fit, the rest behind the «+N» badge. Only the
-   first badge gives way (it ellipsizes when it alone does not fit); while the row is measured,
-   none does. */
+   badge is ever cut: when not even the first fits, all fold and «+N» stands alone. */
 .group[data-overflow="count"] {
   position: relative;
   flex-wrap: nowrap;
@@ -547,11 +546,6 @@
 
 .group[data-overflow="count"] > * {
   flex-shrink: 0;
-}
-
-.group[data-overflow="count"]:not([data-measuring]) > :first-child {
-  flex-shrink: 1;
-  min-width: 0;
 }
 
 /* A badge that did not fit keeps its natural width out of the flow, unseen and out of reach. */

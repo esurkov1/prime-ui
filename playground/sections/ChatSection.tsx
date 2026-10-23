@@ -97,7 +97,7 @@ export const page: ComponentPageConfig = {
       scenario: "header",
       title: "Шапка записи",
       description:
-        "Диалог с клиентом как шапка записи в две строки: аватар, имя с номером над строкой бейджей — этап и ответственный выбираются, статус AI рядом, — а в конце включение AI, поиск и ⋯ — `Chat.Title`, `number`, `Chat.Badges`, `Chat.Actions`.",
+        "Диалог с клиентом как шапка записи в две строки: аватар, имя с номером и бейдж на одной строке, под ними состояние AI и ответственный, а в конце выбор этапа, включение AI, поиск и ⋯ — `Chat.Title`, `number`, `Chat.Badges`, `Chat.Description`, `Chat.Actions`.",
     },
     {
       scenario: "inline",

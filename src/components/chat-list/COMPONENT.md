@@ -33,7 +33,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 │           ├─ ChatList.ItemIcon         before the name: avatar slot (aria-hidden); after it: a glyph (role="img" with aria-label)
 │           ├─ ChatList.ItemText         the name; muted glyph after it
 │           ├─ ChatList.ItemDescription  author · media word · text — cross-fades with draft and «печатает…»
-│           ├─ ChatList.ItemStatus       the record's status as badges, a line under the preview (a deal stage, an AI state)
+│           ├─ ChatList.ItemBadges       the record's badges after the name (a deal stage, an AI state)
 │           ├─ (meta)                    delivery ticks · time
 │           ├─ (badges)                  «@» · unread count · pin
 │           └─ ChatList.ItemMenu         Dropdown.Content of the row, opened at the pointer
@@ -96,7 +96,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `target` | `string` | — | Where the `<a>` opens (`href` only). |
 | `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | The one child element (a router `Link`) is the row; the parts go inside it. |
-| `children` | `ReactNode` | — | `ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemStatus`, `ChatList.ItemMenu` — inside the child element with `asChild`. |
+| `children` | `ReactNode` | — | `ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemBadges`, `ChatList.ItemMenu` — inside the child element with `asChild`. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and the native attributes of the row element. |
 
 ### ChatList.ItemIcon
@@ -114,13 +114,13 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className`, `title` and the other `span` attributes. |
 
-### ChatList.ItemStatus
-`ref` → `HTMLSpanElement`. The status of the record behind the dialog (a deal stage, an AI agent's state): its `Badge.Root`s on one line under the preview in the compact tier, the rest behind «+N»; they stay in a pane too narrow for the preview.
+### ChatList.ItemBadges
+`ref` → `HTMLDivElement`. The badges of the record behind the dialog (a deal stage, an AI agent's state): its `Badge.Root`s after the name, on its line, in the compact tier, the rest behind «+N»; the name gives way first. They stay in a pane too narrow for the preview.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — | The `Badge.Root`s of the status: «Бронь» (`color`), «Ждёт человека» (`tone`). |
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the native attributes of the `span`. |
+| `children` | `ReactNode` | — | The `Badge.Root`s of the record: «Бронь» (`color`), «Ждёт человека» (`tone`). |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the native attributes of the `div`. |
 
 ### ChatList.ItemDescription
 `ref` → `HTMLSpanElement`. The preview of the last message, one line: «{author}: », a media word, the text; the search query is marked in the text.
@@ -193,10 +193,10 @@ The search field takes the tier too; counts are one tier down (the Badge's own r
 Root attribute: `data-size`. Every motion honours reduced motion (durations collapse, glides and ghosts are skipped).
 
 ## Layout & spacing
-- The root is a flex column that fills its host's height: put it straight into a `Card.Root` or a `Page.List` pane with a height; the scroller takes the rest under the search field and `ChatList.Actions`.
+- The root is a flex column that fills its host's height: put it straight into a pane `Card.Root` (no zones) or a `Page.List` pane with a height; the scroller takes the rest under the search field and `ChatList.Actions`.
 - The pane reads search → create → dialogs: `ChatList.Actions` stands under the search (first in the pane without one) at the same inset, its Buttons in a row with an 8px gap at the list's tier; a `fullWidth` Button fills the row. Creating never goes under the list, where a long list pushes it out of view.
-- One pane inset, 12px, for the search field, `ChatList.Actions` and the rows' highlight: they stand on one vertical, with the same air above the first control. The search and the actions are one block (an 8px gap) over a faint hairline, inset to the same vertical, that stays while the list scrolls under it; a pane without a search and actions has no line. Rows stand 4px apart (a margin inside each `<li>`, so the virtual window measures rows with their space); the last row's margin and the list's padding make the inset below it.
-- A row: avatar · name and preview · time over the counts; a row with a status adds a third line of badges, the counts staying beside the preview. The name and the preview truncate; glyphs, the time and the counts never do.
+- One pane inset, 12px, for the search field, `ChatList.Actions` and the rows' highlight: they stand on one vertical, with the same air above the first control. The search and the actions are one block (an 8px gap) with no line under it: the list's scroller fades its top edge while rows are scrolled under the block. Rows stand 4px apart (a margin inside each `<li>`, so the virtual window measures rows with their space); the last row's margin and the list's padding make the inset below it.
+- A row: avatar · name and preview · time over the counts; a record's badges stand after the name on its line. The name and the preview truncate; glyphs, the time and the counts never do.
 - From 100 dialogs only the rows around the view render; spacers hold the rest of the height. The row with the Tab stop and the row with an open menu stay rendered.
 - The root is the `chat-list` container: below 240px the preview line and the time step out, the names, the counts and the status badges stay (the state of the record is not a preview). At 320px (a phone) everything shows.
 - On a coarse pointer a row is at least the touch target (List).
@@ -262,7 +262,7 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A support inbox: pinned dialogs first, the search, unread and muted counts, the typing line, a draft, delivery ticks and a row menu that pins, mutes, marks read and deletes after a confirm — `ChatList.Root`, `items`, `renderItem`, `value`, `onSearchChange`, `ChatList.Item`, `ChatList.ItemMenu`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: row height, text, avatar, glyphs and the search field follow the tier — `size`. |
-| [structure.tsx](examples/structure.tsx) | Every piece of a row: a photo or initials with presence, a glyph beside the name, the record status as badges, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. |
+| [structure.tsx](examples/structure.tsx) | Every piece of a row: a photo or initials with presence, a glyph beside the name, the record status as badges, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemBadges`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. |
 | [search.tsx](examples/search.tsx) | The search field filters dialogs by name and by the last message, marks the match in both, says how many were found and shows a quiet state when none match — `defaultSearch`, `onSearchChange`. |
 | [actions.tsx](examples/actions.tsx) | The threads pane of an assistant: the search, the new chat button under it, then the threads — creating stands at the top, never under the list — `ChatList.Actions`, `onSearchChange`. |
 | [live.tsx](examples/live.tsx) | A live inbox: a client types, then writes — the preview turns into the typing line and back, the count rolls up and the dialog glides to the top; opening it clears the count — `typing`, `unread`, `items`. |
@@ -284,9 +284,9 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 - Deleting from the menu without a question → open a `ConfirmDialog` from the menu item.
 - `href` with an `onClick` that calls `preventDefault()` and the router's `navigate` → `asChild` with the router's `Link`, the parts inside it.
 - «+ Чат» under the list, or a button of your own above the search → `ChatList.Actions` inside the root: search → create → dialogs.
-- The record's status as plain text («Бронь · ждёт человека») in `ChatList.ItemStatus` → one `Badge.Root` per fact (`color` for a stage, `tone` for a judgement): a badge is noticed, muted text is not.
+- The record's status as plain text («Бронь · ждёт человека») in `ChatList.ItemBadges` → one `Badge.Root` per fact (`color` for a stage, `tone` for a judgement): a badge is noticed, muted text is not.
 - Times shifted by hand to a profile's zone before `time` → `timeZone` on the root: «сегодня», the weekday and the clock are read in it.
 
 ## Related
-- **Built from:** [List](../list/COMPONENT.md) (rows, current fill, focus, touch height), [Input](../input/COMPONENT.md) (search), [ScrollContainer](../scroll-container/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md) (counts, the status line), [Dropdown](../dropdown/COMPONENT.md) (row menu), [VisuallyHidden](../visually-hidden/COMPONENT.md), `useFlipList` (the glide of a new order)
+- **Built from:** [List](../list/COMPONENT.md) (rows, current fill, focus, touch height), [Input](../input/COMPONENT.md) (search), [ScrollContainer](../scroll-container/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md) (counts, the badges), [Dropdown](../dropdown/COMPONENT.md) (row menu), [VisuallyHidden](../visually-hidden/COMPONENT.md), `useFlipList` (the glide of a new order)
 - **See also:** [Chat](../chat/COMPONENT.md), [Message](../message/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Page](../../layout/page/COMPONENT.md), [ConfirmDialog](../confirm-dialog/COMPONENT.md)

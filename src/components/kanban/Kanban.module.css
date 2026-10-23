@@ -1,6 +1,6 @@
 /*
  * Kanban — Graphite. A row of columns: without wells (`plain` with a header plate, `line` with a
- * header over a faint line; cards are surfaces on the board's host) or
+ * bare header; cards are surfaces on the board's host) or
  * filled wells holding the cards (`well`); depth from fill, no lines.
  * The board scrolls sideways inside itself, each column body scrolls on its own. A grip in the
  * header moves a column (`reorderableColumns`); the strip of columns is a sortable list. Columns span the
@@ -12,7 +12,7 @@
 .root {
   --kanban-column-width: calc(var(--prime-space-24) * 3);
   --kanban-gap: var(--prime-space-3);
-  /* Room between the column edge and its cards (the hairline spans the same width). */
+  /* Room between the column edge and its cards. */
   --kanban-inset: var(--prime-space-2);
 
   container-type: inline-size;
@@ -95,7 +95,7 @@
 
 /* plain: the header is a filled plate as wide as the cards (one ladder step off the board's surface,
    the well's fill), in place of the hairline. line keeps the base header: bare, over the faint
-   inset hairline. Its padding around the title row makes it taller than a control `l`. */
+   nothing under it. Its padding around the title row makes it taller than a control `l`. */
 .root[data-variant="plain"] .header {
   margin-inline: var(--kanban-inset);
   padding-block: var(--prime-space-3);
@@ -124,8 +124,6 @@
   padding-block-end: var(--prime-space-3);
   /* The title starts where the card text does: the inset plus the card padding. */
   padding-inline: calc(var(--kanban-inset) + var(--prime-space-3)) var(--kanban-inset);
-  /* The faint inset hairline under the header (`hairline.bottom`), as wide as the cards. */
-  --hairline-inset: var(--kanban-inset);
 }
 
 .header[data-reorderable] {
@@ -251,11 +249,13 @@
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-2);
+  /* The `s` step of the frame (`surfaceFrameClass` + `data-frame`, joined in TSX): padding,
+     radius and the air between zones. */
+  gap: var(--frame-gap);
   box-sizing: border-box;
   min-width: 0;
-  padding: var(--prime-space-3);
-  border-radius: var(--prime-radius-m);
+  padding: var(--frame-pad);
+  border-radius: var(--frame-radius);
   /* A movable card: two ladder steps lighter than its column (the selected thumb of the host's
      track: white in light), with the raised whisper. */
   background: var(--prime-color-control-selected);
@@ -343,8 +343,7 @@
   color: var(--prime-color-text-secondary);
 }
 
-/* The card's top zone: a muted caption row over a faint hairline (as the column header), at least
-   as tall as an `xs` control (`fieldTierClass` + `data-size="xs"`, joined in TSX). */
+/* The card's top row: a muted caption row, at least as tall as an `xs` control (`fieldTierClass` + `data-size="xs"`, joined in TSX). */
 .itemHeader {
   --prime-icon-size: var(--prime-icon-xs);
 
@@ -353,7 +352,8 @@
   gap: var(--prime-space-2);
   min-width: 0;
   min-block-size: var(--field-h);
-  padding-block-end: var(--prime-space-2);
+  /* The title stands close under its key. */
+  margin-block-end: calc(var(--prime-space-2) - var(--frame-gap));
   color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -377,33 +377,12 @@
   margin-inline-start: auto;
 }
 
-/* `body-m` (`textRole.bodyM`, joined in TSX) at the medium weight. */
-.itemTitle {
-  display: -webkit-box;
-  overflow: hidden;
-  font-weight: var(--prime-font-weight-medium);
-  overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-}
-
-.itemDescription {
-  overflow: hidden;
-  color: var(--prime-color-text-muted);
-  font-variant-numeric: tabular-nums;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* A title with a tail (`number`, an owner `Avatar`): one row, the name cut with an ellipsis, the
    tail at the end never shrinks. */
 .itemTitleRow {
   display: flex;
   align-items: center;
   gap: var(--prime-space-2);
-  min-width: 0;
-  font-weight: var(--prime-font-weight-medium);
 }
 
 .itemTitleRow > * {
@@ -423,11 +402,6 @@
   color: var(--prime-color-text-muted);
   font-weight: var(--prime-font-weight-regular);
   font-variant-numeric: tabular-nums;
-}
-
-/* The title and its meta line read as one block. */
-.itemTitle + .itemDescription {
-  margin-block-start: calc(var(--prime-space-1) - var(--prime-space-2));
 }
 
 /* Counts at the start; the last child, unless a count, at the end (the assignee, a date): muted
@@ -469,20 +443,14 @@
 }
 
 /*
- * A zone of the card (`Kanban.ItemSection`): its parts stand `space-2` apart, as in the card; a zone
- * after a zone stands `space-3` off the faint line between them (`hairline.between`, joined in TSX)
- * on both sides.
+ * A zone of the card (`Kanban.ItemSection`): its parts stand `space-2` apart; the zones stand the
+ * frame's zone gap apart (the card's own gap), with no line between them.
  */
 .itemSection {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-2);
   min-width: 0;
-}
-
-.itemSection + .itemSection {
-  margin-block-start: calc(var(--prime-space-3) - var(--prime-space-2));
-  padding-block-start: var(--prime-space-3);
 }
 
 /* One unit a record holds: the mark, then its name over a caption line. */

@@ -2,12 +2,13 @@
  * The dialog shell of Modal, Drawer and Sheet, and their header / body / footer. Every zone owns
  * its side padding (`--dialog-padding`, the padding token of the panel's kind): the scrolling body
  * keeps it inside the scroll box, so focus rings of edge-to-edge fields are never clipped
- * (foundation §7). Header and footer are separated by the faint zone hairline (internal/hairline,
- * joined in TSX, inset by the same padding):
+ * (foundation §7). The dialog is the surface frame `m` (internal/surfaceFrame, `data-frame`): no
+ * line parts the zones, the zone gap (16) does; while the body is scrolled its edge fades under the
+ * header and the footer (ScrollContainer `edges`), never a static line:
  *
- *   header  24 top · 20 bottom
- *   ─────── body 20 · gap 16 (scrolls)
- *   ─────── footer 20 top · 24 bottom
+ *   header  24 top · 0 bottom
+ *   body    16 · gap 16 (scrolls)
+ *   footer  0 top · 24 bottom
  */
 
 /* ─── Shell ──────────────────────────────────────────────────────────────── */
@@ -25,7 +26,6 @@
  */
 .shell {
   --dialog-padding: var(--prime-modal-padding);
-  --hairline-inset: var(--dialog-padding);
 
   container: prime-dialog / inline-size;
   z-index: var(--prime-z-overlay);
@@ -52,63 +52,28 @@
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 
 /*
- * Grid, not markup order: icon | text | actions | close share the first row, whatever order the
- * children come in. The text column stacks its lines by `order` — title, description, badges —
- * then the actions when they move under it, then a tab strip. Every column is named; an absent
- * part leaves an empty `auto` track of zero width, so the spacing is a margin on each part instead
- * of a gap (an empty row costs nothing).
+ * The header row of the surface frame `m` (internal/headerRow: `[mark] [title · badges /
+ * description] [controls]`, one line each); this module adds the dialog's zone around it: the side
+ * padding, 24 above, none below (the body stands off by the zone gap). Anything else in the header
+ * (a tab strip) closes it under the row.
  */
 .header {
-  display: grid;
+  display: flex;
   flex: 0 0 auto;
-  grid-template-columns: [icon] auto [text] minmax(0, 1fr) [actions] auto [close] auto;
-  align-items: center;
+  flex-direction: column;
   min-width: 0;
-  padding: var(--prime-space-6) var(--dialog-padding) var(--prime-space-5);
+  padding: var(--prime-space-6) var(--dialog-padding) 0;
 }
 
-/*
- * With `Actions` the title keeps 12rem (or the whole row, if narrower). When the row cannot give it
- * that (icon buttons and a ⋯ beside the × on a phone), the header measures an overflow and moves the
- * actions under the text (`data-actions-below`, set in TSX): the title never folds into a column
- * of letters.
- */
-.header:has(> .actions):not([data-actions-below]) {
-  grid-template-columns:
-    [icon] auto
-    [text] minmax(min(calc(var(--prime-space-24) * 2), 100%), 1fr)
-    [actions] auto
-    [close] auto;
-}
-
-/* Title, description, badges and any custom text sit in the text column. */
-.header > :not(.icon, .actions, .close) {
-  grid-column: text;
-}
-
-/* The actions and the close button stand on line 1 only: the lines under the title run on under
-   them to the content edge, so the description and the badges keep the panel's width on a phone. */
-.header > :is(.badges, .description) {
-  grid-column: text / -1;
-}
-
-/* Under a record's picture (`Avatar.Root`, `Thumbnail.Root` in the icon) the badges start at the
-   header's start edge: the picture spans the title and the description, and the badges line runs
-   under it, a full row wide, instead of a strip indented by the picture. */
-.header:has(> .icon[data-media="true"]) > .badges {
-  grid-column: 1 / -1;
-}
-
-/* With a line under the title the parts hang from the top: the icon, the actions and the close
-   button centre on the first lines, the text runs down. */
-.header[data-multiline="true"] {
-  align-items: start;
+/* Header alone closes with the dialog's 24px rhythm. */
+.header:last-child {
+  padding-block-end: var(--prime-space-6);
 }
 
 /*
  * Tabs in the header: the header becomes the tab strip — painted like the strip (two steps off
- * the dialog), no hairline, flush with the body — and hands the bar its side padding so it runs
- * edge to edge. The active tab is the body rising into the header; the panels sit in the body.
+ * the dialog), flush with the body — and hands the bar its side padding so it runs edge to edge.
+ * The active tab is the body rising into the header; the panels sit in the body.
  */
 .header:has([role="tablist"]) {
   --prime-bleed-inline: var(--dialog-padding);
@@ -118,102 +83,53 @@
 }
 
 .header > :has([role="tablist"]) {
-  order: 4;
-  grid-column: 1 / -1;
-  margin-block-start: var(--prime-space-4);
+  margin-block-start: var(--frame-gap);
 }
 
-/* Header alone closes with the dialog's 24px rhythm. */
-.header:last-child {
-  padding-block-end: var(--prime-space-6);
-}
-
-/* The icon tile (internal/iconBox `.tile`) or the record's picture, in the icon column, centred on
-   the first two lines of the text. */
-.icon {
-  grid-column: icon;
-  grid-row: 1;
-  margin-inline-end: var(--prime-space-4);
-}
-
-.header[data-multiline="true"] > .icon {
-  grid-row: 1 / span 2;
-  align-self: center;
-}
-
-/*
- * The record's picture (`Avatar.Root`, `Thumbnail.Root`): no tile of its own, the picture is the
- * mark. An avatar takes size `l` (40, set in TSX); a thumbnail keeps its `m` height (40) and its
- * ratio.
- */
+/* The mark (internal/iconBox tile or the record's picture), 48 in the row. */
 .icon[data-media="true"] {
   display: inline-flex;
-  flex: 0 0 auto;
   align-items: center;
-  min-width: var(--prime-space-10);
-  height: var(--prime-space-10);
 }
 
-/*
- * Line 1 — the title (title-m; the text role is joined in TSX). The record's number stands muted
- * after the name. In a question dialog the title wraps, balanced.
- */
-.title {
-  order: 0;
+/* A record header holds the name on one line (the floor and the ellipsis are the header row's);
+   the name cuts, its number never does. */
+.titleLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+}
+
+.titleName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleNumber {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* A question dialog: the title and the text under it wrap, balanced. */
+.titleWrap {
   margin: 0;
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
   text-wrap-style: balance;
 }
 
-.titleNumber {
-  color: var(--prime-color-text-muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+.titleWrap .titleNumber {
+  white-space: normal;
 }
 
-/* Line 2 — the description (body-s, muted): the record's context, 4 under the title (a tight pair). */
-.description {
-  order: 1;
-  margin: var(--prime-space-1) 0 0;
-  color: var(--prime-color-text-muted);
+.descriptionWrap {
+  margin: var(--frame-lines-gap) 0 0;
+  color: var(--prime-color-text-secondary);
   overflow-wrap: anywhere;
-}
-
-/* Line 3 — the badges (`Badge.Group` of tier m, one row, «+N»): the record's working controls,
-   8 under the line above them, right over the body or the tab strip. */
-.badges {
-  order: 2;
-  margin-block-start: var(--prime-space-2);
-}
-
-/*
- * A record header (badges, or a title with a number) is one line per line: the name ellipsizes
- * while its number keeps its width, the description is one line with an ellipsis. The whole text
- * stays in the dialog's name and description, and in a `title` while a line is cut (TSX).
- */
-.header:is(:has(> .badges), :has(> .title > .titleNumber)) > .title {
-  display: flex;
-  align-items: baseline;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.header:is(:has(> .badges), :has(> .title > .titleNumber)) .titleName {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.header:is(:has(> .badges), :has(> .title > .titleNumber)) .titleNumber {
-  flex: none;
-}
-
-.header:is(:has(> .badges), :has(> .title > .titleNumber)) > .description {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* The line's place while its data loads. */
@@ -221,6 +137,10 @@
   inline-size: calc(var(--prime-space-24) * 2.5);
   max-inline-size: 100%;
   vertical-align: middle;
+}
+
+.badges {
+  display: flex;
 }
 
 .badgesSkeleton {
@@ -233,60 +153,21 @@
   vertical-align: middle;
 }
 
-/*
- * A row of controls at the end of the header, before the close button (tier s, joined in TSX: the
- * close button's height `--field-h`). With lines under the title it hangs from the top, centred on
- * the title's line.
- */
+/* A row of controls at the end of the header, before the close button (the dialog's tier, joined
+   in TSX): it never wraps or gives. */
 .actions {
-  grid-column: actions;
-  grid-row: 1;
   display: flex;
+  flex: none;
   flex-wrap: nowrap;
   align-items: center;
   gap: var(--prime-space-2);
-  min-width: 0;
-  margin-inline-start: var(--prime-space-4);
-}
-
-.header[data-multiline="true"] > .actions {
-  min-height: var(--field-h);
-  margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
-}
-
-/* Beside the title the row never gives: the title's minimum decides. */
-.header:not([data-actions-below]) > .actions {
   min-width: max-content;
 }
 
-/* Under the text: the last row of the text column, after the badges, above a tab strip,
-   which always closes the header. */
-.header[data-actions-below] > .actions {
-  grid-row: auto;
-  grid-column: text / close;
-  order: 3;
-  flex-wrap: wrap;
-  margin: var(--prime-space-2) 0 0;
-}
-
-/*
- * The ghost icon-only close (a square Button of tier s, whose own `--field-h` centres it). With
- * lines under the title it hangs from the top, centred on the title's line; the inline pull puts
- * the glyph on the content edge.
- */
+/* The ghost icon-only close, at the end of the row, the glyph on the content edge. */
 .close {
-  grid-column: close;
-  grid-row: 1;
-  margin-inline: var(--prime-space-4) calc(var(--prime-space-2) * -1);
-}
-
-/* After the actions the close button is one of them: the row's own step. */
-.header:has(> .actions) > .close {
-  margin-inline-start: var(--prime-space-2);
-}
-
-.header[data-multiline="true"] > .close {
-  margin-block: calc((var(--prime-text-title-m-line-height) - var(--field-h)) / 2);
+  flex: none;
+  margin-inline-end: calc(var(--prime-space-2) * -1);
 }
 
 /* ─── Body ───────────────────────────────────────────────────────────────── */
@@ -298,7 +179,7 @@
   gap: var(--prime-space-4);
   min-width: 0;
   min-height: 0;
-  padding: var(--prime-space-5) var(--dialog-padding);
+  padding: var(--frame-gap) var(--dialog-padding);
   overflow-wrap: anywhere;
 }
 
@@ -385,7 +266,12 @@
   flex: 0 0 auto;
   align-items: center;
   min-width: 0;
-  padding: var(--prime-space-5) var(--dialog-padding) var(--prime-space-6);
+  padding: 0 var(--dialog-padding) var(--prime-space-6);
+}
+
+/* No body between them: the zone gap parts the header from the footer. */
+.header + .footer {
+  padding-block-start: var(--frame-gap);
 }
 
 .footer:first-child {

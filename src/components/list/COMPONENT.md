@@ -16,7 +16,7 @@
 - Panels of one screen → use [Tabs](../tabs/COMPONENT.md).
 - Conversations of a messenger or an inbox (a preview, «печатает…», unread counts) → use [ChatList](../chat-list/COMPONENT.md).
 - Many records compared by columns, sorted, filtered or selected in bulk → use [DataTable](../data-table/COMPONENT.md).
-- A static list of facts inside a card (no selection, nothing opens) → use `Card.List` of [Card](../card/COMPONENT.md).
+- A static list of label — value facts inside a card (no selection, nothing opens) → `DescriptionList align="end"` in a `Card.Body` of [Card](../card/COMPONENT.md).
 - Picking a value from options → use [Select](../select/COMPONENT.md) or [Radio](../radio/COMPONENT.md); a menu of commands → [Dropdown](../dropdown/COMPONENT.md).
 
 ## Import
@@ -31,7 +31,8 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
    │                         value; with onReorder: Dnd.Handle (busy while saving) at the row's end, after its actions
    ├─ List.ItemIcon         leading Avatar.Root / Icon / Badge.Dot (aria-hidden); after the text — a trailing glyph
    ├─ List.ItemText         primary line, truncates
-   ├─ List.ItemDescription  second line, muted, truncates
+   ├─ List.ItemBadges       badges after the title, on its line (a Badge.Group, «+N» on overflow)
+   ├─ List.ItemDescription  second line, muted, truncates; a StatusDot first, then «·»
    ├─ List.ItemMeta         trailing small text (time, date, amount)
    ├─ List.ItemCount        trailing Badge, one tier down
    └─ List.ItemActions      the row's own controls (Switch, Dropdown): beside the row element, one tier down;
@@ -68,7 +69,7 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | `asChild` | `boolean` | `false` | Renders the single child (a router link) as the row; its children are the content. |
 | `disabled` | `boolean` | `false` | Muted and out of the Tab order: a disabled button, or `aria-disabled` and no navigation on a link. |
 | `locked` | `boolean` | `false` | With `onReorder`: the row holds its place (a system stage) and shows a lock in the grip's box; no row moves past it. The row and its `List.ItemActions` work as on any row. |
-| `children` | `ReactNode` | — | `List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (also inside a fragment); loose text becomes the text line. |
+| `children` | `ReactNode` | — | `List.ItemIcon`, `List.ItemText`, `List.ItemBadges`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (also inside a fragment); loose text becomes the text line. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and native attributes of the row element (`target`, `rel` on a link). |
 
 ### List.ItemIcon
@@ -86,8 +87,17 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className`, `title` (full text when truncated) and the other `span` attributes. |
 
+### List.ItemBadges
+`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the record, the meaning in its `tone` or `color`. The title gives way first; what does not fit folds into «+N».
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The `Badge.Root`s of the record (a status, a role). |
+| `labels` | `Partial<BadgeGroupLabels>` | — | Built-in strings of the «+N» badge, see the `Badge.Group` labels. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other `div` attributes. |
+
 ### List.ItemDescription
-`ref` → `HTMLSpanElement`. The second line (a preview, a status): muted, smaller, truncated.
+`ref` → `HTMLSpanElement`. The second line (a preview, a state): muted, smaller, one line cut with an ellipsis. A `StatusDot` first states the record's state, and a «·» is put after it by itself.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -168,7 +178,8 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - The root fills its container (`width: 100%`); rows are 4px apart, each row a full-width button with the tier radius and field padding.
 - Put the list on a surface: a `Card.Root` pane in `Page.List`, with a `ScrollContainer` around it when it is long — the list never scrolls by itself.
 - Row: leading icon · body (text over description) · trail. Beside two lines the trail stacks — meta on top, count below; beside one line they sit in a row.
-- Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
+- `--list-bleed` (public hook, `0` by default): a host such as `Card.Body` sets it to `1`, and the rows reach past the list's edges by their own inline padding (`--field-px`), so their text stands on the host's content edge and the hover wash runs into the host's padding.
+- Nothing wraps: the title, the badges line and the description are one line each. The title gives way to `List.ItemBadges` first (down to its text or 8em), then the badges fold into «+N».- Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
 - Reorderable (`onReorder`): an `xs` handle box ends each row, 4px after the row element and its `List.ItemActions` (inline-end: on the left in RTL); the row keeps its own padding and fill, so every row's handle stands on one line.
 - `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's side edge as the row's own text (`--field-px`) — at any row height, so one-line and two-line rows stand on one vertical. The end edge, or the start edge with `side="start"`, where the row's own padding then parts the controls from its icon or text. A row with no `onClick`, `href` or `asChild` is a static `<div>` (no Tab stop, no hover wash) with the same parts and controls. Parts may be passed inside a fragment.
@@ -200,15 +211,24 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+#### List.Root
+
 | Key | Default | Used for |
 |---|---|---|
 | `reorderItem` | `"Переместить {label}"` | `aria-label` of a row's drag handle (`onReorder`); `{label}` is the row's text line. |
 | `lockedItem` | `"{label}: закреплено"` | Name of the lock a `locked` row shows in the grip's place; `{label}` is the row's text line. |
 
+#### List.ItemBadges
+
+| Key | Default | Used for |
+|---|---|---|
+| `more` | `"+{count}"` | Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many. |
+| `moreCount` | `"Ещё {count}"` | What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip. |
+
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A support ticket queue with the client, the last update and the open count; a click opens a ticket and makes it the current row — `current`, `onClick`. |
+| [overview.tsx](examples/overview.tsx) | A support ticket queue: the subject with its badge, the state and the client under it, the last update and the open count at the end; a click opens a ticket and makes it the current row — `current`, `onClick`, `List.ItemBadges`, `StatusDot`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: row height, text, icon and count follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | The open record, a regular row and an unavailable one — `current`, `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients, icons of queues and colour dots of projects; an avatar takes the row tier, a dot stands in an icon-wide box — `List.ItemIcon`, `Badge.Dot`. |
@@ -231,5 +251,5 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - A hollow `Icon` circle or a hand-drawn dot as a stage colour → `Badge.Dot color` in `List.ItemIcon`.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`; `Badge.Dot` in `List.ItemIcon`), [Avatar](../avatar/COMPONENT.md) (`List.ItemIcon` gives an avatar the row tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`, the lock of a `locked` row)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`, `List.ItemBadges`; `Badge.Dot` in `List.ItemIcon`), [StatusDot](../status-dot/COMPONENT.md) (the state first in `List.ItemDescription`), [Avatar](../avatar/COMPONENT.md) (`List.ItemIcon` gives an avatar the row tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`, the lock of a `locked` row)
 - **See also:** [Page](../../layout/page/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md)

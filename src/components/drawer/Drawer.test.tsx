@@ -172,7 +172,10 @@ describe("Drawer", () => {
       "aria-labelledby",
       screen.getByRole("heading", { name: "Drawer title" }).id,
     );
-    expect(dialog).toHaveAttribute("aria-describedby", screen.getByText("Drawer description").id);
+    expect(dialog).toHaveAttribute(
+      "aria-describedby",
+      screen.getByText("Drawer description").closest("p")?.id,
+    );
   });
 
   it("closes by the header close button", async () => {
@@ -305,7 +308,7 @@ describe("Drawer", () => {
     render(<BasicDrawer defaultOpen labels={{ close: "Закрыть панель" }} />);
     expect(screen.getByRole("button", { name: "Закрыть панель" })).toHaveAttribute(
       "data-size",
-      "s",
+      "m",
     );
   });
 
@@ -658,7 +661,7 @@ describe("Drawer — overlay contract", () => {
 });
 
 describe("Drawer — header actions, footer meta, exit snapshot", () => {
-  it("places Actions in the header before the close button, one tier down", () => {
+  it("places Actions in the header before the close button, at the dialog tier", () => {
     render(
       <Drawer.Root defaultOpen>
         <Drawer.Content>
@@ -676,10 +679,10 @@ describe("Drawer — header actions, footer meta, exit snapshot", () => {
     const actions = screen.getByTestId("actions");
     const close = screen.getByRole("button", { name: "Закрыть" });
     expect(actions.nextElementSibling).toBe(close);
-    expect(screen.getByRole("button", { name: "Ещё" })).toHaveAttribute("data-size", "s");
+    expect(screen.getByRole("button", { name: "Ещё" })).toHaveAttribute("data-size", "m");
   });
 
-  it("holds a tab-wide switcher before the buttons at tier s; one shown later rises in", async () => {
+  it("holds a tab-wide switcher before the buttons at the dialog tier; one shown later rises in", async () => {
     function Card({ lang }: { lang: boolean }) {
       return (
         <Drawer.Root defaultOpen>
@@ -717,7 +720,7 @@ describe("Drawer — header actions, footer meta, exit snapshot", () => {
     expect(more.parentElement).not.toHaveClass(enterMotion.enter);
     expect(screen.getByRole("radiogroup", { name: "Язык текстов" })).toHaveAttribute(
       "data-size",
-      "s",
+      "m",
     );
   });
 

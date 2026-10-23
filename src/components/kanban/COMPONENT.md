@@ -37,19 +37,19 @@ Kanban.Root                          board: horizontal strip of columns, its own
 ├─ placeholder columns               while `loading` and `columns` is empty: `loadingColumns` columns of Skeleton title and cards
 ├─ <div role="group"> per group      with `columnGroups`: the group heading over its own <ul>; columns stay inside their group
 └─ <ul> (Dnd.Sortable, axis x)       the columns in `columnOrder`
-   └─ <li> column (from `columns`)   no well with a header plate (`plain`) or a header line (`line`), or a `fill-muted` well (`well`)
+   └─ <li> column (from `columns`)   no well with a header plate (`plain`) or a bare header (`line`), or a `fill-muted` well (`well`)
       ├─ header                      title (`columnTitleAs`, h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
       │  ├─ description              muted line under the title (`column.description`)
       │  └─ meta                     the stage's figures (`renderColumnMeta(column)`), a line per array entry
       └─ <ul> (Dnd.Sortable)         own vertical scroll; Skeleton cards while loading; EmptyPage (Dnd `empty`) when empty
          └─ Kanban.Item              <li> card from renderItem(item); with getItemHref an <a> covers it
-            ├─ Kanban.ItemSection    optional zone of parts; zones stand apart over a faint line, an empty one is not drawn
-            ├─ Kanban.ItemHeader     optional top row over a faint hairline: key · priority (or a full-width Thumbnail cover)
-            ├─ Kanban.ItemTitle      title, up to three lines; with `number` / an owner Avatar.Root one cut row
-            ├─ Kanban.ItemDescription  muted meta line: id, due date
+            ├─ Kanban.ItemSection    optional zone of parts; zones stand apart by air, no line; an empty one is not drawn
+            ├─ Kanban.ItemHeader     optional top row, no line: key · priority (or a full-width Thumbnail cover)
+            ├─ Kanban.ItemTitle      header row: one line, the badges after it; with `number` / an owner Avatar.Root one cut row
+            ├─ Kanban.ItemDescription  header row: muted line under the title: id, due date; a StatusDot first
             ├─ Kanban.ItemResource   a unit of the record: a mark (ProgressCircle s) · name over a caption
             ├─ Kanban.ItemFact       a 14 px icon + a secondary caption line
-            ├─ Kanban.ItemBadges     wrapping row of Badge (a Badge.Group)
+            ├─ Kanban.ItemBadges     badges on the title line (a Badge.Group, extra fold into «+N»)
             └─ Kanban.ItemFooter     row: Kanban.ItemCount … at the start, text cut, the last child (assignee, date) at the end
                └─ Kanban.ItemCount   icon + number (an icon alone: the channel)
 KanbanFieldsMenu                     the kit's view trigger (columns icon · «Вид» · count Badge) + Dropdown: «На карточке» (or `group`) check items, a grip each with `fieldOrder` · «По умолчанию» once changed; in Page.Tools beside the filter
@@ -84,7 +84,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `renderColumnActions` | `(column: KanbanColumn) => ReactNode` | — | Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier. |
 | `renderColumnMeta` | `(column: KanbanColumn) => ReactNode \| readonly ReactNode[]` | — | The meta under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»); an array is a line per entry, in order. Describes the column's list. |
 | `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). The column turns `danger` before the release. |
-| `variant` | `"plain" \| "line" \| "well"` | `"plain"` | No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues). |
+| `variant` | `"plain" \| "line" \| "well"` | `"plain"` | No wells: `plain` — a filled header plate over the cards, `line` — a bare header with no plate; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues). |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
 | `loadingColumns` | `number` | `3` | Placeholder columns a `loading` board draws while `columns` is empty (the stages are still loading); the columns fade in where they stood. |
 | `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; `onItemOpen` and `getItemHref` still open cards. |
@@ -107,7 +107,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Kanban.ItemTitle
-`ref` → `HTMLSpanElement`. The card title: medium body text, up to three lines. With a tail — `number`, an `Avatar.Root` child (the owner, also inside a fragment) — one row: the name cut with an ellipsis, then the number, the owner last; the tail never shrinks.
+`ref` → `HTMLSpanElement`. The card title: one line, cut with an ellipsis; the badges share its line. With a tail — `number`, an `Avatar.Root` child (the owner) — one row: the name, the number, the owner last; the tail never shrinks.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -115,14 +115,14 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the name, an owner `Avatar.Root`), `className` and the other span attributes. |
 
 ### Kanban.ItemDescription
-`ref` → `HTMLSpanElement`. The muted meta line under the title: id, due date; one line, tabular numbers.
+`ref` → `HTMLSpanElement`. The muted line under the title: id, due date; one line; a `StatusDot` first states the state.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Kanban.ItemBadges
-`ref` → `HTMLDivElement`. A wrapping row of `Badge`s (a `Badge.Group`): labels, priority.
+`ref` → `HTMLDivElement`. The `Badge`s after the title, on its line (a `Badge.Group`): labels, priority; what does not fit folds into «+N».
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -143,7 +143,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Kanban.ItemSection
-`ref` → `HTMLDivElement`. A zone of a card, a group of its parts: zones stand `space-3` off a faint line between them, parts inside one `space-2` apart. A zone with nothing in it is not drawn and leaves no line.
+`ref` → `HTMLDivElement`. A zone of a card, a group of its parts: zones stand the frame's zone gap apart with no line, parts inside one `space-2` apart. A zone with nothing in it is not drawn.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -187,7 +187,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `plain` | no wells: the column is its header — a filled plate as wide as the cards (title, count) — and its cards, which stand on the board's host, each a surface one ladder step off it (white on the light page), as a Card on the page | the board is the page's main region (a pipeline, a task board, a queue screen) or sits in a Card or Drawer — one level of nesting, cards are the only boxes | yes |
-| `line` | no wells, like `plain`, but the header is bare: title and count over a faint inset hairline as wide as the cards | the same places as `plain` when the headers should stay quiet — many columns, a calm board, the column headers are not the focus | |
+| `line` | no wells, like `plain`, but the header is bare: title and count, no plate | the same places as `plain` when the headers should stay quiet — many columns, a calm board, the column headers are not the focus | |
 | `well` | every column is a filled well (`fill-muted`, radius `l`) holding its cards (the selected step of the well) | columns must read as bounded queues: WIP limits and capacity, many sparse or empty columns whose drop area must show, a dense board of many narrow columns | |
 
 Do not wrap a `plain` board's columns in your own boxes, and do not put a `well` board inside a filled box of your own — both are the double nesting the variants exist to avoid.
@@ -234,18 +234,19 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - The board is a size container. From 40rem of its own width columns keep a fixed 18rem; below it a column takes 85% of the board, so the next column peeks. The strip snaps to the start of a column (ScrollContainer `snap="mandatory"`); snapping is off while a drag carries a card.
 - Every column draws only the cards around its view (Dnd.Sortable `virtual`): a column of thousands scrolls and drags as fast as one of ten. Pass every card in `items` and `value` — never slice a column by hand; the carried, the focused and a card arriving by Alt + ← / → stay drawn.
 - The strip scrolls sideways inside the board, never the page. Cards sit at the top of their column; the drop area runs to the bottom of the column, so a card can be released anywhere in it.
-- `plain` / `line`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
+- `plain` / `line`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. A card stands on the `s` step of the surface frame (`surfaceFrame`): padding 16, radius 12, 12 between zones, title 13/16, controls at tier `s`.
 - The column title is `title-m`; the header is at least a control `m` tall, its text starts where the card text does.
-- `well` and `line`: a faint inset hairline (`--prime-color-border-faint`, as in a dialog header) separates the header from the cards. `plain`: the header is a filled plate (`--prime-color-fill-muted`, `--prime-radius-l`) as wide as the cards, in place of the hairline.
+- No line separates a header from its cards: air does. `plain`: the header is a filled plate (`--prime-color-fill-muted`, `--prime-radius-l`) as wide as the cards.
 - Every header of the board is as tall as the tallest one (the board's rows are shared by its columns, subgrid; with `columnGroups` across the phases too): a column with figures under its title and one without start their cards on one line. Never pad a header with an empty `renderColumnMeta` line to line them up.
 - The header is a grid: the title, the count, the actions and the grip at the end on the first row; the description under the title on the second, the meta line under it (`--prime-space-1` above, caption, `text-secondary`).
 - A card is on `--prime-shadow-raised`: in `plain` / `line` the next layer of the board's host (`--prime-color-layer-current` of its own depth), in `well` `--prime-color-control-selected` (two ladder steps off its well; white in light).
-- `Kanban.ItemHeader` is a muted caption row over a faint hairline (`--prime-color-border-faint`); a card without it starts with its title or a full-width `Thumbnail` cover.
-- Rich cards group their parts in `Kanban.ItemSection` zones: parts inside a zone stand `--prime-space-2` apart, zones `--prime-space-3` off a faint line between them (`hairline.between`, `--prime-color-border-faint`); a zone with nothing in it is not drawn and leaves no line. A `Badge fullWidth` plate (the next step) goes first in its zone; facts in a row stand `--prime-space-1` apart.
+- `Kanban.ItemTitle`, `Kanban.ItemBadges` and `Kanban.ItemDescription` (in a card or in a `Kanban.ItemSection`) form the kit's header row at the place of the first of them: the title and its badges on one line (the title gives way first, then the badges fold into «+N»), the description under them, one line each, nothing wraps.
+- `Kanban.ItemHeader` is a muted caption row with no line; a card without it starts with its title or a full-width `Thumbnail` cover.
+- Rich cards group their parts in `Kanban.ItemSection` zones: parts inside a zone stand `--prime-space-2` apart, zones the frame's zone gap apart, with no line; a zone with nothing in it is not drawn. A `Badge fullWidth` plate (the next step) goes first in its zone; facts in a row stand `--prime-space-1` apart.
 - `Kanban.ItemResource`: its mark (kit marks take the `s` tier: a `ProgressCircle` 32 with a short text «18 д») `--prime-space-3` from a body-s medium name over a muted caption, both cut with an ellipsis.
 - `Kanban.ItemHeader` and `Kanban.ItemFooter` cut text with an ellipsis and never shrink their last child, so a long source never pushes the date onto a second line.
 - `KanbanFieldsMenu` holds only the view of the board's cards (not a table's columns): the page decides which parts each card renders from `hiddenFields`. Its trigger is the kit's one view trigger — the same soft neutral Button with the `view.columns` icon, «Вид» and the count of shown items as `DataTableColumnsMenu` and `GanttCategoriesMenu` — so a page that switches board ↔ list ↔ schedule keeps one «Вид» in one place, each view's own menu behind it. «По умолчанию» appears (with its separator) only while the view differs from the default (`defaultHiddenFields`, the order of `fields`) and puts both back. With any of the `fieldOrder` triad the items are a `Dnd.Sortable` list per group, a grip ending each item (a held press drags on touch), Alt + ↑ / ↓ on the focused item moves it; a field with a `group` stands under that heading and moves only within it. The cards are yours, so the page renders their parts in `fieldOrder` (`[]` is the order of `fields`) and skips `hiddenFields`.
-- Header actions get the `s` tier; inside a card, kit controls take the `m` host tier (a `Badge` is `s`). Pick a small `Avatar` (`size="s"`).
+- Header actions get the `s` tier; inside a card, kit controls take the frame's tier `s` (badges after the title are `xs`). Pick a small `Avatar` (`size="s"`).
 
 ## Accessibility
 
@@ -337,7 +338,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - Stats squeezed into the column `title` → `renderColumnMeta`.
 - `canDrop` returning `false` for a rule a person cannot guess → return the reason as a string.
 - Applying a move in `onValueChange` and then undoing it yourself when the request fails → return the request's promise and apply `value` only after it succeeds; the board keeps the card in place meanwhile and glides it back on a rejection.
-- A hand-drawn `Divider` and gaps between groups of card parts → `Kanban.ItemSection`; it drops an empty zone and its line by itself.
+- A hand-drawn `Divider` and gaps between groups of card parts → `Kanban.ItemSection`; it drops an empty zone by itself.
 - The record number or the owner in `Kanban.ItemHeader` above a one-line title → `Kanban.ItemTitle number` with an `Avatar.Root` child.
 - A hand-made row of a truncated name, a number caption and the owner inside `Kanban.ItemTitle` → `Kanban.ItemTitle number` with the `Avatar.Root` as a child (a fragment around it is fine).
 - Your own row of a ring and two text lines for a vehicle or a room → `Kanban.ItemResource`.
@@ -345,5 +346,5 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - Drag as the only way to change a status → keep a status field or a menu in the card details too.
 
 ## Related
-- **Built from:** [Dnd](../dnd/COMPONENT.md), [Badge](../badge/COMPONENT.md) (the column count, the view trigger's count), [Avatar](../avatar/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md); `ViewMenu` (`KanbanFieldsMenu`: the kit's one view trigger and menu)
+- **Built from:** [Dnd](../dnd/COMPONENT.md), [Badge](../badge/COMPONENT.md) (the column count, the view trigger's count, the badges of a card), [StatusDot](../status-dot/COMPONENT.md) (the state at the start of a description), [Avatar](../avatar/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md); `ViewMenu` (`KanbanFieldsMenu`: the kit's one view trigger and menu)
 - **See also:** [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [Timeline](../timeline/COMPONENT.md), [Gantt](../gantt/COMPONENT.md)

@@ -8,20 +8,6 @@
   min-width: 0;
 }
 
-/* A request row in the list: method, route (takes the room), service. */
-.request {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-3);
-  width: 100%;
-  min-width: 0;
-}
-
-.route {
-  flex: 1;
-  min-width: 0;
-}
-
 .views {
   display: flex;
   flex-wrap: wrap;

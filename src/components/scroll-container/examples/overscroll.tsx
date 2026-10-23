@@ -1,5 +1,5 @@
 /** A panel that keeps its scroll: at the end of the list the page behind stays put — `overscrollBehavior`. */
-import { Card, ScrollContainer, Typography } from "prime-ui-kit";
+import { Card, List, ScrollContainer } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -11,17 +11,17 @@ export default function ScrollContainerOverscrollExample() {
       <Card.Header>
         <Card.Title>Журнал выгрузок</Card.Title>
       </Card.Header>
-      <ScrollContainer overscrollBehavior="contain" tabIndex={0} aria-label="Журнал выгрузок">
-        <Card.List>
-          {HOURS.map((hour) => (
-            <Card.ListItem key={hour}>
-              <Typography as="span" variant="body-m" tone="secondary">
-                {hour} — отчёт выгружен
-              </Typography>
-            </Card.ListItem>
-          ))}
-        </Card.List>
-      </ScrollContainer>
+      <Card.Body>
+        <ScrollContainer overscrollBehavior="contain" tabIndex={0} aria-label="Журнал выгрузок">
+          <List.Root aria-label="Выгрузки">
+            {HOURS.map((hour) => (
+              <List.Item key={hour}>
+                <List.ItemText>{hour} — отчёт выгружен</List.ItemText>
+              </List.Item>
+            ))}
+          </List.Root>
+        </ScrollContainer>
+      </Card.Body>
     </Card.Root>
   );
 }

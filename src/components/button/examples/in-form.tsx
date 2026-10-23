@@ -26,7 +26,7 @@ export default function ButtonInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Input.Root label="Рабочая почта" required error={error} reserveSupportRow>
+      <Input.Root label="Рабочая почта" required error={error}>
         <Input.Wrapper>
           <Input.Field
             type="email"

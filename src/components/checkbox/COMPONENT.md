@@ -168,7 +168,7 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 | [sizes.tsx](examples/sizes.tsx) | Every size; the box and the text follow the control tier — `size`. |
 | [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `defaultChecked`, `indeterminate`, `readOnly`, `invalid`, `disabled`. |
 | [without-label.tsx](examples/without-label.tsx) | Bare boxes in table rows, named for assistive tech and submitted with the form — `aria-label`, `name`, `value`. |
-| [indicator.tsx](examples/indicator.tsx) | The box alone on selectable tiles: the toggle button carries `aria-pressed`, the box only shows it — `Checkbox.Indicator`. |
+| [indicator.tsx](examples/indicator.tsx) | The box alone on selectable tiles: `selected` on the card marks its toggle button and the box shows it — `Card.Indicator`, `selected`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the selection; «select all» turns indeterminate on a partial one — `checked`, `onCheckedChange`, `indeterminate`. |
 | [in-form.tsx](examples/in-form.tsx) | Consent in a sign-up form: the required tick and an optional subscription, a hint under the text, an error after a submit without the tick — `required`, `optional`, `hint`, `error`. |
 

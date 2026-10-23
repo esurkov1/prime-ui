@@ -1,4 +1,4 @@
-/** Every tier: padding, icon and title follow the control tier, the description is one step smaller — `size`. */
+/** Every tier on its own frame step: padding, radius, mark and text roles grow with it — `size`. */
 import { Banner, Icon, Typography } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;

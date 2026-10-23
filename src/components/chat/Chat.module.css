@@ -2,7 +2,7 @@
  * Chat — a conversation assembled: a column that fills its host's height. The header, the search
  * bar and the pinned bar stand at the top, the messages scroll in the middle (`Chat.Messages`,
  * the one region that grows), the footer with the Composer stays at the bottom. The frame draws
- * no surface of its own: put it in a `Card` or a page pane.
+ * no surface of its own: put it in a pane `Card` (a `Card.Root` with no zones: padding 0, edge to edge) or a page pane.
  *
  * The list (`MessageList`): rows in normal flow; in its scroller only the rows near the view
  * render (`useVirtualRows`), each in its own box (`.row`, layout and paint contained, measured
@@ -23,14 +23,21 @@
 
 /* ─── Header ───────────────────────────────────────────────────────────── */
 
-/* One line: the name ellipsizes, a record's number after it keeps its width, muted. */
+/*
+ * The kit's header row (internal/headerRow) at the frame of the chat's letter: [lead: back button,
+ * avatar] [title · badges / description] [actions]. One line each, nothing wraps. No line under it:
+ * the messages dissolve at their top edge while scrolled (ScrollContainer edges).
+ */
+.header {
+  flex: none;
+  padding: var(--frame-pad) var(--frame-pad) var(--frame-gap);
+}
+
+/* The name ellipsizes, a record's number after it keeps its width, muted. */
 .title {
   display: flex;
   align-items: baseline;
   gap: var(--prime-space-2);
-  min-width: 0;
-  margin: 0;
-  color: var(--prime-color-text-primary);
 }
 
 .titleName {
@@ -47,20 +54,8 @@
   white-space: nowrap;
 }
 
-/* The record's badges (`Badge.Group` of tier s, one row, «+N»): 4 under the title. */
-.badges {
-  min-width: 0;
-  margin-block: var(--prime-space-1) 0;
-}
-
 .description {
-  min-width: 0;
-  overflow: hidden;
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* «печатает…» in the accent, cross-fading with the status line. */
@@ -68,70 +63,12 @@
   color: var(--prime-color-accent-text);
 }
 
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-1);
-}
-
-/*
- * [lead: back button, avatar] [title over badges over description] [actions]. `Chat.Header` sorts
- * its children: anything that is not the title, the badges, the description or the actions goes
- * into `.lead`, side by side. The text lines are auto rows: a line that is absent takes no room,
- * and the lead and the actions centre on the lines there are.
- */
-.header {
-  display: grid;
-  flex: none;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "lead title actions"
-    "lead badges actions"
-    "lead description actions";
-  align-items: center;
-  column-gap: var(--prime-space-3);
-  padding: var(--prime-space-3) var(--prime-space-3) var(--prime-space-3) var(--prime-space-4);
-  /* The zone line under it (internal/hairline, joined in TSX), inset like the header's text. */
-  --hairline-inset: var(--prime-space-4);
-}
-
+/* The leading elements (a back button, an avatar), side by side before the text. */
 .lead {
   display: flex;
-  grid-area: lead;
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
-}
-
-/* Without a leading element the text starts the row (no empty column and gap before it). */
-.header:not(:has(> .lead)) {
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "title actions"
-    "badges actions"
-    "description actions";
-}
-
-.header > .title {
-  grid-area: title;
-}
-
-.header > .badges {
-  grid-area: badges;
-}
-
-.header > .description {
-  grid-area: description;
-}
-
-.header > .actions {
-  grid-area: actions;
-}
-
-/* Under badges the description stands 4 lower. */
-.header:has(> .badges) > .description {
-  margin-block-start: var(--prime-space-1);
 }
 
 /* ─── Search ───────────────────────────────────────────────────────────── */
@@ -195,11 +132,6 @@
 .pinned {
   flex: none;
   margin: 0 var(--prime-space-3) var(--prime-space-2);
-}
-
-/* Right under the header's line it keeps the air the search bar would. */
-.header + .pinned {
-  margin-block-start: var(--prime-space-2);
 }
 
 /* ─── Messages ─────────────────────────────────────────────────────────── */

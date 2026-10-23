@@ -4,6 +4,7 @@ import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import enterMotion from "@/internal/enterMotion.module.css";
+import { headerRowStyles } from "@/internal/headerRow";
 import { withMotion } from "@/test/motion";
 
 import { Banner } from "./Banner";
@@ -55,7 +56,7 @@ describe("Banner", () => {
     expect(container.firstElementChild).toHaveAttribute("data-size", "m");
     unmount();
 
-    for (const size of ["s", "m", "l", "xl"] as const) {
+    for (const size of ["xs", "s", "m", "l", "xl"] as const) {
       const { container: c, unmount: u } = render(
         <Banner.Root size={size}>
           <Banner.Content>S</Banner.Content>
@@ -243,22 +244,23 @@ describe("Banner", () => {
       </Banner.Root>,
     );
     const root = container.firstElementChild as HTMLElement;
-    // With actions dismiss lines up with the other buttons; CSS hides the corner close slot
-    // (`.root:has(.actions) > .close`), which jsdom does not apply.
+    // With actions the dismiss ends their row, lined up with the other buttons.
+    expect(root.children).toHaveLength(1);
     expect(root.children[0]).toHaveClass(styles.content);
-    expect(root.children[1]).toHaveClass(styles.close);
     const close = within(root.children[0] as HTMLElement).getByRole("button", { name: "Закрыть" });
-    expect(close).toHaveClass(styles.actionsClose);
     expect(close.parentElement).toHaveClass(styles.actions);
+    expect(close.parentElement?.lastElementChild).toBe(close);
     expect(screen.getByTestId("icon")).toHaveClass(styles.icon);
-    expect(screen.getByText("Пробный период закончится 12 октября")).toHaveClass(styles.title);
+    expect(screen.getByText("Пробный период закончится 12 октября")).toHaveClass(
+      headerRowStyles.title,
+    );
     expect(screen.getByText("Выберите тариф.")).toHaveClass(styles.description);
     expect(screen.getByRole("button", { name: "Выбрать тариф" }).parentElement).toHaveClass(
       styles.actions,
     );
   });
 
-  it("keeps the small corner close when there are no actions", () => {
+  it("ends the row with a lone close button when there are no actions", () => {
     const { container } = render(
       <Banner.Root onDismiss={() => {}}>
         <Banner.Content>
@@ -267,13 +269,14 @@ describe("Banner", () => {
       </Banner.Root>,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.children).toHaveLength(2);
-    expect(root.children[1]).toHaveClass(styles.close);
+    expect(root.children).toHaveLength(1);
     const close = screen.getByRole("button", { name: "Закрыть" });
-    expect(close.parentElement).toBe(root.children[1]);
+    expect(close.parentElement).toHaveClass(headerRowStyles.end);
+    expect(close.parentElement?.parentElement).toBe(root.children[0]);
     expect(close).toHaveAttribute("data-variant", "ghost");
     // Takes the banner's text color from the host, so it reads on solid fills.
     expect(close).toHaveAttribute("data-tone", "inherit");
-    expect(close).toHaveAttribute("data-size", "xs");
+    // The banner's frame tier (m): as tall as the fields of the same surface.
+    expect(close).toHaveAttribute("data-size", "m");
   });
 });

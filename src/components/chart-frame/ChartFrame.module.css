@@ -1,9 +1,9 @@
 /*
  * ChartFrame — a dashboard panel around any chart. The root is a layer of the surface ladder
  * (foundation §4: `data-depth`, `--prime-color-layer-current`, the whisper only where the depth
- * gives one), card radius and padding, no border. Zones stack with one gap: header, value, plot,
- * legend. The panel adapts to its own width (container queries): actions under the title, a
- * lower default plot.
+ * gives one), the surface frame of its letter (padding, radius, zone gap: internal/surfaceFrame), no border.
+ * Zones stack with one gap: header (the kit's header row), value, plot, legend. The panel adapts to
+ * its own width (container queries): a lower default plot.
  *
  * Motion: the plot region cross-fades between states (Crossfade, fixed height — nothing glides);
  * the value swaps from its Skeleton (RegionSwap) and the legend values fade in place (they sit in
@@ -19,55 +19,18 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-4);
+  gap: var(--frame-gap);
   width: 100%;
   min-width: 0;
   max-width: 100%;
   margin: 0;
-  padding: var(--prime-card-padding-m);
-  border-radius: var(--prime-card-radius);
+  padding: var(--frame-pad);
+  border-radius: var(--frame-radius);
   background: var(--prime-color-layer-current);
   box-shadow: var(--prime-layer-shadow);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
   text-align: start;
-}
-
-/* ---------- Header ---------- */
-
-.header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--prime-space-1) var(--prime-space-3);
-  min-width: 0;
-}
-
-.title,
-.description {
-  grid-column: 1;
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.title {
-  color: var(--prime-color-text-primary);
-}
-
-.description {
-  color: var(--prime-color-text-secondary);
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--prime-space-2);
-  min-width: 0;
 }
 
 /* ---------- Value ---------- */
@@ -331,13 +294,5 @@
 @container (max-width: 30rem) {
   .plot {
     --cf-plot-height: calc(var(--prime-space-20) * 2);
-  }
-}
-
-@container (max-width: 24rem) {
-  .actions {
-    grid-column: 1;
-    grid-row: auto;
-    justify-content: flex-start;
   }
 }

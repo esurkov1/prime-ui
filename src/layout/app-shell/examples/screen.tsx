@@ -9,14 +9,12 @@ import {
   type IconName,
   Kpi,
   type KpiTone,
+  List,
   Page,
   Sidebar,
-  Typography,
   useAppShellNav,
 } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./screen.module.css";
 
 type SectionId = "today" | "deals" | "clients" | "tasks" | "reports" | "settings";
 type Section = { id: SectionId; label: string; icon: IconName };
@@ -24,10 +22,10 @@ type Row = { id: string; title: string; meta: string };
 type Figure = {
   label: string;
   value: string;
-  change: number | null;
-  delta: string;
+  unit?: string;
+  change?: { value: number; text: string; tone: KpiTone };
+  period?: string;
   meta?: string;
-  tone: KpiTone;
 };
 
 /** The main sections: the Sidebar's first group on a wide screen, the bar on a phone. */
@@ -53,25 +51,21 @@ const KPIS: Figure[] = [
   {
     label: "Сделки в работе",
     value: "37",
-    change: 4,
-    delta: "+4",
-    meta: "за неделю",
-    tone: "success",
+    change: { value: 4, text: "+4", tone: "success" },
+    period: "За неделю",
   },
   {
-    label: "Выручка за октябрь",
-    value: "4,8 млн ₽",
-    change: 12,
-    delta: "+12%",
-    meta: "к сентябрю",
-    tone: "success",
+    label: "Выручка",
+    value: "4,8",
+    unit: "млн ₽",
+    change: { value: 12, text: "+12%", tone: "success" },
+    period: "Октябрь",
   },
   {
     label: "Ждут ответа",
-    value: "5 клиентов",
-    change: null,
-    delta: "2 дольше суток",
-    tone: "danger",
+    value: "5",
+    unit: "клиентов",
+    meta: "2 дольше суток",
   },
 ];
 
@@ -238,10 +232,16 @@ export default function AppShellScreenExample() {
                     <Page.Cell key={kpi.label} span={4}>
                       <Kpi.Root>
                         <Kpi.Title>{kpi.label}</Kpi.Title>
-                        <Kpi.Value>{kpi.value}</Kpi.Value>
-                        <Kpi.Delta value={kpi.change} tone={kpi.tone}>
-                          {kpi.delta}
-                        </Kpi.Delta>
+                        <Kpi.Value>
+                          {kpi.value}
+                          {kpi.unit ? <Kpi.Unit>{kpi.unit}</Kpi.Unit> : null}
+                        </Kpi.Value>
+                        {kpi.change ? (
+                          <Kpi.Delta value={kpi.change.value} tone={kpi.change.tone}>
+                            {kpi.change.text}
+                          </Kpi.Delta>
+                        ) : null}
+                        {kpi.period ? <Kpi.Period>{kpi.period}</Kpi.Period> : null}
                         {kpi.meta ? <Kpi.Meta>{kpi.meta}</Kpi.Meta> : null}
                       </Kpi.Root>
                     </Page.Cell>
@@ -251,41 +251,35 @@ export default function AppShellScreenExample() {
                   <Card.Header>
                     <Card.Title as="h2">Задачи на сегодня</Card.Title>
                   </Card.Header>
-                  <Card.List>
-                    {TASKS.map((task) => (
-                      <Card.ListItem key={task.id}>
-                        <span className={styles.row}>
-                          <Checkbox.Root
-                            checked={done.has(task.id)}
-                            onCheckedChange={(checked) => toggleTask(task.id, checked)}
-                          >
-                            <Checkbox.Label>{task.title}</Checkbox.Label>
-                          </Checkbox.Root>
-                          <Typography as="span" variant="caption" tone="muted">
-                            {task.meta}
-                          </Typography>
-                        </span>
-                      </Card.ListItem>
-                    ))}
-                  </Card.List>
+                  <Card.Body>
+                    <List.Root aria-label="Задачи на сегодня">
+                      {TASKS.map((task) => (
+                        <List.Item key={task.id}>
+                          <List.ItemActions side="start">
+                            <Checkbox.Root
+                              aria-label={task.title}
+                              checked={done.has(task.id)}
+                              onCheckedChange={(checked) => toggleTask(task.id, checked)}
+                            />
+                          </List.ItemActions>
+                          <List.ItemText>{task.title}</List.ItemText>
+                          <List.ItemMeta>{task.meta}</List.ItemMeta>
+                        </List.Item>
+                      ))}
+                    </List.Root>
+                  </Card.Body>
                 </Card.Root>
               </>
             ) : (
               <Card.Root>
-                <Card.List>
+                <List.Root aria-label={SECTIONS.find((item) => item.id === current)?.label}>
                   {PAGES[current].rows.map((row) => (
-                    <Card.ListItem key={row.id}>
-                      <span className={styles.row}>
-                        <Typography as="span" variant="body-m" truncate>
-                          {row.title}
-                        </Typography>
-                        <Typography as="span" variant="caption" tone="muted">
-                          {row.meta}
-                        </Typography>
-                      </span>
-                    </Card.ListItem>
+                    <List.Item key={row.id}>
+                      <List.ItemText>{row.title}</List.ItemText>
+                      <List.ItemMeta>{row.meta}</List.ItemMeta>
+                    </List.Item>
                   ))}
-                </Card.List>
+                </List.Root>
               </Card.Root>
             )}
           </Page.Body>

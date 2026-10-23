@@ -66,7 +66,7 @@ describe("Chat.Root variant", () => {
 });
 
 describe("Chat.Header parts", () => {
-  it("renders the title with its number, the badges and the actions at tier s", () => {
+  it("renders the title with its number, the badges on its line and the actions at the frame tier", () => {
     render(
       <Chat.Root>
         <Chat.Header>
@@ -90,9 +90,11 @@ describe("Chat.Header parts", () => {
     // The number is part of the list's name.
     expect(screen.getByRole("log", { name: "Ольга Ветрова #4120" })).toBeInTheDocument();
     expect(screen.getByText("В работе")).toBeInTheDocument();
+    // The badges share the title's line.
+    expect(title.parentElement).toContainElement(screen.getByText("В работе"));
     const toggle = screen.getByRole("button", { name: "AI-ассистент" });
     expect(toggle).toHaveAttribute("aria-pressed", "true");
-    expect(toggle).toHaveAttribute("data-size", "s");
+    expect(toggle).toHaveAttribute("data-size", "m");
     // Anything else leads the row.
     expect(screen.getByTestId("lead").parentElement).not.toBe(title.parentElement);
   });

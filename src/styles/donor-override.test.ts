@@ -23,6 +23,7 @@ const PUBLIC_HOOKS = [
   /^--dnd-gap-[\w-]+$/,
   /^--dnd-sortable-gap$/,
   /^--divider-bleed$/,
+  /^--list-bleed$/,
   /^--disclosure-[\w-]+$/,
   /^--enter-[\w-]+$/,
   /^--swatch-inline-size$/,
@@ -37,9 +38,6 @@ const PUBLIC_HOOKS = [
   // The page's edge air: the host of a page (AppShell.Main, a preview stage) hands it the side
   // gutter and the top air (Page COMPONENT.md, Layout & spacing).
   /^--page-(gutter|top)$/,
-  // A card that opens without a header hands the room of its corner arrow to its content: the
-  // title of a Kpi keeps clear of it (Card COMPONENT.md, Layout & spacing).
-  /^--corner-mark-room$/,
 ];
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);

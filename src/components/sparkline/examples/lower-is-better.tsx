@@ -26,7 +26,7 @@ const PREVIOUS_AVERAGE = 4.1;
 
 const MINUTES = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
 
-const formatMinutes = (value: number) => `${MINUTES.format(value)} мин`;
+const formatMinutes = (value: number) => MINUTES.format(value);
 
 export default function SparklineLowerIsBetterExample() {
   const response = useSparkline({
@@ -40,9 +40,12 @@ export default function SparklineLowerIsBetterExample() {
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Время первого ответа</Kpi.Title>
-      <Kpi.Period>{response.date}</Kpi.Period>
-      <Kpi.Value>{response.valueText}</Kpi.Value>
+      <Kpi.Value>
+        {response.valueText}
+        <Kpi.Unit>мин</Kpi.Unit>
+      </Kpi.Value>
       <Kpi.Delta reading={response} />
+      <Kpi.Period>{response.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline {...response.plot} label="Время первого ответа по дням" />
       </Kpi.Media>

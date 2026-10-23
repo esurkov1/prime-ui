@@ -1,5 +1,5 @@
 /** A live exchange log pinned to its last entry: a new entry keeps it at the end, scrolling up loads older ones without moving what is on screen — `anchor`, `onReachStart`. */
-import { Button, Card, ScrollContainer, Skeleton, Typography } from "prime-ui-kit";
+import { Button, Card, List, ScrollContainer, Skeleton } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -74,26 +74,25 @@ export default function ScrollContainerLogExample() {
           </Button.Root>
         </Card.Actions>
       </Card.Header>
-      <ScrollContainer
-        anchor="end"
-        onReachStart={loadOlder}
-        tabIndex={0}
-        role="log"
-        aria-label="Журнал обмена"
-        className={styles.entries}
-      >
-        {loading ? <Skeleton lines={2} className={styles.older} /> : null}
-        <Card.List>
-          {entries.map((entry) => (
-            <Card.ListItem key={entry.id}>
-              <Typography as="span" variant="caption" tone="muted">
-                {entry.time}
-              </Typography>
-              <Typography variant="body-m">{entry.text}</Typography>
-            </Card.ListItem>
-          ))}
-        </Card.List>
-      </ScrollContainer>
+      <Card.Body>
+        <ScrollContainer
+          anchor="end"
+          onReachStart={loadOlder}
+          tabIndex={0}
+          role="log"
+          aria-label="Журнал обмена"
+        >
+          {loading ? <Skeleton lines={2} className={styles.older} /> : null}
+          <List.Root aria-label="Записи обмена">
+            {entries.map((entry) => (
+              <List.Item key={entry.id}>
+                <List.ItemText>{entry.text}</List.ItemText>
+                <List.ItemMeta>{entry.time}</List.ItemMeta>
+              </List.Item>
+            ))}
+          </List.Root>
+        </ScrollContainer>
+      </Card.Body>
     </Card.Root>
   );
 }

@@ -1,5 +1,11 @@
-/** Every arc color; the tone tells the outcome, not the progress — `tone`, `color`, `track`. */
+/** Every way to draw the ring and every arc color; the tone tells the outcome, not the progress — `variant`, `tone`, `color`, `track`. */
 import { ProgressCircle, Typography } from "prime-ui-kit";
+
+const VARIANTS = [
+  { variant: "line", label: "Загрузка", value: 64, max: 100 },
+  { variant: "steps", label: "Шаги профиля", value: 3, max: 5 },
+  { variant: "ticks", label: "Загрузка", value: 64, max: 100 },
+] as const;
 
 const TONES = [
   { tone: "accent", label: "Загрузка", value: 45 },
@@ -18,27 +24,41 @@ const HUES = [
 
 export default function ProgressCircleVariantsExample() {
   return (
-    <div>
-      {TONES.map(({ tone, label, value }) => (
-        <div key={tone}>
-          <ProgressCircle value={value} tone={tone} aria-label={label}>
-            {`${value}%`}
-          </ProgressCircle>
-          <Typography as="span" variant="caption" tone="muted">
-            {tone}
-          </Typography>
-        </div>
-      ))}
-      {HUES.map(({ color, label, value }) => (
-        <div key={color}>
-          <ProgressCircle value={value} color={color} track="tinted" aria-label={label}>
-            {`${value}%`}
-          </ProgressCircle>
-          <Typography as="span" variant="caption" tone="muted">
-            {`${color} · tinted`}
-          </Typography>
-        </div>
-      ))}
-    </div>
+    <>
+      <div>
+        {VARIANTS.map(({ variant, label, value, max }) => (
+          <div key={variant}>
+            <ProgressCircle variant={variant} value={value} max={max} aria-label={label}>
+              {variant === "steps" ? `${value}/${max}` : `${value}%`}
+            </ProgressCircle>
+            <Typography as="span" variant="caption" tone="muted">
+              {variant}
+            </Typography>
+          </div>
+        ))}
+      </div>
+      <div>
+        {TONES.map(({ tone, label, value }) => (
+          <div key={tone}>
+            <ProgressCircle value={value} tone={tone} aria-label={label}>
+              {`${value}%`}
+            </ProgressCircle>
+            <Typography as="span" variant="caption" tone="muted">
+              {tone}
+            </Typography>
+          </div>
+        ))}
+        {HUES.map(({ color, label, value }) => (
+          <div key={color}>
+            <ProgressCircle value={value} color={color} track="tinted" aria-label={label}>
+              {`${value}%`}
+            </ProgressCircle>
+            <Typography as="span" variant="caption" tone="muted">
+              {`${color} · tinted`}
+            </Typography>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

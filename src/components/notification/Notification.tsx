@@ -6,9 +6,16 @@ import { Icon, type IconName } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { fieldTierClass } from "@/internal/fieldClasses";
-import { iconSlotClass } from "@/internal/iconBox";
-import { type ControlSize, compactTier, stepDown, type Tone } from "@/internal/states";
+import { headerRowStyles, useTitleFloor } from "@/internal/headerRow";
+import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
+import {
+  type ControlSize,
+  cardMarkSize,
+  stepDown,
+  type Tone,
+  tierMappings,
+} from "@/internal/states";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 
 import styles from "./Notification.module.css";
 
@@ -165,15 +172,23 @@ function CardView({
   const labels = React.useContext(NotificationLabelsContext);
   const tier = useHostTier(sizeProp);
   const size = tier.size;
+  // A toast floats over a page of small text: it stands two steps under its tier (m → the xs
+  // frame: 12 padding, a 13/16 title, a 32 mark, 28 controls), so it never outweighs the page.
+  const frame = stepDown(size, 2);
+  const controlTier = frame;
+  const titleRef = React.useRef<HTMLParagraphElement>(null);
+  useTitleFloor(titleRef);
   const liveRole = tone === "danger" || tone === "warning" ? "alert" : "status";
 
   return tier.provide(
     <article
       {...rest}
-      className={cx(fieldTierClass, styles.card, className)}
+      className={cx(surfaceFrameClass, headerRowStyles.header, styles.card, className)}
       role={liveRole}
       aria-live={liveRole === "alert" ? "assertive" : "polite"}
       data-depth="floating"
+      data-frame={frame}
+      data-lines={description ? "two" : "one"}
       {...toDataAttributes({
         tone,
         size,
@@ -182,25 +197,36 @@ function CardView({
         "stack-expanded": stackExpanded,
       })}
     >
-      <div className={cx(styles.iconWrap, iconSlotClass)} aria-hidden="true">
+      <div
+        className={cx(iconBoxStyles.tile, iconSlotClass, headerRowStyles.mark)}
+        data-tone={tone}
+        data-size={cardMarkSize.header.tile[frame]}
+        aria-hidden="true"
+      >
         {icon ?? <Icon name={TONE_ICON[tone]} />}
       </div>
-      <div className={styles.content}>
-        <header className={styles.header}>
-          <p className={styles.title}>{title}</p>
+      <div className={headerRowStyles.titles}>
+        <div className={headerRowStyles.titleRow}>
+          <p ref={titleRef} className={cx(FRAME_TITLE[frame], headerRowStyles.title)}>
+            {title}
+          </p>
           {badge !== undefined ? (
-            <Badge.Root size="xs" tone={tone}>
+            <Badge.Root size={tierMappings.cardBadges[frame]} tone={tone}>
               {badge}
             </Badge.Root>
           ) : null}
-        </header>
-        {description ? <p className={styles.description}>{description}</p> : null}
+        </div>
+        {description ? (
+          <p className={cx(FRAME_DESCRIPTION[frame], styles.description)}>{description}</p>
+        ) : null}
+        {/* The action under the text, as a system notification puts it: beside the text in a
+            narrow toast it would leave the title and the message a column too narrow to read. */}
         {action ? (
           <div className={styles.actionRow}>
             <Button.Root
               variant="soft"
-              tone="neutral"
-              size={stepDown(size)}
+              tone="accent"
+              size={controlTier}
               onClick={() => {
                 action.onClick();
                 onAction?.();
@@ -212,11 +238,11 @@ function CardView({
         ) : null}
       </div>
       {onClose ? (
-        <div className={styles.closeWrap}>
+        <div className={headerRowStyles.end}>
           <Button.Root
             variant="ghost"
             tone="neutral"
-            size={compactTier(size)}
+            size={controlTier}
             aria-label={labels.close}
             onClick={onClose}
           >

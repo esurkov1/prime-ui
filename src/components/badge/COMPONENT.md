@@ -212,7 +212,7 @@ Beside controls in one row a chip is two sizes up: `l` (28) is as tall as an `xs
 - The root never clips: the text ellipsizes in its own box, so the segments' touch areas reach past the chip.
 - `Badge.Action` room is reserved, so revealing it never changes the badge width.
 - Several badges in a row: `Badge.Group` — it wraps, badges 8 apart (4 at the `xs` and `s` tiers).
-- `overflow="count"` fits the container, not the viewport: a DataTable cell, a 320px column. At least the first badge stays; when it alone does not fit it ellipsizes.
+- `overflow="count"` fits the container, not the viewport: a DataTable cell, a 320px column. A badge is never cut: when not even the first fits beside «+N», every badge folds and «+N» stands alone.
 - A person's chip (`Badge.Avatar`): the avatar keeps the same 2 px from the top, the bottom and the start (flush in the 16 tier), and as much again before the name.
 - Two lines (`Badge.Description`): each line is the tier's line height, 4 above and below; the avatar sits 4 from the top, the bottom and the start, 8 before the text; both lines ellipsize on their own.
 - In a list row the badge is the trailing column; the title column gets `min-width: 0` and an ellipsis.
@@ -288,6 +288,7 @@ Beside controls in one row a chip is two sizes up: `l` (28) is as tall as an `xs
 - A row of badges in a hand-made flex wrapper with its own gap → `Badge.Group`.
 - A set of values in a table cell that wraps and grows the row, or a hand-made «+N» → `Badge.Group overflow="count"`.
 - `onRemove` together with `Badge.Action` → one end segment per badge.
+- A `Badge.Root` in `Dropdown.Trigger` as the picker of a status or a person in the header or footer of a surface → a `Select` at the surface's control tier; the chip picker stays in a dense row or table cell.
 - A person's role or e-mail as a second badge, a `·` in the text or a hand-made two-line chip → `Badge.Description`.
 - An `Avatar.Root` with its own `size` inside a badge, or in a `Badge.Icon` → put it in `Badge.Avatar` without `size`: the chip sizes it.
 - Removing the badge from your list first and putting it back when the request fails → return the request's promise and remove it after it succeeds; the badge waits meanwhile.

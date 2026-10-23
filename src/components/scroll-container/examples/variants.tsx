@@ -13,52 +13,43 @@ export default function ScrollContainerVariantsExample() {
       <Card.Root role="region" className={styles.card} aria-label="Статусы заказов">
         <Card.Header>
           <Card.Title>Статусы заказов</Card.Title>
-          <Card.Actions>
-            <Typography as="span" variant="caption" tone="muted">
-              horizontal
-            </Typography>
-          </Card.Actions>
+          <Card.Description>horizontal</Card.Description>
         </Card.Header>
-        <ScrollContainer axis="horizontal">
-          <div className={styles.strip}>
-            {TAGS.map((tag) => (
-              <Badge.Root key={tag}>{tag}</Badge.Root>
-            ))}
-          </div>
-        </ScrollContainer>
+        <Card.Body>
+          <ScrollContainer axis="horizontal">
+            <div className={styles.strip}>
+              {TAGS.map((tag) => (
+                <Badge.Root key={tag}>{tag}</Badge.Root>
+              ))}
+            </div>
+          </ScrollContainer>
+        </Card.Body>
       </Card.Root>
       <Card.Root role="region" className={styles.card} aria-label="Расписание залов">
         <Card.Header>
           <Card.Title>Расписание залов</Card.Title>
-          <Card.Actions>
-            <Typography as="span" variant="caption" tone="muted">
-              both
-            </Typography>
-          </Card.Actions>
+          <Card.Description>both</Card.Description>
         </Card.Header>
-        <ScrollContainer
-          axis="both"
-          tabIndex={0}
-          aria-label="Сетка расписания"
-          className={styles.canvas}
-        >
-          <div className={styles.grid}>
-            {ROOMS.flatMap((room) =>
-              HOURS.map((hour) => (
-                <Typography
-                  key={`${room}-${hour}`}
-                  as="div"
-                  variant="caption"
-                  tone="secondary"
-                  numeric="tabular"
-                  className={styles.cell}
-                >
-                  {room} · {hour}
-                </Typography>
-              )),
-            )}
-          </div>
-        </ScrollContainer>
+        <Card.Body>
+          <ScrollContainer axis="both" tabIndex={0} aria-label="Сетка расписания">
+            <div className={styles.grid}>
+              {ROOMS.flatMap((room) =>
+                HOURS.map((hour) => (
+                  <Typography
+                    key={`${room}-${hour}`}
+                    as="div"
+                    variant="caption"
+                    tone="secondary"
+                    numeric="tabular"
+                    className={styles.cell}
+                  >
+                    {room} · {hour}
+                  </Typography>
+                )),
+              )}
+            </div>
+          </ScrollContainer>
+        </Card.Body>
       </Card.Root>
     </div>
   );

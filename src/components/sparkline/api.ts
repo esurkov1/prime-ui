@@ -55,8 +55,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Plot height 40 · 48 · 80 · 96 · 128 px, the Skeleton the same. `s` fits a KPI tile in a row of four; `compact` keeps the `xs` height.",
-          ru: "Высота графика 40 · 48 · 80 · 96 · 128 px, Skeleton той же высоты. `s` — KPI-плитка в ряду из четырёх; `compact` держит высоту `xs`.",
+          en: "Plot height 40 · 48 · 80 · 96 · 128 px, the Skeleton the same. In `Kpi.Media` the card sets it (M `xs` · L `s` · XL `m`); `compact` keeps the `xs` height.",
+          ru: "Высота графика 40 · 48 · 80 · 96 · 128 px, Skeleton той же высоты. В `Kpi.Media` её задаёт карточка (M `xs` · L `s` · XL `m`); `compact` держит высоту `xs`.",
         },
         {
           name: "point",

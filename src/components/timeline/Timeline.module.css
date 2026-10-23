@@ -289,20 +289,37 @@
 
 .title {
   min-width: 0;
+  overflow: hidden;
   color: var(--tl-title-color, var(--prime-color-text-primary));
   font-weight: var(--prime-font-weight-medium);
-  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
+/* Beside badges the title gives way first, down to its text or 8em (`useTitleFloor`). */
+.badged {
+  flex: 0 1000 auto;
+  min-width: min(var(--header-title-min, 0), 100%);
+}
+
 .meta {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--prime-space-1) * 1.5);
   min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   color: var(--prime-color-text-muted);
   font-size: var(--tl-meta-size);
   line-height: var(--tl-meta-line-height);
   font-weight: var(--prime-font-weight-regular);
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+}
+
+/* The status and the dot keep their width; the text after them is cut. */
+.meta > :not(:last-child) {
+  flex: none;
 }
 
 .meta strong {
@@ -391,7 +408,9 @@
 .gapCaption {
   grid-area: caption;
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gapTrailing {
@@ -414,7 +433,5 @@
     align-items: flex-start;
     justify-self: start;
     text-align: start;
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
 }

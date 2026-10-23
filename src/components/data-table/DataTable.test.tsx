@@ -555,7 +555,7 @@ describe("DataTable CSS contract", () => {
     expect(cssValue(cssRule(CSS, ".viewport"), "padding")).toBe("0");
     const root = cssRule(CSS, ".root");
     expect(cssValue(root, "overflow")).toMatch(/^(hidden|clip)$/);
-    expect(cssValue(root, "border-radius")).toBe("var(--prime-card-radius)");
+    expect(cssValue(root, "border-radius")).toBe("var(--frame-radius)");
     expect(cssValue(root, "background")).toBe("var(--dt-surface)");
     expect(cssValue(root, "--dt-surface")).toBe("var(--prime-color-layer-current)");
   });

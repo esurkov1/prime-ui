@@ -42,7 +42,7 @@ export const page: ComponentPageConfig = {
       scenario: "header-actions",
       title: "Шапка записи",
       description:
-        "Одна шапка записи: имя с номером, под ним строка данных, затем бейджи — статус и ответственный как выборы, за ними остальные статусы, — и только кнопки в конце — `Drawer.Title`, `number`, `Drawer.Description`, `Drawer.Badges`, `Badge.Avatar`, `Drawer.Actions`.",
+        "Одна шапка записи: имя с номером и обычные статусы на одной строке, под ними строка данных, а в конце — статус и ответственный как выборы, кнопка и меню ⋯ — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Actions`, `Select.Root`.",
     },
     {
       scenario: "footer-actions",
@@ -60,7 +60,7 @@ export const page: ComponentPageConfig = {
       scenario: "record-picture",
       title: "Фото записи и бейджи",
       description:
-        "Панель транспорта с фото в шапке: название и номер рядом с картинкой, строка данных под ними, а бейджи статусов начинаются под фото, от края шапки — `Drawer.Icon`, `Thumbnail.Root`, `Drawer.Badges`.",
+        "Панель транспорта с фото в шапке: название и номер рядом с картинкой, строка данных под ними, а бейджи статусов стоят на строке названия, после номера — `Drawer.Icon`, `Thumbnail.Root`, `Drawer.Badges`.",
     },
     {
       scenario: "tab-switcher",

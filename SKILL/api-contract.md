@@ -43,7 +43,7 @@ A component without `size` takes the tier of the sized kit host around it — a 
 a Popover or Dropdown `Content`, a Banner, a LoginForm, the DataTable `toolbar`, an EmptyPage — else
 `m`. Set the tier once on the region (`<ControlSizeProvider value="s">` around a dense toolbar), never
 `size` on one control to make it fit. A control nested in another component's row is one tier down
-by hand: buttons and menus in table cells `s`, a switch in a card header `s`.
+by hand: buttons and menus in table cells `s`; the header and footer of a surface (Card, Modal, Drawer) set their controls' tier themselves.
 
 ## Controlled vs uncontrolled
 

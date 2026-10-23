@@ -3,7 +3,7 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
-import { useHostTier } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -12,6 +12,7 @@ import { useLabels } from "@/internal/labels";
 import { useEnterOnAppear } from "@/internal/partPresence";
 import type { TagRef } from "@/internal/polymorphic";
 import type { ControlSize, Tone } from "@/internal/states";
+import { FRAME_DESCRIPTION, FRAME_TITLE } from "@/internal/surfaceFrame";
 import textRole from "@/internal/textRole.module.css";
 import { usePendingAction } from "@/internal/usePendingChanges";
 
@@ -29,25 +30,12 @@ export type EmptyPageLabels = {
 
 export const EMPTY_PAGE_LABELS: EmptyPageLabels = { retry: "Повторить" };
 
-/**
- * The type scale of the state by tier: the title and the description grow with the tier; the
- * `compact` state of a menu or a list is the quiet body-s / caption pair at any tier.
+/*
+ * The state stands on the frame scale of its tier (internal/surfaceFrame): the title and the
+ * description take the frame roles, the tile and the actions the tier itself (32 · 40 · 48 · 56 ·
+ * 64 tile); the `compact` state of a menu or a list is the quiet body-s / caption pair with the
+ * smallest tile at any tier.
  */
-const TITLE_ROLE: Record<ControlSize, string | undefined> = {
-  xs: textRole.titleS,
-  s: textRole.titleS,
-  m: textRole.titleM,
-  l: textRole.titleL,
-  xl: textRole.headingS,
-};
-
-const DESCRIPTION_ROLE: Record<ControlSize, string | undefined> = {
-  xs: textRole.caption,
-  s: textRole.bodyS,
-  m: textRole.bodyM,
-  l: textRole.bodyM,
-  xl: textRole.bodyL,
-};
 
 type Ctx = {
   tone: EmptyPageTone;
@@ -107,7 +95,14 @@ function EmptyPageRoot({
         tone: tone === "neutral" ? undefined : tone,
       })}
     >
-      <EmptyPageContext.Provider value={context}>{children}</EmptyPageContext.Provider>
+      <EmptyPageContext.Provider value={context}>
+        {/* The actions are as tall as the frame's controls (the tier itself). */}
+        {layout === "compact" ? (
+          children
+        ) : (
+          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+        )}
+      </EmptyPageContext.Provider>
     </div>,
   );
 }
@@ -146,7 +141,7 @@ function EmptyPageTitle({ as: Tag = "h2", className, ref, ...rest }: EmptyPageTi
   return (
     <Tag
       ref={ref as TagRef<EmptyPageTitleAs>}
-      className={cx(compact ? textRole.bodyS : TITLE_ROLE[size], styles.title, className)}
+      className={cx(compact ? textRole.bodyS : FRAME_TITLE[size], styles.title, className)}
       {...rest}
     />
   );
@@ -162,7 +157,7 @@ function EmptyPageDescription({ className, ...rest }: EmptyPageDescriptionProps)
   return (
     <p
       className={cx(
-        compact ? textRole.caption : DESCRIPTION_ROLE[size],
+        compact ? textRole.caption : FRAME_DESCRIPTION[size],
         styles.description,
         className,
       )}

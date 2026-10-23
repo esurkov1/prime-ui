@@ -16,13 +16,20 @@
   flex-direction: column;
   gap: var(--prime-space-1);
   box-sizing: border-box;
-  width: 100%;
   min-width: 0;
 }
 
-/* The list reset at zero specificity: a consumer's class may pad the list in its pane. */
+/*
+ * The list reset at zero specificity: a consumer's class may pad the list in its pane. Bleed (the
+ * public hook `--list-bleed: 1`, set by a host whose content edge the text should stand on — a
+ * `Card.Body`): the rows reach past the list's edges by their own inline padding, so their text
+ * lines up with the host's other content and the hover wash runs into the host's padding.
+ */
 :where(.root) {
-  margin: 0;
+  --list-bleed-size: calc(var(--field-px) * var(--list-bleed, 0));
+
+  width: calc(100% + 2 * var(--list-bleed-size));
+  margin: 0 calc(var(--list-bleed-size) * -1);
   padding: 0;
   list-style: none;
 }
@@ -150,12 +157,18 @@
   font-weight: var(--prime-font-weight-medium);
 }
 
+/* Beside badges the title gives way first, down to its text or 8em (`useTitleFloor`). */
+.badged {
+  flex: 0 1000 auto;
+  min-width: min(var(--header-title-min, 0), 100%);
+}
+
 .item[aria-current="true"] .text,
 .item[aria-current="page"] .text {
   color: var(--prime-color-text-primary);
 }
 
-.description {
+.body > .description {
   color: var(--prime-color-text-muted);
   font-size: var(--list-desc);
   line-height: var(--list-desc-lh);

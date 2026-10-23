@@ -80,8 +80,8 @@ const TYPE: Row[] = [
   { what: "мета, даты, подписи значений", value: "12", how: '`caption` + `tone="muted"`' },
   {
     what: "главное число KPI",
-    value: "30",
-    how: '`Kpi.Value` (`heading-l`; `valueSize="m"` в плотном ряду)',
+    value: "24",
+    how: "`Kpi.Value` (`heading-m`; роль задаёт `size` карточки: S `heading-s` · L `heading-l` · XL `display-s`)",
   },
 ];
 
@@ -161,7 +161,7 @@ export default function CompositionPage() {
           </li>
           <li>
             {renderInlineCode(
-              "`Card` — для самостоятельного блока (метрика, панель настроек, сведения сбоку). Раздел, который и так один в своей области, — `Page.Section` с заголовком и содержимым без карточки. Все плитки экрана — одна `Page.Grid`, а не сетка на каждый ряд.",
+              "`Card` — для самостоятельного блока (форма, запись, панель настроек, сведения сбоку); одна цифра с динамикой — `Kpi`. Раздел, который и так один в своей области, — `Page.Section` с заголовком и содержимым без карточки. Все плитки экрана — одна `Page.Grid`, а не сетка на каждый ряд.",
             )}
           </li>
           <li>
@@ -259,19 +259,24 @@ export default function CompositionPage() {
               <Card.Root>
                 <Card.Header>
                   <Card.Title>{page.title}</Card.Title>
-                  <Card.Description>{renderInlineCode(description)}</Card.Description>
                 </Card.Header>
+                <Card.Body>
+                  <Typography variant="body-s" tone="secondary">
+                    {renderInlineCode(description)}
+                  </Typography>
+                </Card.Body>
                 <Card.Footer>
-                  <LinkButton
-                    href={`/${nav.segment}`}
-                    size="s"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      navigate(`/${nav.segment}`);
-                    }}
-                  >
-                    Открыть
-                  </LinkButton>
+                  <Card.Actions>
+                    <LinkButton
+                      href={`/${nav.segment}`}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        navigate(`/${nav.segment}`);
+                      }}
+                    >
+                      Открыть
+                    </LinkButton>
+                  </Card.Actions>
                 </Card.Footer>
               </Card.Root>
             </Page.Cell>

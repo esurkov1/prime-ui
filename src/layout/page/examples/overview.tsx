@@ -1,5 +1,5 @@
 /** A work page in an app window: the top bar with the title, its line of data and the page's buttons, the body under it — `Page.TopBar`, `Page.Heading`, `Page.Actions`. */
-import { AppShell, Button, Card, Icon, Page, Typography } from "prime-ui-kit";
+import { AppShell, Button, Card, Icon, List, Page } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -38,15 +38,16 @@ export default function PageOverviewExample() {
             </Page.TopBar>
             <Page.Body>
               <Card.Root>
-                <Card.List>
+                <List.Root aria-label="Заказы">
                   {ORDERS.map((order) => (
-                    <Card.ListItem key={order.id}>
-                      <Typography as="span" variant="body-m">
-                        {order.id} · {order.client} · {order.sum}
-                      </Typography>
-                    </Card.ListItem>
+                    <List.Item key={order.id}>
+                      <List.ItemText>
+                        {order.id} · {order.client}
+                      </List.ItemText>
+                      <List.ItemMeta>{order.sum}</List.ItemMeta>
+                    </List.Item>
                   ))}
-                </Card.List>
+                </List.Root>
               </Card.Root>
             </Page.Body>
           </Page.Root>

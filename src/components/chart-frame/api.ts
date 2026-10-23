@@ -77,8 +77,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChartFrame.Header",
-      en: "`ref` → `HTMLDivElement`. The top zone: title and description in the first column, `ChartFrame.Actions` at the end, under them when the panel is narrower than 24rem.",
-      ru: "Верхняя зона: название и описание в первой колонке, `ChartFrame.Actions` в конце, под ними, когда панель уже 24rem.",
+      en: "`ref` → `HTMLDivElement`. The top zone, the kit's header row: the title with the description under it, `ChartFrame.Actions` at the end, whatever order they are written in. One line each, nothing wraps; without a description the actions share the title's line.",
+      ru: "Верхняя зона — строка заголовка кита: название, под ним описание, `ChartFrame.Actions` в конце, в каком бы порядке они ни были записаны. Каждая строка одна, ничто не переносится; без описания действия стоят на строке названия.",
       props: [
         {
           name: "…rest",
@@ -90,8 +90,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChartFrame.Title",
-      en: "`ref` → `HTMLHeadingElement`. The name of the chart; names the figure and the data table.",
-      ru: "Название графика; даёт имя фигуре и таблице данных.",
+      en: "`ref` → `HTMLHeadingElement`. The name of the chart on one line cut with an ellipsis, set in the title role of the panel's frame; names the figure and the data table.",
+      ru: "Название графика в одну строку с многоточием, в роли заголовка рамки панели; даёт имя фигуре и таблице данных.",
       props: [
         {
           name: "as",
@@ -110,8 +110,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChartFrame.Description",
-      en: "`ref` → `HTMLParagraphElement`. What the chart measures and over which period; describes the figure.",
-      ru: "Что измеряет график и за какой период; описание фигуры.",
+      en: "`ref` → `HTMLParagraphElement`. What the chart measures and over which period, plain text on one line cut with an ellipsis; a `StatusDot` first is allowed. Describes the figure.",
+      ru: "Что измеряет график и за какой период: простой текст в одну строку с многоточием; первым может стоять `StatusDot`. Описание фигуры.",
       props: [
         {
           name: "…rest",
@@ -123,8 +123,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChartFrame.Actions",
-      en: "`ref` → `HTMLDivElement`. Controls of the chart in the header: a period switch, an export button.",
-      ru: "Управление графиком в заголовке: переключатель периода, кнопка выгрузки.",
+      en: "`ref` → `HTMLDivElement`. Controls of the chart at the end of the header: a period switch, an export button. They take the tier of the panel's frame (its own tier) and never wrap.",
+      ru: "Управление графиком в конце заголовка: переключатель периода, кнопка выгрузки. Берут ярус рамки панели (её собственный) и не переносятся.",
       props: [
         {
           name: "…rest",

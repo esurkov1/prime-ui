@@ -215,8 +215,8 @@ export const api: ComponentApi = {
           name: "variant",
           type: '"field" | "status"',
           default: '"field"',
-          en: "`field` — the field trigger, in the picked option's `color` if it has one. `status` — a chip in the picked option's `color` (gray with none) with a chevron, as wide as its content: a status picked in a row.",
-          ru: "`field` — поле, цветом выбранного пункта (`color`), если он задан. `status` — чип цвета выбранного пункта (`color`, без него — серый) со стрелкой, шириной по содержимому: выбор статуса в строке.",
+          en: "`field` — the field trigger. `status` — a chip in the picked option's `color` with a chevron: a status in a dense row or table cell (a surface's header or footer takes `field`).",
+          ru: "`field` — поле. `status` — чип цвета выбранного пункта (`color`) со стрелкой: статус в плотной строке или ячейке таблицы (в шапке и подвале поверхности — `field`).",
         },
         {
           name: "focusRing",

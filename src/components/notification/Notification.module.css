@@ -178,59 +178,25 @@
 
 /* ---------- Card ---------- */
 
+/*
+ * The card is a header row on the surface frame two steps under its tier (padding, radius, mark, title and
+ * description roles: internal/surfaceFrame, internal/headerRow): the tone tile, the title with its
+ * badge, the description, the action under the text, the close button at the end.
+ */
 .card {
   --ntf-accent: var(--prime-color-info-default);
-  --ntf-pad: var(--prime-space-4);
-  --ntf-gap: var(--prime-space-3);
-  /* Icon and title follow the control tier: `fieldTierClass` on the card resolves `--field-*`. */
-  --ntf-icon: var(--field-icon);
-  --ntf-title-size: var(--field-text);
-  --ntf-title-line-height: var(--field-lh);
-  --ntf-desc-size: var(--prime-text-body-s-size);
-  --ntf-desc-line-height: var(--prime-text-body-s-line-height);
 
   position: relative;
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: start;
-  gap: var(--ntf-gap);
   width: 100%;
-  padding: var(--ntf-pad);
+  padding: var(--frame-pad);
   overflow: hidden;
-  border-radius: var(--prime-panel-radius);
+  border-radius: var(--frame-radius);
   /* The floating layer of the ladder (`data-depth="floating"`). */
   background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
-}
-
-.card[data-size="xs"] {
-  --ntf-pad: var(--prime-space-2);
-  --ntf-gap: var(--prime-space-2);
-  --ntf-desc-size: var(--prime-text-caption-size);
-  --ntf-desc-line-height: var(--prime-text-caption-line-height);
-}
-
-.card[data-size="s"] {
-  --ntf-pad: var(--prime-space-3);
-  --ntf-gap: var(--prime-space-2);
-  --ntf-desc-size: var(--prime-text-caption-size);
-  --ntf-desc-line-height: var(--prime-text-caption-line-height);
-}
-
-.card[data-size="l"] {
-  --ntf-pad: var(--prime-space-5);
-  --ntf-desc-size: var(--prime-text-body-m-size);
-  --ntf-desc-line-height: var(--prime-text-body-m-line-height);
-}
-
-.card[data-size="xl"] {
-  --ntf-pad: var(--prime-space-6);
-  --ntf-gap: var(--prime-space-4);
-  --ntf-desc-size: var(--prime-text-body-m-size);
-  --ntf-desc-line-height: var(--prime-text-body-m-line-height);
 }
 
 .card[data-tone="success"] {
@@ -252,62 +218,27 @@
 
 /* ---------- Slots ---------- */
 
-/* Icon box is as tall as the title line so the glyph centers on the first line. */
-.iconWrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--ntf-title-line-height);
-  color: var(--ntf-accent);
-  --prime-icon-size: var(--ntf-icon);
-}
-
-/* The close button is taller than the title line: centered on it, it overhangs into the padding
-   instead of growing the row, so a one-line toast keeps its text in the middle. */
-.closeWrap {
-  display: flex;
-  align-items: center;
-  height: var(--ntf-title-line-height);
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-1);
-  min-width: 0;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.title {
-  min-width: 0;
-  margin: 0;
-  font-size: var(--ntf-title-size);
-  line-height: var(--ntf-title-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  color: var(--prime-color-text-primary);
-  overflow-wrap: anywhere;
-}
-
+/* A toast's body is a message to read, not a row of data: it may take two lines before the cut. */
 .description {
+  display: -webkit-box;
   margin: 0;
-  font-size: var(--ntf-desc-size);
-  line-height: var(--ntf-desc-line-height);
+  overflow: hidden;
   color: var(--prime-color-text-secondary);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow-wrap: anywhere;
 }
 
+/* With an action under the text the tile and the close button hold the top edge. */
+.card:has(.actionRow) {
+  align-items: flex-start;
+}
+
+/* The action under the text, the zone gap of the frame above it. */
 .actionRow {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
-  padding-block-start: var(--prime-space-2);
+  padding-top: calc(var(--frame-gap) - var(--frame-lines-gap));
 }
 
 /* ---------- Countdown ---------- */

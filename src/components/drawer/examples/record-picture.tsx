@@ -1,4 +1,4 @@
-/** A vehicle's panel headed by its photo: the name and the plate beside the picture, a line of data under them, and the status badges starting under the photo, at the header's edge — `Drawer.Icon`, `Thumbnail.Root`, `Drawer.Badges`. */
+/** A vehicle's panel headed by its photo: the name and the plate beside the picture, a line of data under them, and the status badges on the name's line, after the plate — `Drawer.Icon`, `Thumbnail.Root`, `Drawer.Badges`. */
 import { Badge, Button, DescriptionList, Drawer, Icon, Thumbnail } from "prime-ui-kit";
 
 const PHOTO = "https://picsum.photos/seed/pcx/320/180";

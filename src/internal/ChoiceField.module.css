@@ -82,6 +82,29 @@
   min-width: 0;
 }
 
+/*
+ * The control at the end (a Switch `fullWidth`): a settings row as wide as its container, the text
+ * and its support at the start, the control at the end of the first line.
+ */
+.field[data-control="end"] {
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.field[data-control="end"] .controlCell {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.field[data-control="end"] .text {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.field[data-control="end"] .support {
+  grid-column: 1;
+}
+
 /* ---- The square box of a checkbox or a radio (the host sets its radius) ---- */
 .box {
   box-sizing: border-box;

@@ -21,25 +21,26 @@ import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { Icon } from "@/icons";
 import { BlockStackContext } from "@/internal/blockStack";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
-import hairline from "@/internal/hairline.module.css";
 import { hasContent } from "@/internal/hasContent";
-import { iconBoxStyles } from "@/internal/iconBox";
+import { HeaderLineContent, HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
+import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { usePartPresence } from "@/internal/partPresence";
-import { splitParts } from "@/internal/parts";
+import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { RowCells } from "@/internal/rowCells";
 import sheetStyles from "@/internal/sheet.module.css";
 import { Slot, type SlotPartProps } from "@/internal/slot";
-import type { ControlSize, Tone } from "@/internal/states";
+import { type ControlSize, cardMarkSize, type Tone, tierMappings } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 import textRole from "@/internal/textRole.module.css";
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
@@ -357,6 +358,7 @@ function DialogPanelBody({
         aria-modal="true"
         tabIndex={-1}
         className={cx(
+          surfaceFrameClass,
           styles.shell,
           panelClassName,
           sheet
@@ -365,6 +367,7 @@ function DialogPanelBody({
           className,
         )}
         data-kind={kind}
+        data-frame="l"
         data-state={state}
         data-depth="floating"
         data-sheet={sheet ? "" : undefined}
@@ -394,11 +397,8 @@ type DialogShellContextValue = {
   titleId: string;
   descriptionId: string;
   hasDescription: boolean;
-  /** The header has a line under the title: `Badges` or `Description`. */
-  multiline: boolean;
   registerTitle: (present: boolean) => void;
   registerDescription: (present: boolean) => void;
-  registerBadges: (present: boolean) => void;
   onClose: () => void;
   closeLabel: string;
   /** The guard is busy: the close button stays in place, disabled. */
@@ -449,35 +449,21 @@ function useDialogShellValue({
 
   const [hasTitle, setHasTitle] = React.useState(false);
   const [hasDescription, setHasDescription] = React.useState(false);
-  const [hasBadges, setHasBadges] = React.useState(false);
-  const multiline = hasDescription || hasBadges;
 
   const value = React.useMemo<DialogShellContextValue>(
     () => ({
       titleId,
       descriptionId,
       hasDescription,
-      multiline,
       registerTitle: setHasTitle,
       registerDescription: setHasDescription,
-      registerBadges: setHasBadges,
       onClose,
       closeLabel,
       busy,
       footerLayout,
       confirmRef,
     }),
-    [
-      titleId,
-      descriptionId,
-      hasDescription,
-      multiline,
-      onClose,
-      closeLabel,
-      busy,
-      footerLayout,
-      confirmRef,
-    ],
+    [titleId, descriptionId, hasDescription, onClose, closeLabel, busy, footerLayout, confirmRef],
   );
 
   const aria = {
@@ -508,16 +494,28 @@ export type DialogIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "child
 };
 
 /**
- * The leading mark: a glyph on the tone tile, or the record's picture (an `Avatar.Root` or a
- * `Thumbnail.Root` anywhere inside, internal/mediaSlot) with no tile, at the tile's 40 box.
+ * The leading mark of the header row, 48 (frame `l`: the dialog's title-m 16/24 with its line):
+ * a glyph on the tone tile, or the record's picture (an `Avatar.Root` or a `Thumbnail.Root`
+ * anywhere inside, internal/mediaSlot) with no tile, in the same box.
  */
 export function DialogIcon({ tone = "neutral", children, className, ...rest }: DialogIconProps) {
-  const { media, provide } = useMediaSlotHost();
+  const sizes = cardMarkSize.header;
+  const { media, provide } = useMediaSlotHost({
+    avatar: sizes.avatar.l,
+    thumbnail: sizes.thumbnail.l,
+    ring: sizes.ring.l,
+  });
   return (
     <span
       {...rest}
-      className={cx(media ? undefined : iconBoxStyles.tile, styles.icon, className)}
+      className={cx(
+        media ? undefined : cx(iconBoxStyles.tile, iconSlotClass),
+        headerRowStyles.mark,
+        styles.icon,
+        className,
+      )}
       data-tone={media ? undefined : tone}
+      data-size={media ? undefined : sizes.tile.l}
       data-media={media ? true : undefined}
       aria-hidden="true"
     >
@@ -530,19 +528,58 @@ DialogIcon.displayName = "Dialog.Icon";
 // ─── Title / Description / Badges ────────────────────────────────────────────
 
 /**
+ * What the header row is: a `record` header (a mark, badges or a numbered title) holds one line per
+ * line, cut with an ellipsis; a plain header (a title and a question under it) wraps.
+ */
+const DialogHeaderContext = React.createContext<{ record: boolean } | null>(null);
+
+/**
  * A line of a record header cut with an ellipsis tells its whole text on hover (`title`), only
  * while it is cut and only when the consumer gave no `title` of its own; assistive tech always
- * reads the whole text (the dialog's name and description).
+ * reads the whole text (the dialog's name and description). `pick` names the cut element when it
+ * is inside the line.
  */
-function useCutLineTitle<T extends HTMLElement>(ref: React.RefObject<T | null>, own: unknown) {
+function useCutLineTitle<T extends HTMLElement>(
+  ref: React.RefObject<T | null>,
+  own: unknown,
+  pick?: (line: T) => HTMLElement | null,
+) {
   const sync = React.useCallback(() => {
-    const line = ref.current;
+    const host = ref.current;
+    const line = host && pick ? pick(host) : host;
     if (!line || own !== undefined) return;
     if (line.scrollWidth > line.clientWidth + 1) line.title = line.textContent ?? "";
     else line.removeAttribute("title");
-  }, [ref, own]);
+  }, [ref, own, pick]);
   React.useLayoutEffect(sync);
   useResizeEffect(ref, sync);
+}
+
+/** The longest a title gives way to its badges: its own text, at most this many `em`. */
+const TITLE_MIN_EM = 8;
+
+/**
+ * The floor a record title keeps beside its badges (`--header-title-min`, read by the header row):
+ * its name and its number, or 8em when they are longer. The number never gives way, so the floor
+ * is measured from the parts (`useTitleFloor` of the header row measures a plain text title).
+ */
+function useNumberedTitleFloor(
+  title: React.RefObject<HTMLElement | null>,
+  name: React.RefObject<HTMLElement | null>,
+  number: React.RefObject<HTMLElement | null>,
+) {
+  React.useLayoutEffect(() => {
+    const node = title.current;
+    const text = name.current;
+    if (!node || !text) return;
+    node.style.removeProperty("--header-title-min");
+    const em = Number.parseFloat(getComputedStyle(node).fontSize) || 0;
+    const full = text.scrollWidth + (number.current?.offsetWidth ?? 0);
+    node.style.setProperty(
+      "--header-title-min",
+      `${Math.ceil(Math.min(full, em * TITLE_MIN_EM))}px`,
+    );
+  });
 }
 
 export type DialogTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "id"> & {
@@ -552,23 +589,30 @@ export type DialogTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "i
 };
 
 /**
- * The dialog's name, line 1 of the header. A record's `number` stands muted after the name and is
- * part of it; in a record header the name ellipsizes, the number never does. While it loads
- * (`loading`: a record opened by a link knows only its id) a Skeleton holds the title line, so the
- * header never moves when the name arrives; the name then fades in under the same element.
+ * The dialog's name, on the first line of the header row. A record's `number` stands muted after
+ * the name and is part of it; in a record header the name ellipsizes, the number never does. While
+ * it loads (`loading`: a record opened by a link knows only its id) a Skeleton holds the title
+ * line, so the header never moves when the name arrives; the name then fades in under the same
+ * element.
  */
 export function DialogTitle({
   loading = false,
   number,
   className,
   children,
+  ref,
   ...rest
 }: DialogTitleProps) {
   const { titleId, registerTitle } = useDialogShell("Title");
+  const record = React.useContext(DialogHeaderContext)?.record ?? false;
   const swap = useSwapIn(loading ? "loading" : "data", children);
   const shownLoading = swap.state === "loading";
+  const titleRef = React.useRef<HTMLHeadingElement>(null);
+  const mergedRef = useMergedRefs(titleRef, ref);
   const nameRef = React.useRef<HTMLSpanElement>(null);
+  const numberRef = React.useRef<HTMLSpanElement>(null);
   useCutLineTitle(nameRef, rest.title);
+  useNumberedTitleFloor(titleRef, nameRef, numberRef);
   React.useLayoutEffect(() => {
     registerTitle(true);
     return () => registerTitle(false);
@@ -576,10 +620,16 @@ export function DialogTitle({
   return (
     <h2
       {...rest}
+      ref={mergedRef}
       key={swap.key}
       id={titleId}
       aria-busy={shownLoading || undefined}
-      className={cx(textRole.titleM, styles.title, swap.className, className)}
+      className={cx(
+        FRAME_TITLE.l,
+        record ? cx(headerRowStyles.title, styles.titleLine) : styles.titleWrap,
+        swap.className,
+        className,
+      )}
     >
       {shownLoading ? (
         <Skeleton size="l" className={styles.titleSkeleton} />
@@ -591,7 +641,9 @@ export function DialogTitle({
           {number !== undefined && number !== null ? (
             <>
               {" "}
-              <span className={styles.titleNumber}>{number}</span>
+              <span ref={numberRef} className={styles.titleNumber}>
+                {number}
+              </span>
             </>
           ) : null}
         </>
@@ -607,30 +659,26 @@ export type DialogBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * Line 3 of a record header, under the description, right over the body or the tab strip (the
- * header's grid places it there, whatever the JSX order): the record's working controls in one
- * row — first the pickers (the status, the assignee: a `Badge.Root` in a `Dropdown.Trigger`), then
- * the plain statuses. The kit sizes them
- * (chip tier `m`) and never wraps the row: what does not fit waits behind «+N» (`Badge.Group`
- * `overflow="count"`), whose tooltip lists it. While the record loads (`loading`) a Skeleton
- * holds the line, so the header never moves.
+ * The badges after the title, on its line, 6 apart from it: one `Badge.Group` for every badge of
+ * the record (a status, a role, a counter — the meaning is the badge's `tone` or `color`). The kit
+ * sizes them (frame `l`: chip tier `s`) and never wraps the row: once the title has given way to
+ * its text, what does not fit folds into «+N» (`overflow="count"`), whose tooltip lists it. A
+ * picker of a status or a person is not a badge: it is a `Select` in `Actions`. While the record
+ * loads (`loading`) a Skeleton holds the line, so the header never moves.
  */
 export function DialogBadges({ loading = false, className, children, ...rest }: DialogBadgesProps) {
-  const { registerBadges } = useDialogShell("Badges");
+  useDialogShell("Badges");
   const swap = useSwapIn(loading ? "loading" : "data", children);
-  React.useLayoutEffect(() => {
-    registerBadges(true);
-    return () => registerBadges(false);
-  }, [registerBadges]);
+  const size = tierMappings.cardBadges.l;
   if (swap.state === "loading") {
     return (
       <div
         {...rest}
         key={swap.key}
         aria-busy="true"
-        className={cx(styles.badges, swap.className, className)}
+        className={cx(headerRowStyles.badges, styles.badges, swap.className, className)}
       >
-        <Skeleton shape="chip" size="m" className={styles.badgesSkeleton} />
+        <Skeleton shape="chip" size={size} className={styles.badgesSkeleton} />
       </div>
     );
   }
@@ -638,9 +686,9 @@ export function DialogBadges({ loading = false, className, children, ...rest }: 
     <Badge.Group
       {...rest}
       key={swap.key}
-      size="m"
+      size={size}
       overflow="count"
-      className={cx(styles.badges, swap.className, className)}
+      className={cx(headerRowStyles.badges, swap.className, className)}
     >
       {swap.content}
     </Badge.Group>
@@ -653,13 +701,16 @@ export type DialogDescriptionProps = Omit<React.HTMLAttributes<HTMLParagraphElem
   ref?: React.Ref<HTMLParagraphElement>;
 };
 
+/** The element of a description line that is cut with an ellipsis. */
+const descriptionText = (line: HTMLElement) =>
+  line.querySelector<HTMLElement>(`.${headerRowStyles.descriptionText}`);
+
 /**
- * Line 2, the text right under the title (the badges go under it in a record header): plain text,
- * no badges — a status is a `Badges` line of its own. In a record header it is one line cut with
- * an ellipsis
- * (the whole text in its `title` while cut); in a question dialog it wraps. While its data loads
- * (`loading`) it keeps its place with a Skeleton, so the header never moves when the data
- * arrives; the data then fades in under the same element.
+ * The text under the title: plain text, no badges. In a record header it is one line cut with an
+ * ellipsis (the whole text in its `title` while cut) and a `StatusDot` first states the record's
+ * state, followed by a «·»; in a question dialog it wraps. While its data loads (`loading`) it
+ * keeps its place with a Skeleton, so the header never moves when the data arrives; the data then
+ * fades in under the same element.
  */
 export function DialogDescription({
   loading = false,
@@ -669,11 +720,12 @@ export function DialogDescription({
   ...rest
 }: DialogDescriptionProps) {
   const { descriptionId, registerDescription } = useDialogShell("Description");
+  const record = React.useContext(DialogHeaderContext)?.record ?? false;
   const swap = useSwapIn(loading ? "loading" : "data", children);
   const shownLoading = swap.state === "loading";
   const lineRef = React.useRef<HTMLParagraphElement>(null);
   const mergedRef = useMergedRefs(lineRef, ref);
-  useCutLineTitle(lineRef, rest.title);
+  useCutLineTitle(lineRef, rest.title, descriptionText);
   React.useLayoutEffect(() => {
     registerDescription(true);
     return () => registerDescription(false);
@@ -685,9 +737,20 @@ export function DialogDescription({
       key={swap.key}
       id={descriptionId}
       aria-busy={shownLoading || undefined}
-      className={cx(textRole.bodyS, styles.description, swap.className, className)}
+      className={cx(
+        FRAME_DESCRIPTION.l,
+        record ? headerRowStyles.description : styles.descriptionWrap,
+        swap.className,
+        className,
+      )}
     >
-      {shownLoading ? <Skeleton size="s" className={styles.descriptionSkeleton} /> : swap.content}
+      {shownLoading ? (
+        <Skeleton size="s" className={styles.descriptionSkeleton} />
+      ) : record ? (
+        <HeaderLineContent>{swap.content}</HeaderLineContent>
+      ) : (
+        swap.content
+      )}
     </p>
   );
 }
@@ -701,34 +764,11 @@ export type DialogHeaderProps = React.HTMLAttributes<HTMLElement> & {
 };
 
 /**
- * Places the header's `Actions`: beside the title while the title keeps its minimum width (the grid
- * track of `.header:has(> .actions)`), under the title and the description when it would not — the
- * header then overflows its box. The trial runs on the DOM, between two layouts of one frame.
- */
-function placeHeaderActions(header: HTMLElement): boolean {
-  header.removeAttribute("data-actions-below");
-  const actions = header.querySelector<HTMLElement>(`:scope > .${styles.actions}`);
-  if (!actions) return false;
-  // A cell closing up (`leaveInPlace`) is already gone: the place is decided by the row it leaves,
-  // so a control that goes never sends the row under the title for a moment.
-  const leaving = Array.from(actions.querySelectorAll<HTMLElement>(":scope > [data-leaving]"));
-  for (const ghost of leaving) ghost.style.display = "none";
-  const overflows = header.scrollWidth > header.clientWidth + 1;
-  for (const ghost of leaving) ghost.style.display = "";
-  if (overflows) header.setAttribute("data-actions-below", "");
-  return overflows;
-}
-
-/**
- * Whether the header's `Actions` stand under the text: the row then starts at the text's start
- * edge, so its cells hold to their start edge; beside the title they hold to the end, by the ×.
- */
-const HeaderActionsBelowContext = React.createContext(false);
-
-/**
- * `[Icon] [Title + Description] [Actions] [close]` in one row. Layout is a CSS grid, so child
- * order does not matter; text children stack in the text column. When the row is too narrow for
- * the title beside the actions (a phone), the actions move under the text.
+ * The header row of the surface (internal/headerRow), frame `l`: `[Icon] [Title + Badges /
+ * Description] [Actions] [close]`, whatever order the parts are written in. One line each, nothing
+ * wraps; the title gives way to its text before the badges fold into «+N». A header without a
+ * description centres its controls on the title line. Anything else inside (a tab strip) closes
+ * the header under the row.
  */
 export function DialogHeader({
   showClose = true,
@@ -737,40 +777,65 @@ export function DialogHeader({
   ref,
   ...rest
 }: DialogHeaderProps) {
-  const { onClose, closeLabel, busy, multiline } = useDialogShell("Header");
-  const headerRef = React.useRef<HTMLElement>(null);
-  const mergedRef = useMergedRefs(headerRef, ref);
-  const [below, setBelow] = React.useState(false);
-  const place = React.useCallback(() => {
-    if (headerRef.current) setBelow(placeHeaderActions(headerRef.current));
-  }, []);
-  React.useLayoutEffect(place);
-  useResizeEffect(headerRef, place, { children: true });
+  const { onClose, closeLabel, busy } = useDialogShell("Header");
+  const items = flattenChildren(children);
+  const pick = (type: React.ElementType) => items.filter((part) => isPart(part, type));
+  const icon = pick(DialogIcon);
+  const title = pick(DialogTitle);
+  const badges = pick(DialogBadges);
+  const description = pick(DialogDescription);
+  const actions = pick(DialogActions);
+  const own: React.ElementType[] = [
+    DialogIcon,
+    DialogTitle,
+    DialogBadges,
+    DialogDescription,
+    DialogActions,
+  ];
+  const extra = items.filter(
+    (part) => !(React.isValidElement(part) && own.includes(part.type as React.ElementType)),
+  );
+  const numbered = title.some(
+    (part) => isPart<DialogTitleProps>(part, DialogTitle) && part.props.number != null,
+  );
+  const record = icon.length > 0 || badges.length > 0 || numbered;
+  const context = React.useMemo(() => ({ record }), [record]);
 
   return (
-    <header
-      ref={mergedRef}
-      className={cx(hairline.bottom, styles.header, className)}
-      data-multiline={multiline ? "true" : undefined}
-      {...rest}
-    >
-      <HeaderActionsBelowContext value={below}>{children}</HeaderActionsBelowContext>
-      {showClose ? (
-        <Button.Root
-          variant="ghost"
-          tone="neutral"
-          type="button"
-          size="s"
-          aria-label={closeLabel}
-          className={styles.close}
-          disabled={busy}
-          onClick={onClose}
-        >
-          <Button.Icon>
-            <Icon name="action.close" tone="secondary" />
-          </Button.Icon>
-        </Button.Root>
-      ) : null}
+    <header ref={ref} className={cx(styles.header, className)} {...rest}>
+      <DialogHeaderContext value={context}>
+        <div className={headerRowStyles.header} data-lines={description.length > 0 ? "two" : "one"}>
+          <HeaderRowContent
+            mark={icon}
+            title={title}
+            badges={badges}
+            description={description}
+            end={
+              actions.length > 0 || showClose ? (
+                <div className={headerRowStyles.end}>
+                  {actions}
+                  {showClose ? (
+                    <Button.Root
+                      variant="ghost"
+                      tone="neutral"
+                      type="button"
+                      aria-label={closeLabel}
+                      className={styles.close}
+                      disabled={busy}
+                      onClick={onClose}
+                    >
+                      <Button.Icon>
+                        <Icon name="action.close" tone="secondary" />
+                      </Button.Icon>
+                    </Button.Root>
+                  ) : null}
+                </div>
+              ) : null
+            }
+          />
+        </div>
+        {extra}
+      </DialogHeaderContext>
     </header>
   );
 }
@@ -786,21 +851,23 @@ export type DialogActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 const DialogFooterContext = React.createContext(false);
 
 /**
- * The controls at the end of the header, before the close button: first one switcher that applies
- * to the whole open tab (a `SegmentedControl`, a `Datepicker` period), then the buttons — ghost icon
- * buttons (each named, with a Tooltip) and a ⋯ Dropdown — never a status, which belongs to the
- * `Badges`. They take tier `s`, the close button's, and sit on the title's line. Each child
- * stands in a cell held to the row's edge (`RowCells`; the end beside the title, the start under
- * it): another control in the same place (the language on one tab, the period on another)
- * cross-fades in its cell while its width glides, and a control shown only on some tabs rises in
- * and closes up — beside the title the ⋯ and × never move.
- * In the footer it is the start group — an action apart from the main pair («Удалить», «Выйти») —
- * and its buttons keep the footer's tier.
+ * The controls at the end of the header, before the close button: first one switcher or value
+ * picker that applies to the whole open tab (a `SegmentedControl`, a `Datepicker` period, a `Select`
+ * of the status or the assignee), then the buttons — neutral buttons (each named, with a Tooltip)
+ * and a ⋯ Dropdown; with a footer the header keeps «Ещё» and the picker, the accent button stands
+ * in the footer. They take the dialog's own control tier, the close button's, and sit on the
+ * title's line. Each child stands in a cell held to the row's end (`RowCells`): another control in
+ * the same place (the language on one tab, the period on another) cross-fades in its cell while
+ * its width glides, and a control shown only on some tabs rises in and closes up — the ⋯ and ×
+ * never move. In a body `Section` it sits at the end of the heading row, tier `s`. In the footer
+ * it is the start group — one thing apart from the main pair — and its controls keep the footer's
+ * tier.
  */
 export function DialogActions({ className, children, ...rest }: DialogActionsProps) {
   useDialogShell("Actions");
   const inFooter = React.useContext(DialogFooterContext);
-  const below = React.useContext(HeaderActionsBelowContext);
+  const inHeader = React.useContext(DialogHeaderContext) !== null;
+  const tier = useHostTier(inHeader ? undefined : "s");
   if (inFooter) {
     return (
       <div className={cx(styles.footerStart, className)} {...rest}>
@@ -809,10 +876,8 @@ export function DialogActions({ className, children, ...rest }: DialogActionsPro
     );
   }
   return (
-    <div className={cx(fieldTierClass, styles.actions, className)} data-size="s" {...rest}>
-      <ControlSizeProvider value="s">
-        <RowCells align={below ? "start" : "end"}>{children}</RowCells>
-      </ControlSizeProvider>
+    <div className={cx(fieldTierClass, styles.actions, className)} data-size={tier.size} {...rest}>
+      {tier.provide(<RowCells align="end">{children}</RowCells>)}
     </div>
   );
 }
@@ -932,7 +997,7 @@ export function DialogFooter({ layout, className, children, ref, ...rest }: Dial
   return (
     <footer
       ref={mergedRef}
-      className={cx(hairline.top, styles.footer, presence.className, className)}
+      className={cx(styles.footer, presence.className, className)}
       data-layout={layout ?? footerLayout}
       {...rest}
     >

@@ -2,11 +2,11 @@
 import {
   Badge,
   Card,
+  List,
   matchesSmartFilter,
   SmartFilter,
   type SmartFilterField,
   type SmartFilterValue,
-  Typography,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -84,27 +84,23 @@ export default function SmartFilterOverviewExample() {
       <Card.Root>
         <Card.Header>
           <Card.Title>Запросы</Card.Title>
-          <Card.Actions>
-            <Typography as="span" variant="caption" tone="muted">
-              {found.length} из {REQUESTS.length}
-            </Typography>
-          </Card.Actions>
+          <Card.Description>
+            {found.length} из {REQUESTS.length}
+          </Card.Description>
         </Card.Header>
-        <Card.List>
-          {found.map((request) => (
-            <Card.ListItem key={request.id}>
-              <span className={styles.request}>
-                <Badge.Root color={METHOD_COLOR[request.method]}>{request.method}</Badge.Root>
-                <Typography as="span" variant="code" className={styles.route} truncate>
-                  {request.route}
-                </Typography>
-                <Typography as="span" variant="caption" tone="muted">
-                  {request.service}
-                </Typography>
-              </span>
-            </Card.ListItem>
-          ))}
-        </Card.List>
+        <Card.Body>
+          <List.Root aria-label="Запросы">
+            {found.map((request) => (
+              <List.Item key={request.id}>
+                <List.ItemText>{request.route}</List.ItemText>
+                <List.ItemDescription>{request.service}</List.ItemDescription>
+                <List.ItemMeta>
+                  <Badge.Root color={METHOD_COLOR[request.method]}>{request.method}</Badge.Root>
+                </List.ItemMeta>
+              </List.Item>
+            ))}
+          </List.Root>
+        </Card.Body>
       </Card.Root>
     </div>
   );

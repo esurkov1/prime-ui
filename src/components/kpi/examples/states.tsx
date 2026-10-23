@@ -1,32 +1,45 @@
-/** A card while its report loads next to the loaded one: the title and the period stay, the value, the change and the reference line hold their place — `loading`. */
-import { Kpi, Typography } from "prime-ui-kit";
+/** Loading: the value, the change and the line under it are Skeletons in their geometry, the head stays; the data fades in — `loading`. */
+import { Kpi, Sparkline, type SparklinePoint, Typography } from "prime-ui-kit";
+
+/** Daily revenue of 1–22 October, thousands of rubles. */
+const REVENUE: SparklinePoint[] = Array.from({ length: 22 }, (_, i) => {
+  const date = new Date(2026, 9, 1 + i);
+  const weekend = date.getDay() === 0 || date.getDay() === 6;
+  const value = 440 + 60 * Math.sin(i / 3.4) + i * 2.4;
+  return { date, value: Math.round(weekend ? value * 0.45 : value) };
+});
 
 const STATES = [
-  { id: "loading", loading: true, caption: "loading" },
-  { id: "loaded", loading: false, caption: "loading={false}" },
-];
+  { caption: "loading", loading: true },
+  { caption: "данные", loading: false },
+] as const;
 
 export default function KpiStatesExample() {
   return (
     <>
-      {STATES.map((state) => (
-        <div key={state.id}>
-          <div>
+      <div>
+        {STATES.map((state) => (
+          <div key={state.caption}>
             <Kpi.Root loading={state.loading}>
               <Kpi.Title>Выручка</Kpi.Title>
-              <Kpi.Period>1–31 окт</Kpi.Period>
-              <Kpi.Value>4,2 млн ₽</Kpi.Value>
-              <Kpi.Delta value={18} tone="success">
-                +18%
+              <Kpi.Value>
+                8,7<Kpi.Unit>млн ₽</Kpi.Unit>
+              </Kpi.Value>
+              <Kpi.Delta value={9.6} tone="success">
+                +9,6 %
               </Kpi.Delta>
-              <Kpi.Meta>к сентябрю</Kpi.Meta>
+              <Kpi.Period>1–22 окт</Kpi.Period>
+              <Kpi.Meta>план 9,5 млн ₽</Kpi.Meta>
+              <Kpi.Media>
+                <Sparkline data={REVENUE} loading={state.loading} label="Выручка по дням" />
+              </Kpi.Media>
             </Kpi.Root>
             <Typography as="span" variant="caption" tone="muted">
               {state.caption}
             </Typography>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </>
   );
 }

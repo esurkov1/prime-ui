@@ -24,12 +24,12 @@
   gap: var(--prime-space-4);
 }
 
-/* controlled: a row of KPI tiles, as many per line as fit. */
+/* controlled, shared-grain: a row of M KPI cards, as many per line as fit. */
 .tiles {
   display: grid;
   grid-template-columns: repeat(
       auto-fit,
-      minmax(min(100%, calc(var(--prime-layout-tile-min-width) * 1.5)), 1fr)
+      minmax(min(100%, calc(var(--prime-layout-tile-min-width) * 1.25)), 1fr)
     );
   gap: var(--prime-space-4);
   width: 100%;

@@ -20,7 +20,12 @@
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
 }
 
-.root[data-state="checked"] .dot {
+/* `Radio.Indicator`: the circle alone, a mark of an element that carries the state itself. */
+.indicator {
+  pointer-events: none;
+}
+
+:is(.root, .indicator)[data-state="checked"] .dot {
   opacity: 1;
   transform: none;
   transition:
@@ -28,7 +33,7 @@
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.root[data-disabled="true"] .dot {
+:is(.root, .indicator)[data-disabled="true"] .dot {
   background: var(--prime-color-text-disabled);
 }
 

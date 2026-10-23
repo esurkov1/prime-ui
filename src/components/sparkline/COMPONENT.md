@@ -15,7 +15,7 @@
 - A series with missing days — a collector that was down (`value: null` breaks the line).
 - A metric where growth is bad — response time, costs, bounce rate (`better="lower"`); a share in percent whose change is in percentage points (`changeUnit="points"`).
 - A period value that is neither the sum nor the mean of the days — a median, unique clients (`value`, `compareTo`).
-- A row of KPI tiles over one period that follow one cursor (one `point` / `onPointChange` for every reading, `size="s"`), each tile opening its section (`Card.Link`).
+- A row of KPI tiles over one period that follow one cursor (one `point` / `onPointChange` for every reading), each tile opening its section (`Kpi.Link`).
 - Raw days over any range — a month, a quarter, a year (`{ date, value }`): the kit folds them by days, weeks, months or quarters (`grain`); a card's step switcher is built from `grains` / `setGrain`, a page's switcher sets one `grain` for several tiles.
 - A metric against last year, a plan or another channel on one scale (`series`: each line with its chart `color` and `variant`, named in a legend), bars with lines over them included.
 - A KPI tile of the latest week or month against the one before, the current one still running (`aggregate="sum"`, `change="previous"`: the cut period compares with the same days of the previous).
@@ -60,7 +60,7 @@ tooltip (compact):     the kit chart tooltip (date · value, a row per line) rig
 | `variant` | `"area" \| "line" \| "dashed" \| "dotted" \| "bars"` | `"area"` | The main series: `area` — a line over a fading gradient; `line` — the line alone; `dashed`, `dotted` — a broken line; `bars` — a bar per point from zero, down (danger) when negative. |
 | `curve` | `"smooth" \| "linear" \| "step"` | `"smooth"` | Shape of the lines: `smooth` — a monotone cubic that never overshoots a peak or a trough; `linear` — straight segments; `step` — a level per point, changing halfway. |
 | `layout` | `"default" \| "compact"` | `"default"` | `default` — the plot of its `size` with the legend of `series`; `compact` — an `xs` control height for a DataTable cell, the point in a tooltip. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Plot height 40 · 48 · 80 · 96 · 128 px, the Skeleton the same. `s` fits a KPI tile in a row of four; `compact` keeps the `xs` height. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Plot height 40 · 48 · 80 · 96 · 128 px, the Skeleton the same. In `Kpi.Media` the card sets it (M `xs` · L `s` · XL `m`); `compact` keeps the `xs` height. |
 | `point` | `number \| null` | — | Index of the scrubbed point, `null` at rest. One `point` on sparklines of one axis moves the cursor of all; `useSparkline` passes its own. |
 | `defaultPoint` | `number \| null` | `null` | The scrubbed point at mount (uncontrolled). |
 | `onPointChange` | `(point: number \| null) => void` | — | Called with the point index while scrubbing (pointer, touch, arrow keys) and with `null` when the chart returns to rest. |
@@ -173,13 +173,13 @@ A share or a unique count (a conversion, unique clients) cannot be folded from d
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | a 40 px plot | a tile in a dense side panel | |
-| `s` | a 48 px plot | a KPI tile in a row of four | |
-| `m` | an 80 px plot | a dashboard card | the host tier, else yes |
+| `xs` | a 40 px plot | an M KPI card, a tile in a dense side panel | |
+| `s` | a 48 px plot | an L KPI card | |
+| `m` | an 80 px plot | a dashboard card, an XL KPI card | the host tier, else yes |
 | `l` | a 96 px plot | the chart that leads its panel | |
 | `xl` | a 128 px plot | a detail page header | |
 
-The Skeleton of `loading` takes the same height. `layout="compact"` keeps the `xs` control height whatever the tier.
+In `Kpi.Media` the card sets the tier (M `xs` · L `s` · XL `m`): the plot there takes no `size`. The Skeleton of `loading` takes the same height. `layout="compact"` keeps the `xs` control height whatever the tier.
 
 ### layout
 | Value | Looks like | Use when | Default |
@@ -195,7 +195,7 @@ The Skeleton of `loading` takes the same height. `layout="compact"` keeps the `x
 | `reference` | a dashed chart-axis line at the value | a plan, a target, an average | — |
 | `loading` | the plot Skeleton | the series is on its way | `false` |
 
-Put it in a [Kpi](../kpi/COMPONENT.md) for a dashboard tile: `Kpi.Value` (`valueText`), `<Kpi.Delta reading={…} />` (the change, its tone and arrow; none when there is no change) and `Kpi.Period` (`date`) hold the reading, the plot goes in `Kpi.Media`.
+Put it in a [Kpi](../kpi/COMPONENT.md) for a dashboard tile: `Kpi.Value` (`valueText`, the unit in `Kpi.Unit` — `formatValue` gives the figure alone), `<Kpi.Delta reading={…} />` (the change, its tone and arrow; none when there is no change) and `Kpi.Period` (`date`, under the value) hold the reading, the plot goes in `Kpi.Media`.
 
 ## States
 | State | Driven by | DOM |
@@ -216,8 +216,8 @@ Put it in a [Kpi](../kpi/COMPONENT.md) for a dashboard tile: `Kpi.Value` (`value
 ## Layout & spacing
 - Takes the width of its container; the plot is as high as its `size` (80 px at `m`) and inset by the dot radius so the cursor is never clipped. The smooth curve never leaves the plot: a monotone cubic does not overshoot the extremes.
 - Bars share the width equally, 4 px apart; the zero line sits where 0 falls on the scale (the bottom when every value is positive).
-- It draws no headline: the `Kpi` card lays out the reading of `useSparkline` (`Kpi.Title`, `Kpi.Period`, `Kpi.Value`, `Kpi.Delta`) and the plot in its `Kpi.Media`.
-- A tile that opens: `Card.Link` with an `aria-label` inside the `Kpi.Root`. The link stretches over the card and the plot (a slider) stands above it, so a scrub never opens the tile.
+- It draws no headline: the `Kpi` card lays out the reading of `useSparkline` (`Kpi.Value` with its `Kpi.Unit`, `Kpi.Delta`, `Kpi.Period`) under its `Kpi.Title` and the plot in its `Kpi.Media`.
+- A tile that opens: `Kpi.Link` in its `Kpi.Title`. The link stretches over the card and the plot (a slider) stands above it, so a scrub never opens the tile.
 - The pointer hits only the plot, never a line, a dot or a bar inside it: the cursor stays one arrow while scrubbing.
 - The legend of `series` wraps on a narrow card, 16 between lines, 8 between a swatch and its name.
 - `layout="compact"` fits a DataTable row of any tier (plot and dot within an `xs` control height) and takes the cell width, at least `--prime-space-24`; give the column a `width` for an even plot per row. Put the number next to it in its own column: the compact plot shows a value only in its tooltip while scrubbed.
@@ -277,7 +277,7 @@ Put it in a [Kpi](../kpi/COMPONENT.md) for a dashboard tile: `Kpi.Value` (`value
 | [period.tsx](examples/period.tsx) | Another period swaps the days and the step follows them — a month by days, a quarter by weeks, a year by months; the line cross-fades in and the card reads the new total — `data`, `summary`. |
 | [grain.tsx](examples/grain.tsx) | A year of daily revenue with a step switcher the card lays out from the reading: the current period is cut at today, hatched, and compared with the same days of the one before — `grains`, `setGrain`, `change`. |
 | [shared-grain.tsx](examples/shared-grain.tsx) | One step for every KPI tile: the switcher above them sets it, each tile reads its latest period against the one before — `grain`, `aggregate`, `change`. |
-| [controlled.tsx](examples/controlled.tsx) | The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the reading of all, no tooltip repeats the readings, and each tile opens its section — `point`, `onPointChange`, `size`. |
+| [controlled.tsx](examples/controlled.tsx) | The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the reading of all, no tooltip repeats the readings, and each tile opens its section — `point`, `onPointChange`. |
 
 ## Mistakes
 - A new array on every render (`data={rows.map(...)}` inline) → the line cross-fades on every render; memoize the series.
@@ -296,13 +296,13 @@ Put it in a [Kpi](../kpi/COMPONENT.md) for a dashboard tile: `Kpi.Value` (`value
 - A median or a unique count forced into `summary="sum"` / `"average"`, or a chart dropped for it → pass the period's own `value` with `compareTo`.
 - A grey box while the series loads → `loading`.
 - A full Sparkline squeezed into a table cell → `layout="compact"`.
-- A row of KPI tiles too tall with an 80 px plot, or `--sparkline-h` set from outside → `size="s"`.
+- A `size` on the plot in `Kpi.Media`, or `--sparkline-h` set from outside → leave both out: the card sets the plot's tier.
 - KPI tiles of one period scrubbed one by one → share `point` and `onPointChange` across their readings.
 - Days folded into weeks or months by hand, with labels written for each step → pass the days as `{ date, value }` and set `grain` (a card's switcher from `grains` / `setGrain`).
 - A current month compared with the whole previous month («−30%» on the 22nd) → dated points with `change="previous"`: a cut period compares with the same days.
 - A level (MRR, a balance) summed over a week → `aggregate="latest"` (the default with `summary="latest"`); a flow under a `latest` reading → `aggregate="sum"`.
 - A grain switcher in every tile of one dashboard → one `grain` for all from a switcher of the page.
-- A tile with a Sparkline made a link with `Kpi.Root asChild` + `<a>` → a slider inside a link; use `Card.Link` with an `aria-label`.
+- A tile with a Sparkline made a link with `Kpi.Root asChild` + `<a>` → a slider inside a link; use `Kpi.Link` in the title.
 
 ## Related
 - **Built from:** [Skeleton](../skeleton/COMPONENT.md) (loading), `ChartTooltip` (the chart tooltip shared with ChartFrame), [ScrollContainer](../scroll-container/COMPONENT.md) (the tooltip's floating panel)

@@ -1,17 +1,26 @@
 import * as React from "react";
 
+import { Badge, type BadgeGroupProps } from "@/components/badge/Badge";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
-import { useHostTier } from "@/internal/ControlSizeContext";
+import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import {
+  HeaderLineContent,
+  HeaderRowContent,
+  headerRowStyles,
+  useTitleFloor,
+} from "@/internal/headerRow";
 import { iconSlotClass } from "@/internal/iconBox";
-import type { ControlSize } from "@/internal/states";
+import { flattenChildren, isPart } from "@/internal/parts";
+import { type ControlSize, tierMappings } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { FRAME_DESCRIPTION } from "@/internal/surfaceFrame";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./Accordion.module.css";
@@ -188,10 +197,21 @@ export type AccordionTriggerProps = Omit<React.ButtonHTMLAttributes<HTMLButtonEl
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** The item's button: its children, then the chevron that turns when the item opens. */
+/**
+ * The item's header row: the mark (`Accordion.Icon`), the title with its `Accordion.Badges` on one
+ * line and the `Accordion.Description` under it, then the chevron at the end that turns when the
+ * item opens. Loose children are the title. Nothing wraps.
+ */
 function AccordionTrigger({ className, children, onClick, ...rest }: AccordionTriggerProps) {
   const { toggleItem } = useAccordionContext();
   const item = useAccordionItem();
+  const titleRef = React.useRef<HTMLSpanElement>(null);
+  useTitleFloor(titleRef);
+  const nodes = flattenChildren(children);
+  const mark = nodes.find((node) => isPart(node, AccordionIcon));
+  const badges = nodes.find((node) => isPart(node, AccordionBadges));
+  const description = nodes.find((node) => isPart(node, AccordionDescription));
+  const title = nodes.filter((node) => node !== mark && node !== badges && node !== description);
 
   return (
     <button
@@ -211,7 +231,18 @@ function AccordionTrigger({ className, children, onClick, ...rest }: AccordionTr
         if (!event.defaultPrevented) toggleItem(item.value);
       }}
     >
-      {children}
+      <HeaderRowContent
+        mark={mark}
+        title={
+          title.length > 0 ? (
+            <span ref={titleRef} className={cx(headerRowStyles.title, styles.title)}>
+              {title}
+            </span>
+          ) : null
+        }
+        badges={badges}
+        description={description}
+      />
       <Icon name="nav.chevronDown" className={styles.chevron} />
     </button>
   );
@@ -232,6 +263,51 @@ function AccordionIcon({ className, children, ...rest }: AccordionIconProps) {
   );
 }
 AccordionIcon.displayName = "Accordion.Icon";
+
+export type AccordionBadgesProps = Omit<BadgeGroupProps, "size" | "overflow">;
+
+/**
+ * The badges after the title, on its line: one container for every badge of the section (a status,
+ * a count — the meaning is the badge's `tone` or `color`). What does not fit folds into «+N».
+ */
+function AccordionBadges({ className, ...rest }: AccordionBadgesProps) {
+  const size = useControlSize(undefined);
+  return (
+    <Badge.Group
+      {...rest}
+      size={tierMappings.cardBadges[size]}
+      overflow="count"
+      className={cx(headerRowStyles.badges, className)}
+    />
+  );
+}
+AccordionBadges.displayName = "Accordion.Badges";
+
+export type AccordionDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * The line under the title: plain text with new data only, one line cut with an ellipsis. A
+ * `StatusDot` first states the section's state; the text after it follows a «·».
+ */
+function AccordionDescription({ className, children, ...rest }: AccordionDescriptionProps) {
+  const size = useControlSize(undefined);
+  return (
+    <span
+      {...rest}
+      className={cx(
+        FRAME_DESCRIPTION[size],
+        headerRowStyles.description,
+        styles.description,
+        className,
+      )}
+    >
+      <HeaderLineContent>{children}</HeaderLineContent>
+    </span>
+  );
+}
+AccordionDescription.displayName = "Accordion.Description";
 
 export type AccordionContentProps = React.HTMLAttributes<HTMLElement> & {
   ref?: React.Ref<HTMLElement>;
@@ -278,5 +354,7 @@ export const Accordion = {
   Header: AccordionHeader,
   Trigger: AccordionTrigger,
   Icon: AccordionIcon,
+  Badges: AccordionBadges,
+  Description: AccordionDescription,
   Content: AccordionContent,
 };

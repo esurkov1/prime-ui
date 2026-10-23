@@ -203,7 +203,8 @@ describe("Message cards", () => {
     );
     expect(container.firstElementChild).toHaveAttribute("data-message-bleed");
     expect(container.querySelector("[data-ratio='16:9']")).not.toBeNull();
-    expect(screen.getByText("ул. Складочная, 1").nextElementSibling).toBe(
+    // The address is the cut text of the line; the spacer follows the line's text.
+    expect(screen.getByText("ул. Складочная, 1").parentElement?.nextElementSibling).toBe(
       screen.getByTestId("spacer"),
     );
     expect(messagePartOf(MessageLocation)).toMatchObject({ bleed: true, sized: true });

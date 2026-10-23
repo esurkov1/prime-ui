@@ -1,0 +1,100 @@
+/*
+ * The header row of a surface that holds one entity (Card, a dialog, ChartFrame, Chat, a Kanban
+ * card…), as Card set it:
+ *   [mark] [title · badges        ] [end: controls | indicator]
+ *          [description           ]
+ * One line each, nothing wraps. The title and its badges share a line 6 apart: the title gives way
+ * first (down to its text or 8em, `useTitleFloor`), then the badges fold into «+N». The end holds
+ * only controls, at the top edge beside two lines; a one-line header (`data-lines="one"`), a header
+ * with a mark, or a header that is the whole surface centres them on its line. Without a mark the
+ * air above the title's letters is cut, so its cap top stands on the padding like the controls.
+ * The host sets the roles (`FRAME_TITLE`, `FRAME_DESCRIPTION`) and `--frame-lines-gap`.
+ */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.header[data-lines="one"],
+.header:has(> .mark),
+.header:only-child {
+  align-items: center;
+}
+
+.mark {
+  flex: none;
+}
+
+.titles {
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--frame-lines-gap, 0);
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--prime-space-1) * 1.5);
+  min-width: 0;
+}
+
+.title {
+  flex: 0 1000 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleRow:has(> .badges) > .title {
+  min-width: min(var(--header-title-min, 0), 100%);
+}
+
+@supports (text-box: trim-start cap alphabetic) {
+  .header[data-lines="two"]:not(:has(> .mark)):not(:only-child) .title {
+    text-box: trim-start cap alphabetic;
+  }
+}
+
+.badges {
+  flex: 1 1 auto;
+}
+
+.description {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--prime-space-1) * 1.5);
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-secondary);
+  white-space: nowrap;
+}
+
+/* The status and the dot keep their width; the text after them is cut. */
+.description > :not(.descriptionText) {
+  flex: none;
+}
+
+.separator {
+  color: var(--prime-color-text-muted);
+}
+
+.descriptionText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.end {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-2);
+}

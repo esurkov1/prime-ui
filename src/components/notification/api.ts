@@ -29,8 +29,8 @@ const CONTENT = [
     name: "size",
     type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
-    en: "Padding, icon and text tier of the card. Without it the tier of the host (a toast of `notify()` sits outside any host: `m`).",
-    ru: "Ярус отступов, иконки и текста карточки. Без него — ярус хоста (уведомление из `notify()` вне хоста: `m`).",
+    en: "Tier of the card; its padding, icon and text stand two steps under it (`m` → the `xs` frame). Without it the tier of the host (`notify()` sits outside any host: `m`).",
+    ru: "Ярус карточки; отступы, иконка и текст — на две ступени ниже (`m` → рамка `xs`). Без него — ярус хоста (`notify()` вне хоста: `m`).",
   },
   {
     name: "icon",
@@ -47,8 +47,8 @@ const CONTENT = [
   {
     name: "action",
     type: "{ label: string; onClick: () => void }",
-    en: "One soft button under the text, one tier below the card; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`).",
-    ru: "Одна мягкая кнопка под текстом, на ярус меньше карточки; у уведомления из `notify()` после своего `onClick` закрывает его (причина `action`).",
+    en: "One soft accent button under the text; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`).",
+    ru: "Одна мягкая акцентная кнопка под текстом; у уведомления из `notify()` после своего `onClick` закрывает его (причина `action`).",
   },
 ];
 

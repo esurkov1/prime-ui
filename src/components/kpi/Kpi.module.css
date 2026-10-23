@@ -1,119 +1,129 @@
 /*
- * Kpi — one figure and what it means, inside the kit's Card (the card pads it: Card.Body). Three
- * blocks a card gap apart, each present only with its parts:
- *   head   — the icon tile, the title (title-s) over the line of description · period (body-s),
- *            the actions at the end;
- *   figure — the value (heading-l, a step by `valueSize`) over the row of its change: a Badge one
- *            step below the card and the reference line (body-s). The change has its own row, so a
- *            value that changes width (a scrubbed point) never moves it;
- *   media  — a Sparkline, a ProgressBar or a breakdown, kept to the bottom of a stretched card so
- *            the cards of a row line them up.
+ * Kpi — one figure and what it means. A surface of the depth ladder (`data-depth`, painted with
+ * `--prime-color-layer-current`, the raised whisper on the page). The size decides the parts it holds
+ * and their scale. The frame is the Card's (internal/surfaceFrame, `--frame-*`), so a Kpi beside a
+ * Card a step larger lines up; each size takes the frame a step under its tier (the title labels
+ * the figure, the figure is the headline):
+ *            S        M        L        XL
+ *   frame    xs       s        m        l
+ *   padding  12       16       20       24
+ *   gap      8        12       16       20
+ *   radius   12       12       16       16
+ *   title    13/16    13/16    14/20    16/24      (the frame's title role)
+ *   mark     —        —        40       48         (L and XL icon tile)
+ *   controls 28       32       36       40         (the frame's tier)
+ *   value    20/28    24/32    30/36    36/44      (heading-s · heading-m · heading-l · display-s)
+ *   line     —        12/16    13/20    14/20      (the period · the note, 4 / 6 / 6 under the value)
+ * Blocks: head (S its own line of title and period; M, L, XL the kit's header row), figure, media
+ * (kept to the bottom of a stretched card), footer (the padding below the rest, no line — as in Card).
  */
 
 .root {
+  --kpi-line-gap: var(--prime-space-1);
+  --kpi-unit: var(--prime-text-body-m-size);
+
+  position: relative;
+  container-type: inline-size;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-4);
+  gap: var(--frame-gap);
+  width: 100%;
   min-width: 0;
-  min-height: 0;
+  height: 100%;
+  padding: var(--frame-pad);
+  border-radius: var(--frame-radius);
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-layer-shadow);
   color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  text-align: start;
+  transition:
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-size="s"] {
+  --kpi-unit: var(--prime-text-caption-size);
+}
+
+.root[data-size="l"] {
+  --kpi-line-gap: calc(var(--prime-space-1) * 1.5);
+  --kpi-unit: var(--prime-text-title-l-size);
+}
+
+.root[data-size="xl"] {
+  --kpi-line-gap: calc(var(--prime-space-1) * 1.5);
+  --kpi-unit: var(--prime-text-heading-s-size);
+}
+
+/* A card that is one link or button (`asChild`): it lifts on hover and presses like a control. */
+.root[data-interactive] {
+  margin: 0;
+  border: 0;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .root[data-interactive]:hover {
+    box-shadow: var(--prime-shadow-overlay);
+  }
+}
+
+/* A card with a `Kpi.Link`: the link's `::after` covers the card; it lifts and shows the focus ring. */
+@media (hover: hover) and (pointer: fine) {
+  .root[data-link]:hover {
+    box-shadow: var(--prime-shadow-overlay);
+  }
+}
+
+.root[data-link]:has(.link:focus-visible),
+.root[data-interactive]:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--prime-z-raised);
+  border-radius: inherit;
 }
 
 /* ---------- head ---------- */
 
+/* S: the title and the period on one line. M, L, XL: the kit's header row (internal/headerRow). */
 .head {
   display: flex;
   align-items: center;
-  gap: var(--prime-space-3);
+  gap: var(--prime-space-2);
   min-width: 0;
 }
 
-.icon {
-  flex: none;
-}
-
-.text {
+.titles {
   display: grid;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-/* The title: one line, cut; a card that opens keeps its corner arrow clear of it. */
-.title {
-  min-width: 0;
-  padding-inline-end: var(--corner-mark-room, 0);
+/* The end of the head on S: the period, quiet, never cut. */
+.end {
+  flex: none;
+  max-width: 60%;
   overflow: hidden;
-  color: var(--prime-color-text-primary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* The line under the title: the description, then the period — always last, in the secondary ink.
-   Short of room the description gives way and the period stays whole: the time a figure stands
-   for is never cut. */
-.sub {
-  display: flex;
-  align-items: baseline;
-  min-width: 0;
   color: var(--prime-color-text-muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.description {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.dot {
-  flex: none;
-  margin-inline: var(--prime-space-1);
-}
-
-.period {
-  flex: none;
-  color: var(--prime-color-text-secondary);
-}
-
-.actions {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: var(--prime-space-2);
-  margin-inline-start: auto;
-}
-
-/*
- * A narrow card (below 22rem of the card's width, the Card's container): actions with a labelled
- * button or link drop under the title onto a row of their own and share its width, so the title is
- * not cut to a few letters; icon buttons, a switch or a mark stay in the corner.
- */
-@container (max-width: 22rem) {
-  .head {
-    flex-wrap: wrap;
-  }
-
-  .head > .actions:has(> :is(button, a):not([data-icon-only])) {
-    flex-basis: 100%;
-    justify-content: flex-start;
-    margin-inline-start: 0;
-  }
-
-  .head > .actions > :is(button, a):not([data-icon-only]) {
-    flex: 1 1 auto;
-  }
-}
-
-/* A figure on one line has to fit its card: below 18rem the default step takes the size of `m`
-   (heading-m), so «13 900 000 ₽» stays inside a narrow tile. */
-@container (max-width: 18rem) {
-  .root[data-value-size="l"] .value {
-    font-size: var(--prime-text-heading-m-size);
-    line-height: var(--prime-text-heading-m-line-height);
-  }
+  white-space: nowrap;
 }
 
 /* ---------- figure ---------- */
@@ -121,49 +131,50 @@
 .figure {
   display: grid;
   justify-items: start;
-  gap: var(--prime-space-1);
+  gap: var(--kpi-line-gap);
   min-width: 0;
 }
 
-/* A figure is one line: its unit never wraps away from the digits, so a scrubbed point that grows
-   the number never grows the card. */
-.value {
+/* The value and its change on one line, on one baseline; the line never wraps. */
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
   min-width: 0;
   max-width: 100%;
+}
+
+.root[data-size="l"] .valueRow,
+.root[data-size="xl"] .valueRow {
+  gap: var(--prime-space-3);
+}
+
+/* The value is cut last: a value that does not fit asks for the short form or a larger size. */
+.value {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
   color: var(--prime-color-text-primary);
   font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* `valueSize="s"`: a value that is a line of text — body-m (joined in TSX) at medium weight, so it
-   reads as a value beside the text; a phrase may wrap. */
-.root[data-value-size="s"] .value {
+/* The unit after the figure: about 0.6 of it, quiet; its own line height never grows the value's. */
+.unit {
+  margin-inline-start: var(--prime-space-1);
+  color: var(--prime-color-text-muted);
+  font-size: var(--kpi-unit);
   font-weight: var(--prime-font-weight-medium);
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-/* A Badge straight in the value (TSX: `hasBadge`) stands beside the text, the chip gap apart. */
-.badged {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
-/* The row of the change: the Badge, then the reference line, centred on each other — one line, the
-   reference line cut, so the card keeps its height while the reading changes. */
-.change {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--prime-space-1) var(--prime-space-2);
-  min-width: 0;
+  line-height: 1;
+  letter-spacing: var(--prime-font-tracking-normal);
 }
 
 .delta {
   display: inline-flex;
   flex: none;
   align-items: center;
+  align-self: center;
 }
 
 /* One arrow: falling is the rising one turned half a turn, so a change of sign turns it over. */
@@ -175,13 +186,35 @@
   rotate: 180deg;
 }
 
-.meta {
+/* The line under the value: the period, then the note; one line, the note is cut, the period never. */
+.line {
+  display: flex;
+  align-items: baseline;
   min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The period gives way to nothing but the card's own edge. */
+.period {
+  flex: 0 0 auto;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dot {
+  flex: none;
+  white-space: pre;
+}
+
+.meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ---------- media ---------- */
@@ -194,10 +227,82 @@
   margin-top: auto;
 }
 
+/* ---------- footer ---------- */
+
+.footer {
+  display: grid;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  padding-top: calc(var(--frame-pad) - var(--frame-gap));
+}
+
+/* The media keeps to the bottom; a footer after it stands right under it. */
+.media + .footer {
+  margin-top: 0;
+}
+
+.footer:first-child,
+.head + .footer,
+.figure + .footer {
+  margin-top: auto;
+}
+
+/* Totals: equal columns, up to four. */
+.totals {
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--prime-space-4);
+}
+
+.total {
+  display: grid;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.totalLabel {
+  overflow: hidden;
+  color: var(--prime-color-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.totalValue {
+  overflow: hidden;
+  color: var(--prime-color-text-primary);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  color: var(--prime-color-text-secondary);
+}
+
+.noteStatus {
+  flex: 0 1 auto;
+}
+
+.noteText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend,
+.ring {
+  min-width: 0;
+}
+
 /*
- * Loading (`Kpi.Root loading`): the value, the change and the reference line keep their element
+ * Loading (`Kpi.Root loading`): the value, the change, the period and the note keep their element
  * and show a Skeleton in its geometry — the value a bar one line of its own text role high, the
- * change and the line a text line of their tier.
+ * others a text line of their tier.
  */
 .valueSkeleton {
   width: calc(var(--prime-space-24) * 1.25);
@@ -210,59 +315,10 @@
   width: var(--prime-space-12);
 }
 
+.periodSkeleton {
+  width: var(--prime-space-16);
+}
+
 .metaSkeleton {
-  width: calc(var(--prime-space-24) * 1.5);
-}
-
-/* ---------- Group ---------- */
-
-/* Related figures in one card: equal columns, a faint line between them. The group is the size
-   container, its cells the grid. */
-.group {
-  container-type: inline-size;
-  min-width: 0;
-}
-
-.cells {
-  display: grid;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  min-width: 0;
-}
-
-.cell {
-  display: flex;
-  min-width: 0;
-}
-
-.cell > .root {
-  flex: 1 1 auto;
-}
-
-.cells > * + * {
-  padding-inline-start: var(--prime-space-5);
-  border-inline-start: var(--prime-border-width) solid var(--prime-color-border-faint);
-}
-
-.cells > :not(:last-child) {
-  padding-inline-end: var(--prime-space-5);
-}
-
-/* A narrow group stacks its figures, the line between them across. */
-@container (max-width: 22rem) {
-  .cells {
-    grid-auto-flow: row;
-  }
-
-  .cells > :not(:last-child) {
-    padding-inline-end: 0;
-  }
-
-  .cells > * + * {
-    margin-top: var(--prime-space-4);
-    padding-top: var(--prime-space-4);
-    padding-inline-start: 0;
-    border-inline-start: 0;
-    border-top: var(--prime-border-width) solid var(--prime-color-border-faint);
-  }
+  width: var(--prime-space-24);
 }

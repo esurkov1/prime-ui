@@ -46,7 +46,7 @@ const RETURNS: SparklinePoint[] = [
   { label: "окт", value: 1 },
 ];
 
-const formatPieces = (value: number) => `${value.toLocaleString("ru-RU")} шт.`;
+const formatPieces = (value: number) => value.toLocaleString("ru-RU");
 
 const ALL_TIME: DatepickerRange = { from: null, to: null };
 
@@ -132,18 +132,24 @@ export default function DrawerTabSwitcherExample() {
               </DescriptionList.Root>
             </Tabs.Panel>
             <Tabs.Panel value="analytics">
-              <Kpi.Root valueSize="m">
+              <Kpi.Root>
                 <Kpi.Title>Продажи</Kpi.Title>
-                <Kpi.Description>По месяцам, в штуках</Kpi.Description>
-                <Kpi.Value>{sold.valueText}</Kpi.Value>
+                <Kpi.Value>
+                  {sold.valueText}
+                  <Kpi.Unit>шт.</Kpi.Unit>
+                </Kpi.Value>
+                <Kpi.Period>{sold.date}</Kpi.Period>
                 <Kpi.Media>
                   <Sparkline {...sold.plot} label="Продано по месяцам" />
                 </Kpi.Media>
               </Kpi.Root>
-              <Kpi.Root valueSize="m">
+              <Kpi.Root>
                 <Kpi.Title>Возвраты</Kpi.Title>
-                <Kpi.Description>По месяцам, в штуках</Kpi.Description>
-                <Kpi.Value>{returned.valueText}</Kpi.Value>
+                <Kpi.Value>
+                  {returned.valueText}
+                  <Kpi.Unit>шт.</Kpi.Unit>
+                </Kpi.Value>
+                <Kpi.Period>{returned.date}</Kpi.Period>
                 <Kpi.Media>
                   <Sparkline {...returned.plot} label="Возвращено по месяцам" />
                 </Kpi.Media>

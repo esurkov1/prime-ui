@@ -263,7 +263,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Project tasks reordered by dragging the whole row; one root above, the move applied with a helper — `Dnd.Root`, `Dnd.Sortable`, `onReorder`, `moveBefore`. |
-| [handle.tsx](examples/handle.tsx) | Notification channels, each switch leading its row and the grip ending it: only the grip starts a drag, and the async save can roll the order back — `handle`, `Dnd.Handle`, `onReorder`. |
+| [handle.tsx](examples/handle.tsx) | Notification channels with the switch ending each row; a reorder mode swaps the switches for the grips, and only a grip starts a drag, the async save can roll the order back — `handle`, `Dnd.Handle`, `onReorder`, `fullWidth`. |
 | [grid.tsx](examples/grid.tsx) | Product photos in a wrapping grid: a photo carried across rows lands in reading order, the gap takes a cell, Alt + ← / → steps it one place — `axis`. |
 | [locked.tsx](examples/locked.tsx) | Sections of a workspace menu: the home section is pinned first with a lock in place of its grip, the rest reorder around nothing past it; each row is named by its visible title — `locked`, `handle`, `aria-labelledby`. |
 | [board.tsx](examples/board.tsx) | A ticket board: columns share one kind, so a ticket lands in another column at an exact position or moves there with Alt + ← / →, an empty column says so, and a full column refuses it before the release with the reason under the ticket — `kind`, `canDrop`, `empty`, `onReorder`. |

@@ -1,5 +1,5 @@
 /** A task dragged to the top or bottom edge of a scrolling list scrolls it, faster the closer it comes — `ScrollContainer`, `Dnd.Sortable`. */
-import { Card, Dnd, moveBefore, ScrollContainer, Typography } from "prime-ui-kit";
+import { Card, Dnd, moveBefore, ScrollContainer } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -25,32 +25,32 @@ export default function ScrollContainerAutoScrollExample() {
       <Card.Header>
         <Card.Title>План проекта</Card.Title>
       </Card.Header>
-      <ScrollContainer>
-        <Dnd.Root>
-          <Dnd.Sortable
-            as="ul"
-            aria-label="Задачи"
-            className={styles.sortable}
-            items={tasks}
-            getId={(task) => task.id}
-            getLabel={(task) => task.title}
-            onReorder={(id, beforeId) =>
-              setTasks((current) => moveBefore(current, id, beforeId, (task) => task.id))
-            }
-            renderItem={(task) => (
-              <Dnd.SortableItem id={task.id}>
-                <Card.Root>
-                  <Card.Body>
-                    <Typography as="span" variant="body-m" truncate>
-                      {task.title}
-                    </Typography>
-                  </Card.Body>
-                </Card.Root>
-              </Dnd.SortableItem>
-            )}
-          />
-        </Dnd.Root>
-      </ScrollContainer>
+      <Card.Body>
+        <ScrollContainer>
+          <Dnd.Root>
+            <Dnd.Sortable
+              as="ul"
+              aria-label="Задачи"
+              className={styles.sortable}
+              items={tasks}
+              getId={(task) => task.id}
+              getLabel={(task) => task.title}
+              onReorder={(id, beforeId) =>
+                setTasks((current) => moveBefore(current, id, beforeId, (task) => task.id))
+              }
+              renderItem={(task) => (
+                <Dnd.SortableItem id={task.id}>
+                  <Card.Root>
+                    <Card.Header>
+                      <Card.Title as="span">{task.title}</Card.Title>
+                    </Card.Header>
+                  </Card.Root>
+                </Dnd.SortableItem>
+              )}
+            />
+          </Dnd.Root>
+        </ScrollContainer>
+      </Card.Body>
     </Card.Root>
   );
 }

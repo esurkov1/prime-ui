@@ -3,25 +3,24 @@
 **Category:** data-display
 **Kind:** composite
 
-> A filled surface block whose subject is not one figure — a form, a record, a list, a cover tile — laid out by its zones: a header with its actions, a body, a list, a cover and a footer of buttons.
+> A filled surface that holds one entity — a record, a plan, a setting, a listing — as a cover, a header with its mark, title, badges and actions, a body and a footer, parted by air and never by lines.
 
 ## When to use
-A card is a block whose subject is not one figure — a form, a record, a list, a picture. A card about one figure (a metric with its change and period) is a [Kpi](../kpi/COMPONENT.md).
-
-- A titled block: a settings or profile form, a block of facts (`Card.Header` + `Card.Body` [+ `Card.Footer`]).
-- A block about one person or object — a linked account, a session, a rental term — headed by its mark (`Card.Icon` with an `Avatar.Root`, an icon or a `ProgressCircle`) with its action in `Card.Actions`.
-- A task of a record with its assignee — a rental's return, an order's delivery: the term in `Card.Title` («Вернуть 10 дек · через 50 дн.»), the assignee picker (a `Badge.Root` with `Badge.Avatar` in a `Dropdown.Trigger`) first in `Card.Description` and the facts after it, the actions in `Card.Actions`. One secondary action is a labelled `soft` button beside the primary; two or more gather behind one `action.more` button, the destructive one last. The person is named once — never in the text and again in the picker.
-- Several records of one kind inside one card — the deposits of a rental, the payments of an invoice: `Card.List` of record rows (`Card.ListItem` with `Card.Title` — a state badge and the amount — one `Card.Description` line and `Card.Actions` at its end), hairlines between them; an action that needs a form (a return with a hold) folds a `Card.ListItemContent` open under its row with a `Card.Footer` of its buttons. Never a card per record in a stack.
-- A record with line items and a total: the items in `Card.Body`, a `Card.Footer divider="fill"` with the action, the next task (`Card.Description`) and `Card.Total`.
-- A tile with a picture on top — a campaign, a catalogue unit: `Card.Media` first (a `Carousel` of the record's photos, its status and plate as overlays), the title under it, the term at the bottom, the whole card opening the record (`Card.Link`).
-- A tile that is itself the way to its details — a project, a report (`asChild` with a link or a button).
+- A record with its facts and actions — an order, a client, a contract: `Card.Header` (the mark, the title, `Card.Badges`, the state line, «Ещё») + `Card.Body` (label — value rows) + `Card.Footer` (`Card.Total` and the primary button).
+- A catalogue tile with photos: `Card.Media` holding a `Carousel`, the status in `Card.Badges`, the price in the footer, the whole tile opening the record through `Card.Link`.
+- A choice among cards — a plan, a module, an extra: `asChild` with a `<button>`, `selected`, and `Card.Indicator` at the end of the header.
+- A setting: one switch is a one-line card (`Card.Icon`, `Card.Title`, a `Switch.Root` in `Card.Actions`); several are a group card with `Switch.Root fullWidth` rows in the body.
+- A pane for a list that pads itself — a `List`, a `ChatList`, a `Chat` — with no zone inside: it stands edge to edge.
+- A block of a form, a chart or a long list in a titled surface — the body takes it, a `ScrollContainer` holds six rows of a long list.
 
 ## When not to use
-- One figure and what it means — a KPI tile, a record's fact in a drawer, a figure with its trend or progress → [Kpi](../kpi/COMPONENT.md), never a card laid out by hand.
-- A whole page region with a title and description → [Page](../../layout/page/COMPONENT.md) sections (`Page.Section`); do not wrap every section in a card.
-- Tabular data → use [DataTable](../data-table/COMPONENT.md) (it has its own fill).
-- A message about the page state → [Banner](../banner/COMPONENT.md); nothing to show yet → [EmptyPage](../empty-page/COMPONENT.md).
-- Content that floats over the page → [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md) or [Drawer](../drawer/COMPONENT.md).
+- One figure and what it means → [Kpi](../kpi/COMPONENT.md).
+- A list of places to go, or records that are chosen and opened one by one with nothing else around → [List](../list/COMPONENT.md) (inside a `Card.Body` or a pane).
+- A record's label — value facts alone (a drawer, a profile) → [DescriptionList](../description-list/COMPONENT.md).
+- A page region with a title and description → `Page.Section` of [Page](../../layout/page/COMPONENT.md); do not wrap every section in a card.
+- A card on a board that is dragged between columns → [Kanban](../kanban/COMPONENT.md) draws its own.
+- Tabular data → [DataTable](../data-table/COMPONENT.md); a message about the page state → [Banner](../banner/COMPONENT.md).
+- Content that floats over the page → [Popover](../popover/COMPONENT.md), [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md).
 
 ## Import
 ```tsx
@@ -30,195 +29,194 @@ import { Card } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Card.Root                         zones, in this order, each optional:
-  Card.Media                      first: the cover picture (the zones under it draw no lines)
-  Card.Header                     Card.Icon? · Card.Title · Card.Description? · Card.Actions?
-  Card.Body                       fields, a chart, a DescriptionList
-  Card.Media                      after the header or the body: an edge-to-edge chart
-  Card.List                       Card.ListItem …
-    record row                    Card.Icon? · Card.Title · Card.Description · Card.Actions?
-                                  · Card.ListItemContent open (…, Card.Footer)
-  Card.Footer                     buttons · Card.Description? (a note) · Card.Total?
-Card.Root                         no zone: the content (a chat, a list) edge to edge
-Card.Title > Card.Link            a stretched link: the card opens from anywhere, its own buttons stay
-Card.Root asChild                 <a> or <button> (the only child) holding the parts
+Card.Root size? selected? asChild?        the card; with no zone inside it is a pane
+  Card.Media placement?                   the cover: Carousel.Root (one or more photos)
+  Card.Header                             the parts take their places in any written order
+    Card.Icon?                              the mark: an icon tile, Avatar.Root, Thumbnail.Root, ProgressCircle
+    Card.Title (Card.Link?)                 required; one line
+    Card.Badges?                            on the title's line, fold into «+N»
+    Card.Description? (StatusDot?)          the line under the title
+    Card.Actions? | Card.Indicator?         the end: controls, or the choice mark
+  Card.Body                               label — value rows, a List, a form, switch rows, a chart
+  Card.Footer
+    Card.Total?                             the start: the amount with its state, an assignee picker, or a note
+    Card.Actions?                           the end: up to two buttons, the accent one last
 ```
-
-Buttons stand in two places only: `Card.Actions` at the end of the header (or of a record row), and `Card.Footer`, the bottom row.
 
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Card.Root
-`ref` → `HTMLDivElement` (the `asChild` element). A surface one layer up, no border, a size container. Laid out by its zones: zones under faint lines; a cover when `Card.Media` leads; no zone — the content edge to edge.
+`ref` → `HTMLDivElement` (the `asChild` element). A card: one entity on a surface of the depth ladder, parted by air, never by lines. Its zones (`Card.Media`, `Card.Header`, `Card.Body`, `Card.Footer`) stand a zone gap apart; with none it is a pane, content edge to edge.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | The card's tier: its padding (`--prime-card-padding-s` 16 at `xs` · `s`, `-m` 20, `-l` 24 at `l` · `xl`) and the tier of the controls inside; the type roles stay. |
-| `flat` | `boolean` | `false` | No raised shadow: a flat tile for dense grids. |
-| `asChild` | `boolean` | `false` | The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring, a link draws the arrow. No interactive inside: see `Card.Link`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | One of five steps of metrics: `xs` (padding 12), `s` (16), `m` (20), `l` (24), `xl` (28) with the type, the mark and the controls inside. The width comes from the grid, not from the size. |
+| `selected` | `boolean` | — | The card is chosen: a 2 px accent ring, `Card.Indicator` checked. With `asChild` the element carries the state: `aria-pressed`, or `aria-checked` when it has `role="radio"` or `role="checkbox"`. |
+| `asChild` | `boolean` | `false` | The whole card is one link or button (a choice card): pass that element as the only child with the parts inside it. Nothing interactive goes inside; for a card with its own controls use `Card.Link`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
-### Card.Header
-`ref` → `HTMLDivElement`. The top zone: an optional `Card.Icon`, `Card.Title` with an optional `Card.Description` under it, `Card.Actions` at the end. Wraps below 22rem.
+### Card.Media
+`ref` → `HTMLDivElement`. The cover: the kit `Carousel` (one photo or several), edge to edge, in its own ratio. Only what belongs to the photo stands on it (dots, arrows, `Carousel.Overlay`); status and number go to the header.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+| `placement` | `"top" \| "start"` | `"top"` | `top` — over the zones, full width. `start` — from 30rem a column of 40% at the start, the card's full height; narrower it stands on top. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
+
+### Card.Header
+`ref` → `HTMLDivElement`. The top zone. Its parts take their places whatever the order: `Card.Icon`, the title with `Card.Badges` and `Card.Description` under it, then `Card.Actions` or `Card.Indicator` at the end. Only the title is required.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Card.Icon
-`ref` → `HTMLDivElement`. The mark leading `Card.Header` or a record row: a 40px accent tile of one icon. An `Avatar.Root` or `Thumbnail.Root` inside is the record's picture (no tile, `aria-hidden`); a `ProgressCircle` its state ring (no tile, its own name).
+`ref` → `HTMLDivElement`. The mark leading `Card.Header` (32 · 32 · 40 · 48 · 56): an accent icon tile, or a picture or ring, no tile. A step smaller beside a `Switch`; under a top cover, on its edge.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Card.Title
-`ref` → `HTMLHeadingElement`. The card heading (`<h3>`, title-s). A `Badge.Root` inside stands beside the text, 8 apart, centred on its line.
+`ref` → `HTMLHeadingElement`. What the card is about: one line, cut with an ellipsis. Beside `Card.Badges` it gives way first, down to its own text or 8em, before the badges fold into «+N». 13/16 · 13/16 · 14/20 · 16/24 · 18/24 by size.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `as` | `"h2" \| "h3" \| "h4"` | `"h3"` | Heading level that fits the page outline; the look does not change. |
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+| `as` | `"h2" \| "h3" \| "h4" \| "span"` | `"h3"` | The element: the heading level that fits the page outline, or `span` when the card is no heading. |
+| `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `children`, `className` and the other heading attributes. |
+
+### Card.Link
+`ref` → `HTMLAnchorElement`. Inside `Card.Title`: the link that opens the record. It stretches over the whole card and is the one tab stop, while the card's own controls stay above it. On hover the card lifts and the title is underlined; there is no arrow.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `asChild` | `boolean` | `false` | Render the router's link element instead of an `<a>`. |
+| `…rest` | `AnchorHTMLAttributes<HTMLAnchorElement>` | — | `href`, `children`, `className` and the other anchor attributes. |
+
+### Card.Badges
+`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: one container for every badge of the record (status, role, counter; the meaning is the `tone` or `color` of a badge). Badges are `xs` · `xs` · `xs` · `s` · `s` by card size; what does not fit folds into «+N».
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `labels` | `Partial<BadgeGroupLabels>` | — | Built-in strings of the «+N» badge, see the `Badge.Group` labels. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the `Badge.Root`s), `className` and the other div attributes. |
 
 ### Card.Description
-`ref` → `HTMLDivElement`. Secondary text (body-s): under the title, badges inside (a picker too) in a wrapping row; in `Card.Footer` it is the note: a `Badge.Dot` first, the text cut to one line.
+`ref` → `HTMLDivElement`. The line under the title: plain text with new data only, one line, cut with an ellipsis; 12/16 · 12/16 · 13/20 · 14/20 · 14/20. A `StatusDot` first states the record's state, and a «·» is put after it by itself.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Card.Actions
-`ref` → `HTMLDivElement`. The end of `Card.Header` or of a record row: buttons, a switch, a period switch or a quiet caption, 8 apart, centred on the text. Below 22rem it drops under the text; icon buttons only stay beside it.
+`ref` → `HTMLDivElement`. The card's controls, the card's tier (xs · s · m · l · xl), as tall as its form fields. In the header: with a footer only «Ещё» and a picker, without one neutral buttons too; never an accent button. In the footer: up to two buttons, the accent one last.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+| `fullWidth` | `boolean` | `false` | Footer only: the buttons share the footer's width. Use it when there is no start part. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
+
+### Card.Indicator
+`ref` → `HTMLSpanElement`. The choice mark at the end of the header: a radio circle or a checkbox, checked while the card is `selected`. It is `aria-hidden`; the card's own element carries the state.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `type` | `"radio" \| "checkbox"` | — (required) | `radio` — one of several (inside a `role="radiogroup"`), `checkbox` — any of several. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Card.Body
-`ref` → `HTMLDivElement`. The padded content zone (gap 16): fields, a chart, a `DescriptionList`.
+`ref` → `HTMLDivElement`. The content zone; its rows are parted by air, never lines: label — value rows (`DescriptionList` with `align="end"`), a `List` of records, a form, `Switch.Root` rows with `fullWidth`, a chart, a `ScrollContainer` of a long list, an `EmptyPage`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `divider` | `"full"` | — | A line above the zone that runs edge to edge, in the `Divider` ink (`border-subtle`) so it reads in both themes (without it: the faint inset zone line). |
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
-
-### Card.Media
-`ref` → `HTMLDivElement`. A picture or a chart, edge to edge: first in the card it is the 128–192px cover on top and the zones under it draw no lines; under the header or the body it is a chart. A chart SVG needs a CSS height.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
-
-### Card.List · Card.ListItem
-`ref` → `HTMLUListElement` / `HTMLLIElement`. A `<ul>` of `<li>` rows, faint hairlines between them. A row with `Card.Title` is a record row laid out like `Card.Header`: `Card.Icon`, the title over its description, `Card.Actions` at the end.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
-
-### Card.ListItemContent
-`ref` → `HTMLDivElement`. The zone under its `Card.ListItem` (any row) that folds open in place, rendered from anywhere inside the row; a `Card.Footer` holds its buttons at the end.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `open` | `boolean` | — (required) | Unfolds the zone (height and fade, reduced motion honoured); closed, it folds away. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Card.Footer
-`ref` → `HTMLDivElement`. The bottom row of buttons: at the end, under a faint hairline after zones. A record's row: the actions, the note (`Card.Description`), `Card.Total` at the end.
+`ref` → `HTMLDivElement`. The bottom zone, no line and no fill, kept to the bottom of a stretched card: one thing at the start (`Card.Total`, an assignee picker, a note) and `Card.Actions` at the end. On a narrow card the buttons go under and share the width.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `divider` | `"full" \| "fill"` | — | How the zone stands off the one above: `full` — a line edge to edge in the `Divider` ink; `fill` — no line, the zone on the next layer, its actions from the start (a record's footer). Without it: the faint zone line. |
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Card.Total
-`ref` → `HTMLDivElement`. The total of a record at the end of `Card.Footer`: the amount (title-m, tabular) with its state above it.
+`ref` → `HTMLDivElement`. At the start of the footer: the amount, tabular, with its state (`label`) above it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `label` | `ReactNode` | — | The total's state above the amount («к оплате 21 000 ₽», «оплачено»): body-s, muted. |
-| `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | — | The ink of the `label` by meaning (an amount due is `warning`, paid `success`). |
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the amount), `className` and the other div attributes. |
-
-### Card.Link
-`ref` → `HTMLAnchorElement`. The stretched link around the title: a click anywhere on the card opens it, it is the one tab stop, the card's own buttons stay above it. The card draws the arrow: at the end of `Card.Header`, centred on it, or in the top corner.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `asChild` | `boolean` | `false` | Render the single child element instead of the `<a>`: a router `Link`, or a `<button>` when the record opens in place (a window). |
-| `…rest` | `AnchorHTMLAttributes<HTMLAnchorElement>` | — | `href`, `className` and the other attributes of the link. |
+| `label` | `ReactNode` | — | The state of the amount («К оплате»), muted and coloured by `tone`. |
+| `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | — | The colour of `label` by meaning; the word says the meaning. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ## Variants
-
-### layout (from the zones)
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| zoned | no root padding; `Header` a padded zone, `Body` / `List` under faint inset hairlines, `Media` edge to edge, `Footer` buttons at the end under a hairline | any titled block: forms, charts, facts, lists | yes, with any zone |
-| cover | `Card.Media` first: a 128–192px picture on top, the zones under it a card gap apart with no lines, the footer at the bottom | a tile with a picture: a campaign, a catalogue unit | |
-| bare | no zone: the content edge to edge, no padding | content that pads itself: a chat, a conversation list, a form of its own | |
-
-### divider (Body · Footer)
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| `full` | the zone's top line runs edge to edge in the `Divider` ink (`border-subtle`), so it reads in both themes; the zone lines stay faint | a zone line wider than the card padding | |
-| `fill` (Footer) | no line: the footer is a zone on the next layer of the ladder (`data-depth`, `--prime-color-layer-current`), out to the card's edges and its bottom radius, the card padding on every side, its actions from the start | the footer of a record or an invoice: its action, task and total | |
 
 ### size (Root)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` · `s` | padding 16 (`--prime-card-padding-s`), the controls inside at the tier | dense tiles: a catalogue grid, a narrow drawer | |
-| `m` | padding 20 (`--prime-card-padding-m`) | most cards | yes (or the host tier) |
-| `l` · `xl` | padding 24 (`--prime-card-padding-l`) | a roomy settings or a lone summary card | |
+| `xs` | padding 12, radius 12, zone gap 8; the title 13/16, the line 12/16, the mark 32, buttons `xs`, badges `xs` | a very dense grid, a narrow side panel | |
+| `s` | padding 16, radius 12, zone gap 12; the title 13/16, the line 12/16, the mark 32, buttons `s`, badges `xs` | a dense grid, a side panel, a card in a drawer | |
+| `m` | padding 20, radius 16, zone gap 16; the title 14/20, the line 13/20, the mark 40, buttons `m`, badges `xs` | the default card of a page | the host tier, else `m` |
+| `l` | padding 24, radius 16, zone gap 20; the title 16/24, the line 14/20, the mark 48, buttons `l`, badges `s` | a lead card of a screen, a roomy plan or listing | |
+| `xl` | padding 28, radius 16, zone gap 24; the title 18/24, the line 14/20, the mark 56, buttons `xl`, badges `s` | a hero card, a card on a wide screen | |
 
-The type roles stay at every tier: the cards of one screen share one type scale (title-s, body-s), and the tier is the card's density, not its voice. Without its own `size` and a sized host a card gives no tier to its parts, so a Badge inside keeps its standalone `m`; with one, a Badge follows the pairing rule (one step down).
+The width comes from the grid, not from the size; one size per row.
 
-### tone (Total)
+### placement (Media)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| — | the `label` muted | a total with no judgement | yes |
-| `neutral` | the primary ink | a state in plain words | |
-| `success` | `success-text` | paid | |
-| `warning` | `warning-text` | an amount due | |
-| `danger` | `danger-text` | overdue | |
+| `top` | the cover over the zones, full width, in the carousel's `ratio`; the zones follow a padding below it | a catalogue tile, a listing | yes |
+| `start` | from 30rem of the card a column of 40% (a tile wide at most) at the start, the card's full height, the photo cropped about its middle; narrower it stands on top | a wide card with a long body, a list of listings | |
+
+### type (Indicator)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `radio` | a radio circle at the end of the header, checked while the card is `selected` | one of several cards (inside a `role="radiogroup"`) | |
+| `checkbox` | a checkbox, checked while the card is `selected` | any of several cards (extras, modules) | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `flat` | same fill, no shadow | dense grids of tiles | `false` |
-| `asChild` | the card is the link or button it wraps: lifts on hover (raised → overlay shadow), presses, focus ring | the whole tile opens its details | `false` |
+| `fullWidth` (Actions) | in the footer the buttons share the footer's width; ignored in the header | the footer has no start part | `false` |
+| `asChild` (Root) | the card is the `<button>` or link it wraps: it lifts on hover and presses; with `selected` it carries `aria-pressed` / `aria-checked` | a choice card, a tile that is one link with nothing inside it | `false` |
+| `asChild` (Link) | the router's link element instead of an `<a>` | `Card.Link` over a router `Link` | `false` |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| layout | the zones in the root | `data-layout` (`zoned`, `cover`, `bare`) |
-| flat | `flat` | `data-flat` |
-| depth | nesting: one above the nearest surface (the page and the AppShell panel are 0) | `data-depth` (`1`–`4`, `floating-1`/`floating-2` inside a floating layer); the fill is `--prime-color-layer-current`, the shadow only at depth 1; a `divider="fill"` footer takes the next depth the same way |
-| link arrow | `Card.Link` or `asChild` with a link | the kit's arrow, `aria-hidden`: the last child of `Card.Header` (at its end, centred on its height), or in the top corner of a card without a header; none on a cover |
-| card width | container queries | a record footer puts its note on its own line below 30rem; `Card.Actions` drops under the text below 22rem (its buttons and links share the width, an icon-only button keeps its square; actions of icon buttons only stay beside the text) |
-| hover | `asChild`, a fine pointer | the fill stays (a whole surface never changes its fill, foundation §8); the shadow lifts to `--prime-shadow-overlay` over `fast` |
-| press | `asChild`, `:active` | the edges give in by `--prime-motion-press-distance` at any card size (the kit press) over `fast`; reduced motion keeps it still |
-| focus | `asChild`, `:focus-visible` | the focus ring outside the card |
-
-Without `asChild` a card is static: no hover, focus or press of its own. With it: `data-interactive` on the element.
+| size | `size`, the host tier | `data-size` and `data-frame` on the card (the same tier) |
+| selected | `selected` | `data-selected` and a 2 px accent ring inside the edge, over the cover too; `Card.Indicator` is checked; on an `asChild` element `aria-pressed`, or `aria-checked` with `role="radio"` / `role="checkbox"` |
+| pane | no `Card.Media`, `Card.Header`, `Card.Body` or `Card.Footer` straight inside | `data-bare`: padding 0, the content edge to edge and clipped to the corners |
+| cover | `Card.Media` | `data-cover="top" \| "start"` on the card, `data-placement` on the cover |
+| opens | a `Card.Link` in the title, or `asChild` | `data-link` / `data-interactive`: the card lifts on hover (`(hover: hover)` only), the title is underlined, the focus ring is drawn on the card |
+| one-line header | no `Card.Description` | `data-lines="one"` on the header: the controls share the title's centre line; a header with a description holds them at its top edge |
+| row mark | a one-line header with a `Switch.Root` in `Card.Actions` | `data-mark="row"`: the mark is a step smaller (24 · 24 · 32 · 40 · 48) |
+| edge mark | a `Card.Icon` in a header under a top cover | `data-edge`: the owner's avatar on the cover's edge, ringed with the card's fill |
+| folded badges | `Card.Badges` that do not fit once the title has given way | the rest fold into one «+N» badge |
+| narrow footer | the card is 20rem wide or less | the buttons of `Card.Actions` go under the start part and share the width |
+| surface | nesting | `data-depth` from the surfaces around; a card inside a card is a flat step |
 
 ## Layout & spacing
-- Cards on a page: one `Page.Grid` with a `Page.Cell span` per card (16 on both axes, the cards of a row share one height); a grid inside one block is the block's own intrinsic `auto-fill` grid on the tile width of the layout tokens (a lone card keeps its column width), gap `--prime-space-4`.
-- The zones go straight in `Card.Root`, in order: the card reads its layout from them. Radius `--prime-card-radius`, no border. The `Header` is a padded zone with a faint inset hairline below; a header with no `Body` or `List` under it (alone, or right before the `Footer`) has its bottom padding equal to its top (16).
-- Padding `--prime-card-padding-m` (20); a `Body` that opens the card (no `Header` or `Media` above) has it on all four sides, and so does a `Footer` under a hairline — a zone of its own, its buttons and total in its middle; `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
-- Content with no zone (a `Chat.Root`, a `ChatList.Root`) stands edge to edge and pads itself.
-- Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
-- In a `Header` the title takes the free width; `Card.Actions` stands at the end — its buttons, a switch, a period switch or a quiet caption, 8 apart, centred on each other. A `Card.Description` stacks under the title, 4 apart; the actions stay at the end, centred on both lines.
-- A `Card.Icon` in a `Header` leads the row, 12 before the title, centred on the title and the description: the accent tile, or the record's picture — an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own wrapper component, with no tile; it takes 40 px whatever size it was given — for a card about one person or object (a linked account, a contact). A `ProgressCircle` in it is the record's state ring (the term of a rental): no tile, 40 px like a picture (a ring `m`, whatever size it was given), and it keeps its name for assistive tech.
-- A record's footer: `Card.Total` at the end of the row holds the amount (title-m, tabular) with its `label` above it in a `tone` («к оплате 21 000 ₽», «оплачено»), both aligned to the end; a `Card.Description` is the note between the actions and the total — a `Badge.Dot` first, the text cut to one line; below 30rem of the card's width the note takes its own line above the actions and the total. `divider="fill"` sets the footer on its own fill instead of a line. Line items with amounts above it are a `DescriptionList align="end"` in a `Card.Body`. The actions lead from the start with or without a total, so the first payment never moves them.
-- The transition arrow of a card that opens stands at the end of its `Card.Header`, centred on the header's height (a two-line head with a picture or a ring included); the title keeps clear of it. Without a header it stands in the top corner, and the card hands its room to the content through `--corner-mark-room` (the title of a `Kpi` keeps clear of the arrow). A control inside a card that opens — a button, a Sparkline's plot (a slider) — stands above the stretched `Card.Link` and takes its own press. A cover draws no arrow: the picture is the cue, and in the corner the arrow would sit under the media.
-- A catalogue tile (a cover): `Card.Media` holds the record's `Carousel` (its status and plate as `Carousel.Overlay` badges), `Card.Header` the title and a one-line `Card.Description`, a `Card.Body` a `Badge.Group` of the record's other badges, `Card.Footer` its term — a line of text and a thin `ProgressBar`. The footer keeps to the bottom, so in a grid row every footer lines up whether a card has badges or not.
-- A narrow card (a phone): `Card.Actions` drops onto its own row under the text below 22rem and runs from the text column to the end edge: its buttons and links share the whole content width, an icon-only button keeps its square, and a Switch, a caption or a badge keeps its own size at the start. Actions of icon buttons only (an edit pencil) never drop: they stay beside the text.
-- Badges under the title of a record (its state, its deposit) go straight into the header's `Card.Description` — `Badge.Root` children or a `Badge.Group`, rendered by the kit or by your own component (an owner picker): the description sees a badge in its markup (`data-badge`), so they stand in a wrapping row, 8 apart, centred with any text beside them. The description is a `<div>`, so a `Badge.Group` inside it is valid markup.
-- A `Badge.Root` straight in a `Card.Title` («[У нас] 300 $») stands before or after the text on its line, centred on it, 8 apart (the gap of `Badge.Group`), at its own chip size; the text wraps in its own box. No space or wrapper of yours.
-- `Card.Link` is an `<a>` with `href`; a record that opens in place (a window, a drawer) takes `asChild` with a `<button>` — it stretches over the card the same way, with the same arrow and focus ring.
+Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the header row is `internal/headerRow`):
+
+| | `xs` | `s` | `m` | `l` | `xl` |
+|---|---|---|---|---|---|
+| padding | 12 | 16 | 20 | 24 | 28 |
+| radius | 12 | 12 | 16 | 16 | 16 |
+| zone gap (header · body) | 8 | 12 | 16 | 20 | 24 |
+| title | 13/16 | 13/16 | 14/20 | 16/24 | 18/24 |
+| description | 12/16 | 12/16 | 13/20 | 14/20 | 14/20 |
+| mark | 32 | 32 | 40 | 48 | 56 |
+| badges | `xs` 16 | `xs` 16 | `xs` 16 | `s` 20 | `s` 20 |
+| controls | `xs` 28 | `s` 32 | `m` 36 | `l` 40 | `xl` 48 |
+
+- The card is a surface of the depth ladder: no border, no lines inside; zones are parted by air. It fills its grid cell and, in a row, cards stretch to one height while the footer keeps to the bottom.
+- Nothing wraps. Every header line and every body row is one line cut with an ellipsis.
+- The header gives way in this order: the title shrinks to its own text or 8em, the extra buttons go into «Ещё» (the consumer's part), the value picker compacts, the badges fold into «+N».
+- The footer has no line and no fill; it stands off the content by the card padding (more than the zone gap). One thing at the start, up to two buttons at the end with the accent one last; `fullWidth` only when nothing stands at the start.
+- A header with a description holds its controls at the top; a one-line header, or a card that is only its header, centres them on the title line.
+- In `Card.Body` a `List` stands on the content edge: the body sets the public hook `--list-bleed` and the rows reach past the list's edges by their own padding, so their text lines up with the rest of the body.
+- The cover is the kit `Carousel`, edge to edge; the card's corners shape it. On the photo stand only the photo's things — dots, arrows, a video's length, a count of photos (`Carousel.Overlay`). The status and the price go to the header.
 
 ## Accessibility
 
@@ -227,60 +225,62 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 
 | Key | Action |
 |---|---|
-| `Tab` | A card with `asChild` is one stop: focus lands on the whole link or button. |
-| `Enter` · `Space` | Opens the link (`Enter`) or presses the button (`Enter`, `Space`) of a card with `asChild`. |
+| `Tab` | A card with `Card.Link` is one stop on the link; a card with `asChild` is one stop on its element; otherwise the stops are the controls in `Card.Actions`. |
+| `Enter` | Opens the card's link, or presses its button (`asChild`). |
+| `Space` | Presses the button of a card with `asChild` (a choice card). |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- With `asChild` the card is the link or button itself; its name is the text of its parts. Nothing interactive may sit inside it — put row actions next to the card instead.
-- `Card.Link` is the card's one tab stop: an `<a>` named by the title, or, through `asChild`, a `<button>` (the record opens in a window) with the same name; the arrow is `aria-hidden`.
-- `Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.
-- `Card.Title` renders `<h3>`; directly under the page title pass `as="h2"`.
-- Decorative icons in `Card.Icon` and cover images in `Card.Media` get `aria-hidden`; controls in `Card.Actions` need their own names.
+- `Card.Title` is a heading (`h3` by default, `as` picks the level); with `Card.Link` the link inside it names the card.
+- `Card.Link` stretches over the card with a pseudo-element, so the card is one link for a pointer and one tab stop for the keyboard; its focus ring is drawn on the card.
+- A choice card is `Card.Root` with `asChild` and `selected` around a `<button>`: it gets `aria-pressed`, or `aria-checked` with `role="radio"` (inside a `role="radiogroup"`) or `role="checkbox"`. The `selected` ring never carries the meaning alone.
+- `Card.Indicator` is `aria-hidden`: it repeats the state the element carries. A picture in `Card.Icon` is `aria-hidden` (it repeats the title), a `ProgressCircle` keeps its name.
+- The «·» after a `StatusDot` in `Card.Description` is `aria-hidden`; the state is the dot's word.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No `labels`.
+#### Card.Badges
+
+| Key | Default | Used for |
+|---|---|---|
+| `more` | `"+{count}"` | Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many. |
+| `moreCount` | `"Ещё {count}"` | What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip. |
 
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A company settings form on a card: a header, fields on the surface fill and the submit button in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. |
-| [sizes.tsx](examples/sizes.tsx) | A record card at every tier: the padding steps 16 · 20 · 24 and the button inside takes the tier, the text keeps its roles — `size`. |
-| [structure.tsx](examples/structure.tsx) | Which zones a card has and where its buttons go: a header with its actions, a body, a footer row of buttons, a list and a cover picture on top — `Card.Header`, `Card.Actions`, `Card.Body`, `Card.Footer`, `Card.List`, `Card.Media`. |
-| [marks.tsx](examples/marks.tsx) | Cards about one object in one two-line shape: its mark leads the header — a person's avatar, an icon tile, a term ring — its name stands over one secondary line and its action sits at the end — `Card.Icon`, `Avatar.Root`, `ProgressCircle`, `Card.Actions`. |
-| [actions.tsx](examples/actions.tsx) | Tasks of a rental with their assignee: the picker leads the line under the title, the actions stand at the end of the header — one secondary action as a labelled button beside the primary, or several gathered in one menu with the destructive one last — `Card.Actions`, `Card.Description`, `Badge.Avatar`, `action.more`. |
-| [link.tsx](examples/link.tsx) | Cards that open: a transport card that opens its record from anywhere and keeps its own button under a full-width line, a deposit card that opens its window in place, and a project tile that is itself the link — `Card.Link`, `asChild`, `Card.Footer`, `divider`. |
-| [record-totals.tsx](examples/record-totals.tsx) | A rental unit of a deal: its term ring leads the header beside the arrow, its state and deposit badges stand under the title, the line items with their amounts sit under a full-width line, and the footer on its own fill holds the action, the next task and the total with its state at the end — `Card.Icon`, `Card.Link`, `divider`, `Card.Description`, `Card.Total`, `label`, `tone`. |
-| [record-rows.tsx](examples/record-rows.tsx) | The deposits of a rental in one card: a row per deposit with its state badge and amount over one line of detail, the step's action and an edit button in its actions, and a return with a hold folding open under its row — `Card.List`, `Card.ListItem`, `Card.Actions`, `Card.ListItemContent`. |
-| [catalogue.tsx](examples/catalogue.tsx) | A fleet catalogue: each unit's photos are the cover, its status and plate stand on them, the model and the place sit under them, the other badges wrap, and the term with its bar keeps to the bottom of the card, which opens the unit as a whole, at the dense tier — `Card.Media`, `size`, `Card.Header`, `Card.Link`, `Card.Footer`. |
-| [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
-| [narrow.tsx](examples/narrow.tsx) | The card is a size container: below 22rem its header actions drop under the text and share the width, below 30rem the footer's note takes its own line above the total — `Card.Actions`, `Card.Total`. |
-| [screen.tsx](examples/screen.tsx) | A dashboard: the title with a line of data, the period switch and the report in the page's top bar; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `Page.TopBar`, `Page.Grid`. |
+| [overview.tsx](examples/overview.tsx) | A record card: the mark, the title with its badges, a status line, a more menu, label — value rows and the total with one accent button — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`. |
+| [sizes.tsx](examples/sizes.tsx) | The same record card on the five steps: padding, radius, mark, text and the controls step together — `size`. |
+| [structure.tsx](examples/structure.tsx) | The zones a card has: a header alone, a header and a body, all three with a footer, and a pane with no zone where a list stands edge to edge — `Card.Header`, `Card.Body`, `Card.Footer`. |
+| [header.tsx](examples/header.tsx) | What a header holds: four marks, badges that fold into a count on a narrow card, and controls by zone — a more menu alone with a footer, neutral buttons and a menu without one, a value picker — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. |
+| [link.tsx](examples/link.tsx) | Cards that open: a link in the title stretches over the card while its own button stays its own, and a whole card is one link when nothing inside is a control — `Card.Link`, `asChild`. |
+| [body.tsx](examples/body.tsx) | What the body holds: label — value rows, a list of records that open, a form on kit fields and an empty state — `DescriptionList`, `List`, `Input.Root`, `EmptyPage`. |
+| [long-list.tsx](examples/long-list.tsx) | A long list in a card: the scroller shows six rows, loads the next batch near its end and holds the place of the new rows with skeleton lines — `ScrollContainer`, `onReachEnd`, `Skeleton`. |
+| [footer.tsx](examples/footer.tsx) | What the footer holds: the total and two buttons with the accent one last, an assignee picker as tall as the button beside it, and buttons that share the width with nothing at the start — `Card.Total`, `Select.Root`, `fullWidth`. |
+| [cover.tsx](examples/cover.tsx) | A cover is the kit's carousel: on top with the owner's avatar on its edge, a column at the start, and a cover that is still loading — `Card.Media`, `placement`, `ratio`, `dots`, `loading`. |
+| [choice.tsx](examples/choice.tsx) | Cards that are a choice: one tariff of three in a group of pressed buttons, and any number of extras, each card a button with its mark at the end — `Card.Indicator`, `selected`, `asChild`. |
+| [switch.tsx](examples/switch.tsx) | A switch in a card: one setting is a one-line card with the switch at its end, several settings are a group card with a more menu in the header and a switch per row — `Switch.Root`, `fullWidth`, `Card.Actions`. |
+| [narrow.tsx](examples/narrow.tsx) | On a narrow card nothing wraps: the title gives way and the badges fold into a count, the footer buttons go under the total and share the width — `Card.Title`, `Card.Badges`, `Card.Footer`, `Card.Actions`. |
+| [screen.tsx](examples/screen.tsx) | An orders page of cards: the title with its line of data, the status filter and the new-order button in the top bar, one grid of record cards that cross-fades when the filter changes and loads as skeleton cards of the same geometry — `Page.TopBar`, `Crossfade`, `Skeleton`, `Card.Link`. |
 
 ## Mistakes
-- A `<div>` with a border styled as a card → use `Card.Root`; depth comes from fill, not lines.
-- Wrapping every page section in a card → use `Page.Section`.
-- A KPI laid out by hand in a card (a label, a big number, a change in your own spans) → `Kpi.Root`.
-- Buttons, a switch or a caption straight in `Card.Header` after the title → wrap them in `Card.Actions`.
-- Buttons scattered in `Card.Body` → the card's actions live in `Card.Actions` (at the top) or `Card.Footer` (at the bottom).
-- Custom padding on `Card.Root` → padding belongs to `Header` / `Body` / `Footer`.
-- Zones wrapped in your own `<div>` inside the root → the zones go straight in `Card.Root`: it reads its layout from them.
-- An avatar, a name and a handle hand-laid in `Card.Body` with a button beside them → `Card.Header` with `Card.Icon` (the `Avatar.Root`), `Card.Title`, `Card.Description` and `Card.Actions`.
-- A chart SVG with only a `viewBox` → give it a CSS height.
-- A trend with its total in a card of your own → a `Kpi` with the `Sparkline` in `Kpi.Media`; a chart with a legend and states → `ChartFrame`.
-- A clickable `<div>` card with `onClick` → `asChild` with a real `<a href>` (Cmd-click, a new tab) or a `<button>`.
-- Buttons or links inside an `asChild` card → nested interactive elements; use `Card.Link` instead.
-- Your own bottom padding on a `Card.Header` with nothing under it → the kit pads a lone header, and one right before the `Footer`, as at its top.
-- A `?modal=…` link to open a window from a card → `Card.Link asChild` with a `<button>`.
-- A hand-laid grid of action, task and total in `Card.Footer` → the Button, a `Card.Description` (with a `Badge.Dot`) and a `Card.Total` straight in the footer.
-- A total's state and amount in your own spans → `Card.Total label tone`.
-- Badges in the header's `Card.Description` spaced by hand or wrapped in your own row → the badges straight in the description.
-- A space or a flex wrapper of your own between a Badge and the text in a `Card.Title` → the Badge straight beside the text: the kit sets the gap.
-- A footer painted with your own background → `Card.Footer divider="fill"`.
+- A badge beside a button in the header, or an accent button in the header → the header holds `Card.Badges` after the title and neutral controls; the accent button stands last in the footer.
+- Badges under the title or at the right of the card → `Card.Badges`, on the title's line.
+- Lines between the zones, a divider in the footer, a filled footer → air only; the zones are parted by the zone gap and the footer by the card padding.
+- A hand-made photo (an `<img>`, a gradient box) as the cover → `Card.Media` with a `Carousel`, even for one photo.
+- A status or a price on the photo → the status in `Card.Badges`, the price in the header or `Card.Total`; the photo carries only dots, arrows, a video's length, a count of photos.
+- A pencil or buttons on a record row of a list → the row opens as a whole, its value stands at the end; edit in the opened record.
+- A state badge inside the description (`Badge.Dot` beside the text) → a `StatusDot` first in `Card.Description`.
+- A list drawn from ghost buttons or a stack of cards per record → a `List` in `Card.Body`.
+- A switch beside «Ещё» in one row, in a header with a description, or in the footer → one switch is a one-line card with the switch in `Card.Actions`; several are a group card with `Switch.Root fullWidth` rows.
+- A choice card whose inside holds buttons → the card is the `<button>` (`asChild`, `selected`) with `Card.Indicator`; controls go beside it.
+- A KPI laid out by hand in a card → [Kpi](../kpi/COMPONENT.md).
+- A wrapped title, description or row → shorten the text; the card keeps one line and cuts it.
+- Different sizes of cards in one row → one size per row.
+- Skeletons of an unlike shape while a grid loads → skeleton cards of the same geometry, cross-faded with the data (`Crossfade`).
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`Badge.Dot` of a footer note), `Icon` (the transition arrow), `internal/rowLink` (the stretched link), `internal/mediaSlot` (a record's Avatar, Thumbnail or ProgressCircle in `Card.Icon`), `internal/Disclosure` (the folding row zone), `internal/parts` (the dot of a footer note)
-- **See also:** [Kpi](../kpi/COMPONENT.md) (a card about one figure), [Page](../../layout/page/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [ChartFrame](../chart-frame/COMPONENT.md) (a full chart with legend and states)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`Card.Badges` is a `Badge.Group`), [Checkbox](../checkbox/COMPONENT.md) and [Radio](../radio/COMPONENT.md) (the marks of `Card.Indicator`), [StatusDot](../status-dot/COMPONENT.md) (the state in the description), [Switch](../switch/COMPONENT.md) (its presence in `Card.Actions` shrinks the mark), `internal/iconBox` (the icon tile), `internal/mediaSlot` (the picture or ring in `Card.Icon`), `internal/surfaceDepth` (the surface), `internal/surfaceFrame` (the metrics per step, title and description roles), `internal/headerRow` (the header row: mark, title with badges, description, controls), `internal/press` (the card that is one element), `internal/rowLink` (the stretched `Card.Link`), `internal/textRole`, `internal/textTone`
+- **See also:** [Kpi](../kpi/COMPONENT.md), [Carousel](../carousel/COMPONENT.md) (the cover), [List](../list/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md), [Page](../../layout/page/COMPONENT.md) (`Page.Section`, `Page.Grid` for a row of cards), [Kanban](../kanban/COMPONENT.md)

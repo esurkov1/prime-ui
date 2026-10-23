@@ -22,13 +22,6 @@ export const api: ComponentApi = {
           ru: "`start` — как шапка Modal (плитка слева, текст справа); `center` — круглый логотип над текстом по центру.",
         },
         {
-          name: "flat",
-          type: "boolean",
-          default: "false",
-          en: "Removes the card shadow (inside a Modal or on a plain page). No border either way.",
-          ru: "Убирает тень карточки (внутри Modal или на простой странице).",
-        },
-        {
           name: "className",
           type: "string",
           en: "Class on the card.",

@@ -37,7 +37,7 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"caption" \| "body-s" \| "body-m" \| "body-l" \| "title-s" \| "title-m" \| "title-l" \| "heading-s" \| "heading-m" \| "heading-l" \| "display-s" \| "display-m" \| "display-l" \| "code"` | — (required) | Text role: size, line height, weight and tracking. |
+| `variant` | `"caption" \| "body-s" \| "body-m" \| "body-l" \| "title-xs" \| "title-s" \| "title-m" \| "title-l" \| "heading-s" \| "heading-m" \| "heading-l" \| "display-s" \| "display-m" \| "display-l" \| "code"` | — (required) | Text role: size, line height, weight and tracking. |
 | `tone` | `"default" \| "secondary" \| "muted" \| "accent" \| "success" \| "warning" \| "danger"` | `"default"` | Text color by meaning; `default` is primary text. |
 | `as` | `"p" \| "span" \| "div" \| "h1" \| "h2" \| "h3" \| "h4" \| "h5" \| "h6" \| "small" \| "blockquote" \| "article" \| "section" \| "header" \| "footer" \| "aside" \| "nav" \| "main"` | `"p"` | The element, by the page outline; the role keeps the look. |
 | `weight` | `"regular" \| "medium" \| "semibold"` | — | Overrides the role's weight. |
@@ -56,7 +56,7 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 |---|---|---|---|
 | `display-l` · `display-m` · `display-s` | 60/68 · 48/56 · 36/44, 600 | hero numbers, promo | |
 | `heading-l` · `heading-m` · `heading-s` | 30/36 · 24/32 · 20/28, 600 | page titles and subtitles | |
-| `title-l` · `title-m` · `title-s` | 18/24 · 16/24 · 14/20, 600 | block, dialog and card titles | |
+| `title-l` · `title-m` · `title-s` · `title-xs` | 18/24 · 16/24 · 14/20 · 13/16, 600 | block, dialog and card titles (a surface's title by its size) | |
 | `body-l` · `body-m` · `body-s` | 16/24 · 14/20 · 13/20, 400 | reading text, interface text, dense secondary text | |
 | `caption` | 12/16, 400 | hints, meta, table heads | |
 | `code` | 13/20, mono | identifiers, inline code | |

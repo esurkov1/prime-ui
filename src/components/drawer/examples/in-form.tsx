@@ -41,7 +41,7 @@ export default function DrawerInFormExample() {
         <Drawer.Body>
           <form id={formId} noValidate onSubmit={submit}>
             <Fieldset>
-              <Input.Root label="Название" required error={error} reserveSupportRow>
+              <Input.Root label="Название" required error={error}>
                 <Input.Wrapper>
                   <Input.Field
                     name="name"

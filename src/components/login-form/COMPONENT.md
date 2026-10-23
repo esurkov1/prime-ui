@@ -7,7 +7,7 @@
 
 ## When to use
 - The one auth screen of a product: sign-in, sign-up, an invite (set a password by a link), a password reset and a one-time code are its modes (`/login?invite=…`), each the same card with another header and form — never a page of its own per mode.
-- The same flow inside a [Modal](../modal/COMPONENT.md) (`flat`) when sign-in is opened over a page.
+- The same flow inside a [Modal](../modal/COMPONENT.md) (it sits on the next depth of the ladder, so the card stays flat) when sign-in is opened over a page.
 - Any short authentication step where one card holds a header, optional provider buttons, 1–5 fields and one primary action.
 
 ## When not to use
@@ -47,7 +47,6 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of padding, gaps and text roles; every field and button inside without its own `size` takes it. Without it the form takes the tier of a sized host (a Modal). |
 | `align` | `"start" \| "center"` | `"start"` | `start` — the Modal header layout (rounded accent tile left, title over description right); `center` — a round logo above centered text. |
-| `flat` | `boolean` | `false` | Removes the card shadow (inside a Modal or on a plain page). No border either way. |
 | `className` | `string` | — | Class on the card. |
 | `children` | `ReactNode` | — | The parts: Header, Body. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
@@ -130,10 +129,13 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` / `s` | padding 16, gap 24, field gap 16, title-s / title-m | inside a Modal or a narrow popover | |
-| `m` | padding 24, gap 32, field gap 20, title-l | a regular sign-in page | the host tier, else `m` |
-| `l` | padding 32, gap 40, field gap 20, heading-s | a standalone sign-in screen on a wide canvas | |
-| `xl` | padding 40, gap 40, field gap 24, heading-m | marketing-grade sign-in, touch-first | |
+| `xs` | padding 12, gap 24, field gap 16, 32 tile, 13/16 title | a narrow popover | |
+| `s` | padding 16, gap 24, field gap 16, 40 tile, 13/16 title | inside a Modal | |
+| `m` | padding 20, gap 32, field gap 20, 48 tile, 14/20 title | a regular sign-in page | the host tier, else `m` |
+| `l` | padding 24, gap 40, field gap 20, 56 tile, 16/24 title | a standalone sign-in screen on a wide canvas | |
+| `xl` | padding 28, gap 40, field gap 24, 64 tile, 18/24 title | marketing-grade sign-in, touch-first | |
+
+The padding, the tile, and the `start` title and description follow the surface frame of the tier; a `center` header keeps its own larger title scale.
 
 **Sizes:** every field and button inside (Input, DigitInput, Checkbox, Button, LinkButton…) takes the Root `size` unless it sets its own.
 
@@ -142,11 +144,6 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 |---|---|---|---|
 | `start` | accent icon tile on the left, title over description to its right, left-aligned footer | every auth screen of a product and sign-in over a page: the tile holds the icon of the action (`action.login`), the title names it | yes |
 | `center` | round logo, centered title, description and footer | a public brand page outside the product, where the mark is the point | |
-
-### Flags
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| `flat` | card fill, no shadow | inside a Modal or any other surface | `false` |
 
 **Combinations**
 - Recommended: one `size` on Root only (fields and buttons follow it); `hint` / `error` on fields for validation; a refused sign-in as `invalid` on the e-mail and the reason in words as the password field's `error` («Неверная почта или пароль»).
@@ -161,7 +158,7 @@ LoginForm has no state of its own. Compose them:
 | field error | `error` / `invalid` on `Input.Root`, `error` on `DigitInput` | `aria-invalid`, the error under the field |
 | refused sign-in | `invalid` on the e-mail, `error` with the reason on the password (both shake once) | `aria-invalid` on the fields; the error in the password's support row, announced by its live region |
 
-Root carries `data-size`, `data-align` and `data-flat`.
+Root carries `data-size`, and `data-align`.
 
 ## Layout & spacing
 - header → body `--prime-space-8` (gap on Root); provider buttons → divider → form `--prime-space-4`; field → field → submit `--prime-space-5`; submit → back action `--prime-space-3`; form → footer `--prime-space-6`.
@@ -197,7 +194,7 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a header that names the action: its icon tile on the left, the title and one line beside it — `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Padding, gaps and text roles of the card follow the tier; the fields and buttons take the same one — `size`. |
-| [structure.tsx](examples/structure.tsx) | The minimal form: no logo, description or footer, no shadow for a host that already is a surface and a second-level title under the host page's own heading — `flat`, `as`. |
+| [structure.tsx](examples/structure.tsx) | The minimal form: no logo, description or footer, a second-level title under the host page's own heading — `as`. |
 | [register.tsx](examples/register.tsx) | Sign-up: four fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. |
 | [forgot-password.tsx](examples/forgot-password.tsx) | Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. |
 | [reset-password.tsx](examples/reset-password.tsx) | A new password after the e-mail link: a strength meter on the first field and a mismatch error under the second one — `strength`, `error`. |
@@ -212,7 +209,7 @@ No `labels`.
 - A product mark centred over the title on the product's own sign-in → `align="start"` (the default) with the action's icon in `LoginForm.Logo`.
 - A separate page for an invite or a reset → a mode of the auth screen, the same card.
 - A placeholder instead of a field label → pass `label` to the field.
-- A Card around LoginForm → the root already is the card; use `flat` inside another surface.
+- A Card around LoginForm → the root already is the card; inside another surface it stands one depth up automatically.
 - Repeating the card `size` on every field and button → set it once on Root; fields and buttons follow it.
 
 ## Related

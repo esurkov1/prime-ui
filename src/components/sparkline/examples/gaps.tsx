@@ -26,8 +26,8 @@ export default function SparklineGapsExample() {
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Запросы к API в день</Kpi.Title>
-      <Kpi.Period>{requests.date}</Kpi.Period>
       <Kpi.Value>{requests.valueText}</Kpi.Value>
+      <Kpi.Period>{requests.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline {...requests.plot} label="Запросы по дням" />
       </Kpi.Media>

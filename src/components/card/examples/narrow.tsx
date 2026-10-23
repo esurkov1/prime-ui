@@ -1,44 +1,45 @@
-/** The card is a size container: below 22rem its header actions drop under the text and share the width, below 30rem the footer's note takes its own line above the total — `Card.Actions`, `Card.Total`. */
-import { Badge, Button, Card, Icon } from "prime-ui-kit";
+/** On a narrow card nothing wraps: the title gives way and the badges fold into a count, the footer buttons go under the total and share the width — `Card.Title`, `Card.Badges`, `Card.Footer`, `Card.Actions`. */
+import { Badge, Button, Card, DescriptionList, Icon, StatusDot } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const WIDTHS = [
-  { id: "narrow", className: styles.w18 },
-  { id: "wide", className: styles.w40 },
-];
-
 export default function CardNarrowExample() {
   return (
-    <div className={styles.stack}>
-      {WIDTHS.map((width) => (
-        <div key={width.id} className={width.className}>
-          <Card.Root>
-            <Card.Header>
-              <Card.Icon>
-                <Icon name="object.receipt" />
-              </Card.Icon>
-              <Card.Title>Счёт № 4821</Card.Title>
-              <Card.Description>ООО «Мостострой» · до 15 окт</Card.Description>
-              <Card.Actions>
-                <Button.Root variant="soft" tone="neutral">
-                  Отправить
-                </Button.Root>
-              </Card.Actions>
-            </Card.Header>
-            <Card.Footer divider="fill">
-              <Button.Root>Оплачен</Button.Root>
-              <Card.Description>
-                <Badge.Dot color="yellow" />
-                Напомнить 14 окт
-              </Card.Description>
-              <Card.Total label="к оплате" tone="warning">
-                248 000 ₽
-              </Card.Total>
-            </Card.Footer>
-          </Card.Root>
-        </div>
-      ))}
+    <div className={styles.phone}>
+      <Card.Root>
+        <Card.Header>
+          <Card.Icon>
+            <Icon name="object.truck" />
+          </Card.Icon>
+          <Card.Title>Поставка № 318 на склад «Север»</Card.Title>
+          <Card.Badges>
+            <Badge.Root tone="warning">Срочно</Badge.Root>
+            <Badge.Root>Опт</Badge.Root>
+            <Badge.Root>Холодильник</Badge.Root>
+            <Badge.Root>Хрупкое</Badge.Root>
+          </Card.Badges>
+          <Card.Description>
+            <StatusDot tone="warning">Ждёт приёмки</StatusDot>9 окт., ООО «Северный ветер»
+          </Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <DescriptionList.Root align="end">
+            <DescriptionList.Item label="Водитель">Сергей Орлов</DescriptionList.Item>
+            <DescriptionList.Item label="Паллет">14</DescriptionList.Item>
+          </DescriptionList.Root>
+        </Card.Body>
+        <Card.Footer>
+          <Card.Total label="Стоимость" tone="warning">
+            184 500 ₽
+          </Card.Total>
+          <Card.Actions>
+            <Button.Root variant="soft" tone="neutral">
+              Накладная
+            </Button.Root>
+            <Button.Root>Принять</Button.Root>
+          </Card.Actions>
+        </Card.Footer>
+      </Card.Root>
     </div>
   );
 }

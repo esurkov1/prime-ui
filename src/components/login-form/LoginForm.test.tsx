@@ -67,20 +67,12 @@ describe("LoginForm", () => {
     expect(screen.getByRole("img", { name: "Маршрут" })).toBeInTheDocument();
   });
 
-  it("sets data-size (default m) and data-flat on the root", () => {
+  it("sets data-size (default m) on the root", () => {
     const { rerender } = render(<Sample />);
     expect(screen.getByTestId("root")).toHaveAttribute("data-size", "m");
-    expect(screen.getByTestId("root")).toHaveAttribute("data-flat", "false");
 
     rerender(<Sample size="l" />);
     expect(screen.getByTestId("root")).toHaveAttribute("data-size", "l");
-
-    rerender(
-      <LoginForm.Root flat data-testid="root">
-        <LoginForm.Title>x</LoginForm.Title>
-      </LoginForm.Root>,
-    );
-    expect(screen.getByTestId("root")).toHaveAttribute("data-flat", "true");
   });
 
   it("takes the tier of a sized host without its own size", () => {
@@ -105,9 +97,9 @@ describe("LoginForm", () => {
 
   it("changes the title text role with the size", () => {
     const { rerender } = render(<Sample size="s" />);
-    const small = screen.getByRole("heading").getAttribute("data-variant");
+    const small = screen.getByRole("heading").className;
     rerender(<Sample size="xl" />);
-    expect(screen.getByRole("heading").getAttribute("data-variant")).not.toBe(small);
+    expect(screen.getByRole("heading").className).not.toBe(small);
   });
 
   it("submits through Enter and the submit button, with typed values", () => {

@@ -136,8 +136,8 @@ export const api: ComponentApi = {
           name: "variant",
           type: '"plain" | "line" | "well"',
           default: '"plain"',
-          en: "No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues).",
-          ru: "Без подложек: `plain` — шапка-плашка с фоном над карточками, `line` — шапка над тонкой линией; карточки стоят на фоне. `well`: каждая колонка — залитая подложка с карточками (ограниченные очереди).",
+          en: "No wells: `plain` — a filled header plate over the cards, `line` — a bare header with no plate; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues).",
+          ru: "Без подложек: `plain` — шапка-плашка с фоном над карточками, `line` — шапка без плашки; карточки стоят на фоне. `well`: каждая колонка — залитая подложка с карточками (ограниченные очереди).",
         },
         {
           name: "loading",
@@ -209,8 +209,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemTitle",
-      en: "`ref` → `HTMLSpanElement`. The card title: medium body text, up to three lines. With a tail — `number`, an `Avatar.Root` child (the owner, also inside a fragment) — one row: the name cut with an ellipsis, then the number, the owner last; the tail never shrinks.",
-      ru: "Заголовок карточки: средний текст, до трёх строк. С хвостом — `number`, дочерний `Avatar.Root` (ответственный, в том числе внутри фрагмента) — одна строка: имя обрезается многоточием, затем номер, ответственный последним; хвост не сжимается.",
+      en: "`ref` → `HTMLSpanElement`. The card title: one line, cut with an ellipsis; the badges share its line. With a tail — `number`, an `Avatar.Root` child (the owner) — one row: the name, the number, the owner last; the tail never shrinks.",
+      ru: "Заголовок карточки: одна строка с многоточием; бейджи — в его строке. С хвостом — `number`, дочерний `Avatar.Root` (ответственный, в том числе внутри фрагмента) — одна строка: имя обрезается многоточием, затем номер, ответственный последним; хвост не сжимается.",
       props: [
         {
           name: "number",
@@ -228,8 +228,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemDescription",
-      en: "`ref` → `HTMLSpanElement`. The muted meta line under the title: id, due date; one line, tabular numbers.",
-      ru: "Приглушённая строка меты под заголовком: id, срок; одна строка, моноширинные цифры.",
+      en: "`ref` → `HTMLSpanElement`. The muted line under the title: id, due date; one line; a `StatusDot` first states the state.",
+      ru: "Приглушённая строка под заголовком: id, срок; одна строка, `StatusDot` первым задаёт состояние.",
       props: [
         {
           name: "…rest",
@@ -241,8 +241,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemBadges",
-      en: "`ref` → `HTMLDivElement`. A wrapping row of `Badge`s (a `Badge.Group`): labels, priority.",
-      ru: "Строка `Badge` с переносом (`Badge.Group`): метки, приоритет.",
+      en: "`ref` → `HTMLDivElement`. The `Badge`s after the title, on its line (a `Badge.Group`): labels, priority; what does not fit folds into «+N».",
+      ru: "`Badge` после заголовка, в его строке (`Badge.Group`): метки, приоритет; что не поместилось, сворачивается в «+N».",
       props: [
         {
           name: "…rest",
@@ -280,8 +280,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.ItemSection",
-      en: "`ref` → `HTMLDivElement`. A zone of a card, a group of its parts: zones stand `space-3` off a faint line between them, parts inside one `space-2` apart. A zone with nothing in it is not drawn and leaves no line.",
-      ru: "Зона карточки, группа её частей: зоны стоят на `space-3` от еле видимой линии между ними, части внутри — через `space-2`. Пустая зона не рисуется и не оставляет линию.",
+      en: "`ref` → `HTMLDivElement`. A zone of a card, a group of its parts: zones stand the frame's zone gap apart with no line, parts inside one `space-2` apart. A zone with nothing in it is not drawn.",
+      ru: "Зона карточки, группа её частей: зоны стоят друг от друга на отступ рамки, без линии, части внутри — через `space-2`. Пустая зона не рисуется.",
       props: [
         {
           name: "…rest",

@@ -1,15 +1,18 @@
 import * as React from "react";
+import { Badge, type BadgeGroupProps } from "@/components/badge/Badge";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { hasContent } from "@/internal/hasContent";
+import { HeaderLineContent, headerRowStyles, useTitleFloor } from "@/internal/headerRow";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import palette from "@/internal/palette.module.css";
-import { isPart, splitParts } from "@/internal/parts";
+import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { press } from "@/internal/press";
 import { slotChild } from "@/internal/slot";
-import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
+import { type ControlSize, type PaletteColor, type Tone, tierMappings } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
 import { touchTargetRowClass } from "@/internal/touchTarget";
@@ -167,10 +170,29 @@ function TimelineItem({
   // share a grid cell; the value keeps its own column.
   const content = (parts: React.ReactNode) => {
     const { parts: value, rest: text } = splitParts(parts, TimelineItemValue);
+    // The badges join the title on its line.
+    const nodes = flattenChildren(text) as React.ReactNode[];
+    const badges = nodes.find((node) => isPart(node, TimelineItemBadges));
+    const titleAt = nodes.findIndex((node) => isPart(node, TimelineItemTitle));
+    const lines =
+      badges && titleAt >= 0
+        ? nodes.flatMap<React.ReactNode>((node, index) =>
+            node === badges
+              ? []
+              : index === titleAt
+                ? [
+                    <span key="title-row" className={headerRowStyles.titleRow}>
+                      <BadgedTitleContext value={true}>{node}</BadgedTitleContext>
+                      {badges}
+                    </span>,
+                  ]
+                : [node],
+          )
+        : text;
     return (
       <>
         {dot}
-        <span className={styles.text}>{text}</span>
+        <span className={styles.text}>{lines}</span>
         {value}
       </>
     );
@@ -230,15 +252,58 @@ type SpanPartProps = {
 
 export type TimelineItemTitleProps = SpanPartProps;
 
-/** First line: the event. Medium, primary (accent on the highlighted row); wraps when narrow. */
-function TimelineItemTitle({ children, className, ...rest }: TimelineItemTitleProps) {
+/** The title shares its line with `Timeline.ItemBadges`. */
+const BadgedTitleContext = React.createContext(false);
+
+/**
+ * First line: the event. Medium, primary (accent on the highlighted row), one line cut with an
+ * ellipsis. Beside `Timeline.ItemBadges` it gives way first, down to its text or 8em.
+ */
+function TimelineItemTitle({ children, className, ref, ...rest }: TimelineItemTitleProps) {
+  const badged = React.useContext(BadgedTitleContext);
+  if (badged)
+    return (
+      <BadgedTitle {...rest} ref={ref} className={className}>
+        {children}
+      </BadgedTitle>
+    );
   return (
-    <span {...rest} className={cx(styles.title, className)}>
+    <span {...rest} ref={ref} className={cx(styles.title, className)}>
       {children}
     </span>
   );
 }
 TimelineItemTitle.displayName = "Timeline.ItemTitle";
+
+function BadgedTitle({ children, className, ref, ...rest }: TimelineItemTitleProps) {
+  const own = React.useRef<HTMLSpanElement>(null);
+  const merged = useMergedRefs(own, ref);
+  useTitleFloor(own);
+  return (
+    <span {...rest} ref={merged} className={cx(styles.title, styles.badged, className)}>
+      {children}
+    </span>
+  );
+}
+
+export type TimelineItemBadgesProps = Omit<BadgeGroupProps, "size" | "overflow">;
+
+/**
+ * The badges after the title, on its line: one container for every badge of the event (a status,
+ * a kind — the meaning is the badge's `tone` or `color`). What does not fit folds into «+N».
+ */
+function TimelineItemBadges({ className, ...rest }: TimelineItemBadgesProps) {
+  const size = useControlSize(undefined);
+  return (
+    <Badge.Group
+      {...rest}
+      size={tierMappings.cardBadges[size]}
+      overflow="count"
+      className={cx(headerRowStyles.badges, className)}
+    />
+  );
+}
+TimelineItemBadges.displayName = "Timeline.ItemBadges";
 
 /** `Timeline.ItemMeta` inside `Timeline.ItemValue` is the value's second line. */
 const ValueContext = React.createContext(false);
@@ -254,7 +319,7 @@ function TimelineItemMeta({ children, className, ...rest }: TimelineItemMetaProp
   const inValue = React.useContext(ValueContext);
   return (
     <span {...rest} className={cx(inValue ? styles.valueMeta : styles.meta, className)}>
-      {children}
+      {inValue ? children : <HeaderLineContent>{children}</HeaderLineContent>}
     </span>
   );
 }
@@ -332,6 +397,7 @@ export const Timeline = {
   Group: TimelineGroup,
   Item: TimelineItem,
   ItemTitle: TimelineItemTitle,
+  ItemBadges: TimelineItemBadges,
   ItemMeta: TimelineItemMeta,
   ItemValue: TimelineItemValue,
   Gap: TimelineGap,

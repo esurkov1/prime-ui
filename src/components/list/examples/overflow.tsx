@@ -25,21 +25,19 @@ export default function ListOverflowExample() {
   return (
     <Card.Root className={styles.pane}>
       <ScrollContainer className={styles.scroll}>
-        <Card.Body>
-          <List.Root aria-label="Обращения">
-            {TICKETS.map((ticket) => (
-              <List.Item
-                key={ticket.id}
-                current={ticket.id === ticketId}
-                onClick={() => setTicketId(ticket.id)}
-              >
-                <List.ItemText>{ticket.subject}</List.ItemText>
-                <List.ItemDescription>{ticket.client}</List.ItemDescription>
-                <List.ItemMeta>№ {ticket.id}</List.ItemMeta>
-              </List.Item>
-            ))}
-          </List.Root>
-        </Card.Body>
+        <List.Root aria-label="Обращения">
+          {TICKETS.map((ticket) => (
+            <List.Item
+              key={ticket.id}
+              current={ticket.id === ticketId}
+              onClick={() => setTicketId(ticket.id)}
+            >
+              <List.ItemText>{ticket.subject}</List.ItemText>
+              <List.ItemDescription>{ticket.client}</List.ItemDescription>
+              <List.ItemMeta>№ {ticket.id}</List.ItemMeta>
+            </List.Item>
+          ))}
+        </List.Root>
       </ScrollContainer>
     </Card.Root>
   );

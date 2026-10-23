@@ -66,7 +66,7 @@ export default function MessageKindsExample() {
       </Message.Root>
       <Message.Root direction="outgoing" time="09:19" status="read">
         <Message.Contact name="Дмитрий Орлов" phone="+7 916 204-18-77" color="teal">
-          <Button.Root variant="soft" tone="neutral" size="s">
+          <Button.Root variant="soft" tone="neutral">
             Написать
           </Button.Root>
         </Message.Contact>

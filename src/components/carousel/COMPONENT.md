@@ -154,11 +154,11 @@ Carousel.Root          <section aria-roledescription="карусель">, the bo
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Five photos of a scooter in one 4 : 3 box: swipe, the arrows on hover or a dot — `items`, `ratio`, `arrows`. |
 | [states.tsx](examples/states.tsx) | The record still loading, a single photo (no dots), a photo that failed, no photos at all and the dots left out — `loading`, `items`, `dots`. |
-| [card-cover.tsx](examples/card-cover.tsx) | A vehicle card with the photos as its cover: the car's badges stand still in the four corners, a photo's own note and a video's length travel with their slide, and a press opens the photo full-screen — `Carousel.Overlay`, `placement`, `renderOverlay`, `onItemOpen`. |
+| [card-cover.tsx](examples/card-cover.tsx) | A vehicle card with the photos as its cover: only the photo's own things stand on it — the count of photos, a photo's note and a video's length travelling with their slide — while the status goes to the header, and a press opens the photo full-screen — `Carousel.Overlay`, `placement`, `renderOverlay`, `onItemOpen`. |
 | [scrub.tsx](examples/scrub.tsx) | A catalogue of scooters: moving the mouse across a card's cover runs through its photos, leaving the card shows the first again — `scrub`. |
 | [video.tsx](examples/video.tsx) | A bike with a short looping clip first, muted and playing while it is in view, and a walkaround video among the photos — `type`, `autoPlay`, `loop`, `poster`. |
 | [controlled.tsx](examples/controlled.tsx) | The photo shown lives in the screen: the thumbnails under the carousel pick it, the caption follows every swipe, around the ends too — `index`, `onIndexChange`, `loop`. |
-| [narrow.tsx](examples/narrow.tsx) | A listing card in a phone-wide column: the box follows the column, the dots and the corners stay clear of each other — `ratio`, `Carousel.Overlay`. |
+| [narrow.tsx](examples/narrow.tsx) | A listing card in a phone-wide column: the box follows the column, the dots and the photo count stay clear of each other while the price stands in the footer — `ratio`, `Carousel.Overlay`. |
 
 ## Mistakes
 - An `<img>` with a hand-made swipe or `scroll-snap` row → `Carousel.Root` with `items`.

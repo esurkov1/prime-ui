@@ -18,7 +18,7 @@ export default function ColorSwatchesInFormExample() {
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
       <Fieldset>
-        <Input.Root label="Название события" required error={titleError} reserveSupportRow>
+        <Input.Root label="Название события" required error={titleError}>
           <Input.Wrapper>
             <Input.Field
               name="title"

@@ -49,7 +49,8 @@
  * (a kit `Icon`) takes the m icon size from `--prime-icon-size`.
  *
  * A tile that grows with its host (the mark of an empty state) takes the host tier in
- * `data-size`: xs 32 · s 40 · m 48 · l 56 · xl 64, with the glyph and the radius to match.
+ * `data-size`: xs 32 · s 40 · m 48 · l 56 · xl 64, with the glyph and the radius to match; `2xs`
+ * 24 is the mark of a one-line card row (a Card with a switch).
  */
 .tile {
   --prime-icon-size: var(--prime-icon-m);
@@ -66,6 +67,12 @@
   /* The fill and the glyph colour of the role travel as one pair. */
   background: var(--icon-tile-fill, var(--prime-color-fill-muted));
   color: var(--icon-tile-ink, var(--prime-color-text-secondary));
+}
+
+.tile[data-size="2xs"] {
+  --prime-icon-size: var(--prime-icon-xs);
+  --icon-tile-box: var(--prime-space-6);
+  --icon-tile-radius: var(--prime-radius-s);
 }
 
 .tile[data-size="xs"] {

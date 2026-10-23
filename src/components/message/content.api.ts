@@ -88,8 +88,8 @@ export const contentParts: ApiPart[] = [
   },
   {
     name: "Message.Location",
-    en: "`ref` → `HTMLDivElement`. A place in one card width: a 16 : 9 map picture edge to edge at the top of the bubble (its box is final before it loads) with an accent pin, the place and its address under it; `live` makes the pin breathe and adds a «Трансляция» badge.",
-    ru: "Место шириной карточки: картинка карты 16 : 9 от края до края вверху пузыря (её рамка известна до загрузки) с акцентной меткой, название и адрес под ней; `live` заставляет метку «дышать» и добавляет значок «Трансляция».",
+    en: "`ref` → `HTMLDivElement`. A place in one card width: a 16 : 9 map picture edge to edge at the top of the bubble (its box is final before it loads) with an accent pin, the place and its address under it; `live` makes the pin breathe and adds a «Трансляция» `StatusDot`.",
+    ru: "Место шириной карточки: картинка карты 16 : 9 от края до края вверху пузыря (её рамка известна до загрузки) с акцентной меткой, название и адрес под ней; `live` заставляет метку «дышать» и добавляет `StatusDot` «Трансляция».",
     props: [
       {
         name: "src",
@@ -255,8 +255,8 @@ export const contentLabelRows: ApiLabel[] = [
       part: "Message.Location",
     },
     live: {
-      en: "`Message.Location`: the mark of a live location.",
-      ru: "`Message.Location`: отметка геопозиции в реальном времени.",
+      en: "`Message.Location`: the state of a live location, a `StatusDot` before the address.",
+      ru: "`Message.Location`: состояние геопозиции в реальном времени, `StatusDot` перед адресом.",
       part: "Message.Location",
     },
   }),

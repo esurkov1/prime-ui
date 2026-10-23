@@ -64,22 +64,17 @@ a.mapFrame:focus-visible {
   padding-block-end: var(--message-pad-y, var(--prime-message-padding-y));
 }
 
+/* The title and the address line are rows of the card: one line each, cut with an ellipsis. */
 .placeTitle {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
-  font-weight: var(--prime-font-weight-medium);
-  overflow-wrap: anywhere;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* The status and the address; the time of the message follows the line (`spacer`). */
 .placeAddress {
-  display: flex;
-  align-items: baseline;
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 /* ─── Contact ───────────────────────────────────────────────────────────── */
@@ -104,7 +99,6 @@ a.mapFrame:focus-visible {
 
 .personName {
   overflow: hidden;
-  font-weight: var(--prime-font-weight-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -112,9 +106,7 @@ a.mapFrame:focus-visible {
 .personPhone {
   display: flex;
   align-items: baseline;
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
+  color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 

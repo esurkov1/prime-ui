@@ -1,14 +1,11 @@
-/* Dashboard: the board of tiles is Page.Grid; here only the inside of the tiles. */
-
-/* Bars inside a panel: 20 apart, like fields. */
-.bars {
+/* Orders as cards: one grid, equal cards, as many to a row as fit; a phone stacks them. */
+.grid {
   display: grid;
-  gap: var(--prime-space-5);
-}
-
-.client {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, calc(var(--prime-layout-tile-min-width) * 1.75)), 1fr)
+    );
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
 }

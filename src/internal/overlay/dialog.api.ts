@@ -164,15 +164,15 @@ export function dialogParts(
   return [
     {
       name: `${name}.Header`,
-      en: "`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title / Description / Badges] [Actions] [close button] — the title on line 1 with the actions and the close button centred on it, the description on line 2, the badges on line 3.",
-      ru: "Рисует `<header>`: [Icon] [Title / Description / Badges] [Actions] [кнопка закрытия] — заголовок в строке 1, действия и крестик по её центру, описание в строке 2, бейджи в строке 3.",
+      en: "`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each, nothing wraps.",
+      ru: "`<header>` — строка шапки кита, фрейм `l`, без линии под ней: [Icon] [Title + Badges / Description] [Actions] [кнопка закрытия]. Каждое — в одну строку, ничего не переносится.",
       props: [
         {
           name: "showClose",
           type: "boolean",
           default: "true",
-          en: "Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`.",
-          ru: "Встроенная кнопка закрытия: квадратная ghost `s` с именем из `labels.close`; при `Guard` `busy` остаётся на месте, выключенная.",
+          en: "Built-in square ghost close button at the dialog's control tier, named by `labels.close`; disabled in place while a `Guard` is `busy`.",
+          ru: "Встроенная кнопка закрытия: квадратная ghost ярусом диалога с именем из `labels.close`; при `Guard` `busy` остаётся на месте, выключенная.",
         },
         {
           name: "children",
@@ -190,8 +190,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Actions`,
-      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher (\`SegmentedControl\`, \`Datepicker\`), then buttons (a status is a badge), tier \`s\`, on line 1; under the title below 12rem${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group at the footer tier.`,
-      ru: `Шапка: переключатель вкладки (\`SegmentedControl\`, \`Datepicker\`), затем кнопки (статус — бейдж), ярус \`s\`, в строке 1; под заголовком при ширине меньше 12rem${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале, ярус подвала.`,
+      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher or picker (\`SegmentedControl\`, \`Select\`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group.`,
+      ru: `Шапка: переключатель вкладки или выбор (\`SegmentedControl\`, \`Select\`), затем кнопки и меню ⋯, ярус диалога, в конце строки заголовка${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале.`,
       props: [
         {
           name: "…rest",
@@ -203,8 +203,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Icon`,
-      en: "`ref` → `HTMLSpanElement`. Optional mark centred on lines 1–2: an `aria-hidden` 40 px tone tile; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` anywhere inside, also from your own component) no tile (`data-media`), the picture at 40 px.",
-      ru: "Необязательная метка по центру строк 1–2: `aria-hidden` плашка 40 px с заливкой тона; вокруг картинки записи (`Avatar.Root` или `Thumbnail.Root` где угодно внутри, в том числе из вашего компонента) плашки нет (`data-media`), картинка — 40 px.",
+      en: "`ref` → `HTMLSpanElement`. Optional mark of the header row, 48 px: an `aria-hidden` tone tile; around the record's picture (an `Avatar.Root` or a `Thumbnail.Root` inside) no tile (`data-media`).",
+      ru: "Необязательная метка строки шапки, 48 px: `aria-hidden` плашка с заливкой тона; вокруг картинки записи (`Avatar.Root` или `Thumbnail.Root` внутри) плашки нет (`data-media`).",
       props: [
         {
           name: "tone",
@@ -217,8 +217,8 @@ export function dialogParts(
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (size `l`) or a `Thumbnail.Root` (size `m`), set by the slot.",
-          ru: "`Icon` размера m или картинка записи: `Avatar.Root` (размер `l`) или `Thumbnail.Root` (размер `m`) — размер задаёт слот.",
+          en: "An `Icon`, or the record's picture: an `Avatar.Root` or a `Thumbnail.Root` (or a `ProgressCircle`), sized by the slot.",
+          ru: "`Icon` или картинка записи: `Avatar.Root`, `Thumbnail.Root` (или `ProgressCircle`) — размер задаёт слот.",
         },
         {
           name: "…rest",
@@ -230,8 +230,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Title`,
-      en: "`ref` → `HTMLHeadingElement`. Line 1: `<h2>` (title-m); its id names the dialog. In a record header (with `Badges` or a `number`) the name is one line with an ellipsis (the whole name in its `title` while cut); in a question dialog it wraps.",
-      ru: "Строка 1: `<h2>` (title-m); его id даёт диалогу имя. В шапке записи (с `Badges` или `number`) имя — одна строка с многоточием (целиком в `title`, пока обрезано); в диалоге-вопросе переносится.",
+      en: "`ref` → `HTMLHeadingElement`. `<h2>` (16/24) of the header row; its id names the dialog. In a record header (an `Icon`, `Badges` or a `number`) one line with an ellipsis, giving way to the badges; in a question dialog it wraps.",
+      ru: "`<h2>` (16/24) строки шапки; его id даёт диалогу имя. В шапке записи (`Icon`, `Badges` или `number`) — одна строка с многоточием, уступает бейджам; в диалоге-вопросе переносится.",
       props: [
         {
           name: "number",
@@ -256,8 +256,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Description`,
-      en: "`ref` → `HTMLParagraphElement`. Line 2: `<p>` (body-s, muted), text only, 4 under the title; its id describes the dialog. In a record header one line with an ellipsis (the whole text in its `title` while cut); in a question dialog it wraps under the title.",
-      ru: "Строка 2: `<p>` (body-s, приглушённый), только текст, на 4 под заголовком; его id даёт диалогу описание. В шапке записи — одна строка с многоточием (целиком в `title`, пока обрезана); в диалоге-вопросе переносится под заголовком.",
+      en: "`ref` → `HTMLParagraphElement`. `<p>` (14/20) under the title; its id describes the dialog. In a record header one line with an ellipsis, a `StatusDot` may stand first; in a question dialog it wraps.",
+      ru: "`<p>` (14/20) под заголовком; его id даёт диалогу описание. В шапке записи — одна строка с многоточием, первым может стоять `StatusDot`; в диалоге-вопросе переносится.",
       props: [
         {
           name: "loading",
@@ -276,8 +276,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Badges`,
-      en: "`ref` → `HTMLDivElement`. Line 3 of a record header: a `Badge.Group` — the pickers first (status; assignee with `Badge.Avatar`, or an `outline` «Назначить»; each a `Badge.Root` in a `Dropdown.Trigger`), then the statuses. Chip tier `m`; one row, the rest behind «+N».",
-      ru: "Строка 3 шапки записи: `Badge.Group` — сначала выборы (статус; исполнитель с `Badge.Avatar` или `outline` «Назначить»; каждый — `Badge.Root` в `Dropdown.Trigger`), затем статусы. Ярус чипов `m`; один ряд, остальное за «+N».",
+      en: "`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Actions`.",
+      ru: "Бейджи после заголовка, на его строке: один `Badge.Group`, ярус чипов `s`, один ряд, остальное в «+N». Выбор статуса или человека — `Select` в `Actions`.",
       props: [
         {
           name: "loading",
@@ -289,15 +289,15 @@ export function dialogParts(
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: '`children` (`Badge.Root`s, the pickers in their `Dropdown.Root`), `className`, `aria-label` (a named row is `role="group"`) and the other attributes of the row.',
-          ru: '`children` (`Badge.Root`, выборы — в своём `Dropdown.Root`), `className`, `aria-label` (названный ряд — `role="group"`) и остальные атрибуты ряда.',
+          en: '`children` (`Badge.Root`s), `className`, `aria-label` (a named row is `role="group"`) and the other attributes of the row.',
+          ru: '`children` (`Badge.Root`), `className`, `aria-label` (названный ряд — `role="group"`) и остальные атрибуты ряда.',
         },
       ],
     },
     {
       name: `${name}.Body`,
-      en: "`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.",
-      ru: "Единственная прокручиваемая зона (ScrollContainer), зазор 16 между блоками.",
+      en: "`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks. No line parts it from the header and the footer: while it is scrolled its edge fades under them.",
+      ru: "Единственная прокручиваемая зона (ScrollContainer), зазор 16 между блоками. Линии между ней, шапкой и подвалом нет: пока она прокручена, её край гаснет под ними.",
       props: [
         {
           name: "…rest",
@@ -310,8 +310,8 @@ export function dialogParts(
     ...(section ? [dialogSectionPart(name)] : []),
     {
       name: `${name}.Footer`,
-      en: `\`ref\` → \`HTMLElement\`. Renders \`<footer>\` with the actions, primary last, only while it holds something (it enters and closes up in place); at the start an optional \`${name}.Actions\` (an action apart) and \`Meta\`.`,
-      ru: `Рисует \`<footer>\` с действиями, главное последним, только пока в нём что-то есть (появляется и схлопывается на месте); в начале необязательные \`${name}.Actions\` (отдельное действие) и \`Meta\`.`,
+      en: `\`ref\` → \`HTMLElement\`. Renders \`<footer>\` with the actions, primary last, with no line above it, only while it holds something (it enters and closes up in place); at the start one thing — an optional \`${name}.Actions\` (an action apart) and \`Meta\`.`,
+      ru: `Рисует \`<footer>\` с действиями, главное последним, без линии над ним, только пока в нём что-то есть (появляется и схлопывается на месте); в начале одно — необязательные \`${name}.Actions\` (отдельное действие) и \`Meta\`.`,
       props: [
         {
           name: "layout",

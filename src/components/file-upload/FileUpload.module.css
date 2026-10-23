@@ -9,10 +9,8 @@
   --fu-pad: var(--prime-space-6);
   --fu-stack: var(--prime-space-4);
   /* The tier of the zone comes from fieldTier (`fieldTierClass` in TSX). */
-  --fu-title: var(--field-text);
-  --fu-title-line-height: var(--field-lh);
-  --fu-icon-box: var(--field-h);
-  --fu-radius: var(--prime-radius-l);
+  --fu-icon-box: var(--frame-mark);
+  --fu-radius: var(--frame-radius);
   /* The add tile's line: a translucent fill stays visible on the gray field fill of any surface. */
   --fu-line: var(--prime-color-fill-strong);
   --fu-line-hover: var(--prime-color-text-placeholder);
@@ -42,13 +40,11 @@
 .root[data-size="xs"] {
   --fu-pad: var(--prime-space-4);
   --fu-stack: var(--prime-space-2);
-  --fu-radius: var(--prime-radius-m);
 }
 
 .root[data-size="s"] {
   --fu-pad: var(--prime-space-5);
   --fu-stack: var(--prime-space-3);
-  --fu-radius: var(--prime-radius-m);
 }
 
 .root[data-size="l"] {
@@ -59,7 +55,6 @@
 .root[data-size="xl"] {
   --fu-pad: var(--prime-space-10);
   --fu-stack: var(--prime-space-6);
-  --fu-radius: var(--prime-radius-xl);
 }
 
 /*
@@ -150,9 +145,6 @@
 
 .title {
   margin: 0;
-  font-size: var(--fu-title);
-  line-height: var(--fu-title-line-height);
-  font-weight: var(--prime-font-weight-medium);
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
 }
@@ -166,101 +158,33 @@
   color: var(--prime-color-text-disabled);
 }
 
-/* ─── File row: [badge] name / description [actions], then progress ─── */
+/*
+ * ─── File row: the kit's header row on the surface frame of its tier ───
+ *   [badge] [name        ] [actions]
+ *           [description ]
+ * then the progress bar across the row. One line each, nothing wraps; no line, the danger fill
+ * and the description's word mark a failed row.
+ */
 .item {
-  --fu-item-pad: var(--prime-space-3);
-  --fu-item-gap: var(--prime-space-3);
-  /* The tier of the row comes from fieldTier (`fieldTierClass` in TSX). */
-  --fu-item-name: var(--field-text);
-  --fu-item-name-line-height: var(--field-lh);
-  --fu-item-meta: var(--field-hint-size);
-  --fu-item-meta-line-height: var(--field-hint-lh);
-  --fu-item-radius: var(--prime-radius-l);
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas:
-    "badge name actions"
-    "badge description actions"
-    "progress progress progress";
-  align-items: center;
-  column-gap: var(--fu-item-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--frame-gap);
   width: 100%;
   min-width: 0;
-  padding: var(--fu-item-pad);
-  border-radius: var(--fu-item-radius);
+  padding: var(--frame-gap);
+  border-radius: var(--frame-radius);
   background: var(--prime-color-fill-subtle);
   font-family: var(--prime-font-family-sans);
   /* A failed upload turns the row danger, and a retry turns it back: both glide. */
-  transition:
-    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-/* Without a badge or a preview the name starts at the edge. */
-.item:not(:has(> .formatBadge, > .preview)) {
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "name actions"
-    "description actions"
-    "progress progress";
-}
-
-.item[data-size="xs"] {
-  --fu-item-pad: var(--prime-space-2);
-  --fu-item-gap: var(--prime-space-2);
-  --fu-item-radius: var(--prime-radius-m);
-}
-
-.item[data-size="s"] {
-  --fu-item-pad: var(--prime-space-2);
-  --fu-item-gap: var(--prime-space-2);
-  --fu-item-radius: var(--prime-radius-m);
-}
-
-.item[data-size="l"] {
-  --fu-item-pad: var(--prime-space-4);
-}
-
-.item[data-size="xl"] {
-  --fu-item-pad: var(--prime-space-4);
-  --fu-item-gap: var(--prime-space-4);
-  --fu-item-radius: var(--prime-radius-xl);
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .item[data-invalid="true"] {
   background: var(--prime-color-danger-soft);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-/* The format (a Thumbnail's short label) stands where an image file's picture would. */
-.formatBadge {
-  grid-area: badge;
-}
-
-/* An image file's picture (the kit Thumbnail of the row tier) where the badge would stand. */
-.preview {
-  grid-area: badge;
-}
-
-.itemText {
-  grid-area: name;
-  min-width: 0;
-  overflow: hidden;
-  font-size: var(--fu-item-name);
-  line-height: var(--fu-item-name-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  color: var(--prime-color-text-primary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .itemDescription {
-  grid-area: description;
-  min-width: 0;
-  margin-top: var(--prime-space-1);
-  font-size: var(--fu-item-meta);
-  line-height: var(--fu-item-meta-line-height);
   font-variant-numeric: tabular-nums;
   color: var(--prime-color-text-muted);
 }
@@ -269,17 +193,8 @@
   color: var(--prime-color-danger-text);
 }
 
-.itemActions {
-  grid-area: actions;
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-1);
-}
-
 .itemProgress {
-  grid-area: progress;
   min-width: 0;
-  margin-top: var(--fu-item-gap);
 }
 
 /* ─── Queue: the rows of `useUploadQueue`, one under another ─── */
@@ -299,11 +214,12 @@
 
 /* A row whose removal is being saved (`onRemove` returned a promise): its content quiets down
    while the remove button spins, both ways eased. */
-.queueRow .item > :not(.itemActions) {
+.queueRow :is(.formatBadge, .preview, .itemText, .itemDescription, .itemProgress) {
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.queueRow[data-pending="true"] .item > :not(.itemActions) {
+.queueRow[data-pending="true"]
+  :is(.formatBadge, .preview, .itemText, .itemDescription, .itemProgress) {
   opacity: var(--prime-opacity-busy);
 }
 

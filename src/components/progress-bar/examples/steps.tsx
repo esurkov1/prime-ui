@@ -1,4 +1,4 @@
-/** The scale as whole cells that fill one after another: 2 of 5 onboarding steps, forward and back — `steps`, `max`. */
+/** The scale as whole cells that one front fills: 2 of 5 onboarding steps, forward and back — `variant`, `max`. */
 import { Button, ProgressBar } from "prime-ui-kit";
 import * as React from "react";
 
@@ -12,7 +12,7 @@ export default function ProgressBarStepsExample() {
   return (
     <div className={styles.column}>
       <ProgressBar
-        steps
+        variant="steps"
         value={done}
         max={TOTAL}
         label={`Настройка компании: ${done} из ${TOTAL}`}

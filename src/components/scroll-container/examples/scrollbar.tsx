@@ -1,5 +1,5 @@
 /** The kit's quiet thin bar on a list and no bar on a strip of chips, where the faded edges show the overflow — `scrollbar`. */
-import { Badge, Card, ScrollContainer, Typography } from "prime-ui-kit";
+import { Badge, Card, List, ScrollContainer } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -22,40 +22,34 @@ export default function ScrollContainerScrollbarExample() {
       <Card.Root role="region" className={styles.card} aria-label="Клиенты">
         <Card.Header>
           <Card.Title>Клиенты</Card.Title>
-          <Card.Actions>
-            <Typography as="span" variant="caption" tone="muted">
-              thin
-            </Typography>
-          </Card.Actions>
+          <Card.Description>thin</Card.Description>
         </Card.Header>
-        <ScrollContainer>
-          <Card.List>
-            {CLIENTS.map((client) => (
-              <Card.ListItem key={client}>
-                <Typography as="span" variant="body-m">
-                  {client}
-                </Typography>
-              </Card.ListItem>
-            ))}
-          </Card.List>
-        </ScrollContainer>
+        <Card.Body>
+          <ScrollContainer>
+            <List.Root aria-label="Клиенты">
+              {CLIENTS.map((client) => (
+                <List.Item key={client}>
+                  <List.ItemText>{client}</List.ItemText>
+                </List.Item>
+              ))}
+            </List.Root>
+          </ScrollContainer>
+        </Card.Body>
       </Card.Root>
       <Card.Root role="region" className={styles.card} aria-label="Статусы заказов">
         <Card.Header>
           <Card.Title>Статусы заказов</Card.Title>
-          <Card.Actions>
-            <Typography as="span" variant="caption" tone="muted">
-              hidden
-            </Typography>
-          </Card.Actions>
+          <Card.Description>hidden</Card.Description>
         </Card.Header>
-        <ScrollContainer axis="horizontal" scrollbar="hidden">
-          <div className={styles.strip}>
-            {TAGS.map((tag) => (
-              <Badge.Root key={tag}>{tag}</Badge.Root>
-            ))}
-          </div>
-        </ScrollContainer>
+        <Card.Body>
+          <ScrollContainer axis="horizontal" scrollbar="hidden">
+            <div className={styles.strip}>
+              {TAGS.map((tag) => (
+                <Badge.Root key={tag}>{tag}</Badge.Root>
+              ))}
+            </div>
+          </ScrollContainer>
+        </Card.Body>
       </Card.Root>
     </div>
   );

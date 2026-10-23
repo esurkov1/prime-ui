@@ -35,9 +35,9 @@ export default function SparklineOwnValueExample() {
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Клиенты в диалогах</Kpi.Title>
-      <Kpi.Period>{clients.date}</Kpi.Period>
       <Kpi.Value>{clients.valueText}</Kpi.Value>
       <Kpi.Delta reading={clients} />
+      <Kpi.Period>{clients.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline {...clients.plot} label="Клиенты по дням" />
       </Kpi.Media>

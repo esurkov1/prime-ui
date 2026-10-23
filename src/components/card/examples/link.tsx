@@ -1,64 +1,52 @@
-/** Cards that open: a transport card that opens its record from anywhere and keeps its own button under a full-width line, a deposit card that opens its window in place, and a project tile that is itself the link — `Card.Link`, `asChild`, `Card.Footer`, `divider`. */
-import { Badge, Button, Card, Icon, Modal } from "prime-ui-kit";
-import * as React from "react";
+/** Cards that open: a link in the title stretches over the card while its own button stays its own, and a whole card is one link when nothing inside is a control — `Card.Link`, `asChild`. */
+import { Badge, Button, Card, DescriptionList, Icon, StatusDot } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 export default function CardLinkExample() {
-  const [depositOpen, setDepositOpen] = React.useState(false);
-
   return (
     <div className={styles.grid}>
       <Card.Root>
         <Card.Header>
+          <Card.Icon>
+            <Icon name="object.motorbike" />
+          </Card.Icon>
           <Card.Title>
-            <Card.Link href="#pcx-160">Honda PCX 160 · А 123 ВС 77</Card.Link>
+            <Card.Link href="#nmax">Yamaha NMAX 155</Card.Link>
           </Card.Title>
+          <Card.Badges>
+            <Badge.Root tone="success">На линии</Badge.Root>
+          </Card.Badges>
+          <Card.Description>А 123 ВС 777 · пробег 3 200 км</Card.Description>
         </Card.Header>
         <Card.Body>
-          <Card.Description>Аренда с 14 по 21 октября, залог 15 000 ₽</Card.Description>
-          <Badge.Root color="blue">Ждёт выдачи</Badge.Root>
+          <DescriptionList.Root align="end">
+            <DescriptionList.Item label="Арендатор">Иван Петров</DescriptionList.Item>
+            <DescriptionList.Item label="Возврат">12 окт.</DescriptionList.Item>
+          </DescriptionList.Root>
         </Card.Body>
-        <Card.Footer divider="full">
-          <Button.Root size="s" variant="soft" tone="neutral">
-            <Button.Icon>
-              <Icon name="action.check" />
-            </Button.Icon>
-            Выдан
-          </Button.Root>
+        <Card.Footer>
+          <Card.Total label="Аренда">2 400 ₽ / сутки</Card.Total>
+          <Card.Actions>
+            <Button.Root variant="soft" tone="neutral">
+              Продлить
+            </Button.Root>
+          </Card.Actions>
         </Card.Footer>
       </Card.Root>
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>
-            <Card.Link asChild>
-              <button type="button" onClick={() => setDepositOpen(true)}>
-                Залог · 15 000 ₽
-              </button>
-            </Card.Link>
-          </Card.Title>
-        </Card.Header>
-        <Card.Body>
-          <Card.Description>Принят наличными 14 октября</Card.Description>
-          <Badge.Root color="green">Получен</Badge.Root>
-        </Card.Body>
-      </Card.Root>
       <Card.Root asChild>
-        <a href="#warehouse">
+        <a href="#project">
           <Card.Header>
-            <Card.Title>Переезд склада</Card.Title>
-            <Card.Description>Проект · 12 задач, 4 открыты</Card.Description>
+            <Card.Icon>
+              <Icon name="object.rocket" />
+            </Card.Icon>
+            <Card.Title>Внедрение CRM</Card.Title>
+            <Card.Description>
+              <StatusDot tone="accent">В работе</StatusDot>до 30 нояб.
+            </Card.Description>
           </Card.Header>
         </a>
       </Card.Root>
-      <Modal.Root open={depositOpen} onOpenChange={setDepositOpen}>
-        <Modal.Content size="s">
-          <Modal.Header>
-            <Modal.Title>Залог · 15 000 ₽</Modal.Title>
-            <Modal.Description>Принят наличными 14 октября, вернуть при сдаче.</Modal.Description>
-          </Modal.Header>
-        </Modal.Content>
-      </Modal.Root>
     </div>
   );
 }

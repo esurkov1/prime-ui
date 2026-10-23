@@ -112,6 +112,163 @@ one list.
 </List.Root>
 ```
 
+### A card's header, body and footer
+
+A card has a fixed place for each kind of thing ([Card](../src/components/card/COMPONENT.md)); the
+screen that moves one elsewhere reads as built by hand.
+
+- **Status and role are `Card.Badges`, after the title on its line** — one container for every
+  badge of the record, never under the title and never at the right beside the buttons.
+- **The header holds no accent button.** Beside a footer it holds «Ещё» and a value picker; the
+  accent action is the last button of the footer, and a danger action lives in «Ещё» behind a
+  `ConfirmDialog`.
+- **A picker of a person or a status is a `Select` as tall as the buttons**, in `Card.Actions` or
+  at the start of `Card.Footer` (both give their controls the buttons' tier) — never a Badge chip
+  that opens a menu. When a narrow footer stacks, the picker takes the full width like the buttons.
+
+```tsx partial
+// bad — the assignee is a chip, lower than the button beside it
+<Card.Footer>
+  <Badge.Root>Анна Котова</Badge.Root>
+  <Card.Actions>
+    <Button.Root>Взять в работу</Button.Root>
+  </Card.Actions>
+</Card.Footer>
+```
+
+```tsx good
+// good — the assignee is a Select at the button's height
+<Card.Footer>
+  <Select.Root defaultValue="kotova">
+    <Select.Trigger aria-label="Ответственный">
+      <Select.Value />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="kotova">Анна Котова</Select.Item>
+      <Select.Item value="sokolov">Илья Соколов</Select.Item>
+    </Select.Content>
+  </Select.Root>
+  <Card.Actions>
+    <Button.Root>Взять в работу</Button.Root>
+  </Card.Actions>
+</Card.Footer>
+```
+
+```tsx partial
+// bad — the status beside the buttons, the accent button in the header
+<Card.Header>
+  <Card.Title>Счёт № 2026-0418</Card.Title>
+  <Card.Actions>
+    <Badge.Root tone="warning">Ждёт оплаты</Badge.Root>
+    <Button.Root>Оплатить</Button.Root>
+  </Card.Actions>
+</Card.Header>
+```
+
+```tsx good
+// good — the status after the title, «Ещё» in the header, the accent button last in the footer
+<Card.Root>
+  <Card.Header>
+    <Card.Title>Счёт № 2026-0418</Card.Title>
+    <Card.Badges>
+      <Badge.Root tone="warning">Ждёт оплаты</Badge.Root>
+    </Card.Badges>
+    <Card.Actions>
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
+            <Button.Icon>
+              <Icon name="action.more" />
+            </Button.Icon>
+          </Button.Root>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Скачать PDF</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>
+    </Card.Actions>
+  </Card.Header>
+  <Card.Footer>
+    <Card.Total label="К оплате">256 000 ₽</Card.Total>
+    <Card.Actions>
+      <Button.Root>Оплатить</Button.Root>
+    </Card.Actions>
+  </Card.Footer>
+</Card.Root>
+```
+
+### Headers and rows of a surface
+
+Every surface that holds one entity (Card, Kpi, Modal, Drawer, Sheet, ChartFrame, Chat, a Kanban
+card, LoginForm, a banner) and every record row (List, ChatList, Timeline, Accordion) shares one
+frame and one header row: mark · title with its badges on one line · a one-line description ·
+controls at the end. The rules below hold for all of them.
+
+- **Badges stand after the title on its line**, in `Card.Badges`, `Drawer.Badges`,
+  `Accordion.Badges`, `List.ItemBadges`, `Timeline.ItemBadges`, `ChatList.ItemBadges`, never under
+  it and never at the right beside the buttons. `Badge.Group overflow="count"` never cuts a badge: what
+  does not fit folds whole into «+N».
+- **A status inside a line of text is a `StatusDot`** (the dot and its word, first in the
+  description), never a hand-made dot and never `Badge.Dot` beside a text.
+- **A person or a status picker on a surface is a `Select` at the controls' tier** (in `X.Actions`
+  or at the start of the footer). A chip picker — `Select variant="status"`, a `Badge.Root` in a
+  `Dropdown.Trigger` — stays only in a dense row or a table cell.
+- **No static line between the zones of a surface** (a dialog's header and body, a chat header, a
+  Kanban card, a banner): air separates them. A region that scrolls shows an edge cue while it is
+  scrolled, never a line that is always there.
+- **Menu descriptions are one line.** Nothing of a header or a row wraps; the only deliberate
+  exceptions are a `Notification` text (up to two lines) and a `Banner` text.
+
+```tsx partial
+// bad — the status under the title, a chip picker beside the buttons, a hand-made dot
+<Card.Header>
+  <Card.Title>Заявка № 678</Card.Title>
+  <Card.Description>
+    <Badge.Dot tone="success" /> В работе
+  </Card.Description>
+  <Card.Actions>
+    <Badge.Root tone="warning">Ждёт оплаты</Badge.Root>
+  </Card.Actions>
+</Card.Header>
+```
+
+```tsx good
+// good — the badge after the title, the status a StatusDot in the description
+<Card.Header>
+  <Card.Title>Заявка № 678</Card.Title>
+  <Card.Badges>
+    <Badge.Root tone="warning">Ждёт оплаты</Badge.Root>
+  </Card.Badges>
+  <Card.Description>
+    <StatusDot tone="success">В работе</StatusDot> · ООО «Северный ветер»
+  </Card.Description>
+</Card.Header>
+```
+
+- **A record row opens as a whole.** Its value stands at the right; a pencil or a button on the
+  row asks for a second click for what one click does.
+
+```tsx partial
+// bad — a pencil on a record row
+<List.Item>
+  <List.ItemText>Платёж № 41</List.ItemText>
+  <Button.Root variant="ghost" tone="neutral" aria-label="Изменить платёж">
+    <Button.Icon>
+      <Icon name="action.edit" />
+    </Button.Icon>
+  </Button.Root>
+</List.Item>
+```
+
+```tsx good
+// declare: const openPayment: (id: string) => void
+// good — the row opens the payment
+<List.Item onClick={() => openPayment("41")}>
+  <List.ItemText>Платёж № 41</List.ItemText>
+  <List.ItemMeta>12 400 ₽</List.ItemMeta>
+</List.Item>
+```
+
 ## 3. Label economy
 
 Every word on screen must carry something the person does not see already.

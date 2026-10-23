@@ -1,4 +1,4 @@
-/** A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `height`, `rows`. */
+/** A 320px column: the header keeps one line each and the title gives way to the action, the plot gets lower and a self-sizing SVG stretches to it — `height`, `rows`. */
 import { Button, ChartFrame, type ChartFrameSeries, chartColors, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

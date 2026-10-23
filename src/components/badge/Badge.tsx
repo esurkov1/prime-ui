@@ -509,7 +509,8 @@ function badgeText(badge: HTMLElement): string {
 
 /**
  * How many of `widths` stand in `available` px a `gap` apart; when not all of them do, the rest
- * goes into a «+N» badge `moreWidth` wide at the end. At least one stays shown (it ellipsizes).
+ * goes into a «+N» badge `moreWidth` wide at the end. A badge is never cut: when not even the first
+ * fits beside «+N», every badge folds and «+N» stands alone.
  */
 function fitCount(widths: number[], gap: number, available: number, moreWidth: number): number {
   const total = widths.reduce((sum, width) => sum + width, 0) + gap * (widths.length - 1);
@@ -521,7 +522,7 @@ function fitCount(widths: number[], gap: number, available: number, moreWidth: n
     used += width + gap;
     count += 1;
   }
-  return Math.max(1, count);
+  return count;
 }
 
 /**
@@ -560,21 +561,25 @@ function BadgeGroup({
     const badges = Array.from(group.children).filter(
       (child): child is HTMLElement => child !== more && child instanceof HTMLElement,
     );
-    // Measured at their natural width: no badge shrinks while the row is being measured.
-    group.setAttribute("data-measuring", "");
+    // Measured with every badge in the row and «+N» out of it: the room a group gets in a row
+    // (a title's line) depends on its own content, so measuring the folded state would make the
+    // answer flip back and forth. Fractional widths, so a badge a fraction wider than a rounded
+    // box does not fold. No badge of a counting row shrinks.
+    for (const badge of badges) badge.removeAttribute("data-overflowed");
+    more.setAttribute("data-overflowed", "");
     const widths = badges.map((badge) => badge.getBoundingClientRect().width);
     const moreWidth = more.getBoundingClientRect().width;
     const style = getComputedStyle(group);
     const gap = Number.parseFloat(style.columnGap) || 0;
     const available =
-      group.clientWidth -
+      group.getBoundingClientRect().width -
       (Number.parseFloat(style.paddingInlineStart) || 0) -
       (Number.parseFloat(style.paddingInlineEnd) || 0);
-    group.removeAttribute("data-measuring");
     const count = fitCount(widths, gap, available, moreWidth + gap);
     badges.forEach((badge, index) => {
       badge.toggleAttribute("data-overflowed", index >= count);
     });
+    more.toggleAttribute("data-overflowed", count === badges.length);
     setShown(count);
     setHiddenText(badges.slice(count).map(badgeText).filter(Boolean).join(", "));
   }, []);

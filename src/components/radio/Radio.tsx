@@ -10,12 +10,13 @@ import {
   choiceInputClass,
   choiceVisualClass,
 } from "@/internal/ChoiceField";
-import { useHostTier } from "@/internal/ControlSizeContext";
+import { useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/FieldFrame";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 
@@ -232,8 +233,53 @@ function RadioLabel(props: RadioLabelProps) {
 }
 RadioLabel.displayName = "Radio.Label";
 
+export type RadioIndicatorProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+  checked?: boolean;
+  disabled?: boolean;
+  size?: ControlSize;
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * The radio circle alone, without an input: a decorative mark for an element that carries the
+ * state itself (`role="radio"` with `aria-checked`, a choice card). It is `aria-hidden` and takes
+ * no focus or clicks.
+ */
+function RadioIndicator({
+  checked = false,
+  disabled = false,
+  size: sizeProp,
+  className,
+  ...rest
+}: RadioIndicatorProps) {
+  const size = useControlSize(sizeProp);
+  return (
+    <span
+      aria-hidden="true"
+      className={cx(
+        fieldTierClass,
+        choiceVisualClass,
+        choiceBoxClass,
+        styles.control,
+        styles.indicator,
+        className,
+      )}
+      {...toDataAttributes({
+        size,
+        state: checked ? "checked" : "unchecked",
+        disabled: disabled || undefined,
+      })}
+      {...rest}
+    >
+      <span className={styles.dot} />
+    </span>
+  );
+}
+RadioIndicator.displayName = "Radio.Indicator";
+
 export const Radio = {
   Group: RadioGroup,
   Root: RadioRoot,
   Label: RadioLabel,
+  Indicator: RadioIndicator,
 };

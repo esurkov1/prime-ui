@@ -1,78 +1,328 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it } from "vitest";
 
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
-import { Sparkline } from "@/components/sparkline/Sparkline";
-import { useSparkline } from "@/components/sparkline/useSparkline";
+import { DescriptionList } from "@/components/description-list/DescriptionList";
+import { ProgressBar } from "@/components/progress-bar/ProgressBar";
 import { Icon } from "@/icons";
-import textRole from "@/internal/textRole.module.css";
+import { headerRowStyles } from "@/internal/headerRow";
+import rowLink from "@/internal/rowLink.module.css";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 import { cssRule, cssValue } from "@/test/css";
-
 import { Kpi } from "./Kpi";
+
 import styles from "./Kpi.module.css";
 
 const CSS = "src/components/kpi/Kpi.module.css";
 
+const PARTS = [
+  { value: 591, label: "Сайт" },
+  { value: 360, label: "Партнёры" },
+  { value: 231, label: "Реклама" },
+];
+
+/** Every part, written out of order, for the arrangement tests. */
+function everything(size: "xs" | "s" | "m" | "l" | "xl") {
+  return (
+    <Kpi.Root size={size} data-testid="kpi">
+      <Kpi.Footer data-testid="footer">
+        <Kpi.Note data-testid="note">9 счетов ждут напоминания</Kpi.Note>
+        <Kpi.Total label="Счетов">412</Kpi.Total>
+        <Kpi.Total label="Средний чек">21 100 ₽</Kpi.Total>
+        <Kpi.Total label="Возвраты" data-testid="third-total">
+          146 000 ₽
+        </Kpi.Total>
+        <DescriptionList.Root data-testid="breakdown">
+          <DescriptionList.Item label="Маржа">42,8 %</DescriptionList.Item>
+        </DescriptionList.Root>
+        <Kpi.Legend segments={PARTS} />
+      </Kpi.Footer>
+      <Kpi.Media data-testid="media">график</Kpi.Media>
+      <Kpi.Meta data-testid="meta">план 9,5 млн ₽</Kpi.Meta>
+      <Kpi.Period data-testid="period">1–22 окт</Kpi.Period>
+      <Kpi.Delta value={9.6} tone="success" data-testid="delta">
+        +9,6 %
+      </Kpi.Delta>
+      <Kpi.Value data-testid="value">
+        8,7<Kpi.Unit data-testid="unit">млн ₽</Kpi.Unit>
+      </Kpi.Value>
+      <Kpi.Actions data-testid="actions">
+        <Badge.Root>Прогноз</Badge.Root>
+      </Kpi.Actions>
+      <Kpi.Description data-testid="description">Оплаченные счета</Kpi.Description>
+      <Kpi.Title data-testid="title">Выручка</Kpi.Title>
+      <Kpi.Icon data-testid="icon">
+        <Icon name="currency.ruble" />
+      </Kpi.Icon>
+    </Kpi.Root>
+  );
+}
+
 describe("Kpi", () => {
-  it("is a card: the root is the kit's Card with the figure in its padded body", () => {
+  it("is a surface of the ladder with its own size, class and ref", () => {
+    const ref = React.createRef<HTMLDivElement>();
     render(
-      <Kpi.Root data-testid="kpi" className="own" size="s">
+      <Kpi.Root ref={ref} data-testid="kpi" className="own" size="l">
         <Kpi.Title>Выручка</Kpi.Title>
         <Kpi.Value>4,2 млн ₽</Kpi.Value>
       </Kpi.Root>,
     );
     const card = screen.getByTestId("kpi");
-    expect(card).toHaveClass("own");
+    expect(card).toBe(ref.current);
+    expect(card).toHaveClass(styles.root, "own");
     expect(card).toHaveAttribute("data-depth", "1");
-    expect(card).toHaveAttribute("data-size", "s");
-    expect(card).toHaveAttribute("data-layout", "zoned");
-    expect(card.querySelector(`.${styles.root}`)).not.toBeNull();
+    expect(card).toHaveAttribute("data-size", "l");
   });
 
-  it("puts the parts in their places whatever order they are written in", () => {
-    render(
-      <Kpi.Root>
-        <Kpi.Media data-testid="media">график</Kpi.Media>
-        <Kpi.Meta data-testid="meta">к сентябрю</Kpi.Meta>
-        <Kpi.Delta value={18} tone="success" data-testid="delta">
-          +18%
-        </Kpi.Delta>
-        <Kpi.Value data-testid="value">4,2 млн ₽</Kpi.Value>
-        <Kpi.Actions data-testid="actions">
-          <Button.Root aria-label="Ещё">
-            <Button.Icon>
-              <Icon name="action.more" />
-            </Button.Icon>
-          </Button.Root>
-        </Kpi.Actions>
-        <Kpi.Period data-testid="period">1–31 окт</Kpi.Period>
-        <Kpi.Description data-testid="description">Оплаченные счета</Kpi.Description>
-        <Kpi.Title data-testid="title">Выручка</Kpi.Title>
-        <Kpi.Icon data-testid="icon">
-          <Icon name="object.wallet" />
-        </Kpi.Icon>
-      </Kpi.Root>,
-    );
-    const head = screen.getByTestId("title").closest(`.${styles.head}`) as HTMLElement;
+  it("stands on the frame a step under its tier: S xs · M s · L m · XL l", () => {
+    const frames = (["xs", "s", "m", "l", "xl"] as const).map((size) => {
+      const { unmount } = render(everything(size));
+      const frame = screen.getByTestId("kpi").getAttribute("data-frame");
+      expect(screen.getByTestId("kpi")).toHaveClass(surfaceFrameClass);
+      unmount();
+      return frame;
+    });
+    expect(frames).toEqual(["xs", "xs", "s", "m", "l"]);
+    const rule = cssRule(CSS, ".root");
+    expect(cssValue(rule, "padding")).toBe("var(--frame-pad)");
+    expect(cssValue(rule, "border-radius")).toBe("var(--frame-radius)");
+    expect(cssValue(rule, "gap")).toBe("var(--frame-gap)");
+  });
+
+  it("the title takes the frame's title role", () => {
+    render(everything("m"));
+    expect(screen.getByTestId("title")).toHaveClass(FRAME_TITLE.s, headerRowStyles.title);
+  });
+
+  it("takes s for the kit's xs", () => {
+    render(everything("xs"));
+    expect(screen.getByTestId("kpi")).toHaveAttribute("data-size", "s");
+  });
+
+  it("M: the parts stand in their places whatever order they are written in", () => {
+    render(everything("m"));
+    const card = screen.getByTestId("kpi");
+    const head = screen.getByTestId("title").closest(`.${headerRowStyles.header}`) as HTMLElement;
+    expect(head).toHaveAttribute("data-lines", "one");
     expect([...head.children]).toEqual([
-      screen.getByTestId("icon"),
-      screen.getByTestId("title").parentElement,
+      screen.getByTestId("title").closest(`.${headerRowStyles.titles}`),
       screen.getByTestId("actions"),
     ]);
-    const sub = screen.getByTestId("description").parentElement as HTMLElement;
-    expect(sub).toHaveClass(styles.sub);
-    // The description, a quiet dot, then the period — always last.
-    expect(sub.firstElementChild).toBe(screen.getByTestId("description"));
-    expect(sub.lastElementChild).toBe(screen.getByTestId("period"));
-    expect(sub.children[1]).toHaveAttribute("aria-hidden", "true");
-    const figure = screen.getByTestId("value").parentElement as HTMLElement;
-    expect(figure).toHaveClass(styles.figure);
-    const change = figure.lastElementChild as HTMLElement;
-    expect(change).toHaveClass(styles.change);
-    expect([...change.children]).toEqual([screen.getByTestId("delta"), screen.getByTestId("meta")]);
-    expect(figure.nextElementSibling).toBe(screen.getByTestId("media"));
+    const figure = screen.getByTestId("value").closest(`.${styles.figure}`) as HTMLElement;
+    const [valueRow, line] = [...figure.children] as HTMLElement[];
+    expect([...valueRow.children]).toEqual([
+      screen.getByTestId("value"),
+      screen.getByTestId("delta"),
+    ]);
+    // The line under the value: the period, a quiet dot, the note.
+    expect(line.firstElementChild).toBe(screen.getByTestId("period"));
+    expect(line.children[1]).toHaveAttribute("aria-hidden", "true");
+    expect(line.lastElementChild).toBe(screen.getByTestId("meta"));
+    expect([...card.children]).toEqual([
+      head,
+      figure,
+      screen.getByTestId("media"),
+      screen.getByTestId("footer"),
+    ]);
+  });
+
+  it("S holds the title, the period at the end of the head, the value and the change — nothing else", () => {
+    render(everything("s"));
+    const head = screen.getByTestId("title").closest(`.${styles.head}`) as HTMLElement;
+    expect(head.lastElementChild).toContainElement(screen.getByTestId("period"));
+    for (const part of ["icon", "description", "actions", "meta", "media", "footer"]) {
+      expect(screen.queryByTestId(part)).toBeNull();
+    }
+    expect(screen.getByTestId("delta")).toBeInTheDocument();
+  });
+
+  it("M drops the icon and the description; its footer holds only the legend", () => {
+    render(everything("m"));
+    expect(screen.queryByTestId("icon")).toBeNull();
+    expect(screen.queryByTestId("description")).toBeNull();
+    const footer = screen.getByTestId("footer");
+    expect(footer).toContainElement(screen.getByText("Сайт"));
+    expect(screen.queryByTestId("note")).toBeNull();
+    expect(screen.queryByText("Счетов")).toBeNull();
+  });
+
+  it("L adds the icon and the description; its footer keeps two totals and no breakdown", () => {
+    render(everything("l"));
+    expect(screen.getByTestId("icon")).toHaveAttribute("data-size", "s");
+    expect(screen.getByTestId("icon")).toHaveClass(headerRowStyles.mark);
+    expect(screen.getByTestId("description")).toHaveTextContent("Оплаченные счета");
+    expect(screen.getByTestId("description")).toHaveClass(FRAME_DESCRIPTION.m);
+    expect(screen.getByTestId("kpi").querySelector(`.${headerRowStyles.header}`)).toHaveAttribute(
+      "data-lines",
+      "two",
+    );
+    expect(screen.getByTestId("note")).toBeInTheDocument();
+    expect(screen.getByText("Средний чек")).toBeInTheDocument();
+    expect(screen.queryByTestId("third-total")).toBeNull();
+    expect(screen.queryByTestId("breakdown")).toBeNull();
+  });
+
+  it("XL keeps up to four totals and the breakdown; its icon tile is 48", () => {
+    render(everything("xl"));
+    expect(screen.getByTestId("icon")).toHaveAttribute("data-size", "m");
+    expect(screen.getByTestId("third-total")).toBeInTheDocument();
+    expect(screen.getByTestId("breakdown")).toBeInTheDocument();
+  });
+
+  it("a footer of totals lays them out in columns", () => {
+    render(
+      <Kpi.Root size="xl">
+        <Kpi.Value>8 704 000 ₽</Kpi.Value>
+        <Kpi.Footer data-testid="footer">
+          <Kpi.Total label="Счетов">412</Kpi.Total>
+          <Kpi.Total label="Средний чек">21 100 ₽</Kpi.Total>
+        </Kpi.Footer>
+      </Kpi.Root>,
+    );
+    expect(screen.getByTestId("footer")).toHaveClass(styles.footer, styles.totals);
+    expect(cssValue(cssRule(CSS, ".totals"), "grid-auto-flow")).toBe("column");
+  });
+
+  it("the ring stands in the footer beside its legend on XL only", () => {
+    const { rerender } = render(
+      <Kpi.Root size="xl">
+        <Kpi.Value>24 600</Kpi.Value>
+        <Kpi.Footer>
+          <Kpi.Legend segments={PARTS} ring />
+        </Kpi.Footer>
+      </Kpi.Root>,
+    );
+    expect(screen.getByRole("group", { name: /Сайт/ }).closest('[data-size="2xl"]')).not.toBeNull();
+    rerender(
+      <Kpi.Root size="l">
+        <Kpi.Value>24 600</Kpi.Value>
+        <Kpi.Footer>
+          <Kpi.Legend segments={PARTS} ring />
+        </Kpi.Footer>
+      </Kpi.Root>,
+    );
+    expect(document.querySelector('[data-size="2xl"]')).toBeNull();
+    expect(screen.getByText("Сайт")).toBeInTheDocument();
+  });
+
+  it("the legend reads each part's value and share", () => {
+    render(
+      <Kpi.Root>
+        <Kpi.Footer>
+          <Kpi.Legend segments={PARTS} />
+        </Kpi.Footer>
+      </Kpi.Root>,
+    );
+    const row = screen.getByText("Сайт").closest("li") as HTMLElement;
+    expect(row).toHaveTextContent("591");
+    expect(row).toHaveTextContent("50%");
+  });
+
+  it("the actions take the frame's size, the media two steps under the card", () => {
+    render(
+      <Kpi.Root size="l">
+        <Kpi.Actions>
+          <Button.Root data-testid="button">Отчёт</Button.Root>
+        </Kpi.Actions>
+        <Kpi.Media>
+          <ProgressBar value={73} aria-label="План" data-testid="bar" />
+        </Kpi.Media>
+      </Kpi.Root>,
+    );
+    expect(screen.getByTestId("button")).toHaveAttribute("data-size", "m");
+    expect(screen.getByTestId("bar").closest("[data-size]")).toHaveAttribute("data-size", "s");
+  });
+
+  it("the unit never grows the value's line", () => {
+    render(everything("m"));
+    expect(screen.getByTestId("unit")).toHaveClass(styles.unit);
+    expect(cssValue(cssRule(CSS, ".unit"), "line-height")).toBe("1");
+  });
+
+  it("nothing wraps and nothing leaves the card: the note is cut first, the value last, the period only at the edge", () => {
+    expect(cssValue(cssRule(CSS, ".period"), "flex")).toBe("0 0 auto");
+    expect(cssValue(cssRule(CSS, ".period"), "max-width")).toBe("100%");
+    expect(cssValue(cssRule(CSS, ".meta"), "text-overflow")).toBe("ellipsis");
+    expect(cssValue(cssRule(CSS, ".value"), "text-overflow")).toBe("ellipsis");
+    expect(cssValue(cssRule(CSS, ".totalValue"), "text-overflow")).toBe("ellipsis");
+    expect(cssValue(cssRule(CSS, ".delta"), "flex")).toBe("none");
+  });
+
+  it("the change turns its arrow by the sign and takes its tone; a reading drives it, no change — no part", () => {
+    render(
+      <>
+        <Kpi.Root>
+          <Kpi.Delta
+            reading={{ change: -3, changeText: "−3%", changeTone: "danger" }}
+            data-testid="delta"
+          />
+        </Kpi.Root>
+        <Kpi.Root data-testid="quiet">
+          <Kpi.Value>38</Kpi.Value>
+          <Kpi.Delta reading={{ change: null, changeText: "", changeTone: "neutral" }} />
+        </Kpi.Root>
+        <Kpi.Root>
+          <Kpi.Delta value={0} data-testid="flat">
+            0 %
+          </Kpi.Delta>
+        </Kpi.Root>
+      </>,
+    );
+    const badge = screen.getByTestId("delta").firstElementChild as HTMLElement;
+    expect(badge).toHaveTextContent("−3%");
+    expect(badge).toHaveAttribute("data-tone", "danger");
+    expect(badge.querySelector(`.${styles.trend}`)).toHaveAttribute("data-down", "true");
+    expect(screen.getByTestId("quiet").querySelector(`.${styles.delta}`)).toBeNull();
+    expect(screen.getByTestId("flat").querySelector(`.${styles.trend}`)).toBeNull();
+  });
+
+  it("the change badge is a chip a size under the figure", () => {
+    render(
+      <Kpi.Root size="xl">
+        <Kpi.Delta value={1} tone="success" data-testid="delta">
+          +1 %
+        </Kpi.Delta>
+      </Kpi.Root>,
+    );
+    expect(screen.getByTestId("delta").firstElementChild).toHaveAttribute("data-size", "m");
+  });
+
+  it("a note says its meaning in words; its dot is the kit's StatusDot, decorative", () => {
+    render(
+      <Kpi.Root size="l">
+        <Kpi.Footer>
+          <Kpi.Note tone="danger" data-testid="note">
+            Сорван срок
+          </Kpi.Note>
+        </Kpi.Footer>
+      </Kpi.Root>,
+    );
+    const note = screen.getByTestId("note");
+    expect(note).toHaveAttribute("data-tone", "danger");
+    expect(note.querySelector('[data-tone="danger"] > [aria-hidden="true"]')).not.toBeNull();
+    expect(cssValue(cssRule(CSS, ".noteText"), "text-overflow")).toBe("ellipsis");
+  });
+
+  it("loading: the data parts are Skeletons, the head stays, the card is busy", () => {
+    render(
+      <Kpi.Root loading data-testid="kpi">
+        <Kpi.Title>Выручка</Kpi.Title>
+        <Kpi.Value data-testid="value">8,7 млн ₽</Kpi.Value>
+        <Kpi.Delta value={9.6} tone="success" data-testid="delta">
+          +9,6 %
+        </Kpi.Delta>
+        <Kpi.Period data-testid="period">1–22 окт</Kpi.Period>
+      </Kpi.Root>,
+    );
+    expect(screen.getByTestId("kpi")).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByText("Выручка")).toBeInTheDocument();
+    for (const part of ["value", "delta", "period"]) {
+      expect(screen.getByTestId(part)).toHaveAttribute("data-loading", "true");
+    }
+    expect(screen.queryByText("8,7 млн ₽")).toBeNull();
   });
 
   it("is a group named by its title; a link card is named by its own text", () => {
@@ -101,242 +351,40 @@ describe("Kpi", () => {
     expect(screen.getByTestId("link")).not.toHaveAttribute("role");
   });
 
-  it("the period stays whole on a narrow line: the description gives way", () => {
-    expect(cssValue(cssRule(CSS, ".period"), "flex")).toBe("none");
-    expect(cssValue(cssRule(CSS, ".description"), "text-overflow")).toBe("ellipsis");
-    expect(cssValue(cssRule(CSS, ".description"), "flex")).toBe("0 1 auto");
-  });
-
-  it("on a narrow card actions with a labelled button drop under the title", () => {
-    const narrow = ["@container (max-width: 22rem)"];
-    const rule = cssRule(
-      CSS,
-      ".head > .actions:has(> :is(button, a):not([data-icon-only]))",
-      narrow,
-    );
-    expect(cssValue(rule, "flex-basis")).toBe("100%");
-    expect(cssValue(rule, "margin-inline-start")).toBe("0");
-  });
-
-  it("a reading gives the change its value, tone and text, and no change draws no part", () => {
-    render(
-      <>
-        <Kpi.Root>
-          <Kpi.Delta
-            reading={{ change: -3, changeText: "−3%", changeTone: "danger" }}
-            data-testid="delta"
-          />
-        </Kpi.Root>
-        <Kpi.Root data-testid="quiet">
-          <Kpi.Value>38</Kpi.Value>
-          <Kpi.Delta reading={{ change: null, changeText: "", changeTone: "neutral" }} />
-        </Kpi.Root>
-      </>,
-    );
-    const badge = screen.getByTestId("delta").firstElementChild as HTMLElement;
-    expect(badge).toHaveTextContent("−3%");
-    expect(badge).toHaveAttribute("data-tone", "danger");
-    expect(badge.querySelector(`.${styles.trend}`)).toHaveAttribute("data-down", "true");
-    expect(screen.getByTestId("quiet").querySelector(`.${styles.change}`)).toBeNull();
-  });
-
-  it("a period alone takes the line under the title with no dot", () => {
-    render(
-      <Kpi.Root>
-        <Kpi.Title>Лиды</Kpi.Title>
-        <Kpi.Period data-testid="period">Октябрь</Kpi.Period>
-      </Kpi.Root>,
-    );
-    expect(screen.getByTestId("period").parentElement?.children).toHaveLength(1);
-  });
-
-  it("the title is title-s; the value steps by valueSize", () => {
-    render(
-      <>
-        <Kpi.Root>
-          <Kpi.Title data-testid="title">Выручка</Kpi.Title>
-          <Kpi.Value data-testid="l">4,2 млн ₽</Kpi.Value>
-        </Kpi.Root>
-        <Kpi.Root valueSize="m">
-          <Kpi.Value data-testid="m">92 %</Kpi.Value>
-        </Kpi.Root>
-        <Kpi.Root valueSize="s">
-          <Kpi.Value data-testid="s">Выдать PCX 160</Kpi.Value>
-        </Kpi.Root>
-      </>,
-    );
-    expect(screen.getByTestId("title")).toHaveClass(textRole.titleS);
-    expect(screen.getByTestId("l")).toHaveClass(textRole.headingL);
-    expect(screen.getByTestId("m")).toHaveClass(textRole.headingM);
-    expect(screen.getByTestId("s")).toHaveClass(textRole.bodyM);
-    expect(cssValue(cssRule(CSS, '.root[data-value-size="s"] .value'), "font-weight")).toBe(
-      "var(--prime-font-weight-medium)",
-    );
-  });
-
-  it("the change is a Badge s whose arrow follows the sign of value, none for zero", () => {
-    render(
-      <Kpi.Root>
-        <Kpi.Delta value={12} tone="success" data-testid="up">
-          +12%
-        </Kpi.Delta>
-        <Kpi.Delta value={-3} tone="danger" data-testid="down">
-          −3%
-        </Kpi.Delta>
-        <Kpi.Delta value={0} data-testid="flat">
-          0%
-        </Kpi.Delta>
-      </Kpi.Root>,
-    );
-    const badgeOf = (id: string) => screen.getByTestId(id).firstElementChild as HTMLElement;
-    expect(badgeOf("up")).toHaveAttribute("data-size", "s");
-    expect(badgeOf("up")).toHaveAttribute("data-tone", "success");
-    expect(badgeOf("up").querySelector(`.${styles.trend}`)).not.toHaveAttribute("data-down");
-    expect(badgeOf("down").querySelector(`.${styles.trend}`)).toHaveAttribute("data-down", "true");
-    expect(badgeOf("flat").querySelector(`.${styles.trend}`)).toBeNull();
-    expect(badgeOf("flat")).toHaveAttribute("data-tone", "neutral");
-    expect(cssValue(cssRule(CSS, ".trend[data-down]"), "rotate")).toBe("180deg");
-  });
-
-  it("loading holds a Skeleton in the value, the change and the reference line; the head stays", () => {
-    const kpi = (loading: boolean) => (
-      <Kpi.Root loading={loading} data-testid="kpi">
-        <Kpi.Title>Выручка</Kpi.Title>
-        <Kpi.Value data-testid="value">4,2 млн ₽</Kpi.Value>
-        <Kpi.Delta value={18} tone="success" data-testid="delta">
-          +18%
-        </Kpi.Delta>
-        <Kpi.Meta data-testid="meta">к сентябрю</Kpi.Meta>
-      </Kpi.Root>
-    );
-    const { rerender } = render(kpi(true));
-    expect(screen.getByTestId("kpi")).toHaveAttribute("aria-busy", "true");
-    expect(screen.getByText("Выручка")).toBeInTheDocument();
-    for (const id of ["value", "delta", "meta"]) {
-      const part = screen.getByTestId(id);
-      expect(part).toHaveAttribute("data-loading", "true");
-      expect(part.querySelector('[aria-hidden="true"][data-shape]')).not.toBeNull();
-    }
-    expect(screen.queryByText("4,2 млн ₽")).toBeNull();
-    rerender(kpi(false));
-    expect(screen.getByTestId("kpi")).not.toHaveAttribute("aria-busy");
-    expect(screen.getByTestId("value")).toHaveTextContent("4,2 млн ₽");
-    expect(screen.getByTestId("delta")).toHaveTextContent("+18%");
-  });
-
-  it("the value and the reference line take a tone; a Badge in the value stands beside it", () => {
-    render(
-      <Kpi.Root>
-        <Kpi.Value tone="warning" data-testid="value">
-          56 000 ₽<Badge.Root>SLA</Badge.Root>
-        </Kpi.Value>
-        <Kpi.Meta tone="success" data-testid="meta">
-          оплачено
-        </Kpi.Meta>
-      </Kpi.Root>,
-    );
-    expect(screen.getByTestId("value")).toHaveAttribute("data-tone", "warning");
-    expect(screen.getByTestId("value")).toHaveClass(styles.badged);
-    expect(screen.getByTestId("meta")).toHaveAttribute("data-tone", "success");
-  });
-
-  it("the change has a row of its own under the value; the media keeps to the bottom", () => {
-    expect(cssValue(cssRule(CSS, ".figure"), "display")).toBe("grid");
-    expect(cssValue(cssRule(CSS, ".change"), "display")).toBe("flex");
-    expect(cssValue(cssRule(CSS, ".media"), "margin-top")).toBe("auto");
-    expect(cssValue(cssRule(CSS, ".actions"), "margin-inline-start")).toBe("auto");
-    expect(cssValue(cssRule(CSS, ".title"), "padding-inline-end")).toBe(
-      "var(--corner-mark-room, 0)",
-    );
-  });
-
-  it("with asChild the whole card is the link: one tab stop, the parts inside it", async () => {
+  it("a Kpi.Link in the title stretches over the card; the controls inside stay above it", async () => {
     const user = userEvent.setup();
     render(
-      <>
-        <button type="button">До</button>
-        <Kpi.Root asChild>
-          <a href="#invoices">
-            <Kpi.Title>Счета к оплате</Kpi.Title>
-            <Kpi.Value>37</Kpi.Value>
-          </a>
-        </Kpi.Root>
-      </>,
+      <Kpi.Root data-testid="kpi">
+        <Kpi.Title>
+          <Kpi.Link href="#leads">Лиды</Kpi.Link>
+        </Kpi.Title>
+        <Kpi.Value>58</Kpi.Value>
+      </Kpi.Root>,
     );
-    const link = screen.getByRole("link", { name: /Счета к оплате\s*37/ });
-    expect(link).toHaveAttribute("data-interactive", "true");
-    expect(link).toHaveAttribute("data-mark", "true");
-    screen.getByRole("button", { name: "До" }).focus();
+    const card = screen.getByTestId("kpi");
+    const link = screen.getByRole("link", { name: "Лиды" });
+    expect(card).toHaveAttribute("data-link", "true");
+    expect(card).toHaveClass(rowLink.host);
+    expect(link).toHaveAttribute("data-row-link");
+    expect(cssValue(cssRule(CSS, ".link::after"), "inset")).toBe("0");
     await user.tab();
     expect(link).toHaveFocus();
   });
 
-  it("a group is one card: its Kpi.Root are cells, a faint line between them", () => {
+  it("asChild: the link is the card — one Tab stop that carries the card's look", async () => {
+    const user = userEvent.setup();
     render(
-      <Kpi.Group data-testid="group">
-        <Kpi.Root data-testid="cell">
-          <Kpi.Title>Конверсия</Kpi.Title>
-          <Kpi.Value>3,8%</Kpi.Value>
-        </Kpi.Root>
-        <Kpi.Root>
-          <Kpi.Title>Средний чек</Kpi.Title>
-          <Kpi.Value>2 450 ₽</Kpi.Value>
-        </Kpi.Root>
-      </Kpi.Group>,
-    );
-    const group = screen.getByTestId("group");
-    expect(group).toHaveAttribute("data-depth", "1");
-    const cell = screen.getByTestId("cell");
-    expect(cell).toHaveClass(styles.cell);
-    expect(cell).not.toHaveAttribute("data-depth");
-    expect(group.querySelectorAll("[data-depth]")).toHaveLength(0);
-    expect(cssValue(cssRule(CSS, ".cells > * + *"), "border-inline-start")).toContain(
-      "--prime-color-border-faint",
-    );
-    expect(
-      cssValue(cssRule(CSS, ".cells", ["@container (max-width: 22rem)"]), "grid-auto-flow"),
-    ).toBe("row");
-  });
-
-  it("a Sparkline reading fills the head: the scrubbed point moves the value, the period and the change", () => {
-    function Revenue() {
-      const reading = useSparkline({
-        data: [
-          { label: "1 окт", value: 400 },
-          { label: "2 окт", value: 500 },
-          { label: "3 окт", value: 450 },
-        ],
-        change: "previous",
-      });
-      return (
-        <Kpi.Root>
+      <Kpi.Root asChild>
+        <a href="#revenue" data-testid="link">
           <Kpi.Title>Выручка</Kpi.Title>
-          <Kpi.Period data-testid="period">{reading.date}</Kpi.Period>
-          <Kpi.Value data-testid="value">{reading.valueText}</Kpi.Value>
-          <Kpi.Delta value={reading.change} tone={reading.changeTone} data-testid="delta">
-            {reading.changeText}
-          </Kpi.Delta>
-          <Kpi.Media>
-            <Sparkline {...reading.plot} label="Выручка по дням" />
-          </Kpi.Media>
-        </Kpi.Root>
-      );
-    }
-    render(<Revenue />);
-    expect(screen.getByTestId("value")).toHaveTextContent("450");
-    expect(screen.getByTestId("period")).toHaveTextContent("3 окт");
-    expect(screen.getByTestId("delta")).toHaveTextContent("−10%");
-    const slider = screen.getByRole("slider", { name: "Выручка по дням" });
-    slider.focus();
-    return userEvent.keyboard("{ArrowLeft}").then(() => {
-      expect(screen.getByTestId("value")).toHaveTextContent("500");
-      expect(screen.getByTestId("period")).toHaveTextContent("2 окт");
-      expect(screen.getByTestId("delta")).toHaveTextContent("+25%");
-      expect(
-        (screen.getByTestId("delta").firstElementChild as HTMLElement).querySelector(
-          `.${styles.trend}`,
-        ),
-      ).not.toHaveAttribute("data-down");
-    });
+          <Kpi.Value>8,7 млн ₽</Kpi.Value>
+        </a>
+      </Kpi.Root>,
+    );
+    const link = screen.getByTestId("link");
+    expect(link).toHaveClass(styles.root);
+    expect(link).toHaveAttribute("data-interactive", "true");
+    await user.tab();
+    expect(link).toHaveFocus();
   });
 });

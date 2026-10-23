@@ -44,6 +44,7 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 | `loading` | `boolean` | `false` | Saving, for an owner that tracks the request itself: a spinner in the thumb, `aria-busy` on the input, presses do nothing. A promise from `onCheckedChange` does the same on its own. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`. |
 | `optional` | `boolean` | `false` | Muted `labels.optional` after the label text; the field may stay off. |
+| `fullWidth` | `boolean` | `false` | A settings row as wide as its container: the text and its hint at the start, the track at the end of the first line (`data-control="end"`). The label stays inside the row, so the whole row toggles. |
 | `labels` | `Partial<SwitchLabels>` | — | Built-in strings, see Labels. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
@@ -85,6 +86,7 @@ No `variant` / `tone` / `color`.
 | `disabled` | muted track (on = `accent-soft`), dimmed text | the setting is unavailable | `false` |
 | `invalid` | danger ring on the off track | the message is shown elsewhere; otherwise pass `error` | `false` |
 | `optional` | muted `labels.optional` after the text | a form where most fields are required | `false` |
+| `fullWidth` | the row spans its container: text and hint at the start, the track at the end | a settings row inside a card or a list (`Card.Body`) | `false` |
 | `loading` | a spinner turns inside the thumb, presses do nothing | the owner tracks the save itself; with a promise from `onCheckedChange` it comes on its own | `false` |
 
 **Combinations**
@@ -109,7 +111,7 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 ## Layout & spacing
 - Grid `[track][text]`; hint and error sit under the text column.
 - Switches in a settings list: a label-less [Fieldset](../fieldset/COMPONENT.md), the field column of a form, sets their rhythm.
-- Settings row (text left, switch right): flex row with `justify-content: space-between`; a bare `Switch.Root` with `aria-labelledby` / `aria-describedby` pointing at the row text.
+- Settings row (text left, switch right): `fullWidth`; or, with the text elsewhere, a flex row with `justify-content: space-between`; a bare `Switch.Root` with `aria-labelledby` / `aria-describedby` pointing at the row text.
 - In a form, a `name`d switch submits `"on"` when checked (native checkbox semantics).
 
 ## Accessibility
@@ -144,6 +146,7 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 | [sizes.tsx](examples/sizes.tsx) | Every size, track 24×16 to 44×24; the text follows the control tier — `size`. |
 | [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `defaultChecked`, `readOnly`, `invalid`, `loading`, `disabled`. |
 | [settings-row.tsx](examples/settings-row.tsx) | A settings row with text on the left and a bare track on the right — `aria-labelledby`, `aria-describedby`. |
+| [full-width.tsx](examples/full-width.tsx) | Settings rows with the text at the start and the track at the end, one with a hint — `fullWidth`, `hint`. |
 | [saving.tsx](examples/saving.tsx) | A setting that applies on the server at once: the thumb waits in its new place with a spinner, and a refused save glides it back and says why — `onCheckedChange`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the state and rewrites the hint to match it — `checked`, `onCheckedChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Switches submitted with a form: the value goes to FormData by `name`, a required one shows an error — `name`, `required`, `error`. |

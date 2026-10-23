@@ -4,13 +4,14 @@ import {
   Button,
   Card,
   ConfirmDialog,
+  Dropdown,
   Fieldset,
+  Icon,
   Input,
   Page,
   Select,
   Switch,
   Textarea,
-  Typography,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -67,6 +68,8 @@ export default function PageScreenExample() {
       window.setTimeout(() => setSaved(false), 2000);
     }, 900);
   };
+
+  const [removing, setRemoving] = React.useState(false);
 
   const removeWorkspace = () => new Promise<void>((resolve) => window.setTimeout(resolve, 1200));
 
@@ -130,12 +133,14 @@ export default function PageScreenExample() {
               </Fieldset>
             </Card.Body>
             <Card.Footer>
-              <Button.Root type="reset" variant="soft" tone="neutral" disabled={saving}>
-                Отменить изменения
-              </Button.Root>
-              <Button.Root type="submit" loading={saving}>
-                {saved ? "Сохранено" : "Сохранить"}
-              </Button.Root>
+              <Card.Actions>
+                <Button.Root type="reset" variant="soft" tone="neutral" disabled={saving}>
+                  Отменить изменения
+                </Button.Root>
+                <Button.Root type="submit" loading={saving}>
+                  {saved ? "Сохранено" : "Сохранить"}
+                </Button.Root>
+              </Card.Actions>
             </Card.Footer>
           </Card.Root>
         </form>
@@ -149,6 +154,7 @@ export default function PageScreenExample() {
             <Fieldset aria-label="Уведомления">
               {ALERTS.map((alert) => (
                 <Switch.Root
+                  fullWidth
                   key={alert.name}
                   name={alert.name}
                   defaultChecked={alert.defaultChecked}
@@ -164,31 +170,33 @@ export default function PageScreenExample() {
         <Card.Root>
           <Card.Header>
             <Card.Title as="h2">Рабочее пространство</Card.Title>
-            <Card.Description>Действия, которые нельзя отменить.</Card.Description>
-          </Card.Header>
-          <Card.Body>
-            <div className={styles.danger}>
-              <div className={styles.dangerText}>
-                <Typography variant="title-s">Удалить пространство</Typography>
-                <Typography variant="body-s" tone="secondary">
-                  Счета, клиенты и история будут удалены для всех участников.
-                </Typography>
-              </div>
-              <ConfirmDialog.Root
-                title="Удалить «Прайм Софт»?"
-                description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
-                confirmLabel="Удалить пространство"
-                onConfirm={removeWorkspace}
-              >
-                <ConfirmDialog.Trigger>
-                  <Button.Root variant="soft" tone="danger">
-                    Удалить
+            <Card.Description>Удаление необратимо, доступно владельцу.</Card.Description>
+            <Card.Actions>
+              <Dropdown.Root>
+                <Dropdown.Trigger>
+                  <Button.Root variant="ghost" tone="neutral" aria-label="Действия с пространством">
+                    <Button.Icon>
+                      <Icon name="action.more" />
+                    </Button.Icon>
                   </Button.Root>
-                </ConfirmDialog.Trigger>
-              </ConfirmDialog.Root>
-            </div>
-          </Card.Body>
+                </Dropdown.Trigger>
+                <Dropdown.Content>
+                  <Dropdown.Item tone="danger" onSelect={() => setRemoving(true)}>
+                    Удалить пространство
+                  </Dropdown.Item>
+                </Dropdown.Content>
+              </Dropdown.Root>
+            </Card.Actions>
+          </Card.Header>
         </Card.Root>
+        <ConfirmDialog.Root
+          open={removing}
+          onOpenChange={setRemoving}
+          title="Удалить «Прайм Софт»?"
+          description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
+          confirmLabel="Удалить пространство"
+          onConfirm={removeWorkspace}
+        />
       </Page.Body>
     </Page.Root>
   );

@@ -1,4 +1,4 @@
-/** A vehicle card with the photos as its cover: the car's badges stand still in the four corners, a photo's own note and a video's length travel with their slide, and a press opens the photo full-screen — `Carousel.Overlay`, `placement`, `renderOverlay`, `onItemOpen`. */
+/** A vehicle card with the photos as its cover: only the photo's own things stand on it — the count of photos, a photo's note and a video's length travelling with their slide — while the status goes to the header, and a press opens the photo full-screen — `Carousel.Overlay`, `placement`, `renderOverlay`, `onItemOpen`. */
 import { Badge, Card, Carousel, type CarouselItem, MediaViewer } from "prime-ui-kit";
 import * as React from "react";
 
@@ -53,26 +53,16 @@ export default function CarouselCardCoverExample() {
             }
             aria-label="Фото Kia Rio"
           >
-            <Carousel.Overlay placement="top-start">
-              <Badge.Root tone="success" variant="solid">
-                На линии
-              </Badge.Root>
-            </Carousel.Overlay>
             <Carousel.Overlay placement="top-end">
-              <Badge.Root tone="info" variant="solid">
-                Новая
-              </Badge.Root>
-            </Carousel.Overlay>
-            <Carousel.Overlay placement="bottom-start">
-              <Badge.Root variant="solid">А 123 ВС 777</Badge.Root>
-            </Carousel.Overlay>
-            <Carousel.Overlay placement="bottom-end">
-              <Badge.Root variant="solid">Аренда</Badge.Root>
+              <Badge.Root variant="solid">{`${index + 1} / ${MEDIA.length}`}</Badge.Root>
             </Carousel.Overlay>
           </Carousel.Root>
         </Card.Media>
         <Card.Header>
           <Card.Title>Kia Rio, 2022</Card.Title>
+          <Card.Badges>
+            <Badge.Root tone="success">На линии</Badge.Root>
+          </Card.Badges>
           <Card.Description>Пробег 48 200 км · водитель Иван Петров</Card.Description>
         </Card.Header>
       </Card.Root>

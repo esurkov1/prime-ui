@@ -57,14 +57,14 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other figure attributes. |
 
 ### ChartFrame.Header
-`ref` → `HTMLDivElement`. The top zone: title and description in the first column, `ChartFrame.Actions` at the end, under them when the panel is narrower than 24rem.
+`ref` → `HTMLDivElement`. The top zone, the kit's header row: the title with the description under it, `ChartFrame.Actions` at the end, whatever order they are written in. One line each, nothing wraps; without a description the actions share the title's line.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ### ChartFrame.Title
-`ref` → `HTMLHeadingElement`. The name of the chart; names the figure and the data table.
+`ref` → `HTMLHeadingElement`. The name of the chart on one line cut with an ellipsis, set in the title role of the panel's frame; names the figure and the data table.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -72,14 +72,14 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `className` and the other heading attributes. |
 
 ### ChartFrame.Description
-`ref` → `HTMLParagraphElement`. What the chart measures and over which period; describes the figure.
+`ref` → `HTMLParagraphElement`. What the chart measures and over which period, plain text on one line cut with an ellipsis; a `StatusDot` first is allowed. Describes the figure.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `className` and the other p attributes. |
 
 ### ChartFrame.Actions
-`ref` → `HTMLDivElement`. Controls of the chart in the header: a period switch, an export button.
+`ref` → `HTMLDivElement`. Controls of the chart at the end of the header: a period switch, an export button. They take the tier of the panel's frame (its own tier) and never wrap.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -172,7 +172,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 
 ## Layout & spacing
 - The root takes its container's width, card padding and radius, zones 16 px apart; on the page it carries the raised whisper, nested in a surface it is a flat tile one step deeper.
-- The header puts the title and the description in the first column and the actions at the end; under 24rem of panel width the actions drop under the description.
+- The panel takes the surface frame of its host tier (padding, radius, zone gap); the header is the kit's header row: the title and the description under it, one line each, the actions at the end at the frame's tier; nothing wraps, the title gives way.
 - The plot is 240 px high (160 px under 30rem of panel width) unless `height` is set; it never changes height between states.
 - Legend entries are chips one `xs` control high and wrap onto more lines; each has a 44 px touch hit area on coarse pointers.
 - `ChartFrame.Tooltip` is the floating layer of the ladder with the point's label over rows of swatch · series name · value. With `point` the kit places it like every anchored layer (`usePosition`): right of the point at its height, on the left only where the right has no room in the viewport, inside the viewport, following the plot on scroll. Without `point` the chart library positions it (Recharts `content`).
@@ -221,7 +221,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | [fill-height.tsx](examples/fill-height.tsx) | Revenue against the plan beside two KPI tiles: the plot takes the height of the stretched grid cell, and the plan line starts hidden until the legend turns it on — `height`, `defaultHiddenSeries`. |
 | [states.tsx](examples/states.tsx) | Loading, data, empty and error in the plot's place at one panel size; the error retries, and the legend of the one series only names it — `state`, `onRetry`, `readOnly`. |
 | [controlled.tsx](examples/controlled.tsx) | Lead sources with totals in the legend; the hidden series live in the page state and one button shows them all again — `hiddenSeries`, `onHiddenSeriesChange`. |
-| [narrow.tsx](examples/narrow.tsx) | A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `height`, `rows`. |
+| [narrow.tsx](examples/narrow.tsx) | A 320px column: the header keeps one line each and the title gives way to the action, the plot gets lower and a self-sizing SVG stretches to it — `height`, `rows`. |
 
 ### With a chart library
 ```tsx
@@ -267,5 +267,5 @@ ECharts and Chart.js take the same `width`, `height` and `series[i].color`; thei
 - A hand-drawn chart with its tooltip placed by hand (a `foreignObject`, clamped coordinates) → `ChartFrame.Tooltip` with `point`: it flips only when out of room and never jumps at the middle.
 
 ## Related
-- **Built from:** [Crossfade](../crossfade/COMPONENT.md) (state swap), [Skeleton](../skeleton/COMPONENT.md) (loading), [EmptyPage](../empty-page/COMPONENT.md) (empty, error, retry), `Icon`, `chartColors`, `ChartTooltip` (the chart tooltip shared with Sparkline; its floating panel scrolls in a [ScrollContainer](../scroll-container/COMPONENT.md)), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [StatusDot](../status-dot/COMPONENT.md) (the description's state), [Crossfade](../crossfade/COMPONENT.md) (state swap), [Skeleton](../skeleton/COMPONENT.md) (loading), [EmptyPage](../empty-page/COMPONENT.md) (empty, error, retry), `Icon`, `chartColors`, `ChartTooltip` (the chart tooltip shared with Sparkline; its floating panel scrolls in a [ScrollContainer](../scroll-container/COMPONENT.md)), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Sparkline](../sparkline/COMPONENT.md), [Card](../card/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

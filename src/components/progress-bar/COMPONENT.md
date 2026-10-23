@@ -7,14 +7,15 @@
 
 ## When to use
 - Determinate progress of an operation: file upload, import, export (`value`).
-- How much of a quota or a set of steps is done («Профиль: 3 из 5 шагов») (`value` + `max`).
+- How much of a quota or a set of steps is done («Профиль: 3 из 5 шагов») (`value` + `max`); a level out of a few — password strength, onboarding steps — as whole cells (`variant="steps"`).
 - How a whole splits into parts: used space by file type, tasks by status (`segments`, `max`); categories wear `color`, meanings wear `tone`; `legend` adds color · name · value · share.
+- A score or a share that is the headline of a card — a match score, leads by channel — drawn as tall ticks (`variant="ticks"`, with `value` or `segments`).
 - A ranking «label · value · share — bar»: top cities, reasons, funnel steps (`layout="rows"`, `scale`); a row that leads to the records behind it is a link (`href` of the segment: the whole row, hover wash and focus ring; `onClick` lets a router navigate with `event.preventDefault()`).
 - A ranking where each row has its own whole: fleet load per model, a quota per seat (`layout="rows"`, `scale="own"`, `max` per segment).
 - Per-row progress inside lists (FileUpload rows render it).
 
 ## When not to use
-- A compact radial indicator or KPI ring → use [ProgressCircle](../progress-circle/COMPONENT.md) (same `value` / `segments` API).
+- A compact radial indicator, or the ring of a KPI's parts beside its legend (`Kpi.Legend ring`) → use [ProgressCircle](../progress-circle/COMPONENT.md) (same `value` / `segments` API).
 - Unknown duration → use [Spinner](../spinner/COMPONENT.md); ProgressBar has no indeterminate mode.
 - Navigation through wizard steps → use [Stepper](../stepper/COMPONENT.md).
 - A trend over time → use [Sparkline](../sparkline/COMPONENT.md) or a chart on `chartColors`.
@@ -26,13 +27,13 @@ import { ProgressBar, type ProgressSegment } from "prime-ui-kit";
 
 ## Anatomy
 ```
-ProgressBar              <div>; size, tone (value mode), aria-busy while loading
+ProgressBar              <div>; size, variant, tone (value mode), aria-busy while loading
 ├─ header                label (ellipsis) + percentage (showValue, aria-hidden)
-└─ value mode:           <progress> (transparent, for assistive tech) + drawn line
-   segments mode:        <div role="group"> — parts pill + free rest; hidden distribution text
+└─ value mode:           <progress> (transparent, for assistive tech) + drawn line or cells
+   segments mode:        <div role="group"> — parts pill + free rest (ticks: the cells are the group); hidden distribution text
    └─ legend             <ul>: swatch · name · value · share per part (legend)
    rows layout:          <ol> — per part: label · value · share over its own bar
-   loading:              Skeleton bar (+ legend / row lines) in the same geometry
+   loading:              Skeleton bar or Skeleton cells (+ legend / row lines) in the same geometry
 ```
 
 ## API
@@ -44,16 +45,16 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type; `ticks` stand 16 → 40 px tall. Without it the tier of its host, else `m`. |
+| `variant` | `"line" \| "steps" \| "ticks"` | `"line"` | `line` — one line; `steps` (value mode) — `max` cells (2–12); `ticks` — thin tall ticks, as many as the width holds. Cells fill whole, by one front. `bar` layout. |
 | `label` | `string` | — | Visible label above the line and its accessible name; a value bar without it needs `aria-label`. |
 | `showValue` | `boolean` | `false` | Shows the rounded filled percentage at the end of the label row (`aria-hidden`); `bar` layout only. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton in the bar's geometry cross-fades into the data; the label stays. Pass the last known `value` or `segments` (or `0` / `[]`). |
 | `value` | `number` | — | Value mode: the current value, clamped to `0…max`. |
 | `max` | `number` | `100` (value mode), the sum of the parts (segments mode) | Value mode: top of the scale. Segments mode: total capacity; a `max` above the sum of the parts leaves the rest as track. `scale` `own`: the top of every row without its own `max` (default `100`). |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Value mode: fill color, telling the outcome. |
-| `steps` | `boolean` | `false` | Value mode: draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. For a level out of a few: password strength, onboarding steps. |
 | `segments` | `ProgressSegment[]` | — | Segments mode: parts `{ value, label?, max?, href?, onClick?, tone? \| color? }`; the width is a share of `max`. `rows` only: `href` makes the row a link, `onClick` runs on its press, `max` tops the row's own scale. |
-| `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout. |
+| `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout, `line` variant. |
 | `legend` | `boolean` | `false` | Segments mode: a legend under the bar, one row per part: color · name · value · share; it becomes the group's description. `bar` layout. |
 | `formatValue` | `(value: number) => string` | Russian digit groups | Segments mode: display of a part's value in the legend and the rows («1 840 000 ₽»). |
 | `layout` | `"bar" \| "rows"` | `"bar"` | Segments mode: `bar` — every part in one bar; `rows` — a ranking: an `<ol>`, one row per part with label · value · share over its own bar. |
@@ -63,6 +64,13 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root; `aria-label` names the bar when there is no `label`. |
 
 ## Variants
+
+### variant (`bar` layout)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `line` | one continuous line of the tier's track (4–8 px) | progress of an operation, a quota, parts of a whole | yes |
+| `steps` | `max` equal cells (2–12) of the line's thickness, ¾ of it apart; `value` rounds to a whole cell (value mode only) | a level out of a few: password strength, onboarding steps | |
+| `ticks` | thin ticks 16 · 20 · 24 · 32 · 40 px tall by tier, a tick ⅔ of the track wide and ½ of it apart, as many as the width holds; the value or each part takes whole ticks | a score or a distribution that heads a card: a match score, leads by channel | |
 
 ### tone (value mode or each segment)
 | Value | Looks like | Use when | Default |
@@ -104,30 +112,29 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | line 4px, label 12/16 | dense tables, inline rows | |
-| `s` | line 5px, label 12/16 | compact lists | |
-| `m` | line 6px, label 13/20 | default | yes |
-| `l` | line 7px, label 14/20 | a prominent single progress | |
-| `xl` | line 8px, label 14/20 | onboarding, dashboards | |
+| `xs` | line 4px, ticks 16px tall, label 12/16 | dense tables, inline rows | |
+| `s` | line 5px, ticks 20px tall, label 12/16 | compact lists | |
+| `m` | line 6px, ticks 24px tall, label 13/20 | default | yes |
+| `l` | line 7px, ticks 32px tall, label 14/20 | a prominent single progress | |
+| `xl` | line 8px, ticks 40px tall, label 14/20 | onboarding, dashboards, the headline of a card | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `showValue` | secondary `NN%` at the end of the header | uploads, quotas — the user tracks the number | `false` |
 | `legend` | rows of swatch · name · value · share under the bar | a distribution the reader compares in numbers | `false` |
-| `loading` | a Skeleton bar (and legend or row lines) in the same geometry | the data is on its way | `false` |
-| `steps` | `max` equal cells (2–12), each filled whole | a level out of a few: password strength, an onboarding step | `false` |
+| `loading` | a Skeleton bar or Skeleton cells (and legend or row lines) in the same geometry | the data is on its way | `false` |
 | `showShare` | `rows`: the muted share at the end of each row | off when the value already is the share (a load in percent) | `true` |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| tone / size | props | `data-tone` (value mode), `data-size` on the root |
+| tone / size / variant | props | `data-tone` (value mode), `data-size`, `data-variant` (`bar` layout) on the root |
 | value | `value`, `max` | native `value` / `max`; the drawn pill slides by `translate` over `slow` + `standard`, RTL aware |
 | segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the group, `data-tone` or `data-color` per part; widths animate by `flex-grow` over `slow` |
 | rows | `layout="rows"`, `scale` | `data-layout="rows"` on the root, an `<ol>`; each bar slides like the value pill |
 | loading | `loading` | `aria-busy` on the root; Skeletons in place of the bar, the legend or the rows; the data cross-fades in and the height glides (`RegionSwap`) |
-| steps | `steps` (value mode) | `data-steps="true"` on the bar; `max` cells (2–12), filled ones `data-filled`; a cell fills from its start edge (`base` · emphasized), cells of one change go half a stagger step apart — from the start when filling, from the end when emptying |
+| steps / ticks | `variant` | the cells are drawn twice — the rest row and the fill row; one front reveals the fill row (`--pb-filled` of `--pb-cells` on the cells, `translate` over `slow` + `standard`, RTL aware) while the cells stand still, so a change caught mid-way goes on from where the front is and never splits into cells of their own. At rest the front stands mid-gap: a cell is always whole. Ticks follow the width (their count changes, never their size); a recolored tick fades (`fade-base`), a tick the front leaves keeps its color while the front passes it |
 | empty segments | `segments` empty or all `0` | only the track; accessible text `labels.empty` / `labels.allEmpty` |
 | reduced motion | `prefers-reduced-motion` | fill, widths and cells change instantly |
 
@@ -137,7 +144,7 @@ Always controlled: pass the current `value` or `segments` on every render.
 - `width: 100%` of the parent; the header is a row with the label (ellipsis) and the value.
 - Label → line: the tier `label-gap` (`--prime-space-1` xs/s, `--prime-space-2` m–xl). The label is primary, medium weight; the percentage secondary, tabular numbers.
 - Bar → legend `--prime-space-3` (12). Rows (`layout="rows"`) are 12 apart, each header 4 above its bar: the label (secondary, truncates) takes the free width, the value (primary, medium) and the share (muted, at least 4ch) line up at the end in tabular numbers.
-- `hairline` gaps and `steps` cells are ¾ of the line thickness apart.
+- `hairline` gaps and `steps` cells are ¾ of the line thickness apart; `ticks` are ⅔ of it wide and ½ of it apart (a tick 4 and a gap 3 on `m`), their height the tier's 16 · 20 · 24 · 32 · 40.
 - Stack several bars 16–20 apart (a gap on their parent).
 
 ## Accessibility
@@ -172,8 +179,8 @@ Always controlled: pass the current `value` or `segments` on every render.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | An import in progress with its name and percentage — `value`, `label`, `showValue`. |
-| [variants.tsx](examples/variants.tsx) | Every fill color; the tone tells the outcome, not the progress — `tone`. |
-| [sizes.tsx](examples/sizes.tsx) | Every tier: the line grows from 4 to 8 px like the Slider track — `size`. |
+| [variants.tsx](examples/variants.tsx) | Every way to draw the scale and every fill color; the tone tells the outcome, not the progress — `variant`, `tone`. |
+| [sizes.tsx](examples/sizes.tsx) | Every tier: the line grows from 4 to 8 px like the Slider track, ticks stand 16 to 40 px tall — `size`, `variant`. |
 | [states.tsx](examples/states.tsx) | Loading takes the bar's own geometry, so the data lands without a jump — `loading`. |
 | [custom-max.tsx](examples/custom-max.tsx) | A scale of steps instead of percent: 3 of 5 profile steps — `max`. |
 | [segments.tsx](examples/segments.tsx) | Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list with its own spoken text — `segments`, `segmentGap`, `max`, `labels`. |
@@ -181,7 +188,9 @@ Always controlled: pass the current `value` or `segments` on every render.
 | [ranking.tsx](examples/ranking.tsx) | Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step, each step a link — `layout`, `scale`, `href`. |
 | [own-scale.tsx](examples/own-scale.tsx) | A ranking where each row has its own scale: fleet load per model, each model out of its own fleet, each row a link — `layout`, `scale`, `max`, `href`. |
 | [percent-rows.tsx](examples/percent-rows.tsx) | A ranking whose values already are percents: fleet load per model, each row its value alone — `layout`, `scale`, `showShare`, `formatValue`. |
-| [steps.tsx](examples/steps.tsx) | The scale as whole cells that fill one after another: 2 of 5 onboarding steps, forward and back — `steps`, `max`. |
+| [steps.tsx](examples/steps.tsx) | The scale as whole cells that one front fills: 2 of 5 onboarding steps, forward and back — `variant`, `max`. |
+| [ticks.tsx](examples/ticks.tsx) | Ticks as many as the width holds: a match score and an index that has no data yet — `variant`, `size`, `tone`. |
+| [ticks-legend.tsx](examples/ticks-legend.tsx) | Leads by channel as ticks with a legend; another period moves one front and recolors the ticks — `variant`, `segments`, `legend`. |
 | [milestone.tsx](examples/milestone.tsx) | A rare milestone: the last invoice of the quarter fills the bar, the tone turns success and a short confetti burst marks it — `value`, `tone`, `celebrate()`. |
 
 ## Mistakes
@@ -196,6 +205,8 @@ Always controlled: pass the current `value` or `segments` on every render.
 - A column of separate value bars for rows that each have their own whole → `layout="rows"`, `scale="own"`, `max` on each segment.
 - «79% 79%» in a ranking of percents → `showShare={false}` with a `formatValue` that adds `%`.
 - A grey box while the data loads → `loading` draws the Skeleton in the bar's geometry.
+- A row of hand-drawn bars or cells for a level or a score → `variant="steps"` or `variant="ticks"`: one front fills them, so a fast change never breaks into cells of their own.
+- A larger `size` to make a bar look heavier → `size` follows the host's tier; a score that heads a card takes `variant="ticks"`.
 
 ## Related
 - **Built from:** [Skeleton](../skeleton/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md)

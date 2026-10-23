@@ -170,6 +170,11 @@ const darkOnly = Object.fromEntries(
  * off-screen size estimate, a gesture clock. One theme-independent value each.
  */
 const JS_DEFAULTS = [
+  "control.xs.track",
+  "control.s.track",
+  "control.m.track",
+  "control.l.track",
+  "control.xl.track",
   "gallery.maxSize",
   "message.sticker",
   "message.videoNoteBox",

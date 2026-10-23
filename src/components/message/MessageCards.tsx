@@ -1,18 +1,24 @@
 import * as React from "react";
 
 import { Avatar } from "@/components/avatar/Avatar";
-import { Badge } from "@/components/badge/Badge";
+import { StatusDot } from "@/components/status-dot/StatusDot";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
+import { HeaderLineContent, headerRowStyles } from "@/internal/headerRow";
 import { useLabels } from "@/internal/labels";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import type { PaletteColor } from "@/internal/states";
 import statusLoop from "@/internal/statusLoop.module.css";
+import { FRAME_DESCRIPTION, FRAME_TITLE } from "@/internal/surfaceFrame";
 
 import styles from "./MessageCards.module.css";
+
+/** A card in a bubble stands on the `m` step: the 14/20 title keeps the bubble's text scale. */
+const CARD_FRAME = "m";
 
 // ─── Location ─────────────────────────────────────────────────────────────────
 
@@ -87,19 +93,23 @@ export function MessageLocation({
         <div className={styles.mapFrame}>{map}</div>
       )}
       <div className={styles.place}>
-        {title || live ? (
-          <div className={styles.placeTitle}>
-            {title ? <span data-message-selectable="">{title}</span> : null}
-            {live ? (
-              <Badge.Root size="xs" tone="success">
-                <Badge.Dot />
-                {labels.live}
-              </Badge.Root>
-            ) : null}
+        {title ? (
+          <div className={cx(FRAME_TITLE[CARD_FRAME], styles.placeTitle)}>
+            <span data-message-selectable="">{title}</span>
           </div>
         ) : null}
-        <div className={styles.placeAddress}>
-          {address ? <span data-message-selectable="">{address}</span> : null}
+        {/* A live place states it first: the dot, the word, then the address. */}
+        <div
+          className={cx(
+            FRAME_DESCRIPTION[CARD_FRAME],
+            headerRowStyles.description,
+            styles.placeAddress,
+          )}
+        >
+          <HeaderLineContent>
+            {live ? <StatusDot tone="success">{labels.live}</StatusDot> : null}
+            {address ? <span data-message-selectable="">{address}</span> : null}
+          </HeaderLineContent>
           {spacer}
         </div>
       </div>
@@ -142,6 +152,8 @@ export function MessageContact({
 }: MessageContactProps) {
   const { spacer } = useMessagePart();
   const actions = React.Children.toArray(children).length > 0;
+  // The buttons take the card's tier, like the fields of a surface.
+  const controls = useHostTier(CARD_FRAME, "surface");
   return (
     <div {...rest} ref={ref} className={cx(styles.contact, className)}>
       <div className={styles.person}>
@@ -150,10 +162,10 @@ export function MessageContact({
           <Avatar.Fallback>{initials(name)}</Avatar.Fallback>
         </Avatar.Root>
         <div className={styles.personText}>
-          <div className={styles.personName}>
+          <div className={cx(FRAME_TITLE[CARD_FRAME], styles.personName)}>
             <span data-message-selectable="">{name}</span>
           </div>
-          <div className={styles.personPhone}>
+          <div className={cx(FRAME_DESCRIPTION[CARD_FRAME], styles.personPhone)}>
             {phone ? <span data-message-selectable="">{phone}</span> : null}
             {actions ? null : spacer}
           </div>
@@ -161,7 +173,7 @@ export function MessageContact({
       </div>
       {actions ? (
         <div className={styles.contactActions}>
-          {children}
+          {controls.provide(children)}
           {spacer}
         </div>
       ) : null}

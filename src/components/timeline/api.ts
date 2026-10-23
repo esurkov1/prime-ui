@@ -1,4 +1,5 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BADGE_GROUP_LABELS } from "../badge/Badge";
 
 const TONE = '"neutral" | "accent" | "success" | "warning" | "danger" | "info"';
 
@@ -140,9 +141,34 @@ export const api: ComponentApi = {
     },
     {
       name: "Timeline.ItemTitle · Timeline.ItemMeta",
-      en: "`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, wraps) and the muted secondary line, tabular — under the title the date (`<strong>` emphasizes a part; several `Timeline.ItemMeta` stack), inside `Timeline.ItemValue` the value's second line.",
-      ru: "Строки `<span>`: событие (medium, переносится) и приглушённая вторая строка, табличные цифры — под заголовком дата (`<strong>` выделяет часть; несколько `Timeline.ItemMeta` встают столбиком), внутри `Timeline.ItemValue` вторая строка значения.",
+      en: "`ref` → `HTMLSpanElement`. `<span>` lines, one line each, cut with an ellipsis: the event (medium) and the muted secondary line, tabular; a `StatusDot` first states the state. Inside `Timeline.ItemValue` the meta is the value's second line.",
+      ru: "Строки `<span>`, каждая одна, с обрезкой: событие (medium) и приглушённая вторая строка, табличные цифры; `StatusDot` первым называет состояние. Внутри `Timeline.ItemValue` мета — вторая строка значения.",
       props: textProps("The text of the line.", "Текст строки."),
+    },
+    {
+      name: "Timeline.ItemBadges",
+      en: "`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the event, the meaning in its `tone` or `color`. The title gives way first; what does not fit folds into «+N».",
+      ru: "`Badge.Group` после названия, на его строке: все бейджи события, смысл — в `tone` или `color`. Название уступает первым, что не влезло — «+N».",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The `Badge.Root`s of the event (a status, a kind).",
+          ru: "`Badge.Root` события (статус, вид).",
+        },
+        {
+          name: "labels",
+          type: "Partial<BadgeGroupLabels>",
+          en: "Built-in strings of the «+N» badge, see the `Badge.Group` labels.",
+          ru: "Системные строки бейджа «+N», см. подписи `Badge.Group`.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other `div` attributes.",
+          ru: "`className` и остальные атрибуты `div`.",
+        },
+      ],
     },
     {
       name: "Timeline.ItemValue",
@@ -194,7 +220,18 @@ export const api: ComponentApi = {
       props: [spanRest],
     },
   ],
-  labels: [],
+  labels: labelRows(BADGE_GROUP_LABELS, {
+    more: {
+      en: "Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many.",
+      ru: "Видимый текст бейджа «+N» для не поместившихся бейджей; `{count}` — сколько их.",
+      part: "Timeline.ItemBadges",
+    },
+    moreCount: {
+      en: "What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip.",
+      ru: "Что читают ассистивные технологии вместо видимого текста этого бейджа; `{count}` — сколько. Сами значения — в его подсказке.",
+      part: "Timeline.ItemBadges",
+    },
+  }),
   accessibility: {
     keyboard: [
       {

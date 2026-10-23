@@ -1,5 +1,10 @@
-/* Cards side by side, at least 18rem each, sharing the row; a phone stacks them. */
-.grid {
+/*
+ * Cards side by side, as many as fit; a phone stacks them. `.grid` lays out cards of different
+ * kinds, each at its own height; `.row` is a row of one kind (tariffs, orders): the cards stretch
+ * to one height and their footers keep to the bottom.
+ */
+.grid,
+.row {
   display: grid;
   grid-template-columns: repeat(
       auto-fit,
@@ -10,7 +15,16 @@
   min-width: 0;
 }
 
-/* A catalogue: dense photo tiles, at least 12rem each, as many as fit. */
+.grid {
+  align-items: start;
+}
+
+/* A card across the whole row (a start cover needs the width for its column). */
+.wide {
+  grid-column: 1 / -1;
+}
+
+/* Photo cards: one ratio per grid, tiles of the catalogue width. */
 .catalogue {
   display: grid;
   grid-template-columns: repeat(
@@ -22,36 +36,17 @@
   min-width: 0;
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-4);
-  width: 100%;
-  min-width: 0;
+/* The narrowest phone (320): the card keeps every text inside, its footer stacks. */
+.phone {
+  width: min(100%, calc(var(--prime-layout-narrow-width) - var(--prime-space-10)));
 }
 
-/* Width probes for the container-query demo: 18rem and 40rem. */
-.w18 {
-  width: min(100%, calc(var(--prime-space-24) * 3));
+/* The box of a long list: a card whose body scrolls its own rows. */
+.scroller {
+  max-block-size: calc(var(--prime-space-24) * 3.5);
 }
 
-.w40 {
-  width: min(100%, calc(var(--prime-space-20) * 8));
-}
-
-/* 36rem. */
-.panel {
-  width: min(100%, calc(var(--prime-space-24) * 6));
-}
-
-.listRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  min-width: 0;
-}
-
-.listMeta {
-  flex: none;
+/* A form around a card in a grid: the card itself is the grid item. */
+.form {
+  display: contents;
 }

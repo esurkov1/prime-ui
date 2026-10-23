@@ -1,5 +1,5 @@
-/** The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the reading of all, no tooltip repeats the readings, and each tile opens its section — `point`, `onPointChange`, `size`. */
-import { Card, Kpi, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
+/** The KPI tiles of a dashboard follow one cursor: a scrub on any tile moves the point and the reading of all, no tooltip repeats the readings, and each tile opens its section — `point`, `onPointChange`. */
+import { Kpi, Sparkline, type SparklinePoint, useSparkline } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -22,22 +22,22 @@ export default function SparklineControlledExample() {
     <div className={styles.tiles}>
       <Kpi.Root>
         <Kpi.Title>
-          <Card.Link href="#leads">Лиды</Card.Link>
+          <Kpi.Link href="#leads">Лиды</Kpi.Link>
         </Kpi.Title>
-        <Kpi.Period>{leads.date}</Kpi.Period>
         <Kpi.Value>{leads.valueText}</Kpi.Value>
+        <Kpi.Period>{leads.date}</Kpi.Period>
         <Kpi.Media>
-          <Sparkline {...leads.plot} label="Лиды по дням" size="s" />
+          <Sparkline {...leads.plot} label="Лиды по дням" />
         </Kpi.Media>
       </Kpi.Root>
       <Kpi.Root>
         <Kpi.Title>
-          <Card.Link href="#bookings">Брони</Card.Link>
+          <Kpi.Link href="#bookings">Брони</Kpi.Link>
         </Kpi.Title>
-        <Kpi.Period>{bookings.date}</Kpi.Period>
         <Kpi.Value>{bookings.valueText}</Kpi.Value>
+        <Kpi.Period>{bookings.date}</Kpi.Period>
         <Kpi.Media>
-          <Sparkline {...bookings.plot} label="Брони по дням" size="s" />
+          <Sparkline {...bookings.plot} label="Брони по дням" />
         </Kpi.Media>
       </Kpi.Root>
     </div>

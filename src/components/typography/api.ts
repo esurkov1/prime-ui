@@ -9,7 +9,7 @@ export const api: ComponentApi = {
       props: [
         {
           name: "variant",
-          type: '"caption" | "body-s" | "body-m" | "body-l" | "title-s" | "title-m" | "title-l" | "heading-s" | "heading-m" | "heading-l" | "display-s" | "display-m" | "display-l" | "code"',
+          type: '"caption" | "body-s" | "body-m" | "body-l" | "title-xs" | "title-s" | "title-m" | "title-l" | "heading-s" | "heading-m" | "heading-l" | "display-s" | "display-m" | "display-l" | "code"',
           required: true,
           en: "Text role: size, line height, weight and tracking.",
           ru: "Текстовая роль: кегль, межстрочный интервал, начертание и трекинг.",

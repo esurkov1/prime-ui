@@ -12,6 +12,7 @@ import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import palette from "@/internal/palette.module.css";
+import { FRAME_DESCRIPTION, FRAME_TITLE } from "@/internal/surfaceFrame";
 import textRole from "@/internal/textRole.module.css";
 import {
   inFlight,
@@ -50,10 +51,10 @@ export type MessageFileProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
   };
 
 /**
- * A document: a round tile with the format (or the file's picture), the name and the size (or
+ * A document, the row anatomy of a card on the `s` step of the frame (the bubble's text scale): a round 40 tile with the format (or the file's picture), the name and the size (or
  * «{done} из {total}», or the failure) beside it. The tile is the file's one action, in one spot:
  * download, cancel, retry. While the file transfers, failed or is not fetched yet, the shared
- * transfer disk (`internal/transferDisk`, size `xl`) covers the tile: the cross on the media shade
+ * transfer disk (`internal/transferDisk`, size `l`) covers the tile: the cross on the media shade
  * with the ring of the share, the danger retry, the download arrow. The download of `href` is a
  * link drawn as a `Button shape="circle"` (`asChild`) over the tile.
  */
@@ -125,7 +126,7 @@ export function MessageFile({
           <Button.Root
             asChild
             shape="circle"
-            size="xl"
+            size="l"
             className={styles.action}
             aria-label={formatLabel(labels.download, { name })}
           >
@@ -141,7 +142,7 @@ export function MessageFile({
         {/* Mounted for any transfer state: it fills, and fades out once the file is done. */}
         {transfer !== undefined ? (
           <TransferDisk
-            size="xl"
+            size="l"
             className={styles.disk}
             state={transfer}
             progress={progressProp}
@@ -156,10 +157,10 @@ export function MessageFile({
           />
         ) : null}
       </span>
-      <div className={styles.name} title={name}>
+      <div className={cx(FRAME_TITLE.m, styles.name)} title={name}>
         <span data-message-selectable="">{preview ? name : splitFileName(name).base}</span>
       </div>
-      <div className={styles.meta} data-failed={failed || undefined}>
+      <div className={cx(FRAME_DESCRIPTION.m, styles.meta)} data-failed={failed || undefined}>
         {description ? <span className={styles.size}>{description}</span> : null}
         {spacer}
       </div>

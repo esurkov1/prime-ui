@@ -63,7 +63,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "narrow",
       description:
-        "Колонка 320px: действия уходят под заголовок, график ниже, SVG с viewBox растягивается по области — `height`, `rows`.",
+        "Колонка 320px: заголовок уступает действию, строки не переносятся, график ниже, SVG с viewBox растягивается по области — `height`, `rows`.",
     },
   ],
   api,

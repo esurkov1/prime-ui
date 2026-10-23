@@ -1,39 +1,53 @@
-/** A company settings form on a card: a header, fields on the surface fill and the submit button in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. */
-import { Button, Card, Fieldset, Input, Switch } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+/** A record card: the mark, the title with its badges, a status line, a more menu, label — value rows and the total with one accent button — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`. */
+import { Badge, Button, Card, DescriptionList, Dropdown, Icon, StatusDot } from "prime-ui-kit";
 
 export default function CardOverviewExample() {
   return (
-    <form className={styles.panel} onSubmit={(event) => event.preventDefault()}>
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>Профиль компании</Card.Title>
-        </Card.Header>
-        <Card.Body>
-          <Fieldset>
-            <Input.Root label="Название" required>
-              <Input.Wrapper>
-                <Input.Field name="name" defaultValue="ООО «Прайм»" />
-              </Input.Wrapper>
-            </Input.Root>
-            <Input.Root label="Сайт" optional hint="Покажем в счетах и письмах">
-              <Input.Wrapper>
-                <Input.Field name="site" type="url" placeholder="https://" />
-              </Input.Wrapper>
-            </Input.Root>
-            <Switch.Root name="report" defaultChecked>
-              <Switch.Label>Отправлять ежемесячный отчёт</Switch.Label>
-            </Switch.Root>
-          </Fieldset>
-        </Card.Body>
-        <Card.Footer>
-          <Button.Root type="reset" variant="soft" tone="neutral">
-            Отмена
-          </Button.Root>
-          <Button.Root type="submit">Сохранить</Button.Root>
-        </Card.Footer>
-      </Card.Root>
-    </form>
+    <Card.Root>
+      <Card.Header>
+        <Card.Icon>
+          <Icon name="object.package" />
+        </Card.Icon>
+        <Card.Title>Заказ № 4821</Card.Title>
+        <Card.Badges>
+          <Badge.Root tone="warning">Срочно</Badge.Root>
+          <Badge.Root>Опт</Badge.Root>
+        </Card.Badges>
+        <Card.Description>
+          <StatusDot tone="warning">Ждёт оплаты</StatusDot>
+          ООО «Северный ветер»
+        </Card.Description>
+        <Card.Actions>
+          <Dropdown.Root>
+            <Dropdown.Trigger>
+              <Button.Root variant="soft" tone="neutral" aria-label="Ещё">
+                <Button.Icon>
+                  <Icon name="action.more" />
+                </Button.Icon>
+              </Button.Root>
+            </Dropdown.Trigger>
+            <Dropdown.Content align="end">
+              <Dropdown.Item>Открыть заказ</Dropdown.Item>
+              <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Root>
+        </Card.Actions>
+      </Card.Header>
+      <Card.Body>
+        <DescriptionList.Root align="end">
+          <DescriptionList.Item label="Менеджер">Анна Котова</DescriptionList.Item>
+          <DescriptionList.Item label="Доставка">Курьер, 9 окт.</DescriptionList.Item>
+          <DescriptionList.Item label="Позиций">12</DescriptionList.Item>
+        </DescriptionList.Root>
+      </Card.Body>
+      <Card.Footer>
+        <Card.Total label="К оплате" tone="warning">
+          184 500 ₽
+        </Card.Total>
+        <Card.Actions>
+          <Button.Root>Выставить счёт</Button.Root>
+        </Card.Actions>
+      </Card.Footer>
+    </Card.Root>
   );
 }

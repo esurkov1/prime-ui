@@ -19,7 +19,8 @@ checks.
 - [ ] Creating one of several kinds whose forms differ is a button with a `Dropdown` of kinds (grouped by family), a pick opens that kind's form; no choosing step and «Далее» inside a dialog ([a kind that leads to its own form](choosing.md#a-kind-that-leads-to-its-own-form)).
 - [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 - [ ] A titled panel carries its heading in its `Card.Header` and stacks in the flow; no heading column beside a panel ([surfaces](composition.md#4-surfaces)).
-- [ ] A card about one figure is a `Kpi.Root` with no `Card.Root` around it; a figure inside a record card is a `DescriptionList` or `Card.Total`, not a Kpi ([Kpi / Card](choosing.md#3-pairs-that-are-easy-to-confuse)).
+- [ ] A card about one figure is a `Kpi.Root` with no `Card.Root` around it; a figure inside a record card is a `DescriptionList` or `Card.Total`, a record's text facts a `DescriptionList` — never a Kpi ([Kpi / Card](choosing.md#3-pairs-that-are-easy-to-confuse)).
+- [ ] Every KPI row holds one size, picked by how many figures share it: `s` for 6–8, `m` for 4–5, `l` for three, `xl` for one or two ([a figure: Kpi and its size](choosing.md#a-figure-kpi-and-its-size)).
 - [ ] A DataTable's row grip and column order follow the rule: grip at the end, columns by `columnOrder` saved with `hiddenColumns` ([choosing](choosing.md#3-pairs-that-are-easy-to-confuse)).
 - [ ] The column chooser is `columnsMenu` only over a row-actions column, else `DataTableColumnsMenu` beside the table's search; a DataTable `toolbar` holds the table's controls unwrapped, never a lone button ([controls of a table](composition.md#controls-of-a-table)).
 - [ ] A rich board card is made of the Kanban card parts (zones, title with number, resources, facts, a `fullWidth` next step), its hideable fields a `KanbanFieldsMenu` beside the filter, every card in `items` ([sales pipeline board](composition.md#sales-pipeline-board)).
@@ -108,11 +109,26 @@ checks.
 - [ ] A drawer loads its tabs' data itself, the history has its own tab, and returning to a tab never shows a skeleton again ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] A record dialog opens with its header and tabs at once: what the list row knows shows, only the unknown lines hold `loading` ([a record in a drawer](composition.md#a-record-in-a-drawer)).
 - [ ] An action apart from a dialog's answer («Выйти» on a profile) is `Drawer.Actions` / `Modal.Actions` inside the footer, at its start ([a record in a drawer](composition.md#a-record-in-a-drawer)).
-- [ ] A chat about a record heads itself in two lines — `Chat.Title number` over `Chat.Badges` — and an always-open search is `Chat.Search persistent` ([messages](choosing.md#2-inside-a-category)).
-- [ ] A tile that is a link shows the kit's arrow, never one of mine; a value in words is `Kpi.Root valueSize="s"` ([KPI tiles](composition.md#worked-example-a-metric-panel-with-a-period-switch)).
-- [ ] A task card with an assignee names the person once: the picker first in `Card.Description`, the facts after it, the term in `Card.Title` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
+- [ ] A chat about a record heads itself in two lines — `Chat.Title number` with `Chat.Badges` on its line, the pickers `Select`s in `Chat.Actions` — and an always-open search is `Chat.Search persistent` ([messages](choosing.md#2-inside-a-category)).
+- [ ] A KPI card that opens is `Kpi.Root asChild` around the link (no actions inside, no arrow of mine) or, with a chart, `Kpi.Link` in its title ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
+- [ ] A KPI's period stands once — `Kpi.Period` under the value, or once in the page's bar for a row that shares it; never in the title ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
+- [ ] `Kpi.Meta` holds only new data (a plan, a threshold, a composition), never the period or the base of the change ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
+- [ ] S and M cards write a large sum short («8,7» + `Kpi.Unit` «млн ₽»), L and XL in full; the unit always in `Kpi.Unit` ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
+- [ ] A card's status and role badges are `Card.Badges` after the title — not under it, not beside the buttons ([a card's header](ux.md#a-cards-header-body-and-footer)).
+- [ ] A `Card.Header` holds no accent button: «Ещё» and a value picker beside a footer, the accent button last in `Card.Footer` ([a card's header](ux.md#a-cards-header-body-and-footer)).
+- [ ] A person or status picker in a card is a `Select` as tall as the buttons, never a Badge chip ([a card's header](ux.md#a-cards-header-body-and-footer)).
+- [ ] A record row in a card opens as a whole — no pencil or button on it ([a card's header](ux.md#a-cards-header-body-and-footer)).
+- [ ] Badges stand after the title on its line in every header and record row, folding whole into «+N» — never under it ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
+- [ ] A status in a line of text is a `StatusDot`, not a hand-made dot or `Badge.Dot` beside a text ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
+- [ ] A chip picker (`Select variant="status"`, a `Badge.Root` in a `Dropdown.Trigger`) is only in a dense row or a table cell; on a surface it is a `Select` at the controls' tier ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
+- [ ] No static line between the zones of a surface; only a scrolled region shows an edge cue ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
+- [ ] A record's dialog header is the title with its number and badges on one line, a one-line description, and `Select` pickers and «Ещё» in its actions ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] A card draws no line between its zones, and its photo is a `Carousel` in `Card.Media` ([a card drawn by hand](anti-slop.md#3b-a-card-drawn-by-hand)).
+- [ ] A KPI made of parts names them in `Kpi.Legend` inside `Kpi.Footer`, never with the bar's `legend` in `Kpi.Media` ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
+- [ ] No text of a KPI card wraps or leaves it: a long title or note is shortened, never wrapped or the card widened ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
+- [ ] A task card with an assignee names the person once: the picker in `Card.Actions`, the facts in `Card.Description`, the term in `Card.Title` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
 - [ ] An object of a record (a video, an account, a session) is a card of one `Card.Header`: picture, title, one line of data, one action in `Card.Actions` — two lines, never three ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
-- [ ] A record's fact tiles are `Kpi.Root valueSize="s"` in every dialog of the app (`valueSize="m"` for a record's figures in rows of two or four), no Typography inside `Kpi.Value`; a record card with a total ends in `Card.Footer divider="fill"` with `Card.Total` ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
+- [ ] A record's facts are one `DescriptionList` in every dialog of the app (a judgement in `DescriptionList.Item tone`), its figures `Kpi.Root` on the dialog's tier, no Typography inside a value; a record card with a total has `Card.Total` at the start of its `Card.Footer` and the action at its end ([tiles and cards of a record](composition.md#tiles-and-cards-of-a-record)).
 - [ ] An on/off permission or setting is a `Switch`, a level per entity a `FieldList` of `Select`s, a set of values in a table cell `Badge.Group overflow="count"` ([a flag, a level, a set](choosing.md#a-flag-a-level-a-set)).
 - [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 

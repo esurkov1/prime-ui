@@ -325,6 +325,13 @@ export const semanticTokens = {
       weight: "{font.weight.regular}",
       tracking: "{font.tracking.normal}",
     },
+    /** The title of the smallest surface (an xs card, a dense tile): over a caption line, 32 high. */
+    titleXs: {
+      size: "{font.size.13}",
+      lineHeight: "{font.lineHeight.16}",
+      weight: "{font.weight.semibold}",
+      tracking: "{font.tracking.normal}",
+    },
     titleS: {
       size: "{font.size.14}",
       lineHeight: "{font.lineHeight.20}",
@@ -898,7 +905,6 @@ export const semanticTokens = {
     paddingS: "{space.4}",
     paddingM: "{space.5}",
     paddingL: "{space.6}",
-    gap: "{space.4}",
   },
 
   modal: {

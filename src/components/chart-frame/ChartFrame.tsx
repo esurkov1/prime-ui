@@ -5,18 +5,22 @@ import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatNumber } from "@/internal/formatNumber";
+import { HeaderLineContent, HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
 import { useLabels } from "@/internal/labels";
 import { HUE_CHART } from "@/internal/palette";
+import { flattenChildren, isPart } from "@/internal/parts";
 import type { TagRef } from "@/internal/polymorphic";
 import { press } from "@/internal/press";
 import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import { rovingIndex } from "@/internal/rovingFocus";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
 import { touchTargetClass } from "@/internal/touchTarget";
@@ -113,6 +117,8 @@ type ChartFrameContextValue = {
   formatValue: (value: number) => string;
   labels: ChartFrameLabels;
   onRetry?: () => void | Promise<void>;
+  /** The surface frame: the resolved tier of the panel. */
+  frame: ControlSize;
   titleId: string;
   descriptionId: string;
   setHasTitle: (has: boolean) => void;
@@ -161,6 +167,7 @@ function ChartFrameRoot({
   ...rest
 }: ChartFrameRootProps) {
   const depth = useNestedSurfaceDepth();
+  const frame = useHostTier(undefined, "surface").size;
   const labels = useLabels(CHART_FRAME_LABELS, labelsProp);
   const titleId = React.useId();
   const descriptionId = React.useId();
@@ -199,6 +206,7 @@ function ChartFrameRoot({
     formatValue,
     labels,
     onRetry,
+    frame,
     titleId,
     descriptionId,
     setHasTitle,
@@ -212,8 +220,9 @@ function ChartFrameRoot({
       aria-describedby={hasDescription ? descriptionId : undefined}
       aria-busy={state === "loading" || undefined}
       {...rest}
-      className={cx(styles.root, className)}
+      className={cx(surfaceFrameClass, styles.root, className)}
       data-depth={depth}
+      data-frame={frame}
       data-state={state}
     >
       <SurfaceDepthProvider value={depth}>
@@ -236,9 +245,33 @@ export type ChartFrameHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The top zone: the title and the description first, `ChartFrame.Actions` at the end. */
-function ChartFrameHeader({ className, ...rest }: ChartFrameHeaderProps) {
-  return <div {...rest} className={cx(styles.header, className)} />;
+/**
+ * The top zone, the kit's header row (internal/headerRow): the title and the description under it,
+ * `ChartFrame.Actions` at the end — whatever order they are written in. Without a description the
+ * controls share the title's line.
+ */
+function ChartFrameHeader({ className, children, ...rest }: ChartFrameHeaderProps) {
+  const items = flattenChildren(children);
+  const pick = (type: React.ElementType) => items.filter((part) => isPart(part, type));
+  const description = pick(ChartFrameDescription);
+  const own: React.ElementType[] = [ChartFrameTitle, ChartFrameDescription, ChartFrameActions];
+  return (
+    <div
+      {...rest}
+      className={cx(headerRowStyles.header, className)}
+      data-lines={description.length === 0 ? "one" : "two"}
+    >
+      <HeaderRowContent
+        title={pick(ChartFrameTitle)}
+        description={description}
+        end={pick(ChartFrameActions)}
+      >
+        {items.filter(
+          (part) => !(React.isValidElement(part) && own.includes(part.type as React.ElementType)),
+        )}
+      </HeaderRowContent>
+    </div>
+  );
 }
 ChartFrameHeader.displayName = "ChartFrame.Header";
 
@@ -251,7 +284,7 @@ export type ChartFrameTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
 
 /** The name of the chart: heads the panel and names the figure. */
 function ChartFrameTitle({ as: Tag = "h3", className, ref, ...rest }: ChartFrameTitleProps) {
-  const { titleId, setHasTitle } = useChartFrame("ChartFrame.Title");
+  const { titleId, setHasTitle, frame } = useChartFrame("ChartFrame.Title");
   React.useLayoutEffect(() => {
     setHasTitle(true);
     return () => setHasTitle(false);
@@ -261,7 +294,7 @@ function ChartFrameTitle({ as: Tag = "h3", className, ref, ...rest }: ChartFrame
       id={titleId}
       {...rest}
       ref={ref as TagRef<ChartFrameTitleAs>}
-      className={cx(textRole.titleS, styles.title, className)}
+      className={cx(FRAME_TITLE[frame], headerRowStyles.title, className)}
     />
   );
 }
@@ -272,14 +305,20 @@ export type ChartFrameDescriptionProps = React.HTMLAttributes<HTMLParagraphEleme
 };
 
 /** What the chart measures and over which period; describes the figure. */
-function ChartFrameDescription({ className, ...rest }: ChartFrameDescriptionProps) {
-  const { descriptionId, setHasDescription } = useChartFrame("ChartFrame.Description");
+function ChartFrameDescription({ className, children, ...rest }: ChartFrameDescriptionProps) {
+  const { descriptionId, setHasDescription, frame } = useChartFrame("ChartFrame.Description");
   React.useLayoutEffect(() => {
     setHasDescription(true);
     return () => setHasDescription(false);
   }, [setHasDescription]);
   return (
-    <p id={descriptionId} {...rest} className={cx(textRole.bodyS, styles.description, className)} />
+    <p
+      id={descriptionId}
+      {...rest}
+      className={cx(FRAME_DESCRIPTION[frame], headerRowStyles.description, className)}
+    >
+      <HeaderLineContent>{children}</HeaderLineContent>
+    </p>
   );
 }
 ChartFrameDescription.displayName = "ChartFrame.Description";
@@ -288,9 +327,18 @@ export type ChartFrameActionsProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Controls of the chart in the header (period switch, export); drops under the title when narrow. */
-function ChartFrameActions({ className, ...rest }: ChartFrameActionsProps) {
-  return <div {...rest} className={cx(styles.actions, className)} />;
+/**
+ * Controls of the chart at the end of the header (period switch, export), at the tier of the
+ * panel's frame; they never wrap — the title gives way.
+ */
+function ChartFrameActions({ className, children, ...rest }: ChartFrameActionsProps) {
+  const { frame } = useChartFrame("ChartFrame.Actions");
+  const tier = useHostTier(frame, "surface");
+  return (
+    <div {...rest} className={cx(headerRowStyles.end, className)}>
+      {tier.provide(children)}
+    </div>
+  );
 }
 ChartFrameActions.displayName = "ChartFrame.Actions";
 

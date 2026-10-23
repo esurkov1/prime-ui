@@ -1,25 +1,26 @@
-/** The one header of a record: the name with its number, one line of data under it, then the badges — the status and the assignee as pickers, the other statuses after them — and only buttons at the end — `Drawer.Title`, `number`, `Drawer.Description`, `Drawer.Badges`, `Badge.Avatar`, `Drawer.Actions`. */
+/** The one header of a record: the name with its number and its plain statuses on one line, a line of data under it, and at the end the status and the assignee as pickers, a button and the ⋯ menu — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Actions`, `Select.Root`. */
 import {
   Avatar,
   Badge,
   Button,
+  ConfirmDialog,
   DescriptionList,
   Drawer,
   Dropdown,
   Icon,
   type PaletteColor,
+  Select,
   Tooltip,
 } from "prime-ui-kit";
 import * as React from "react";
 
-type Status = { id: string; title: string; tone: "info" | "warning" | "success" | "neutral" };
 type Manager = { id: string; name: string; initials: string; color: PaletteColor };
 
-const STATUSES: Status[] = [
-  { id: "new", title: "Новая", tone: "info" },
-  { id: "progress", title: "В работе", tone: "warning" },
-  { id: "won", title: "Бронь оплачена", tone: "success" },
-  { id: "closed", title: "Закрыта", tone: "neutral" },
+const STATUSES = [
+  { id: "new", title: "Новая" },
+  { id: "progress", title: "В работе" },
+  { id: "won", title: "Бронь оплачена" },
+  { id: "closed", title: "Закрыта" },
 ];
 
 const MANAGERS: Manager[] = [
@@ -35,70 +36,72 @@ const LEAD = {
   dates: "21–28 сентября",
 };
 
+/** Pretends to delete the lead on the server. */
+function deleteLead() {
+  return new Promise((resolve) => setTimeout(resolve, 900));
+}
+
 export default function DrawerHeaderActionsExample() {
+  const [open, setOpen] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
   const [statusId, setStatusId] = React.useState("new");
-  const [managerId, setManagerId] = React.useState<string | null>("kotova");
-  const status = STATUSES.find((item) => item.id === statusId) ?? STATUSES[0];
-  const manager = MANAGERS.find((item) => item.id === managerId);
+  const [managerId, setManagerId] = React.useState("kotova");
 
   return (
-    <Drawer.Root>
+    <Drawer.Root open={open} onOpenChange={setOpen}>
       <Drawer.Trigger>
         <Button.Root variant="soft" tone="neutral">
           Открыть заявку
         </Button.Root>
       </Drawer.Trigger>
-      <Drawer.Content>
+      <Drawer.Content size="l">
         <Drawer.Header>
           <Drawer.Title number={LEAD.number}>{LEAD.name}</Drawer.Title>
-          <Drawer.Description>{LEAD.summary}</Drawer.Description>
           <Drawer.Badges>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                <Badge.Root tone={status?.tone} aria-label={`Статус: ${status?.title}`}>
-                  {status?.title}
-                </Badge.Root>
-              </Dropdown.Trigger>
-              <Dropdown.Content>
-                {STATUSES.map((item) => (
-                  <Dropdown.Item key={item.id} onSelect={() => setStatusId(item.id)}>
-                    {item.title}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Content>
-            </Dropdown.Root>
-            <Dropdown.Root>
-              <Dropdown.Trigger>
-                {manager ? (
-                  <Badge.Root aria-label={`Ответственный: ${manager.name}`}>
-                    <Badge.Avatar>
-                      <Avatar.Root color={manager.color}>
-                        <Avatar.Fallback>{manager.initials}</Avatar.Fallback>
-                      </Avatar.Root>
-                    </Badge.Avatar>
-                    {manager.name}
-                  </Badge.Root>
-                ) : (
-                  <Badge.Root variant="outline">Назначить</Badge.Root>
-                )}
-              </Dropdown.Trigger>
-              <Dropdown.Content>
-                {MANAGERS.map((item) => (
-                  <Dropdown.Item key={item.id} onSelect={() => setManagerId(item.id)}>
-                    {item.name}
-                  </Dropdown.Item>
-                ))}
-                <Dropdown.Separator />
-                <Dropdown.Item onSelect={() => setManagerId(null)}>
-                  Снять ответственного
-                </Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Root>
             <Badge.Root color="sky">Telegram</Badge.Root>
             <Badge.Root tone="warning">Ждёт человека</Badge.Root>
             <Badge.Root color="purple">VIP</Badge.Root>
           </Drawer.Badges>
+          <Drawer.Description>{LEAD.summary}</Drawer.Description>
           <Drawer.Actions>
+            <Select.Root aria-label="Статус" value={statusId} onValueChange={setStatusId}>
+              <Select.Trigger>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                {STATUSES.map((item) => (
+                  <Select.Item key={item.id} value={item.id}>
+                    {item.title}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+            <Select.Root aria-label="Ответственный" value={managerId} onValueChange={setManagerId}>
+              <Select.Trigger>
+                <Select.Value
+                  renderValue={({ value, label }) => (
+                    <>
+                      <Avatar.Root color={MANAGERS.find((item) => item.id === value)?.color}>
+                        <Avatar.Fallback>
+                          {MANAGERS.find((item) => item.id === value)?.initials}
+                        </Avatar.Fallback>
+                      </Avatar.Root>
+                      <Select.ItemText>{label}</Select.ItemText>
+                    </>
+                  )}
+                />
+              </Select.Trigger>
+              <Select.Content>
+                {MANAGERS.map((item) => (
+                  <Select.Item key={item.id} value={item.id}>
+                    <Avatar.Root color={item.color}>
+                      <Avatar.Fallback>{item.initials}</Avatar.Fallback>
+                    </Avatar.Root>
+                    <Select.ItemText>{item.name}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
             <Tooltip.Root>
               <Tooltip.Trigger>
                 <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">
@@ -109,26 +112,22 @@ export default function DrawerHeaderActionsExample() {
               </Tooltip.Trigger>
               <Tooltip.Content>Диалог</Tooltip.Content>
             </Tooltip.Root>
-            <Tooltip.Root>
-              <Tooltip.Trigger>
-                <Button.Root variant="ghost" tone="neutral" aria-label="Скопировать ссылку">
+            <Dropdown.Root>
+              <Dropdown.Trigger>
+                <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
                   <Button.Icon>
-                    <Icon name="action.copy" />
+                    <Icon name="action.more" />
                   </Button.Icon>
                 </Button.Root>
-              </Tooltip.Trigger>
-              <Tooltip.Content>Скопировать ссылку</Tooltip.Content>
-            </Tooltip.Root>
-            <Tooltip.Root>
-              <Tooltip.Trigger>
-                <Button.Root variant="ghost" tone="danger" aria-label="Удалить заявку">
-                  <Button.Icon>
-                    <Icon name="action.delete" />
-                  </Button.Icon>
-                </Button.Root>
-              </Tooltip.Trigger>
-              <Tooltip.Content>Удалить заявку</Tooltip.Content>
-            </Tooltip.Root>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
+                <Dropdown.Separator />
+                <Dropdown.Item tone="danger" onSelect={() => setDeleting(true)}>
+                  Удалить заявку
+                </Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Root>
           </Drawer.Actions>
         </Drawer.Header>
         <Drawer.Body>
@@ -137,6 +136,14 @@ export default function DrawerHeaderActionsExample() {
             <DescriptionList.Item label="Даты">{LEAD.dates}</DescriptionList.Item>
           </DescriptionList.Root>
         </Drawer.Body>
+        <ConfirmDialog.Root
+          open={deleting}
+          onOpenChange={setDeleting}
+          title="Удалить заявку?"
+          description="Заявка и переписка пропадут без возможности восстановления."
+          confirmLabel="Удалить"
+          onConfirm={() => deleteLead().then(() => setOpen(false))}
+        />
       </Drawer.Content>
     </Drawer.Root>
   );

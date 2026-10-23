@@ -21,21 +21,27 @@ const PROFIT: SparklinePoint[] = [
 /** October is the current month: November and December are still empty. */
 const CURRENT_MONTH = 9;
 
-const formatRubles = (value: number) =>
-  `${value < 0 ? "−" : ""}${Math.abs(value).toLocaleString("ru-RU")} ₽`;
+const THOUSANDS = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+/** An M card writes a sum short: thousands with the sign, the unit stands in `Kpi.Unit`. */
+const formatThousands = (value: number) =>
+  `${value < 0 ? "−" : ""}${THOUSANDS.format(Math.abs(value) / 1000)}`;
 
 export default function SparklineSignedBarsExample() {
   const profit = useSparkline({
     data: PROFIT,
     highlight: CURRENT_MONTH,
-    formatValue: formatRubles,
+    formatValue: formatThousands,
   });
 
   return (
     <Kpi.Root className={styles.card}>
-      <Kpi.Title>Прибыль, 2026</Kpi.Title>
+      <Kpi.Title>Прибыль</Kpi.Title>
+      <Kpi.Value>
+        {profit.valueText}
+        {profit.value === null ? null : <Kpi.Unit>тыс. ₽</Kpi.Unit>}
+      </Kpi.Value>
       <Kpi.Period>{profit.date}</Kpi.Period>
-      <Kpi.Value>{profit.valueText}</Kpi.Value>
       <Kpi.Media>
         <Sparkline {...profit.plot} label="Прибыль по месяцам" variant="bars" />
       </Kpi.Media>

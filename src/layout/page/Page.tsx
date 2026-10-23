@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog/ConfirmDialog";
 import { Crossfade, type CrossfadeProps } from "@/components/crossfade/Crossfade";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Skeleton } from "@/components/skeleton/Skeleton";
+import { StatusDot } from "@/components/status-dot/StatusDot";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
@@ -23,6 +24,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { HeaderLineContent, headerRowStyles } from "@/internal/headerRow";
 import { iconLayout } from "@/internal/iconLayout";
 import { useLabels } from "@/internal/labels";
 import { useLeaveGuard } from "@/internal/leaveGuard";
@@ -529,7 +531,8 @@ export type PageHeadingProps = DivProps;
  * The title group: an optional `Breadcrumb` path, `Page.Title`, `Page.Description`. In the bar
  * the title is the path's last level — the path, a chevron and the title on one line, the
  * description under the whole line, both truncating; in the flow the path stands over a large
- * title and the description wraps.
+ * title and the description wraps. Anything else in it (a `Badge.Group` of the page's status)
+ * stands on the title's line after the title. A `StatusDot` opens the description, a «·» after it.
  */
 function PageHeading({ className, children, ...rest }: PageHeadingProps) {
   const place = React.useContext(PlaceContext);
@@ -548,9 +551,15 @@ function PageHeading({ className, children, ...rest }: PageHeadingProps) {
     return (
       <div {...rest} className={cx(styles.heading, className)} data-place="flow">
         {hasPath ? <div className={styles.path}>{path}</div> : null}
-        {titles}
+        {other.length > 0 ? (
+          <div className={styles.titleLine}>
+            {titles}
+            {other}
+          </div>
+        ) : (
+          titles
+        )}
         {descriptions}
-        {other}
       </div>
     );
   }
@@ -647,12 +656,21 @@ function PageDescription({ loading = false, className, children, ...rest }: Page
       aria-busy={shownLoading || undefined}
       className={cx(
         place === "bar" ? textRole.caption : textRole.bodyM,
-        place === "bar" ? styles.barDescription : styles.description,
+        place === "bar"
+          ? cx(styles.barDescription, headerRowStyles.description)
+          : styles.description,
         swap.className,
         className,
       )}
     >
-      {shownLoading ? <Skeleton size="xs" className={styles.descriptionSkeleton} /> : swap.content}
+      {shownLoading ? (
+        <Skeleton size="xs" className={styles.descriptionSkeleton} />
+      ) : place === "bar" &&
+        flattenChildren(swap.content).some((part) => isPart(part, StatusDot)) ? (
+        <HeaderLineContent>{swap.content}</HeaderLineContent>
+      ) : (
+        swap.content
+      )}
     </p>
   );
 }

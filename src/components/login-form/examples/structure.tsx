@@ -1,9 +1,9 @@
-/** The minimal form: no logo, description or footer, no shadow for a host that already is a surface and a second-level title under the host page's own heading — `flat`, `as`. */
+/** The minimal form: no logo, description or footer, a second-level title under the host page's own heading — `as`. */
 import { Button, Input, LoginForm } from "prime-ui-kit";
 
 export default function LoginFormStructureExample() {
   return (
-    <LoginForm.Root flat>
+    <LoginForm.Root>
       <LoginForm.Header>
         <LoginForm.Title as="h2">Войти, чтобы оплатить счёт</LoginForm.Title>
       </LoginForm.Header>

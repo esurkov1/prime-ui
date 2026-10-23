@@ -3,7 +3,9 @@ export { ControlSizeProvider, useOptionalControlSize } from "../internal/Control
 export type { ProgressScale, ProgressSegment } from "../internal/progressSegments";
 export * from "../layout";
 export type {
+  AccordionBadgesProps,
   AccordionContentProps,
+  AccordionDescriptionProps,
   AccordionHeaderProps,
   AccordionHeadingLevel,
   AccordionIconProps,
@@ -67,18 +69,17 @@ export type {
 export { ButtonGroup } from "./button-group/ButtonGroup";
 export type {
   CardActionsProps,
+  CardBadgesProps,
   CardBodyProps,
   CardDescriptionProps,
-  CardDivider,
-  CardFooterDivider,
   CardFooterProps,
   CardHeaderProps,
   CardHeadingLevel,
   CardIconProps,
+  CardIndicatorProps,
+  CardIndicatorType,
   CardLinkProps,
-  CardListItemContentProps,
-  CardListItemProps,
-  CardListProps,
+  CardMediaPlacement,
   CardMediaProps,
   CardRootProps,
   CardTitleProps,
@@ -144,11 +145,11 @@ export type {
 export { Chat, formatMessageDate, groupMessages } from "./chat/Chat";
 export type {
   ChatListActionsProps,
+  ChatListItemBadgesProps,
   ChatListItemDescriptionProps,
   ChatListItemIconProps,
   ChatListItemMenuProps,
   ChatListItemProps,
-  ChatListItemStatusProps,
   ChatListItemTextProps,
   ChatListLabels,
   ChatListMediaKind,
@@ -425,16 +426,20 @@ export type {
   KpiDeltaProps,
   KpiDeltaReading,
   KpiDescriptionProps,
-  KpiGroupProps,
+  KpiFooterProps,
   KpiIconProps,
+  KpiLegendProps,
+  KpiLinkProps,
   KpiMediaProps,
   KpiMetaProps,
+  KpiNoteProps,
   KpiPeriodProps,
   KpiRootProps,
   KpiTitleProps,
   KpiTone,
+  KpiTotalProps,
+  KpiUnitProps,
   KpiValueProps,
-  KpiValueSize,
 } from "./kpi/Kpi";
 export { Kpi } from "./kpi/Kpi";
 export type {
@@ -448,6 +453,7 @@ export type { LinkButtonProps } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
 export type {
   ListItemActionsProps,
+  ListItemBadgesProps,
   ListItemCountProps,
   ListItemDescriptionProps,
   ListItemIconProps,
@@ -569,11 +575,13 @@ export { ProgressBar } from "./progress-bar/ProgressBar";
 export type {
   ProgressCircleLabels,
   ProgressCircleProps,
+  ProgressCircleSize,
 } from "./progress-circle/ProgressCircle";
 export { ProgressCircle } from "./progress-circle/ProgressCircle";
 export type {
   RadioGroupLabels,
   RadioGroupProps,
+  RadioIndicatorProps,
   RadioLabelProps,
   RadioRootProps,
 } from "./radio/Radio";
@@ -672,6 +680,8 @@ export type {
 export { useSparkline } from "./sparkline/useSparkline";
 export type { SpinnerLabels, SpinnerProps } from "./spinner/Spinner";
 export { Spinner } from "./spinner/Spinner";
+export type { StatusDotProps, StatusDotTone } from "./status-dot/StatusDot";
+export { StatusDot } from "./status-dot/StatusDot";
 export type {
   StepperContentProps,
   StepperDescriptionProps,
@@ -730,6 +740,7 @@ export type {
   TimelineDescriptionProps,
   TimelineGapProps,
   TimelineGroupProps,
+  TimelineItemBadgesProps,
   TimelineItemMetaProps,
   TimelineItemProps,
   TimelineItemTitleProps,

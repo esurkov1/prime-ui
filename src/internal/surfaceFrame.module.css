@@ -1,0 +1,56 @@
+/*
+ * The frame of a surface that holds one entity (Card, Kpi, ChartFrame, a dialog's zones…): one set
+ * of metrics per tier of the kit's one size axis. The page sets the type ladder the frame stays
+ * under: a page title (heading-m 24, title-m 16 in the top bar) and a section title (title-m 16)
+ * stand above a card's title, which stands near the body text (14) — a default card is title-s 14.
+ * Padding and controls step with the tier; the title steps where the ladder leaves room. Join
+ * `.frame` (`surfaceFrameClass`) on the surface and its tier in `data-frame`:
+ *                     xs       s        m        l        xl
+ *   --frame-pad       12       16       20       24       28
+ *   --frame-radius    12       12       16       16       16
+ *   --frame-gap       8        12       16       20       24      (between zones; a footer
+ *                                                                   stands off by the padding)
+ *   --frame-mark      32       32       40       48       56      (the mark of a header; the title
+ *                                                                   with its line centres on it)
+ *   --frame-lines-gap 0        0        0        4        4       (between the title and its line)
+ * The title and the description take `FRAME_TITLE` / `FRAME_DESCRIPTION` (13/16 · 13/16 · 14/20 ·
+ * 16/24 · 18/24, 12/16 · 12/16 · 13/20 · 14/20 · 14/20); the controls take the tier itself
+ * (28 · 32 · 36 · 40 · 48), as tall as the fields of a form in the same surface.
+ */
+
+.frame {
+  --frame-pad: var(--prime-card-padding-m);
+  --frame-radius: var(--prime-radius-xl);
+  --frame-gap: var(--prime-space-4);
+  --frame-mark: var(--prime-space-10);
+  /* A length, not a bare 0: hosts subtract it in `calc()`. */
+  --frame-lines-gap: var(--prime-space-0);
+}
+
+.frame[data-frame="xs"] {
+  --frame-pad: var(--prime-space-3);
+  --frame-radius: var(--prime-radius-l);
+  --frame-gap: var(--prime-space-2);
+  --frame-mark: var(--prime-space-8);
+}
+
+.frame[data-frame="s"] {
+  --frame-pad: var(--prime-card-padding-s);
+  --frame-radius: var(--prime-card-radius);
+  --frame-gap: var(--prime-space-3);
+  --frame-mark: var(--prime-space-8);
+}
+
+.frame[data-frame="l"] {
+  --frame-pad: var(--prime-card-padding-l);
+  --frame-gap: var(--prime-space-5);
+  --frame-mark: var(--prime-space-12);
+  --frame-lines-gap: var(--prime-space-1);
+}
+
+.frame[data-frame="xl"] {
+  --frame-pad: var(--prime-space-7);
+  --frame-gap: var(--prime-space-6);
+  --frame-mark: var(--prime-space-14);
+  --frame-lines-gap: var(--prime-space-1);
+}

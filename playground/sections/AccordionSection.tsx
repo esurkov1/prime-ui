@@ -39,7 +39,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "with-icon",
       description:
-        "Иконка перед подписью каждого раздела; содержимое выравнивается по подписи — `Accordion.Icon`.",
+        "Строка заголовка раздела: метка, название с бейджем, состояние и пояснение под ним, шеврон в конце; содержимое выравнивается по названию — `Accordion.Icon`, `Accordion.Badges`, `Accordion.Description`.",
     },
     {
       scenario: "multiple",

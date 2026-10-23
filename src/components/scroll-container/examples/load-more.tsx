@@ -1,5 +1,5 @@
 /** An order log that loads the next page as the reader nears its end, with loading lines in the rows' place — `onReachEnd`. */
-import { Card, ScrollContainer, Skeleton, Typography } from "prime-ui-kit";
+import { Card, List, ScrollContainer, Skeleton } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -34,18 +34,19 @@ export default function ScrollContainerLoadMoreExample() {
       <Card.Header>
         <Card.Title>Журнал заказов</Card.Title>
       </Card.Header>
-      <ScrollContainer onReachEnd={loadMore} tabIndex={0} aria-label="Заказы">
-        <Card.List>
-          {ORDERS.slice(0, shown).map((order) => (
-            <Card.ListItem key={order.id}>
-              <Typography as="span" variant="body-m" tone="secondary">
-                Заказ № {order.id} · {order.amount}
-              </Typography>
-            </Card.ListItem>
-          ))}
-        </Card.List>
-        {loading ? <Skeleton lines={3} className={styles.older} /> : null}
-      </ScrollContainer>
+      <Card.Body>
+        <ScrollContainer onReachEnd={loadMore} tabIndex={0} aria-label="Заказы">
+          <List.Root aria-label="Заказы">
+            {ORDERS.slice(0, shown).map((order) => (
+              <List.Item key={order.id}>
+                <List.ItemText>Заказ № {order.id}</List.ItemText>
+                <List.ItemMeta>{order.amount}</List.ItemMeta>
+              </List.Item>
+            ))}
+          </List.Root>
+          {loading ? <Skeleton lines={3} className={styles.older} /> : null}
+        </ScrollContainer>
+      </Card.Body>
     </Card.Root>
   );
 }

@@ -28,6 +28,48 @@ export type ProgressModeProps =
       tone?: never;
     };
 
+/**
+ * How a progress indicator draws its scale: `line` — one continuous stroke; `steps` — `max` equal
+ * cells (value mode); `ticks` — many thin cells.
+ */
+export type ProgressVariant = "line" | "steps" | "ticks";
+
+/** Cells of a `steps` scale: `max` rounded into 2…12. */
+export function stepCells(max: number): number {
+  return Math.min(12, Math.max(2, Math.round(max)));
+}
+
+/** Whole cells a share fills: `ratio` (0…1) of `count`, rounded to a cell. */
+export function filledCells(ratio: number, count: number): number {
+  return Math.round(Math.min(1, Math.max(0, ratio)) * count);
+}
+
+/**
+ * Whole cells per weight: `count` cells shared by the weights (pass the free rest last) by the
+ * largest remainder; a weight above zero keeps at least one cell while the cells last.
+ */
+export function allocateCells(weights: number[], count: number): number[] {
+  const own = weights.map(nonNegative);
+  const sum = own.reduce((acc, w) => acc + w, 0);
+  if (sum <= 0 || count <= 0) return own.map(() => 0);
+  const exact = own.map((w) => (w / sum) * count);
+  const cells = exact.map((x, i) => (own[i] > 0 ? Math.max(1, Math.floor(x)) : 0));
+  let used = cells.reduce((acc, c) => acc + c, 0);
+  const byRemainder = own
+    .map((_, i) => i)
+    .filter((i) => own[i] > 0)
+    .sort((a, b) => exact[b] - cells[b] - (exact[a] - cells[a]) || a - b);
+  for (let k = 0; used < count; k = (k + 1) % byRemainder.length) {
+    cells[byRemainder[k]] += 1;
+    used += 1;
+  }
+  while (used > count) {
+    cells[cells.indexOf(Math.max(...cells))] -= 1;
+    used -= 1;
+  }
+  return cells;
+}
+
 /** `value` mode: `max` defaults to 100 (or when not positive) and `value` is clamped to `0…max`. */
 export function resolveValue(
   value: number,

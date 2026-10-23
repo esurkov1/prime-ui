@@ -561,18 +561,14 @@ describe("Badge.Group", () => {
       const rect = vi
         .spyOn(HTMLElement.prototype, "getBoundingClientRect")
         .mockImplementation(function (this: HTMLElement) {
+          if (this.classList.contains(styles.group))
+            return { width: rowWidth, height: 24 } as DOMRect;
           const more = this.querySelector(":scope > span[aria-hidden='true']") !== null;
           const width = more ? 40 : (this.textContent ?? "").length * 10;
           return { width, height: 24 } as DOMRect;
         });
-      const client = vi
-        .spyOn(HTMLElement.prototype, "clientWidth", "get")
-        .mockImplementation(function (this: HTMLElement) {
-          return this.classList.contains(styles.group) ? rowWidth : 0;
-        });
       return () => {
         rect.mockRestore();
-        client.mockRestore();
       };
     };
 
@@ -632,6 +628,42 @@ describe("Badge.Group", () => {
       }
       expect(badgeOf("+0")).toHaveAttribute("data-overflowed");
       restore();
+    });
+
+    it("never cuts a badge: when not even the first fits beside «+N», all fold into «+N»", () => {
+      rowWidth = 90;
+      const restore = mockSizes();
+      render(<Row />);
+      for (const section of SECTIONS) {
+        expect(badgeOf(section)).toHaveAttribute("data-overflowed");
+      }
+      expect(badgeOf("+5")).not.toHaveAttribute("data-overflowed");
+      const rule = cssRule(CSS, '.group[data-overflow="count"] > *');
+      expect(cssValue(rule, "flex-shrink")).toBe("0");
+      restore();
+    });
+
+    it("measures its room with every badge in the row, so a title's line never flips it back and forth", () => {
+      // On a title's line the group's room depends on its own content: 63 px with the badge in the
+      // row, 60 px once it folds into «+1». The badge (60.4 px) fits the room it is measured in.
+      const rect = vi
+        .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+        .mockImplementation(function (this: HTMLElement) {
+          if (this.classList.contains(styles.group)) {
+            const folded = this.querySelector(":scope > [data-overflowed]:not(:last-child)");
+            return { width: folded ? 60 : 63, height: 24 } as DOMRect;
+          }
+          const more = this.querySelector(":scope > span[aria-hidden='true']") !== null;
+          return { width: more ? 22 : 60.4, height: 24 } as DOMRect;
+        });
+      render(
+        <Badge.Group overflow="count">
+          <Badge.Root>Срочно</Badge.Root>
+        </Badge.Group>,
+      );
+      expect(badgeOf("Срочно")).not.toHaveAttribute("data-overflowed");
+      expect(badgeOf("+0")).toHaveAttribute("data-overflowed");
+      rect.mockRestore();
     });
 
     it("takes its own texts from `labels`", () => {
@@ -781,11 +813,10 @@ describe("Badge.Avatar", () => {
   it("reads as its trigger's text in the «+N» tooltip, never as the menu behind it", async () => {
     const rect = vi
       .spyOn(HTMLElement.prototype, "getBoundingClientRect")
-      .mockImplementation(() => ({ width: 100, height: 24 }) as DOMRect);
-    const client = vi
-      .spyOn(HTMLElement.prototype, "clientWidth", "get")
       .mockImplementation(function (this: HTMLElement) {
-        return this.classList.contains(styles.group) ? 150 : 0;
+        if (this.classList.contains(styles.group)) return { width: 120, height: 24 } as DOMRect;
+        const person = (this.textContent ?? "").includes("Анна");
+        return { width: person ? 100 : 50, height: 24 } as DOMRect;
       });
     render(
       <Badge.Group overflow="count">
@@ -810,7 +841,6 @@ describe("Badge.Avatar", () => {
     act(() => (badgeOf("+1") as HTMLElement).focus());
     expect(await screen.findByRole("tooltip")).toHaveTextContent(/^Анна Котова$/);
     rect.mockRestore();
-    client.mockRestore();
   });
 });
 

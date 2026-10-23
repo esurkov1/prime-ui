@@ -77,34 +77,32 @@ export default function ListReorderExample() {
 
   return (
     <Card.Root className={styles.pane}>
-      <Card.Body>
-        <List.Root
-          aria-label="Этапы воронки"
-          onReorder={async (id, beforeId) => {
-            await saveOrder();
-            setStages((current) => moveBefore(current, id, beforeId, (stage) => stage.id));
-          }}
-        >
-          {stages.map((stage) => (
-            <List.Item key={stage.id} value={stage.id} locked={stage.system}>
-              <List.ItemActions side="start">
-                <Switch.Root
-                  aria-label={`Показывать «${stage.name}» на доске`}
-                  checked={stage.shown}
-                  onCheckedChange={(shown) =>
-                    setStages((current) =>
-                      current.map((item) => (item.id === stage.id ? { ...item, shown } : item)),
-                    )
-                  }
-                />
-              </List.ItemActions>
-              <List.ItemText>{stage.name}</List.ItemText>
-              <List.ItemDescription>{stage.description}</List.ItemDescription>
-              <List.ItemCount>{stage.deals}</List.ItemCount>
-            </List.Item>
-          ))}
-        </List.Root>
-      </Card.Body>
+      <List.Root
+        aria-label="Этапы воронки"
+        onReorder={async (id, beforeId) => {
+          await saveOrder();
+          setStages((current) => moveBefore(current, id, beforeId, (stage) => stage.id));
+        }}
+      >
+        {stages.map((stage) => (
+          <List.Item key={stage.id} value={stage.id} locked={stage.system}>
+            <List.ItemActions side="start">
+              <Switch.Root
+                aria-label={`Показывать «${stage.name}» на доске`}
+                checked={stage.shown}
+                onCheckedChange={(shown) =>
+                  setStages((current) =>
+                    current.map((item) => (item.id === stage.id ? { ...item, shown } : item)),
+                  )
+                }
+              />
+            </List.ItemActions>
+            <List.ItemText>{stage.name}</List.ItemText>
+            <List.ItemDescription>{stage.description}</List.ItemDescription>
+            <List.ItemCount>{stage.deals}</List.ItemCount>
+          </List.Item>
+        ))}
+      </List.Root>
     </Card.Root>
   );
 }

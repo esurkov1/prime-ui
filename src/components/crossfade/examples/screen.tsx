@@ -11,7 +11,6 @@ import {
   Icon,
   Page,
   Skeleton,
-  Typography,
   useNotifications,
 } from "prime-ui-kit";
 import * as React from "react";
@@ -111,11 +110,9 @@ export default function CrossfadeScreenExample() {
               <Card.Root aria-busy={status === "loading"}>
                 <Card.Header>
                   <Card.Title as="h2">Остатки</Card.Title>
-                  <Card.Actions>
-                    <Typography as="span" variant="caption" tone="muted">
-                      {status === "ready" ? "на 7 октября" : "на 6 октября"}
-                    </Typography>
-                  </Card.Actions>
+                  <Card.Description>
+                    {status === "ready" ? "на 7 октября" : "на 6 октября"}
+                  </Card.Description>
                 </Card.Header>
                 <Card.Body>
                   {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}

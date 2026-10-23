@@ -117,4 +117,34 @@ describe("Ring", () => {
     expect(svgOf(container)).not.toHaveAttribute("aria-hidden");
     expect(svgOf(container)).toHaveAttribute("role", "progressbar");
   });
+
+  it("cells: one mask cuts the track and the arc, its pattern starts half a gap past the top", () => {
+    const { container, rerender } = render(
+      <Ring value={0.5} weight="data" track="surface" cells={{ count: 10, look: "ticks" }} />,
+    );
+    const svg = svgOf(container);
+    const mask = svg.querySelector("mask") as SVGMaskElement;
+    const group = svg.querySelector("g") as SVGGElement;
+    expect(svg).toHaveAttribute("data-cells", "ticks");
+    expect(group.getAttribute("mask")).toBe(`url(#${mask.id})`);
+    // 10 cells: a pitch of 10, a tick 4/7 of it, the pattern shifted by half the gap.
+    const cut = mask.querySelector("circle") as SVGCircleElement;
+    const [dash, gap] = cut.style.strokeDasharray.split(/[ ,]+/).map(Number);
+    expect(dash + gap).toBeCloseTo(10);
+    expect(dash).toBeCloseTo(40 / 7);
+    expect(Number(cut.style.strokeDashoffset)).toBeCloseTo(-gap / 2);
+    expect(cssValue(cssRule(CSS, ".ring[data-cells] .arc"), "stroke-linecap")).toBe("butt");
+    // Steps: round ends on the data stroke, ¾ of it apart.
+    rerender(<Ring value={0.5} weight="data" cells={{ count: 4, look: "steps" }} />);
+    const [stepDash, stepGap] = (
+      svgOf(container).querySelector("mask circle") as SVGCircleElement
+    ).style.strokeDasharray
+      .split(/[ ,]+/)
+      .map(Number);
+    expect(stepGap).toBeCloseTo(RING_DATA_STROKE * 1.75);
+    expect(stepDash + stepGap).toBeCloseTo(25);
+    rerender(<Ring value={0.5} />);
+    expect(svgOf(container).querySelector("mask")).toBeNull();
+    expect(svgOf(container).querySelector("g")).not.toHaveAttribute("mask");
+  });
 });

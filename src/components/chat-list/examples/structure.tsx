@@ -1,4 +1,4 @@
-/** Every piece of a row: a photo or initials with presence, a glyph beside the name, the record status as badges, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemStatus`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. */
+/** Every piece of a row: a photo or initials with presence, a glyph beside the name, the record status as badges, the author of the last message, media words with a length, a member typing in a group, ticks from sending to failed — `ChatList.ItemIcon`, `ChatList.ItemBadges`, `ChatList.ItemDescription`, `author`, `kind`, `duration`, `typing`, `status`. */
 import { Avatar, Badge, Card, ChatList, hueOf, Icon, type MessageStatus } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -124,7 +124,7 @@ export default function ChatListStructureExample() {
               </ChatList.ItemIcon>
             ) : null}
             {item.record ? (
-              <ChatList.ItemStatus>
+              <ChatList.ItemBadges>
                 {item.record.map((badge) =>
                   badge.stage ? (
                     <Badge.Root key={badge.label} color="yellow">
@@ -136,7 +136,7 @@ export default function ChatListStructureExample() {
                     </Badge.Root>
                   ),
                 )}
-              </ChatList.ItemStatus>
+              </ChatList.ItemBadges>
             ) : null}
             <ChatList.ItemDescription
               author={item.author}

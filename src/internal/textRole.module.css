@@ -31,6 +31,13 @@
   letter-spacing: var(--prime-text-body-l-tracking);
 }
 
+.titleXs {
+  font-size: var(--prime-text-title-xs-size);
+  line-height: var(--prime-text-title-xs-line-height);
+  font-weight: var(--prime-text-title-xs-weight);
+  letter-spacing: var(--prime-text-title-xs-tracking);
+}
+
 .titleS {
   font-size: var(--prime-text-title-s-size);
   line-height: var(--prime-text-title-s-line-height);

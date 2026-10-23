@@ -16,7 +16,7 @@
 ## When not to use
 - A person or an organization's account → use [Avatar](../avatar/COMPONENT.md).
 - An illustration in an empty state → use [EmptyPage](../empty-page/COMPONENT.md).
-- A metric tile with an icon → use [Kpi](../kpi/COMPONENT.md) (`Kpi.Icon`).
+- A figure with an icon → use [Kpi](../kpi/COMPONENT.md) (`Kpi.Icon`, on L and XL).
 
 ## Import
 ```tsx

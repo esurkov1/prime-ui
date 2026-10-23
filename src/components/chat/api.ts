@@ -14,8 +14,8 @@ export const api: ComponentApi = {
           name: "variant",
           type: '"pane" | "inline"',
           default: '"pane"',
-          en: "How the chat stands in its host: `pane` — inset from its own edges (a `Card`, a page pane); `inline` — flush with the content edges of a padded host (a `Drawer.Body`, a `Tabs.Panel`, a `Card.Body`).",
-          ru: "Как чат стоит в родителе: `pane` — с отступами от своих краёв (`Card`, панель страницы); `inline` — вровень с краями содержимого родителя с отступами (`Drawer.Body`, `Tabs.Panel`, `Card.Body`).",
+          en: "How the chat stands in its host: `pane` — inset from its own edges (a pane `Card` with no zones, a page pane); `inline` — flush with the content edges of a padded host (a `Drawer.Body`, a `Tabs.Panel`, a `Card.Body`).",
+          ru: "Как чат стоит в родителе: `pane` — с отступами от своих краёв (`Card` без зон, панель страницы); `inline` — вровень с краями содержимого родителя с отступами (`Drawer.Body`, `Tabs.Panel`, `Card.Body`).",
         },
         {
           name: "selected",
@@ -92,8 +92,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Header",
-      en: "`ref` → `HTMLDivElement`. The top of the chat: who it is with. The title over the badges and the description, the actions at the end; every other child (a back button, an `Avatar`) leads the row. It draws nothing of its own.",
-      ru: "Верх чата: с кем переписка. Заголовок над бейджами и описанием, действия в конце; все остальные дети (кнопка «Назад», `Avatar`) встают в начало ряда. Своего ничего не рисует.",
+      en: "`ref` → `HTMLDivElement`. The top of the chat, the kit's header row: the title with its badges on one line, the description under it, the actions at the end; other children (a back button, an `Avatar`) lead the row. One line each, no line under it.",
+      ru: "Верх чата — строка заголовка кита: название с бейджами на одной строке, под ним описание, действия в конце; все остальные дети (кнопка «Назад», `Avatar`) — метка в начале ряда. Каждая строка одна, ничто не переносится; линии под шапкой нет.",
       props: [
         {
           name: "…rest",
@@ -131,21 +131,21 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Badges",
-      en: "`ref` → `HTMLDivElement`. The record's badges under the title: the pickers first (a `Badge.Root` in a `Dropdown.Trigger`), then the statuses. One row of `s` chips (`Badge.Group`); what does not fit waits behind «+N».",
-      ru: "Бейджи записи под заголовком: сначала выбор (`Badge.Root` в `Dropdown.Trigger`), затем статусы. Один ряд чипов `s` (`Badge.Group`); что не влезло, ждёт за «+N».",
+      en: "`ref` → `HTMLDivElement`. The record's badges on the title's line, 6 px after it, one `Badge.Group` (meaning by `tone` or `color`). The title gives way first, then the rest folds into «+N». A picker is a `Select` in `Chat.Actions`, not a badge.",
+      ru: "Бейджи записи на строке заголовка, через 6 px после него, одним `Badge.Group` (смысл — `tone` или `color`). Первым уступает заголовок, остальное сворачивается в «+N». Выбор — `Select` в `Chat.Actions`, а не бейдж.",
       props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (`Badge.Root`, a `Dropdown.Root` around one), `className`.",
-          ru: "`children` (`Badge.Root`, `Dropdown.Root` вокруг него), `className`.",
+          en: "`children` (`Badge.Root`), `className`.",
+          ru: "`children` (`Badge.Root`), `className`.",
         },
       ],
     },
     {
       name: "Chat.Description",
-      en: "`ref` → `HTMLDivElement`. The status line under the title («в сети», «3 участника»); while the other side types (`Chat.Root typing`) it cross-fades into «печатает…» in the accent, and back.",
-      ru: "Строка статуса под заголовком («в сети», «3 участника»); пока собеседник пишет (`Chat.Root typing`), плавно сменяется на «печатает…» акцентом и обратно.",
+      en: "`ref` → `HTMLDivElement`. The status line under the title («в сети», «3 участника») in one line cut with an ellipsis; a `StatusDot` first is allowed; while the other side types (`Chat.Root typing`) it cross-fades into «печатает…» in the accent, and back.",
+      ru: "Строка статуса под заголовком («в сети», «3 участника») в одну строку с многоточием; первым может стоять `StatusDot`; пока собеседник пишет (`Chat.Root typing`), плавно сменяется на «печатает…» акцентом и обратно.",
       props: [
         {
           name: "…rest",
@@ -157,8 +157,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Actions",
-      en: "`ref` → `HTMLDivElement`. The controls at the end of the header, tier `s`: ghost icon buttons (`Chat.SearchButton`, a call, a toggle with `pressed`), a `Select` or a `SegmentedControl`, a ⋯ `Dropdown` last. Centred on the header's text.",
-      ru: "Элементы управления в конце шапки, ярус `s`: призрачные кнопки-иконки (`Chat.SearchButton`, звонок, переключатель с `pressed`), `Select` или `SegmentedControl`, ⋯ `Dropdown` последним. По центру текста шапки.",
+      en: "`ref` → `HTMLDivElement`. The controls at the end of the header, at the frame's tier: ghost icon buttons (`Chat.SearchButton`, a toggle with `pressed`), a `Select` or a `SegmentedControl`, a ⋯ `Dropdown` last.",
+      ru: "Элементы управления в конце шапки, ярус рамки: призрачные кнопки-иконки (`Chat.SearchButton`, переключатель с `pressed`), `Select` или `SegmentedControl`, ⋯ `Dropdown` последним.",
       props: [
         {
           name: "…rest",

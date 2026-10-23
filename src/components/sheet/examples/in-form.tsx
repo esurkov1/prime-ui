@@ -44,7 +44,6 @@ export default function SheetInFormExample() {
               name="comment"
               placeholder="Позвонить за час, домофон не работает"
               error={error}
-              reserveSupportRow
               onValueChange={() => setError(undefined)}
             />
           </form>

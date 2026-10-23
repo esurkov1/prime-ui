@@ -275,11 +275,13 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | zone padding 16, icon circle 28, browse 28, title 12/16; row badge 28 | compact attachment field in dense forms | |
-| `s` | padding 20, icon 32, browse 32, title 13/20; badge 32 | side panels, small dialogs | |
-| `m` | padding 24, icon 36, browse 36, title 14/20; badge 36 | regular forms | yes |
-| `l` | padding 32, icon 40, browse 40, title 16/24; badge 40 | the main upload area of a page | |
-| `xl` | padding 40, icon 48, browse 48, title 16/24; badge 48 | full-page or onboarding upload | |
+| `xs` | zone padding 16, icon tile 32, browse 28, title 13/16; row badge 32 | compact attachment field in dense forms | |
+| `s` | padding 20, icon 32, browse 32, title 13/16; badge 32 | side panels, small dialogs | |
+| `m` | padding 24, icon 40, browse 36, title 14/20; badge 40 | regular forms | yes |
+| `l` | padding 32, icon 48, browse 40, title 16/24; badge 48 | the main upload area of a page | |
+| `xl` | padding 40, icon 56, browse 48, title 18/24; badge 48 | full-page or onboarding upload | |
+
+The zone and its file rows stand on the surface frame of the tier; the buttons in a row take the tier itself.
 
 **Sizes:** the rows of the root take its tier; a standalone `FileUpload.Item` takes `size` of its own. Tiles keep one size.
 
@@ -337,7 +339,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 ## Layout & spacing
 - The zone and Item are `width: 100%`; the parent sets the width. Label → trigger and the field → hint use the tier `label-gap` / `hint-gap`; trigger → files and row → row `--prime-space-2`.
 - `trigger="button"` hugs its content; the hidden input sits beside the button.
-- `ItemPreview` is a Thumbnail of the row tier (40 at `m`): the height of the name and description lines.
+- `ItemPreview` is a Thumbnail of the row tier (40 at `m`, 32 at `xs` and `s`, 48 from `l`): the height of the name and description lines.
 - A row shows a picture's preview, or the format badge beside the name without its extension, in the format's hue: pdf red, doc blue, xls green, ppt orange, archives yellow, video purple, audio pink, anything else gray.
 - Tiles (`layout="grid" | "strip"`) reorder through Dnd: `FileUpload.Root` and `FileUpload.Queue` mount their own `Dnd.Root` unless one is already above them. A video tile mounts its first frame (`Thumbnail.Video`) once the tile nears the view.
 - Tiles are the shared attachment tile (`src/internal/attachmentTile`, also the Composer tray). The tiles are a size container: 5 across from 36rem of its own width, 4 below, 3 below 32rem, 2 below 22rem; gap `--prime-space-3` (`--prime-space-2` from 3 across). With `cover` the first tile spans two columns and two rows at every width.
@@ -443,5 +445,5 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 - Styling a tile from an ancestor (`.gallery li`) → the carried clone is portalled to `<body>` and loses it.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (the cover pill), [Thumbnail](../thumbnail/COMPONENT.md) (`FormatBadge`, `ItemPreview`, video tiles), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`, a [Spinner](../spinner/COMPONENT.md) while a transfer waits), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (the cover pill), [StatusDot](../status-dot/COMPONENT.md) (the header row's description line), [Thumbnail](../thumbnail/COMPONENT.md) (`FormatBadge`, `ItemPreview`, video tiles), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`, a [Spinner](../spinner/COMPONENT.md) while a transfer waits), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Composer](../composer/COMPONENT.md) (its attachment tray is `FileUpload.Queue layout="strip"`), [LinkButton](../link-button/COMPONENT.md) (an inline browse link in a custom body), [Avatar](../avatar/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

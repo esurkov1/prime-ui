@@ -12,6 +12,8 @@ export const page: ComponentPageConfig = {
       "прогресс",
       "загрузка",
       "сегменты",
+      "штрихи",
+      "шаги",
       "распределение",
       "квоты",
       "value",
@@ -33,11 +35,13 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "variants",
-      description: "Все цвета заливки; тон говорит об исходе, а не о прогрессе — `tone`.",
+      description:
+        "Все виды шкалы и все цвета заливки; тон говорит об исходе, а не о прогрессе — `variant`, `tone`.",
     },
     {
       slot: "sizes",
-      description: "Все ярусы: линия растёт от 4 до 8 px, как дорожка Slider — `size`.",
+      description:
+        "Все ярусы: линия растёт от 4 до 8 px, как дорожка Slider, штрихи — от 16 до 40 px в высоту — `size`, `variant`.",
     },
     {
       slot: "states",
@@ -83,7 +87,19 @@ export const page: ComponentPageConfig = {
       scenario: "steps",
       title: "Ступени",
       description:
-        "Шкала целыми ячейками, которые заполняются друг за другом: 2 из 5 шагов настройки, вперёд и назад — `steps`, `max`.",
+        "Шкала целыми ячейками, которые заполняет один фронт: 2 из 5 шагов настройки, вперёд и назад — `variant`, `max`.",
+    },
+    {
+      scenario: "ticks",
+      title: "Штрихи",
+      description:
+        "Штрихов столько, сколько помещается по ширине: совпадение с запросом и индекс, по которому ещё нет данных — `variant`, `size`, `tone`.",
+    },
+    {
+      scenario: "ticks-legend",
+      title: "Штрихи с легендой",
+      description:
+        "Лиды по каналам штрихами с легендой; другой период двигает один фронт и перекрашивает штрихи — `variant`, `segments`, `legend`.",
     },
     {
       scenario: "milestone",

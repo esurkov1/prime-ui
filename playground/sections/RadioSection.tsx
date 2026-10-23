@@ -38,6 +38,12 @@ export const page: ComponentPageConfig = {
       description: "Варианты столбцом и рядом с переносом — `orientation`.",
     },
     {
+      scenario: "indicator",
+      title: "Индикатор на плитке выбора",
+      description:
+        "Только кружок на плитках тарифов: `selected` на карточке отмечает её кнопку, а кружок лишь показывает это — `Card.Indicator`, `selected`.",
+    },
+    {
       slot: "controlled",
       description:
         "Выбранным тарифом владеет родитель и показывает его в подсказке — `value`, `onValueChange`.",

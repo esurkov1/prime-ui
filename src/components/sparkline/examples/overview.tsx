@@ -12,7 +12,10 @@ const REVENUE: SparklinePoint[] = Array.from({ length: 30 }, (_, i) => ({
 /** Revenue for the 30 days before, 10 August — 8 September 2026. */
 const PREVIOUS_TOTAL = 8_240_000;
 
-const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
+const THOUSANDS = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+/** An M card writes a sum short: thousands, the unit stands in `Kpi.Unit`. */
+const formatThousands = (value: number) => THOUSANDS.format(value / 1000);
 
 export default function SparklineOverviewExample() {
   const revenue = useSparkline({
@@ -20,15 +23,18 @@ export default function SparklineOverviewExample() {
     summary: "sum",
     compareTo: PREVIOUS_TOTAL,
     change: "previous",
-    formatValue: formatRubles,
+    formatValue: formatThousands,
   });
 
   return (
     <Kpi.Root className={styles.card}>
-      <Kpi.Title>Выручка за 30 дней</Kpi.Title>
-      <Kpi.Period>{revenue.date}</Kpi.Period>
-      <Kpi.Value>{revenue.valueText}</Kpi.Value>
+      <Kpi.Title>Выручка</Kpi.Title>
+      <Kpi.Value>
+        {revenue.valueText}
+        <Kpi.Unit>тыс. ₽</Kpi.Unit>
+      </Kpi.Value>
       <Kpi.Delta reading={revenue} />
+      <Kpi.Period>{revenue.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline {...revenue.plot} label="Выручка по дням" />
       </Kpi.Media>

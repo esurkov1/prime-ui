@@ -505,6 +505,19 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "Card.Title",
+    "H3",
+    (ref) => (
+      <Card.Root>
+        <Card.Header>
+          <Card.Title ref={ref} data-testid="part">
+            Заказы
+          </Card.Title>
+        </Card.Header>
+      </Card.Root>
+    ),
+  ],
+  [
     "ChartFrame.Plot",
     "DIV",
     (ref) => (
@@ -676,6 +689,25 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "Kanban.ItemTitle",
+    "SPAN",
+    (ref) => (
+      <Kanban.Root
+        columns={[{ id: "todo", title: "К выполнению" }]}
+        items={["a"]}
+        getId={(id) => id}
+        defaultValue={{ todo: ["a"] }}
+        renderItem={() => (
+          <Kanban.Item>
+            <Kanban.ItemTitle ref={ref} data-testid="part">
+              Подготовить договор
+            </Kanban.ItemTitle>
+          </Kanban.Item>
+        )}
+      />
+    ),
+  ],
+  [
     "Sidebar.SubContent",
     "DIV",
     (ref) => (
@@ -749,6 +781,19 @@ const CASES: Case[] = [
     (ref) => (
       <Chat.Root>
         <Chat.Messages ref={ref} data-testid="part" />
+      </Chat.Root>
+    ),
+  ],
+  [
+    "Chat.Title",
+    "H2",
+    (ref) => (
+      <Chat.Root>
+        <Chat.Header>
+          <Chat.Title ref={ref} data-testid="part">
+            ООО «Северный ветер»
+          </Chat.Title>
+        </Chat.Header>
       </Chat.Root>
     ),
   ],

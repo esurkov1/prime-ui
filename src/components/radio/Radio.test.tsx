@@ -343,3 +343,35 @@ describe("Radio", () => {
     expect(screen.getByRole("radiogroup", { name: "Host" })).toHaveAttribute("data-size", "s");
   });
 });
+
+describe("Radio.Indicator", () => {
+  it("is aria-hidden, shows the state and carries no input", () => {
+    const { container } = render(
+      <button type="button" aria-pressed="true">
+        <Radio.Indicator checked data-testid="mark" />
+      </button>,
+    );
+    const mark = screen.getByTestId("mark");
+    expect(mark).toHaveAttribute("aria-hidden", "true");
+    expect(mark).toHaveAttribute("data-state", "checked");
+    expect(container.querySelector("input")).toBeNull();
+  });
+
+  it("is unchecked by default and marks disabled", () => {
+    render(<Radio.Indicator disabled data-testid="mark" />);
+    const mark = screen.getByTestId("mark");
+    expect(mark).toHaveAttribute("data-state", "unchecked");
+    expect(mark).toHaveAttribute("data-disabled", "true");
+  });
+
+  it("takes its own size, else the host tier", () => {
+    render(
+      <ControlSizeProvider value="l">
+        <Radio.Indicator data-testid="host" />
+        <Radio.Indicator size="xs" data-testid="own" />
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByTestId("host")).toHaveAttribute("data-size", "l");
+    expect(screen.getByTestId("own")).toHaveAttribute("data-size", "xs");
+  });
+});

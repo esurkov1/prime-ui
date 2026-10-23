@@ -18,8 +18,12 @@
   box-shadow: var(--prime-shadow-raised);
 }
 
-/* The grip ends the row and sits closer to the edge: a square button with its own inner room. */
+/*
+ * The grip ends the row and sits closer to the edge: a square button with its own inner room. The
+ * row is as tall with the switch as with the grip (28), so the reorder mode moves nothing.
+ */
 .handleRow {
+  min-height: calc(var(--prime-space-3) * 2 + var(--prime-space-7));
   padding-inline-end: var(--prime-space-2);
 }
 

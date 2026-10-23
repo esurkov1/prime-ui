@@ -4,6 +4,7 @@ import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
+import { Badge } from "@/components/badge/Badge";
 import { Dnd } from "@/components/dnd/Dnd";
 import { DRAG_HOLD_MS } from "@/internal/longPress";
 import { cssRule, cssRules, cssValue } from "@/test/css";
@@ -1039,7 +1040,7 @@ describe("rich card parts", () => {
     );
   }
 
-  it("draws zones apart over a faint line and drops an empty zone with its line", () => {
+  it("draws zones apart and drops an empty zone", () => {
     render(
       <RichBoard>
         <Kanban.ItemSection data-testid="zone-1">
@@ -1056,7 +1057,7 @@ describe("rich card parts", () => {
     );
     expect(screen.queryByTestId("zone-empty")).not.toBeInTheDocument();
     const second = screen.getByTestId("zone-2");
-    // The zones stand side by side: the second one draws the line at its top.
+    // The zones stand side by side; air, not a line, separates them.
     expect(second.previousElementSibling).toBe(screen.getByTestId("zone-1"));
     expect(second.className).toBe(screen.getByTestId("zone-1").className);
   });
@@ -1108,6 +1109,25 @@ describe("rich card parts", () => {
         ),
     );
     expect(reorders).toEqual([]);
+  });
+
+  it("the title, its badges and the description form one header row, badges on the title line", () => {
+    render(
+      <RichBoard>
+        <Kanban.ItemDescription data-testid="description">INV-3102</Kanban.ItemDescription>
+        <Kanban.ItemFact>Депозит</Kanban.ItemFact>
+        <Kanban.ItemBadges data-testid="badges">
+          <Badge.Root>Финансы</Badge.Root>
+        </Kanban.ItemBadges>
+        <Kanban.ItemTitle data-testid="title">Акт сверки</Kanban.ItemTitle>
+      </RichBoard>,
+    );
+    const title = screen.getByTestId("title");
+    expect(screen.getByTestId("badges").parentElement).toBe(title.parentElement);
+    const titles = title.parentElement?.parentElement;
+    expect(titles?.children[1]).toBe(screen.getByTestId("description"));
+    // The row stands where the first of its parts was written; the fact keeps its place after it.
+    expect(titles?.parentElement?.nextElementSibling).toHaveTextContent("Депозит");
   });
 
   it("a plain title keeps its single element", () => {

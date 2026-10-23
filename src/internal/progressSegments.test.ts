@@ -2,13 +2,30 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  allocateCells,
+  filledCells,
   formatProgressValue,
   PROGRESS_SEGMENTS_LABELS,
   resolveRows,
   resolveSegments,
   resolveValue,
   segmentFill,
+  stepCells,
 } from "./progressSegments";
+
+describe("cells", () => {
+  it("rounds a steps scale into 2…12 cells and a share to whole cells", () => {
+    expect([stepCells(1), stepCells(4.4), stepCells(40)]).toEqual([2, 4, 12]);
+    expect([filledCells(0.64, 40), filledCells(1.4, 10), filledCells(-1, 10)]).toEqual([26, 10, 0]);
+  });
+
+  it("shares the cells by the largest remainder and keeps a cell for every weight above zero", () => {
+    expect(allocateCells([52, 32, 24, 18], 40)).toEqual([16, 10, 8, 6]);
+    expect(allocateCells([98, 1, 1, 0], 10)).toEqual([8, 1, 1, 0]);
+    expect(allocateCells([5, 5, 5], 2)).toEqual([0, 1, 1]);
+    expect(allocateCells([0, 0], 10)).toEqual([0, 0]);
+  });
+});
 
 describe("resolveValue", () => {
   it("clamps the value to 0…max and gives its ratio and rounded percent", () => {

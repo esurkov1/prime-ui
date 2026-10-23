@@ -7,13 +7,15 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
-import { fieldTierClass } from "@/internal/fieldClasses";
+import { HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
 import { iconSlotClass } from "@/internal/iconBox";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { handoffFocus, tabStopBeside } from "@/internal/overlay/focus";
 import { useEnterOnAppear } from "@/internal/partPresence";
-import { type ControlSize, compactTier, type Tone, type Variant } from "@/internal/states";
+import { flattenChildren, isPart } from "@/internal/parts";
+import type { ControlSize, Tone, Variant } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 
 import styles from "./Banner.module.css";
 
@@ -25,17 +27,43 @@ export type BannerLabels = {
 export const BANNER_LABELS: BannerLabels = { dismiss: "Закрыть" };
 
 /**
- * With `onDismiss` the close button is the small corner button, or — when the banner has
- * `Banner.Actions` — a regular square button at the end of that row, lined up with the others
- * (CSS hides the corner one with `:has(.actions)`).
+ * With `onDismiss` the close button stands last at the end of the banner's row: in
+ * `Banner.Actions` when the banner has them, alone otherwise.
  */
 type BannerContextValue = {
   onDismiss?: () => void;
-  size: ControlSize;
+  frame: ControlSize;
+  controls: ControlSize;
   dismissLabel: string;
 };
 
 const BannerContext = React.createContext<BannerContextValue | null>(null);
+
+function useBanner(): BannerContextValue | null {
+  return React.useContext(BannerContext);
+}
+
+function CloseButton({
+  banner,
+  variant,
+}: {
+  banner: BannerContextValue;
+  variant: "ghost" | "soft";
+}) {
+  return (
+    <Button.Root
+      variant={variant}
+      tone="inherit"
+      size={banner.controls}
+      aria-label={banner.dismissLabel}
+      onClick={banner.onDismiss}
+    >
+      <Button.Icon>
+        <Icon name="action.close" />
+      </Button.Icon>
+    </Button.Root>
+  );
+}
 
 export type BannerRootProps = React.HTMLAttributes<HTMLDivElement> & {
   variant?: Exclude<Variant, "ghost">;
@@ -77,9 +105,12 @@ function BannerRoot({
     };
   }, []);
   const dismissLabel = labels?.dismiss ?? BANNER_LABELS.dismiss;
+  const frame = size;
+  // The buttons of the banner take its tier: as tall as the fields of the same surface.
+  const controls = useHostTier(frame, "surface");
   const context = React.useMemo<BannerContextValue>(
-    () => ({ onDismiss, size, dismissLabel }),
-    [onDismiss, size, dismissLabel],
+    () => ({ onDismiss, frame, controls: controls.size, dismissLabel }),
+    [onDismiss, frame, controls.size, dismissLabel],
   );
   // A tinted banner is a host off the ladder (translucent fills inside); an outline one is a layer.
   const nested = useNestedSurfaceDepth();
@@ -89,32 +120,19 @@ function BannerRoot({
     <div
       {...rest}
       ref={mergedRef}
-      className={cx(fieldTierClass, styles.root, appear.entering && enterMotion.enter, className)}
+      className={cx(
+        surfaceFrameClass,
+        styles.root,
+        appear.entering && enterMotion.enter,
+        className,
+      )}
       data-depth={depth}
+      data-frame={frame}
       {...toDataAttributes({ variant, tone, size, placement })}
     >
       <SurfaceDepthProvider value={depth}>
         <BannerContext.Provider value={context}>
-          {tier.provide(
-            <>
-              {children}
-              {onDismiss ? (
-                <span className={cx(fieldTierClass, styles.close)} data-size={compactTier(size)}>
-                  <Button.Root
-                    variant="ghost"
-                    tone="inherit"
-                    size={compactTier(size)}
-                    aria-label={dismissLabel}
-                    onClick={onDismiss}
-                  >
-                    <Button.Icon>
-                      <Icon name="action.close" />
-                    </Button.Icon>
-                  </Button.Root>
-                </span>
-              ) : null}
-            </>,
-          )}
+          {controls.provide(children)}
         </BannerContext.Provider>
       </SurfaceDepthProvider>
     </div>
@@ -126,9 +144,43 @@ export type BannerContentProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Layout of the message: icon on the first line, title over description, actions right (under the text when narrow). */
-function BannerContent({ className, ...rest }: BannerContentProps) {
-  return <div className={cx(styles.content, className)} {...rest} />;
+/**
+ * The banner's header row: the mark (`Banner.Icon`), the title over the description, the actions
+ * at the end (under the text when narrow) — whatever order they are written in. With `onDismiss`
+ * and no `Banner.Actions` the close button stands alone at the end.
+ */
+function BannerContent({ className, children, ...rest }: BannerContentProps) {
+  const banner = useBanner();
+  const items = flattenChildren(children);
+  const pick = (type: React.ElementType) => items.filter((part) => isPart(part, type));
+  const actions = pick(BannerActions);
+  const own: React.ElementType[] = [BannerIcon, BannerTitle, BannerDescription, BannerActions];
+  return (
+    <div
+      {...rest}
+      className={cx(headerRowStyles.header, styles.content, className)}
+      data-lines={pick(BannerDescription).length > 0 ? "two" : "one"}
+    >
+      <HeaderRowContent
+        mark={pick(BannerIcon)}
+        title={pick(BannerTitle)}
+        description={pick(BannerDescription)}
+        end={
+          actions.length === 0 && banner?.onDismiss ? (
+            <div className={headerRowStyles.end}>
+              <CloseButton banner={banner} variant="ghost" />
+            </div>
+          ) : (
+            actions
+          )
+        }
+      >
+        {items.filter(
+          (part) => !(React.isValidElement(part) && own.includes(part.type as React.ElementType)),
+        )}
+      </HeaderRowContent>
+    </div>
+  );
 }
 BannerContent.displayName = "Banner.Content";
 
@@ -136,10 +188,14 @@ export type BannerIconProps = React.HTMLAttributes<HTMLSpanElement> & {
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** Holds one `Icon` on the first text line, in the tone color. */
+/** Holds one `Icon` in the mark box of the banner's frame, in the tone color. */
 function BannerIcon({ className, ...rest }: BannerIconProps) {
   return (
-    <span className={cx(styles.icon, iconSlotClass, className)} aria-hidden="true" {...rest} />
+    <span
+      className={cx(headerRowStyles.mark, styles.icon, iconSlotClass, className)}
+      aria-hidden="true"
+      {...rest}
+    />
   );
 }
 BannerIcon.displayName = "Banner.Icon";
@@ -149,7 +205,13 @@ export type BannerTitleProps = React.HTMLAttributes<HTMLSpanElement> & {
 };
 
 function BannerTitle({ className, ...rest }: BannerTitleProps) {
-  return <span className={cx(styles.title, className)} {...rest} />;
+  const banner = useBanner();
+  return (
+    <span
+      className={cx(FRAME_TITLE[banner?.frame ?? "m"], headerRowStyles.title, className)}
+      {...rest}
+    />
+  );
 }
 BannerTitle.displayName = "Banner.Title";
 
@@ -158,7 +220,13 @@ export type BannerDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
 };
 
 function BannerDescription({ className, ...rest }: BannerDescriptionProps) {
-  return <span className={cx(styles.description, className)} {...rest} />;
+  const banner = useBanner();
+  return (
+    <span
+      className={cx(FRAME_DESCRIPTION[banner?.frame ?? "m"], styles.description, className)}
+      {...rest}
+    />
+  );
 }
 BannerDescription.displayName = "Banner.Description";
 
@@ -166,27 +234,14 @@ export type BannerActionsProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Action buttons take the banner `size`; with `onDismiss` the close button joins this row. */
+/** Action buttons take the banner's frame tier; with `onDismiss` the close button ends this row. */
 function BannerActions({ className, children, ...rest }: BannerActionsProps) {
-  const banner = React.useContext(BannerContext);
+  const banner = useBanner();
 
   return (
-    <div className={cx(styles.actions, className)} {...rest}>
+    <div className={cx(headerRowStyles.end, styles.actions, className)} {...rest}>
       {children}
-      {banner?.onDismiss ? (
-        <Button.Root
-          variant="soft"
-          tone="inherit"
-          size={banner.size}
-          aria-label={banner.dismissLabel}
-          className={styles.actionsClose}
-          onClick={banner.onDismiss}
-        >
-          <Button.Icon>
-            <Icon name="action.close" />
-          </Button.Icon>
-        </Button.Root>
-      ) : null}
+      {banner?.onDismiss ? <CloseButton banner={banner} variant="soft" /> : null}
     </div>
   );
 }

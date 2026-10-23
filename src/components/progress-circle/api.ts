@@ -10,10 +10,17 @@ export const api: ComponentApi = {
       props: [
         {
           name: "size",
-          type: '"xs" | "s" | "m" | "l" | "xl"',
+          type: '"xs" | "s" | "m" | "l" | "xl" | "2xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Diameter 24 · 32 · 40 · 48 · 64 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host; in a mark slot (`Card.Icon`, a dialog's `Icon`) it is `m`, the 40 box of an avatar.",
-          ru: "Диаметр 24 · 32 · 40 · 48 · 64 px; толщина — 1/12 диаметра. Без него кольцо берёт ярус хоста с размером; в слоте знака (`Card.Icon`, `Icon` диалога) оно `m` — 40, как аватар.",
+          en: "Diameter 24 · 32 · 40 · 48 · 64 · 96 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host; in a mark slot (`Card.Icon`, a dialog's `Icon`) it is `m`, the 40 box of an avatar.",
+          ru: "Диаметр 24 · 32 · 40 · 48 · 64 · 96 px; толщина — 1/12 диаметра. Без него кольцо берёт ярус хоста с размером; в слоте знака (`Card.Icon`, `Icon` диалога) оно `m` — 40, как аватар.",
+        },
+        {
+          name: "variant",
+          type: '"line" | "steps" | "ticks"',
+          default: '"line"',
+          en: "`line` — one ring; `steps` (value mode) — `max` arcs (2–12); `ticks` — thin ticks on a ring twice as heavy, more on a larger tier. Cells fill whole, by one front.",
+          ru: "`line` — одно кольцо; `steps` (режим значения) — `max` дуг (2–12); `ticks` — тонкие штрихи на вдвое более толстом кольце, на большем ярусе их больше. Ячейки заполняются целиком, одним фронтом.",
         },
         {
           name: "children",
@@ -87,8 +94,8 @@ export const api: ComponentApi = {
           name: "segmentGap",
           type: '"none" | "hairline"',
           default: '"none"',
-          en: "Segments mode: `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs.",
-          ru: "Режим сегментов: `none` — одно сплошное кольцо; `hairline` — каждая часть и остаток отдельными дугами.",
+          en: "Segments mode: `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. `line` variant.",
+          ru: "Режим сегментов: `none` — одно сплошное кольцо; `hairline` — каждая часть и остаток отдельными дугами. Вид `line`.",
         },
         {
           name: "legend",

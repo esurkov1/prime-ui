@@ -209,6 +209,14 @@
   min-width: 0;
 }
 
+/* The flow title with the page's badges after it, 6 apart on one line. */
+.titleLine {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--prime-space-1) * 1.5);
+  min-width: 0;
+}
+
 .actions {
   display: flex;
   flex: 0 1 auto;
@@ -283,7 +291,7 @@
   color: var(--prime-color-text-primary);
 }
 
-.barDescription {
+p.barDescription {
   margin: 0;
   color: var(--prime-color-text-muted);
 }

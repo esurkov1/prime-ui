@@ -2,6 +2,7 @@ import type * as React from "react";
 
 import { createComponentContext } from "@/internal/context";
 import type { Selection } from "@/internal/messageList";
+import type { ControlSize } from "@/internal/states";
 
 import type { MessageListLabels } from "./MessageList";
 
@@ -56,6 +57,8 @@ export type ChatContextValue = {
   searchButtonRef: React.RefObject<HTMLButtonElement | null>;
   /** The list hands its jump here. */
   revealRef: React.RefObject<((value: string) => void) | null>;
+  /** The surface frame: the resolved tier of the chat. */
+  frame: ControlSize;
   /** The id of `Chat.Title`, the name of the list. */
   titleId: string;
   hasTitle: boolean;

@@ -1,0 +1,105 @@
+import { render, screen } from "@testing-library/react";
+import * as React from "react";
+import { describe, expect, it } from "vitest";
+
+import { StatusDot } from "@/components/status-dot/StatusDot";
+
+import { HeaderLineContent, HeaderRowContent, headerRowStyles, useTitleFloor } from "./headerRow";
+
+describe("HeaderRowContent", () => {
+  it("places mark, titles (title row, then description) and end whatever the order given", () => {
+    const { container } = render(
+      <div>
+        <HeaderRowContent
+          end={<i data-testid="end" />}
+          description={<p data-testid="description" />}
+          badges={<b data-testid="badges" />}
+          title={<h3 data-testid="title">Заказ</h3>}
+          mark={<u data-testid="mark" />}
+        />
+      </div>,
+    );
+    const [mark, titles, end] = [...(container.firstElementChild?.children ?? [])];
+    expect(mark).toBe(screen.getByTestId("mark"));
+    expect(end).toBe(screen.getByTestId("end"));
+    expect(titles).toHaveClass(headerRowStyles.titles);
+    const [row, description] = [...titles.children];
+    expect(row).toHaveClass(headerRowStyles.titleRow);
+    expect([...row.children]).toEqual([screen.getByTestId("title"), screen.getByTestId("badges")]);
+    expect(description).toBe(screen.getByTestId("description"));
+  });
+
+  it("draws the titles wrapper only when there is text", () => {
+    const { container } = render(
+      <div>
+        <HeaderRowContent mark={<u />} end={<i />} title={false} badges={null} />
+      </div>,
+    );
+    expect(container.querySelector(`.${headerRowStyles.titles}`)).toBeNull();
+  });
+});
+
+describe("useTitleFloor", () => {
+  function Title({ text }: { text: string }) {
+    const ref = React.useRef<HTMLHeadingElement>(null);
+    useTitleFloor(ref);
+    return (
+      <h3 ref={ref} data-testid="title">
+        {text}
+      </h3>
+    );
+  }
+
+  it("sets --header-title-min to the smaller of the text and 8em", () => {
+    const widths = { current: 0 };
+    const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollWidth");
+    Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+      configurable: true,
+      get: () => widths.current,
+    });
+    const size = Object.getOwnPropertyDescriptor(window, "getComputedStyle");
+    window.getComputedStyle = (() => ({ fontSize: "10px" })) as unknown as typeof getComputedStyle;
+    try {
+      widths.current = 50;
+      const view = render(<Title text="Заказ" />);
+      expect(screen.getByTestId("title").style.getPropertyValue("--header-title-min")).toBe("50px");
+      widths.current = 300;
+      view.rerender(<Title text="Очень длинное название заказа" />);
+      expect(screen.getByTestId("title").style.getPropertyValue("--header-title-min")).toBe("80px");
+    } finally {
+      if (original) Object.defineProperty(HTMLElement.prototype, "scrollWidth", original);
+      else Reflect.deleteProperty(HTMLElement.prototype, "scrollWidth");
+      if (size) Object.defineProperty(window, "getComputedStyle", size);
+    }
+  });
+});
+
+describe("HeaderLineContent", () => {
+  it("separates a StatusDot from the cut text with a «·»", () => {
+    const { container } = render(
+      <div>
+        <HeaderLineContent>
+          Обновлён вчера
+          <StatusDot tone="success">Оплачен</StatusDot>
+        </HeaderLineContent>
+      </div>,
+    );
+    const [dot, separator, text] = [...(container.firstElementChild?.children ?? [])];
+    expect(dot).toHaveTextContent("Оплачен");
+    expect(separator).toHaveAttribute("aria-hidden", "true");
+    expect(separator).toHaveClass(headerRowStyles.separator);
+    expect(text).toHaveClass(headerRowStyles.descriptionText);
+  });
+
+  it("has no separator for text alone or a StatusDot alone", () => {
+    const { container } = render(
+      <div>
+        <HeaderLineContent>Обновлён вчера</HeaderLineContent>
+        <HeaderLineContent>
+          <StatusDot tone="warning">Ждёт оплаты</StatusDot>
+        </HeaderLineContent>
+      </div>,
+    );
+    expect(container.querySelector(`.${headerRowStyles.separator}`)).toBeNull();
+  });
+});

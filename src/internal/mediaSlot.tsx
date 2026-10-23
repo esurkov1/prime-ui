@@ -16,8 +16,12 @@ import * as React from "react";
 
 import type { ControlSize } from "./states";
 
-/** The size a picture takes in a slot: an avatar may go below the control tiers (`2xs`). */
-type MediaSlotSizes = { avatar: "2xs" | ControlSize; thumbnail?: ControlSize; ring?: ControlSize };
+/** The size a picture takes in a slot: an avatar may go below or above the control tiers. */
+type MediaSlotSizes = {
+  avatar: "2xs" | ControlSize | "2xl";
+  thumbnail?: ControlSize;
+  ring?: ControlSize;
+};
 
 type MediaKind = keyof MediaSlotSizes;
 

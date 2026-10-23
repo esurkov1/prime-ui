@@ -53,6 +53,23 @@
   --ring-arc: max(var(--ring-value, 0), 0.08);
 }
 
+/*
+ * Cells (`cells`): the track and the arcs show only through one mask of whole cells, so the arc's
+ * one front fills them; the arc's ends are flat, the mask shapes them. Ticks stand on a stroke
+ * twice as heavy as `data`: a tick is longer across the ring than along it.
+ */
+.ring[data-cells="ticks"] {
+  --ring-stroke: max(calc(100% / 6), calc(var(--prime-border-width) * 2));
+}
+
+.ring[data-cells] .arc {
+  stroke-linecap: butt;
+}
+
+.cellMask {
+  stroke: white;
+}
+
 /* Arcs start at 12 o'clock and run clockwise. */
 .turn {
   transform: rotate(-90deg);

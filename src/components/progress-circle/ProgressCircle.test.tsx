@@ -38,6 +38,21 @@ describe("ProgressCircle", () => {
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", String(value));
   });
 
+  it("2xl draws a 96 ring and keeps the xl tier for its legend", () => {
+    render(
+      <ProgressCircle
+        size="2xl"
+        segments={[
+          { value: 3, label: "Сырьё" },
+          { value: 1, label: "Запас" },
+        ]}
+        legend
+      />,
+    );
+    expect(screen.getByRole("group").closest('[data-size="2xl"]')).not.toBeNull();
+    expect(screen.getByText("Сырьё").closest("ul")).toHaveAttribute("data-size", "l");
+  });
+
   it.each(["s", "m", "l", "xl"] as const)("sets data-size=%s", (size: ControlSize) => {
     render(<ProgressCircle value={50} size={size} />);
     expect(screen.getByRole("progressbar").closest("[data-size]")).toHaveAttribute(
@@ -260,5 +275,57 @@ describe("ProgressCircle", () => {
     expect(root).toHaveAttribute("data-tone", "success");
     expect(root).not.toHaveAttribute("data-track");
     expect(root).not.toHaveAttribute("data-color");
+  });
+
+  describe("variant", () => {
+    const svgOf = (container: HTMLElement) => container.querySelector("svg") as SVGSVGElement;
+
+    it("steps: max cells, the arc stops on a whole cell", () => {
+      const { container } = render(
+        <ProgressCircle variant="steps" value={2.6} max={4} aria-label="Шаги" />,
+      );
+      expect(container.firstElementChild).toHaveAttribute("data-variant", "steps");
+      expect(svgOf(container)).toHaveAttribute("data-cells", "steps");
+      expect(svgOf(container).style.getPropertyValue("--ring-value")).toBe("0.75");
+      expect(screen.getByRole("progressbar", { name: "Шаги" })).toHaveAttribute(
+        "aria-valuenow",
+        "2.6",
+      );
+    });
+
+    it("ticks: the tier's tick count, the share rounded to a whole tick", () => {
+      const { container } = render(
+        <ProgressCircle variant="ticks" size="m" value={50} aria-label="Готово" />,
+      );
+      expect(svgOf(container)).toHaveAttribute("data-cells", "ticks");
+      expect(svgOf(container).style.getPropertyValue("--ring-value")).toBe("0.5");
+      const cut = svgOf(container).querySelector("mask circle") as SVGCircleElement;
+      const [dash, gap] = cut.style.strokeDasharray.split(/[ ,]+/).map(Number);
+      expect(100 / (dash + gap)).toBeCloseTo(24);
+    });
+
+    it("ticks with segments: flat arcs on whole ticks, the free rest stays track", () => {
+      render(
+        <ProgressCircle
+          variant="ticks"
+          size="m"
+          max={24}
+          aria-label="Лиды"
+          segments={[
+            { value: 8, label: "Сайт", color: "blue" },
+            { value: 4, label: "Звонки", color: "orange" },
+          ]}
+        />,
+      );
+      const group = screen.getByRole("group", { name: "Лиды" });
+      const arcs = [...group.querySelectorAll("g > circle[data-color]")] as SVGCircleElement[];
+      expect(arcs.map((a) => a.getAttribute("data-color"))).toEqual(["blue", "orange"]);
+      // 24 ticks of 100/24: 8 + 4 ticks, the second starting where the first ends.
+      expect(Number(arcs[1].style.strokeDashoffset)).toBeCloseTo(100 - 4 * (100 / 24));
+      expect(Number.parseFloat(arcs[1].style.rotate)).toBeCloseTo(120);
+      expect(group.querySelectorAll("g > circle:not([data-color]):not([data-tone])")).toHaveLength(
+        1,
+      );
+    });
   });
 });

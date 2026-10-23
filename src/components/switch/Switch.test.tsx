@@ -253,4 +253,28 @@ describe("Switch", () => {
     expect(onCheckedChange).not.toHaveBeenCalled();
     expect(control).not.toBeChecked();
   });
+
+  it("fullWidth marks the field root with data-control=end and keeps the text first", () => {
+    render(
+      <Switch.Root fullWidth data-testid="input">
+        <Switch.Label>Уведомления</Switch.Label>
+      </Switch.Root>,
+    );
+    const field = screen.getByTestId("input").closest("[data-control]");
+    expect(field).toHaveAttribute("data-control", "end");
+    // The text takes the first grid column, the control cell the second.
+    const rule = (selector: string) =>
+      cssRule("src/internal/ChoiceField.module.css", `.field[data-control="end"] ${selector}`);
+    expect(cssValue(rule(".text"), "grid-column")).toBe("1");
+    expect(cssValue(rule(".controlCell"), "grid-column")).toBe("2");
+  });
+
+  it("has no data-control without fullWidth", () => {
+    const { container } = render(
+      <Switch.Root>
+        <Switch.Label>Уведомления</Switch.Label>
+      </Switch.Root>,
+    );
+    expect(container.querySelector("[data-control]")).toBeNull();
+  });
 });

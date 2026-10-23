@@ -3,15 +3,13 @@
  * soft: tinted tone fill, primary text, tone icon · solid: saturated tone fill ·
  * outline: card fill with a hairline tone ring.
  *
- * Layout (left-aligned, Notification's status-icon pattern):
+ * The surface frame of its tier (internal/surfaceFrame: padding, radius, mark) and the kit's
+ * header row (internal/headerRow):
  *   [icon] [title          ] [actions] [×]
  *          [description    ]
- * The icon sits on the title's first line, title and description stack in a text column capped at
- * the reading width, actions are on the right and vertically centered on the text. Below 36rem of the
- * banner's own width (container query) the actions move under the text. The close button is top-right,
- * centered on the first line; it joins a wide banner's actions row and returns to the corner when the
- * actions move under the text.
- * Spacing lives in item paddings (not grid gaps), so absent parts leave no empty gutters.
+ * The icon is the mark box, centred on the text; the title is one line cut with an ellipsis, the
+ * description is a message to read and may wrap. Below 36rem of the banner's own width (container
+ * query) the actions move under the text.
  * `placement="page"`: edge-to-edge strip without radius, content aligned to the page content column.
  */
 
@@ -25,26 +23,13 @@
   --bn-solid: var(--prime-color-info-default);
   --bn-solid-fg: var(--prime-color-info-fg);
 
-  --bn-pad-y: var(--prime-space-3);
-  --bn-pad-x: var(--prime-space-4);
-  --bn-gap: var(--prime-space-3);
-  --bn-actions-gap: var(--prime-space-4);
-  /* Icon and title follow the control tier: `fieldTierClass` on the root resolves `--field-*`. */
-  --bn-icon: var(--field-icon);
-  --bn-title-size: var(--field-text);
-  --bn-title-line-height: var(--field-lh);
-  --bn-desc-size: var(--prime-text-body-s-size);
-  --bn-desc-line-height: var(--prime-text-body-s-line-height);
-  --bn-radius: var(--prime-radius-l);
+  --bn-radius: var(--frame-radius);
 
   position: relative;
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
   width: 100%;
   min-width: 0;
-  padding: var(--bn-pad-y) var(--bn-pad-x);
+  padding: var(--frame-pad);
   border-radius: var(--bn-radius);
   background: var(--bn-bg);
   color: var(--bn-fg);
@@ -58,54 +43,10 @@
   container-type: inline-size;
 }
 
-.root:has(> .close):not(:has(.actions)) {
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: var(--bn-gap);
-}
-
 /* Full-width page strip: no radius, content follows the page content column. */
 .root[data-placement="page"] {
   --bn-radius: 0;
-  padding-inline: max(var(--bn-pad-x), calc((100% - var(--prime-layout-content-max-width)) / 2));
-}
-
-/* ---------- Sizes ---------- */
-
-.root[data-size="xs"] {
-  --bn-pad-y: var(--prime-space-2);
-  --bn-pad-x: var(--prime-space-2);
-  --bn-gap: var(--prime-space-2);
-  --bn-actions-gap: var(--prime-space-3);
-  --bn-desc-size: var(--prime-text-caption-size);
-  --bn-desc-line-height: var(--prime-text-caption-line-height);
-  --bn-radius: var(--prime-radius-m);
-}
-
-.root[data-size="s"] {
-  --bn-pad-y: var(--prime-space-2);
-  --bn-pad-x: var(--prime-space-3);
-  --bn-gap: var(--prime-space-2);
-  --bn-actions-gap: var(--prime-space-3);
-  --bn-desc-size: var(--prime-text-caption-size);
-  --bn-desc-line-height: var(--prime-text-caption-line-height);
-  --bn-radius: var(--prime-radius-m);
-}
-
-.root[data-size="l"] {
-  --bn-pad-y: var(--prime-space-4);
-  --bn-pad-x: var(--prime-space-5);
-  --bn-desc-size: var(--prime-text-body-m-size);
-  --bn-desc-line-height: var(--prime-text-body-m-line-height);
-}
-
-.root[data-size="xl"] {
-  --bn-pad-y: var(--prime-space-5);
-  --bn-pad-x: var(--prime-space-6);
-  --bn-gap: var(--prime-space-4);
-  --bn-actions-gap: var(--prime-space-6);
-  --bn-desc-size: var(--prime-text-body-m-size);
-  --bn-desc-line-height: var(--prime-text-body-m-line-height);
-  --bn-radius: var(--prime-radius-xl);
+  padding-inline: max(var(--frame-pad), calc((100% - var(--prime-layout-content-max-width)) / 2));
 }
 
 /* ---------- Tones ---------- */
@@ -172,112 +113,50 @@
 /* ---------- Slots ---------- */
 
 .content {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas:
-    "icon title actions"
-    "icon description actions";
-  align-items: start;
   min-width: 0;
 }
 
-/* The icon box is one title line high, so the glyph is centered on the first line. */
+/* The mark: a box of the frame's mark size, the glyph centred in the tone color. */
 .icon {
-  grid-area: icon;
-  box-sizing: content-box;
   display: inline-flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--bn-icon);
-  height: var(--bn-title-line-height);
-  padding-inline-end: var(--bn-gap);
+  width: var(--frame-mark);
+  height: var(--frame-mark);
   color: var(--bn-icon-color);
-  --prime-icon-size: var(--bn-icon);
+  --prime-icon-size: var(--prime-icon-m);
 }
 
-.title {
-  grid-area: title;
-  min-width: 0;
-  max-inline-size: var(--prime-layout-reading-max-width);
-  font-size: var(--bn-title-size);
-  line-height: var(--bn-title-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  overflow-wrap: anywhere;
+.root:is([data-frame="l"], [data-frame="xl"]) .icon {
+  --prime-icon-size: var(--prime-icon-l);
 }
 
 .description {
-  grid-area: description;
   min-width: 0;
   max-inline-size: var(--prime-layout-reading-max-width);
-  font-size: var(--bn-desc-size);
-  line-height: var(--bn-desc-line-height);
   color: var(--bn-desc-color);
   overflow-wrap: anywhere;
 }
 
-.content:has(> .title) > .description {
-  padding-top: var(--prime-space-1);
-}
-
 .actions {
-  grid-area: actions;
-  align-self: center;
-  display: flex;
   flex-shrink: 0;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
-  padding-inline-start: var(--bn-actions-gap);
-}
-
-/* Dismiss inside the actions row: a regular square button, last in the row. */
-.actionsClose {
-  order: 1;
-}
-
-/* Corner close slot (holds a ghost icon Button, `tone="inherit"`: the banner's text color, so it
-   reads on solid fills too): top-right, centered on the first text line without growing the
-   banner. The slot carries the placement, so the Button keeps its own box untouched; it is a tier
-   of its own (the close Button's `compactTier`), so `--field-h` is the Button's height. */
-.close {
-  display: flex;
-  grid-column: 2;
-  grid-row: 1;
-  align-self: start;
-  margin-block: calc((var(--bn-title-line-height) - var(--field-h)) / 2);
-}
-
-/* With `Banner.Actions` the dismiss joins that row; the corner close steps aside. */
-.root:has(.actions) > .close {
-  display: none;
 }
 
 /* ---------- Narrow container: actions under the text ---------- */
 
 @container (max-width: 36rem) {
   .content {
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas:
-      "icon title"
-      "icon description"
-      ". actions";
+    flex-wrap: wrap;
   }
 
+  /* Under the text column: the mark and the gap are skipped. */
   .actions {
-    align-self: start;
-    padding-inline-start: 0;
-    padding-top: var(--prime-space-3);
+    flex: 1 1 100%;
+    justify-content: flex-start;
   }
 
-  /* The dismiss leaves the actions row for the corner: a row that wraps under the text would
-     otherwise leave the × alone on a line of its own. */
-  .root:has(.actions) > .close {
-    display: flex;
-    margin-inline-start: var(--bn-gap);
-  }
-
-  .actions > .actionsClose {
-    display: none;
+  .content:has(> .icon) > .actions {
+    padding-inline-start: calc(var(--frame-mark) + var(--prime-space-3));
   }
 }

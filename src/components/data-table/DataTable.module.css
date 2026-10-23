@@ -75,7 +75,7 @@
   width: 100%;
   min-width: 0;
   overflow: hidden;
-  border-radius: var(--prime-card-radius);
+  border-radius: var(--frame-radius);
   background: var(--dt-surface);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);

@@ -72,6 +72,12 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The title of a row that carries a description is medium, like a rich Select option. */
+.itemBody > .itemLabel {
+  font-weight: var(--prime-font-weight-medium);
 }
 
 .itemSlot {

@@ -18,14 +18,20 @@ import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
-import hairline from "@/internal/hairline.module.css";
 import { hasContent } from "@/internal/hasContent";
+import {
+  HeaderLineContent,
+  HeaderRowContent,
+  headerRowStyles,
+  useTitleFloor,
+} from "@/internal/headerRow";
 import { namedRole } from "@/internal/namedRole";
-import { flattenChildren, splitParts } from "@/internal/parts";
+import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { isPlainClick, opensRow } from "@/internal/rowLink";
 import rowLink from "@/internal/rowLink.module.css";
-import type { PaletteColor } from "@/internal/states";
+import { type PaletteColor, tierMappings } from "@/internal/states";
 import { type SurfaceDepth, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 import textRole from "@/internal/textRole.module.css";
 import { useFlipList } from "@/internal/useFlipList";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
@@ -117,6 +123,9 @@ export const KANBAN_LABELS: KanbanLabels = {
 };
 
 const SKELETON_CARDS = [3, 2, 1];
+
+/** A board card is dense: it stands on the small letter of the frame. */
+const CARD_FRAME = "s";
 
 type BoardContextValue = {
   disabled: boolean;
@@ -553,7 +562,7 @@ function KanbanBoard<T>({
               {Array.from({ length: loadingColumns }, (_, columnIndex) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder columns
                 <div key={columnIndex} className={styles.column}>
-                  <div className={cx(styles.header, hairline.bottom)}>
+                  <div className={cx(styles.header)}>
                     <Skeleton shape="block" className={styles.skeletonTitle} />
                   </div>
                   <div className={styles.body}>
@@ -641,7 +650,8 @@ function SkeletonCards({
         <div
           // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder cards
           key={index}
-          className={cx(styles.item, styles.skeleton)}
+          className={cx(surfaceFrameClass, styles.item, styles.skeleton)}
+          data-frame={CARD_FRAME}
           data-depth={cardDepth}
           data-surface={cardDepth !== undefined || undefined}
           aria-hidden="true"
@@ -726,10 +736,7 @@ function KanbanColumnView<T>({
       data-full={full || undefined}
     >
       <ControlSizeProvider value="s">
-        <div
-          className={cx(styles.header, hairline.bottom)}
-          data-reorderable={reorderable || undefined}
-        >
+        <div className={styles.header} data-reorderable={reorderable || undefined}>
           <Title id={headingId} className={cx(textRole.titleM, styles.title)}>
             {column.title}
           </Title>
@@ -853,7 +860,8 @@ function KanbanItem({
       data-surface={board.cardDepth !== undefined || undefined}
       data-link={href !== undefined || undefined}
       data-clickable={(href === undefined && openItem !== null) || undefined}
-      className={cx(styles.item, href !== undefined && rowLink.host, className)}
+      className={cx(surfaceFrameClass, styles.item, href !== undefined && rowLink.host, className)}
+      data-frame={CARD_FRAME}
       onClick={(event: React.MouseEvent<HTMLElement>) => {
         onClick?.(event);
         // The release of a drag never opens the card: Dnd takes that click.
@@ -898,7 +906,7 @@ function KanbanItem({
           }}
         />
       ) : null}
-      <ControlSizeProvider value="m">{children}</ControlSizeProvider>
+      <ControlSizeProvider value={CARD_FRAME}>{arrangeParts(children)}</ControlSizeProvider>
       <KanbanItemSpinner />
     </Dnd.SortableItem>
   );
@@ -923,19 +931,49 @@ function textInSpans(children: React.ReactNode): React.ReactNode {
 }
 
 /**
- * The top zone of a card above a faint hairline: a muted row with the key or project at the start
- * and the last child (a priority, an assignee) at the end.
+ * The header row of a card: the title with the badges after it on one line and the description
+ * under them (the kit's header row, internal/headerRow), at the place of the first of the three —
+ * whatever order they are written in. Anything else keeps its order.
+ */
+function arrangeParts(children: React.ReactNode): React.ReactNode {
+  const items = flattenChildren(children);
+  const heads = items.filter(
+    (part) =>
+      isPart(part, KanbanItemTitle) ||
+      isPart(part, KanbanItemBadges) ||
+      isPart(part, KanbanItemDescription),
+  );
+  if (heads.length === 0) return children;
+  const pick = (type: React.ElementType) => heads.filter((part) => isPart(part, type));
+  const description = pick(KanbanItemDescription);
+  const header = (
+    <div
+      key="kanban-header-row"
+      className={headerRowStyles.header}
+      data-lines={description.length > 0 ? "two" : "one"}
+    >
+      <HeaderRowContent
+        title={pick(KanbanItemTitle)}
+        badges={pick(KanbanItemBadges)}
+        description={description}
+      />
+    </div>
+  );
+  const headSet = new Set<React.ReactNode>(heads);
+  const first = items.findIndex((part) => headSet.has(part));
+  return items.flatMap((part, index): React.ReactNode[] =>
+    index === first ? [header] : headSet.has(part) ? [] : [part],
+  );
+}
+
+/**
+ * The top row of a card: a muted caption row with the key or project at the start and the last
+ * child (a priority, an assignee) at the end. No line under it; air separates.
  */
 function KanbanItemHeader({ className, children, ...rest }: KanbanItemHeaderProps) {
   return (
     <div
-      className={cx(
-        fieldTierClass,
-        textRole.caption,
-        styles.itemHeader,
-        hairline.bottom,
-        className,
-      )}
+      className={cx(fieldTierClass, textRole.caption, styles.itemHeader, className)}
       data-size="xs"
       {...rest}
     >
@@ -951,22 +989,27 @@ export type KanbanItemTitleProps = React.HTMLAttributes<HTMLSpanElement> & {
 };
 
 /**
- * The card title: medium body text, wraps up to three lines. With a tail — the record's `number`,
- * an `Avatar.Root` child (the owner, found inside fragments too) — it is one row: the name cut with
- * an ellipsis, then the number, the owner last, never shrunk.
+ * The card title: one line, cut with an ellipsis; the badges after it share its line and it gives
+ * way first. With a tail — the record's `number`, an `Avatar.Root` child (the owner, found inside
+ * fragments too) — it is one row: the name cut with an ellipsis, then the number, the owner last,
+ * never shrunk.
  */
-function KanbanItemTitle({ number, className, children, ...rest }: KanbanItemTitleProps) {
+function KanbanItemTitle({ number, className, children, ref, ...rest }: KanbanItemTitleProps) {
+  const own = React.useRef<HTMLSpanElement>(null);
+  const mergedRef = useMergedRefs(own, ref);
+  useTitleFloor(own);
   const { parts: avatars, rest: text } = splitParts(flattenChildren(children), Avatar.Root);
   const hasNumber = hasContent(number);
+  const title = cx(FRAME_TITLE[CARD_FRAME], headerRowStyles.title);
   if (!hasNumber && avatars.length === 0) {
     return (
-      <span className={cx(textRole.bodyM, styles.itemTitle, className)} {...rest}>
+      <span ref={mergedRef} className={cx(title, className)} {...rest}>
         {children}
       </span>
     );
   }
   return (
-    <span className={cx(textRole.bodyM, styles.itemTitleRow, className)} {...rest}>
+    <span ref={mergedRef} className={cx(title, styles.itemTitleRow, className)} {...rest}>
       <span className={styles.itemTitleText}>{text}</span>
       {hasNumber ? <span className={cx(textRole.caption, styles.itemNumber)}>{number}</span> : null}
       {avatars}
@@ -979,9 +1022,16 @@ export type KanbanItemDescriptionProps = React.HTMLAttributes<HTMLSpanElement> &
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** The muted meta line: id, due date. */
-function KanbanItemDescription({ className, ...rest }: KanbanItemDescriptionProps) {
-  return <span className={cx(textRole.caption, styles.itemDescription, className)} {...rest} />;
+/** The muted line under the title: id, due date; a `StatusDot` first states the state. */
+function KanbanItemDescription({ className, children, ...rest }: KanbanItemDescriptionProps) {
+  return (
+    <span
+      className={cx(FRAME_DESCRIPTION[CARD_FRAME], headerRowStyles.description, className)}
+      {...rest}
+    >
+      <HeaderLineContent>{children}</HeaderLineContent>
+    </span>
+  );
 }
 KanbanItemDescription.displayName = "Kanban.ItemDescription";
 
@@ -989,9 +1039,16 @@ export type KanbanItemBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** A wrapping row of `Badge`s: labels, priority (a `Badge.Group`). */
-function KanbanItemBadges(props: KanbanItemBadgesProps) {
-  return <Badge.Group {...props} />;
+/** The badges after the title, on its line: what does not fit folds into «+N» (a `Badge.Group`). */
+function KanbanItemBadges({ className, ...rest }: KanbanItemBadgesProps) {
+  return (
+    <Badge.Group
+      {...rest}
+      size={tierMappings.cardBadges[CARD_FRAME]}
+      overflow="count"
+      className={cx(headerRowStyles.badges, className)}
+    />
+  );
 }
 KanbanItemBadges.displayName = "Kanban.ItemBadges";
 
@@ -1032,13 +1089,14 @@ export type KanbanItemSectionProps = React.HTMLAttributes<HTMLDivElement> & {
 
 /**
  * A zone of a card: a group of its parts. Neighbouring zones stand apart by more air than the parts
- * inside one, over a faint line; a zone with nothing in it is not drawn and leaves no line.
+ * inside one, with no line; a zone with nothing in it is not drawn. Its title, badges and
+ * description form the header row, as in the card itself.
  */
 function KanbanItemSection({ className, children, ...rest }: KanbanItemSectionProps) {
   if (!hasContent(children)) return null;
   return (
-    <div className={cx(styles.itemSection, hairline.between, className)} {...rest}>
-      {children}
+    <div className={cx(styles.itemSection, className)} {...rest}>
+      {arrangeParts(children)}
     </div>
   );
 }

@@ -16,6 +16,7 @@
   --pc-fill: var(--prime-color-accent-default);
   --pc-rest: var(--prime-color-fill-strong);
   --pc-icon-size: var(--prime-icon-m);
+  --pc-stroke-share: 12;
 
   font-family: var(--prime-font-family-sans);
 }
@@ -46,7 +47,12 @@
   min-width: 0;
 }
 
-/* Loading: a Skeleton ring of the same diameter and stroke (1/12), its hole masked out. */
+/* Ticks stand on a stroke twice as heavy (the ring's `ticks` cells). */
+.root[data-variant="ticks"] {
+  --pc-stroke-share: 6;
+}
+
+/* Loading: a Skeleton ring of the same diameter and stroke (1/12, ticks 1/6), its hole masked out. */
 .ringSkeleton {
   width: var(--pc-size);
   height: var(--pc-size);
@@ -54,8 +60,8 @@
   border-radius: var(--prime-radius-full);
   mask: radial-gradient(
     farthest-side,
-    transparent calc(100% - var(--pc-size) / 12),
-    var(--prime-color-text-primary) calc(100% - var(--pc-size) / 12)
+    transparent calc(100% - var(--pc-size) / var(--pc-stroke-share)),
+    var(--prime-color-text-primary) calc(100% - var(--pc-size) / var(--pc-stroke-share))
   );
 }
 
@@ -75,6 +81,12 @@
 
 .root[data-size="xl"] {
   --pc-size: var(--prime-space-16);
+  --pc-icon-size: var(--prime-icon-xl);
+}
+
+/* `2xl` — the ring that heads a breakdown (the KPI card's footer): 96, the icon stays `xl`. */
+.root[data-size="2xl"] {
+  --pc-size: var(--prime-space-24);
   --pc-icon-size: var(--prime-icon-xl);
 }
 

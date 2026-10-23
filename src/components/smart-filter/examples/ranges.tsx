@@ -4,6 +4,7 @@ import {
   DEFAULT_DATEPICKER_PRESETS,
   formatDateValue,
   isSmartFilterRange,
+  List,
   matchesSmartFilter,
   SmartFilter,
   type SmartFilterField,
@@ -103,26 +104,20 @@ export default function SmartFilterRangesExample() {
       <Card.Root>
         <Card.Header>
           <Card.Title>Сделки</Card.Title>
-          <Card.Actions>
-            <Typography as="span" variant="caption" tone="muted">
-              {rows.length} из {DEALS.length}
-            </Typography>
-          </Card.Actions>
+          <Card.Description>
+            {rows.length} из {DEALS.length}
+          </Card.Description>
         </Card.Header>
-        <Card.List>
-          {rows.map((deal) => (
-            <Card.ListItem key={deal.id}>
-              <span className={styles.request}>
-                <Typography as="span" variant="body-m" truncate className={styles.route}>
-                  {deal.client}
-                </Typography>
-                <Typography as="span" variant="body-m" tone="secondary">
-                  {formatRubles(deal.amount)}
-                </Typography>
-              </span>
-            </Card.ListItem>
-          ))}
-        </Card.List>
+        <Card.Body>
+          <List.Root aria-label="Сделки">
+            {rows.map((deal) => (
+              <List.Item key={deal.id}>
+                <List.ItemText>{deal.client}</List.ItemText>
+                <List.ItemMeta>{formatRubles(deal.amount)}</List.ItemMeta>
+              </List.Item>
+            ))}
+          </List.Root>
+        </Card.Body>
       </Card.Root>
       <Typography as="span" variant="code" tone="secondary">
         {`GET /deals?${toQuery(value)}`}

@@ -44,7 +44,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "История обслуживания с промежутками между событиями, подписью справа у промежутка, двумя строками меты под ремонтом и второй строкой суммы — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`.",
+        "История обслуживания с промежутками между событиями, подписью справа у промежутка, двумя строками меты под ремонтом и бейджем после названия ремонта с состоянием в мете и второй строкой суммы — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`, `Timeline.ItemBadges`, `StatusDot`.",
     },
     {
       scenario: "links",

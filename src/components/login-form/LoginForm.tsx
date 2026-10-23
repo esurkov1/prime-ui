@@ -8,14 +8,16 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { iconBoxStyles } from "@/internal/iconBox";
 import type { ControlSize } from "@/internal/states";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 
 import styles from "./LoginForm.module.css";
 
 /*
- * The type scale of the form by tier (its own scale, like a heading level per tier): the title,
- * the description and the footer line grow with the tier.
+ * A `start` header is the surface's header row: the title, the description and the footer line take
+ * the frame roles of the letter (internal/surfaceFrame). A `center` header is its own column and
+ * keeps a larger scale of the title and the description.
  */
-const TITLE_ROLE: Record<ControlSize, TypographyRole> = {
+const CENTER_TITLE_ROLE: Record<ControlSize, TypographyRole> = {
   xs: "title-s",
   s: "title-m",
   m: "title-l",
@@ -23,20 +25,12 @@ const TITLE_ROLE: Record<ControlSize, TypographyRole> = {
   xl: "heading-m",
 };
 
-const DESCRIPTION_ROLE: Record<ControlSize, TypographyRole> = {
+const CENTER_DESCRIPTION_ROLE: Record<ControlSize, TypographyRole> = {
   xs: "body-s",
   s: "body-s",
   m: "body-m",
   l: "body-m",
   xl: "body-l",
-};
-
-const FOOTER_ROLE: Record<ControlSize, TypographyRole> = {
-  xs: "caption",
-  s: "body-s",
-  m: "body-s",
-  l: "body-m",
-  xl: "body-m",
 };
 
 /** Tier of the text parts: the root's `size`, provided through the control-size context. */
@@ -48,7 +42,6 @@ const AlignContext = React.createContext<"center" | "start">("start");
 export type LoginFormRootProps = {
   size?: ControlSize;
   align?: "center" | "start";
-  flat?: boolean;
   className?: string;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
@@ -57,7 +50,6 @@ export type LoginFormRootProps = {
 function LoginFormRoot({
   size: sizeProp,
   align = "start",
-  flat = false,
   className,
   children,
   ref,
@@ -70,10 +62,10 @@ function LoginFormRoot({
     <div
       ref={ref}
       {...rest}
-      className={cx(styles.root, className)}
-      {...toDataAttributes({ size, align, flat })}
+      className={cx(surfaceFrameClass, styles.root, className)}
+      {...toDataAttributes({ size, align, frame: size })}
     >
-      <Card.Root flat={flat}>
+      <Card.Root size={size}>
         <div className={styles.content}>
           <AlignContext value={align}>{provide(children)}</AlignContext>
         </div>
@@ -112,11 +104,13 @@ export type LoginFormLogoProps = {
  */
 function LoginFormLogo({ className, children, ...rest }: LoginFormLogoProps) {
   const align = React.useContext(AlignContext);
+  const size = useLoginFormSize();
   return (
     <div
       role={rest["aria-label"] ? "img" : undefined}
       className={cx(styles.logo, align === "start" && iconBoxStyles.tile, className)}
       data-tone={align === "start" ? "accent" : undefined}
+      data-size={align === "start" ? size : undefined}
       {...rest}
     >
       {children}
@@ -134,10 +128,16 @@ export type LoginFormTitleProps = {
 
 function LoginFormTitle({ as = "h1", className, children, ...rest }: LoginFormTitleProps) {
   const size = useLoginFormSize();
-  return (
+  const align = React.useContext(AlignContext);
+  const Tag = as;
+  return align === "start" ? (
+    <Tag className={cx(FRAME_TITLE[size], styles.title, className)} {...rest}>
+      {children}
+    </Tag>
+  ) : (
     <Typography
       as={as}
-      variant={TITLE_ROLE[size]}
+      variant={CENTER_TITLE_ROLE[size]}
       className={cx(styles.title, className)}
       {...rest}
     >
@@ -155,10 +155,18 @@ export type LoginFormDescriptionProps = {
 
 function LoginFormDescription({ className, children, ...rest }: LoginFormDescriptionProps) {
   const size = useLoginFormSize();
-  return (
+  const align = React.useContext(AlignContext);
+  return align === "start" ? (
+    <p
+      className={cx(FRAME_DESCRIPTION[size], styles.description, styles.quiet, className)}
+      {...rest}
+    >
+      {children}
+    </p>
+  ) : (
     <Typography
       as="p"
-      variant={DESCRIPTION_ROLE[size]}
+      variant={CENTER_DESCRIPTION_ROLE[size]}
       tone="secondary"
       className={cx(styles.description, className)}
       {...rest}
@@ -234,15 +242,9 @@ export type LoginFormFooterProps = {
 function LoginFormFooter({ className, children, ...rest }: LoginFormFooterProps) {
   const size = useLoginFormSize();
   return (
-    <Typography
-      as="p"
-      variant={FOOTER_ROLE[size]}
-      tone="secondary"
-      className={cx(styles.footer, className)}
-      {...rest}
-    >
+    <p className={cx(FRAME_DESCRIPTION[size], styles.footer, styles.quiet, className)} {...rest}>
       {children}
-    </Typography>
+    </p>
   );
 }
 LoginFormFooter.displayName = "LoginForm.Footer";

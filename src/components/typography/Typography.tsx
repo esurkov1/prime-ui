@@ -15,6 +15,7 @@ export type TypographyRole =
   | "body-s"
   | "body-m"
   | "body-l"
+  | "title-xs"
   | "title-s"
   | "title-m"
   | "title-l"
@@ -31,6 +32,7 @@ const ROLE_CLASS: Record<TypographyRole, string> = {
   "body-s": roles.bodyS,
   "body-m": roles.bodyM,
   "body-l": roles.bodyL,
+  "title-xs": roles.titleXs,
   "title-s": roles.titleS,
   "title-m": roles.titleM,
   "title-l": roles.titleL,

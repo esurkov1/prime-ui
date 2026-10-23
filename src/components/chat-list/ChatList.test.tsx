@@ -469,7 +469,7 @@ describe("ChatList.Item asChild", () => {
     expect(screen.getByText("09:30")).toHaveAttribute("datetime", sent.toISOString());
   });
 
-  it("draws the record status as badges on a line under the preview", () => {
+  it("draws the record badges on the name line", () => {
     render(
       <ChatList.Root
         items={DIALOGS.slice(0, 1)}
@@ -478,25 +478,24 @@ describe("ChatList.Item asChild", () => {
           <ChatList.Item>
             <ChatList.ItemText>{item.name}</ChatList.ItemText>
             <ChatList.ItemDescription>{item.preview}</ChatList.ItemDescription>
-            <ChatList.ItemStatus data-testid="record">
+            <ChatList.ItemBadges data-testid="record">
               <Badge.Root color="yellow">Бронь</Badge.Root>
               <Badge.Root tone="warning">Ждёт человека</Badge.Root>
-            </ChatList.ItemStatus>
+            </ChatList.ItemBadges>
           </ChatList.Item>
         )}
       />,
     );
     const row = screen.getByRole("button", { name: /ООО «Вектор»/ });
     const record = within(row).getByTestId("record");
-    const preview = within(row).getByText("Счёт не выгружается");
+    const name = within(row).getByText("ООО «Вектор»");
     expect(record).toHaveTextContent("Бронь");
     expect(record).toHaveTextContent("Ждёт человека");
-    // Name, then the preview, then the badges.
-    expect(preview.compareDocumentPosition(record) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    // The compact tier, in one line with a «+N» badge behind them.
-    const group = record.querySelector("[data-overflow]");
-    expect(group).toHaveAttribute("data-overflow", "count");
-    expect(group).toHaveAttribute("data-tier", "xs");
-    expect(row).toHaveAttribute("data-record", "true");
+    // The badges follow the name on its line, ahead of the preview.
+    expect(name.compareDocumentPosition(record) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(row.querySelector("[data-record]")).toBeNull();
+    // The badges of the row's frame (`xs` at `m`), in one line with a «+N» badge behind them.
+    expect(record).toHaveAttribute("data-overflow", "count");
+    expect(record).toHaveAttribute("data-tier", "xs");
   });
 });

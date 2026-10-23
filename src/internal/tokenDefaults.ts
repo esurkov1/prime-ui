@@ -6,6 +6,11 @@
  * come from the CSS (`readCssLengthPx`, `readCssDurationMs`), with these as their defaults.
  */
 export const TOKEN_DEFAULTS = {
+  "--prime-control-xs-track": 4,
+  "--prime-control-s-track": 5,
+  "--prime-control-m-track": 6,
+  "--prime-control-l-track": 7,
+  "--prime-control-xl-track": 8,
   "--prime-gallery-max-size": 360,
   "--prime-message-sticker": 160,
   "--prime-message-video-note-box": 268,

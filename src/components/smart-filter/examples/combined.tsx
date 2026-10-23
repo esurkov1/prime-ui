@@ -2,11 +2,11 @@
 import {
   Badge,
   Card,
+  List,
   matchesSmartFilter,
   SmartFilter,
   type SmartFilterField,
   type SmartFilterValue,
-  Typography,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -71,29 +71,25 @@ export default function SmartFilterCombinedExample() {
       <Card.Root>
         <Card.Header>
           <Card.Title>Заказы</Card.Title>
-          <Card.Actions>
-            <Typography as="span" variant="caption" tone="muted">
-              {found.length} из {ORDERS.length}
-            </Typography>
-          </Card.Actions>
+          <Card.Description>
+            {found.length} из {ORDERS.length}
+          </Card.Description>
         </Card.Header>
-        <Card.List>
-          {found.map((order) => (
-            <Card.ListItem key={order.id}>
-              <span className={styles.request}>
-                <Typography as="span" variant="code">
-                  {order.id}
-                </Typography>
-                <Typography as="span" variant="body-m" className={styles.route} truncate>
-                  {order.client}
-                </Typography>
-                <Badge.Root color={STATUS[order.status].color}>
-                  {STATUS[order.status].label}
-                </Badge.Root>
-              </span>
-            </Card.ListItem>
-          ))}
-        </Card.List>
+        <Card.Body>
+          <List.Root aria-label="Заказы">
+            {found.map((order) => (
+              <List.Item key={order.id}>
+                <List.ItemText>{order.client}</List.ItemText>
+                <List.ItemDescription>{order.id}</List.ItemDescription>
+                <List.ItemMeta>
+                  <Badge.Root color={STATUS[order.status].color}>
+                    {STATUS[order.status].label}
+                  </Badge.Root>
+                </List.ItemMeta>
+              </List.Item>
+            ))}
+          </List.Root>
+        </Card.Body>
       </Card.Root>
     </div>
   );

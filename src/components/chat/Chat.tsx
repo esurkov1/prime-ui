@@ -12,17 +12,23 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
-import hairline from "@/internal/hairline.module.css";
+import {
+  HeaderLineContent,
+  HeaderRowContent,
+  headerRowStyles,
+  useTitleFloor,
+} from "@/internal/headerRow";
 import { useLabels } from "@/internal/labels";
 import type { Selection } from "@/internal/messageList";
 import { usePartPresence } from "@/internal/partPresence";
-import { flattenChildren } from "@/internal/parts";
+import { flattenChildren, isPart } from "@/internal/parts";
 import { RollingNumber } from "@/internal/RollingNumber";
-import textRole from "@/internal/textRole.module.css";
+import { tierMappings } from "@/internal/states";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 
 import styles from "./Chat.module.css";
 import { ChatPinned } from "./ChatPinned";
@@ -75,7 +81,7 @@ export const CHAT_LABELS: ChatLabels = {
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 /**
- * How the chat stands in its host: `pane` — inset from its own edges (a `Card`, a page pane);
+ * How the chat stands in its host: `pane` — inset from its own edges (a pane `Card` with no zones, a page pane);
  * `inline` — flush with the host's content edges (a dialog body, a tab, a `Card.Body`).
  */
 export type ChatVariant = "pane" | "inline";
@@ -120,6 +126,7 @@ function ChatRoot({
   ...rest
 }: ChatRootProps) {
   const labels = useLabels(CHAT_LABELS, labelsProp);
+  const frame = useHostTier(undefined, "surface").size;
   const selectable =
     selectedProp !== undefined || defaultSelected !== undefined || onSelectedChange !== undefined;
   const [selectedState, setSelected] = useControllableState<Selection>({
@@ -171,6 +178,7 @@ function ChatRoot({
       jump,
       revealRef,
       searchButtonRef,
+      frame,
       titleId,
       hasTitle,
       setHasTitle,
@@ -187,6 +195,7 @@ function ChatRoot({
       jumpTo,
       typing,
       jump,
+      frame,
       titleId,
       hasTitle,
       labels,
@@ -195,7 +204,13 @@ function ChatRoot({
 
   return (
     <ChatProvider value={value}>
-      <div ref={ref} className={cx(styles.root, className)} data-variant={variant} {...rest}>
+      <div
+        ref={ref}
+        className={cx(surfaceFrameClass, styles.root, className)}
+        data-variant={variant}
+        data-frame={frame}
+        {...rest}
+      >
         {children}
       </div>
     </ChatProvider>
@@ -210,28 +225,38 @@ export type ChatHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * The top of the chat: who it is with. A row of the leading elements (a back button, an `Avatar`),
- * the title over the badges and the description, and the actions at the end. Children are sorted
- * by type: `Chat.Title`, `Chat.Badges`, `Chat.Description` and `Chat.Actions` take their places,
- * everything else leads the row side by side, in the order written. The header draws nothing of
- * its own: every element in it is a part or a child you put.
+ * The top of the chat: who it is with, the kit's header row (internal/headerRow). A row of the
+ * leading elements (a back button, an `Avatar`) is the mark; the title with its badges on one line
+ * and the description under it follow; the actions stand at the end. Children are sorted by type:
+ * `Chat.Title`, `Chat.Badges`, `Chat.Description` and `Chat.Actions` take their places, everything
+ * else leads the row side by side, in the order written. One line each, nothing wraps; no line
+ * under the header — the messages dissolve at their top edge while scrolled.
  */
 function ChatHeader({ className, children, ...rest }: ChatHeaderProps) {
-  const lead: React.ReactNode[] = [];
-  const text: React.ReactNode[] = [];
-  for (const child of flattenChildren(children)) {
-    const own =
-      React.isValidElement(child) &&
-      (child.type === ChatTitle ||
-        child.type === ChatBadges ||
-        child.type === ChatDescription ||
-        child.type === ChatActions);
-    (own ? text : lead).push(child);
-  }
+  const items = flattenChildren(children);
+  const pick = (type: React.ElementType) => items.filter((part) => isPart(part, type));
+  const description = pick(ChatDescription);
+  const own: React.ElementType[] = [ChatTitle, ChatBadges, ChatDescription, ChatActions];
+  const lead = items.filter(
+    (part) => !(React.isValidElement(part) && own.includes(part.type as React.ElementType)),
+  );
   return (
-    <div className={cx(hairline.bottom, styles.header, className)} {...rest}>
-      {lead.length > 0 ? <div className={styles.lead}>{lead}</div> : null}
-      {text}
+    <div
+      className={cx(headerRowStyles.header, styles.header, className)}
+      data-lines={description.length === 0 ? "one" : "two"}
+      {...rest}
+    >
+      <HeaderRowContent
+        mark={
+          lead.length > 0 ? (
+            <div className={cx(headerRowStyles.mark, styles.lead)}>{lead}</div>
+          ) : null
+        }
+        title={pick(ChatTitle)}
+        badges={pick(ChatBadges)}
+        description={description}
+        end={pick(ChatActions)}
+      />
     </div>
   );
 }
@@ -247,14 +272,30 @@ export type ChatTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
  * Who the chat is with, one line; it also names the conversation for assistive tech. A record's
  * `number` stands muted after the name and is part of it: the name ellipsizes, the number never.
  */
-function ChatTitle({ as: Tag = "h2", number, className, id, children, ...rest }: ChatTitleProps) {
-  const { titleId, setHasTitle } = useChat();
+function ChatTitle({
+  as: Tag = "h2",
+  number,
+  className,
+  id,
+  children,
+  ref,
+  ...rest
+}: ChatTitleProps) {
+  const { titleId, setHasTitle, frame } = useChat();
+  const own = React.useRef<HTMLHeadingElement>(null);
+  const mergedRef = useMergedRefs(own, ref);
+  useTitleFloor(own);
   React.useEffect(() => {
     setHasTitle(true);
     return () => setHasTitle(false);
   }, [setHasTitle]);
   return (
-    <Tag id={id ?? titleId} className={cx(textRole.titleS, styles.title, className)} {...rest}>
+    <Tag
+      id={id ?? titleId}
+      ref={mergedRef}
+      className={cx(FRAME_TITLE[frame], headerRowStyles.title, styles.title, className)}
+      {...rest}
+    >
       <span className={styles.titleName}>{children}</span>
       {number !== undefined && number !== null ? (
         <>
@@ -278,8 +319,14 @@ export type ChatBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
  * (`Badge.Group overflow="count"`), whose tooltip lists it.
  */
 function ChatBadges({ className, ...rest }: ChatBadgesProps) {
+  const { frame } = useChat();
   return (
-    <Badge.Group size="s" overflow="count" className={cx(styles.badges, className)} {...rest} />
+    <Badge.Group
+      size={tierMappings.cardBadges[frame]}
+      overflow="count"
+      className={cx(headerRowStyles.badges, className)}
+      {...rest}
+    />
   );
 }
 ChatBadges.displayName = "Chat.Badges";
@@ -293,11 +340,23 @@ export type ChatDescriptionProps = React.HTMLAttributes<HTMLDivElement> & {
  * (`Chat.Root typing`) it cross-fades into «печатает…» in the accent, and back.
  */
 function ChatDescription({ className, children, ...rest }: ChatDescriptionProps) {
-  const { typing, labels } = useChat();
+  const { typing, labels, frame } = useChat();
   return (
-    <div className={cx(styles.description, className)} {...rest}>
+    <div
+      className={cx(
+        FRAME_DESCRIPTION[frame],
+        headerRowStyles.description,
+        styles.description,
+        className,
+      )}
+      {...rest}
+    >
       <Crossfade state={typing ? "typing" : "status"}>
-        {typing ? <span className={styles.typing}>{labels.typing}</span> : children}
+        {typing ? (
+          <span className={styles.typing}>{labels.typing}</span>
+        ) : (
+          <HeaderLineContent>{children}</HeaderLineContent>
+        )}
       </Crossfade>
     </div>
   );
@@ -309,13 +368,19 @@ export type ChatActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * The controls at the end of the header, tier `s`: ghost icon buttons (`Chat.SearchButton`, a
+ * The controls at the end of the header, at the tier of the frame: ghost icon buttons (`Chat.SearchButton`, a
  * call, a toggle), a `Select` or a `SegmentedControl`, a ⋯ `Dropdown` last.
  */
 function ChatActions({ className, children, ...rest }: ChatActionsProps) {
+  const { frame } = useChat();
+  const tier = useHostTier(frame, "surface");
   return (
-    <div className={cx(fieldTierClass, styles.actions, className)} data-size="s" {...rest}>
-      <ControlSizeProvider value="s">{children}</ControlSizeProvider>
+    <div
+      className={cx(fieldTierClass, headerRowStyles.end, className)}
+      data-size={tier.size}
+      {...rest}
+    >
+      {tier.provide(children)}
     </div>
   );
 }
@@ -759,7 +824,6 @@ function ChatMessages<T>({
         ) : (
           <ScrollContainer
             anchor="end"
-            edges="none"
             onReachStart={hasOlder ? onLoadOlder : undefined}
             className={styles.scroller}
           >

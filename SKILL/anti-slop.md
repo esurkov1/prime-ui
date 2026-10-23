@@ -90,6 +90,36 @@ on different hosts does the same: on a white host the "white card" is already th
 Build the tile as a `Card` (it takes the right layer wherever it lands). Check every hover on the page
 and inside a card, in both themes: rest, hover and the neighbour must be three different colors.
 
+## 3b. A card drawn by hand
+
+A card's photo is its `Card.Media` with a `Carousel` (one photo is a carousel of one), and its zones
+are parted by air — what stands where is in [a card's header, body and footer](ux.md#a-cards-header-body-and-footer).
+
+```tsx partial
+// bad — an <img> for the cover, Dividers between the zones
+<Card.Root>
+  <img src={unit.photo} alt="" className={styles.cover} />
+  <Card.Header>
+    <Card.Title>{unit.name}</Card.Title>
+  </Card.Header>
+  <Divider />
+  <Card.Footer>…</Card.Footer>
+</Card.Root>
+```
+
+```tsx good
+// declare: const unit: { name: string; photos: { src: string; alt: string }[] }
+// good — the cover is a Carousel in Card.Media, the zones stand apart by air
+<Card.Root>
+  <Card.Media>
+    <Carousel.Root items={unit.photos} aria-label={unit.name} />
+  </Card.Media>
+  <Card.Header>
+    <Card.Title>{unit.name}</Card.Title>
+  </Card.Header>
+</Card.Root>
+```
+
 ## 4. Mixed control sizes in one row
 
 ```tsx partial

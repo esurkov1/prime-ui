@@ -83,7 +83,10 @@ describe("Modal", () => {
       "aria-labelledby",
       screen.getByRole("heading", { name: "Test title" }).id,
     );
-    expect(dialog).toHaveAttribute("aria-describedby", screen.getByText("Test description").id);
+    expect(dialog).toHaveAttribute(
+      "aria-describedby",
+      screen.getByText("Test description").closest("p")?.id,
+    );
   });
 
   it("uses explicit aria-labelledby / aria-describedby as the part ids", () => {
@@ -128,10 +131,10 @@ describe("Modal", () => {
     expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("renders the header close as a small ghost icon button with labels.close", () => {
+  it("renders the header close as a ghost icon button at the dialog tier with labels.close", () => {
     render(<BasicModal defaultOpen labels={{ close: "Close dialog" }} />);
     const close = screen.getByRole("button", { name: "Close dialog" });
-    expect(close).toHaveAttribute("data-size", "s");
+    expect(close).toHaveAttribute("data-size", "m");
     expect(close).toHaveAttribute("data-variant", "ghost");
   });
 
@@ -621,7 +624,7 @@ describe("Modal — xs, header actions", () => {
     expect(screen.getByTestId("footer")).toHaveAttribute("data-layout", "fill");
   });
 
-  it("renders Modal.Actions in the header with tier s controls", () => {
+  it("renders Modal.Actions in the header at the dialog tier", () => {
     render(
       <Modal.Root defaultOpen>
         <Modal.Content>
@@ -636,7 +639,7 @@ describe("Modal — xs, header actions", () => {
         </Modal.Content>
       </Modal.Root>,
     );
-    expect(screen.getByRole("button", { name: "Печать" })).toHaveAttribute("data-size", "s");
+    expect(screen.getByRole("button", { name: "Печать" })).toHaveAttribute("data-size", "m");
   });
 });
 

@@ -4,10 +4,10 @@ import { ChartFrame, type ChartFrameSeries, chartColors, Kpi, Page } from "prime
 import styles from "./examples.module.css";
 
 const KPIS = [
-  { label: "Выручка", value: "4,8 млн ₽", change: 12, delta: "+12%", tone: "success" },
-  { label: "Заказы", value: "1 284", change: 6, delta: "+6%", tone: "success" },
-  { label: "Средний чек", value: "3 740 ₽", change: -2, delta: "−2%", tone: "danger" },
-  { label: "Возвраты", value: "1,8%", change: 0, delta: "0%", tone: "neutral" },
+  { label: "Выручка", value: "4,8", unit: "млн ₽", change: 12, delta: "+12%", tone: "success" },
+  { label: "Заказы", value: "1 284", unit: null, change: 6, delta: "+6%", tone: "success" },
+  { label: "Средний чек", value: "3 740", unit: "₽", change: -2, delta: "−2%", tone: "danger" },
+  { label: "Возвраты", value: "1,8", unit: "%", change: 0, delta: "0%", tone: "neutral" },
 ] as const;
 
 const SERIES: ChartFrameSeries[] = [{ id: "orders", label: "Заказы" }];
@@ -35,11 +35,14 @@ export default function PageGridExample() {
             <Page.Cell key={kpi.label} span={3}>
               <Kpi.Root>
                 <Kpi.Title>{kpi.label}</Kpi.Title>
-                <Kpi.Value>{kpi.value}</Kpi.Value>
+                <Kpi.Value>
+                  {kpi.value}
+                  {kpi.unit ? <Kpi.Unit>{kpi.unit}</Kpi.Unit> : null}
+                </Kpi.Value>
                 <Kpi.Delta value={kpi.change} tone={kpi.tone}>
                   {kpi.delta}
                 </Kpi.Delta>
-                <Kpi.Meta>к сентябрю</Kpi.Meta>
+                <Kpi.Period>Октябрь</Kpi.Period>
               </Kpi.Root>
             </Page.Cell>
           ))}
@@ -98,13 +101,16 @@ export default function PageGridExample() {
               <Kpi.Delta value={14} tone="success">
                 +14
               </Kpi.Delta>
-              <Kpi.Meta>к сентябрю</Kpi.Meta>
+              <Kpi.Period>Октябрь</Kpi.Period>
             </Kpi.Root>
           </Page.Cell>
           <Page.Cell span={4}>
             <Kpi.Root>
               <Kpi.Title>Ждут оплаты</Kpi.Title>
-              <Kpi.Value tone="warning">312 400 ₽</Kpi.Value>
+              <Kpi.Value>
+                312 400<Kpi.Unit>₽</Kpi.Unit>
+              </Kpi.Value>
+              <Kpi.Period>на 22 окт</Kpi.Period>
               <Kpi.Meta>7 счетов</Kpi.Meta>
             </Kpi.Root>
           </Page.Cell>

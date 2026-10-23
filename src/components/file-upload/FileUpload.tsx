@@ -35,13 +35,22 @@ import { extensionOf, formatColor } from "@/internal/fileFormat";
 import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
 import { formatLabel } from "@/internal/formatLabel";
+import { HeaderLineContent, HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
 import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
 import { handoffFocus } from "@/internal/overlay/focus";
 import { useEnterOnAppear, usePartPresence } from "@/internal/partPresence";
-import type { ControlSize, PaletteColor, TextTone, Tone } from "@/internal/states";
+import { flattenChildren, isPart } from "@/internal/parts";
+import {
+  type ControlSize,
+  cardMarkSize,
+  type PaletteColor,
+  type TextTone,
+  type Tone,
+} from "@/internal/states";
+import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
@@ -195,9 +204,10 @@ export type FileUploadTitleProps = ParagraphProps & {
 };
 
 function FileUploadTitle({ className, tone = "default", ...rest }: FileUploadTitleProps) {
+  const size = useControlSize(undefined);
   return (
     <p
-      className={cx(textTone.tone, styles.title, className)}
+      className={cx(textTone.tone, FRAME_TITLE[size], styles.title, className)}
       data-tone={tone === "default" ? undefined : tone}
       {...rest}
     />
@@ -220,20 +230,52 @@ export type FileUploadItemProps = DivProps & {
   size?: ControlSize;
 };
 
-/** A file row: format badge or preview · name over description · actions, then the progress bar. */
+/**
+ * A file row, the kit's header row on the surface frame of its tier (internal/headerRow): the
+ * picture or format badge, the name over the description, the actions at the end — whatever order
+ * they are written in — then the progress bar across the row.
+ */
 function FileUploadItem({
   className,
   invalid = false,
   size: sizeProp,
+  children,
   ...rest
 }: FileUploadItemProps) {
   const tier = useHostTier(sizeProp);
+  const items = flattenChildren(children);
+  const pick = (...types: React.ElementType[]) =>
+    items.filter((part) => types.some((type) => isPart(part, type)));
+  const own: React.ElementType[] = [
+    FileUploadFormatBadge,
+    FileUploadItemPreview,
+    FileUploadItemText,
+    FileUploadItemDescription,
+    FileUploadItemActions,
+    FileUploadItemProgress,
+  ];
+  const progress = pick(FileUploadItemProgress);
+  const description = pick(FileUploadItemDescription);
   return tier.provide(
     <div
-      className={cx(fieldTierClass, styles.item, className)}
-      {...toDataAttributes({ size: tier.size, invalid: invalid || undefined })}
+      className={cx(surfaceFrameClass, styles.item, className)}
+      {...toDataAttributes({ size: tier.size, frame: tier.size, invalid: invalid || undefined })}
       {...rest}
-    />,
+    >
+      <div className={headerRowStyles.header} data-lines={description.length > 0 ? "two" : "one"}>
+        <HeaderRowContent
+          mark={pick(FileUploadFormatBadge, FileUploadItemPreview)}
+          title={pick(FileUploadItemText)}
+          description={description}
+          end={pick(FileUploadItemActions)}
+        >
+          {items.filter(
+            (part) => !(React.isValidElement(part) && own.includes(part.type as React.ElementType)),
+          )}
+        </HeaderRowContent>
+      </div>
+      {progress}
+    </div>,
   );
 }
 FileUploadItem.displayName = "FileUpload.Item";
@@ -247,9 +289,14 @@ export type FileUploadFormatBadgeProps = Omit<
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** The thumbnail of a row's mark: the frame's mark size (32 · 32 · 40 · 48 · 48) of the row's tier. */
+function useRowMark() {
+  return cardMarkSize.header.thumbnail[useControlSize(undefined)];
+}
+
 /**
- * The file format as the short label of a square kit Thumbnail of the row tier, the box an image
- * file's picture takes (decorative: the name already carries the extension).
+ * The file format as the short label of a square kit Thumbnail of the row's mark size, the box an
+ * image file's picture takes (decorative: the name already carries the extension).
  */
 function FileUploadFormatBadge({
   format,
@@ -257,13 +304,13 @@ function FileUploadFormatBadge({
   className,
   ...rest
 }: FileUploadFormatBadgeProps) {
-  const size = useControlSize(undefined);
+  const size = useRowMark();
   return (
     <Thumbnail.Root
       {...rest}
       size={size}
       color={color}
-      className={cx(styles.formatBadge, className)}
+      className={cx(headerRowStyles.mark, styles.formatBadge, className)}
       aria-hidden="true"
     >
       <Thumbnail.Fallback>{format.trim().slice(0, 8).toUpperCase()}</Thumbnail.Fallback>
@@ -281,16 +328,16 @@ export type FileUploadItemPreviewProps = Omit<
 };
 
 /**
- * An image file's picture in place of the format badge: a square kit Thumbnail of the row tier
- * (decorative: the name names the file); an icon shows while it loads or if it fails.
+ * An image file's picture in place of the format badge: a square kit Thumbnail of the row's mark
+ * size (decorative: the name names the file); an icon shows while it loads or if it fails.
  */
 function FileUploadItemPreview({ src, className, ...rest }: FileUploadItemPreviewProps) {
-  const size = useControlSize(undefined);
+  const size = useRowMark();
   return (
     <Thumbnail.Root
       {...rest}
       size={size}
-      className={cx(styles.preview, className)}
+      className={cx(headerRowStyles.mark, styles.preview, className)}
       aria-hidden="true"
     >
       <Thumbnail.Image src={src} />
@@ -304,24 +351,53 @@ FileUploadItemPreview.displayName = "FileUpload.ItemPreview";
 
 export type FileUploadItemTextProps = DivProps;
 
+/** The file's name: one line, cut with an ellipsis. */
 function FileUploadItemText({ className, ...rest }: FileUploadItemTextProps) {
-  return <div className={cx(styles.itemText, className)} {...rest} />;
+  const size = useControlSize(undefined);
+  return (
+    <div
+      className={cx(FRAME_TITLE[size], headerRowStyles.title, styles.itemText, className)}
+      {...rest}
+    />
+  );
 }
 FileUploadItemText.displayName = "FileUpload.ItemText";
 
 export type FileUploadItemDescriptionProps = DivProps;
 
-/** Size, progress or the error of the file; turns danger in an invalid row. */
-function FileUploadItemDescription({ className, ...rest }: FileUploadItemDescriptionProps) {
-  return <div className={cx(styles.itemDescription, className)} {...rest} />;
+/** Size, progress or the error of the file, one line; turns danger in an invalid row. */
+function FileUploadItemDescription({
+  className,
+  children,
+  ...rest
+}: FileUploadItemDescriptionProps) {
+  const size = useControlSize(undefined);
+  return (
+    <div
+      className={cx(
+        FRAME_DESCRIPTION[size],
+        headerRowStyles.description,
+        styles.itemDescription,
+        className,
+      )}
+      {...rest}
+    >
+      <HeaderLineContent>{children}</HeaderLineContent>
+    </div>
+  );
 }
 FileUploadItemDescription.displayName = "FileUpload.ItemDescription";
 
 export type FileUploadItemActionsProps = DivProps;
 
-/** Buttons at the end of the row (remove, retry). */
-function FileUploadItemActions({ className, ...rest }: FileUploadItemActionsProps) {
-  return <div className={cx(styles.itemActions, className)} {...rest} />;
+/** Buttons at the end of the row (remove, retry), the row's tier tall. */
+function FileUploadItemActions({ className, children, ...rest }: FileUploadItemActionsProps) {
+  const controls = useHostTier(undefined, "surface");
+  return (
+    <div className={cx(headerRowStyles.end, className)} {...rest}>
+      {controls.provide(children)}
+    </div>
+  );
 }
 FileUploadItemActions.displayName = "FileUpload.ItemActions";
 
@@ -1261,9 +1337,10 @@ function FileUploadField({
     control = (
       // biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child
       <label
-        className={cx(fieldTierClass, styles.root)}
+        className={cx(fieldTierClass, surfaceFrameClass, styles.root)}
         {...toDataAttributes({
           size,
+          frame: size,
           variant,
           state: dragOver ? "active" : undefined,
           invalid: ids.invalid || undefined,

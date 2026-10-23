@@ -2,6 +2,8 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { Badge } from "@/components/badge/Badge";
+import { StatusDot } from "@/components/status-dot/StatusDot";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import press from "@/internal/press.module.css";
 import textTone from "@/internal/textTone.module.css";
@@ -272,9 +274,9 @@ describe("Timeline", () => {
     const second = screen.getByText("Этап: Переговоры → Договор");
     const text = title.parentElement;
     expect(text).toHaveClass(styles.text);
-    expect(first.parentElement).toBe(text);
-    expect(second.parentElement).toBe(text);
-    expect(first.nextElementSibling).toBe(second);
+    expect(first.parentElement?.parentElement).toBe(text);
+    expect(second.parentElement?.parentElement).toBe(text);
+    expect(first.parentElement?.nextElementSibling).toBe(second.parentElement);
     const value = screen.getByText("120 000 ₽");
     expect(value.parentElement).toBe(text?.parentElement);
   });
@@ -347,5 +349,27 @@ describe("Timeline", () => {
     link.focus();
     expect(link).toHaveFocus();
     expect(link).toHaveAttribute("data-interactive", "true");
+  });
+
+  it("puts the badges on the title's line", () => {
+    render(
+      <Timeline.Root>
+        <Timeline.Group>
+          <Timeline.Item>
+            <Timeline.ItemTitle>Сделка закрыта</Timeline.ItemTitle>
+            <Timeline.ItemBadges data-testid="badges">
+              <Badge.Root tone="success">Оплачено</Badge.Root>
+            </Timeline.ItemBadges>
+            <Timeline.ItemMeta>
+              <StatusDot tone="success">Выполнено</StatusDot>
+              15:02
+            </Timeline.ItemMeta>
+          </Timeline.Item>
+        </Timeline.Group>
+      </Timeline.Root>,
+    );
+    const title = screen.getByText("Сделка закрыта");
+    expect(screen.getByTestId("badges").parentElement).toBe(title.parentElement);
+    expect(screen.getByText("15:02").previousElementSibling).toHaveTextContent("·");
   });
 });

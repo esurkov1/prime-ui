@@ -8,7 +8,8 @@
 ## When to use
 - Compact metrics and goals in cards and dashboards (84% of plan).
 - Progress where horizontal space is short: table cells, list rows.
-- A value on a custom scale shown as a ring («7/12»).
+- A value on a custom scale shown as a ring («7/12»); a few steps as whole arcs (`variant="steps"`).
+- A score or a breakdown that heads a card, drawn as ticks around the ring (`variant="ticks"`).
 - A compact breakdown of a whole: tasks by status, storage by type (`segments`); categories in their chart colors (`color`) with a `legend` beside the ring.
 - A named process whose share is not known yet (`value={null}`) or that turns while its share grows (`spin`), with an icon in the center that changes with its state.
 
@@ -25,9 +26,9 @@ import { ProgressCircle, type ProgressSegment } from "prime-ui-kit";
 
 ## Anatomy
 ```
-ProgressCircle           <div>; size, tone (value mode), children in the center, aria-busy while loading
+ProgressCircle           <div>; size, variant, tone (value mode), children in the center, aria-busy while loading
 ├─ svg                   the kit ring (internal/ring, data weight); role="progressbar" (value) or
-│                        role="group" (segments); track + arcs
+│                        role="group" (segments); track + arcs (steps / ticks: one cell mask over both)
 │                        (loading: a Skeleton ring of the same diameter and stroke)
 ├─ description           visually hidden distribution (segments with aria-label, no legend)
 └─ inner                 children in the hole of the ring, a changed icon cross-fades
@@ -45,7 +46,8 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Diameter 24 · 32 · 40 · 48 · 64 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host; in a mark slot (`Card.Icon`, a dialog's `Icon`) it is `m`, the 40 box of an avatar. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | host tier, else `"m"` | Diameter 24 · 32 · 40 · 48 · 64 · 96 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host; in a mark slot (`Card.Icon`, a dialog's `Icon`) it is `m`, the 40 box of an avatar. |
+| `variant` | `"line" \| "steps" \| "ticks"` | `"line"` | `line` — one ring; `steps` (value mode) — `max` arcs (2–12); `ticks` — thin ticks on a ring twice as heavy, more on a larger tier. Cells fill whole, by one front. |
 | `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`): an icon or a short text («18 д», «72%») from `s`, sized with the ring (a quarter of its diameter), nothing on `xs`. A string or number also becomes `aria-valuetext`. |
 | `aria-label` | `string` | — | Accessible name of the ring (set on the svg). Always pass it. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton ring of the same diameter and stroke (and legend lines) that cross-fades into the data; the inner content waits, the root is `aria-busy`. |
@@ -56,7 +58,7 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 | `color` | `PaletteColor` | — | Value mode: arc color by category or status word (booking yellow, rented blue), a palette hue in its chart color. Mutually exclusive with `tone`. |
 | `track` | `"surface" \| "tinted"` | `"surface"` | Value mode: `tinted` — the track is a soft wash of the arc's color, so 0% reads as an empty ring of that color. Ignored with `tone="inherit"`. |
 | `segments` | `ProgressSegment[]` | — | Segments mode: parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette. Each part's length is its share of `max`. |
-| `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. |
+| `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. `line` variant. |
 | `legend` | `boolean` | `false` | Segments mode: a legend beside the ring (below it when narrow), one row per part: color · name · value · share; with `aria-label` it becomes the group's description. The root turns into the row of ring and legend. |
 | `formatValue` | `(value: number) => string` | Russian digit groups | Segments mode: display of a part's value in the legend («38 ГБ»). |
 | `labels` | `Partial<ProgressCircleLabels>` | — | Segments mode: built-in strings, see Labels. |
@@ -64,14 +66,22 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 
 ## Variants
 
+### variant
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `line` | one continuous ring, the stroke 1/12 of the diameter | a goal, a share, a breakdown | yes |
+| `steps` | `max` equal arcs (2–12) with round ends, ¾ of the stroke apart; `value` rounds to a whole arc (value mode only) | a few steps of a whole («3 из 5») | |
+| `ticks` | thin ticks around a ring twice as heavy (stroke 1/6): 12 · 16 · 24 · 30 · 40 · 60 by size; the value or each part takes whole ticks | a score or a breakdown that heads a card | |
+
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `xs` | 24 diameter, no inner content | inline in text or table cells | |
 | `s` | 32 diameter, an icon 16 or a short text 8 («18 д», «72%») in the center | list rows, compact cards | |
-| `m` | 40 diameter, inner text 10, icon 20 | KPI tiles, the mark slot of a card or dialog header (`Card.Icon`) | the host tier, else `m` |
+| `m` | 40 diameter, inner text 10, icon 20 | the mark slot of a card or dialog header (`Card.Icon`) | the host tier, else `m` |
 | `l` | 48 diameter, inner text 12, icon 24 | dashboard cards | |
 | `xl` | 64 diameter, inner text 16, icon 32 | hero metrics, breakdowns | |
+| `2xl` | 96 diameter, inner text 24, icon 32; its legend takes `xl` | the ring beside a breakdown's legend (a KPI card's footer) | |
 
 The stroke is always 1/12 of the diameter (the kit ring's `data` weight), the inner text 1/4 and the icon 1/2, so every tier is the same ring scaled. These diameters are the scale of an object's mark (the Thumbnail heights; a ring `m` is as large as an avatar `l` and the 40 icon tile), separate from the control heights of a circle Button.
 
@@ -115,7 +125,8 @@ The stroke is always 1/12 of the diameter (the kit ring's `data` weight), the in
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| size / tone | props | `data-size`, `data-tone` (value mode) on the root |
+| size / tone / variant | props | `data-size`, `data-tone` (value mode), `data-variant` on the root |
+| steps / ticks | `variant` | `data-cells` on the svg; one mask cuts the track and the arcs into whole cells, so the arc's one front fills them — a change caught mid-way goes on from where the front is. The arc stops on a whole cell; its ends are flat, the mask shapes them |
 | empty | `value` 0, or `segments` empty / all 0 | arc hidden, track only |
 | value | `value`, `max` | `aria-valuenow`, `aria-valuemin="0"`, `aria-valuemax`; `--ring-value` on the svg, the arc glides by `stroke-dashoffset` over `base` |
 | share unknown | `value={null}` | no `aria-valuenow`; `data-spin` on the svg: a quarter arc turning (one turn = 3 × `--prime-motion-loop`); a share that arrives glides out of the quarter |
@@ -133,7 +144,8 @@ Always controlled: pass the current `value` or `segments`.
 - Diameters sit on the 4px grid (`--prime-space-6…20`); the ring is placed in CSS (an svg without a viewBox), lengths along it are percent of the circle.
 - Inner content sits in the hole (5/6 of the diameter, clipped), primary, medium weight, tabular numbers.
 - With `legend` the root is a wrapping row: the ring and the legend `--prime-space-5` (20) apart; the legend takes the rest of the row (basis 192) and drops below the ring when that does not fit.
-- `hairline` arcs are ¾ of the stroke apart; arcs start at 12 o'clock and run clockwise.
+- `hairline` arcs and `steps` are ¾ of the stroke apart; arcs start at 12 o'clock and run clockwise.
+- `ticks` stand on a stroke of 1/6 of the diameter, a tick 4/7 of its pitch along the circle; the cell pattern starts half a gap past 12 o'clock.
 
 ## Accessibility
 
@@ -165,13 +177,14 @@ No keyboard interaction.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A plan ring with the percentage in the center, named for screen readers — `value`, `aria-label`. |
-| [variants.tsx](examples/variants.tsx) | Every arc color; the tone tells the outcome, not the progress — `tone`, `color`, `track`. |
-| [sizes.tsx](examples/sizes.tsx) | Diameters 24 to 64 px, the avatar scale; the center text is a quarter of the diameter and not rendered on `xs` — `size`. |
+| [variants.tsx](examples/variants.tsx) | Every way to draw the ring and every arc color; the tone tells the outcome, not the progress — `variant`, `tone`, `color`, `track`. |
+| [sizes.tsx](examples/sizes.tsx) | Diameters 24 to 96 px, the mark scale with `2xl` above it; the center text is a quarter of the diameter and not rendered on `xs`; ticks grow in number with the ring — `size`, `variant`. |
 | [states.tsx](examples/states.tsx) | Loading is a Skeleton ring of the same diameter and stroke; the number in the centre waits for the data — `loading`. |
 | [inner-content.tsx](examples/inner-content.tsx) | The center holds a percentage, a count on its own scale or an icon — `children`, `max`. |
 | [under-way.tsx](examples/under-way.tsx) | An import whose share is not known yet turns a quarter arc, then fills and swaps its icon; a sync turns while its share grows — `value`, `spin`, `children`. |
 | [segments.tsx](examples/segments.tsx) | Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list with its own spoken text — `segments`, `segmentGap`, `labels`. |
 | [legend.tsx](examples/legend.tsx) | A ring of category shares with a legend beside it, in the categories' chart colors — `color`, `legend`, `formatValue`. |
+| [ticks.tsx](examples/ticks.tsx) | A ring of ticks: the plan's share in the centre, and channel shares beside a legend — `variant`, `segments`, `legend`. |
 | [on-color.tsx](examples/on-color.tsx) | A ring on a colored host takes the host's text color — `tone`. |
 
 ## Mistakes
@@ -183,6 +196,7 @@ No keyboard interaction.
 - `tone` on the root with `segments` → set `tone` on each segment.
 - Long text inside the ring → it is clipped to the inner circle.
 - Categories painted with `tone` → use `color`; a hand-built legend beside the ring → `legend`.
+- `segmentGap="hairline"` with `variant="ticks"` → a type error: ticks are separate already.
 
 ## Related
 - **Built from:** [Skeleton](../skeleton/COMPONENT.md), `internal/ring` (the ring drawing, shared with Spinner and the circle Button), `internal/glyphSwap` (the center cross-fade), [VisuallyHidden](../visually-hidden/COMPONENT.md)

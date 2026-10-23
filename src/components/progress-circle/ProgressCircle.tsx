@@ -9,14 +9,18 @@ import { useMediaSlotSize } from "@/internal/mediaSlot";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
+  allocateCells,
+  filledCells,
   formatProgressValue,
   PROGRESS_SEGMENTS_LABELS,
   type ProgressModeProps,
   type ProgressSegment,
   type ProgressSegmentsLabels,
+  type ProgressVariant,
   resolveSegments,
   resolveValue,
   segmentFill,
+  stepCells,
 } from "@/internal/progressSegments";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { RING_DATA_STROKE, RING_PATH, Ring, RingCap, RingCircle } from "@/internal/ring";
@@ -31,10 +35,24 @@ const HAIRLINE_GAP = RING_DATA_STROKE * 0.75;
 /** Legend rows drawn while a distribution loads and its length is not known yet. */
 const LOADING_ROWS = 3;
 
+/** `xs` 24 · `s` 32 · `m` 40 · `l` 48 · `xl` 64 · `2xl` 96: the mark scale, one ring larger for the ring that heads a breakdown. */
+export type ProgressCircleSize = ControlSize | "2xl";
+
+/** Ticks around the ring per tier: about one per 4–5px of the circle through the ticks' middle. */
+const RING_TICKS: Record<ProgressCircleSize, number> = {
+  xs: 12,
+  s: 16,
+  m: 24,
+  l: 30,
+  xl: 40,
+  "2xl": 60,
+};
+
 export type ProgressCircleLabels = ProgressSegmentsLabels;
 
 type ValueModeProps = {
   value: number | null;
+  variant?: ProgressVariant;
   max?: number;
   spin?: boolean;
   track?: "surface" | "tinted";
@@ -49,10 +67,10 @@ type SegmentsModeProps = Extract<ProgressModeProps, { segments: ProgressSegment[
   spin?: never;
   track?: never;
   color?: never;
-};
+} & ({ variant?: "line" } | { variant: "ticks"; segmentGap?: never });
 
 export type ProgressCircleProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  size?: ControlSize;
+  size?: ProgressCircleSize;
   children?: React.ReactNode;
   loading?: boolean;
   ref?: React.Ref<HTMLDivElement>;
@@ -139,6 +157,26 @@ function SegmentArcs({
   );
 }
 
+/** Ticks: flat arcs on whole cells, the ring's cell mask cuts them into ticks. */
+function TickArcs({ arcs }: { arcs: Arc[] }) {
+  return (
+    <>
+      {arcs.map((a, i) => {
+        const own = fillProps(a.fill);
+        return (
+          <RingCircle
+            // biome-ignore lint/suspicious/noArrayIndexKey: presentational parts in source order
+            key={i}
+            {...own}
+            className={cx(own.className, styles.segment)}
+            style={arcStyle(a.start, a.length)}
+          />
+        );
+      })}
+    </>
+  );
+}
+
 function Cap({ position, fill }: { position: number; fill?: Fill }) {
   const own = fillProps(fill);
   return <RingCap position={position} {...own} className={cx(own.className, styles.cap)} />;
@@ -148,7 +186,8 @@ function Cap({ position, fill }: { position: number; fill?: Fill }) {
  * A progress ring drawn from the kit ring (`internal/ring`, `data` weight): a single `value`
  * (`role="progressbar"`; `null` — under way, share unknown) or `segments` — parts of a whole
  * clockwise from the top (`role="group"` described by the distribution), with an optional legend
- * beside the ring.
+ * beside the ring. `variant` draws the ring as a line, as `max` steps or as ticks (the ring's
+ * cells: one mask, one front).
  */
 export function ProgressCircle(props: ProgressCircleProps) {
   const {
@@ -165,6 +204,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
     spin = false,
     segments: segmentsProp,
     segmentGap = "none",
+    variant = "line",
     legend = false,
     formatValue = formatProgressValue,
     labels,
@@ -173,7 +213,10 @@ export function ProgressCircle(props: ProgressCircleProps) {
   const descriptionId = React.useId();
   // In a mark slot (`Card.Icon`) the ring stands for the record's state: the tile gives way and
   // the ring takes its 40 box.
-  const { size, provide } = useHostTier(useMediaSlotSize("ring") ?? sizeProp);
+  // `2xl` stands above the tier axis: the ring is 96, its legend and the controls inside take `xl`.
+  const slotSize = useMediaSlotSize("ring");
+  const { size: tier, provide } = useHostTier(slotSize ?? (sizeProp === "2xl" ? "xl" : sizeProp));
+  const size: ProgressCircleSize = !slotSize && sizeProp === "2xl" ? "2xl" : tier;
   const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
   const isText = typeof children === "string" || typeof children === "number";
   const showInner = !loading && children != null && children !== false && size !== "xs";
@@ -186,15 +229,27 @@ export function ProgressCircle(props: ProgressCircleProps) {
 
   if (segmentsProp) {
     const gap = segmentGap;
+    const ticks = variant === "ticks";
     const resolved = resolveSegments(segmentsProp, maxProp, segmentLabels);
     const { segments, total, rest: free, scale, text } = resolved;
     const unit = scale > 0 ? RING_PATH / scale : 0;
     const arcs: Arc[] = [];
     let cursor = 0;
-    for (const seg of segments as ProgressSegment[]) {
-      if (seg.value > 0)
-        arcs.push({ start: cursor, length: seg.value * unit, fill: segmentFill(seg) });
-      cursor += seg.value * unit;
+    if (ticks) {
+      // Each part takes whole ticks by its share; the free rest stays track.
+      const count = RING_TICKS[size];
+      const cells = allocateCells([...segments.map((seg) => seg.value), free], count);
+      segments.forEach((seg, i) => {
+        const length = cells[i] * (RING_PATH / count);
+        if (length > 0) arcs.push({ start: cursor, length, fill: segmentFill(seg) });
+        cursor += length;
+      });
+    } else {
+      for (const seg of segments as ProgressSegment[]) {
+        if (seg.value > 0)
+          arcs.push({ start: cursor, length: seg.value * unit, fill: segmentFill(seg) });
+        cursor += seg.value * unit;
+      }
     }
     if (free > 0 && total > 0) arcs.push({ start: cursor, length: free * unit, rest: true });
     const showLegend = legend && segments.length > 0;
@@ -210,14 +265,14 @@ export function ProgressCircle(props: ProgressCircleProps) {
     }
     if (legend) {
       legendNode = loading ? (
-        <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size={size} />
+        <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size={tier} />
       ) : showLegend ? (
         <ProgressLegend
           id={label ? descriptionId : undefined}
           segments={segments}
           scale={scale}
           formatValue={formatValue}
-          size={size}
+          size={tier}
         />
       ) : null;
     }
@@ -226,22 +281,30 @@ export function ProgressCircle(props: ProgressCircleProps) {
       <Ring
         value={0}
         weight="data"
-        track={gap === "none" || total === 0 ? "surface" : "none"}
+        track={ticks || gap === "none" || total === 0 ? "surface" : "none"}
+        cells={ticks ? { count: RING_TICKS[size], look: "ticks" } : undefined}
         className={styles.svg}
         role="group"
         {...a11y}
-        {...toDataAttributes({ "segment-gap": gap })}
+        {...toDataAttributes({ "segment-gap": ticks ? undefined : gap })}
       >
-        {total > 0 ? <SegmentArcs arcs={arcs} gap={gap} closed={free === 0} /> : null}
+        {total > 0 && ticks ? <TickArcs arcs={arcs} /> : null}
+        {total > 0 && !ticks ? <SegmentArcs arcs={arcs} gap={gap} closed={free === 0} /> : null}
       </Ring>
     );
   } else {
     const unknown = valueProp === null || valueProp === undefined;
     const { value, max, ratio } = resolveValue(valueProp ?? 0, maxProp);
     tone = color ? undefined : (toneProp ?? "accent");
+    // Steps and ticks: the arc stops on a whole cell.
+    const cells =
+      variant === "line"
+        ? undefined
+        : { count: variant === "steps" ? stepCells(max) : RING_TICKS[size], look: variant };
     ring = (
       <Ring
-        value={unknown ? null : ratio}
+        value={unknown ? null : cells ? filledCells(ratio, cells.count) / cells.count : ratio}
+        cells={cells}
         spin={spin}
         weight="data"
         // `inherit` keeps the ring's own track, a tint of the host's color; `tinted` is the same
@@ -284,6 +347,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
       tone,
       color: segmentsProp ? undefined : color,
       track: segmentsProp || tone === "inherit" ? undefined : trackProp,
+      variant,
       legend: legend || undefined,
     }),
   };

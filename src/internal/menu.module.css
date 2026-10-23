@@ -175,14 +175,16 @@
   color: inherit;
 }
 
-/* The muted second line of a row (why an item is unavailable): the tier's description text, and a
-   sentence wraps inside the menu's width limit. */
+/* The muted second line of a row (why an item is unavailable): the tier's description text, one
+   line that ends in an ellipsis — nothing wraps. */
 .itemDescription {
+  min-width: 0;
+  overflow: hidden;
   color: var(--prime-color-text-muted);
   font-size: var(--menu-desc);
   line-height: var(--menu-desc-lh);
-  white-space: normal;
-  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .item[data-disabled="true"] .itemDescription {

@@ -27,9 +27,9 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 ├─ Chat.Header                    grid: lead · title over badges over description · actions; draws nothing of its own
 │  ├─ [lead]                      every other child (a back button, an Avatar), side by side
 │  ├─ Chat.Title                  <h2>, names the list (aria-labelledby); `number` muted after the name
-│  ├─ Chat.Badges                 Badge.Group of tier s, one row, «+N»: pickers (stage, assignee), then statuses
+│  ├─ Chat.Badges                 Badge.Group on the title's line, «+N»: the record's statuses (meaning by tone)
 │  ├─ Chat.Description            status line, cross-fades into «печатает…» while `typing`
-│  └─ Chat.Actions                tier s: icon buttons, a Select / SegmentedControl, a ⋯ Dropdown
+│  └─ Chat.Actions                frame tier: icon buttons, a Select / SegmentedControl, a ⋯ Dropdown
 │     └─ Chat.SearchButton        ghost icon Button (aria-pressed) that opens / closes Chat.Search
 ├─ Chat.Search                    while open, or always (`persistent`): [your control] · field (its end, once typed: older · newer · «2/5» badge)
 ├─ Chat.Pinned                    rail · pin · title over one line · unpin; a press jumps to the message
@@ -94,8 +94,8 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 
 - A messenger contact: `Avatar.Root` · `Chat.Title` · `Chat.Description` («в сети», cross-fades into «печатает…» with `typing`) · `Chat.Actions` with `Chat.SearchButton`.
 - A phone pane under a list: `Page.BackButton` first in the lead, then the avatar.
-- A record (a client, a deal, a ticket): two lines — `Chat.Title number="#4120"` over `Chat.Badges` with the stage and the assignee as `Badge.Root` in a `Dropdown.Trigger`, then plain statuses (an AI state as `Badge.Dot` + text); no `Chat.Description` under the badges. At a phone's width the badges collapse into «+N» and the title ellipsizes; keep the actions few there (one ⋯ `Dropdown` holding the rest).
-- Actions, in this order: one switcher for the whole chat (a `Select` of the channel, a `SegmentedControl`), ghost icon buttons each named and with a `Tooltip` (a call, an AI toggle with `pressed`, `Chat.SearchButton`), a ⋯ `Dropdown` last. They take tier `s` from the header.
+- A record (a client, a deal, a ticket): two lines — `Chat.Title number="#4120"` with `Chat.Badges` after it on the same line, and a `Chat.Description` under them (a `StatusDot` first, then the owner); the stage is a `Select` in `Chat.Actions`, never a badge that opens a menu. At a phone's width the badges collapse into «+N» and the title ellipsizes; keep the actions few there (one ⋯ `Dropdown` holding the rest).
+- Actions, in this order: one switcher for the whole chat (a `Select` of the channel, a `SegmentedControl`), ghost icon buttons each named and with a `Tooltip` (a call, an AI toggle with `pressed`, `Chat.SearchButton`), a ⋯ `Dropdown` last. They take the tier of the chat's frame.
 - No search button: `Chat.Search persistent` keeps the field under the header; a channel `Select.Root` as its child stands before the field.
 - No header at all (the host's own header names the record, as in a drawer tab): leave `Chat.Header` out and name the list with `aria-label` on `Chat.Messages`.
 
@@ -108,7 +108,7 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"pane" \| "inline"` | `"pane"` | How the chat stands in its host: `pane` — inset from its own edges (a `Card`, a page pane); `inline` — flush with the content edges of a padded host (a `Drawer.Body`, a `Tabs.Panel`, a `Card.Body`). |
+| `variant` | `"pane" \| "inline"` | `"pane"` | How the chat stands in its host: `pane` — inset from its own edges (a pane `Card` with no zones, a page pane); `inline` — flush with the content edges of a padded host (a `Drawer.Body`, a `Tabs.Panel`, a `Card.Body`). |
 | `selected` | `readonly string[] \| null` | — | Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting. Any of the triad adds «Выбрать» to every `Message.Menu`; without it the chat has no selection. |
 | `defaultSelected` | `readonly string[] \| null` | `null` | Initial selection (uncontrolled). |
 | `onSelectedChange` | `(selected: readonly string[] \| null) => void` | — | The selection changed: a message toggled, selection started from the menu (`[value]`) or ended (`null`). |
@@ -122,7 +122,7 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other attributes of the frame. |
 
 ### Chat.Header
-`ref` → `HTMLDivElement`. The top of the chat: who it is with. The title over the badges and the description, the actions at the end; every other child (a back button, an `Avatar`) leads the row. It draws nothing of its own.
+`ref` → `HTMLDivElement`. The top of the chat, the kit's header row: the title with its badges on one line, the description under it, the actions at the end; other children (a back button, an `Avatar`) lead the row. One line each, no line under it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -138,21 +138,21 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `children` (the name), `className`. |
 
 ### Chat.Badges
-`ref` → `HTMLDivElement`. The record's badges under the title: the pickers first (a `Badge.Root` in a `Dropdown.Trigger`), then the statuses. One row of `s` chips (`Badge.Group`); what does not fit waits behind «+N».
+`ref` → `HTMLDivElement`. The record's badges on the title's line, 6 px after it, one `Badge.Group` (meaning by `tone` or `color`). The title gives way first, then the rest folds into «+N». A picker is a `Select` in `Chat.Actions`, not a badge.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Badge.Root`, a `Dropdown.Root` around one), `className`. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Badge.Root`), `className`. |
 
 ### Chat.Description
-`ref` → `HTMLDivElement`. The status line under the title («в сети», «3 участника»); while the other side types (`Chat.Root typing`) it cross-fades into «печатает…» in the accent, and back.
+`ref` → `HTMLDivElement`. The status line under the title («в сети», «3 участника») in one line cut with an ellipsis; a `StatusDot` first is allowed; while the other side types (`Chat.Root typing`) it cross-fades into «печатает…» in the accent, and back.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the status), `className`. |
 
 ### Chat.Actions
-`ref` → `HTMLDivElement`. The controls at the end of the header, tier `s`: ghost icon buttons (`Chat.SearchButton`, a call, a toggle with `pressed`), a `Select` or a `SegmentedControl`, a ⋯ `Dropdown` last. Centred on the header's text.
+`ref` → `HTMLDivElement`. The controls at the end of the header, at the frame's tier: ghost icon buttons (`Chat.SearchButton`, a toggle with `pressed`), a `Select` or a `SegmentedControl`, a ⋯ `Dropdown` last.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -276,7 +276,7 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 ### variant
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `pane` | the header, the search, the pinned bar and the footer inset from the chat's own edges | the chat is the whole content of a `Card` or a page pane | yes |
+| `pane` | the header, the search, the pinned bar and the footer inset from the chat's own edges | the chat is the whole content of a pane `Card` (a `Card.Root` with no zones) or a page pane | yes |
 | `inline` | no insets of its own: the zones stand on the host's content edges, the messages reach 16 into its side padding | the chat sits in a padded host — a `Drawer.Body` or a `Tabs.Panel` of a dialog, a `Card.Body` | |
 
 ### authors
@@ -326,9 +326,9 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 | selection mode | `selected` (not `null`); any of `selected` / `defaultSelected` / `onSelectedChange` adds «Выбрать» to every `Message.Menu` | listbox / options with `aria-selected`; a check at the row start; a click toggles, Shift+click selects the range from the anchor, press-and-drag (or a finger slid from a check) paints the messages it passes with the first one's new state and scrolls the list at its edges; the unselected messages step back to the dimmed opacity of `Message` with a slight desaturation (`fast`, both ways; `data-selecting` on the list, `data-selected` on the message); `Chat.SelectionBar` — the «к последним» button rises above it first (its height upward in `--message-bottom-lift` on the list, `fast`), then the bar fades in, so the two never overlap; outside selection the bar renders nothing |
 
 ## Layout & spacing
-- `Chat.Root` is a column that fills its host's height (`block-size: 100%`, a flex item that grows): give the host a height — a `Card` sized by the page, a page pane, the viewport. Only `Chat.Messages` grows and scrolls; the header, the search, the pinned bar and the footer keep their height.
+- `Chat.Root` is a column that fills its host's height (`block-size: 100%`, a flex item that grows): give the host a height — a pane `Card` sized by the page, a page pane, the viewport. Only `Chat.Messages` grows and scrolls; the header, the search, the pinned bar and the footer keep their height.
 - The header sorts its children by type: `Chat.Title`, `Chat.Description` and `Chat.Actions` take their places, every other child (fragments opened) goes into the lead, a row centred with `space-2` between its items — a back button and an avatar stand side by side; without them the text starts the row.
-- The header is a zone: `space-3` top, end and bottom, `space-4` start, the faint zone hairline under it (inset `space-4`; edge to edge in `inline`); `space-3` between its columns; the lead and the actions centre on the whole text block; the title `title-s` on one line whose name ellipsizes while its `number` keeps its width, the badges one row of `s` chips `space-1` under it, the description a muted caption (`space-1` under the badges); the actions keep their width, so at 320px the title gives way.
+- The header is the kit's header row at the frame of the chat's host tier (padding 12 · 16 · 20 · 24 · 28, no line under it): the lead (back button, avatar) is the mark; the title in the frame's title role on one line whose name ellipsizes while its `number` keeps its width, the badges 6 px after it on the same line, the description under them in the frame's description role, one line; the actions keep their width, so at 320px the title gives way. Messages dissolve at their top edge while scrolled (the edge cue).
 - The search bar and the pinned bar stand under the header with `space-3` side padding, `space-2` under the header's line; the count and the steps are the field's own end parts, so the bar has no spacing of its own beyond its gap; it never overflows: the field gives way first down to `space-20` × 2, then a control before it ellipsizes (between `space-16` and half the row), and in a chat under 20rem the control takes its own line above the field; the footer pads the Composer by `space-2` / `space-3`.
 - `variant="inline"`: the header has no padding but `space-3` under it, the search bar and the pinned bar no side padding, the footer only `space-2` above; the messages' region reaches `space-4` into the host's side padding (the room of the scroller and the rows, so a focused row's wash and the rings of the controls inside fit), so a bubble's tail stands on the host's content edge under the header's text. The host needs at least `space-4` side padding and a height.
 - A conversation shorter than the pane hugs the end: the empty space is above it and the last message stands right above the footer; a longer one is pinned to the end and scrolls up for history.
@@ -421,7 +421,7 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 | [search.tsx](examples/search.tsx) | Search and pinned messages: the search bar marks every match in the texts and transcripts, counts them and steps between them while the others step back; a pinned message's press jumps to it and blinks it — `Chat.SearchButton`, `Chat.Search`, `defaultSearch`, `Chat.Pinned`. |
 | [persistent-search.tsx](examples/persistent-search.tsx) | Search with no button in the header: the field is there from the start, and the count and the steps between matches appear only once a query is typed — `persistent`, `Chat.Search`. |
 | [channel-search.tsx](examples/channel-search.tsx) | A channel picker in the search bar: one control of the field's height stands before it and filters the conversation, the search finds within what it shows — `Chat.Search`, `Select.Root`. |
-| [header.tsx](examples/header.tsx) | A conversation with a client as a record header of two lines: the avatar, the name with its number over a line of badges — the stage and the assignee as pickers, the AI's state beside them — and at the end the AI switch, search and ⋯ — `Chat.Title`, `number`, `Chat.Badges`, `Chat.Actions`. |
+| [header.tsx](examples/header.tsx) | A conversation with a client as a record header of two lines: the avatar, the name with its number and a badge on one line, the AI's state and the owner under it, and at the end the stage picker, the AI switch, search and ⋯ — `Chat.Title`, `number`, `Chat.Badges`, `Chat.Description`, `Chat.Actions`. |
 | [inline.tsx](examples/inline.tsx) | The dialog tab of a deal card: the chat stands flush with the edges of the panel's body, with no insets of its own, and takes its whole height under the panel's own record header — `variant`, `Chat.Root`, `Drawer.Body`, `Tabs.Panel`. |
 | [time-zone.tsx](examples/time-zone.tsx) | The conversation in the zone of the manager's profile, not the browser's: the date separators, the runs and every time follow it — `timeZone`, `items`, `renderMessage`. |
 | [states.tsx](examples/states.tsx) | The first load of a conversation: bubble-shaped placeholders on both sides stand in the list's place, then cross-fade into the messages — `loading`. |
@@ -443,7 +443,7 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 - «печатает…» as a text you swap in the header and a row you add to the list → `Chat.Root typing`: both move together, smoothly.
 - A chat in a drawer tab or a `Card.Body` with its own insets doubling the host's padding, or a `className` that zeroes them → `Chat.Root variant="inline"`.
 - A search field of your own above the chat, or `defaultSearch=""` to hold the bar open → `Chat.Search persistent`; a channel picker as a row of its own above it → the picker as the child of `Chat.Search`.
-- A status as text in `Chat.Description` («Этап: В работе · Анна Котова») → `Chat.Badges` with the pickers; the description stays one line of data.
+- A picker of a stage or an assignee as a badge that opens a menu → a `Select` in `Chat.Actions`; the description stays one line of data.
 - Search results computed and scrolled to by hand → `Chat.Search`: it finds, counts, marks and brings matches into view, the focus staying in the field.
 - A chat event as a `Message.Root` from «system», or a `Notification` → `Chat.Service`: a row of the list, outside the arrows, the selection and the search.
 - A change written as «Лид → Арендатор» in the text → `Chat.ServiceChange from to`: the values keep their colours and assistive tech hears «с «Лид» на «Арендатор»».
@@ -451,5 +451,5 @@ The header draws nothing by itself; compose it from parts, leave out what you do
 - Checkboxes and selection handling of your own → `Chat.Root selected` with `Chat.SelectionBar`: click, Shift range and drag like DataTable rows.
 
 ## Related
-- **Built from:** [Message](../message/COMPONENT.md) (`Message.Typing`, the rows), [ScrollContainer](../scroll-container/COMPONENT.md) (the scroller, `anchor="end"`), [Input](../input/COMPONENT.md) (the search field; its end: `Input.Action` the steps), [Badge](../badge/COMPONENT.md) (`Chat.Badges` is a `Badge.Group`; the search count), [Button](../button/COMPONENT.md) (search, unpin, «к последним», the selection bar), [Crossfade](../crossfade/COMPONENT.md) (the status line, the first load), [Skeleton](../skeleton/COMPONENT.md) (the first load, older history), [VisuallyHidden](../visually-hidden/COMPONENT.md) (the loading announcement, the phrase of a change), Icon (`action.search`, `nav.chevronUp`, `nav.chevronDown`, `nav.chevronRight`, `action.pin`, `action.close`); `useVirtualRows` (the window), `internal/messageList` (the contract between the list and its messages), `internal/readReceipts`, `internal/useRangeSelection` (selection by click, Shift and drag), `internal/messagePart` (the search query its texts mark), `internal/partPresence` (the count and the steps), `internal/RollingNumber` (the count's numbers), `internal/fieldClasses` + `ControlSizeContext` (the actions' tier), `internal/hairline` (the header's zone line)
+- **Built from:** [Message](../message/COMPONENT.md) (`Message.Typing`, the rows), [ScrollContainer](../scroll-container/COMPONENT.md) (the scroller, `anchor="end"`), [Input](../input/COMPONENT.md) (the search field; its end: `Input.Action` the steps), [StatusDot](../status-dot/COMPONENT.md) (the description's state), [Badge](../badge/COMPONENT.md) (`Chat.Badges` is a `Badge.Group`; the search count), [Button](../button/COMPONENT.md) (search, unpin, «к последним», the selection bar), [Crossfade](../crossfade/COMPONENT.md) (the status line, the first load), [Skeleton](../skeleton/COMPONENT.md) (the first load, older history), [VisuallyHidden](../visually-hidden/COMPONENT.md) (the loading announcement, the phrase of a change), Icon (`action.search`, `nav.chevronUp`, `nav.chevronDown`, `nav.chevronRight`, `action.pin`, `action.close`); `useVirtualRows` (the window), `internal/messageList` (the contract between the list and its messages), `internal/readReceipts`, `internal/useRangeSelection` (selection by click, Shift and drag), `internal/messagePart` (the search query its texts mark), `internal/partPresence` (the count and the steps), `internal/RollingNumber` (the count's numbers), `internal/fieldClasses` + `ControlSizeContext` (the actions' tier), `internal/headerRow` (the header row), `internal/surfaceFrame` (the frame metrics and roles), StatusDot (the description's state)
 - **See also:** [Message](../message/COMPONENT.md) — one message and every content part; [Composer](../composer/COMPONENT.md) — the input in `Chat.Footer`; [Gallery](../gallery/COMPONENT.md), [VoicePlayer](../voice-player/COMPONENT.md), [VideoNote](../video-note/COMPONENT.md), [Timeline](../timeline/COMPONENT.md)

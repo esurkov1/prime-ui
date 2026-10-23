@@ -1,5 +1,5 @@
 /** A strip of warehouse cards that always comes to rest on a card's start, scrolled by touch, a trackpad or the mouse wheel — `snap`, `axis`. */
-import { Card, ScrollContainer, Typography } from "prime-ui-kit";
+import { Card, ScrollContainer } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -19,14 +19,10 @@ export default function ScrollContainerSnapExample() {
         {WAREHOUSES.map((warehouse) => (
           <li key={warehouse.id} className={styles.tile}>
             <Card.Root>
-              <Card.Body>
-                <Typography as="h3" variant="title-s">
-                  {warehouse.city}
-                </Typography>
-                <Typography as="p" variant="caption" tone="muted">
-                  {warehouse.stock}
-                </Typography>
-              </Card.Body>
+              <Card.Header>
+                <Card.Title>{warehouse.city}</Card.Title>
+                <Card.Description>{warehouse.stock}</Card.Description>
+              </Card.Header>
             </Card.Root>
           </li>
         ))}

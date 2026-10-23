@@ -9,19 +9,3 @@
   align-items: start;
   gap: var(--prime-space-5);
 }
-
-/* Danger zone row: text takes the room, the button stays at the end and wraps under it. */
-.danger {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-4);
-}
-
-.dangerText {
-  display: grid;
-  flex: 1 1 calc(var(--prime-space-16) * 4);
-  gap: var(--prime-space-1);
-  min-width: 0;
-}

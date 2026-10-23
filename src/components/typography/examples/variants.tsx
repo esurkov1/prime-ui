@@ -11,6 +11,7 @@ const ROLES: TypographyRole[] = [
   "title-l",
   "title-m",
   "title-s",
+  "title-xs",
   "body-l",
   "body-m",
   "body-s",

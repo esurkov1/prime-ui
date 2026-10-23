@@ -1,13 +1,17 @@
+import { readFileSync } from "node:fs";
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import * as React from "react";
+import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
-import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Select } from "@/components/select/Select";
+import { StatusDot } from "@/components/status-dot/StatusDot";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { headerRowStyles } from "@/internal/headerRow";
 import { cssRule, cssValue } from "@/test/css";
 import {
   DialogActions,
@@ -31,6 +35,7 @@ import {
 import styles from "./DialogParts.module.css";
 
 const CSS = "src/internal/overlay/DialogParts.module.css";
+const CSS_SOURCE = readFileSync(CSS, "utf8");
 
 type DialogKind = React.ComponentProps<typeof DialogPanel>["kind"];
 
@@ -79,12 +84,11 @@ function Dialog({
 }
 
 describe("DialogParts", () => {
-  it("starts the badges line under a record's picture, at the header's edge", () => {
-    const rule = cssRule(
-      "src/internal/overlay/DialogParts.module.css",
-      '.header:has(> .icon[data-media="true"]) > .badges',
-    );
-    expect(cssValue(rule, "grid-column")).toBe("1 / -1");
+  it("stands as the surface frame `l` and draws no line between its zones", () => {
+    render(<Dialog />);
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-frame", "l");
+    expect(CSS_SOURCE).not.toContain("hairline");
+    expect(screen.getByRole("banner")).not.toHaveClass("hairline");
   });
 
   it("names the dialog by its Title and describes it by its Description", () => {
@@ -151,7 +155,7 @@ describe("DialogParts", () => {
     expect(box).not.toHaveAttribute("data-tone");
   });
 
-  it("sizes an avatar to the 40px icon box (`l`)", () => {
+  it("sizes an avatar to the 48 mark of the header row (`xl`)", () => {
     render(
       <Dialog
         icon={
@@ -161,10 +165,10 @@ describe("DialogParts", () => {
         }
       />,
     );
-    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "l");
+    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "xl");
   });
 
-  it("finds the picture through the consumer's own component and a wrapper: no tile, size l", () => {
+  it("finds the picture through the consumer's own component and a wrapper: no tile, size xl", () => {
     function ClientAvatar() {
       return (
         <Avatar.Root size="s" data-testid="avatar">
@@ -185,7 +189,7 @@ describe("DialogParts", () => {
     const box = avatar.closest(`.${styles.icon}`) as HTMLElement;
     expect(box).toHaveAttribute("data-media", "true");
     expect(box).not.toHaveAttribute("data-tone");
-    expect(avatar).toHaveAttribute("data-size", "l");
+    expect(avatar).toHaveAttribute("data-size", "xl");
   });
 
   it("gives the tile back when the picture leaves the slot", () => {
@@ -197,12 +201,15 @@ describe("DialogParts", () => {
     expect(screen.getByTestId("glyph").parentElement).not.toHaveAttribute("data-media");
   });
 
-  it("lays a record header out in three lines: title with its number, the description, the badges row", () => {
+  it("lays a record header out as the header row: title with its number and badges on one line, the description under", () => {
     render(
       <Root defaultOpen>
         <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
           <DialogHeader data-testid="header">
-            <DialogDescription>Аренда байка Пхукет · заявка 19 сент, 06:37</DialogDescription>
+            <DialogDescription>
+              <StatusDot tone="accent">Новая</StatusDot>
+              Аренда байка Пхукет · заявка 19 сент, 06:37
+            </DialogDescription>
             <DialogBadges data-testid="badges">
               <Badge.Root tone="info">Новая</Badge.Root>
               <Badge.Root color="sky">Telegram</Badge.Root>
@@ -213,42 +220,52 @@ describe("DialogParts", () => {
       </Root>,
     );
     const dialog = screen.getByRole("dialog");
-    // The number is part of the name; the description is the text line alone.
+    // The number is part of the name; the status dot is part of the description's text.
     expect(dialog).toHaveAccessibleName("Александра #678");
-    expect(dialog).toHaveAccessibleDescription("Аренда байка Пхукет · заявка 19 сент, 06:37");
     expect(screen.getByText("#678")).toHaveClass(styles.titleNumber);
     expect(screen.getByText("Александра")).toHaveClass(styles.titleName);
-    // The badges row is the one-line Badge.Group of tier m, whatever order the parts come in.
+    // The badges are the one-line Badge.Group of the frame's chip tier, after the title on its line.
     const badges = screen.getByTestId("badges");
-    expect(badges).toHaveClass(styles.badges);
     expect(badges).toHaveAttribute("data-overflow", "count");
     expect(
       Array.from(badges.querySelectorAll(":scope > [data-tier]:not([data-overflowed])")).map(
         (badge) => badge.getAttribute("data-tier"),
       ),
-    ).toEqual(["m", "m"]);
-    expect(screen.getByTestId("header")).toHaveAttribute("data-multiline", "true");
-    // Line order comes from the header, not the JSX: title, description, badges.
-    expect(cssValue(cssRule(CSS, ".title"), "order")).toBe("0");
-    expect(cssValue(cssRule(CSS, ".description"), "order")).toBe("1");
-    expect(cssValue(cssRule(CSS, ".badges"), "order")).toBe("2");
-    // The title and the description are a tight pair (4); the badges stand 8 under the line above.
-    expect(cssValue(cssRule(CSS, ".description"), "margin")).toBe("var(--prime-space-1) 0 0");
-    expect(cssValue(cssRule(CSS, ".badges"), "margin-block-start")).toBe("var(--prime-space-2)");
-    expect(() => cssRule(CSS, ".header:has(> .badges) > .description")).toThrow();
+    ).toEqual(["s", "s"]);
+    const title = screen.getByRole("heading", { level: 2 });
+    expect(title.parentElement).toBe(badges.parentElement);
+    expect(title.parentElement?.nextElementSibling).toBe(
+      screen.getByText("Аренда байка Пхукет · заявка 19 сент, 06:37").closest("p"),
+    );
+    expect(title.parentElement?.parentElement?.parentElement).toHaveAttribute("data-lines", "two");
   });
 
-  it("cuts the name and the description of a record header to one line; the number never", () => {
-    const record = ".header:is(:has(> .badges), :has(> .title > .titleNumber))";
-    for (const line of [`${record} .titleName`, `${record} > .description`]) {
-      const rule = cssRule(CSS, line);
-      expect(cssValue(rule, "white-space")).toBe("nowrap");
-      expect(cssValue(rule, "text-overflow")).toBe("ellipsis");
-      expect(cssValue(rule, "overflow")).toBe("hidden");
-    }
-    expect(cssValue(cssRule(CSS, `${record} .titleNumber`), "flex")).toBe("none");
-    // A question dialog keeps its wrapping title and description.
-    expect(() => cssValue(cssRule(CSS, ".description"), "white-space")).toThrow();
+  it("holds a record header on one line per line and lets a question dialog wrap", () => {
+    // A header with a mark, badges or a numbered title is a record; a title with a text is a question.
+    const { unmount } = render(
+      <Root defaultOpen>
+        <DialogPanel kind="modal" panelClassName="panel" swipe="never" footerLayout="fill">
+          <DialogHeader>
+            <DialogTitle>Удалить счёт?</DialogTitle>
+            <DialogDescription>
+              Счёт №1042 пропадёт без возможности восстановления.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogPanel>
+      </Root>,
+    );
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass(styles.titleWrap);
+    expect(
+      screen.getByText("Счёт №1042 пропадёт без возможности восстановления.").closest("p"),
+    ).toHaveClass(styles.descriptionWrap);
+    unmount();
+    render(<Dialog icon={<svg />} />);
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass(headerRowStyles.title);
+    expect(screen.getByText("Оплата до 20 октября").closest("p")).toHaveClass(
+      headerRowStyles.description,
+    );
+    expect(cssValue(cssRule(CSS, ".titleNumber"), "flex")).toBe("none");
+    expect(cssValue(cssRule(CSS, ".titleName"), "text-overflow")).toBe("ellipsis");
   });
 
   it("tells a cut line whole in its title while it is cut, unless the consumer set one", () => {
@@ -274,7 +291,12 @@ describe("DialogParts", () => {
       "title",
       "Александра Константинопольская",
     );
-    expect(screen.getByText("Аренда байка Пхукет")).toHaveAttribute("title", "Своя подсказка");
+    // The consumer's own `title` stays on the line; the cut text takes none.
+    expect(screen.getByText("Аренда байка Пхукет").closest("p")).toHaveAttribute(
+      "title",
+      "Своя подсказка",
+    );
+    expect(screen.getByText("Аренда байка Пхукет")).not.toHaveAttribute("title");
     scroll.mockRestore();
     client.mockRestore();
   });
@@ -297,7 +319,7 @@ describe("DialogParts", () => {
     // The placeholder is a badge of the line's tier, never a block with its own minimum height.
     const chip = screen.getByTestId("badges").querySelector("[data-shape]");
     expect(chip).toHaveAttribute("data-shape", "chip");
-    expect(chip).toHaveAttribute("data-size", "m");
+    expect(chip).toHaveAttribute("data-size", "s");
     rerender(
       <Root defaultOpen>
         <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
@@ -314,55 +336,44 @@ describe("DialogParts", () => {
     expect(screen.getByText("Новая")).toBeInTheDocument();
   });
 
-  it("makes the assignee chip a picker in the badges row, opened and chosen from the keyboard", async () => {
+  it("holds a value picker in Actions at the dialog's control tier, as tall as the buttons", async () => {
     const user = userEvent.setup();
-    function Assignee() {
-      const [name, setName] = React.useState<string | null>(null);
-      return (
-        <Dropdown.Root>
-          <Dropdown.Trigger>
-            {name ? (
-              <Badge.Root aria-label={`Ответственный: ${name}`}>
-                <Badge.Avatar>
-                  <Avatar.Root color="purple">
-                    <Avatar.Fallback>АК</Avatar.Fallback>
-                  </Avatar.Root>
-                </Badge.Avatar>
-                {name}
-              </Badge.Root>
-            ) : (
-              <Badge.Root variant="outline">Назначить</Badge.Root>
-            )}
-          </Dropdown.Trigger>
-          <Dropdown.Content>
-            <Dropdown.Item onSelect={() => setName("Анна Котова")}>Анна Котова</Dropdown.Item>
-          </Dropdown.Content>
-        </Dropdown.Root>
-      );
-    }
     render(
       <Root defaultOpen>
-        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+        <DialogPanel
+          kind="drawer"
+          panelClassName="panel"
+          swipe="never"
+          footerLayout="end"
+          controlSize="m"
+        >
           <DialogHeader>
             <DialogTitle>Александра</DialogTitle>
-            <DialogBadges>
-              <Assignee />
-            </DialogBadges>
+            <DialogActions data-testid="actions">
+              <Select.Root aria-label="Ответственный" defaultValue="kotova">
+                <Select.Trigger>
+                  <Select.Value />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="kotova">Анна Котова</Select.Item>
+                  <Select.Item value="orlov">Глеб Орлов</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </DialogActions>
           </DialogHeader>
         </DialogPanel>
       </Root>,
     );
-    const assign = screen.getByRole("button", { name: "Назначить" });
-    assign.focus();
+    const actions = screen.getByTestId("actions");
+    expect(actions).toHaveAttribute("data-size", "m");
+    const picker = screen.getByRole("combobox");
+    expect(picker).toHaveAttribute("data-size", "m");
+    expect(screen.getByRole("button", { name: "Закрыть" })).toHaveAttribute("data-size", "m");
+    picker.focus();
     await user.keyboard("{Enter}");
-    expect(assign).toHaveAttribute("aria-expanded", "true");
+    expect(picker).toHaveAttribute("aria-expanded", "true");
     await user.keyboard("{ArrowDown}{Enter}");
-    const chip = await screen.findByRole("button", { name: "Ответственный: Анна Котова" });
-    expect(chip).toHaveAttribute("aria-expanded", "false");
-    // The avatar sits in the chip at the size of its tier (m → xs), decorative.
-    const avatar = chip.querySelector("[data-color]");
-    expect(avatar).toHaveAttribute("data-size", "xs");
-    expect(avatar?.parentElement).toHaveAttribute("aria-hidden", "true");
+    expect(picker).toHaveTextContent("Глеб Орлов");
   });
 
   it("names a body section by its h3 heading and puts its Actions at the end of the heading row", () => {
@@ -392,46 +403,23 @@ describe("DialogParts", () => {
     expect(screen.getByText("Поставка серверов").parentElement).toBe(section);
   });
 
-  it("moves the header Actions under the title when the row has no room for the title beside them", () => {
-    // The header overflows (the title's 12rem minimum beside the actions) until the actions go below.
-    const scrollWidth = vi
-      .spyOn(HTMLElement.prototype, "scrollWidth", "get")
-      .mockImplementation(function (this: HTMLElement) {
-        return this.tagName === "HEADER" && !this.hasAttribute("data-actions-below") ? 420 : 343;
-      });
-    const clientWidth = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(343);
-    const { rerender } = render(
+  it("puts the header Actions and the close button at the end of the row, on the title line", () => {
+    render(
       <Root defaultOpen>
         <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
           <DialogHeader data-testid="header">
             <DialogTitle>Заказ №1042</DialogTitle>
-            <DialogActions>
+            <DialogActions data-testid="actions">
               <Button.Root>Ещё</Button.Root>
             </DialogActions>
           </DialogHeader>
         </DialogPanel>
       </Root>,
     );
-    expect(screen.getByTestId("header")).toHaveAttribute("data-actions-below");
-
-    // A wide row keeps them beside the title.
-    clientWidth.mockReturnValue(640);
-    scrollWidth.mockReturnValue(640);
-    rerender(
-      <Root defaultOpen>
-        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
-          <DialogHeader data-testid="header">
-            <DialogTitle>Заказ №1042</DialogTitle>
-            <DialogActions>
-              <Button.Root>Ещё</Button.Root>
-            </DialogActions>
-          </DialogHeader>
-        </DialogPanel>
-      </Root>,
-    );
-    expect(screen.getByTestId("header")).not.toHaveAttribute("data-actions-below");
-    scrollWidth.mockRestore();
-    clientWidth.mockRestore();
+    const actions = screen.getByTestId("actions");
+    expect(actions.nextElementSibling).toBe(screen.getByRole("button", { name: "Закрыть" }));
+    expect(actions.parentElement).toHaveClass(headerRowStyles.end);
+    expect(actions.parentElement?.parentElement).toHaveAttribute("data-lines", "one");
   });
 
   it("keeps 32 between sections in plain flow, adds 16 to a smaller gap and nothing to a 32 gap", () => {

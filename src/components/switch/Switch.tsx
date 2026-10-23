@@ -42,6 +42,7 @@ export type SwitchRootProps = Omit<
   error?: React.ReactNode;
   size?: ControlSize;
   optional?: boolean;
+  fullWidth?: boolean;
   labels?: Partial<SwitchLabels>;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLInputElement>;
@@ -59,6 +60,7 @@ function SwitchRoot({
   error,
   size: sizeProp,
   optional = false,
+  fullWidth = false,
   labels: labelsProp,
   disabled: disabledProp = false,
   readOnly = false,
@@ -104,6 +106,7 @@ function SwitchRoot({
       hint={hint}
       hintTone={hintTone}
       error={error}
+      controlAtEnd={fullWidth}
       className={cx(styles.root, className)}
       control={
         <>

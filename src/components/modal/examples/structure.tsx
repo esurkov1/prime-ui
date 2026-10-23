@@ -1,4 +1,4 @@
-/** Optional parts: an icon tile with a header-only notice, and a record header — the status on its own line under the name and the text — with a footer and no body between them — `Modal.Icon`, `Modal.Badges`, `Modal.Footer`. */
+/** Optional parts: an icon tile with a header-only notice, and a record header — the status badge on the name's line, the text under it — with a footer and no body between them — `Modal.Icon`, `Modal.Badges`, `Modal.Footer`. */
 import { Badge, Button, Icon, Modal } from "prime-ui-kit";
 
 export default function ModalStructureExample() {

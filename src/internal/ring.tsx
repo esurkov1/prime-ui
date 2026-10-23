@@ -1,4 +1,4 @@
-import type * as React from "react";
+import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -31,6 +31,31 @@ type RingWeight = "data" | "line" | "band";
 
 type RingTrack = "line" | "faint" | "surface" | "none";
 
+/** The ring cut into whole cells: `count` of them, drawn as `look`. */
+type RingCells = { count: number; look: "steps" | "ticks" };
+
+/** Ticks: a tick takes 4/7 of its pitch along the circle, the gap 3/7 (as ProgressBar's ⅔ : ½). */
+const TICK_SHARE = 4 / 7;
+
+/**
+ * The dash pattern of the cell mask, in `RING_PATH` units: the pattern starts half a gap past
+ * 12 o'clock, so an arc of `k / count` ends in the middle of a gap and a cell is always whole.
+ * `steps` cells have round ends on the `data` stroke (each dash shortened by a stroke, the gap
+ * ¾ of it, as ProgressBar's); `ticks` have flat ends.
+ */
+function cellDashes({ count, look }: RingCells): React.CSSProperties {
+  const pitch = RING_PATH / count;
+  if (look === "ticks") {
+    const gap = pitch * (1 - TICK_SHARE);
+    return { strokeDasharray: `${pitch - gap} ${gap}`, strokeDashoffset: -gap / 2 };
+  }
+  const gap = RING_DATA_STROKE * 0.75;
+  return {
+    strokeDasharray: `${Math.max(pitch - gap - RING_DATA_STROKE, 0)} ${gap + RING_DATA_STROKE}`,
+    strokeDashoffset: -(gap + RING_DATA_STROKE) / 2,
+  };
+}
+
 type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
   /**
    * The share drawn, `0…1`; `null` — under way, the share unknown: a quarter arc that always
@@ -58,6 +83,13 @@ type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
    * `RingCap`s, already turned to start at 12 o'clock.
    */
   children?: React.ReactNode;
+  /**
+   * The ring as whole cells (ProgressCircle `steps` / `ticks`, `data` weight): one mask cuts the
+   * track and the arcs into `count` cells, so the arc's one front fills them and a change caught
+   * mid-way goes on from where the front is. `steps` — cells of the stroke with round ends;
+   * `ticks` — thin ticks on a stroke twice as heavy. A share of `k / count` fills whole cells.
+   */
+  cells?: RingCells;
   ref?: React.Ref<SVGSVGElement>;
 };
 
@@ -113,9 +145,11 @@ export function Ring({
   className,
   style,
   children,
+  cells,
   role,
   ...rest
 }: RingProps) {
+  const maskId = `ring-cells-${React.useId().replace(/[^\w-]/g, "")}`;
   const unknown = value === null;
   const turning = spin || unknown;
   const share = unknown ? 0.25 : Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0));
@@ -135,9 +169,17 @@ export function Ring({
         // An empty arc still at rest draws nothing (a round cap would leave a dot).
         empty: (!live && !turning && share === 0) || undefined,
         live: live || undefined,
+        cells: cells?.look,
       })}
     >
-      <g className={styles.turn}>
+      {cells ? (
+        <defs>
+          <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%">
+            <RingCircle className={styles.cellMask} style={cellDashes(cells)} />
+          </mask>
+        </defs>
+      ) : null}
+      <g className={styles.turn} mask={cells ? `url(#${maskId})` : undefined}>
         {track === "none" ? null : <RingCircle className={styles.track} />}
         {children ?? <RingCircle className={styles.arc} />}
       </g>

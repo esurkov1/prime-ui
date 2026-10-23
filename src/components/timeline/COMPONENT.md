@@ -26,8 +26,9 @@ import { Timeline } from "prime-ui-kit";
 Timeline.Root                    size container, sets the tier (size, else the host tier)
 └─ Timeline.Group label          labelled <ol role="list">; the line runs from its first dot to its last
    ├─ Timeline.Item              <li> + row (div | button | a | asChild element) with the dot
-   │  ├─ Timeline.ItemTitle      first line
-   │  ├─ Timeline.ItemMeta       second line (date); <strong> emphasizes a part; repeats, lines stack
+   │  ├─ Timeline.ItemTitle      first line, truncates
+   │  ├─ Timeline.ItemBadges     badges after the title, on its line (a Badge.Group, «+N» on overflow)
+   │  ├─ Timeline.ItemMeta       second line (date); <strong> emphasizes a part; a StatusDot first, then «·»; repeats, lines stack
    │  └─ Timeline.ItemValue      trailing amount
    │     └─ Timeline.ItemMeta    second line under the amount
    └─ Timeline.Gap               <li>: interval between events (dashed segment, hollow dot)
@@ -73,13 +74,22 @@ Timeline.Root                    size container, sets the tier (size, else the h
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children" \| "color" \| "onClick">` | — | The other row attributes (`target`, `rel`, `download` with `href`). |
 
 ### Timeline.ItemTitle · Timeline.ItemMeta
-`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, wraps) and the muted secondary line, tabular — under the title the date (`<strong>` emphasizes a part; several `Timeline.ItemMeta` stack), inside `Timeline.ItemValue` the value's second line.
+`ref` → `HTMLSpanElement`. `<span>` lines, one line each, cut with an ellipsis: the event (medium) and the muted secondary line, tabular; a `StatusDot` first states the state. Inside `Timeline.ItemValue` the meta is the value's second line.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The text of the line. |
 | `className` | `string` | — | Class on the element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
+
+### Timeline.ItemBadges
+`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the event, the meaning in its `tone` or `color`. The title gives way first; what does not fit folds into «+N».
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The `Badge.Root`s of the event (a status, a kind). |
+| `labels` | `Partial<BadgeGroupLabels>` | — | Built-in strings of the «+N» badge, see the `Badge.Group` labels. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other `div` attributes. |
 
 ### Timeline.ItemValue
 `ref` → `HTMLSpanElement`. A `<span>` with the trailing amount (right-aligned, tabular), a `Timeline.ItemMeta` inside under it. Moves under the meta below 20rem.
@@ -172,7 +182,12 @@ Timeline keeps no state and has no persistent selection: every row is highlighte
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No `labels`.
+#### Timeline.ItemBadges
+
+| Key | Default | Used for |
+|---|---|---|
+| `more` | `"+{count}"` | Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many. |
+| `moreCount` | `"Ещё {count}"` | What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip. |
 
 ## Examples
 | Example | Shows |
@@ -180,7 +195,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | An operations feed: one labelled group, a line through the dots, the row under the pointer highlighted — `Timeline.Group`, `Timeline.ItemValue`. |
 | [variants.tsx](examples/variants.tsx) | Dot hues for categories at reduced emphasis, and status tones on items, values and gaps at full emphasis — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier scales text, dot and row rhythm, rows 40 to 76 px — `size`. |
-| [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap, two meta lines under a repair and a second value line — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`. |
+| [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap, two meta lines under a repair, a badge after its title with a state in the meta, and a second value line — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`, `Timeline.ItemBadges`, `StatusDot`. |
 | [links.tsx](examples/links.tsx) | Rows that open something: an operation page by a link or by your router link through the slot, a receipt in place by a button; one Tab stop each with a focus ring — `href`, `asChild`, `onClick`. |
 | [narrow.tsx](examples/narrow.tsx) | At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line — `Timeline.ItemValue`. |
 
@@ -193,5 +208,5 @@ No `labels`.
 - Using the timeline to pick a row (a selected / current state) → it has none; use a list with selection (`Select`, `DataTable` row selection) or `Tabs`.
 
 ## Related
-- **Built from:** —
+- **Built from:** [Badge](../badge/COMPONENT.md) (`Timeline.ItemBadges`), [StatusDot](../status-dot/COMPONENT.md) (the state first in `Timeline.ItemMeta`)
 - **See also:** [Stepper](../stepper/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Gantt](../gantt/COMPONENT.md), [Card](../card/COMPONENT.md)

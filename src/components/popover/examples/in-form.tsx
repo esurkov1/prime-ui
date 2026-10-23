@@ -41,7 +41,7 @@ export default function PopoverInFormExample() {
             if (!next) setOpen(false);
           }}
         >
-          <Input.Root label="Почта" required error={error} reserveSupportRow>
+          <Input.Root label="Почта" required error={error}>
             <Input.Wrapper>
               <Input.Field
                 type="email"

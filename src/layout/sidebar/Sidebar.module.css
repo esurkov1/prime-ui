@@ -435,6 +435,12 @@
   font-weight: var(--prime-font-weight-regular);
 }
 
+/* The brand's description follows the frame scale: the caption at xs and s, body-s above. */
+:is(.root, .flyout):not([data-size="xs"], [data-size="s"]) .brandDescription {
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+}
+
 /* --- Groups ------------------------------------------------------------------ */
 
 .group {

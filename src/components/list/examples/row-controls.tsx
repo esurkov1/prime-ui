@@ -22,59 +22,57 @@ export default function ListRowControlsExample() {
 
   return (
     <Card.Root className={styles.pane}>
-      <Card.Body>
-        <List.Root aria-label="Этапы воронки">
-          {stages.map((stage) => (
-            <List.Item
-              key={stage.id}
-              value={stage.id}
-              current={current === stage.id}
-              onClick={() => setCurrent(stage.id)}
-            >
-              <List.ItemIcon>
-                <Badge.Dot color={stage.color} />
-              </List.ItemIcon>
-              <List.ItemText>{stage.name}</List.ItemText>
-              <List.ItemCount>{stage.deals}</List.ItemCount>
-              <List.ItemActions>
-                <Switch.Root
-                  aria-label={`Показывать «${stage.name}» на доске`}
-                  checked={stage.shown}
-                  onCheckedChange={(shown) => patch(stage.id, { shown })}
-                />
-                <Dropdown.Root>
-                  <Dropdown.Trigger>
-                    <Button.Root
-                      variant="ghost"
-                      tone="neutral"
-                      aria-label={`Действия с этапом «${stage.name}»`}
-                    >
-                      <Button.Icon>
-                        <Icon name="action.more" />
-                      </Button.Icon>
-                    </Button.Root>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    <Dropdown.Item onSelect={() => setCurrent(stage.id)}>Открыть</Dropdown.Item>
-                    <Dropdown.Item onSelect={() => patch(stage.id, { color: "green" })}>
-                      Отметить зелёным
-                    </Dropdown.Item>
-                    <Dropdown.Separator />
-                    <Dropdown.Item
-                      tone="danger"
-                      onSelect={() =>
-                        setStages((list) => list.filter((item) => item.id !== stage.id))
-                      }
-                    >
-                      Удалить этап
-                    </Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown.Root>
-              </List.ItemActions>
-            </List.Item>
-          ))}
-        </List.Root>
-      </Card.Body>
+      <List.Root aria-label="Этапы воронки">
+        {stages.map((stage) => (
+          <List.Item
+            key={stage.id}
+            value={stage.id}
+            current={current === stage.id}
+            onClick={() => setCurrent(stage.id)}
+          >
+            <List.ItemIcon>
+              <Badge.Dot color={stage.color} />
+            </List.ItemIcon>
+            <List.ItemText>{stage.name}</List.ItemText>
+            <List.ItemCount>{stage.deals}</List.ItemCount>
+            <List.ItemActions>
+              <Switch.Root
+                aria-label={`Показывать «${stage.name}» на доске`}
+                checked={stage.shown}
+                onCheckedChange={(shown) => patch(stage.id, { shown })}
+              />
+              <Dropdown.Root>
+                <Dropdown.Trigger>
+                  <Button.Root
+                    variant="ghost"
+                    tone="neutral"
+                    aria-label={`Действия с этапом «${stage.name}»`}
+                  >
+                    <Button.Icon>
+                      <Icon name="action.more" />
+                    </Button.Icon>
+                  </Button.Root>
+                </Dropdown.Trigger>
+                <Dropdown.Content>
+                  <Dropdown.Item onSelect={() => setCurrent(stage.id)}>Открыть</Dropdown.Item>
+                  <Dropdown.Item onSelect={() => patch(stage.id, { color: "green" })}>
+                    Отметить зелёным
+                  </Dropdown.Item>
+                  <Dropdown.Separator />
+                  <Dropdown.Item
+                    tone="danger"
+                    onSelect={() =>
+                      setStages((list) => list.filter((item) => item.id !== stage.id))
+                    }
+                  >
+                    Удалить этап
+                  </Dropdown.Item>
+                </Dropdown.Content>
+              </Dropdown.Root>
+            </List.ItemActions>
+          </List.Item>
+        ))}
+      </List.Root>
     </Card.Root>
   );
 }

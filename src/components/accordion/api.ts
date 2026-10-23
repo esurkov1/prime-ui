@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BADGE_GROUP_LABELS } from "../badge/Badge";
 
 export const api: ComponentApi = {
   parts: [
@@ -116,14 +117,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Trigger",
-      en: "`ref` → `HTMLButtonElement`. The `<button>` that toggles the item; draws a chevron after its children that turns when open.",
-      ru: "Кнопка `<button>` раздела; после содержимого рисует шеврон, который поворачивается при открытии.",
+      en: "`ref` → `HTMLButtonElement`. The `<button>` that toggles the item, a header row: `Accordion.Icon`, the title with `Accordion.Badges`, the `Accordion.Description` under it, the chevron at the end that turns when open. Nothing wraps.",
+      ru: "Кнопка `<button>` раздела, устроена как строка заголовка: метка (`Accordion.Icon`), название с `Accordion.Badges` на одной строке, `Accordion.Description` под ним и шеврон в конце, который поворачивается при открытии. Каждая — одна строка, ничего не переносится.",
       props: [
         {
           name: "children",
           type: "ReactNode",
-          en: "Optional `Accordion.Icon`, then the label.",
-          ru: "Необязательная `Accordion.Icon`, затем подпись.",
+          en: "Optional `Accordion.Icon`, `Accordion.Badges` and `Accordion.Description` (in any order); the rest is the title.",
+          ru: "Необязательные `Accordion.Icon`, `Accordion.Badges` и `Accordion.Description` (в любом порядке); остальное — название.",
         },
         {
           name: "…rest",
@@ -154,6 +155,50 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Accordion.Badges",
+      en: "`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the section, the meaning in its `tone` or `color`. The title gives way first; what does not fit folds into «+N».",
+      ru: "`Badge.Group` после названия, на его строке: все бейджи раздела, смысл — в `tone` или `color`. Название уступает первым, что не влезло — «+N».",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The `Badge.Root`s of the section (a status, a count).",
+          ru: "`Badge.Root` раздела (статус, число).",
+        },
+        {
+          name: "labels",
+          type: "Partial<BadgeGroupLabels>",
+          en: "Built-in strings of the «+N» badge, see the `Badge.Group` labels.",
+          ru: "Системные строки бейджа «+N», см. подписи `Badge.Group`.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other `div` attributes.",
+          ru: "`className` и остальные атрибуты `div`.",
+        },
+      ],
+    },
+    {
+      name: "Accordion.Description",
+      en: "`ref` → `HTMLSpanElement`. The line under the title: plain text with new data only, one line cut with an ellipsis; 12/16 · 13/20 · 14/20 by size. A `StatusDot` first states the section's state, and a «·» is put after it by itself.",
+      ru: "Строка под названием: простой текст только с новыми данными, одна строка с обрезкой; 12/16 · 13/20 · 14/20 по размеру. `StatusDot` первым называет состояние раздела, «·» после него ставится сам.",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The text, with an optional `StatusDot` first.",
+          ru: "Текст, первым может идти `StatusDot`.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
+      ],
+    },
+    {
       name: "Accordion.Content",
       en: "`ref` → `HTMLElement`. The `<section>` region; closed content is out of the tab order and the accessibility tree but found by find in page, which opens its item. `className` goes to the padded inner block.",
       ru: "Область `<section>`; закрытое содержимое вне порядка Tab и дерева доступности, но находится поиском по странице, который раскрывает его раздел. `className` попадает на внутренний блок с отступами.",
@@ -173,7 +218,18 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: labelRows(BADGE_GROUP_LABELS, {
+    more: {
+      en: "Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many.",
+      ru: "Видимый текст бейджа «+N» для не поместившихся бейджей; `{count}` — сколько их.",
+      part: "Accordion.Badges",
+    },
+    moreCount: {
+      en: "What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip.",
+      ru: "Что читают ассистивные технологии вместо видимого текста этого бейджа; `{count}` — сколько. Сами значения — в его подсказке.",
+      part: "Accordion.Badges",
+    },
+  }),
   accessibility: {
     keyboard: [
       {

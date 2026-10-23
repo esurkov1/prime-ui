@@ -70,7 +70,7 @@ Which chip size a place takes:
 | Where the chip stands | Chip size |
 |---|---|
 | Inside a control (a count in a Button, a tag in an Input) | none — the kit takes one step down |
-| Alone as a mark: a status in a table cell, a tag in a list, the badges under a card's title | none — `m` (24), or the host's tier on a sized card |
+| Alone as a mark: a status in a table cell, a tag in a list, the badges after a card's title | none — `m` (24), or the host's tier on a sized card |
 | A row of chips only: `X.Badges` of a dialog header, a record's labels | one size for the whole row (the kit's `m` in `X.Badges`) |
 | In one row with `xs` controls (a record line: state, person, date) | `l` — 28, as tall as the `xs` field |
 | In one row with `s` controls | `xl` — 32, as tall as the `s` field |
@@ -120,13 +120,30 @@ A mark is the round or square picture that leads a row or a card: an `Avatar`, a
 - In one row or one list, every mark has one diameter: an avatar `l` beside a ring `m`, never an
   avatar `m` beside a ring `m` (32 and 40).
 - The mark slot of a card or a dialog header (`Card.Icon`, `Modal.Icon`, `Drawer.Icon`, `Sheet.Icon`)
-  is the 40 of the icon tile and sizes the mark in it: leave `size` off an Avatar, a Thumbnail or a
-  ProgressCircle there.
+  is the slot of the icon tile (a card's is 32 · 32 · 40 · 48 · 56 for `xs` · `s` · `m` · `l` · `xl`; a dialog's is 48) and sizes the mark
+  in it: leave `size` off an Avatar, a Thumbnail or a ProgressCircle there.
 - What is inside a mark is a share of its circle at every size, so a mark is the same picture scaled:
   initials 2/5 of an avatar, a ring's text 1/4 of its diameter (8 · 10 · 12 · 16 from `s`), an icon
   1/2. Never a `font-size` or a `Typography` inside a mark to change it.
 - A ring holds a short text («72%», «18 д») from `s` and nothing on `xs`; a longer one is a label
   beside the ring. Below 40 an icon or a bare ring reads better than 8px text.
+- A surface that holds one entity (Card, Kpi, a dialog, a banner) follows the same axis in five steps,
+  each visibly apart; its controls take the tier itself:
+
+  | Tier | `xs` | `s` | `m` | `l` | `xl` |
+  |---|---|---|---|---|---|
+  | padding | 12 | 16 | 20 | 24 | 28 |
+  | radius | 12 | 12 | 16 | 16 | 16 |
+  | zone gap | 8 | 12 | 16 | 20 | 24 |
+  | title | 13/16 | 13/16 | 14/20 | 16/24 | 18/24 |
+  | description | 12/16 | 12/16 | 13/20 | 14/20 | 14/20 |
+  | mark | 32 | 32 | 40 | 48 | 56 |
+  | row mark (a one-line card) | 24 | 24 | 32 | 40 | 48 |
+  | controls | 28 | 32 | 36 | 40 | 48 |
+  | badges | 16 | 16 | 16 | 20 | 20 |
+
+  A surface's title stays under the page's section title (16): a default card's is 14. A Kpi stands
+  a step under a Card of the same size, a toast two steps under its tier, a dialog on `l`.
 
 ```tsx good
 // good — one list row: the avatar l and the ring m are both 40
@@ -155,7 +172,7 @@ column of marks, the list's left edge jumps.
   always one step off the layer they sit on. The kit sets every depth itself (`data-depth`) — just
   nest components, never set backgrounds yourself.
 - Separate blocks by fill and air. Hairlines (`Divider`) only inside a block: list rows, table rows,
-  between a form and its footer.
+  between a form and its footer — a Card has none, its zones are parted by air.
 
 ### Card in a card
 
@@ -354,6 +371,7 @@ A chart color does one job, and the job picks the colors:
 | `body-s` | 13/20 | secondary text, dense UI |
 | `body-m` | 14/20 | default text |
 | `body-l` | 16/24 | reading text |
+| `title-xs` | 13/16 600 | title of an xs surface (a dense tile) |
 | `title-s` | 14/20 600 | card title, group heading inside a card or form |
 | `title-m` | 16/24 600 | page section heading (`Page.Section` draws it), modal title |
 | `title-l` | 18/24 600 | large block title |

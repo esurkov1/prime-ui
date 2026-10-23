@@ -37,17 +37,22 @@ export default function PageSectionsExample() {
           <Page.Cell span={6}>
             <Kpi.Root>
               <Kpi.Title>Выставлено</Kpi.Title>
-              <Kpi.Value>2,4 млн ₽</Kpi.Value>
+              <Kpi.Value>
+                2,4<Kpi.Unit>млн ₽</Kpi.Unit>
+              </Kpi.Value>
               <Kpi.Delta value={9} tone="success">
                 +9%
               </Kpi.Delta>
-              <Kpi.Meta>к сентябрю</Kpi.Meta>
+              <Kpi.Period>Октябрь</Kpi.Period>
             </Kpi.Root>
           </Page.Cell>
           <Page.Cell span={6}>
             <Kpi.Root>
               <Kpi.Title>Оплачено</Kpi.Title>
-              <Kpi.Value>1,9 млн ₽</Kpi.Value>
+              <Kpi.Value>
+                1,9<Kpi.Unit>млн ₽</Kpi.Unit>
+              </Kpi.Value>
+              <Kpi.Period>Октябрь</Kpi.Period>
               <Kpi.Meta>79% выставленного</Kpi.Meta>
             </Kpi.Root>
           </Page.Cell>

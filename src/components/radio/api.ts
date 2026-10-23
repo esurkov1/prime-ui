@@ -185,6 +185,39 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "Radio.Indicator",
+      en: '`ref` → `HTMLSpanElement`. The circle alone, without an input (`aria-hidden`, no focus or clicks) for elements that carry the state themselves: `role="radio"` + `aria-checked` inside a `role="radiogroup"`, a choice card.',
+      ru: 'Кружок без input (`aria-hidden`, без фокуса и кликов) для элементов, которые сами несут состояние: `role="radio"` + `aria-checked` внутри `role="radiogroup"`, карточка выбора.',
+      props: [
+        {
+          name: "checked",
+          type: "boolean",
+          default: "false",
+          en: "Shows the dot.",
+          ru: "Показывает точку.",
+        },
+        {
+          name: "disabled",
+          type: "boolean",
+          default: "false",
+          en: "Disabled fill.",
+          ru: "Неактивная заливка.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          en: "Circle tier; without it the nearest control size, else `m`.",
+          ru: "Ярус кружка; без него — ярус ближайшего контрола, иначе `m`.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className`, `data-*` and the other span attributes.",
+          ru: "`className`, `data-*` и остальные атрибуты span.",
+        },
+      ],
+    },
   ],
   labels: labelRows(RADIO_GROUP_LABELS, {
     optional: {
@@ -218,6 +251,10 @@ export const api: ComponentApi = {
       {
         en: 'Every option is a native `<input type="radio">` with the shared `name`; an option `hint` is linked through `aria-describedby`.',
         ru: 'Каждый вариант — нативный `<input type="radio">` с общим `name`; описание варианта (`hint`) связано через `aria-describedby`.',
+      },
+      {
+        en: '`Radio.Indicator` is `aria-hidden`; the host element carries `role="radio"` and `aria-checked`.',
+        ru: '`Radio.Indicator` скрыт (`aria-hidden`); состояние несёт элемент-хозяин (`role="radio"`, `aria-checked`).',
       },
     ],
   },

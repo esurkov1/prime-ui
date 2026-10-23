@@ -25,12 +25,12 @@ import { Banner } from "prime-ui-kit";
 ## Anatomy
 ```
 Banner.Root                 <div>; variant, tone, size, placement
-├─ Banner.Content           grid: [icon] [title / description] [actions]
-│  ├─ Banner.Icon           one Icon on the first line (aria-hidden)
+├─ Banner.Content           header row: [icon] [title / description] [actions]
+│  ├─ Banner.Icon           one Icon in the mark box (aria-hidden)
 │  ├─ Banner.Title
 │  ├─ Banner.Description
-│  └─ Banner.Actions        buttons; with onDismiss the close button is last here (wide banner)
-└─ close button             with onDismiss and no Actions, or Actions under the text: ghost icon Button (tone="inherit"), top-right
+│  └─ Banner.Actions        buttons; with onDismiss the close button is last here
+└─ close button             with onDismiss and no Actions: ghost icon Button (tone="inherit"), alone at the end of the row
 ```
 
 ## API
@@ -44,35 +44,35 @@ Banner.Root                 <div>; variant, tone, size, placement
 |---|---|---|---|
 | `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | `soft` tinted fill, `solid` saturated fill for urgent messages, `outline` card fill with a tone ring. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"info"` | Semantic color of the message. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Spacing, icon and title follow the control tier; the description is one step smaller. Without it the tier of the host. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | The surface frame of its tier (five steps): padding, radius, mark, title and description roles; the buttons take the same tier. Without it the tier of the host. |
 | `placement` | `"inset" \| "page"` | `"inset"` | `inset` — rounded block in the flow or in a card; `page` — edge-to-edge strip above a page, content aligned to the page column. |
 | `onDismiss` | `() => void` | — | Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place; focus inside it moves to the next tab stop of the page. |
 | `labels` | `Partial<BannerLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` (`alert`, `status`, `region`), `aria-label` and the other div attributes. |
 
 ### Banner.Content
-`ref` → `HTMLDivElement`. A `<div>` grid: icon on the first line, title over description, actions on the right (under the text below 36rem).
+`ref` → `HTMLDivElement`. A `<div>` header row: the mark, the title over the description, the actions at the end (under the text below 36rem); with `onDismiss` and no `Banner.Actions` the close button stands alone at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Banner.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding one `Icon`, one title line high, in the tone color.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding one `Icon` in the frame's mark box, in the tone color.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (`Icon`), `className` and the other span attributes. |
 
 ### Banner.Title · Banner.Description
-`ref` → `HTMLSpanElement`. `<span>` elements: the medium title and the secondary text, both capped at the reading width.
+`ref` → `HTMLSpanElement`. `<span>` elements: the title (one line, cut with an ellipsis) and the secondary text (wraps, capped at the reading width).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Banner.Actions
-`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button (in the corner below 36rem).
+`ref` → `HTMLDivElement`. A `<div>` row of buttons; with `onDismiss` the close button becomes its last square button.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -100,9 +100,11 @@ Banner.Root                 <div>; variant, tone, size, placement
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` · `s` | tight padding, caption description | dense panels, side columns | |
-| `m` | padding 12 × 16, body-s description | most pages | yes |
-| `l` · `xl` | roomy padding, body-m description | hero areas, empty pages | |
+| `xs` | padding 12, mark 32, title 13/16, caption description | dense panels, side columns | |
+| `s` | padding 16, mark 32, title 13/16, caption description | compact blocks | |
+| `m` | padding 20, mark 40, title 14/20, body-s description | most pages | yes |
+| `l` | padding 24, mark 48, title 16/24, body-m description | hero areas | |
+| `xl` | padding 28, mark 56, title 18/24, body-m description | empty pages | |
 
 ### placement
 | Value | Looks like | Use when | Default |
@@ -114,15 +116,15 @@ Banner.Root                 <div>; variant, tone, size, placement
 | State | Driven by | DOM |
 |---|---|---|
 | look | `variant`, `tone`, `size`, `placement` | `data-variant`, `data-tone`, `data-size`, `data-placement` |
-| dismissible | `onDismiss` | corner ghost Button (`xs`, `s` on `l` / `xl`), or the last soft Button (`tone="inherit"`) in `Banner.Actions` |
-| narrow | own width < 36rem (a banner with `Banner.Actions` is a size container) | actions move under the text; the close button returns to the corner |
+| dismissible | `onDismiss` | a ghost Button (`tone="inherit"`) alone at the end of the row, or the last soft Button (`tone="inherit"`) in `Banner.Actions` |
+| narrow | own width < 36rem (a banner with `Banner.Actions` is a size container) | actions move under the text, the close button stays last among them |
 
 No `open` prop: the parent mounts and unmounts the banner. A banner that appears on a page already shown enters (a short fade and rise), one that mounts with its page stands still; an unmounted one closes up in place, so the content below glides up instead of jumping. To swap the banner for another block in the same spot (a «restore» button), wrap both in [Crossfade](../crossfade/COMPONENT.md).
 
 ## Layout & spacing
 - `width: 100%`; text column capped at `--prime-layout-reading-max-width`.
-- Spacing lives in item paddings, so absent parts leave no gutters.
-- Action buttons take the banner `size`; the close button is centered on the first text line and never grows the banner.
+- The surface frame of the banner's tier: padding (12 · 16 · 20 · 24 · 28), radius and the mark box (32 · 32 · 40 · 48 · 56); the title and the description take its roles. The title is one line cut with an ellipsis; the description is a message to read and wraps.
+- Action buttons and the close button take the banner's own tier, as tall as the fields of the same surface.
 
 ## Accessibility
 
@@ -152,7 +154,7 @@ No `open` prop: the parent mounts and unmounts the banner. A banner that appears
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A maintenance notice: icon, title and description on a soft info fill — `Banner.Icon`, `Banner.Title`, `Banner.Description`. |
 | [variants.tsx](examples/variants.tsx) | Every treatment on every tone: soft by default, solid for urgent, outline for calm — `variant`, `tone`. |
-| [sizes.tsx](examples/sizes.tsx) | Every tier: padding, icon and title follow the control tier, the description is one step smaller — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Every tier on its own frame step: padding, radius, mark and text roles grow with it — `size`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: a one-line title, a title with a description, and actions where the close button joins the row — `Banner.Description`, `Banner.Actions`, `onDismiss`. |
 | [dismissible.tsx](examples/dismissible.tsx) | The parent owns visibility: the close button calls back, the banner fades into the restore button and focus follows it; the button name comes from labels — `onDismiss`, `labels`. |
 | [page-strip.tsx](examples/page-strip.tsx) | An edge-to-edge strip above a page and a rounded block inside a card — `placement`. |
@@ -165,5 +167,5 @@ No `open` prop: the parent mounts and unmounts the banner. A banner that appears
 - Several `solid` banners on one screen → keep `solid` for the one urgent message.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (close button), Icon (`action.close`)
+- **Built from:** [Button](../button/COMPONENT.md) (actions, close button), [StatusDot](../status-dot/COMPONENT.md) (the header row's description line), Icon (`action.close`); `internal/headerRow` and `internal/surfaceFrame` (the row and the frame of its tier)
 - **See also:** [Crossfade](../crossfade/COMPONENT.md), [Notification](../notification/COMPONENT.md), [Hint](../hint/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md)

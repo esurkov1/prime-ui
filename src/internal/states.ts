@@ -50,7 +50,52 @@ export const tierMappings = {
    * compact rail with even air around it (32 at `l`, 40 at `xl`).
    */
   railAvatar: { xs: "xs", s: "s", m: "m", l: "m", xl: "l" },
+  /**
+   * The change badge of a KPI card beside its value (16 · 16 · 20 · 20 · 24): a chip a size under
+   * the figure, kept at 20 on `l` so it does not outweigh the 30px value.
+   */
+  kpiDelta: { xs: "xs", s: "xs", m: "s", l: "s", xl: "m" },
+  /**
+   * The legend tier in a KPI card's footer: `m` reads the compact rows, `l` the rows of the card's
+   * other footer text, `xl` the rows of the 2xl ring's legend beside it (xs · xs · xs · m · xl).
+   */
+  kpiLegend: { xs: "xs", s: "xs", m: "xs", l: "m", xl: "xl" },
+  /**
+   * The badges after a surface's title (16 · 16 · 16 · 20 · 20 for a frame xs · s · m · l · xl,
+   * titles 13 · 13 · 14 · 16 · 18): chips a line of the title tall at most, so the title row keeps
+   * its height.
+   */
+  cardBadges: { xs: "xs", s: "xs", m: "xs", l: "s", xl: "s" },
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
+
+/**
+ * The mark of a surface's header (`Card.Icon` and its kin), per kind of mark, for a frame
+ * xs · s · m · l · xl. `header` — the frame mark, the title with its line tall (32 · 32 · 40 · 48 ·
+ * 56; a picture has no 56, so at `xl` it stands at 48 in the 56 box); `row` — a one-line card with
+ * a switch, one step down (24 · 24 · 32 · 40 · 48). Each kind names the tier that has that height.
+ */
+export const cardMarkSize = {
+  header: {
+    tile: { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" },
+    avatar: { xs: "m", s: "m", m: "l", l: "xl", xl: "xl" },
+    thumbnail: { xs: "s", s: "s", m: "m", l: "l", xl: "l" },
+    ring: { xs: "s", s: "s", m: "m", l: "l", xl: "l" },
+  },
+  row: {
+    tile: { xs: "2xs", s: "2xs", m: "xs", l: "s", xl: "m" },
+    avatar: { xs: "s", s: "s", m: "m", l: "l", xl: "xl" },
+    thumbnail: { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" },
+    ring: { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" },
+  },
+} as const satisfies Record<
+  "header" | "row",
+  {
+    tile: Record<ControlSize, "2xs" | ControlSize>;
+    avatar: Record<ControlSize, "2xs" | "2xl" | ControlSize>;
+    thumbnail: Record<ControlSize, ControlSize>;
+    ring: Record<ControlSize, ControlSize>;
+  }
+>;
 
 /**
  * The Avatar of a chip (`Badge.Avatar`). `line` — a one-line chip: the circle 2 px inside the

@@ -4,9 +4,12 @@ import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cssRule, cssValue } from "@/test/css";
 import { withMotion } from "@/test/motion";
 
 import { ProgressBar } from "./ProgressBar";
+
+const CSS = "src/components/progress-bar/ProgressBar.module.css";
 
 describe("ProgressBar", () => {
   it("renders", () => {
@@ -153,43 +156,107 @@ describe("ProgressBar", () => {
     });
   });
 
-  describe("steps", () => {
-    const cells = (container: HTMLElement) =>
-      [...container.querySelectorAll("[data-steps] > span")] as HTMLElement[];
+  describe("cells", () => {
+    const scale = (container: HTMLElement) =>
+      container.querySelector<HTMLElement>("[style*='--pb-cells']") as HTMLElement;
+    const fillCells = (container: HTMLElement) =>
+      [...(scale(container).lastElementChild?.firstElementChild?.children ?? [])] as HTMLElement[];
+    const rows = (container: HTMLElement) => [
+      ...(scale(container).firstElementChild?.children ?? []),
+      ...fillCells(container),
+    ];
+    const front = (container: HTMLElement) => [
+      scale(container).style.getPropertyValue("--pb-filled"),
+      scale(container).style.getPropertyValue("--pb-cells"),
+    ];
 
-    it("draws max cells, fills whole ones and keeps the native progress", () => {
+    it("steps: max cells, the value rounds to a whole cell, the native progress stays", () => {
       const { container } = render(
-        <ProgressBar steps value={2.6} max={4} aria-label="Надёжность" />,
+        <ProgressBar variant="steps" value={2.6} max={4} aria-label="Надёжность" />,
       );
-      expect(cells(container)).toHaveLength(4);
-      expect(cells(container).map((c) => c.hasAttribute("data-filled"))).toEqual([
-        true,
-        true,
-        true,
-        false,
-      ]);
+      expect(container.firstElementChild).toHaveAttribute("data-variant", "steps");
+      expect(front(container)).toEqual(["3", "4"]);
+      expect(rows(container)).toHaveLength(8);
       const progress = screen.getByRole("progressbar", { name: "Надёжность" });
       expect(progress).toHaveAttribute("max", "4");
     });
 
-    it("clamps the cell count to 2…12", () => {
+    it("steps: clamps the cell count to 2…12", () => {
       const { container, rerender } = render(
-        <ProgressBar steps value={1} max={1} aria-label="a" />,
+        <ProgressBar variant="steps" value={1} max={1} aria-label="a" />,
       );
-      expect(cells(container)).toHaveLength(2);
-      rerender(<ProgressBar steps value={1} max={40} aria-label="a" />);
-      expect(cells(container)).toHaveLength(12);
+      expect(front(container)).toEqual(["2", "2"]);
+      rerender(<ProgressBar variant="steps" value={1} max={40} aria-label="a" />);
+      expect(front(container)).toEqual(["0", "12"]);
     });
 
-    it("orders a change from the start when filling and from the end when emptying", () => {
+    it("moves one front for every change: no cell carries its own delay", () => {
       const { container, rerender } = render(
-        <ProgressBar steps value={1} max={4} aria-label="a" />,
+        <ProgressBar variant="steps" value={1} max={4} aria-label="a" />,
       );
-      rerender(<ProgressBar steps value={4} max={4} aria-label="a" />);
-      const order = () => cells(container).map((c) => c.style.getPropertyValue("--pb-step-order"));
-      expect(order()).toEqual(["0", "0", "1", "2"]);
-      rerender(<ProgressBar steps value={1} max={4} aria-label="a" />);
-      expect(order()).toEqual(["3", "2", "1", "0"]);
+      rerender(<ProgressBar variant="steps" value={4} max={4} aria-label="a" />);
+      expect(front(container)).toEqual(["4", "4"]);
+      rerender(<ProgressBar variant="steps" value={0} max={4} aria-label="a" />);
+      expect(front(container)).toEqual(["0", "4"]);
+      for (const cell of rows(container)) expect(cell.getAttribute("style")).toBeNull();
+      expect(cssValue(cssRule(CSS, ".reveal"), "transition")).toBe(
+        "translate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard)",
+      );
+    });
+
+    it("ticks: as many as the width holds at the tier's pitch, filled to the share", () => {
+      const spy = vi
+        .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+        .mockReturnValue({ width: 350, height: 40 } as DOMRect);
+      try {
+        const { container } = render(
+          <ProgressBar variant="ticks" value={50} aria-label="Совпадение" />,
+        );
+        // m: track 6, tick 4 + gap 3 → (350 + 3) / 7 = 50 ticks.
+        expect(front(container)).toEqual(["25", "50"]);
+        expect(screen.getByRole("progressbar", { name: "Совпадение" })).toBeInTheDocument();
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it("ticks with segments: whole ticks per part, the free rest stays track", () => {
+      const { container } = render(
+        <ProgressBar
+          variant="ticks"
+          max={24}
+          aria-label="Лиды"
+          segments={[
+            { value: 6, label: "Сайт", color: "blue" },
+            { value: 3, label: "Звонки", color: "orange" },
+          ]}
+        />,
+      );
+      expect(screen.getByRole("group", { name: "Лиды" })).toBe(scale(container));
+      expect(front(container)).toEqual(["5", "12"]);
+      const colors = fillCells(container).map((c) => c.getAttribute("data-color"));
+      expect(colors.slice(0, 5)).toEqual(["blue", "blue", "blue", "orange", "orange"]);
+    });
+
+    it("a cell the front leaves keeps its fill while the front passes it", () => {
+      const parts = (a: number) => [
+        { value: a, label: "Сайт", color: "blue" as const },
+        { value: 12 - a, label: "Звонки", color: "orange" as const },
+      ];
+      const { container, rerender } = render(
+        <ProgressBar variant="ticks" max={24} aria-label="Лиды" segments={parts(6)} />,
+      );
+      rerender(<ProgressBar variant="ticks" max={24} aria-label="Лиды" segments={[]} />);
+      expect(front(container)).toEqual(["0", "12"]);
+      expect(fillCells(container)[0]).toHaveAttribute("data-color", "blue");
+      expect(fillCells(container)[5]).toHaveAttribute("data-color", "orange");
+    });
+
+    it("loading: Skeleton cells in the scale's geometry", () => {
+      const { container } = render(
+        <ProgressBar variant="steps" value={2} max={5} aria-label="a" loading />,
+      );
+      expect(container.querySelectorAll("[data-shape='block']")).toHaveLength(5);
     });
   });
 

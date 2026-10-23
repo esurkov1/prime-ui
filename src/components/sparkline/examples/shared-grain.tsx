@@ -38,29 +38,29 @@ export default function SparklineSharedGrainExample() {
       <div className={styles.tiles}>
         <Kpi.Root>
           <Kpi.Title>Лиды</Kpi.Title>
-          <Kpi.Period>{leads.date}</Kpi.Period>
           <Kpi.Value>{leads.valueText}</Kpi.Value>
           <Kpi.Delta reading={leads} />
+          <Kpi.Period>{leads.date}</Kpi.Period>
           <Kpi.Media>
-            <Sparkline {...leads.plot} label="Лиды" size="s" />
+            <Sparkline {...leads.plot} label="Лиды" />
           </Kpi.Media>
         </Kpi.Root>
         <Kpi.Root>
           <Kpi.Title>Брони</Kpi.Title>
-          <Kpi.Period>{bookings.date}</Kpi.Period>
           <Kpi.Value>{bookings.valueText}</Kpi.Value>
           <Kpi.Delta reading={bookings} />
+          <Kpi.Period>{bookings.date}</Kpi.Period>
           <Kpi.Media>
-            <Sparkline {...bookings.plot} label="Брони" size="s" />
+            <Sparkline {...bookings.plot} label="Брони" />
           </Kpi.Media>
         </Kpi.Root>
         <Kpi.Root>
           <Kpi.Title>Возвраты</Kpi.Title>
-          <Kpi.Period>{returns.date}</Kpi.Period>
           <Kpi.Value>{returns.valueText}</Kpi.Value>
           <Kpi.Delta reading={returns} />
+          <Kpi.Period>{returns.date}</Kpi.Period>
           <Kpi.Media>
-            <Sparkline {...returns.plot} label="Возвраты" size="s" />
+            <Sparkline {...returns.plot} label="Возвраты" />
           </Kpi.Media>
         </Kpi.Root>
       </div>

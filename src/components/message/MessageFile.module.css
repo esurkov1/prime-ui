@@ -1,12 +1,13 @@
 /*
- * Message.File — a round tile and the name over the size line (the meta's spacer at its end). One
+ * Message.File — a round tile (the frame's `s` mark, 40) and the name over the size line (the
+ * card row anatomy: title and description roles of the `s` step) (the meta's spacer at its end). One
  * fixed width: the card width of a message, within 75% of the row.
  *
  * The tile is the file's one action, in one spot over the tile's face:
- *   download — the link as an accent `Button shape="circle"` (`xl`, the tile's size) with the
+ *   download — the link as an accent `Button shape="circle"` (`l`, the tile's size) with the
  *              arrow, shown on hover and focus (always on touch);
  *   cancel   — while the file transfers, either way: the shared transfer disk
- *              (`internal/transferDisk`, `xl`) — the cross on the media shade with the progress
+ *              (`internal/transferDisk`, `l`) — the cross on the media shade with the progress
  *              ring along its edge, always shown;
  *   retry    — after a failure: the same disk in danger with the refresh glyph;
  *   fetch    — a file not fetched yet (`remote`): the same disk with the download arrow.
@@ -31,8 +32,8 @@
   position: relative;
   display: grid;
   place-items: center;
-  inline-size: var(--prime-space-12);
-  block-size: var(--prime-space-12);
+  inline-size: var(--prime-space-10);
+  block-size: var(--prime-space-10);
   border-radius: var(--prime-radius-full);
   color: var(--hue-text);
   isolation: isolate;
@@ -65,7 +66,7 @@
   border-radius: 0;
 }
 
-/* The download covers the tile (the `xl` circle is the tile's size): its hover, press and focus
+/* The download covers the tile (the `l` circle is the tile's size): its hover, press and focus
    are the circle's. It adds a fade to the Button's own transitions. */
 .tile > .action {
   position: absolute;
@@ -109,7 +110,7 @@
 }
 
 /*
- * A transfer: the shared transfer disk (`internal/transferDisk`, `xl`) is the tile — the cross on
+ * A transfer: the shared transfer disk (`internal/transferDisk`, `l`) is the tile — the cross on
  * the media shade with the ring, the danger retry after a failure, the download arrow of a remote
  * file. The face under it fades out and comes back once the disk is done and fades away itself.
  */
@@ -134,7 +135,6 @@
   align-self: end;
   min-width: 0;
   overflow: hidden;
-  font-weight: var(--prime-font-weight-medium);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -145,9 +145,7 @@
   display: flex;
   align-items: baseline;
   min-width: 0;
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
+  color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 

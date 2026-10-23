@@ -1,4 +1,4 @@
-/** A profile panel: Sign out stands apart at the start of the footer, the main action keeps the end; on a phone the column puts it first and the main action last — `Drawer.Footer`, `Drawer.Actions`. */
+/** A profile panel: Sign out, a neutral button, stands apart at the start of the footer, the main action keeps the end; on a phone the column puts it first and the main action last — `Drawer.Footer`, `Drawer.Actions`. */
 import { Avatar, Button, DescriptionList, Drawer, Icon } from "prime-ui-kit";
 
 const PROFILE = {
@@ -34,7 +34,7 @@ export default function DrawerFooterActionsExample() {
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Actions>
-            <Button.Root variant="soft" tone="danger">
+            <Button.Root variant="soft" tone="neutral">
               <Button.Icon>
                 <Icon name="action.logout" />
               </Button.Icon>

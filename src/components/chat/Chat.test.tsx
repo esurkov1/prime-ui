@@ -246,9 +246,12 @@ describe("Chat: the conversation assembled", () => {
     expect(within(lead).getByRole("button", { name: "Назад" })).toBeInTheDocument();
     expect(within(lead).getByTestId("avatar")).toBeInTheDocument();
     expect(lead.children).toHaveLength(3);
-    // The title, the description and the actions stay direct children of the header.
-    expect(screen.getByRole("heading", { name: "ООО «Вектор»" }).parentElement).toBe(header);
-    expect(header.children).toHaveLength(4);
+    // The text column and the actions follow the lead as direct children of the header.
+    expect(header.children).toHaveLength(3);
+    expect(header).toHaveAttribute("data-lines", "two");
+    expect(header.children[1]).toContainElement(
+      screen.getByRole("heading", { name: "ООО «Вектор»" }),
+    );
   });
 
   it("has no lead without a leading child", () => {
@@ -261,6 +264,7 @@ describe("Chat: the conversation assembled", () => {
       </Chat.Root>,
     );
     expect(screen.getByTestId("header").children).toHaveLength(1);
+    expect(screen.getByTestId("header")).toHaveAttribute("data-lines", "one");
   });
 
   it("stands placeholders in the list's place while loading, busy and announced, then shows the list", () => {

@@ -50,6 +50,13 @@ export const api: ComponentApi = {
           ru: "Приглушённое `labels.optional` после текста подписи; поле можно не включать.",
         },
         {
+          name: "fullWidth",
+          type: "boolean",
+          default: "false",
+          en: 'A settings row as wide as its container: the text and its hint at the start, the track at the end of the first line (`data-control="end"`). The label stays inside the row, so the whole row toggles.',
+          ru: 'Строка настроек на всю ширину контейнера: текст и подсказка в начале, дорожка в конце первой строки (`data-control="end"`). Подпись остаётся внутри строки, поэтому переключает вся строка.',
+        },
+        {
           name: "labels",
           type: "Partial<SwitchLabels>",
           en: "Built-in strings, see Labels.",

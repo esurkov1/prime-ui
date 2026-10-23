@@ -26,6 +26,7 @@ import { Radio } from "prime-ui-kit";
 Radio.Group             field: group label → role="radiogroup" → hint | error; value, name, size, flags
 └─ Radio.Root           one option (value): the <label> row with the input and the circle, its hint
    └─ Radio.Label       the visible text of the option
+Radio.Indicator         the circle alone, no input: for an element that carries role="radio" + aria-checked itself
 ```
 `className`, `ref` and the rest of `Radio.Group` go to the field frame; `id`, `aria-label`, `aria-labelledby` and `aria-describedby` to the `role="radiogroup"` element. `Radio.Root` must be inside `Radio.Group`. Without `Radio.Label` only the circle renders — give the option an `aria-label`.
 
@@ -77,6 +78,16 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
+
+### Radio.Indicator
+`ref` → `HTMLSpanElement`. The circle alone, without an input (`aria-hidden`, no focus or clicks) for elements that carry the state themselves: `role="radio"` + `aria-checked` inside a `role="radiogroup"`, a choice card.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `checked` | `boolean` | `false` | Shows the dot. |
+| `disabled` | `boolean` | `false` | Disabled fill. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Circle tier; without it the nearest control size, else `m`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className`, `data-*` and the other span attributes. |
 
 ## Variants
 No `variant` / `tone` / `color`.
@@ -146,6 +157,7 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 - `Radio.Group` is `role="radiogroup"`, named by its `label` through `aria-labelledby`, or by `aria-label`.
 - `aria-required`, `aria-invalid` and `aria-orientation` sit on the group; the group hint or error is in its `aria-describedby`.
 - Every option is a native `<input type="radio">` with the shared `name`; an option `hint` is linked through `aria-describedby`.
+- `Radio.Indicator` is `aria-hidden`; the host element carries `role="radio"` and `aria-checked`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -162,6 +174,7 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 | [states.tsx](examples/states.tsx) | Every state, each in its own group and labelled by its prop — `value`, `invalid`, `disabled`. |
 | [group.tsx](examples/group.tsx) | A required group with option descriptions and the group's error under the options — `label`, `required`, `hint`, `error`. |
 | [orientation.tsx](examples/orientation.tsx) | Options stacked in a column and laid out in a wrapping row — `orientation`. |
+| [indicator.tsx](examples/indicator.tsx) | The circle alone on selectable tiles: `selected` on the card marks its button and the circle shows it — `Card.Indicator`, `selected`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the chosen plan and shows it in the hint — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Choices of an order form: a required group shows its error after a submit without a choice, an optional one is marked — `name`, `required`, `optional`, `error`. |
 

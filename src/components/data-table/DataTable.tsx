@@ -20,6 +20,7 @@ import { usePartPresence } from "@/internal/partPresence";
 import { useSwapIn } from "@/internal/RegionSwap";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { surfaceFrameClass } from "@/internal/surfaceFrame";
 import { ToolCell, ToolChips, ToolRow } from "@/internal/ToolRow";
 import { useFlipList } from "@/internal/useFlipList";
 import { sameIds } from "@/internal/ViewMenu";
@@ -1079,7 +1080,8 @@ export function DataTable<Row>({
           <div
             {...rest}
             ref={mergedRootRef}
-            className={cx(fieldTierClass, styles.root, className)}
+            className={cx(fieldTierClass, surfaceFrameClass, styles.root, className)}
+            data-frame={size}
             data-depth={depth}
             {...toDataAttributes({
               size,

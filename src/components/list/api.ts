@@ -1,4 +1,5 @@
 import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BADGE_GROUP_LABELS } from "../badge/Badge";
 import { LIST_LABELS } from "./List";
 
 export const api: ComponentApi = {
@@ -113,8 +114,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (also inside a fragment); loose text becomes the text line.",
-          ru: "`List.ItemIcon`, `List.ItemText`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (и внутри фрагмента); просто текст становится основной строкой.",
+          en: "`List.ItemIcon`, `List.ItemText`, `List.ItemBadges`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (also inside a fragment); loose text becomes the text line.",
+          ru: "`List.ItemIcon`, `List.ItemText`, `List.ItemBadges`, `List.ItemDescription`, `List.ItemMeta`, `List.ItemCount`, `List.ItemActions` (и внутри фрагмента); просто текст становится основной строкой.",
         },
         {
           name: "…rest",
@@ -158,9 +159,34 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "List.ItemBadges",
+      en: "`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the record, the meaning in its `tone` or `color`. The title gives way first; what does not fit folds into «+N».",
+      ru: "`Badge.Group` после названия, на его строке: все бейджи записи, смысл — в `tone` или `color`. Название уступает первым, что не влезло — «+N».",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The `Badge.Root`s of the record (a status, a role).",
+          ru: "`Badge.Root` записи (статус, роль).",
+        },
+        {
+          name: "labels",
+          type: "Partial<BadgeGroupLabels>",
+          en: "Built-in strings of the «+N» badge, see the `Badge.Group` labels.",
+          ru: "Системные строки бейджа «+N», см. подписи `Badge.Group`.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other `div` attributes.",
+          ru: "`className` и остальные атрибуты `div`.",
+        },
+      ],
+    },
+    {
       name: "List.ItemDescription",
-      en: "`ref` → `HTMLSpanElement`. The second line (a preview, a status): muted, smaller, truncated.",
-      ru: "Вторая строка (превью, статус): приглушённая, мельче, обрезается.",
+      en: "`ref` → `HTMLSpanElement`. The second line (a preview, a state): muted, smaller, one line cut with an ellipsis. A `StatusDot` first states the record's state, and a «·» is put after it by itself.",
+      ru: "Вторая строка (превью, состояние): приглушённая, мельче, одна строка с обрезкой. `StatusDot` первым называет состояние записи, «·» после него ставится сам.",
       props: [
         {
           name: "…rest",
@@ -240,7 +266,20 @@ export const api: ComponentApi = {
       en: "Name of the lock a `locked` row shows in the grip's place; `{label}` is the row's text line.",
       ru: "Имя замка, который строка с `locked` показывает на месте ручки; `{label}` — текст строки.",
     },
-  }),
+  }).concat(
+    labelRows(BADGE_GROUP_LABELS, {
+      more: {
+        en: "Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many.",
+        ru: "Видимый текст бейджа «+N» для не поместившихся бейджей; `{count}` — сколько их.",
+        part: "List.ItemBadges",
+      },
+      moreCount: {
+        en: "What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip.",
+        ru: "Что читают ассистивные технологии вместо видимого текста этого бейджа; `{count}` — сколько. Сами значения — в его подсказке.",
+        part: "List.ItemBadges",
+      },
+    }),
+  ),
   accessibility: {
     keyboard: [
       {

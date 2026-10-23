@@ -100,21 +100,24 @@ export default function ChartFrameFillHeightExample() {
       <Page.Cell span={4}>
         <Kpi.Root>
           <Kpi.Title>Выполнение плана</Kpi.Title>
-          <Kpi.Period>Октябрь</Kpi.Period>
-          <Kpi.Value>96%</Kpi.Value>
+          <Kpi.Value>
+            96<Kpi.Unit>%</Kpi.Unit>
+          </Kpi.Value>
           <Kpi.Delta value={-4} tone="warning">
             −4 п. п.
           </Kpi.Delta>
-          <Kpi.Meta>к сентябрю</Kpi.Meta>
+          <Kpi.Period>Октябрь</Kpi.Period>
         </Kpi.Root>
       </Page.Cell>
 
       <Page.Cell span={4}>
         <Kpi.Root>
-          <Kpi.Title>Прогноз на год</Kpi.Title>
+          <Kpi.Title>Прогноз выручки</Kpi.Title>
+          <Kpi.Value>
+            84<Kpi.Unit>млн ₽</Kpi.Unit>
+          </Kpi.Value>
           <Kpi.Period>2026</Kpi.Period>
-          <Kpi.Value>84 млн ₽</Kpi.Value>
-          <Kpi.Meta>План — 86 млн ₽</Kpi.Meta>
+          <Kpi.Meta>план 86 млн ₽</Kpi.Meta>
         </Kpi.Root>
       </Page.Cell>
     </Page.Grid>

@@ -12,8 +12,15 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type. Without it the tier of its host, else `m`.",
-          ru: "Толщина линии 4 → 8 px (`--prime-control-<tier>-track`, как у Slider) и шрифт подписи. Без него — ярус хоста, иначе `m`.",
+          en: "Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type; `ticks` stand 16 → 40 px tall. Without it the tier of its host, else `m`.",
+          ru: "Толщина линии 4 → 8 px (`--prime-control-<tier>-track`, как у Slider) и шрифт подписи; штрихи `ticks` — высотой 16 → 40 px. Без него — ярус хоста, иначе `m`.",
+        },
+        {
+          name: "variant",
+          type: '"line" | "steps" | "ticks"',
+          default: '"line"',
+          en: "`line` — one line; `steps` (value mode) — `max` cells (2–12); `ticks` — thin tall ticks, as many as the width holds. Cells fill whole, by one front. `bar` layout.",
+          ru: "`line` — одна линия; `steps` (режим значения) — `max` ячеек (2–12); `ticks` — тонкие высокие штрихи, сколько помещается по ширине. Ячейки заполняются целиком, одним фронтом. Раскладка `bar`.",
         },
         {
           name: "label",
@@ -59,13 +66,6 @@ export const api: ComponentApi = {
           ru: "Режим значения: цвет заливки, показывает исход.",
         },
         {
-          name: "steps",
-          type: "boolean",
-          default: "false",
-          en: "Value mode: draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. For a level out of a few: password strength, onboarding steps.",
-          ru: "Режим значения: шкала из `max` равных ячеек (2–12), каждая заполняется целиком; `value` округляется до ячейки. Для уровня из нескольких: надёжность пароля, шаги настройки.",
-        },
-        {
           name: "segments",
           type: "ProgressSegment[]",
           en: "Segments mode: parts `{ value, label?, max?, href?, onClick?, tone? | color? }`; the width is a share of `max`. `rows` only: `href` makes the row a link, `onClick` runs on its press, `max` tops the row's own scale.",
@@ -75,8 +75,8 @@ export const api: ComponentApi = {
           name: "segmentGap",
           type: '"none" | "hairline"',
           default: '"none"',
-          en: "Segments mode: `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout.",
-          ru: "Режим сегментов: `none` — одна сплошная капсула; `hairline` — каждая часть и остаток отдельно. Раскладка `bar`.",
+          en: "Segments mode: `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout, `line` variant.",
+          ru: "Режим сегментов: `none` — одна сплошная капсула; `hairline` — каждая часть и остаток отдельно. Раскладка `bar`, вид `line`.",
         },
         {
           name: "legend",

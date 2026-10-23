@@ -12,3 +12,14 @@
   display: flex;
   margin-top: var(--prime-space-2);
 }
+
+/* indicator.tsx: selectable tiles in a fluid grid. */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, calc(var(--prime-layout-tile-min-width) * 1.5)), 1fr)
+    );
+  gap: var(--prime-space-4);
+  width: 100%;
+}

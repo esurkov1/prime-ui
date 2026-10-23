@@ -27,8 +27,10 @@ import { Accordion } from "prime-ui-kit";
 Accordion.Root                frame (grouped) or column of cards (separate)
 └─ Accordion.Item             one section; data-state open / closed
    ├─ Accordion.Header        heading around the trigger (<h3>, or the level of `as`)
-   │  └─ Accordion.Trigger    <button>: children, then the chevron (Icon nav.chevronDown)
-   │     └─ Accordion.Icon    optional leading icon
+   │  └─ Accordion.Trigger    <button>: a header row — mark, title, badges, description, then the chevron (Icon nav.chevronDown)
+   │     ├─ Accordion.Icon    optional leading mark
+   │     ├─ Accordion.Badges  badges after the title, on its line (a Badge.Group, «+N» on overflow)
+   │     └─ Accordion.Description  line under the title; a StatusDot first, then «·»
    └─ Accordion.Content       <section> region (the kit fold); clip <div> → padded body <div>
 ```
 
@@ -69,11 +71,11 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `className` and the other heading attributes. |
 
 ### Accordion.Trigger
-`ref` → `HTMLButtonElement`. The `<button>` that toggles the item; draws a chevron after its children that turns when open.
+`ref` → `HTMLButtonElement`. The `<button>` that toggles the item, a header row: `Accordion.Icon`, the title with `Accordion.Badges`, the `Accordion.Description` under it, the chevron at the end that turns when open. Nothing wraps.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — | Optional `Accordion.Icon`, then the label. |
+| `children` | `ReactNode` | — | Optional `Accordion.Icon`, `Accordion.Badges` and `Accordion.Description` (in any order); the rest is the title. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
 ### Accordion.Icon
@@ -83,6 +85,23 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="field.calendar" />`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
+
+### Accordion.Badges
+`ref` → `HTMLDivElement`. A `Badge.Group` after the title, on its line: every badge of the section, the meaning in its `tone` or `color`. The title gives way first; what does not fit folds into «+N».
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The `Badge.Root`s of the section (a status, a count). |
+| `labels` | `Partial<BadgeGroupLabels>` | — | Built-in strings of the «+N» badge, see the `Badge.Group` labels. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other `div` attributes. |
+
+### Accordion.Description
+`ref` → `HTMLSpanElement`. The line under the title: plain text with new data only, one line cut with an ellipsis; 12/16 · 13/20 · 14/20 by size. A `StatusDot` first states the section's state, and a «·» is put after it by itself.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The text, with an optional `StatusDot` first. |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Accordion.Content
 `ref` → `HTMLElement`. The `<section>` region; closed content is out of the tab order and the accessibility tree but found by find in page, which opens its item. `className` goes to the padded inner block.
@@ -156,7 +175,12 @@ Root: `data-size`, `data-layout`. The panel is the kit fold (`Disclosure`): its 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No `labels`.
+#### Accordion.Badges
+
+| Key | Default | Used for |
+|---|---|---|
+| `more` | `"+{count}"` | Visible text of the «+N» badge for the badges that did not fit; `{count}` — how many. |
+| `moreCount` | `"Ещё {count}"` | What assistive tech reads for that badge instead of its visible text; `{count}` — how many. The values themselves come in its tooltip. |
 
 ## Examples
 | Example | Shows |
@@ -165,7 +189,7 @@ No `labels`.
 | [variants.tsx](examples/variants.tsx) | One surface with hairlines between items, or every item as its own card — `layout`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: trigger height, text, icon and padding grow together — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled section that cannot be opened, next to regular ones — `disabled`. |
-| [with-icon.tsx](examples/with-icon.tsx) | A leading icon per section; the content lines up with the label after it — `Accordion.Icon`. |
+| [with-icon.tsx](examples/with-icon.tsx) | A header row per section: the mark, the title with its badge, the state and a note under it, the chevron at the end; the content lines up with the title — `Accordion.Icon`, `Accordion.Badges`, `Accordion.Description`. |
 | [multiple.tsx](examples/multiple.tsx) | Several sections stay open at once; the value is a list — `multiple`. |
 | [collapsible.tsx](examples/collapsible.tsx) | Checkout steps where one step always stays open — `collapsible`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the open sections and opens or closes all of them at once — `value`, `onValueChange`. |
@@ -179,5 +203,5 @@ No `labels`.
 - Accordion used for tab-like switching → use Tabs.
 
 ## Related
-- **Built from:** `Icon` (`nav.chevronDown`)
+- **Built from:** `Icon` (`nav.chevronDown`), [Badge](../badge/COMPONENT.md) (`Accordion.Badges`), [StatusDot](../status-dot/COMPONENT.md) (the state first in `Accordion.Description`)
 - **See also:** [Tabs](../tabs/COMPONENT.md), [Card](../card/COMPONENT.md), [Stepper](../stepper/COMPONENT.md), [Divider](../divider/COMPONENT.md)

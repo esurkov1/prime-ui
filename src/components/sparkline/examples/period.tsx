@@ -31,7 +31,6 @@ export default function SparklinePeriodExample() {
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Новые заказы</Kpi.Title>
-      <Kpi.Period>{orders.date}</Kpi.Period>
       <Kpi.Actions>
         <SegmentedControl.Root
           value={period}
@@ -44,6 +43,7 @@ export default function SparklinePeriodExample() {
         </SegmentedControl.Root>
       </Kpi.Actions>
       <Kpi.Value>{orders.valueText}</Kpi.Value>
+      <Kpi.Period>{orders.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline {...orders.plot} label="Новые заказы по периодам" />
       </Kpi.Media>

@@ -10,7 +10,7 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
 | type a value (text, number, code, file, photos), group the fields of a form, edit a list of records of one shape | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint, Fieldset, FieldList |
 | pick from options, toggle, set a range, filter, a date or a color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorField, ColorPicker, ColorSwatches |
-| see data: status labels, people, objects and their photos, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Carousel, Kbd, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, RichText, Accordion, Sparkline, ChartFrame |
+| see data: status labels, people, objects and their photos, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Carousel, Kbd, StatusDot, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, RichText, Accordion, Sparkline, ChartFrame |
 | hold a conversation: pick a dialog, read and send chat messages of every kind | Messages — Chat, ChatList, Message, Gallery, VoicePlayer, VideoNote, Composer |
 | learn what happened, how far along it is, or watch a region load and change state; say it to a screen reader | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage, VisuallyHidden |
 | move between places: app sections, panels of a screen, the records of a list, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, List, Stepper, Sidebar, BottomNav |
@@ -63,9 +63,9 @@ under them → its `renderTotals`.
 **Data.** Status, count, removable value or applied filter → Badge (`tone` for a judgement, `color` for a
 stage or a category — [tone or color](foundations.md#tone-or-color), `onRemove` to remove, `pressed` / `onPressedChange` to toggle); several badges as one value
 (a client's tags) → `Badge.Group`, on one line with «+N» in a table cell. Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
-`ratio` — never a round Avatar for things. Keyboard shortcut → Kbd. A titled block of related
-content → Card (its zones lay it out; a whole tile that opens its details → `Card.Root asChild`
-with a link). One figure and what it means (a KPI) → Kpi, which is the card itself
+`ratio` — never a round Avatar for things. A state inside a line of text («● Работает · каждые 15 минут») → StatusDot, a chip → Badge. Keyboard shortcut → Kbd. A titled block of related
+content → Card (its zones lay it out; a tile that opens its details → `Card.Link` in `Card.Title`,
+a tile a person chooses → `Card.Root asChild selected` with `Card.Indicator`). One figure and what it means (a KPI) → Kpi, which is the card itself
 ([Kpi / Card](#3-pairs-that-are-easy-to-confuse)). Read-only properties of one record («label — value») → DescriptionList, never a
 hand-made grid of text pairs. Rows with columns, sorting, selection → DataTable (a header that
 needs explaining → the column's `description`). A KPI tile waiting for its figure →
@@ -95,7 +95,7 @@ first and the last of a run. A one-to-one chat with several writers and no avata
 authors`: `outgoing` when your side has several (an operator, the account owner, an AI agent),
 `incoming` when the client's has, `all` for both — the author heads each run of that side. A chat
 inside a drawer tab or a `Card.Body` → `Chat.Root variant="inline"`. A record's state under the preview in a dialog
-row (a deal stage, «ждёт человека») → `ChatList.ItemStatus` with a `Badge.Root` per fact. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
+row (a deal stage, «ждёт человека») → `ChatList.ItemBadges` with a `Badge.Root` per fact. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
 outside a chat → `VoicePlayer` alone. A round video message → `VideoNote` inside `Message.Root`
 (alone there it is the message: no bubble); a face-to-camera report outside a chat → `VideoNote`
 alone. The two players take the same props (`src`, `duration`, `unplayed`, `disabled`, `playing`,
@@ -108,8 +108,9 @@ comment, a report) → `Gallery`; one picture of an object → `Thumbnail`. A vi
 without a search button → `Chat.Search persistent` (one control of yours, a channel `Select`, before
 the field; the «2/5» count sits inside the field and a query counts from `minSearchLength`, 2 by
 default). A chat about a record (a client, a deal) heads itself in two lines: the avatar, then
-`Chat.Title number` over `Chat.Badges` (the stage and assignee pickers first, then statuses), the
-`Chat.Actions` centred at the end — no `Chat.Description` under the badges. An event of the record in
+`Chat.Title number` with `Chat.Badges` (the statuses) on its line over a `Chat.Description` (a
+`StatusDot` first, then the owner); the stage and the assignee are `Select`s in `Chat.Actions` at
+the end. An event of the record in
 the feed (an agent took the client, a stage moved) → `Chat.Service` with `Chat.ServiceIcon` and
 `Chat.ServiceChange`, never a message from a fake author. A bot's inline keys under a message →
 `Message.Actions` (a link key gets the kit's corner mark — ↗ out of the product, a window into it —
@@ -130,7 +131,8 @@ row's time; an action above the list («Новый чат») is `persistent`. Ti
 ProgressBar `segments` (categories wear `color`, meanings wear `tone`; `legend` for color · name ·
 value · share); a ranking «label · value · share — bar» (top cities, a funnel) → ProgressBar
 `layout="rows"` with `scale` (`own` when each row has its own whole: a load per model, a quota per seat); compact goal / KPI ring or a ring breakdown → ProgressCircle (`value` or
-`segments`). Loading with unknown progress → `loading` on the component that has it (Button, Select,
+`segments`). Either draws its scale as `variant` `steps` (a level out of a few) or `ticks` (a
+score or a breakdown that heads a card) — never a row of hand-drawn cells. Loading with unknown progress → `loading` on the component that has it (Button, Select,
 DataTable, ProgressBar, ProgressCircle, Sparkline, ChartFrame `state`); a region whose content has a shape (list, card,
 form) → Skeleton of that shape; nothing to hold (a running job, a status line) → Spinner. Nothing to
 show → EmptyPage; a region that failed to load → EmptyPage `tone="danger"` with
@@ -313,11 +315,28 @@ will create. One kind only → the button opens its form directly, no menu.
 </Dropdown.Root>
 ```
 
+### A figure: Kpi and its size
+
+The size of a `Kpi.Root` follows how many figures share its row, and the whole row takes that one
+size — never a larger card for the figure you like best:
+
+| Row | Size | The card holds |
+|---|---|---|
+| a strip of 6–8 figures over a table, a side panel | `s` | the title and the period on one line, the value with its change |
+| the default row of 4–5 | `m` (omit `size`) | + one badge or menu, the period and a note under the value, a chart or a progress, a legend |
+| a row of 3, a figure that needs explaining | `l` | + the icon, the description, a button, a note or two totals |
+| the lead figure of a screen, one or two to a row | `xl` | + four totals, a breakdown, the ring beside its legend |
+
+A part the size does not hold renders nothing — a `Kpi.Description` or a `Kpi.Icon` on M is
+dropped — so pick the size from the row first, then the parts
+([Kpi → Variants](../src/components/kpi/COMPONENT.md#variants)). Inside a dialog the card takes
+the dialog's tier by itself.
+
 ## 3. Pairs that are easy to confuse
 
 | Pair | Rule |
 |---|---|
-| List / ChatList / Sidebar / Tabs / Card list / DataTable | List: the records of a list + detail screen that are not conversations (tickets, letters, invoices), one open at a time (`current`), each row a button or a link with a text line, a preview, meta and a count. ChatList: the conversations of a messenger or an inbox. Sidebar: the sections of the **app**. Tabs: panels of **one screen**. `Card.List`: static facts in a card, nothing opens. DataTable: many records compared by columns, sorted, filtered, selected in bulk. |
+| List / ChatList / Sidebar / Tabs / DataTable | List: the records of a list + detail screen that are not conversations (tickets, letters, invoices), one open at a time (`current`), each row a button or a link with a text line, a preview, meta and a count. ChatList: the conversations of a messenger or an inbox. Sidebar: the sections of the **app**. Tabs: panels of **one screen**. Static facts in a card, nothing opens → `DescriptionList align="end"` in `Card.Body`; a list of records inside a card is this `List` (a `Card.Root` holding only it is a pane). DataTable: many records compared by columns, sorted, filtered, selected in bulk. |
 | FieldList / DataTable / Fieldset / TagSelect | FieldList: records of one shape a person **edits** in a form, a row of fields each, added and removed by hand, up to four short fields per row. DataTable: records a person **reads**, sorts, filters and selects; edits open a Drawer. Fieldset: **one** record's fields under a heading. TagSelect: values **picked** from options, shown as tags. One value in several units is none of them — fields in one row under one heading. |
 | Tabs / SegmentedControl | Tabs switch **panels of content** (navigation inside a screen). SegmentedControl switches a **mode** of the same content (period, view mode, filter) — never a stored setting, which is a `Select` field. |
 | Modal / Drawer / Sheet / Popover / Tooltip | Modal: blocking decision or a short form (≤ 4 fields) that needs full attention. Drawer: long form, filters, record details beside the page, while keeping page context. Sheet: a short task that ends by itself — a pick, an action, a short note — raised from the bottom edge. Popover: small non-modal panel anchored to a control (quick edit, explanation with a link). Tooltip: a few words naming or explaining a control, no interactive content; a hint on hover that holds a link or a button (a person or record card by a name) → Popover `openOn="hover"`. |
@@ -333,7 +352,7 @@ will create. One kind only → the button opens its form directly, no menu.
 | Sparkline / ChartFrame | Sparkline: a small line or bars you can scrub for one main series, its reading (value, change, date) from `useSparkline` laid out by a Kpi (`variant="bars"` for signed values), comparison lines beside it (`series`). ChartFrame: a panel around a real chart (axes, several series, legend, tooltip, states) drawn by a library or your SVG. Rows to compare → DataTable. |
 | VoicePlayer / VideoNote | The same player props (`src`, `duration`, `playing`, transcript, `transfer`). VoicePlayer: audio, a waveform seek slider and a playback rate. VideoNote: a round face-to-camera video with a `poster`; alone in `Message.Root` it is the message. A video with controls → `Thumbnail.Video` / `Message.Media`. |
 | Card / plain section / Grid | Card for a bounded block of related content that stands out (settings panel, side facts). A page section that is the only thing in its region needs no card: `Page.Section label` and the content. Several tiles of one screen → one `Page.Grid` with a `Page.Cell span` each; a grid inside one block (thumbnails, fields) is the block's own CSS. Never wrap a single field, a DataTable or a whole page in a Card. |
-| Kpi / Card | **Kpi**: a card about one figure — a metric with its change, its period, optionally a chart, a progress or a breakdown (`Kpi.Media`) and actions; `Kpi.Root` is the card, never wrapped in a `Card.Root`. **Card**: a block whose subject is not one figure — a form, a record with its facts and actions, a list, a cover tile; a chart with axes and a legend is a ChartFrame, a panel of its own. A figure inside a record card is a `DescriptionList` or `Card.Total`, never a nested Kpi. Several KPIs in a row: a `Kpi.Root` each in `Page.Grid`; related figures of one block: one `Kpi.Group`, never a card per figure. |
+| Kpi / Card / List / DescriptionList / ChartFrame / Kanban card | **Kpi**: a card about one figure — its value, change and period, optionally a chart or a progress (`Kpi.Media`), its parts and totals (`Kpi.Footer`) and one action; `Kpi.Root` is the card, never wrapped in a `Card.Root`. **Card**: a block whose subject is not one figure — a form, a record with its facts and actions, a list, a cover tile, a tile a person selects. **DescriptionList**: a record's facts as label–value pairs, a phrase or a link among them («Ближайшая задача», «t.me/…») — never Kpi cards of text. **ChartFrame**: a chart with axes, a legend and series, a panel of its own. A figure inside a record card is a `DescriptionList` or `Card.Total`, never a nested Kpi. **List**: the records of a card when they open as a whole. **Kanban card**: Kanban's own item, never a `Card` — a card does not drag; reordering is a screen mode on `Dnd`. Several KPIs: a `Kpi.Root` each in `Page.Grid`, one size per row ([a figure: Kpi and its size](#a-figure-kpi-and-its-size)). |
 | EmptyPage / empty DataTable | Empty table (no rows yet or nothing matches the filter): the DataTable `empty` prop — headers and toolbar stay. Whole page or region with no data at all (first run): EmptyPage with one action. |
 | Accordion / Tabs | Accordion when the user may need several sections open or reads them in order (FAQ, settings groups). Tabs when sections are alternatives viewed one at a time. |
 | Divider / gap | Divider inside a block between rows or a form and its footer. Between blocks and groups use air (`gap`), not lines. |

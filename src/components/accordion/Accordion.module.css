@@ -115,7 +115,6 @@
   line-height: var(--acc-line-height);
   font-weight: var(--prime-font-weight-medium);
   text-align: start;
-  overflow-wrap: anywhere;
   cursor: pointer;
   transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
@@ -140,6 +139,16 @@
 .trigger:disabled {
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
+}
+
+/* The title keeps the trigger's medium text (`--acc-*`); the header row sets the line. */
+.title {
+  color: inherit;
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.description {
+  font-weight: var(--prime-font-weight-regular);
 }
 
 /* A glyph slot (`iconSlotClass`): a kit Icon or a raw svg takes the tier icon size. */

@@ -4,12 +4,16 @@
  * Value mode: one pill with a rounded leading end over a `fill-strong` track.
  * Segments mode: parts of a whole in one pill (or separate pills with `hairline`), the free
  * capacity up to `max` stays track.
+ * `steps` / `ticks`: whole cells filled by one front (`.cells`); ticks stand as tall as the tier's
+ * ticks height (16 · 20 · 24 · 32 · 40), a tick ⅔ of the track wide, ½ of it apart.
  */
 
 .root {
   --pb-gap: calc(var(--field-track) * 3 / 4);
   --pb-fill: var(--prime-color-accent-default);
   --pb-rest: var(--prime-color-fill-strong);
+  --pb-dir: 1;
+  --pb-ticks-height: var(--prime-space-6);
 
   position: relative;
   display: flex;
@@ -20,29 +24,49 @@
   font-family: var(--prime-font-family-sans);
 }
 
-/* Tone of the whole bar (value mode) or of one part (segments: a segment or a row's fill). */
-:is(.root, .segment, .fill)[data-tone="neutral"] {
+.root:dir(rtl) {
+  --pb-dir: -1;
+}
+
+.root[data-size="xs"] {
+  --pb-ticks-height: var(--prime-space-4);
+}
+
+.root[data-size="s"] {
+  --pb-ticks-height: var(--prime-space-5);
+}
+
+.root[data-size="l"] {
+  --pb-ticks-height: var(--prime-space-8);
+}
+
+.root[data-size="xl"] {
+  --pb-ticks-height: var(--prime-space-10);
+}
+
+/* Tone of the whole bar (value mode) or of one part (segments: a segment, a row's fill, a cell). */
+:is(.root, .segment, .fill, .cell)[data-tone="neutral"] {
   --pb-fill: var(--prime-color-text-secondary);
 }
 
-:is(.root, .segment, .fill)[data-tone="success"] {
+:is(.root, .segment, .fill, .cell)[data-tone="success"] {
   --pb-fill: var(--prime-color-success-default);
 }
 
-:is(.root, .segment, .fill)[data-tone="warning"] {
+:is(.root, .segment, .fill, .cell)[data-tone="warning"] {
   --pb-fill: var(--prime-color-warning-default);
 }
 
-:is(.root, .segment, .fill)[data-tone="danger"] {
+:is(.root, .segment, .fill, .cell)[data-tone="danger"] {
   --pb-fill: var(--prime-color-danger-default);
 }
 
-:is(.root, .segment, .fill)[data-tone="info"] {
+:is(.root, .segment, .fill, .cell)[data-tone="info"] {
   --pb-fill: var(--prime-color-info-default);
 }
 
 /* A category color: the hue's step of the chart palette (`palette.hue` on the same element). */
-:is(.segment, .fill)[data-color] {
+:is(.segment, .fill, .cell)[data-color] {
   --pb-fill: var(--hue-chart);
 }
 
@@ -198,18 +222,12 @@
 
 /* ---- bar: the track is the pill clip itself ---- */
 .bar {
-  --pb-dir: 1;
-
   position: relative;
   display: flex;
   height: var(--field-track);
   overflow: hidden;
   border-radius: var(--prime-radius-full);
   background: var(--pb-rest);
-}
-
-.bar:dir(rtl) {
-  --pb-dir: -1;
 }
 
 /* Value mode: one full-width pill slides in from the start, its leading end stays a round cap. */
@@ -275,43 +293,73 @@
 }
 
 /*
- * Steps (value mode, `steps`): `max` equal cells with the hairline gap. A cell fills whole — its
- * fill grows from the start edge (`base` · `emphasized`); in one change the cells go one after
- * another, half a stagger step apart (from the start when filling, from the end when emptying).
- * The tone recolors every filled cell at once.
+ * Cells (`steps`, `ticks`): one field, not N cells. The cells are drawn twice — the rest row, and
+ * the fill row inside `.reveal`. `.reveal` slides like the line's fill and its row slides back by
+ * as much, so the cells stand still and only one front moves (`slow` · standard, as the line);
+ * a change caught mid-way goes on from where the front is. At rest the front stands in the middle
+ * of the gap after the last filled cell (`--pb-filled` of `--pb-cells`), so a cell is always
+ * whole. A recolored cell (segments) fades.
  */
-.bar[data-steps="true"] {
-  gap: var(--pb-gap);
-  overflow: visible;
-  border-radius: 0;
-  background: transparent;
+.cells {
+  --pb-cell-gap: var(--pb-gap);
+
+  position: relative;
+  display: flex;
+  height: var(--field-track);
+  min-width: 0;
 }
 
-.step {
+.root[data-variant="ticks"] .cells {
+  --pb-cell-gap: calc(var(--field-track) / 2);
+
+  height: var(--pb-ticks-height);
+}
+
+.cellRow {
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--pb-cell-gap);
+  min-width: 0;
+  height: 100%;
+}
+
+.cell {
   flex: 1 1 0;
   min-width: 0;
-  overflow: hidden;
   border-radius: var(--prime-radius-full);
   background: var(--pb-rest);
 }
 
-.step::after {
-  content: "";
-  display: block;
-  height: 100%;
+.reveal {
+  --pb-edge: clamp(
+    0%,
+    calc(var(--pb-filled) / var(--pb-cells) * (100% + var(--pb-cell-gap)) - var(--pb-cell-gap) / 2),
+    100%
+  );
+
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  translate: calc(var(--pb-dir) * (var(--pb-edge) - 100%)) 0;
+  transition: translate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
+}
+
+.reveal > .cellRow {
+  translate: calc(var(--pb-dir) * (100% - var(--pb-edge))) 0;
+  transition: translate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
+}
+
+.reveal .cell {
   background: var(--pb-fill);
-  scale: 0 1;
-  transform-origin: left center;
-  transition:
-    scale var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
-  transition-delay: calc(var(--pb-step-order) * var(--prime-motion-stagger) / 2);
+  transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
-.bar:dir(rtl) .step::after {
-  transform-origin: right center;
-}
-
-.step[data-filled]::after {
-  scale: 1;
+/* Loading: Skeleton cells in the scale's geometry. */
+.cellSkeleton {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  border-radius: var(--prime-radius-full);
 }

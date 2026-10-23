@@ -19,7 +19,10 @@ const REVENUE: SparklinePoint[] = Array.from({ length: 365 }, (_, i) => ({
 
 const STEPS = { day: "По дням", week: "По неделям", month: "По месяцам", quarter: "По кварталам" };
 
-const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
+const THOUSANDS = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+/** An M card writes a sum short: thousands, the unit stands in `Kpi.Unit`. */
+const formatThousands = (value: number) => THOUSANDS.format(value / 1000);
 
 export default function SparklineGrainExample() {
   const revenue = useSparkline({
@@ -27,7 +30,7 @@ export default function SparklineGrainExample() {
     defaultGrain: "month",
     aggregate: "sum",
     change: "previous",
-    formatValue: formatRubles,
+    formatValue: formatThousands,
   });
   // A year by days is 365 points: the switcher offers the steps a tile can show.
   const steps = revenue.grains.filter((step) => step !== "day");
@@ -35,16 +38,10 @@ export default function SparklineGrainExample() {
   return (
     <Kpi.Root className={styles.card}>
       <Kpi.Title>Выручка</Kpi.Title>
-      <Kpi.Period>{revenue.date}</Kpi.Period>
       <Kpi.Actions>
         <Dropdown.Root>
           <Dropdown.Trigger>
-            <Button.Root
-              variant="ghost"
-              tone="neutral"
-              size="xs"
-              aria-label={`Шаг: ${STEPS[revenue.grain]}`}
-            >
+            <Button.Root variant="soft" tone="neutral" aria-label={`Шаг: ${STEPS[revenue.grain]}`}>
               {STEPS[revenue.grain]}
               <Button.Icon>
                 <Icon name="nav.chevronDown" />
@@ -64,8 +61,12 @@ export default function SparklineGrainExample() {
           </Dropdown.Content>
         </Dropdown.Root>
       </Kpi.Actions>
-      <Kpi.Value>{revenue.valueText}</Kpi.Value>
+      <Kpi.Value>
+        {revenue.valueText}
+        <Kpi.Unit>тыс. ₽</Kpi.Unit>
+      </Kpi.Value>
       <Kpi.Delta reading={revenue} />
+      <Kpi.Period>{revenue.date}</Kpi.Period>
       <Kpi.Media>
         <Sparkline {...revenue.plot} label="Выручка по периодам" variant="bars" />
       </Kpi.Media>

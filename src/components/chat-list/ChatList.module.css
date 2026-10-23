@@ -1,6 +1,6 @@
 /*
  * ChatList — the conversation list of a messenger, built from List: a column that fills its host
- * (the search field on top, the rows scrolling below). No surface of its own: put it in a Card or
+ * (the search field on top, the rows scrolling below). No surface of its own: put it in a pane Card (no zones) or
  * a page pane. Rows are `List.Item`s — their fill, current state, focus ring and touch height are
  * List's; this file lays out what a dialog adds: the name with its glyphs, the time with the
  * delivery ticks, the preview that cross-fades to «печатает…» or a draft, the counts.
@@ -27,12 +27,10 @@
 /*
  * One pane inset (12px) for the search, the actions and the rows' highlight: they stand on one
  * vertical, with the same air above the first control. The search and the actions are one block
- * (an 8px gap) over a faint hairline (`hairline.bottom`, inset to the same vertical) that stays
- * while the list scrolls under it.
+ * (an 8px gap) with no line under it: the list's scroller fades its top edge while rows are
+ * scrolled under the block.
  */
 .head {
-  --hairline-inset: var(--pane-inset);
-
   display: flex;
   flex: none;
   flex-direction: column;
@@ -155,33 +153,12 @@
 }
 
 /*
- * The record's status line (a deal stage, an AI state) under the preview: the badges of one line
- * (`Badge.Group overflow="count"`), at a fixed height — the cell of the counts reads it to stay
- * beside the preview.
- */
-.root {
-  --record-h: var(--prime-badge-xs-height);
-}
-
-.root[data-size="l"],
-.root[data-size="xl"] {
-  --record-h: var(--prime-badge-s-height);
-}
-
-.record {
-  display: block;
-  box-sizing: border-box;
-  block-size: calc(var(--record-h) + var(--prime-space-1));
-  padding-block-start: var(--prime-space-1);
-  overflow: hidden;
-}
-
-/*
  * Second line: the preview, the draft and «печатает…» stand in one cell and cross-fade, each
  * truncated on its own. An unread dialog's preview is a step brighter.
  */
-.preview {
+.layers {
   display: grid;
+  min-width: 0;
 }
 
 .layer {
@@ -198,9 +175,9 @@
   color: var(--prime-color-accent-text);
 }
 
-.preview[data-shown="preview"] > [data-layer="preview"],
-.preview[data-shown="draft"] > [data-layer="draft"],
-.preview[data-shown="typing"] > [data-layer="typing"] {
+.preview[data-shown="preview"] [data-layer="preview"],
+.preview[data-shown="draft"] [data-layer="draft"],
+.preview[data-shown="typing"] [data-layer="typing"] {
   opacity: 1;
 }
 
@@ -225,11 +202,6 @@
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-1);
-}
-
-/* The trail stretches over every line: with a status line the counts rise to the preview's. */
-.item[data-record="true"] .badges {
-  margin-block-end: calc(var(--record-h) + var(--prime-space-1));
 }
 
 .pop {
@@ -274,8 +246,7 @@
   }
 
   /* Alone at the end of the row, the counts stand on its middle. */
-  .badges,
-  .item[data-record="true"] .badges {
+  .badges {
     margin-block: auto;
   }
 }

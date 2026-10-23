@@ -1,56 +1,44 @@
-/** A row of KPI cards: the title over what the figure counts and its period, the value, and the change with what it compares under it — `Kpi.Title`, `Kpi.Period`, `Kpi.Value`, `Kpi.Delta`, `Kpi.Meta`. */
-import { Kpi } from "prime-ui-kit";
+/** Two standard cards of a row: the title, the value with its unit and change, the period and a note under it, a chart at the bottom — `Kpi.Title`, `Kpi.Value`, `Kpi.Unit`, `Kpi.Delta`, `Kpi.Period`, `Kpi.Meta`, `Kpi.Media`. */
+import { Kpi, Sparkline, type SparklinePoint } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const KPIS = [
-  {
-    title: "Выручка",
-    description: "Оплаченные счета",
-    period: "1–31 окт",
-    value: "4,2 млн ₽",
-    change: 18,
-    delta: "+18%",
-    tone: "success",
-    meta: "к сентябрю · 3,56 млн ₽",
-  },
-  {
-    title: "Новые клиенты",
-    description: "Первый оплаченный счёт",
-    period: "Октябрь",
-    value: "38",
-    change: 6,
-    delta: "+6",
-    tone: "success",
-    meta: "к сентябрю · из них 12 по рекомендации",
-  },
-  {
-    title: "Просрочено",
-    description: "9 счетов",
-    period: "на 22 окт, 09:40",
-    value: "1,2 млн ₽",
-    change: 180,
-    delta: "+180 тыс. ₽",
-    tone: "danger",
-    meta: "за неделю",
-  },
-] as const;
+/** Daily revenue of 1–22 October, thousands of rubles: weekends are quieter. */
+const REVENUE: SparklinePoint[] = Array.from({ length: 22 }, (_, i) => {
+  const date = new Date(2026, 9, 1 + i);
+  const weekend = date.getDay() === 0 || date.getDay() === 6;
+  const value = 440 + 60 * Math.sin(i / 3.4) + i * 2.4;
+  return { date, value: Math.round(weekend ? value * 0.45 : value) };
+});
 
 export default function KpiOverviewExample() {
   return (
-    <div className={styles.grid}>
-      {KPIS.map((kpi) => (
-        <Kpi.Root key={kpi.title}>
-          <Kpi.Title>{kpi.title}</Kpi.Title>
-          <Kpi.Description>{kpi.description}</Kpi.Description>
-          <Kpi.Period>{kpi.period}</Kpi.Period>
-          <Kpi.Value>{kpi.value}</Kpi.Value>
-          <Kpi.Delta value={kpi.change} tone={kpi.tone}>
-            {kpi.delta}
-          </Kpi.Delta>
-          <Kpi.Meta>{kpi.meta}</Kpi.Meta>
-        </Kpi.Root>
-      ))}
+    <div className={styles.row}>
+      <Kpi.Root>
+        <Kpi.Title>Выручка</Kpi.Title>
+        <Kpi.Value>
+          8,7<Kpi.Unit>млн ₽</Kpi.Unit>
+        </Kpi.Value>
+        <Kpi.Delta value={9.6} tone="success">
+          +9,6 %
+        </Kpi.Delta>
+        <Kpi.Period>1–22 окт</Kpi.Period>
+        <Kpi.Meta>план 9,5 млн ₽</Kpi.Meta>
+        <Kpi.Media>
+          <Sparkline data={REVENUE} label="Выручка по дням" />
+        </Kpi.Media>
+      </Kpi.Root>
+      <Kpi.Root>
+        <Kpi.Title>Отток</Kpi.Title>
+        <Kpi.Value>
+          3,1<Kpi.Unit>%</Kpi.Unit>
+        </Kpi.Value>
+        <Kpi.Delta value={0.6} tone="danger">
+          +0,6 п. п.
+        </Kpi.Delta>
+        <Kpi.Period>Октябрь</Kpi.Period>
+        <Kpi.Meta>порог 4 %</Kpi.Meta>
+      </Kpi.Root>
     </div>
   );
 }

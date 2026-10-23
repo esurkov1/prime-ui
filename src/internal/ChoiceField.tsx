@@ -75,6 +75,8 @@ type ChoiceFieldProps = {
   error?: React.ReactNode;
   /** The native input (with `choiceInputClass`) followed by its aria-hidden visual. */
   control: React.ReactNode;
+  /** The row spans its container, the control at its end (a settings row). */
+  controlAtEnd?: boolean;
   className?: string;
   children?: React.ReactNode;
 };
@@ -94,6 +96,7 @@ export function ChoiceField({
   hintTone,
   error,
   control,
+  controlAtEnd = false,
   className,
   children,
 }: ChoiceFieldProps) {
@@ -113,6 +116,7 @@ export function ChoiceField({
           invalid: ids.invalid || undefined,
           disabled: disabled || undefined,
           readonly: readOnly || undefined,
+          control: controlAtEnd ? "end" : undefined,
         })}
       >
         <label

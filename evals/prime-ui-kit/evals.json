@@ -207,7 +207,7 @@
     {
       "id": 17,
       "prompt": "Сделай карточку сотрудника в дровере с вкладками «Профиль», «Доступ», «Уведомления», «Безопасность», «История». Она открывается из таблицы «Команда», а свой аккаунт человек открывает из меню профиля в сайдбаре — там он может менять не всё. В «Безопасности» — сеансы на других устройствах. У приглашённого, но не вошедшего сотрудника можно только удалить приглашение.",
-      "expected_output": "One user drawer component opened from both places by id; permissions make fields readOnly and hide tabs and actions; the header is the record header — Drawer.Title with the name, Drawer.Description with one line of text, Drawer.Badges with the status and role badges (no badge in the description), Drawer.Actions only with actions on the record — one action as an icon Button with a Tooltip, a ⋯ menu only from two; one form over all tabs with one «Сохранить» in Drawer.Footer shown while dirty and Drawer.Guard; the drawer loads all tab data, tabs keep their content (keepMounted where drafts live); «История» its own tab; «Сеансы» a List of sessions with an end per row.",
+      "expected_output": "One user drawer component opened from both places by id; permissions make fields readOnly and hide tabs and actions; the header is the record header — Drawer.Title with the name, Drawer.Badges on the title's line with the status and role badges, Drawer.Description with one line of text (no badge in the description), Drawer.Actions only with actions on the record — one action as an icon Button with a Tooltip, a ⋯ menu only from two; one form over all tabs with one «Сохранить» in Drawer.Footer shown while dirty and Drawer.Guard; the drawer loads all tab data, tabs keep their content (keepMounted where drafts live); «История» its own tab; «Сеансы» a List of sessions with an end per row.",
       "files": [],
       "expectations": [
         "There is one drawer component for the user, used for the own account and for a team member; no second «Мой аккаунт» drawer",
@@ -216,7 +216,7 @@
         "Data for the tabs is loaded at the drawer level (not fetched inside each tab on mount); the body loads as a Skeleton in the form's geometry under a header and tabs that appear at once",
         "«История» stays a tab of its own even when the tabs do not fit; the strip scrolls",
         "«Сеансы» shows the sessions as a List with an action per session, not only a «Выйти на других устройствах» button",
-        "The header's status badges stand in Drawer.Badges after Drawer.Description, which holds only one line of text"
+        "The header's status badges stand in Drawer.Badges on the title's line, and Drawer.Description holds only one line of text"
       ]
     },
     {
@@ -373,26 +373,26 @@
     {
       "id": 30,
       "prompt": "Сделай карточку лида в CRM проката: открывается справа из списка заявок. В шапке — имя клиента и номер заявки, статус (можно сменить), ответственный менеджер (можно назначить или сменить), канал (Telegram, WhatsApp), метка «Ждёт человека» и VIP, откуда заявка и когда пришла. Справа в шапке — кнопка «Диалог» и меню действий.",
-      "expected_output": "A Drawer with the one record header in three lines: `Drawer.Title number=\"#…\"` with the client's name; `Drawer.Description` with one line of text (the source and the time) under it; then `Drawer.Badges` with the status picker (a `Badge.Root` inside a `Dropdown.Trigger`) first, then the assignee picker (a `Badge.Root` with `Badge.Avatar` and the manager's name, or `<Badge.Root variant=\"outline\">Назначить</Badge.Root>` when nobody is assigned), then the channel, «Ждёт человека» and VIP badges. `Drawer.Actions` hold a ghost icon Button «Диалог» in a Tooltip and a ⋯ Dropdown, nothing else.",
+      "expected_output": "A Drawer with the one record header in two lines: `Drawer.Title number=\"#…\"` with the client's name and `Drawer.Badges` on the same line (the channel, «Ждёт человека» and VIP, plain badges); `Drawer.Description` with one line of text (the source and the time) under it. `Drawer.Actions` at the end hold the status `Select` first, then the assignee `Select` (its items with an `Avatar.Root`; «Назначить» as the empty value), a ghost icon Button «Диалог» in a Tooltip and a ⋯ Dropdown.",
       "files": [],
       "expectations": [
         "The lead number is the `number` prop of `Drawer.Title` (or `Modal.Title`), not part of the title text and not in `Drawer.Description`",
-        "Every status, channel and label badge of the lead is inside `Drawer.Badges`; none is inside `Drawer.Description` or `Drawer.Actions`",
-        "The status and the assignee are each a `Badge.Root` inside a `Dropdown.Trigger`, the status first; there is no separate «Сменить статус» / «Назначить» button",
-        "The assigned manager is a `Badge.Root` with `Badge.Avatar` around an `Avatar.Root` without `size`; the unassigned state is `Badge.Root variant=\"outline\"` with «Назначить»",
+        "Every channel and label badge of the lead is inside `Drawer.Badges`, on the title's line; none is inside `Drawer.Description` or under the title",
+        "The status and the assignee are each a value `Select` in `Drawer.Actions` (no `size`), the status first; neither is a `Badge.Root` inside a `Dropdown.Trigger`, and there is no separate «Сменить статус» / «Назначить» button",
+        "The assigned manager is a `Select.Item` with an `Avatar.Root` without `size`; nobody assigned is the empty value «Назначить»",
         "`Drawer.Description` holds only text (no Badge, no number); no Badge has its own `size` in the header",
-        "The header lines are written in the order `Drawer.Title`, `Drawer.Description`, `Drawer.Badges`: the line of data sits under the name and the badges stand last, over the body",
-        "`Drawer.Actions` holds only buttons: the «Диалог» icon Button with a Tooltip and a ⋯ Dropdown"
+        "The header is the record header of the kit: no Divider or border under it",
+        "`Drawer.Actions` holds the two `Select`s, the «Диалог» icon Button with a Tooltip and a ⋯ Dropdown"
       ]
     },
     {
       "id": 31,
       "prompt": "В карточке лида (дровер) добавь вкладку «Диалог»: переписка с клиентом из Telegram. Клиенту отвечают оператор, владелец аккаунта и AI-агент — видно, кто написал. В шапке чата — имя клиента с номером заявки, этап (можно сменить) и ответственный. Поиск по переписке всегда открыт, рядом выбор канала. В ленте видны события: «Анна взяла клиента», «Этап: Новая → В работе».",
-      "expected_output": "`Chat.Root variant=\"inline\"` inside the tab; the header is two lines — the avatar, then `Chat.Title number` over `Chat.Badges` with the stage and assignee pickers (`Badge.Root` in `Dropdown.Trigger`), `Chat.Actions` at the end, no `Chat.Description`; `Chat.Search persistent` with the channel `Select` as its one control before the field; `Chat.Messages authors=\"outgoing\"` (not `group`); the events are `Chat.Service` rows with `Chat.ServiceIcon` and `Chat.ServiceChange`.",
+      "expected_output": "`Chat.Root variant=\"inline\"` inside the tab; the header is the avatar, then `Chat.Title number` with `Chat.Badges` on its line (the statuses) over a one-line `Chat.Description`, and the stage and assignee `Select`s in `Chat.Actions` at the end; `Chat.Search persistent` with the channel `Select` as its one control before the field; `Chat.Messages authors=\"outgoing\"` (not `group`); the events are `Chat.Service` rows with `Chat.ServiceIcon` and `Chat.ServiceChange`.",
       "files": [],
       "expectations": [
         "The chat inside the drawer tab is Chat.Root with variant=\"inline\"",
-        "The lead number is the `number` prop of Chat.Title; the stage and the assignee are Badge.Root pickers inside Chat.Badges, with no Chat.Description under them",
+        "The lead number is the `number` prop of Chat.Title; the stage and the assignee are Select pickers in Chat.Actions, not Badge.Root chips in Chat.Badges or a Dropdown.Trigger",
         "The search is Chat.Search with `persistent` (no Chat.SearchButton); the channel Select is its child before the field and is its only control",
         "Several writers on the business side are shown with Chat.Messages authors=\"outgoing\", not `group` and not names typed into message text",
         "The events are Chat.Service rows (via isService) with Chat.ServiceIcon and, for the stage, Chat.ServiceChange — not messages from a fake author and not Notifications"
@@ -454,13 +454,13 @@
     {
       "id": 36,
       "prompt": "В дровере сделки сверху сделай три плитки: «К оплате» (21 000 ₽, это долг), «Депозиты у нас» (5 000 ₽), «Ближайшая задача» (Выдать PCX 160 завтра). Ниже — карточка транспорта сделки с позициями аренды и доставки и итогом.",
-      "expected_output": "Three Kpi.Root valueSize=\"s\" tiles (no larger valueSize on a row of facts, no Card.Root around them), the debt with tone warning, the phrase in the same style as the numbers; no Typography inside Kpi.Value. The vehicle card has a Card.Header, line items in a DescriptionList align end inside Card.Body divider full, and a Card.Footer divider fill with the action, the task and Card.Total.",
+      "expected_output": "The three facts are label–value pairs of one DescriptionList (no Kpi cards for facts in words, no Card.Root per fact), the debt with DescriptionList.Item tone warning, the phrase in the same style as the amounts; no Typography inside a value. The vehicle card has a Card.Header, line items in a DescriptionList align end inside Card.Body (no divider, no line), and a Card.Footer with Card.Total at its start and the action in Card.Actions at its end.",
       "files": [],
       "expectations": [
-        "All three tiles are a Kpi.Root valueSize=\"s\" with no Card.Root around it (one style for numbers and the phrase, no valueSize=\"m\" or larger on the row); none puts a Typography inside Kpi.Value",
-        "«К оплате» has Kpi.Value tone=\"warning\" (or danger) by its meaning",
-        "The vehicle card's line items are a DescriptionList.Root align=\"end\" inside Card.Body divider=\"full\"",
-        "The vehicle card's footer is Card.Footer divider=\"fill\" with the total in Card.Total (the amount as its children, its state in label), at the end of the row"
+        "The three facts are DescriptionList.Item pairs of one DescriptionList.Root, not Kpi.Root cards and not a Card.Root each (one style for the amounts and the phrase); none puts a Typography inside a value",
+        "«К оплате» has DescriptionList.Item tone=\"warning\" (or danger) by its meaning",
+        "The vehicle card's line items are a DescriptionList.Root align=\"end\" inside Card.Body, with no Divider and no divider prop",
+        "The vehicle card's footer is a Card.Footer with no line: the total in Card.Total (the amount as its children, its state in label) at the start, the action in Card.Actions at the end"
       ]
     },
     {
@@ -500,13 +500,13 @@
     {
       "id": 40,
       "prompt": "В карточке аренды покажи блок выдачи: вернуть 10 декабря (через 50 дней), выдан 21 октября в 15:43, ответственный — Евгений Сурков (можно сменить), кнопки «Отменить выдачу» и «Возврат».",
-      "expected_output": "A Card.Root with one Card.Header: Card.Title «Вернуть 10 дек · через 50 дн.», Card.Description with the assignee picker (Badge.Root + Badge.Avatar in Dropdown.Trigger) first and «выдан 21 окт, 15:43» after it, and in Card.Actions at the header's end a soft neutral «Отменить» button and the primary «Принять возврат» last.",
+      "expected_output": "A Card.Root: Card.Header with Card.Title «Вернуть 10 дек · через 50 дн.», Card.Description «выдан 21 окт, 15:43», and in Card.Actions at the header's end the assignee as a Select (items with an Avatar.Root); Card.Footer with Card.Actions at its end holding a soft neutral «Отменить выдачу» and the primary «Принять возврат» last.",
       "files": [],
       "expectations": [
-        "The assignee's name appears once: only in the picker, not also in the text line",
-        "The assignee picker is a Badge.Root with Badge.Avatar inside Dropdown.Trigger, first in Card.Description",
+        "The assignee's name appears once: only in the picker, not also in the description",
+        "The assignee picker is a Select.Root in Card.Actions (or the start of Card.Footer), not a Badge.Root inside Dropdown.Trigger and not in Card.Description",
         "The term («через 50 дн.») is in Card.Title, not a separate badge",
-        "The primary return action is the last button; the single secondary action is a labelled soft neutral Button, not a lone «⋯» menu"
+        "The primary return action is the last button of Card.Footer and the header holds no accent button; the single secondary action is a labelled soft neutral Button, not a lone «⋯» menu"
       ]
     },
     {
@@ -535,14 +535,54 @@
     {
       "id": 43,
       "prompt": "Сделай дашборд продаж: сверху три плитки — выручка, новые клиенты и средний чек, у каждой маленький график по дням за месяц и изменение к прошлому месяцу; при наведении на график плитка показывает день. Ниже блок «Последние сделки» списком с кнопкой «Все сделки».",
-      "expected_output": "Three Kpi.Root tiles in one Page.Grid, each laid out from useSparkline: Kpi.Title, Kpi.Period with the reading's date, Kpi.Value with valueText, <Kpi.Delta reading={…} /> and the Sparkline in Kpi.Media; the change against the previous month from compareTo, change=\"previous\" for a day while scrubbing. «Последние сделки» is a Card with Card.Header (Card.Title, the button in Card.Actions) and a Card.List.",
+      "expected_output": "Three Kpi.Root cards of one size in one Page.Grid, each laid out from useSparkline: Kpi.Title, Kpi.Value with valueText and its unit in Kpi.Unit, <Kpi.Delta reading={…} />, Kpi.Period with the reading's date under the value and the Sparkline in Kpi.Media; the change against the previous month from compareTo, change=\"previous\" for a day while scrubbing; no Kpi.Meta repeating the base of the change. «Последние сделки» is a Card with Card.Header (Card.Title, the button in Card.Actions) and a List of the deals in Card.Body.",
       "files": [],
       "expectations": [
         "Every tile is a Kpi.Root, never a Card.Root with a label, a big number and a change laid out by hand, and never a Kpi.Root inside a Card.Root",
         "The value, the change and the period come from useSparkline (valueText, Kpi.Delta reading, date in Kpi.Period) and the plot is <Sparkline {...reading.plot} /> in Kpi.Media, so scrubbing moves all three",
         "The period of a tile is in Kpi.Period, not written into the title («Выручка за октябрь»)",
-        "The change and what it compares with are apart: the change in Kpi.Delta, «к сентябрю» in Kpi.Meta — never one string in the badge",
-        "«Последние сделки» is a Card (Card.Header with Card.Actions for «Все сделки», Card.List of the deals), not a Kpi"
+        "The change is in Kpi.Delta alone and its base follows from Kpi.Period: no «к сентябрю» in the badge or in Kpi.Meta",
+        "The three cards share one size (no size, or one size on every card) and the unit stands in Kpi.Unit, never typed into the value",
+        "«Последние сделки» is a Card (Card.Header with Card.Actions for «Все сделки», a List of the deals in Card.Body), not a Kpi"
+      ]
+    },
+    {
+      "id": 44,
+      "prompt": "Сделай карточку заказа в списке заказов: фото товара (три снимка), номер № 4821, статусы «Срочно» и «Опт», клиент ООО «Северный ветер», позиции заказа с суммами, итог 48 600 ₽, кнопки «Оплатить», «Скачать счёт» и «Удалить заказ». Строки позиций можно открыть и поправить.",
+      "expected_output": "One Card.Root: Card.Media with a Carousel of the three photos; Card.Header with Card.Title and Card.Badges after it (both statuses), Card.Description with the client, and only a «Ещё» Dropdown in Card.Actions; Card.Body with the lines (a List whose rows open as a whole, or a DescriptionList align end); Card.Footer with Card.Total at the start and Card.Actions at the end holding the primary «Оплатить» last. «Удалить заказ» is in «Ещё» behind a ConfirmDialog. No Divider between zones.",
+      "files": [],
+      "expectations": [
+        "The photos are a Carousel.Root inside Card.Media, not an <img> or a Thumbnail drawn by hand",
+        "The statuses are Badge.Root in Card.Badges inside Card.Header, not under the title and not in Card.Actions beside the buttons",
+        "Card.Header holds no accent (solid primary) button: its Card.Actions has only the «Ещё» menu",
+        "The primary «Оплатить» is the last button, in Card.Actions of Card.Footer, with Card.Total at the start of the footer",
+        "«Удалить заказ» is a Dropdown.Item with tone danger confirmed by a ConfirmDialog, not a visible button",
+        "No Divider and no divider prop between the header, the body and the footer",
+        "The line rows have no pencil or edit button: a row opens as a whole (List.Item onClick or href)"
+      ]
+    },
+    {
+      "id": 45,
+      "prompt": "Сделай карточку задачи «Подготовить договор»: задача T-118, срок до 12 октября, проект «Внедрение CRM», ответственный — Анна Котова, его можно сменить прямо на карточке, и кнопка «Взять в работу».",
+      "expected_output": "One Card.Root: Card.Header with Card.Title and a one-line Card.Description (task number and term), Card.Body with the project as a DescriptionList align=\"end\" row, Card.Footer with the assignee as a Select (avatar + name, aria-label on Select.Trigger) at the start and «Взять в работу» in Card.Actions at the end.",
+      "files": [],
+      "expectations": [
+        "The assignee picker is a Select.Root, not a Badge.Root or a Badge inside a Dropdown.Trigger",
+        "The picker stands in Card.Footer (or Card.Actions) with no size of its own, so it is as tall as the button",
+        "«Взять в работу» is the last button, in Card.Actions of Card.Footer; Card.Header holds no accent button",
+        "The person is named once: not again in Card.Description or in a body row"
+      ]
+    },
+    {
+      "id": 46,
+      "prompt": "Слева в разделе «Обращения» нужен список тикетов: тема, у каждого метки (канал, приоритет, VIP), статус («Открыт», «Ждёт ответа», «Решён»), кто и когда писал последним. Тикет открывается справа.",
+      "expected_output": "A List of tickets in a list + detail layout: each List.Item has List.ItemText with the subject and List.ItemBadges after it on the same line (channel, priority, VIP as Badge.Root, folding into «+N»), a one-line List.ItemDescription that starts with a StatusDot of the status and then the author and the time, and the current ticket marked with List current.",
+      "files": [],
+      "expectations": [
+        "The labels are Badge.Root in List.ItemBadges on the subject's line, not under the subject and not at the right edge",
+        "The status is a StatusDot (tone and word) first in List.ItemDescription, not a Badge and not a hand-made dot",
+        "Every row is one subject line and one description line; nothing wraps and the row has no own Divider",
+        "The rows are List.Item (with current), not ghost Buttons and not Cards"
       ]
     }
   ]

@@ -1,5 +1,5 @@
 /** While an order is opened for review, the queue behind it holds still: no wheel, touch, key or drag moves it — `lock`. */
-import { Button, Card, ScrollContainer, Typography } from "prime-ui-kit";
+import { Button, Card, List, ScrollContainer } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -33,17 +33,17 @@ export default function ScrollContainerLockExample() {
           </Button.Root>
         </Card.Actions>
       </Card.Header>
-      <ScrollContainer lock={reviewing}>
-        <Card.List>
-          {ORDERS.map((order) => (
-            <Card.ListItem key={order}>
-              <Typography as="span" variant="body-m">
-                {order}
-              </Typography>
-            </Card.ListItem>
-          ))}
-        </Card.List>
-      </ScrollContainer>
+      <Card.Body>
+        <ScrollContainer lock={reviewing}>
+          <List.Root aria-label="Заказы в очереди">
+            {ORDERS.map((order) => (
+              <List.Item key={order}>
+                <List.ItemText>{order}</List.ItemText>
+              </List.Item>
+            ))}
+          </List.Root>
+        </ScrollContainer>
+      </Card.Body>
     </Card.Root>
   );
 }

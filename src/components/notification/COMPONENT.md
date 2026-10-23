@@ -27,10 +27,10 @@ NotificationProvider                 store + portaled viewport (z-index toast)
 └─ zone per position                 top/bottom × left/center/right
    └─ stack per tone                 <ol> named by labels; newest in front
       └─ card                        <article role="status|alert">
-         ├─ icon                     tone Icon or `icon`
-         ├─ title + Badge            `badge` counter
-         ├─ description
-         ├─ action Button            soft neutral, one tier below the card
+         ├─ mark                     tone tile with the tone Icon or `icon`
+         ├─ title + Badge            `badge` counter, one line
+         ├─ description              up to two lines
+         ├─ action Button            soft accent, at the end, before the close button
          ├─ close Button             ghost icon, when `closable`
          └─ countdown line           when not `persistent`
 NotificationCard                     the same card, static, without a timer
@@ -58,10 +58,10 @@ No DOM of its own, no ref. Wraps the app once: keeps the toasts and renders thei
 | `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
 | `title` | `string` | — (required) | The message. |
 | `description` | `string` | — | Secondary text under the title. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Padding, icon and text tier of the card. Without it the tier of the host (a toast of `notify()` sits outside any host: `m`). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the card; its padding, icon and text stand two steps under it (`m` → the `xs` frame). Without it the tier of the host (`notify()` sits outside any host: `m`). |
 | `icon` | `ReactNode` | — | Replaces the tone icon. |
 | `badge` | `string \| number` | — | A counter next to the title (a `Badge` of the same `tone`). |
-| `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
+| `action` | `{ label: string; onClick: () => void }` | — | One soft accent button under the text; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
 | `onDismiss` | `() => void` | — | Shows the close button and is called on its click. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title" \| "children" \| "role">` | — | `className` and the other attributes of the `<article>`. |
 
@@ -75,10 +75,10 @@ The argument of `notify(options)`: what the toast shows and how it closes.
 | `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
 | `title` | `string` | — (required) | The message. |
 | `description` | `string` | — | Secondary text under the title. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Padding, icon and text tier of the card. Without it the tier of the host (a toast of `notify()` sits outside any host: `m`). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the card; its padding, icon and text stand two steps under it (`m` → the `xs` frame). Without it the tier of the host (`notify()` sits outside any host: `m`). |
 | `icon` | `ReactNode` | — | Replaces the tone icon. |
 | `badge` | `string \| number` | — | A counter next to the title (a `Badge` of the same `tone`). |
-| `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
+| `action` | `{ label: string; onClick: () => void }` | — | One soft accent button under the text; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
 | `position` | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | — | Default: the provider's `position`. |
 | `duration` | `number` | `5000` | Auto-close delay in ms; the timer pauses on hover, focus, swipe and in a hidden tab. |
 | `persistent` | `boolean` | `false` | No timer and no countdown line. |
@@ -102,14 +102,18 @@ Called inside `NotificationProvider`; returns the store: `notify(options)` shows
 | `warning` | warning icon | something needs attention soon | |
 | `danger` | danger icon | failed actions; pair with `action` to retry | |
 
-The card is always a raised surface without a border; only the icon, the badge and the countdown take the tone. Each tone forms its own stack in a position.
+The card is always a raised surface without a border, on the surface frame two steps under its tier (header row: mark, title, description, actions); only the mark tile, the badge and the countdown take the tone. The title is one line; the description may take two lines before it is cut, as a toast's body is a message to read. Each tone forms its own stack in a position.
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` · `s` | compact padding and text; action `xs` | dense apps | |
-| `m` | padding 16, title 14/20, description 13/20; action `s` | default | yes |
-| `l` · `xl` | larger padding and text; action `m` / `l` | touch and large screens | |
+| `xs` | the `xs` frame: padding 12, mark 32, title 13/16, description 12/16; buttons `xs` (28) | dense apps | |
+| `s` | the `xs` frame, as above | compact toasts | |
+| `m` | the `xs` frame, as above | default | yes |
+| `l` | the `s` frame: padding 16, mark 32, title 13/16, description 12/16; buttons `s` (32) | touch and large screens | |
+| `xl` | the `m` frame: padding 20, mark 40, title 14/20, description 13/20; buttons `m` (36) | touch and large screens | |
+
+A toast stands two steps under its tier, so it never outweighs the page it floats over.
 
 ### position
 | Value | Looks like | Use when | Default |
@@ -195,5 +199,5 @@ Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard
 - A toast for a permanent state («пробный период закончится через 3 дня») → use a Banner.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (action, close), [Badge](../badge/COMPONENT.md) (`badge`), Icon (`status.*`, `action.close`)
+- **Built from:** [Button](../button/COMPONENT.md) (action, close), [Badge](../badge/COMPONENT.md) (`badge`), [StatusDot](../status-dot/COMPONENT.md) (the header row's description line), Icon (`status.*`, `action.close`)
 - **See also:** [Banner](../banner/COMPONENT.md), [Button](../button/COMPONENT.md), [Modal](../modal/COMPONENT.md)
