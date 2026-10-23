@@ -547,12 +547,12 @@ function BadgeGroup({
   const groupRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(groupRef, ref);
   const moreRef = React.useRef<HTMLSpanElement>(null);
-  const items = React.Children.toArray(children);
-  // How many badges stand in the row; the rest wait behind «+N».
-  const [shown, setShown] = React.useState(items.length);
+  // How many badges wait behind «+N», counted in the row itself: the children may come in a
+  // fragment or a wrapper, so their count is not the number of badges.
+  const [folded, setFolded] = React.useState(0);
   // What the badges behind «+N» say, read from the row (a picker's trigger reads as its badge).
   const [hiddenText, setHiddenText] = React.useState("");
-  const hidden = counting ? Math.max(0, items.length - shown) : 0;
+  const hidden = counting ? folded : 0;
 
   const fitRow = React.useCallback(() => {
     const group = groupRef.current;
@@ -580,7 +580,7 @@ function BadgeGroup({
       badge.toggleAttribute("data-overflowed", index >= count);
     });
     more.toggleAttribute("data-overflowed", count === badges.length);
-    setShown(count);
+    setFolded(badges.length - count);
     setHiddenText(badges.slice(count).map(badgeText).filter(Boolean).join(", "));
   }, []);
 

@@ -253,7 +253,7 @@ describe("Card.Header", () => {
       cssValue(
         cssRule(
           HEADER_CSS,
-          '.header[data-lines="one"], .header:has(> .mark), .header:only-child, .header[data-whole]',
+          '.header[data-lines="one"], .header:has(> .mark), .header:only-child:not([data-nested])',
         ),
         "align-items",
       ),
@@ -420,6 +420,27 @@ describe("Card.Title", () => {
     expect(cssValue(title, "text-overflow")).toBe("ellipsis");
   });
 
+  it("puts the record's `number` after the name: muted and tabular, cut never", () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title number="№ 2026-0418">Счёт</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    const title = screen.getByRole("heading", { name: "Счёт № 2026-0418" });
+    expect(title).toHaveClass(styles.titleLine);
+    const [name, number] = [...title.children] as HTMLElement[];
+    expect(name).toHaveClass(styles.titleName);
+    expect(number).toHaveClass(styles.titleNumber);
+    expect(number).toHaveTextContent("№ 2026-0418");
+    expect(cssValue(cssRule(CSS, ".titleName"), "text-overflow")).toBe("ellipsis");
+    const rule = cssRule(CSS, ".titleNumber");
+    expect(cssValue(rule, "flex")).toBe("none");
+    expect(cssValue(rule, "color")).toBe("var(--prime-color-text-muted)");
+    expect(cssValue(rule, "font-variant-numeric")).toBe("tabular-nums");
+  });
+
   it("gives way to its badges first, down to its own text or 8em", () => {
     render(
       <Card.Root>
@@ -436,6 +457,31 @@ describe("Card.Title", () => {
       .filter((rule) => rule.selector === ".title")
       .flatMap((rule) => rule.decls.filter((decl) => decl.prop === "min-width"));
     expect(floors.some((decl) => decl.value.includes("--header-title-min"))).toBe(true);
+  });
+
+  it("measures a numbered title's floor from its name and number, not the squeezed title", () => {
+    const widths = vi
+      .spyOn(HTMLElement.prototype, "scrollWidth", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains(styles.titleName) ? 48 : 20;
+      });
+    const offsets = vi
+      .spyOn(HTMLElement.prototype, "offsetWidth", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains(styles.titleNumber) ? 40 : 0;
+      });
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title data-testid="title" number="№ 4821" style={{ fontSize: "16px" }}>
+            Заказ
+          </Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+    expect(screen.getByTestId("title").style.getPropertyValue("--header-title-min")).toBe("88px");
+    widths.mockRestore();
+    offsets.mockRestore();
   });
 
   it("keeps the title's floor and drops the controls under it on a narrow card", () => {
@@ -463,7 +509,7 @@ describe("Card.Title", () => {
 });
 
 describe("Card.Badges", () => {
-  it("is one Badge.Group after the title with badges xs · xs · xs · s · s by card size", () => {
+  it("is one Badge.Group after the title with badges as tall as the title line (xs · xs · s · m · m)", () => {
     render(
       (["xs", "s", "m", "l", "xl"] as const).map((size) => (
         <Card.Root key={size} size={size}>
@@ -479,7 +525,7 @@ describe("Card.Badges", () => {
     const sizes = ["xs", "s", "m", "l", "xl"].map((id) =>
       screen.getByTestId(`badge-${id}`).getAttribute("data-size"),
     );
-    expect(sizes).toEqual(["xs", "xs", "xs", "s", "s"]);
+    expect(sizes).toEqual(["xs", "xs", "s", "m", "m"]);
     expect(screen.getByTestId("badges-m")).toHaveAttribute("data-overflow", "count");
     expect(screen.getByTestId("badges-m")).toHaveClass(headerRow.badges);
   });
@@ -880,6 +926,16 @@ describe("Card.Footer and Card.Total", () => {
     expect(label).toHaveAttribute("data-tone", "warning");
     expect(value).toHaveTextContent("42 500 ₽");
     expect(cssValue(cssRule(CSS, ".totalValue"), "font-variant-numeric")).toBe("tabular-nums");
+  });
+
+  it("stacks a narrow footer: the start part a row, the buttons under it, cut rather than out", () => {
+    const narrow = ["@container (max-width: 17.5rem)"];
+    expect(
+      cssValue(cssRule(CSS, ".footer > :not(.actions), .footer > .actions", narrow), "flex"),
+    ).toBe("1 1 100%");
+    const button = cssRule(CSS, ".footer > .actions > *", narrow);
+    expect(cssValue(button, "min-width")).toBe("0");
+    expect(cssValue(button, "max-width")).toBe("100%");
   });
 
   it("shows the amount alone without a label", () => {

@@ -56,7 +56,7 @@ const TITLE_MIN_EM = 8;
  * Writes a title's floor (`--header-title-min`) on the title and on the header row's titles column,
  * which wraps the row by it (headerRow.module.css).
  */
-export function setTitleFloor(title: HTMLElement, width: number) {
+function setTitleFloor(title: HTMLElement, width: number) {
   const em = Number.parseFloat(getComputedStyle(title).fontSize) || 0;
   const value = `${Math.ceil(Math.min(width, em * TITLE_MIN_EM))}px`;
   title.style.setProperty("--header-title-min", value);
@@ -64,7 +64,7 @@ export function setTitleFloor(title: HTMLElement, width: number) {
 }
 
 /** Forgets the floor, so the title is measured at its natural width. */
-export function clearTitleFloor(title: HTMLElement) {
+function clearTitleFloor(title: HTMLElement) {
   title.style.removeProperty("--header-title-min");
   title.closest<HTMLElement>(`.${styles.titles}`)?.style.removeProperty("--header-title-min");
 }
@@ -75,12 +75,26 @@ export function clearTitleFloor(title: HTMLElement) {
  * drop to their own line when the row cannot hold both. Measured after every render, so a new
  * title gets its own floor.
  */
-export function useTitleFloor(ref: React.RefObject<HTMLElement | null>) {
+export function useTitleFloor(
+  ref: React.RefObject<HTMLElement | null>,
+  name?: React.RefObject<HTMLElement | null>,
+  number?: React.RefObject<HTMLElement | null>,
+) {
   React.useLayoutEffect(() => {
     const node = ref.current;
     if (!node) return;
     clearTitleFloor(node);
-    setTitleFloor(node, node.scrollWidth);
+    if (!name) {
+      setTitleFloor(node, node.scrollWidth);
+      return;
+    }
+    // A record title (a name and its `number`): the number never gives way and the name shrinks
+    // inside the title, so the floor is measured from the parts and the gap between them.
+    const text = name.current;
+    if (!text) return;
+    const tail = number?.current;
+    const gap = tail ? Number.parseFloat(getComputedStyle(node).columnGap) || 0 : 0;
+    setTitleFloor(node, text.scrollWidth + (tail ? tail.offsetWidth + gap : 0));
   });
 }
 

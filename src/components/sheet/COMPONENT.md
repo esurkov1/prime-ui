@@ -31,7 +31,7 @@ Sheet.Root                     state and dismiss policy (no DOM)
    ├─ Sheet.Header             optional: the header row (frame `l`, no line under it): [Icon] [Title + Badges / Description] [Actions] [close Button]
    │  ├─ Sheet.Title           <h2> name + muted `number`; `loading` holds it with a skeleton
    │  ├─ Sheet.Description     <p> text only, a `StatusDot` first allowed, one line in a record header
-   │  ├─ Sheet.Badges          one row of Badges after the title, chip tier s, extra folded into «+N»
+   │  ├─ Sheet.Badges          one row of Badges after the title, chip tier m, extra folded into «+N»
    │  ├─ Sheet.Actions         one tab-wide switcher, then at most two icon buttons (three or more: a ⋯ Dropdown), at the dialog's tier
    │  ├─ Sheet.Fields          the record's value pickers (Selects) as one row under the title row, tier xs, wraps when narrow
    │  └─ Sheet.Icon            optional: tone tile around an Icon, or a picture, 48
@@ -120,7 +120,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Sheet.Badges
-`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.
+`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -216,7 +216,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
   ```
   - `Sheet.Title`: the record's name, then its `number` muted («#678», «№ 1042»); `loading` holds it with a Skeleton while the name loads. The name ellipsizes, the number never does; both are the dialog's name.
   - `Sheet.Description` under the title: the record's context in plain text, one line with an ellipsis in a record header; a `StatusDot` may stand first for the record's state. The whole text stays the dialog's description. A number never goes here.
-  - `Sheet.Badges` after the title, on its line, 6 apart: one container for every badge of the record (a status, a channel, a counter — the meaning is the badge's `tone` or `color`), chip tier `s`. The title gives way to its text (or 8em) first, then what does not fit waits behind «+N», whose tooltip lists it. A picker of a status or a person is a `Select` in `Sheet.Fields`, never a badge.
+  - `Sheet.Badges` after the title, on its line, 6 apart: one container for every badge of the record (a status, a channel, a counter — the meaning is the badge's `tone` or `color`), chip tier `m`. The title gives way to its text (or 8em) first, then what does not fit waits behind «+N», whose tooltip lists it. A picker of a status or a person is a `Select` in `Sheet.Fields`, never a badge.
   - The header places the parts whatever the order in code; write them in the order Icon, Title, Badges, Description, Actions anyway.
   - `Sheet.Fields`: the record's value pickers — the status, the assignee, the priority, kit `Select`s — as one row under the title row (under the description) and above a `Tabs.List`, a zone gap from what is above. Its controls take tier `xs` by themselves (write no `size`), each at its content width; on a narrow sheet the row wraps and no picker is wider than the sheet. The title row then holds only icon buttons and the ×. Every picker carries its own `aria-label` or `label`; the row has no name of its own. Header placement does not depend on the order in code.
   - end — `Sheet.Actions`: first one switcher for the whole open tab (a `SegmentedControl`, a `Datepicker` period), then neutral buttons — icon buttons with a Tooltip, at most two; a danger one is `tone="danger"` behind a ConfirmDialog — and a ⋯ Dropdown only when there are three or more actions, all at the dialog's control tier (the close button's), centred on the title line. The title keeps a floor (its text, at most 8em): when the mark, the floor and the controls no longer fit one row, the whole row of `Sheet.Actions` drops to a line of its own under the title, starting at the row's start edge, and wraps only if it is wider than the sheet; the × never moves, it stays at the top end. The kit does not move your buttons into a menu; the accent button stands in the footer, never in the header. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
@@ -296,5 +296,5 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - `closeOnOutsideClick={false}` and `closeOnEscape={false}` with no header × and no `Sheet.Close` → nothing closes it; keep a button that answers.
 
 ## Related
-- **Built from:** the dialog shared with Modal and Drawer (`internal/overlay/DialogParts`), [Badge](../badge/COMPONENT.md) (`Sheet.Badges`: a one-line `Badge.Group` of chip tier s), [StatusDot](../status-dot/COMPONENT.md) (the state in front of a record's description), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Sheet.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Sheet.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Drawer (`internal/overlay/DialogParts`), [Badge](../badge/COMPONENT.md) (`Sheet.Badges`: a one-line `Badge.Group` of chip tier m), [StatusDot](../status-dot/COMPONENT.md) (the state in front of a record's description), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Sheet.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Sheet.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Drawer](../drawer/COMPONENT.md) (the same parts as a side panel), [Modal](../modal/COMPONENT.md) (the same parts in the centre), [Datepicker](../datepicker/COMPONENT.md) (`Datepicker.Panel` in a sheet), [Dropdown](../dropdown/COMPONENT.md)

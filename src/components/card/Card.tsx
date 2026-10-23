@@ -318,24 +318,47 @@ export type CardHeadingLevel = "h2" | "h3" | "h4" | "span";
 
 export type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
   as?: CardHeadingLevel;
+  number?: React.ReactNode;
   ref?: React.Ref<HTMLHeadingElement>;
 };
 
 /**
  * What the card is about: one line, cut with an ellipsis. Beside `Card.Badges` it gives way first,
- * down to its own text or 8em, before the badges fold into «+N».
+ * down to its own text or 8em, before the badges fold into «+N». A record's `number` follows the
+ * name, muted and tabular: the name is cut, the number never is.
  */
-function CardTitle({ as: Tag = "h3", className, ref, ...rest }: CardTitleProps) {
+function CardTitle({ as: Tag = "h3", number, className, children, ref, ...rest }: CardTitleProps) {
   const { size } = React.useContext(CardContext);
   const own = React.useRef<HTMLHeadingElement>(null);
   const mergedRef = useMergedRefs(own, ref);
-  useTitleFloor(own);
+  const nameRef = React.useRef<HTMLSpanElement>(null);
+  const numberRef = React.useRef<HTMLSpanElement>(null);
+  const numbered = number !== undefined && number !== null && number !== false && number !== "";
+  useTitleFloor(own, numbered ? nameRef : undefined, numberRef);
   return (
     <Tag
       {...rest}
       ref={mergedRef}
-      className={cx(FRAME_TITLE[size], headerRowStyles.title, className)}
-    />
+      className={cx(
+        FRAME_TITLE[size],
+        headerRowStyles.title,
+        numbered && styles.titleLine,
+        className,
+      )}
+    >
+      {numbered ? (
+        <>
+          <span ref={nameRef} className={styles.titleName}>
+            {children}
+          </span>{" "}
+          <span ref={numberRef} className={styles.titleNumber}>
+            {number}
+          </span>
+        </>
+      ) : (
+        children
+      )}
+    </Tag>
   );
 }
 CardTitle.displayName = "Card.Title";

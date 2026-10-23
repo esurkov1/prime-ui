@@ -61,17 +61,19 @@ records they cannot see. A set that can be empty shows its empty state, never a 
 ```
 
 ```tsx good
-// good — the sessions themselves, an end per row, the end of all of them beside the heading
+// good — the sessions themselves (the device on its tile), an end per row, the end of all of them beside the heading
 <Drawer.Section label="Сеансы">
   <Drawer.Actions>
     <Button.Root variant="soft" tone="neutral">Завершить остальные</Button.Root>
   </Drawer.Actions>
   <List.Root aria-label="Сеансы">
     <List.Item value="mac">
+      <List.ItemIcon><Icon name="viewport.desktop" /></List.ItemIcon>
       <List.ItemText>Chrome · macOS</List.ItemText>
       <List.ItemDescription>Москва · это устройство</List.ItemDescription>
     </List.Item>
     <List.Item value="iphone">
+      <List.ItemIcon><Icon name="viewport.mobile" /></List.ItemIcon>
       <List.ItemText>Safari · iPhone</List.ItemText>
       <List.ItemDescription>Казань · вчера в 21:40</List.ItemDescription>
       <List.ItemActions>

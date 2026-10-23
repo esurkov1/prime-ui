@@ -3,6 +3,7 @@ import * as React from "react";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge, type BadgeGroupProps } from "@/components/badge/Badge";
 import { Dnd, DndLock } from "@/components/dnd/Dnd";
+import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider, useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -11,6 +12,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { HeaderLineContent, headerRowStyles, useTitleFloor } from "@/internal/headerRow";
+import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
@@ -18,7 +20,13 @@ import { nodeText } from "@/internal/nodeText";
 import { usePartPresence } from "@/internal/partPresence";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { slotChild } from "@/internal/slot";
-import { type ControlSize, type PaletteColor, stepDown, tierMappings } from "@/internal/states";
+import {
+  type ControlSize,
+  listMarkSize,
+  type PaletteColor,
+  stepDown,
+  tierMappings,
+} from "@/internal/states";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./List.module.css";
@@ -169,31 +177,58 @@ function itemLabelOf(item: React.ReactElement<ListItemProps>): string {
 /** The row's title shares its line with `List.ItemBadges`. */
 const BadgedTitleContext = React.createContext(false);
 
+/** The leading picture stands beside two lines (`List.ItemDescription`). */
+const TwoLinesContext = React.createContext(false);
+
 export type ListItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
 
 /**
- * The leading picture of a row: an avatar of the row tier, an icon, or a colour dot
- * (`Badge.Dot color`) in a box as wide as an icon, so the rows' text lines up. After the text it is
- * a quiet trailing glyph. Decorative: the text names the row.
+ * The leading picture of a row: an avatar, a progress ring, an icon, or a colour dot
+ * (`Badge.Dot color`) in a box as wide as an icon, so the rows' text lines up. Beside two lines an
+ * avatar or a ring is as tall as they are and a glyph stands on a tile, as a card's mark does.
+ * After the text it is a quiet trailing glyph. Decorative, except a ring: it names the state.
  */
 function ListItemIcon({ className, children, ...rest }: ListItemIconProps) {
   const size = useControlSize(undefined);
-  // An avatar without its own `size` takes the row tier through its public `size`.
-  const sized = React.Children.map(children, (child) =>
-    isPart<{ size?: unknown }>(child, Avatar.Root) && child.props.size === undefined
-      ? React.cloneElement(child, { size })
-      : child,
-  );
-  const dot = React.Children.toArray(children).some((child) => isPart(child, Badge.Dot));
+  const two = React.useContext(TwoLinesContext);
+  const marks = two ? listMarkSize.two : listMarkSize.line;
+  const parts = React.Children.toArray(children);
+  const dot = parts.some((child) => isPart(child, Badge.Dot));
+  const avatar = parts.some((child) => isPart(child, Avatar.Root));
+  const ring = parts.some((child) => isPart(child, ProgressCircle));
+  // An avatar or a ring without its own `size` takes the row's mark size through its public `size`.
+  const sized = React.Children.map(children, (child) => {
+    if (!isPart<{ size?: unknown }>(child, Avatar.Root) && !isPart(child, ProgressCircle))
+      return child;
+    const own = child as React.ReactElement<{ size?: unknown }>;
+    if (own.props.size !== undefined) return child;
+    return React.cloneElement(own, {
+      size: isPart(child, ProgressCircle) ? marks.ring[size] : marks.avatar[size],
+    });
+  });
+  // A glyph beside two lines stands on a tile as tall as they are.
+  if (two && !dot && !avatar && !ring) {
+    return (
+      <span
+        {...rest}
+        className={cx(iconBoxStyles.tile, iconSlotClass, styles.tile, className)}
+        data-size={listMarkSize.two.tile[size]}
+        aria-hidden="true"
+      >
+        {children}
+      </span>
+    );
+  }
   return (
     <span
       {...rest}
       className={cx(styles.icon, className)}
       data-mark={dot ? "dot" : undefined}
-      aria-hidden="true"
+      // A picture repeats the text; a ring tells the row's state by its name.
+      aria-hidden={ring ? undefined : "true"}
     >
       {/* A dot standing for an icon takes the large dot, as the Sidebar's marks do. */}
       {dot ? <ControlSizeProvider value="l">{sized}</ControlSizeProvider> : sized}
@@ -372,7 +407,7 @@ function splitItemChildren(children: React.ReactNode) {
 
   return (
     <>
-      {leading}
+      {leading === null ? null : <TwoLinesContext value={twoLines}>{leading}</TwoLinesContext>}
       <span className={styles.body}>{spaced(body)}</span>
       {trail.length > 0 ? (
         <>

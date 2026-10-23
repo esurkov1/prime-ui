@@ -85,6 +85,7 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `as` | `"h2" \| "h3" \| "h4" \| "span"` | `"h3"` | The element: the heading level that fits the page outline, or `span` when the card is no heading. |
+| `number` | `ReactNode` | — | The record's number after the name («#866»), muted and tabular: the name is cut, the number never is. |
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `children`, `className` and the other heading attributes. |
 
 ### Card.Link
@@ -167,9 +168,9 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
 |---|---|---|---|
 | `xs` | padding 12, radius 12, zone gap 8; the title 13/16, the line 12/16, the mark 32, buttons `xs`, badges `xs` | a very dense grid, a narrow side panel | |
 | `s` | padding 16, radius 12, zone gap 12; the title 13/16, the line 12/16, the mark 32, buttons `s`, badges `xs` | a dense grid, a side panel, a card in a drawer | |
-| `m` | padding 20, radius 16, zone gap 16; the title 14/20, the line 13/20, the mark 40, buttons `m`, badges `xs` | the default card of a page | the host tier, else `m` |
-| `l` | padding 24, radius 16, zone gap 20; the title 16/24, the line 14/20, the mark 48, buttons `l`, badges `s` | a lead card of a screen, a roomy plan or listing | |
-| `xl` | padding 28, radius 16, zone gap 24; the title 18/24, the line 14/20, the mark 56, buttons `xl`, badges `s` | a hero card, a card on a wide screen | |
+| `m` | padding 20, radius 16, zone gap 16; the title 14/20, the line 13/20, the mark 40, buttons `m`, badges `s` | the default card of a page | the host tier, else `m` |
+| `l` | padding 24, radius 16, zone gap 20; the title 16/24, the line 14/20, the mark 48, buttons `l`, badges `m` | a lead card of a screen, a roomy plan or listing | |
+| `xl` | padding 28, radius 16, zone gap 24; the title 18/24, the line 14/20, the mark 56, buttons `xl`, badges `m` | a hero card, a card on a wide screen | |
 
 The width comes from the grid, not from the size; one size per row.
 
@@ -219,7 +220,7 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 | title | 13/16 | 13/16 | 14/20 | 16/24 | 18/24 |
 | description | 12/16 | 12/16 | 13/20 | 14/20 | 14/20 |
 | mark | 32 | 32 | 40 | 48 | 56 |
-| badges | `xs` 16 | `xs` 16 | `xs` 16 | `s` 20 | `s` 20 |
+| badges | `xs` 16 | `xs` 16 | `s` 20 | `m` 24 | `m` 24 |
 | controls | `xs` 28 | `s` 32 | `m` 36 | `l` 40 | `xl` 48 |
 
 - The card is a surface of the depth ladder: no border, no lines inside; zones are parted by air. It fills its grid cell and, in a row, cards stretch to one height while the footer keeps to the bottom.
@@ -266,7 +267,7 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 | [overview.tsx](examples/overview.tsx) | A record card: the mark, the title with its badges, a status line, two icon buttons, label — value rows and the total with one accent button — `Card.Icon`, `Card.Badges`, `Card.Description`, `StatusDot`, `Card.Actions`, `Card.Total`. |
 | [sizes.tsx](examples/sizes.tsx) | The same record card on the five steps: padding, radius, mark, text and the controls step together — `size`. |
 | [structure.tsx](examples/structure.tsx) | The zones a card has: a header alone, a header and a body, all three with a footer, and a pane with no zone where a list stands edge to edge — `Card.Header`, `Card.Body`, `Card.Footer`. |
-| [header.tsx](examples/header.tsx) | What a header holds: four marks, badges that fold into a count on a narrow card, and controls by their count — two icon buttons, a more menu from three actions, a value picker — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. |
+| [header.tsx](examples/header.tsx) | What a header holds: four marks, a record's number after its name, badges that fold into a count on a narrow card, and controls by their count — two icon buttons, a more menu from three actions, a value picker — `Card.Icon`, `number`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. |
 | [link.tsx](examples/link.tsx) | Cards that open: a link in the title stretches over the card while its own button stays its own, and a whole card is one link when nothing inside is a control — `Card.Link`, `asChild`. |
 | [body.tsx](examples/body.tsx) | What the body holds: label — value rows, a list of records that open, a form on kit fields and an empty state — `DescriptionList`, `List`, `Input.Root`, `EmptyPage`. |
 | [long-list.tsx](examples/long-list.tsx) | A long list in a card: the scroller shows six rows, loads the next batch near its end and holds the place of the new rows with skeleton lines — `ScrollContainer`, `onReachEnd`, `Skeleton`. |

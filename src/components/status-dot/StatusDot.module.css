@@ -8,7 +8,9 @@
   --status-dot-fill: var(--prime-color-text-muted);
 
   display: inline-flex;
-  align-items: center;
+  /* The word sets the baseline: beside text on a baseline row (a description after a «·») it stands on
+     the same line; the dot alone is centred. */
+  align-items: baseline;
   gap: calc(var(--prime-space-1) * 1.5);
   min-width: 0;
   max-width: 100%;
@@ -18,6 +20,7 @@
 
 .dot {
   flex: none;
+  align-self: center;
   width: calc(var(--prime-space-1) * 1.5);
   height: calc(var(--prime-space-1) * 1.5);
   border-radius: var(--prime-radius-full);

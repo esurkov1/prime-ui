@@ -494,8 +494,8 @@ describe("ChatList.Item asChild", () => {
     // The badges follow the name on its line, ahead of the preview.
     expect(name.compareDocumentPosition(record) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(row.querySelector("[data-record]")).toBeNull();
-    // The badges of the row's frame (`xs` at `m`), in one line with a «+N» badge behind them.
+    // The badges of the row's frame (`s` at `m`), in one line with a «+N» badge behind them.
     expect(record).toHaveAttribute("data-overflow", "count");
-    expect(record).toHaveAttribute("data-tier", "xs");
+    expect(record).toHaveAttribute("data-tier", "s");
   });
 });

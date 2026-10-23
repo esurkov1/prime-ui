@@ -134,8 +134,16 @@
 }
 
 .item[data-disabled="true"] .icon,
-.item:disabled .icon {
+.item:disabled .icon,
+.item[data-disabled="true"] .tile,
+.item:disabled .tile {
   color: var(--prime-color-text-disabled);
+}
+
+/* A glyph beside two lines: the kit's icon tile (internal/iconBox), as tall as the lines at most
+   (`tierMappings.listMarkTile`), so the row keeps its height. */
+.tile {
+  flex: none;
 }
 
 .body {

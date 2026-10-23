@@ -27,11 +27,10 @@ import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { hasContent } from "@/internal/hasContent";
 import {
-  clearTitleFloor,
   HeaderLineContent,
   HeaderRowContent,
   headerRowStyles,
-  setTitleFloor,
+  useTitleFloor,
 } from "@/internal/headerRow";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
@@ -561,25 +560,6 @@ function useCutLineTitle<T extends HTMLElement>(
   useResizeEffect(ref, sync);
 }
 
-/**
- * The floor a record title keeps beside its badges (`--header-title-min`, read by the header row):
- * its name and its number, or 8em when they are longer. The number never gives way, so the floor
- * is measured from the parts (`useTitleFloor` of the header row measures a plain text title).
- */
-function useNumberedTitleFloor(
-  title: React.RefObject<HTMLElement | null>,
-  name: React.RefObject<HTMLElement | null>,
-  number: React.RefObject<HTMLElement | null>,
-) {
-  React.useLayoutEffect(() => {
-    const node = title.current;
-    const text = name.current;
-    if (!node || !text) return;
-    clearTitleFloor(node);
-    setTitleFloor(node, text.scrollWidth + (number.current?.offsetWidth ?? 0));
-  });
-}
-
 export type DialogTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "id"> & {
   loading?: boolean;
   number?: React.ReactNode;
@@ -610,7 +590,7 @@ export function DialogTitle({
   const nameRef = React.useRef<HTMLSpanElement>(null);
   const numberRef = React.useRef<HTMLSpanElement>(null);
   useCutLineTitle(nameRef, rest.title);
-  useNumberedTitleFloor(titleRef, nameRef, numberRef);
+  useTitleFloor(titleRef, nameRef, numberRef);
   React.useLayoutEffect(() => {
     registerTitle(true);
     return () => registerTitle(false);
@@ -659,7 +639,7 @@ export type DialogBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
 /**
  * The badges after the title, on its line, 6 apart from it: one `Badge.Group` for every badge of
  * the record (a status, a role, a counter — the meaning is the badge's `tone` or `color`). The kit
- * sizes them (frame `l`: chip tier `s`) and never wraps the row: once the title has given way to
+ * sizes them (frame `l`: chip tier `m`) and never wraps the row: once the title has given way to
  * its text, what does not fit folds into «+N» (`overflow="count"`), whose tooltip lists it. A
  * picker of a status or a person is not a badge: it is a `Select` in `Fields`. While the record
  * loads (`loading`) a Skeleton holds the line, so the header never moves.
@@ -808,7 +788,7 @@ export function DialogHeader({
           <div
             className={headerRowStyles.header}
             data-lines={description.length > 0 ? "two" : "one"}
-            data-whole={extra.length === 0 || undefined}
+            data-nested=""
           >
             <HeaderRowContent
               mark={icon}

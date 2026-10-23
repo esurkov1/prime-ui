@@ -289,8 +289,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Badges`,
-      en: "`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `s`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.",
-      ru: "Бейджи после заголовка, на его строке: один `Badge.Group`, ярус чипов `s`, один ряд, остальное в «+N». Выбор статуса или человека — `Select` в `Fields`.",
+      en: "`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.",
+      ru: "Бейджи после заголовка, на его строке: один `Badge.Group`, ярус чипов `m`, один ряд, остальное в «+N». Выбор статуса или человека — `Select` в `Fields`.",
       props: [
         {
           name: "loading",

@@ -127,15 +127,15 @@ export const api: ComponentApi = {
     },
     {
       name: "List.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), an `Icon` or a colour `Badge.Dot` in an icon-wide box. After the text it is a trailing glyph.",
-      ru: "Ведущий слот `aria-hidden`: `Avatar.Root` (без своего `size` берёт ярус строки), `Icon` или цветная `Badge.Dot` в рамке шириной с иконку. После текста — замыкающий значок.",
+      en: "`ref` → `HTMLSpanElement`. Leading slot, `aria-hidden` but for a `ProgressCircle`: an `Avatar.Root` or a ring (no `size`: they fit the row; beside `List.ItemDescription` its two lines), an `Icon` (there on a tile), a `Badge.Dot`. After the text, a trailing glyph.",
+      ru: "Ведущий слот, `aria-hidden` кроме `ProgressCircle`: `Avatar.Root` или кольцо (без своего `size` — по высоте строки, рядом с `List.ItemDescription` — двух строк), `Icon` (там — на плашке) или `Badge.Dot` в рамке шириной с иконку. После текста — замыкающий значок.",
       props: [
         {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "An `Avatar.Root`, an `Icon`, or a `Badge.Dot` with `color` (a stage, a project): the large dot.",
-          ru: "`Avatar.Root`, `Icon` или `Badge.Dot` с `color` (этап, проект): крупная точка.",
+          en: "An `Avatar.Root`, a `ProgressCircle` (a record's term), an `Icon`, or a `Badge.Dot` with `color` (a stage, a project): the large dot.",
+          ru: "`Avatar.Root`, `ProgressCircle` (срок записи), `Icon` или `Badge.Dot` с `color` (этап, проект): крупная точка.",
         },
         {
           name: "…rest",
@@ -308,8 +308,8 @@ export const api: ComponentApi = {
         ru: 'Открытая запись — `aria-current="true"` на кнопке, `aria-current="page"` на ссылке (`href`, `asChild`).',
       },
       {
-        en: "The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.",
-        ru: "Имя строки складывается из текста, описания, меты и счётчика; ведущая иконка или аватар скрыты (`aria-hidden`).",
+        en: "The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row. A leading `ProgressCircle` keeps its `progressbar` role and name: it tells the row's state.",
+        ru: "Имя строки складывается из текста, описания, меты и счётчика; ведущая иконка или аватар скрыты (`aria-hidden`). Ведущий `ProgressCircle` сохраняет роль `progressbar` и имя: он сообщает состояние строки.",
       },
       {
         en: "Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.",

@@ -1,4 +1,4 @@
-/** What a header holds: four marks, badges that fold into a count on a narrow card, and controls by their count — two icon buttons, a more menu from three actions, a value picker — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. */
+/** What a header holds: four marks, a record's number after its name, badges that fold into a count on a narrow card, and controls by their count — two icon buttons, a more menu from three actions, a value picker — `Card.Icon`, `number`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`. */
 import {
   Avatar,
   Badge,
@@ -42,7 +42,7 @@ export default function CardHeaderExample() {
           <Card.Icon>
             <Icon name="object.receipt" />
           </Card.Icon>
-          <Card.Title>Счёт № 2026-0418</Card.Title>
+          <Card.Title number="№ 2026-0418">Счёт</Card.Title>
           <Card.Description>
             <StatusDot tone="success">Оплачен</StatusDot>7 окт.
           </Card.Description>

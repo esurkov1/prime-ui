@@ -38,7 +38,7 @@ export const page: ComponentPageConfig = {
       title: "Шапка",
       layout: "full",
       description:
-        "Что держит шапка: четыре вида метки, бейджи, которые на узкой карточке сворачиваются в «+N», и контролы по числу — две кнопки-иконки, «Ещё» с трёх действий, выбор значения — `Card.Icon`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`.",
+        "Что держит шапка: четыре вида метки, номер записи после имени, бейджи, которые на узкой карточке сворачиваются в «+N», и контролы по числу — две кнопки-иконки, «Ещё» с трёх действий, выбор значения — `Card.Icon`, `number`, `Card.Badges`, `StatusDot`, `Card.Actions`, `Select.Root`.",
     },
     {
       scenario: "link",

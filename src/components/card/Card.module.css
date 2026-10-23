@@ -68,6 +68,25 @@
   border-radius: var(--frame-radius);
 }
 
+/* A title with the record's `number`: the name cuts, the number after it never does. */
+.titleLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+}
+
+.titleName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.titleNumber {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 /* A card with a `Card.Link`: the link's `::after` covers the card; it lifts, the title underlines. */
 @media (hover: hover) and (pointer: fine) {
   .root[data-interactive]:hover,
@@ -266,11 +285,17 @@
   align-items: stretch;
 }
 
+/* The footer's buttons: at the end, as wide as they are; a row that no longer fits the card wraps
+   its buttons rather than leaving the card. */
 .actions {
   display: flex;
-  flex: none;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--prime-space-2);
+  min-width: 0;
+  max-width: 100%;
   margin-inline-start: auto;
 }
 
@@ -307,6 +332,8 @@
 /*
  * A narrow footer (a card under 320 at `m`; the query reads the card's content width): it stacks —
  * the start part (a total, an assignee picker) a full row, the buttons under it sharing the width.
+ * Buttons that do not fit side by side take a row each, full width; a label wider than the card
+ * is cut rather than leaving it.
  */
 @container (max-width: 17.5rem) {
   .footer > :not(.actions),
@@ -315,7 +342,8 @@
   }
 
   .footer > .actions > * {
-    flex: 1 1 0;
-    min-width: max-content;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
   }
 }

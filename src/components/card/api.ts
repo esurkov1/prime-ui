@@ -83,6 +83,12 @@ export const api: ComponentApi = {
           ru: "Элемент: уровень заголовка по структуре страницы или `span`, когда карточка не заголовок.",
         },
         {
+          name: "number",
+          type: "ReactNode",
+          en: "The record's number after the name («#866»), muted and tabular: the name is cut, the number never is.",
+          ru: "Номер записи после имени («#866»), приглушённый и табличный: имя обрезается, номер — никогда.",
+        },
+        {
           name: "…rest",
           type: "HTMLAttributes<HTMLHeadingElement>",
           en: "`children`, `className` and the other heading attributes.",

@@ -29,7 +29,7 @@ import { List } from "prime-ui-kit";
 List.Root                   <ul aria-label>; size (else the host tier) → row tier; onReorder → Dnd.Sortable <ul>
 └─ List.Item                <li> with a full-width <button> (onClick) | <a href> | asChild element | static <div>; current, disabled
    │                         value; with onReorder: Dnd.Handle (busy while saving) at the row's end, after its actions
-   ├─ List.ItemIcon         leading Avatar.Root / Icon / Badge.Dot (aria-hidden); after the text — a trailing glyph
+   ├─ List.ItemIcon         leading Avatar.Root / ProgressCircle / Icon (a tile beside two lines) / Badge.Dot; after the text — a trailing glyph
    ├─ List.ItemText         primary line, truncates
    ├─ List.ItemBadges       badges after the title, on its line (a Badge.Group, «+N» on overflow)
    ├─ List.ItemDescription  second line, muted, truncates; a StatusDot first, then «·»
@@ -73,11 +73,11 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and native attributes of the row element (`target`, `rel` on a link). |
 
 ### List.ItemIcon
-`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), an `Icon` or a colour `Badge.Dot` in an icon-wide box. After the text it is a trailing glyph.
+`ref` → `HTMLSpanElement`. Leading slot, `aria-hidden` but for a `ProgressCircle`: an `Avatar.Root` or a ring (no `size`: they fit the row; beside `List.ItemDescription` its two lines), an `Icon` (there on a tile), a `Badge.Dot`. After the text, a trailing glyph.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | An `Avatar.Root`, an `Icon`, or a `Badge.Dot` with `color` (a stage, a project): the large dot. |
+| `children` | `ReactNode` | — (required) | An `Avatar.Root`, a `ProgressCircle` (a record's term), an `Icon`, or a `Badge.Dot` with `color` (a stage, a project): the large dot. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other `span` attributes. |
 
 ### List.ItemText
@@ -186,6 +186,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - A locked row keeps every column of the movable rows: its `List.ItemActions` on the same side, the lock in the grip's box. System stages and the team's stages are one list, not two.
 - A switch always ends its row (label first). Reordering is a mode of the list: while it is on, `onReorder` is passed, the rows render no switch and the grips stand at the end in its place — never a switch and a grip in one row.
 - A colour dot in `List.ItemIcon` is the large `Badge.Dot` (8px) centred in an icon-wide box, so the text lines up with the rows that carry icons.
+- The mark in `List.ItemIcon` fits the row: an avatar of the tier and a ring of the row's height (24 · 24 · 32 · 40 · 48) in a one-line row; beside `List.ItemDescription` an avatar, a ring and an `Icon` on the kit's icon tile are as tall as the two lines at most (32 · 32 · 40 · 40 · 40 by tier), so the row keeps its height. A mark with its own `size` keeps it.
 
 ## Accessibility
 
@@ -203,7 +204,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 
 - `<ul>` named by `aria-label` (or `aria-labelledby` to a visible heading); each row is an `<li>` with a button or link.
 - The open record: `aria-current="true"` on a button (a selection inside the screen), `aria-current="page"` on a link (`href`, `asChild`) — the link points at the current URL. A router link may set it itself.
-- The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.
+- The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row. A leading `ProgressCircle` keeps its `progressbar` role and name: it tells the row's state.
 - Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.
 - `List.ItemActions` stand beside the row element, never inside it: the row's name stays its text. Tab follows the row as it reads: the `side="start"` controls, the row, the `side="end"` controls.
 - With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`, last in the row: Tab reaches the row with its `List.ItemActions`, then the handle; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`. A `locked` row ends with a lock instead: `role="img"` named «{label}: закреплено» (`labels.lockedItem`); a keyboard step over it is refused aloud («Переговоры: «Новая» закреплено, дальше не переместить», Dnd `labels.blocked`). While no row can move, rows carry neither a handle, a lock nor `aria-keyshortcuts`.
@@ -231,7 +232,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 | [overview.tsx](examples/overview.tsx) | A support ticket queue: the subject with its badge, the state and the client under it, the last update and the open count at the end; a click opens a ticket and makes it the current row — `current`, `onClick`, `List.ItemBadges`, `StatusDot`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: row height, text, icon and count follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | The open record, a regular row and an unavailable one — `current`, `disabled`. |
-| [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients, icons of queues and colour dots of projects; an avatar takes the row tier, a dot stands in an icon-wide box — `List.ItemIcon`, `Badge.Dot`. |
+| [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients, icons of queues, devices of sessions, rental terms and colour dots of projects; beside two lines an avatar and a ring are as tall as the lines and an icon stands on a tile, a dot in an icon-wide box — `List.ItemIcon`, `List.ItemDescription`, `ProgressCircle`, `Badge.Dot`. |
 | [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. |
 | [as-link.tsx](examples/as-link.tsx) | Rows as links to the invoice pages: a plain link, or your router link through the slot — `href`, `asChild`. |
 | [reorder.tsx](examples/reorder.tsx) | Funnel stages in one list: the switches end the rows; a reorder mode swaps them for the grips, the team's stages move by the grip or Alt+arrows and are saved on the server, the system ones hold their places with a lock — `onReorder`, `value`, `locked`, `List.ItemActions`. |
@@ -239,7 +240,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 
 ## Mistakes
 - Rows hand-drawn from `Button.Root variant="ghost"` with a `soft` current → `List.Item current`.
-- An `Avatar.Root size="s"` in `List.ItemIcon` to fit the row → leave `size` out; an avatar without its own `size` takes the row tier.
+- An `Avatar.Root size="s"` or a sized `ProgressCircle` in `List.ItemIcon` to fit the row → leave `size` out; a mark without its own `size` fits the row and its lines.
 - A list as app navigation → Sidebar; as tabs of a screen → Tabs.
 - Several rows `current` at once → one open record; bulk selection belongs to DataTable.
 - A long list without a scroller → wrap it in `ScrollContainer` inside the pane.
@@ -251,5 +252,5 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - A hollow `Icon` circle or a hand-drawn dot as a stage colour → `Badge.Dot color` in `List.ItemIcon`.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`, `List.ItemBadges`; `Badge.Dot` in `List.ItemIcon`), [StatusDot](../status-dot/COMPONENT.md) (the state first in `List.ItemDescription`), [Avatar](../avatar/COMPONENT.md) (`List.ItemIcon` gives an avatar the row tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`, the lock of a `locked` row)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`, `List.ItemBadges`; `Badge.Dot` in `List.ItemIcon`), [StatusDot](../status-dot/COMPONENT.md) (the state first in `List.ItemDescription`), [Avatar](../avatar/COMPONENT.md) and [ProgressCircle](../progress-circle/COMPONENT.md) (`List.ItemIcon` sizes them to the row), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`, the lock of a `locked` row)
 - **See also:** [Page](../../layout/page/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md)

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { moveBefore } from "@/components/dnd/useSortableList";
+import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
 import { StatusDot } from "@/components/status-dot/StatusDot";
 import { Switch } from "@/components/switch/Switch";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -181,6 +182,77 @@ describe("List", () => {
     expect(button.firstElementChild).toBe(lead);
     // Loose content becomes the text line.
     expect(screen.getByText("Внедрение CRM").tagName).toBe("SPAN");
+  });
+
+  it("puts a glyph beside two lines on a tile as tall as the lines; an avatar and a one-line row keep theirs", () => {
+    render(
+      <List.Root aria-label="Сеансы">
+        <List.Item>
+          <List.ItemIcon>
+            <svg data-testid="device" />
+          </List.ItemIcon>
+          <List.ItemText>MacBook Pro · Safari</List.ItemText>
+          <List.ItemDescription>Москва · сейчас</List.ItemDescription>
+        </List.Item>
+        <List.Item>
+          <List.ItemIcon>
+            <svg data-testid="plain" />
+          </List.ItemIcon>
+          <List.ItemText>iPhone 15</List.ItemText>
+        </List.Item>
+        <List.Item>
+          <List.ItemIcon>
+            <Avatar.Root data-testid="avatar">
+              <Avatar.Fallback>ИБ</Avatar.Fallback>
+            </Avatar.Root>
+          </List.ItemIcon>
+          <List.ItemText>Ирина Белова</List.ItemText>
+          <List.ItemDescription>ООО «Гранит»</List.ItemDescription>
+        </List.Item>
+      </List.Root>,
+    );
+    const tile = screen.getByTestId("device").parentElement as HTMLElement;
+    expect(tile).toHaveClass(styles.tile);
+    expect(tile).toHaveAttribute("data-size", "s");
+    expect(tile).toHaveAttribute("aria-hidden", "true");
+    const plain = screen.getByTestId("plain").parentElement as HTMLElement;
+    expect(plain).toHaveClass(styles.icon);
+    expect(plain).not.toHaveClass(styles.tile);
+    expect(screen.getByTestId("avatar").parentElement).toHaveClass(styles.icon);
+    // An avatar beside two lines is as tall as they are (40 at `m`), as the tile.
+    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "l");
+  });
+
+  it("fits a progress ring to the row and keeps its name: the row's height, or the two lines", () => {
+    render(
+      <List.Root aria-label="Аренды">
+        <List.Item>
+          <List.ItemIcon>
+            <ProgressCircle value={72} aria-label="Срок аренды: 72%" data-testid="line" />
+          </List.ItemIcon>
+          <List.ItemText>Yamaha NMAX</List.ItemText>
+        </List.Item>
+        <List.Item>
+          <List.ItemIcon>
+            <ProgressCircle value={40} aria-label="Срок аренды: 40%" data-testid="two" />
+          </List.ItemIcon>
+          <List.ItemText>Honda ADV 350</List.ItemText>
+          <List.ItemDescription>Осталось 8 дней</List.ItemDescription>
+        </List.Item>
+        <List.Item>
+          <List.ItemIcon>
+            <ProgressCircle value={10} size="xs" aria-label="Срок аренды: 10%" data-testid="own" />
+          </List.ItemIcon>
+          <List.ItemText>Vespa Primavera</List.ItemText>
+        </List.Item>
+      </List.Root>,
+    );
+    expect(screen.getByTestId("line")).toHaveAttribute("data-size", "s");
+    expect(screen.getByTestId("two")).toHaveAttribute("data-size", "m");
+    expect(screen.getByTestId("own")).toHaveAttribute("data-size", "xs");
+    // The ring tells the row's state: its slot is not hidden from assistive tech.
+    expect(screen.getByTestId("two").parentElement).not.toHaveAttribute("aria-hidden");
+    expect(screen.getByRole("progressbar", { name: "Срок аренды: 40%" })).toBeInTheDocument();
   });
 
   it("passes size to the count badge one tier down", () => {

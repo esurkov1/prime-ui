@@ -11,8 +11,9 @@
  * row's start edge, instead of squeezing the title or leaving the surface; only when even that line is too
  * wide do its controls wrap. The end holds only controls, at the top edge beside two lines; a
  * one-line header (`data-lines="one"`), a header with a mark, or a header that is the whole
- * surface (`:only-child`, or `data-whole` when a wrapper stands around the row) centres them on
- * their line. Without a mark the air above the title's letters is cut, so its cap top stands on
+ * surface (`:only-child`) centres them on their line. A header row in a wrapper of its host
+ * (`data-nested`: a dialog's, beside its × or alone) is never the whole surface: a body or a
+ * footer follows it, and its controls stand on the title's line. Without a mark the air above the title's letters is cut, so its cap top stands on
  * the padding like the controls. The host sets the roles (`FRAME_TITLE`, `FRAME_DESCRIPTION`)
  * and `--frame-lines-gap`.
  */
@@ -28,8 +29,7 @@
 
 .header[data-lines="one"],
 .header:has(> .mark),
-.header:only-child,
-.header[data-whole] {
+.header:only-child:not([data-nested]) {
   align-items: center;
 }
 
@@ -69,7 +69,7 @@
 }
 
 @supports (text-box: trim-start cap alphabetic) {
-  .header[data-lines="two"]:not(:has(> .mark)):not(:only-child):not([data-whole]) .title {
+  .header[data-lines="two"]:not(:has(> .mark)):is(:not(:only-child), [data-nested]) .title {
     text-box: trim-start cap alphabetic;
   }
 }

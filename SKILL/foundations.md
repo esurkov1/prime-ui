@@ -140,7 +140,7 @@ A mark is the round or square picture that leads a row or a card: an `Avatar`, a
   | mark | 32 | 32 | 40 | 48 | 56 |
   | row mark (a one-line card) | 24 | 24 | 32 | 40 | 48 |
   | controls | 28 | 32 | 36 | 40 | 48 |
-  | badges | 16 | 16 | 16 | 20 | 20 |
+  | badges | 16 | 16 | 20 | 24 | 24 |
 
   A surface's title stays under the page's section title (16): a default card's is 14. A Kpi stands
   a step under a Card of the same size, a dialog on `l`; every other surface (a toast included) on

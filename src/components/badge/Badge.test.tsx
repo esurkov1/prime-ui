@@ -598,6 +598,24 @@ describe("Badge.Group", () => {
       restore();
     });
 
+    it("counts the badges of the row, not its children, when they come in a fragment", () => {
+      rowWidth = 200;
+      const restore = mockSizes();
+      render(
+        <Badge.Group overflow="count" aria-label="Разделы роли">
+          <>
+            <Badge.Root>{SECTIONS[0]}</Badge.Root>
+            {SECTIONS.slice(1).map((section) => (
+              <Badge.Root key={section}>{section}</Badge.Root>
+            ))}
+          </>
+        </Badge.Group>,
+      );
+      expect(screen.getByText("+3")).toBeInTheDocument();
+      expect(screen.getByText("Ещё 3")).toBeInTheDocument();
+      restore();
+    });
+
     it("Tab reaches «+N» and its tooltip lists the hidden values", async () => {
       rowWidth = 200;
       const restore = mockSizes();

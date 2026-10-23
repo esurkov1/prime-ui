@@ -85,6 +85,40 @@ function Dialog({
 }
 
 describe("DialogParts", () => {
+  it("gives the footer its own zone gap, so the body's scroll edge never touches the buttons", () => {
+    expect(cssValue(cssRule(CSS, ".footer"), "padding")).toBe(
+      "var(--frame-gap) var(--dialog-padding) var(--prime-space-6)",
+    );
+    // The body keeps only a focus ring's room before the footer.
+    expect(cssValue(cssRule(CSS, ".body:has(+ .footer)"), "padding-block-end")).toBe(
+      "var(--prime-space-1)",
+    );
+  });
+
+  it("never takes its header row for the whole surface: the controls stay on the title's line", () => {
+    render(<Dialog />);
+    const row = screen.getByRole("banner").querySelector(`.${headerRowStyles.header}`);
+    // With or without the ×, a body follows the header: no host wrapper makes it `:only-child`.
+    expect(row).toHaveAttribute("data-nested");
+    expect(row).not.toHaveAttribute("data-whole");
+    expect(
+      cssValue(
+        cssRule(
+          "src/internal/headerRow.module.css",
+          '.header[data-lines="one"], .header:has(> .mark), .header:only-child:not([data-nested])',
+        ),
+        "align-items",
+      ),
+    ).toBe("center");
+  });
+
+  it("drops a section's actions under its heading on a narrow dialog instead of breaking the title", () => {
+    expect(cssValue(cssRule(CSS, ".sectionHeader"), "flex-wrap")).toBe("wrap");
+    expect(cssValue(cssRule(CSS, ".sectionHeading"), "min-width")).toBe(
+      "min(100%, calc(var(--prime-space-1) * 32))",
+    );
+  });
+
   it("stands as the surface frame `l` and draws no line between its zones", () => {
     render(<Dialog />);
     expect(screen.getByRole("dialog")).toHaveAttribute("data-frame", "l");
@@ -232,7 +266,7 @@ describe("DialogParts", () => {
       Array.from(badges.querySelectorAll(":scope > [data-tier]:not([data-overflowed])")).map(
         (badge) => badge.getAttribute("data-tier"),
       ),
-    ).toEqual(["s", "s"]);
+    ).toEqual(["m", "m"]);
     const title = screen.getByRole("heading", { level: 2 });
     expect(title.parentElement).toBe(badges.parentElement);
     expect(title.parentElement?.nextElementSibling).toBe(
@@ -320,7 +354,7 @@ describe("DialogParts", () => {
     // The placeholder is a badge of the line's tier, never a block with its own minimum height.
     const chip = screen.getByTestId("badges").querySelector("[data-shape]");
     expect(chip).toHaveAttribute("data-shape", "chip");
-    expect(chip).toHaveAttribute("data-size", "s");
+    expect(chip).toHaveAttribute("data-size", "m");
     rerender(
       <Root defaultOpen>
         <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">

@@ -61,12 +61,33 @@ export const tierMappings = {
    */
   kpiLegend: { xs: "xs", s: "xs", m: "xs", l: "m", xl: "xl" },
   /**
-   * The badges after a surface's title (16 · 16 · 16 · 20 · 20 for a frame xs · s · m · l · xl,
-   * titles 13 · 13 · 14 · 16 · 18): chips a line of the title tall at most, so the title row keeps
-   * its height.
+   * The badges after a surface's title (16 · 16 · 20 · 24 · 24 for a frame xs · s · m · l · xl,
+   * titles 13/16 · 13/16 · 14/20 · 16/24 · 18/24): a chip as tall as the title's line, so the
+   * title row keeps its height.
    */
-  cardBadges: { xs: "xs", s: "xs", m: "xs", l: "s", xl: "s" },
+  cardBadges: { xs: "xs", s: "xs", m: "s", l: "m", xl: "m" },
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
+
+/**
+ * The leading mark of a List row (`List.ItemIcon`) without a `size` of its own, by row tier.
+ * `line` — a one-line row: an avatar of the tier, a ring that fits the row (24 · 24 · 32 · 40 ·
+ * 48). `two` — beside `List.ItemDescription`: every mark as tall as the two lines at most (32 · 32 ·
+ * 40 · 40 · 40 for lines 32 · 36 · 40 · 44 · 44), a glyph on a tile, so the row keeps its height.
+ */
+export const listMarkSize = {
+  line: {
+    avatar: { xs: "xs", s: "s", m: "m", l: "l", xl: "xl" },
+    ring: { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" },
+  },
+  two: {
+    tile: { xs: "xs", s: "xs", m: "s", l: "s", xl: "s" },
+    avatar: { xs: "m", s: "m", m: "l", l: "l", xl: "l" },
+    ring: { xs: "s", s: "s", m: "m", l: "m", xl: "m" },
+  },
+} as const satisfies {
+  line: Record<"avatar" | "ring", Record<ControlSize, ControlSize>>;
+  two: Record<"tile" | "avatar" | "ring", Record<ControlSize, ControlSize>>;
+};
 
 /**
  * The mark of a surface's header (`Card.Icon` and its kin), per kind of mark, for a frame
