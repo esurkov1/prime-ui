@@ -526,6 +526,11 @@
   padding-inline: 0;
 }
 
+/* With no header the search is the first zone: it stands on the host's top edge, as the header does. */
+.root[data-variant="inline"] > .search:not(.header ~ .search) {
+  padding-block-start: 0;
+}
+
 .root[data-variant="inline"] > .pinned {
   margin-inline: 0;
 }

@@ -4,8 +4,11 @@ import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Message } from "@/components/message/Message";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Chat } from "./Chat";
+
+const CSS = "src/components/chat/Chat.module.css";
 
 /** The place of the match as the live region says it (the visible count is `aria-hidden`). */
 const ANNOUNCED = { ignore: "[aria-hidden='true'], [aria-hidden='true'] *" };
@@ -90,6 +93,15 @@ afterEach(() => {
 });
 
 describe("Chat: the conversation assembled", () => {
+  it("an inline chat without a header puts its search on the host's top edge", () => {
+    const first = cssRule(CSS, '.root[data-variant="inline"] > .search:not(.header ~ .search)');
+    expect(cssValue(first, "padding-block-start")).toBe("0");
+    // After a header the search keeps its own air above it.
+    expect(cssValue(cssRule(CSS, ".search"), "padding")).toBe(
+      "var(--prime-space-2) var(--prime-space-3)",
+    );
+  });
+
   it("builds the rows from items: dates, runs, the unread band, values and positions", () => {
     render(<Thread />);
     const log = screen.getByRole("log", { name: "Анна Котова" });
