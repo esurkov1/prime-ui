@@ -946,45 +946,49 @@ Bad → good: [anti-slop.md](anti-slop.md#7c-a-create-button-out-of-reach).
 
 ### List rows
 
-- A row's own controls stand beside its element in `List.ItemActions`, one tier below the row.
-- **A switch always ends its row** (the platform convention): the label first, the toggle at the
-  trailing edge — in a plain settings row, in a row people may reorder, everywhere.
-- **Reordering is a mode of the list, not a part of every row.** A button «Изменить порядок» turns
-  into «Готово»; while the mode is on the switches leave and the grips stand at the trailing edge
-  in their place ([reorder.tsx](../src/components/list/examples/reorder.tsx) for `List`,
-  [handle.tsx](../src/components/dnd/examples/handle.tsx) for rows of `Switch.Root fullWidth`). A
-  row never holds a switch and a grip together, and a switch is never moved to the start of the row
-  to make room for the grip.
+Every list-like row of the kit is one row — `List`, and the same row inside Sidebar, menus, Select,
+CommandMenu, Timeline, the file queue and legends ([List](../src/components/list/COMPONENT.md)).
+Build a list of records or places from `List` parts; never a row of your own.
+
+- **The row reads like a card's header**: mark · title with its `number` and `List.ItemBadges` /
+  `List.ItemDescription` (a `StatusDot` first) · meta · count · controls. Badges stay on the title's
+  line and fold into «+N»; marks stand on every row of a list or on none.
+- **The end has one order**: `List.ItemMeta` → `List.ItemCount` → `List.ItemActions` → a switch last.
+  A count is a plain number; `color` only for what is new and needs attention.
+- **Controls stand beside the row's element** in `List.ItemActions`: one or two icon buttons with a
+  Tooltip (soft), «⋯» from three; ghost beside a Switch. `actions="hover"` shows them on hover and
+  focus for a dense list (always on touch). A row without its own action toggles its Switch.
+- **A choice is the list's own**: `value` + `onValueChange` (`multiple` — the checkbox column), never
+  a Checkbox in `List.ItemActions`.
+- **A reorderable list shows its grips always** (`onReorder`): at the row's end by default; when the
+  rows end with a Switch, the grip leads (`handle="start"`) and the switch keeps the end.
 
 ```tsx partial
-// bad — the switch leads a row that can always be dragged
+// bad — a hand-made checkbox to pick rows, and a switch pushed before the grip
 <List.Item value={stage.id}>
-  <List.ItemActions side="start">
-    <Switch.Root aria-label="Показывать этап" checked={stage.shown} />
+  <List.ItemActions>
+    <Checkbox.Root aria-label="Выбрать этап" />
   </List.ItemActions>
   <List.ItemText>{stage.name}</List.ItemText>
 </List.Item>
 ```
 
 ```tsx good
-// declare: const stages: { id: string; name: string; shown: boolean }[]
-// declare: const reordering: boolean
+// declare: const stages: { id: string; name: string; shown: boolean; system: boolean }[]
 // declare: const reorder: (id: string, beforeId: string | null) => void
 // declare: const show: (id: string, shown: boolean) => void
-// good — the switch ends the row; in the «Изменить порядок» mode it leaves and the grip takes its place
-<List.Root aria-label="Этапы воронки" onReorder={reordering ? reorder : undefined}>
+// good — the grips always there, leading; the switch ends the row; system stages hold their places
+<List.Root aria-label="Этапы воронки" onReorder={reorder} handle="start">
   {stages.map((stage) => (
-    <List.Item key={stage.id} value={stage.id}>
+    <List.Item key={stage.id} value={stage.id} locked={stage.system}>
       <List.ItemText>{stage.name}</List.ItemText>
-      {!reordering && (
-        <List.ItemActions>
-          <Switch.Root
-            aria-label={`Показывать «${stage.name}»`}
-            checked={stage.shown}
-            onCheckedChange={(shown) => show(stage.id, shown)}
-          />
-        </List.ItemActions>
-      )}
+      <List.ItemActions>
+        <Switch.Root
+          aria-label={`Показывать «${stage.name}»`}
+          checked={stage.shown}
+          onCheckedChange={(shown) => show(stage.id, shown)}
+        />
+      </List.ItemActions>
     </List.Item>
   ))}
 </List.Root>

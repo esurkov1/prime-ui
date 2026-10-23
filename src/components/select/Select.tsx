@@ -39,7 +39,7 @@ import {
   useStoreSlice,
   useTypeahead,
 } from "@/internal/listbox";
-import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
+import { MenuGroup, type MenuGroupProps, menuRowProps, menuRowTier } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
@@ -616,13 +616,17 @@ const LOADING_ROWS = 4;
 const LOADING_MORE_ROWS = 2;
 
 /** Skeleton rows in the option geometry; decorative (the list carries `aria-busy`). */
-function SkeletonRows({ count }: { count: number }) {
+function SkeletonRows({ count, panel }: { count: number; panel: ControlSize }) {
   return Array.from({ length: count }, (_, index) => (
     <div
       // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder rows
       key={index}
       aria-hidden="true"
-      className={cx(menu.item, menu.skeletonRow)}
+      {...menuRowProps({
+        size: menuRowTier(panel),
+        interactive: false,
+        className: menu.skeletonRow,
+      })}
       data-skeleton=""
     >
       <Skeleton />
@@ -811,16 +815,16 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
               aria-owns={actions.length > 0 ? actionsId : undefined}
               tabIndex={-1}
               data-autofocus={searchable ? undefined : ""}
-              className={styles.listbox}
+              className={cx(menu.list, styles.listbox)}
             >
               {/* Items render while loading too: they register, and the first match ends it. */}
               {items}
-              {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
+              {region === "loading" ? <SkeletonRows count={LOADING_ROWS} panel={size} /> : null}
               {region === "ready" && hasMore ? (
                 <div ref={setSentinelRef} aria-hidden="true" className={menu.loadSentinel} />
               ) : null}
               {region === "ready" && loadingMore ? (
-                <SkeletonRows count={LOADING_MORE_ROWS} />
+                <SkeletonRows count={LOADING_MORE_ROWS} panel={size} />
               ) : null}
             </ScrollContainer>
             {region === "ready" && isEmpty ? (
@@ -832,7 +836,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
               // Owned by the listbox (`aria-owns`): its options for assistive tech, pinned under
               // the scroller and the empty state for the eye.
               // biome-ignore lint/a11y/useSemanticElements: a group of options inside a listbox, not a form fieldset
-              <div id={actionsId} role="group" className={styles.actions}>
+              <div id={actionsId} role="group" className={cx(menu.list, styles.actions)}>
                 {actions}
               </div>
             ) : null}

@@ -453,6 +453,7 @@ export { Label } from "./label/Label";
 export type { LinkButtonProps } from "./link-button/LinkButton";
 export { LinkButton } from "./link-button/LinkButton";
 export type {
+  ListGroupProps,
   ListItemActionsProps,
   ListItemBadgesProps,
   ListItemCountProps,

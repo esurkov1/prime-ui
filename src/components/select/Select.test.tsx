@@ -1167,7 +1167,7 @@ describe("Select rich options", () => {
     render(<RichSelect defaultValue="adv160" />);
     const option = screen.getByRole("option", { name: /Honda ADV 160/, hidden: true });
     expect(screen.getByRole("combobox")).toHaveTextContent("Honda ADV 160");
-    expect(option).toHaveAttribute("data-rich", "true");
+    expect(option).toHaveAttribute("data-lines", "two");
     const meta = option.querySelector('[data-testid="row-meta"]');
     expect(meta?.textContent).toBe("300 ฿ / день");
     // The check of the selected option follows the meta.
@@ -1252,12 +1252,14 @@ describe("Select rich options", () => {
     );
     const option = screen.getByRole("option", { name: /Анна Смирнова/ });
     const avatar = screen.getByTestId("row-avatar");
+    // The rows of an `l` panel stand at `m`: a picture beside one line is 24 (`s`), decorative.
     expect(avatar).toHaveAttribute("data-size", "s");
-    expect(avatar).toHaveAttribute("aria-hidden", "true");
-    expect(option).not.toHaveAttribute("data-rich");
-    expect(option.firstElementChild).toBe(avatar);
+    expect(avatar.closest('[aria-hidden="true"]')).not.toBeNull();
+    expect(option).not.toHaveAttribute("data-lines");
+    expect(option.firstElementChild).toContainElement(avatar);
+    // The badge stands at the row's end, after the text.
     const badge = screen.getByTestId("row-badge");
-    expect(badge.previousElementSibling).toHaveTextContent("Анна Смирнова");
+    expect(badge.parentElement?.previousElementSibling).toHaveTextContent("Анна Смирнова");
     expect(
       screen.getByRole("option", { name: /Борис Котов/ }).querySelector("[data-size]"),
     ).toHaveAttribute("data-size", "xs");

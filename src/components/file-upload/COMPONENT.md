@@ -60,12 +60,12 @@ FileUpload.Root                 field frame: label → trigger → files → hin
 FileUpload.Queue                the same files with no trigger of their own (a tray whose paperclip lives elsewhere)
 
 FileUpload.Item                 a file row the set does not draw (own actions, a server-side job)
-├─ FileUpload.FormatBadge       square kit Thumbnail labelled with the extension
+├─ FileUpload.FormatBadge       the mark: a square kit Thumbnail labelled with the extension
 │  or FileUpload.ItemPreview    square kit Thumbnail of an image file
-├─ FileUpload.ItemText          one line, truncated (the set passes the name without its extension when a format badge shows it)
+├─ FileUpload.ItemText          one line, cut in the middle (the set passes the name without its extension when a format badge shows it)
 ├─ FileUpload.ItemDescription   size, progress or error
 ├─ FileUpload.ItemActions       buttons at the end of the row (kit Button)
-└─ FileUpload.ItemProgress      the kit ProgressBar across the row
+└─ FileUpload.ItemProgress      the kit ProgressCircle in the place of the mark
 ```
 The built-in zone body (icon, `labels.title` and a decorative soft Button; formats and limits go in `hint`) renders when there are no children; the built-in button content is the paperclip and `labels.browse`. The set draws its rows and tiles itself from `value` and `queue`; the `Item` parts are for a row it does not draw (a download button, a report being prepared).
 
@@ -183,16 +183,16 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLUListElement>, "children" \| "defaultValue">` | — | `className`, `aria-label` (name the list) and the other attributes of the `<ul>`. |
 
 ### FileUpload.Item
-`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part.
+`ref` → `HTMLDivElement`. A file row, the one list row of the kit: mark (format badge, picture or progress ring) · name over description · actions; children are placed by their part.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the padding, text and the format badge. Without it the tier of its host, else `m`. |
-| `invalid` | `boolean` | `false` | A failed upload: danger wash and ring, danger description. |
+| `invalid` | `boolean` | `false` | A failed upload: the description turns danger. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the item parts), `className` and the other div attributes. |
 
 ### FileUpload.FormatBadge
-`ref` → `HTMLDivElement`. The file format as the short label of a square kit Thumbnail of the row tier, where an image file shows its picture (`aria-hidden`: the accessible name carries the extension).
+`ref` → `HTMLDivElement`. The file format as the short label of a square kit Thumbnail as the mark of the row (40 at `m` beside a description), where an image file shows its picture (`aria-hidden`: the accessible name carries the extension).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -201,7 +201,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the tile. |
 
 ### FileUpload.ItemPreview
-`ref` → `HTMLDivElement`. An image file's picture in place of the format badge: a square kit Thumbnail of the row tier (`aria-hidden`: the name names the file), the image icon while it loads or if it fails.
+`ref` → `HTMLDivElement`. An image file's picture in place of the format badge: a square kit Thumbnail as the mark of the row (`aria-hidden`: the name names the file), the image icon while it loads or if it fails.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -209,21 +209,21 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the thumbnail frame. |
 
 ### FileUpload.ItemText · FileUpload.ItemDescription · FileUpload.ItemActions
-`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.
+`ref` → `HTMLDivElement`. The file name (one line, cut in the middle so its start and its extension stay in view), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### FileUpload.ItemProgress
-`ref` → `HTMLDivElement` (the wrapper). Upload progress across the row: the kit ProgressBar.
+`ref` → `HTMLSpanElement` (the mark). Upload progress: the kit ProgressCircle in the place of the mark, where the format stood.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `number` | — (required) | Uploaded amount. |
-| `max` | `number` | — | Total amount (ProgressBar default). |
-| `tone` | `"accent" \| "neutral" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Fill color: `success` for a finished file, `danger` where a failed one stopped. |
-| `aria-label` | `string` | `labels.upload` | Accessible name of the bar (not the wrapper); name the file. |
+| `max` | `number` | — | Total amount (ProgressCircle default). |
+| `tone` | `"accent" \| "neutral" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Ring color: `success` for a finished file, `danger` where a failed one stopped. |
+| `aria-label` | `string` | `labels.upload` | Accessible name of the ring (not the mark); name the file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
 ### Types
@@ -262,7 +262,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 ### layout (FileUpload.Root · FileUpload.Queue)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `list` | a row per file: badge or preview, name, size and status, a bar across the row while it uploads; no reorder | documents of a form, where the name matters most | yes |
+| `list` | a row per file: badge or preview, name, size and status, a ring in the place of the mark while it uploads; no reorder | documents of a form, where the name matters most | yes |
 | `grid` | square tiles that follow the set's width: 5 · 4 · 3 · 2 across; reorder by drag or Alt + arrows | file cards whose order matters (a report); with `cover` — the image gallery of a listing or a product | |
 | `strip` | one row of `--prime-space-24` tiles that scrolls sideways with faded edges; reorder along the row | an attachment tray above a message field (Composer), where the height must not grow | |
 
@@ -281,7 +281,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | `l` | padding 32, icon 48, browse 40, title 16/24; badge 48 | the main upload area of a page | |
 | `xl` | padding 40, icon 56, browse 48, title 18/24; badge 48 | full-page or onboarding upload | |
 
-The zone and its file rows stand on the surface frame of the tier; the buttons in a row take the tier itself.
+The zone stands on the surface frame of the tier; a file row is the list row of the tier (28 · 32 · 36 · 40 · 48 tall, 44 · 48 · 56 · 60 · 68 beside a description) and its buttons are the row controls (a tier down beside a description).
 
 **Sizes:** the rows of the root take its tier; a standalone `FileUpload.Item` takes `size` of its own. Tiles keep one size.
 
@@ -294,9 +294,9 @@ The zone and its file rows stand on the surface frame of the tier; the buttons i
 ### tone (FileUpload.ItemProgress)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `accent` | accent fill | a file in flight | yes |
-| `success` | success fill, full | the file is uploaded | |
-| `danger` | danger fill where it stopped | the upload failed | |
+| `accent` | accent ring | a file in flight | yes |
+| `success` | success ring | the file is uploaded | |
+| `danger` | danger ring where it stopped | the upload failed | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -325,21 +325,21 @@ The zone and its file rows stand on the surface frame of the tier; the buttons i
 | empty | no files, `trigger="tile"` | the add tile spans the row with «Нажмите или перетащите файлы» |
 | cover | `cover`, the first tile | «Обложка» in place of the format pill, `data-cover` on the tiles wrapper (the first tile takes a 2 × 2 cell in a grid) |
 | full | the set reaches `max` | the add tile (and its file input) closes up in place; focus that was on it moves to the last file; it enters again once a file leaves |
-| queued | queue item `status: "queued"` | a row reads «size · В очереди» over an empty bar; a tile (`data-upload="queued"`) dims under a 40px disk on the `media` shade (Button `shape="circle"` `variant="shade"`) whose ring turns at its least arc, described by «В очереди» |
-| loading | `status: "loading"` | a row reads «size · Загрузка 40%» and its bar fills (`accent`); a tile's white arc grows clockwise from 12 o'clock with the share sent (the `progress` ring of a shade circle Button, one variable `--ring-value`, gliding `base` while it turns); the disk is the remove («Отменить загрузку: name», described by the state), the corner × is not drawn; the tile still reorders, its carried copy keeps the disk |
-| done | `status: "done"` | a row reads «size» over a full `success` bar; a tile's ring fills, then its disk fades and shrinks to 0.9 (`fast`, `inert`), the picture returns to full or the sheet comes back |
-| failed | `status: "failed"` | an invalid row, «size · reason», `danger` bar where it stopped, retry and remove; a tile's disk turns danger with a retry arrow («Повторить загрузку: name», described by the reason), a danger ring, the corner × is back |
+| queued | queue item `status: "queued"` | a row reads «size · В очереди»; a tile (`data-upload="queued"`) dims under a 40px disk on the `media` shade (Button `shape="circle"` `variant="shade"`) whose ring turns at its least arc, described by «В очереди» |
+| loading | `status: "loading"` | a row reads «size · Загрузка 40%» and a progress ring (`accent`) takes the place of the mark, the full name beside it; a tile's white arc grows clockwise from 12 o'clock with the share sent (the `progress` ring of a shade circle Button, one variable `--ring-value`, gliding `base` while it turns); the disk is the remove («Отменить загрузку: name», described by the state), the corner × is not drawn; the tile still reorders, its carried copy keeps the disk |
+| done | `status: "done"` | a row reads «size», the ring gives the mark back to the format (the swap glides, `RegionSwap`); a tile's ring fills, then its disk fades and shrinks to 0.9 (`fast`, `inert`), the picture returns to full or the sheet comes back |
+| failed | `status: "failed"` | an invalid row (no fill: «size · reason» in the danger text), retry and remove; a tile's disk turns danger with a retry arrow («Повторить загрузку: name», described by the reason), a danger ring, the corner × is back |
 | carried | a drag or Alt + arrows | Dnd: the tile lifts as a copy that takes the size of the cell it would land in, a dashed gap opens, neighbours glide; a file that becomes or stops being the cover moves to its new cell and fades in, and the new cover is announced («Обложка: name») |
 | saving | `onValueChange` returned a pending promise | the touched files get `aria-busy` and `data-pending`: their content quiets to 0.6 (`fast`, both ways), the remove button is `loading` and stays shown, a tile does not drag; a move or new files stand in their new places, a removed file stays until the answer |
 | refused | that promise rejected | the set goes back — a moved tile glides back, new files leave the queue — and `labels.changeFailed` is announced |
 | leaving | a file left by its remove button | a row or a strip tile leaves a copy in place that closes up — fades, settles to 0.96 and shrinks to nothing with its gap (`fast`, `exit`) — so the files after it glide; off under reduced motion |
 
-Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status` on a row in the queue, `data-upload` and `data-kind` on a tile. A row of an upload keeps one height in every status: the bar stays, only its fill and the text change (the text morphs, `MorphText`); a new row enters (`enterMotion`), a tile that arrives after the first render enters too. A new cover's word fades in where its format pill stood.
+Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status` on a row in the queue, `data-upload` and `data-kind` on a tile. A row of an upload keeps one height in every status: only its mark and the text change (the text morphs, `MorphText`); a new row enters (`enterMotion`), a tile that arrives after the first render enters too. A new cover's word fades in where its format pill stood.
 
 ## Layout & spacing
-- The zone and Item are `width: 100%`; the parent sets the width. Label → trigger and the field → hint use the tier `label-gap` / `hint-gap`; trigger → files and row → row `--prime-space-2`.
+- The zone and Item are `width: 100%`; the parent sets the width. Label → trigger and the field → hint use the tier `label-gap` / `hint-gap`; trigger → files 8, row → row 2 (the gap of the list row).
 - `trigger="button"` hugs its content; the hidden input sits beside the button.
-- `ItemPreview` is a Thumbnail of the row tier (40 at `m`, 32 at `xs` and `s`, 48 from `l`): the height of the name and description lines.
+- A row is the list row of its tier (`src/internal/listRow`): no fill of its own, a wash on hover and on keyboard focus inside. The mark never grows the row: a Thumbnail or a ring of the row tier (`listMarkSize`), 40 at `m` beside a description, 24 beside a line alone. The name is cut in the middle: its last six characters, the extension included, always stay.
 - A row shows a picture's preview, or the format badge beside the name without its extension, in the format's hue: pdf red, doc blue, xls green, ppt orange, archives yellow, video purple, audio pink, anything else gray.
 - Tiles (`layout="grid" | "strip"`) reorder through Dnd: `FileUpload.Root` and `FileUpload.Queue` mount their own `Dnd.Root` unless one is already above them. A video tile mounts its first frame (`Thumbnail.Video`) once the tile nears the view.
 - Tiles are the shared attachment tile (`src/internal/attachmentTile`, also the Composer tray). The tiles are a size container: 5 across from 36rem of its own width, 4 below, 3 below 32rem, 2 below 22rem; gap `--prime-space-3` (`--prime-space-2` from 3 across). With `cover` the first tile spans two columns and two rows at every width.
@@ -370,7 +370,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 - `trigger="tile"`: the frame is a group named by the label; the add tile is the label of a hidden input («Добавить файлы») with the hint, the error and `aria-invalid` wired to it.
 - The files are a `<ul>` named by the field label (or `aria-label`). `FileUpload.Icon`, `FormatBadge` and `ItemPreview` are `aria-hidden`: the file name and description carry the meaning.
 - Icon-only buttons in `ItemActions` need an `aria-label` with the file name; the set names its own («Убрать …», «Повторить загрузку: …»).
-- A row in flight has its progress bar named by the file; a polite live region speaks a file that finished, the reason of one that failed, a removed file, the new cover after a reorder («Обложка: name», `labels.coverChanged`) and a refused change (`labels.changeFailed`); a file whose change is saved has `aria-busy`.
+- A row in flight has its progress ring named by the file; a polite live region speaks a file that finished, the reason of one that failed, a removed file, the new cover after a reorder («Обложка: name», `labels.coverChanged`) and a refused change (`labels.changeFailed`); a file whose change is saved has `aria-busy`.
 - Tiles are `<li>` of a Dnd.Sortable `<ul>`, named «Фото 2: склад.jpg · Загрузка 45%» («Видео …», «Файл …»; the file's `alt` in place of its name), with `aria-roledescription` and `aria-keyshortcuts`; the position and format on a tile are hidden (the name says them); the disk is a circle button («Отменить загрузку: …» described by the state, «В очереди» / «Загрузка 45%», `aria-busy`, its ring `aria-hidden`; on a failure «Повторить загрузку: …» described by the reason); without a remove handler the disk is no button but a `progressbar` (`aria-valuenow`) while the file is queued or uploading; Dnd's live region announces moves.
 - A file with `href`: in a row its name is a link (`<a target="_blank">`, named by the name); a tile holds a link over its middle named «Открыть name» (`labels.open`), a Tab stop after the tile itself.
 - Touch: a tile drag starts after a hold; the buttons on a tile are always shown, never hover-only.
@@ -390,7 +390,7 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | `queued` | `"В очереди"` | A file waiting for a free slot (a row's status, a tile's name and its empty ring). |
 | `uploading` | `"Загрузка {percent}%"` | A file in flight. |
 | `failed` | `"Не удалось загрузить"` | A failed file whose upload gave no reason. |
-| `progress` | `"Загрузка: {name}"` | Name of a row's progress bar. |
+| `progress` | `"Загрузка: {name}"` | Name of a row's progress ring. |
 | `upload` | `"Загрузка файла"` | Name of a `FileUpload.ItemProgress` without an `aria-label` of its own. |
 | `cancel` | `"Отменить загрузку: {name}"` | Name of the disk that cancels a tile's upload in flight. |
 | `retry` | `"Повторить загрузку: {name}"` | Name of the retry button of a failed row (the retry disk of a failed tile). |
@@ -445,5 +445,5 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 - Styling a tile from an ancestor (`.gallery li`) → the carried clone is portalled to `<body>` and loses it.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (the cover pill), [StatusDot](../status-dot/COMPONENT.md) (the header row's description line), [Thumbnail](../thumbnail/COMPONENT.md) (`FormatBadge`, `ItemPreview`, video tiles), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`, a [Spinner](../spinner/COMPONENT.md) while a transfer waits), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (the cover pill), [StatusDot](../status-dot/COMPONENT.md) (the description line of a row), [Thumbnail](../thumbnail/COMPONENT.md) (`FormatBadge`, `ItemPreview`, video tiles), [ProgressCircle](../progress-circle/COMPONENT.md) (`ItemProgress`), the list row (`src/internal/listRow`, which sizes an [Avatar](../avatar/COMPONENT.md), a ProgressCircle or a Thumbnail in the mark), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`, a [Spinner](../spinner/COMPONENT.md) while a transfer waits), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Composer](../composer/COMPONENT.md) (its attachment tray is `FileUpload.Queue layout="strip"`), [LinkButton](../link-button/COMPONENT.md) (an inline browse link in a custom body), [Avatar](../avatar/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

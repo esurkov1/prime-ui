@@ -100,8 +100,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Row tier: item height, text and icon; key hints one tier down. The menu's own: it does not follow the trigger's size.",
-          ru: "Ярус строк: высота пункта, текст и иконка; подсказки клавиш на ярус меньше. Свой у меню: размер триггера на него не влияет.",
+          en: "Menu tier: the rows stand a tier below it (an `m` menu has `s` rows, 32). The menu's own: it does not follow the trigger's size.",
+          ru: "Ярус меню: строки стоят на ярус ниже (у меню `m` строки `s`, 32). Свой у меню: размер триггера на него не влияет.",
         },
         {
           name: "width",
@@ -218,8 +218,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.CheckboxItem",
-      en: '`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a check mark at the end while checked; a click, Enter or Space toggles it and the menu stays open.',
-      ru: 'Пункт-переключатель `<button role="menuitemcheckbox">` с `aria-checked` и галочкой в конце, пока он выбран; клик, Enter или Space переключают его, меню остаётся открытым.',
+      en: '`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked`, a `Checkbox.Indicator` before the label and the accent\'s soft tone while checked; a click, Enter or Space toggles it and the menu stays open.',
+      ru: 'Пункт-переключатель `<button role="menuitemcheckbox">` с `aria-checked`, `Checkbox.Indicator` перед подписью и мягким тоном акцента, пока он выбран; клик, Enter или Space переключают его, меню остаётся открытым.',
       props: [
         {
           name: "checked",
@@ -283,8 +283,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "The sentence; it wraps inside the menu's width.",
-          ru: "Фраза; переносится в пределах ширины меню.",
+          en: "The sentence: one line cut with an ellipsis; a `StatusDot` first.",
+          ru: "Фраза: одна строка с многоточием; `StatusDot` — первым.",
         },
         {
           name: "…rest",
@@ -296,8 +296,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. The `aria-hidden` leading glyph of an item at the menu icon size.",
-      ru: "Иконка в начале пункта (`aria-hidden`) по размеру яруса меню.",
+      en: "`ref` → `HTMLSpanElement`. The `aria-hidden` leading mark of an item: the glyph of the row's tier, bare beside one line, on a tile beside a `Dropdown.ItemDescription`.",
+      ru: "Метка в начале пункта (`aria-hidden`): глиф яруса строки, голый в одну строку, на плитке рядом с `Dropdown.ItemDescription`.",
       props: [
         {
           name: "…rest",

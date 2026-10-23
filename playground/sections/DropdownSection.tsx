@@ -70,7 +70,7 @@ export const page: ComponentPageConfig = {
       scenario: "checkbox-items",
       title: "Флажки",
       description:
-        "Выбор колонок: пункты-переключатели с галочкой в конце не закрывают меню, ключевую колонку не скрыть — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`.",
+        "Выбор колонок: пункты-переключатели с флажком перед подписью не закрывают меню, ключевую колонку не скрыть — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`.",
     },
     {
       scenario: "person-choice",

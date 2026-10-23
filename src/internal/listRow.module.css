@@ -1,0 +1,451 @@
+/*
+ * The one list row of the kit — List, Sidebar, the rows of menus, Select, CommandMenu, Timeline, the
+ * file queue and legends. The grammar of a card's header:
+ *   [mark] [title · number · badges        ] [meta · count · controls]
+ *          [description                    ]
+ * No box of its own: a wash on hover, a fill step on the current row. Geometry is the field tier
+ * (`fieldTierClass` on the host, which also carries `.tier` with `data-size`): a row without a
+ * description is the control height (28 · 32 · 36 · 40 · 48), its padding (height − line) / 2 above
+ * and below and `--field-px` at the sides; with a description two lines and the same padding
+ * (44 · 48 · 56 · 60 · 68). Radius — the control's (6 · 8 · 8 · 10 · 12). Everything at the end stands
+ * on the row's centre line. A mark never grows the row.
+ *
+ * Parts: `.row` draws the fills and holds the hit element (`.hit`: the row's button, link or static
+ * box) and the row's own controls (`.actions`) side by side; a host whose element is the whole row
+ * joins both classes on it.
+ */
+
+/* --- Tier: description text, gaps, mark boxes ------------------------------------- */
+
+.tier {
+  --lr-desc: var(--prime-text-body-s-size);
+  --lr-desc-lh: var(--prime-text-body-s-line-height);
+  --lr-gap-line: var(--prime-space-2);
+  --lr-gap-two: var(--prime-space-3);
+}
+
+.tier[data-size="xs"],
+.tier[data-size="s"] {
+  --lr-desc: var(--prime-text-caption-size);
+  --lr-desc-lh: var(--prime-text-caption-line-height);
+  --lr-gap-two: var(--prime-space-2);
+}
+
+.tier[data-size="l"] {
+  --lr-desc: var(--prime-text-body-m-size);
+  --lr-desc-lh: var(--prime-text-body-m-line-height);
+}
+
+.tier[data-size="xl"] {
+  --lr-desc: var(--prime-text-body-m-size);
+  --lr-desc-lh: var(--prime-text-body-m-line-height);
+  --lr-gap-line: var(--prime-space-3);
+  --lr-gap-two: var(--prime-space-4);
+}
+
+/* --- Row --------------------------------------------------------------------------- */
+
+.row {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  min-width: 0;
+  min-height: max(var(--list-row-h, var(--field-h)), var(--touch-row-min, var(--prime-space-0)));
+  border-radius: var(--field-radius);
+  color: var(--prime-color-text-primary);
+}
+
+/* The row's transitions have zero specificity: a host that moves more on the same element (the
+   Sidebar's rail cut and press) declares its own list in any bundle order, as `internal/press`. */
+:where(.row, .hit) {
+  transition:
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+.hit {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--lr-gap-line);
+  min-width: 0;
+  margin: 0;
+  /* Public hooks: `--list-row-h` — the row height (a Sidebar flyout's menu rows), `--list-row-px`
+     — the side padding, one or two lengths (the Sidebar's rail-centred icons, its sub-rows). */
+  padding-block: calc((var(--list-row-h, var(--field-h)) - var(--field-lh)) / 2);
+  padding-inline: var(--list-row-px, var(--field-px));
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  text-align: start;
+  text-decoration: none;
+}
+
+.row[data-lines="two"] .hit,
+.row[data-lines="two"].hit {
+  gap: var(--lr-gap-two);
+}
+
+/* A host whose element is the whole row (a menu item, an option): one line of parts and its own
+   corners — it has no controls to drop and no row around it to inherit from. */
+.row.hit {
+  flex-wrap: nowrap;
+  border-radius: var(--field-radius);
+}
+
+/* The row's text keeps a floor beside its controls; controls that leave less than the floor drop
+   to a line of their own at the row's end instead of crushing the text or leaving the row. */
+.row > .hit {
+  flex: 1 1 var(--prime-space-24);
+}
+
+.row > .actions {
+  margin-inline-start: auto;
+}
+
+/* A row with its own controls: they take the end padding. */
+.row:has(> .actions) > .hit {
+  padding-inline-end: var(--prime-space-0);
+}
+
+/* A legend row: no wash, so no padding of its own — marks and values stand on the content edges. */
+.row[data-plain] > .hit,
+.row[data-plain].hit {
+  padding-inline: var(--prime-space-0);
+}
+
+/* A legend names its parts in regular weight (the values are the meta). */
+.row[data-plain] .title {
+  font-weight: var(--prime-font-weight-regular);
+}
+
+.hit[data-interactive] {
+  cursor: pointer;
+}
+
+/* The focus ring inside the row edge: a scrolling pane never cuts it (lists, navigation). */
+.hit:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+@media (hover: hover) {
+  .row:has(> .hit[data-interactive]):hover,
+  .row.hit[data-interactive]:hover {
+    background: var(--prime-color-fill-subtle);
+    color: var(--prime-color-text-primary);
+  }
+
+  .row[data-danger]:has(> .hit[data-interactive]):hover,
+  .row.hit[data-danger][data-interactive]:hover {
+    background: var(--prime-color-danger-soft);
+    color: var(--prime-color-danger-text);
+  }
+}
+
+/* A menu row that takes real focus (the roving focus of a menu, a button in a popover menu:
+   `data-focus="fill"` on the hit element): the focus is its highlight — the fill, no ring. */
+.hit[data-focus="fill"]:focus-visible {
+  outline: none;
+}
+
+.row.hit[data-focus="fill"]:focus-visible {
+  background: var(--prime-color-fill-subtle);
+}
+
+.row.hit[data-danger][data-focus="fill"]:focus-visible {
+  background: var(--prime-color-danger-soft);
+}
+
+.row.hit[data-checked][data-focus="fill"]:focus-visible {
+  background: var(--prime-color-accent-soft-hover);
+}
+
+/* A row a filter left out (a menu's search): `hidden` wins over the row's flex. */
+.row[hidden] {
+  display: none;
+}
+
+/* The keyboard highlight of a menu or a listbox (focus stays in the field or the panel). */
+.row[data-highlighted] {
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-primary);
+}
+
+.row[data-danger][data-highlighted] {
+  background: var(--prime-color-danger-soft);
+}
+
+/* A static row that holds its own links and controls (the file queue): a wash on hover and while
+   focus is inside it. */
+@media (hover: hover) {
+  .row[data-wash]:hover {
+    background: var(--prime-color-fill-subtle);
+  }
+}
+
+.row[data-wash]:focus-within {
+  background: var(--prime-color-fill-subtle);
+}
+
+/* Pressed: one step stronger, the row does not move. */
+.row:has(> .hit[data-interactive]:active),
+.row.hit[data-interactive]:active {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+/* Checked by a checkbox (multiple selection): the accent's soft tone. */
+.row[data-checked] {
+  background: var(--prime-color-accent-soft);
+}
+
+/* A checked row under the keyboard highlight or the pointer: the accent's tone a step deeper, so
+   the highlight still reads on it. */
+.row[data-checked][data-highlighted] {
+  background: var(--prime-color-accent-soft-hover);
+}
+
+@media (hover: hover) {
+  .row[data-checked]:has(> .hit[data-interactive]):hover,
+  .row.hit[data-checked][data-interactive]:hover {
+    background: var(--prime-color-accent-soft-hover);
+  }
+}
+
+/* The current row (the open record, the page): a fill step, the weight unchanged. A host sets
+   `data-current` on the row, or the hit element carries `aria-current`. */
+.row[data-current],
+.row:has(> .hit:is([aria-current="page"], [aria-current="true"])) {
+  background: var(--prime-color-fill-muted-hover);
+  color: var(--prime-color-text-primary);
+}
+
+.row[data-danger] {
+  color: var(--prime-color-danger-text);
+}
+
+.row[data-disabled] {
+  background: transparent;
+  color: var(--prime-color-text-disabled);
+}
+
+.row[data-disabled] .hit {
+  cursor: not-allowed;
+}
+
+/* --- Mark ---------------------------------------------------------------------------- */
+
+/* A glyph of the tier (muted; the text colour on the current row), a picture under the row's line
+   (internal/states `listMarkSize.line`), a colour dot in an icon-wide box. */
+.mark {
+  --prime-icon-size: var(--field-icon);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--prime-color-text-muted);
+}
+
+.mark[data-kind="dot"] {
+  inline-size: var(--field-icon);
+  block-size: var(--field-icon);
+}
+
+.row[data-current] .mark[data-kind="glyph"] {
+  color: var(--prime-color-text-primary);
+}
+
+.row[data-danger] .mark {
+  color: inherit;
+}
+
+/* A row in a palette hue of its own (a Select status option, `data-color` with the palette's
+   `.hue`): its mark and its secondary text take the row's ink. */
+.row[data-color]:not([data-disabled]) :is(.mark, .description, .meta, .count) {
+  color: inherit;
+}
+
+.row[data-disabled] .mark {
+  color: var(--prime-color-text-disabled);
+}
+
+/* --- Text ---------------------------------------------------------------------------- */
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The title's line: the title, its number and the badges, never cut — the title gives way first
+   (down to its text or 8em, `useTitleFloor`), then the badges fold into «+N». */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--prime-space-1) * 1.5);
+  min-width: 0;
+}
+
+.title {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: var(--prime-font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleRow > .title {
+  flex: 0 1000 auto;
+  min-width: min(var(--header-title-min, var(--prime-space-0)), 100%);
+}
+
+/* The record's number after the title: muted, figures in columns, never cut. */
+.number {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.badges {
+  flex: 0 0 auto;
+}
+
+/* A StatusDot first, then «·», then the text, which is cut (internal/headerRow `HeaderLineContent`). */
+.description {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--prime-space-1) * 1.5);
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-muted);
+  font-size: var(--lr-desc);
+  line-height: var(--lr-desc-lh);
+  white-space: nowrap;
+}
+
+.description > :not(:last-child) {
+  flex: none;
+}
+
+.row[data-disabled] :is(.description, .number, .meta, .count) {
+  color: inherit;
+}
+
+/* --- End: meta, count, controls ----------------------------------------------------- */
+
+.end {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--field-gap);
+  margin-inline-start: auto;
+}
+
+/* Beside two lines a time over a count: one column on the row's centre line. */
+.stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(var(--prime-space-1) / 2);
+}
+
+.meta,
+.count {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-size: var(--lr-desc);
+  line-height: var(--lr-desc-lh);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The row's own controls, beside its hit element and never inside it: buttons as tall as the row
+   minus 8 (beside two lines a tier down — the host sets that tier), the end padding after them. */
+.actions {
+  --prime-control-height: calc(var(--field-h) - var(--prime-space-2));
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-1);
+  padding-inline: var(--field-gap) var(--field-px);
+}
+
+.row[data-lines="two"] > .actions {
+  --prime-control-height: initial;
+}
+
+/* `actions="hover"`: the controls come on hover or keyboard focus in the row; on touch they stay. */
+@media (hover: hover) and (pointer: fine) {
+  .tier[data-actions="hover"] .row > .actions {
+    opacity: 0;
+    transition: opacity var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+  }
+
+  .tier[data-actions="hover"] .row:hover > .actions,
+  .tier[data-actions="hover"] .row:focus-within > .actions {
+    opacity: 1;
+  }
+}
+
+/* The check of a single choice: a column at the end, held even while empty, so labels never shift. */
+.check {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--field-icon);
+  block-size: var(--field-icon);
+  color: var(--prime-color-accent-text);
+}
+
+/* The checkbox of a multiple choice, at the start (or at the end with `indicator="end"`). */
+.indicator {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+/* --- Navigation (`data-nav` on the tier: the Sidebar) ------------------------------- */
+
+/* Items are quiet; the current and the hovered one read in the text colour. One class strong, so
+   the row's states and the host's own win in any bundle order. */
+:where(.tier[data-nav]) .row {
+  color: var(--prime-color-text-secondary);
+}
+
+/* The rail's row is one element in a column: it never grows or wraps there and keeps its own
+   radius; the tier gap stands after its icon, 8 between its end parts, and its count takes the
+   row's text. Its fill and focus ring are the host's layer, which the rail cut moves. */
+.tier[data-nav] .row.hit {
+  flex: none;
+  flex-wrap: nowrap;
+  border-radius: var(--field-radius);
+}
+
+.tier[data-nav] .hit {
+  gap: var(--field-gap);
+}
+
+.tier[data-nav] .hit:focus-visible {
+  outline: none;
+}
+
+.tier[data-nav] .end {
+  gap: var(--prime-space-2);
+}
+
+.tier[data-nav] .count {
+  font-size: inherit;
+  line-height: inherit;
+}

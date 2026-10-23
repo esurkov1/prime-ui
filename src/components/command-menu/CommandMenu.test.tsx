@@ -212,7 +212,7 @@ describe("CommandMenu — size и labels", () => {
       </CommandMenu.Root>,
     );
     const option = screen.getByRole("option", { name: "Alpha" });
-    expect(option.closest("[data-size]")).toHaveAttribute("data-size", "xl");
+    expect(option.closest("[data-size]")).toHaveAttribute("data-size", "l");
     const input = screen.getByRole("combobox", { name: "Find" });
     expect(input).toHaveAttribute("placeholder", "Find");
     await user.type(input, "zz");

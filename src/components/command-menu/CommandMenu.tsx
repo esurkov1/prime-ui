@@ -19,7 +19,6 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldInputTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { hasContent } from "@/internal/hasContent";
-import { iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import {
   handleListboxKeyDown,
@@ -32,10 +31,13 @@ import {
   useListboxView,
   useStoreSlice,
 } from "@/internal/listbox";
+import { type ListRowLines, ListRowMark, listRowStyles } from "@/internal/listRow";
 import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
+import { isPart } from "@/internal/parts";
 import { RegionSwap } from "@/internal/RegionSwap";
-import type { ControlSize } from "@/internal/states";
+import { type ControlSize, stepDown } from "@/internal/states";
+import { touchTargetRowClass } from "@/internal/touchTarget";
 import { usePendingAction } from "@/internal/usePendingChanges";
 
 import styles from "./CommandMenu.module.css";
@@ -101,6 +103,9 @@ const [CommandMenuProvider, useCommandMenuContext] =
 
 /** The items of a `CommandMenu.Group`: the group hides while none of them is shown. */
 const CommandMenuGroupContext = React.createContext<Set<string> | null>(null);
+
+/** Whether the item being drawn stands beside a description (two lines) or alone. */
+const CommandMenuLinesContext = React.createContext<ListRowLines>("line");
 
 const optionId = (id: string) => `${id}-option`;
 
@@ -275,9 +280,9 @@ function CommandMenuRoot({
       closeOnEscape={closeOnEscape}
       closeOnOutsideClick={closeOnOutsideClick}
     >
-      <Modal.Content {...rest} size="l" placement="top" className={cx(styles.content, className)}>
+      <Modal.Content {...rest} size="l" placement="top" className={className}>
         {/* `display: contents`: carries the tier variables without breaking the panel's flex column. */}
-        <div className={cx(fieldTierClass, menu.tier, styles.tier)} data-size={size}>
+        <div className={cx(fieldTierClass, styles.tier)} data-size={size}>
           {tier.provide(
             <CommandMenuState
               labels={labels}
@@ -428,7 +433,7 @@ function SkeletonRows({ count }: { count: number }) {
       // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder rows
       key={index}
       aria-hidden="true"
-      className={cx(menu.item, menu.itemPalette, menu.skeletonRow)}
+      className={cx(listRowStyles.row, listRowStyles.hit, menu.skeletonRow)}
       data-skeleton=""
     >
       <Skeleton />
@@ -497,7 +502,8 @@ function CommandMenuList({ className, children, ref, ...rest }: CommandMenuListP
             id={listboxId}
             role="listbox"
             aria-busy={loading || loadingMore || undefined}
-            className={cx(styles.list, className)}
+            className={cx(fieldTierClass, listRowStyles.tier, styles.list, className)}
+            data-size={stepDown(size)}
           >
             {/* Items render while loading too: they register, and the first match ends it. */}
             {children}
@@ -530,7 +536,11 @@ function CommandMenuGroup({ className, ...rest }: CommandMenuGroupProps) {
 
   return (
     <CommandMenuGroupContext.Provider value={members}>
-      <MenuGroup {...rest} hidden={hasVisible ? undefined : true} className={className} />
+      <MenuGroup
+        {...rest}
+        hidden={hasVisible ? undefined : true}
+        className={cx(styles.group, className)}
+      />
     </CommandMenuGroupContext.Provider>
   );
 }
@@ -598,6 +608,13 @@ function CommandMenuItem({
   // Only this item's slice of the active option: moving it re-renders two rows.
   const active = useStoreSlice(activeStore, (current) => current === id);
 
+  const lines: ListRowLines = React.Children.toArray(children).some(
+    (child) =>
+      isPart<CommandMenuItemTextProps>(child, CommandMenuItemText) && child.props.description,
+  )
+    ? "two"
+    : "line";
+
   return (
     <button
       {...rest}
@@ -609,7 +626,15 @@ function CommandMenuItem({
       aria-selected={active}
       aria-disabled={disabled || undefined}
       hidden={shown ? undefined : true}
-      className={cx(menu.item, menu.itemPalette, className)}
+      className={cx(
+        listRowStyles.row,
+        listRowStyles.hit,
+        touchTargetRowClass,
+        styles.item,
+        className,
+      )}
+      data-lines={lines}
+      data-interactive={disabled ? undefined : ""}
       {...toDataAttributes({ highlighted: active || undefined, disabled: disabled || undefined })}
       onPointerMove={(event) => {
         onPointerMove?.(event);
@@ -620,7 +645,9 @@ function CommandMenuItem({
         if (!event.defaultPrevented && shown) registry.activate(id);
       }}
     >
-      {highlightChildren(children, search)}
+      <CommandMenuLinesContext.Provider value={lines}>
+        {highlightChildren(children, search)}
+      </CommandMenuLinesContext.Provider>
     </button>
   );
 }
@@ -631,9 +658,13 @@ export type CommandMenuItemIconProps = React.HTMLAttributes<HTMLSpanElement> & {
 };
 
 /** Leading glyph of an item at the tier icon size (a kit `Icon` follows it). */
-function CommandMenuItemIcon({ className, ...rest }: CommandMenuItemIconProps) {
+function CommandMenuItemIcon({ children, ...rest }: CommandMenuItemIconProps) {
+  const { size } = useCommandMenuContext();
+  const lines = React.useContext(CommandMenuLinesContext);
   return (
-    <span aria-hidden="true" className={cx(menu.itemIcon, iconSlotClass, className)} {...rest} />
+    <ListRowMark {...rest} size={stepDown(size)} lines={lines}>
+      {children}
+    </ListRowMark>
   );
 }
 CommandMenuItemIcon.displayName = "CommandMenu.ItemIcon";
@@ -652,11 +683,11 @@ function CommandMenuItemText({
 }: CommandMenuItemTextProps) {
   const { search } = useCommandMenuContext();
   return (
-    <span className={cx(styles.itemText, className)} {...rest}>
-      <span className={styles.itemLabel}>{highlightChildren(children, search)}</span>
+    <span className={cx(listRowStyles.body, className)} {...rest}>
+      <span className={listRowStyles.title}>{highlightChildren(children, search)}</span>
       {description ? (
-        <span className={cx(menu.itemDescription, styles.itemDescription)}>
-          {highlightChildren(description, search)}
+        <span className={listRowStyles.description}>
+          <span className={styles.descriptionText}>{highlightChildren(description, search)}</span>
         </span>
       ) : null}
     </span>
@@ -671,7 +702,7 @@ export type CommandMenuItemShortcutProps = Omit<React.HTMLAttributes<HTMLElement
 
 /** Key hint at the end of an item (a Kbd one tier below). A hint only — not a handler. */
 function CommandMenuItemShortcut({ className, ...rest }: CommandMenuItemShortcutProps) {
-  return <Kbd className={cx(menu.shortcut, className)} {...rest} />;
+  return <Kbd className={cx(styles.shortcut, className)} {...rest} />;
 }
 CommandMenuItemShortcut.displayName = "CommandMenu.ItemShortcut";
 

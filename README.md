@@ -294,7 +294,7 @@ accessibility, examples and common mistakes.
 | [**Stepper**](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) | Steps of a multi-step process with pending, current, completed and danger statuses. |
 | [**Sidebar**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. |
 | [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation: a bar of 2–6 main sections at the bottom of the screen, optionally with a round action beside it. |
-| [**List**](https://github.com/esurkov1/prime-ui/blob/main/src/components/list/COMPONENT.md) | A selectable navigation list of rows: the master half of a list + detail screen (tickets, mail, records). |
+| [**List**](https://github.com/esurkov1/prime-ui/blob/main/src/components/list/COMPONENT.md) | A list of records or places built of the kit's one list row — the row Sidebar, menus, Select, CommandMenu, Timeline and the file queue stand on: a mark, a title with its number and badges, a description, meta and controls. |
 
 ### Overlays (`overlays`)
 

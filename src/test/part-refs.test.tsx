@@ -340,6 +340,19 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "List.ItemText",
+    "SPAN",
+    (ref) => (
+      <List.Root aria-label="Счета">
+        <List.Item>
+          <List.ItemText ref={ref} data-testid="part">
+            Счёт
+          </List.ItemText>
+        </List.Item>
+      </List.Root>
+    ),
+  ],
+  [
     "Tabs.Item",
     "BUTTON",
     (ref) => (

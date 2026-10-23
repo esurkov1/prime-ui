@@ -136,10 +136,9 @@
   overflow: hidden;
 }
 
+/* With `menu.list` (TSX): the column of option rows. */
 .listbox {
-  display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
   min-height: 0;
   outline: none;
 }
@@ -170,49 +169,20 @@
   display: none;
 }
 
-/* List-level actions (`Select.Action`): pinned under the scroller and the empty state, a faint
-   full-bleed hairline above them, never scrolled away. */
+/* List-level actions (`Select.Action`, a `menu.list` column): pinned under the scroller and the
+   empty state, a faint full-bleed hairline above them, never scrolled away. */
 .actions {
-  display: flex;
   flex-shrink: 0;
-  flex-direction: column;
   margin: var(--prime-panel-padding) calc(var(--menu-inset) * -1)
     calc(var(--prime-panel-padding) * -1);
   padding: var(--prime-panel-padding) var(--menu-inset);
   border-top: var(--prime-border-width) solid var(--prime-color-border-faint);
 }
 
-/* ─── Option ─────────────────────────────────────────────────────────────── */
-
-/* With `menu.item` (TSX): the row's fades. Every row, one line or rich, marks its choice the same
-   way: medium weight and the trailing check, on the neutral highlight fill — never a tint. */
-.item {
-  transition:
-    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
-}
-
-.item[data-selected="true"] {
-  font-weight: var(--prime-font-weight-medium);
-}
-
-.itemText {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Two-line option: grows from the tier item height with tier padding. */
-.item[data-rich="true"] {
-  padding-block: var(--field-gap);
-}
-
-.item[data-rich="true"] .itemText {
-  display: flex;
-  flex-direction: column;
-}
+/* ─── Rich value (the trigger's `renderValue`) ───────────────────────────────
+ * The option rows are the kit's one list row (`internal/listRow` through `internal/MenuGroup`); the
+ * option parts take these classes only in the trigger.
+ */
 
 .itemTitle,
 .itemDescription {
@@ -223,16 +193,16 @@
   white-space: nowrap;
 }
 
-:is(.item[data-rich="true"], .value[data-rich="true"]) .itemTitle {
+.value[data-rich="true"] .itemTitle {
   font-weight: var(--prime-font-weight-medium);
 }
 
 .itemDescription,
 .itemMeta {
   color: var(--prime-color-text-muted);
-  font-size: var(--menu-desc, var(--sel-desc));
+  font-size: var(--sel-desc);
   font-weight: var(--prime-font-weight-regular);
-  line-height: var(--menu-desc-lh, var(--sel-desc-lh));
+  line-height: var(--sel-desc-lh);
 }
 
 .itemMeta {
@@ -242,12 +212,12 @@
   white-space: nowrap;
 }
 
-/* Thumbnail.Root / Avatar.Root as the leading media of a row: placement only, the look is theirs. */
+/* Thumbnail.Root / Avatar.Root as the leading media of the value: placement only, the look is theirs. */
 .media {
   flex-shrink: 0;
 }
 
-:is(.trigger:disabled, .item[data-disabled="true"]) :is(.itemDescription, .itemMeta) {
+.trigger:disabled :is(.itemDescription, .itemMeta) {
   color: var(--prime-color-text-disabled);
 }
 
@@ -434,21 +404,31 @@
   );
 }
 
-/* An option with a hue (`color`): its text and icon in the hue's ink, the highlight and the press a
-   wash of the hue — the fill of a Badge of that hue. */
-.item[data-color]:not([data-disabled="true"]) {
+/* An option with a hue (`color`): its text, mark and secondary text in the hue's ink (the list
+   row's `data-color` mode), the highlight, the hover and the press a wash of the hue — the fill of
+   a Badge of that hue. */
+.item {
+  transition:
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+.item[data-color]:not([data-disabled]) {
   color: var(--hue-text);
 }
 
-.item[data-color] :is(.itemDescription, .itemMeta) {
-  color: inherit;
-}
-
-.item[data-color][data-highlighted="true"] {
+.item[data-color][data-highlighted]:not([data-disabled]) {
   background: var(--hue-soft);
 }
 
-.item[data-color]:active:not([data-disabled="true"]) {
+@media (hover: hover) {
+  .item[data-color][data-interactive]:hover:not([data-disabled]) {
+    background: var(--hue-soft);
+    color: var(--hue-text);
+  }
+}
+
+.item[data-color][data-interactive]:active:not([data-disabled]) {
   background: color-mix(in srgb, var(--hue-text) var(--prime-tint-faint), var(--hue-soft));
   color: color-mix(
     in srgb,

@@ -159,49 +159,58 @@
 }
 
 /*
- * ─── File row: the kit's header row on the surface frame of its tier ───
- *   [badge] [name        ] [actions]
- *           [description ]
- * then the progress bar across the row. One line each, nothing wraps; no line, the danger fill
- * and the description's word mark a failed row.
+ * ─── File row: the kit's one list row (internal/listRow) ───
+ *   [mark] [name        ] [actions]
+ *          [description ]
+ * No fill of its own: a wash on hover or focus inside, rows 2 apart. A failed row has no fill
+ * either: its description turns danger and says why, its ring is danger, a retry button stands
+ * beside it. A file in transfer shows its ring where the format stood.
  */
 .item {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: var(--frame-gap);
   width: 100%;
-  min-width: 0;
-  padding: var(--frame-gap);
-  border-radius: var(--frame-radius);
-  background: var(--prime-color-fill-subtle);
   font-family: var(--prime-font-family-sans);
-  /* A failed upload turns the row danger, and a retry turns it back: both glide. */
-  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.item[data-invalid="true"] {
-  background: var(--prime-color-danger-soft);
 }
 
 .itemDescription {
   font-variant-numeric: tabular-nums;
-  color: var(--prime-color-text-muted);
 }
 
 .item[data-invalid="true"] .itemDescription {
   color: var(--prime-color-danger-text);
 }
 
-.itemProgress {
+/* A name cut in the middle: the start gives way to an ellipsis, the last characters stay. */
+.itemText {
+  display: flex;
+}
+
+.cut {
+  display: flex;
   min-width: 0;
 }
 
-/* ─── Queue: the rows of `useUploadQueue`, one under another ─── */
+.cutHead {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+.cutTail {
+  flex: none;
+  white-space: pre;
+}
+
+.nameLink {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ─── Queue: the rows of `useUploadQueue`, 2 apart ─── */
 .queue {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-2);
+  gap: calc(var(--prime-space-1) / 2);
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -214,12 +223,11 @@
 
 /* A row whose removal is being saved (`onRemove` returned a promise): its content quiets down
    while the remove button spins, both ways eased. */
-.queueRow :is(.formatBadge, .preview, .itemText, .itemDescription, .itemProgress) {
+.queueRow :is(.formatBadge, .preview, .itemText, .itemDescription) {
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.queueRow[data-pending="true"]
-  :is(.formatBadge, .preview, .itemText, .itemDescription, .itemProgress) {
+.queueRow[data-pending="true"] :is(.formatBadge, .preview, .itemText, .itemDescription) {
   opacity: var(--prime-opacity-busy);
 }
 

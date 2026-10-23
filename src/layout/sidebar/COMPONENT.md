@@ -324,14 +324,15 @@ On the active path a SubTrigger takes the current fill. On the compact rail a Su
 Leaving the narrow viewport closes the off-canvas panel; activating an item (a link, a button or an `asChild` element) or the brand closes it too, unless its `onClick` prevents the default. Activating an item in a flyout closes the flyout.
 
 ## Layout & spacing
-- Panel padding: `--prime-space-3` block, `--prime-space-2` inline; regions 8 apart; groups 16 apart, items 4 apart.
-- Item horizontal padding is derived from the compact width so icons and the brand logo sit on one axis in every mode (the account avatar joins that axis on the rail).
+- Panel padding: `--prime-space-3` block, `--prime-space-2` inline; regions 8 apart; groups 16 apart, items 2 apart, as every list row of the kit.
+- An item is the kit list row (`internal/listRow`) in its navigation mode: the control height of the tier (28 · 32 · 36 · 40 · 48), its text, radius and icon, the icon as the row's mark, the label as its title (medium weight), the trail as its end and a plain count as its count at the row's text size; `text-secondary` until hovered or current.
+- Item horizontal padding is derived from the compact width (13 · 12 · 12 · 10 · 10) so icons and the brand logo sit on one axis in every mode (the account avatar joins that axis on the rail).
 - Header is one row of the item height + 8. The header toggle (a disk of the compact tier: 28, 32 at `l` and `xl`) sits at its end, 8 from the rail edge; in compact mode it moves half past the edge, scales to 3/4 and gets a ring in the rail color. The root clips with `clip-path`, reaching past the edge by the toggle's half-width and ring beside the header only; everywhere else the panel ends exactly at the spacer edge.
 - Collapsible group: heading 28 high with the chevron (14) at its end, aligned with the item trail; items start 4 below. A folded group's attention dot sits before the chevron.
 - On the rail a heading keeps its 28 and its layout: the text slides 8 toward the edge, scales to 0.85 and is cut at the rail box with a 12 fade into the rail. A folded group adds one `…` row under its heading. The items and the row share one place: folding or unfolding on the rail glides the group's height one way (list ↔ row) while the two cross-fade, so the rows below never move back.
-- Sub-list: a 1px `border-default` guide line on the parent icon's centre; every child branches off it with an 8 elbow and a 6 bend; child labels line up with the parent label.
+- Sub-list: a 1px `border-default` guide line on the parent icon's centre; every child branches off it with an 8 elbow and a 6 bend; child labels line up with the parent label; children stand 2 apart, the first 2 below the parent.
 - Trail (count, key hint, trailing icon) sits at the row end; a row action (one tier down) appears there on hover / focus (always on touch screens) and the trail moves aside.
-- Footer: items 4 apart; the account is set 8 apart below them. It is its own card-like row: the
+- Footer: items 2 apart; the account is set 8 apart below them. It is its own card-like row: the
   avatar of the tier (xs 20, s 24, m·l 32, xl 40) sits in an even frame — the inset before it, the
   gap to the text and the air above and below are one value, the tier gap (xs 4, s·m·l 8, xl 12),
   so the row is the avatar + 2 × gap high (48 at m). On the compact rail the start inset becomes the
@@ -418,5 +419,5 @@ Leaving the narrow viewport closes the off-canvas panel; activating an item (a l
 - Your own `localStorage` code for the rail mode → `persistKey` keeps the mode and the folded groups.
 
 ## Related
-- **Built from:** [AppShell](../app-shell/COMPONENT.md) (publishes the navigation), [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), [Popover](../../components/popover/COMPONENT.md) (compact flyout), [Button](../../components/button/COMPONENT.md) (header toggle, row action), [Avatar](../../components/avatar/COMPONENT.md) slot, Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`, `nav.chevronsLeft`, `nav.chevronDown`, `nav.chevronsUpDown`, `action.add`, `action.more`)
+- **Built from:** `internal/listRow` (the item row in its navigation mode: tier, mark, title, end, count; its mark holds the account avatar and would size a [ProgressCircle](../../components/progress-circle/COMPONENT.md) or a [Thumbnail](../../components/thumbnail/COMPONENT.md)), [AppShell](../app-shell/COMPONENT.md) (publishes the navigation), [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), [Popover](../../components/popover/COMPONENT.md) (compact flyout), [Button](../../components/button/COMPONENT.md) (header toggle, row action), [Avatar](../../components/avatar/COMPONENT.md) slot, Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`, `nav.chevronsLeft`, `nav.chevronDown`, `nav.chevronsUpDown`, `action.add`, `action.more`)
 - **See also:** [AppShell](../app-shell/COMPONENT.md), [Dropdown](../../components/dropdown/COMPONENT.md) (account menu), [Drawer](../../components/drawer/COMPONENT.md), [Kbd](../../components/kbd/COMPONENT.md)

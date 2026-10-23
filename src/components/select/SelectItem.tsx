@@ -5,16 +5,18 @@ import { Badge } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { HeaderLineContent } from "@/internal/headerRow";
 import { iconSlotClass } from "@/internal/iconBox";
 import { optionDomId, useListboxItem, useStoreSlice } from "@/internal/listbox";
-import menu from "@/internal/menu.module.css";
+import { type ListRowLines, ListRowMark, listRowStyles } from "@/internal/listRow";
+import { MenuRowCheck, menuRowProps, menuRowTier } from "@/internal/MenuGroup";
 import { nodeText } from "@/internal/nodeText";
 import palette from "@/internal/palette.module.css";
-import { type ControlSize, type PaletteColor, stepDown, tierMappings } from "@/internal/states";
+import { isPart } from "@/internal/parts";
+import { type ControlSize, type PaletteColor, tierMappings } from "@/internal/states";
 
 import styles from "./Select.module.css";
 import { normalize, useSelectContext } from "./selectContext";
@@ -23,27 +25,46 @@ type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLS
 
 // ─── Rich option parts (row and trigger) ─────────────────────────────────────
 
+/**
+ * The option row a part stands in: the panel's tier, whether the row has a description and the
+ * search query. `null` in the trigger (`renderValue`): the parts take the field's look there and
+ * the query never marks them.
+ */
+type OptionRowContextValue = { panel: ControlSize; lines: ListRowLines; query: string };
+
+const OptionRowContext = React.createContext<OptionRowContextValue | null>(null);
+
 export type SelectItemIconProps = SpanProps;
 
-/** A leading glyph of an option (decorative). */
-export function SelectItemIcon({ className, ...rest }: SelectItemIconProps) {
+/**
+ * A leading glyph of an option (decorative): the row's mark — bare beside one line, on a tile
+ * beside a description; in the trigger a field glyph before the value.
+ */
+export function SelectItemIcon({ className, children, ...rest }: SelectItemIconProps) {
+  const row = React.useContext(OptionRowContext);
+  if (row) {
+    return (
+      <ListRowMark {...rest} size={menuRowTier(row.panel)} lines={row.lines} className={className}>
+        {children}
+      </ListRowMark>
+    );
+  }
   return (
-    <span aria-hidden="true" className={cx(menu.itemIcon, iconSlotClass, className)} {...rest} />
+    <span aria-hidden="true" className={cx(styles.triggerIcon, iconSlotClass, className)} {...rest}>
+      {children}
+    </span>
   );
 }
 SelectItemIcon.displayName = "Select.ItemIcon";
 
 export type SelectItemTextProps = SpanProps & { children: React.ReactNode };
 
-/** The search query inside an option row; empty in the trigger, so `renderValue` never marks it. */
-const OptionQueryContext = React.createContext("");
-
 /** Title of a rich option; its text is the option label (trigger, typeahead, search). */
 export function SelectItemText({ children, className, ...rest }: SelectItemTextProps) {
-  const query = React.useContext(OptionQueryContext);
+  const row = React.useContext(OptionRowContext);
   return (
-    <span {...rest} className={cx(styles.itemTitle, className)}>
-      {highlightChildren(children, query)}
+    <span {...rest} className={cx(row ? listRowStyles.title : styles.itemTitle, className)}>
+      {highlightChildren(children, row?.query ?? "")}
     </span>
   );
 }
@@ -57,10 +78,17 @@ export function SelectItemDescription({
   className,
   ...rest
 }: SelectItemDescriptionProps) {
-  const query = React.useContext(OptionQueryContext);
+  const row = React.useContext(OptionRowContext);
+  if (row) {
+    return (
+      <span {...rest} className={cx(listRowStyles.description, className)}>
+        <HeaderLineContent>{highlightChildren(children, row.query)}</HeaderLineContent>
+      </span>
+    );
+  }
   return (
     <span {...rest} className={cx(styles.itemDescription, className)}>
-      {highlightChildren(children, query)}
+      {children}
     </span>
   );
 }
@@ -70,8 +98,9 @@ export type SelectItemMetaProps = SpanProps & { children: React.ReactNode };
 
 /** Trailing meta of an option (price, count): muted, tabular, before the check. */
 export function SelectItemMeta({ children, className, ...rest }: SelectItemMetaProps) {
+  const row = React.useContext(OptionRowContext);
   return (
-    <span {...rest} className={cx(styles.itemMeta, className)}>
+    <span {...rest} className={cx(row ? listRowStyles.meta : styles.itemMeta, className)}>
       {children}
     </span>
   );
@@ -202,6 +231,9 @@ export function SelectItem({
   const search = normalize(query);
   if (filter && search !== "" && !haystack.includes(search)) return null;
 
+  const lines: ListRowLines = parts.body.some((node) => isPart(node, SelectItemDescription))
+    ? "two"
+    : "line";
   return (
     // biome-ignore lint/a11y/useFocusableInteractive: focus stays on the listbox / search (aria-activedescendant)
     // biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the listbox
@@ -212,7 +244,6 @@ export function SelectItem({
       role="option"
       aria-selected={isSelected}
       aria-disabled={disabled || undefined}
-      className={cx(menu.item, styles.item, color !== undefined && palette.hue, className)}
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) registry.activate(value);
@@ -221,34 +252,81 @@ export function SelectItem({
         onMouseMove?.(event);
         if (!disabled && !isHighlighted) highlight.set(value);
       }}
-      {...toDataAttributes({
-        value,
-        selected: isSelected,
+      {...menuRowProps({
+        size: menuRowTier(size),
+        lines,
         highlighted: isHighlighted,
         disabled,
-        rich: parts.rich || undefined,
-        color,
+        // A choice of several tints its checked rows; a choice of one only checks at the end.
+        checked: multiple && isSelected,
+        className: cx(styles.item, color !== undefined && palette.hue, className),
       })}
+      {...toDataAttributes({ value, color })}
     >
+      {/* A choice of several: the checkbox column at the start. */}
       {multiple ? (
-        <Checkbox.Indicator checked={isSelected} disabled={disabled} size={stepDown(size)} />
-      ) : null}
-      {sizeMedia(parts.leading, size)}
-      <span className={styles.itemText}>
-        <OptionQueryContext.Provider value={query}>
-          {highlightChildren(parts.body, query)}
-        </OptionQueryContext.Provider>
-      </span>
-      {parts.meta}
-      {multiple ? null : (
-        <span className={menu.check} aria-hidden="true">
-          {isSelected ? <Icon name="action.check" /> : null}
+        <span className={listRowStyles.indicator}>
+          <Checkbox.Indicator checked={isSelected} disabled={disabled} size={menuRowTier(size)} />
         </span>
-      )}
+      ) : null}
+      <OptionRowContext value={{ panel: size, lines, query }}>
+        <OptionRowContent parts={parts} panel={size} lines={lines} query={query}>
+          {/* A choice of one: the check at the end, its place held on the other rows. */}
+          {multiple ? null : <MenuRowCheck checked={isSelected} />}
+        </OptionRowContent>
+      </OptionRowContext>
     </div>
   );
 }
 SelectItem.displayName = "Select.Item";
+
+/**
+ * An option's content in the list row's places: the mark (`Select.ItemIcon`, an `Avatar.Root` or a
+ * `Thumbnail.Root`, sized by the row), the title (plain text or `Select.ItemText`) with the
+ * description under it, then the end: `Select.ItemMeta`, a `Badge.Root` and `children` (the check).
+ */
+function OptionRowContent({
+  parts,
+  panel,
+  lines,
+  query,
+  children,
+}: {
+  parts: ItemParts;
+  panel: ControlSize;
+  lines: ListRowLines;
+  query: string;
+  children?: React.ReactNode;
+}) {
+  const isDescription = (node: React.ReactNode): boolean => isPart(node, SelectItemDescription);
+  const description = parts.body.filter(isDescription);
+  const title = parts.body.filter((node) => !isDescription(node));
+  const titled = title.some((node) => isPart(node, SelectItemText));
+  const end = [...parts.meta, ...React.Children.toArray(children)];
+  return (
+    <>
+      {parts.leading.map((node, index) =>
+        React.isValidElement(node) && node.type === SelectItemIcon ? (
+          node
+        ) : (
+          // biome-ignore lint/suspicious/noArrayIndexKey: the leading marks keep their order
+          <ListRowMark key={index} size={menuRowTier(panel)} lines={lines}>
+            {node}
+          </ListRowMark>
+        ),
+      )}
+      <span className={listRowStyles.body}>
+        {titled ? (
+          title
+        ) : (
+          <span className={listRowStyles.title}>{highlightChildren(title, query)}</span>
+        )}
+        {description}
+      </span>
+      {end.length > 0 ? <span className={listRowStyles.end}>{end}</span> : null}
+    </>
+  );
+}
 
 // ─── Action ──────────────────────────────────────────────────────────────────
 
@@ -314,7 +392,6 @@ export function SelectAction({
       id={optionDomId(listboxId, value)}
       role="option"
       aria-disabled={disabled || undefined}
-      className={cx(menu.item, className)}
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) registry.activate(value);
@@ -323,15 +400,17 @@ export function SelectAction({
         onMouseMove?.(event);
         if (!disabled && !isHighlighted) highlight.set(value);
       }}
-      {...toDataAttributes({
-        value,
-        action: true,
+      {...menuRowProps({
+        size: menuRowTier(size),
         highlighted: isHighlighted,
         disabled,
+        className,
       })}
+      {...toDataAttributes({ value, action: true })}
     >
-      {sizeMedia(parts.leading, size)}
-      <span className={styles.itemText}>{parts.body}</span>
+      <OptionRowContext value={{ panel: size, lines: "line", query: "" }}>
+        <OptionRowContent parts={parts} panel={size} lines="line" query="" />
+      </OptionRowContext>
     </div>
   );
 }

@@ -1,11 +1,12 @@
 import * as React from "react";
 
-import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
+import { Avatar } from "@/components/avatar/Avatar";
+import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Kbd } from "@/components/kbd/Kbd";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
-import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
+import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import {
@@ -23,7 +24,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldInputTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { highlightChildren } from "@/internal/HighlightMatch";
-import { iconSlotClass } from "@/internal/iconBox";
+import { HeaderLineContent } from "@/internal/headerRow";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import {
@@ -38,7 +39,14 @@ import {
   useListboxView,
   useStoreSlice,
 } from "@/internal/listbox";
-import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
+import { type ListRowLines, ListRowMark, listRowStyles } from "@/internal/listRow";
+import {
+  MenuGroup,
+  type MenuGroupProps,
+  MenuRowCheck,
+  menuRowProps,
+  menuRowTier,
+} from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { nodeText } from "@/internal/nodeText";
 import {
@@ -51,9 +59,8 @@ import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFl
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot, type SlotPartProps, slotChild } from "@/internal/slot";
-import { type ControlSize, OVERLAY_CONTENT_SIZE, type Tone, tierMappings } from "@/internal/states";
+import { type ControlSize, OVERLAY_CONTENT_SIZE, type Tone } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
-import textTone from "@/internal/textTone.module.css";
 
 import styles from "./Dropdown.module.css";
 
@@ -334,7 +341,7 @@ function DropdownContent({
           scroll
           id={menuId}
           role="menu"
-          className={cx(fieldTierClass, menu.tier, menu.menu, className)}
+          className={cx(fieldTierClass, menu.tier, menu.menu, menu.list, className)}
           onKeyDown={handleKeyDown}
         >
           {children}
@@ -362,7 +369,7 @@ function DropdownContent({
           id={menuId}
           role="menu"
           edges="shadow"
-          className={menu.panelList}
+          className={cx(menu.list, menu.panelList)}
           hidden={view.visible.size === 0 ? true : undefined}
         >
           {items}
@@ -468,36 +475,38 @@ export type DropdownItemProps = Omit<
 const isType = (node: React.ReactNode, type: unknown) =>
   React.isValidElement(node) && node.type === type;
 
+/** The row an item part stands in: its panel's tier and whether it has a description. */
+type DropdownItemContextValue = { panel: ControlSize; lines: ListRowLines };
+
+const DropdownItemContext = React.createContext<DropdownItemContextValue>({
+  panel: OVERLAY_CONTENT_SIZE,
+  lines: "line",
+});
+
 /**
- * Lays out an item's content: leading `ItemIcon`s, the label (it truncates first), a
- * `Dropdown.ItemDescription` under it, then a trailing `ItemMeta` and `ItemShortcut`. With a
- * description or a meta the label names the item (`aria-labelledby`) and they describe it
+ * Lays out an item's content in the list row's places: the leading mark (`ItemIcon`, an
+ * `Avatar.Root` or a `Thumbnail.Root`), the label (it truncates first) with a
+ * `Dropdown.ItemDescription` under it, then the end: `ItemMeta`, `ItemShortcut` and the check.
+ * With a description or a meta the label names the item (`aria-labelledby`) and they describe it
  * (`aria-describedby`): the reason under a disabled item, the time of a thread are read with it,
  * not as part of its name. While a query is typed the matching part of the label and the
  * description is marked.
  */
-function useItemContent(children: React.ReactNode, query: string) {
+function useItemContent(
+  children: React.ReactNode,
+  query: string,
+  { start = null, end = null }: { start?: React.ReactNode; end?: React.ReactNode } = {},
+) {
   const labelId = React.useId();
   const descriptionId = React.useId();
   const metaId = React.useId();
-  const tier = useOptionalControlSize() ?? OVERLAY_CONTENT_SIZE;
-  // A person's or an object's picture leads the row at the row's media size, decorative: the label
-  // names the item.
-  const nodes = React.Children.toArray(children).map((node) =>
-    React.isValidElement<AvatarRootProps | ThumbnailRootProps>(node) &&
-    (node.type === Avatar.Root || node.type === Thumbnail.Root)
-      ? React.cloneElement(node, {
-          size: node.props.size ?? tierMappings.rowMedia[tier],
-          className: cx(styles.media, node.props.className),
-          "aria-hidden": true,
-        } as Partial<AvatarRootProps & ThumbnailRootProps>)
-      : node,
-  );
-  const leading = nodes.filter(
-    (node) =>
-      isType(node, DropdownItemIcon) || isType(node, Avatar.Root) || isType(node, Thumbnail.Root),
-  );
+  const panel = useOptionalControlSize() ?? OVERLAY_CONTENT_SIZE;
+  const nodes = React.Children.toArray(children);
   const description = nodes.filter((node) => isType(node, DropdownItemDescription));
+  const lines: ListRowLines = description.length > 0 ? "two" : "line";
+  const isPicture = (node: React.ReactNode) =>
+    isType(node, Avatar.Root) || isType(node, Thumbnail.Root);
+  const leading = nodes.filter((node) => isType(node, DropdownItemIcon) || isPicture(node));
   const meta = nodes.filter((node) => isType(node, DropdownItemMeta));
   const shortcut = nodes.filter((node) => isType(node, DropdownItemShortcut));
   const label = nodes.filter(
@@ -508,62 +517,62 @@ function useItemContent(children: React.ReactNode, query: string) {
       !shortcut.includes(node),
   );
   const text = `${nodeText(label)} ${nodeText(description)}`;
-  const labelNode = highlightChildren(label, query);
-
-  if (description.length === 0 && meta.length === 0) {
-    return {
-      text,
-      aria: null,
-      content: (
-        <>
-          {leading}
-          <span className={styles.itemLabel}>{labelNode}</span>
-          {shortcut}
-        </>
-      ),
-    };
-  }
+  const named = description.length > 0 || meta.length > 0;
   const described = [description.length > 0 && descriptionId, meta.length > 0 && metaId];
-  const labelSpan = (
-    <span id={labelId} className={styles.itemLabel}>
-      {labelNode}
-    </span>
+
+  const content = (
+    <DropdownItemContext value={{ panel, lines }}>
+      {start}
+      {leading.map((node, index) =>
+        // A person's or an object's picture leads the row at the row's mark size, decorative:
+        // the label names the item.
+        isPicture(node) ? (
+          // biome-ignore lint/suspicious/noArrayIndexKey: the leading marks keep their order
+          <ListRowMark key={index} size={menuRowTier(panel)} lines={lines}>
+            {node}
+          </ListRowMark>
+        ) : (
+          node
+        ),
+      )}
+      <span className={listRowStyles.body}>
+        <span id={named ? labelId : undefined} className={listRowStyles.title}>
+          {highlightChildren(label, query)}
+        </span>
+        {description.length > 0 ? (
+          <span id={descriptionId} className={styles.itemSlot}>
+            {description.map((node) =>
+              React.isValidElement<{ children?: React.ReactNode }>(node)
+                ? React.cloneElement(node, undefined, highlightChildren(node.props.children, query))
+                : node,
+            )}
+          </span>
+        ) : null}
+      </span>
+      {meta.length > 0 || shortcut.length > 0 || end !== null ? (
+        <span className={listRowStyles.end}>
+          {meta.length > 0 ? (
+            <span id={metaId} className={styles.itemSlot}>
+              {meta}
+            </span>
+          ) : null}
+          {shortcut}
+          {end}
+        </span>
+      ) : null}
+    </DropdownItemContext>
   );
   return {
     text,
-    aria: {
-      "aria-labelledby": labelId,
-      "aria-describedby": described.filter(Boolean).join(" "),
-    },
-    content: (
-      <>
-        {leading}
-        {description.length > 0 ? (
-          <span className={styles.itemBody}>
-            {labelSpan}
-            <span id={descriptionId} className={styles.itemSlot}>
-              {description.map((node) =>
-                React.isValidElement<{ children?: React.ReactNode }>(node)
-                  ? React.cloneElement(
-                      node,
-                      undefined,
-                      highlightChildren(node.props.children, query),
-                    )
-                  : node,
-              )}
-            </span>
-          </span>
-        ) : (
-          labelSpan
-        )}
-        {meta.length > 0 ? (
-          <span id={metaId} className={styles.itemSlot}>
-            {meta}
-          </span>
-        ) : null}
-        {shortcut}
-      </>
-    ),
+    lines,
+    panel,
+    aria: named
+      ? {
+          "aria-labelledby": labelId,
+          "aria-describedby": described.filter(Boolean).join(" "),
+        }
+      : null,
+    content,
   };
 }
 
@@ -604,13 +613,11 @@ function useSearchItem(
   return {
     nodeRef,
     shown,
+    highlighted,
     props: {
       id,
       hidden: shown ? undefined : true,
-      ...toDataAttributes({
-        highlighted: highlighted || undefined,
-        persistent: persistent || undefined,
-      }),
+      ...toDataAttributes({ persistent: persistent || undefined }),
       // The pointer moves the highlight too, so the keyboard goes on from where it is.
       onPointerMove: (event: React.PointerEvent<HTMLElement>) => {
         if (!event.defaultPrevented && searchable && shown && !disabled && !highlighted) {
@@ -646,33 +653,36 @@ function DropdownItem({
   const { query } = useDropdownMenuContext("Dropdown.Item");
   const autoId = React.useId();
   const child = asChild ? slotChild(children, "Dropdown.Item") : null;
-  const { content, aria, text } = useItemContent(child ? child.props.children : children, query);
+  // A choice of one (a person, a status): the chosen item has the check at the end, the place held
+  // on the others; the row is not filled.
+  const { content, aria, text, lines, panel } = useItemContent(
+    child ? child.props.children : children,
+    query,
+    { end: selected === undefined ? null : <MenuRowCheck checked={selected} /> },
+  );
   const search = useSearchItem(idProp ?? autoId, text, { keywords, persistent, disabled });
   const mergedRef = useMergedRefs(search.nodeRef, ref);
+  const row = menuRowProps({
+    size: menuRowTier(panel),
+    lines,
+    highlighted: search.highlighted,
+    disabled,
+    danger: tone === "danger",
+    focusFill: true,
+    className: cx(styles.item, className),
+  });
 
   const itemProps = {
     ...rest,
     ...aria,
     ...search.props,
+    ...row,
     ref: mergedRef,
-    // A choice of one (a person, a status): the chosen item is checked, the others are not.
     role: selected === undefined ? "menuitem" : "menuitemradio",
     "aria-checked": selected,
     tabIndex: -1,
     disabled,
-    // A danger row takes its ink from the tone ladder; a disabled row keeps the disabled ink.
-    className: cx(
-      menu.item,
-      menu.focusRow,
-      tone === "danger" && !disabled && cx(textTone.tone, menu.tonedRow),
-      styles.item,
-      className,
-    ),
-    ...toDataAttributes({
-      tone,
-      disabled: disabled || undefined,
-      checked: selected || undefined,
-    }),
+    "data-tone": tone,
     onPointerMove: (event: React.PointerEvent<HTMLElement>) => {
       onPointerMove?.(event as React.PointerEvent<HTMLButtonElement>);
       search.props.onPointerMove(event);
@@ -686,31 +696,17 @@ function DropdownItem({
     },
   };
 
-  const check =
-    selected === undefined ? null : (
-      <span className={menu.check} aria-hidden="true">
-        {selected ? <Icon name="action.check" /> : null}
-      </span>
-    );
   if (child) {
     // A link keeps its native click: a modified click opens a new tab and the menu still closes.
     return (
       <InteractiveElement {...itemProps} element="slot">
-        {React.cloneElement(
-          child,
-          undefined,
-          <>
-            {content}
-            {check}
-          </>,
-        )}
+        {React.cloneElement(child, undefined, content)}
       </InteractiveElement>
     );
   }
   return (
     <InteractiveElement {...itemProps} element="button">
       {content}
-      {check}
     </InteractiveElement>
   );
 }
@@ -755,7 +751,15 @@ function DropdownCheckboxItem({
   });
   const { query } = useDropdownMenuContext("Dropdown.CheckboxItem");
   const autoId = React.useId();
-  const { content, aria, text } = useItemContent(children, query);
+  const panel = useOptionalControlSize() ?? OVERLAY_CONTENT_SIZE;
+  // A choice of several: the checkbox column at the start, a checked row in the accent's tone.
+  const { content, aria, text, lines } = useItemContent(children, query, {
+    start: (
+      <span className={listRowStyles.indicator}>
+        <Checkbox.Indicator checked={checked} disabled={disabled} size={menuRowTier(panel)} />
+      </span>
+    ),
+  });
   const search = useSearchItem(idProp ?? autoId, text, { keywords, persistent, disabled });
   const mergedRef = useMergedRefs(search.nodeRef, ref);
 
@@ -764,14 +768,21 @@ function DropdownCheckboxItem({
       {...rest}
       {...aria}
       {...search.props}
+      {...menuRowProps({
+        size: menuRowTier(panel),
+        lines,
+        highlighted: search.highlighted,
+        disabled,
+        checked,
+        focusFill: true,
+        className: cx(styles.item, className),
+      })}
       ref={mergedRef}
       element="button"
       role="menuitemcheckbox"
       aria-checked={checked}
       tabIndex={-1}
       disabled={disabled}
-      className={cx(menu.item, menu.focusRow, styles.item, className)}
-      {...toDataAttributes({ disabled: disabled || undefined, checked: checked || undefined })}
       onPointerMove={(event) => {
         onPointerMove?.(event as React.PointerEvent<HTMLButtonElement>);
         search.props.onPointerMove(event);
@@ -782,9 +793,6 @@ function DropdownCheckboxItem({
       }}
     >
       {content}
-      <span className={menu.check} aria-hidden="true">
-        {checked ? <Icon name="action.check" /> : null}
-      </span>
     </InteractiveElement>
   );
 }
@@ -796,10 +804,16 @@ export type DropdownItemIconProps = React.HTMLAttributes<HTMLSpanElement> & {
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** Leading glyph of an item at the menu's icon size (a kit `Icon` follows it). */
-function DropdownItemIcon({ className, ...rest }: DropdownItemIconProps) {
+/**
+ * The leading mark of an item: a glyph of the row's tier, bare beside one line, on a tile beside a
+ * description (a kit `Icon` follows it).
+ */
+function DropdownItemIcon({ children, ...rest }: DropdownItemIconProps) {
+  const { panel, lines } = React.useContext(DropdownItemContext);
   return (
-    <span aria-hidden="true" className={cx(menu.itemIcon, iconSlotClass, className)} {...rest} />
+    <ListRowMark {...rest} size={menuRowTier(panel)} lines={lines}>
+      {children}
+    </ListRowMark>
   );
 }
 DropdownItemIcon.displayName = "Dropdown.ItemIcon";
@@ -811,7 +825,7 @@ export type DropdownItemShortcutProps = Omit<React.HTMLAttributes<HTMLElement>, 
 
 /** Key hint at the end of an item (a Kbd one tier below the menu). A hint only — not a handler. */
 function DropdownItemShortcut({ className, ...rest }: DropdownItemShortcutProps) {
-  return <Kbd className={cx(menu.shortcut, styles.shortcut, className)} {...rest} />;
+  return <Kbd className={cx(styles.shortcut, className)} {...rest} />;
 }
 DropdownItemShortcut.displayName = "Dropdown.ItemShortcut";
 
@@ -825,7 +839,7 @@ export type DropdownItemMetaProps = Omit<React.HTMLAttributes<HTMLSpanElement>, 
  * never shrinks or wraps — the label truncates first. It describes the item; the label names it.
  */
 function DropdownItemMeta({ className, ...rest }: DropdownItemMetaProps) {
-  return <span className={cx(menu.itemMeta, className)} {...rest} />;
+  return <span className={cx(listRowStyles.meta, className)} {...rest} />;
 }
 DropdownItemMeta.displayName = "Dropdown.ItemMeta";
 
@@ -836,10 +850,14 @@ export type DropdownItemDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanEle
 
 /**
  * Muted second line of an item, under its label: what the action does, or why a disabled item is
- * unavailable («Доступно владельцу проекта»). Wraps instead of widening the menu past its limit.
+ * unavailable («Доступно владельцу проекта»). One line cut with an ellipsis; a `StatusDot` first.
  */
-function DropdownItemDescription({ className, ...rest }: DropdownItemDescriptionProps) {
-  return <span className={cx(menu.itemDescription, className)} {...rest} />;
+function DropdownItemDescription({ className, children, ...rest }: DropdownItemDescriptionProps) {
+  return (
+    <span className={cx(listRowStyles.description, className)} {...rest}>
+      <HeaderLineContent>{children}</HeaderLineContent>
+    </span>
+  );
 }
 DropdownItemDescription.displayName = "Dropdown.ItemDescription";
 

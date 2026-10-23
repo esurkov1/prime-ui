@@ -8,3 +8,8 @@
 .scroll {
   height: calc(var(--prime-space-24) * 3);
 }
+
+/* narrow: a pane as narrow as a phone column. */
+.narrow {
+  width: min(100%, var(--prime-layout-narrow-width));
+}

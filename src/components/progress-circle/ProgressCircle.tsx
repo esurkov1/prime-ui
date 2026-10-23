@@ -265,14 +265,14 @@ export function ProgressCircle(props: ProgressCircleProps) {
     }
     if (legend) {
       legendNode = loading ? (
-        <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size={tier} />
+        <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size="xs" />
       ) : showLegend ? (
         <ProgressLegend
           id={label ? descriptionId : undefined}
           segments={segments}
           scale={scale}
           formatValue={formatValue}
-          size={tier}
+          size="xs"
         />
       ) : null;
     }

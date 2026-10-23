@@ -200,16 +200,17 @@
   scroll-padding-block: var(--prime-space-8);
 }
 
-/* Bare items without groups form one list: item rhythm, not group rhythm. */
+/* Bare items without groups form one list: item rhythm (2 between rows, the kit's list row), not
+   group rhythm. */
 .content:not(:has(> .group)) {
-  gap: var(--prime-space-1);
+  gap: calc(var(--prime-space-1) / 2);
 }
 
 .footer {
   display: flex;
   flex: none;
   flex-direction: column;
-  gap: var(--prime-space-1);
+  gap: calc(var(--prime-space-1) / 2);
   min-width: 0;
 }
 
@@ -446,7 +447,7 @@
 .group {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-1);
+  gap: calc(var(--prime-space-1) / 2);
   min-width: 0;
 }
 
@@ -481,6 +482,11 @@
   font-weight: var(--prime-font-weight-medium);
   text-align: start;
   white-space: nowrap;
+}
+
+/* The heading stands 4 above the first item, the rows 2 apart. */
+.group:not([data-collapsible]) > .groupLabel {
+  margin-block-end: calc(var(--prime-space-1) / 2);
 }
 
 .groupText {
@@ -605,7 +611,7 @@
 .groupItems {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-1);
+  gap: calc(var(--prime-space-1) / 2);
   padding-block-start: var(--prime-space-1);
 }
 
@@ -634,30 +640,19 @@
 
 /* --- Item -------------------------------------------------------------------- */
 
+/*
+ * The kit list row (`internal/listRow`, joined in TSX: `.row` + `.hit`, the tier with `data-nav`):
+ * its height, type, radius, the tier gap after the icon and the quiet navigation colour. The rail
+ * gives it its icon axis (`--list-row-px`: the padding that centres the icon in the compact rail)
+ * and, in the flyout, the menu row height (`--list-row-h`). The fill and the ring stay on
+ * `::before`, where the rail cut moves them.
+ */
 .item {
+  --list-row-px: var(--sb-item-pad);
+  --list-row-h: var(--sb-h);
+
   position: relative;
-  box-sizing: border-box;
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: var(--sb-gap);
   width: 100%;
-  min-width: 0;
-  /* The touch row (`touchTargetRowClass`) grows a short row to the touch target. */
-  min-height: max(var(--sb-h), var(--touch-row-min, var(--sb-h)));
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--sb-item-pad);
-  border: 0;
-  border-radius: var(--sb-radius);
-  background: transparent;
-  color: var(--prime-color-text-secondary);
-  font: inherit;
-  font-size: var(--sb-text);
-  line-height: var(--sb-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  text-align: start;
-  text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   isolation: isolate;
@@ -708,17 +703,11 @@
   cursor: not-allowed;
 }
 
-/* A glyph slot (`iconSlotClass`): a kit Icon or a raw svg takes the tier icon. */
+/* The leading icon is the row's mark (`ListRowMark`: the tier glyph, muted) in a box of the icon,
+   so the rail's dot and the sub-list's guide line stand on its axis. */
 .icon {
-  --prime-icon-size: var(--sb-icon);
-
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
   width: var(--sb-icon);
   height: var(--sb-icon);
-  color: var(--prime-color-text-muted);
   transition: color var(--prime-motion-fade-xfast) var(--sb-ease);
 }
 
@@ -738,6 +727,10 @@
 .item .icon[data-edge="end"] {
   --prime-icon-size: var(--prime-icon-xs);
 
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
   width: var(--prime-icon-xs);
   height: var(--prime-icon-xs);
   color: var(--prime-color-text-muted);
@@ -748,32 +741,17 @@
   color: var(--prime-color-text-disabled);
 }
 
-.label {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Count, key hint, trailing icons: one cluster at the end that can step aside for an action. */
+/* The label is the row's body and title (`internal/listRow`); the trail is its end — count, key
+   hint, trailing icons: one cluster that can step aside for an action. */
 .trail {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--prime-space-2);
   transition: translate var(--prime-motion-duration-fast) var(--sb-ease);
 }
 
-/* The count is a plain muted number, or a kit Badge (one tier below the items) when it is coloured. */
+/* The count is the row's plain muted number, or a kit Badge (one tier below the items) when it is
+   coloured. */
 .count {
   flex: none;
   font-variant-numeric: tabular-nums;
-}
-
-.countPlain {
-  color: var(--prime-color-text-muted);
-  font-weight: var(--prime-font-weight-regular);
 }
 
 /*
@@ -912,7 +890,7 @@
  * on down (`::after`). Child labels line up with the parent label.
  */
 .subList {
-  --sub-gap: var(--prime-space-1);
+  --sub-gap: calc(var(--prime-space-1) / 2);
   --sub-line-x: calc(var(--sb-item-pad) + var(--sb-icon) / 2 - var(--prime-border-width) / 2);
   --sub-elbow: var(--prime-space-2);
   --sub-bend: var(--prime-radius-s);
@@ -962,7 +940,7 @@
 }
 
 .subRow .item {
-  padding-inline-start: calc(var(--sb-icon) / 2 + var(--sb-gap) - var(--sub-elbow));
+  --list-row-px: calc(var(--sb-icon) / 2 + var(--sb-gap) - var(--sub-elbow)) var(--sb-item-pad);
 }
 
 /* --- Compact flyout ---------------------------------------------------------------- */

@@ -20,9 +20,12 @@ describe("rows with controls", () => {
     );
   });
 
-  it("gives a List row's text a floor and lets its controls drop below", () => {
-    const css = read("list/List.module.css");
-    expect(css).toMatch(/\.frame \{[^}]*flex-wrap: wrap;/);
-    expect(css).toMatch(/\.frame > \.item \{\s*flex: 1 1 var\(--prime-space-24\);/);
+  it("gives a list row's text a floor and lets its controls drop below", () => {
+    const css = readFileSync(
+      path.resolve(process.cwd(), "src/internal/listRow.module.css"),
+      "utf8",
+    );
+    expect(css).toMatch(/\.row \{[^}]*flex-wrap: wrap;/);
+    expect(css).toMatch(/\.row > \.hit \{\s*flex: 1 1 var\(--prime-space-24\);/);
   });
 });

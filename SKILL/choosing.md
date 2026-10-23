@@ -178,6 +178,7 @@ Pick the control by what the value is, never by when it saves or by what fits in
 | The value | Control |
 |---|---|
 | a capability or a setting that is on or off (a permission, «Звук», «Вход по ссылке») | `Switch` with its label: inside a form it saves with the form, outside one it applies at once and its section has no save |
+| several on/off settings applied at once, each with its icon or a line of explanation | rows of a `List` in a `Card.Body`, the Switch ending each row (the row toggles it) — never a `Card` per setting |
 | items picked out of a set (rows, recipients, «Выбрать все»), a consent, a one-off option of the action being sent («Отправить копию себе») | `Checkbox` |
 | one level for each of several entities (access per section, a frequency per channel) | one row per entity, its level and scope as `Select`s in columns: a `FieldList` from five entities or whenever most entities have no level — an absent row is «no access», «+ Раздел» adds one; up to four entities that every record has may stand as one labelled `Select` each |
 | a stored preference with options (the theme, the language, the start page) | a `Select` field beside the related fields (`Radio.Group` for 2–3 options that each need a line of description) |

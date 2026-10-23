@@ -201,8 +201,9 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 
 ## Layout & spacing
 - The width of a Modal of size `l`; the list is at most 1.5 × `--prime-panel-max-height` tall and only it scrolls.
-- One content column: title, search icon, group labels and item icons start 16 from the edge.
-- `CommandMenu.ItemIcon` holds the glyph at the tier icon size; `CommandMenu.ItemShortcut` is a `Kbd` one tier below, pushed to the end of the item.
+- Items are the kit's list row one tier below the palette's `size` (`s` on an `m` palette), 4 from the list edge and 2 apart; a group starts with its 28-tall heading.
+- One content column: title, search icon, group labels and item icons start where the rows' content does (12 at `m`).
+- `CommandMenu.ItemIcon` is the row's mark: a bare glyph beside one line, on a neutral tile beside an `ItemText` `description`; an `Avatar` is sized under the row. The title is medium weight; `CommandMenu.ItemShortcut` is a `Kbd` pushed to the end of the item.
 - Search row and footer are separated from the list by hairlines; the search row hairline is faint.
 
 ## Accessibility
@@ -264,5 +265,5 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 - The create action both in `CommandMenu.Empty` and in the list → one `persistent` item; `Empty` holds only the text.
 
 ## Related
-- **Built from:** [Modal](../modal/COMPONENT.md) (dialog, scrim, focus, Title / Description), [ScrollContainer](../scroll-container/COMPONENT.md) (`List`), [EmptyPage](../empty-page/COMPONENT.md) (`Empty`, load error), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [Button](../button/COMPONENT.md) (retry), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`, `FooterHint`), `Icon` (search glyph, retry), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** `internal/listRow` (the item row: tier, mark, title, description, highlight fill; it sizes an [Avatar](../avatar/COMPONENT.md), a [ProgressCircle](../progress-circle/COMPONENT.md) or a [Thumbnail](../thumbnail/COMPONENT.md) in the mark, a [Badge](../badge/COMPONENT.md) dot in an icon-wide box), `internal/touchTarget`, [Modal](../modal/COMPONENT.md) (dialog, scrim, focus, Title / Description), [ScrollContainer](../scroll-container/COMPONENT.md) (`List`), [EmptyPage](../empty-page/COMPONENT.md) (`Empty`, load error), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [Button](../button/COMPONENT.md) (retry), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`, `FooterHint`), `Icon` (search glyph, retry), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Dropdown](../dropdown/COMPONENT.md), [Select](../select/COMPONENT.md), [Modal](../modal/COMPONENT.md)

@@ -34,14 +34,10 @@ describe("ProgressLegend", () => {
     const { container } = render(
       <ProgressLegend segments={SEGMENTS} scale={2000} formatValue={String} size="s" />,
     );
-    // A legend reads the label of the tier below at s (`tierMappings.legendText`).
-    expect(screen.getByRole("list")).toHaveAttribute("data-size", "xs");
-    const swatches = Array.from(container.querySelectorAll("li > span:first-child"));
-    expect(swatches.map((swatch) => swatch.getAttribute("aria-hidden"))).toEqual([
-      "true",
-      "true",
-      "true",
-    ]);
+    expect(screen.getByRole("list")).toHaveAttribute("data-size", "s");
+    const marks = Array.from(container.querySelectorAll("li > span:first-child"));
+    const swatches = marks.map((mark) => mark.firstElementChild as Element);
+    expect(marks.map((mark) => mark.getAttribute("aria-hidden"))).toEqual(["true", "true", "true"]);
     expect(swatches.map((swatch) => swatch.getAttribute("data-color"))).toEqual([
       "purple",
       null,

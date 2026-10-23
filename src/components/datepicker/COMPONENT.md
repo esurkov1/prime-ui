@@ -39,7 +39,7 @@ Datepicker.Panel            the same calendar without a field, the host's own co
 
 panel                       presets column (range) · 1–2 month grids · prompt · footer
 ├─ month header             ghost icon-only Buttons (previous / next) around the month title
-├─ presets                  Buttons with aria-pressed; a scrolling row above the months when narrow
+├─ presets                  list rows with aria-pressed; a scrolling row of Buttons above the months when narrow
 └─ footer                   date (+ time) pairs · Сбросить / Применить Buttons
 ```
 
@@ -166,7 +166,7 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `presets` | a column of preset buttons on the left (a scrolling row above when narrow); the active preset is pressed | analytics periods | `false` |
+| `presets` | a column of preset list rows on the left, the active one checked at the end (a scrolling row of soft Buttons above when narrow, the active one in the accent) | analytics periods | `false` |
 | `prompt` | muted step line under the grid | infrequent use of ranges | `false` |
 | `footer` | dates (dd.MM.yyyy, dd.MM with `yearless`) and «Сбросить» / «Применить» | the user confirms, or with time | `false` |
 | `withTime` | HH:mm inputs in the footer | timestamps (with `footer`) | `false` |
@@ -201,6 +201,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 - Months gap `--prime-space-6`. `Datepicker.Panel` has no fill, padding or radius — the host is its container; it shows 1–2 months by the host's width with day columns spread across it. An embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works in a 320 px column.
 - On a coarse pointer the day cells grow to the 44 px touch target (a dense grid cannot grow an invisible hit area past its neighbours); narrower than seven of them, the columns shrink.
 - Values are wall-clock local dates; convert time zones in the app.
+- The presets column: the kit's list rows a tier below the panel (an `m` panel has `s` rows, 32), 2 apart, 4 in from its edges; the active preset's accent check fades in at the end, its place held on the others; the row is not filled.
 
 ## Accessibility
 
@@ -281,5 +282,5 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 - Converting values to UTC inside the component → values are wall-clock dates; convert in the app.
 
 ## Related
-- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, presets, Reset / Apply), [ScrollContainer](../scroll-container/COMPONENT.md) (the presets row when narrow), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (the TriggerIcon calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
+- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, the narrow presets row, Reset / Apply), `internal/listRow` (the presets column), [ScrollContainer](../scroll-container/COMPONENT.md) (the presets row when narrow), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (the TriggerIcon calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

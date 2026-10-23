@@ -60,7 +60,7 @@ Timeline.Root                    size container, sets the tier (size, else the h
 | `…rest` | `Omit<OlHTMLAttributes<HTMLOListElement>, "children">` | — | The other ol attributes. |
 
 ### Timeline.Item
-`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot); an interactive row gives under the press.
+`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row is the kit's list row: hover, press, keyboard focus and `aria-current` are its fills.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -150,17 +150,18 @@ On an Item `tone` wins over `color` and shows at full emphasis.
 | State | Driven by | DOM |
 |---|---|---|
 | tier | `size` | `data-size` on the root |
-| highlighted | pointer over the row, keyboard focus | `:hover`, `:focus-visible`: `fill-subtle-active` pill, accent title and dot (a `tone` keeps its dot) |
+| highlighted | pointer over an interactive row | `:hover` in `@media (hover: hover)`: the list row's `fill-subtle` |
+| pressed | pointer or key down on an interactive row | the list row's `fill-subtle-active` |
+| current | `aria-current="page"` or `"true"` on the row | `data-current`: the list row's `fill-muted-hover` |
 | dot color | `color` / `tone` | `data-color` (without a tone) or `data-tone` |
 | interactive | `onClick`, `href`, `asChild` | `data-interactive`; pointer cursor, inset focus ring, the touch row height (`touchTargetRowClass`) |
-| pressed | pointer or key down on an interactive row | the row gives (`press`: scale over `fast`), back on release |
 
-Timeline keeps no state and has no persistent selection: every row is highlighted only while it is under the pointer or focused.
+Timeline keeps no state and has no persistent selection.
 
 ## Layout & spacing
 - The root is a size container: give it a definite width (`width: min(100%, 30rem)`).
-- Row grid: dot column · text · value; the dot column and the text stand 8 · 12 · 16 · 16 · 20 apart by tier (`--tl-gap`); below 20rem of root width the value moves under the meta line.
-- Rows touch so the line is continuous; group → group `--prime-space-4`.
+- An event is the kit's list row (`internal/listRow`): control height without a date line (28 · 32 · 36 · 40 · 48), two lines with one (44 · 48 · 56 · 60 · 68), radius and side padding of the tier, 2px between rows. The dot stands in the mark's icon-wide column; below 20rem of root width the value moves under the date line.
+- The line runs through the 2px between rows, so it is continuous; group → group `--prime-space-4`.
 - Inside a Card put it in `Card.Body`; the card owns the padding.
 
 ## Accessibility
@@ -208,5 +209,5 @@ Timeline keeps no state and has no persistent selection: every row is highlighte
 - Using the timeline to pick a row (a selected / current state) → it has none; use a list with selection (`Select`, `DataTable` row selection) or `Tabs`.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`Timeline.ItemBadges`), [StatusDot](../status-dot/COMPONENT.md) (the state first in `Timeline.ItemMeta`)
+- **Built from:** `internal/listRow` (the row; it sizes an [Avatar](../avatar/COMPONENT.md), a [ProgressCircle](../progress-circle/COMPONENT.md) and a [Thumbnail](../thumbnail/COMPONENT.md) in the mark), [Badge](../badge/COMPONENT.md) (`Timeline.ItemBadges`), [StatusDot](../status-dot/COMPONENT.md) (the state first in `Timeline.ItemMeta`)
 - **See also:** [Stepper](../stepper/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Gantt](../gantt/COMPONENT.md), [Card](../card/COMPONENT.md)

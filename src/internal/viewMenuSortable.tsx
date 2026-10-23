@@ -3,7 +3,13 @@ import * as React from "react";
 import { Dnd } from "@/components/dnd/Dnd";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 
+import { useOptionalControlSize } from "./ControlSizeContext";
+import { cx } from "./cx";
+import { fieldTierClass } from "./fieldClasses";
 import { formatLabel } from "./formatLabel";
+import listRowStyles from "./listRow.module.css";
+import { menuRowTier } from "./MenuGroup";
+import { OVERLAY_CONTENT_SIZE } from "./states";
 import {
   groupsOf,
   type ViewMenuEntry,
@@ -32,6 +38,8 @@ export function SortableViewMenuItems({
   /** The item a keyboard move carried: it keeps the focus once it is drawn in its new place. */
   const refocus = React.useRef<string | null>(null);
   const kind = React.useId();
+  // The items' rows stand a tier below the menu panel.
+  const rowTier = menuRowTier(useOptionalControlSize() ?? OVERLAY_CONTENT_SIZE);
 
   React.useLayoutEffect(() => {
     const id = refocus.current;
@@ -71,7 +79,12 @@ export function SortableViewMenuItems({
             kind={`${kind}-${index}`}
             className={styles.list}
             renderItem={(entry) => (
-              <Dnd.SortableItem id={entry.id} locked={entry.locked} className={styles.item}>
+              <Dnd.SortableItem
+                id={entry.id}
+                locked={entry.locked}
+                className={cx(fieldTierClass, listRowStyles.tier, styles.item)}
+                data-size={rowTier}
+              >
                 <Dropdown.CheckboxItem
                   checked={entry.checked}
                   disabled={entry.disabled}
@@ -81,14 +94,16 @@ export function SortableViewMenuItems({
                 >
                   {entry.label}
                 </Dropdown.CheckboxItem>
-                {/* The menu moves focus between its items: the grip is for the pointer (a press
-                    leaves the focus where it was: the lifted item leaves the layout), the item
-                    itself takes Alt + ↑ / ↓. */}
-                <Dnd.Handle
-                  tabIndex={-1}
-                  onMouseDown={(event) => event.preventDefault()}
-                  aria-label={formatLabel(reorder.handleLabel, { label: entry.name })}
-                />
+                {/* The grip as tall as the row's controls, at the row's end. The menu moves focus
+                    between its items: the grip is for the pointer (a press leaves the focus where
+                    it was: the lifted item leaves the layout), the item itself takes Alt + ↑ / ↓. */}
+                <span className={listRowStyles.actions}>
+                  <Dnd.Handle
+                    tabIndex={-1}
+                    onMouseDown={(event) => event.preventDefault()}
+                    aria-label={formatLabel(reorder.handleLabel, { label: entry.name })}
+                  />
+                </span>
               </Dnd.SortableItem>
             )}
           />

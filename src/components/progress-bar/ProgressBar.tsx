@@ -27,7 +27,7 @@ import {
   stepCells,
 } from "@/internal/progressSegments";
 import { RegionSwap } from "@/internal/RegionSwap";
-import type { ControlSize, Tone } from "@/internal/states";
+import { type ControlSize, type Tone, tierMappings } from "@/internal/states";
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 import { Skeleton } from "../skeleton/Skeleton";
 import styles from "./ProgressBar.module.css";
@@ -221,7 +221,11 @@ export function ProgressBar(props: ProgressBarProps) {
         {Array.from({ length: segmentsProp.length || LOADING_ROWS }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder rows
           <div key={i} className={styles.row}>
-            <ProgressLegendSkeleton rows={1} size={size} className={styles.rowSkeletonText} />
+            <Skeleton
+              shape="text"
+              size={tierMappings.legendSkeleton[size]}
+              className={styles.rowSkeletonText}
+            />
             {barSkeleton}
           </div>
         ))}
@@ -305,7 +309,7 @@ export function ProgressBar(props: ProgressBarProps) {
       <div className={styles.stack}>
         {ticks ? <CellSkeleton count={tickCount} /> : barSkeleton}
         {legend ? (
-          <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size={size} />
+          <ProgressLegendSkeleton rows={segmentsProp.length || LOADING_ROWS} size="xs" />
         ) : null}
       </div>
     ) : (
@@ -318,7 +322,7 @@ export function ProgressBar(props: ProgressBarProps) {
             segments={segments}
             scale={resolved.scale}
             formatValue={formatValue}
-            size={size}
+            size="xs"
           />
         ) : null}
       </div>

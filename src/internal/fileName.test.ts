@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { splitFileName } from "./fileName";
+import { splitFileName, splitNameTail } from "./fileName";
 
 describe("splitFileName", () => {
   it("cuts the final extension only", () => {
@@ -10,5 +10,17 @@ describe("splitFileName", () => {
     expect(splitFileName("README")).toEqual({ base: "README", ext: "" });
     expect(splitFileName(".env")).toEqual({ base: ".env", ext: "" });
     expect(splitFileName("name.")).toEqual({ base: "name.", ext: "" });
+  });
+});
+
+describe("splitNameTail", () => {
+  it("keeps the last characters apart for a long name", () => {
+    expect(splitNameTail("Договор поставки № 318.pdf")).toEqual({
+      head: "Договор поставки № 3",
+      tail: "18.pdf",
+    });
+  });
+  it("leaves a short name whole", () => {
+    expect(splitNameTail("report.pdf")).toEqual({ head: "report.pdf", tail: "" });
   });
 });

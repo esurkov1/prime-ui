@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { setControlValue } from "@/internal/controlValue";
 import { cx } from "@/internal/cx";
-import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { HighlightMatch } from "@/internal/HighlightMatch";
 import {
@@ -13,6 +12,8 @@ import {
   useCreateStore,
   useStoreSlice,
 } from "@/internal/listbox";
+import listRowStyles from "@/internal/listRow.module.css";
+import { menuRowProps, menuRowTier } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
@@ -190,16 +191,30 @@ export function InputSuggestionList({
       width="trigger"
       className={cx(fieldTierClass, menu.tier, menu.menu)}
     >
-      <div id={suggest.listboxId} role="listbox" aria-labelledby={suggest.labelledBy}>
+      <div
+        id={suggest.listboxId}
+        role="listbox"
+        aria-labelledby={suggest.labelledBy}
+        className={menu.list}
+      >
         {suggest.matches.map((item) => (
-          <SuggestionOption key={item} item={item} suggest={suggest} />
+          <SuggestionOption key={item} item={item} suggest={suggest} size={menuRowTier(size)} />
         ))}
       </div>
     </FloatingPanel>
   );
 }
 
-function SuggestionOption({ item, suggest }: { item: string; suggest: InputSuggestions }) {
+/** A suggestion: the list row, a tier below the panel, its match with the typed text marked. */
+function SuggestionOption({
+  item,
+  suggest,
+  size,
+}: {
+  item: string;
+  suggest: InputSuggestions;
+  size: ControlSize;
+}) {
   const highlighted = useStoreSlice(suggest.highlight, (value) => value === item);
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard stays in the field (`aria-activedescendant`)
@@ -208,8 +223,7 @@ function SuggestionOption({ item, suggest }: { item: string; suggest: InputSugge
       role="option"
       tabIndex={-1}
       aria-selected={highlighted}
-      className={menu.item}
-      {...toDataAttributes({ highlighted })}
+      {...menuRowProps({ size, highlighted })}
       // The field keeps the focus: a press must not blur it before the pick.
       onMouseDown={(event) => event.preventDefault()}
       onMouseMove={() => {
@@ -217,7 +231,9 @@ function SuggestionOption({ item, suggest }: { item: string; suggest: InputSugge
       }}
       onClick={() => suggest.pick(item)}
     >
-      <HighlightMatch text={item} query={suggest.query} />
+      <span className={listRowStyles.title}>
+        <HighlightMatch text={item} query={suggest.query} />
+      </span>
     </div>
   );
 }

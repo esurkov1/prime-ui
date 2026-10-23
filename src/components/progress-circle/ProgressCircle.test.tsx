@@ -38,7 +38,7 @@ describe("ProgressCircle", () => {
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", String(value));
   });
 
-  it("2xl draws a 96 ring and keeps the xl tier for its legend", () => {
+  it("2xl draws a 96 ring and a legend of xs rows", () => {
     render(
       <ProgressCircle
         size="2xl"
@@ -50,7 +50,7 @@ describe("ProgressCircle", () => {
       />,
     );
     expect(screen.getByRole("group").closest('[data-size="2xl"]')).not.toBeNull();
-    expect(screen.getByText("Сырьё").closest("ul")).toHaveAttribute("data-size", "l");
+    expect(screen.getByText("Сырьё").closest("ul")).toHaveAttribute("data-size", "xs");
   });
 
   it.each(["s", "m", "l", "xl"] as const)("sets data-size=%s", (size: ControlSize) => {

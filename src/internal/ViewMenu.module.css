@@ -1,12 +1,15 @@
-/* The view menu items that reorder (`viewMenuSortable`): a Dnd.Sortable list per group, a grip at the end of each item. */
+/* The view menu items that reorder (`viewMenuSortable`): a Dnd.Sortable list per group, 2 apart as
+   every list of rows; each item the list row of a check item (`Dropdown.CheckboxItem`) with the
+   grip at its end in the row's controls box (`listRowStyles.actions`: as tall as the row's
+   controls). */
 .list {
-  --dnd-sortable-gap: var(--prime-space-0);
+  --dnd-sortable-gap: calc(var(--prime-space-1) / 2);
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: var(--prime-space-1);
+  min-width: 0;
 }
 
 .check {

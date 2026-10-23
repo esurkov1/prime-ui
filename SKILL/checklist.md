@@ -58,7 +58,7 @@ checks.
 ## Sizes and alignment
 - [ ] Default size `m`; a tier changes for a whole region, never for one control ([the host tier](api-contract.md#size-and-the-host-tier)).
 - [ ] Every row of controls uses one size and its heights line up ([density](composition.md#5-density-and-size)).
-- [ ] A switch ends its row; reordering is a «Изменить порядок» / «Готово» mode where the switches leave and the grips take their place ([list rows](composition.md#list-rows)).
+- [ ] A switch ends its row; a reorderable list shows its grips always — leading (`handle="start"`) when the rows end with a switch ([list rows](composition.md#list-rows)).
 - [ ] A destructive action is `tone="danger"` and asks through a `ConfirmDialog` — an icon button with a Tooltip among one or two actions, the last item of «Ещё» among three or more ([the number of actions](composition.md#the-number-of-actions)).
 - [ ] Controls in table cells are one tier below the table; no CSS sets row or cell heights ([size axis](foundations.md#3-size-axis)).
 - [ ] A chip in one row with controls is two sizes up (`l` beside `xs`, `xl` beside `s`); beside `m` and larger the whole row is fields ([chips beside fields](foundations.md#chips-beside-fields)).

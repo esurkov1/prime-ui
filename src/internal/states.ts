@@ -41,11 +41,6 @@ export const tierMappings = {
    */
   legendSkeleton: { xs: "xs", s: "xs", m: "m", l: "m", xl: "m" },
   /**
-   * The label tier of a legend's text (ProgressBar, ProgressCircle): a legend is secondary to its
-   * indicator, so s and xl read the label of the tier below (xs · xs · m · l · l).
-   */
-  legendText: { xs: "xs", s: "xs", m: "m", l: "l", xl: "l" },
-  /**
    * The account Avatar of a Sidebar row: the avatar of the tier, capped so it still fits the
    * compact rail with even air around it (32 at `l`, 40 at `xl`).
    */
@@ -69,25 +64,43 @@ export const tierMappings = {
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
 
 /**
- * The leading mark of a List row (`List.ItemIcon`) without a `size` of its own, by row tier.
- * `line` — a one-line row: an avatar of the tier, a ring that fits the row (24 · 24 · 32 · 40 ·
- * 48). `two` — beside `List.ItemDescription`: every mark as tall as the two lines at most (32 · 32 ·
- * 40 · 40 · 40 for lines 32 · 36 · 40 · 44 · 44), a glyph on a tile, so the row keeps its height.
+ * The leading mark of a list row (internal/listRow: List, Sidebar, menus, Timeline, the file queue)
+ * without a `size` of its own, by row tier. It never grows the row. `line` — a row without a
+ * description: a picture under the row's line, 16 · 20 · 24 · 24 · 32 (a ring or a thumbnail has no
+ * size under 24). `two` — beside a description: every mark as tall as the two lines at most,
+ * 32 · 32 · 40 · 40 · 40, a glyph on a tile.
  */
 export const listMarkSize = {
   line: {
-    avatar: { xs: "xs", s: "s", m: "m", l: "l", xl: "xl" },
-    ring: { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" },
+    avatar: { xs: "2xs", s: "xs", m: "s", l: "s", xl: "m" },
+    ring: { xs: "xs", s: "xs", m: "xs", l: "xs", xl: "s" },
+    thumbnail: { xs: "xs", s: "xs", m: "xs", l: "xs", xl: "s" },
   },
   two: {
     tile: { xs: "xs", s: "xs", m: "s", l: "s", xl: "s" },
     avatar: { xs: "m", s: "m", m: "l", l: "l", xl: "l" },
     ring: { xs: "s", s: "s", m: "m", l: "m", xl: "m" },
+    thumbnail: { xs: "s", s: "s", m: "m", l: "m", xl: "m" },
   },
 } as const satisfies {
-  line: Record<"avatar" | "ring", Record<ControlSize, ControlSize>>;
-  two: Record<"tile" | "avatar" | "ring", Record<ControlSize, ControlSize>>;
+  line: {
+    avatar: Record<ControlSize, "2xs" | ControlSize>;
+    ring: Record<ControlSize, ControlSize>;
+    thumbnail: Record<ControlSize, ControlSize>;
+  };
+  two: Record<"tile" | "avatar" | "ring" | "thumbnail", Record<ControlSize, ControlSize>>;
 };
+
+/**
+ * The tier of the controls in a list row (`List.ItemActions` and its kin). `line` — a row without a
+ * description: buttons as tall as the row minus 8 (20 · 24 · 28 · 32 · 40; the row sets the height
+ * through `--prime-control-height`), the tier whose text and icon fit that height. `two` — beside a
+ * description: a tier down (`stepDown`, 28 · 28 · 32 · 36 · 40).
+ */
+export const listControlTier = {
+  line: { xs: "xs", s: "xs", m: "xs", l: "s", xl: "l" },
+  two: { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" },
+} as const satisfies Record<"line" | "two", Record<ControlSize, ControlSize>>;
 
 /**
  * The mark of a surface's header (`Card.Icon` and its kin), per kind of mark, for a frame

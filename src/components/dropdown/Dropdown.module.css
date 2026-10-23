@@ -1,15 +1,16 @@
 /* ─── Dropdown menu ──────────────────────────────────────────────────────────
- * Rows, groups and separators come from `menu.module.css`; the panel from the shared surface.
- * Items take real focus (roving inside the menu): the menu's `.focusRow` lights them on keyboard
- * focus and under a hovering pointer.
+ * Items are the kit's one list row (`internal/listRow` through `internal/MenuGroup`), a tier below
+ * the panel; groups and separators come from `menu.module.css`, the panel from the shared surface.
+ * Items take real focus (roving inside the menu): the focus is the row's fill, no ring.
  */
 
-.item {
-  white-space: nowrap;
+.item[data-disabled] .shortcut {
+  color: var(--prime-color-text-disabled);
 }
 
-.item[data-disabled="true"] .shortcut {
-  color: var(--prime-color-text-disabled);
+/* The description and the meta keep their own element under the ids that describe the item. */
+.itemSlot {
+  display: contents;
 }
 
 /* ─── Header: who is signed in, the current plan ─────────────────────────── */
@@ -49,47 +50,4 @@
 /* Caption (the text role is joined in TSX). */
 .description {
   color: var(--prime-color-text-muted);
-}
-
-/* ─── Item with a description: label over a muted line ──────────────────── */
-
-/* Two lines grow the row from the tier height with the tier gap above and below. */
-.item:has(> .itemBody) {
-  align-items: center;
-  padding-block: var(--field-gap);
-}
-
-.itemBody {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-width: 0;
-}
-
-/* The label takes the room of the row and truncates first: a meta or a key hint stays whole. */
-.itemLabel {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* The title of a row that carries a description is medium, like a rich Select option. */
-.itemBody > .itemLabel {
-  font-weight: var(--prime-font-weight-medium);
-}
-
-.itemSlot {
-  display: contents;
-}
-
-/* A link item: no underline, the row's own colors. */
-a.item {
-  text-decoration: none;
-}
-
-/* A person's or an object's picture leading an item (`Avatar.Root`, `Thumbnail.Root`), at the row's media size. */
-.media {
-  flex-shrink: 0;
 }

@@ -12,6 +12,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatNumber } from "@/internal/formatNumber";
 import { HeaderLineContent, HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
 import { useLabels } from "@/internal/labels";
+import listRowStyles from "@/internal/listRow.module.css";
 import { HUE_CHART } from "@/internal/palette";
 import { flattenChildren, isPart } from "@/internal/parts";
 import type { TagRef } from "@/internal/polymorphic";
@@ -478,7 +479,7 @@ function ChartFramePlot({
 }
 ChartFramePlot.displayName = "ChartFrame.Plot";
 
-/** A legend entry is a quiet chip one `xs` control high (the field tier at `xs`). */
+/** A legend entry is the list row at tier `xs`, plain: no hover, no padding of its own. */
 const ENTRY_TIER: ControlSize = "xs";
 
 export type ChartFrameLegendProps = React.HTMLAttributes<HTMLUListElement> & {
@@ -517,18 +518,20 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
       role="list"
       aria-label={labels.legend}
       {...rest}
-      className={cx(styles.legend, className)}
+      className={cx(fieldTierClass, listRowStyles.tier, styles.legend, className)}
+      data-size={ENTRY_TIER}
       data-read-only={readOnly || undefined}
     >
       {series.map((item, index) => {
         const content = (
           <>
-            <span
-              className={styles.swatch}
-              aria-hidden="true"
-              style={{ "--chart-frame-swatch": item.color } as React.CSSProperties}
-            />
-            <span className={styles.legendLabel}>{item.label}</span>
+            <span className={listRowStyles.mark} data-kind="dot" aria-hidden="true">
+              <span
+                className={styles.swatch}
+                style={{ "--chart-frame-swatch": item.color } as React.CSSProperties}
+              />
+            </span>
+            <span className={listRowStyles.title}>{item.label}</span>
             {item.value !== undefined ? (
               valueLoading ? (
                 <Skeleton
@@ -538,7 +541,7 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
                   className={cx(styles.legendValueSkeleton, valueSwap.className)}
                 />
               ) : (
-                <span key={valueSwap.key} className={cx(styles.legendValue, valueSwap.className)}>
+                <span key={valueSwap.key} className={cx(listRowStyles.meta, valueSwap.className)}>
                   {item.formatValue(item.value)}
                 </span>
               )
@@ -548,25 +551,29 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
         return (
           <li key={item.id} className={styles.legendItem}>
             {readOnly ? (
-              <span className={cx(fieldTierClass, styles.entry)} data-size={ENTRY_TIER}>
+              <span
+                className={cx(listRowStyles.row, listRowStyles.hit, styles.entry)}
+                data-plain=""
+              >
                 {content}
               </span>
             ) : (
-              // A legend entry names a series and toggles it; Button's command look (filled label,
-              // tier padding) would read as an action, so the entry draws its own quiet chip.
+              // A legend entry names a series and toggles it; Button's command look would read as
+              // an action, so the entry is the plain list row on a button.
               <button
                 ref={(node) => {
                   buttons.current[index] = node;
                 }}
                 type="button"
                 className={cx(
-                  fieldTierClass,
+                  listRowStyles.row,
+                  listRowStyles.hit,
                   styles.entry,
                   styles.toggle,
                   press.press,
                   touchTargetClass,
                 )}
-                data-size={ENTRY_TIER}
+                data-plain=""
                 aria-pressed={!item.hidden}
                 tabIndex={index === active ? 0 : -1}
                 onClick={() => {

@@ -1,17 +1,13 @@
 /* ─── CommandMenu ────────────────────────────────────────────────────────────
  * Modal-level search palette on Modal: search row on top (faint hairline below), a scrolling list
- * of sections, a footer with key hints (hairline above). Rows come from `internal/menu.module.css`.
+ * of sections, a footer with key hints (hairline above). Rows are the kit's list row (`internal/listRow`).
  */
 
-/* The dialog surface, its top placement and the column are Modal's (`placement="top"`). */
-.content {
-  /* One content column: title, search icon, group labels and item icons start at 16
-     (list padding 8 + row padding 8). */
-  --cm-inset: calc(var(--prime-space-2) + var(--prime-panel-item-padding-x));
-}
-
-/* Search row height per tier; the row metrics come from `menu.tier` on the same element. */
+/* Search row height per tier; the rows' own tier is the list's (one below). */
 .tier {
+  /* One content column: title, search icon, group labels and item icons start where the rows'
+     content does (list padding 4 + the row's `--field-px`, the tier below the page's). */
+  --cm-inset: calc(var(--prime-space-1) + var(--prime-space-2));
   --cm-input-h: var(--prime-space-12);
 
   display: contents;
@@ -22,6 +18,7 @@
 }
 
 .tier:is([data-size="l"], [data-size="xl"]) {
+  --cm-inset: calc(var(--prime-space-1) + var(--prime-space-3));
   --cm-input-h: calc(var(--prime-space-12) + var(--prime-space-2));
 }
 
@@ -66,31 +63,32 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-1);
+  gap: calc(var(--prime-space-1) / 2);
   min-width: 0;
   min-height: 0;
   max-height: calc(var(--prime-panel-max-height) * 1.5);
-  padding: var(--prime-space-2);
+  padding: var(--prime-space-1);
 }
 
-.itemText {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-width: 0;
+.group {
+  gap: calc(var(--prime-space-1) / 2);
 }
 
-.itemLabel,
-.itemDescription {
+/* Filtered-out rows: `hidden` must win over the row's `display: flex`. */
+.item[hidden] {
+  display: none;
+}
+
+.descriptionText {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-/* The description takes the tier's text from `menu.itemDescription`; the title above it is medium. */
-.itemText > .itemLabel:not(:only-child) {
-  font-weight: var(--prime-font-weight-medium);
+/* The key hint stands at the end of the row. */
+.shortcut {
+  flex: none;
+  margin-inline-start: auto;
 }
 
 /* ─── Footer with key hints ─────────────────────────────────────────────── */

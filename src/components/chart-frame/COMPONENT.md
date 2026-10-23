@@ -148,7 +148,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `Legend readOnly` | entries without hover or press | the series cannot be turned off (a stacked total that must add up) | `false` |
+| `Legend readOnly` | entries as plain rows without a press | the series cannot be turned off (a stacked total that must add up) | `false` |
 
 ### Value format
 - `formatValue` on the root displays every series; a series with its own `formatValue` (a count beside money) uses its own in the legend, the tooltip and the data table.
@@ -168,13 +168,13 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | error | `state="error"` | `data-state="error"` on the root; the value is a muted dash; EmptyPage `compact` `tone="danger"` (`role="alert"`, `labels.error`) with the retry button when `onRetry` is set; it waits for a returned Promise |
 | swap | `state` changes | the plot region cross-fades (Crossfade, the height stays); the value and legend values fade in from their Skeletons |
 | series hidden | a legend toggle, `hiddenSeries` | `aria-pressed="false"` on the entry (the style hangs on it): it keeps its place and color, the swatch becomes a ring, the name quiet; `renderPlot` gets `hidden: true` — a mark with `data-hidden="true"` fades out, the axes keep their scale |
-| hover / press | pointer on a legend entry | hover fill (hover-capable pointers only), press scale |
+| press | pointer on a legend entry | press scale; the plain row has no hover fill |
 
 ## Layout & spacing
 - The root takes its container's width, card padding and radius, zones 16 px apart; on the page it carries the raised whisper, nested in a surface it is a flat tile one step deeper.
 - The panel takes the surface frame of its host tier (padding, radius, zone gap); the header is the kit's header row: the title and the description under it, one line each, the actions at the end at the frame's tier; nothing wraps, the title gives way.
 - The plot is 240 px high (160 px under 30rem of panel width) unless `height` is set; it never changes height between states.
-- Legend entries are chips one `xs` control high and wrap onto more lines; each has a 44 px touch hit area on coarse pointers.
+- Legend entries are plain rows of the kit list row at tier `xs` (a dot in an icon-wide box, the name in regular weight, the value as muted meta; no padding of their own), 28 high, 16 apart, and wrap onto more lines; each has a 44 px touch hit area on coarse pointers.
 - `ChartFrame.Tooltip` is the floating layer of the ladder with the point's label over rows of swatch · series name · value. With `point` the kit places it like every anchored layer (`usePosition`): right of the point at its height, on the left only where the right has no room in the viewport, inside the viewport, following the plot on scroll. Without `point` the chart library positions it (Recharts `content`).
 - SVG `<text>` in the plot takes the caption type in `--prime-color-text-muted` (the plot area carries the caption role); a class of your own still wins.
 - Works in a 320 px column; the container queries are on the panel's own width, so it adapts in a grid cell as on a phone.

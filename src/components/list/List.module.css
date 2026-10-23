@@ -1,20 +1,14 @@
 /*
- * List — a selectable navigation list (the master half of a list + detail screen). No border, no
- * card of its own: rows are transparent with a `fill-subtle` wash on hover; the current row takes
- * the surface's fill two ladder steps off it (`fill-muted-hover`), as the Sidebar's current item.
- * A one-line row is the control height of the tier; a second line (description) or an avatar
- * makes it taller. On a coarse pointer a row is at least the touch target (`touchTargetRowClass`).
+ * List — a list of records or places, built of the kit's one list row (internal/listRow: the row,
+ * its marks, text, end and controls). This module only stacks the rows: 2 apart, groups with a
+ * heading, the grip of a reorderable list. The rows have no box: a wash on hover, a fill step on the
+ * current row, the accent's soft tone on a checked one.
  */
 
-/* The row tier (height, text, icon, gap, padding, radius) is the field tier table: the root joins
-   `fieldTierClass` and the rows read `--field-*`. */
 .root {
-  --list-desc: var(--prime-text-body-s-size);
-  --list-desc-lh: var(--prime-text-body-s-line-height);
-
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-1);
+  gap: calc(var(--prime-space-1) / 2);
   box-sizing: border-box;
   min-width: 0;
 }
@@ -23,7 +17,7 @@
  * The list reset at zero specificity: a consumer's class may pad the list in its pane. Bleed (the
  * public hook `--list-bleed: 1`, set by a host whose content edge the text should stand on — a
  * `Card.Body`): the rows reach past the list's edges by their own inline padding, so their text
- * lines up with the host's other content and the hover wash runs into the host's padding.
+ * lines up with the host's other content and the wash runs into the host's padding.
  */
 :where(.root) {
   --list-bleed-size: calc(var(--field-px) * var(--list-bleed, 0));
@@ -34,301 +28,63 @@
   list-style: none;
 }
 
-/* On xs and s the second line steps down to the caption. */
-.root[data-size="xs"],
-.root[data-size="s"] {
-  --list-desc: var(--prime-text-caption-size);
-  --list-desc-lh: var(--prime-text-caption-line-height);
-}
-
-.row {
-  display: flex;
-  min-width: 0;
-}
-
-/* --- Item ------------------------------------------------------------------------ */
-
 .item {
-  box-sizing: border-box;
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: var(--field-gap);
-  width: 100%;
   min-width: 0;
-  min-height: max(var(--field-h), var(--touch-row-min, var(--prime-space-0)));
-  margin: 0;
-  padding-block: calc((var(--field-h) - var(--field-lh)) / 2);
-  padding-inline: var(--field-px);
-  border: 0;
-  border-radius: var(--field-radius);
-  background: transparent;
-  color: var(--prime-color-text-secondary);
-  font: inherit;
-  font-size: var(--field-text);
-  line-height: var(--field-lh);
-  text-align: start;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
-/* Inside the row edge: a scrolling pane never cuts the ring. */
-.item:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
+/* --- Groups -------------------------------------------------------------------------- */
 
-@media (hover: hover) {
-  .item:hover:not([data-static="true"]) {
-    background: var(--prime-color-fill-subtle);
-    color: var(--prime-color-text-primary);
-  }
-}
-
-/* A row that opens nothing (no `onClick`, `href` or `asChild`): a plain box, no pointer, no wash. */
-.item[data-static="true"] {
-  cursor: default;
-}
-
-.item:active:not([data-disabled="true"], [data-static="true"], :disabled) {
-  background: var(--prime-color-fill-subtle-active);
-}
-
-/* The open record: two ladder steps off the surface, apart from the `fill-subtle` hover. */
-.item[aria-current="true"],
-.item[aria-current="page"] {
-  background: var(--prime-color-fill-muted-hover);
-  color: var(--prime-color-text-primary);
-}
-
-.item[data-disabled="true"],
-.item:disabled {
-  background: transparent;
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
-}
-
-/* --- Parts ----------------------------------------------------------------------- */
-
-/* The leading picture: an icon at the tier size, or an avatar of the tier (List.ItemIcon gives an
-   `Avatar.Root` without its own `size` the row tier). */
-.icon {
-  --prime-icon-size: var(--field-icon);
-
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  color: var(--prime-color-text-muted);
-}
-
-/* A colour dot (`Badge.Dot`) stands in an icon-wide box, so its row's text lines up with the
-   rows that carry icons. A trailing glyph stays quiet: the icon size, never an avatar. */
-.icon[data-mark="dot"],
-.icon[data-edge="end"] {
-  width: var(--field-icon);
-  height: var(--field-icon);
-}
-
-.item[data-disabled="true"] .icon,
-.item:disabled .icon,
-.item[data-disabled="true"] .tile,
-.item:disabled .tile {
-  color: var(--prime-color-text-disabled);
-}
-
-/* A glyph beside two lines: the kit's icon tile (internal/iconBox), as tall as the lines at most
-   (`tierMappings.listMarkTile`), so the row keeps its height. */
-.tile {
-  flex: none;
-}
-
-.body {
+.group {
   display: flex;
-  flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
 }
 
-.text,
-.description {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.text {
+/* The heading as the Sidebar's and the menus' (28 tall, the caption role in the medium weight,
+   muted), on the rows' text edge; the next group starts right after the last row. */
+.groupLabel {
+  display: flex;
+  align-items: center;
+  min-height: var(--prime-panel-group-label-height);
+  padding-inline: var(--field-px);
+  color: var(--prime-color-text-muted);
   font-weight: var(--prime-font-weight-medium);
 }
 
-/* Beside badges the title gives way first, down to its text or 8em (`useTitleFloor`). */
-.badged {
-  flex: 0 1000 auto;
-  min-width: min(var(--header-title-min, 0), 100%);
-}
-
-.item[aria-current="true"] .text,
-.item[aria-current="page"] .text {
-  color: var(--prime-color-text-primary);
-}
-
-.body > .description {
-  color: var(--prime-color-text-muted);
-  font-size: var(--list-desc);
-  line-height: var(--list-desc-lh);
-}
-
-.item[data-disabled="true"] .description,
-.item:disabled .description {
-  color: inherit;
-}
-
-/* Meta, count, trailing icons: one cluster at the end; beside two lines meta on top, count below. */
-.trail {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
-.trailStacked {
-  flex-direction: column;
-  align-items: flex-end;
-  align-self: stretch;
-  justify-content: space-between;
-  gap: var(--prime-space-1);
-}
-
-.meta {
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.count {
-  flex: none;
-  font-variant-numeric: tabular-nums;
-}
-
-/* --- Own controls (`List.ItemActions`) ------------------------------------------- */
-
-/* The frame holds the row element and its controls and draws the row's fills for both: hover over
-   the whole row, the press of the element, the current row. The element itself stays clear. */
-.frame {
+.groupList {
   display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  align-items: center;
-  min-width: 0;
-  border-radius: var(--field-radius);
-  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+  flex-direction: column;
+  gap: calc(var(--prime-space-1) / 2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-/* The row's text keeps a floor beside its controls; controls that leave less than the floor drop
-   to a line of their own at the row's end instead of crushing the text or leaving the row. */
-.frame > .item {
-  flex: 1 1 var(--prime-space-24);
+/* --- Reorder (`onReorder`) --------------------------------------------------------- */
+
+/* The sortable list keeps the list's rhythm, not Dnd's default gap. */
+.root[data-reorderable] {
+  --dnd-sortable-gap: calc(var(--prime-space-1) / 2);
 }
 
-.frame > .actions[data-side="end"] {
-  margin-inline-start: auto;
-}
-
-.frame > .item,
-.frame > .item[aria-current],
-.frame > .item:active {
-  background: transparent;
-}
-
-@media (hover: hover) {
-  .frame > .item:hover {
-    background: transparent;
-  }
-
-  .frame:hover:not(:has(> .item[data-disabled="true"], > .item[data-static="true"])) {
-    background: var(--prime-color-fill-subtle);
-  }
-
-  .frame:hover > .item:not([data-disabled="true"]) {
-    color: var(--prime-color-text-primary);
-  }
-}
-
-.frame:has(> .item:active:not([data-disabled="true"], [data-static="true"], :disabled)) {
-  background: var(--prime-color-fill-subtle-active);
-}
-
-.frame:has(> .item[aria-current="true"], > .item[aria-current="page"]) {
-  background: var(--prime-color-fill-muted-hover);
-}
-
-/* The controls, one tier below the row, as far from the row's side edge as the row's own text is
-   (`--field-px`), at any row height: one line, a description, an avatar and the touch row stand on
-   one vertical. A spacer at their outer edge makes the distance; the end edge, or the start edge
-   for controls that lead the row (`side="start"`). The spacer's negative margin takes back the
-   gap before it. */
-.actions {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--prime-space-1);
-}
-
-.actions[data-side="end"]::after,
-.actions[data-side="start"]::before {
-  content: "";
-  flex: none;
-  inline-size: var(--field-px);
-}
-
-.actions[data-side="end"]::after {
-  margin-inline-start: calc(var(--prime-space-0) - var(--prime-space-1));
-}
-
-.actions[data-side="start"]::before {
-  margin-inline-end: calc(var(--prime-space-0) - var(--prime-space-1));
-}
-
-/* --- Reorder (`onReorder`) ------------------------------------------------------- */
-
-/* The sortable list keeps the list's own rhythm, not Dnd's default gap. */
-.root[data-reorderable="true"] {
-  gap: var(--prime-space-1);
-}
-
-/* The grip sits at the row's end, after the row element and its controls, centred on the row; a
-   spinner stands in while saving. The row's radius shapes the carried copy and the gap it leaves
-   like the row itself. */
-.sortableRow {
-  align-items: center;
-  gap: var(--prime-space-1);
-  border-radius: var(--field-radius);
-}
-
-/* The grip box is the xs control height on every tier: it carries the field tier at `xs`. */
+/* The grip (or the lock of a locked row) as tall as the row's controls, at the end of the row or at
+   its start (`handle="start"`); a row whose move is being saved quiets down until the answer. */
 .grip {
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  inline-size: var(--field-h);
-  block-size: var(--field-h);
 }
 
-/* A row whose move is being saved quiets down until the answer, both ways eased. */
-.sortableRow > .item {
-  transition:
-    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+.grip[data-side="start"] {
+  padding-inline: var(--field-px) var(--prime-space-0);
 }
 
-.sortableRow[aria-busy="true"] > .item {
+.sortable {
+  border-radius: var(--field-radius);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.sortable[aria-busy="true"] {
   opacity: var(--prime-opacity-busy);
 }

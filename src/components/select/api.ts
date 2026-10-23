@@ -293,8 +293,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.TriggerIcon · Select.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label.",
-      ru: "`<span>` с ведущим глифом размера иконки яруса, `aria-hidden`: перед значением / перед подписью пункта.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph: before the value at the tier icon size / the option's mark — bare beside one line, on a tile beside a description.",
+      ru: "`<span>` с ведущим глифом, `aria-hidden`: перед значением по размеру иконки яруса / метка пункта — голая в одну строку, на плитке рядом с описанием.",
       props: [
         {
           name: "…rest",
@@ -333,8 +333,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Item",
-      en: '`ref` → `HTMLDivElement`. `role="option"` with `aria-selected`; a check on the end (single) or a Checkbox.Indicator in front (`multiple`).',
-      ru: 'Пункт `role="option"` с `aria-selected`: галочка в конце (одиночный выбор) или Checkbox.Indicator в начале (`multiple`).',
+      en: "`ref` → `HTMLDivElement`. `role=\"option\"` with `aria-selected`, the kit's list row a tier below the field; a check on the end (single) or a Checkbox.Indicator in front and the accent's soft tone on a checked row (`multiple`).",
+      ru: 'Пункт `role="option"` с `aria-selected`, строка списка кита на ярус ниже поля: галочка в конце (одиночный выбор) или Checkbox.Indicator в начале и мягкий тон акцента у выбранной строки (`multiple`).',
       props: [
         {
           name: "value",

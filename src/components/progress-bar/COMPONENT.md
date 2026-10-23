@@ -143,7 +143,7 @@ Always controlled: pass the current `value` or `segments` on every render.
 ## Layout & spacing
 - `width: 100%` of the parent; the header is a row with the label (ellipsis) and the value.
 - Label → line: the tier `label-gap` (`--prime-space-1` xs/s, `--prime-space-2` m–xl). The label is primary, medium weight; the percentage secondary, tabular numbers.
-- Bar → legend `--prime-space-3` (12). Rows (`layout="rows"`) are 12 apart, each header 4 above its bar: the label (secondary, truncates) takes the free width, the value (primary, medium) and the share (muted, at least 4ch) line up at the end in tabular numbers.
+- Bar → legend `--prime-space-3` (12). Legend rows are the kit list row at tier `xs`, plain (28 high, 2 apart, no padding or hover): the dot, the name (regular), then the value and the share as muted meta at the end. Rows (`layout="rows"`) are 12 apart, each header 4 above its bar: the label (secondary, truncates) takes the free width, the value (primary, medium) and the share (muted, at least 4ch) line up at the end in tabular numbers.
 - `hairline` gaps and `steps` cells are ¾ of the line thickness apart; `ticks` are ⅔ of it wide and ½ of it apart (a tick 4 and a gap 3 on `m`), their height the tier's 16 · 20 · 24 · 32 · 40.
 - Stack several bars 16–20 apart (a gap on their parent).
 

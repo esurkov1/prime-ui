@@ -151,10 +151,9 @@
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-space-1) var(--prime-space-2);
+  gap: var(--prime-space-1) var(--prime-space-4);
   min-width: 0;
-  /* Entries are chips with side padding: the first swatch lines up with the panel text. */
-  margin: 0 0 0 calc(var(--prime-space-2) * -1);
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -164,42 +163,19 @@
   min-width: 0;
 }
 
-/* A chip one `xs` control high: the entry carries the field tier at `xs` (`--field-h`). */
-.entry {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--prime-space-2);
+/* The entry is the list row at `xs` (internal/listRow, plain): it takes its width from its content. */
+.legend .entry {
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
   min-width: 0;
-  min-height: var(--field-h);
-  padding: 0 var(--prime-space-2);
-  border: 0;
-  border-radius: var(--prime-radius-s);
-  background: transparent;
-  color: var(--prime-color-text-secondary);
-  font-family: inherit;
-  font-size: var(--prime-control-m-label-size);
-  line-height: var(--prime-control-m-label-line-height);
-  text-align: start;
 }
 
-.toggle {
+.legend .toggle {
   cursor: pointer;
   appearance: none;
   transition:
-    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
     scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-@media (hover: hover) {
-  .toggle:hover {
-    background: var(--prime-color-fill-muted);
-  }
-}
-
-.toggle:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
 }
 
 .swatch {
@@ -215,31 +191,13 @@
 
 /* Hidden (`aria-pressed="false"`): the swatch is a ring (a shape change, not only a color one) and
    the name goes quiet. */
-.toggle[aria-pressed="false"] {
+.legend .toggle[aria-pressed="false"] {
   color: var(--prime-color-text-muted);
 }
 
 .toggle[aria-pressed="false"] .swatch {
   background: transparent;
   box-shadow: inset 0 0 0 calc(var(--prime-border-width) * 1.5) var(--chart-frame-swatch);
-}
-
-.legendLabel {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.legendValue {
-  color: var(--prime-color-text-primary);
-  font-weight: var(--prime-font-weight-medium);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.toggle[aria-pressed="false"] .legendValue {
-  color: inherit;
 }
 
 .legendValueSkeleton {

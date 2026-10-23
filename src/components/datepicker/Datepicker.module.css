@@ -86,13 +86,30 @@
 
 /* ─── Presets ────────────────────────────────────────────────────────────── */
 
+/* Aside: a column of list rows (`menuRowProps` of `internal/MenuGroup`, a tier below the panel), 2 apart, 4 in from the
+   column's edges; the active preset is checked at the end, the check's place held on the others. */
 .presets {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
+  gap: calc(var(--prime-space-1) / 2);
   width: calc(var(--dp-cell) * 5);
   padding: var(--prime-panel-padding);
   border-inline-end: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+/* A preset row keeps its height in the column as tall as the months. */
+.presets > .preset {
+  flex: none;
+}
+
+.presetCheck {
+  opacity: 0;
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+.preset[aria-pressed="true"] .presetCheck {
+  opacity: 1;
 }
 
 /* Narrow: presets become a sideways ScrollContainer row of soft Buttons above the calendar. */

@@ -25,6 +25,7 @@ import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import { leaveGuardCapture } from "@/internal/leaveGuard";
+import { ListRowMark, listRowStyles } from "@/internal/listRow";
 import { nodeText } from "@/internal/nodeText";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
@@ -443,8 +444,9 @@ function SidebarRoot({
         <div
           {...rest}
           ref={mergedRootRef}
-          className={cx(fieldTierClass, styles.root, className)}
+          className={cx(fieldTierClass, listRowStyles.tier, styles.root, className)}
           data-depth={depth}
+          data-nav=""
           {...state}
         >
           {/* Off-canvas, the panel is a layer of the stack like a Modal: it goes to the body, so
@@ -454,8 +456,9 @@ function SidebarRoot({
           {offCanvas ? (
             <Portal>
               <div
-                className={cx(fieldTierClass, styles.root, styles.layerHost)}
+                className={cx(fieldTierClass, listRowStyles.tier, styles.root, styles.layerHost)}
                 data-depth={depth}
+                data-nav=""
                 {...state}
               >
                 {layerContent}
@@ -638,16 +641,16 @@ function SidebarGroup({
                     <button
                       ref={flyout.triggerRef}
                       type="button"
-                      className={styles.item}
+                      className={cx(listRowStyles.row, listRowStyles.hit, styles.item)}
                       aria-label={text}
                       aria-expanded={flyout.open}
                       aria-haspopup="dialog"
                       {...toDataAttributes({ "active-path": active || undefined })}
                       {...flyout.triggerHandlers}
                     >
-                      <span className={cx(styles.icon, iconSlotClass)} aria-hidden="true">
+                      <SidebarItemIcon>
                         <Icon name="action.more" />
-                      </span>
+                      </SidebarItemIcon>
                       <AttentionDot hue={hue} shown={folded} />
                     </button>
                   </Popover.Anchor>
@@ -690,9 +693,21 @@ export type SidebarItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "
  * An item icon. Before the label it leads and stays in place in every mode; after the label it is
  * a quiet trailing glyph (an external link) that hides in compact mode.
  */
-function SidebarItemIcon({ className, ...rest }: SidebarItemIconProps) {
+function SidebarItemIcon({ className, children, ...rest }: SidebarItemIconProps) {
+  const { size } = useSidebar();
+  // Leading, it is the row's mark (internal/listRow); a trailing glyph (`data-edge="end"`, set by
+  // the item) is a quiet glyph of the trail.
+  if ((rest as { "data-edge"?: string })["data-edge"] === "end") {
+    return (
+      <span {...rest} className={cx(styles.icon, iconSlotClass, className)} aria-hidden="true">
+        {children}
+      </span>
+    );
+  }
   return (
-    <span {...rest} className={cx(styles.icon, iconSlotClass, className)} aria-hidden="true" />
+    <ListRowMark {...rest} size={size} lines="line" className={cx(styles.icon, className)}>
+      {children}
+    </ListRowMark>
   );
 }
 SidebarItemIcon.displayName = "Sidebar.ItemIcon";
@@ -716,7 +731,7 @@ export type SidebarItemCountProps = Omit<
 function SidebarItemCount({ children, color, variant, className, ...rest }: SidebarItemCountProps) {
   if (color === undefined && variant === undefined) {
     return (
-      <span {...rest} className={cx(styles.count, styles.countPlain, className)}>
+      <span {...rest} className={cx(listRowStyles.count, styles.countPlain, className)}>
         {children}
       </span>
     );
@@ -875,9 +890,11 @@ function splitItemChildren(children: React.ReactNode, end?: React.ReactNode): It
     content: (
       <>
         {leading}
-        <span className={styles.label}>{label}</span>
+        <span className={cx(listRowStyles.body, styles.label)}>
+          <span className={listRowStyles.title}>{label}</span>
+        </span>
         {trail ? (
-          <span className={styles.trail}>
+          <span className={cx(listRowStyles.end, styles.trail)}>
             {count}
             {shortcut}
             {endIcons}
@@ -979,7 +996,14 @@ function SidebarItem({
   const shared = {
     ...rest,
     disabled,
-    className: cx(styles.item, touchTargetRowClass, press.press, className),
+    className: cx(
+      listRowStyles.row,
+      listRowStyles.hit,
+      styles.item,
+      touchTargetRowClass,
+      press.press,
+      className,
+    ),
     onClick: handleClick,
     onClickCapture: leaveGuardCapture(rest.onClickCapture),
     "aria-current": current ? ("page" as const) : rest["aria-current"],
@@ -1199,7 +1223,8 @@ function RailFlyout({ flyout, children }: { flyout: RailFlyoutState; children: R
       side="right"
       size={size}
       flush
-      className={cx(fieldTierClass, styles.flyout)}
+      className={cx(fieldTierClass, listRowStyles.tier, styles.flyout)}
+      data-nav=""
       onPointerEnter={(event) => {
         if (event.pointerType !== "touch") flyout.keepOpen();
       }}
@@ -1326,7 +1351,14 @@ function SidebarSubTrigger({
       id={sub.triggerId}
       type="button"
       disabled={disabled}
-      className={cx(styles.item, touchTargetRowClass, press.press, className)}
+      className={cx(
+        listRowStyles.row,
+        listRowStyles.hit,
+        styles.item,
+        touchTargetRowClass,
+        press.press,
+        className,
+      )}
       aria-expanded={rail ? flyout.open : sub.open}
       aria-controls={rail ? undefined : sub.contentId}
       aria-haspopup={rail ? "dialog" : undefined}
@@ -1551,9 +1583,9 @@ function SidebarAccount({ description, className, children, type, ...rest }: Sid
       >
         {/* The avatar takes the rail's tier (`tierMappings.railAvatar`); the name says who it is. */}
         {avatar ? (
-          <span className={styles.accountAvatar} aria-hidden="true">
+          <ListRowMark size={size} lines="line" className={styles.accountAvatar}>
             {React.cloneElement(avatar, { size: tierMappings.railAvatar[size] })}
-          </span>
+          </ListRowMark>
         ) : null}
         <span className={styles.accountText}>
           <span className={styles.accountName}>{name}</span>
@@ -1639,7 +1671,14 @@ function RailToggle({ variant = "item", className, onClick, ref, ...rest }: Side
         {...rest}
         ref={ref}
         type="button"
-        className={cx(styles.item, touchTargetRowClass, press.press, className)}
+        className={cx(
+          listRowStyles.row,
+          listRowStyles.hit,
+          styles.item,
+          touchTargetRowClass,
+          press.press,
+          className,
+        )}
         aria-expanded={expanded}
         aria-controls={navId}
         aria-label={label}
@@ -1650,7 +1689,9 @@ function RailToggle({ variant = "item", className, onClick, ref, ...rest }: Side
             <Icon name={toggleGlyph(expanded)} />
           </GlyphSwap>
         </SidebarItemIcon>
-        <span className={styles.label}>{label}</span>
+        <span className={cx(listRowStyles.body, styles.label)}>
+          <span className={listRowStyles.title}>{label}</span>
+        </span>
       </button>
     </CompactTooltip>
   );

@@ -1,4 +1,4 @@
-/** A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. */
+/** A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer, long subjects and clients are cut at the end and the numbers never are — `List.ItemText`, `number`, `List.ItemDescription`. */
 import { Card, List, ScrollContainer } from "prime-ui-kit";
 import * as React from "react";
 
@@ -8,11 +8,7 @@ const TICKETS = [
   { id: "1207", subject: "Возврат оплаты по счёту № 4821 за сентябрь", client: "ООО «Гранит»" },
   { id: "1206", subject: "Смена тарифа", client: "ООО «Лето»" },
   { id: "1205", subject: "Подключение ЭДО через Диадок", client: "ИП Козлов" },
-  {
-    id: "1204",
-    subject: "Акт сверки",
-    client: "АО «Северо-Западная транспортная компания»",
-  },
+  { id: "1204", subject: "Акт сверки", client: "АО «Северо-Западная транспортная компания»" },
   { id: "1203", subject: "Доступ к API для интеграции со складом", client: "ООО «Логистик Про»" },
   { id: "1202", subject: "Перенос поставки", client: "ООО «Альфа-Трейд»" },
   { id: "1201", subject: "Новый пользователь в команде", client: "ООО «Вектор»" },
@@ -32,9 +28,8 @@ export default function ListOverflowExample() {
               current={ticket.id === ticketId}
               onClick={() => setTicketId(ticket.id)}
             >
-              <List.ItemText>{ticket.subject}</List.ItemText>
+              <List.ItemText number={`#${ticket.id}`}>{ticket.subject}</List.ItemText>
               <List.ItemDescription>{ticket.client}</List.ItemDescription>
-              <List.ItemMeta>№ {ticket.id}</List.ItemMeta>
             </List.Item>
           ))}
         </List.Root>

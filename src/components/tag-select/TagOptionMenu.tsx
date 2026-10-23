@@ -6,12 +6,11 @@ import { Divider } from "@/components/divider/Divider";
 import { Input } from "@/components/input/Input";
 import { Popover } from "@/components/popover/Popover";
 import { Icon } from "@/icons";
-import { cx } from "@/internal/cx";
-import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { ListRowMark, listRowStyles } from "@/internal/listRow";
+import { menuRowProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import type { PaletteColor } from "@/internal/states";
-import textTone from "@/internal/textTone.module.css";
 
 import styles from "./TagSelect.module.css";
 
@@ -103,7 +102,7 @@ export function TagOptionMenu({
         </Button.Root>
       </Popover.Trigger>
       <Popover.Content size="s" flush className={styles.menuPanel}>
-        <div className={cx(fieldTierClass, menu.tier, styles.menuBody)} data-size="s">
+        <div className={styles.menuBody}>
           {onUpdate ? (
             <Input.Root size="s">
               <Input.Wrapper>
@@ -140,19 +139,20 @@ export function TagOptionMenu({
           {onDelete ? (
             <>
               {onUpdate ? <Divider className={menu.separator} /> : null}
+              {/* A menu row beside the `s` field and swatches: the list row at `s`, danger. */}
               <button
                 type="button"
                 data-tone="danger"
-                className={cx(menu.item, menu.focusRow, textTone.tone, menu.tonedRow)}
+                {...menuRowProps({ size: "s", danger: true, focusFill: true })}
                 onClick={() => {
                   onOpenChange(false);
                   onDelete(value);
                 }}
               >
-                <span className={menu.itemIcon} aria-hidden="true">
+                <ListRowMark size="s" lines="line">
                   <Icon name="action.delete" />
-                </span>
-                {labels.delete}
+                </ListRowMark>
+                <span className={listRowStyles.title}>{labels.delete}</span>
               </button>
             </>
           ) : null}

@@ -294,8 +294,8 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.Item",
-      en: "`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part.",
-      ru: "Строка файла: бейдж формата · имя над описанием · действия, затем полоса прогресса; дети встают по своим частям.",
+      en: "`ref` → `HTMLDivElement`. A file row, the one list row of the kit: mark (format badge, picture or progress ring) · name over description · actions; children are placed by their part.",
+      ru: "Строка файла — единая строка списка кита: метка (бейдж формата, картинка или кольцо прогресса) · имя над описанием · действия; дети встают по своим частям.",
       props: [
         {
           name: "size",
@@ -308,8 +308,8 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           default: "false",
-          en: "A failed upload: danger wash and ring, danger description.",
-          ru: "Неудачная загрузка: красная подложка и кольцо, красное описание.",
+          en: "A failed upload: the description turns danger.",
+          ru: "Неудачная загрузка: описание становится красным.",
         },
         {
           name: "…rest",
@@ -321,8 +321,8 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.FormatBadge",
-      en: "`ref` → `HTMLDivElement`. The file format as the short label of a square kit Thumbnail of the row tier, where an image file shows its picture (`aria-hidden`: the accessible name carries the extension).",
-      ru: "Формат файла — короткая подпись квадратного Thumbnail кита в ярусе строки, на месте картинки файла-изображения (`aria-hidden`: расширение есть в доступном имени).",
+      en: "`ref` → `HTMLDivElement`. The file format as the short label of a square kit Thumbnail as the mark of the row (40 at `m` beside a description), where an image file shows its picture (`aria-hidden`: the accessible name carries the extension).",
+      ru: "Формат файла — короткая подпись квадратного Thumbnail кита — метка строки (40 при `m` рядом с описанием), на месте картинки файла-изображения (`aria-hidden`: расширение есть в доступном имени).",
       props: [
         {
           name: "format",
@@ -348,8 +348,8 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.ItemPreview",
-      en: "`ref` → `HTMLDivElement`. An image file's picture in place of the format badge: a square kit Thumbnail of the row tier (`aria-hidden`: the name names the file), the image icon while it loads or if it fails.",
-      ru: "Картинка файла-изображения вместо бейджа формата: квадратный Thumbnail яруса строки (`aria-hidden`: файл называет имя), иконка, пока картинка грузится или если не загрузилась.",
+      en: "`ref` → `HTMLDivElement`. An image file's picture in place of the format badge: a square kit Thumbnail as the mark of the row (`aria-hidden`: the name names the file), the image icon while it loads or if it fails.",
+      ru: "Картинка файла-изображения вместо бейджа формата: квадратный Thumbnail — метка строки (`aria-hidden`: файл называет имя), иконка, пока картинка грузится или если не загрузилась.",
       props: [
         {
           name: "src",
@@ -368,8 +368,8 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.ItemText · FileUpload.ItemDescription · FileUpload.ItemActions",
-      en: "`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.",
-      ru: "Имя файла (одна строка с обрезкой), его описание (размер, прогресс, ошибка; danger в строке с ошибкой) и кнопки в конце строки.",
+      en: "`ref` → `HTMLDivElement`. The file name (one line, cut in the middle so its start and its extension stay in view), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.",
+      ru: "Имя файла (одна строка, обрезается посередине: видны начало и расширение), его описание (размер, прогресс, ошибка; danger в строке с ошибкой) и кнопки в конце строки.",
       props: [
         {
           name: "…rest",
@@ -381,8 +381,8 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.ItemProgress",
-      en: "`ref` → `HTMLDivElement` (the wrapper). Upload progress across the row: the kit ProgressBar.",
-      ru: "Прогресс загрузки поперёк строки: ProgressBar кита.",
+      en: "`ref` → `HTMLSpanElement` (the mark). Upload progress: the kit ProgressCircle in the place of the mark, where the format stood.",
+      ru: "Прогресс загрузки: ProgressCircle кита на месте метки, где стоял формат.",
       props: [
         {
           name: "value",
@@ -394,22 +394,22 @@ export const api: ComponentApi = {
         {
           name: "max",
           type: "number",
-          en: "Total amount (ProgressBar default).",
-          ru: "Полный объём (по умолчанию ProgressBar).",
+          en: "Total amount (ProgressCircle default).",
+          ru: "Полный объём (по умолчанию ProgressCircle).",
         },
         {
           name: "tone",
           type: '"accent" | "neutral" | "success" | "warning" | "danger" | "info"',
           default: '"accent"',
-          en: "Fill color: `success` for a finished file, `danger` where a failed one stopped.",
-          ru: "Цвет заполнения: `success` — файл загружен, `danger` — где остановилась неудачная загрузка.",
+          en: "Ring color: `success` for a finished file, `danger` where a failed one stopped.",
+          ru: "Цвет кольца: `success` — файл загружен, `danger` — где остановилась неудачная загрузка.",
         },
         {
           name: "aria-label",
           type: "string",
           defaultNote: { en: "`labels.upload`", ru: "`labels.upload`" },
-          en: "Accessible name of the bar (not the wrapper); name the file.",
-          ru: "Доступное имя полосы (не обёртки); назовите файл.",
+          en: "Accessible name of the ring (not the mark); name the file.",
+          ru: "Доступное имя кольца (не метки); назовите файл.",
         },
         {
           name: "…rest",
@@ -451,7 +451,7 @@ export const api: ComponentApi = {
     },
     uploading: { en: "A file in flight.", ru: "Файл загружается." },
     failed: { en: "A failed file whose upload gave no reason.", ru: "Загрузка упала без причины." },
-    progress: { en: "Name of a row's progress bar.", ru: "Имя полосы прогресса строки." },
+    progress: { en: "Name of a row's progress ring.", ru: "Имя кольца прогресса строки." },
     upload: {
       en: "Name of a `FileUpload.ItemProgress` without an `aria-label` of its own.",
       ru: "Имя `FileUpload.ItemProgress` без собственного `aria-label`.",
@@ -546,8 +546,8 @@ export const api: ComponentApi = {
         ru: "Кнопкам-иконкам в `ItemActions` нужен `aria-label` с именем файла; набор называет свои сам («Убрать …», «Повторить загрузку: …»).",
       },
       {
-        en: "A row in flight has its progress bar named by the file; a polite live region speaks a file that finished, the reason of one that failed, a removed file, the new cover after a reorder («Обложка: name», `labels.coverChanged`) and a refused change (`labels.changeFailed`); a file whose change is saved has `aria-busy`.",
-        ru: "У строки в пути полоса прогресса, названная именем файла; вежливая live-область объявляет загруженный файл, причину ошибки, убранный файл, новую обложку после перестановки («Обложка: name», `labels.coverChanged`) и отклонённое изменение (`labels.changeFailed`); у файла, изменение которого сохраняется, — `aria-busy`.",
+        en: "A row in flight has its progress ring named by the file; a polite live region speaks a file that finished, the reason of one that failed, a removed file, the new cover after a reorder («Обложка: name», `labels.coverChanged`) and a refused change (`labels.changeFailed`); a file whose change is saved has `aria-busy`.",
+        ru: "У строки в пути кольцо прогресса, названное именем файла; вежливая live-область объявляет загруженный файл, причину ошибки, убранный файл, новую обложку после перестановки («Обложка: name», `labels.coverChanged`) и отклонённое изменение (`labels.changeFailed`); у файла, изменение которого сохраняется, — `aria-busy`.",
       },
       {
         en: "Tiles are `<li>` of a Dnd.Sortable `<ul>`, named «Фото 2: склад.jpg · Загрузка 45%» («Видео …», «Файл …»; the file's `alt` in place of its name), with `aria-roledescription` and `aria-keyshortcuts`; the position and format on a tile are hidden (the name says them); the disk is a circle button («Отменить загрузку: …» described by the state, «В очереди» / «Загрузка 45%», `aria-busy`, its ring `aria-hidden`; on a failure «Повторить загрузку: …» described by the reason); without a remove handler the disk is no button but a `progressbar` (`aria-valuenow`) while the file is queued or uploading; Dnd's live region announces moves.",

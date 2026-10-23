@@ -14,6 +14,8 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
+import listRowStyles from "@/internal/listRow.module.css";
+import { menuRowProps, menuRowTier } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { type ControlSize, stepDown } from "@/internal/states";
@@ -535,22 +537,41 @@ export function PanelView(props: PanelViewProps) {
         >
           {presets.map((preset) => {
             const pressed = activePreset?.key === preset.key;
+            const apply = () => {
+              const r = preset.days(today);
+              commitRange(r.from, r.to, DAY_START_MINUTES, DAY_END_MINUTES);
+            };
+            // Narrow: a sideways row of soft Buttons above the months.
+            if (layout === "stacked") {
+              return (
+                <Button.Root
+                  key={preset.key}
+                  variant="soft"
+                  tone={pressed ? "accent" : "neutral"}
+                  size={controlSize}
+                  pressed={pressed}
+                  onClick={apply}
+                >
+                  {preset.label}
+                </Button.Root>
+              );
+            }
+            // Aside: a column of list rows, the active one checked at the end (a choice of one).
             return (
-              <Button.Root
+              <button
                 key={preset.key}
-                variant={pressed || layout === "stacked" ? "soft" : "ghost"}
-                tone={pressed ? "accent" : "neutral"}
-                size={controlSize}
-                fullWidth={layout === "aside"}
-                align="start"
-                pressed={pressed}
-                onClick={() => {
-                  const r = preset.days(today);
-                  commitRange(r.from, r.to, DAY_START_MINUTES, DAY_END_MINUTES);
-                }}
+                type="button"
+                aria-pressed={pressed}
+                {...menuRowProps({ size: menuRowTier(size), className: styles.preset })}
+                onClick={apply}
               >
-                {preset.label}
-              </Button.Root>
+                <span className={listRowStyles.body}>
+                  <span className={listRowStyles.title}>{preset.label}</span>
+                </span>
+                <span className={cx(listRowStyles.check, styles.presetCheck)} aria-hidden="true">
+                  <Icon name="action.check" />
+                </span>
+              </button>
             );
           })}
         </ScrollContainer>

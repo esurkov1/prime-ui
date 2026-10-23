@@ -3,7 +3,6 @@ import {
   AppShell,
   BottomNav,
   Card,
-  Checkbox,
   Crossfade,
   Icon,
   type IconName,
@@ -136,21 +135,13 @@ function MoreItem({ current }: { current: boolean }) {
 
 export default function AppShellScreenExample() {
   const [current, setCurrent] = React.useState<SectionId>("today");
-  const [done, setDone] = React.useState<ReadonlySet<string>>(() => new Set(["t1"]));
+  const [done, setDone] = React.useState<string[]>(["t1"]);
 
-  const openTasks = TASKS.length - done.size;
+  const openTasks = TASKS.length - done.length;
   const section = SECTIONS.find((item) => item.id === current) ?? SECTIONS[0];
 
   // One handler for every way into a section: the Sidebar (an item closes its panel) and the bar.
   const go = (id: SectionId) => setCurrent(id);
-
-  const toggleTask = (id: string, checked: boolean) =>
-    setDone((prev) => {
-      const next = new Set(prev);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
 
   const countOf = (id: SectionId) => {
     if (id === "deals") return <Sidebar.ItemCount>{OPEN_DEALS}</Sidebar.ItemCount>;
@@ -252,16 +243,14 @@ export default function AppShellScreenExample() {
                     <Card.Title as="h2">Задачи на сегодня</Card.Title>
                   </Card.Header>
                   <Card.Body>
-                    <List.Root aria-label="Задачи на сегодня">
+                    <List.Root
+                      aria-label="Задачи на сегодня"
+                      multiple
+                      value={done}
+                      onValueChange={(next) => setDone(Array.isArray(next) ? next : [])}
+                    >
                       {TASKS.map((task) => (
-                        <List.Item key={task.id}>
-                          <List.ItemActions side="start">
-                            <Checkbox.Root
-                              aria-label={task.title}
-                              checked={done.has(task.id)}
-                              onCheckedChange={(checked) => toggleTask(task.id, checked)}
-                            />
-                          </List.ItemActions>
+                        <List.Item key={task.id} value={task.id}>
                           <List.ItemText>{task.title}</List.ItemText>
                           <List.ItemMeta>{task.meta}</List.ItemMeta>
                         </List.Item>

@@ -5,7 +5,7 @@
  * List's; this file lays out what a dialog adds: the name with its glyphs, the time with the
  * delivery ticks, the preview that cross-fades to «печатает…» or a draft, the counts.
  *
- * Rows stand 4px apart by a margin inside their `<li>` (not the list's gap), so the virtual
+ * Rows stand 2px apart by a margin inside their `<li>` (not the list's gap), so the virtual
  * window measures each row with its space and the spacers stand for exactly what they replace.
  */
 
@@ -56,10 +56,10 @@
   min-block-size: 0;
 }
 
-/* The last row's own margin and the padding add up to the inset below it. */
+/* Rows stand 2 apart (the list row's rhythm) by a margin; it and the padding add up to the inset below. */
 .scroller .list {
   gap: 0;
-  padding: var(--pane-inset) var(--pane-inset) calc(var(--pane-inset) - var(--prime-space-1));
+  padding: var(--pane-inset) var(--pane-inset) calc(var(--pane-inset) - var(--prime-space-1) / 2);
 }
 
 /* The placeholder row of the next page keeps the rows' rhythm. */
@@ -68,7 +68,7 @@
 }
 
 .list .item {
-  margin-block-end: var(--prime-space-1);
+  margin-block-end: calc(var(--prime-space-1) / 2);
 }
 
 .spacer {

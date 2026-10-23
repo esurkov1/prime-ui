@@ -35,12 +35,12 @@ Dropdown.Root                     state and dismiss policy (no DOM)
     │   └── Dropdown.Description
     ├── Dropdown.Separator        full-bleed Divider
     ├── Dropdown.Group            role="group", named by `label`
-    │   └── Dropdown.Item         <button role="menuitem"> (or the asChild link)
-    │       ├── Dropdown.ItemIcon         leading glyph (aria-hidden)
+    │   └── Dropdown.Item         <button role="menuitem"> (or the asChild link): the kit's list row
+    │       ├── Dropdown.ItemIcon         leading mark (aria-hidden): bare glyph, a tile beside a description
     │       ├── Dropdown.ItemDescription  muted second line; describes the item
-    │       ├── Dropdown.ItemMeta         muted meta at the end of the label's line; describes the item
+    │       ├── Dropdown.ItemMeta         muted meta at the row's end; describes the item
     │       └── Dropdown.ItemShortcut     Kbd at the end
-    ├── Dropdown.CheckboxItem     <button role="menuitemcheckbox">: label + check mark at the end while checked; stays open
+    ├── Dropdown.CheckboxItem     <button role="menuitemcheckbox">: a checkbox column before the label; stays open
     └── Dropdown.Item
 ```
 
@@ -76,7 +76,7 @@ No DOM: clone the single child and merge `ref`. Trigger toggles the menu on a cl
 |---|---|---|---|
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
 | `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` lines the menu up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix the edge. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: item height, text and icon; key hints one tier down. The menu's own: it does not follow the trigger's size. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Menu tier: the rows stand a tier below it (an `m` menu has `s` rows, 32). The menu's own: it does not follow the trigger's size. |
 | `width` | `"auto" \| "s" \| "m" \| "l"` | `"auto"` | `auto`: the content's width between `--prime-panel-min-width` and twice that. `s`, `m`, `l`: a fixed 1.5, 2 or 2.5 panel minimums within the viewport, labels truncate (threads, projects). |
 | `maxRows` | `number` | — | The height of about this many item rows (a search row on top), then the list scrolls; without it `--prime-panel-max-height`. Never more than the room at the trigger; a bottom sheet uses its own. |
 | `matchTriggerWidth` | `boolean` | `false` | The menu is at least as wide as the trigger (with `width`, too). |
@@ -106,7 +106,7 @@ No DOM: clone the single child and merge `ref`. Trigger toggles the menu on a cl
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "role" \| "onSelect">` | — | `className`, `onClick` (runs before `onSelect`; `preventDefault()` keeps the menu open) and the other attributes of the item. |
 
 ### Dropdown.CheckboxItem
-`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a check mark at the end while checked; a click, Enter or Space toggles it and the menu stays open.
+`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked`, a `Checkbox.Indicator` before the label and the accent's soft tone while checked; a click, Enter or Space toggles it and the menu stays open.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -124,11 +124,11 @@ No DOM: clone the single child and merge `ref`. Trigger toggles the menu on a cl
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | The sentence; it wraps inside the menu's width. |
+| `children` | `ReactNode` | — (required) | The sentence: one line cut with an ellipsis; a `StatusDot` first. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "id">` | — | `className` and the other attributes except `id` (the item points at it). |
 
 ### Dropdown.ItemIcon
-`ref` → `HTMLSpanElement`. The `aria-hidden` leading glyph of an item at the menu icon size.
+`ref` → `HTMLSpanElement`. The `aria-hidden` leading mark of an item: the glyph of the row's tier, bare beside one line, on a tile beside a `Dropdown.ItemDescription`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -173,16 +173,16 @@ No DOM: clone the single child and merge `ref`. Trigger toggles the menu on a cl
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the `<div>`. |
 
 ## Variants
-The panel is the shared floating surface: the floating layer of the ladder (`data-depth="floating"`), `--prime-panel-radius` (12), padding 4, `shadow-overlay`; rows have radius 8 and the tier item height.
+The panel is the shared floating surface: the floating layer of the ladder (`data-depth="floating"`), `--prime-panel-radius` (12), padding 4, `shadow-overlay`. Items are the kit's one list row (`internal/listRow`), a tier below the panel: an `m` menu has `s` rows (32, radius 8), 2 apart, 4 in from the panel edge; a row with a description is 48.
 
 ### size (Content)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | item 24, text 12/16, icon 14 | Dense toolbars | |
-| `s` | item 28, text 13/20, icon 16 | Table rows, compact headers | |
-| `m` | item 32, text 14/20, icon 16 | Most menus | yes |
-| `l` | item 36, text 16/24, icon 20 | Roomy layouts | |
-| `xl` | item 40, text 16/24, icon 20 | Touch-first screens | |
+| `xs` | row 28, text 12/16, icon 14 | Dense toolbars | |
+| `s` | row 28, text 12/16, icon 14 | Table rows, compact headers | |
+| `m` | row 32, text 13/20, icon 16 | Most menus | yes |
+| `l` | row 36, text 14/20, icon 16 | Roomy layouts | |
+| `xl` | row 40, text 16/24, icon 20 | Touch-first screens | |
 
 ### width (Content)
 | Value | Looks like | Use when | Default |
@@ -195,8 +195,8 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 ### tone (Item)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `neutral` | primary text, muted icon, subtle fill on hover | Regular actions | yes |
-| `danger` | danger text and icon, danger-soft fill on hover | Delete, revoke, leave | |
+| `neutral` | primary text, muted icon, subtle fill on hover and focus | Regular actions | yes |
+| `danger` | danger text and icon, danger-soft fill only on hover and focus | Delete, revoke, leave | |
 
 ### side / align (Content)
 | Value | Looks like | Use when | Default |
@@ -228,25 +228,26 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape and a press outside close the menu; `false` turns that way off |
 | side | `side` and the room next to the trigger | `data-side` (resolved) |
 | size | `size` on Content | `data-size` |
-| chosen | `selected` on every item of a choice of one | `role="menuitemradio"`, `aria-checked`, `data-checked` and the `action.check` mark at the end of the chosen item; an `Avatar.Root` / `Thumbnail.Root` child leads the row at the row's media size, `aria-hidden` |
-| item hover / focus | a hovering pointer, arrow keys | subtle fill (danger-soft for `danger`), no movement; a tap leaves no hover fill |
-| item disabled | `disabled` | native `disabled` (a link item `aria-disabled="true"`), `data-disabled="true"`; no handler runs |
-| item tone | `tone` | `data-tone` |
+| chosen | `selected` on every item of a choice of one | `role="menuitemradio"`, `aria-checked` and the plain accent `action.check` at the end of the chosen item, its place held on the others; the row is not filled. An `Avatar.Root` / `Thumbnail.Root` child leads the row at the row's mark size, `aria-hidden` |
+| item hover / focus | a hovering pointer, arrow keys (roving focus) | subtle fill (danger-soft for `danger`), no ring, no movement (`data-focus="fill"`); a press one step stronger; a tap leaves no hover fill |
+| item disabled | `disabled` | native `disabled` (a link item `aria-disabled="true"`), `data-disabled="true"`, disabled text and mark; no handler runs |
+| item tone | `tone` | `data-tone`; a danger item that is not disabled `data-danger` |
 | searching | the query in `Dropdown.Search` | items that do not match (by label, description and `keywords`) and groups left without one are `hidden`, separators step aside, the match is a `<mark>`; the highlighted item carries `data-highlighted="true"` and is the field's `aria-activedescendant`; nothing matches → a compact EmptyPage (`role="status"`, `labels.empty`) |
-| item checked | `checked` / `defaultChecked` / `onCheckedChange` on `Dropdown.CheckboxItem` | `aria-checked`; an accent check mark at the end while checked, nothing while not |
+| item checked | `checked` / `defaultChecked` / `onCheckedChange` on `Dropdown.CheckboxItem` | `aria-checked`; the `Checkbox.Indicator` before the label checks, the row takes the accent's soft tone (`data-checked`) |
 | sheet | a phone viewport | a scrim and a full-width bottom sheet around the menu; the sheet carries `data-state`, the menu `data-sheet` and keeps its role and ref; page scroll locked; with `closeOnOutsideClick` an `aria-hidden` grab handle, and a swipe down from it closes the sheet |
 
 Motion (`overlayMotion`): the menu grows out of the side that faces its trigger and fades, in and out over `fast`; as a sheet it slides up over `slow` and down over `base`. Content stays mounted until the exit ends; under `prefers-reduced-motion` it unmounts at once.
 
 ## Layout & spacing
-- Width follows `width`: by default `max-content` between `--prime-panel-min-width` and twice that; `s` / `m` / `l` fix it at 1.5 / 2 / 2.5 minimums within the viewport. Item labels never wrap: they truncate first, a `Dropdown.ItemMeta` and a key hint stay whole; a `Dropdown.ItemDescription` wraps inside the width.
-- Max height = min(`--prime-panel-max-height`, the room on the resolved side); with `maxRows` the height of that many item rows instead (plus the search row); the menu scrolls inside. A bottom sheet uses its own height and stays clear of the safe-area insets.
+- Width follows `width`: by default `max-content` between `--prime-panel-min-width` and twice that; `s` / `m` / `l` fix it at 1.5 / 2 / 2.5 minimums within the viewport. Item labels (weight 500) never wrap: they truncate first, a `Dropdown.ItemMeta` and a key hint stay whole; a `Dropdown.ItemDescription` is one muted line under the label, cut with an ellipsis (a `StatusDot` first).
+- Rows are the list row a tier below the panel, 2 apart, 4 in from the panel edge; on a coarse pointer a row is at least 44 tall.
+- Max height = min(`--prime-panel-max-height`, the room on the resolved side); with `maxRows` the height of that many rows instead (plus the search row); the menu scrolls inside. A bottom sheet uses its own height and stays clear of the safe-area insets.
 - `Dropdown.Search` is a row of the tier item height across the panel padding with a faint hairline under it; it stays while the list under it scrolls.
-- `Dropdown.ItemMeta` takes the tier's description text, muted, figures in columns, pushed to the end of the label's line.
-- A checkbox item keeps the label (and an `ItemIcon`) on the left like any item; the check mark sits at the end.
-- `Dropdown.ItemIcon` holds the glyph at the menu icon size (a kit `Icon` follows it); `Dropdown.ItemShortcut` is a `Kbd` one tier below the menu, pushed to the end of the item.
+- The row's end, on its centre line: `Dropdown.ItemMeta` (the row's description text, muted, figures in columns), then `Dropdown.ItemShortcut`, then the check of a `selected` item.
+- A checkbox item draws the `Checkbox.Indicator` at the row's start, before an `ItemIcon` and the label.
+- `Dropdown.ItemIcon` is the row's mark: the glyph of the row's tier, muted, bare beside one line, on a neutral tile beside a description (a kit `Icon` follows it); an `Avatar.Root` / `Thumbnail.Root` without its own `size` is sized under the row. `Dropdown.ItemShortcut` is a `Kbd`.
 - `Dropdown.Header` lays out its children in the written order; `Dropdown.Title` is the medium heading line, `Dropdown.Description` the muted line under it; both truncate.
-- Separators run edge to edge across the panel padding; group labels take `--prime-panel-group-label-height`.
+- Separators run edge to edge across the panel padding; a group starts with its heading (28 tall, the caption in 500, muted, on the rows' text edge), its rows right under it.
 - Kept `--prime-space-2` from viewport edges; follows the trigger on scroll and resize.
 
 ## Accessibility
@@ -320,5 +321,5 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 - An action above a searched list that disappears while typing → mark it `persistent`.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (sized as an item's picture), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), [EmptyPage](../empty-page/COMPONENT.md) (the empty state of `Search`), `Icon` (`action.check` of `CheckboxItem` and a `selected` item, `action.search` of `Search`)
+- **Built from:** `internal/listRow` (every item is the kit's list row: its mark, text, end and states), [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Avatar](../avatar/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md) and [Badge](../badge/COMPONENT.md) (`Badge.Dot`) as an item's mark, [StatusDot](../status-dot/COMPONENT.md) (first in `ItemDescription`), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` of `CheckboxItem`), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), [EmptyPage](../empty-page/COMPONENT.md) (the empty state of `Search`), `Icon` (`action.check` of a `selected` item, `action.search` of `Search`)
 - **See also:** [Select](../select/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md)

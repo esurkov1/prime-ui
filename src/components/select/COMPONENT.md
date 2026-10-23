@@ -121,7 +121,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Select.TriggerIcon · Select.ItemIcon
-`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph: before the value at the tier icon size / the option's mark — bare beside one line, on a tile beside a description.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -137,7 +137,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "hidden" \| "onKeyDown" \| "onAnimationEnd">` | — | `className` and the other attributes of the panel. |
 
 ### Select.Item
-`ref` → `HTMLDivElement`. `role="option"` with `aria-selected`; a check on the end (single) or a Checkbox.Indicator in front (`multiple`).
+`ref` → `HTMLDivElement`. `role="option"` with `aria-selected`, the kit's list row a tier below the field; a check on the end (single) or a Checkbox.Indicator in front and the accent's soft tone on a checked row (`multiple`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -191,14 +191,14 @@ an icon) goes inside `Select.ItemMeta`.
 
 A `status` select takes the chip scale (`size` `m` is 24, like a Badge): in a row with `xs` fields write `size="l"` (28), with `s` fields `size="xl"` (32).
 
-The panel is the shared floating surface with menu rows; an option with `color` draws its text and icon in the hue's ink and its highlight as the hue's wash. Text carries the value: the hue never stands alone.
+The panel is the shared floating surface; its options are the kit's one list row (`internal/listRow`) a tier below the field (an `m` field has `s` rows), 2 apart, 4 in from the panel edge, the title in weight 500. An option with `color` draws its text, mark and secondary text in the hue's ink and its highlight as the hue's wash. Text carries the value: the hue never stands alone.
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | 28 trigger, 12/16 text, 24 rows | Dense table filters | |
+| `xs` | 28 trigger, 12/16 text, 28 rows | Dense table filters | |
 | `s` | 32 trigger, 13/20 text, 28 rows | Compact toolbars and side panels | |
-| `m` | 36 trigger, 14/20 text, 32 rows | Regular forms | yes |
+| `m` | 36 trigger, 14/20 text, 32 rows (13/20) | Regular forms | yes |
 | `l` | 40 trigger, 16/24 text, 36 rows | Spacious forms | |
 | `xl` | 48 trigger, 16/24 text, 40 rows | Touch-first screens | |
 
@@ -215,11 +215,11 @@ The panel is the shared floating surface with menu rows; an option with `color` 
 | `closeOnOutsideClick` | `false`: the list stays open on a press beside it; Escape, the trigger, a single pick and Tab still close it | A filter list the person compares with the page | `true` |
 | `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by a pick or the trigger | `true` |
 | `searchable` (Content) | search row with a faint hairline at the top of the list | More than ~10 options | `false` |
-| rich options | `Thumbnail.Root` or `Select.ItemDescription` in an item: a two-line row; `Avatar.Root` before the text and `Badge.Root` after it keep one line; the trigger the same with `renderValue` | Products, people, delivery tariffs | |
+| rich options | `Select.ItemDescription` in an item: a two-line row (a `Select.ItemIcon` on a tile beside it); `Avatar.Root` or `Thumbnail.Root` before the text and `Badge.Root` after it keep the row's lines; the trigger the same with `renderValue` | Products, people, delivery tariffs | |
 | `Select.Action` | a row under the list behind a faint full-bleed hairline, with an optional leading icon; stays whatever the query | One list-level action: «Новый клиент», «Пригласить в команду» | |
 | async `onValueChange` | the picked value at once, a Spinner instead of the chevron until the promise settles | The choice saves on the server right away | |
 
-**Combinations** — `renderValue` is single-mode only; with `multiple` the trigger shows the joined labels. `error` implies `invalid`; `loadError` is a different thing — the options failed to load — and never marks the field invalid. `Select.ItemDescription` is searchable. A status Badge can follow `Select.Value` inside the trigger; it takes the tier one step down by itself. An `Avatar.Root` or `Thumbnail.Root` in a row or `renderValue` takes the tier media size (`xs` · `xs` · `s` · `s` · `m` for `xs`–`xl`) unless it sets `size`. A server search: `searchable` + `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; keep the selected option among the items (or draw it with `renderValue`) so the trigger knows its label. `Select.Action` is a direct child of `Select.Content`; when the search finds nothing, the empty text and the action show together (text above, action pinned below) and the action takes the highlight, so Enter runs it — never repeat the action inside the empty state. A promise from `onValueChange` works in single and `multiple` mode: picks and the clear segment wait until it settles; on a rejection show the reason through `error` (and rethrow, so the value rolls back).
+**Combinations** — `renderValue` is single-mode only; with `multiple` the trigger shows the joined labels. `error` implies `invalid`; `loadError` is a different thing — the options failed to load — and never marks the field invalid. `Select.ItemDescription` is searchable. A status Badge can follow `Select.Value` inside the trigger; it takes the tier one step down by itself. An `Avatar.Root` or `Thumbnail.Root` without its own `size` takes the row's mark size in a row (under the row's line beside one line, two lines tall beside a description) and the tier media size in `renderValue` (`xs` · `xs` · `s` · `s` · `m` for `xs`–`xl`). A server search: `searchable` + `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; keep the selected option among the items (or draw it with `renderValue`) so the trigger knows its label. `Select.Action` is a direct child of `Select.Content`; when the search finds nothing, the empty text and the action show together (text above, action pinned below) and the action takes the highlight, so Enter runs it — never repeat the action inside the empty state. A promise from `onValueChange` works in single and `multiple` mode: picks and the clear segment wait until it settles; on a rejection show the reason through `error` (and rethrow, so the value rolls back).
 
 ## States
 | State | Driven by | DOM |
@@ -238,7 +238,7 @@ The panel is the shared floating surface with menu rows; an option with `color` 
 | nothing to show | no option matches (and not loading) | a compact EmptyPage with `role="status"`: `labels.empty` alone; a `Select.Action` stays under it, highlighted |
 | sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it |
 | segment | inside `Input.Wrapper` | no frame (label, hint, error, support row): the root is `data-field-segment`, the trigger `data-segment="true"` — a tinted section flush with the box's start edge, a stronger fill on hover and while open, an inset focus ring; named «`aria-label`: value» |
-| option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is the neutral fill only; selected is medium weight and the trailing check (the checkbox with `multiple`), the same in one-line and rich rows |
+| option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted="true"`, `aria-selected`, `data-disabled="true"` + `aria-disabled`; highlight is the neutral fill only, no ring (focus stays in the list or the search); a single choice is the plain accent check at the end, its place held on every row, the row not filled; with `multiple` the `Checkbox.Indicator` at the start and the accent's soft tone on a checked row (`data-checked`); a disabled row in the disabled ink |
 
 ## Layout & spacing
 - The trigger is 100% wide; set the width with the layout (grid column, max-width wrapper).
@@ -373,5 +373,5 @@ The panel is the shared floating surface with menu rows; an option with `color` 
 - Saving the choice in `onValueChange` and resetting the value by hand on failure → return the promise; the Select shows the value, waits and rolls back by itself.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (list), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in `multiple`), [Spinner](../spinner/COMPONENT.md) (`loading` and saving in the trigger), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [EmptyPage](../empty-page/COMPONENT.md) (empty state, load error), [Button](../button/COMPONENT.md) (retry), [Divider](../divider/COMPONENT.md) (`Separator`), [Thumbnail](../thumbnail/COMPONENT.md) and [Avatar](../avatar/COMPONENT.md) (row media), [Badge](../badge/COMPONENT.md) (row badge), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading and save-failure announcements), `Icon` (chevron, clear, check, search, retry), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame), [Input](../input/COMPONENT.md) (the start segment of `Input.Wrapper`)
+- **Built from:** `internal/listRow` (every option is the kit's list row), [ScrollContainer](../scroll-container/COMPONENT.md) (list), [ProgressCircle](../progress-circle/COMPONENT.md) (a ring as an option's mark), [StatusDot](../status-dot/COMPONENT.md) (first in `Select.ItemDescription`), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in `multiple`), [Spinner](../spinner/COMPONENT.md) (`loading` and saving in the trigger), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [EmptyPage](../empty-page/COMPONENT.md) (empty state, load error), [Button](../button/COMPONENT.md) (retry), [Divider](../divider/COMPONENT.md) (`Separator`), [Thumbnail](../thumbnail/COMPONENT.md) and [Avatar](../avatar/COMPONENT.md) (row media), [Badge](../badge/COMPONENT.md) (row badge), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading and save-failure announcements), `Icon` (chevron, clear, check, search, retry), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame), [Input](../input/COMPONENT.md) (the start segment of `Input.Wrapper`)
 - **See also:** [NativeSelect](../native-select/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

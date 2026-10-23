@@ -6,11 +6,11 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { hasContent } from "@/internal/hasContent";
-import { HeaderLineContent, headerRowStyles, useTitleFloor } from "@/internal/headerRow";
+import { HeaderLineContent, useTitleFloor } from "@/internal/headerRow";
 import { InteractiveElement } from "@/internal/interactiveElement";
+import { listRowStyles } from "@/internal/listRow";
 import palette from "@/internal/palette.module.css";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
-import { press } from "@/internal/press";
 import { slotChild } from "@/internal/slot";
 import { type ControlSize, type PaletteColor, type Tone, tierMappings } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
@@ -33,7 +33,7 @@ function TimelineRoot({ size: sizeProp, children, className, ...rest }: Timeline
   return tier.provide(
     <div
       {...rest}
-      className={cx(fieldTierClass, styles.root, className)}
+      className={cx(fieldTierClass, listRowStyles.tier, styles.root, className)}
       {...toDataAttributes({ size: tier.size })}
     >
       {children}
@@ -149,20 +149,28 @@ function TimelineItem({
 }: TimelineItemProps) {
   const edge = React.useContext(EdgeContext);
   const interactive = Boolean(asChild || href || onClick);
+  // A date line under the title makes the row two lines tall.
+  const described = flattenChildren(
+    asChild ? slotChild(children, "Timeline.Item").props.children : children,
+  ).some((node) => isPart(node, TimelineItemMeta));
+  const current = rest["aria-current"] === "page" || rest["aria-current"] === "true";
   const rowProps = {
     ...rest,
     ref,
     className: cx(
       palette.hue,
+      listRowStyles.row,
+      listRowStyles.hit,
       styles.row,
       interactive && touchTargetRowClass,
-      interactive && press.press,
       className,
     ),
     ...toDataAttributes({
       color: tone ? undefined : color,
       tone,
       interactive: interactive || undefined,
+      lines: described ? "two" : undefined,
+      current: current || undefined,
     }),
   };
   const dot = <span className={styles.dot} aria-hidden="true" />;
@@ -181,7 +189,7 @@ function TimelineItem({
               ? []
               : index === titleAt
                 ? [
-                    <span key="title-row" className={headerRowStyles.titleRow}>
+                    <span key="title-row" className={listRowStyles.titleRow}>
                       <BadgedTitleContext value={true}>{node}</BadgedTitleContext>
                       {badges}
                     </span>,
@@ -268,7 +276,7 @@ function TimelineItemTitle({ children, className, ref, ...rest }: TimelineItemTi
       </BadgedTitle>
     );
   return (
-    <span {...rest} ref={ref} className={cx(styles.title, className)}>
+    <span {...rest} ref={ref} className={cx(listRowStyles.title, className)}>
       {children}
     </span>
   );
@@ -280,7 +288,7 @@ function BadgedTitle({ children, className, ref, ...rest }: TimelineItemTitlePro
   const merged = useMergedRefs(own, ref);
   useTitleFloor(own);
   return (
-    <span {...rest} ref={merged} className={cx(styles.title, styles.badged, className)}>
+    <span {...rest} ref={merged} className={cx(listRowStyles.title, className)}>
       {children}
     </span>
   );
@@ -299,7 +307,7 @@ function TimelineItemBadges({ className, ...rest }: TimelineItemBadgesProps) {
       {...rest}
       size={tierMappings.cardBadges[size]}
       overflow="count"
-      className={cx(headerRowStyles.badges, className)}
+      className={cx(listRowStyles.badges, className)}
     />
   );
 }
@@ -318,7 +326,15 @@ export type TimelineItemMetaProps = SpanPartProps;
 function TimelineItemMeta({ children, className, ...rest }: TimelineItemMetaProps) {
   const inValue = React.useContext(ValueContext);
   return (
-    <span {...rest} className={cx(inValue ? styles.valueMeta : styles.meta, className)}>
+    <span
+      {...rest}
+      className={cx(
+        inValue
+          ? cx(listRowStyles.meta, styles.valueMeta)
+          : cx(listRowStyles.description, styles.meta),
+        className,
+      )}
+    >
       {inValue ? children : <HeaderLineContent>{children}</HeaderLineContent>}
     </span>
   );

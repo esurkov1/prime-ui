@@ -247,6 +247,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `Input.Root` is `width: 100%` and `min-width: 0`; there is no `fullWidth` prop — the width comes from the parent (grid column, flex item, capped wrapper).
 - Use `reserveSupportRow` on fields that share a grid row so their bottoms stay aligned when only one shows an error.
 - The value truncates with an ellipsis before icons and affixes; the field height never changes.
+- The `suggestions` list is the shared floating panel as wide as the box; each suggestion is the kit's list row a tier below the field (an `m` field has `s` rows, 32), 2 apart, 4 in from the panel edge.
 
 ## Accessibility
 
@@ -344,5 +345,5 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `autoComplete="email"` / `"name"` on a search, filter or record field → leave it out: autofill is off unless you pass `autoComplete`; tokens belong on sign-in and sign-up fields (`LoginForm.Form`) and on a new password (`new-password`).
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments, the `valid` check), [VisuallyHidden](../visually-hidden/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md) (the `suggestions` list)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments, the `valid` check), [VisuallyHidden](../visually-hidden/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md) (the `suggestions` list), `internal/listRow` (its rows)
 - **See also:** [Textarea](../textarea/COMPONENT.md), [Select](../select/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md) — fields with the same contract

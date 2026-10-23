@@ -1,7 +1,8 @@
 import * as React from "react";
 
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
+import { flowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
+import { menuRowTier } from "@/internal/MenuGroup";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./TagSelect.module.css";
@@ -50,10 +51,12 @@ export function VirtualOptions({
       start.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
     );
   }, [scrollRef]);
+  // A row is the control height of its tier (a tier below the panel); the rows stand 2 apart.
   const estimate = React.useMemo(
-    () => readCssLengthPx(`--prime-control-${size}-height`, 36),
+    () => readCssLengthPx(`--prime-control-${menuRowTier(size)}-height`, 32),
     [size],
   );
+  const gap = React.useMemo(() => readCssLengthPx("--prime-space-1", 4) / 2, []);
   const estimateSize = React.useCallback(() => estimate, [estimate]);
   const virtual = useVirtualRows({
     count,
@@ -63,6 +66,7 @@ export function VirtualOptions({
     getGroup: ONE_GROUP,
     offset,
     pinned,
+    gap,
   });
 
   const { startOf } = virtual;
@@ -83,17 +87,17 @@ export function VirtualOptions({
     [scrollRef, offset, startOf],
   );
 
-  const laid = rowGaps(virtual);
+  const laid = flowGaps(virtual, gap);
   const spacer = (key: string, height: number) =>
     height > 0 ? (
       <div key={key} className={styles.spacer} style={{ height }} aria-hidden="true" />
     ) : null;
   return (
     <>
-      <div ref={startRef} aria-hidden="true" />
-      {laid.rows.map(({ index, gap }) => (
+      <div ref={startRef} aria-hidden="true" className={styles.start} />
+      {laid.rows.map(({ index, spacer: before }) => (
         <React.Fragment key={getKey(index)}>
-          {spacer("gap", gap)}
+          {spacer("gap", before)}
           {renderOption(index, virtual.measure(index))}
         </React.Fragment>
       ))}

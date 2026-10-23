@@ -1,81 +1,26 @@
-/** Leading avatars of clients, icons of queues, devices of sessions, rental terms and colour dots of projects; beside two lines an avatar and a ring are as tall as the lines and an icon stands on a tile, a dot in an icon-wide box — `List.ItemIcon`, `List.ItemDescription`, `ProgressCircle`, `Badge.Dot`. */
-import { Avatar, Badge, Icon, List, ProgressCircle, Typography } from "prime-ui-kit";
+/** Every mark, alone and beside a description: an icon bare and on a tile, an avatar, a progress ring, a thumbnail, a colour dot; a mark without its own size takes the row's and never grows it — `List.ItemIcon`, `List.ItemDescription`, `ProgressCircle`, `Thumbnail.Root`, `Badge.Dot`. */
+import { Avatar, Badge, Icon, List, ProgressCircle, Thumbnail, Typography } from "prime-ui-kit";
 
-const CLIENTS = [
-  { id: "belova", name: "Ирина Белова", company: "ООО «Гранит»", initials: "ИБ", color: "blue" },
-  { id: "orlov", name: "Павел Орлов", company: "ООО «Лето»", initials: "ПО", color: "green" },
-  { id: "kozlov", name: "Сергей Козлов", company: "ИП Козлов", initials: "СК", color: "orange" },
-] as const;
-
-const SESSIONS = [
-  {
-    id: "mac",
-    device: "Chrome · macOS",
-    place: "Москва · это устройство",
-    icon: "viewport.desktop",
-  },
-  {
-    id: "iphone",
-    device: "Safari · iPhone",
-    place: "Казань · вчера в 21:40",
-    icon: "viewport.mobile",
-  },
-] as const;
-
-const RENTALS = [
-  { id: "nmax", bike: "Yamaha NMAX 155", left: "Осталось 8 дней", term: 72 },
-  { id: "adv", bike: "Honda ADV 350", left: "Осталось 2 дня", term: 93 },
-] as const;
-
-const PROJECTS = [
-  { id: "crm", name: "Внедрение CRM", color: "purple" },
-  { id: "portal", name: "Клиентский портал", color: "teal" },
-  { id: "billing", name: "Биллинг", color: "orange" },
-] as const;
+const PHOTO = "https://picsum.photos/seed/list-warehouse/160/160";
 
 export default function ListWithIconExample() {
   return (
     <div>
       <div>
         <div>
-          <List.Root aria-label="Клиенты">
-            {CLIENTS.map((client, index) => (
-              <List.Item key={client.id} current={index === 0}>
-                <List.ItemIcon>
-                  <Avatar.Root color={client.color}>
-                    <Avatar.Fallback>{client.initials}</Avatar.Fallback>
-                  </Avatar.Root>
-                </List.ItemIcon>
-                <List.ItemText>{client.name}</List.ItemText>
-                <List.ItemDescription>{client.company}</List.ItemDescription>
-              </List.Item>
-            ))}
-          </List.Root>
-          <Typography as="span" variant="caption" tone="muted">
-            Avatar.Root
-          </Typography>
-        </div>
-        <div>
-          <List.Root aria-label="Очереди">
-            <List.Item current>
+          <List.Root aria-label="Сеансы">
+            <List.Item>
               <List.ItemIcon>
-                <Icon name="object.headset" />
+                <Icon name="viewport.desktop" />
               </List.ItemIcon>
-              <List.ItemText>Поддержка</List.ItemText>
-              <List.ItemCount color="blue">8</List.ItemCount>
+              <List.ItemText>Chrome · macOS</List.ItemText>
             </List.Item>
             <List.Item>
               <List.ItemIcon>
-                <Icon name="object.receipt" />
+                <Icon name="viewport.mobile" />
               </List.ItemIcon>
-              <List.ItemText>Биллинг</List.ItemText>
-              <List.ItemCount>3</List.ItemCount>
-            </List.Item>
-            <List.Item>
-              <List.ItemIcon>
-                <Icon name="object.truck" />
-              </List.ItemIcon>
-              <List.ItemText>Доставка</List.ItemText>
+              <List.ItemText>Safari · iPhone</List.ItemText>
+              <List.ItemDescription>Казань · вчера в 21:40</List.ItemDescription>
             </List.Item>
           </List.Root>
           <Typography as="span" variant="caption" tone="muted">
@@ -83,47 +28,91 @@ export default function ListWithIconExample() {
           </Typography>
         </div>
         <div>
-          <List.Root aria-label="Сеансы">
-            {SESSIONS.map((session) => (
-              <List.Item key={session.id}>
-                <List.ItemIcon>
-                  <Icon name={session.icon} />
-                </List.ItemIcon>
-                <List.ItemText>{session.device}</List.ItemText>
-                <List.ItemDescription>{session.place}</List.ItemDescription>
-              </List.Item>
-            ))}
+          <List.Root aria-label="Клиенты">
+            <List.Item>
+              <List.ItemIcon>
+                <Avatar.Root color="blue">
+                  <Avatar.Fallback>ИБ</Avatar.Fallback>
+                </Avatar.Root>
+              </List.ItemIcon>
+              <List.ItemText>Ирина Белова</List.ItemText>
+            </List.Item>
+            <List.Item>
+              <List.ItemIcon>
+                <Avatar.Root color="green">
+                  <Avatar.Fallback>ПО</Avatar.Fallback>
+                </Avatar.Root>
+              </List.ItemIcon>
+              <List.ItemText>Павел Орлов</List.ItemText>
+              <List.ItemDescription>Менеджер · ООО «Лето»</List.ItemDescription>
+            </List.Item>
           </List.Root>
           <Typography as="span" variant="caption" tone="muted">
-            Icon · ItemDescription
+            Avatar.Root
           </Typography>
         </div>
         <div>
           <List.Root aria-label="Аренды">
-            {RENTALS.map((rental) => (
-              <List.Item key={rental.id}>
-                <List.ItemIcon>
-                  <ProgressCircle value={rental.term} aria-label={`Срок аренды: ${rental.term}%`} />
-                </List.ItemIcon>
-                <List.ItemText>{rental.bike}</List.ItemText>
-                <List.ItemDescription>{rental.left}</List.ItemDescription>
-              </List.Item>
-            ))}
+            <List.Item>
+              <List.ItemIcon>
+                <ProgressCircle value={72} aria-label="Срок аренды: 72%" />
+              </List.ItemIcon>
+              <List.ItemText>Yamaha NMAX 155</List.ItemText>
+              <List.ItemMeta>8 дней</List.ItemMeta>
+            </List.Item>
+            <List.Item>
+              <List.ItemIcon>
+                <ProgressCircle value={93} tone="warning" aria-label="Срок аренды: 93%" />
+              </List.ItemIcon>
+              <List.ItemText>Honda ADV 350</List.ItemText>
+              <List.ItemDescription>Сергей Орлов · до 25 окт.</List.ItemDescription>
+              <List.ItemMeta>2 дня</List.ItemMeta>
+            </List.Item>
           </List.Root>
           <Typography as="span" variant="caption" tone="muted">
-            ProgressCircle · ItemDescription
+            ProgressCircle
+          </Typography>
+        </div>
+        <div>
+          <List.Root aria-label="Склады">
+            <List.Item>
+              <List.ItemIcon>
+                <Thumbnail.Root>
+                  <Thumbnail.Image src={PHOTO} alt="" />
+                </Thumbnail.Root>
+              </List.ItemIcon>
+              <List.ItemText>Склад «Север»</List.ItemText>
+            </List.Item>
+            <List.Item>
+              <List.ItemIcon>
+                <Thumbnail.Root>
+                  <Thumbnail.Image src={PHOTO} alt="" />
+                </Thumbnail.Root>
+              </List.ItemIcon>
+              <List.ItemText>Склад «Юг»</List.ItemText>
+              <List.ItemDescription>Краснодар · 14 паллет</List.ItemDescription>
+            </List.Item>
+          </List.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            Thumbnail.Root
           </Typography>
         </div>
         <div>
           <List.Root aria-label="Проекты">
-            {PROJECTS.map((project, index) => (
-              <List.Item key={project.id} current={index === 0}>
-                <List.ItemIcon>
-                  <Badge.Dot color={project.color} />
-                </List.ItemIcon>
-                <List.ItemText>{project.name}</List.ItemText>
-              </List.Item>
-            ))}
+            <List.Item current>
+              <List.ItemIcon>
+                <Badge.Dot color="purple" />
+              </List.ItemIcon>
+              <List.ItemText>Внедрение CRM</List.ItemText>
+              <List.ItemCount>12</List.ItemCount>
+            </List.Item>
+            <List.Item>
+              <List.ItemIcon>
+                <Badge.Dot color="teal" />
+              </List.ItemIcon>
+              <List.ItemText>Клиентский портал</List.ItemText>
+              <List.ItemCount>4</List.ItemCount>
+            </List.Item>
           </List.Root>
           <Typography as="span" variant="caption" tone="muted">
             Badge.Dot

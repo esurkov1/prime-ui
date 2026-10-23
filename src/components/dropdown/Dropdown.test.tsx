@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
-import textTone from "@/internal/textTone.module.css";
 import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Dropdown } from "./Dropdown";
@@ -58,7 +57,7 @@ function DropdownWithOnSelect({
 // ─── Render ───────────────────────────────────────────────────────────────────
 
 describe("Dropdown", () => {
-  it("picks a person: the avatar at the row's media size, the chosen one checked with a mark", async () => {
+  it("picks a person: the avatar at the row's mark size, the chosen one checked with a mark", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     render(
@@ -83,8 +82,11 @@ describe("Dropdown", () => {
     const chosen = screen.getByRole("menuitemradio", { name: "Евгений Сурков" });
     expect(chosen).toHaveAttribute("aria-checked", "true");
     expect(chosen.querySelector("svg")).not.toBeNull();
-    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "s");
-    expect(screen.getByTestId("avatar")).toHaveAttribute("aria-hidden", "true");
+    // The rows stand a tier below the `m` panel (`s`): a picture beside one line is 20 (`xs`).
+    expect(chosen).toHaveAttribute("data-size", "s");
+    expect(screen.getByTestId("avatar")).toHaveAttribute("data-size", "xs");
+    // Decorative: the label names the item.
+    expect(screen.getByTestId("avatar").closest('[aria-hidden="true"]')).not.toBeNull();
     const other = screen.getByRole("menuitemradio", { name: "Анна Котова" });
     expect(other).toHaveAttribute("aria-checked", "false");
     await user.click(other);
@@ -402,9 +404,9 @@ describe("Dropdown", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     const danger = screen.getByRole("menuitem", { name: "Delete" });
     expect(danger).toHaveAttribute("data-tone", "danger");
-    // The ink comes from the shared tone ladder; a disabled row keeps the disabled ink.
-    expect(danger).toHaveClass(textTone.tone);
-    expect(screen.getByRole("menuitem", { name: "Archive" })).not.toHaveClass(textTone.tone);
+    // The list row draws the danger ink (`data-danger`); a disabled row keeps the disabled ink.
+    expect(danger).toHaveAttribute("data-danger");
+    expect(screen.getByRole("menuitem", { name: "Archive" })).not.toHaveAttribute("data-danger");
   });
 
   // ─── Groups ──────────────────────────────────────────────────────────────────
@@ -736,12 +738,15 @@ describe("Dropdown — overlay contract", () => {
     );
     const item = screen.getByRole("menuitemcheckbox", { name: "Сумма" });
     expect(item).toHaveAttribute("aria-checked", "true");
-    // The label leads; a check mark closes the row while checked, nothing while not.
-    expect(item.firstChild).toHaveTextContent("Сумма");
-    expect(item.lastElementChild?.querySelector("svg")).toBeInTheDocument();
+    // A choice of several: the checkbox column leads, the label after it; a checked row is tinted.
+    const box = () => (item.firstElementChild as HTMLElement).querySelector("[data-state]");
+    expect(box()).toHaveAttribute("data-state", "checked");
+    expect(item.lastElementChild).toHaveTextContent("Сумма");
+    expect(item).toHaveAttribute("data-checked");
     fireEvent.click(item);
     expect(item).toHaveAttribute("aria-checked", "false");
-    expect(item.lastElementChild?.querySelector("svg")).toBeNull();
+    expect(box()).toHaveAttribute("data-state", "unchecked");
+    expect(item).not.toHaveAttribute("data-checked");
     expect(onCheckedChange).toHaveBeenCalledWith(false);
     expect(screen.getByRole("menu")).toBeInTheDocument();
 

@@ -5,9 +5,9 @@ import { describe, expect, it, vi } from "vitest";
 import { Badge } from "@/components/badge/Badge";
 import { StatusDot } from "@/components/status-dot/StatusDot";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
-import press from "@/internal/press.module.css";
+import listRowStyles from "@/internal/listRow.module.css";
 import textTone from "@/internal/textTone.module.css";
-import { cssRule, cssRules, cssValue } from "@/test/css";
+import { cssRule, cssRules } from "@/test/css";
 
 import { Timeline } from "./Timeline";
 import styles from "./Timeline.module.css";
@@ -68,7 +68,7 @@ describe("Timeline", () => {
     expect(list.tagName).toBe("OL");
     const items = within(list).getAllByRole("listitem");
     expect(items).toHaveLength(2);
-    expect(within(items[0]).getByText("Аренда закончилась")).toHaveClass(styles.title);
+    expect(within(items[0]).getByText("Аренда закончилась")).toHaveClass(listRowStyles.title);
     expect(within(items[0]).getByText("21.09.26").tagName).toBe("STRONG");
     expect(screen.queryByRole("button")).toBeNull();
   });
@@ -187,7 +187,7 @@ describe("Timeline", () => {
     expect(within(links[1]).getByText("Custom row")).toBeInTheDocument();
   });
 
-  it("interactive rows give under the press; a static row does not", () => {
+  it("every row is the kit's list row; only an interactive one is a hit target", () => {
     render(
       <Timeline.Root>
         <Timeline.Group>
@@ -200,8 +200,12 @@ describe("Timeline", () => {
         </Timeline.Group>
       </Timeline.Root>,
     );
-    expect(screen.getByRole("button")).toHaveClass(press.press);
-    expect(screen.getByText("Static row").closest(`.${styles.row}`)).not.toHaveClass(press.press);
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass(listRowStyles.row, listRowStyles.hit);
+    expect(button).toHaveAttribute("data-interactive", "true");
+    const still = screen.getByText("Static row").closest(`.${styles.row}`);
+    expect(still).toHaveClass(listRowStyles.row, listRowStyles.hit);
+    expect(still).not.toHaveAttribute("data-interactive");
   });
 
   it("asChild needs one element child", () => {
@@ -322,17 +326,14 @@ describe("Timeline", () => {
     expect(items[3]).not.toHaveAttribute("data-before-gap");
   });
 
-  it("CSS highlights only the row under the pointer or with keyboard focus", () => {
+  it("CSS draws no state of its own: hover, focus and current are the list row's", () => {
     const file = "src/components/timeline/Timeline.module.css";
-    expect(cssValue(cssRule(file, ".row:focus-visible"), "background")).toBe(
-      "var(--prime-color-fill-subtle-active)",
-    );
-    expect(cssValue(cssRule(file, ".row:hover", ["@media (hover: hover)"]), "background")).toBe(
-      "var(--prime-color-fill-subtle-active)",
-    );
-    expect(cssRules(file).some((rule) => /data-state|data-highlight/.test(rule.selector))).toBe(
-      false,
-    );
+    expect(
+      cssRules(file).some((rule) =>
+        /:hover|:focus|:active|data-current|data-state/.test(rule.selector),
+      ),
+    ).toBe(false);
+    expect(cssRule(file, ".row").decls.some((decl) => decl.prop === "border-radius")).toBe(false);
   });
 
   it("link rows stay focusable without a click handler", () => {

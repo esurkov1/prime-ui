@@ -11,7 +11,7 @@ export default function FileUploadRowPartsExample() {
         <FileUpload.ItemText>Счёт № 318.pdf</FileUpload.ItemText>
         <FileUpload.ItemDescription>1,2 МБ · выставлен 12 марта</FileUpload.ItemDescription>
         <FileUpload.ItemActions>
-          <Button.Root variant="ghost" tone="neutral" aria-label="Скачать Счёт № 318.pdf">
+          <Button.Root variant="soft" tone="neutral" aria-label="Скачать Счёт № 318.pdf">
             <Button.Icon>
               <Icon name="action.download" />
             </Button.Icon>
@@ -23,7 +23,7 @@ export default function FileUploadRowPartsExample() {
         <FileUpload.ItemText>Отгрузка, паллет 4.jpg</FileUpload.ItemText>
         <FileUpload.ItemDescription>820 КБ · снято при отгрузке</FileUpload.ItemDescription>
         <FileUpload.ItemActions>
-          <Button.Root variant="ghost" tone="neutral" aria-label="Скачать Отгрузка, паллет 4.jpg">
+          <Button.Root variant="soft" tone="neutral" aria-label="Скачать Отгрузка, паллет 4.jpg">
             <Button.Icon>
               <Icon name="action.download" />
             </Button.Icon>
@@ -44,7 +44,7 @@ export default function FileUploadRowPartsExample() {
         </FileUpload.ItemDescription>
         <FileUpload.ItemActions>
           <Button.Root
-            variant="ghost"
+            variant="soft"
             tone="neutral"
             aria-label="Сформировать заново: Акт сверки за март.pdf"
           >

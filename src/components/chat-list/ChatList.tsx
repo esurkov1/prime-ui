@@ -400,6 +400,16 @@ function ChatListItem({
     </List.ItemText>
   );
 
+  // The spoken count follows the time inside one cell: the stacked cells (time over count) are
+  // read without a space between them.
+  const spokenUnread =
+    count || mention ? (
+      <VisuallyHidden>
+        {mention ? labels.mention : null}
+        {mention && count ? " " : null}
+        {count ? formatLabel(labels.unread, { count: unread }) : null}
+      </VisuallyHidden>
+    ) : null;
   const formatted = time instanceof Date ? list.formatTime(time, list.now, list.timeZone) : time;
   const meta =
     formatted || status ? (
@@ -422,6 +432,8 @@ function ChatListItem({
         {formatted ? (
           <time dateTime={time instanceof Date ? time.toISOString() : undefined}>{formatted}</time>
         ) : null}
+        {spokenUnread ? " " : null}
+        {spokenUnread}
       </List.ItemMeta>
     ) : null;
 
@@ -504,13 +516,13 @@ function ChatListItem({
   // Beside two lines the cell stays even when empty: a count that goes closes up in place.
   const badges =
     count || mention || pin || hasSecondLine ? (
-      <List.ItemMeta key="badges" className={styles.badges}>
+      <List.ItemCount key="badges" className={styles.badges}>
+        {meta ? null : spokenUnread}
         {mention ? (
           <span ref={mentionPart.ref} className={cx(styles.pop, mentionPart.className)}>
             <Badge.Root color="blue" variant="solid" className={styles.mention} aria-hidden="true">
               @
             </Badge.Root>
-            <VisuallyHidden>{labels.mention}</VisuallyHidden>
           </span>
         ) : null}
         {mention && count ? " " : null}
@@ -524,7 +536,6 @@ function ChatListItem({
             >
               {unread}
             </Badge.Root>
-            <VisuallyHidden>{formatLabel(labels.unread, { count: unread })}</VisuallyHidden>
           </span>
         ) : null}
         {pin ? (
@@ -532,7 +543,7 @@ function ChatListItem({
             <Icon name="action.pin" size={glyphSize} label={labels.pinned} animated={false} />
           </span>
         ) : null}
-      </List.ItemMeta>
+      </List.ItemCount>
     ) : null;
 
   const avatarProps = parts.avatar?.props;

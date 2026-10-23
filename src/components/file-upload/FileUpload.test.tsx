@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -252,13 +252,12 @@ describe("FileUpload", () => {
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 
-  it("renders file item row with a decorative format tile and a progress bar", () => {
+  it("renders file item row with a decorative format tile", () => {
     render(
       <FileUpload.Item>
         <FileUpload.FormatBadge format="pdf" color="red" />
         <FileUpload.ItemText>report.pdf</FileUpload.ItemText>
         <FileUpload.ItemDescription>1,2 МБ</FileUpload.ItemDescription>
-        <FileUpload.ItemProgress value={40} />
       </FileUpload.Item>,
     );
 
@@ -266,7 +265,34 @@ describe("FileUpload", () => {
     expect(badge).toHaveAttribute("data-color", "red");
     expect(badge).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByText("report.pdf")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "Загрузка файла" })).toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).toBeNull();
+  });
+
+  it("a row with a progress ring shows the ring in the mark's place", () => {
+    const { container } = render(
+      <FileUpload.Item>
+        <FileUpload.FormatBadge format="pdf" color="red" />
+        <FileUpload.ItemText>report.pdf</FileUpload.ItemText>
+        <FileUpload.ItemDescription>1,2 МБ · 40%</FileUpload.ItemDescription>
+        <FileUpload.ItemProgress value={40} />
+      </FileUpload.Item>,
+    );
+    expect(screen.getByRole("progressbar", { name: "Загрузка файла" })).toHaveAttribute(
+      "aria-valuenow",
+      "40",
+    );
+    expect(screen.queryByText("PDF")).toBeNull();
+    expect(container.firstChild).toHaveAttribute("data-lines", "two");
+  });
+
+  it("cuts a long name in the middle: the start gives way, the end stays", () => {
+    render(
+      <FileUpload.Item>
+        <FileUpload.ItemText>Договор поставки № 318.pdf</FileUpload.ItemText>
+      </FileUpload.Item>,
+    );
+    expect(screen.getByText("18.pdf")).toBeInTheDocument();
+    expect(screen.getByText("Договор поставки № 3")).toBeInTheDocument();
   });
 
   it("names the progress bar by aria-label", () => {
@@ -320,7 +346,7 @@ describe("FileUpload", () => {
     expect(preview).toHaveAttribute("src", "blob:photo");
     const frame = preview.parentElement as HTMLElement;
     expect(frame).toHaveAttribute("aria-hidden", "true");
-    expect(frame).toHaveAttribute("data-size", "s");
+    expect(frame).toHaveAttribute("data-size", "xs");
   });
 
   describe('trigger="button"', () => {
@@ -463,10 +489,12 @@ describe("FileUpload.Queue, a queue only", () => {
     );
     const list = screen.getByRole("list", { name: "Вложения" });
     expect(list.children).toHaveLength(2);
-    expect(screen.getByText("PDF").closest("[data-color]")).toHaveAttribute("data-color", "red");
+    // A file in transfer shows its ring where the format stood, and its full name.
+    expect(screen.queryByText("PDF")).toBeNull();
+    expect(screen.getByText("Отчёт.pdf")).toBeInTheDocument();
     expect(screen.getByText("2 КБ · Загрузка 40%")).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "Загрузка: Отчёт.pdf" })).toHaveAttribute(
-      "value",
+      "aria-valuenow",
       "40",
     );
     expect(document.querySelector('img[src="blob:1"]')).not.toBeNull();
@@ -537,7 +565,9 @@ describe("FileUpload.Queue, a queue only", () => {
       fireEvent.change(input, { target: { files: [pdf] } });
     });
     expect(screen.getByText("2 КБ")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toHaveAttribute("value", "100");
+    // Settled: the ring gives the mark back to the format.
+    await waitFor(() => expect(screen.queryByRole("progressbar")).toBeNull());
+    expect(screen.getByText("PDF")).toBeInTheDocument();
   });
 
   describe('layout="grid" | "strip"', () => {
@@ -1051,7 +1081,7 @@ describe('layout="list" with a value and a queue', () => {
     expect(rows.map((row) => row.textContent)).toEqual([
       "PDFДоговор4 КБ",
       "Площадка.jpg1 КБ",
-      "PDFОтчёт2 КБ · Загрузка 50%",
+      "Отчёт.pdf2 КБ · Загрузка 50%",
     ]);
     expect(screen.getAllByRole("progressbar")).toHaveLength(1);
     expect(document.querySelector('img[src="site.jpg"]')).not.toBeNull();

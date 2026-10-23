@@ -5,7 +5,7 @@ import { Button } from "@/components/button/Button";
 import { Dnd, useDragAnnouncer } from "@/components/dnd/Dnd";
 import { Hint } from "@/components/hint/Hint";
 import { LinkButton } from "@/components/link-button/LinkButton";
-import { ProgressBar } from "@/components/progress-bar/ProgressBar";
+import { ProgressCircle } from "@/components/progress-circle/ProgressCircle";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -32,25 +32,22 @@ import {
 } from "@/internal/FieldFrame";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { extensionOf, formatColor } from "@/internal/fileFormat";
-import { splitFileName } from "@/internal/fileName";
+import { splitFileName, splitNameTail } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
 import { formatLabel } from "@/internal/formatLabel";
-import { HeaderLineContent, HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
+import { HeaderLineContent } from "@/internal/headerRow";
 import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
+import { ListRowControls, type ListRowLines, ListRowMark } from "@/internal/listRow";
+import listRowStyles from "@/internal/listRow.module.css";
 import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
 import { handoffFocus } from "@/internal/overlay/focus";
 import { useEnterOnAppear, usePartPresence } from "@/internal/partPresence";
 import { flattenChildren, isPart } from "@/internal/parts";
-import {
-  type ControlSize,
-  cardMarkSize,
-  type PaletteColor,
-  type TextTone,
-  type Tone,
-} from "@/internal/states";
-import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
+import { RegionSwap } from "@/internal/RegionSwap";
+import type { ControlSize, PaletteColor, TextTone, Tone } from "@/internal/states";
+import { FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
@@ -225,15 +222,20 @@ FileUploadDescription.displayName = "FileUpload.Description";
 
 // ─── File row ────────────────────────────────────────────────────────────────
 
+type ItemContextValue = { size: ControlSize; lines: ListRowLines };
+
+/** The tier and the lines of the row around a part: what sizes its mark and its controls. */
+const ItemContext = React.createContext<ItemContextValue>({ size: "m", lines: "line" });
+
 export type FileUploadItemProps = DivProps & {
   invalid?: boolean;
   size?: ControlSize;
 };
 
 /**
- * A file row, the kit's header row on the surface frame of its tier (internal/headerRow): the
- * picture or format badge, the name over the description, the actions at the end — whatever order
- * they are written in — then the progress bar across the row.
+ * A file row, the kit's one list row (internal/listRow): the mark (the format badge, the picture or
+ * the transfer ring) beside the name over its description, the actions at the end — whatever order
+ * they are written in. A file in transfer shows its ring in the mark's place.
  */
 function FileUploadItem({
   className,
@@ -254,28 +256,40 @@ function FileUploadItem({
     FileUploadItemActions,
     FileUploadItemProgress,
   ];
-  const progress = pick(FileUploadItemProgress);
+  const ring = pick(FileUploadItemProgress);
   const description = pick(FileUploadItemDescription);
+  const lines: ListRowLines = description.length > 0 ? "two" : "line";
+  const mark = ring.length > 0 ? ring : pick(FileUploadFormatBadge, FileUploadItemPreview);
+  const context = React.useMemo(() => ({ size: tier.size, lines }), [tier.size, lines]);
   return tier.provide(
-    <div
-      className={cx(surfaceFrameClass, styles.item, className)}
-      {...toDataAttributes({ size: tier.size, frame: tier.size, invalid: invalid || undefined })}
-      {...rest}
-    >
-      <div className={headerRowStyles.header} data-lines={description.length > 0 ? "two" : "one"}>
-        <HeaderRowContent
-          mark={pick(FileUploadFormatBadge, FileUploadItemPreview)}
-          title={pick(FileUploadItemText)}
-          description={description}
-          end={pick(FileUploadItemActions)}
-        >
+    <ItemContext value={context}>
+      <div
+        className={cx(
+          fieldTierClass,
+          listRowStyles.tier,
+          listRowStyles.row,
+          styles.item,
+          className,
+        )}
+        {...toDataAttributes({ size: tier.size, lines, wash: true, invalid: invalid || undefined })}
+        {...rest}
+      >
+        <div className={listRowStyles.hit}>
+          {/* The ring and the file's mark hand over in place. */}
+          <RegionSwap axis="inline" state={ring.length > 0 ? "transfer" : "file"}>
+            {mark}
+          </RegionSwap>
+          <div className={listRowStyles.body}>
+            <div className={listRowStyles.titleRow}>{pick(FileUploadItemText)}</div>
+            {description}
+          </div>
           {items.filter(
             (part) => !(React.isValidElement(part) && own.includes(part.type as React.ElementType)),
           )}
-        </HeaderRowContent>
+        </div>
+        {pick(FileUploadItemActions)}
       </div>
-      {progress}
-    </div>,
+    </ItemContext>,
   );
 }
 FileUploadItem.displayName = "FileUpload.Item";
@@ -289,14 +303,9 @@ export type FileUploadFormatBadgeProps = Omit<
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The thumbnail of a row's mark: the frame's mark size (32 · 32 · 40 · 48 · 48) of the row's tier. */
-function useRowMark() {
-  return cardMarkSize.header.thumbnail[useControlSize(undefined)];
-}
-
 /**
- * The file format as the short label of a square kit Thumbnail of the row's mark size, the box an
- * image file's picture takes (decorative: the name already carries the extension).
+ * The file format as the short label of a square kit Thumbnail, the mark of the row (decorative:
+ * the name already carries the extension).
  */
 function FileUploadFormatBadge({
   format,
@@ -304,17 +313,18 @@ function FileUploadFormatBadge({
   className,
   ...rest
 }: FileUploadFormatBadgeProps) {
-  const size = useRowMark();
+  const { size, lines } = React.useContext(ItemContext);
   return (
-    <Thumbnail.Root
-      {...rest}
-      size={size}
-      color={color}
-      className={cx(headerRowStyles.mark, styles.formatBadge, className)}
-      aria-hidden="true"
-    >
-      <Thumbnail.Fallback>{format.trim().slice(0, 8).toUpperCase()}</Thumbnail.Fallback>
-    </Thumbnail.Root>
+    <ListRowMark size={size} lines={lines}>
+      <Thumbnail.Root
+        {...rest}
+        color={color}
+        className={cx(styles.formatBadge, className)}
+        aria-hidden="true"
+      >
+        <Thumbnail.Fallback>{format.trim().slice(0, 8).toUpperCase()}</Thumbnail.Fallback>
+      </Thumbnail.Root>
+    </ListRowMark>
   );
 }
 FileUploadFormatBadge.displayName = "FileUpload.FormatBadge";
@@ -328,37 +338,44 @@ export type FileUploadItemPreviewProps = Omit<
 };
 
 /**
- * An image file's picture in place of the format badge: a square kit Thumbnail of the row's mark
- * size (decorative: the name names the file); an icon shows while it loads or if it fails.
+ * An image file's picture in place of the format badge: a square kit Thumbnail, the mark of the
+ * row (decorative: the name names the file); an icon shows while it loads or if it fails.
  */
 function FileUploadItemPreview({ src, className, ...rest }: FileUploadItemPreviewProps) {
-  const size = useRowMark();
+  const { size, lines } = React.useContext(ItemContext);
   return (
-    <Thumbnail.Root
-      {...rest}
-      size={size}
-      className={cx(headerRowStyles.mark, styles.preview, className)}
-      aria-hidden="true"
-    >
-      <Thumbnail.Image src={src} />
-      <Thumbnail.Fallback>
-        <Icon name="object.image" />
-      </Thumbnail.Fallback>
-    </Thumbnail.Root>
+    <ListRowMark size={size} lines={lines}>
+      <Thumbnail.Root {...rest} className={cx(styles.preview, className)} aria-hidden="true">
+        <Thumbnail.Image src={src} />
+        <Thumbnail.Fallback>
+          <Icon name="object.image" />
+        </Thumbnail.Fallback>
+      </Thumbnail.Root>
+    </ListRowMark>
   );
 }
 FileUploadItemPreview.displayName = "FileUpload.ItemPreview";
 
+/** A name cut in the middle: its start gives way to an ellipsis, its last characters stay. */
+function CutName({ children }: { children: string }) {
+  const { head, tail } = splitNameTail(children);
+  if (tail === "") return children;
+  return (
+    <span className={styles.cut}>
+      <span className={styles.cutHead}>{head}</span>
+      <span className={styles.cutTail}>{tail}</span>
+    </span>
+  );
+}
+
 export type FileUploadItemTextProps = DivProps;
 
-/** The file's name: one line, cut with an ellipsis. */
-function FileUploadItemText({ className, ...rest }: FileUploadItemTextProps) {
-  const size = useControlSize(undefined);
+/** The file's name: one line, cut in the middle so its start and its extension stay in view. */
+function FileUploadItemText({ className, children, ...rest }: FileUploadItemTextProps) {
   return (
-    <div
-      className={cx(FRAME_TITLE[size], headerRowStyles.title, styles.itemText, className)}
-      {...rest}
-    />
+    <div {...rest} className={cx(listRowStyles.title, styles.itemText, className)}>
+      {typeof children === "string" ? <CutName>{children}</CutName> : children}
+    </div>
   );
 }
 FileUploadItemText.displayName = "FileUpload.ItemText";
@@ -371,17 +388,8 @@ function FileUploadItemDescription({
   children,
   ...rest
 }: FileUploadItemDescriptionProps) {
-  const size = useControlSize(undefined);
   return (
-    <div
-      className={cx(
-        FRAME_DESCRIPTION[size],
-        headerRowStyles.description,
-        styles.itemDescription,
-        className,
-      )}
-      {...rest}
-    >
+    <div {...rest} className={cx(listRowStyles.description, styles.itemDescription, className)}>
       <HeaderLineContent>{children}</HeaderLineContent>
     </div>
   );
@@ -390,37 +398,37 @@ FileUploadItemDescription.displayName = "FileUpload.ItemDescription";
 
 export type FileUploadItemActionsProps = DivProps;
 
-/** Buttons at the end of the row (remove, retry), the row's tier tall. */
-function FileUploadItemActions({ className, children, ...rest }: FileUploadItemActionsProps) {
-  const controls = useHostTier(undefined, "surface");
-  return (
-    <div className={cx(headerRowStyles.end, className)} {...rest}>
-      {controls.provide(children)}
-    </div>
-  );
+/** Buttons at the end of the row (remove, retry), the row's controls: a tier under its line. */
+function FileUploadItemActions(props: FileUploadItemActionsProps) {
+  const { size, lines } = React.useContext(ItemContext);
+  return <ListRowControls {...props} size={size} lines={lines} />;
 }
 FileUploadItemActions.displayName = "FileUpload.ItemActions";
 
-export type FileUploadItemProgressProps = Omit<DivProps, "children"> & {
+export type FileUploadItemProgressProps = Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  "children"
+> & {
   value: number;
   max?: number;
   tone?: Tone;
   "aria-label"?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** Upload progress across the whole row: the kit ProgressBar. */
+/** Upload progress: the kit ProgressCircle in the mark's place. */
 function FileUploadItemProgress({
   value,
   max,
   tone,
-  className,
   "aria-label": ariaLabel = FILE_UPLOAD_LABELS.upload,
   ...rest
 }: FileUploadItemProgressProps) {
+  const { size, lines } = React.useContext(ItemContext);
   return (
-    <div {...rest} className={cx(styles.itemProgress, className)}>
-      <ProgressBar value={value} max={max} tone={tone} aria-label={ariaLabel} />
-    </div>
+    <ListRowMark {...rest} size={size} lines={lines}>
+      <ProgressCircle value={value} max={max} tone={tone} aria-label={ariaLabel} />
+    </ListRowMark>
   );
 }
 FileUploadItemProgress.displayName = "FileUpload.ItemProgress";
@@ -947,15 +955,8 @@ function FileSetView({
   );
 }
 
-const PROGRESS_TONE: Record<UploadItem["status"], Tone | undefined> = {
-  queued: undefined,
-  loading: undefined,
-  done: "success",
-  failed: "danger",
-};
-
 /**
- * One row of the list. A file on its way shows its progress across the row; a row its remove button
+ * One row of the list. A file on its way shows its ring in the mark's place; a row its remove button
  * took out closes up in place.
  */
 function FileRow({
@@ -993,6 +994,9 @@ function FileRow({
   const status = upload?.status;
   const picture = src && kindOf(file, src) === "image" ? src : undefined;
   const state = stateOf(upload, labels);
+  const transferring = status === "loading";
+  // The extension stands in the badge; a picture or a file in transfer has none, so it keeps it.
+  const name = picture || transferring ? file.name : splitFileName(file.name).base;
   const parts = [file.size === undefined ? null : formatSize(file.size), state].filter(
     (part): part is string => part !== null,
   );
@@ -1011,7 +1015,6 @@ function FileRow({
           <FileUploadFormatBadge format={format || "—"} color={formatColor(format)} />
         )}
         <FileUploadItemText title={file.name}>
-          {/* The extension stands in the badge; a picture row has none, so it keeps it. */}
           {file.href ? (
             <LinkButton
               href={file.href}
@@ -1019,13 +1022,12 @@ function FileRow({
               rel="noopener noreferrer"
               tone="neutral"
               inline
+              className={styles.nameLink}
             >
-              {picture ? file.name : splitFileName(file.name).base}
+              <CutName>{name}</CutName>
             </LinkButton>
-          ) : picture ? (
-            file.name
           ) : (
-            splitFileName(file.name).base
+            name
           )}
         </FileUploadItemText>
         {parts.length > 0 ? (
@@ -1038,7 +1040,7 @@ function FileRow({
           <FileUploadItemActions>
             {status === "failed" && onRetry ? (
               <Button.Root
-                variant="ghost"
+                variant="soft"
                 tone="neutral"
                 aria-label={formatLabel(labels.retry, { name: file.name })}
                 onClick={onRetry}
@@ -1050,7 +1052,7 @@ function FileRow({
             ) : null}
             {onRemove ? (
               <Button.Root
-                variant="ghost"
+                variant="soft"
                 tone="danger"
                 aria-label={formatLabel(labels.remove, { name: file.name })}
                 loading={pending}
@@ -1063,10 +1065,10 @@ function FileRow({
             ) : null}
           </FileUploadItemActions>
         ) : null}
-        {upload ? (
+        {/* A file in transfer shows its ring where the format stood; a settled one gets the format back. */}
+        {transferring && upload ? (
           <FileUploadItemProgress
             value={Math.round(upload.progress * 100)}
-            tone={PROGRESS_TONE[upload.status]}
             aria-label={formatLabel(labels.progress, { name: file.name })}
           />
         ) : null}

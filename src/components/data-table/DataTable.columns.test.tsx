@@ -296,7 +296,8 @@ describe("DataTable column chooser with columnOrder", () => {
     ]);
     const menuGrip = within(menu).getByRole("button", { name: "Переместить колонку Клиент" });
     expect(menuGrip).toHaveAttribute("tabindex", "-1");
-    expect(menuGrip.closest("[data-dnd-item]")?.lastElementChild).toBe(menuGrip);
+    // The grip ends the item, in the row's controls box.
+    expect(menuGrip.closest("[data-dnd-item]")?.lastElementChild).toContainElement(menuGrip);
     expect(items[2]).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
     // The pinned first column on screen («Сумма») holds its place: a lock, no keys.
     expect(within(menu).queryByRole("button", { name: "Переместить колонку Сумма" })).toBeNull();

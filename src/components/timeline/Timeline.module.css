@@ -1,12 +1,12 @@
 /*
  * Timeline — Graphite. Activity feed: labelled `ol` groups of rows.
- * Row grid: dot column · text (the title over its meta lines, stacked in one column) · value
- * (centered on the row, right-aligned).
- * The 2px `border-subtle` line is drawn per `li` around the dot and spans the first to the last dot.
- * The row under the pointer or with keyboard focus: `fill-subtle-active` pill (radius l), accent
- * title and dot; interactive rows add an inset focus ring. Below 20rem of root width the value moves
- * under the meta. The title is the field tier text (`fieldTierClass` on the root, `--field-*`);
- * the group heading takes a text role per tier in TSX.
+ * An event is a row of the kit's list row (`internal/listRow`): the dot stands in the mark's place
+ * (an icon-wide column), the title, the date line and the amount are the row's title, description
+ * and meta; hover, focus and the current row are the row's. Timeline draws what is its own: the dot,
+ * the 2px `border-subtle` line (per `li`, around the dot, from the first to the last dot) and the
+ * intervals. Below 20rem of root width the amount moves under the description.
+ * The tier is `fieldTierClass` on the root (`--field-*`); the group heading takes a text role per
+ * tier in TSX.
  */
 
 .root {
@@ -17,11 +17,7 @@
   --tl-dot: calc(var(--prime-space-2) + var(--prime-border-width) * 2);
   --tl-gap-dot: var(--prime-space-2);
   --tl-gap-pad-y: var(--prime-space-2);
-  --tl-dot-col: var(--prime-space-6);
-  --tl-gap: var(--prime-space-4);
-  --tl-pad-y: var(--prime-space-3);
-  --tl-pad-start: var(--prime-space-2);
-  --tl-pad-end: var(--prime-space-4);
+  --tl-col-gap: var(--prime-space-2);
   --tl-line: calc(var(--prime-border-width) * 2);
 
   /* Fill the available width: an inline-size container collapses inside shrink-wrapped parents. */
@@ -41,11 +37,6 @@
   --tl-group-gap: var(--prime-space-3);
   --tl-dot: var(--prime-space-2);
   --tl-gap-pad-y: var(--prime-space-1);
-  --tl-dot-col: var(--prime-space-4);
-  --tl-gap: var(--prime-space-2);
-  --tl-pad-y: var(--prime-space-1);
-  --tl-pad-start: var(--prime-space-1);
-  --tl-pad-end: var(--prime-space-2);
 }
 
 .root[data-size="s"] {
@@ -54,11 +45,6 @@
   --tl-label-gap: var(--prime-space-1);
   --tl-dot: var(--prime-space-2);
   --tl-gap-pad-y: var(--prime-space-1);
-  --tl-dot-col: var(--prime-space-5);
-  --tl-gap: var(--prime-space-3);
-  --tl-pad-y: var(--prime-space-2);
-  --tl-pad-start: var(--prime-space-1);
-  --tl-pad-end: var(--prime-space-3);
 }
 
 .root[data-size="l"] {
@@ -68,7 +54,6 @@
   --tl-group-gap: var(--prime-space-5);
   --tl-dot: var(--prime-space-3);
   --tl-gap-dot: calc(var(--prime-space-2) + var(--prime-border-width) * 2);
-  --tl-dot-col: var(--prime-space-7);
 }
 
 .root[data-size="xl"] {
@@ -79,11 +64,7 @@
   --tl-dot: var(--prime-space-3);
   --tl-gap-dot: calc(var(--prime-space-2) + var(--prime-border-width) * 2);
   --tl-gap-pad-y: var(--prime-space-3);
-  --tl-dot-col: var(--prime-space-8);
-  --tl-gap: var(--prime-space-5);
-  --tl-pad-y: var(--prime-space-4);
-  --tl-pad-start: var(--prime-space-3);
-  --tl-pad-end: var(--prime-space-5);
+  --tl-col-gap: var(--prime-space-3);
 }
 
 /* ---------- Group ---------- */
@@ -98,8 +79,7 @@
 /* The text role comes from TSX per tier (caption · body-s · title-s · title-m). */
 .groupLabel {
   /* Starts at the dots' leading edge, so heading and dots share one vertical edge. */
-  padding-inline: calc(var(--tl-pad-start) + (var(--tl-dot-col) - var(--tl-dot)) / 2)
-    var(--tl-pad-end);
+  padding-inline: calc(var(--field-px) + (var(--field-icon) - var(--tl-dot)) / 2) var(--field-px);
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
 }
@@ -120,22 +100,24 @@
 
 /* ---------- Item + connecting line ---------- */
 
+/* The row stands between 2px of air (the kit's list rhythm); the connecting line runs through the
+ * air too, so it is continuous from the first dot to the last. */
 .item {
   position: relative;
   min-width: 0;
   margin: 0;
-  padding: 0;
+  padding: var(--prime-border-width) 0;
   list-style: none;
 }
 
-/* Rows touch (no gap), so per-row segments form one line between the first and last dot centers.
- * `::before` runs from the row top to the dot, `::after` from the dot to the row bottom; the line
- * stops at the dot edge, so a translucent dot never shows the line through it. */
+/* `::before` runs from the item top to the dot, `::after` from the dot to the item bottom; the line
+ * stops at the dot edge, so a translucent dot never shows the line through it. The dot column is the
+ * row's mark column: it starts after the row's side padding and is as wide as the tier's icon. */
 .item::before,
 .item::after {
   content: "";
   position: absolute;
-  inset-inline-start: calc(var(--tl-pad-start) + (var(--tl-dot-col) - var(--tl-line)) / 2);
+  inset-inline-start: calc(var(--field-px) + (var(--field-icon) - var(--tl-line)) / 2);
   width: var(--tl-line);
   background: var(--prime-color-border-subtle);
   pointer-events: none;
@@ -176,35 +158,13 @@
 
 /* ---------- Row ---------- */
 
+/* The row itself is the kit's list row (`listRowStyles.row` + `.hit`); this class only carries the
+ * hue of the dot. `--hue-solid` comes from `internal/palette` (`data-color`, default `blue`). */
 .row {
-  /* `--hue-solid` comes from `internal/palette` (`data-color`, default `blue` from TSX). */
-  --tl-hue: var(--hue-solid);
-  /* Decorative hues sit at reduced emphasis; tones and the highlighted row use full color. */
-  --tl-dot-color: color-mix(in srgb, var(--tl-hue) var(--prime-tint-strong), transparent);
+  --tl-dot-color: color-mix(in srgb, var(--hue-solid) var(--prime-tint-strong), transparent);
 
-  appearance: none;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: var(--tl-dot-col) minmax(0, 1fr) auto;
-  grid-template-areas: "dot text value";
-  align-items: center;
-  column-gap: var(--tl-gap);
   width: 100%;
-  min-width: 0;
-  margin: 0;
-  padding: var(--tl-pad-y) var(--tl-pad-end) var(--tl-pad-y) var(--tl-pad-start);
-  border: 0;
-  border-radius: var(--prime-radius-l);
-  background: transparent;
-  color: var(--prime-color-text-primary);
-  font: inherit;
-  font-size: var(--field-text);
-  line-height: var(--field-lh);
-  text-align: start;
-  text-decoration: none;
-  transition:
-    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  appearance: none;
 }
 
 .row[data-tone="neutral"] {
@@ -231,109 +191,41 @@
   --tl-dot-color: var(--prime-color-info-default);
 }
 
-/* Highlighted look on the row under the pointer or with keyboard focus: `fill-subtle-active` pill,
- * accent title, accent dot (a `tone` keeps its dot). */
-.row:focus-visible {
-  --tl-title-color: var(--prime-color-accent-text);
-
-  background: var(--prime-color-fill-subtle-active);
-}
-
-.row:focus-visible:not([data-tone]) {
-  --tl-dot-color: var(--prime-color-accent-default);
-}
-
-@media (hover: hover) {
-  .row:hover {
-    --tl-title-color: var(--prime-color-accent-text);
-
-    background: var(--prime-color-fill-subtle-active);
-  }
-
-  .row:hover:not([data-tone]) {
-    --tl-dot-color: var(--prime-color-accent-default);
-  }
-}
-
-.row[data-interactive="true"] {
-  cursor: pointer;
-}
-
-/* Full-width list row: the ring is drawn inside its edge. */
-.row:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
+/* The dot stands in the mark's place: an icon-wide column beside the row's lines. */
 .dot {
-  grid-area: dot;
-  align-self: center;
-  justify-self: center;
+  flex: none;
   box-sizing: border-box;
   width: var(--tl-dot);
   height: var(--tl-dot);
+  margin-inline: calc((var(--field-icon) - var(--tl-dot)) / 2);
   border-radius: 50%;
   background: var(--tl-dot-color);
-  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* ---------- Text ---------- */
 
-/* The title and its meta lines, one under another (`Timeline.ItemMeta` may repeat). */
+/* The title over its description lines. It grows from nothing, so a long title is cut instead of
+ * pushing the amount onto a line of its own (the row wraps only below 20rem, see the end). */
 .text {
-  grid-area: text;
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
   min-width: 0;
 }
 
-.title {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--tl-title-color, var(--prime-color-text-primary));
-  font-weight: var(--prime-font-weight-medium);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-/* Beside badges the title gives way first, down to its text or 8em (`useTitleFloor`). */
-.badged {
-  flex: 0 1000 auto;
-  min-width: min(var(--header-title-min, 0), 100%);
-}
-
-.meta {
-  display: flex;
-  align-items: baseline;
-  gap: calc(var(--prime-space-1) * 1.5);
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  color: var(--prime-color-text-muted);
-  font-size: var(--tl-meta-size);
-  line-height: var(--tl-meta-line-height);
-  font-weight: var(--prime-font-weight-regular);
-  font-variant-numeric: tabular-nums;
-}
-
-/* The status and the dot keep their width; the text after them is cut. */
-.meta > :not(:last-child) {
-  flex: none;
-}
-
+/* The row's description under the title: `strong` reads in the text colour. */
 .meta strong {
   color: var(--prime-color-text-primary);
   font-weight: var(--prime-font-weight-medium);
 }
 
+/* The row's meta: the amount, tabular, in the text colour; centred on the row's line. */
 .value {
-  grid-area: value;
   display: flex;
+  flex: none;
   flex-direction: column;
   align-items: flex-end;
-  align-self: center;
-  justify-self: end;
+  margin-inline-start: auto;
   color: var(--prime-color-text-primary);
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
@@ -341,11 +233,8 @@
   white-space: nowrap;
 }
 
-/* Second line under the value (category, unit): meta size, muted, regular. */
+/* The second line under the amount (category, unit): the row's meta, regular. */
 .valueMeta {
-  color: var(--prime-color-text-muted);
-  font-size: var(--tl-meta-size);
-  line-height: var(--tl-meta-line-height);
   font-weight: var(--prime-font-weight-regular);
 }
 
@@ -357,13 +246,13 @@
 
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: var(--tl-dot-col) minmax(0, 1fr) auto;
+  grid-template-columns: var(--field-icon) minmax(0, 1fr) auto;
   grid-template-areas: "dot caption trailing";
   align-items: center;
-  column-gap: var(--tl-gap);
+  column-gap: var(--tl-col-gap);
   width: 100%;
   min-width: 0;
-  padding: var(--tl-gap-pad-y) var(--tl-pad-end) var(--tl-gap-pad-y) var(--tl-pad-start);
+  padding: var(--tl-gap-pad-y) var(--field-px);
   color: var(--tl-gap-color);
   font-size: var(--tl-meta-size);
   line-height: var(--tl-meta-line-height);
@@ -422,16 +311,10 @@
 /* ---------- Narrow container: value under the meta ---------- */
 
 @container (max-width: 20rem) {
-  .row {
-    grid-template-columns: var(--tl-dot-col) minmax(0, 1fr);
-    grid-template-areas:
-      "dot text"
-      "dot value";
-  }
-
   .value {
+    flex-basis: 100%;
     align-items: flex-start;
-    justify-self: start;
+    margin-inline-start: calc(var(--field-icon) + var(--tl-col-gap));
     text-align: start;
   }
 }

@@ -122,10 +122,10 @@
     {
       "id": 10,
       "prompt": "Сделай блок настроек «Каналы уведомлений»: Почта, Push-уведомления, Slack, SMS. Каждый канал включается и выключается сразу, а порядок каналов (приоритет доставки) команда меняет перетаскиванием. Рядом — блок «Общие» с переключателями «Звук» и «Сводка по понедельникам», их порядок не меняется.",
-      "expected_output": "The channels are a List.Root with onReorder (List.Item value per channel), each row leading with its Switch in List.ItemActions side=\"start\" and ending with the grip the list draws; the general settings are plain rows with the label first and the Switch at the end (or Switch.Root with Switch.Label in a Fieldset), no grip.",
+      "expected_output": "The channels are a List.Root with onReorder (List.Item value per channel), its grips always shown and leading (handle=\"start\"), each row ending with its Switch in List.ItemActions; the general settings are plain rows with the label first and the Switch at the end (or Switch.Root with Switch.Label in a Fieldset), no grip.",
       "files": [],
       "expectations": [
-        "The reorderable channel rows put the Switch first — List.ItemActions side=\"start\" (or the Switch as the first child of a Dnd.SortableItem) — and the grip last",
+        "The reorderable channel rows lead with the grip (List.Root handle=\"start\") and end with the Switch in List.ItemActions",
         "No reorderable row has a Switch between its label and the grip",
         "The general settings rows have no grip and their Switch stays after the label (a trailing toggle) or is a Switch.Root with its Switch.Label",
         "Each Switch of a channel row is named by its channel (aria-label or a label) and returns the save's Promise or sets the state at once — no Save button"
@@ -311,13 +311,13 @@
     {
       "id": 25,
       "prompt": "Сделай настройки воронки: у воронки есть системные этапы «Новая», «Успешно», «Отказ» и свои этапы команды между ними. Свои этапы можно переставлять, системные стоят на месте. У каждого этапа переключатель «Показывать на доске».",
-      "expected_output": "One List.Root with onReorder in board order: system stages as List.Item locked (the lock in the grip's place), the team's stages movable; every row leads with its Switch in List.ItemActions side=\"start\" and keeps one grid. No separate sections or lists for system and own stages.",
+      "expected_output": "One List.Root with onReorder in board order: system stages as List.Item locked (the lock in the grip's place), the team's stages movable; the grips lead (handle=\"start\"), every row ends with its Switch in List.ItemActions and keeps one grid. No separate sections or lists for system and own stages.",
       "files": [],
       "expectations": [
         "All stages are in one List.Root with onReorder, in the order the board shows them",
         "System stages are List.Item locked — not disabled, not a separate list",
         "There is no second section or heading splitting «Свои» and «Системные» stages",
-        "The «Показывать на доске» switch stands in the same place on every row (List.ItemActions side=\"start\"), so the switches line up in one column"
+        "The «Показывать на доске» switch ends every row (List.ItemActions), so the switches line up in one column at the end"
       ]
     },
     {
@@ -591,7 +591,7 @@
       "expected_output": "A List (or Dnd rows of Switch.Root fullWidth) where every switch ends its row; a «Изменить порядок» button toggles to «Готово», and in that mode onReorder is passed, the switches are not rendered and the grips stand at the trailing edge.",
       "files": [],
       "expectations": [
-        "The Switch is at the end of its row (List.ItemActions without side=\"start\", or Switch.Root fullWidth with its label first)",
+        "The Switch is at the end of its row (List.ItemActions, or Switch.Root fullWidth with its label first)",
         "Reordering is a mode toggled by a button «Изменить порядок» / «Готово»; outside it rows have no grip",
         "In the reorder mode the switches are gone and the grips take their place; a row never shows a switch and a grip together",
         "No switch leads a row or stands between the label and the grip"

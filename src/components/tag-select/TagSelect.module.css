@@ -224,46 +224,12 @@
   pointer-events: none;
 }
 
-/* A row with the «⋯» menu: a pick button across the row and the menu button at the end. */
-.optionManaged {
-  padding-inline-end: var(--prime-space-1);
-  cursor: default;
-}
-
-.optionPick {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: var(--field-gap);
-  min-width: 0;
-  height: var(--menu-item-h);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-
-.optionPick:disabled {
-  cursor: not-allowed;
-}
+/* The option rows are the kit's one list row (`internal/listRow` through `internal/MenuGroup`); a
+   row with the «⋯» menu holds a pick button (the hit element) and the menu button beside it. */
 
 /* Its deletion is pending: the row keeps its look and place, the spinner on «⋯» says it waits. */
-.option[data-pending="true"] .optionPick {
+.option[data-pending] .optionPick {
   cursor: progress;
-}
-
-.createIcon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--field-icon);
-  height: var(--field-icon);
-  color: var(--prime-color-text-muted);
-  --prime-icon-size: var(--field-icon);
 }
 
 .createLabel {
@@ -277,7 +243,7 @@
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.option[data-highlighted="true"] .menuTrigger,
+.option[data-highlighted] .menuTrigger,
 .menuTrigger:focus-visible,
 .menuTrigger[aria-expanded="true"],
 .menuTrigger[aria-busy="true"] {
@@ -312,4 +278,10 @@
 /* A long list: the height of the options not rendered. */
 .spacer {
   flex-shrink: 0;
+}
+
+/* The mark where a long list's options start takes no room: the list's gap after it is given back. */
+.start {
+  flex-shrink: 0;
+  margin-block-end: calc(var(--prime-space-1) / -2);
 }

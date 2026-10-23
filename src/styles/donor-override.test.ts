@@ -38,6 +38,9 @@ const PUBLIC_HOOKS = [
   // The page's edge air: the host of a page (AppShell.Main, a preview stage) hands it the side
   // gutter and the top air (Page COMPONENT.md, Layout & spacing).
   /^--page-(gutter|top)$/,
+  // The list row's height and side padding: the Sidebar keeps its rail-centred icons, its
+  // sub-rows' indent and its flyout's menu height on the one row (internal/listRow).
+  /^--list-row-(h|px)$/,
 ];
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);

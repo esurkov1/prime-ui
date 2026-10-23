@@ -33,12 +33,14 @@ import {
   useListboxRegistry,
   useStoreSlice,
 } from "@/internal/listbox";
+import { ListRowControls, ListRowMark, listRowStyles } from "@/internal/listRow";
+import { menuRowProps, menuRowTier } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
-import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
+import type { ControlSize, PaletteColor } from "@/internal/states";
 import { isPromiseLike, usePendingChanges, usePendingKeys } from "@/internal/usePendingChanges";
 
 import { TagOptionMenu } from "./TagOptionMenu";
@@ -568,6 +570,8 @@ export function TagSelect({
   };
 
   const setSize = listed.length + (showCreate ? 1 : 0);
+  // The option rows stand a tier below the panel (`s` in an `m` field).
+  const rowTier = menuRowTier(size);
   const optionRow = (
     option: TagSelectOption,
     windowed?: { index: number; measure: (node: HTMLElement | null) => void },
@@ -580,7 +584,9 @@ export function TagSelect({
     };
     const content = (
       <>
-        <Checkbox.Indicator checked={isSelected} disabled={option.disabled} size={stepDown(size)} />
+        <span className={listRowStyles.indicator}>
+          <Checkbox.Indicator checked={isSelected} disabled={option.disabled} size={rowTier} />
+        </span>
         <Badge.Root
           color={option.color ?? fallbackColor}
           disabled={option.disabled}
@@ -603,6 +609,7 @@ export function TagSelect({
         registry={registry}
         managed={manageable}
         pending={pending}
+        size={rowTier}
         onPick={pickOption}
         ref={windowed?.measure}
         posInSet={windowed ? windowed.index + 1 + (showCreate ? 1 : 0) : undefined}
@@ -613,8 +620,9 @@ export function TagSelect({
             <button
               type="button"
               tabIndex={-1}
-              className={styles.optionPick}
+              className={cx(listRowStyles.hit, styles.optionPick)}
               disabled={option.disabled || pending}
+              data-interactive={option.disabled || pending ? undefined : ""}
               onMouseDown={(event) => {
                 if (!option.disabled) event.preventDefault();
               }}
@@ -623,19 +631,22 @@ export function TagSelect({
               {content}
             </button>
             {option.disabled ? null : (
-              <TagOptionMenu
-                value={option.value}
-                label={option.label}
-                color={option.color ?? fallbackColor}
-                open={menuValue === option.value && !pending}
-                onOpenChange={(next) => setMenuValue(next ? option.value : null)}
-                onUpdate={handleOptionUpdate}
-                onDelete={handleOptionDelete}
-                labels={labels}
-                disabled={disabled}
-                pending={pending}
-                saving={saving}
-              />
+              // The row's own control, beside its pick button: as tall as the row minus 8.
+              <ListRowControls size={rowTier} lines="line">
+                <TagOptionMenu
+                  value={option.value}
+                  label={option.label}
+                  color={option.color ?? fallbackColor}
+                  open={menuValue === option.value && !pending}
+                  onOpenChange={(next) => setMenuValue(next ? option.value : null)}
+                  onUpdate={handleOptionUpdate}
+                  onDelete={handleOptionDelete}
+                  labels={labels}
+                  disabled={disabled}
+                  pending={pending}
+                  saving={saving}
+                />
+              </ListRowControls>
             )}
           </>
         ) : (
@@ -806,7 +817,7 @@ export function TagSelect({
         aria-labelledby={ariaLabel ? undefined : (ariaLabelledBy ?? ids.labelledBy)}
         tabIndex={-1}
         ref={scrollerRef}
-        className={cx(fieldTierClass, menu.tier, menu.menu, styles.panel)}
+        className={cx(fieldTierClass, menu.tier, menu.menu, menu.list, styles.panel)}
       >
         {showCreate ? (
           <OptionRow
@@ -818,11 +829,12 @@ export function TagSelect({
             highlight={highlight}
             registry={registry}
             managed={false}
+            size={rowTier}
             onPick={() => pick(CREATE_VALUE)}
           >
-            <span className={styles.createIcon} aria-hidden="true">
+            <ListRowMark size={rowTier} lines="line">
               <Icon name="action.add" />
-            </span>
+            </ListRowMark>
             <span className={styles.createLabel}>{labels.create}</span>
             <Badge.Root color={fallbackColor} className={styles.chip}>
               <span className={styles.chipLabel}>{inputTrim}</span>
@@ -877,6 +889,8 @@ type OptionRowProps = {
   managed: boolean;
   /** Its deletion is pending: busy, not pickable. */
   pending?: boolean;
+  /** The row's tier (a tier below the panel). */
+  size: ControlSize;
   onPick: () => void;
   /** A windowed list: measures the row, and its place among every option. */
   ref?: ((node: HTMLElement | null) => void) | undefined;
@@ -896,6 +910,7 @@ function OptionRow({
   registry,
   managed,
   pending = false,
+  size,
   onPick,
   ref,
   posInSet,
@@ -928,15 +943,24 @@ function OptionRow({
     onMouseMove: () => {
       if (!disabled && !highlighted) highlight.set(value);
     },
-    ...toDataAttributes({ value, highlighted, selected, disabled, pending }),
+    ...toDataAttributes({ value, pending: pending || undefined }),
   } as const;
+  // A choice of several: a checked row in the accent's tone.
+  const row = {
+    size,
+    highlighted,
+    disabled,
+    checked: selected,
+    className: styles.option,
+  };
 
   if (managed) {
+    // The row holds its pick button (the hit element) and the «⋯» menu beside it.
     return (
       <div
         {...props}
+        {...menuRowProps({ ...row, hit: false })}
         aria-disabled={disabled || undefined}
-        className={cx(menu.item, styles.option, styles.optionManaged)}
       >
         {children}
       </div>
@@ -946,8 +970,8 @@ function OptionRow({
     <button
       type="button"
       {...props}
+      {...menuRowProps(row)}
       disabled={disabled}
-      className={cx(menu.item, styles.option)}
       // Keeps focus in the input.
       onMouseDown={(event) => {
         if (!disabled) event.preventDefault();
