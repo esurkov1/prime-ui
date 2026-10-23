@@ -1,4 +1,4 @@
-/** Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them — `getLocked`, `width`, `reorderable`. */
+/** Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them, and two of the pinned say their own reason — `getLocked`, `getLockedReason`, `width`, `reorderable`. */
 import {
   ColorPresets,
   FieldList,
@@ -17,6 +17,7 @@ type Spec = {
   value: string;
   color: string;
   pinned?: boolean;
+  reason?: string;
 };
 
 const COLUMNS: FieldListColumn[] = [
@@ -43,6 +44,7 @@ const SPECS: Spec[] = [
     value: "до 50",
     color: "#5068f5",
     pinned: true,
+    reason: "Сотрудников считает сам тариф",
   },
   {
     id: "storage",
@@ -51,6 +53,7 @@ const SPECS: Spec[] = [
     value: "200 ГБ",
     color: "#22c55e",
     pinned: true,
+    reason: "Хранилище входит в любой тариф",
   },
   {
     id: "support",
@@ -77,6 +80,7 @@ export default function FieldListLockedExample() {
       getId={(spec) => spec.id}
       getLabel={(spec) => spec.name}
       getLocked={(spec) => spec.pinned ?? false}
+      getLockedReason={(spec) => spec.reason}
       createItem={(): Spec => ({
         id: crypto.randomUUID(),
         icon: "object.globe",

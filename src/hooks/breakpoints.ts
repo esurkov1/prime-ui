@@ -1,5 +1,6 @@
 /*
- * The media queries the kit reads in TypeScript (`useMediaQuery`). The viewport widths are the
+ * The media queries the kit reads in TypeScript (`useMediaQuery`); public, so a screen switches
+ * at the same point the kit does (`useMediaQuery(COMPACT_QUERY)`). The viewport widths are the
  * breakpoints of foundation §9 (640 · 768 · 1024 · 1280); the same values stand in the CSS rules,
  * each with a comment naming its constant here.
  */

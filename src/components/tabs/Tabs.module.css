@@ -609,7 +609,9 @@
   border-radius: var(--prime-radius-s);
 }
 
-.panel :where(p, ul, ol) {
+/* Raw text of the panel only, at zero specificity: an element with a class (a kit part such as a
+   `List` with its bleed margin, or a consumer's own) keeps its margin. */
+:where(.panel :is(p, ul, ol):not([class])) {
   margin: 0;
 }
 

@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Badge, type BadgeGroupProps } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
+import { ProgressBar } from "@/components/progress-bar/ProgressBar";
 import { Radio } from "@/components/radio/Radio";
 import { Switch } from "@/components/switch/Switch";
 import { useResizeEffect } from "@/hooks/useElementSize";
@@ -17,6 +18,7 @@ import {
 } from "@/internal/headerRow";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
+import { nodeText } from "@/internal/nodeText";
 import { flattenChildren, isPart } from "@/internal/parts";
 import { press } from "@/internal/press";
 import rowLink from "@/internal/rowLink.module.css";
@@ -501,6 +503,38 @@ function CardTotal({ label, tone, className, children, ...rest }: CardTotalProps
 }
 CardTotal.displayName = "Card.Total";
 
+export type CardNoteProps = Omit<DivProps, "children"> & {
+  children?: React.ReactNode;
+  progress?: number;
+  max?: number;
+  progressTone?: Tone;
+};
+
+/**
+ * The note at the start of the footer: one line of text with a `StatusDot` first, and — with
+ * `progress` — the kit's `ProgressBar` under it (a term, a quota, a delivery). It takes the free
+ * width beside the buttons; the bar is named by the note's text.
+ */
+function CardNote({ progress, max, progressTone, className, children, ...rest }: CardNoteProps) {
+  const { size } = React.useContext(CardContext);
+  return (
+    <div {...rest} className={cx(styles.note, className)}>
+      <div className={cx(FRAME_DESCRIPTION[size], headerRowStyles.description)}>
+        <HeaderLineContent>{children}</HeaderLineContent>
+      </div>
+      {progress !== undefined ? (
+        <ProgressBar
+          value={progress}
+          max={max}
+          tone={progressTone}
+          aria-label={nodeText(children)}
+        />
+      ) : null}
+    </div>
+  );
+}
+CardNote.displayName = "Card.Note";
+
 export const Card = {
   Root: CardRoot,
   Media: CardMedia,
@@ -515,4 +549,5 @@ export const Card = {
   Body: CardBody,
   Footer: CardFooter,
   Total: CardTotal,
+  Note: CardNote,
 };

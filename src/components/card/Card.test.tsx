@@ -13,7 +13,7 @@ import { Icon } from "@/icons";
 import headerRow from "@/internal/headerRow.module.css";
 import rowLink from "@/internal/rowLink.module.css";
 import surfaceFrame from "@/internal/surfaceFrame.module.css";
-import { cssRule, cssValue } from "@/test/css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { Card } from "./Card";
 import styles from "./Card.module.css";
@@ -251,7 +251,10 @@ describe("Card.Header", () => {
     // The controls of a one-line header share the title's centre line.
     expect(
       cssValue(
-        cssRule(HEADER_CSS, '.header[data-lines="one"], .header:has(> .mark), .header:only-child'),
+        cssRule(
+          HEADER_CSS,
+          '.header[data-lines="one"], .header:has(> .mark), .header:only-child, .header[data-whole]',
+        ),
         "align-items",
       ),
     ).toBe("center");
@@ -429,9 +432,33 @@ describe("Card.Title", () => {
       </Card.Root>,
     );
     expect(screen.getByTestId("title").style.getPropertyValue("--header-title-min")).toMatch(/px$/);
-    expect(
-      cssValue(cssRule(HEADER_CSS, ".titleRow:has(> .badges) > .title"), "min-width"),
-    ).toContain("--header-title-min");
+    const floors = cssRules(HEADER_CSS)
+      .filter((rule) => rule.selector === ".title")
+      .flatMap((rule) => rule.decls.filter((decl) => decl.prop === "min-width"));
+    expect(floors.some((decl) => decl.value.includes("--header-title-min"))).toBe(true);
+  });
+
+  it("keeps the title's floor and drops the controls under it on a narrow card", () => {
+    render(
+      <Card.Root>
+        <Card.Header data-testid="header">
+          <Card.Title data-testid="title">Подготовить договор поставки</Card.Title>
+          <Card.Actions data-testid="actions">
+            <Button.Root>Выполнено</Button.Root>
+          </Card.Actions>
+        </Card.Header>
+      </Card.Root>,
+    );
+    // The floor sits on the title and on its column, which the row wraps by.
+    const column = screen.getByTestId("title").closest(`.${headerRow.titles}`) as HTMLElement;
+    expect(column.style.getPropertyValue("--header-title-min")).toMatch(/px$/);
+    expect(cssValue(cssRule(HEADER_CSS, ".titles"), "flex")).toContain("--header-title-min");
+    // The row wraps, so the end drops to a line of its own; only there its controls wrap.
+    expect(cssValue(cssRule(HEADER_CSS, ".header"), "flex-wrap")).toBe("wrap");
+    const end = cssRule(HEADER_CSS, ".end");
+    expect(cssValue(end, "flex-wrap")).toBe("wrap");
+    expect(cssValue(end, "max-width")).toBe("100%");
+    expect(screen.getByTestId("actions")).toHaveClass(headerRow.end);
   });
 });
 
@@ -864,6 +891,44 @@ describe("Card.Footer and Card.Total", () => {
       </Card.Root>,
     );
     expect(screen.getByTestId("total").children).toHaveLength(1);
+  });
+});
+
+describe("Card.Note", () => {
+  it("is a line of text with the dot first, and a bar named by the text with progress", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Card.Root>
+        <Card.Footer>
+          <Card.Note ref={ref} className="own" progress={30} data-testid="note">
+            <StatusDot tone="warning">Срок</StatusDot>3 дня из 10
+          </Card.Note>
+          <Card.Actions>
+            <Button.Root>Продлить</Button.Root>
+          </Card.Actions>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    const note = screen.getByTestId("note");
+    expect(ref.current).toBe(note);
+    expect(note).toHaveClass(styles.note, "own");
+    expect(note).toHaveTextContent("3 дня из 10");
+    expect(within(note).getByRole("progressbar", { name: /3 дня из 10/ })).toHaveAttribute(
+      "value",
+      "30",
+    );
+  });
+
+  it("draws no bar without progress and takes the free width of the footer", () => {
+    render(
+      <Card.Root>
+        <Card.Footer>
+          <Card.Note data-testid="note">Срок не задан</Card.Note>
+        </Card.Footer>
+      </Card.Root>,
+    );
+    expect(within(screen.getByTestId("note")).queryByRole("progressbar")).toBeNull();
+    expect(cssValue(cssRule(CSS, ".footer > .note"), "flex")).toContain("1 1");
   });
 });
 

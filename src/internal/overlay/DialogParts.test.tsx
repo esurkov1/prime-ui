@@ -403,7 +403,7 @@ describe("DialogParts", () => {
     expect(screen.getByText("Поставка серверов").parentElement).toBe(section);
   });
 
-  it("puts the header Actions and the close button at the end of the row, on the title line", () => {
+  it("keeps the close button beside the header row, never inside the end that wraps", () => {
     render(
       <Root defaultOpen>
         <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
@@ -417,9 +417,16 @@ describe("DialogParts", () => {
       </Root>,
     );
     const actions = screen.getByTestId("actions");
-    expect(actions.nextElementSibling).toBe(screen.getByRole("button", { name: "Закрыть" }));
-    expect(actions.parentElement).toHaveClass(headerRowStyles.end);
-    expect(actions.parentElement?.parentElement).toHaveAttribute("data-lines", "one");
+    const close = screen.getByRole("button", { name: "Закрыть" });
+    const end = actions.parentElement;
+    const row = end?.parentElement;
+    expect(end).toHaveClass(headerRowStyles.end);
+    expect(row).toHaveAttribute("data-lines", "one");
+    expect(row).toHaveClass(headerRowStyles.header);
+    expect(end?.contains(close)).toBe(false);
+    expect(row?.contains(close)).toBe(false);
+    expect(close.parentElement).toBe(row?.parentElement);
+    expect(actions).toHaveAttribute("data-zone", "header");
   });
 
   it("keeps 32 between sections in plain flow, adds 16 to a smaller gap and nothing to a 32 gap", () => {

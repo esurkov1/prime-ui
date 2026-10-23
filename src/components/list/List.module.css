@@ -215,10 +215,21 @@
 .frame {
   display: flex;
   flex: 1 1 auto;
+  flex-wrap: wrap;
   align-items: center;
   min-width: 0;
   border-radius: var(--field-radius);
   transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+/* The row's text keeps a floor beside its controls; controls that leave less than the floor drop
+   to a line of their own at the row's end instead of crushing the text or leaving the row. */
+.frame > .item {
+  flex: 1 1 var(--prime-space-24);
+}
+
+.frame > .actions[data-side="end"] {
+  margin-inline-start: auto;
 }
 
 .frame > .item,

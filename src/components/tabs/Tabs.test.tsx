@@ -12,6 +12,7 @@ import { cssRule, cssValue } from "@/test/css";
 import { Tabs } from "./Tabs";
 
 const CSS = "src/components/tabs/Tabs.module.css";
+const LIST_CSS = "src/components/list/List.module.css";
 const INDICATOR_CSS = "src/internal/selectionIndicator.module.css";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -643,6 +644,13 @@ describe("Tabs — indicator", () => {
     const content = cssRule(CSS, ".panelContent");
     expect(cssValue(content, "flex")).toBe("1 1 auto");
     expect(cssValue(content, "min-height")).toBe("0");
+  });
+
+  it("resets the margin of raw panel text only, never of an element with a class (List bleed)", () => {
+    const reset = cssRule(CSS, ":where(.panel :is(p, ul, ol):not([class]))");
+    expect(cssValue(reset, "margin")).toBe("0");
+    const bleed = cssRule(LIST_CSS, ":where(.root)");
+    expect(cssValue(bleed, "margin")).toContain("--list-bleed-size");
   });
 
   it("the folder glides only under data-animate, and its geometry never as a transform", () => {

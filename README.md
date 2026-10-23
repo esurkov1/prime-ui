@@ -354,6 +354,7 @@ accessibility, examples and common mistakes.
 | `formatDateValue(date, { withTime })` | A date as the local `yyyy-MM-dd` (`THH:mm`) value for a form or a query. |
 | `chartColors` | The chart palette as CSS values for a chart library; follows the theme. |
 | `useTokenValue(token)` | A length token in px for geometry CSS cannot take (SVG, canvas). |
+| `useMediaQuery(query, enabled?)` | Whether a media query matches, live. Pass one of the kit's queries — `COMPACT_QUERY` (below 640px: Drawer full width, overlays as sheets), `OFF_CANVAS_QUERY`, `TOUCH_QUERY`, `HOVER_QUERY`, `REDUCED_MOTION_QUERY` — to switch a screen at the kit's own point. |
 | `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set: Lucide drawings, each with a small gesture that plays when its host is hovered or pressed; `createIcon` turns any SVG icon component (a `lucide-react` glyph you install, an SVGR import) into a kit icon. |
 
 ## Docs inside the package

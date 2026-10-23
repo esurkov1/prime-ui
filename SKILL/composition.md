@@ -583,23 +583,27 @@ place — a page or dialog header, a table row, a card, a list row:
 |---|---|
 | one | an icon-only `Button.Root` (`aria-label`) in a `Tooltip.Trigger` (`ghost` in a dialog header), or a labelled button where its row has room |
 | two or more | one `Dropdown` behind an `action.more` icon button — `soft` + `neutral` in a page header (a shape beside its neighbours), `ghost` in a dialog header, `ghost` size `s` in a table cell; destructive last, `tone="danger"` |
+| a destructive one in a header of a page, dialog or card, alone or among others | always the last item of «Ещё» (`tone="danger"`) with a `ConfirmDialog` — even when it is the only action, the menu stays |
 
-A ⋯ with one item hides the only action behind a second press and a guess. Nothing else decides:
-not the density of the row, not the number of its columns, not the room left for later actions. A
-row of a `FieldList` follows the same count ([forms](#7-forms)).
+A ⋯ with one harmless item hides the only action behind a second press and a guess. Nothing else
+decides: not the density of the row, not the number of its columns, not the room left for later
+actions. The one exception is a destructive action in a header: it is never one tap away, so it is
+never an icon of its own in sight — it sits behind «Ещё» and asks. A row of a `FieldList` follows
+the same count for its other actions, and its remove trash stays in sight ([forms](#7-forms)).
 
 ### Actions of a record
 
 The header of a record's dialog is the exception to the count above: the record's actions are what
-the person opened it for, so each stays in sight. Up to five — spam, not a target, copy, delete — are
-icon-only ghost `Button.Root`s, each in a `Tooltip.Trigger`, in `Drawer.Actions` / `Modal.Actions`
-before the ×; a «⋯» `Dropdown` only gathers the sixth and later. The header never wraps, so on a
-phone keep one picker or icon button and the «⋯» beside the ×. A destructive one either asks
-(`ConfirmDialog.Trigger` around it) or, when it is easy to redo by hand, holds
-(`holdToConfirm` with the action in `onConfirm`) — never a delete that runs on a plain press.
+the person opened it for, so each harmless one stays in sight. Up to five — spam, not a target,
+copy — are icon-only ghost `Button.Root`s, each in a `Tooltip.Trigger`, in `Drawer.Actions` /
+`Modal.Actions` before the ×; a «⋯» `Dropdown` only gathers the sixth and later. The destructive
+action (delete, archive for good) is never among them: it is the last item of «Ещё»
+(`tone="danger"`) behind a `ConfirmDialog` — even when it is the record's only action, so the
+header has «Ещё» with one item and nothing else. The header's width rules for a phone are in
+[a narrow header](responsive.md#a-narrow-header).
 
 ```tsx partial
-// bad — three actions of the record behind a guess
+// bad — three harmless actions behind a guess
 <Drawer.Actions>
   <Dropdown.Root>
     <Dropdown.Trigger>
@@ -608,7 +612,7 @@ phone keep one picker or icon button and the «⋯» beside the ×. A destructiv
     <Dropdown.Content>
       <Dropdown.Item>Спам</Dropdown.Item>
       <Dropdown.Item>Нецелевое</Dropdown.Item>
-      <Dropdown.Item tone="danger">Удалить</Dropdown.Item>
+      <Dropdown.Item>Копировать</Dropdown.Item>
     </Dropdown.Content>
   </Dropdown.Root>
 </Drawer.Actions>
@@ -616,7 +620,10 @@ phone keep one picker or icon button and the «⋯» beside the ×. A destructiv
 
 ```tsx good
 // declare: const remove: () => Promise<void>
-// good — each action in sight, named by its tooltip; the delete asks
+// declare: const deleting: boolean
+// declare: const setDeleting: (open: boolean) => void
+// good — each harmless action in sight, named by its tooltip; the delete behind «Ещё», asking
+<>
 <Drawer.Actions>
   <Tooltip.Root>
     <Tooltip.Trigger>
@@ -630,48 +637,45 @@ phone keep one picker or icon button and the «⋯» beside the ×. A destructiv
     </Tooltip.Trigger>
     <Tooltip.Content>Нецелевое обращение</Tooltip.Content>
   </Tooltip.Root>
-  <ConfirmDialog.Root title="Удалить сделку?" confirmLabel="Удалить" onConfirm={remove}>
-    <Tooltip.Root>
-      <ConfirmDialog.Trigger>
-        <Tooltip.Trigger>
-          <Button.Root variant="ghost" tone="danger" aria-label="Удалить сделку">…</Button.Root>
-        </Tooltip.Trigger>
-      </ConfirmDialog.Trigger>
-      <Tooltip.Content>Удалить сделку</Tooltip.Content>
-    </Tooltip.Root>
-  </ConfirmDialog.Root>
-</Drawer.Actions>
-```
-
-```tsx partial
-// bad — a menu for the one thing this header can do
-<Drawer.Actions>
   <Dropdown.Root>
     <Dropdown.Trigger>
-      <Button.Root variant="ghost" tone="neutral" aria-label="Другие действия">…</Button.Root>
+      <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
+        <Button.Icon>
+          <Icon name="action.more" />
+        </Button.Icon>
+      </Button.Root>
     </Dropdown.Trigger>
     <Dropdown.Content>
-      <Dropdown.Item tone="danger">Удалить приглашение</Dropdown.Item>
+      <Dropdown.Item tone="danger" onSelect={() => setDeleting(true)}>
+        Удалить сделку
+      </Dropdown.Item>
     </Dropdown.Content>
   </Dropdown.Root>
 </Drawer.Actions>
+<ConfirmDialog.Root
+  open={deleting}
+  onOpenChange={setDeleting}
+  title="Удалить сделку?"
+  confirmLabel="Удалить"
+  onConfirm={remove}
+/>
+</>
 ```
 
-```tsx good
-// good — one action in sight, named by its tooltip
+```tsx partial
+// bad — the only action of the header is a destructive one, one tap from being gone
 <Drawer.Actions>
   <Tooltip.Root>
     <Tooltip.Trigger>
-      <Button.Root variant="ghost" tone="danger" aria-label="Удалить приглашение">
-        <Button.Icon>
-          <Icon name="action.delete" />
-        </Button.Icon>
-      </Button.Root>
+      <Button.Root variant="ghost" tone="danger" aria-label="Удалить приглашение">…</Button.Root>
     </Tooltip.Trigger>
     <Tooltip.Content>Удалить приглашение</Tooltip.Content>
   </Tooltip.Root>
 </Drawer.Actions>
 ```
+
+The good half of that pair is the «Ещё» above: a menu with a single danger item is correct, because
+keeping a destructive action out of reach is what the menu is for.
 
 ## 7. Forms
 
@@ -683,7 +687,10 @@ phone keep one picker or icon button and the «⋯» beside the ×. A destructiv
   FieldList draws every row's actions itself — the remove trash and the handle after it, a pinned
   row's remove off with its reason (`labels.lockedReason`) — so never add your own. Its add button
   under the rows is the place for records filled in place; a list people pick from creates at its
-  top ([where the create button goes](#where-the-create-button-goes)).
+  top ([where the create button goes](#where-the-create-button-goes)). A pinned row says its own
+  reason through `getLockedReason(item)`; a record the server creates is `createItem` returning a
+  Promise — a placeholder row holds the place, the key comes from the resolved item and focus goes
+  into the row.
 - The row's actions (`rowActions`) follow [the menu threshold](#a-menu-from-two-actions): a row
   that only removes shows its trash (the default `"buttons"`, and the grip after it with
   `reorderable`), however many columns it has; `"menu"` — one «⋯» with «Выше», «Ниже», «Удалить» —
@@ -947,11 +954,48 @@ Bad → good: [anti-slop.md](anti-slop.md#7c-a-create-button-out-of-reach).
 ### List rows
 
 - A row's own controls stand beside its element in `List.ItemActions`, one tier below the row.
-- A plain settings row reads label first and ends with its toggle (the platform convention).
-- A row people reorder leads with its toggle — `<List.ItemActions side="start">`, or the Switch as the
-  first child of a `Dnd.SortableItem` — so the on / off state reads first, like a checkbox, and the
-  grip keeps the end edge ([reorder.tsx](../src/components/list/examples/reorder.tsx)).
-- Never a toggle between the label and the grip: «Почта … [Switch] [grip]» reads as two handles.
+- **A switch always ends its row** (the platform convention): the label first, the toggle at the
+  trailing edge — in a plain settings row, in a row people may reorder, everywhere.
+- **Reordering is a mode of the list, not a part of every row.** A button «Изменить порядок» turns
+  into «Готово»; while the mode is on the switches leave and the grips stand at the trailing edge
+  in their place ([reorder.tsx](../src/components/list/examples/reorder.tsx) for `List`,
+  [handle.tsx](../src/components/dnd/examples/handle.tsx) for rows of `Switch.Root fullWidth`). A
+  row never holds a switch and a grip together, and a switch is never moved to the start of the row
+  to make room for the grip.
+
+```tsx partial
+// bad — the switch leads a row that can always be dragged
+<List.Item value={stage.id}>
+  <List.ItemActions side="start">
+    <Switch.Root aria-label="Показывать этап" checked={stage.shown} />
+  </List.ItemActions>
+  <List.ItemText>{stage.name}</List.ItemText>
+</List.Item>
+```
+
+```tsx good
+// declare: const stages: { id: string; name: string; shown: boolean }[]
+// declare: const reordering: boolean
+// declare: const reorder: (id: string, beforeId: string | null) => void
+// declare: const show: (id: string, shown: boolean) => void
+// good — the switch ends the row; in the «Изменить порядок» mode it leaves and the grip takes its place
+<List.Root aria-label="Этапы воронки" onReorder={reordering ? reorder : undefined}>
+  {stages.map((stage) => (
+    <List.Item key={stage.id} value={stage.id}>
+      <List.ItemText>{stage.name}</List.ItemText>
+      {!reordering && (
+        <List.ItemActions>
+          <Switch.Root
+            aria-label={`Показывать «${stage.name}»`}
+            checked={stage.shown}
+            onCheckedChange={(shown) => show(stage.id, shown)}
+          />
+        </List.ItemActions>
+      )}
+    </List.Item>
+  ))}
+</List.Root>
+```
 - Rows that cannot move stay in the same list with `List.Item locked` — the lock takes the grip's
   place, so every row keeps one grid ([one kind, one list](ux.md#2-the-shape-of-the-data-decides-the-layout)).
 
@@ -1094,44 +1138,38 @@ wherever it opens:
   ([label economy](ux.md#3-label-economy)).
 
 ```tsx good
-// good — the record header: name and number, one line of data, the badges with the two pickers first
+// good — the record header: name and number, one line of data, plain badges, the two pickers as Selects in the actions
+// declare: const status: string
 // declare: const setStatus: (status: string) => void
-// declare: const setAssignee: (id: string | null) => void
+// declare: const assignee: string
+// declare: const setAssignee: (id: string) => void
 <Drawer.Header>
   <Drawer.Title number="#678">Александра</Drawer.Title>
   <Drawer.Description>Аренда байка Пхукет · заявка 19 сент, 06:37</Drawer.Description>
   <Drawer.Badges>
-    <Dropdown.Root>
-      <Dropdown.Trigger>
-        <Badge.Root tone="info" aria-label="Статус: Новая">
-          Новая
-        </Badge.Root>
-      </Dropdown.Trigger>
-      <Dropdown.Content>
-        <Dropdown.Item onSelect={() => setStatus("progress")}>В работе</Dropdown.Item>
-        <Dropdown.Item onSelect={() => setStatus("closed")}>Закрыта</Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown.Root>
-    <Dropdown.Root>
-      <Dropdown.Trigger>
-        <Badge.Root aria-label="Ответственный: Анна Котова">
-          <Badge.Avatar>
-            <Avatar.Root color="purple">
-              <Avatar.Fallback>АК</Avatar.Fallback>
-            </Avatar.Root>
-          </Badge.Avatar>
-          Анна Котова
-        </Badge.Root>
-      </Dropdown.Trigger>
-      <Dropdown.Content>
-        <Dropdown.Item onSelect={() => setAssignee("sokolov")}>Илья Соколов</Dropdown.Item>
-        <Dropdown.Item onSelect={() => setAssignee(null)}>Снять ответственного</Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown.Root>
     <Badge.Root color="sky">Telegram</Badge.Root>
     <Badge.Root tone="warning">Ждёт человека</Badge.Root>
   </Drawer.Badges>
   <Drawer.Actions>
+    <Select.Root aria-label="Статус" value={status} onValueChange={setStatus}>
+      <Select.Trigger>
+        <Select.Value />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="new">Новая</Select.Item>
+        <Select.Item value="progress">В работе</Select.Item>
+        <Select.Item value="closed">Закрыта</Select.Item>
+      </Select.Content>
+    </Select.Root>
+    <Select.Root aria-label="Ответственный" value={assignee} onValueChange={setAssignee}>
+      <Select.Trigger>
+        <Select.Value />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="kotova">Анна Котова</Select.Item>
+        <Select.Item value="sokolov">Илья Соколов</Select.Item>
+      </Select.Content>
+    </Select.Root>
     <Tooltip.Root>
       <Tooltip.Trigger>
         <Button.Root variant="ghost" tone="neutral" aria-label="Диалог">
@@ -1148,7 +1186,7 @@ wherever it opens:
 
 ```tsx partial
 // bad — the statuses above the text, the number and a status in the description, a status beside
-// the buttons
+// the buttons (and a chip that opens a menu in place of a Select is wrong in the same way)
 <Drawer.Header>
   <Drawer.Title>Александра</Drawer.Title>
   <Drawer.Badges>
@@ -1457,7 +1495,9 @@ app: one look per kind of block, never a weight per screen.
   `Card.Badges` after the title, one line of new data in `Card.Description`; the line items are a
   `DescriptionList.Root align="end"` in `Card.Body`; the footer has no line: `Card.Total` at its
   start (the amount, its state in `label` with a `tone`, «к оплате 6 400 ฿») and the action in
-  `Card.Actions` at its end. A record row inside a card opens as a whole, with its value at the
+  `Card.Actions` at its end. A term or progress at the start of a footer (a due date, a quota, a
+  delivery) is `Card.Note` — one line of text and, with `progress` (`max`, `progressTone`), a
+  `ProgressBar` under it — not a wrapper of your own around a bar. A record row inside a card opens as a whole, with its value at the
   right and no pencil or button on it.
 - **A card with a picture** (a catalogue unit, a campaign): `Card.Media` with a `Carousel`, even for
   one photo; only what belongs to the photo stands on it (dots, arrows, the duration), while the

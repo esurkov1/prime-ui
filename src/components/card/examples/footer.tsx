@@ -1,5 +1,13 @@
-/** What the footer holds: the total and two buttons with the accent one last, an assignee picker as tall as the button beside it, and buttons that share the width with nothing at the start — `Card.Total`, `Select.Root`, `fullWidth`. */
-import { Avatar, Button, Card, DescriptionList, type PaletteColor, Select } from "prime-ui-kit";
+/** What the footer holds: the total and two buttons with the accent one last, an assignee picker as tall as the button beside it, a note with a term's progress, and buttons that share the width with nothing at the start — `Card.Total`, `Select.Root`, `Card.Note`, `progress`, `fullWidth`. */
+import {
+  Avatar,
+  Button,
+  Card,
+  DescriptionList,
+  type PaletteColor,
+  Select,
+  StatusDot,
+} from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -78,6 +86,25 @@ export default function CardFooterExample() {
           </Select.Root>
           <Card.Actions>
             <Button.Root>Взять в работу</Button.Root>
+          </Card.Actions>
+        </Card.Footer>
+      </Card.Root>
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Перевозка № 318</Card.Title>
+          <Card.Description>Склад «Север» → Казань</Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <DescriptionList.Root align="end">
+            <DescriptionList.Item label="Водитель">Сергей Орлов</DescriptionList.Item>
+          </DescriptionList.Root>
+        </Card.Body>
+        <Card.Footer>
+          <Card.Note progress={70} progressTone="warning">
+            <StatusDot tone="warning">Срок</StatusDot>3 дня из 10
+          </Card.Note>
+          <Card.Actions>
+            <Button.Root>Продлить</Button.Root>
           </Card.Actions>
         </Card.Footer>
       </Card.Root>

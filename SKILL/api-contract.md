@@ -370,6 +370,7 @@ crumb of your own.
 | `Icon`, `createIcon` | kit icon set and domain glyphs — see Icons below |
 | `chartColors` | the chart palette as CSS values for a chart library: `series` 1…8 in order, `other`, `grid`, `axis`, `scale` — follows the theme |
 | `useTokenValue("--prime-space-7")` | a length token in px for geometry CSS cannot take (SVG coordinates, canvas, virtual rows); follows a theme switch |
+| `useMediaQuery(query, enabled?)` | whether a media query matches, live; `false` on the server and while `enabled` is `false`. Pass a named query of the kit: `COMPACT_QUERY` (below 640px, where Drawer goes full width and overlays become sheets), `OFF_CANVAS_QUERY` (below 768px, the Sidebar off-canvas), `TOUCH_QUERY`, `HOVER_QUERY`, `REDUCED_MOTION_QUERY` — a screen switches at the kit's own point with these, not a `matchMedia` of its own ([narrow screens](responsive.md#breakpoints)) |
 | `VisuallyHidden` | text for screen readers only (an icon-only part's name, a spoken count); `live="polite"` on it for an announcement (`"assertive"` only for an error that blocks) |
 
 ## Icons

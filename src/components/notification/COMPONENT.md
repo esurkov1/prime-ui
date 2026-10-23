@@ -58,7 +58,7 @@ No DOM of its own, no ref. Wraps the app once: keeps the toasts and renders thei
 | `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
 | `title` | `string` | — (required) | The message. |
 | `description` | `string` | — | Secondary text under the title. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the card; its padding, icon and text stand two steps under it (`m` → the `xs` frame). Without it the tier of the host (`notify()` sits outside any host: `m`). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the card: its padding, icon, text and buttons are the surface frame of that size, as in Card. Without it the tier of the host (`notify()` sits outside any host: `m`). |
 | `icon` | `ReactNode` | — | Replaces the tone icon. |
 | `badge` | `string \| number` | — | A counter next to the title (a `Badge` of the same `tone`). |
 | `action` | `{ label: string; onClick: () => void }` | — | One soft accent button under the text; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
@@ -75,7 +75,7 @@ The argument of `notify(options)`: what the toast shows and how it closes.
 | `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
 | `title` | `string` | — (required) | The message. |
 | `description` | `string` | — | Secondary text under the title. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the card; its padding, icon and text stand two steps under it (`m` → the `xs` frame). Without it the tier of the host (`notify()` sits outside any host: `m`). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the card: its padding, icon, text and buttons are the surface frame of that size, as in Card. Without it the tier of the host (`notify()` sits outside any host: `m`). |
 | `icon` | `ReactNode` | — | Replaces the tone icon. |
 | `badge` | `string \| number` | — | A counter next to the title (a `Badge` of the same `tone`). |
 | `action` | `{ label: string; onClick: () => void }` | — | One soft accent button under the text; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
@@ -102,18 +102,18 @@ Called inside `NotificationProvider`; returns the store: `notify(options)` shows
 | `warning` | warning icon | something needs attention soon | |
 | `danger` | danger icon | failed actions; pair with `action` to retry | |
 
-The card is always a raised surface without a border, on the surface frame two steps under its tier (header row: mark, title, description, actions); only the mark tile, the badge and the countdown take the tone. The title is one line; the description may take two lines before it is cut, as a toast's body is a message to read. Each tone forms its own stack in a position.
+The card is always a raised surface without a border, on the surface frame of its size (header row: mark, title, description, actions); only the mark tile, the badge and the countdown take the tone. The title is one line; the description may take two lines before it is cut, as a toast's body is a message to read. Each tone forms its own stack in a position.
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | the `xs` frame: padding 12, mark 32, title 13/16, description 12/16; buttons `xs` (28) | dense apps | |
-| `s` | the `xs` frame, as above | compact toasts | |
-| `m` | the `xs` frame, as above | default | yes |
-| `l` | the `s` frame: padding 16, mark 32, title 13/16, description 12/16; buttons `s` (32) | touch and large screens | |
-| `xl` | the `m` frame: padding 20, mark 40, title 14/20, description 13/20; buttons `m` (36) | touch and large screens | |
+| `xs` | padding 12, mark 32, title 13/16, description 12/16; buttons `xs` (28) | dense apps | |
+| `s` | padding 16, mark 32, title 13/16, description 12/16; buttons `s` (32) | compact toasts | |
+| `m` | padding 20, mark 40, title 14/20, description 13/20; buttons `m` (36) | default | yes |
+| `l` | padding 24, mark 48, title 16/24, description 14/20; buttons `l` (40) | touch and large screens | |
+| `xl` | padding 28, mark 56, title 18/24, description 14/20; buttons `xl` (48) | touch and large screens | |
 
-A toast stands two steps under its tier, so it never outweighs the page it floats over.
+A toast stands on the frame of its size, as a Card of the same size does.
 
 ### position
 | Value | Looks like | Use when | Default |

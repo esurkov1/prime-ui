@@ -4,6 +4,7 @@ import { Dnd, moveBefore } from "@/components/dnd/Dnd";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import type { HintTone } from "@/components/hint/Hint";
 import { Label } from "@/components/label/Label";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -114,10 +115,11 @@ export type FieldListProps<T extends object> = Omit<FieldRootDomProps, "onChange
   columns: readonly FieldListColumn[];
   renderItem: (item: T, row: FieldListRow<T>) => React.ReactNode;
   renderTotals?: (items: readonly T[]) => React.ReactNode;
-  createItem?: () => T;
+  createItem?: () => T | Promise<T>;
   addLabel?: string;
   getLabel?: (item: T) => string;
   getLocked?: (item: T) => boolean;
+  getLockedReason?: (item: T) => string | undefined;
   reorderable?: boolean;
   stackedLabels?: boolean;
   hideHeadings?: boolean;
@@ -271,6 +273,7 @@ export function FieldList<T extends object>({
   addLabel,
   getLabel,
   getLocked,
+  getLockedReason,
   reorderable = false,
   stackedLabels = true,
   hideHeadings = false,
@@ -309,16 +312,31 @@ export function FieldList<T extends object>({
   // Read synchronously: two edits in one handler chain on each other.
   const latest = React.useRef(items);
   latest.current = items;
+  // An add that waits for its item reports to the handler of the render that finishes it.
+  const onChange = React.useRef(onValueChange);
+  onChange.current = onValueChange;
   const setItems = (edit: (current: readonly T[]) => T[]) => {
     const next = edit(latest.current);
     latest.current = next;
-    const outcome = onValueChange?.(next);
+    const outcome = onChange.current?.(next);
     if (!isPromiseLike(outcome)) {
       setStored(next);
       return;
     }
     changes.track(next, outcome, { onResolve: () => setStored(next) });
   };
+  // A row `createItem` is still making (its promise): drawn as a placeholder in the row's geometry
+  // until the item arrives; one at a time.
+  const [creating, setCreating] = React.useState(false);
+  const alive = React.useRef(true);
+  React.useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
+  // Rows that took the place of their placeholder: the item arrives in place, it does not rise in.
+  const arrived = React.useRef(new Set<string>());
   const ids = useFieldFrame(undefined, { label, hint, error });
   // The list is named by the visible label, else by the consumer's `aria-labelledby` / `aria-label`,
   // and described by the list's hint and error, which speak for every row.
@@ -326,7 +344,7 @@ export function FieldList<T extends object>({
     "aria-labelledby": ids.labelledBy ?? ariaLabelledBy,
     "aria-label": ids.labelledBy || ariaLabelledBy ? undefined : ariaLabel,
     "aria-describedby": ids.describedBy,
-    "aria-busy": busy || undefined,
+    "aria-busy": busy || creating || undefined,
   };
   const addRef = React.useRef<HTMLButtonElement>(null);
   const rows = React.useRef(new Map<string, HTMLElement>());
@@ -374,7 +392,8 @@ export function FieldList<T extends object>({
   } as React.CSSProperties;
   // The heading row comes with the first row and leaves with the last one; `hideHeadings` drops it
   // (the fields keep the column names as their accessible names).
-  const hasHead = items.length > 0 && !single && !hideHeadings;
+  const shownCount = items.length + (creating ? 1 : 0);
+  const hasHead = shownCount > 0 && !single && !hideHeadings;
   const head = usePartPresence<HTMLDivElement>({ present: hasHead, axis: "block" });
   const totalCells = renderTotals && items.length > 0 ? totalsOf(renderTotals(items)) : null;
   if (totalCells && totalCells.length !== columns.length)
@@ -392,7 +411,7 @@ export function FieldList<T extends object>({
     const cells = bodyRef.current?.querySelector("[data-fl-cells]")?.children;
     setEndColumns(columns.map((_, column) => (endsText(cells?.[column]) ? "1" : "0")).join(""));
   });
-  const atMax = max !== undefined && items.length >= max;
+  const atMax = max !== undefined && shownCount >= max;
   const atMin = items.length <= min;
   // A full list has nothing to offer: the add button closes up in place and comes back once a row
   // leaves (a limit the person should know is the consumer's `hint`).
@@ -500,12 +519,44 @@ export function FieldList<T extends object>({
 
   const isLocked = (item: T | undefined) => (item ? (getLocked?.(item) ?? false) : false);
 
-  const add = () => {
-    if (!createItem || atMax || disabled) return;
-    const item = createItem();
+  /** Focus follows an async add only while it is still with the add button (or nowhere). */
+  const focusIsFree = () =>
+    document.activeElement === document.body || document.activeElement === addRef.current;
+
+  const append = (item: T, quiet: boolean) => {
     const id = getId(item);
+    if (quiet) arrived.current.add(id);
     focusNext.current = { id, part: "first" };
     setItems((current) => [...current, item]);
+  };
+
+  const add = () => {
+    if (!createItem || atMax || disabled || creating) return;
+    const made = createItem();
+    if (!isPromiseLike(made)) {
+      append(made, false);
+      return;
+    }
+    setCreating(true);
+    (made as PromiseLike<T>).then(
+      (item) => {
+        if (!alive.current) return;
+        const free = focusIsFree();
+        setCreating(false);
+        if (free) append(item, true);
+        else {
+          arrived.current.add(getId(item));
+          setItems((current) => [...current, item]);
+        }
+      },
+      () => {
+        // Nothing was made: the placeholder goes and the add button is where focus was. The owner
+        // says why through `error`, as for a refused `onValueChange`.
+        if (!alive.current) return;
+        if (focusIsFree()) focusNext.current = { id: null, part: "first" };
+        setCreating(false);
+      },
+    );
   };
 
   const remove = (id: string) => {
@@ -563,7 +614,7 @@ export function FieldList<T extends object>({
         `FieldList: row "${id}" renders ${cells.length} cells for ${columns.length} columns`,
       );
     // Every row has the same slots: a pinned row's remove is there, off, and says why.
-    const reason = locked && !disabled ? labels.lockedReason : null;
+    const reason = locked && !disabled ? getLockedReason?.(item) || labels.lockedReason : null;
     const removeOff = disabled || atMin || locked;
     let action: React.ReactNode;
     if (menu) {
@@ -703,7 +754,7 @@ export function FieldList<T extends object>({
         // A list on its own fill draws lines between its rows; a plain one only once they stack
         // (its one-line rows are parted by air: FieldList.module.css).
         hairline.between,
-        presence.entering.has(id) && enterMotion.enter,
+        presence.entering.has(id) && !arrived.current.has(id) && enterMotion.enter,
       ),
       style: trackStyle,
       "data-size": size,
@@ -728,7 +779,7 @@ export function FieldList<T extends object>({
       className={styles.sheet}
       data-variant={variant}
       data-depth={surface ? depth : undefined}
-      data-empty={items.length === 0 || undefined}
+      data-empty={shownCount === 0 || undefined}
     >
       {hasHead ? (
         <div
@@ -792,6 +843,34 @@ export function FieldList<T extends object>({
           {items.map(renderRow)}
         </ol>
       )}
+      {creating ? (
+        // The row being made: the cells' geometry in placeholders, replaced in place by the item.
+        <ol className={styles.rows} aria-hidden="true" data-fl-creating="">
+          <li
+            className={cx(fieldTierClass, styles.row, styles.record, hairline.between)}
+            style={trackStyle}
+            data-size={size}
+            data-single={single || undefined}
+            data-unlabelled={cellLabels === "always" || undefined}
+          >
+            <div className={styles.cells}>
+              {columns.map((column, index) => (
+                <div
+                  // biome-ignore lint/suspicious/noArrayIndexKey: a cell is its column
+                  key={index}
+                  className={styles.cell}
+                  data-width={column.width ?? "fill"}
+                  data-place={places[index]}
+                >
+                  <Skeleton shape="control" />
+                </div>
+              ))}
+            </div>
+            <span className={styles.end} />
+            {grip ? <GripBox /> : null}
+          </li>
+        </ol>
+      ) : null}
       {totalCells ? (
         // biome-ignore lint/a11y/useSemanticElements: a row of figures, not a form fieldset
         <div

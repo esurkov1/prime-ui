@@ -179,7 +179,7 @@
 /* ---------- Card ---------- */
 
 /*
- * The card is a header row on the surface frame two steps under its tier (padding, radius, mark, title and
+ * The card is a header row on the surface frame of its size (padding, radius, mark, title and
  * description roles: internal/surfaceFrame, internal/headerRow): the tone tile, the title with its
  * badge, the description, the action under the text, the close button at the end.
  */

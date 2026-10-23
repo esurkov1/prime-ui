@@ -584,6 +584,52 @@
         "Every row is one subject line and one description line; nothing wraps and the row has no own Divider",
         "The rows are List.Item (with current), not ghost Buttons and not Cards"
       ]
+    },
+    {
+      "id": 47,
+      "prompt": "В настройках «Работы» нужен список видов работ с переключателями «Показывать в заказе». Виды работ можно переставлять.",
+      "expected_output": "A List (or Dnd rows of Switch.Root fullWidth) where every switch ends its row; a «Изменить порядок» button toggles to «Готово», and in that mode onReorder is passed, the switches are not rendered and the grips stand at the trailing edge.",
+      "files": [],
+      "expectations": [
+        "The Switch is at the end of its row (List.ItemActions without side=\"start\", or Switch.Root fullWidth with its label first)",
+        "Reordering is a mode toggled by a button «Изменить порядок» / «Готово»; outside it rows have no grip",
+        "In the reorder mode the switches are gone and the grips take their place; a row never shows a switch and a grip together",
+        "No switch leads a row or stands between the label and the grip"
+      ]
+    },
+    {
+      "id": 48,
+      "prompt": "Сделай Drawer заявки: заголовок с номером #678, имя клиента, строка с данными, статус «Новая», ответственный Анна Котова — оба меняются прямо в шапке.",
+      "expected_output": "A Drawer.Header: Drawer.Title number, a one-line Drawer.Description, plain Drawer.Badges, and the status and the assignee as value Select.Root at the dialog's tier inside Drawer.Actions.",
+      "files": [],
+      "expectations": [
+        "The status and the assignee are Select.Root in Drawer.Actions, not a Badge.Root inside a Dropdown.Trigger",
+        "Drawer.Badges holds only plain badges (channel, flag), not the two pickers",
+        "The number is Drawer.Title number, not text in the description",
+        "No static line under the header"
+      ]
+    },
+    {
+      "id": 49,
+      "prompt": "В шапке Drawer приглашения сотрудника единственное действие — «Удалить приглашение». Добавь его.",
+      "expected_output": "Drawer.Actions holds a «Ещё» icon Button in a Dropdown.Trigger with one danger item «Удалить приглашение» that opens a ConfirmDialog; the delete is not an icon button in sight.",
+      "files": [],
+      "expectations": [
+        "The delete is the danger item of a «Ещё» Dropdown, even though it is the only action",
+        "It opens a ConfirmDialog (async onConfirm) and does not run on the first press",
+        "There is no stand-alone delete icon button in Drawer.Actions"
+      ]
+    },
+    {
+      "id": 50,
+      "prompt": "Шапка Drawer заказа: выбор статуса, выбор ответственного, кнопки «Диалог» и «Копировать», «Ещё». Drawer должен нормально выглядеть на телефоне 320px.",
+      "expected_output": "On a phone (useMediaQuery(COMPACT_QUERY)) the header keeps one picker and «Ещё»; the second picker and the other buttons move into the body, the footer or the «Ещё» menu by the screen's own code.",
+      "files": [],
+      "expectations": [
+        "The narrow variant is chosen with useMediaQuery(COMPACT_QUERY), not a window.matchMedia of its own",
+        "On a narrow surface the header shows one picker and «Ещё», not two pickers and several buttons",
+        "The screen does not rely on the kit to move buttons into «Ещё» by itself"
+      ]
     }
   ]
 }

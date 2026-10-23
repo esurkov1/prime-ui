@@ -34,6 +34,8 @@ everything inside a page breaks by its container.
 | 1024–1279 | laptop | gutters 32 |
 | ≥ 1280 | desktop | extra columns or a side panel; tables and dashboards use every pixel |
 
+- A screen that switches its own structure at the kit's point (one picker instead of two, a list
+  instead of a table) reads `useMediaQuery(COMPACT_QUERY)`, not a `matchMedia` of its own.
 - Write "below 640" as `@media (max-width: 639px)`, "from 640" as `@media (min-width: 640px)`.
 - CSS custom properties cannot be used inside media / container conditions: write the number.
 - Inside your own blocks prefer container queries: `container-type: inline-size` on the block,
@@ -73,7 +75,7 @@ Use these as they are; never wrap them in your own breakpoints.
 | system messages | Banner actions move under the text in a narrow container; Notification stays within the viewport with safe-area insets. Every edge part (BottomNav, `Page.TopBar`, `AppShell.Fab`, Drawer, a centred Modal, Sheet, the off-canvas Sidebar, Notification, MediaViewer) reads `--prime-safe-area-top` / `-right` / `-bottom` / `-left` (default `env(safe-area-inset-*)`): an app whose host covers the web view (a Telegram Mini App in full screen) sets them on `:root` once |
 | chat | `Message` bubbles fit their content in CSS and cap at 30rem and 85% of the chat column, file / contact / location cards at 16rem and 75%, a round video at its size token × 1.15 and the row width (the Composer's recording preview at 70%), so a chat works from 320px; the message menu is a bottom sheet below 640, the reaction bar opens on a long press; `Composer` takes its container's width, keeps 16px text and 44px hit areas on touch, and the recording bar covers the field without changing the row height; `VoicePlayer` shrinks its waveform to fit; `Chat` fills its pane, a chat beside its dialogs is `Page.Split` (one pane at a time when narrow); `Chat.Header` keeps the avatar, a title that truncates and icon-only actions, `Chat.Search` puts its counter and arrows after a shrinking field, `Chat.Pinned` truncates its line, the «к последним» button floats inside the thread at its bottom-end, and the Composer stays one row (paperclip · field · button) from 320px with its bars above it |
 | schedules and boards | `Gantt` scrolls inside itself with the header and the first column pinned; the first column narrows (12 → 10 → 6rem by the chart's width, or only the avatar); a long press on touch creates a one-unit bar; rows and days are virtualized. `Kanban` columns are 18rem from 40rem of board width, below that 85% of it with snapping so the next column peeks; the strip scrolls sideways inside the board |
-| cards and properties | a `Card` never wraps — every header line and body row is one line cut with an ellipsis, the title gives way first, then the badges fold into «+N», and a narrow footer sends its buttons under the start part to share the width; a `Kpi` never wraps — its texts cut with an ellipsis, the value last, while `Kpi.Actions` keep their corner; `DescriptionList` stacks label over value below 24rem of its width; FileUpload `layout="grid"` shows 5 · 4 · 3 · 2 tiles across by its own width |
+| cards and properties | a `Card` never wraps — every header line and body row is one line cut with an ellipsis, the title gives way first, then the badges fold into «+N», then the header's controls drop to a line of their own ([a narrow header](#a-narrow-header)), and a narrow footer sends its buttons under the start part to share the width; a `Kpi` never wraps — its texts cut with an ellipsis, the value last, while `Kpi.Actions` keep their corner; `DescriptionList` stacks label over value below 24rem of its width; FileUpload `layout="grid"` shows 5 · 4 · 3 · 2 tiles across by its own width |
 | fields | text ≥ 16px under a coarse pointer (no iOS zoom on focus); labels above fields; affixes in the field row |
 | codes | DigitInput cells 36–64px, `fullWidth` cells share a phone column |
 | touch | hover effects only under `(hover: hover)`; under `(pointer: coarse)` small controls get a 44px hit area; nothing is hover-only |
@@ -266,6 +268,75 @@ your own does the same: container width, the legend wraps under it, axis labels 
 
 **Media.** `width` + `height` or `aspect-ratio` on every image and video, `max-width: 100%`; raster
 images with `srcset` + `sizes` (Thumbnail and Avatar already reserve their box).
+
+### A narrow header
+
+The header row of a surface (Card, Drawer, Modal, Sheet, Chat, ChartFrame) gives way in a fixed
+order: the title shrinks to a floor (its own text, at most 8em), the badges fold into «+N», and when
+the controls no longer fit beside the title they drop, as one row, to a line of their own under it.
+A dialog's «×» never moves. The kit does not shrink a picker or move a button into «Ещё» — that is
+the screen's choice: on a narrow surface keep one picker and «Ещё», and move the second picker or
+action into the body or the footer. Read the kit's own point with `useMediaQuery(COMPACT_QUERY)`,
+never a `matchMedia` of your own ([hooks](api-contract.md#providers-and-helpers)).
+
+```tsx partial
+// bad — two pickers and three buttons in a header of 320px: the controls drop to a second and a third line
+<Drawer.Actions>
+  <Select.Root aria-label="Статус">…</Select.Root>
+  <Select.Root aria-label="Ответственный">…</Select.Root>
+  <Button.Root aria-label="Диалог">…</Button.Root>
+  <Button.Root aria-label="Копировать">…</Button.Root>
+  <Button.Root aria-label="Ещё">…</Button.Root>
+</Drawer.Actions>
+```
+
+```tsx good
+// declare: const compact: boolean
+// declare: const assignee: string
+// declare: const setAssignee: (id: string) => void
+// good — one picker and «Ещё» in the header; the second picker goes to the body on a phone
+<>
+  <Drawer.Actions>
+    {compact ? null : (
+      <Select.Root aria-label="Ответственный" value={assignee} onValueChange={setAssignee}>
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="kotova">Анна Котова</Select.Item>
+        </Select.Content>
+      </Select.Root>
+    )}
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <Button.Root variant="ghost" tone="neutral" aria-label="Ещё">
+          <Button.Icon>
+            <Icon name="action.more" />
+          </Button.Icon>
+        </Button.Root>
+      </Dropdown.Trigger>
+      <Dropdown.Content>
+        <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown.Root>
+  </Drawer.Actions>
+  <Drawer.Body>
+    {compact ? (
+      <Select.Root aria-label="Ответственный" value={assignee} onValueChange={setAssignee}>
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="kotova">Анна Котова</Select.Item>
+        </Select.Content>
+      </Select.Root>
+    ) : null}
+  </Drawer.Body>
+</>
+```
+
+`List.ItemActions` of a narrow row follow the same logic: when they would leave the text under 96px
+they drop under it, so a row keeps its name readable instead of clipping it.
 
 ## Interaction and accessibility
 

@@ -70,7 +70,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Sheet.Header
-`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each, nothing wraps.
+`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each; a row too full drops `Actions` under the title, the close button stays on top.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -79,7 +79,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Sheet.Actions
-`ref` → `HTMLDivElement`. Header: a tab-wide switcher or picker (`SegmentedControl`, `Select`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line. In `Sheet.Footer`: the start group.
+`ref` → `HTMLDivElement`. Header: a tab-wide switcher or picker (`SegmentedControl`, `Select`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight). In `Sheet.Footer`: the start group.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -199,7 +199,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - A sheet is a short task that ends by itself — a pick, a tap on an action, a swipe down. Its zones follow the task, not a template:
   - **No footer by default.** A footer only for a form with an explicit submit: «Отмена» (`Sheet.Close`, soft neutral) and the submit (solid, last; `type="submit" form={formId}`).
   - **The header is optional.** Keep it when the content needs a title to be understood (a list of actions on «Заказ № 1042»). Drop it — and with it the ×, when the content speaks for itself (a calendar opened from a «Дата отгрузки» button): name the sheet with `aria-label` on `Sheet.Content`.
-- The header has one anatomy, the same in every modal, drawer and sheet and on a Card — the header row of the kit at frame `l` (title 16/24, description 14/20, mark 48), one line each, nothing wraps; no line parts it from the body:
+- The header has one anatomy, the same in every modal, drawer and sheet and on a Card — the header row of the kit at frame `l` (title 16/24, description 14/20, mark 48), one line each; no line parts it from the body:
   ```
   (mark)  Александра #678  [Telegram] [VIP] [+1]       [Статус ⌄] [Анна Котова ⌄] [⋯] [×]
           ● Новая · Аренда байка Пхукет · заявка 19 сент, 06:37
@@ -208,7 +208,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
   - `Sheet.Description` under the title: the record's context in plain text, one line with an ellipsis in a record header; a `StatusDot` may stand first for the record's state. The whole text stays the dialog's description. A number never goes here.
   - `Sheet.Badges` after the title, on its line, 6 apart: one container for every badge of the record (a status, a channel, a counter — the meaning is the badge's `tone` or `color`), chip tier `s`. The title gives way to its text (or 8em) first, then what does not fit waits behind «+N», whose tooltip lists it. A picker of a status or a person is a `Select` in `Sheet.Actions`, never a badge.
   - The header places the parts whatever the order in code; write them in the order Icon, Title, Badges, Description, Actions anyway.
-  - end — `Sheet.Actions`: first one switcher or value picker for the whole open tab (a `SegmentedControl`, a `Datepicker` period, a `Select` of the status or the assignee), then neutral buttons — icon buttons with a Tooltip — and a ⋯ Dropdown for the rest, all at the dialog's control tier (the close button's), centred on the title line; with a footer only the picker and «Ещё» stay in the header, the accent button stands in the footer, a danger action lives in «Ещё» behind a ConfirmDialog. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
+  - end — `Sheet.Actions`: first one switcher or value picker for the whole open tab (a `SegmentedControl`, a `Datepicker` period, a `Select` of the status or the assignee), then neutral buttons — icon buttons with a Tooltip — and a ⋯ Dropdown for the rest, all at the dialog's control tier (the close button's), centred on the title line. The title keeps a floor (its text, at most 8em): when the mark, the floor and the controls no longer fit one row, the whole row of `Sheet.Actions` drops to a line of its own under the title, starting at the row's start edge, and wraps only if it is wider than the sheet; the × never moves, it stays at the top end. The kit does not move your buttons into a menu — keep one picker and the ⋯ and put the other buttons in the ⋯ `Dropdown` yourself; with a footer only the picker and «Ещё» stay in the header, the accent button stands in the footer, a danger action lives in «Ещё» behind a ConfirmDialog. Each child keeps its cell by its place: another control in the same place cross-fades inside the cell, a control rendered only on some tabs rises in and closes up.
   - `Sheet.Icon` is optional, the header row's mark (48): a glyph on the tone tile, or a picture (`Avatar.Root`, `Thumbnail.Root`) with no tile.
   - A question or a form keeps a plain header: its title and description wrap; only an `Sheet.Icon`, `Sheet.Badges` or a `number` make it a record header, whose lines are one line each.
 - A form's action apart from its submit pair: `Sheet.Actions` inside `Sheet.Footer` puts it at the start, at the footer's tier; stacked on a phone it comes first and the primary stays last.
@@ -275,6 +275,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - A status `Badge` in the header's `Sheet.Actions`, or inside `Sheet.Description` → put it in `Sheet.Badges`, after the title (or a `StatusDot` first in the description): the kit sizes it and keeps the row on one line.
 - The badges under the text, or the record number in `Sheet.Description` → `Sheet.Title number`, `Sheet.Badges` after it on its line, `Sheet.Description` under.
 - A long name wrapped onto two title lines in a record header → it is one line with an ellipsis; the whole name stays the dialog's name.
+- Four icon buttons and two pickers in `Sheet.Actions` → they drop to a second line, three lines at 320 px; keep one picker and the ⋯ in the header and move the other buttons into the ⋯ `Dropdown` — the kit moves nothing into a menu for you.
 - A control that applies to the whole tab (the text language, the period) repeated in section headings or put in one section → one switcher in the header's `Sheet.Actions`, before the buttons, rendered only on the tabs it applies to.
 - A Badge with its own `size` in `Sheet.Badges` → leave `size` out: the row gives every header the same chip tier.
 - A `Skeleton` placed by hand in `Sheet.Title` or `Sheet.Description` → their `loading`.

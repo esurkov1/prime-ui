@@ -8,13 +8,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { headerRowStyles, useTitleFloor } from "@/internal/headerRow";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
-import {
-  type ControlSize,
-  cardMarkSize,
-  stepDown,
-  type Tone,
-  tierMappings,
-} from "@/internal/states";
+import { type ControlSize, cardMarkSize, type Tone, tierMappings } from "@/internal/states";
 import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "@/internal/surfaceFrame";
 
 import styles from "./Notification.module.css";
@@ -172,10 +166,9 @@ function CardView({
   const labels = React.useContext(NotificationLabelsContext);
   const tier = useHostTier(sizeProp);
   const size = tier.size;
-  // A toast floats over a page of small text: it stands two steps under its tier (m → the xs
-  // frame: 12 padding, a 13/16 title, a 32 mark, 28 controls), so it never outweighs the page.
-  const frame = stepDown(size, 2);
-  const controlTier = frame;
+  // The toast stands on the frame of its own size, as a Card does: each size reads apart.
+  const frame = size;
+  const controlTier = size;
   const titleRef = React.useRef<HTMLParagraphElement>(null);
   useTitleFloor(titleRef);
   const liveRole = tone === "danger" || tone === "warning" ? "alert" : "status";

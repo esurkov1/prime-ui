@@ -36,7 +36,7 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
    ├─ List.ItemMeta         trailing small text (time, date, amount)
    ├─ List.ItemCount        trailing Badge, one tier down
    └─ List.ItemActions      the row's own controls (Switch, Dropdown): beside the row element, one tier down;
-                             side="end" after it, side="start" before it (a reorderable row's toggle)
+                             side="end" after it (a switch always ends the row), side="start" before it
 ```
 
 ## API
@@ -124,7 +124,7 @@ List.Root                   <ul aria-label>; size (else the host tier) → row t
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `side` | `"start" \| "end"` | `"end"` | `"end"` after the row element: a plain settings row, label first. `"start"` before it, in the DOM too: the on / off of a reorderable row reads first and the grip keeps the end. |
+| `side` | `"start" \| "end"` | `"end"` | `"end"` after the row element: a switch or a menu, label first; a switch always ends its row. `"start"` before it, in the DOM too: a control that leads the row (a selection checkbox), never a switch. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the controls, each named on its own), `className` and the other `div` attributes. |
 
 ## Variants
@@ -153,8 +153,8 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 ### List.ItemActions side
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `end` | the controls after the row's text and trail | a plain row: the label first, the toggle or ⋯ menu at the end | yes |
-| `start` | the controls before the row's icon and text, first in the DOM and the Tab order | a reorderable row's on / off: the state reads first, the grip keeps the end edge | |
+| `end` | the controls after the row's text and trail | a switch or a ⋯ menu: the label first, the control at the end | yes |
+| `start` | the controls before the row's icon and text, first in the DOM and the Tab order | a control that leads the row (a selection checkbox) — never a switch | |
 
 ## States
 | State | Driven by | DOM |
@@ -184,7 +184,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - Reorderable (`onReorder`): an `xs` handle box ends each row, 4px after the row element and its `List.ItemActions` (inline-end: on the left in RTL); the row keeps its own padding and fill, so every row's handle stands on one line.
 - `List.ItemActions`: the controls one tier below the row, 4px apart, as far from the row's side edge as the row's own text (`--field-px`) — at any row height, so one-line and two-line rows stand on one vertical. The end edge, or the start edge with `side="start"`, where the row's own padding then parts the controls from its icon or text. A row with no `onClick`, `href` or `asChild` is a static `<div>` (no Tab stop, no hover wash) with the same parts and controls. Parts may be passed inside a fragment.
 - A locked row keeps every column of the movable rows: its `List.ItemActions` on the same side, the lock in the grip's box. System stages and the team's stages are one list, not two.
-- One toggle place per row: a plain row ends with its toggle (label first); a reorderable row leads with it (`side="start"`) and ends with the grip — never a toggle between the label and the grip.
+- A switch always ends its row (label first). Reordering is a mode of the list: while it is on, `onReorder` is passed, the rows render no switch and the grips stand at the end in its place — never a switch and a grip in one row.
 - A colour dot in `List.ItemIcon` is the large `Badge.Dot` (8px) centred in an icon-wide box, so the text lines up with the rows that carry icons.
 
 ## Accessibility
@@ -234,7 +234,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 | [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients, icons of queues and colour dots of projects; an avatar takes the row tier, a dot stands in an icon-wide box — `List.ItemIcon`, `Badge.Dot`. |
 | [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. |
 | [as-link.tsx](examples/as-link.tsx) | Rows as links to the invoice pages: a plain link, or your router link through the slot — `href`, `asChild`. |
-| [reorder.tsx](examples/reorder.tsx) | Funnel stages in one list: the team's stages move by the handle or Alt+arrows and are saved on the server, the system ones hold their places with a lock where the grip is; the switch leads every row, the grip ends it — `onReorder`, `value`, `locked`, `side`. |
+| [reorder.tsx](examples/reorder.tsx) | Funnel stages in one list: the switches end the rows; a reorder mode swaps them for the grips, the team's stages move by the grip or Alt+arrows and are saved on the server, the system ones hold their places with a lock — `onReorder`, `value`, `locked`, `List.ItemActions`. |
 | [row-controls.tsx](examples/row-controls.tsx) | Funnel stages with their own controls: a colour dot names the stage's hue, a switch shows it on the board and a menu edits it, all beside the row that opens the stage — `List.ItemActions`, `Badge.Dot`. |
 
 ## Mistakes
@@ -247,7 +247,7 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - `onReorder` that rolls the order back itself on an error → return the promise; a rejection moves the row back.
 - A Switch or a menu button put inside a row, or a row rebuilt as a `div` to hold one → `List.ItemActions` beside the row element.
 - System stages in a list of their own above or below the movable ones, or `disabled` to pin them (it dims the row and lets neighbours pass) → one list, `locked` on the system rows.
-- A Switch at the end of a reorderable row, between its label and the grip → `List.ItemActions side="start"`; the grip keeps the end.
+- A Switch that leads a row, or stands between the label and the grip → the switch ends the row; reordering is a «Изменить порядок» / «Готово» mode in which the switches leave and the grips take their place ([reorder.tsx](examples/reorder.tsx)).
 - A hollow `Icon` circle or a hand-drawn dot as a stage colour → `Badge.Dot color` in `List.ItemIcon`.
 
 ## Related

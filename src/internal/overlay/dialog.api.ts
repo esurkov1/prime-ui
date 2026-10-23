@@ -164,8 +164,8 @@ export function dialogParts(
   return [
     {
       name: `${name}.Header`,
-      en: "`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each, nothing wraps.",
-      ru: "`<header>` — строка шапки кита, фрейм `l`, без линии под ней: [Icon] [Title + Badges / Description] [Actions] [кнопка закрытия]. Каждое — в одну строку, ничего не переносится.",
+      en: "`ref` → `HTMLElement`. `<header>`, the kit's header row, frame `l`, no line under it: [Icon] [Title + Badges / Description] [Actions] [close button]. One line each; a row too full drops `Actions` under the title, the close button stays on top.",
+      ru: "`<header>` — строка шапки кита, фрейм `l`, без линии под ней: [Icon] [Title + Badges / Description] [Actions] [кнопка закрытия]. Каждое — в одну строку; у заголовка есть минимум (до 8em), тесная строка роняет `Actions` под него; кнопка закрытия остаётся наверху в конце.",
       props: [
         {
           name: "showClose",
@@ -190,8 +190,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Actions`,
-      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher or picker (\`SegmentedControl\`, \`Select\`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group.`,
-      ru: `Шапка: переключатель вкладки или выбор (\`SegmentedControl\`, \`Select\`), затем кнопки и меню ⋯, ярус диалога, в конце строки заголовка${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале.`,
+      en: `\`ref\` → \`HTMLDivElement\`. Header: a tab-wide switcher or picker (\`SegmentedControl\`, \`Select\`), then buttons and the ⋯ menu, at the dialog's tier, at the end of the title line (under it if too tight)${section ? `; at the end of a \`${name}.Section\` heading` : ""}. In \`${name}.Footer\`: the start group.`,
+      ru: `Шапка: переключатель вкладки или выбор (\`SegmentedControl\`, \`Select\`), затем кнопки и меню ⋯, ярус диалога, в конце строки заголовка (под заголовком, когда не помещаются)${section ? `; в конце заголовка \`${name}.Section\`` : ""}. В \`${name}.Footer\` — группа в начале.`,
       props: [
         {
           name: "…rest",

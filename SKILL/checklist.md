@@ -58,7 +58,8 @@ checks.
 ## Sizes and alignment
 - [ ] Default size `m`; a tier changes for a whole region, never for one control ([the host tier](api-contract.md#size-and-the-host-tier)).
 - [ ] Every row of controls uses one size and its heights line up ([density](composition.md#5-density-and-size)).
-- [ ] A reorderable row's toggle leads it and the grip ends it; a plain settings row ends with its toggle ([list rows](composition.md#list-rows)).
+- [ ] A switch ends its row; reordering is a «Изменить порядок» / «Готово» mode where the switches leave and the grips take their place ([list rows](composition.md#list-rows)).
+- [ ] A destructive action is the last item of «Ещё» behind a `ConfirmDialog`, even when it is the only action; a «⋯» with one harmless item is still wrong ([a menu from two actions](composition.md#a-menu-from-two-actions)).
 - [ ] Controls in table cells are one tier below the table; no CSS sets row or cell heights ([size axis](foundations.md#3-size-axis)).
 - [ ] A chip in one row with controls is two sizes up (`l` beside `xs`, `xl` beside `s`); beside `m` and larger the whole row is fields ([chips beside fields](foundations.md#chips-beside-fields)).
 - [ ] Marks of one row or list (avatar, thumbnail, ring, icon tile) have one diameter, matched by the scale, not the size name; no `size` on a mark in a mark slot ([marks side by side](foundations.md#marks-side-by-side)).
@@ -123,6 +124,7 @@ checks.
 - [ ] A chip picker (`Select variant="status"`, a `Badge.Root` in a `Dropdown.Trigger`) is only in a dense row or a table cell; on a surface it is a `Select` at the controls' tier ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
 - [ ] No static line between the zones of a surface; only a scrolled region shows an edge cue ([headers and rows](ux.md#headers-and-rows-of-a-surface)).
 - [ ] A record's dialog header is the title with its number and badges on one line, a one-line description, and `Select` pickers and «Ещё» in its actions ([a record in a drawer](composition.md#a-record-in-a-drawer)).
+- [ ] On a narrow surface the header keeps one picker and «Ещё»; the second picker or action moves to the body or the footer by the screen's own choice, read from `useMediaQuery(COMPACT_QUERY)` ([a narrow header](responsive.md#a-narrow-header)).
 - [ ] A card draws no line between its zones, and its photo is a `Carousel` in `Card.Media` ([a card drawn by hand](anti-slop.md#3b-a-card-drawn-by-hand)).
 - [ ] A KPI made of parts names them in `Kpi.Legend` inside `Kpi.Footer`, never with the bar's `legend` in `Kpi.Media` ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).
 - [ ] No text of a KPI card wraps or leaves it: a long title or note is shortened, never wrapped or the card widened ([KPI cards on a screen](composition.md#kpi-cards-on-a-screen)).

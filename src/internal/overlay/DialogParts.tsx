@@ -26,7 +26,13 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { hasContent } from "@/internal/hasContent";
-import { HeaderLineContent, HeaderRowContent, headerRowStyles } from "@/internal/headerRow";
+import {
+  clearTitleFloor,
+  HeaderLineContent,
+  HeaderRowContent,
+  headerRowStyles,
+  setTitleFloor,
+} from "@/internal/headerRow";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import { useMediaSlotHost } from "@/internal/mediaSlot";
@@ -555,9 +561,6 @@ function useCutLineTitle<T extends HTMLElement>(
   useResizeEffect(ref, sync);
 }
 
-/** The longest a title gives way to its badges: its own text, at most this many `em`. */
-const TITLE_MIN_EM = 8;
-
 /**
  * The floor a record title keeps beside its badges (`--header-title-min`, read by the header row):
  * its name and its number, or 8em when they are longer. The number never gives way, so the floor
@@ -572,13 +575,8 @@ function useNumberedTitleFloor(
     const node = title.current;
     const text = name.current;
     if (!node || !text) return;
-    node.style.removeProperty("--header-title-min");
-    const em = Number.parseFloat(getComputedStyle(node).fontSize) || 0;
-    const full = text.scrollWidth + (number.current?.offsetWidth ?? 0);
-    node.style.setProperty(
-      "--header-title-min",
-      `${Math.ceil(Math.min(full, em * TITLE_MIN_EM))}px`,
-    );
+    clearTitleFloor(node);
+    setTitleFloor(node, text.scrollWidth + (number.current?.offsetWidth ?? 0));
   });
 }
 
@@ -804,35 +802,35 @@ export function DialogHeader({
   return (
     <header ref={ref} className={cx(styles.header, className)} {...rest}>
       <DialogHeaderContext value={context}>
-        <div className={headerRowStyles.header} data-lines={description.length > 0 ? "two" : "one"}>
-          <HeaderRowContent
-            mark={icon}
-            title={title}
-            badges={badges}
-            description={description}
-            end={
-              actions.length > 0 || showClose ? (
-                <div className={headerRowStyles.end}>
-                  {actions}
-                  {showClose ? (
-                    <Button.Root
-                      variant="ghost"
-                      tone="neutral"
-                      type="button"
-                      aria-label={closeLabel}
-                      className={styles.close}
-                      disabled={busy}
-                      onClick={onClose}
-                    >
-                      <Button.Icon>
-                        <Icon name="action.close" tone="secondary" />
-                      </Button.Icon>
-                    </Button.Root>
-                  ) : null}
-                </div>
-              ) : null
-            }
-          />
+        <div className={styles.row} data-close={showClose || undefined}>
+          <div
+            className={headerRowStyles.header}
+            data-lines={description.length > 0 ? "two" : "one"}
+            data-whole={extra.length === 0 || undefined}
+          >
+            <HeaderRowContent
+              mark={icon}
+              title={title}
+              badges={badges}
+              description={description}
+              end={actions.length > 0 ? <div className={headerRowStyles.end}>{actions}</div> : null}
+            />
+          </div>
+          {showClose ? (
+            <Button.Root
+              variant="ghost"
+              tone="neutral"
+              type="button"
+              aria-label={closeLabel}
+              className={styles.close}
+              disabled={busy}
+              onClick={onClose}
+            >
+              <Button.Icon>
+                <Icon name="action.close" tone="secondary" />
+              </Button.Icon>
+            </Button.Root>
+          ) : null}
         </div>
         {extra}
       </DialogHeaderContext>
@@ -876,7 +874,12 @@ export function DialogActions({ className, children, ...rest }: DialogActionsPro
     );
   }
   return (
-    <div className={cx(fieldTierClass, styles.actions, className)} data-size={tier.size} {...rest}>
+    <div
+      className={cx(fieldTierClass, styles.actions, className)}
+      data-size={tier.size}
+      data-zone={inHeader ? "header" : undefined}
+      {...rest}
+    >
       {tier.provide(<RowCells align="end">{children}</RowCells>)}
     </div>
   );

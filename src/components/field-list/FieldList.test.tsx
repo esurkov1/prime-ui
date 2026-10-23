@@ -252,6 +252,109 @@ describe("FieldList", () => {
     expect(fields[2]).toHaveFocus();
   });
 
+  it("keeps a placeholder row while createItem's promise is pending, then the item takes its place and focus", async () => {
+    const user = userEvent.setup();
+    let settle: (line: Line) => void = () => {};
+    render(
+      <Lines
+        createItem={() =>
+          new Promise<Line>((resolve) => {
+            settle = resolve;
+          })
+        }
+      />,
+    );
+    const add = screen.getByRole("button", { name: "Добавить позицию" });
+    await user.click(add);
+    expect(rowsOf()).toHaveLength(2);
+    expect(document.querySelector("[data-fl-creating]")).not.toBeNull();
+    expect(screen.getByRole("list", { name: "Позиции счёта" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    // One at a time: the button is still there and still focused, a second press makes nothing.
+    expect(add).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await act(async () => settle({ id: "server-1", service: "", price: "" }));
+    expect(document.querySelector("[data-fl-creating]")).toBeNull();
+    expect(rowsOf()).toHaveLength(3);
+    expect(rowsOf()[2]?.getAttribute("data-fl-row")).toBe("server-1");
+    expect(rowsOf()[2]?.className).not.toContain(enterMotion.enter);
+    expect(screen.getAllByRole("textbox", { name: "Услуга" })[2]).toHaveFocus();
+  });
+
+  it("drops the placeholder when createItem rejects and leaves focus on the add button", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    let fail: (reason: Error) => void = () => {};
+    render(
+      <Lines
+        onChange={onChange}
+        createItem={() =>
+          new Promise<Line>((_, reject) => {
+            fail = reject;
+          })
+        }
+      />,
+    );
+    const add = screen.getByRole("button", { name: "Добавить позицию" });
+    await user.click(add);
+    await act(async () => fail(new Error("нет связи")));
+    expect(document.querySelector("[data-fl-creating]")).toBeNull();
+    expect(rowsOf()).toHaveLength(2);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(add).toHaveFocus();
+  });
+
+  it("leaves focus where the person moved it while the item was being made", async () => {
+    const user = userEvent.setup();
+    let settle: (line: Line) => void = () => {};
+    render(
+      <Lines
+        createItem={() =>
+          new Promise<Line>((resolve) => {
+            settle = resolve;
+          })
+        }
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Добавить позицию" }));
+    const first = screen.getAllByRole("textbox", { name: "Услуга" })[0] as HTMLElement;
+    first.focus();
+    await act(async () => settle({ id: "server-2", service: "", price: "" }));
+    expect(rowsOf()).toHaveLength(3);
+    expect(first).toHaveFocus();
+  });
+
+  it("counts the row being made against max", async () => {
+    const user = userEvent.setup();
+    render(<Lines max={3} createItem={() => new Promise<Line>(() => {})} />);
+    await user.click(screen.getByRole("button", { name: "Добавить позицию" }));
+    // The full list's add button closes up in place; its row is the placeholder.
+    expect(document.querySelector("[data-fl-creating]")).not.toBeNull();
+  });
+
+  it("says a pinned row's own reason, else the list's", async () => {
+    const user = userEvent.setup();
+    render(
+      <Lines
+        initial={[
+          { ...LINES[0], pinned: true } as Line,
+          { ...LINES[1], pinned: true } as Line,
+          { id: "extra", service: "Доплата", price: "1" },
+        ]}
+        getLocked={(line) => line.pinned ?? false}
+        getLockedReason={(line) => (line.id === "setup" ? "Последний депозит" : undefined)}
+        labels={{ lockedReason: "Закреплено" }}
+      />,
+    );
+    await user.hover(screen.getByRole("button", { name: "Удалить: «Внедрение»" }));
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Последний депозит");
+    await user.unhover(screen.getByRole("button", { name: "Удалить: «Внедрение»" }));
+    await user.hover(screen.getByRole("button", { name: "Удалить: «Обучение»" }));
+    expect(await screen.findByText("Закреплено")).toBeInTheDocument();
+  });
+
   it("names the remove button by the row and moves focus to the next row's remove", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

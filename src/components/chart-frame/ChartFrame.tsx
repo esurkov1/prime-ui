@@ -666,32 +666,36 @@ type HiddenTableProps = {
  */
 function HiddenTable({ rows, series, category, titleId }: HiddenTableProps) {
   const columns = series.filter((item) => !item.hidden);
+  // The hidden box is a block around the table: a table ignores `overflow` and a 1px width, so
+  // the recipe on the `<table>` itself would keep its natural width and stretch the page.
   return (
-    <table aria-labelledby={titleId} className={visuallyHiddenClass}>
-      <thead>
-        <tr>
-          <th scope="col">{category}</th>
-          {columns.map((column) => (
-            <th key={column.id} scope="col">
-              {column.label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row) => (
-          <tr key={row.label}>
-            <th scope="row">{row.label}</th>
-            {columns.map((column) => {
-              const value = row.values[column.id];
-              return (
-                <td key={column.id}>{value === undefined ? "—" : column.formatValue(value)}</td>
-              );
-            })}
+    <div className={visuallyHiddenClass}>
+      <table aria-labelledby={titleId}>
+        <thead>
+          <tr>
+            <th scope="col">{category}</th>
+            {columns.map((column) => (
+              <th key={column.id} scope="col">
+                {column.label}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.label}>
+              <th scope="row">{row.label}</th>
+              {columns.map((column) => {
+                const value = row.values[column.id];
+                return (
+                  <td key={column.id}>{value === undefined ? "—" : column.formatValue(value)}</td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

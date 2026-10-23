@@ -50,6 +50,7 @@ export const PART_REFS = {
   "Card.Body": ["HTMLDivElement"],
   "Card.Footer": ["HTMLDivElement"],
   "Card.Total": ["HTMLDivElement"],
+  "Card.Note": ["HTMLDivElement"],
   "Carousel.Root": ["HTMLElement"],
   "Carousel.Overlay": ["HTMLDivElement"],
   "ChartFrame.Root": ["HTMLElement"],

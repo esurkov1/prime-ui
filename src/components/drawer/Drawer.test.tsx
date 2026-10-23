@@ -678,7 +678,8 @@ describe("Drawer — header actions, footer meta, exit snapshot", () => {
     );
     const actions = screen.getByTestId("actions");
     const close = screen.getByRole("button", { name: "Закрыть" });
-    expect(actions.nextElementSibling).toBe(close);
+    expect(actions.closest("header")?.contains(close)).toBe(true);
+    expect(actions.compareDocumentPosition(close) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("button", { name: "Ещё" })).toHaveAttribute("data-size", "m");
   });
 

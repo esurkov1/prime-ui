@@ -3,24 +3,33 @@
  * card…), as Card set it:
  *   [mark] [title · badges        ] [end: controls | indicator]
  *          [description           ]
- * One line each, nothing wraps. The title and its badges share a line 6 apart: the title gives way
- * first (down to its text or 8em, `useTitleFloor`), then the badges fold into «+N». The end holds
- * only controls, at the top edge beside two lines; a one-line header (`data-lines="one"`), a header
- * with a mark, or a header that is the whole surface centres them on its line. Without a mark the
- * air above the title's letters is cut, so its cap top stands on the padding like the controls.
- * The host sets the roles (`FRAME_TITLE`, `FRAME_DESCRIPTION`) and `--frame-lines-gap`.
+ * One line each, nothing wraps inside a line. The title and its badges share a line 6 apart: the
+ * title gives way first (down to its text or 8em, `useTitleFloor`), then the badges fold into
+ * «+N». The title keeps that floor in every header: the titles column is as wide as its floor
+ * at least (`--header-title-min`, written on the column), so when the mark, the floor and the
+ * controls no longer fit the row, the end drops to a line of its own under the title, at the
+ * row's start edge, instead of squeezing the title or leaving the surface; only when even that line is too
+ * wide do its controls wrap. The end holds only controls, at the top edge beside two lines; a
+ * one-line header (`data-lines="one"`), a header with a mark, or a header that is the whole
+ * surface (`:only-child`, or `data-whole` when a wrapper stands around the row) centres them on
+ * their line. Without a mark the air above the title's letters is cut, so its cap top stands on
+ * the padding like the controls. The host sets the roles (`FRAME_TITLE`, `FRAME_DESCRIPTION`)
+ * and `--frame-lines-gap`.
  */
 
 .header {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: var(--prime-space-3);
+  column-gap: var(--prime-space-3);
+  row-gap: var(--prime-space-2);
   min-width: 0;
 }
 
 .header[data-lines="one"],
 .header:has(> .mark),
-.header:only-child {
+.header:only-child,
+.header[data-whole] {
   align-items: center;
 }
 
@@ -28,11 +37,14 @@
   flex: none;
 }
 
+/* The column's basis is the floor of its title (8em before the host measured it): it grows into
+   the room that is left and is the unit the row wraps by. */
 .titles {
   display: grid;
-  flex: 1 1 auto;
+  flex: 1 1 var(--header-title-min, calc(var(--prime-space-1) * 32));
   gap: var(--frame-lines-gap, 0);
   min-width: 0;
+  max-width: 100%;
 }
 
 .titleRow {
@@ -52,12 +64,12 @@
   white-space: nowrap;
 }
 
-.titleRow:has(> .badges) > .title {
-  min-width: min(var(--header-title-min, 0), 100%);
+.title {
+  min-width: min(var(--header-title-min, calc(var(--prime-space-1) * 0)), 100%);
 }
 
 @supports (text-box: trim-start cap alphabetic) {
-  .header[data-lines="two"]:not(:has(> .mark)):not(:only-child) .title {
+  .header[data-lines="two"]:not(:has(> .mark)):not(:only-child):not([data-whole]) .title {
     text-box: trim-start cap alphabetic;
   }
 }
@@ -92,9 +104,21 @@
   text-overflow: ellipsis;
 }
 
+/* Beside the title the end is as wide as its controls (the titles column grows to push it to the
+   end edge); on a line of its own it starts at the row's start edge and wraps only when the row
+   itself is narrower than its controls. */
 .end {
   display: flex;
-  flex: none;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--prime-space-2);
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* No titles column to push it: the end holds the end edge by itself. */
+.end:first-child,
+.mark + .end {
+  margin-inline-start: auto;
 }

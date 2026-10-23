@@ -1,4 +1,6 @@
 export * from "./components";
+export * from "./hooks/breakpoints";
+export * from "./hooks/useMediaQuery";
 export * from "./hooks/useTokenValue";
 export * from "./hooks/useUploadQueue";
 export * from "./icons";

@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import enterMotion from "@/internal/enterMotion.module.css";
 import { headerRowStyles } from "@/internal/headerRow";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 import { withMotion } from "@/test/motion";
 
 import { Banner } from "./Banner";
@@ -278,5 +279,21 @@ describe("Banner", () => {
     expect(close).toHaveAttribute("data-tone", "inherit");
     // The banner's frame tier (m): as tall as the fields of the same surface.
     expect(close).toHaveAttribute("data-size", "m");
+  });
+});
+
+describe("Banner narrow layout", () => {
+  it("wraps only a banner that is its own size container (has actions)", () => {
+    const css = "src/components/banner/Banner.module.css";
+    const rules = cssRules(css).filter((rule) =>
+      rule.parents.some((parent) => parent.startsWith("@container")),
+    );
+    expect(rules.length).toBeGreaterThan(0);
+    const wrapping = rules.filter((rule) =>
+      rule.decls.some((decl) => decl.prop === "flex-wrap" && decl.value === "wrap"),
+    );
+    expect(wrapping.length).toBeGreaterThan(0);
+    for (const rule of wrapping) expect(rule.selector).toContain(":has(> .actions)");
+    expect(cssValue(cssRule(css, ".root:has(.actions)"), "container-type")).toBe("inline-size");
   });
 });

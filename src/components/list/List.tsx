@@ -293,8 +293,7 @@ export type ListItemActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 /**
  * The row's own controls (a Switch, a Dropdown with its icon Button, an icon Button): beside its
  * button or link and never inside it, one tier below the row — at its end, or leading it with
- * `side="start"` (the on / off of a reorderable row, whose end edge is the grip's). The row's fills
- * cover them.
+ * `side="start"` (a selection checkbox; a switch always ends the row). The row's fills cover them.
  */
 function ListItemActions({ side = "end", className, ...rest }: ListItemActionsProps) {
   const size = useControlSize(undefined);

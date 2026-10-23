@@ -29,8 +29,8 @@ const CONTENT = [
     name: "size",
     type: '"xs" | "s" | "m" | "l" | "xl"',
     defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
-    en: "Tier of the card; its padding, icon and text stand two steps under it (`m` → the `xs` frame). Without it the tier of the host (`notify()` sits outside any host: `m`).",
-    ru: "Ярус карточки; отступы, иконка и текст — на две ступени ниже (`m` → рамка `xs`). Без него — ярус хоста (`notify()` вне хоста: `m`).",
+    en: "Tier of the card: its padding, icon, text and buttons are the surface frame of that size, as in Card. Without it the tier of the host (`notify()` sits outside any host: `m`).",
+    ru: "Ярус карточки: отступы, иконка, текст и кнопки — рамка поверхности этого размера, как у Card. Без него — ярус хоста (`notify()` вне хоста: `m`).",
   },
   {
     name: "icon",

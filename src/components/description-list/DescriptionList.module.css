@@ -39,6 +39,12 @@
   min-width: 0;
 }
 
+/* A value that is a control (a Select, an Input, a Switch) is taller than the text line: the label
+   centres on it instead of standing on the text baseline. Plain text keeps the baseline. */
+.item:has(> .value > .text :is(input:not([type="hidden"]), select, [role="combobox"])) {
+  align-items: center;
+}
+
 .root[data-orientation="vertical"] .item {
   grid-template-columns: minmax(0, 1fr);
 }

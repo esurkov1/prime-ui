@@ -49,21 +49,38 @@ export function HeaderRowContent({
   );
 }
 
-/** The longest a title gives way to its badges: its own text, at most this many `em`. */
+/** The longest a title gives way: its own text, at most this many `em`. */
 const TITLE_MIN_EM = 8;
 
 /**
- * The floor a title keeps beside its badges (`--header-title-min`): its text, or 8em when the text
- * is longer. Measured after every render, so a new title gets its own floor.
+ * Writes a title's floor (`--header-title-min`) on the title and on the header row's titles column,
+ * which wraps the row by it (headerRow.module.css).
+ */
+export function setTitleFloor(title: HTMLElement, width: number) {
+  const em = Number.parseFloat(getComputedStyle(title).fontSize) || 0;
+  const value = `${Math.ceil(Math.min(width, em * TITLE_MIN_EM))}px`;
+  title.style.setProperty("--header-title-min", value);
+  title.closest<HTMLElement>(`.${styles.titles}`)?.style.setProperty("--header-title-min", value);
+}
+
+/** Forgets the floor, so the title is measured at its natural width. */
+export function clearTitleFloor(title: HTMLElement) {
+  title.style.removeProperty("--header-title-min");
+  title.closest<HTMLElement>(`.${styles.titles}`)?.style.removeProperty("--header-title-min");
+}
+
+/**
+ * The floor a title keeps in its header (`--header-title-min`): its text, or 8em when the text is
+ * longer. The title never gives way below it: beside badges they fold, and the controls at the end
+ * drop to their own line when the row cannot hold both. Measured after every render, so a new
+ * title gets its own floor.
  */
 export function useTitleFloor(ref: React.RefObject<HTMLElement | null>) {
   React.useLayoutEffect(() => {
     const node = ref.current;
     if (!node) return;
-    node.style.removeProperty("--header-title-min");
-    const em = Number.parseFloat(getComputedStyle(node).fontSize) || 0;
-    const floor = Math.min(node.scrollWidth, em * TITLE_MIN_EM);
-    node.style.setProperty("--header-title-min", `${Math.ceil(floor)}px`);
+    clearTitleFloor(node);
+    setTitleFloor(node, node.scrollWidth);
   });
 }
 

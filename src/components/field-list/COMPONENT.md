@@ -53,10 +53,11 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `value` | `readonly T[]` | — | The rows (controlled). |
 | `defaultValue` | `readonly T[]` | `[]` | The first rows (uncontrolled). |
 | `onValueChange` | `(value: T[]) => void \| Promise<void>` | — | The new list after an edit (`row.update`), an add, a remove or a move. Return the save's promise: the new list shows while it is pending, the owner's again on a reject (say why with `error`). |
-| `createItem` | `() => T` | — | A new empty item; with it the add button shows under the rows (until `max`) and focus goes to the new row's first field. |
+| `createItem` | `() => T \| Promise<T>` | — | A new empty item: the add button shows under the rows (until `max`), focus goes to the new row. A promise (the server makes the item): a placeholder row holds its place; a reject removes it. |
 | `addLabel` | `string` | — | Text of the add button: the object it adds, without the verb its «+» already says («Позиция»). |
 | `getLabel` | `(item: T) => string` | — | The row's own text (its title field) for the remove button, the handle, the menu button and move announcements; else the row number. |
 | `getLocked` | `(item: T) => boolean` | — | Pinned rows: the remove stays in its place, off, and says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it. In the menu every item is off. |
+| `getLockedReason` | `(item: T) => string \| undefined` | — | Why this pinned row (`getLocked`) cannot be removed, when the reason is the row's own; `undefined` or an empty string falls back to `labels.lockedReason`. |
 | `reorderable` | `boolean` | `false` | Rows move: with `rowActions="buttons"` by a handle that ends the row, after the remove button (drag, a touch hold, Alt + ↑ / ↓); with `"menu"` by its items «Выше» and «Ниже» and Alt + ↑ / ↓ on the menu button. |
 | `stackedLabels` | `boolean` | `true` | Stacked rows (under 30rem) show each field's column heading as its label. `false` for values that name themselves («Аренда: 20 окт → 2 нояб»): no labels, the headings stay the fields' names. |
 | `hideHeadings` | `boolean` | `false` | No heading row above the rows, for fields that name themselves (a placeholder, a value); each field keeps its column heading as its accessible name. |
@@ -102,7 +103,8 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 |---|---|---|---|
 | `reorderable` | buttons: a grip at the very end of every row, after the remove button, Alt + ↑ / ↓ on it; menu: «Выше» and «Ниже» in the menu, Alt + ↑ / ↓ on «⋯» | the order of the records matters (a pricing page, a checklist, payment stages) | `false` |
 | `getLocked` | the remove button in its place, off, with a tooltip saying why (`labels.lockedReason`); with `reorderable` a lock where the grip is and the row holds its place; in the menu every item off, «Удалить» says why | a base value, system records a person cannot drop | — |
-| `createItem` | the add button under the rows, aligned with the first column | the person grows the list | — |
+| `getLockedReason` | the pinned row's own reason in the tooltip / the menu item's description, else `labels.lockedReason` | pinned rows are pinned for different reasons (the last deposit, a model's deposit) | — |
+| `createItem` | the add button under the rows, aligned with the first column; a promise: a row of placeholders in the row's geometry until the item arrives in place | the person grows the list; the server makes the record and its id | — |
 | `min` · `max` | remove buttons off at `min`; the add button closes up at `max` and comes back when a row leaves — no limit text of its own, a limit the person should know goes in `hint` | the record count is bounded | `0` · — |
 | `renderTotals` | a row of totals under the rows over a faint line, each on its column, aligned as the column's field text; «Итого» in the first cell without a total | the rows add up (shares, amounts, hours) | — |
 | `stackedLabels` | `true`: once the rows stack, each field shows its column heading above it; `false`: the stacked rows show no labels, the headings stay the fields' hidden names | `false` when the values name themselves («Аренда: 20 окт → 2 нояб», «1 200 ₽»); keep `true` for generic fields («Параметр», «Значение») | `true` |
@@ -125,6 +127,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | invalid | `error` (the list), a field's own `error` | the list's message under the add row; a field's under the field in its row |
 | disabled | `disabled` (or a disabled Fieldset) | `data-disabled="true"` on the frame; fields, handles, buttons and menu buttons disabled through the kit's disabled context |
 | stacked | container narrower than 30rem | heading row hidden; the compact columns, the first field and the actions on the first line, every other field on a line of its own with its label shown (none with `stackedLabels={false}`, and the lines stand 12 apart); `data-stack` on the body keeps the first field at least 160 wide: `actions` when it is too narrow beside the actions (they end the second line, after the next field), `main` when it is too narrow even without them (it takes the full width under the compact columns and the actions); each total on its own line after its column name |
+| creating | a promise from `createItem` | an `<ol aria-hidden data-fl-creating>` under the rows holds one row of `Skeleton` cells in the columns' tracks, `aria-busy="true"` on the list; the add button stays and presses nothing meanwhile; the item takes its place without rising in and focus goes to its first field only if it is still on the add button; a reject removes the placeholder and leaves focus on the add button |
 | saving | a promise from `onValueChange` | the rows show the new list, `aria-busy="true"` on the `<ol>`; a reject brings the owner's list back |
 | rows come and go | the add button, a remove, a menu move, a new `value` | a row the data adds rises in once (`enterMotion`), a removed one closes up in place and the rows below glide up (`listPresence`); any other change of the rows' set or order (a row added in the middle, a menu move, a new order in `value`) glides every row from where it stood (`useFlipList`), a drag leaves the glide to Dnd; still under reduced motion; the heading row rises in with the first row and closes up with the last (`partPresence`); the first render stays still |
 
@@ -160,6 +163,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - With `rowActions="menu"` the row's «⋯» button opens a `role="menu"` (Dropdown) named «Действия: {row}»; it lists Alt + ↑ / ↓ in `aria-keyshortcuts`, and a move says the row's new place in a polite live region.
 - The totals row (`renderTotals`) is a `group` named by `labels.totals`; each total is read after its column heading.
 - The remove button is «Удалить: {row}», the handle «Переместить: {row}»: the row's name from `getLabel`, else its number.
+- While `onValueChange` or `createItem` is saving, the list has `aria-busy`; the placeholder row of a pending `createItem` is `aria-hidden`.
 - A pinned row keeps its remove button: `aria-disabled`, described by `labels.lockedReason` (a tooltip on hover and focus); with `reorderable` Dnd's lock stands in place of the handle. In the menu its items are `disabled` and the remove item is described by `labels.lockedReason`.
 
 ### Labels
@@ -176,7 +180,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | `moved` | `"{row}: позиция {position} из {total}"` | Announced after a move from the menu or its keys; `{row}` is the row's name, `{position}` its new place, `{total}` the row count. |
 | `row` | `"строка {index}"` | Name of a row without `getLabel` text; `{index}` counts from 1. |
 | `namedRow` | `"«{label}»"` | Name of a row with `getLabel` text; `{label}` is that text. |
-| `lockedReason` | `"Закреплённую строку нельзя удалить"` | Why a pinned row (`getLocked`) cannot be removed: the tooltip of its remove button, the description of its menu's remove item. |
+| `lockedReason` | `"Закреплённую строку нельзя удалить"` | Why a pinned row (`getLocked`) cannot be removed, unless `getLockedReason` gives its own: the tooltip of its remove button, the description of its menu's remove item. |
 | `totals` | `"Итого"` | Name of the totals row (`renderTotals`), shown in its first cell when that has no total. |
 
 ## Examples
@@ -187,12 +191,13 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [sizes.tsx](examples/sizes.tsx) | Every tier: the headings, the fields, the handle and the buttons follow the list's size — `size`. |
 | [reorder.tsx](examples/reorder.tsx) | Selling points of a plan in the order of the pricing page: a one-column list has no headings and no numbers, each row ends with its remove button and then its handle, a point moves by the handle or Alt+arrows — `reorderable`, `getLabel`. |
 | [row-menu.tsx](examples/row-menu.tsx) | Payment stages of a project on a touch-first screen, where a drag is awkward: one more-button per row holds move up, move down and remove, the moves are off at the ends and next to the pinned advance, and Alt+arrows on the button move the row too — `rowActions`, `reorderable`, `getLocked`. |
-| [locked.tsx](examples/locked.tsx) | Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them — `getLocked`, `width`, `reorderable`. |
+| [locked.tsx](examples/locked.tsx) | Specs of a plan on one line each: an icon picker and its color side by side in compact columns, the first three specs are pinned with a lock in the handle's place and a remove button that is off and says why, the rest reorder below them, and two of the pinned say their own reason — `getLocked`, `getLockedReason`, `width`, `reorderable`. |
 | [base-row.tsx](examples/base-row.tsx) | A plan price and its changes by month in one table: the base price is the first, pinned row whose remove button is off and says why, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `labels`, `width`. |
 | [limits.tsx](examples/limits.tsx) | Recipients of invoice reminders, from one to three: the last row cannot be removed, the add button leaves once the list is full and the hint names the limit — `min`, `max`, `hint`. |
 | [errors.tsx](examples/errors.tsx) | Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field; a `*` after a heading marks a required column — `error`, `required`. |
 | [totals.tsx](examples/totals.tsx) | A deal bonus split between the team: the share takes a narrow column, and the totals row under the lines sums the shares and the amounts, each ending where its fields end their numbers — `renderTotals`, `width`. |
 | [saving.tsx](examples/saving.tsx) | Removing a recipient is saved on the server: the row leaves at once and comes back with the reason if the server refuses — `onValueChange`, `error`. |
+| [creating.tsx](examples/creating.tsx) | A contact is created on the server, which gives it its id: a row of placeholders holds its place until the answer, the new row takes it with focus in its first field, and a refusal takes the placeholder away — `createItem`, `onValueChange`. |
 | [named-rows.tsx](examples/named-rows.tsx) | A rental bill in a 320 px column whose lines name themselves: each line keeps its item and its remove button on the first line and its amount under it, with no labels, while every field is still named by its column — `stackedLabels`. |
 | [hidden-headings.tsx](examples/hidden-headings.tsx) | The links of a project, where each field names itself by its placeholder: no heading row above the rows, the column names still read to assistive tech — `hideHeadings`. |
 | [grouped.tsx](examples/grouped.tsx) | A rental bill kept in groups by type: a new line and a line whose type changes take their place in their group, and the rows below glide aside to make room — `value`, `onValueChange`, `createItem`. |
@@ -219,5 +224,5 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A total under the list typed by hand in a line of text, or a DataTable of fields to get a totals row → `renderTotals`.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (add, remove, the menu button), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Dropdown](../dropdown/COMPONENT.md) (`rowActions="menu"`), [Label](../label/COMPONENT.md) (headings), [Tooltip](../tooltip/COMPONENT.md) (why a pinned row's remove is off), the field frame (label, [Hint](../hint/COMPONENT.md) for the hint and error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md) (add, remove, the menu button), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Dropdown](../dropdown/COMPONENT.md) (`rowActions="menu"`), [Label](../label/COMPONENT.md) (headings), [Skeleton](../skeleton/COMPONENT.md) (the row a pending `createItem` holds), [Tooltip](../tooltip/COMPONENT.md) (why a pinned row's remove is off), the field frame (label, [Hint](../hint/COMPONENT.md) for the hint and error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md) (icon-only trigger), [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`), [Fieldset](../fieldset/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

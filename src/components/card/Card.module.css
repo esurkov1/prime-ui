@@ -254,6 +254,18 @@
   min-width: 0;
 }
 
+/* A note takes the free width beside the buttons; its bar is as wide as the note. */
+.footer > .note {
+  flex: 1 1 var(--prime-layout-tile-min-width);
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  align-items: stretch;
+}
+
 .actions {
   display: flex;
   flex: none;

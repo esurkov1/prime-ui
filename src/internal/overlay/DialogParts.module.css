@@ -86,6 +86,30 @@
   margin-block-start: var(--frame-gap);
 }
 
+/*
+ * The row of the header: the header row (internal/headerRow) and the close button beside it. The
+ * close is its own column, never part of the row that wraps, so when the title's floor and the
+ * `Actions` no longer fit one line the actions drop under the title and the × stays where it is, at
+ * the top end, centred on the row's first line (the mark's 48, or the control's own height).
+ */
+.row {
+  --header-first-line: var(--prime-control-m-height);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.row[data-close] {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.row:has(.icon) {
+  --header-first-line: var(--prime-space-12);
+}
+
 /* The mark (internal/iconBox tile or the record's picture), 48 in the row. */
 .icon[data-media="true"] {
   display: inline-flex;
@@ -154,7 +178,9 @@
 }
 
 /* A row of controls at the end of the header, before the close button (the dialog's tier, joined
-   in TSX): it never wraps or gives. */
+   in TSX): its controls keep their width; beside the title it is one line, and when the row
+   cannot hold the title's floor and them the whole row of controls drops under the title (the
+   header row's end) and wraps only if it is wider than the dialog itself. */
 .actions {
   display: flex;
   flex: none;
@@ -164,9 +190,18 @@
   min-width: max-content;
 }
 
-/* The ghost icon-only close, at the end of the row, the glyph on the content edge. */
+.actions[data-zone="header"] {
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* The ghost icon-only close, at the end of the row, the glyph on the content edge, centred on the
+   first line of the row. */
 .close {
-  flex: none;
+  align-self: start;
+  margin-block-start: calc((var(--header-first-line) - var(--prime-control-m-height)) / 2);
   margin-inline-end: calc(var(--prime-space-2) * -1);
 }
 

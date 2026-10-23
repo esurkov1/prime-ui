@@ -38,6 +38,16 @@ describe("useMediaQuery", () => {
     expect(result.current).toBe(true);
   });
 
+  it("is public with the kit's named queries", async () => {
+    const kit = await import("@/index");
+    expect(kit.useMediaQuery).toBe(useMediaQuery);
+    expect(kit.COMPACT_QUERY).toBe(COMPACT_QUERY);
+    expect(kit.OFF_CANVAS_QUERY).toBe("(max-width: 767px)");
+    expect(kit.TOUCH_QUERY).toBeTypeOf("string");
+    expect(kit.HOVER_QUERY).toBeTypeOf("string");
+    expect(kit.REDUCED_MOTION_QUERY).toBeTypeOf("string");
+  });
+
   it("stays false while disabled", () => {
     stubMatchMedia(true);
     const { result } = renderHook(() => useMediaQuery(COMPACT_QUERY, false));

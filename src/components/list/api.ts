@@ -245,8 +245,8 @@ export const api: ComponentApi = {
           name: "side",
           type: '"start" | "end"',
           default: '"end"',
-          en: '`"end"` after the row element: a plain settings row, label first. `"start"` before it, in the DOM too: the on / off of a reorderable row reads first and the grip keeps the end.',
-          ru: '`"end"` — после элемента строки: обычная строка настроек, сначала подпись. `"start"` — перед ним, и в DOM тоже: вкл / выкл переставляемой строки читается первым, а конец остаётся за ручкой.',
+          en: '`"end"` after the row element: a switch or a menu, label first; a switch always ends its row. `"start"` before it, in the DOM too: a control that leads the row (a selection checkbox), never a switch.',
+          ru: '`"end"` — после элемента строки: переключатель или меню; переключатель всегда завершает строку. `"start"` — перед ним, и в DOM тоже: чекбокс выбора, но не переключатель.',
         },
         {
           name: "…rest",

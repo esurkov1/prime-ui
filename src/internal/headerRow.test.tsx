@@ -44,9 +44,11 @@ describe("useTitleFloor", () => {
     const ref = React.useRef<HTMLHeadingElement>(null);
     useTitleFloor(ref);
     return (
-      <h3 ref={ref} data-testid="title">
-        {text}
-      </h3>
+      <div className={headerRowStyles.titles} data-testid="titles">
+        <h3 ref={ref} data-testid="title">
+          {text}
+        </h3>
+      </div>
     );
   }
 
@@ -62,10 +64,15 @@ describe("useTitleFloor", () => {
     try {
       widths.current = 50;
       const view = render(<Title text="Заказ" />);
-      expect(screen.getByTestId("title").style.getPropertyValue("--header-title-min")).toBe("50px");
+      const floor = (id: string) =>
+        screen.getByTestId(id).style.getPropertyValue("--header-title-min");
+      expect(floor("title")).toBe("50px");
+      // The titles column wraps the row by the same floor.
+      expect(floor("titles")).toBe("50px");
       widths.current = 300;
       view.rerender(<Title text="Очень длинное название заказа" />);
-      expect(screen.getByTestId("title").style.getPropertyValue("--header-title-min")).toBe("80px");
+      expect(floor("title")).toBe("80px");
+      expect(floor("titles")).toBe("80px");
     } finally {
       if (original) Object.defineProperty(HTMLElement.prototype, "scrollWidth", original);
       else Reflect.deleteProperty(HTMLElement.prototype, "scrollWidth");

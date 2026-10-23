@@ -178,8 +178,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Footer",
-      en: "`ref` → `HTMLDivElement`. The bottom zone, no line and no fill, kept to the bottom of a stretched card: one thing at the start (`Card.Total`, an assignee picker, a note) and `Card.Actions` at the end. On a narrow card the buttons go under and share the width.",
-      ru: "Нижняя зона без линии и заливки, прижата к низу растянутой карточки: одно слева (`Card.Total`, выбор ответственного высотой с кнопку, пометка) и `Card.Actions` справа. На узкой карточке кнопки уходят вниз и делят ширину.",
+      en: "`ref` → `HTMLDivElement`. The bottom zone, no line and no fill, kept to the bottom of a stretched card: one thing at the start (`Card.Total`, an assignee picker, `Card.Note`) and `Card.Actions` at the end. On a narrow card the buttons go under and share the width.",
+      ru: "Нижняя зона без линии и заливки, прижата к низу растянутой карточки: одно слева (`Card.Total`, выбор ответственного высотой с кнопку, `Card.Note`) и `Card.Actions` справа. На узкой карточке кнопки уходят вниз и делят ширину.",
       props: [REST_DIV],
     },
     {
@@ -200,6 +200,44 @@ export const api: ComponentApi = {
           ru: "Цвет `label` по смыслу; смысл говорит слово.",
         },
         REST_DIV,
+      ],
+    },
+    {
+      name: "Card.Note",
+      en: "`ref` → `HTMLDivElement`. At the start of the footer: one line of text (a `StatusDot` first states the state) and, with `progress`, the kit `ProgressBar` under it — a term, a quota, a delivery. It takes the free width beside the buttons; the bar is named by the note's text.",
+      ru: "В начале подвала: одна строка текста (`StatusDot` первым говорит состояние) и, с `progress`, `ProgressBar` кита под ней — срок, квота, доставка. Занимает свободную ширину рядом с кнопками; полосу называет текст заметки.",
+      props: [
+        {
+          name: "progress",
+          type: "number",
+          en: "Draws the progress bar under the line: the value from 0 to `max`. Omit it for a note of text alone.",
+          ru: "Рисует полосу прогресса под строкой: значение от 0 до `max`. Без него заметка — только текст.",
+        },
+        {
+          name: "max",
+          type: "number",
+          default: "100",
+          en: "The top of the bar's scale; used with `progress`.",
+          ru: "Верх шкалы полосы; вместе с `progress`.",
+        },
+        {
+          name: "progressTone",
+          type: '"neutral" | "accent" | "success" | "warning" | "danger" | "info"',
+          en: "The colour of the bar by meaning (an overdue term is `danger`); used with `progress`.",
+          ru: "Цвет полосы по смыслу (просроченный срок — `danger`); вместе с `progress`.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The line: a `StatusDot` first, then the text, cut with an ellipsis.",
+          ru: "Строка: `StatusDot` первым, затем текст, обрезается многоточием.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
       ],
     },
   ],

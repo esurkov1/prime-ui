@@ -39,7 +39,7 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
     Card.Actions? | Card.Indicator?         the end: controls, or the choice mark
   Card.Body                               label — value rows, a List, a form, switch rows, a chart
   Card.Footer
-    Card.Total?                             the start: the amount with its state, an assignee picker, or a note
+    Card.Total? | Card.Note?                the start: the amount with its state, or a note (a line, a progress bar); or an assignee picker
     Card.Actions?                           the end: up to two buttons, the accent one last
 ```
 
@@ -134,7 +134,7 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Card.Footer
-`ref` → `HTMLDivElement`. The bottom zone, no line and no fill, kept to the bottom of a stretched card: one thing at the start (`Card.Total`, an assignee picker, a note) and `Card.Actions` at the end. On a narrow card the buttons go under and share the width.
+`ref` → `HTMLDivElement`. The bottom zone, no line and no fill, kept to the bottom of a stretched card: one thing at the start (`Card.Total`, an assignee picker, `Card.Note`) and `Card.Actions` at the end. On a narrow card the buttons go under and share the width.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -148,6 +148,17 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
 | `label` | `ReactNode` | — | The state of the amount («К оплате»), muted and coloured by `tone`. |
 | `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | — | The colour of `label` by meaning; the word says the meaning. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
+
+### Card.Note
+`ref` → `HTMLDivElement`. At the start of the footer: one line of text (a `StatusDot` first states the state) and, with `progress`, the kit `ProgressBar` under it — a term, a quota, a delivery. It takes the free width beside the buttons; the bar is named by the note's text.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `progress` | `number` | — | Draws the progress bar under the line: the value from 0 to `max`. Omit it for a note of text alone. |
+| `max` | `number` | `100` | The top of the bar's scale; used with `progress`. |
+| `progressTone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | — | The colour of the bar by meaning (an overdue term is `danger`); used with `progress`. |
+| `children` | `ReactNode` | — | The line: a `StatusDot` first, then the text, cut with an ellipsis. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other div attributes. |
 
 ## Variants
 
@@ -194,6 +205,7 @@ The width comes from the grid, not from the size; one size per row.
 | edge mark | a `Card.Icon` in a header under a top cover | `data-edge`: the owner's avatar on the cover's edge, ringed with the card's fill |
 | folded badges | `Card.Badges` that do not fit once the title has given way | the rest fold into one «+N» badge |
 | narrow footer | the card is 20rem wide or less | the buttons of `Card.Actions` go under the start part and share the width |
+| note | `Card.Note` | one line with a `StatusDot` first; with `progress` a `ProgressBar` under it, named by the line's text, `progressTone` colours it |
 | surface | nesting | `data-depth` from the surfaces around; a card inside a card is a flat step |
 
 ## Layout & spacing
@@ -212,7 +224,7 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 
 - The card is a surface of the depth ladder: no border, no lines inside; zones are parted by air. It fills its grid cell and, in a row, cards stretch to one height while the footer keeps to the bottom.
 - Nothing wraps. Every header line and every body row is one line cut with an ellipsis.
-- The header gives way in this order: the title shrinks to its own text or 8em, the extra buttons go into «Ещё» (the consumer's part), the value picker compacts, the badges fold into «+N».
+- The header gives way in this order: the title shrinks down to its floor (its own text or 8em) and the badges fold into «+N»; the title never goes below the floor. When the mark, the floor and the controls no longer fit one row, the controls drop under the title onto a line of their own, and wrap only if that line is narrower than they are. The kit does not shrink a picker or move buttons into «Ещё» by itself: the extra buttons going into «Ещё» is the consumer's choice, and on a narrow card a picker and the action belong in `Card.Footer`, which stacks.
 - The footer has no line and no fill; it stands off the content by the card padding (more than the zone gap). One thing at the start, up to two buttons at the end with the accent one last; `fullWidth` only when nothing stands at the start.
 - A header with a description holds its controls at the top; a one-line header, or a card that is only its header, centres them on the title line.
 - In `Card.Body` a `List` stands on the content edge: the body sets the public hook `--list-bleed` and the rows reach past the list's edges by their own padding, so their text lines up with the rest of the body.
@@ -258,7 +270,7 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 | [link.tsx](examples/link.tsx) | Cards that open: a link in the title stretches over the card while its own button stays its own, and a whole card is one link when nothing inside is a control — `Card.Link`, `asChild`. |
 | [body.tsx](examples/body.tsx) | What the body holds: label — value rows, a list of records that open, a form on kit fields and an empty state — `DescriptionList`, `List`, `Input.Root`, `EmptyPage`. |
 | [long-list.tsx](examples/long-list.tsx) | A long list in a card: the scroller shows six rows, loads the next batch near its end and holds the place of the new rows with skeleton lines — `ScrollContainer`, `onReachEnd`, `Skeleton`. |
-| [footer.tsx](examples/footer.tsx) | What the footer holds: the total and two buttons with the accent one last, an assignee picker as tall as the button beside it, and buttons that share the width with nothing at the start — `Card.Total`, `Select.Root`, `fullWidth`. |
+| [footer.tsx](examples/footer.tsx) | What the footer holds: the total and two buttons with the accent one last, an assignee picker as tall as the button beside it, a note with a term's progress, and buttons that share the width with nothing at the start — `Card.Total`, `Select.Root`, `Card.Note`, `progress`, `fullWidth`. |
 | [cover.tsx](examples/cover.tsx) | A cover is the kit's carousel: on top with the owner's avatar on its edge, a column at the start, and a cover that is still loading — `Card.Media`, `placement`, `ratio`, `dots`, `loading`. |
 | [choice.tsx](examples/choice.tsx) | Cards that are a choice: one tariff of three in a group of pressed buttons, and any number of extras, each card a button with its mark at the end — `Card.Indicator`, `selected`, `asChild`. |
 | [switch.tsx](examples/switch.tsx) | A switch in a card: one setting is a one-line card with the switch at its end, several settings are a group card with a more menu in the header and a switch per row — `Switch.Root`, `fullWidth`, `Card.Actions`. |
@@ -277,10 +289,11 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 - A switch beside «Ещё» in one row, in a header with a description, or in the footer → one switch is a one-line card with the switch in `Card.Actions`; several are a group card with `Switch.Root fullWidth` rows.
 - A choice card whose inside holds buttons → the card is the `<button>` (`asChild`, `selected`) with `Card.Indicator`; controls go beside it.
 - A KPI laid out by hand in a card → [Kpi](../kpi/COMPONENT.md).
+- A hand-made term with a bar in the footer (an own wrapper around text and `ProgressBar`) → `Card.Note` with `progress`.
 - A wrapped title, description or row → shorten the text; the card keeps one line and cuts it.
 - Different sizes of cards in one row → one size per row.
 - Skeletons of an unlike shape while a grid loads → skeleton cards of the same geometry, cross-faded with the data (`Crossfade`).
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`Card.Badges` is a `Badge.Group`), [Checkbox](../checkbox/COMPONENT.md) and [Radio](../radio/COMPONENT.md) (the marks of `Card.Indicator`), [StatusDot](../status-dot/COMPONENT.md) (the state in the description), [Switch](../switch/COMPONENT.md) (its presence in `Card.Actions` shrinks the mark), `internal/iconBox` (the icon tile), `internal/mediaSlot` (the picture or ring in `Card.Icon`), `internal/surfaceDepth` (the surface), `internal/surfaceFrame` (the metrics per step, title and description roles), `internal/headerRow` (the header row: mark, title with badges, description, controls), `internal/press` (the card that is one element), `internal/rowLink` (the stretched `Card.Link`), `internal/textRole`, `internal/textTone`
+- **Built from:** [Badge](../badge/COMPONENT.md) (`Card.Badges` is a `Badge.Group`), [Checkbox](../checkbox/COMPONENT.md) and [Radio](../radio/COMPONENT.md) (the marks of `Card.Indicator`), [StatusDot](../status-dot/COMPONENT.md) (the state in the description and in `Card.Note`), [ProgressBar](../progress-bar/COMPONENT.md) (the bar of `Card.Note`), [Switch](../switch/COMPONENT.md) (its presence in `Card.Actions` shrinks the mark), `internal/iconBox` (the icon tile), `internal/mediaSlot` (the picture or ring in `Card.Icon`), `internal/surfaceDepth` (the surface), `internal/surfaceFrame` (the metrics per step, title and description roles), `internal/headerRow` (the header row: mark, title with badges, description, controls), `internal/press` (the card that is one element), `internal/rowLink` (the stretched `Card.Link`), `internal/textRole`, `internal/textTone`
 - **See also:** [Kpi](../kpi/COMPONENT.md), [Carousel](../carousel/COMPONENT.md) (the cover), [List](../list/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md), [Page](../../layout/page/COMPONENT.md) (`Page.Section`, `Page.Grid` for a row of cards), [Kanban](../kanban/COMPONENT.md)

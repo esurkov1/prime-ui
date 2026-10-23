@@ -57,9 +57,9 @@ export const api: ComponentApi = {
         },
         {
           name: "createItem",
-          type: "() => T",
-          en: "A new empty item; with it the add button shows under the rows (until `max`) and focus goes to the new row's first field.",
-          ru: "Новая пустая запись; с ней под строками есть кнопка добавления (пока строк меньше `max`), а фокус уходит в первое поле новой строки.",
+          type: "() => T | Promise<T>",
+          en: "A new empty item: the add button shows under the rows (until `max`), focus goes to the new row. A promise (the server makes the item): a placeholder row holds its place; a reject removes it.",
+          ru: "Новая пустая запись: под строками кнопка добавления (пока меньше `max`), фокус уходит в новую строку. Промис (запись создаёт сервер): место держит строка-заглушка; reject её убирает.",
         },
         {
           name: "addLabel",
@@ -78,6 +78,12 @@ export const api: ComponentApi = {
           type: "(item: T) => boolean",
           en: "Pinned rows: the remove stays in its place, off, and says why (`labels.lockedReason`); with `reorderable` a lock takes the handle's place and the row holds it. In the menu every item is off.",
           ru: "Закреплённые строки: удаление на своём месте, выключено и объясняет почему (`labels.lockedReason`); с `reorderable` на месте ручки — замок, строка держит место. В меню все пункты выключены.",
+        },
+        {
+          name: "getLockedReason",
+          type: "(item: T) => string | undefined",
+          en: "Why this pinned row (`getLocked`) cannot be removed, when the reason is the row's own; `undefined` or an empty string falls back to `labels.lockedReason`.",
+          ru: "Почему нельзя удалить эту закреплённую строку (`getLocked`), если причина у строки своя; `undefined` или пустая строка — `labels.lockedReason`.",
         },
         {
           name: "reorderable",
@@ -219,8 +225,8 @@ export const api: ComponentApi = {
       ru: "Имя строки с текстом `getLabel`; `{label}` — этот текст.",
     },
     lockedReason: {
-      en: "Why a pinned row (`getLocked`) cannot be removed: the tooltip of its remove button, the description of its menu's remove item.",
-      ru: "Почему закреплённую строку (`getLocked`) нельзя удалить: подсказка её кнопки удаления, описание пункта удаления в меню.",
+      en: "Why a pinned row (`getLocked`) cannot be removed, unless `getLockedReason` gives its own: the tooltip of its remove button, the description of its menu's remove item.",
+      ru: "Почему закреплённую строку (`getLocked`) нельзя удалить, если `getLockedReason` не назвал свою: подсказка её кнопки удаления, описание пункта удаления в меню.",
     },
     totals: {
       en: "Name of the totals row (`renderTotals`), shown in its first cell when that has no total.",
@@ -273,6 +279,10 @@ export const api: ComponentApi = {
       {
         en: "The remove button is «Удалить: {row}», the handle «Переместить: {row}»: the row's name from `getLabel`, else its number.",
         ru: "Кнопка удаления — «Удалить: {row}», ручка — «Переместить: {row}»: имя строки из `getLabel` или её номер.",
+      },
+      {
+        en: "While `onValueChange` or `createItem` is saving, the list has `aria-busy`; the placeholder row of a pending `createItem` is `aria-hidden`.",
+        ru: "Пока `onValueChange` или `createItem` сохраняют, у списка `aria-busy`; строка-заглушка ожидающего `createItem` — `aria-hidden`.",
       },
       {
         en: "A pinned row keeps its remove button: `aria-disabled`, described by `labels.lockedReason` (a tooltip on hover and focus); with `reorderable` Dnd's lock stands in place of the handle. In the menu its items are `disabled` and the remove item is described by `labels.lockedReason`.",

@@ -1,5 +1,5 @@
-/** Funnel stages in one list: the team's stages move by the handle or Alt+arrows and are saved on the server, the system ones hold their places with a lock where the grip is; the switch leads every row, the grip ends it — `onReorder`, `value`, `locked`, `side`. */
-import { Card, List, moveBefore, Switch } from "prime-ui-kit";
+/** Funnel stages in one list: the switches end the rows; a reorder mode swaps them for the grips, the team's stages move by the grip or Alt+arrows and are saved on the server, the system ones hold their places with a lock — `onReorder`, `value`, `locked`, `List.ItemActions`. */
+import { Button, Card, Icon, List, moveBefore, Switch } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -74,35 +74,54 @@ function saveOrder(): Promise<void> {
 
 export default function ListReorderExample() {
   const [stages, setStages] = React.useState(STAGES);
+  const [reordering, setReordering] = React.useState(false);
 
   return (
-    <Card.Root className={styles.pane}>
-      <List.Root
-        aria-label="Этапы воронки"
-        onReorder={async (id, beforeId) => {
-          await saveOrder();
-          setStages((current) => moveBefore(current, id, beforeId, (stage) => stage.id));
-        }}
+    <>
+      <Button.Root
+        variant="soft"
+        tone="neutral"
+        onClick={() => setReordering((current) => !current)}
       >
-        {stages.map((stage) => (
-          <List.Item key={stage.id} value={stage.id} locked={stage.system}>
-            <List.ItemActions side="start">
-              <Switch.Root
-                aria-label={`Показывать «${stage.name}» на доске`}
-                checked={stage.shown}
-                onCheckedChange={(shown) =>
-                  setStages((current) =>
-                    current.map((item) => (item.id === stage.id ? { ...item, shown } : item)),
-                  )
+        <Button.Icon>
+          <Icon name={reordering ? "action.check" : "sort.none"} />
+        </Button.Icon>
+        {reordering ? "Готово" : "Изменить порядок"}
+      </Button.Root>
+      <Card.Root className={styles.pane}>
+        <List.Root
+          aria-label="Этапы воронки"
+          onReorder={
+            reordering
+              ? async (id, beforeId) => {
+                  await saveOrder();
+                  setStages((current) => moveBefore(current, id, beforeId, (stage) => stage.id));
                 }
-              />
-            </List.ItemActions>
-            <List.ItemText>{stage.name}</List.ItemText>
-            <List.ItemDescription>{stage.description}</List.ItemDescription>
-            <List.ItemCount>{stage.deals}</List.ItemCount>
-          </List.Item>
-        ))}
-      </List.Root>
-    </Card.Root>
+              : undefined
+          }
+        >
+          {stages.map((stage) => (
+            <List.Item key={stage.id} value={stage.id} locked={stage.system}>
+              <List.ItemText>{stage.name}</List.ItemText>
+              <List.ItemDescription>{stage.description}</List.ItemDescription>
+              <List.ItemCount>{stage.deals}</List.ItemCount>
+              {!reordering && (
+                <List.ItemActions>
+                  <Switch.Root
+                    aria-label={`Показывать «${stage.name}» на доске`}
+                    checked={stage.shown}
+                    onCheckedChange={(shown) =>
+                      setStages((current) =>
+                        current.map((item) => (item.id === stage.id ? { ...item, shown } : item)),
+                      )
+                    }
+                  />
+                </List.ItemActions>
+              )}
+            </List.Item>
+          ))}
+        </List.Root>
+      </Card.Root>
+    </>
   );
 }

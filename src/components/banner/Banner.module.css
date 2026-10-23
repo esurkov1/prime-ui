@@ -145,13 +145,15 @@
 
 /* ---------- Narrow container: actions under the text ---------- */
 
+/* Only a banner with actions is a size container (see `.root:has(.actions)`), so the rules are
+   scoped to it: a banner without actions must never read the container of its host. */
 @container (max-width: 36rem) {
-  .content {
+  .content:has(> .actions) {
     flex-wrap: wrap;
   }
 
   /* Under the text column: the mark and the gap are skipped. */
-  .actions {
+  .content > .actions {
     flex: 1 1 100%;
     justify-content: flex-start;
   }

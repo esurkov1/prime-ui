@@ -81,6 +81,7 @@ export type {
   CardLinkProps,
   CardMediaPlacement,
   CardMediaProps,
+  CardNoteProps,
   CardRootProps,
   CardTitleProps,
   CardTotalProps,

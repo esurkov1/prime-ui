@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { passSwapHold } from "@/test/motion";
 
 import {
@@ -445,5 +446,14 @@ describe("ChartFrame", () => {
     expect(() => render(<ChartFrame.Legend />)).toThrow(
       "`ChartFrame.Legend` sub-component must be used inside `ChartFrame.Root`",
     );
+  });
+});
+
+describe("ChartFrame hidden data table", () => {
+  it("sits in a visually hidden block, never carries the recipe on the table itself", () => {
+    render(<Frame />);
+    const table = screen.getByRole("table");
+    expect(table.className).toBe("");
+    expect(table.parentElement?.className).toBe(visuallyHiddenClass);
   });
 });

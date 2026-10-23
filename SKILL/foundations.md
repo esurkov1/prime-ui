@@ -143,7 +143,8 @@ A mark is the round or square picture that leads a row or a card: an `Avatar`, a
   | badges | 16 | 16 | 16 | 20 | 20 |
 
   A surface's title stays under the page's section title (16): a default card's is 14. A Kpi stands
-  a step under a Card of the same size, a toast two steps under its tier, a dialog on `l`.
+  a step under a Card of the same size, a dialog on `l`; every other surface (a toast included) on
+  the frame of its own size.
 
 ```tsx good
 // good — one list row: the avatar l and the ring m are both 40
