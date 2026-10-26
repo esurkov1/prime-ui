@@ -30,6 +30,7 @@ import {
   HeaderLineContent,
   HeaderRowContent,
   headerRowStyles,
+  SectionTitle,
   useTitleFloor,
 } from "@/internal/headerRow";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
@@ -538,6 +539,9 @@ DialogIcon.displayName = "Dialog.Icon";
  */
 const DialogHeaderContext = React.createContext<{ record: boolean } | null>(null);
 
+/** Badges inside a section stand on its title-s heading: the chip tier of a frame `m` title. */
+const DialogSectionContext = React.createContext(false);
+
 /**
  * A line of a record header cut with an ellipsis tells its whole text on hover (`title`), only
  * while it is cut and only when the consumer gave no `title` of its own; assistive tech always
@@ -647,7 +651,7 @@ export type DialogBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
 export function DialogBadges({ loading = false, className, children, ...rest }: DialogBadgesProps) {
   useDialogShell("Badges");
   const swap = useSwapIn(loading ? "loading" : "data", children);
-  const size = tierMappings.cardBadges.l;
+  const size = tierMappings.cardBadges[React.useContext(DialogSectionContext) ? "m" : "l"];
   if (swap.state === "loading") {
     return (
       <div
@@ -919,6 +923,7 @@ DialogBody.displayName = "Dialog.Body";
 
 export type DialogSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
   label: React.ReactNode;
+  number?: React.ReactNode;
   description?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 };
@@ -941,11 +946,13 @@ function flowOf(parent: HTMLElement): "step" | "gap" | "block" {
 /**
  * A titled group of the dialog body — what `Page.Section` is to a page: an `<h3>` (title-s, one
  * level under the dialog's `<h2>` title) with an optional description and the dialog's `Actions`
- * at the end of the heading row, then the content 16 below. Sections stand further apart than the
- * plain blocks of the body.
+ * at the end of the heading row, then the content 16 below. A section about a record (a deal of a
+ * feed) takes its `number` and the dialog's `Badges` on the heading's line, as a record header
+ * does. Sections stand further apart than the plain blocks of the body.
  */
 export function DialogSection({
   label,
+  number,
   description,
   className,
   children,
@@ -960,7 +967,8 @@ export function DialogSection({
     const section = sectionRef.current;
     if (section?.parentElement) section.dataset.flow = flowOf(section.parentElement);
   });
-  const { parts: actions, rest: content } = splitParts(children, DialogActions);
+  const { parts: actions, rest: other } = splitParts(children, DialogActions);
+  const { parts: badges, rest: content } = splitParts(other, DialogBadges);
   return (
     <section
       aria-labelledby={headingId}
@@ -970,9 +978,17 @@ export function DialogSection({
     >
       <div className={styles.sectionHeader}>
         <div className={styles.sectionHeading}>
-          <h3 id={headingId} className={cx(textRole.titleS, styles.sectionTitle)}>
+          <SectionTitle
+            as="h3"
+            id={headingId}
+            number={number}
+            badges={
+              badges.length > 0 ? <DialogSectionContext value>{badges}</DialogSectionContext> : null
+            }
+            className={cx(textRole.titleS, styles.sectionTitle)}
+          >
             {label}
-          </h3>
+          </SectionTitle>
           {description ? (
             <p className={cx(textRole.bodyS, styles.sectionDescription)}>{description}</p>
           ) : null}

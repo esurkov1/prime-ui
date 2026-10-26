@@ -87,8 +87,8 @@ export const api: ComponentApi = {
       ru: "Группа заголовка: путь `Breadcrumb.Root`, `Page.Title`, `Page.Description`. В полосе заголовок — последний уровень пути (путь › заголовок в одну строку, оба обрезаются); в потоке путь стоит над большим заголовком.",
       props: [
         divRest({
-          en: "`children` (`Breadcrumb.Root`, `Page.Title`, `Page.Description`)",
-          ru: "`children` (`Breadcrumb.Root`, `Page.Title`, `Page.Description`)",
+          en: "`children` (`Breadcrumb.Root`, `Page.Title`, `Page.Badges`, `Page.Description`)",
+          ru: "`children` (`Breadcrumb.Root`, `Page.Title`, `Page.Badges`, `Page.Description`)",
         }),
       ],
     },
@@ -123,6 +123,17 @@ export const api: ComponentApi = {
           en: "`children`, `className` and the other paragraph attributes.",
           ru: "`children`, `className` и остальные атрибуты абзаца.",
         },
+      ],
+    },
+    {
+      name: "Page.Badges",
+      en: "`ref` → `HTMLDivElement`. The badges of what a heading names, on its line after the title — in `Page.Heading` beside `Page.Title`, in a `Page.Section` beside its `label`: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N».",
+      ru: "Бейджи того, что называет заголовок, на его строке после названия — в `Page.Heading` рядом с `Page.Title`, в `Page.Section` рядом с её `label`: один `Badge.Group`, ярус чипов `m`, один ряд, остальное в «+N».",
+      props: [
+        divRest({
+          en: '`children` (`Badge.Root`s), `aria-label` (a named row is `role="group"`)',
+          ru: '`children` (`Badge.Root`), `aria-label` (названный ряд — `role="group"`)',
+        }),
       ],
     },
     {
@@ -162,6 +173,12 @@ export const api: ComponentApi = {
           ru: "Видимый заголовок (`h2`); он же называет раздел.",
         },
         {
+          name: "number",
+          type: "ReactNode",
+          en: "The number of the record the section is about («#852»): muted, tabular, after the `label`. The heading becomes one line: the `label` is cut, the number never is.",
+          ru: "Номер записи, о которой раздел («#852»): приглушённый, табличный, после `label`. Заголовок становится одной строкой: `label` режется, номер — никогда.",
+        },
+        {
           name: "description",
           type: "ReactNode",
           en: "One line of context under the heading, in secondary body-s.",
@@ -170,8 +187,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "title">',
-          en: "`children` (the content; `Page.Actions` goes to the heading row), `className` and the other section attributes.",
-          ru: "`children` (содержимое; `Page.Actions` уходит в строку заголовка), `className` и остальные атрибуты section.",
+          en: "`children` (the content; `Page.Actions` goes to the heading row, `Page.Badges` to the heading's line), `className` and the other section attributes.",
+          ru: "`children` (содержимое; `Page.Actions` уходит в строку заголовка, `Page.Badges` — на строку заголовка после него), `className` и остальные атрибуты section.",
         },
       ],
     },

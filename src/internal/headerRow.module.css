@@ -74,6 +74,25 @@
   }
 }
 
+/* A record's title with its `number` (a section heading): the name cuts, the number never does. */
+.numbered {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.number {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .badges {
   flex: 1 1 auto;
 }

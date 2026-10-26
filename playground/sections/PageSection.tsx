@@ -93,7 +93,7 @@ export const page: ComponentPageConfig = {
       scenario: "sections",
       title: "Разделы",
       description:
-        "Плитки одного экрана рядом, новая тема отделена воздухом, ссылка в конце заголовка — `Page.Section`, `label`, `description`, `Page.Actions`.",
+        "Плитки одного экрана рядом, новая тема отделена воздухом, ссылка в конце заголовка, раздел об одном договоре с его номером и статусом на строке заголовка — `Page.Section`, `label`, `number`, `description`, `Page.Badges`, `Page.Actions`.",
     },
     {
       scenario: "grid",

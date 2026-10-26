@@ -99,6 +99,13 @@
   border-radius: var(--field-radius);
 }
 
+/* A whole row whose end may drop under its text (a Timeline amount in a narrow container): the end
+   takes a line of its own, read as one more line of the text. */
+.row.hit[data-wrap] {
+  flex-wrap: wrap;
+  row-gap: var(--prime-space-0);
+}
+
 /* The row's text keeps a floor beside its controls; controls that leave less than the floor drop
    to a line of their own at the row's end instead of crushing the text or leaving the row. */
 .row > .hit {

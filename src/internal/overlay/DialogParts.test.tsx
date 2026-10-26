@@ -438,6 +438,35 @@ describe("DialogParts", () => {
     expect(screen.getByText("Поставка серверов").parentElement).toBe(section);
   });
 
+  it("puts a section's record number and Badges on its heading line, a chip tier under the header's", () => {
+    render(
+      <Root defaultOpen>
+        <DialogPanel kind="drawer" panelClassName="panel" swipe="never" footerLayout="end">
+          <DialogHeader>
+            <DialogTitle>Анна Соколова</DialogTitle>
+            <DialogBadges>
+              <Badge.Root>Клиент</Badge.Root>
+            </DialogBadges>
+          </DialogHeader>
+          <DialogBody>
+            <DialogSection label="Сделка 15 окт" number="#852">
+              <DialogBadges>
+                <Badge.Root color="blue">Аренда</Badge.Root>
+              </DialogBadges>
+              <p>Аренда закончилась</p>
+            </DialogSection>
+          </DialogBody>
+        </DialogPanel>
+      </Root>,
+    );
+    const heading = screen.getByRole("heading", { level: 3, name: "Сделка 15 окт #852" });
+    const badge = screen.getByText("Аренда");
+    expect(heading.parentElement).toContainElement(badge);
+    expect(badge.closest("[data-size]")).toHaveAttribute("data-size", "s");
+    expect(screen.getByText("Клиент").closest("[data-size]")).toHaveAttribute("data-size", "m");
+    expect(badge.closest(`.${styles.sectionHeader}`)).not.toBeNull();
+  });
+
   it("keeps the close button beside the header row, never inside the end that wraps", () => {
     render(
       <Root defaultOpen>

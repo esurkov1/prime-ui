@@ -57,6 +57,12 @@ export const page: ComponentPageConfig = {
         "Карточка клиента из списка: аватар контакта стоит в шапке вместо плашки с иконкой, ниже — реквизиты в разделах с заголовками, у одного своё действие — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`.",
     },
     {
+      scenario: "history",
+      title: "Разделы о записях",
+      description:
+        "История клиента главами по сделкам: каждый раздел называет сделку с её номером и этапом на строке заголовка, в конце — ссылка на сделку, под ним — её события — `Drawer.Section`, `number`, `Drawer.Badges`, `Drawer.Actions`.",
+    },
+    {
       scenario: "record-picture",
       title: "Фото записи и бейджи",
       description:

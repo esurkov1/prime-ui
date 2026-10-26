@@ -20,6 +20,7 @@ export { BottomNav } from "./bottom-nav/BottomNav";
 export type {
   PageActionsProps,
   PageBackButtonProps,
+  PageBadgesProps,
   PageBodyProps,
   PageCellProps,
   PageCellRows,

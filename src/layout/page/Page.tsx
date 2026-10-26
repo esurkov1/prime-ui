@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
 import { Breadcrumb, type BreadcrumbRootProps } from "@/components/breadcrumb/Breadcrumb";
 import { Button, type ButtonRootProps } from "@/components/button/Button";
 import { ConfirmDialog } from "@/components/confirm-dialog/ConfirmDialog";
@@ -24,7 +25,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
-import { HeaderLineContent, headerRowStyles } from "@/internal/headerRow";
+import { HeaderLineContent, headerRowStyles, SectionTitle } from "@/internal/headerRow";
 import { iconLayout } from "@/internal/iconLayout";
 import { useLabels } from "@/internal/labels";
 import { useLeaveGuard } from "@/internal/leaveGuard";
@@ -32,6 +33,7 @@ import { namedRole } from "@/internal/namedRole";
 import { nodeText } from "@/internal/nodeText";
 import { flattenChildren, isPart, splitParts } from "@/internal/parts";
 import { useSwapIn } from "@/internal/RegionSwap";
+import { tierMappings } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { ToolChips, ToolRow } from "@/internal/ToolRow";
 import textRole from "@/internal/textRole.module.css";
@@ -925,20 +927,53 @@ function PageBody({ className, ...rest }: PageBodyProps) {
 }
 PageBody.displayName = "Page.Body";
 
+export type PageBadgesProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * The badges of what a heading names, on its line after the title — a record's status beside
+ * `Page.Title` or a `Page.Section` heading: one `Badge.Group` at the chip tier of a 16/24 title,
+ * one row, what does not fit folds into «+N».
+ */
+function PageBadges({ className, children, ...rest }: PageBadgesProps) {
+  return (
+    <Badge.Group
+      {...rest}
+      size={tierMappings.cardBadges.l}
+      overflow="count"
+      className={cx(headerRowStyles.badges, className)}
+    >
+      {children}
+    </Badge.Group>
+  );
+}
+PageBadges.displayName = "Page.Badges";
+
 export type PageSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
   label: React.ReactNode;
+  number?: React.ReactNode;
   description?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 };
 
 /**
  * A titled section of the page: an `h2` heading (with an optional description and `Page.Actions`
- * at its end) over its content. Sections stand further apart than the plain blocks of the body,
- * so the air shows where a new topic starts.
+ * at its end) over its content. A section about a record takes its `number` and `Page.Badges` on
+ * the heading's line, as a record header does. Sections stand further apart than the plain blocks
+ * of the body, so the air shows where a new topic starts.
  */
-function PageSection({ label, description, className, children, ...rest }: PageSectionProps) {
+function PageSection({
+  label,
+  number,
+  description,
+  className,
+  children,
+  ...rest
+}: PageSectionProps) {
   const headingId = React.useId();
-  const { parts: actions, rest: content } = splitParts(children, PageActions);
+  const { parts: actions, rest: other } = splitParts(children, PageActions);
+  const { parts: badges, rest: content } = splitParts(other, PageBadges);
 
   return (
     <section aria-labelledby={headingId} {...rest} className={cx(styles.section, className)}>
@@ -947,9 +982,15 @@ function PageSection({ label, description, className, children, ...rest }: PageS
         data-has-actions={actions.length > 0 ? "true" : undefined}
       >
         <div className={styles.sectionHeading}>
-          <h2 id={headingId} className={cx(textRole.titleM, styles.sectionTitle)}>
+          <SectionTitle
+            as="h2"
+            id={headingId}
+            number={number}
+            badges={badges.length > 0 ? badges : null}
+            className={cx(textRole.titleM, styles.sectionTitle)}
+          >
             {label}
-          </h2>
+          </SectionTitle>
           {description ? (
             <p className={cx(textRole.bodyS, styles.sectionDescription)}>{description}</p>
           ) : null}
@@ -1243,6 +1284,7 @@ export const Page = {
   Heading: PageHeading,
   Title: PageTitle,
   Description: PageDescription,
+  Badges: PageBadges,
   Actions: PageActions,
   Tools: PageTools,
   Chips: PageChips,

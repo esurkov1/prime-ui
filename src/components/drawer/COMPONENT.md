@@ -37,7 +37,7 @@ Drawer.Root                    state and dismiss policy (no DOM)
    │  ├─ Drawer.Fields         the record's value pickers (Selects) as one row under the title row, tier xs, wraps when narrow
    │  └─ Drawer.Icon           optional: tone tile around an Icon, or a picture, 48
    ├─ Drawer.Body              the only scrolling zone (ScrollContainer)
-   │  └─ Drawer.Section        <section>: <h3> label, description, Drawer.Actions at the heading's end
+   │  └─ Drawer.Section        <section>: <h3> label (+ a record's number), description, Drawer.Badges on the heading's line, Drawer.Actions at its end
    └─ Drawer.Footer            when there is something to do: Cancel + submit, the record's action; drawn only with content
       ├─ Drawer.Actions        the start group: an action apart from the main pair
       ├─ Drawer.Meta           <p>, muted status at the start
@@ -124,7 +124,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Drawer.Badges
-`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.
+`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N»; inside a `Drawer.Section` after its heading, tier `s`. A status or person picker is a `Select` in `Fields`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -144,8 +144,9 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | The heading of the section; it names the `<section>`. |
+| `number` | `ReactNode` | — | The number of the record the section is about («#852», a deal of a feed): muted, tabular, after the `label`. The heading becomes one line: the `label` is cut, the number never is. |
 | `description` | `ReactNode` | — | One line of context under the heading (body-s). |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content and an optional `Drawer.Actions`), `className` and the other attributes of the `<section>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content, an optional `Drawer.Actions` and `Drawer.Badges` — chip tier `s`, on the heading's line), `className` and the other attributes of the `<section>`. |
 
 ### Drawer.Footer
 `ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, with no line above it, only while it holds something (it enters and closes up in place); at the start one thing — an optional `Drawer.Actions` (an action apart) and `Meta`.
@@ -251,6 +252,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Tabs in the header: a `Tabs.List` inside `Drawer.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and flush with the body; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.
 - Titled groups of the body (a record's contacts, its deals, its history): `Drawer.Section label` — an `<h3>` under the drawer's `<h2>` title, an optional `description`, a `Drawer.Actions` at the end of its heading row (on a narrow dialog they drop under the heading, which keeps 128 at least); content 16 below, sections 32 apart — directly in the body, in a `Tabs.Panel` or in a form, with no spacing wrapper of your own. A tab's blocks: a `Drawer.Section` with a label, or a self-titled block (a `ChartFrame`, a `Card` with its `Card.Title`) directly in the panel — a `Tabs.Panel` in the body stands its blocks 32 apart, the step between sections, by itself. A group of fields is a `Fieldset`; a page section is `Page.Section`.
+- A section about a record (a deal in a client's history): `Drawer.Section label number` with `Drawer.Badges` inside — the heading becomes one line like a record header: the label cut down to its text or 8em, the number never, the badges (chip tier `s`, a tier under the header's) fold into «+N»; a link to the record goes in its `Drawer.Actions`.
 - With a `Drawer.Meta` the buttons stay one row: when the footer runs short the status goes above them first.
 - `Drawer.Actions` stay at the end of the title line while the title keeps its floor; when they do not fit they drop to a line of its own under the title and the × stays at the top end. The count of actions is one rule for every header: one or two are icon buttons with a Tooltip, three or more a ⋯ menu.
 - Opening a record: the header and its tabs come at once, the body as a `Skeleton` in the data's geometry. A record opened from a list row comes with the data the row already has (its title, often its status) at once, and only the rest loads (`Drawer.Description loading`); a record opened by a link knows only its id, so `Drawer.Title loading` and `Drawer.Badges loading` hold the title and the badges too. Read-only data swaps under a `Crossfade`; a form gets no `Crossfade` around it — its fields render once the record is there, so typing and focus are never cross-faded. Never a skeleton of your own in the header.
@@ -297,6 +299,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [header-actions.tsx](examples/header-actions.tsx) | The one header of a record: the name with its number and its plain statuses on one line, a line of data under it, the status and the assignee as a row of pickers under them, and in the title row only two icon buttons and the close — `Drawer.Title`, `number`, `Drawer.Badges`, `Drawer.Description`, `Drawer.Fields`, `Drawer.Actions`, `Select.Root`. |
 | [footer-actions.tsx](examples/footer-actions.tsx) | A profile panel: Sign out, a neutral button, stands apart at the start of the footer, the main action keeps the end; on a phone the column puts it first and the main action last — `Drawer.Footer`, `Drawer.Actions`. |
 | [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details in titled sections, one with its own action — `Drawer.Icon`, `Avatar.Root`, `Drawer.Section`, `Drawer.Actions`. |
+| [history.tsx](examples/history.tsx) | A client's history in chapters by deal: each section names its deal with the deal's number and stage on the heading's line, a link to the deal at its end, the deal's events under it — `Drawer.Section`, `number`, `Drawer.Badges`, `Drawer.Actions`. |
 | [record-picture.tsx](examples/record-picture.tsx) | A vehicle's panel headed by its photo: the name and the plate beside the picture, a line of data under them, and the status badges on the name's line, after the plate — `Drawer.Icon`, `Thumbnail.Root`, `Drawer.Badges`. |
 | [tab-switcher.tsx](examples/tab-switcher.tsx) | A model card with tabs: one switcher for the whole open tab stands in the header before the record's icon buttons — the text language on the description tab, the period on the analytics tab, whose two self-titled charts the panel spaces by itself — `Drawer.Actions`, `Tabs.Root`, `Tabs.Panel`. |
 | [loading.tsx](examples/loading.tsx) | A record card that opens before its data arrives: the title and the status come from the list row, the line of data between them and the body hold their place in skeletons, then the data fades in — `Drawer.Description`, `loading`. |
@@ -313,6 +316,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Save or Cancel buttons at the end of the body, or in the header → they go in `Drawer.Footer`, which stays in place while the body scrolls.
 - A delete confirmation in a Drawer → use ConfirmDialog.
 - A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Drawer.Section label` with `Drawer.Actions`.
+- A `List` row or a heading with a hand-placed `Badge` over a record's group (a deal's events) → `Drawer.Section label number` with `Drawer.Badges`.
 - A wrapper with its own gap around `Drawer.Section`s or self-titled blocks inside a `Tabs.Panel`, or around sections in a form → not needed: the panel in the body stands its blocks 32 apart, and sections keep 32 between them in any wrapper.
 - A `Drawer.Section` only to space a block that already names itself (a chart, a titled card) → put it directly in the `Tabs.Panel`; the panel spaces it.
 - A `Skeleton` placed by hand in `Drawer.Title` or `Drawer.Description` while the record loads → their `loading`; a placeholder title that shifts the header when the name arrives → `Drawer.Title loading`.
@@ -337,5 +341,5 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Padding on a wrapper inside Body → Body already pads and scrolls.
 
 ## Related
-- **Built from:** the dialog shared with Modal and Sheet (`internal/overlay/DialogParts`), [Badge](../badge/COMPONENT.md) (`Drawer.Badges`: a one-line `Badge.Group` of chip tier m), [StatusDot](../status-dot/COMPONENT.md) (the state in front of a record's description), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Drawer.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Drawer.Title loading`, `Drawer.Badges loading`, `Drawer.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Sheet (`internal/overlay/DialogParts`), [Badge](../badge/COMPONENT.md) (`Drawer.Badges`: a one-line `Badge.Group` of chip tier m, s in a section), [StatusDot](../status-dot/COMPONENT.md) (the state in front of a record's description), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Drawer.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Drawer.Title loading`, `Drawer.Badges loading`, `Drawer.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Modal](../modal/COMPONENT.md) (the same header, body, footer and `Guard` in the centre), [Sheet](../sheet/COMPONENT.md) (the same parts raised from the bottom edge for a short task), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm), [Sidebar](../../layout/sidebar/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Avatar](../avatar/COMPONENT.md) (a person's picture in `Drawer.Icon`)

@@ -312,6 +312,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | card / panel title | `Card.Title as="h2"` (under the page title) |
 | heading of a group of fields | `Fieldset label` (`title-s` in the `<legend>`) |
 | section heading inside a Drawer or a Modal | `Drawer.Section label` / `Modal.Section label` (an `h3` in `title-s`, `Drawer.Actions` at its end) |
+| a section about one record (a deal's chapter of a feed, a contract on a client page) | the section's `number` and its `Drawer.Badges` / `Page.Badges` on the heading's line — never a `List` row or a heading with a hand-placed `Badge` |
 | other group heading inside a card | `Typography as="h3" variant="title-s"` |
 | body text, cells | `body-m` |
 | lead under a heading | `body-m` + `tone="secondary"` |

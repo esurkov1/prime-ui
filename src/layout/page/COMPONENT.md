@@ -55,12 +55,14 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 │  ├─ Page.Heading
 │  │  ├─ Breadcrumb.Root           the path over the title
 │  │  ├─ Page.Title                <h1>, heading-m
+│  │  ├─ Page.Badges               a record's badges on the title's line
 │  │  └─ Page.Description          <p>, secondary body-m
 │  └─ Page.Actions                 wrap under the heading on a narrow column
 └─ Page.Body                       page content, blocks 24 apart
    ├─ Page.Grid                    12-column tile grid, 16 on both axes; a container (prime-grid)
    │  └─ Page.Cell                 one tile place: span, rows; its child fills it
-   ├─ Page.Section                 <section> + <h2> label, 40 from its neighbours
+   ├─ Page.Section                 <section> + <h2> label (+ a record's number), 40 from its neighbours
+   │  ├─ Page.Badges               the record's badges on the heading's line
    │  └─ Page.Actions              a link or button at the end of the section heading
    └─ Page.Split                   list + detail; a container (prime-split)
       ├─ Page.List                 list pane: 16–20rem column, or the whole split while closed
@@ -105,7 +107,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Breadcrumb.Root`, `Page.Title`, `Page.Description`), `className` and the other div attributes. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Breadcrumb.Root`, `Page.Title`, `Page.Badges`, `Page.Description`), `className` and the other div attributes. |
 
 ### Page.Title
 `ref` → `HTMLHeadingElement`. The page's `<h1>`, one per page: the path's last level in the bar (title-m, truncates), a large title in the flow (heading-m, wraps). A flow title is what a `collapse` bar repeats.
@@ -121,6 +123,13 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 |---|---|---|---|
 | `loading` | `boolean` | `false` | Its data is loading: a Skeleton keeps the line's place, so the title never moves; the data then fades in. Sets `aria-busy`. |
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
+
+### Page.Badges
+`ref` → `HTMLDivElement`. The badges of what a heading names, on its line after the title — in `Page.Heading` beside `Page.Title`, in a `Page.Section` beside its `label`: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N».
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Badge.Root`s), `aria-label` (a named row is `role="group"`), `className` and the other div attributes. |
 
 ### Page.Tools
 `ref` → `HTMLDivElement`. What acts on the whole page: sub-page links, view, a shared period, a filter over views, a section page's table tools (a table block: its `toolbar`). In the heading row before the buttons while they fit, else on a line of their own. Named, a `group`.
@@ -156,8 +165,9 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | The visible heading (`h2`); it also names the section. |
+| `number` | `ReactNode` | — | The number of the record the section is about («#852»): muted, tabular, after the `label`. The heading becomes one line: the `label` is cut, the number never is. |
 | `description` | `ReactNode` | — | One line of context under the heading, in secondary body-s. |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content; `Page.Actions` goes to the heading row), `className` and the other section attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content; `Page.Actions` goes to the heading row, `Page.Badges` to the heading's line), `className` and the other section attributes. |
 
 ### Page.Grid
 `ref` → `HTMLDivElement`. The grid of the page's tiles (KPI cards, charts, panels): 12 columns, 16 apart on both axes, so its rows read as one board. A size container: cells fold by its own width, a wide cell next to a narrow one pairs up (see Grid columns).
@@ -298,6 +308,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its natural width until every button step is taken; then a heading with a path stacks (the path over the title, the title and the description wrapping), so no level is cut to a fragment; a heading without a path truncates its title.
 - The plan is measured, never chosen by breakpoints: the bar lays itself out from its own width.
 - Header (flow) → Body 24; blocks inside Body 24; a `Page.Section` 40 from its neighbours (the body's 24 + 16); tile → tile in a Grid 16 on both axes; section heading → content 16, heading → description 4; flow Title → Description 8; heading → Actions 24 side by side, 16 once they wrap below.
+- A `Page.Section` about a record (`number`, `Page.Badges`) heads it with one line, as a record header does: the `label` is cut down to its own text or 8em, the number after it never, the badges 6 after it fold into «+N»; a plain heading wraps.
 - The grid lays itself out from its own width (`prime-grid`), the split from its own (`prime-split`) — never from the window.
 - `fill` needs a main with a height: `AppShell.Root fillViewport`. The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `Page.Split`.
 - Each pane of a split is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there. The detail pane on a wide split shows a short hint while nothing is chosen; a newly chosen record cross-fades in.
@@ -347,7 +358,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 | [tools.tsx](examples/tools.tsx) | The orders page's tools in its top bar: sections with counts, the search and filter that narrow both views, the view, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. |
 | [router.tsx](examples/router.tsx) | A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the heading row before the buttons is their links and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. |
 | [actions-collapse.tsx](examples/actions-collapse.tsx) | The buttons of an invoices page on a tablet-wide column: the line runs short, so the secondary buttons show only their icons with the label as the name and the tooltip, the primary keeps its label — `Page.Actions`, `Button.Icon`. |
-| [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading — `Page.Section`, `label`, `description`, `Page.Actions`. |
+| [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading, a section about one contract with its number and status on the heading's line — `Page.Section`, `label`, `number`, `description`, `Page.Badges`, `Page.Actions`. |
 | [grid.tsx](examples/grid.tsx) | A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `Page.Grid`, `Page.Cell`, `span`, `rows`. |
 | [list-detail.tsx](examples/list-detail.tsx) | A ticket queue as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one; the chosen ticket cross-fades in — `Page.Split`, `Page.List`, `Page.Detail`, `Page.BackButton`, `fill`. |
 | [guard.tsx](examples/guard.tsx) | A client's card edited on its own page: after an edit a press on the navigation or the path asks before the changes are lost, and while it saves nothing leaves — `Page.Guard`, `dirty`, `busy`. |
@@ -373,6 +384,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - Hiding buttons with media queries on a phone → `Page.Actions` in the bar collapses and folds them by measured width.
 - Wrapping a group of the bar or `Page.Title` in your own component → the bar and the heading find their parts among their direct children.
 - A hand-made `<section>` + `Typography as="h2"` + own gap CSS → `Page.Section label`.
+- A record's number typed into a section `label` («Сделка #852»), or a `List` row or a hand-made row of a heading and a `Badge` over a section → `Page.Section label number` with `Page.Badges`.
 - A heading column beside a panel (the section's title and description on the left, its card on the right) → it wastes the width and breaks the reading line; a titled block is a `Card.Root` with its own `Card.Header` (`Card.Title as="h2"`, `Card.Description`) stacked in the flow.
 - Each row of cards in its own grid → put every tile of the screen in one `Page.Grid`.
 - Computing a height from `100vh` minus the bar for a full-height table or chat → `Page.Root fill` and a filling child.
@@ -381,5 +393,5 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 - Tiles of a row cut to 6 + 6 so a mid-width grid keeps no hole → write the 8 and the 4 next to each other; the grid pairs them as 2/3 + 1/3.
 
 ## Related
-- **Built from:** [AppShell](../app-shell/COMPONENT.md) (the navigation the menu button opens), [Breadcrumb](../../components/breadcrumb/COMPONENT.md) (the path the heading places), [Button](../../components/button/COMPONENT.md) (the menu button, «⋯», `Page.BackButton`; the icon-only label hook), [Dropdown](../../components/dropdown/COMPONENT.md) (folded buttons), [Tooltip](../../components/tooltip/COMPONENT.md) (the label of an icon-only button), `ToolRow` (`Page.Tools` and `Page.Chips`: the kit's one tool row and chips line) with [SmartFilter](../../components/smart-filter/COMPONENT.md), [Input](../../components/input/COMPONENT.md) and [Typography](../../components/typography/COMPONENT.md) (what grows in the tool row), [SegmentedControl](../../components/segmented-control/COMPONENT.md), [Datepicker](../../components/datepicker/COMPONENT.md) and [Select](../../components/select/COMPONENT.md) (what fills a short line; the first two get `fullWidth`), [Crossfade](../../components/crossfade/COMPONENT.md) (a `Page.Cell` child gets `fill`), [Skeleton](../../components/skeleton/COMPONENT.md) (the line of data while it loads), [StatusDot](../../components/status-dot/COMPONENT.md) (the status that opens a description), [ConfirmDialog](../../components/confirm-dialog/COMPONENT.md) (the confirm of `Page.Guard`), Icon (`nav.menu`, `nav.chevronRight`, `action.more`, `nav.chevronLeft`)
+- **Built from:** [AppShell](../app-shell/COMPONENT.md) (the navigation the menu button opens), [Badge](../../components/badge/COMPONENT.md) (the `Badge.Group` of `Page.Badges`), `headerRow` (a record section's title line), [Breadcrumb](../../components/breadcrumb/COMPONENT.md) (the path the heading places), [Button](../../components/button/COMPONENT.md) (the menu button, «⋯», `Page.BackButton`; the icon-only label hook), [Dropdown](../../components/dropdown/COMPONENT.md) (folded buttons), [Tooltip](../../components/tooltip/COMPONENT.md) (the label of an icon-only button), `ToolRow` (`Page.Tools` and `Page.Chips`: the kit's one tool row and chips line) with [SmartFilter](../../components/smart-filter/COMPONENT.md), [Input](../../components/input/COMPONENT.md) and [Typography](../../components/typography/COMPONENT.md) (what grows in the tool row), [SegmentedControl](../../components/segmented-control/COMPONENT.md), [Datepicker](../../components/datepicker/COMPONENT.md) and [Select](../../components/select/COMPONENT.md) (what fills a short line; the first two get `fullWidth`), [Crossfade](../../components/crossfade/COMPONENT.md) (a `Page.Cell` child gets `fill`), [Skeleton](../../components/skeleton/COMPONENT.md) (the line of data while it loads), [StatusDot](../../components/status-dot/COMPONENT.md) (the status that opens a description), [ConfirmDialog](../../components/confirm-dialog/COMPONENT.md) (the confirm of `Page.Guard`), Icon (`nav.menu`, `nav.chevronRight`, `action.more`, `nav.chevronLeft`)
 - **See also:** [DataTable](../../components/data-table/COMPONENT.md) (`toolbar`, `toolbarChips`), [Sidebar](../sidebar/COMPONENT.md), [BottomNav](../bottom-nav/COMPONENT.md), [Select](../../components/select/COMPONENT.md), [Card](../../components/card/COMPONENT.md), [ChartFrame](../../components/chart-frame/COMPONENT.md), [List](../../components/list/COMPONENT.md), [EmptyPage](../../components/empty-page/COMPONENT.md), [Drawer](../../components/drawer/COMPONENT.md), [VisuallyHidden](../../components/visually-hidden/COMPONENT.md)

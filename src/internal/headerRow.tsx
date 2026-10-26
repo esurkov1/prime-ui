@@ -6,6 +6,8 @@
 import * as React from "react";
 
 import { StatusDot } from "@/components/status-dot/StatusDot";
+import { cx } from "./cx";
+import { hasContent } from "./hasContent";
 import styles from "./headerRow.module.css";
 import { flattenChildren, isPart } from "./parts";
 
@@ -96,6 +98,64 @@ export function useTitleFloor(
     const gap = tail ? Number.parseFloat(getComputedStyle(node).columnGap) || 0 : 0;
     setTitleFloor(node, text.scrollWidth + (tail ? tail.offsetWidth + gap : 0));
   });
+}
+
+type SectionTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "title"> & {
+  as: "h2" | "h3";
+  number?: React.ReactNode;
+  badges?: React.ReactNode;
+};
+
+/**
+ * The heading of a section (`Page.Section`, a dialog's `Section`). A plain heading wraps; one that
+ * names a record — a `number` after the name, badges after it — is a header row's title line: one
+ * line, the name cut with an ellipsis down to its floor, the number never, then the badges fold
+ * into «+N».
+ */
+export function SectionTitle({
+  as: Tag,
+  number,
+  badges,
+  className,
+  children,
+  ...rest
+}: SectionTitleProps) {
+  const titleRef = React.useRef<HTMLHeadingElement>(null);
+  const nameRef = React.useRef<HTMLSpanElement>(null);
+  const numberRef = React.useRef<HTMLSpanElement>(null);
+  const numbered = hasContent(number);
+  const record = numbered || present(badges);
+  useTitleFloor(titleRef, numbered ? nameRef : undefined, numberRef);
+  if (!record) {
+    return (
+      <Tag {...rest} ref={titleRef} className={className}>
+        {children}
+      </Tag>
+    );
+  }
+  return (
+    <div className={styles.titleRow}>
+      <Tag
+        {...rest}
+        ref={titleRef}
+        className={cx(className, styles.title, numbered && styles.numbered)}
+      >
+        {numbered ? (
+          <>
+            <span ref={nameRef} className={styles.name}>
+              {children}
+            </span>{" "}
+            <span ref={numberRef} className={styles.number}>
+              {number}
+            </span>
+          </>
+        ) : (
+          children
+        )}
+      </Tag>
+      {badges}
+    </div>
+  );
 }
 
 /**

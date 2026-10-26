@@ -312,7 +312,7 @@
 
 @container (max-width: 20rem) {
   .value {
-    flex-basis: 100%;
+    flex: 1 1 100%;
     align-items: flex-start;
     margin-inline-start: calc(var(--field-icon) + var(--tl-col-gap));
     text-align: start;

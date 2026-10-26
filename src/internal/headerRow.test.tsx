@@ -1,10 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { StatusDot } from "@/components/status-dot/StatusDot";
 
-import { HeaderLineContent, HeaderRowContent, headerRowStyles, useTitleFloor } from "./headerRow";
+import {
+  HeaderLineContent,
+  HeaderRowContent,
+  headerRowStyles,
+  SectionTitle,
+  useTitleFloor,
+} from "./headerRow";
 
 describe("HeaderRowContent", () => {
   it("places mark, titles (title row, then description) and end whatever the order given", () => {
@@ -59,8 +65,9 @@ describe("useTitleFloor", () => {
       configurable: true,
       get: () => widths.current,
     });
-    const size = Object.getOwnPropertyDescriptor(window, "getComputedStyle");
-    window.getComputedStyle = (() => ({ fontSize: "10px" })) as unknown as typeof getComputedStyle;
+    const size = vi
+      .spyOn(window, "getComputedStyle")
+      .mockImplementation(() => ({ fontSize: "10px" }) as CSSStyleDeclaration);
     try {
       widths.current = 50;
       const view = render(<Title text="Заказ" />);
@@ -76,8 +83,50 @@ describe("useTitleFloor", () => {
     } finally {
       if (original) Object.defineProperty(HTMLElement.prototype, "scrollWidth", original);
       else Reflect.deleteProperty(HTMLElement.prototype, "scrollWidth");
-      if (size) Object.defineProperty(window, "getComputedStyle", size);
+      size.mockRestore();
     }
+  });
+});
+
+describe("SectionTitle", () => {
+  it("is a plain wrapping heading without a number or badges", () => {
+    render(
+      <SectionTitle as="h2" className="own">
+        Реквизиты
+      </SectionTitle>,
+    );
+    const heading = screen.getByRole("heading", { level: 2, name: "Реквизиты" });
+    expect(heading).toHaveClass("own");
+    expect(heading).not.toHaveClass(headerRowStyles.title);
+    expect(heading.parentElement).not.toHaveClass(headerRowStyles.titleRow);
+  });
+
+  it("names a record on one title line: the name, its number, then the badges", () => {
+    render(
+      <SectionTitle as="h3" number="#852" badges={<b data-testid="badges" />}>
+        Сделка 15 окт
+      </SectionTitle>,
+    );
+    const heading = screen.getByRole("heading", { level: 3, name: "Сделка 15 окт #852" });
+    expect(heading).toHaveClass(headerRowStyles.title, headerRowStyles.numbered);
+    const [name, number] = [...heading.children];
+    expect(name).toHaveClass(headerRowStyles.name);
+    expect(number).toHaveClass(headerRowStyles.number);
+    expect(number).toHaveTextContent("#852");
+    const row = heading.parentElement;
+    expect(row).toHaveClass(headerRowStyles.titleRow);
+    expect(row?.lastElementChild).toBe(screen.getByTestId("badges"));
+  });
+
+  it("takes badges alone without a number", () => {
+    render(
+      <SectionTitle as="h3" badges={<b data-testid="badges" />}>
+        Сделка 15 окт
+      </SectionTitle>,
+    );
+    const heading = screen.getByRole("heading", { name: "Сделка 15 окт" });
+    expect(heading).toHaveClass(headerRowStyles.title);
+    expect(heading).not.toHaveClass(headerRowStyles.numbered);
   });
 });
 

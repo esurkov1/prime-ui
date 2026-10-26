@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { Badge } from "@/components/badge/Badge";
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
 import { Button } from "@/components/button/Button";
 import { Crossfade } from "@/components/crossfade/Crossfade";
@@ -783,6 +784,61 @@ describe("Page body", () => {
     const link = screen.getByRole("link", { name: "Все счета" });
     expect(heading.parentElement?.parentElement).toContainElement(link);
     expect(screen.getByText("Таблица").parentElement).not.toContainElement(link);
+  });
+
+  it("Page.Badges stands on the title's line in the flow heading and in the bar", () => {
+    render(
+      <>
+        <Page.Header>
+          <Page.Heading>
+            <Page.Title>Договор № 114</Page.Title>
+            <Page.Badges>
+              <Badge.Root tone="success">Действует</Badge.Root>
+            </Page.Badges>
+            <Page.Description>ООО «Север»</Page.Description>
+          </Page.Heading>
+        </Page.Header>
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Сделка 15 окт</Page.Title>
+            <Page.Badges>
+              <Badge.Root color="blue">Аренда</Badge.Root>
+            </Page.Badges>
+          </Page.Heading>
+        </Page.TopBar>
+      </>,
+    );
+    for (const [title, badge] of [
+      ["Договор № 114", "Действует"],
+      ["Сделка 15 окт", "Аренда"],
+    ]) {
+      const heading = screen.getByRole("heading", { level: 1, name: title });
+      const chip = screen.getByText(badge);
+      expect(heading.parentElement).toContainElement(chip);
+      expect(chip.closest("[data-size]")).toHaveAttribute("data-size", "m");
+    }
+    expect(screen.getByText("ООО «Север»").parentElement).not.toBe(
+      screen.getByText("Действует").closest("[data-size]")?.parentElement,
+    );
+  });
+
+  it("Section about a record: its number and Page.Badges on the heading's line", () => {
+    render(
+      <Page.Body>
+        <Page.Section label="Сделка 15 окт" number="#852">
+          <Page.Badges>
+            <Badge.Root color="blue">Аренда</Badge.Root>
+          </Page.Badges>
+          <p>События</p>
+        </Page.Section>
+      </Page.Body>,
+    );
+    const heading = screen.getByRole("heading", { level: 2, name: "Сделка 15 окт #852" });
+    expect(screen.getByRole("region", { name: "Сделка 15 окт #852" })).toContainElement(heading);
+    const badge = screen.getByText("Аренда");
+    expect(heading.parentElement).toContainElement(badge);
+    expect(badge.closest("[data-size]")).toHaveAttribute("data-size", "m");
+    expect(screen.getByText("События").parentElement).not.toContainElement(badge);
   });
 
   it("Cell: span defaults to the full row; rows only when more than one", () => {

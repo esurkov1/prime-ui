@@ -171,6 +171,8 @@ function TimelineItem({
       interactive: interactive || undefined,
       lines: described ? "two" : undefined,
       current: current || undefined,
+      // Below 20rem the amount drops under the text (see the end of the CSS).
+      wrap: true,
     }),
   };
   const dot = <span className={styles.dot} aria-hidden="true" />;

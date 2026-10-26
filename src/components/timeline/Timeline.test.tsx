@@ -336,6 +336,21 @@ describe("Timeline", () => {
     expect(cssRule(file, ".row").decls.some((decl) => decl.prop === "border-radius")).toBe(false);
   });
 
+  it("lets the amount drop under the text in a narrow container instead of crushing it", () => {
+    render(
+      <Timeline.Root>
+        <Timeline.Item data-testid="row">
+          <Timeline.ItemTitle>Аренда закончилась</Timeline.ItemTitle>
+          <Timeline.ItemMeta>21.09.26</Timeline.ItemMeta>
+          <Timeline.ItemValue>+6 300 ₽</Timeline.ItemValue>
+        </Timeline.Item>
+      </Timeline.Root>,
+    );
+    expect(screen.getByTestId("row")).toHaveAttribute("data-wrap");
+    const wrap = cssRule("src/internal/listRow.module.css", ".row.hit[data-wrap]");
+    expect(wrap.decls.find((decl) => decl.prop === "flex-wrap")?.value).toBe("wrap");
+  });
+
   it("link rows stay focusable without a click handler", () => {
     render(
       <Timeline.Root>

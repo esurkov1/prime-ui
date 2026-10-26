@@ -36,7 +36,7 @@ Modal.Root                    state and dismiss policy (no DOM)
     │   ├── Modal.Fields      the record's value pickers (Selects) as one row under the title row, tier xs, wraps when narrow
     │   └── Modal.Icon        optional: 48 tile with a tone fill, or a picture with no tile
     ├── Modal.Body            the only scrolling zone
-    │   └── Modal.Section     <section>: <h3> label, description, Modal.Actions at the heading's end
+    │   └── Modal.Section     <section>: <h3> label (+ a record's number), description, Modal.Badges on the heading's line, Modal.Actions at its end
     └── Modal.Footer          actions, primary last
         ├── Modal.Actions     the start group: an action apart from the main pair
         ├── Modal.Meta        <p>, muted status at the start
@@ -127,7 +127,7 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Modal.Badges
-`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.
+`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N»; inside a `Modal.Section` after its heading, tier `s`. A status or person picker is a `Select` in `Fields`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -147,8 +147,9 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | The heading of the section; it names the `<section>`. |
+| `number` | `ReactNode` | — | The number of the record the section is about («#852», a deal of a feed): muted, tabular, after the `label`. The heading becomes one line: the `label` is cut, the number never is. |
 | `description` | `ReactNode` | — | One line of context under the heading (body-s). |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content and an optional `Modal.Actions`), `className` and the other attributes of the `<section>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content, an optional `Modal.Actions` and `Modal.Badges` — chip tier `s`, on the heading's line), `className` and the other attributes of the `<section>`. |
 
 ### Modal.Footer
 `ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, with no line above it, only while it holds something (it enters and closes up in place); at the start one thing — an optional `Modal.Actions` (an action apart) and `Meta`.
@@ -283,6 +284,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Tabs in the header: a `Tabs.List` inside `Modal.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and flush with the body; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside take the floating layer's fill; a card inside is the next layer (`floating-1`), a flat tile. Group fields with a 20 gap.
 - Titled groups of a long body: `Modal.Section label` — an `<h3>` under the dialog's `<h2>` title, an optional `description`, a `Modal.Actions` at the end of its heading row (on a narrow dialog they drop under the heading, which keeps 128 at least); content 16 below, sections 32 apart — directly in the body, in a `Tabs.Panel` or in a form, with no spacing wrapper of your own. A group of fields is a `Fieldset`.
+- A section about a record: `Modal.Section label number` with `Modal.Badges` inside — one heading line like a record header: the label cut down to its text or 8em, the number never, the badges (chip tier `s`, a tier under the header's) fold into «+N».
 - Narrow viewport (< 640px), `placement="center"`: the shared bottom-sheet surface (`src/internal/sheet.module.css`) — full width, rounded top, a grab handle strip on top while it swipes, up to the sheet top gap high, the bottom safe-area inset below the content.
 - `placement="top"`: the dialog hangs from a line 12% of the viewport down (between `--prime-modal-viewport-padding` and `--prime-space-24`, never above the top safe-area inset) and grows downward.
 
@@ -338,7 +340,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Primary action first in the footer → put it last (DOM order is the visual order).
 - «Удалить» as a third footer button of an edit dialog → the footer is the dialog's answer (Cancel + the primary); deleting the record is a `tone="danger"` icon button with a Tooltip in `Modal.Actions` (the last `tone="danger"` item of a ⋯ `Dropdown` from three actions), confirmed by a ConfirmDialog.
 - A wrapper with its own gap around `Modal.Section`s inside a `Tabs.Panel` or a form → not needed: sections keep 32 between them in any wrapper.
-- A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Modal.Section label` with `Modal.Actions`.
+- A hand-made heading row (`Typography as="h3"` + buttons) over a group in the body → `Modal.Section label` with `Modal.Actions`; a record's number and badges on it → `number` and `Modal.Badges`.
 - Busy or unsaved state lifted out of the form into Root props → put `Modal.Guard` next to the form, inside Content.
 - `key` or a conditional around `Modal.Root` to reset a form → the dialog unmounts at once, without its exit; keep the Root mounted and drive `open`.
 - A status `Badge` in the header's `Modal.Fields`, or inside `Modal.Description` → put it in `Modal.Badges`, after the title (or a `StatusDot` first in the description): the kit sizes it and keeps the row on one line.
@@ -353,5 +355,5 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Long multi-section forms in a modal → use Drawer.
 
 ## Related
-- **Built from:** the dialog shared with Drawer and Sheet (`internal/overlay/DialogParts`, `internal/overlay/ModalDialog`), [Badge](../badge/COMPONENT.md) (`Modal.Badges`: a one-line `Badge.Group` of chip tier m), [StatusDot](../status-dot/COMPONENT.md) (the state in front of a record's description), [Button](../button/COMPONENT.md) (header close button), `internal/headerRow` and `internal/surfaceFrame` (the header row and the frame `l`), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Modal.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Modal.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Drawer and Sheet (`internal/overlay/DialogParts`, `internal/overlay/ModalDialog`), [Badge](../badge/COMPONENT.md) (`Modal.Badges`: a one-line `Badge.Group` of chip tier m, s in a section), [StatusDot](../status-dot/COMPONENT.md) (the state in front of a record's description), [Button](../button/COMPONENT.md) (header close button), `internal/headerRow` and `internal/surfaceFrame` (the header row and the frame `l`), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), `internal/mediaSlot` (a record's Avatar or Thumbnail in `Modal.Icon`), [Skeleton](../skeleton/COMPONENT.md) (`Modal.Description loading`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm built on Modal `s`), [Drawer](../drawer/COMPONENT.md) (the same header, body, footer and `Guard` at the edge), [Popover](../popover/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md)

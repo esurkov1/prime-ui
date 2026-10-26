@@ -141,6 +141,12 @@ function dialogSectionPart(name: DialogName): ApiPart {
         ru: "Заголовок секции; он же имя `<section>`.",
       },
       {
+        name: "number",
+        type: "ReactNode",
+        en: "The number of the record the section is about («#852», a deal of a feed): muted, tabular, after the `label`. The heading becomes one line: the `label` is cut, the number never is.",
+        ru: "Номер записи, о которой секция («#852», сделка ленты): приглушённый, табличный, после `label`. Заголовок становится одной строкой: `label` режется, номер — никогда.",
+      },
+      {
         name: "description",
         type: "ReactNode",
         en: "One line of context under the heading (body-s).",
@@ -149,8 +155,8 @@ function dialogSectionPart(name: DialogName): ApiPart {
       {
         name: "…rest",
         type: 'Omit<HTMLAttributes<HTMLElement>, "title">',
-        en: `\`children\` (the content and an optional \`${name}.Actions\`), \`className\` and the other attributes of the \`<section>\`.`,
-        ru: `\`children\` (содержимое и необязательный \`${name}.Actions\`), \`className\` и остальные атрибуты \`<section>\`.`,
+        en: `\`children\` (the content, an optional \`${name}.Actions\` and \`${name}.Badges\` — chip tier \`s\`, on the heading's line), \`className\` and the other attributes of the \`<section>\`.`,
+        ru: `\`children\` (содержимое, необязательные \`${name}.Actions\` и \`${name}.Badges\` — ярус чипов \`s\`, на строке заголовка), \`className\` и остальные атрибуты \`<section>\`.`,
       },
     ],
   };
@@ -289,8 +295,8 @@ export function dialogParts(
     },
     {
       name: `${name}.Badges`,
-      en: "`ref` → `HTMLDivElement`. The badges after the title, on its line: one `Badge.Group`, chip tier `m`, one row, the rest folds into «+N». A status or person picker is a `Select` in `Fields`.",
-      ru: "Бейджи после заголовка, на его строке: один `Badge.Group`, ярус чипов `m`, один ряд, остальное в «+N». Выбор статуса или человека — `Select` в `Fields`.",
+      en: `\`ref\` → \`HTMLDivElement\`. The badges after the title, on its line: one \`Badge.Group\`, chip tier \`m\`, one row, the rest folds into «+N»${section ? `; inside a \`${name}.Section\` after its heading, tier \`s\`` : ""}. A status or person picker is a \`Select\` in \`Fields\`.`,
+      ru: `Бейджи после заголовка, на его строке: один \`Badge.Group\`, ярус чипов \`m\`, один ряд, остальное в «+N»${section ? `; в \`${name}.Section\` — после её заголовка, ярус \`s\`` : ""}. Выбор статуса или человека — \`Select\` в \`Fields\`.`,
       props: [
         {
           name: "loading",

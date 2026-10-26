@@ -433,6 +433,7 @@ export const PART_REFS = {
   "Page.Heading": ["HTMLDivElement"],
   "Page.Title": ["HTMLHeadingElement"],
   "Page.Description": ["HTMLParagraphElement"],
+  "Page.Badges": ["HTMLDivElement"],
   "Page.Tools": ["HTMLDivElement"],
   "Page.Actions": ["HTMLDivElement"],
   "Page.Chips": ["HTMLDivElement"],
