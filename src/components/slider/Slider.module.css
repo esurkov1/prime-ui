@@ -1,6 +1,7 @@
 /*
- * Slider — one proportion at every tier, all derived from the tier track thickness T
- * (`--field-track` of the field tier the frame joins): thumb is a 4.5T × 3T capsule.
+ * Slider — one proportion at every tier, all derived from the tier's track thickness T
+ * (`--field-track` of the field tier the frame joins) and thumb height H (`--field-thumb`, 3T,
+ * larger on touch): the thumb is a 1.5H × H capsule.
  *
  * Layers (bottom → top): `.track` (inactive pill) holds `.range` (active pill whose rounded end
  * sits at the thumb centre), then `.thumb`, then the transparent native `<input type="range">`
@@ -12,8 +13,8 @@
  */
 .root {
   --slider-track: var(--field-track);
-  --slider-thumb-h: calc(var(--slider-track) * 3);
-  --slider-thumb-w: calc(var(--slider-track) * 4.5);
+  --slider-thumb-h: var(--field-thumb);
+  --slider-thumb-w: calc(var(--slider-thumb-h) * 1.5);
   /* Hover glass frosts the track a little; press glass is clear. */
   --slider-glass-blur: calc(var(--slider-track) / 4);
   --slider-track-bg: var(--prime-color-fill-strong);
@@ -268,7 +269,7 @@
 }
 
 .input:focus-visible ~ .thumb {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 

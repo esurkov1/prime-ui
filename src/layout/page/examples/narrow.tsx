@@ -12,7 +12,7 @@ const ORDERS = [
 export default function PageNarrowExample() {
   return (
     <div className={`${styles.window} ${styles.phone}`}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Nav>
           {/* `always`: this window is phone-wide on any screen; in an app keep the default `auto`. */}
           <Sidebar.Root offCanvas="always">

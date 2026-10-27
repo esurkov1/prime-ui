@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function SidebarDismissExample() {
   return (
     <div className={styles.stage}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Nav>
           <Sidebar.Root offCanvas="always" closeOnOutsideClick={false} closeOnEscape={false}>
             <Sidebar.Header>

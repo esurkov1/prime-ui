@@ -16,7 +16,6 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
-  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -70,8 +69,7 @@ export const COLOR_FIELD_LABELS: ColorFieldLabels = {
 const FALLBACK_COLOR = "#000000";
 
 export type ColorFieldProps = FieldRootDomProps &
-  FieldFrameProps &
-  FieldFocusRingProps & {
+  FieldFrameProps & {
     value?: string;
     defaultValue?: string;
     onValueChange?: (value: string) => void;
@@ -106,7 +104,6 @@ export function ColorField({
   size: sizeProp,
   disabled: disabledProp = false,
   invalid: invalidProp,
-  focusRing,
   name,
   id,
   label,
@@ -193,7 +190,6 @@ export function ColorField({
                 size,
                 invalid: ids.invalid || undefined,
                 disabled: disabled || undefined,
-                "focus-ring": focusRing,
               })}
             >
               <ColorPicker.TriggerSwatch className={styles.swatch} />

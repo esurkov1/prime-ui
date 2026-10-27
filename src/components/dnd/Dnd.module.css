@@ -115,7 +115,7 @@
 
 /* A table row or head cell draws its own focus (the table's style, inset); an outline is clipped. */
 .draggable:not(tr, th):focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 

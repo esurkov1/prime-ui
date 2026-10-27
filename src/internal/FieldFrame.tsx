@@ -27,16 +27,6 @@ export type FieldFrameProps = {
 };
 
 /**
- * `focusRing` of a field whose box draws the focus ring (Input, Select, Datepicker…): `false`
- * hides only the visual ring — focus, keyboard and ARIA are unchanged, the error ring still shows
- * (WCAG 2.4.7: only where focus is otherwise obvious). The host passes it as `data-focus-ring` on
- * the box (`fieldSurface` reads `"false"`). Group controls (SegmentedControl, Slider…) have none.
- */
-export type FieldFocusRingProps = {
-  focusRing?: boolean;
-};
-
-/**
  * Native attributes and `ref` of a framed field's root. One rule for every field root:
  * `className`, `ref` and the rest land on the frame `<div>`, `id` on the control (the value props
  * belong to the field). Leaf fields whose root wraps a native control and has no `Field` part

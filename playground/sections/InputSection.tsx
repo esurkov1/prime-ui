@@ -41,11 +41,6 @@ export const page: ComponentPageConfig = {
         "Постоянные префикс и суффикс у краёв и единица рядом со значением, которую скринридер слышит словом, — `Input.Affix`, `Input.InlineAffix`, `aria-label`.",
     },
     {
-      scenario: "without-focus-ring",
-      title: "Без кольца фокуса",
-      description: "Одно поле поиска, где фокус видно по каретке и светлой заливке — `focusRing`.",
-    },
-    {
       scenario: "password-strength",
       title: "Пароль",
       description:

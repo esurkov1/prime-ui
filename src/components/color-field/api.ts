@@ -94,13 +94,6 @@ export const api: ComponentApi = {
           ru: "Отключает поле: цвет виден, панель не открывается.",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides only the visual focus ring (`data-focus-ring="false"`); focus, keyboard and ARIA are unchanged.',
-          ru: '`false` прячет только видимое кольцо фокуса; фокус, клавиатура и ARIA не меняются. Атрибут — `data-focus-ring="false"`.',
-        },
-        {
           name: "name",
           type: "string",
           en: "Form field name: a hidden input submits the hex value.",

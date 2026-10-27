@@ -11,7 +11,8 @@
  *   valid     data-valid on the box (a success ring; invalid wins)
  *   disabled  :disabled / data-disabled on the box, or a disabled input / textarea inside
  *   read-only data-readonly on the box, or a read-only direct input (no hover wash)
- * `data-focus-ring="false"` on the box or an ancestor hides only the focus ring (WCAG 2.4.7).
+ * The focus ring reads the app-wide switch (`--prime-focus-ring-width`, globals.css); the focus fill
+ * and the danger ring never depend on it.
  *
  * The bundle may emit this file before or after a host's CSS, so nothing may depend on order:
  * the base rule has zero specificity (a host's one-class rule — its own transition, cursor —
@@ -46,10 +47,8 @@
   background: var(--prime-color-field-bg-focus);
 }
 
-.surface:is(:focus-visible, :has(:is(input, textarea):focus-visible)):not(
-    :where([data-focus-ring="false"], [data-focus-ring="false"] *)
-  ) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+.surface:is(:focus-visible, :has(:is(input, textarea):focus-visible)) {
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 

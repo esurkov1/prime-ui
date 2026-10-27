@@ -38,6 +38,23 @@
   --po-gap: var(--prime-space-0);
 }
 
+/*
+ * In a bottom sheet (a phone) the content stands on the dialog frame of every sheet: the sheet
+ * padding on the sides and below, the body's gap of 16 between the blocks, no air on top (the grab
+ * strip of internal/sheet is that air). The anchored surface's column does not reach in here, so
+ * the content is its own column. Flush content keeps its own spacing.
+ */
+.content[data-sheet] {
+  display: flex;
+  flex-direction: column;
+  padding-block-start: 0;
+}
+
+.content[data-sheet]:not([data-flush="true"]) {
+  --po-pad: var(--prime-sheet-padding);
+  --po-gap: var(--prime-space-4);
+}
+
 /* ─── Title / description / actions ─────────────────────────────────────── */
 
 .header {

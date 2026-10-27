@@ -445,7 +445,8 @@ describe("Tooltip", () => {
     const user = userEvent.setup();
     render(
       <>
-        <BasicTooltip delayDuration={50} />
+        {/* Long enough that a slow runner still checks "not yet" before it opens. */}
+        <BasicTooltip delayDuration={300} />
         <button type="button">Дальше</button>
       </>,
     );

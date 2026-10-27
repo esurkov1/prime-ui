@@ -471,7 +471,7 @@ describe("Button shape circle", () => {
       ),
     ).toBe("var(--prime-radius-full)");
     expect(cssValue(cssRule(CSS, ".root:focus-visible"), "outline")).toMatch(
-      /^var\(--prime-focus-width\) solid/,
+      /^var\(--prime-focus-ring-width\) solid/,
     );
   });
 

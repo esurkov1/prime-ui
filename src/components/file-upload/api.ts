@@ -125,13 +125,6 @@ export const api: ComponentApi = {
           ru: "Красная линия и иконка зоны, `aria-invalid` на input. Непустой `error` включает его.",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides only the visual focus ring of the drop zone and the add tile (`data-focus-ring="false"`); focus, keyboard and ARIA stay. The picker Button keeps its ring.',
-          ru: '`false` скрывает только кольцо фокуса зоны и плитки добавления (`data-focus-ring="false"`); фокус, клавиатура и ARIA остаются. Кнопка выбора сохраняет своё кольцо.',
-        },
-        {
           name: "disabled",
           type: "boolean",
           default: "false",

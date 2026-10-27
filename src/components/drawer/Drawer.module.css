@@ -10,8 +10,9 @@
   --drawer-width: var(--prime-drawer-width-m);
 
   position: fixed;
-  top: 0;
-  bottom: 0;
+  /* On the part of the screen the keyboard leaves (useKeyboardInset): the footer stays on view. */
+  top: var(--visual-inset-top, var(--prime-space-0));
+  bottom: var(--visual-inset-bottom, var(--prime-space-0));
   width: min(100vw, var(--drawer-width));
   /*
    * The safe-area insets of the app's container (`--prime-safe-area-*`: the notch, the home
@@ -22,6 +23,11 @@
   padding-block: max(var(--prime-space-0), calc(var(--prime-safe-area-top) - var(--prime-space-6)))
     max(var(--prime-space-0), calc(var(--prime-safe-area-bottom) - var(--prime-space-6)));
   box-shadow: var(--prime-shadow-modal);
+}
+
+/* On the keyboard: the home indicator is under it, the last zone keeps its own air. */
+.panel[data-keyboard] {
+  padding-block-end: var(--prime-space-0);
 }
 
 .panel[data-size="s"] {

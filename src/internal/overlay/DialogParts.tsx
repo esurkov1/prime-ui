@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/skeleton/Skeleton";
 import { COMPACT_QUERY } from "@/hooks/breakpoints";
 import { useResizeEffect } from "@/hooks/useElementSize";
 import { useEnterConfirm } from "@/hooks/useEnterConfirm";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
@@ -310,7 +311,10 @@ function DialogPanelBody({
     onDismiss: root.requestClose,
     focusStart,
   });
-  const panelRef = useMergedRefs(layerRef, ref);
+  // The panel node, for the keyboard insets: every dialog stays on what the keyboard leaves.
+  const [panelNode, setPanelNode] = React.useState<HTMLDivElement | null>(null);
+  const panelRef = useMergedRefs(layerRef, ref, setPanelNode);
+  useKeyboardInset(panelNode);
   const compact = useMediaQuery(COMPACT_QUERY, swipePolicy === "compact");
   const sheet = swipePolicy === "always" || (swipePolicy === "compact" && compact);
   // Swiping down is a dismiss from outside the content, like a scrim click: it follows

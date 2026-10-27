@@ -19,7 +19,8 @@ import type { FloatingLayer } from "./useFloatingLayer";
 /**
  * The grab bar of a bottom sheet (Sheet, a Modal or a floating layer as a phone sheet): drawn only
  * while the swipe exists, `aria-hidden` (the gesture is an extra way out next to Escape and the
- * scrim). The drag starts on it or on the header right after it.
+ * scrim). The strip is a touch target tall with a small bar (internal/sheet); the drag starts on
+ * it or on the header right after it.
  */
 export function SheetHandle({ swipe }: { swipe: Pick<SwipeDismiss, "enabled"> }) {
   if (!swipe.enabled) return null;

@@ -5,14 +5,6 @@ import { COLOR_SWATCHES_LABELS } from "../color-swatches/ColorSwatches";
 import { COLOR_PICKER_LABELS } from "./ColorPicker";
 import { COLOR_PRESETS_LABELS } from "./ColorPresets";
 
-const focusRing: ApiProp = {
-  name: "focusRing",
-  type: "boolean",
-  default: "true",
-  en: '`false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay.',
-  ru: '`false` скрывает только кольцо фокуса полей; фокус, клавиатура и ARIA остаются. Атрибут — `data-focus-ring="false"`.',
-};
-
 const disabled: ApiProp = {
   name: "disabled",
   type: "boolean",
@@ -130,7 +122,6 @@ export const api: ComponentApi = {
           en: "Error message in the hint slot; marks the field invalid.",
           ru: "Текст ошибки на месте подсказки; поле становится ошибочным.",
         },
-        focusRing,
         {
           name: "children",
           type: "ReactNode",
@@ -189,7 +180,6 @@ export const api: ComponentApi = {
       en: "`ref` → `HTMLDivElement`. One row: the eyedropper, then a field per channel of the current format (or one hex field); each field commits on blur / Enter.",
       ru: "Одна строка: пипетка, затем поле на каждый канал текущего формата (или одно hex-поле); поле применяется по blur / Enter.",
       props: [
-        focusRing,
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',

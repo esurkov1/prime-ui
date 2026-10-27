@@ -973,24 +973,7 @@ describe("Select (field)", () => {
   });
 });
 
-describe("Select focusRing", () => {
-  it("focusRing={false} marks the trigger and keeps the invalid state", () => {
-    render(
-      <Select.Root focusRing={false} invalid placeholder="Pick">
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content searchable>
-          <Select.Item value="one">One</Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    );
-    const trigger = screen.getByRole("combobox");
-    expect(trigger).toHaveAttribute("data-focus-ring", "false");
-    expect(trigger).toHaveAttribute("data-invalid", "true");
-    expect(trigger).toHaveAttribute("aria-invalid", "true");
-  });
-
+describe("Select panel search", () => {
   it("the panel search takes focus and draws no ring: the row tints instead", () => {
     render(
       <Select.Root placeholder="Pick">
@@ -1002,7 +985,6 @@ describe("Select focusRing", () => {
         </Select.Content>
       </Select.Root>,
     );
-    expect(screen.getByRole("combobox")).not.toHaveAttribute("data-focus-ring");
     fireEvent.click(screen.getByRole("combobox"));
     expect(screen.getByRole("searchbox", { name: "Поиск" })).toHaveFocus();
     const menuCss = "src/internal/menu.module.css";

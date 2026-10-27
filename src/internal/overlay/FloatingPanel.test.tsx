@@ -1,6 +1,6 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Popover } from "@/components/popover/Popover";
@@ -153,6 +153,37 @@ describe("floating layers below 640px", () => {
     );
     expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
     expect(document.querySelector("[data-swipe-handle]")).toBeNull();
+  });
+
+  it("a sheet stands on the on-screen keyboard; a Popover sheet is a column on the sheet frame", () => {
+    const viewport = Object.assign(new EventTarget(), { height: 800, offsetTop: 0, scale: 1 });
+    vi.stubGlobal("visualViewport", viewport);
+    vi.stubGlobal("innerHeight", 800);
+    try {
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>
+            <button type="button">Пароль</button>
+          </Popover.Trigger>
+          <Popover.Content aria-label="Пароль сети">
+            <input aria-label="Пароль" />
+          </Popover.Content>
+        </Popover.Root>,
+      );
+      const panel = screen.getByRole("dialog");
+      const sheet = sheetOf(panel);
+      expect(panel).toHaveAttribute("data-sheet");
+      act(() => {
+        viewport.height = 460;
+        viewport.dispatchEvent(new Event("resize"));
+      });
+      // The surface, not the panel inside, moves onto the keyboard.
+      expect(sheet.style.getPropertyValue("--visual-inset-bottom")).toBe("340px");
+      expect(sheet).toHaveAttribute("data-keyboard");
+      expect(panel).not.toHaveAttribute("data-keyboard");
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("a Tooltip stays anchored", () => {

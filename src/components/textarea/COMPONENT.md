@@ -49,7 +49,6 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger inset ring on the field box, `aria-invalid` on the textarea. A non-empty `error` implies it. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on the field box (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
 | `counter` | `ReactNode` | — | Right side of the support row, usually `<Textarea.Counter current max />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
 | `autoResize` | `boolean` | `true` | Height follows the content (minimum `rows` lines, no resize handle; up to `maxRows` lines when set, then it scrolls inside). `false` → fixed height of `rows` lines with native vertical resize. |
@@ -116,7 +115,6 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `focusRing` | `false`: no focus ring; focus fill and caret remain | A single composer field where focus is obvious | `true` |
 | `formatting` | A floating toolbar over a selection (bold, italic, underline, strikethrough, code, spoiler, link, quote) and the Mod-hotkeys; each writes Markdown around the selection | The text is shown later with its Markdown (Message renders the same subset) | `false` |
 | `reserveSupportRow` | Empty support row of hint height | Live validation, fields side by side | `false` |
 | `required` / `optional` | Red `*` / muted «необязательно» after the label | Mark the minority of the form | — / `false` |
@@ -124,14 +122,12 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 **Combinations**
 - Recommended: `counter` + `maxLength` for a hard limit; `counter` without `maxLength` for a soft limit that shows overflow; `reserveSupportRow` + `error` for validation on submit.
 - Pointless: `hint` and `error` at once (error replaces hint); `required` with `optional`.
-- Forbidden: `focusRing={false}` on regular form fields (WCAG 2.4.7).
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | hover | — | fill darkens (not when focused, disabled or read-only) |
 | focus | keyboard focus | focus fill and inset focus ring on the field box; clicking the box padding focuses the textarea |
-| no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the field box |
 | invalid | `invalid` or non-empty `error` | `data-invalid="true"` on the outer wrapper and the field box, `aria-invalid="true"`, danger ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"` on the field box, disabled fill and text; label and hint dimmed; under a `Tooltip.Trigger` the textarea is `aria-disabled="true"` and `readOnly` with no `name` or `required`, the same node |
 | capped | `autoResize` with `maxRows` | `data-capped="true"` on the field box; the box grows line by line up to `maxRows` lines, then the textarea scrolls inside with the thin scrollbar |
@@ -211,7 +207,6 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 | [states.tsx](examples/states.tsx) | A default field next to a read-only, a disabled and an invalid one with no message — `readOnly`, `disabled`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the text is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
 | [auto-resize.tsx](examples/auto-resize.tsx) | A field that grows with its text, one that starts as a line and stops growing at five, and a fixed one with a resize handle — `autoResize`, `rows`, `maxRows`. |
-| [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single reply composer where the caret and the lighter fill show focus — `focusRing`. |
 | [edge-actions.tsx](examples/edge-actions.tsx) | A read-only generated reply with copying and a link to the template in the field's corner — `Textarea.CopyButton`, `Textarea.Action`. |
 | [inline-edit.tsx](examples/inline-edit.tsx) | A record card note that saves on blur and Mod+Enter, reverts on Escape and shows the server's refusal — `onCommit`, `error`. |
 | [formatting.tsx](examples/formatting.tsx) | A long announcement where a selection gets the formatting toolbar and its hotkeys, written as Markdown around it — `formatting`. |

@@ -57,7 +57,10 @@
   --digit-cell-line-height: var(--prime-text-heading-l-line-height);
 }
 
+/* The row's gliding ring replaces each cell's own: a cell is drawn with no ring width. */
 .cell {
+  --prime-focus-ring-width: var(--prime-space-0);
+
   -webkit-appearance: none;
   appearance: none;
   box-sizing: border-box;
@@ -119,7 +122,7 @@
   inset-block-start: 0;
   inset-inline-start: 0;
   border-radius: var(--field-code-radius);
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
   opacity: 0;
   pointer-events: none;
@@ -135,10 +138,6 @@
 
 .root[data-invalid="true"] .ring {
   outline-color: var(--prime-color-danger-border);
-}
-
-.root[data-focus-ring="false"] .ring {
-  display: none;
 }
 
 /* The success colours wash over the cells one after another; the ring and the fade keep no delay

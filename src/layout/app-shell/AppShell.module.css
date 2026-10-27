@@ -39,6 +39,19 @@
   overflow: hidden;
 }
 
+/*
+ * The viewport frame (the top-level shell with `fillViewport`): fixed to the layout viewport, so it
+ * follows the browser's collapsing toolbars without a `dvh` lag and the document under it has
+ * nothing to scroll; globals.css keeps that document still (`data-prime-frame` on `<html>`). Its
+ * edges — and the bar or the capsule at its bottom — stand where the app's window is, on every
+ * page. Under `:where()` as above: a host class may still size it.
+ */
+.root:where([data-frame="viewport"]) {
+  position: fixed;
+  inset: 0;
+  height: auto;
+}
+
 @media (min-width: 1024px) {
   .root {
     --shell-top: var(--prime-space-8);
@@ -103,11 +116,9 @@
   --shell-fab-lift: var(--prime-layout-gutter);
 }
 
-/* A floating capsule (the dock is 0 high): the actions clear the capsule, its inset and the safe
-   area, and line up with its end edge. The capsule's height follows BottomNav (icons only,
-   the touch row). */
+/* A floating capsule (the dock is 0 high): the actions clear the capsule (`--shell-capsule`, set on
+   the panel), its inset and the safe area, and line up with its end edge. */
 .dock:has(> .footer > [data-floating="true"]) {
-  --shell-capsule: var(--prime-bottom-nav-floating-height);
   --shell-fab-lift: calc(
     var(--prime-bottom-nav-floating-inset) *
     2 +
@@ -115,26 +126,6 @@
     var(--prime-safe-area-bottom)
   );
   --shell-fab-end: var(--prime-bottom-nav-floating-inset);
-}
-
-.dock:has(> .footer > [data-floating="true"][data-icon-only="true"]) {
-  --shell-capsule: var(--prime-bottom-nav-floating-icon-only-height);
-}
-
-@media (pointer: coarse) {
-  .dock:has(> .footer > [data-floating="true"]) {
-    --shell-capsule: max(
-      var(--prime-bottom-nav-floating-height),
-      calc(var(--prime-control-touch-target) + 2 * var(--prime-bottom-nav-floating-padding))
-    );
-  }
-
-  .dock:has(> .footer > [data-floating="true"][data-icon-only="true"]) {
-    --shell-capsule: max(
-      var(--prime-bottom-nav-floating-icon-only-height),
-      calc(var(--prime-control-touch-target) + 2 * var(--prime-bottom-nav-floating-padding))
-    );
-  }
 }
 
 /* The corner of the floating actions: a column at the bottom end, above the dock; the gaps around
@@ -188,9 +179,17 @@
   min-width: 0;
   min-height: 0;
   margin: 0;
-  /* The bottom air: a fill page's gutter or the default tail, and never less than the room a
-     floating BottomNav on screen needs. */
-  padding-block-end: max(
+}
+
+/*
+ * The bottom air, as the last flex item of main rather than its padding: a scroller's end padding
+ * is not part of what scrolls in every engine, a spacer always is. A fill page's gutter or the
+ * default tail, and never less than the room a floating BottomNav on screen needs.
+ */
+.main::after {
+  content: "";
+  flex: none;
+  block-size: max(
     var(--shell-fill-end, var(--prime-space-16)),
     var(--shell-floating-end, var(--prime-space-0))
   );
@@ -214,15 +213,43 @@
   height: 0;
 }
 
+/*
+ * The capsule's place, read by main (its room) and the dock (the floating actions): the capsule is
+ * as high as BottomNav draws it (icons only, the touch row) and stands its inset above the bottom
+ * safe area. Main keeps exactly that plus a page gutter under its last line, so the last block
+ * scrolls up to a gutter above the glass — the same on every page.
+ */
 .panel:has(> .dock > .footer > [data-floating="true"]) {
+  --shell-capsule: var(--prime-bottom-nav-floating-height);
   --shell-floating-end: calc(
     (
-      var(--prime-space-16) +
-      var(--prime-bottom-nav-floating-height) +
-      var(--prime-safe-area-bottom)
+      var(--prime-bottom-nav-floating-inset) +
+      var(--shell-capsule) +
+      var(--prime-safe-area-bottom) +
+      var(--prime-layout-gutter)
     ) *
     var(--shell-floating-scale)
   );
+}
+
+.panel:has(> .dock > .footer > [data-floating="true"][data-icon-only="true"]) {
+  --shell-capsule: var(--prime-bottom-nav-floating-icon-only-height);
+}
+
+@media (pointer: coarse) {
+  .panel:has(> .dock > .footer > [data-floating="true"]) {
+    --shell-capsule: max(
+      var(--prime-bottom-nav-floating-height),
+      calc(var(--prime-control-touch-target) + 2 * var(--prime-bottom-nav-floating-padding))
+    );
+  }
+
+  .panel:has(> .dock > .footer > [data-floating="true"][data-icon-only="true"]) {
+    --shell-capsule: max(
+      var(--prime-bottom-nav-floating-icon-only-height),
+      calc(var(--prime-control-touch-target) + 2 * var(--prime-bottom-nav-floating-padding))
+    );
+  }
 }
 
 /*

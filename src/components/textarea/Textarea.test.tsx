@@ -206,16 +206,6 @@ describe("Textarea.Counter", () => {
   });
 });
 
-describe("Textarea focusRing", () => {
-  it("focusRing={false} marks the field box and keeps the invalid state", () => {
-    render(<Root aria-label="Заметка" focusRing={false} invalid />);
-    const box = screen.getByRole("textbox").closest("[data-focus-ring]");
-    expect(box).toHaveAttribute("data-focus-ring", "false");
-    expect(box).toHaveAttribute("data-invalid", "true");
-    expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
-  });
-});
-
 describe("Textarea onCommit (inline save)", () => {
   it("commits on Mod+Enter and blur, not on a plain Enter; Escape reverts", () => {
     const onCommit = vi.fn();

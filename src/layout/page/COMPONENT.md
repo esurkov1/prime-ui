@@ -82,7 +82,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `maxWidth` | `"full" \| "readable" \| "wide"` | `"full"` | Cap of everything but the top bar, centred: `full` — the whole main; `readable` — 42rem (`--prime-layout-reading-max-width`); `wide` — 75rem (`--prime-layout-content-max-width`). |
-| `fill` | `boolean` | `false` | The page takes the height of main (`AppShell.Root fillViewport`) and the body takes what the bar and the header leave: for a full-height table, board, chat or `Page.Split`. |
+| `fill` | `boolean` | `false` | The page takes the height of main (`AppShell.Root`) and the body takes what the bar and the header leave: for a full-height table, board, chat or `Page.Split`. |
 | `labels` | `Partial<PageLabels>` | — | Built-in strings of every part, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (`Page.TopBar`, `Page.Header`, `Page.Body`), `className` and the other div attributes. |
 
@@ -117,7 +117,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `children`, `id`, `className` and the other heading attributes. |
 
 ### Page.Description
-`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): a muted caption under the whole heading line that truncates in the bar and claims no width of the bar's plan, secondary body-m that wraps (up to the reading measure) in the flow.
+`ref` → `HTMLParagraphElement`. Context that carries data (a period, a count): in the bar a muted caption under the heading line, claiming no width of the plan — one line, two between words on a compact page; body-m that wraps in the flow.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -153,7 +153,7 @@ Page.Root                          the page column (<div>); maxWidth, fill, labe
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Page.Body
-`ref` → `HTMLDivElement`. The page content: blocks of one screen 24 apart, a `Page.Section` 40 from its neighbours.
+`ref` → `HTMLDivElement`. The page content: blocks of one screen 24 apart, a `Page.Section` 40 from its neighbours; on a compact page (under 30rem, a phone) 16 and 32, as wide as the gutter.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -244,7 +244,7 @@ The size follows the place; the consumer passes nothing, and there are no title 
 ### Flags
 | Flag | Looks like when on | Use when | Default |
 |---|---|---|---|
-| `fill` (Root) | the page is as high as main; the body takes what the bar and the header leave; main keeps gutter-high air under it | a full-height table, board, chat or `Page.Split` in an `AppShell.Root fillViewport` | `false` |
+| `fill` (Root) | the page is as high as main; the body takes what the bar and the header leave; main keeps gutter-high air under it | a full-height table, board, chat or `Page.Split` in an `AppShell.Root` | `false` |
 | `sticky` (TopBar) | the bar stays at the top of main while the page scrolls under it | every page; `false` for a bar that should scroll away | `true` |
 | `collapse` (TopBar) | the flow title rises into the bar's title row once it scrolls away | a document page with the path in the bar and the title in the flow | `false` |
 | `dirty` (Guard) | nothing until a person leaves: a press on the navigation or the path asks «leave without saving?» | a form that is the page has unsaved changes | `false` |
@@ -302,15 +302,16 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 
 ## Layout & spacing
 - The edge air comes from the host: `AppShell.Main` sets `--page-gutter` (the page gutter, 16 → 24 → 32) and `--page-top` (24 → 32 from 1024px); `Page.Root` pads itself with them. Outside a host the page brings no air. The page resets both for what it holds, so a page nested in it starts clean.
-- `Page.TopBar` steps out of the gutter to the panel's edges and keeps the gutter inside; padding 12 above (or the top safe-area inset) and below; what follows starts 24 under its controls (header → body; the bar's own 12 counts in). The first line is as high as the Sidebar brand row (control m + 8), so the two read as one line. Groups 16 apart on a line, lines 12 apart; tools 8 apart; buttons 8 apart.
+- `Page.TopBar` steps out of the gutter to the panel's edges and keeps the gutter inside; padding 12 above (or the top safe-area inset) and below; what follows starts 24 under its controls (header → body; the bar's own 12 counts in), 16 on a compact page. The first line is as high as the Sidebar brand row (control m + 8), so the two read as one line. Groups 16 apart on a line, lines 12 apart; tools 8 apart; buttons 8 apart.
 - `Page.Tools` and `Page.Chips` are the kit's one tool row and chips line (`ToolRow`), the same as the DataTable `toolbar` and `toolbarChips`: the bar only places them. On the first line every tool keeps its natural width; on a line of their own they take the line and lay out from its width (container `prime-tool-row`), never from the window.
 - The tool row lays out the elements it is given, each in a cell: pass the tools as direct children of `Page.Tools` or a fragment. A wrapper component that returns several controls is one cell — no gaps between them, no growing search.
-- In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its title line's natural width until every button step is taken — short of room by less than the plan's margin, it truncates by that much and the step holds; its description truncates in whatever room the line has; then a heading with a path stacks (the path over the title, the title and the description wrapping), so no level is cut to a fragment; a heading without a path truncates its title.
+- In the bar only the heading's column gives (`minmax(0, 1fr)`): the tools and the actions keep their width. The heading keeps its title line's natural width until every button step is taken — short of room by less than the plan's margin, it truncates by that much and the step holds; its description truncates in whatever room the line has (on a compact page it wraps between words to two lines first; a description that opens with a `StatusDot` stays one line); then a heading with a path stacks (the path over the title, the title and the description wrapping), so no level is cut to a fragment; a heading without a path truncates its title.
 - The plan is measured, never chosen by breakpoints: the bar lays itself out from its own width.
 - Header (flow) → Body 24; blocks inside Body 24; a `Page.Section` 40 from its neighbours (the body's 24 + 16); tile → tile in a Grid 16 on both axes; section heading → content 16, heading → description 4; flow Title → Description 8; heading → Actions 24 side by side, 16 once they wrap below.
 - A `Page.Section` about a record (`number`, `Page.Badges`) heads it with one line, as a record header does: the `label` is cut down to its own text or 8em, the number after it never, the badges 6 after it fold into «+N»; a plain heading wraps.
+- Compact: under 30rem of its own content width (a phone) the page breathes at one number, 16 — the gutter `AppShell.Main` hands it, header or top bar → body, block → block, tile → tile and the padding of an `m` Card (its frame reads the same width); a `Page.Section` stands 32 off. `Page.Root` is the size container (`prime-page`) that query reads.
 - The grid lays itself out from its own width (`prime-grid`), the split from its own (`prime-split`) — never from the window.
-- `fill` needs a main with a height: `AppShell.Root fillViewport`. The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `Page.Split`.
+- `fill` needs a main with a height: the app frame of `AppShell.Root` (not a `fillViewport={false}` document shell). The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `Page.Split`.
 - Each pane of a split is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there. The detail pane on a wide split shows a short hint while nothing is chosen; a newly chosen record cross-fades in.
 
 ## Accessibility
@@ -356,7 +357,7 @@ A wide cell (`span` 7–11) written next to a narrow one (`span` 4–5) is a pai
 | [loading.tsx](examples/loading.tsx) | A page whose figures load after it opens: the line of data keeps its place under the title while it loads, so nothing in the bar moves — `loading`. |
 | [collapse.tsx](examples/collapse.tsx) | A document page whose large title scrolls away under the top bar: the bar holds the path and repeats the title after it once the title is out of view — `collapse`, `Page.Header`. |
 | [tools.tsx](examples/tools.tsx) | The orders page's tools in its top bar: sections with counts, the search and filter that narrow both views, the view, in the order written; the active filters on a line under everything — `Page.Tools`, `Page.Chips`. |
-| [router.tsx](examples/router.tsx) | A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the heading row before the buttons is their links and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. |
+| [router.tsx](examples/router.tsx) | A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the heading row before the buttons is their links and the body renders the sub-page at once; render it inside a router — `Page.Tools`, `asChild`. |
 | [actions-collapse.tsx](examples/actions-collapse.tsx) | The buttons of an invoices page on a tablet-wide column: the line runs short, so the secondary buttons show only their icons with the label as the name and the tooltip, the primary keeps its label — `Page.Actions`, `Button.Icon`. |
 | [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading, a section about one contract with its number and status on the heading's line — `Page.Section`, `label`, `number`, `description`, `Page.Badges`, `Page.Actions`. |
 | [grid.tsx](examples/grid.tsx) | A dashboard board: four KPI tiles, a chart two rows high beside two panels, one gap on both axes — `Page.Grid`, `Page.Cell`, `span`, `rows`. |

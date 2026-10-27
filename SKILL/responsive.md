@@ -355,6 +355,36 @@ into the body by the screen.
 `List.ItemActions` of a narrow row follow the same logic: when they would leave the text under 96px
 they drop under it, so a row keeps its name readable instead of clipping it.
 
+## Phones
+
+### One scroller, a still frame
+
+An app never scrolls its document: Main is the one scroller ([the frame](layouts.md#the-frame-owns-the-viewport)),
+every other scroll region is a `ScrollContainer`, and an open layer holds its own scroll. The bottom
+bar, the floating capsule and the page's top bar never move with a scroll. Never set
+`interactive-widget=overlays-content` in the viewport meta: sheets, drawers and dialogs follow the
+visual viewport over the on-screen keyboard by themselves.
+
+### The phone rhythm
+
+On a phone the page brings its own 16 rhythm (gutter, block → block, tile → tile, the padding of a
+card): put the blocks straight in `Page.Body` or `Page.Grid` and never add a column gap or a padding
+of your own for a phone.
+
+### The top bar on a phone
+
+The description of a `Page.TopBar` wraps to two lines on a phone: put the stable facts first and the
+volatile one (a time, a count that ticks) last. A status chip in `Page.Actions` stays one line — its
+details go into its popover, not into `Badge.Description`.
+
+### On a real phone
+
+- Pull down at the top of a page: nothing refreshes and nothing stretches.
+- Drag on the top bar or the BottomNav: nothing moves.
+- Scroll to the end: the last block clears the floating capsule.
+- Open and close the keyboard: no empty band stays under the page.
+- A form in a sheet: the focused field stays visible above the keyboard.
+
 ## Interaction and accessibility
 
 | Rule | Number |

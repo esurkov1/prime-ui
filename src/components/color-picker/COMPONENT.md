@@ -89,7 +89,6 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
 | `children` | `ReactNode` | — | End segments of the field box after the value: `ColorPicker.SwatchButton` (in a `Popover.Trigger`), so the hex and its swatch read as one field. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
@@ -119,7 +118,6 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the row `<div>`. |
 
 ### ColorPicker.Area
@@ -278,7 +276,7 @@ No `variant` / `tone` / `color`.
 | State | Driven by | DOM |
 |---|---|---|
 | disabled part | `disabled` on Area / Slider | React Aria `data-disabled`; muted, not interactive |
-| focus-visible | keyboard | React Aria `data-focus-visible`; `data-focus-ring="false"` on fields with `focusRing={false}` |
+| focus-visible | keyboard | React Aria `data-focus-visible`; the field ring follows the app switch (`data-focus-ring="visible"`) |
 | invalid hex | typing | reverts to the current color on blur / Enter |
 | hex error | `error` on HexInput | `aria-invalid`, danger ring, the error replaces the hint |
 | eyedropper unsupported | no `window.EyeDropper` | button `disabled`, `aria-hidden` |

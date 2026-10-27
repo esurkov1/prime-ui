@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 
-import { cssRule, cssValue } from "@/test/css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { FRAME_DESCRIPTION, FRAME_TITLE, surfaceFrameClass } from "./surfaceFrame";
 import textRole from "./textRole.module.css";
@@ -54,5 +54,31 @@ describe("surfaceFrame", () => {
     expect(cssValue(m, "--frame-lines-gap")).toBe("var(--prime-space-0)");
     expect(cssValue(l, "--frame-lines-gap")).toBe("var(--prime-space-1)");
     expect(cssValue(xl, "--frame-lines-gap")).toBe("var(--prime-space-1)");
+  });
+
+  it("in a compact container (under 30rem) pads 12 · 16 · 16 · 20 · 24 — never under s", () => {
+    const compact = ["@container (width < 30rem)"];
+    expect(cssValue(cssRule(CSS, ".frame", compact), "--frame-pad")).toBe(
+      "var(--prime-card-padding-s)",
+    );
+    expect(cssValue(cssRule(CSS, '.frame[data-frame="l"]', compact), "--frame-pad")).toBe(
+      "var(--prime-card-padding-m)",
+    );
+    expect(cssValue(cssRule(CSS, '.frame[data-frame="xl"]', compact), "--frame-pad")).toBe(
+      "var(--prime-card-padding-l)",
+    );
+    // xs and s keep their padding (their own rules outrank the compact `.frame`); only the
+    // padding steps — the radius, the zone gap and the mark stay.
+    const decls = cssRules(CSS)
+      .filter((rule) => rule.parents.some((parent) => parent.startsWith("@container")))
+      .flatMap((rule) => rule.decls.map((decl) => decl.prop));
+    expect(new Set(decls)).toEqual(new Set(["--frame-pad"]));
+    expect(
+      cssRules(CSS).some(
+        (rule) =>
+          rule.parents.length > 0 &&
+          (rule.selector.includes('"xs"') || rule.selector.includes('"s"')),
+      ),
+    ).toBe(false);
   });
 });

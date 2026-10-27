@@ -79,13 +79,6 @@ export const api: ComponentApi = {
           ru: "Подтверждённое значение (повтор совпал, код проверен): зелёное кольцо и прорисованная галочка у конца поля, озвучка `labels.valid`. `invalid` главнее. Передавайте и `false`: только тогда есть live-область.",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: '`false` скрывает только кольцо фокуса на `Input.Wrapper` (`data-focus-ring="false"`); фокус, клавиатура, ARIA и кольцо ошибки остаются.',
-        },
-        {
           name: "counter",
           type: "ReactNode",
           en: "Right side of the support row, usually `<Input.Counter current max />`.",

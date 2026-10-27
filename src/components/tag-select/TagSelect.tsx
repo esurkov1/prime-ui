@@ -14,7 +14,6 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
-  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -147,8 +146,7 @@ function canCreate(
 }
 
 export type TagSelectProps = FieldRootDomProps &
-  FieldFrameProps &
-  FieldFocusRingProps & {
+  FieldFrameProps & {
     options: TagSelectOption[];
     value?: string[];
     defaultValue?: string[];
@@ -198,7 +196,6 @@ export function TagSelect({
   name,
   placeholder = "",
   invalid: invalidProp,
-  focusRing,
   size: sizeProp,
   label,
   required = false,
@@ -702,7 +699,6 @@ export function TagSelect({
           state: shown ? "open" : "closed",
           disabled: disabled || undefined,
           invalid: ids.invalid || undefined,
-          "focus-ring": focusRing,
         })}
       >
         <ScrollContainer

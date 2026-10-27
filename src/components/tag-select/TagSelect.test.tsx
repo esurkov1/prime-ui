@@ -563,17 +563,6 @@ describe("TagSelect", () => {
   });
 });
 
-describe("TagSelect focusRing", () => {
-  it("focusRing={false} marks the field and keeps the invalid state", () => {
-    render(<BasicTagSelect focusRing={false} invalid />);
-    const input = screen.getByRole("combobox");
-    const control = input.closest("[data-focus-ring]");
-    expect(control).toHaveAttribute("data-focus-ring", "false");
-    expect(control).toHaveAttribute("data-invalid", "true");
-    expect(input).toHaveAttribute("aria-invalid", "true");
-  });
-});
-
 describe("TagSelect — overlay contract", () => {
   it("an outside click closes the panel; a click on the field does not", () => {
     render(

@@ -66,6 +66,7 @@ checks.
 - [ ] Every `size=` in my code has a reason I can name; none inside a Popover, Modal, Drawer, Sheet or LoginForm, nothing in the bar taller than its controls ([the host tier](api-contract.md#size-and-the-host-tier)).
 - [ ] A set of many items (modules, ports, tags) takes `xs` once for its region, its number is the title, an order word is `VisuallyHidden`, short readings are one `Badge.Group` ([many of a kind](composition.md#many-of-a-kind-start-small)).
 - [ ] Fields stand two to a row at most, in `Fieldset layout="pair"`; no grid of my own for fields ([forms](composition.md#7-forms)).
+- [ ] A card's fields are one `Fieldset`; no bare field beside a Fieldset in a `Card.Body` ([forms](composition.md#7-forms)).
 - [ ] Every row of controls uses one size and its heights line up ([density](composition.md#5-density-and-size)).
 - [ ] A switch ends its row; a reorderable list shows its grips always — leading (`handle="start"`) when the rows end with a switch ([list rows](composition.md#list-rows)).
 - [ ] A destructive action is `tone="danger"` and asks through a `ConfirmDialog` — an icon button with a Tooltip among one or two actions, the last item of «Ещё» among three or more ([the number of actions](composition.md#the-number-of-actions)).
@@ -78,6 +79,7 @@ checks.
 - [ ] Every text goes through a kit part or a `Typography` role ([typography](foundations.md#7-typography)).
 - [ ] One page title, one `<h1>`; headings descend without skipping levels ([hierarchy](composition.md#3-hierarchy--air-first-then-type)).
 - [ ] Text colour comes from `tone`; numbers in tables and prices are tabular ([text colour](foundations.md#text-colour)).
+- [ ] No mobile font size or `clamp()` type of my own: the same roles and tiers as on desktop ([typography](foundations.md#7-typography)).
 - [ ] No filler copy, no emoji, no text that restates the heading ([decoration](anti-slop.md#8-decoration-and-filler)).
 
 ## Colour
@@ -150,7 +152,8 @@ checks.
 - [ ] No control changes size with its state: a toggle keeps its label and swaps its glyph, a line of data keeps its facts ([nothing changes size](foundations.md#nothing-changes-size-with-its-state)).
 - [ ] Fields show `hint` and `error`; only the minority is marked `required` or `optional` ([forms](api-contract.md#forms)).
 - [ ] Every data block has its loading, empty and error states ([feedback](composition.md#9-feedback)).
-- [ ] Every region swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
+- [ ] Every region inside a page or a dialog swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
+- [ ] Navigation (a section, a sub-route, another page) renders the new page at once: no `Crossfade` around `AppShell`, `Page.Root`, `Page.Body` or `Routes`, none keyed by the path ([navigation never cross-fades](composition.md#navigation-never-cross-fades)).
 - [ ] Whatever loads shows its skeleton on the first render under the state `"loading"`, and the data takes its place without unfolding, sliding or growing from zero ([continuity](foundations.md#11-state-changes-are-continuous)).
 - [ ] A `Page.Description` that waits for data stays mounted with `loading`, so the title in the bar never jumps ([screen states](composition.md#screen-states)).
 - [ ] A KPI tile that waits for its figure is `Kpi.Root loading`, its parts mounted ([inside a category](choosing.md#2-inside-a-category)).
@@ -165,6 +168,11 @@ checks.
 ## Themes and widths
 - [ ] The screen passes the responsive checklist in both themes ([responsive](responsive.md#checklist-before-handing-a-screen-over)).
 - [ ] On a phone the Sidebar opens from the menu button the top bar draws; the page title stays in the bar ([app frame](layouts.md#app-frame-once-per-app)).
+- [ ] The app is `AppShell.Root` at the top level with no `100vh`, `overflow` or `position: fixed` box of mine around it; the viewport meta has `viewport-fit=cover` ([the frame owns the viewport](layouts.md#the-frame-owns-the-viewport)).
+- [ ] The document never scrolls: Main is the one scroller, every other region a `ScrollContainer`; no `interactive-widget=overlays-content` ([one scroller](responsive.md#one-scroller-a-still-frame)).
+- [ ] On a phone the blocks stand straight in `Page.Body` / `Page.Grid`, with no gap or padding of mine for a phone ([the phone rhythm](responsive.md#the-phone-rhythm)).
+- [ ] A top bar description puts its volatile fact last; a status chip in `Page.Actions` is one line ([the top bar on a phone](responsive.md#the-top-bar-on-a-phone)).
+- [ ] On a real phone: no pull-to-refresh, nothing moves under a drag on the bars, the last block clears the capsule, the keyboard leaves no band and keeps a sheet's field in view ([on a real phone](responsive.md#on-a-real-phone)).
 - [ ] Tabs that outgrow the width scroll; no two topics merged into one tab ([switchers](responsive.md#switchers)).
 - [ ] No ButtonGroup or SegmentedControl holds more segments than its column shows; a long one is split by meaning or becomes a `Select` ([switchers](responsive.md#switchers)).
 - [ ] At every width the bar fits: tools on their own line, then icon-only buttons, then «⋯», the primary always on screen ([the page's top bar](responsive.md#the-pages-top-bar--pagetopbar)).

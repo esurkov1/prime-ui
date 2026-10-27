@@ -1,4 +1,4 @@
-/** The app frame: Sidebar in the nav column, the page in main with its title and action in its top bar; only main scrolls — `fillViewport`. */
+/** The app frame: Sidebar in the nav column, the page in main with its title and action in its top bar; only main scrolls — `AppShell.Nav`, `AppShell.Main`. */
 import { AppShell, Button, Icon, Page, Sidebar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function AppShellOverviewExample() {
   return (
     <div className={styles.stage}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Nav>
           {/* A small app window: the icon rail fits every frame width; the toggle widens it. */}
           <Sidebar.Root offCanvas="never" defaultMode="compact">

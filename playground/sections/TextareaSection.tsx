@@ -50,11 +50,6 @@ export const page: ComponentPageConfig = {
         "Поле, которое растёт с текстом, поле с одной строки, которое после пяти строк прокручивается, и фиксированное с ручкой resize — `autoResize`, `rows`, `maxRows`.",
     },
     {
-      scenario: "without-focus-ring",
-      title: "Без кольца фокуса",
-      description: "Одно поле ответа, где фокус видно по каретке и светлой заливке — `focusRing`.",
-    },
-    {
       scenario: "edge-actions",
       title: "Действия в поле",
       description:

@@ -29,7 +29,6 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import {
-  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -1150,7 +1149,6 @@ export type FileUploadPicker = {
 
 export type FileUploadRootProps = FieldRootDomProps &
   FieldFrameProps &
-  FieldFocusRingProps &
   FileSetProps & {
     size?: ControlSize;
     trigger?: FileUploadTrigger;
@@ -1213,7 +1211,6 @@ function FileUploadField({
   hintTone,
   error,
   id,
-  focusRing,
   labels: labelsProp,
   "aria-label": ariaLabel,
   children,
@@ -1465,7 +1462,6 @@ function FileUploadField({
         {...toDataAttributes({
           trigger,
           dropping: (tile && dragOver) || undefined,
-          "focus-ring": focusRing,
         })}
         {...dropHandlers}
       >

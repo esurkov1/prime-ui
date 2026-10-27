@@ -666,7 +666,7 @@ export function PanelView(props: PanelViewProps) {
                   <span className={styles.navSpacer} />
                 )}
               </div>
-              {/* Another month cross-fades in and the height glides (foundation §1 rule 7). */}
+              {/* Another month cross-fades in (foundation §1 rule 7). */}
               <RegionSwap state={m.getTime()} hold={false}>
                 <MonthGrid
                   month={m.getTime()}

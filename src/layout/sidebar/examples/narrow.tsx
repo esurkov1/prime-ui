@@ -8,7 +8,7 @@ const LABELS = { close: "Закрыть меню" };
 export default function SidebarNarrowExample() {
   return (
     <div className={styles.stage}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Nav>
           <Sidebar.Root labels={LABELS}>
             <Sidebar.Header>

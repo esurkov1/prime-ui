@@ -29,7 +29,6 @@ export default function AppShellTemplateExample() {
   return (
     <div className={styles.stage}>
       <AppShell.Template
-        fillViewport
         className={styles.shell}
         scrollResetKey={pageId}
         nav={

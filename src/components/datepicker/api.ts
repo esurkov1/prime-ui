@@ -245,13 +245,6 @@ export const api: ComponentApi = {
           ru: "Выравнивание поповера относительно поля. `auto` выравнивает панель по краю триггера, за которым больше места; `start`, `center` или `end` задают край явно.",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides only the visual focus ring (`data-focus-ring="false"`).',
-          ru: '`false` скрывает только видимое кольцо фокуса (`data-focus-ring="false"`).',
-        },
-        {
           name: "placeholder",
           type: "string",
           default: "labels.placeholder",

@@ -29,6 +29,9 @@ The design contract for every component. Tokens live in `tokens/` and are genera
    - `--prime-control-s-track` 5px — a line between the xs and m tracks
    - `--prime-control-m-track` 6px — the m track line
    - `--prime-control-l-track` 7px — a line between the m and xl tracks
+   - `--prime-control-s-thumb` 15px — three tracks: the slider thumb stands in proportion to its line
+   - `--prime-control-m-thumb` 18px — three tracks: the slider thumb stands in proportion to its line
+   - `--prime-control-l-thumb` 21px — three tracks: the slider thumb stands in proportion to its line
    - `--prime-badge-s-padding-x` 6px — the optical side air of a 20px chip with 12px text
    - `--prime-badge-m-icon` 14px — the glyph of an m chip
    - `--prime-badge-l-padding-x` 10px — the optical side air of a 28px chip with 13px text
@@ -56,8 +59,8 @@ The design contract for every component. Tokens live in `tokens/` and are genera
    the data's geometry from the first paint — never nothing, never a region that grows from zero —
    and the data then replaces it in place: no height glide, no reveal, no slide, at most a short
    cross-fade, the layout settled in one frame. A region swapping between settled states — data →
-   empty → error, one record → another — cross-fades and glides to its new height (`Crossfade`). A
-   region that mounts in its state shows it still. This holds for every region of every screen, not
+   empty → error, one record → another — cross-fades the same way (`Crossfade`): opacity only, the
+   new height taken at once, nothing unfolding or clipped. A region that mounts in its state shows it still. This holds for every region of every screen, not
    only for prominent ones.
 
 ## 2. Token layers and naming
@@ -201,6 +204,19 @@ Font: Golos Text (400/500/600), mono: JetBrains Mono. Roles (`--prime-text-<role
 | display-s/m/l | 36/44 · 48/56 · 60/68 | 600 | −0.02 / −0.03em | hero, metrics |
 | code | 13/20 mono | 400 | 0 | code, IDs |
 
+Touch step: under `@media (pointer: coarse)` the type moves one step along the scale
+(12 · 13 · 14 · 15 · 16 · 17 · 18 · 20): 13/20 → 14/20 (body-s, code) · 14/20 → 15/20 (body-m,
+title-s) · title-xs 13/16 → 14/20. Caption, body-l, title-m and title-l stay. It covers the text
+roles and the text, label and hint of the control tiers (`s` text 14 and label 13, `m` text 15 and label 14, `l` /
+`xl` label 15 and hint 14; the `xs` tier and the `l` / `xl` text stay), and the text of Badge / Kbd
+tiers `s` … `xl` (13 · 13 · 14 · 15) so a badge keeps its ratio to the text beside it, and the BottomNav label (10 → 11, the floating capsule's 9 → 10). Heading and
+display roles, tooltip text, the `xs` badge and every control, badge and BottomNav height stay. The marks
+of the controls take the platform's size too, so they read as native: the Switch the iOS proportions
+(w/h ≈ 1.65, thumb = height − 4: `s` 36×22, `m` 44×26, `l` 48×28, `xl` 51×31; `xs` stays), the
+Checkbox / Radio box +2 up to 24 (`choice`: 16 · 18 · 20 · 22, `xl` stays), the Slider thumb a hand's
+size (`thumb`: 20 · 24 · 28 · 32 · 36 over the desktop 12 · 15 · 18 · 21 · 24) while its track stays. The glyphs step with the text: the control icon (`control.<tier>.icon`) 16 · 18 · 18 · 22 · 22 over 14 · 16 · 16 · 20 · 20, the Badge icon `s` 14, `m` 16, `xl` 18 (`xs` and `l` stay). One
+source, `tokens/touch.ts`, emitted by `tokens:build`; rem, so the person's browser text size still applies.
+
 Numbers in tables, dates, counters, prices: `font-variant-numeric: tabular-nums`. Reading text max width:
 `--prime-layout-reading-max-width` (≈ 65ch). Weights only 400/500/600.
 
@@ -213,6 +229,8 @@ Numbers in tables, dates, counters, prices: `font-variant-numeric: tabular-nums`
 | **m** | **36** | **14/20** | **16** | **12** | **8** | **16** | **8** | **13/20** | **12/16** | **32** | **18** | **6** |
 | l | 40 | 16/24 | 20 | 12 | 8 | 20 | 10 | 14/20 | 13/20 | 36 | 20 | 7 |
 | xl | 48 | 16/24 | 24 | 16 | 12 | 20 | 12 | 14/20 | 13/20 | 40 | 24 | 8 |
+
+On a coarse pointer the Text / Label / Hint columns take the touch step of §5; Height does not change.
 
 Variables: `--prime-control-<tier>-{height,padding-x,field-padding-x,gap,icon,radius,text-size,line-height,label-size,label-line-height,hint-size,hint-line-height,label-gap,hint-gap,item-height,choice,track}`.
 
@@ -253,9 +271,19 @@ Z-index: `--prime-z-*` only, never a number. Two groups:
   (a folder tab over its strip, a thumb over its track, a badge over an avatar, controls over media).
   They never compete with the page-level group.
 
+The focus ring switch — one parameter for the whole kit: every ring is drawn
+`var(--prime-focus-ring-width)` wide, and the base CSS keeps that width at zero, so by default no
+ring shows. An app shows the rings by setting `data-focus-ring="visible"` on `<html>` (or on any
+wrapper, for one part of a page). It is a width, not a colour: nested `data-theme` wrappers and a
+host that recolours its ring keep working. Focus itself, `:focus-visible`, the tab order and roving
+focus never change; the focus fill of a field (`--prime-color-field-bg-focus`) and the danger ring of
+an invalid field are no focus ring and always show. `data-focus-quiet` (focus given back to a
+control a pointer used) sets the width to zero until the next key. No component takes a ring prop of
+its own. The docs site turns the rings on.
+
 Focus ring must never be clipped (hard rule):
 - Fields (Input, Textarea, Select/TagSelect/Datepicker triggers, DigitInput cells, ColorPicker channels, search fields in panels)
-  draw the ring INSIDE their edge: `outline: var(--prime-focus-width) solid var(--prime-color-focus-ring); outline-offset: var(--prime-focus-offset-inset);`.
+  draw the ring INSIDE their edge: `outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring); outline-offset: var(--prime-focus-offset-inset);`.
 - Switcher items draw the ring inside too, because their track or strip clips: a Tabs tab draws it
   inset in the folder's own shape (an inset `box-shadow` on the tab's shape layer), a SegmentedControl
   item uses `--prime-focus-offset-inset`. The tab panel keeps the outer ring.
@@ -270,14 +298,11 @@ Focus ring must never be clipped (hard rule):
 - Exception: a search input that is the permanent focus of its layer (CommandMenu search, search row inside
   Select/TagSelect/Dropdown panels) draws no ring — the caret is the indicator; the row is separated from results
   by a `border-faint` hairline. Everything else inside the layer (items, buttons) keeps the normal rules.
-  Implemented via `focusRing={false}`: every field (Input, Textarea, Select, TagSelect, Datepicker, DigitInput,
-  ColorPicker fields) takes `focusRing?: boolean` (default `true`); `false` sets `data-focus-ring="false"` on the
-  element that draws the ring and its CSS skips the ring (`:not([data-focus-ring="false"])`). Focus, keyboard and
-  ARIA are unchanged; the invalid inset ring still shows. Panel search rows and CommandMenu's search field set the
-  attribute themselves. Use it only where focus is otherwise obvious (WCAG 2.4.7).
+  The Composer field (the caret again) and the DigitInput cells (the row's one gliding ring stands in) set
+  `--prime-focus-ring-width` to zero on their own box.
 - `src/styles/focus-guard.test.ts` enforces this on the CSS.
 
-Base declaration: `outline: var(--prime-focus-width) solid var(--prime-color-focus-ring); outline-offset: var(--prime-focus-offset);`
+Base declaration: `outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring); outline-offset: var(--prime-focus-offset);`
 on `:focus-visible`. Fields draw it on the wrapper with `:focus-within` / `:has(:focus-visible)`.
 Error fields use `--prime-color-danger-border` as ring color.
 
@@ -345,11 +370,11 @@ Every component is designed with its micro-animations, not only its static state
    `padding`, `top/left`; never `transition: all` — list the properties. Where size must animate, prefer
    `transform` / `scale` (progress fills). The exceptions are a closed list, each with one engine,
    and `src/styles/motion-perf.test.ts` allows nothing else:
-   - **height glide** — a region that swaps its content between settled states glides from the
-     height on screen to the new one (`Crossfade`, the Notification stack), never through a smaller
-     or an old height, and only when they differ by more than 2px; an interrupted glide turns to the
-     new target from where it is; a swap into or out of loading never glides; a cell of a row whose
-     control is replaced by another glides its width the same way;
+   - **height glide** — the Notification stack glides from the height on screen to the new one,
+     never through a smaller or an old height; an interrupted glide turns to the new target from
+     where it is. A region swap never glides (rule 8);
+   - **cell width** — a cell of a row whose control is replaced by another glides its width from
+     the old control's to the new one's (`RegionSwap axis="inline"`, `src/internal/rowCells`);
    - **row fold** — a part that folds open or closed animates `grid-template-rows` 0fr ↔ 1fr
      (`Disclosure`: Accordion, DataTable expanded rows);
    - **text width** — a label that morphs into another text glides its `width` (`MorphText`).
@@ -366,13 +391,16 @@ Every component is designed with its micro-animations, not only its static state
    ease. Two states cross-fade rather than flip when they replace each other in place: a region
    swapping its content uses `Crossfade` (inside a component: `RegionSwap`). Its loading state is
    the state `"loading"`: a `Skeleton` of the coming content, drawn from the first paint, which the
-   data replaces in place — the height settles in one frame and the fade takes `fast`; only a swap
-   between settled states fades on `base` and glides its height (principle 7). Nothing moves on the
-   first render of a region. A region swap waits out `--prime-motion-swap-hold` before anything
+   data replaces in place on a `fast` fade; a swap between settled states fades on `base`
+   (principle 7). A region swap is opacity only: the region takes the new state's height in one
+   frame, the new state fades in in flow and is never clipped (a row's wash bleeding into the
+   host's padding, a focus ring stand from the first frame), the old one lies over it from the top
+   edge and fades out, cut a little past the region's edges so a taller old state never paints over
+   what follows. Nothing moves on the first render of a region. A region swap waits out `--prime-motion-swap-hold` before anything
    moves (the data arriving out of loading does not wait): a state that turns back within it (a
-   quiet refetch, a record gone for a moment) is the old one again without a frame of motion, and
-   the new height is measured once the new content has settled. A swap that turns back to a state
-   still fading out reverses in place: both fades and the height continue from where they are. A change inside one state (a row
+   quiet refetch, a record gone for a moment) is the old one again without a frame of motion; while it waits the old state stays in flow. A
+   swap that turns back to a state still fading out reverses in place: both fades continue from
+   where they are. A change inside one state (a row
    added, removed or edited) is no region swap: only that row moves (`useListPresence`,
    `Disclosure`).
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
@@ -489,6 +517,12 @@ open" holds across the kit. Tooltip and Notification are the two layers outside 
   written before the panel is measured, the panel is measured again until its size settles, a late
   size change is placed in the ResizeObserver callback (before paint, never a frame later), and an
   anchored panel stays invisible until it has its first place (`data-float-pending`).
+- **Sheets.** Every bottom sheet (Sheet, a Modal or ConfirmDialog on a phone, a floating layer as a
+  sheet) stands on one frame: `--prime-sheet-padding` on the sides and below, 16 between blocks, its
+  height by content up to the top gap, the last zone's 24 plus the bottom safe-area inset under it.
+  Its grab strip is a touch target (44) tall with a small bar; above a header it is the bar's own 20
+  and the header is the rest of the grab area; above any other zone it is that zone's top air. A drag
+  starts on the strip or the header.
 - **Gestures.** Only a sheet swipes: Sheet, and a Modal or a floating layer shown as a bottom sheet below
   640, close with a swipe down from the grab handle or the header (`useSwipeDismiss`), as an extra way out
   next to Escape and the scrim, following `closeOnOutsideClick`. A Drawer has no touch gestures: it closes
@@ -535,7 +569,8 @@ Components carry no motion code of their own for these layers.
   hover reveals is also shown on focus and under `(hover: none)`. Under `(pointer: coarse)` small
   controls get a 44px hit area (`--prime-control-touch-target`, `src/internal/touchTarget`) and menu
   rows are at least 44px; editable field text is at least 16px under `(pointer: coarse), (max-width:
-  639px)` (`--prime-control-touch-text-size`) so iOS never zooms.
+  639px)` (`--prime-control-touch-text-size`) so iOS never zooms, and the type takes its touch step
+  (§5).
 - Switchers — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — all scroll through
   one shared scroller. They never wrap: they scroll inside themselves,
   stretched items tend to equal width and never shrink below their label, the selection indicator
@@ -566,6 +601,23 @@ Components carry no motion code of their own for these layers.
   On phones (below 640) and in a dialog narrower than 360px (a container query) both stack full
   width with gap `--prime-space-2`, primary last.
 - Overlays near the viewport edge flip/shift, keep `--prime-space-2` from the edge.
+- An app's frame owns the viewport: the top-level `AppShell.Root` (`fillViewport`, on by default) is
+  fixed to the layout viewport (`position: fixed; inset: 0`), the document under it is still
+  (`<html data-prime-frame>`: `overflow: hidden`, `overscroll-behavior: none`; a touch guard where
+  iOS ignores them), and `AppShell.Main` is the page's one scroller, holding its own overscroll. No
+  pull-to-refresh, no rubber band and no document shift in an app. Nested scrollers hand their
+  scroll to Main, never to the document. Edge parts (BottomNav, Fab, the top bar) take their place
+  from the frame's edges plus `--prime-safe-area-*`, the same on every page. Main reserves the
+  floating capsule's room after its last line. The on-screen keyboard overlays the frame (the tab
+  bar stays behind it).
+- The on-screen keyboard: a panel fixed to the viewport (a sheet, a drawer, a centred dialog) stands
+  on what the keyboard leaves — the visual viewport (`useKeyboardInset`: `--visual-inset-top` /
+  `-bottom`, `data-keyboard`). With the keyboard up the bottom safe-area inset gives way, and the
+  panel's own scroller brings the focused field into view.
+- Compact rhythm: a compact container (under 30rem of its own width, a phone page) breathes at one
+  number, 16: the page gutter, header → body, block → block, tile → tile and the padding of a surface
+  frame (12 · 16 · 16 · 20 · 24); a titled section stands 32 off. `Page.Root` is the size container; a
+  surface reads the nearest container around it, never itself.
 
 ## 10. API contract (v1)
 
@@ -585,7 +637,7 @@ No backward compatibility, no aliases, no `@deprecated` props, no legacy types. 
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure. |
 | Dismiss | `closeOnOutsideClick?: boolean` (default `true`), `closeOnEscape?: boolean` (default `true`) | One name on every layer-stack overlay: Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer, Popover, Dropdown, Select, TagSelect, Datepicker, ColorPresets, the Sidebar off-canvas, `Message.Reactions`. ConfirmDialog takes both with `closeOnOutsideClick` default `false`; a form holds closing with `X.Guard`. Tooltip and Notification take neither. No `closeOnOverlayClick`. See §8 Overlay contract. |
 | Flags | `disabled`, `readOnly`, `required`, `loading`, `fullWidth` | Same names everywhere. |
-| Focus ring | `focusRing?: boolean`, default `true` | Fields only. `false` hides the visual ring (`data-focus-ring="false"`), never focus or the error ring; see §7. |
+| Focus ring | no prop: the app's `data-focus-ring="visible"` | Rings are hidden by default and shown for the whole app (or a wrapper) by the one switch; no component takes a ring prop; see §7. |
 | Built-in strings | `labels?: Partial<XLabels>` | Every system string (aria labels, default texts, counters) lives in one `labels` object with Russian defaults. Visible content goes through children/slots, not labels. |
 | Structure | Compound `X.Root` + `X.Part` when a component has parts; a single export for leaf components without parts. | |
 | DOM state | `data-size`, `data-variant`, `data-tone`, `data-color`, `data-invalid`, `data-disabled`, `data-loading`, `data-state` (`open \| closed \| checked \| unchecked \| indeterminate \| active \| inactive`) | CSS styles only from these and ARIA. |

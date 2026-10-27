@@ -202,7 +202,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 State change is continuous in the whole kit: every region that changes what it shows cross-fades, and loading holds the shape of what is coming.
 
-- Every region with loading / data / empty / error (or one record at a time): its content in `<Crossfade state={status} aria-busy={status === "loading"}>` — not `{loading ? <A /> : <B />}` that flips and makes the page jump. DataTable does this itself.
+- Every region inside a page or a dialog with loading / data / empty / error (or one record at a time) — never the page itself on navigation: its content in `<Crossfade state={status} aria-busy={status === "loading"}>` — not `{loading ? <A /> : <B />}` that flips and makes the page jump. DataTable does this itself.
 - Region loading: the state `"loading"`, rendered from the first paint (never `null`), a `<Skeleton>` in the geometry of the data — same rows, same gaps (`<Skeleton />` for a text line, `shape="circle"` for an avatar, `shape="control"` for a field, `shape="block"` for an image or chart) — not a spinner in an empty card, not a grey box or shimmer you draw.
 - `Spinner` only where there is no shape to hold (a running job, a status line); a busy button is `<Button.Root loading>`.
 - Refreshing data already on screen: keep it, set `aria-busy` — not back to a skeleton on every refetch.
@@ -325,7 +325,7 @@ type InvoicesCardProps = {
 const PLACEHOLDER_ROWS = ["a", "b", "c"];
 
 export function InvoicesCard({ status, invoices, onRetry }: InvoicesCardProps) {
-  // One key per state: "loading" hands over to the data in place; settled states glide the height.
+  // One key per state: "loading" hands over to the data in place; every swap is a cross-fade.
   const state = status === "ready" && invoices.length === 0 ? "empty" : status;
 
   return (

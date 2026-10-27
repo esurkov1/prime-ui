@@ -1,7 +1,6 @@
-/** A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the heading row before the buttons is their links and the body cross-fades between them; render it inside a router — `Page.Tools`, `asChild`. */
+/** A section with sub-pages: the title is the section, each sub-page is a route of its own with its own actions, the switch in the heading row before the buttons is their links and the body renders the sub-page at once; render it inside a router — `Page.Tools`, `asChild`. */
 import {
   Button,
-  Crossfade,
   DataTable,
   type DataTableColumn,
   Icon,
@@ -105,72 +104,70 @@ export default function PageRouterExample() {
         ) : null}
       </Page.TopBar>
       <Page.Body>
-        {/* `location` keeps the leaving sub-page on its own route while it fades out. */}
-        <Crossfade state={current.to}>
-          <Routes location={location}>
-            <Route
-              path="/messengers/stats"
-              element={
-                <Page.Grid>
-                  <Page.Cell span={4}>
-                    <Kpi.Root>
-                      <Kpi.Title>Диалогов</Kpi.Title>
-                      <Kpi.Value>1 280</Kpi.Value>
-                      <Kpi.Delta value={14} tone="success">
-                        +14%
-                      </Kpi.Delta>
-                      <Kpi.Period>Октябрь</Kpi.Period>
-                    </Kpi.Root>
-                  </Page.Cell>
-                  <Page.Cell span={4}>
-                    <Kpi.Root>
-                      <Kpi.Title>Первый ответ</Kpi.Title>
-                      <Kpi.Value>
-                        6<Kpi.Unit>мин</Kpi.Unit>
-                      </Kpi.Value>
-                      <Kpi.Delta value={-2} tone="success">
-                        −2 мин
-                      </Kpi.Delta>
-                      <Kpi.Period>Октябрь</Kpi.Period>
-                    </Kpi.Root>
-                  </Page.Cell>
-                  <Page.Cell span={4}>
-                    <Kpi.Root>
-                      <Kpi.Title>Без ответа</Kpi.Title>
-                      <Kpi.Value>23</Kpi.Value>
-                      <Kpi.Delta value={5} tone="danger">
-                        +5
-                      </Kpi.Delta>
-                      <Kpi.Period>За сутки</Kpi.Period>
-                    </Kpi.Root>
-                  </Page.Cell>
-                </Page.Grid>
-              }
-            />
-            <Route
-              path="/messengers/templates"
-              element={
-                <DataTable
-                  columns={TEMPLATE_COLUMNS}
-                  rows={TEMPLATES}
-                  getRowKey={(row) => row.id}
-                  paging="none"
-                />
-              }
-            />
-            <Route
-              path="*"
-              element={
-                <DataTable
-                  columns={COLUMNS}
-                  rows={CHANNELS}
-                  getRowKey={(row) => row.id}
-                  paging="none"
-                />
-              }
-            />
-          </Routes>
-        </Crossfade>
+        {/* Navigation is instant: the new sub-page renders in place, never cross-fades. */}
+        <Routes>
+          <Route
+            path="/messengers/stats"
+            element={
+              <Page.Grid>
+                <Page.Cell span={4}>
+                  <Kpi.Root>
+                    <Kpi.Title>Диалогов</Kpi.Title>
+                    <Kpi.Value>1 280</Kpi.Value>
+                    <Kpi.Delta value={14} tone="success">
+                      +14%
+                    </Kpi.Delta>
+                    <Kpi.Period>Октябрь</Kpi.Period>
+                  </Kpi.Root>
+                </Page.Cell>
+                <Page.Cell span={4}>
+                  <Kpi.Root>
+                    <Kpi.Title>Первый ответ</Kpi.Title>
+                    <Kpi.Value>
+                      6<Kpi.Unit>мин</Kpi.Unit>
+                    </Kpi.Value>
+                    <Kpi.Delta value={-2} tone="success">
+                      −2 мин
+                    </Kpi.Delta>
+                    <Kpi.Period>Октябрь</Kpi.Period>
+                  </Kpi.Root>
+                </Page.Cell>
+                <Page.Cell span={4}>
+                  <Kpi.Root>
+                    <Kpi.Title>Без ответа</Kpi.Title>
+                    <Kpi.Value>23</Kpi.Value>
+                    <Kpi.Delta value={5} tone="danger">
+                      +5
+                    </Kpi.Delta>
+                    <Kpi.Period>За сутки</Kpi.Period>
+                  </Kpi.Root>
+                </Page.Cell>
+              </Page.Grid>
+            }
+          />
+          <Route
+            path="/messengers/templates"
+            element={
+              <DataTable
+                columns={TEMPLATE_COLUMNS}
+                rows={TEMPLATES}
+                getRowKey={(row) => row.id}
+                paging="none"
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <DataTable
+                columns={COLUMNS}
+                rows={CHANNELS}
+                getRowKey={(row) => row.id}
+                paging="none"
+              />
+            }
+          />
+        </Routes>
       </Page.Body>
     </Page.Root>
   );

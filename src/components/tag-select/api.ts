@@ -167,13 +167,6 @@ export const api: ComponentApi = {
           ru: "Ярус поля; список того же яруса, чипы на ярус меньше. Без него — ярус контейнера (форма, панель с размером), иначе `m`.",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring.',
-          ru: '`false` скрывает видимое кольцо фокуса (`data-focus-ring="false"`), но не фокус и не кольцо ошибки.',
-        },
-        {
           name: "id",
           type: "string",
           en: "Id of the input; generated when omitted.",

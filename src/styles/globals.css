@@ -31,6 +31,19 @@ body {
   font-weight: var(--prime-text-body-m-weight);
 }
 
+/* The focus ring switch (foundation §7): every ring of the kit is `--prime-focus-ring-width` wide.
+   It is 0 — no ring — unless an ancestor (`<html>` or any wrapper) sets `data-focus-ring="visible"`.
+   A width, not a colour: it holds no theme value, so nested `data-theme` wrappers and a host that
+   recolours its ring (an outgoing message) keep working. Focus itself, `:focus-visible` and the
+   tab order never change. */
+:root {
+  --prime-focus-ring-width: var(--prime-space-0);
+}
+
+[data-focus-ring="visible"] {
+  --prime-focus-ring-width: var(--prime-focus-width);
+}
+
 /* One focus ring for every interactive element. Components that draw focus on a wrapper
    (fields) suppress it on the native element and use the same tokens on the wrapper. */
 :where(
@@ -43,7 +56,7 @@ body {
     summary,
     [tabindex]:not([tabindex="-1"])
   ):focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 
@@ -52,9 +65,9 @@ body {
 }
 
 /* Focus that came back to a control a pointer used (a layer opened with a click, closed with
-   Escape) shows no ring until the next key: every kit ring is drawn with this token. */
+   Escape) shows no ring until the next key: every kit ring is drawn this wide. */
 [data-focus-quiet] {
-  --prime-color-focus-ring: transparent;
+  --prime-focus-ring-width: var(--prime-space-0);
 }
 
 :where(a, button, input, textarea, select, [role="button"], [tabindex]) {
@@ -276,6 +289,16 @@ textarea:disabled::placeholder {
   --prime-bleed-inline: var(--prime-space-0);
   --prime-control-height: initial;
   --prime-icon-size: initial;
+}
+
+/* An app frame owns the viewport (`AppShell.Root` at the top level sets the attribute,
+   `useViewportFrame`): the document under it is still — no scroll, no rubber band, no
+   pull-to-refresh — and only the frame's own scrollers move. A document page without the frame
+   keeps the browser's behaviour. */
+:root[data-prime-frame],
+:root[data-prime-frame] body {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 @media (min-width: 640px) {

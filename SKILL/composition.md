@@ -232,8 +232,8 @@ with «Сделки» and «Документы». Each facet is a route of its o
   does — never on a line of its own under the title on a wide screen; the bar moves it under the
   title only when the row runs out of room. A sub-page with buttons of its own shifts the switch by
   their width; that is the accepted cost of one heading row.
-- **The body is the sub-page**, swapped in a `Crossfade` keyed by the path (`Routes` given the
-  `location`, so the leaving sub-page stays on its route while it fades).
+- **The body is the sub-page**, rendered by plain `Routes` at once: navigation is instant, the
+  new sub-page simply stands in place ([navigation never cross-fades](#navigation-never-cross-fades)).
 - **The Sidebar stays on the section.** Its item is current on every sub-route: a `NavLink` to
   `/messengers` without `end`, or `current={pathname.startsWith("/messengers")}`.
 - Never a second Sidebar level for facets, never a `Tabs` strip inside `Page.Body` for sub-pages.
@@ -241,6 +241,38 @@ with «Сделки» and «Документы». Each facet is a route of its o
   «Новые», «В работе»); `Tabs` switch panels that are not routes.
 
 Live: [router.tsx](../src/layout/page/examples/router.tsx).
+
+#### Navigation never cross-fades
+
+Another section, a sub-route or another page is navigation: the new page is there in the next
+frame, whole — its frame, its top bar and its blocks, with a `Skeleton` from the first paint where
+data still loads. A `Crossfade` belongs only inside a page or a dialog, around one region whose
+state changes while the page stays (loading → data → empty → error, another record in the same
+panel, a board ↔ list switch of one block). Wrapped around `AppShell`, `Page.Root`, `Page.Body` or
+`Routes`, it makes every page arrive late and fade in from the top.
+
+```tsx partial
+// bad — the page body keyed by the route: every navigation fades the whole page in
+<Crossfade state={pathname}>
+  <Page.Body>
+    <Routes location={location}>…</Routes>
+  </Page.Body>
+</Crossfade>
+```
+
+```tsx good
+// good — the route renders at once; only a region inside the page cross-fades its states
+// declare: const status: "loading" | "ready"
+<Page.Body>
+  <Card.Root>
+    <Card.Body>
+      <Crossfade state={status} aria-busy={status === "loading"}>
+        {status === "loading" ? <Skeleton lines={3} /> : <Typography variant="body-m">Счёт оплачен</Typography>}
+      </Crossfade>
+    </Card.Body>
+  </Card.Root>
+</Page.Body>
+```
 
 ```tsx
 import { Page, SegmentedControl } from "prime-ui-kit";
@@ -832,6 +864,8 @@ screen keeps the same count ([a narrow header](responsive.md#a-narrow-header)). 
   its `onValueChange` when each edit saves at once.
 - Fields 20 apart; groups 32 apart, each a `Fieldset label` (its `title-s` heading 16 above the
   fields, no frame); no dividers between groups.
+- A card's fields go in one `Fieldset` (field → field 20); never bare fields beside a Fieldset in
+  one `Card.Body`.
 - **Fields stand two to a row at most.** Related short fields side by side (ИНН and КПП, the
   network's name and password) are `Fieldset layout="pair"` — a nested one without `label` for a
   part of a group: two columns however wide the card, a field left alone in the last row spans it,
@@ -1977,7 +2011,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - Every page titles itself in its `Page.TopBar`: `Page.Title` with the section's name and a `Page.Description` that carries data («Среда, 14 октября · открытых задач: 3»); its body starts with the page's blocks.
 - Counts: `Sidebar.ItemCount` (a plain number for information, `color="red"` when it needs action) and `BottomNav.ItemCount` only for what needs attention; the number is the same in both navigations.
 - Choosing a section in either navigation goes through one handler; an activated Sidebar item closes the off-canvas panel by itself.
-- A section change is a `Crossfade` by `state`: the page changes smoothly instead of jumping. Menu items in an app with a router are `asChild` + `NavLink`.
+- A section change renders the new page at once, never through a `Crossfade` ([navigation never cross-fades](#navigation-never-cross-fades)). Menu items in an app with a router are `asChild` + `NavLink`.
 
 ### Media library
 

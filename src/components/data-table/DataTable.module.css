@@ -433,7 +433,7 @@
 }
 
 .headCell:has(.sortButton:focus-visible) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
@@ -819,7 +819,7 @@
  * wash.
  */
 .row:is(:focus-visible, :has(.rowLink:focus-visible)) {
-  --dt-ring: var(--prime-focus-width);
+  --dt-ring: var(--prime-focus-ring-width);
   --dt-wash: var(--prime-color-fill-subtle-active);
 
   outline: none;
@@ -1081,7 +1081,7 @@ tbody + tbody > .groupRow > .groupCell {
    the header itself is picked up. A plain one is its own keyboard target and draws the head cell's
    inset ring; a sortable one keeps its sort button's ring and cursor. */
 .headCell:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 

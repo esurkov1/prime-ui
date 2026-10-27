@@ -1,16 +1,18 @@
 /*
- * RegionSwap — a region that swaps its content between states (foundation §7 rule 8). The current
- * state is in flow; the previous one is laid over it, click-through. Their fades are the
- * component's own (WAAPI from the opacity on screen), so a swap that turns back reverses them in
- * place. Between settled states the root glides from the size on screen to the new one (base ·
- * standard, the "height glide" exception of foundation §7 rule 5) through `--swap-size`, which the
- * component sets only while it holds or glides, and returns to `auto`. A swap into or out of
- * loading takes the new size at once (`data-swapping` clips the old layer to it).
+ * RegionSwap — a region that swaps its content between states (foundation §7 rule 8), opacity
+ * only. The current state is in flow and the root takes its height at once; the previous one is
+ * laid over it from the top edge, click-through, and fades out. Their fades are the component's
+ * own (WAAPI from the opacity on screen), so a swap that turns back reverses them in place.
  *
- * `data-axis="block"` (a region): the height glides, the old state lies over the new one from the
- * top edge. `data-axis="inline"` (one cell of a row, `src/internal/rowCells`): the width glides, both
- * states centre on the row's line and hold to the `data-align` edge, so whatever stands beyond it
- * never moves.
+ * Nothing in flow is ever clipped: what the current state draws past its box (a `List` row's wash
+ * bleeding into its host's padding, a focus ring, a shadow) stands as it will stay. Only the
+ * leaving layer is clipped, to the region with room for such a bleed, so a taller old
+ * state (a skeleton over shorter data) never paints over the content below while it fades.
+ *
+ * `data-axis="block"` (a region): the old state lies over the new one from the top edge.
+ * `data-axis="inline"` (one cell of a row, `src/internal/rowCells`): the width glides through
+ * `--swap-size`, which the component sets only while it glides; both states centre on the row's line
+ * and hold to the `data-align` edge, so whatever stands beyond it never moves.
  */
 .root {
   position: relative;
@@ -21,7 +23,6 @@
 .root[data-axis="block"] {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  transition: height var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 .root[data-axis="inline"] {
@@ -41,27 +42,11 @@
   display: none;
 }
 
-/* While the size glides the content may be larger than the root: clip it along the gliding axis
-   only, with room for focus rings (foundation §7): content wider than a block region (a timeline
-   in a scroller) keeps its scroll width. */
-.root[data-axis="block"][data-resizing="true"] {
-  height: var(--swap-size);
-  /* The layer keeps its own height, not the root's: the glide follows what it measures. */
-  align-content: start;
-  overflow-y: clip;
-  overflow-clip-margin: var(--prime-focus-space);
-}
-
+/* While the width glides the controls may be wider than the cell: clip it along the row only,
+   with room for focus rings. */
 .root[data-axis="inline"][data-resizing="true"] {
   width: var(--swap-size);
   overflow-x: clip;
-  overflow-clip-margin: var(--prime-focus-space);
-}
-
-/* A leaving state larger than the new one (a skeleton over shorter data) never paints over the
-   content beside the region while it fades. */
-.root[data-axis="block"][data-swapping="true"] {
-  overflow-y: clip;
   overflow-clip-margin: var(--prime-focus-space);
 }
 
@@ -99,9 +84,38 @@
   pointer-events: none;
 }
 
+/*
+ * A leaving region state: from the top edge, no taller than the region; what it draws past that
+ * (the rest of a taller old state) is cut `--prime-space-4` past the region's edges — room for a
+ * row's wash bleeding into its host's padding (at most the `xl` row padding) or a focus ring, never
+ * across the content below.
+ */
 .root[data-axis="block"] > .leaving {
   inset-block-start: 0;
   inset-inline: 0;
+  max-height: 100%;
+  clip-path: inset(calc(var(--prime-space-4) * -1));
+}
+
+/*
+ * The hold (`data-held`): the state on screen stays in flow, as it was, and the waiting state lies
+ * over it unseen (opacity 0), cut to the region so it adds no scroll overflow; once the hold is
+ * over the two trade places in one frame and the fades begin.
+ */
+.root[data-axis="block"]:not([data-fill="true"])[data-held="true"]
+> .leaving[data-on-screen="true"] {
+  position: relative;
+  inset: auto;
+  max-height: none;
+  clip-path: none;
+}
+
+.root[data-axis="block"]:not([data-fill="true"])[data-held="true"] > .layer:not(.leaving) {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  max-height: 100%;
+  overflow: clip;
 }
 
 .root[data-axis="inline"] > .leaving {

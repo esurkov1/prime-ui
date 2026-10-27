@@ -60,7 +60,7 @@ No DOM, no ref. State and dismiss policy.
 | `children` | `ReactNode` | — | Trigger and Content. |
 
 ### Sheet.Content
-`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge, as tall as its content, with a grab handle while it swipes. Header and footer are optional: without a header name it with `aria-label`.
+`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge (on the on-screen keyboard), as tall as its content, with a grab handle while it swipes. Header and footer are optional: without a header name it with `aria-label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -226,6 +226,9 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - The content is the sheet's own, across its width: `Datepicker.Panel` or a column of actions straight in `Sheet.Body` — never a Card or a padded box inside it.
 - Zone padding `--prime-sheet-padding` (24, frame `l`); no lines between header, body and footer — air parts them, and the scrolled body fades under the header and the footer.
 - Only the body scrolls; header and footer stay in place.
+- Height by content up to the sheet top gap — a short sheet hugs its content, never an empty band under it; below the last zone its 24 and the bottom safe-area inset.
+- The grab strip (while it swipes): a touch target (44) tall with a small bar. Above a header it keeps its own 20 and the header is the rest of the grab area; above a body or a footer the whole 44 is the zone's top air.
+- On-screen keyboard: the sheet stands on the keyboard's top edge (the visual viewport) with no safe-area inset under it, its top gap counted from the visible top; the body scrolls the focused field into view.
 - Tabs in the header: a `Tabs.List` inside `Sheet.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and flush with the body; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.
 

@@ -44,7 +44,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Обычное поле рядом с неактивным, загружающимся, ошибочным, с пустым списком и полем, где фокус виден без кольца — `disabled`, `loading`, `invalid`, `labels`, `focusRing`.",
+        "Обычное поле рядом с неактивным, загружающимся, ошибочным и с пустым списком — `disabled`, `loading`, `invalid`, `labels`.",
     },
     {
       slot: "validation",

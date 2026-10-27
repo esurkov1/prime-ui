@@ -22,7 +22,6 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import {
-  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -97,8 +96,7 @@ export const SELECT_LABELS: SelectLabels = {
 // ─── Root ────────────────────────────────────────────────────────────────────
 
 type SelectRootBase = FieldRootDomProps &
-  FieldFrameProps &
-  FieldFocusRingProps & {
+  FieldFrameProps & {
     size?: ControlSize;
     variant?: SelectVariant;
     disabled?: boolean;
@@ -154,7 +152,6 @@ function SelectRoot(props: SelectRootProps) {
     hintTone,
     error,
     invalid,
-    focusRing,
     disabled: disabledProp = false,
     placeholder,
     id,
@@ -278,7 +275,6 @@ function SelectRoot(props: SelectRootProps) {
       size,
       variant,
       invalid: ids.invalid,
-      focusRing,
       required: ids.required,
       disabled,
       placeholder,
@@ -317,7 +313,6 @@ function SelectRoot(props: SelectRootProps) {
       ids.invalid,
       ids.controlId,
       ids.describedBy,
-      focusRing,
       ids.required,
       disabled,
       placeholder,
@@ -423,7 +418,6 @@ function SelectTrigger({
     disabled,
     size,
     invalid,
-    focusRing,
     required,
     describedBy,
     triggerRef,
@@ -513,7 +507,6 @@ function SelectTrigger({
         invalid: invalid || undefined,
         loading: busy || undefined,
         disabled: disabled || undefined,
-        "focus-ring": focusRing,
         "icon-only": iconOnly || undefined,
         segment: segment ? true : undefined,
         variant: status ? "status" : undefined,

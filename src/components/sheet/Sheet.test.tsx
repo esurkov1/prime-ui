@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Button } from "@/components/button/Button";
@@ -191,6 +191,25 @@ describe("Sheet", () => {
   it("uses labels.close for the header close button", () => {
     render(<TitledSheet defaultOpen labels={{ close: "Скрыть" }} />);
     expect(screen.getByRole("button", { name: "Скрыть" })).toBeInTheDocument();
+  });
+
+  it("stands on the on-screen keyboard: the panel takes the visual viewport's bottom inset", () => {
+    const viewport = Object.assign(new EventTarget(), { height: 800, offsetTop: 0, scale: 1 });
+    vi.stubGlobal("visualViewport", viewport);
+    vi.stubGlobal("innerHeight", 800);
+    try {
+      render(<BareSheet defaultOpen />);
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.style.getPropertyValue("--visual-inset-bottom")).toBe("0px");
+      act(() => {
+        viewport.height = 450;
+        viewport.dispatchEvent(new Event("resize"));
+      });
+      expect(dialog.style.getPropertyValue("--visual-inset-bottom")).toBe("350px");
+      expect(dialog).toHaveAttribute("data-keyboard");
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
 

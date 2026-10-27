@@ -199,7 +199,7 @@
 }
 
 .chipMoreButton:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 
@@ -209,7 +209,7 @@
 
 /* Chip focused with the arrow keys (outer ring; the row is padded by the focus space). */
 .chip:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 

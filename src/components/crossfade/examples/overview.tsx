@@ -1,4 +1,4 @@
-/** A card region that cross-fades between loading, data, empty and error and glides to the new height — `state`. */
+/** A card region that cross-fades between loading, data, empty and error — `state`. */
 import {
   Button,
   Card,

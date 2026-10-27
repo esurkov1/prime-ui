@@ -14,13 +14,6 @@ const CSS = "src/internal/RegionSwap.module.css";
 const layerOf = (text: string) => screen.getByText(text).parentElement as HTMLElement;
 const rootOf = (container: HTMLElement) => container.firstElementChild as HTMLElement;
 
-/** A transition end of the root's height (jsdom's TransitionEvent carries no property name). */
-function heightEnd(root: HTMLElement) {
-  act(() => {
-    root.dispatchEvent(Object.assign(new Event("transitionend"), { propertyName: "height" }));
-  });
-}
-
 type Motion = ReturnType<typeof withMotion>;
 
 /** The opacity runs on a layer, in order: `[from, to]` each (a freeze holds one value). */
@@ -33,10 +26,6 @@ const runningFade = (motion: Motion, node: Element) =>
     .on(node)
     .filter((run) => !run.cancelled && run.animation.playState !== "finished")
     .at(-1);
-
-/** The root's height while it holds or glides: what `--swap-size` sets. */
-const heldSize = (node: HTMLElement) =>
-  Number.parseFloat(node.style.getPropertyValue("--swap-size"));
 
 afterEach(() => {
   vi.useRealTimers();
@@ -145,21 +134,9 @@ describe("RegionSwap", () => {
     expect(screen.queryByText("Загрузка")).toBeNull();
   });
 
-  it("glides from the old content's height to the new one after the hold, then returns to auto", () => {
-    withMotion();
+  it("takes the new state's height at once after the hold: no size motion, nothing in flow clipped", () => {
+    const motion = withMotion();
     vi.useFakeTimers();
-    // The leaving layer holds the old content (100); the root in flow holds the new one (140).
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      const height =
-        this.dataset.state === "closed"
-          ? 100
-          : this.hasAttribute("data-resizing")
-            ? heldSize(this)
-            : 140;
-      return { height, width: 200, top: 0, left: 0, right: 200, bottom: height } as DOMRect;
-    });
     const { container, rerender } = render(
       <RegionSwap state="ready">
         <p>Данные</p>
@@ -172,52 +149,17 @@ describe("RegionSwap", () => {
         <p>Пусто</p>
       </RegionSwap>,
     );
-    // The hold: the region keeps the height on screen, both fades stand at their start.
-    expect(root).toHaveAttribute("data-resizing", "true");
-    expect(setProperty.mock.calls).toEqual([["--swap-size", "100px"]]);
+    // The hold: the state on screen stays in flow, the waiting one lies over it unseen.
     expect(root).toHaveAttribute("data-held", "true");
+    expect(layerOf("Данные")).toHaveAttribute("data-on-screen", "true");
     passSwapHold();
     expect(root).not.toHaveAttribute("data-held");
-    expect(setProperty.mock.calls.slice(1)).toEqual([
-      ["--swap-size", "100px"],
-      ["--swap-size", "140px"],
-    ]);
-    heightEnd(root);
+    expect(layerOf("Данные")).not.toHaveAttribute("data-on-screen");
+    // Opacity only: the region never holds or glides a size.
+    expect(setProperty).not.toHaveBeenCalled();
     expect(root).not.toHaveAttribute("data-resizing");
-    expect(root.style.getPropertyValue("--swap-size")).toBe("");
-  });
-
-  it("a swap during a glide starts from the height on screen", () => {
-    withMotion();
-    vi.useFakeTimers();
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      // Mid-glide the root is drawn at 120; laid out at rest it is 200; a leaving layer 100.
-      const height =
-        this.dataset.state === "closed" ? 100 : this.hasAttribute("data-resizing") ? 120 : 200;
-      return { height } as DOMRect;
-    });
-    const { container, rerender } = render(
-      <RegionSwap state="empty">
-        <p>Пусто</p>
-      </RegionSwap>,
-    );
-    const root = rootOf(container);
-    rerender(
-      <RegionSwap state="ready">
-        <p>Данные</p>
-      </RegionSwap>,
-    );
-    passSwapHold();
-    expect(root).toHaveAttribute("data-resizing", "true");
-    const setProperty = vi.spyOn(root.style, "setProperty");
-    rerender(
-      <RegionSwap state="error">
-        <p>Ошибка</p>
-      </RegionSwap>,
-    );
-    expect(setProperty.mock.calls[0]).toEqual(["--swap-size", "120px"]);
+    expect(fadesOn(motion, layerOf("Пусто")).at(-1)).toEqual([0, 1]);
+    expect(fadesOn(motion, layerOf("Данные")).at(-1)).toEqual([1, 0]);
   });
 
   it("a state that turns back within the hold is the old one again: no frame of motion", () => {
@@ -363,53 +305,6 @@ describe("RegionSwap", () => {
     expect(fadesOn(motion, empty).at(-1)).toEqual([0.4, 0]);
   });
 
-  it("the target follows the new content that settles after it (a part portalled in)", () => {
-    withMotion();
-    vi.useFakeTimers();
-    let observed: ResizeObserverCallback = () => {};
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(callback: ResizeObserverCallback) {
-          observed = callback;
-        }
-        observe() {}
-        disconnect() {}
-      },
-    );
-    let content = 140;
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      const height =
-        this.dataset.state === "closed"
-          ? 100
-          : this.hasAttribute("data-resizing")
-            ? heldSize(this)
-            : content;
-      return { height } as DOMRect;
-    });
-    const { container, rerender } = render(
-      <RegionSwap state="empty">
-        <p>Пусто</p>
-      </RegionSwap>,
-    );
-    const root = rootOf(container);
-    rerender(
-      <RegionSwap state="ready">
-        <p>Данные</p>
-      </RegionSwap>,
-    );
-    passSwapHold();
-    expect(heldSize(root)).toBe(140);
-    content = 200;
-    act(() => observed([], {} as ResizeObserver));
-    expect(heldSize(root)).toBe(200);
-    heightEnd(root);
-    expect(root).not.toHaveAttribute("data-resizing");
-    vi.unstubAllGlobals();
-  });
-
   it("an inline swap and hold={false} move at once", () => {
     withMotion();
     const { container, rerender } = render(
@@ -436,15 +331,8 @@ describe("RegionSwap", () => {
     expect(rootOf(pane.container)).not.toHaveAttribute("data-held");
   });
 
-  it("leaving loading: the data replaces the skeleton in place — no glide, a short fade", () => {
+  it("leaving loading: the data replaces the skeleton in place at once, on a short fade", () => {
     const motion = withMotion();
-    // The skeleton (leaving, 100) and the data (140) differ: a settled swap would glide.
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      const height = this.dataset.state === "closed" ? 100 : 140;
-      return { height } as DOMRect;
-    });
     const { container, rerender } = render(
       <RegionSwap state="loading">
         <p>Загрузка</p>
@@ -461,82 +349,15 @@ describe("RegionSwap", () => {
     expect(setProperty).not.toHaveBeenCalled();
     const fadeIn = runningFade(motion, layerOf("Данные"));
     expect((fadeIn?.options as KeyframeAnimationOptions).duration).toBe(230);
-    // The skeleton fades out clipped to the data's height, never over the content below.
+    // The skeleton fades out over the data, then goes.
     expect(root).toHaveAttribute("data-swapping", "true");
     act(() => runningFade(motion, layerOf("Загрузка"))?.finish());
     expect(root).not.toHaveAttribute("data-swapping");
   });
 
-  it("entering loading drops a running glide and takes the skeleton's height after the hold", () => {
-    const motion = withMotion();
-    vi.useFakeTimers();
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      const height =
-        this.dataset.state === "closed"
-          ? 100
-          : this.hasAttribute("data-resizing")
-            ? heldSize(this)
-            : 140;
-      return { height } as DOMRect;
-    });
-    const { container, rerender } = render(
-      <RegionSwap state="empty">
-        <p>Пусто</p>
-      </RegionSwap>,
-    );
-    const root = rootOf(container);
-    rerender(
-      <RegionSwap state="ready">
-        <p>Данные</p>
-      </RegionSwap>,
-    );
-    passSwapHold();
-    expect(root).toHaveAttribute("data-resizing", "true");
-    rerender(
-      <RegionSwap state="loading">
-        <p>Загрузка</p>
-      </RegionSwap>,
-    );
-    passSwapHold();
-    expect(root).not.toHaveAttribute("data-resizing");
-    expect(root.style.getPropertyValue("--swap-size")).toBe("");
-    const fadeIn = runningFade(motion, layerOf("Загрузка"));
-    expect((fadeIn?.options as KeyframeAnimationOptions).duration).toBe(230);
-  });
-
-  it("does not glide when the heights match within two pixels: it only cross-fades", () => {
-    const motion = withMotion();
-    vi.useFakeTimers();
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      return { height: this.dataset.state === "closed" ? 80 : 82 } as DOMRect;
-    });
-    const { container, rerender } = render(
-      <RegionSwap state="a">
-        <p>Первый</p>
-      </RegionSwap>,
-    );
-    rerender(
-      <RegionSwap state="b">
-        <p>Второй</p>
-      </RegionSwap>,
-    );
-    passSwapHold();
-    expect(rootOf(container)).not.toHaveAttribute("data-resizing");
-    expect(fadesOn(motion, layerOf("Второй")).at(-1)).toEqual([0, 1]);
-  });
-
-  it("fill: marks the root and never glides the height", () => {
+  it("fill: marks the root and swaps its states in place", () => {
     withMotion();
     vi.useFakeTimers();
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      return { height: this.dataset.state === "closed" ? 120 : 300 } as DOMRect;
-    });
     const { container, rerender } = render(
       <RegionSwap state="loading" fill>
         <p>Загрузка</p>
@@ -551,15 +372,11 @@ describe("RegionSwap", () => {
     );
     passSwapHold();
     expect(root).not.toHaveAttribute("data-resizing");
+    expect(screen.getByText("Доска")).toBeInTheDocument();
   });
 
   it("reduced motion (the test default): the old state goes after the hold, the new one fades in", () => {
     vi.useFakeTimers();
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-      this: HTMLElement,
-    ) {
-      return { height: this.dataset.state === "closed" ? 100 : 140 } as DOMRect;
-    });
     const { container, rerender } = render(
       <RegionSwap state="error">
         <p>Ошибка</p>
@@ -739,28 +556,27 @@ describe("RegionSwap", () => {
       expect(cssValue(cssRule(CSS, '.root[data-fill="true"] > .leaving'), "inset")).toBe("0");
     });
 
-    it("measures and sets one box: a padding or border a host adds never throws the glide off", () => {
-      // `getBoundingClientRect` reads the border box; `--swap-size` must set the border box too.
-      expect(cssValue(cssRule(CSS, ".root"), "box-sizing")).toBe("border-box");
-      // While it holds or glides the layer keeps its own height, the target the glide follows.
-      expect(
-        cssValue(cssRule(CSS, '.root[data-axis="block"][data-resizing="true"]'), "align-content"),
-      ).toBe("start");
-    });
-
     it("hands a height its parent stretches it to on to a lone child (tiles of a row match)", () => {
       expect(cssValue(cssRule(CSS, '.root[data-axis="block"]'), "display")).toBe("grid");
       expect(cssValue(cssRule(CSS, ".layer:has(> :only-child)"), "display")).toBe("grid");
     });
 
-    it("glides the height through --swap-size, clipped with room for focus rings", () => {
-      const resizing = cssRule(CSS, '.root[data-axis="block"][data-resizing="true"]');
-      expect(cssValue(resizing, "height")).toBe("var(--swap-size)");
-      expect(cssValue(resizing, "overflow-y")).toBe("clip");
-      expect(cssValue(resizing, "overflow-clip-margin")).toBe("var(--prime-focus-space)");
-      expect(cssValue(cssRule(CSS, '.root[data-axis="block"]'), "transition")).toBe(
-        "height var(--prime-motion-duration-base) var(--prime-motion-easing-standard)",
-      );
+    it("a block region has no size motion and clips nothing in flow", () => {
+      const block = cssRule(CSS, '.root[data-axis="block"]');
+      expect(block.decls.map((decl) => decl.prop)).not.toContain("transition");
+      expect(block.decls.map((decl) => decl.prop)).not.toContain("overflow-y");
+      expect(() => cssRule(CSS, '.root[data-axis="block"][data-swapping="true"]')).toThrow();
+      expect(() => cssRule(CSS, '.root[data-axis="block"][data-resizing="true"]')).toThrow();
+    });
+
+    it("holds the state on screen in flow and the waiting one over it, cut to the region", () => {
+      const held =
+        '.root[data-axis="block"]:not([data-fill="true"])[data-held="true"] > .leaving[data-on-screen="true"]';
+      expect(cssValue(cssRule(CSS, held), "position")).toBe("relative");
+      const waiting =
+        '.root[data-axis="block"]:not([data-fill="true"])[data-held="true"] > .layer:not(.leaving)';
+      expect(cssValue(cssRule(CSS, waiting), "position")).toBe("absolute");
+      expect(cssValue(cssRule(CSS, waiting), "overflow")).toBe("clip");
     });
 
     it("an inline cell glides its width and holds both states to its align edge", () => {
@@ -781,10 +597,10 @@ describe("RegionSwap", () => {
       ).toBe("auto 0");
     });
 
-    it("a leaving layer is clipped to the region; a load fades on the short clock", () => {
-      const leaving = cssRule(CSS, '.root[data-axis="block"][data-swapping="true"]');
-      expect(cssValue(leaving, "overflow-y")).toBe("clip");
-      expect(cssValue(leaving, "overflow-clip-margin")).toBe("var(--prime-focus-space)");
+    it("only a leaving layer is clipped, with room for a bleed; a load fades on the short clock", () => {
+      const leaving = cssRule(CSS, '.root[data-axis="block"] > .leaving');
+      expect(cssValue(leaving, "max-height")).toBe("100%");
+      expect(cssValue(leaving, "clip-path")).toBe("inset(calc(var(--prime-space-4) * -1))");
       expect(
         cssValue(cssRule("src/internal/swapMotion.module.css", ".settleIn"), "animation"),
       ).toContain("var(--prime-motion-fade-fast)");

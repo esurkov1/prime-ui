@@ -11,12 +11,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { NativeButton, useInheritedDisabled } from "@/internal/disabledContext";
-import {
-  type FieldFocusRingProps,
-  FieldFrame,
-  type FieldFrameProps,
-  useFieldFrame,
-} from "@/internal/FieldFrame";
+import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { GlyphSwap } from "@/internal/glyphSwap";
@@ -98,8 +93,7 @@ export function formatDateValue(date: Date, { withTime = false }: { withTime?: b
 }
 
 export type DatepickerRootProps = DatepickerPanelProps &
-  FieldFrameProps &
-  FieldFocusRingProps & {
+  FieldFrameProps & {
     size?: ControlSize;
     placeholder?: string;
     valuePrefix?: string;
@@ -148,7 +142,6 @@ function DatepickerRoot(props: DatepickerRootProps) {
     closeOnOutsideClick = true,
     disabled: disabledProp = false,
     invalid: invalidProp,
-    focusRing,
     fullWidth = false,
     align = DEFAULT_ALIGN,
     id,
@@ -224,7 +217,6 @@ function DatepickerRoot(props: DatepickerRootProps) {
               invalid: ids.invalid || undefined,
               loading: value.saving || undefined,
               disabled: disabled || undefined,
-              "focus-ring": focusRing,
             })}
           >
             {triggerIcon}

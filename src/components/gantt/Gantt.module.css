@@ -548,7 +548,7 @@
 /* A row header is a keyboard stop of the grid (row navigation, `N` creates): full-bleed, so the
    ring is drawn inside it. */
 .rowHeader:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
@@ -601,7 +601,7 @@
 }
 
 .rowHeader:has(> .rowLink:focus-visible) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
@@ -757,7 +757,7 @@
 
 .bar:focus-visible {
   z-index: var(--prime-z-raised);
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 

@@ -35,8 +35,8 @@ Use the component and the motion comes with it. Never re-animate these with your
 | Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers, sheets and toasts come from their edge; a dialog, drawer or sheet leaves faster than it came, a small floating panel opens and closes on the same quick `fast` clock; the last content stays on screen while the exit plays | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `ConfirmDialog`, `Drawer`, `Sheet`, `MediaViewer`, notifications — the `Root` kept mounted |
 | Tooltips along a toolbar | the first waits, the next ones show at once | `Tooltip` (shared warm window) |
 | Toast stack | depth stack, expands on hover | `NotificationProvider` + `useNotifications` |
-| Loading → data | the skeleton is there from the first paint and the data takes its place with a short fade; the height never glides | `Crossfade` with the state `"loading"`, `Skeleton` in the data's geometry |
-| Data → empty → error, another record | the region cross-fades and glides its height | `Crossfade` around the region |
+| Loading → data | the skeleton is there from the first paint and the data takes its place with a short fade | `Crossfade` with the state `"loading"`, `Skeleton` in the data's geometry |
+| Data → empty → error, another record | the region cross-fades, opacity only, at the new height at once | `Crossfade` around the region |
 | Drag | the carried piece lifts, its neighbours glide apart, the drop glides into place; while its save runs the piece stays still and its grip turns busy, and a refused save glides it back — across columns too | `Dnd`, `Kanban` cards and columns, DataTable and `List` `onReorder`, `FileUpload` tiles |
 | A setting saved on the server | the new value shows at once and the control waits busy — a spinner in a Switch thumb or for a Select chevron, a dimmed chip, a slider thumb dims; a refused save glides it back | `Switch` (`onCheckedChange` returns a Promise, or `loading`), `Slider` (`onCommit`), the async `onValueChange` / `onCheckedChange` / `onPressedChange` of the choice controls ([applies at once](api-contract.md#a-control-that-applies-at-once)) |
 | A chip or a file row removed | it waits dimmed with a spinner on its ×; once gone it fades and closes up, the next ones glide into its place; refused, it stays | `Badge` `onRemove`, `FileUpload` `onValueChange`, TagSelect chips |
@@ -58,7 +58,7 @@ the state you pass — never from the shape of your markup:
   another control in the same place on the next): the two cross-fade where they stand and the place
   glides to the new size from the edge it holds to.
 - **A region changes state** (`Crossfade` `state`): loading hands over to the data in place; data,
-  empty, error and another record cross-fade and glide the height; a status that turns back within
+  empty, error and another record cross-fade without any size motion; a status that turns back within
   the swap hold (a quiet refetch) never moves.
 - **A layer opens or closes** (Modal, Drawer, Sheet, menus): only its panel and its scrim move;
   nothing inside replays the opening, and a drag copy lifted out of it flies still.

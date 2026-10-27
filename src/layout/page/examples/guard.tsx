@@ -26,7 +26,7 @@ export default function PageGuardExample() {
 
   return (
     <div className={styles.window}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Nav>
           <Sidebar.Root>
             <Sidebar.Content>

@@ -27,7 +27,10 @@
   gap: var(--prime-bottom-nav-padding-x);
   width: 100%;
   min-height: var(--prime-bottom-nav-height);
-  padding-inline: var(--prime-bottom-nav-padding-x);
+  /* The bar runs to the screen edges; its items stay inside the safe area (landscape notch, home
+     indicator). */
+  padding-right: calc(var(--prime-bottom-nav-padding-x) + var(--prime-safe-area-right));
+  padding-left: calc(var(--prime-bottom-nav-padding-x) + var(--prime-safe-area-left));
   padding-block-end: var(--prime-safe-area-bottom);
   background: var(--prime-color-layer-current);
   box-shadow: inset 0 var(--prime-border-width) 0 var(--prime-color-border-faint);
@@ -59,7 +62,10 @@
 /*
  * Floating: the capsule and its actions as one centred group over the content, inset from the
  * edges and above the home indicator. It positions itself at the bottom of its container
- * (AppShell.Footer), so the page scrolls under it; the gaps between the parts pass taps through.
+ * (AppShell.Footer — the bottom edge of the app frame, never the document), one inset above the
+ * bottom safe area and one inset inside the side safe areas, so it keeps the same place on every
+ * page; the page scrolls under it, and AppShell.Main keeps its room. The gaps between the parts
+ * pass taps through.
  */
 .root[data-floating="true"] {
   --bn-height: var(--prime-bottom-nav-floating-height);
@@ -67,8 +73,9 @@
   --prime-control-height: var(--bn-height);
 
   position: absolute;
-  inset-inline: var(--prime-bottom-nav-floating-inset);
+  right: calc(var(--prime-bottom-nav-floating-inset) + var(--prime-safe-area-right));
   bottom: calc(var(--prime-bottom-nav-floating-inset) + var(--prime-safe-area-bottom));
+  left: calc(var(--prime-bottom-nav-floating-inset) + var(--prime-safe-area-left));
   gap: var(--prime-bottom-nav-floating-gap);
   width: auto;
   min-height: 0;
@@ -266,7 +273,7 @@
 }
 
 .item:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 

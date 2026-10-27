@@ -277,7 +277,7 @@ export function ExampleFrame({
         onColorSchemeChange={showThemeToggle ? setColorScheme : undefined}
         onCopy={onCopy}
       />
-      {/* The pane switch cross-fades and glides the height between the preview and the code. */}
+      {/* The pane switch cross-fades between the preview and the code. */}
       <RegionSwap state={pane} hold={false}>
         {pane === "preview" ? (
           <div className={styles.previewViewport} data-viewport={viewport}>

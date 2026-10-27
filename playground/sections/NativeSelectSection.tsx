@@ -26,8 +26,7 @@ export const page: ComponentPageConfig = {
     { slot: "sizes", description: "Все ярусы; подпись и подсказка берут ярус поля — `size`." },
     {
       slot: "states",
-      description:
-        "Обычное поле рядом с неактивным и ошибочным и поле, где фокус виден без кольца — `disabled`, `invalid`, `focusRing`.",
+      description: "Обычное поле рядом с неактивным и ошибочным — `disabled`, `invalid`.",
     },
     {
       slot: "validation",

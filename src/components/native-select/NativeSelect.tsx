@@ -7,12 +7,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
-import {
-  type FieldFocusRingProps,
-  FieldFrame,
-  type FieldFrameProps,
-  useFieldFrame,
-} from "@/internal/FieldFrame";
+import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
@@ -29,7 +24,6 @@ export type NativeSelectLabels = {
 export const NATIVE_SELECT_LABELS: NativeSelectLabels = { optional: "необязательно" };
 
 export type NativeSelectProps = FieldFrameProps &
-  FieldFocusRingProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size" | "multiple" | "children"> & {
     size?: ControlSize;
     invalid?: boolean;
@@ -53,7 +47,6 @@ export function NativeSelect({
   hintTone,
   error,
   invalid,
-  focusRing,
   disabled: disabledProp = false,
   placeholder,
   id,
@@ -145,7 +138,6 @@ export function NativeSelect({
             invalid: ids.invalid || undefined,
             disabled: disabled || undefined,
             loading: busy || undefined,
-            "focus-ring": focusRing,
           })}
         >
           {placeholder ? (

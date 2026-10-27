@@ -241,7 +241,7 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 ## Layout & spacing
 - Width follows `width`: by default `max-content` between `--prime-panel-min-width` and twice that; `s` / `m` / `l` fix it at 1.5 / 2 / 2.5 minimums within the viewport. Item labels (weight 500) never wrap: they truncate first, a `Dropdown.ItemMeta` and a key hint stay whole; a `Dropdown.ItemDescription` is one muted line under the label, cut with an ellipsis (a `StatusDot` first).
 - Rows are the list row a tier below the panel, 2 apart, 4 in from the panel edge; on a coarse pointer a row is at least 44 tall.
-- Max height = min(`--prime-panel-max-height`, the room on the resolved side); with `maxRows` the height of that many rows instead (plus the search row); the menu scrolls inside. A bottom sheet uses its own height and stays clear of the safe-area insets.
+- Max height = min(`--prime-panel-max-height`, the room on the resolved side); with `maxRows` the height of that many rows instead (plus the search row); the menu scrolls inside. A bottom sheet hugs the menu up to its own height, under a grab strip a touch target (44) tall, and stays clear of the safe-area insets and of the on-screen keyboard.
 - `Dropdown.Search` is a row of the tier item height across the panel padding with a faint hairline under it; it stays while the list under it scrolls.
 - The row's end, on its centre line: `Dropdown.ItemMeta` (the row's description text, muted, figures in columns), then `Dropdown.ItemShortcut`, then the check of a `selected` item.
 - A checkbox item draws the `Checkbox.Indicator` at the row's start, before an `ItemIcon` and the label.

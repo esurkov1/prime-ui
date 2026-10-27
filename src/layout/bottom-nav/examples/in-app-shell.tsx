@@ -15,7 +15,7 @@ const ORDERS = ["№ 4821 · ООО «Север»", "№ 4820 · ИП Кото�
 export default function BottomNavInAppShellExample() {
   return (
     <div className={styles.phone}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>

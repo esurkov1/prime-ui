@@ -27,7 +27,7 @@ export default function BottomNavFloatingActionExample() {
 
   return (
     <div className={styles.phone}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>

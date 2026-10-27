@@ -1,9 +1,8 @@
-/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone whose More item opens the Sidebar, the page top bar with the menu button it draws by itself, the page title with a line of data, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`, `useAppShellNav`. */
+/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone whose More item opens the Sidebar, the page top bar with the menu button it draws by itself, the page title with a line of data, and a simple home page, and each section rendered at once in its place — `scrollResetKey`, `useAppShellNav`. */
 import {
   AppShell,
   BottomNav,
   Card,
-  Crossfade,
   Icon,
   type IconName,
   Kpi,
@@ -163,7 +162,6 @@ export default function AppShellScreenExample() {
 
   return (
     <AppShell.Template
-      fillViewport
       scrollResetKey={current}
       nav={
         <Sidebar.Root>
@@ -213,66 +211,64 @@ export default function AppShellScreenExample() {
             </Page.Description>
           </Page.Heading>
         </Page.TopBar>
-        {/* Another section is another page: it cross-fades instead of flipping. */}
-        <Crossfade state={current}>
-          <Page.Body>
-            {current === "today" ? (
-              <>
-                <Page.Grid>
-                  {KPIS.map((kpi) => (
-                    <Page.Cell key={kpi.label} span={4}>
-                      <Kpi.Root>
-                        <Kpi.Title>{kpi.label}</Kpi.Title>
-                        <Kpi.Value>
-                          {kpi.value}
-                          {kpi.unit ? <Kpi.Unit>{kpi.unit}</Kpi.Unit> : null}
-                        </Kpi.Value>
-                        {kpi.change ? (
-                          <Kpi.Delta value={kpi.change.value} tone={kpi.change.tone}>
-                            {kpi.change.text}
-                          </Kpi.Delta>
-                        ) : null}
-                        {kpi.period ? <Kpi.Period>{kpi.period}</Kpi.Period> : null}
-                        {kpi.meta ? <Kpi.Meta>{kpi.meta}</Kpi.Meta> : null}
-                      </Kpi.Root>
-                    </Page.Cell>
-                  ))}
-                </Page.Grid>
-                <Card.Root>
-                  <Card.Header>
-                    <Card.Title as="h2">Задачи на сегодня</Card.Title>
-                  </Card.Header>
-                  <Card.Body>
-                    <List.Root
-                      aria-label="Задачи на сегодня"
-                      multiple
-                      value={done}
-                      onValueChange={(next) => setDone(Array.isArray(next) ? next : [])}
-                    >
-                      {TASKS.map((task) => (
-                        <List.Item key={task.id} value={task.id}>
-                          <List.ItemText>{task.title}</List.ItemText>
-                          <List.ItemMeta>{task.meta}</List.ItemMeta>
-                        </List.Item>
-                      ))}
-                    </List.Root>
-                  </Card.Body>
-                </Card.Root>
-              </>
-            ) : (
+        {/* Another section is another page: it renders at once, navigation never cross-fades. */}
+        <Page.Body>
+          {current === "today" ? (
+            <>
+              <Page.Grid>
+                {KPIS.map((kpi) => (
+                  <Page.Cell key={kpi.label} span={4}>
+                    <Kpi.Root>
+                      <Kpi.Title>{kpi.label}</Kpi.Title>
+                      <Kpi.Value>
+                        {kpi.value}
+                        {kpi.unit ? <Kpi.Unit>{kpi.unit}</Kpi.Unit> : null}
+                      </Kpi.Value>
+                      {kpi.change ? (
+                        <Kpi.Delta value={kpi.change.value} tone={kpi.change.tone}>
+                          {kpi.change.text}
+                        </Kpi.Delta>
+                      ) : null}
+                      {kpi.period ? <Kpi.Period>{kpi.period}</Kpi.Period> : null}
+                      {kpi.meta ? <Kpi.Meta>{kpi.meta}</Kpi.Meta> : null}
+                    </Kpi.Root>
+                  </Page.Cell>
+                ))}
+              </Page.Grid>
               <Card.Root>
-                <List.Root aria-label={SECTIONS.find((item) => item.id === current)?.label}>
-                  {PAGES[current].rows.map((row) => (
-                    <List.Item key={row.id}>
-                      <List.ItemText>{row.title}</List.ItemText>
-                      <List.ItemMeta>{row.meta}</List.ItemMeta>
-                    </List.Item>
-                  ))}
-                </List.Root>
+                <Card.Header>
+                  <Card.Title as="h2">Задачи на сегодня</Card.Title>
+                </Card.Header>
+                <Card.Body>
+                  <List.Root
+                    aria-label="Задачи на сегодня"
+                    multiple
+                    value={done}
+                    onValueChange={(next) => setDone(Array.isArray(next) ? next : [])}
+                  >
+                    {TASKS.map((task) => (
+                      <List.Item key={task.id} value={task.id}>
+                        <List.ItemText>{task.title}</List.ItemText>
+                        <List.ItemMeta>{task.meta}</List.ItemMeta>
+                      </List.Item>
+                    ))}
+                  </List.Root>
+                </Card.Body>
               </Card.Root>
-            )}
-          </Page.Body>
-        </Crossfade>
+            </>
+          ) : (
+            <Card.Root>
+              <List.Root aria-label={SECTIONS.find((item) => item.id === current)?.label}>
+                {PAGES[current].rows.map((row) => (
+                  <List.Item key={row.id}>
+                    <List.ItemText>{row.title}</List.ItemText>
+                    <List.ItemMeta>{row.meta}</List.ItemMeta>
+                  </List.Item>
+                ))}
+              </List.Root>
+            </Card.Root>
+          )}
+        </Page.Body>
       </Page.Root>
     </AppShell.Template>
   );

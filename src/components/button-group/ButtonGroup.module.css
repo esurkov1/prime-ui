@@ -100,7 +100,7 @@
    The offset sits on `:focus-visible` so it outranks the global ring (`:where(button):focus-visible`
    has the same specificity as `.item` and loads later). */
 .item {
-  outline: var(--prime-focus-width) solid transparent;
+  outline: var(--prime-focus-ring-width) solid transparent;
   outline-offset: var(--prime-focus-offset-inset);
 }
 

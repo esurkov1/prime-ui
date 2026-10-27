@@ -156,6 +156,13 @@ export default function FocusPage() {
       <DocBlock title="Правила">
         <DocList>
           <li>
+            По умолчанию кольца скрыты. Приложение включает их одним атрибутом{" "}
+            <code>data-focus-ring="visible"</code> на <code>&lt;html&gt;</code> или любой обёртке:
+            каждое кольцо кита рисуется толщиной <code>--prime-focus-ring-width</code>, которую
+            задаёт этот переключатель. Фокус, порядок Tab и заливка поля в фокусе не меняются.
+            Документация включает кольца.
+          </li>
+          <li>
             Нужен <code>:focus-visible</code>, а не <code>:focus</code>. Мышь не должна оставлять
             кольцо.
           </li>

@@ -59,7 +59,6 @@ ColorField                       field frame: label · field button · hint | er
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. A non-empty `error` implies it. |
 | `disabled` | `boolean` | `false` | Disables the field: it shows the color and does not open. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring (`data-focus-ring="false"`); focus, keyboard and ARIA are unchanged. |
 | `name` | `string` | — | Form field name: a hidden input submits the hex value. |
 | `id` | `string` | — | Id of the field button; hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-label` | `string` | — | Accessible name without a visible `label`; the current hex is appended. |
@@ -87,7 +86,6 @@ ColorField                       field frame: label · field button · hint | er
 | `disabled` | disabled fill, the color shown at half opacity, does not open | not editable now | `false` |
 | `invalid` / `error` | danger ring (+ the message) | validation failed | — |
 | `required` / `optional` | red `*` / muted «необязательно» after the label; a required field reads `labels.required` after its name | mark the minority of the form | `false` / — |
-| `focusRing` | `false`: no focus ring on the field button; the focus fill stays | a single color control where focus is obvious; never in a regular form (WCAG 2.4.7) | `true` |
 
 **Combinations**
 - Recommended: `label` + `name` inside a form; `presets` with the brand palette; `alpha` only where transparency means something.

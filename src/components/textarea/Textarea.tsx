@@ -13,12 +13,7 @@ import {
   FieldCopyButton,
 } from "@/internal/FieldAction";
 import { type FieldCommitHandler, FieldCommitStatus, useFieldCommit } from "@/internal/FieldCommit";
-import {
-  FieldCounter,
-  type FieldFocusRingProps,
-  FieldFrame,
-  useFieldFrame,
-} from "@/internal/FieldFrame";
+import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
@@ -69,28 +64,27 @@ const [TextareaProvider, useTextareaContext] = createComponentContext<{
 export type TextareaRootProps = Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   "size" | "children"
-> &
-  FieldFocusRingProps & {
-    onCommit?: FieldCommitHandler;
-    children?: React.ReactNode;
-    size?: ControlSize;
-    invalid?: boolean;
-    label?: React.ReactNode;
-    optional?: boolean;
-    hint?: React.ReactNode;
-    hintTone?: HintTone;
-    error?: React.ReactNode;
-    counter?: React.ReactNode;
-    reserveSupportRow?: boolean;
-    autoResize?: boolean;
-    rows?: number;
-    maxRows?: number;
-    onValueChange?: (value: string) => void;
-    formatting?: boolean;
-    labels?: Partial<TextareaLabels>;
-    /** The native `<textarea>`. */
-    ref?: React.Ref<HTMLTextAreaElement>;
-  };
+> & {
+  onCommit?: FieldCommitHandler;
+  children?: React.ReactNode;
+  size?: ControlSize;
+  invalid?: boolean;
+  label?: React.ReactNode;
+  optional?: boolean;
+  hint?: React.ReactNode;
+  hintTone?: HintTone;
+  error?: React.ReactNode;
+  counter?: React.ReactNode;
+  reserveSupportRow?: boolean;
+  autoResize?: boolean;
+  rows?: number;
+  maxRows?: number;
+  onValueChange?: (value: string) => void;
+  formatting?: boolean;
+  labels?: Partial<TextareaLabels>;
+  /** The native `<textarea>`. */
+  ref?: React.Ref<HTMLTextAreaElement>;
+};
 
 /**
  * A multi-line field. `className` goes to the field frame, `id`, `ref` and the native attributes
@@ -101,7 +95,6 @@ function TextareaRoot({
   className,
   size: sizeProp,
   invalid,
-  focusRing,
   label,
   required,
   optional = false,
@@ -271,7 +264,6 @@ function TextareaRoot({
         invalid: ids.invalid || undefined,
         disabled: disabled || undefined,
         readonly: readOnly || undefined,
-        "focus-ring": focusRing,
         capped: (autoResize && maxRows !== undefined) || undefined,
       })}
     >

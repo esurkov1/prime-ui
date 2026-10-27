@@ -776,6 +776,42 @@
         "prime-ui-kit/fonts.css is not imported; the faces come from @fontsource/golos-text and @fontsource/jetbrains-mono or the system font stays",
         "The answer names a gzip size budget for the build and avoids the heavy parts (DataTable, Gantt, Kanban, Chat, MediaViewer, Datepicker) on the settings screen"
       ]
+    },
+    {
+      "id": 63,
+      "prompt": "CRM на prime-ui-kit с react-router: боковая панель с разделами «Сделки», «Клиенты», «Отчёты», у «Отчётов» подстраницы «Продажи» и «Воронка». Сделай, чтобы переходы между разделами и подстраницами были плавными.",
+      "expected_output": "Navigation renders the new page at once: no Crossfade around AppShell, Page.Root, Page.Body or Routes and none keyed by the pathname; Crossfade only around regions inside a page whose state changes (loading → data, another record), with a Skeleton from the first paint.",
+      "files": [],
+      "expectations": [
+        "No Crossfade wraps AppShell.*, Page.Root, Page.Body or <Routes>, and no Crossfade state is a route, pathname, location or section id",
+        "The sub-pages render through plain Routes; the section title stays Page.Title and the sub-page switch is links in Page.Tools",
+        "Regions that load inside a page show a Skeleton from the first paint and swap to the data through Crossfade state=\"loading\" / data, the page itself appears at once"
+      ]
+    },
+    {
+      "id": 64,
+      "prompt": "Мобильное приложение для курьеров на prime-ui-kit (PWA, открывают с телефона): нижняя панель «Заказы», «Карта», «Профиль», список заказов на главной и форма «Отметить проблему» в нижней шторке с полем комментария. Сделай, чтобы на телефоне всё было удобно.",
+      "expected_output": "The app is AppShell.Root at the top level (fillViewport left at its default) with a floating BottomNav in AppShell.Footer; Main is the only scroller, no own 100vh / overflow / position: fixed wrappers, the viewport meta has viewport-fit=cover and no interactive-widget; the page's blocks stand straight in Page.Body with no phone gaps or paddings of its own; the form is a Sheet whose field stays over the keyboard by itself; no mobile font sizes or clamp() type.",
+      "files": [],
+      "expectations": [
+        "AppShell.Root (or AppShell.Template) is the top-level frame without fillViewport={false}, and the BottomNav is in AppShell.Footer — not position: fixed and not inside Main",
+        "No wrapper of the app sets 100vh / 100dvh, overflow or position: fixed, and the page is not padded at the bottom for the BottomNav",
+        "The viewport meta is width=device-width, initial-scale=1, viewport-fit=cover and does not set interactive-widget",
+        "The list's blocks stand directly in Page.Body or Page.Grid with no gap, padding or media query of the screen's own for phones",
+        "The «Отметить проблему» form is a Sheet (or a Modal that becomes a sheet) with no own keyboard handling, visualViewport code or bottom padding",
+        "No CSS sets font-size for phones, under a media query or with clamp(); text comes from Typography roles and kit parts"
+      ]
+    },
+    {
+      "id": 65,
+      "prompt": "Настройки склада на prime-ui-kit: карточка «Адрес отгрузки» с полями «Город», «Улица», «Дом», «Индекс» и переключателем «Самовывоз разрешён». Собери карточку.",
+      "expected_output": "One Card.Root with a Card.Header and every field of the card in one Fieldset inside Card.Body (short fields paired with Fieldset layout=\"pair\"), never bare fields beside a Fieldset in the same Card.Body.",
+      "files": [],
+      "expectations": [
+        "Every field and the switch of the card stand inside one Fieldset in Card.Body",
+        "No Input, Select or Switch stands directly in Card.Body beside a Fieldset",
+        "Short related fields (Дом, Индекс) are paired in a nested Fieldset layout=\"pair\", not in a grid of the screen's own"
+      ]
     }
   ]
 }

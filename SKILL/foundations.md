@@ -432,6 +432,10 @@ tabular (the kit does it in DataTable `numeric` columns, `Kpi.Value` and `Card.T
 `font-variant-numeric: tabular-nums`). Reading text max width `--prime-layout-reading-max-width`
 (`Page.Root maxWidth="readable"`).
 
+On phones and tablets the kit's text is one step larger by itself (`(pointer: coarse)`,
+[foundation §5](../docs/foundation.md#5-typography)) — never add your own mobile font sizes or
+`clamp()` type; pick roles and tiers as on desktop.
+
 ### Text colour
 
 Text takes its colour from `Typography tone` (`secondary`, `muted`, `accent`, `success`, `warning`,
@@ -456,16 +460,19 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
 
 ## 10. Focus and motion
 
-Never remove focus rings, never set `outline: none`. Kit components ship their motion (press, toggle,
-selection glide, open/close, label morph, rolling counters) — never re-implement or override it. Motion
+Never draw, recolour or remove focus rings, never set `outline: none`: every kit ring follows one
+switch, off by default and on under `data-focus-ring="visible"` on `<html>`. Kit components ship
+their motion (press, toggle, selection glide, open/close, label morph, rolling counters) — never
+re-implement or override it. Motion
 of your own elements — when to move at all, the tokens, the rules and recipes — is
 [motion.md](motion.md).
 
 ## 11. State changes are continuous
 
 Nothing on screen flips from one state to another, and nothing that loads unfolds. Kit controls
-already move into their new state. Every region you build that changes what it shows — loading →
-data → empty → error, one record → another — renders its content inside `<Crossfade state={status}>`.
+already move into their new state. Every region inside a page or a dialog that changes what it shows — loading →
+data → empty → error, one record → another — renders its content inside `<Crossfade state={status}>`;
+navigation to another page is instant and never cross-fades.
 
 - **Loading is a skeleton from the first paint.** While data loads the region shows the state
   `"loading"` (that exact key): a `<Skeleton>` in the data's geometry (same rows, gaps and line
@@ -474,8 +481,9 @@ data → empty → error, one record → another — renders its content inside 
 - **The data replaces the skeleton in place.** Leaving `"loading"` (or entering it), Crossfade swaps
   with a short fade and the height settles in one frame — no glide, no reveal, no slide-in. A
   skeleton in the wrong geometry therefore shows as a jump: match the data.
-- **Only settled states glide.** data ↔ empty ↔ error, another record, a period or a section: the old
-  state fades out, the new one fades in, the height glides.
+- **Settled states fade, they never unfold.** data ↔ empty ↔ error, another record, a period or a
+  section: the old state fades out over the new one, which stands at its own height from the first
+  frame.
 - **A region that mounts in its state is still.** Content already loaded (a cached tab, a page
   opened again) renders as it is, with no fade.
 

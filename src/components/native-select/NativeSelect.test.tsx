@@ -93,16 +93,15 @@ describe("NativeSelect", () => {
     expect(select).toHaveAccessibleDescription("Обязательно");
   });
 
-  it("size, disabled and focusRing reach the select", () => {
+  it("size and disabled reach the select", () => {
     render(
-      <NativeSelect aria-label="Тема" size="l" disabled focusRing={false}>
+      <NativeSelect aria-label="Тема" size="l" disabled>
         <option value="a">A</option>
       </NativeSelect>,
     );
     const select = screen.getByRole("combobox");
     expect(select).toHaveAttribute("data-size", "l");
     expect(select).toBeDisabled();
-    expect(select).toHaveAttribute("data-focus-ring", "false");
   });
 
   it("is reachable with Tab and changes with the keyboard", async () => {

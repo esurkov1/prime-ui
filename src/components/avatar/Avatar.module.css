@@ -5,6 +5,8 @@
 .root,
 .overflow {
   --avatar-size: var(--prime-avatar-m);
+  --avatar-initials: 0.4;
+  --avatar-count: 0.36;
 
   position: relative;
   box-sizing: border-box;
@@ -15,7 +17,7 @@
   width: var(--avatar-size);
   height: var(--avatar-size);
   border-radius: var(--prime-radius-full);
-  font-size: calc(var(--avatar-size) * 0.4);
+  font-size: calc(var(--avatar-size) * var(--avatar-initials));
   line-height: 1;
   font-weight: var(--prime-font-weight-medium);
   vertical-align: middle;
@@ -58,6 +60,15 @@
 
 :is(.root, .overflow)[data-size="2xl"] {
   --avatar-size: var(--prime-avatar-2xl);
+}
+
+/* Touch steps the text up a size; the initials follow it (the box stays, rows depend on it). */
+@media (pointer: coarse) {
+  .root,
+  .overflow {
+    --avatar-initials: 0.45;
+    --avatar-count: 0.4;
+  }
 }
 
 /* ─── Parts ─────────────────────────────────────────────────────────────── */
@@ -195,5 +206,5 @@
     var(--avatar-ring, var(--prime-color-layer-current));
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
-  font-size: calc(var(--avatar-size) * 0.36);
+  font-size: calc(var(--avatar-size) * var(--avatar-count));
 }

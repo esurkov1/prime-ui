@@ -16,6 +16,18 @@
  * The title and the description take `FRAME_TITLE` / `FRAME_DESCRIPTION` (13/16 · 13/16 · 14/20 ·
  * 16/24 · 18/24, 12/16 · 12/16 · 13/20 · 14/20 · 14/20); the controls take the tier itself
  * (28 · 32 · 36 · 40 · 48), as tall as the fields of a form in the same surface.
+ *
+ * Compact (the surface's container — a phone page, a narrow column of a page — under 30rem): the
+ * padding steps down to the page's own rhythm, so on a phone the page gutter, the gap between
+ * blocks and a card's padding are one number, 16, and the content of every surface stands on one
+ * line 32 from the screen edge (the inset grouped list of iOS: a 16 margin, a 16 cell inset). A
+ * step never pads less than `s` (16), and `xs` and `s` keep theirs; the radius, the zone gap and
+ * the mark stay:
+ *                     xs       s        m        l        xl
+ *   --frame-pad       12       16       16       20       24
+ * The query names no container (a container name is local to its module): it reads the nearest
+ * one around the surface — `Page.Root`, a `Page.Grid`, a card it stands in — never the surface
+ * itself, which is often a container of its own.
  */
 
 .frame {
@@ -53,4 +65,18 @@
   --frame-gap: var(--prime-space-6);
   --frame-mark: var(--prime-space-14);
   --frame-lines-gap: var(--prime-space-1);
+}
+
+@container (width < 30rem) {
+  .frame {
+    --frame-pad: var(--prime-card-padding-s);
+  }
+
+  .frame[data-frame="l"] {
+    --frame-pad: var(--prime-card-padding-m);
+  }
+
+  .frame[data-frame="xl"] {
+    --frame-pad: var(--prime-card-padding-l);
+  }
 }

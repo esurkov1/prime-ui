@@ -30,9 +30,9 @@ describe("AppShell", () => {
     expect(root).toHaveAttribute("data-nav", "true");
   });
 
-  it("sets data-fill-viewport and merges className", () => {
+  it("fills the viewport by default and merges className", () => {
     render(
-      <AppShell.Root fillViewport className="custom" data-testid="root">
+      <AppShell.Root className="custom" data-testid="root">
         <AppShell.Main />
       </AppShell.Root>,
     );
@@ -45,7 +45,11 @@ describe("AppShell", () => {
     const main = cssRule("src/layout/app-shell/AppShell.module.css", ".main");
     expect(cssValue(main, "--page-gutter")).toBe("var(--prime-layout-gutter)");
     expect(cssValue(main, "--page-top")).toBe("var(--shell-top)");
-    expect(cssValue(main, "padding-block-end").replace(/\s+/g, " ")).toBe(
+    // The bottom air is a spacer, the last flex item: an end padding does not scroll everywhere.
+    expect(() => cssValue(main, "padding-block-end")).toThrow();
+    const tail = cssRule("src/layout/app-shell/AppShell.module.css", ".main::after");
+    expect(cssValue(tail, "flex")).toBe("none");
+    expect(cssValue(tail, "block-size").replace(/\s+/g, " ")).toBe(
       "max( var(--shell-fill-end, var(--prime-space-16)), var(--shell-floating-end, var(--prime-space-0)) )",
     );
     // With the rail on screen the floating capsule's room scales to 0: a fill page keeps its gutter.
@@ -54,6 +58,81 @@ describe("AppShell", () => {
       '.root[data-nav="true"]:not([data-off-canvas])',
     );
     expect(cssValue(rail, "--shell-floating-scale")).toBe("0");
+  });
+
+  it("the top-level shell owns the viewport; a nested one stays a box", () => {
+    const { unmount } = render(
+      <AppShell.Root data-testid="outer">
+        <AppShell.Main>
+          <AppShell.Root data-testid="inner">
+            <AppShell.Main data-testid="inner-main" />
+          </AppShell.Root>
+        </AppShell.Main>
+      </AppShell.Root>,
+    );
+    expect(screen.getByTestId("outer")).toHaveAttribute("data-frame", "viewport");
+    expect(screen.getByTestId("inner")).not.toHaveAttribute("data-frame");
+    expect(document.documentElement).toHaveAttribute("data-prime-frame");
+    // Main of the frame holds its overscroll; a nested main hands it on to the page around.
+    const [outerMain] = screen.getAllByRole("main");
+    expect(outerMain?.className).toMatch(/overscrollContain/);
+    expect(screen.getByTestId("inner-main").className).not.toMatch(/overscroll/);
+    unmount();
+    expect(document.documentElement).not.toHaveAttribute("data-prime-frame");
+  });
+
+  it("a document shell (fillViewport={false}), or one in a frame of its own, leaves the document alone", () => {
+    render(
+      <>
+        <AppShell.Root fillViewport={false} data-testid="document">
+          <AppShell.Main />
+        </AppShell.Root>
+        <AppShellBoundary>
+          <AppShell.Root data-testid="preview">
+            <AppShell.Main />
+          </AppShell.Root>
+        </AppShellBoundary>
+      </>,
+    );
+    expect(screen.getByTestId("document")).not.toHaveAttribute("data-frame");
+    expect(screen.getByTestId("preview")).not.toHaveAttribute("data-frame");
+    expect(document.documentElement).not.toHaveAttribute("data-prime-frame");
+  });
+
+  it("CSS: the viewport frame is fixed to the viewport; the document under it is still", () => {
+    const frame = cssRule(
+      "src/layout/app-shell/AppShell.module.css",
+      '.root:where([data-frame="viewport"])',
+    );
+    expect(cssValue(frame, "position")).toBe("fixed");
+    expect(cssValue(frame, "inset")).toBe("0");
+    const still = cssRule(
+      "src/styles/globals.css",
+      ":root[data-prime-frame], :root[data-prime-frame] body",
+    );
+    expect(cssValue(still, "overflow")).toBe("hidden");
+    expect(cssValue(still, "overscroll-behavior")).toBe("none");
+  });
+
+  it("CSS: main keeps exactly the floating capsule's room — inset, capsule, safe area, gutter", () => {
+    const CSS = "src/layout/app-shell/AppShell.module.css";
+    const panel = cssRule(CSS, '.panel:has(> .dock > .footer > [data-floating="true"])');
+    const room = cssValue(panel, "--shell-floating-end").replace(/\s+/g, " ");
+    for (const part of [
+      "var(--prime-bottom-nav-floating-inset)",
+      "var(--shell-capsule)",
+      "var(--prime-safe-area-bottom)",
+      "var(--prime-layout-gutter)",
+      "var(--shell-floating-scale)",
+    ]) {
+      expect(room).toContain(part);
+    }
+    expect(cssValue(panel, "--shell-capsule")).toBe("var(--prime-bottom-nav-floating-height)");
+    // On touch the capsule grows to the touch row, and the room with it.
+    const touch = cssRule(CSS, '.panel:has(> .dock > .footer > [data-floating="true"])', [
+      "@media (pointer: coarse)",
+    ]);
+    expect(cssValue(touch, "--shell-capsule")).toContain("--prime-control-touch-target");
   });
 
   it("Template composes nav, main and footer", () => {

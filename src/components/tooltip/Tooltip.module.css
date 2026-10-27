@@ -89,7 +89,7 @@
  * control itself gets no pointer events, and the ring is drawn on it, so it follows its radius.
  */
 .focusHost:focus-visible:not(.disabledHost) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 
@@ -110,6 +110,6 @@
 }
 
 .disabledHost:focus-visible > * {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }

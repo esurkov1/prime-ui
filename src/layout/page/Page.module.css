@@ -2,6 +2,11 @@
  * Page — the page column inside `AppShell.Main` (foundation §1.3 rhythm): header → body 24, block →
  * block inside the body 24, a titled section 40 from its neighbours, tile → tile 16 on both axes.
  *
+ * Compact (the page's content under 30rem — a phone): one number, 16 — the gutter the shell hands
+ * it, the step under the top bar, block → block, tile → tile, and the padding of the cards in it
+ * (internal/surfaceFrame steps down by the same query); a titled section stands 32 off. The root
+ * is the size container that query reads.
+ *
  * The host hands the page its edge air through two custom properties: `--page-gutter` (the side
  * gutter) and `--page-top` (the air above the page and under its top bar). `AppShell.Main` sets
  * them to the shell's gutters; outside a host they are unset and the page brings no air. The page
@@ -12,6 +17,7 @@
   --page-inset: var(--page-gutter, var(--prime-space-0));
   --page-air: var(--page-top, var(--prime-space-0));
 
+  container: prime-page / inline-size;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -297,6 +303,22 @@ p.barDescription {
 }
 
 /*
+ * Compact: the bar is as narrow as a phone, and a line of data cut to one line loses its last
+ * fact mid-word («5 модулей · Сох»). The description wraps between words to two lines and only
+ * then ends in «…»; a line that opens with a status stays one line (the status keeps its width,
+ * the text after it truncates).
+ */
+@container prime-page (width < 30rem) {
+  p.barDescription:not([data-status]) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    white-space: normal;
+  }
+}
+
+/*
  * A stacked heading (`data-heading="stack"`: even with the buttons at their narrowest the path and
  * the title do not share the line): the path takes a line of its own over the title, the chevron
  * leaves, and the title and the description wrap — each keeps its words instead of a cut fragment. The
@@ -384,6 +406,26 @@ p.barDescription {
   flex-direction: column;
   gap: var(--prime-space-6);
   min-width: 0;
+}
+
+/*
+ * Compact: the page's air is its gutter — blocks stand 16 apart, a section 32, and what follows the
+ * top bar or the flow header starts 16 under it: the root cannot query its own width, so its 24
+ * gap stays and the part before the body takes the 8 back (the bar: its 12 below the controls,
+ * then 4).
+ */
+@container prime-page (width < 30rem) {
+  .body {
+    gap: var(--prime-space-4);
+  }
+
+  .topBar {
+    margin-block-end: calc((var(--prime-space-3) + var(--prime-space-2)) * -1);
+  }
+
+  .header {
+    margin-block-end: calc(var(--prime-space-2) * -1);
+  }
 }
 
 /*
@@ -577,7 +619,7 @@ p.barDescription {
 }
 
 /*
- * `fill`: the page takes the height of the panel's main (`AppShell.Root fillViewport`) and the
+ * `fill`: the page takes the height of the panel's main (`AppShell.Root`) and the
  * body takes what the header leaves. A filling child inside (DataTable `scrollHeight="fill"`,
  * Crossfade `fill`, Page.Split) takes the body's free height.
  */

@@ -183,10 +183,15 @@ export const primitiveTokens = {
     size: {
       /** Only for tab-bar labels under an icon (BottomNav, iOS tab bar 10pt); text roles start at 12. */
       10: "0.625rem",
+      /** The touch step of the tab-bar label 10 (`tokens/touch.ts`). */
+      11: "0.6875rem",
       12: "0.75rem",
       13: "0.8125rem",
       14: "0.875rem",
+      /** 15 is the touch step of 14 (`tokens/touch.ts`). */
+      15: "0.9375rem",
       16: "1rem",
+      17: "1.0625rem",
       18: "1.125rem",
       20: "1.25rem",
       24: "1.5rem",

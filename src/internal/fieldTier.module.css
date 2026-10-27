@@ -14,6 +14,7 @@
  *   --field-step-h                          a control one tier down (`stepDown`: a row action)
  *   --field-compact-h                       a fixed small control (`compactTier`: a corner close)
  *   --field-track                           thickness of a line (a slider, a progress track)
+ *   --field-thumb                           height of a slider thumb
  *   --field-code / --field-code-radius      cell of a one-time code (DigitInput): two steps above
  *                                           the control height, since a code is the one thing on
  *                                           its screen (xs 36 · s 40 · m 48 · l 56 · xl 64)
@@ -47,6 +48,7 @@
   --field-step-h: var(--prime-control-s-height);
   --field-compact-h: var(--prime-control-xs-height);
   --field-track: var(--prime-control-m-track);
+  --field-thumb: var(--prime-control-m-thumb);
   --field-code: var(--prime-control-xl-height);
   --field-code-radius: var(--prime-control-xl-radius);
   /* Resolved on the same element as the tier rows below, so it follows the tier. */
@@ -86,6 +88,7 @@
   --field-step-h: var(--prime-control-xs-height);
   --field-compact-h: var(--prime-control-xs-height);
   --field-track: var(--prime-control-xs-track);
+  --field-thumb: var(--prime-control-xs-thumb);
   --field-code: var(--prime-control-m-height);
   --field-code-radius: var(--prime-control-m-radius);
 }
@@ -110,6 +113,7 @@
   --field-step-h: var(--prime-control-xs-height);
   --field-compact-h: var(--prime-control-xs-height);
   --field-track: var(--prime-control-s-track);
+  --field-thumb: var(--prime-control-s-thumb);
   --field-code: var(--prime-control-l-height);
   --field-code-radius: var(--prime-control-l-radius);
 }
@@ -135,6 +139,7 @@
   --field-step-h: var(--prime-control-m-height);
   --field-compact-h: var(--prime-control-s-height);
   --field-track: var(--prime-control-l-track);
+  --field-thumb: var(--prime-control-l-thumb);
   --field-code: var(--prime-space-14);
   --field-code-radius: var(--prime-radius-l);
 }
@@ -160,6 +165,7 @@
   --field-step-h: var(--prime-control-l-height);
   --field-compact-h: var(--prime-control-s-height);
   --field-track: var(--prime-control-xl-track);
+  --field-thumb: var(--prime-control-xl-thumb);
   --field-code: var(--prime-space-16);
   --field-code-radius: var(--prime-radius-xl);
 }

@@ -68,7 +68,6 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `name` | `string` | — | Form field name: one hidden input per selected value (read with `formData.getAll(name)`). |
 | `placeholder` | `string` | `""` | Text in the input while no tag is picked. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier; the list uses the same tier, chips one tier down. Without it the tier of its host (a form, a panel with a size), else `m`. |
-| `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `id` | `string` | — | Id of the input; generated when omitted. |
 | `labels` | `Partial<TagSelectLabels>` | — | Built-in strings, see Labels (`colorNames` merges by key). |
 | `aria-label · aria-labelledby` | `string` | — | Name of the input and the list when there is no `label`. |
@@ -97,7 +96,6 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 | `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by Tab or a press outside | `true` |
 | `invalid` / `error` | danger inset ring (+ the message) | Validation failed | |
 | `required` / `optional` | red `*` / muted «необязательно» after the label | Mark the minority of the form | `false` / — |
-| `focusRing` | `false`: no focus ring; the field keeps its focus fill | Only where focus shows otherwise; never on a form field (WCAG 2.4.7) | `true` |
 
 ## States
 | State | Driven by | DOM |
@@ -169,7 +167,7 @@ No `variant` or `tone`. The control is the field look; chips are the kit's soft 
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A labelled tag field: focus opens the list, typing filters it, picked tags become chips — `label`, `options`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier with two picked tags; chips sit one tier below the field — `size`. |
-| [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one and one whose focus shows without the ring, with a disabled option in the list — `disabled`, `invalid`, `focusRing`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one, with a disabled option in the list — `disabled`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: removing the last region shakes the field and drops the error in, adding one clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [creatable.tsx](examples/creatable.tsx) | A typed text that is not in the list becomes a new tag from the Create row or Enter and is saved on the server: the chip waits busy, and a tag the server refuses leaves again — `creatable`, `onCreate`, `fallbackColor`. |
 | [many-tags.tsx](examples/many-tags.tsx) | More tags than fit: at rest one row with «+N», focused every tag on up to three wrapped rows that scroll — `defaultValue`. |

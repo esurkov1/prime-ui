@@ -39,7 +39,7 @@ import type { ReactNode } from "react";
 export function AppFrame({ children }: { children: ReactNode }) {
   return (
     <NotificationProvider>
-      <AppShell.Root fillViewport>
+      <AppShell.Root>
         <AppShell.Nav>
           <Sidebar.Root>
             <Sidebar.Header>
@@ -125,6 +125,16 @@ Phone navigation for 2–6 main sections is a `BottomNav.Root` in `AppShell.Foot
 your own media query. The shell hides the footer while the Sidebar rail is on screen and shows it
 while the Sidebar is off-canvas, so the bar and the rail never appear together.
 
+### The frame owns the viewport
+
+An app is `AppShell.Root` at the top level: it fills the viewport by itself (`fillViewport` is on;
+`fillViewport={false}` only for a page that is a document), the document under it stays still and
+`AppShell.Main` is the one scroller. Never wrap the app in your own `100vh`, `overflow` or
+`position: fixed` boxes. The page's `<head>` carries
+`<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">` and
+leaves `interactive-widget` at its default. A floating BottomNav goes in `AppShell.Footer`, and Main
+keeps its room under the last line by itself — never pad the page for it.
+
 An app-wide floating action (the assistant, a quick create) is `AppShell.Fab` anywhere inside
 `AppShell.Root` (an `aria-label` and the glyph as its child) — never a `position: fixed` wrapper
 around a circle Button: it stands in the corner by itself, above the BottomNav and the safe area,
@@ -165,7 +175,7 @@ shows only icons); none on the children of a sub-list.
   ([the settings page](../src/layout/page/examples/screen.tsx)), or `maxWidth="readable"` for a single
   narrow column of fields.
 - Long reading text (terms, help): `Page.Root maxWidth="readable"` with `Page.Header` in the flow.
-- A page as high as the panel (a log, a board, a chat): `AppShell.Root fillViewport` +
+- A page as high as the panel (a log, a board, a chat): `AppShell.Root` +
   `Page.Root fill`; the body passes its free height to a filling child — DataTable
   `scrollHeight="fill"`, Crossfade `fill`, `Page.Split`. Never compute heights from `100vh`.
 - List + detail (mail, a messenger, a ticket queue): `Page.Split` with `Page.List` and

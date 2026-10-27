@@ -160,6 +160,7 @@ Motion (`overlayMotion`): the panel grows out of the side that faces its trigger
 - Max height follows the free space on the resolved side; the panel scrolls inside.
 - Kept `--prime-space-2` from viewport edges; follows the trigger on scroll and resize.
 - Actions: at the end, `--prime-space-2` gap; in a bottom sheet they stack full width.
+- Bottom sheet (below 640px): the content stands on the sheet frame of every dialog sheet — `--prime-sheet-padding` (24) on the sides and below, its blocks 16 apart, no top air of its own under the grab strip (a touch target, 44, tall; the bar small); the bottom safe-area inset under it; as tall as the content up to the sheet top gap, on the on-screen keyboard's top edge while it is up. `flush` content keeps its own spacing.
 
 ## Accessibility
 

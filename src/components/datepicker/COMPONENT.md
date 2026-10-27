@@ -73,7 +73,6 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `disabled` | `boolean` | `false` | The field cannot be opened. |
 | `fullWidth` | `boolean` | `false` | The field stretches to its container; otherwise it fits the text. |
 | `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Popover alignment to the field. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring (`data-focus-ring="false"`). |
 | `placeholder` | `string` | `labels.placeholder` | Field text without a value for this field. |
 | `valuePrefix` | `string` | — | Text before the value, e.g. «С». |
 | `id` | `string` | — | Id of the field button; generated when omitted. |
@@ -182,7 +181,7 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 |---|---|---|
 | empty | no value | `data-empty="true"`, `labels.placeholder` (or `placeholder`) in placeholder color |
 | open | click, `open` / `defaultOpen` | `data-state="open"`, `field-bg-hover` fill, the chevron turns |
-| focus-visible | keyboard | inset focus ring; none with `focusRing` off (`data-focus-ring="false"`) |
+| focus-visible | keyboard | focus fill; the inset focus ring under `data-focus-ring="visible"` |
 | invalid | `invalid`, `error` | `data-invalid`, `aria-invalid`, inset `danger-border` ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled`, `field-bg-disabled`, cannot open |
 | saving | `onValueChange` returned a pending promise | the new value shows at once, a `Spinner` in place of the chevron, `aria-busy` and `data-loading` on the field button (`cursor: progress`), `aria-busy` on the panel; the field still opens, picks are ignored until the answer; a rejection puts the previous value back |
@@ -257,7 +256,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A shipping date field: a click opens one month, a picked day applies at once — `mode`, `label`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the field is 28 to 48 px high, the day cell of the panel 24 to 40 px — `size`. |
-| [states.tsx](examples/states.tsx) | An empty field with the default placeholder, a filled, a disabled and an invalid one, and one whose focus shows without the ring — `disabled`, `invalid`, `focusRing`. |
+| [states.tsx](examples/states.tsx) | An empty field with the default placeholder, a filled, a disabled and an invalid one — `disabled`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | A leave period checked live: the error shakes in, names the broken rule and leaves once the period fits; an optional return date — `required`, `hint`, `error`, `optional`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A leading glyph before the value: none by default, the calendar, or another icon in its place — `Datepicker.TriggerIcon`. |
 | [range-presets.tsx](examples/range-presets.tsx) | A report period: presets aside, two months, a step prompt, time fields with Reset / Apply, no future days; Reset returns the current month and the panel lines up with the field's end — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`, `resetValue`, `align`. |

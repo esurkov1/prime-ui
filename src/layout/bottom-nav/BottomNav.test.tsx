@@ -337,4 +337,18 @@ describe("BottomNav", () => {
       vi.unstubAllGlobals();
     }
   });
+
+  it("CSS: the bar and the capsule take their place from the frame's edges and safe areas", () => {
+    const CSS = "src/layout/bottom-nav/BottomNav.module.css";
+    const bar = cssRule(CSS, ".root");
+    expect(cssValue(bar, "padding-block-end")).toBe("var(--prime-safe-area-bottom)");
+    expect(cssValue(bar, "padding-left")).toContain("var(--prime-safe-area-left)");
+    expect(cssValue(bar, "padding-right")).toContain("var(--prime-safe-area-right)");
+    const capsule = cssRule(CSS, '.root[data-floating="true"]');
+    expect(cssValue(capsule, "position")).toBe("absolute");
+    const inset = "var(--prime-bottom-nav-floating-inset)";
+    expect(cssValue(capsule, "bottom")).toBe(`calc(${inset} + var(--prime-safe-area-bottom))`);
+    expect(cssValue(capsule, "left")).toBe(`calc(${inset} + var(--prime-safe-area-left))`);
+    expect(cssValue(capsule, "right")).toBe(`calc(${inset} + var(--prime-safe-area-right))`);
+  });
 });

@@ -31,7 +31,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Пустое поле с плейсхолдером по умолчанию, заполненное, отключённое и ошибочное, и поле, где фокус виден без кольца — `disabled`, `invalid`, `focusRing`.",
+        "Пустое поле с плейсхолдером по умолчанию, заполненное, отключённое и ошибочное — `disabled`, `invalid`.",
     },
     {
       slot: "validation",

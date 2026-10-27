@@ -34,7 +34,7 @@ const SECTIONS = [
 export default function PageCollapseExample() {
   return (
     <div className={`${styles.window} ${styles.tall}`}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Main>
           <Page.Root maxWidth="readable">
             <Page.TopBar collapse>

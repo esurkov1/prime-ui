@@ -684,6 +684,13 @@ function PageDescription({ loading = false, className, children, ...rest }: Page
   // moves when the data arrives; the data then fades in under the same element.
   const swap = useSwapIn(loading ? "loading" : "data", children);
   const shownLoading = swap.state === "loading";
+  // A line that opens with a status is the header row's line: the status and its dot keep their
+  // width, the text after them truncates. Plain text is a block of its own, so it can end in «…»
+  // on one line or wrap to two between words on a compact page.
+  const status =
+    place === "bar" &&
+    !shownLoading &&
+    flattenChildren(swap.content).some((part) => isPart(part, StatusDot));
   React.useLayoutEffect(() => {
     store?.set({ description: loading ? null : children });
   });
@@ -694,10 +701,11 @@ function PageDescription({ loading = false, className, children, ...rest }: Page
       {...rest}
       key={swap.key}
       aria-busy={shownLoading || undefined}
+      data-status={status || undefined}
       className={cx(
         place === "bar" ? textRole.caption : textRole.bodyM,
         place === "bar"
-          ? cx(styles.barDescription, headerRowStyles.description)
+          ? cx(styles.barDescription, status && headerRowStyles.description)
           : styles.description,
         swap.className,
         className,
@@ -705,8 +713,7 @@ function PageDescription({ loading = false, className, children, ...rest }: Page
     >
       {shownLoading ? (
         <Skeleton size="xs" className={styles.descriptionSkeleton} />
-      ) : place === "bar" &&
-        flattenChildren(swap.content).some((part) => isPart(part, StatusDot)) ? (
+      ) : status ? (
         <HeaderLineContent>{swap.content}</HeaderLineContent>
       ) : (
         swap.content

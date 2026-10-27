@@ -30,7 +30,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Обычное поле рядом с неактивным, ошибочным и полем, где фокус виден без кольца, неактивная опция в списке — `disabled`, `invalid`, `focusRing`.",
+        "Обычное поле рядом с неактивным и ошибочным, неактивная опция в списке — `disabled`, `invalid`.",
     },
     {
       slot: "validation",

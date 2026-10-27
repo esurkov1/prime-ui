@@ -8,6 +8,7 @@ import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
 import { Button } from "@/components/button/Button";
 import { Crossfade } from "@/components/crossfade/Crossfade";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
+import { StatusDot } from "@/components/status-dot/StatusDot";
 import { Icon } from "@/icons";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { cssRule, cssRules, cssValue } from "@/test/css";
@@ -992,6 +993,24 @@ describe("Page body", () => {
     expect(cssValue(grid, "gap")).toBe("var(--prime-space-4)");
   });
 
+  it("CSS: a compact page (under 30rem) breathes at 16 — blocks, the step under its top part", () => {
+    expect(cssValue(cssRule(CSS, ".root"), "container")).toBe("prime-page / inline-size");
+    const compact = ["@container prime-page (width < 30rem)"];
+    expect(cssValue(cssRule(CSS, ".body", compact), "gap")).toBe("var(--prime-space-4)");
+    // The root keeps its 24 gap (it cannot query itself): the part before the body takes 8 back,
+    // the bar on top of its own 12 under the controls.
+    expect(cssValue(cssRule(CSS, ".root"), "gap")).toBe("var(--prime-space-6)");
+    expect(cssValue(cssRule(CSS, ".topBar"), "margin-block-end")).toBe(
+      "calc(var(--prime-space-3) * -1)",
+    );
+    expect(cssValue(cssRule(CSS, ".topBar", compact), "margin-block-end")).toBe(
+      "calc((var(--prime-space-3) + var(--prime-space-2)) * -1)",
+    );
+    expect(cssValue(cssRule(CSS, ".header", compact), "margin-block-end")).toBe(
+      "calc(var(--prime-space-2) * -1)",
+    );
+  });
+
   it("CSS: the page takes its air from the host and resets it for what it holds", () => {
     const root = cssRule(CSS, ".root");
     expect(cssValue(root, "--page-inset")).toBe("var(--page-gutter, var(--prime-space-0))");
@@ -1210,6 +1229,48 @@ describe("Page.Split", () => {
   it("panes throw outside a split", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Page.BackButton />)).toThrow(/inside `Page.Split`/);
+  });
+});
+
+describe("Page.Description in the bar", () => {
+  it("plain data is a block of its own: one line with «…», two lines between words when compact", () => {
+    render(
+      <Page.Root>
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Оборудование</Page.Title>
+            <Page.Description data-testid="line">
+              160 × 16 px · 5 модулей · Сохранено
+            </Page.Description>
+          </Page.Heading>
+        </Page.TopBar>
+      </Page.Root>,
+    );
+    const line = screen.getByTestId("line");
+    expect(line).not.toHaveAttribute("data-status");
+    expect(line.firstChild?.nodeType).toBe(Node.TEXT_NODE);
+    const compact = cssRule(CSS, "p.barDescription:not([data-status])", [
+      "@container prime-page (width < 30rem)",
+    ]);
+    expect(cssValue(compact, "-webkit-line-clamp")).toBe("2");
+    expect(cssValue(compact, "white-space")).toBe("normal");
+  });
+
+  it("a line that opens with a status stays the header row's one line", () => {
+    render(
+      <Page.Root>
+        <Page.TopBar>
+          <Page.Heading>
+            <Page.Title>Строка</Page.Title>
+            <Page.Description data-testid="line">
+              <StatusDot tone="success">В эфире</StatusDot>
+              192.168.1.47
+            </Page.Description>
+          </Page.Heading>
+        </Page.TopBar>
+      </Page.Root>,
+    );
+    expect(screen.getByTestId("line")).toHaveAttribute("data-status", "true");
   });
 });
 

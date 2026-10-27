@@ -52,7 +52,6 @@ NativeSelect          field frame: label row · control · support row
 | `value` | `string` | — | Controlled value (native); with `onValueChange` or `onChange`. |
 | `defaultValue` | `string` | — | Initial value, uncontrolled. |
 | `onValueChange` | `(value: string) => void \| Promise<void>` | — | The picked value; native `onChange` still fires. A promise: a Spinner for the chevron (`aria-busy`); a controlled owner sets `value` before resolving; reject brings the previous value back (say why with `error`). |
-| `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `labels` | `Partial<NativeSelectLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Native `<option>` and `<optgroup>` elements. |
 | `…rest` | `Omit<SelectHTMLAttributes<HTMLSelectElement>, "size" \| "multiple">` | — | `id`, `name`, `onChange`, `aria-*`, `className` (on the field wrapper) and the other select attributes. |
@@ -76,7 +75,6 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 | `optional` | muted «необязательно» | Most fields are required | |
 | `invalid` / `error` | danger inset ring (+ the message) | Validation failed | |
 | `disabled` | disabled fill and text | Not editable now | `false` |
-| `focusRing` | `false`: no focus ring | Focus is obvious otherwise | `true` |
 
 ## States
 | State | Driven by | DOM |
@@ -86,7 +84,6 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 | disabled | `disabled`, or a disabled `Fieldset` around it | native `disabled`, `data-disabled="true"`; under a `Tooltip.Trigger` `aria-disabled="true"` with no `name` or `required`, no picker, the same node |
 | saving | `onValueChange` returned a pending promise | the picked value stands, a `Spinner` in place of the chevron, `aria-busy` and `data-loading` on the select (`cursor: progress`), picks ignored, never disabled; a rejection puts the previous value back |
 | size | `size` | `data-size` |
-| focus ring off | `focusRing={false}` | `data-focus-ring="false"` |
 
 ## Layout & spacing
 - Full width of its column; label → field and field → hint gaps come from the tier (`label-gap`, `hint-gap`).
@@ -123,7 +120,7 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A labelled system select with a hint; the OS picker opens on phones — `label`, `hint`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the label and the hint follow the field tier — `size`. |
-| [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one, and one whose focus shows without the ring — `disabled`, `invalid`, `focusRing`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one — `disabled`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [option-groups.tsx](examples/option-groups.tsx) | Options under group headings with the native optgroup, and a placeholder while nothing is picked — `placeholder`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field — `value`, `onValueChange`. |

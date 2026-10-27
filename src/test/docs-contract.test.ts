@@ -355,6 +355,20 @@ function contentOffenders(dir: string, file: string, source: string): string[] {
   ) {
     offenders.push(`${file}: Label / Hint beside a framed field (use its label / hint)`);
   }
+  // Navigation is instant (AGENTS.md "State changes are continuous"): a Crossfade lives inside a
+  // page or a dialog, never around the app frame, the page or the routes, nor keyed by the path.
+  for (const m of body.matchAll(
+    /<Crossfade\b([^>]*)>\s*<(AppShell\.\w+|Page\.(?:Root|Body)|Routes)\b/g,
+  )) {
+    offenders.push(`${file}: Crossfade around <${m[2]}> (navigation renders the page at once)`);
+  }
+  for (const m of body.matchAll(/<Crossfade\b[^>]*\bstate=\{([^}]*)\}/g)) {
+    if (/\b(location|pathname)\b|\.to\b/.test(m[1])) {
+      offenders.push(
+        `${file}: Crossfade keyed by the route «${m[1]}» (navigation never cross-fades)`,
+      );
+    }
+  }
   if (/<Card\.(Root|Body)\b/.test(body) && /<Spinner\b/.test(body)) {
     offenders.push(`${file}: Spinner in a Card (a Skeleton holds the shape)`);
   }

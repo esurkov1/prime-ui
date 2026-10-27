@@ -293,19 +293,3 @@ describe("ColorPicker drafts and parts", () => {
     spy.mockRestore();
   });
 });
-
-describe("ColorPicker focusRing", () => {
-  it("focusRing={false} reaches HexInput and ChannelStrip", () => {
-    render(
-      withLocale(
-        <ColorPicker.Root defaultValue="#336699" defaultFormat="hex">
-          <ColorPicker.HexInput focusRing={false} />
-          <ColorPicker.ChannelStrip focusRing={false} />
-        </ColorPicker.Root>,
-      ),
-    );
-    const [hexField, stripField] = screen.getAllByRole("textbox", { name: "Hex" });
-    expect(hexField.parentElement).toHaveAttribute("data-focus-ring", "false");
-    expect(stripField.closest("[data-focus-ring]")).toHaveAttribute("data-focus-ring", "false");
-  });
-});

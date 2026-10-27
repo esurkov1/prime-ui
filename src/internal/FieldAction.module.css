@@ -70,7 +70,7 @@
 }
 
 .action:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
@@ -87,4 +87,11 @@
 /* Copied: the check (`GlyphSwap` in the segment) takes the success color, hovered or not. */
 .action[data-copy-state="copied"] > * {
   color: var(--prime-color-success-text);
+}
+
+/* Touch: the glyph stands beside text a step up, so it gives only a half step to the field icon. */
+@media (pointer: coarse) {
+  .action {
+    --prime-icon-size: calc(var(--field-icon) - var(--prime-space-1) / 2);
+  }
 }

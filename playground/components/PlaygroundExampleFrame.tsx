@@ -131,8 +131,8 @@ function SourceFramePlaceholder({ height }: { height: number | undefined }) {
 
 /**
  * The frame of one example file: a Skeleton in the frame's geometry until module and source load,
- * then the frame in its place — the region's `"loading"` state, so the height never glides
- * (foundation §7 rule 8). A file that already loaded renders at once, with no placeholder.
+ * then the frame in its place — the region's `"loading"` state, a short fade (foundation §7
+ * rule 8). A file that already loaded renders at once, with no placeholder.
  */
 export function PlaygroundSourceFrame({ id, entry, stage, ...rest }: SourceFrameProps) {
   const [state, setState] = React.useState<LoadState>(() => initialState(entry));

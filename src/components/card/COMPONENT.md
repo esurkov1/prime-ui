@@ -52,7 +52,7 @@ Card.Root size? selected? asChild?        the card; with no zone inside it is a 
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | One of five steps of metrics: `xs` (padding 12), `s` (16), `m` (20), `l` (24), `xl` (28) with the type, the mark and the controls inside. The width comes from the grid, not from the size. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Five steps of metrics: `xs` (padding 12), `s` (16), `m` (20), `l` (24), `xl` (28) with the type, the mark and the controls; in a container under 30rem (a phone) the padding is 12 · 16 · 16 · 20 · 24. |
 | `selected` | `boolean` | — | The card is chosen: a 2 px accent ring, `Card.Indicator` checked. With `asChild` the element carries the state: `aria-pressed`, or `aria-checked` when it has `role="radio"` or `role="checkbox"`. |
 | `asChild` | `boolean` | `false` | The whole card is one link or button (a choice card): pass that element as the only child with the parts inside it. Nothing interactive goes inside; for a card with its own controls use `Card.Link`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
@@ -222,7 +222,9 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 | mark | 32 | 32 | 40 | 48 | 56 |
 | badges | `xs` 16 | `xs` 16 | `s` 20 | `m` 24 | `m` 24 |
 | controls | `xs` 28 | `s` 32 | `m` 36 | `l` 40 | `xl` 48 |
+| padding, compact | 12 | 16 | 16 | 20 | 24 |
 
+- Compact: in a container under 30rem — a page on a phone, a card it stands in — the padding steps down a tier and never below 16; the radius, the gaps, the type and the controls keep their step. The page gutter, the gap between blocks and the padding of an `m` card are then one number, 16, and the content of every card stands 32 from the screen edge. The query reads the nearest container around the card (`Page.Root`, `Page.Grid`), never the card itself.
 - The card is a surface of the depth ladder: no border, no lines inside; zones are parted by air. It fills its grid cell and, in a row, cards stretch to one height while the footer keeps to the bottom.
 - Nothing wraps. Every header line and every body row is one line cut with an ellipsis.
 - The header gives way in this order: the title shrinks down to its floor (its own text or 8em) and the badges fold into «+N»; the title never goes below the floor. When the mark, the floor and the controls no longer fit one row, the controls drop under the title onto a line of their own, and wrap only if that line is narrower than they are. The kit does not shrink a picker or move buttons into «Ещё» by itself; a card has no `Fields` row, so its header holds one picker at the controls' tier, and a card with two pickers moves the second into `Card.Footer` (which stacks on a narrow card) or the body.

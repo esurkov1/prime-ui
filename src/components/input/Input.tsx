@@ -26,7 +26,6 @@ import {
 } from "@/internal/FieldCommit";
 import {
   FieldCounter,
-  type FieldFocusRingProps,
   FieldFrame,
   type FieldRootDomProps,
   useFieldFrame,
@@ -119,7 +118,6 @@ type InputContextValue = {
   customValidity: string | null;
   /** The input refused a form submit (`invalid` event). */
   reportInvalid: () => void;
-  focusRing: boolean | undefined;
   required: boolean;
   inputId: string;
   /** `Input.Field` attaches it; `Input.ClearButton` returns focus through it. */
@@ -160,36 +158,34 @@ const NO_HIGHLIGHT = createStore<string | undefined>(undefined);
 
 // ---- InputRoot ----
 
-export type InputRootProps = FieldRootDomProps &
-  FieldFocusRingProps & {
-    size?: ControlSize;
-    invalid?: boolean;
-    valid?: boolean;
-    label?: React.ReactNode;
-    required?: boolean;
-    optional?: boolean;
-    hint?: React.ReactNode;
-    hintTone?: HintTone;
-    error?: React.ReactNode;
-    counter?: React.ReactNode;
-    reserveSupportRow?: boolean;
-    id?: string;
-    strength?: boolean;
-    getStrength?: (value: string) => PasswordStrength;
-    minStrength?: Exclude<PasswordStrength, 0>;
-    onCommit?: FieldCommitHandler;
-    suggestions?: readonly string[];
-    closeOnEscape?: boolean;
-    closeOnOutsideClick?: boolean;
-    labels?: Partial<InputLabels>;
-    children: React.ReactNode;
-  };
+export type InputRootProps = FieldRootDomProps & {
+  size?: ControlSize;
+  invalid?: boolean;
+  valid?: boolean;
+  label?: React.ReactNode;
+  required?: boolean;
+  optional?: boolean;
+  hint?: React.ReactNode;
+  hintTone?: HintTone;
+  error?: React.ReactNode;
+  counter?: React.ReactNode;
+  reserveSupportRow?: boolean;
+  id?: string;
+  strength?: boolean;
+  getStrength?: (value: string) => PasswordStrength;
+  minStrength?: Exclude<PasswordStrength, 0>;
+  onCommit?: FieldCommitHandler;
+  suggestions?: readonly string[];
+  closeOnEscape?: boolean;
+  closeOnOutsideClick?: boolean;
+  labels?: Partial<InputLabels>;
+  children: React.ReactNode;
+};
 
 function InputRoot({
   size: sizeProp,
   invalid,
   valid,
-  focusRing,
   label,
   required = false,
   optional = false,
@@ -259,7 +255,6 @@ function InputRoot({
       validId,
       customValidity,
       reportInvalid,
-      focusRing,
       required: isRequired,
       inputId,
       inputRef,
@@ -283,7 +278,6 @@ function InputRoot({
       validId,
       customValidity,
       reportInvalid,
-      focusRing,
       isRequired,
       inputId,
       describedBy,
@@ -372,8 +366,7 @@ export type InputWrapperProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) {
-  const { size, invalid, valid, validId, focusRing, commit, hasCommit, labels, suggest } =
-    useInputContext();
+  const { size, invalid, valid, validId, commit, hasCommit, labels, suggest } = useInputContext();
   // The box anchors the suggestion list (as wide as the box).
   const setRefs = useMergedRefs(suggest?.anchorRef, ref);
 
@@ -386,7 +379,6 @@ function InputWrapper({ children, className, ref, ...rest }: InputWrapperProps) 
         size,
         invalid: invalid || undefined,
         valid: valid || undefined,
-        "focus-ring": focusRing,
       })}
     >
       {/* A Select among the children becomes the box's start segment. */}

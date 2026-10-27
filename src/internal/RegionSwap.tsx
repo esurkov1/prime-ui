@@ -12,7 +12,7 @@ import swapMotion from "./swapMotion.module.css";
 
 /**
  * The key of the loading state (foundation §7 rule 8): a swap into or out of it is the Skeleton
- * handing over to the data in place — the height settles at once and the fade is short.
+ * handing over to the data in place — the fade is short.
  */
 const LOADING = "loading";
 
@@ -20,25 +20,25 @@ const LOADING = "loading";
 const isLoad = (from: string | number | null, to: string | number) =>
   from === LOADING || to === LOADING;
 
-/** The axis a swap glides the size along: the height (a region) or the width (a cell of a row). */
+/** `"block"`: a region; `"inline"`: a cell of a row, whose width glides. */
 type SwapAxis = "block" | "inline";
 
 type RegionSwapProps = React.HTMLAttributes<HTMLDivElement> & {
   /**
    * Key of what the region shows (`"loading"`, `"ready"`, `"empty"`, `"error"`, a record id). A new
    * value swaps the old content for the new one; the same value updates in place. `"loading"` is
-   * the loading state: a swap into or out of it never glides the height.
+   * the loading state: a swap into or out of it fades on the short clock.
    */
   state: string | number;
-  /** The region takes its parent's height and every state fills it; the height never glides. */
+  /** The region takes its parent's height and every state fills it. */
   fill?: boolean;
   /**
-   * `"block"` — a region: the height glides, both states hold to the top edge. `"inline"` — a cell
-   * in a row (a control of a header's actions): the width glides, the states centre on the row's
-   * line and hold to the `align` edge.
+   * `"block"` — a region: it takes the new state's height at once, the old state lies over it from
+   * the top edge and fades out. `"inline"` — a cell in a row (a control of a header's actions): the
+   * width glides, the states centre on the row's line and hold to the `align` edge.
    */
   axis?: SwapAxis;
-  /** The edge both states hold to while the size glides: the cell's alignment in its row. */
+  /** The edge both states of an inline cell hold to while its width glides. */
   align?: "start" | "end";
   /**
    * After a swap, once the new state is in the document (focus already handed off from a leaving
@@ -55,73 +55,40 @@ type RegionSwapProps = React.HTMLAttributes<HTMLDivElement> & {
 
 type Layer = { key: string | number; children: React.ReactNode };
 
-/** The size of `node` along `axis`. */
-const sizeOf = (node: HTMLElement, axis: SwapAxis) =>
-  node.getBoundingClientRect()[axis === "inline" ? "width" : "height"];
+/** The width of an inline cell. */
+const widthOf = (node: HTMLElement) => node.getBoundingClientRect().width;
 
-/** Sizes this close are one size: a swap between them only cross-fades (no layout motion). */
+/** Widths this close are one width: a swap between them only cross-fades. */
 const GLIDE_TOLERANCE_PX = 2;
 
-/** Drops a running glide or hold: the root takes its natural size in this frame. */
+/** Drops a running width glide: the cell takes its natural width in this frame. */
 function settle(root: HTMLElement) {
   root.removeAttribute("data-resizing");
   root.style.removeProperty("--swap-size");
 }
 
-/** Holds `root` at `size` (the size on screen) while a swap waits out its hold. */
-function hold(root: HTMLElement, size: number) {
-  root.style.setProperty("--swap-size", `${size}px`);
-  root.setAttribute("data-resizing", "true");
-}
-
 /**
- * Starts the size glide of `root` from `from` (the size on screen) to its natural size; returns its
- * cleanup. Content of the new state that settles later (a part portalled in, an image) moves the
- * target, and the running glide turns to it from where it is.
+ * Starts the width glide of an inline cell from `from` (the width on screen) to its natural width;
+ * returns its cleanup.
  */
-function glide(
-  root: HTMLElement,
-  from: number,
-  axis: SwapAxis,
-  incoming: HTMLElement | undefined,
-): (() => void) | undefined {
+function glideWidth(root: HTMLElement, from: number): (() => void) | undefined {
   settle(root);
-  const to = sizeOf(root, axis);
+  const to = widthOf(root);
   if (Math.abs(from - to) <= GLIDE_TOLERANCE_PX) return;
-  hold(root, from);
-  root.getBoundingClientRect(); // commit the start size before the transition target
+  root.style.setProperty("--swap-size", `${from}px`);
+  root.setAttribute("data-resizing", "true");
+  root.getBoundingClientRect(); // commit the start width before the transition target
   root.style.setProperty("--swap-size", `${to}px`);
-  const property = axis === "inline" ? "width" : "height";
-  let target = to;
-  let base = incoming ? sizeOf(incoming, axis) : 0;
-  let timeout = 0;
   const finish = () => {
     stop();
     settle(root);
   };
-  const arm = () => {
-    window.clearTimeout(timeout);
-    timeout = window.setTimeout(finish, exitTimeoutMs("base"));
-  };
   const onEnd = (event: TransitionEvent) => {
-    if (event.target === root && event.propertyName === property) finish();
+    if (event.target === root && event.propertyName === "width") finish();
   };
-  const observer =
-    incoming && typeof ResizeObserver === "function"
-      ? new ResizeObserver(() => {
-          const size = sizeOf(incoming, axis);
-          if (Math.abs(size - base) < 1) return;
-          target += size - base;
-          base = size;
-          root.style.setProperty("--swap-size", `${target}px`);
-          arm();
-        })
-      : null;
-  observer?.observe(incoming as HTMLElement);
   root.addEventListener("transitionend", onEnd);
-  arm();
+  const timeout = window.setTimeout(finish, exitTimeoutMs("base"));
   function stop() {
-    observer?.disconnect();
     root.removeEventListener("transitionend", onEnd);
     window.clearTimeout(timeout);
   }
@@ -187,33 +154,29 @@ function fadeTo(node: HTMLElement, target: 0 | 1, clock: "base" | "fast", done?:
 
 /**
  * The region swap of the kit (foundation §7 rule 8): a region that changes what it shows (loading /
- * data / empty / error, another record) cross-fades — the old content stays as a leaving layer over
- * the new one and fades out (`fast` · exit) while the new one fades in. Between settled states the
- * new one fades in on `base` and the region glides from the height on screen to the new one, the
- * "height glide" exception of foundation §7 rule 5; heights within `GLIDE_TOLERANCE_PX` only
- * cross-fade. A swap into or out of `"loading"` is a load: the Skeleton and the data replace each
- * other in place — the height settles in one frame (the old layer clipped to it) and the fade is
- * short (`fast`). Nothing moves on the first render. Focus in the leaving state moves into the new
- * one (`handoffFocus`). Under reduced motion the old state goes at once and the height jumps; the
- * new one still fades in (rule 12). A region with nothing to show takes no room. `Crossfade` is
- * this region, public.
+ * data / empty / error, another record) cross-fades, opacity only. The region takes the new
+ * state's height at once — nothing glides, unfolds or is clipped in flow: the new state fades in
+ * where it stands (`base` between settled states, `fast` into or out of `"loading"`), and the old
+ * one lies over it from the top edge as a leaving layer and fades out (`fast` · exit). Only the
+ * leaving layer is clipped, to the region with room for what bleeds past it (a list
+ * row's wash, a focus ring), so a taller old state never paints over the content below. Nothing
+ * moves on the first render. Focus in the leaving state moves into the new one (`handoffFocus`).
+ * Under reduced motion the old state goes at once; the new one still fades in (rule 12). A region
+ * with nothing to show takes no room. `Crossfade` is this region, public.
  *
- * Every motion continues from where it is. The fades are the region's own (WAAPI from the opacity
- * on screen) and the height a transition, so a swap that turns back mid-motion — to a state still
- * fading out — reverses both in place: no restart from 0, no dip, no jump.
+ * The fades are the region's own (WAAPI from the opacity on screen), so a swap that turns back
+ * mid-fade — to a state still fading out — reverses in place: no restart from 0, no dip.
  *
  * A block swap waits out `--prime-motion-swap-hold` before it moves (`hold`): the old state stays
- * on screen and the region keeps its height while the new one, already in the document, is
- * unseen. A state that turns back within the hold is the old one again — not a frame of motion;
- * another state within it replaces the one that waited. The target height is measured once the
- * hold is over, when the new content has settled (a part portalled in on its second render), and
- * a glide follows the new content's later size changes from where it is. A swap out of
- * `"loading"` (the data arriving), a return to a state still on screen and an inline swap move at
- * once; `hold={false}` for a swap that follows a person's choice (another month, another pane).
+ * in flow on screen while the new one, already in the document, waits unseen over it. A state
+ * that turns back within the hold is the old one again — not a frame of motion; another state
+ * within it replaces the one that waited. A swap out of `"loading"` (the data arriving), a return
+ * to a state still on screen and an inline swap move at once; `hold={false}` for a swap that
+ * follows a person's choice (another month, another pane).
  *
  * `axis="inline"` is the content swap of one cell in a row (`src/internal/rowCells`): the same
- * cross-fade, the width gliding instead of the height, both states held to the cell's `align`
- * edge, so whatever stands beyond that edge never moves.
+ * cross-fade, the cell's width gliding from the old control's to the new one's, both states held
+ * to the cell's `align` edge, so whatever stands beyond that edge never moves.
  */
 export function RegionSwap({
   state,
@@ -276,10 +239,9 @@ export function RegionSwap({
     setLeaving((list) => list.filter((layer) => layer.key !== key));
   }, []);
 
-  // The swap is in the document: hand focus over; while it waits, hold the old state and the size
-  // on screen; then fade every layer to where it belongs from where it is and glide the size
-  // between settled states (a load settles it at once; under reduced motion the old state also
-  // goes before the new one is painted).
+  // The swap is in the document: hand focus over; while it waits, hold the old state shown and
+  // the new one unseen; then fade every layer to where it belongs from where it is (under reduced
+  // motion the old state goes before the new one is painted) and glide an inline cell's width.
   React.useLayoutEffect(() => {
     const root = rootRef.current;
     if (swap.count === 0 || !root) return;
@@ -291,12 +253,7 @@ export function RegionSwap({
       handoffFocus(left, incoming ?? root);
       latest.current.onSwap?.(state);
     }
-    // The size on screen: mid-glide or held the root's, else the old content's (the leaving
-    // layer, laid over in place), else nothing (the region had no box).
-    const onScreen = () =>
-      root.hasAttribute("data-resizing") ? sizeOf(root, axis) : left ? sizeOf(left, axis) : 0;
     if (swap.held) {
-      hold(root, onScreen());
       if (incoming) freeze(incoming, 0);
       for (const layer of leaving) {
         const node = layerRefs.current.get(layer.key);
@@ -313,6 +270,11 @@ export function RegionSwap({
       if (!fadeTargets.has(incoming)) fadeTargets.set(incoming, 0);
       fadeTo(incoming, 1, load ? "fast" : "base");
     }
+    // The width on screen of an inline cell: mid-glide the cell's, else the old control's.
+    const widthOnScreen = () =>
+      root.hasAttribute("data-resizing") ? widthOf(root) : left ? widthOf(left) : 0;
+    const glides = axis === "inline" && !fill && !load && !prefersReducedMotion();
+    const from = glides ? widthOnScreen() : 0;
     if (prefersReducedMotion()) {
       for (const layer of leaving) {
         const node = layerRefs.current.get(layer.key);
@@ -326,11 +288,11 @@ export function RegionSwap({
       const node = layerRefs.current.get(layer.key);
       if (node) fadeTo(node, 0, "fast", () => removeLayer(layer.key));
     }
-    if (fill || load) {
+    if (!glides) {
       settle(root);
       return;
     }
-    return glide(root, onScreen(), axis, incoming);
+    return glideWidth(root, from);
   }, [swap, removeLayer]);
 
   // The hold runs out: the swap moves.
@@ -368,6 +330,7 @@ export function RegionSwap({
         ref={layerRef(layer.key)}
         className={cx(styles.layer, styles.leaving)}
         data-state="closed"
+        data-on-screen={swap.held && layer.key === swap.from ? "true" : undefined}
         aria-hidden="true"
         inert
       >

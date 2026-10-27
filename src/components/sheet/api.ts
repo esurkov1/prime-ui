@@ -18,8 +18,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sheet.Content",
-      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge, as tall as its content, with a grab handle while it swipes. Header and footer are optional: without a header name it with `aria-label`.',
-      ru: 'Портал, подложка и панель `role="dialog"`, поднятая от нижнего края, высотой по содержимому, с ручкой, пока её можно смахнуть. Шапка и подвал не обязательны: без шапки назовите панель через `aria-label`.',
+      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge (on the on-screen keyboard), as tall as its content, with a grab handle while it swipes. Header and footer are optional: without a header name it with `aria-label`.',
+      ru: 'Портал, подложка и панель `role="dialog"` от нижнего края (над экранной клавиатурой), высотой по содержимому, с ручкой, пока её можно смахнуть. Шапка и подвал не обязательны; без шапки — `aria-label`.',
       props: dialogContentAriaProps,
     },
     ...dialogParts("Sheet", { value: '"end"' }),

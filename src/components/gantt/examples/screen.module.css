@@ -1,5 +1,5 @@
 /* Schedule: a work screen — the header carries the title and the tools, the page fills the app
-   panel (`AppShell.Root fillViewport` + `Page.Root fill`) and the chart takes the free
+   panel (`AppShell.Root` + `Page.Root fill`) and the chart takes the free
    height. */
 
 /* On a short screen the chart keeps room for a few rows; the page scrolls instead. */

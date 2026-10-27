@@ -87,7 +87,7 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| pane | toolbar switch (internal, starts at Preview) | preview stage or code pane is rendered; the switch cross-fades the two and glides the height (`internal/RegionSwap`); the device switch shows only with the preview |
+| pane | toolbar switch (internal, starts at Preview) | preview stage or code pane is rendered; the switch cross-fades the two (`internal/RegionSwap`); the device switch shows only with the preview |
 | viewport | `viewport` / `defaultViewport` | `data-viewport` on the preview viewport |
 | theme | `colorScheme` / `defaultColorScheme` | `data-theme` on the stage and code pane |
 | layout | `previewLayout` | `data-preview-layout` on the stage |

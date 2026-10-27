@@ -62,11 +62,15 @@ describe("scroll regions", () => {
  * (`overscroll-behavior-inline` / `-x`) is free: a page never scrolls sideways.
  */
 const CONTAIN_CSS: Record<string, string> = {
+  "styles/globals.css":
+    "the document under the viewport frame (`data-prime-frame`): it never scrolls, bounces nor pulls to refresh",
   "components/media-viewer/MediaViewer.module.css":
     "a full-screen layer: paging sideways must not swipe back nor bounce the page under it",
 };
 
 const CONTAIN_PROP: Record<string, string> = {
+  "layout/app-shell/AppShell.tsx":
+    "main in the viewport frame: the page's one scroller, nothing around it may scroll",
   "internal/overlay/DialogParts.tsx": "the body of Modal, Drawer and Sheet — an open layer",
   "internal/overlay/FloatingPanel.tsx":
     "the panel of Popover, Dropdown, Select… — an open layer (touch; the wheel: useContainScroll)",

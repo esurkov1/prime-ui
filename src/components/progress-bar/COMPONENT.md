@@ -133,7 +133,7 @@ ProgressBar              <div>; size, variant, tone (value mode), aria-busy whil
 | value | `value`, `max` | native `value` / `max`; the drawn pill slides by `translate` over `slow` + `standard`, RTL aware |
 | segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the group, `data-tone` or `data-color` per part; widths animate by `flex-grow` over `slow` |
 | rows | `layout="rows"`, `scale` | `data-layout="rows"` on the root, an `<ol>`; each bar slides like the value pill |
-| loading | `loading` | `aria-busy` on the root; Skeletons in place of the bar, the legend or the rows; the data cross-fades in and the height glides (`RegionSwap`) |
+| loading | `loading` | `aria-busy` on the root; Skeletons in place of the bar, the legend or the rows; the data cross-fades in (`RegionSwap`) |
 | steps / ticks | `variant` | the cells are drawn twice — the rest row and the fill row; one front reveals the fill row (`--pb-filled` of `--pb-cells` on the cells, `translate` over `slow` + `standard`, RTL aware) while the cells stand still, so a change caught mid-way goes on from where the front is and never splits into cells of their own. At rest the front stands mid-gap: a cell is always whole. Ticks follow the width (their count changes, never their size); a recolored tick fades (`fade-base`), a tick the front leaves keeps its color while the front passes it |
 | empty segments | `segments` empty or all `0` | only the track; accessible text `labels.empty` / `labels.allEmpty` |
 | reduced motion | `prefers-reduced-motion` | fill, widths and cells change instantly |

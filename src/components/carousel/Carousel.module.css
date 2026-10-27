@@ -33,7 +33,7 @@
 }
 
 .root:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
@@ -340,6 +340,17 @@
 }
 
 .dot:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
+}
+
+/* Touch: bigger dots and slots to aim at. */
+@media (pointer: coarse) {
+  .root {
+    --carousel-dot: var(--prime-space-2);
+  }
+
+  .dot {
+    inline-size: var(--prime-space-5);
+  }
 }

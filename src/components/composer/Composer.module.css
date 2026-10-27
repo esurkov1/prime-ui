@@ -24,7 +24,7 @@
 
 /* The attachment tray: one strip of tiles (FileUpload.Queue `layout="strip"`, a single row that
    scrolls sideways, so its height is one tile whatever the count) and the «как файлы» option.
-   A Crossfade: it fades and glides its height open and closed; empty, it takes no room. */
+   A Crossfade: it fades in and out at its own height; empty, it takes no room. */
 .tray {
   min-width: 0;
 }
@@ -99,6 +99,12 @@
   grid-row: 1;
   grid-column: 2;
   min-width: 0;
+}
+
+/* The caret is the focus indicator of the one field of the composer (foundation §7): its box
+   draws no ring, even where the app shows focus rings. */
+.input {
+  --prime-focus-ring-width: var(--prime-space-0);
 }
 
 /* Files dragged over the composer: an accent ring over the field, drawn on top of the Textarea. */

@@ -1065,8 +1065,8 @@ function ComposerRoot({
           <div className={styles.top}>
             {/* The tray: one strip of tiles — photos, videos and files in the order attached and
                 reordered (drag, Alt + arrows). One row that scrolls sideways, so the composer
-                never pushes the thread away. It opens and closes with a cross-fade and a height
-                glide; the row below never changes. */}
+                never pushes the thread away. It comes and goes with a cross-fade at its own
+                height; the row below never changes. */}
             <Crossfade state={uploads.length > 0 ? "tray" : "empty"} className={styles.tray}>
               {queue && uploads.length > 0 ? (
                 <div className={styles.trayBody} inert={disabled || pending}>
@@ -1114,8 +1114,7 @@ function ComposerRoot({
                 id={fieldId}
                 rows={1}
                 maxRows={MAX_ROWS}
-                // The caret is the focus indicator of the one field of the composer (foundation §7).
-                focusRing={false}
+                className={styles.input}
                 value={value}
                 placeholder={keyboardPlaceholder ?? labels.placeholder}
                 aria-label={labels.placeholder}

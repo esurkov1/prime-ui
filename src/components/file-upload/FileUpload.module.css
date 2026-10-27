@@ -96,10 +96,9 @@
   background: var(--prime-color-accent-soft);
 }
 
-/* `focusRing={false}` on the root (`data-focus-ring` on the field) hides only this ring; an
-   invalid zone rings in danger (`--fu-ring`). */
-.root:has(.input:focus-visible):not(:where([data-focus-ring="false"] *)) {
-  outline: var(--prime-focus-width) solid var(--fu-ring);
+/* The focus ring of the zone; an invalid zone rings in danger (`--fu-ring`). */
+.root:has(.input:focus-visible) {
+  outline: var(--prime-focus-ring-width) solid var(--fu-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 

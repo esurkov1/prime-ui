@@ -29,7 +29,7 @@
 }
 
 /*
- * A screen that fills the panel's height (`Page.Root fill`, `AppShell.Root fillViewport` among its
+ * A screen that fills the panel's height (`Page.Root fill`, `AppShell.Root` among its
  * top-level elements): a viewport-high column it can take the height of.
  */
 .screen:has(> [data-fill], > [data-fill-viewport]) {

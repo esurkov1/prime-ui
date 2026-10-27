@@ -30,7 +30,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Selection mode | `multiple` | One vs many (Select, Accordion) — never `type`. `mode` only for structurally different values (Datepicker `single \| range`). |
 | Status words | `selected`, `current`, `pressed` | `current` marks a navigation location (`Sidebar.Item`, `Breadcrumb.Item`) and sets `aria-current`; `pressed` a toggle button. |
 | Flags | `disabled`, `readOnly`, `required`, `optional`, `loading`, `fullWidth` | Same names everywhere. |
-| Focus ring | `focusRing` (default `true`) | Fields only; `false` only where focus is obvious otherwise. |
+| Focus ring | no prop | Off by default; `data-focus-ring="visible"` on `<html>` (or a wrapper) turns every ring of the kit on. |
 | System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults; values as `{token}` templates. Visible content goes in children or props. |
 | Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `Skeleton`, `Crossfade`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Sparkline`, `Pagination`, `DataTable`, `Gantt`, `Fieldset`, `VisuallyHidden`, `ColorField`, `ExampleFrame`, `VoicePlayer`, `VideoNote`, `ScrollContainer`, `Gallery`, `MediaViewer`, `RichText`. This is the one list; other files link here. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`, `Badge.Group`). |
 | Slots | `X.Trigger`, `X.Close`, `X.Confirm`, `X.Anchor` | Your own button inside, exactly one element child; the slot renders no element and takes no `className` — style the child. A trigger the kit draws itself (`Select.Trigger`, `Accordion.Trigger`) is a real part with `className`. |
@@ -345,7 +345,7 @@ export function SigningDate({ error }: { error?: string }) {
 ## Loading without DataTable
 
 DataTable (`loading`), Select (`loading`) and Button (`loading`, `progress`) have built-in states. For
-any other card or region that loads: wrap its content in `Crossfade state={status}` with
+any other card or region inside a page or a dialog that loads: wrap its content in `Crossfade state={status}` with
 `aria-busy={status === "loading"}`, and render a `Skeleton` in the geometry of the data while it loads
 (same rows, gaps and heights). A `Spinner` only where there is no shape to hold. Show the error in
 place (a `Banner` for the page; for a region `EmptyPage tone="danger"` — it announces itself — with

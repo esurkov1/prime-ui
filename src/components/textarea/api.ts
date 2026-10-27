@@ -65,13 +65,6 @@ export const api: ComponentApi = {
           ru: "Красное внутреннее кольцо на рамке поля, `aria-invalid` на textarea. Непустой `error` включает его.",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides only the visual focus ring on the field box (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: '`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются. Атрибут — `data-focus-ring="false"`.',
-        },
-        {
           name: "counter",
           type: "ReactNode",
           en: "Right side of the support row, usually `<Textarea.Counter current max />`.",

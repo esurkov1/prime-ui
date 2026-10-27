@@ -32,10 +32,9 @@ import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldActionButton, type FieldActionButtonProps } from "@/internal/FieldAction";
-import type { FieldFocusRingProps, FieldRootDomProps } from "@/internal/FieldFrame";
+import type { FieldRootDomProps } from "@/internal/FieldFrame";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
@@ -101,14 +100,13 @@ export type ColorPickerRootProps = {
   children: React.ReactNode;
 };
 
-export type ColorPickerHexInputProps = FieldRootDomProps &
-  FieldFocusRingProps & {
-    label?: React.ReactNode;
-    hint?: React.ReactNode;
-    hintTone?: HintTone;
-    error?: React.ReactNode;
-    children?: React.ReactNode;
-  };
+export type ColorPickerHexInputProps = FieldRootDomProps & {
+  label?: React.ReactNode;
+  hint?: React.ReactNode;
+  hintTone?: HintTone;
+  error?: React.ReactNode;
+  children?: React.ReactNode;
+};
 
 export { parseColor };
 
@@ -298,18 +296,14 @@ function StripHexField() {
   );
 }
 
-export type ColorPickerChannelStripProps = DivProps & FieldFocusRingProps;
+export type ColorPickerChannelStripProps = DivProps;
 
 /** Channel row: eyedropper on the left, then the cells of the current format. */
-function ChannelStrip({ className, focusRing, ...rest }: ColorPickerChannelStripProps) {
+function ChannelStrip({ className, ...rest }: ColorPickerChannelStripProps) {
   const { format } = useColorPickerContext();
 
   return (
-    <div
-      {...rest}
-      className={cx(styles.channelStrip, className)}
-      {...toDataAttributes({ "focus-ring": focusRing })}
-    >
+    <div {...rest} className={cx(styles.channelStrip, className)}>
       <div className={styles.channelStripLead}>
         <EyeDropperButton className={styles.channelStripEyedropperBtn} />
       </div>
@@ -523,27 +517,12 @@ function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
   );
 }
 
-function HexInput({
-  label,
-  hint,
-  hintTone,
-  error,
-  focusRing,
-  children,
-  ...rest
-}: ColorPickerHexInputProps) {
+function HexInput({ label, hint, hintTone, error, children, ...rest }: ColorPickerHexInputProps) {
   const { labels } = useColorPickerContext();
   const { inputRef, text, setText, commit } = useColorDraft(toHexText, parseHex);
 
   return (
-    <Input.Root
-      {...rest}
-      label={label ?? labels.hex}
-      hint={hint}
-      hintTone={hintTone}
-      error={error}
-      focusRing={focusRing}
-    >
+    <Input.Root {...rest} label={label ?? labels.hex} hint={hint} hintTone={hintTone} error={error}>
       <Input.Wrapper>
         <Input.Field
           ref={inputRef}

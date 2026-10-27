@@ -19,8 +19,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "One of five steps of metrics: `xs` (padding 12), `s` (16), `m` (20), `l` (24), `xl` (28) with the type, the mark and the controls inside. The width comes from the grid, not from the size.",
-          ru: "Одна из пяти ступеней мер: `xs` (отступ 12), `s` (16), `m` (20), `l` (24), `xl` (28) вместе с текстом, меткой и контролами внутри. Ширину задаёт сетка, не размер.",
+          en: "Five steps of metrics: `xs` (padding 12), `s` (16), `m` (20), `l` (24), `xl` (28) with the type, the mark and the controls; in a container under 30rem (a phone) the padding is 12 · 16 · 16 · 20 · 24.",
+          ru: "Одна из пяти ступеней мер: `xs` (отступ 12), `s` (16), `m` (20), `l` (24), `xl` (28) с текстом, меткой и контролами; в компактном контейнере (уже 30rem, телефон) отступ на шаг меньше: 12 · 16 · 16 · 20 · 24.",
         },
         {
           name: "selected",

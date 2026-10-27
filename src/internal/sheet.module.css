@@ -5,7 +5,8 @@
  *   .scrim       the dimmed page behind a modal layer; it follows a swipe of the panel above it
  *   .surface     a raised panel standing on the bottom edge (Sheet, a Modal or a floating layer as
  *                a phone sheet): top corners, its own fill continued past the edge
- *   .handle      the grab bar strip at the top edge (`data-swipe-handle`); a drag starts here
+ *   .handle      the grab bar strip at the top edge (`data-swipe-handle`, a touch target tall,
+ *                the bar small); a drag starts here or on a header right under it
  *   .swipeY      a panel that follows a vertical drag (`--swipe-offset` from useSwipeDismiss)
  *
  * While `data-swiping` is set the panel follows the pointer with no transition; on release it
@@ -39,18 +40,29 @@
  * sets the width (full width by default; Sheet centres at `--prime-sheet-width`).
  */
 .surface {
+  /* What the keyboard leaves (useKeyboardInset writes the insets of the visual viewport): the
+     sheet stands on the keyboard and its top gap counts from the visible top. */
+  --sheet-bottom: var(--visual-inset-bottom, var(--prime-space-0));
+
   position: fixed;
   right: 0;
-  bottom: 0;
+  bottom: var(--sheet-bottom);
   left: 0;
   z-index: var(--prime-z-overlay);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  /* Clear of the safe-area insets (`--prime-safe-area-*`): the top gap starts under the top inset,
-     the content ends over the bottom one while the fill runs on to the edge. */
-  max-height: calc(100dvh - var(--prime-sheet-top-gap) - var(--prime-safe-area-top));
+  /* Height by content, up to the room it has: clear of the safe-area insets
+     (`--prime-safe-area-*`) — the top gap starts under the top inset, the content ends over the
+     bottom one while the fill runs on to the edge — and of the keyboard. */
+  max-height: calc(
+    100dvh -
+    var(--sheet-bottom) -
+    var(--visual-inset-top, var(--prime-space-0)) -
+    var(--prime-sheet-top-gap) -
+    var(--prime-safe-area-top)
+  );
   margin: 0 auto;
   padding-block-end: var(--prime-safe-area-bottom);
   border-radius: var(--prime-sheet-radius) var(--prime-sheet-radius) 0 0;
@@ -62,12 +74,22 @@
   outline: none;
 }
 
+/* On the keyboard: the home indicator is under it, the content ends at its own padding. */
+.surface[data-keyboard] {
+  padding-block-end: var(--prime-space-0);
+}
+
+/*
+ * The strip is a touch target tall (44, WCAG 2.5.5), the bar in it stays small; it is the top air
+ * of the sheet, so the zone under it starts with no air of its own (each host drops it). A header
+ * under the strip is part of the drag surface, so the strip keeps only its own small height there.
+ */
 .handle {
   display: flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  height: var(--prime-sheet-handle-area);
+  height: max(var(--prime-sheet-handle-area), var(--prime-control-touch-target));
   /* The strip is the drag surface: no browser panning starts from it. */
   touch-action: none;
   cursor: grab;
@@ -79,6 +101,12 @@
   height: var(--prime-sheet-handle-height);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-fill-strong);
+}
+
+/* A header right under the strip: the header is the rest of the grab area (its row is 40 and more),
+   so the strip is only the bar's own room. */
+.handle:has(+ header) {
+  height: var(--prime-sheet-handle-area);
 }
 
 /* A header right under the handle drops its top air: the handle strip is that air. It is part of

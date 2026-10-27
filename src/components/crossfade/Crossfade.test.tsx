@@ -51,7 +51,7 @@ describe("Crossfade", () => {
     vi.useRealTimers();
   });
 
-  it('the data replaces the "loading" skeleton in place: no height glide, a short fade', () => {
+  it('the data replaces the "loading" skeleton in place: at once, a short fade', () => {
     const motion = withMotion();
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
       this: HTMLElement,
@@ -70,7 +70,6 @@ describe("Crossfade", () => {
     );
     const root = container.firstElementChild as HTMLElement;
     expect(root).not.toHaveAttribute("data-resizing");
-    expect(root.style.getPropertyValue("--swap-height")).toBe("");
     const fadeIn = motion.on(layerOf("Платежи")).at(-1);
     expect((fadeIn?.options as KeyframeAnimationOptions).duration).toBe(230);
     vi.restoreAllMocks();
@@ -101,7 +100,7 @@ describe("Crossfade", () => {
     expect(container.firstElementChild).toHaveAttribute("data-fill", "true");
   });
 
-  it("content that mounts already loaded appears in place: no height glide, no fade", () => {
+  it("content that mounts already loaded appears in place: no fade", () => {
     const motion = withMotion();
     // A remounted tab with cached data: the region would glide from zero if it treated its
     // first state as a swap.
@@ -120,7 +119,6 @@ describe("Crossfade", () => {
     );
     const root = container.firstElementChild as HTMLElement;
     expect(root).not.toHaveAttribute("data-resizing");
-    expect(root.style.getPropertyValue("--swap-height")).toBe("");
     expect(root.children).toHaveLength(1);
     expect(motion.animations).toHaveLength(0);
   });

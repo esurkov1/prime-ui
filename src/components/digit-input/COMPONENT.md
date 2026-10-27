@@ -56,7 +56,6 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | `mask` | `boolean` | `false` | Hides the digits (PIN): cells are `type="password"`. |
 | `name` | `string` | — | Name of a hidden input that carries the joined code in a native form submit. |
 | `autoFocus` | `boolean` | `false` | Focuses the first empty cell on mount. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on the cells (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
 | `id` | `string` | — | Id of the first cell (the label points at it); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids on the group. |
 | `labels` | `Partial<DigitInputLabels>` | — | Built-in strings, see Labels. |
@@ -83,14 +82,12 @@ No `variant` or `tone`.
 | `groupSize` | an extra gap before every group (`3` → 123 456) | codes of six digits and longer | — |
 | `mask` | dots instead of digits | PIN codes | `false` |
 | `required` / `optional` | red `*` / muted «необязательно» after the label | mark the minority of the form | — |
-| `focusRing` | `false`: no focus ring; the focus fill and the caret remain | a single code on a screen where focus is obvious | `true` |
 | `autoFocus` | the entry cell takes focus on mount | the code is the one task of its step (a verification screen) | `false` |
 
 **Combinations**
 - Recommended: `onComplete` returning the check's promise — the field waits, shows success or clears and shows the reason; or, checking by hand, `error` set after a rejected code and cleared in `onValueChange`.
 - `error` and `success` you pass win over the `onComplete` check.
 - Pointless: `invalid` together with `error`; `length` larger than the real code.
-- Forbidden: `focusRing={false}` without another focus indicator (WCAG 2.4.7).
 
 ## States
 | State | Driven by | DOM |
@@ -105,7 +102,6 @@ No `variant` or `tone`.
 | group start | `groupSize` | `data-group-start="true"` on the first cell of every group |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the fieldset and the frame, `aria-invalid="true"` on cells; the digits turn `danger-text` and the focus ring `danger-border`; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | `data-disabled="true"` and native `disabled` on the fieldset, every cell disabled, label and hint dimmed |
-| no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the fieldset |
 
 `data-size` is set on the frame, the fieldset and every cell. Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (+ `onValueChange` to observe).
 
@@ -158,7 +154,6 @@ No `variant` or `tone`.
 | [grouped.tsx](examples/grouped.tsx) | A long code read in chunks with a wider gap between groups — `groupSize`. |
 | [full-width.tsx](examples/full-width.tsx) | Cells that share the container width and keep the tier height, above a full-width button — `fullWidth`. |
 | [on-complete.tsx](examples/on-complete.tsx) | The code is checked on the server as soon as the last cell is filled: the cells wait, a right one turns them success, a wrong one clears them and shakes in the reason — `onComplete`, `hint`. |
-| [without-focus-ring.tsx](examples/without-focus-ring.tsx) | The one code on a pickup point screen, where the caret and the lighter fill of the entry cell show focus — `focusRing`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the code and clears it with a button — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A masked card PIN submitted with a form; a short or wrong PIN shakes in an error that leaves when you type again — `name`, `mask`, `required`, `error`. |
 

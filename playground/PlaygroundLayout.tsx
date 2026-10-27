@@ -26,7 +26,6 @@ export function PlaygroundLayout() {
   return (
     <PlaygroundChromeProvider value={chrome}>
       <AppShell.Template
-        fillViewport
         scrollResetKey={pathname}
         mainProps={{ id: "playground-main", tabIndex: -1 }}
         nav={

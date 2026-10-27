@@ -579,33 +579,6 @@ describe("Input field system", () => {
   });
 });
 
-describe("Input focusRing", () => {
-  it("focusRing={false} marks the wrapper and keeps the invalid state", () => {
-    render(
-      <Input.Root focusRing={false} invalid>
-        <Input.Wrapper>
-          <Input.Field aria-label="Поиск" />
-        </Input.Wrapper>
-      </Input.Root>,
-    );
-    const wrapper = screen.getByRole("textbox", { name: "Поиск" }).parentElement;
-    expect(wrapper).toHaveAttribute("data-focus-ring", "false");
-    expect(wrapper).toHaveAttribute("data-invalid", "true");
-    expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
-  });
-
-  it("omits the attribute by default", () => {
-    render(
-      <Input.Root>
-        <Input.Wrapper>
-          <Input.Field aria-label="Имя" />
-        </Input.Wrapper>
-      </Input.Root>,
-    );
-    expect(screen.getByRole("textbox").parentElement).not.toHaveAttribute("data-focus-ring");
-  });
-});
-
 describe("Input support row", () => {
   it("keeps an empty support row without hint, error, counter or reserve", () => {
     render(

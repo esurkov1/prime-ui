@@ -65,7 +65,7 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, soft hidden edges
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `auto` | At its end up or down the scroll goes on to the page (or the region around); a region that does not scroll never holds the wheel. Sideways it stops without a bounce: a page never scrolls sideways, and a sideways chain would swipe the browser's history | every region on a page: lists, tables, boards, chats, code | yes |
-| `contain` | Reaching the end on either axis does not scroll what is behind | an open layer — Modal / Drawer / Sheet body, a floating panel, the CommandMenu list set it themselves; a panel of your own that floats over the page | |
+| `contain` | Reaching the end on either axis does not scroll what is behind; the region still bounces by itself | an open layer — Modal / Drawer / Sheet body, a floating panel, the CommandMenu list set it themselves; `AppShell.Main` in the viewport frame (`fillViewport`), where nothing around the page may scroll; a panel of your own that floats over the page | |
 | `none` | `contain` without the overscroll glow / bounce | a full-screen layer of your own | |
 
 ### edges

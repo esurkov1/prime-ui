@@ -44,7 +44,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel;
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `fillViewport` | `boolean` | `false` | The shell is exactly the viewport high and only `AppShell.Main` scrolls; otherwise the document scrolls and the nav is sticky. |
+| `fillViewport` | `boolean` | `true` | The app frame: fixed to the viewport, only `AppShell.Main` scrolls; the document stays still (no rubber band, no pull-to-refresh). A nested shell is a box. `false`: a document page, the document scrolls. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Nav, Main, Footer), `className` and the other div attributes. |
 
 ### AppShell.Nav
@@ -55,7 +55,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel;
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (usually `Sidebar.Root`), `className` and the other div attributes. |
 
 ### AppShell.Main
-`ref` → `HTMLElement`. The `<main>` where the page renders: a vertical `ScrollContainer` that hands `Page.Root` the gutters and top air (`--page-gutter`, `--page-top`).
+`ref` → `HTMLElement`. The `<main>` where the page renders: a vertical `ScrollContainer` that hands `Page.Root` the gutters and top air (`--page-gutter`, `--page-top`) and keeps room under a floating `BottomNav`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -82,7 +82,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel;
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `fillViewport` | `boolean` | `false` | As on `AppShell.Root`: only `<main>` scrolls. |
+| `fillViewport` | `boolean` | `true` | As on `AppShell.Root`: the app frame, only `<main>` scrolls. |
 | `nav` | `ReactNode` | — | Navigation column content; without it the panel takes the full width. |
 | `footer` | `ReactNode` | — | Footer content (`BottomNav`); no footer when omitted. |
 | `mainProps` | `Omit<AppShellMainProps, "children">` | — | Props for Main (`id`, `tabIndex` for a skip link). |
@@ -116,8 +116,8 @@ The navigation of the nearest `AppShell.Root` for a trigger outside the rail (a 
 ### fillViewport (Root)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `false` | Shell at least viewport high; the document scrolls; nav sticks to the top | Content sites, simple apps | yes |
-| `true` | Shell exactly viewport high; only Main scrolls; nav and the page's sticky top bar stay put | Dense apps with a fixed frame | |
+| `true` | The app frame: the top-level shell is fixed to the viewport (`position: fixed; inset: 0`), only Main scrolls and holds its overscroll, the document under it stays still — no rubber band, no pull-to-refresh, no shift after the keyboard; nav, the page's top bar and the BottomNav stay put. A shell nested in a page or a preview stays a box of the height its host gives | Apps — every app on a phone, an installed PWA, a WebView | yes |
+| `false` | Shell at least viewport high; the document scrolls; nav sticks to the top | A page that is a document (a content site, an article) | |
 
 ### Structure
 | Value | Looks like | Use when | Default |
@@ -133,6 +133,7 @@ The navigation of the nearest `AppShell.Root` for a trigger outside the rail (a 
 | State | Driven by | DOM |
 |---|---|---|
 | fixed frame | `fillViewport` | `data-fill-viewport="true"` on Root |
+| viewport frame | `fillViewport` (on by default) on the outermost shell (not inside another shell or `ExampleFrame`) | `data-frame="viewport"` on Root, `data-prime-frame` on `<html>` while it is mounted |
 | navigation column | an `AppShell.Nav` child | `data-nav="true"` on Root (two grid columns) |
 | off-canvas navigation | the Sidebar publishes that it is an off-canvas panel (`offCanvas="auto"` on a phone, `"always"`) | `data-off-canvas="true"` on Root; `useAppShellNav()` reports `offCanvas`, `open`, `navId` |
 | floating action entering | an `AppShell.Fab` mounted on a shell already shown | `enterMotion.enter` on its holder (a pop from `--prime-motion-scale-pop`); still when it mounts with the shell |
@@ -140,13 +141,14 @@ The navigation of the nearest `AppShell.Root` for a trigger outside the rail (a 
 
 ## Layout & spacing
 - Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (the Sidebar rail is layer 1, the panel the page: white rail beside a gray page in light, a rail one step lighter than the near-black page in dark).
-- Main hands the page its edge air: `--page-gutter` is the page gutter `--prime-layout-gutter` — `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px; `--page-top` is `--prime-space-6` (24) → `--prime-space-8` (32) from 1024px. `Page.Root` pads itself with them (its top bar steps out to the panel's edges). Main itself pads only the bottom: `--prime-space-16`, the scroll tail of a long page. Inside Main the page gutter is the small one again, so a frame nested in the page starts from its own gutter, not the shell's.
-- A page that fills the panel height (`Page.Root fill`): Main's bottom padding drops to the side gutter, so no long scroll tail stays under it — beside the Sidebar rail too.
-- Main hands its scroll on at its end (ScrollContainer `overscrollBehavior="auto"`): without `fillViewport` it is not a scroller and the document scrolls under the pointer.
-- Nav column: sticky at the top, viewport high, `z-index: --prime-z-sticky` (above the panel, so the compact Sidebar toggle can ride the rail edge); with `fillViewport` it fills the shell height instead.
+- Main hands the page its edge air: `--page-gutter` is the page gutter `--prime-layout-gutter` — `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px; `--page-top` is `--prime-space-6` (24) → `--prime-space-8` (32) from 1024px. `Page.Root` pads itself with them (its top bar steps out to the panel's edges). Main itself keeps only the bottom air, as a spacer after the page (a scroller's end padding does not scroll in every engine): `--prime-space-16`, the scroll tail of a long page. Inside Main the page gutter is the small one again, so a frame nested in the page starts from its own gutter, not the shell's.
+- A page that fills the panel height (`Page.Root fill`): Main's bottom air drops to the side gutter, so no long scroll tail stays under it — beside the Sidebar rail too.
+- The viewport frame (the outermost shell with `fillViewport`, on by default) is fixed to the layout viewport, so it follows the browser's collapsing toolbars and the document has nothing to scroll; `<html data-prime-frame>` (globals.css) sets `overflow: hidden` and `overscroll-behavior: none` on `html` and `body`. Main there is the page's one scroller and holds its overscroll (ScrollContainer `overscrollBehavior="contain"`): it scrolls with momentum and bounces by itself, and nothing inside it chains to the document. Where iOS ignores those properties, a touch guard (`useViewportFrame`) cancels a vertical gesture that no scroller under the finger can take, and a document iOS panned for the keyboard goes back to its origin once no field is focused.
+- Outside the viewport frame Main hands its scroll on at its end (`overscrollBehavior="auto"`): with `fillViewport={false}` it is not a scroller and the document scrolls under the pointer; a nested fill shell (an example, a preview) hands it on to the page around it.
+- Nav column: fills the shell height, `z-index: --prime-z-sticky` (above the panel, so the compact Sidebar toggle can ride the rail edge); with `fillViewport={false}` it is sticky at the top and viewport high instead.
 - Footer: no padding of its own (BottomNav keeps the bottom safe-area inset), inside the dock — the last zone of the panel, sticky at the bottom, `z-index: --prime-z-sticky`.
 - Fab: in the dock's bottom end corner, `--prime-layout-gutter` from the panel's end edge plus `--prime-safe-area-right`. Its height above the dock follows what is on screen: no bar (no footer, or the Sidebar rail on screen) — the gutter plus `--prime-safe-area-bottom`; a flat BottomNav — a gutter above the bar; a floating BottomNav — `--prime-bottom-nav-floating-inset` above the capsule (its height grows to the touch row on a coarse pointer), lined up with its end edge. Several stack in a column `--prime-space-3` apart. Over the page and its sticky top bar (the dock comes after main on the same layer), under every overlay and its scrim (the panel is isolated; a modal layer makes it inert).
-- A floating BottomNav (`floating`) in the footer: the footer takes no height, the capsule overlays the page, and Main keeps extra bottom room (the capsule height and the safe-area inset) so its last line never ends up under it.
+- A floating BottomNav (`floating`) in the footer: the footer takes no height, the capsule stands `--prime-bottom-nav-floating-inset` above the frame's bottom safe area — the same place on every page — and overlays the page. Main keeps exactly the capsule's room under its last line — the inset, the capsule height (the touch row on a coarse pointer, icons only lower), `--prime-safe-area-bottom` and a page gutter — so the last block scrolls up to a gutter above the glass.
 - The panel is the page (layer 0 of the surface ladder, gray in light): fields on it take the page fill, a Card inside is layer 1 — white in light with the raised whisper — and cards in cards go deeper.
 - Safe-area insets: the frame and every edge part of the kit (the page's top bar, BottomNav, the floating BottomNav room in Main, Drawer, the off-canvas Sidebar panel, a centred Modal, bottom sheets, Notification zones, MediaViewer) read the container's outer insets from `--prime-safe-area-*` (`top`, `right`, `bottom`, `left`), declared once on `:root` with `env(safe-area-inset-*)` as the value. An app whose host draws over the web view and reports the insets its own way sets those four variables on `:root` once, after the kit's styles; nothing else changes.
 
@@ -175,15 +177,15 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | The app frame: Sidebar in the nav column, the page in main with its title and action in its top bar; only main scrolls — `fillViewport`. |
+| [overview.tsx](examples/overview.tsx) | The app frame: Sidebar in the nav column, the page in main with its title and action in its top bar; only main scrolls — `AppShell.Nav`, `AppShell.Main`. |
 | [footer.tsx](examples/footer.tsx) | A phone app without a Sidebar: the bar in the footer stays at the bottom while main scrolls under it — `AppShell.Footer`. |
 | [fab.tsx](examples/fab.tsx) | The app's floating main action: in the corner beside the Sidebar rail on a wide screen, above the floating BottomNav on a phone, under the Drawer it opens — `AppShell.Fab`. |
 | [template.tsx](examples/template.tsx) | Root, nav, main and footer in one component; main scrolls back to the top whenever the page changes — `AppShell.Template`, `scrollResetKey`. |
-| [screen.tsx](examples/screen.tsx) | The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone whose More item opens the Sidebar, the page top bar with the menu button it draws by itself, the page title with a line of data, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`, `useAppShellNav`. |
+| [screen.tsx](examples/screen.tsx) | The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone whose More item opens the Sidebar, the page top bar with the menu button it draws by itself, the page title with a line of data, and a simple home page, and each section rendered at once in its place — `scrollResetKey`, `useAppShellNav`. |
 
 ## Mistakes
 - Adding padding around the page content → `Page.Root` takes the gutters Main hands it.
-- Wrapping Main content in another scroll container → Main scrolls (with `fillViewport`) or the document does.
+- Wrapping Main content in another scroll container → Main scrolls (or the document, with `fillViewport={false}`).
 - A border or shadow between nav and panel → the fill change is the boundary.
 - Putting the Sidebar directly in Root without `AppShell.Nav` → it lands inside the content panel.
 - BottomNav anywhere but `AppShell.Footer` → it stays next to the Sidebar rail on a desktop; the footer is what leaves while the rail is on screen.

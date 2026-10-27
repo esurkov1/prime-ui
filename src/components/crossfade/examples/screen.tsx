@@ -80,7 +80,7 @@ export default function CrossfadeScreenExample() {
       </Page.TopBar>
       <Page.Body>
         {/* The page banner and the panels are one block: the banner, with the 40 below it, comes and
-            goes inside a Crossfade, so the panels glide instead of jumping. */}
+            goes inside a Crossfade, so it fades in and out instead of flipping. */}
         <div className={styles.lead}>
           <Crossfade state={status === "error" ? "error" : "ok"}>
             {status === "error" ? (

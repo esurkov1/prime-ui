@@ -219,13 +219,6 @@ export const api: ComponentApi = {
           ru: "`field` — поле. `status` — чип цвета выбранного пункта (`color`) со стрелкой: статус в плотной строке или ячейке таблицы (в шапке и подвале поверхности — `field`).",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring.',
-          ru: '`false` скрывает кольцо фокуса, но не фокус и не кольцо ошибки. Атрибут — `data-focus-ring="false"`.',
-        },
-        {
           name: "id",
           type: "string",
           en: "Id of the trigger; generated when omitted.",

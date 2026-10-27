@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { useViewportFrame } from "@/hooks/useScrollLock";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -67,17 +68,29 @@ type FabDock = { dock: HTMLElement | null };
 const [FabDockProvider, useFabDock] = createComponentContext<FabDock>("AppShell");
 
 /**
+ * The frame around: `viewport` — the top-level shell (`fillViewport`, on by default) owns the
+ * viewport (the document is still, only its scrollers move); `box` — any other shell or a frame of
+ * its own (a preview), which keeps the page around it as it is; `null` outside a shell.
+ */
+type ShellFrame = "viewport" | "box" | null;
+
+const FrameContext = React.createContext<ShellFrame>(null);
+FrameContext.displayName = "AppShellFrameContext";
+
+/**
  * Starts a frame of its own inside a shell: a preview of a screen (`ExampleFrame`) is not the
  * page, so a Sidebar in it and the menu button of its top bar stay in the preview instead of
  * joining the shell around it.
  */
 export function AppShellBoundary({ children }: { children?: React.ReactNode }) {
   return (
-    <PublishContext.Provider value={null}>
-      <NavContext.Provider value={null}>
-        <FabDockProvider value={null}>{children}</FabDockProvider>
-      </NavContext.Provider>
-    </PublishContext.Provider>
+    <FrameContext.Provider value="box">
+      <PublishContext.Provider value={null}>
+        <NavContext.Provider value={null}>
+          <FabDockProvider value={null}>{children}</FabDockProvider>
+        </NavContext.Provider>
+      </PublishContext.Provider>
+    </FrameContext.Provider>
   );
 }
 
@@ -106,7 +119,12 @@ AppShellNav.displayName = "AppShell.Nav";
  * (wherever in the shell it is rendered). The root owns the navigation state the Sidebar
  * publishes.
  */
-function AppShellRoot({ fillViewport = false, className, children, ...rest }: AppShellRootProps) {
+function AppShellRoot({ fillViewport = true, className, children, ...rest }: AppShellRootProps) {
+  // Only the outermost shell owns the viewport: a shell inside a page or a preview stays a box.
+  const outer = React.useContext(FrameContext);
+  const frame: ShellFrame = fillViewport && outer === null ? "viewport" : "box";
+  useViewportFrame(frame === "viewport");
+
   const [nav, setNav] = React.useState<AppShellNavState | null>(null);
   const publishNav = React.useCallback(
     (next: AppShellNavState | null) => setNav((prev) => (sameNav(prev, next) ? prev : next)),
@@ -124,32 +142,35 @@ function AppShellRoot({ fillViewport = false, className, children, ...rest }: Ap
   );
 
   return (
-    <PublishContext.Provider value={publishNav}>
-      <NavContext.Provider value={nav}>
-        <FabDockProvider value={fabDock}>
-          <div
-            {...rest}
-            className={cx(styles.root, className)}
-            {...toDataAttributes({
-              "fill-viewport": fillViewport || undefined,
-              nav: navColumn.length > 0 || undefined,
-              "off-canvas": nav?.offCanvas || undefined,
-            })}
-          >
-            {navColumn}
-            <div className={styles.panel}>
-              {panel}
-              {/* After main: the floating actions come after the page in the focus order, before
+    <FrameContext.Provider value={frame}>
+      <PublishContext.Provider value={publishNav}>
+        <NavContext.Provider value={nav}>
+          <FabDockProvider value={fabDock}>
+            <div
+              {...rest}
+              className={cx(styles.root, className)}
+              {...toDataAttributes({
+                "fill-viewport": fillViewport || undefined,
+                frame: frame === "viewport" ? frame : undefined,
+                nav: navColumn.length > 0 || undefined,
+                "off-canvas": nav?.offCanvas || undefined,
+              })}
+            >
+              {navColumn}
+              <div className={styles.panel}>
+                {panel}
+                {/* After main: the floating actions come after the page in the focus order, before
                 the phone navigation. */}
-              <div className={styles.dock}>
-                <div ref={setDock} className={styles.fabs} />
-                {footer}
+                <div className={styles.dock}>
+                  <div ref={setDock} className={styles.fabs} />
+                  {footer}
+                </div>
               </div>
             </div>
-          </div>
-        </FabDockProvider>
-      </NavContext.Provider>
-    </PublishContext.Provider>
+          </FabDockProvider>
+        </NavContext.Provider>
+      </PublishContext.Provider>
+    </FrameContext.Provider>
   );
 }
 AppShellRoot.displayName = "AppShell.Root";
@@ -206,13 +227,17 @@ export type AppShellMainProps = React.HTMLAttributes<HTMLElement> & {
 
 /**
  * `<main>`, where the page renders: it hands the page the shell's gutters and top air
- * (`Page.Root` takes them) and keeps the bottom air; scrolls inside the panel when `fillViewport`
- * is set, so a sticky `Page.TopBar` sticks to its top.
+ * (`Page.Root` takes them) and keeps the bottom air; scrolls inside the panel with `fillViewport`
+ * (the default), so a sticky `Page.TopBar` sticks to its top. In the viewport frame it is the
+ * page's one scroller and holds its own overscroll: it bounces by itself and never hands a scroll
+ * on to the still document (no pull-to-refresh of the frame).
  */
 function AppShellMain({ className, children, ...rest }: AppShellMainProps) {
+  const frame = React.useContext(FrameContext);
   return (
     <ScrollContainer
       {...rest}
+      {...(frame === "viewport" ? { overscrollBehavior: "contain" as const } : null)}
       as="main"
       axis="vertical"
       edges="none"

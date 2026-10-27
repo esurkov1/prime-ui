@@ -13,7 +13,7 @@ const ORDERS = [
 export default function PageOverviewExample() {
   return (
     <div className={styles.window}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Main>
           <Page.Root>
             <Page.TopBar>

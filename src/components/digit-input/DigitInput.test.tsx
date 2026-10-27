@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { cssRule, cssValue } from "@/test/css";
+
 import { DigitInput } from "./DigitInput";
 
 describe("DigitInput", () => {
@@ -169,15 +171,7 @@ describe("DigitInput field frame", () => {
   });
 });
 
-describe("DigitInput focusRing", () => {
-  it("focusRing={false} marks the group and keeps the invalid state", () => {
-    render(<DigitInput length={2} focusRing={false} invalid />);
-    const group = screen.getByRole("group", { name: "Код" });
-    expect(group).toHaveAttribute("data-focus-ring", "false");
-    expect(group).toHaveAttribute("data-invalid", "true");
-    expect(screen.getAllByRole("textbox")[0]).toHaveAttribute("aria-invalid", "true");
-  });
-
+describe("DigitInput fullWidth", () => {
   it("sets data-full-width on the group only with fullWidth", () => {
     const { rerender } = render(<DigitInput />);
     expect(screen.getByRole("group")).not.toHaveAttribute("data-full-width");
@@ -311,7 +305,13 @@ describe("DigitInput motion", () => {
     const { container } = render(<DigitInput length={4} label="Код" />);
     const ring = container.querySelector("fieldset > span[aria-hidden='true']");
     const cells = screen.getAllByRole("textbox");
-    expect(cells.every((cell) => cell.getAttribute("data-focus-ring") === "false")).toBe(true);
+    // Each cell is drawn with no ring width; the row's ring stands in for it.
+    expect(
+      cssValue(
+        cssRule("src/components/digit-input/DigitInput.module.css", ".cell"),
+        "--prime-focus-ring-width",
+      ),
+    ).toBe("var(--prime-space-0)");
     expect(ring).not.toHaveAttribute("data-visible");
     act(() => cells[0].focus());
     expect(ring).toHaveAttribute("data-visible");

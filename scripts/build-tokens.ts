@@ -1,5 +1,6 @@
 /**
  * `bun run tokens:build` — `tokens/*.ts` → `src/styles/{tokens,theme-light,theme-dark}.css`,
+ * (with the touch step of `touch.ts` under `@media (pointer: coarse)` at the end of the light file),
  * `src/internal/tokenDefaults.ts` and the off-grid list of foundation §1 rule 2 (between
  * `<!-- off-grid:start -->` and `<!-- off-grid:end -->` in `docs/foundation.md`).
  * Light is `semantic.ts` itself; dark is `semantic.ts` with `themes/dark.ts` laid over it, and its
@@ -21,6 +22,7 @@ import { OFF_GRID } from "../tokens/offGrid";
 import { primitiveTokens } from "../tokens/primitives";
 import { semanticTokens } from "../tokens/semantic";
 import { darkThemeOverrides } from "../tokens/themes/dark";
+import { touchTextOverrides } from "../tokens/touch";
 
 type TokenTree = { readonly [key: string]: string | number | TokenTree };
 type FlatTokens = Record<string, string>;
@@ -41,12 +43,27 @@ function flatten(tree: TokenTree, prefix = ""): FlatTokens {
 const primitives = flatten(primitiveTokens);
 const semantic = flatten(semanticTokens);
 const darkOverrides = flatten(darkThemeOverrides);
+const touchOverrides = flatten(touchTextOverrides);
 
 const errors: string[] = [];
 
 const unknown = Object.keys(darkOverrides).filter((key) => !(key in semantic));
 if (unknown.length > 0) {
   errors.push(`Dark theme overrides unknown semantic paths:\n- ${unknown.join("\n- ")}`);
+}
+
+/**
+ * The touch step changes type (a role's size / line height, a tier's text, label or hint, the text
+ * of a badge tier, the BottomNav label) and the marks of the controls (the Switch, the choice box,
+ * the Slider thumb) — never a height.
+ */
+const TOUCH_KEYS =
+  /^(text\.\w+\.(size|lineHeight)|control\.\w+\.((text|label|hint)?(Size|LineHeight|lineHeight)|icon|choice|thumb)|badge\.\w+\.(textSize|icon)|bottomNav\.(floatingL|l)abelSize|switch\.\w+\.(width|height|thumb))$/;
+for (const key of Object.keys(touchOverrides)) {
+  if (!(key in semantic)) errors.push(`touch.ts overrides an unknown semantic path: ${key}`);
+  else if (!TOUCH_KEYS.test(key))
+    errors.push(`touch.ts overrides a token the touch step does not own: ${key}`);
+  else if (touchOverrides[key] === semantic[key]) errors.push(`touch.ts repeats ${key}`);
 }
 
 const REFERENCE = /\{([^{}]+)\}/g;
@@ -79,6 +96,7 @@ const RAW_COLOR = /var\(|#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|oklch|oklab|lab|lch)\(/
 for (const [source, tokens] of [
   ["semantic.ts", semantic],
   ["themes/dark.ts", darkOverrides],
+  ["touch.ts", touchOverrides],
 ] as const) {
   for (const [key, value] of Object.entries(tokens)) {
     if (COMPUTED.test(key)) continue;
@@ -156,6 +174,23 @@ function cssBlock(selector: string, tokens: FlatTokens, prefix: string): string 
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => `  ${toVarName(key, prefix)}: ${resolve(value)};`);
   return `${HEADER}${selector} {\n${lines.join("\n")}\n}\n`;
+}
+
+/**
+ * The touch step (`tokens/touch.ts`) under the one input query, on the same selectors as the light
+ * theme: a nested `[data-theme]` subtree that re-declares the tokens takes the step too.
+ */
+const TOUCH_QUERY = "@media (pointer: coarse)";
+const THEME_SELECTOR = ':root,\n:root[data-theme="light"],\n[data-theme="light"]';
+
+function touchBlock(): string {
+  const selector = THEME_SELECTOR.split("\n")
+    .map((line) => `  ${line}`)
+    .join("\n");
+  const lines = Object.entries(touchOverrides)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `    ${toVarName(key, SYS_PREFIX)}: ${resolve(value)};`);
+  return `\n${TOUCH_QUERY} {\n${selector} {\n${lines.join("\n")}\n  }\n}\n`;
 }
 
 const dark = { ...semantic, ...darkOverrides };
@@ -238,7 +273,7 @@ await Promise.all([
   writeAtomic(path.join(stylesDir, "tokens.css"), cssBlock(":root", primitives, REF_PREFIX)),
   writeAtomic(
     path.join(stylesDir, "theme-light.css"),
-    cssBlock(':root,\n:root[data-theme="light"],\n[data-theme="light"]', semantic, SYS_PREFIX),
+    cssBlock(THEME_SELECTOR, semantic, SYS_PREFIX) + touchBlock(),
   ),
   writeAtomic(
     path.join(stylesDir, "theme-dark.css"),

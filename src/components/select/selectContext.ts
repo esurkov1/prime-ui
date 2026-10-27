@@ -30,7 +30,6 @@ export type SelectContextValue = {
   size: ControlSize;
   variant: SelectVariant;
   invalid: boolean;
-  focusRing: boolean | undefined;
   required: boolean;
   disabled: boolean;
   placeholder: string | undefined;

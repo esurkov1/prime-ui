@@ -505,7 +505,7 @@ button.reply {
 /* A quote that jumps gives under a press: `press.press`, joined in TSX. */
 
 button.reply:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 
@@ -820,7 +820,7 @@ button.reply:focus-visible {
 /* The press is `press.pressCompact`, joined in TSX. */
 
 .reaction:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 
@@ -917,6 +917,12 @@ button.reply:focus-visible {
   font-size: calc(var(--prime-avatar-xs) / 2);
 }
 
+@media (pointer: coarse) {
+  .reaction .stackOverflow {
+    font-size: calc(var(--prime-avatar-xs) * 0.55);
+  }
+}
+
 .emoji {
   font-size: var(--prime-text-body-m-size);
   line-height: 1;
@@ -930,5 +936,17 @@ button.reply:focus-visible {
     > :is(.gutter, .column, .retry) {
     opacity: var(--prime-opacity-dim);
     filter: saturate(var(--prime-message-dim-saturation));
+  }
+}
+
+/* Touch: the delivery ticks and the time step up together. */
+@media (pointer: coarse) {
+  .meta {
+    --prime-icon-size: var(--prime-icon-s);
+  }
+
+  .status {
+    inline-size: var(--prime-icon-s);
+    block-size: var(--prime-icon-s);
   }
 }

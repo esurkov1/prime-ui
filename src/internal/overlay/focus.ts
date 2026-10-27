@@ -74,8 +74,8 @@ const MODIFIERS = new Set(["Shift", "Control", "Alt", "Meta", "CapsLock"]);
 
 /**
  * Hides the focus ring of `el` until the person turns to the keyboard or focus leaves: the
- * `data-focus-quiet` attribute makes `--prime-color-focus-ring` transparent (globals.css), which
- * every ring of the kit is drawn with — whatever the browser decides about `:focus-visible`.
+ * `data-focus-quiet` attribute sets `--prime-focus-ring-width` to 0 (globals.css), which every
+ * ring of the kit is drawn with — whatever the browser decides about `:focus-visible`.
  */
 function quietRing(el: HTMLElement): void {
   el.setAttribute("data-focus-quiet", "");

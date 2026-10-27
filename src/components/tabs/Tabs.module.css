@@ -393,7 +393,7 @@
 }
 
 .tab:focus-visible::after {
-  box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-focus-ring);
+  box-shadow: inset 0 0 0 var(--prime-focus-ring-width) var(--prime-color-focus-ring);
 }
 
 @media (hover: hover) {
@@ -604,7 +604,7 @@
 
 /* No fill, no padding: the panel is the host's content. The focus ring sits just outside it. */
 .panel:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
   border-radius: var(--prime-radius-s);
 }

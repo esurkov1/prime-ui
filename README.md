@@ -21,8 +21,8 @@ every screen you build looks like it was drawn by the same hand.
 - **Built from itself.** Components reuse the kit's own Button, Badge, Spinner, Icon, Checkbox,
   EmptyPage and ScrollContainer instead of private copies, so a fix in one place lands everywhere.
 - **States flow, they never flip.** Controls move into their new state; a region that switches
-  between loading, data, empty and error cross-fades and glides to its new height (`Crossfade`),
-  and while it loads a `Skeleton` holds the shape of the coming content — so nothing on the page
+  between loading, data, empty and error cross-fades, opacity only, at its new height at once
+  (`Crossfade`), and while it loads a `Skeleton` holds the shape of the coming content — so nothing on the page
   jumps.
 - **Overlays that behave.** Modal, Drawer, Sheet, Popover, Dropdown, Select, Tooltip, CommandMenu and MediaViewer share
   one stack: one click or one Escape closes exactly the topmost layer, focus goes where it should.
@@ -88,6 +88,15 @@ Next.js, esbuild) keeps only the modules and the styles of the components you us
 few controls ships a few controls, not the whole kit. The base leaves the root font size to the
 browser. `data-theme="light" | "dark"` also works on any wrapper, so one page can show both themes.
 
+Focus rings are off by default: Tab still moves focus, but no ring is drawn. One attribute turns
+every ring of the kit on — buttons, fields, selects, tabs, rows:
+
+```html
+<html data-focus-ring="visible">
+```
+
+It works on any wrapper too, for one part of a page.
+
 `fonts.css` loads the faces from Google Fonts. Offline or under a strict CSP (`default-src 'self'`
 in a desktop app) leave it out and self-host them with `@fontsource/golos-text` (400, 500, 600) and
 `@fontsource/jetbrains-mono` (400, 500) — the token stacks find them by family name — or keep the
@@ -132,7 +141,6 @@ import { AppShell, Button, Icon, Input, Page, Sidebar } from "prime-ui-kit";
 export function App() {
   return (
     <AppShell.Template
-      fillViewport
       nav={
         <Sidebar.Root>
           <Sidebar.Content>
@@ -291,7 +299,7 @@ accessibility, examples and common mistakes.
 | [**Spinner**](https://github.com/esurkov1/prime-ui/blob/main/src/components/spinner/COMPONENT.md) | An indeterminate loading indicator: the kit ring with the share unknown — a quarter arc turning on a faint track while a request runs. |
 | [**Skeleton**](https://github.com/esurkov1/prime-ui/blob/main/src/components/skeleton/COMPONENT.md) | A placeholder in the shape of the content that is loading — text lines, a control, an avatar, a block — so the layout is in place before the data arrives. |
 | [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty or failed state of a page, a block or a menu: icon, title, explanation and an action — a retry for a failed load. |
-| [**Crossfade**](https://github.com/esurkov1/prime-ui/blob/main/src/components/crossfade/COMPONENT.md) | A region that cross-fades between its states (loading → data → empty → error): the data replaces the loading skeleton in place, settled states glide to the new height, so the page below does not jump. |
+| [**Crossfade**](https://github.com/esurkov1/prime-ui/blob/main/src/components/crossfade/COMPONENT.md) | A region that cross-fades between its states (loading → data → empty → error), opacity only: it takes the new state's height at once and the data replaces the loading skeleton in place — nothing unfolds or glides. |
 | [**VisuallyHidden**](https://github.com/esurkov1/prime-ui/blob/main/src/components/visually-hidden/COMPONENT.md) | Text that screen readers read and nobody sees: the words behind an icon, a badge or a change on the screen. |
 
 ### Navigation (`navigation`)

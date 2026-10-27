@@ -21,7 +21,7 @@ const DEALS = [
 export default function AppShellFabExample() {
   return (
     <div className={styles.stage}>
-      <AppShell.Root fillViewport className={styles.shell}>
+      <AppShell.Root className={styles.shell}>
         <AppShell.Nav>
           <Sidebar.Root defaultMode="compact">
             <Sidebar.Content>

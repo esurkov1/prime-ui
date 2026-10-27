@@ -28,8 +28,8 @@ export const api: ComponentApi = {
           name: "fill",
           type: "boolean",
           default: "false",
-          en: "The page takes the height of main (`AppShell.Root fillViewport`) and the body takes what the bar and the header leave: for a full-height table, board, chat or `Page.Split`.",
-          ru: "Страница занимает высоту main (`AppShell.Root fillViewport`), тело — всё, что оставили полоса и заголовок: для таблицы, доски или чата на всю высоту и `Page.Split`.",
+          en: "The page takes the height of main (`AppShell.Root`) and the body takes what the bar and the header leave: for a full-height table, board, chat or `Page.Split`.",
+          ru: "Страница занимает высоту main (`AppShell.Root`), тело — всё, что оставили полоса и заголовок: для таблицы, доски или чата на всю высоту и `Page.Split`.",
         },
         {
           name: "labels",
@@ -107,8 +107,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Description",
-      en: "`ref` → `HTMLParagraphElement`. One line of context that carries data (a period, a count): a muted caption under the whole heading line that truncates in the bar and claims no width of the bar's plan, secondary body-m that wraps (up to the reading measure) in the flow.",
-      ru: "Строка контекста с данными (период, количество): приглушённый caption под всей строкой заголовка с обрезкой в полосе, не влияющий на план полосы, вторичный body-m с переносом (не шире колонки для чтения) в потоке.",
+      en: "`ref` → `HTMLParagraphElement`. Context that carries data (a period, a count): in the bar a muted caption under the heading line, claiming no width of the plan — one line, two between words on a compact page; body-m that wraps in the flow.",
+      ru: "Контекст с данными (период, счёт): в полосе приглушённый caption под заголовком вне плана — одна строка, на компактной странице две, по словам; в потоке body-m с переносом.",
       props: [
         {
           name: "loading",
@@ -156,8 +156,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Page.Body",
-      en: "`ref` → `HTMLDivElement`. The page content: blocks of one screen 24 apart, a `Page.Section` 40 from its neighbours.",
-      ru: "Содержимое страницы: блоки одного экрана через 24, `Page.Section` — через 40 от соседей.",
+      en: "`ref` → `HTMLDivElement`. The page content: blocks of one screen 24 apart, a `Page.Section` 40 from its neighbours; on a compact page (under 30rem, a phone) 16 and 32, as wide as the gutter.",
+      ru: "Содержимое страницы: блоки одного экрана через 24, `Page.Section` — через 40 от соседей; на компактной странице (уже 30rem, телефон) 16 и 32, как поле страницы.",
       props: [divRest(CHILDREN)],
     },
     {

@@ -7,7 +7,7 @@
 
 ## When to use
 - A region whose content has a known shape is loading: a list, a card, a profile, a form with saved values.
-- The loading state inside [Crossfade](../crossfade/COMPONENT.md) (the state `"loading"`), rendered from the first paint: the skeleton holds the data's geometry and the data replaces it in place with a short fade — the height never glides.
+- The loading state inside [Crossfade](../crossfade/COMPONENT.md) (the state `"loading"`), rendered from the first paint: the skeleton holds the data's geometry and the data replaces it in place with a short fade.
 - First load of a page section, when the structure is known before the values.
 
 ## When not to use

@@ -164,7 +164,8 @@ describe("generated token styles", () => {
     ].map((m) => m[1]);
     expect(listed).toEqual(Object.keys(OFF_GRID).map((key) => toVarName(key, SYS_PREFIX)));
     const tokens = read("tokens.css");
-    const theme = read("theme-light.css");
+    // The touch block is the platform's own geometry (the iOS Switch, 51×31): it is not on the grid.
+    const theme = read("theme-light.css").split("@media (pointer: coarse)")[0] ?? "";
     const refs = new Map(
       [...tokens.matchAll(/^\s+(--prime-ref-[\w-]+):\s*([^;]+);/gm)].map((m) => [m[1], m[2]]),
     );
@@ -188,5 +189,127 @@ describe("generated token styles", () => {
       }
     }
     expect(offenders).toEqual([]);
+  });
+
+  // Foundation §5: on a coarse pointer the reading text, the titles of surfaces and the text of
+  // every control tier step up; control heights, headings and badge text stay.
+  it("steps the type and the control marks up under (pointer: coarse) and keeps every height (touch-type)", () => {
+    const theme = read("theme-light.css");
+    const refs = new Map(
+      [...read("tokens.css").matchAll(/^\s+(--prime-ref-[\w-]+):\s*([^;]+);/gm)].map((m) => [
+        m[1],
+        m[2],
+      ]),
+    );
+    const px = (value: string) =>
+      Number(
+        (refs.get(value.match(/^var\((--prime-ref-[\w-]+)\)$/)?.[1] ?? "") ?? value).replace(
+          "rem",
+          "",
+        ),
+      ) * 16;
+    const rem = (value: string | undefined) => Number((value ?? "").replace("rem", "")) * 16;
+    const decls = (css: string) =>
+      new Map([...css.matchAll(/^\s+(--prime-[\w-]+):\s*([^;]+);/gm)].map((m) => [m[1], m[2]]));
+    const [base, touchCss] = theme.split("@media (pointer: coarse) {");
+    expect(touchCss, "the touch block").toBeDefined();
+    expect(touchCss).toContain(':root,\n  :root[data-theme="light"],\n  [data-theme="light"] {');
+    const desktop = decls(base);
+    const touch = decls(touchCss);
+
+    const grows = [
+      ...["body-s", "body-m", "title-xs", "title-s", "code"].map(
+        (role) => `--prime-text-${role}-size`,
+      ),
+      "--prime-control-s-text-size",
+      "--prime-control-s-label-size",
+      "--prime-bottom-nav-label-size",
+      "--prime-bottom-nav-floating-label-size",
+      "--prime-control-m-text-size",
+      "--prime-control-m-label-size",
+      ...["l", "xl"].flatMap((tier) => [
+        `--prime-control-${tier}-label-size`,
+        `--prime-control-${tier}-hint-size`,
+      ]),
+      ...["s", "m", "l", "xl"].map((tier) => `--prime-badge-${tier}-text-size`),
+    ];
+    const tiers = ["xs", "s", "m", "l", "xl"];
+    for (const name of grows) {
+      const value = touch.get(name);
+      expect(value, name).toBeDefined();
+      expect(px(value ?? ""), name).toBeGreaterThan(px(desktop.get(name) ?? ""));
+    }
+    // Editable text keeps its own 16px rule: the touch step never reaches it.
+    expect(touch.has("--prime-control-touch-text-size")).toBe(false);
+    for (const [name, value] of touch) {
+      if (
+        /^--prime-(switch-\w+-(width|height|thumb)|control-\w+-(icon|choice|thumb)|badge-\w+-icon)$/.test(
+          name,
+        )
+      )
+        continue;
+      expect(name, "type only").toMatch(/-(size|line-height)$/);
+      expect(name, "no box").not.toMatch(
+        /^--prime-badge-\w+-(height|padding|gap|radius)|heading|display/,
+      );
+      if (name.endsWith("line-height")) expect(px(value) % 4, name).toBe(0);
+      // Badge and BottomNav labels sit in fixed one-line boxes: their line height is not stepped.
+      if (!name.endsWith("-size") || /^--prime-(badge|bottom-nav)-/.test(name)) continue;
+      // Every grown size keeps a line height of at least 1.2 of it (its own or the desktop one).
+      const lhName = name.replace(/(text-)?size$/, "line-height");
+      const lh = touch.get(lhName) ?? desktop.get(lhName);
+      expect(px(lh ?? ""), lhName).toBeGreaterThanOrEqual(px(value) * 1.2);
+    }
+    // The marks: the Switch keeps the iOS proportions, the choice box and the slider thumb grow.
+    const SWITCH = {
+      s: [36, 22, 18],
+      m: [44, 26, 22],
+      l: [48, 28, 24],
+      xl: [51, 31, 27],
+    } as const;
+    for (const [tier, [w, h, thumb]] of Object.entries(SWITCH)) {
+      expect(rem(touch.get(`--prime-switch-${tier}-width`) ?? ""), `${tier} width`).toBeCloseTo(
+        w,
+        0,
+      );
+      expect(rem(touch.get(`--prime-switch-${tier}-height`) ?? ""), `${tier} height`).toBe(h);
+      expect(rem(touch.get(`--prime-switch-${tier}-thumb`) ?? ""), `${tier} thumb`).toBe(thumb);
+    }
+    // The glyphs step with the text and stay inside their box.
+    const ICONS = { xs: 16, s: 18, m: 18, l: 22, xl: 22 } as const;
+    for (const [tier, size] of Object.entries(ICONS)) {
+      expect(rem(touch.get(`--prime-control-${tier}-icon`) ?? ""), `${tier} icon`).toBe(size);
+    }
+    const BADGE_ICONS = { s: 14, m: 16, xl: 18 } as const;
+    for (const [tier, size] of Object.entries(BADGE_ICONS)) {
+      expect(rem(touch.get(`--prime-badge-${tier}-icon`) ?? ""), `${tier} badge icon`).toBe(size);
+    }
+    expect(touch.has("--prime-badge-xs-icon") || touch.has("--prime-badge-l-icon")).toBe(false);
+    for (const tier of tiers) {
+      const height = px(desktop.get(`--prime-control-${tier}-height`) ?? "");
+      const thumb = touch.get(`--prime-control-${tier}-thumb`);
+      expect(rem(thumb), `${tier} thumb`).toBeGreaterThan(
+        px(desktop.get(`--prime-control-${tier}-thumb`) ?? ""),
+      );
+      expect(rem(thumb), `${tier} thumb fits the height`).toBeLessThan(height);
+      const choice =
+        touch.get(`--prime-control-${tier}-choice`) ??
+        desktop.get(`--prime-control-${tier}-choice`);
+      expect(
+        choice?.endsWith("rem") ? rem(choice) : px(choice ?? ""),
+        `${tier} choice`,
+      ).toBeLessThanOrEqual(24);
+      expect(touch.has(`--prime-control-${tier}-track`), `${tier} track stays`).toBe(false);
+      expect(touch.has(`--prime-control-${tier}-height`), `${tier} height stays`).toBe(false);
+    }
+    // The text grows inside the tier's box: a control's line height stays under its height.
+    for (const tier of tiers) {
+      const lh =
+        touch.get(`--prime-control-${tier}-line-height`) ??
+        desktop.get(`--prime-control-${tier}-line-height`);
+      expect(px(lh ?? ""), tier).toBeLessThan(
+        px(desktop.get(`--prime-control-${tier}-height`) ?? ""),
+      );
+    }
   });
 });

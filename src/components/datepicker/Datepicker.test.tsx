@@ -544,25 +544,6 @@ describe("Datepicker.Root", () => {
   });
 });
 
-describe("Datepicker focusRing", () => {
-  it("focusRing={false} marks the field and keeps the invalid state", () => {
-    render(
-      <Datepicker.Root
-        focusRing={false}
-        invalid
-        mode="single"
-        value={null}
-        onValueChange={() => {}}
-        aria-label="Дата"
-      />,
-    );
-    const trigger = screen.getByRole("button", { name: /Дата/ });
-    expect(trigger).toHaveAttribute("data-focus-ring", "false");
-    expect(trigger).toHaveAttribute("data-invalid", "true");
-    expect(trigger).toHaveAttribute("aria-invalid", "true");
-  });
-});
-
 describe("Datepicker — overlay contract", () => {
   it("an outside click and Escape close the popover; focus returns to the trigger", async () => {
     render(

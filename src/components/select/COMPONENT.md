@@ -97,7 +97,6 @@ an icon) goes inside `Select.ItemMeta`.
 | `placeholder` | `string` | — | Text in the trigger while nothing is picked. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier: trigger height, padding, text; the list rows, the label and the hint follow it. Without it the tier of its host (a form, a panel with a size), else `m`. |
 | `variant` | `"field" \| "status"` | `"field"` | `field` — the field trigger. `status` — a chip in the picked option's `color` with a chevron: a status in a dense row or table cell (a surface's header or footer takes `field`). |
-| `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `id` | `string` | — | Id of the trigger; generated when omitted. |
 | `labels` | `Partial<SelectLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Trigger and Content. |
@@ -211,7 +210,6 @@ The panel is the shared floating surface; its options are the kit's one list row
 | `loadingMore` | skeleton rows after the items | The next page is loading (`hasMore` + `onLoadMore`) | `false` |
 | `filter` | items filter by the query; off, every item shows whatever the query and the query is still marked in the labels | Off when the owner searches on the server (`search`, `onSearchChange`) | `true` |
 | `required` / `optional` | red `*` / muted «необязательно» after the label | Mark the minority of the form | `false` / — |
-| `focusRing` | `false`: no focus ring; the trigger keeps its focus fill | Only where focus shows otherwise; never on a form field (WCAG 2.4.7) | `true` |
 | `closeOnOutsideClick` | `false`: the list stays open on a press beside it; Escape, the trigger, a single pick and Tab still close it | A filter list the person compares with the page | `true` |
 | `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by a pick or the trigger | `true` |
 | `searchable` (Content) | search row with a faint hairline at the top of the list | More than ~10 options | `false` |
@@ -243,7 +241,7 @@ The panel is the shared floating surface; its options are the kit's one list row
 ## Layout & spacing
 - The trigger is 100% wide; set the width with the layout (grid column, max-width wrapper).
 - Label → field: tier `label-gap`; field → hint: tier `hint-gap`; field → field in a form: the gap of a label-less `Fieldset`.
-- Panel: at least the trigger width and `--prime-panel-min-width`, at most twice that; max height `--prime-panel-max-height` (scrolls); flips near the viewport edge.
+- Panel: at least the trigger width and `--prime-panel-min-width`, at most twice that; max height `--prime-panel-max-height` (scrolls); flips near the viewport edge. Below 640px a bottom sheet: as tall as the list up to the sheet top gap, under a grab strip a touch target (44) tall, clear of the safe-area insets and of the on-screen keyboard.
 - Long values truncate with an ellipsis in the trigger.
 - The clear segment's hit area grows to the 44 px touch target in height on a coarse pointer, like the clear segment of an Input.
 - A rich row and its trigger use the same parts in the same order: leading media (`Avatar.Root`,
@@ -336,7 +334,7 @@ The panel is the shared floating surface; its options are the kit's one list row
 | [overview.tsx](examples/overview.tsx) | A labelled field with a placeholder; picking an option closes the list and shows its label — `label`, `placeholder`. |
 | [variants.tsx](examples/variants.tsx) | The field trigger and the status chip side by side — `variant`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the label, the list rows and the hint take the tier of the field — `size`. |
-| [states.tsx](examples/states.tsx) | A default field next to a disabled, a loading, an invalid one, a list with nothing in it and a field whose focus shows without the ring — `disabled`, `loading`, `invalid`, `labels`, `focusRing`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled, a loading, an invalid one, and a list with nothing in it — `disabled`, `loading`, `invalid`, `labels`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A leading icon in the trigger and an icon before every option label — `Select.TriggerIcon`, `Select.ItemIcon`. |
 | [multiple.tsx](examples/multiple.tsx) | Several values: checkboxes in the list, the list stays open on a pick, labels joined in the trigger — `multiple`. |

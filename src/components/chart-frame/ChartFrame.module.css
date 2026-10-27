@@ -106,7 +106,7 @@
 
 /* A focusable chart (a slider over the weeks, a library's keyboard layer) gets the kit ring. */
 .canvas > :focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
   border-radius: var(--prime-radius-xs);
 }

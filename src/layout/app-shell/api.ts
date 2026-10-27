@@ -10,9 +10,9 @@ export const api: ComponentApi = {
         {
           name: "fillViewport",
           type: "boolean",
-          default: "false",
-          en: "The shell is exactly the viewport high and only `AppShell.Main` scrolls; otherwise the document scrolls and the nav is sticky.",
-          ru: "Оболочка ровно в высоту окна, прокручивается только `AppShell.Main`; иначе прокручивается документ, а навигация липкая.",
+          default: "true",
+          en: "The app frame: fixed to the viewport, only `AppShell.Main` scrolls; the document stays still (no rubber band, no pull-to-refresh). A nested shell is a box. `false`: a document page, the document scrolls.",
+          ru: "Каркас приложения: закреплён в окне, прокручивается только `AppShell.Main`; документ неподвижен (без оттяжки и pull-to-refresh). Вложенный — блок. `false`: страница-документ, листается документ.",
         },
         {
           name: "…rest",
@@ -37,8 +37,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Main",
-      en: "`ref` → `HTMLElement`. The `<main>` where the page renders: a vertical `ScrollContainer` that hands `Page.Root` the gutters and top air (`--page-gutter`, `--page-top`).",
-      ru: "`<main>`, где рендерится страница: вертикальный `ScrollContainer`, который передаёт `Page.Root` поля и верхний воздух (`--page-gutter`, `--page-top`).",
+      en: "`ref` → `HTMLElement`. The `<main>` where the page renders: a vertical `ScrollContainer` that hands `Page.Root` the gutters and top air (`--page-gutter`, `--page-top`) and keeps room under a floating `BottomNav`.",
+      ru: "`<main>`, где рендерится страница: вертикальный `ScrollContainer`, который передаёт `Page.Root` поля и верхний воздух (`--page-gutter`, `--page-top`) и оставляет место под плавающей `BottomNav`.",
       props: [
         {
           name: "…rest",
@@ -96,9 +96,9 @@ export const api: ComponentApi = {
         {
           name: "fillViewport",
           type: "boolean",
-          default: "false",
-          en: "As on `AppShell.Root`: only `<main>` scrolls.",
-          ru: "Как у `AppShell.Root`: прокручивается только `<main>`.",
+          default: "true",
+          en: "As on `AppShell.Root`: the app frame, only `<main>` scrolls.",
+          ru: "Как у `AppShell.Root`: каркас приложения, прокручивается только `<main>`.",
         },
         {
           name: "nav",

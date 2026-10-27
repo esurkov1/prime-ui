@@ -123,7 +123,6 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `hintTone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Status color of `hint` («Осталось 12 дней» in `warning`). The words carry the status, the color repeats it; an `error` replaces the hint and its tone. A validation error is `error`, never a `danger` hint. |
 | `error` | `ReactNode` | — | Error message under the field (a rejected file, too few files); implies `invalid`. |
 | `invalid` | `boolean` | — | Danger line and icon of the zone, `aria-invalid` on the input. A non-empty `error` implies it. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the drop zone and the add tile (`data-focus-ring="false"`); focus, keyboard and ARIA stay. The picker Button keeps its ring. |
 | `disabled` | `boolean` | `false` | Blocks picking and drag-and-drop; the files are read-only: no add tile, no reorder, no remove. |
 | `accept` | `string` | — | Native `accept` of the file input; dropped files outside it are not taken (MIME type, `type/*` or `.ext`; a file with no MIME type by its extension). |
 | `multiple` | `boolean` | — | Allows several files at once in the picker. |
@@ -305,7 +304,6 @@ The zone stands on the surface frame of the tier; a file row is the list row of 
 | `invalid` (Root) | danger line and icon | a rejected file without a message; otherwise pass `error` | — |
 | `invalid` (Item) | danger soft fill, danger ring, danger description | an upload failed | `false` |
 | `disabled` | disabled fill and text, drops ignored; the files read-only | uploading is unavailable, a published set | `false` |
-| `focusRing` | `false`: the zone and the add tile draw no focus ring; focus, keys and ARIA stay | the zone sits in a host that marks focus itself | `true` |
 | `multiple` | the picker takes several files at once | a set of files rather than one | — |
 | `required` / `optional` | red `*` / muted «необязательно» after the label | Mark the minority of the form | — |
 

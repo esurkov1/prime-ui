@@ -29,12 +29,19 @@
 /*
  * Centred in the viewport, its height by content up to the viewport less the margin. The margin on
  * each side is the viewport padding, or the safe-area inset there (`--prime-safe-area-*`: the
- * notch, the home indicator, a host app's buttons) when that is larger.
+ * notch, the home indicator, a host app's buttons) when that is larger; with the keyboard up the
+ * dialog centres in what it leaves (the visual viewport insets of useKeyboardInset).
  */
 .content:not([data-sheet]) {
-  --modal-gap-top: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-top));
+  --modal-gap-top: calc(
+    max(var(--prime-modal-viewport-padding), var(--prime-safe-area-top)) +
+    var(--visual-inset-top, var(--prime-space-0))
+  );
   --modal-gap-right: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-right));
-  --modal-gap-bottom: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-bottom));
+  --modal-gap-bottom: calc(
+    max(var(--prime-modal-viewport-padding), var(--prime-safe-area-bottom)) +
+    var(--visual-inset-bottom, var(--prime-space-0))
+  );
   --modal-gap-left: max(var(--prime-modal-viewport-padding), var(--prime-safe-area-left));
 
   position: fixed;

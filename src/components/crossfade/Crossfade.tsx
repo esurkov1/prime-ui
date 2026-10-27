@@ -12,9 +12,9 @@ export type CrossfadeProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * Cross-fades a region between its states (loading → data → empty → error): the data replaces the
- * `"loading"` skeleton in place, settled states glide the height, so the page below does not jump:
- * the kit's region swap (`src/internal/RegionSwap`), public. The region spans its parent's inline
+ * Cross-fades a region between its states (loading → data → empty → error): opacity only — the region
+ * takes the new state's height at once, the old state fades out over the new one fading in, and
+ * the data replaces the `"loading"` skeleton in place: the kit's region swap (`src/internal/RegionSwap`), public. The region spans its parent's inline
  * size, also inside a centring grid.
  */
 export function Crossfade({ className, ...props }: CrossfadeProps) {

@@ -7,7 +7,6 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import {
-  type FieldFocusRingProps,
   FieldFrame,
   type FieldFrameProps,
   type FieldRootDomProps,
@@ -51,8 +50,7 @@ function reasonOf(error: unknown, fallback: string): string {
 }
 
 export type DigitInputProps = FieldRootDomProps &
-  FieldFrameProps &
-  FieldFocusRingProps & {
+  FieldFrameProps & {
     length?: number;
     size?: ControlSize;
     fullWidth?: boolean;
@@ -90,7 +88,6 @@ export function DigitInput({
   disabled: disabledProp,
   invalid,
   success = false,
-  focusRing,
   label,
   required,
   optional,
@@ -268,7 +265,6 @@ export function DigitInput({
           success: (shownSuccess && !ids.invalid) || undefined,
           pending: verifying || undefined,
           disabled: disabled || undefined,
-          "focus-ring": focusRing,
         })}
         onFocus={() => {
           const focused = document.activeElement;
@@ -314,8 +310,6 @@ export function DigitInput({
               styles.cell,
               inks(index) ? enterMotion.enterInk : undefined,
             )}
-            // The row's gliding ring replaces each cell's own.
-            data-focus-ring="false"
             style={{ "--digit-i": index } as React.CSSProperties}
             data-size={size}
             data-filled={cell ? "true" : undefined}

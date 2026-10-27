@@ -65,7 +65,6 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it. |
 | `valid` | `boolean` | — | A confirmed value (a matching repeat, a verified code): a success ring and a drawn check at the field's end, `labels.valid` spoken. `invalid` wins. Pass `false` too: the live region exists only with it. |
-| `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
 | `counter` | `ReactNode` | — | Right side of the support row, usually `<Input.Counter current max />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
@@ -193,7 +192,6 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `focusRing` | `false`: no focus ring; the field still switches to the focus fill, caret visible | A single search field where focus is obvious | `true` |
 | `reserveSupportRow` | Empty support row of hint height under the field | Fields validated on the fly; neighbouring fields in one grid row | `false` |
 | `closeOnOutsideClick` | `false`: a press beside the field keeps the `suggestions` list open | The person copies the value from elsewhere on the page | `true` |
 | `closeOnEscape` | `false`: Escape leaves the `suggestions` list open | Rare: the list closes only by a pick, Tab or blur | `true` |
@@ -203,7 +201,6 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 - Recommended: `Input.Icon side="start"` + `Input.ClearButton` for search; `Input.Affix` on both sides for URLs; `Input.InlineAffix side="end"` with `inputMode="decimal"` for amounts.
 - Allowed but rare: an end icon together with the clear button (the icon sits before the button).
 - Pointless: `required` and `optional` together; `hint` and `error` together (the error replaces the hint); `invalid` without any message in a form where the user needs to know what is wrong.
-- Forbidden: `focusRing={false}` on regular form fields (WCAG 2.4.7).
 
 **Hierarchy:** keep one size for all fields of a form; mark required/optional consistently; a status of the value goes into the hint, not into the field — except a confirmed value (`valid`: a repeated password that matches, a verified email or code), which is a check mark in the field, never a «совпадает» text.
 
@@ -212,7 +209,6 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 |---|---|---|
 | default / hover | — | hover darkens the fill (not when disabled, read-only or focused) |
 | focus | keyboard focus on the input | wrapper gets the focus fill and an inset focus ring (`:has(input:focus-visible)`) |
-| no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the wrapper |
 | invalid | `invalid` or non-empty `error` | `data-invalid="true"` on root and wrapper, `aria-invalid="true"` on the input, danger inset ring, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | valid | `valid` (and not invalid: `invalid` or `error` wins) | `data-valid="true"` on the wrapper, a success inset ring; a check (`aria-hidden`) at the end of the field before the end icon and segments pops in and draws its stroke when the value becomes valid, and closes up in place when it goes; a polite live region says `labels.valid` and is in the input's `aria-describedby` while valid |
 | disabled | native `disabled` on `Input.Field`, or a disabled `Fieldset` around it | disabled fill, disabled text and icons, `cursor: not-allowed`, clear button disabled look; under a `Tooltip.Trigger` the field is `aria-disabled="true"` and `readOnly` with no `name` or `required`, the same node |
@@ -314,7 +310,6 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [validation.tsx](examples/validation.tsx) | Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the value is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A decorative icon at either end of the value — `Input.Icon`, `side`. |
 | [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value, heard as a word by a screen reader — `Input.Affix`, `Input.InlineAffix`, `aria-label`. |
-| [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
 | [password-strength.tsx](examples/password-strength.tsx) | A new password with a show toggle and a meter that fills step by step and names the level beside the hint, and a service password measured by the company's own rule — `Input.RevealButton`, `strength`, `getStrength`. |
 | [password-policy.tsx](examples/password-policy.tsx) | A password change under a policy: a new password below the required level turns the meter danger and stops the submit, the repeat gets a check once it matches — `strength`, `minStrength`, `valid`. |
 | [edge-actions.tsx](examples/edge-actions.tsx) | Actions at the field's end: a mail link with a tooltip beside copying the value, and a profile link on a read-only field — `Input.Action`, `Input.CopyButton`. |

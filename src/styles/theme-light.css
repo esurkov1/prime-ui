@@ -242,6 +242,7 @@
   --prime-control-l-padding-x: var(--prime-ref-space-5);
   --prime-control-l-radius: var(--prime-ref-radius-10);
   --prime-control-l-text-size: var(--prime-ref-font-size-16);
+  --prime-control-l-thumb: 1.3125rem;
   --prime-control-l-track: 0.4375rem;
   --prime-control-m-choice: 1.125rem;
   --prime-control-m-field-padding-x: var(--prime-ref-space-3);
@@ -259,6 +260,7 @@
   --prime-control-m-padding-x: var(--prime-ref-space-4);
   --prime-control-m-radius: var(--prime-ref-radius-8);
   --prime-control-m-text-size: var(--prime-ref-font-size-14);
+  --prime-control-m-thumb: 1.125rem;
   --prime-control-m-track: 0.375rem;
   --prime-control-s-choice: var(--prime-ref-icon-16);
   --prime-control-s-field-padding-x: var(--prime-ref-space-2);
@@ -276,6 +278,7 @@
   --prime-control-s-padding-x: var(--prime-ref-space-3);
   --prime-control-s-radius: var(--prime-ref-radius-8);
   --prime-control-s-text-size: var(--prime-ref-font-size-13);
+  --prime-control-s-thumb: 0.9375rem;
   --prime-control-s-track: 0.3125rem;
   --prime-control-touch-target: 2.75rem;
   --prime-control-touch-text-size: var(--prime-ref-font-size-16);
@@ -295,6 +298,7 @@
   --prime-control-xl-padding-x: var(--prime-ref-space-6);
   --prime-control-xl-radius: var(--prime-ref-radius-12);
   --prime-control-xl-text-size: var(--prime-ref-font-size-16);
+  --prime-control-xl-thumb: 1.5rem;
   --prime-control-xl-track: 0.5rem;
   --prime-control-xs-choice: var(--prime-ref-icon-14);
   --prime-control-xs-field-padding-x: var(--prime-ref-space-2);
@@ -312,6 +316,7 @@
   --prime-control-xs-padding-x: var(--prime-ref-space-2);
   --prime-control-xs-radius: var(--prime-ref-radius-6);
   --prime-control-xs-text-size: var(--prime-ref-font-size-12);
+  --prime-control-xs-thumb: 0.75rem;
   --prime-control-xs-track: 0.25rem;
   --prime-drawer-padding: var(--prime-ref-space-6);
   --prime-drawer-width-l: 40rem;
@@ -598,4 +603,60 @@
   --prime-z-sticky: var(--prime-ref-z-index-sticky);
   --prime-z-toast: var(--prime-ref-z-index-toast);
   --prime-z-top: var(--prime-ref-z-index-3);
+}
+
+@media (pointer: coarse) {
+  :root,
+  :root[data-theme="light"],
+  [data-theme="light"] {
+    --prime-badge-l-text-size: var(--prime-ref-font-size-14);
+    --prime-badge-m-icon: 1rem;
+    --prime-badge-m-text-size: var(--prime-ref-font-size-13);
+    --prime-badge-s-icon: 0.875rem;
+    --prime-badge-s-text-size: var(--prime-ref-font-size-13);
+    --prime-badge-xl-icon: 1.125rem;
+    --prime-badge-xl-text-size: var(--prime-ref-font-size-15);
+    --prime-bottom-nav-floating-label-size: var(--prime-ref-font-size-10);
+    --prime-bottom-nav-label-size: var(--prime-ref-font-size-11);
+    --prime-control-l-choice: 1.375rem;
+    --prime-control-l-hint-size: var(--prime-ref-font-size-14);
+    --prime-control-l-icon: 1.375rem;
+    --prime-control-l-label-size: var(--prime-ref-font-size-15);
+    --prime-control-l-thumb: 2rem;
+    --prime-control-m-choice: 1.25rem;
+    --prime-control-m-icon: 1.125rem;
+    --prime-control-m-label-size: var(--prime-ref-font-size-14);
+    --prime-control-m-text-size: var(--prime-ref-font-size-15);
+    --prime-control-m-thumb: 1.75rem;
+    --prime-control-s-choice: 1.125rem;
+    --prime-control-s-icon: 1.125rem;
+    --prime-control-s-label-size: var(--prime-ref-font-size-13);
+    --prime-control-s-text-size: var(--prime-ref-font-size-14);
+    --prime-control-s-thumb: 1.5rem;
+    --prime-control-xl-hint-size: var(--prime-ref-font-size-14);
+    --prime-control-xl-icon: 1.375rem;
+    --prime-control-xl-label-size: var(--prime-ref-font-size-15);
+    --prime-control-xl-thumb: 2.25rem;
+    --prime-control-xs-choice: 1rem;
+    --prime-control-xs-icon: 1rem;
+    --prime-control-xs-thumb: 1.25rem;
+    --prime-switch-l-height: 1.75rem;
+    --prime-switch-l-thumb: 1.5rem;
+    --prime-switch-l-width: 3rem;
+    --prime-switch-m-height: 1.625rem;
+    --prime-switch-m-thumb: 1.375rem;
+    --prime-switch-m-width: 2.75rem;
+    --prime-switch-s-height: 1.375rem;
+    --prime-switch-s-thumb: 1.125rem;
+    --prime-switch-s-width: 2.25rem;
+    --prime-switch-xl-height: 1.9375rem;
+    --prime-switch-xl-thumb: 1.6875rem;
+    --prime-switch-xl-width: 3.1875rem;
+    --prime-text-body-m-size: var(--prime-ref-font-size-15);
+    --prime-text-body-s-size: var(--prime-ref-font-size-14);
+    --prime-text-code-size: var(--prime-ref-font-size-14);
+    --prime-text-title-s-size: var(--prime-ref-font-size-15);
+    --prime-text-title-xs-line-height: var(--prime-ref-font-line-height-20);
+    --prime-text-title-xs-size: var(--prime-ref-font-size-14);
+  }
 }

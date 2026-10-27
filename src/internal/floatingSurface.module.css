@@ -77,15 +77,18 @@
  * holding the grab handle and the panel itself (`data-sheet`). The panel keeps its own classes
  * (menu, popover content) without the anchored surface, so it takes the sheet's width; menu-like
  * panels scroll inside the sheet's height (`--float-max-h`), which keeps clear of the top inset
- * (a notch, a host app's buttons: `--prime-safe-area-top`); the bottom padding clears the home
- * indicator (`--prime-safe-area-bottom`).
+ * (a notch, a host app's buttons: `--prime-safe-area-top`) and of the keyboard (the visual
+ * viewport insets of useKeyboardInset); the bottom padding clears the home indicator
+ * (`--prime-safe-area-bottom`).
  */
 
 .sheet {
   --float-max-h: calc(
     100dvh -
+    var(--visual-inset-bottom, var(--prime-space-0)) -
+    var(--visual-inset-top, var(--prime-space-0)) -
     var(--prime-sheet-top-gap) -
-    var(--prime-sheet-handle-area) -
+    max(var(--prime-sheet-handle-area), var(--prime-control-touch-target)) -
     var(--prime-safe-area-top)
   );
   /* A list in a sheet uses the room it has, not the anchored panel's limit. */

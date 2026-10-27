@@ -275,7 +275,7 @@
 
 /* Inside the row edge, so clipping and scrolling regions never cut it. */
 :is(.item, .account, .brand):focus-visible::before {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
@@ -511,15 +511,15 @@
 }
 
 .groupTrigger:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);
 }
 
 /* Quiet chevron at the end of the heading; it turns up while the group is open. */
 .groupChevron {
   flex: none;
-  width: var(--prime-icon-xs);
-  height: var(--prime-icon-xs);
+  width: var(--field-hint-icon);
+  height: var(--field-hint-icon);
   color: inherit;
   stroke: currentcolor;
   transition:
@@ -725,14 +725,14 @@
 
 /* A trailing icon (external link) stays quiet: one step smaller, muted. */
 .item .icon[data-edge="end"] {
-  --prime-icon-size: var(--prime-icon-xs);
+  --prime-icon-size: var(--field-hint-icon);
 
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  width: var(--prime-icon-xs);
-  height: var(--prime-icon-xs);
+  width: var(--field-hint-icon);
+  height: var(--field-hint-icon);
   color: var(--prime-color-text-muted);
 }
 

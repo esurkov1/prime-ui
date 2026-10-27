@@ -4,22 +4,22 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Crossfade",
-      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and, between settled states, glides from the height on screen to the new one; still on the first render. A state that turns back within the swap hold never shows.",
-      ru: "Область, которая плавно сменяет содержимое при смене `state` и между устоявшимися состояниями мягко подстраивает высоту; на первом рендере неподвижна. Состояние, вернувшееся за окно удержания смены, не показывается вовсе.",
+      en: "`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes, opacity only: it takes the new state's height at once, nothing glides or unfolds; still on the first render. A state that turns back within the swap hold never shows.",
+      ru: "Область, плавно сменяющая содержимое при смене `state` только прозрачностью: высота нового состояния сразу, ничего не раскрывается; на первом рендере неподвижна. Вернувшееся за окно удержания состояние не видно.",
       props: [
         {
           name: "state",
           type: "string | number",
           required: true,
-          en: 'Key of what the region shows: `"loading"`, `"ready"`, `"empty"`, `"error"` or a record id. A new value cross-fades; the same one updates in place. A swap into or out of `"loading"` never glides the height.',
-          ru: 'Ключ того, что показывает область: `"loading"`, `"ready"`, `"empty"`, `"error"` или id записи. Новое значение — смена с переходом, то же — обновление на месте. Смена в `"loading"` и из него не анимирует высоту.',
+          en: 'Key of what the region shows: `"loading"`, `"ready"`, `"empty"`, `"error"` or a record id. A new value cross-fades; the same one updates in place. A swap into or out of `"loading"` takes the short fade.',
+          ru: 'Ключ того, что показывает область: `"loading"`, `"ready"`, `"empty"`, `"error"` или id записи. Новое значение — смена с переходом, то же — обновление на месте. Смена в `"loading"` и из него — короткое растворение.',
         },
         {
           name: "fill",
           type: "boolean",
           default: "false",
-          en: "The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it; the height never glides. A `Crossfade` that is the child of a `Page.Cell` fills it unless `fill` is set.",
-          ru: "Область занимает высоту родителя (элемент flex или grid, блок с высотой), каждое состояние растягивается по ней; высота не анимируется. `Crossfade` — ребёнок `Page.Cell` — заполняет ячейку, если `fill` не задан.",
+          en: "The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it. A `Crossfade` that is the child of a `Page.Cell` fills it unless `fill` is set.",
+          ru: "Область занимает высоту родителя (элемент flex или grid, блок с высотой), каждое состояние растягивается по ней. `Crossfade` — ребёнок `Page.Cell` — заполняет ячейку, если `fill` не задан.",
         },
         {
           name: "children",

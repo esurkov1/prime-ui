@@ -33,15 +33,6 @@ describe("FileUpload", () => {
     expect(label).toHaveAttribute("data-size", "l");
   });
 
-  it("focusRing={false} marks the field so the zone draws no ring; focus stays", () => {
-    const { container } = render(<FileUpload.Root focusRing={false} aria-label="Договор" />);
-    const zone = container.querySelector("label");
-    expect(zone?.closest('[data-focus-ring="false"]')).not.toBeNull();
-    const input = screen.getByLabelText("Договор");
-    act(() => input.focus());
-    expect(input).toHaveFocus();
-  });
-
   it("ItemProgress is named by labels.upload without an aria-label of its own", () => {
     render(<FileUpload.ItemProgress value={40} />);
     expect(screen.getByRole("progressbar", { name: "Загрузка файла" })).toBeInTheDocument();

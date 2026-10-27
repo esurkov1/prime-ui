@@ -132,13 +132,6 @@ export const api: ComponentApi = {
           ru: "Фокус на первую пустую ячейку при монтировании.",
         },
         {
-          name: "focusRing",
-          type: "boolean",
-          default: "true",
-          en: '`false` hides only the visual focus ring on the cells (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: '`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются. Атрибут — `data-focus-ring="false"`.',
-        },
-        {
           name: "id",
           type: "string",
           en: "Id of the first cell (the label points at it); hint id is `<id>-hint`, error id is `<id>-error`.",

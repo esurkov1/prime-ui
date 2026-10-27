@@ -45,7 +45,8 @@
   --dialog-padding: var(--prime-drawer-padding);
 }
 
-.shell[data-kind="sheet"] {
+.shell[data-kind="sheet"],
+.shell[data-sheet] {
   --dialog-padding: var(--prime-sheet-padding);
 }
 
@@ -334,6 +335,13 @@
 
 .footer:first-child {
   padding-block-start: var(--prime-space-6);
+}
+
+/* Under the grab strip of a bottom sheet (internal/sheet: a touch target tall) the strip is the
+   zone's top air. */
+[data-swipe-handle] + .body,
+[data-swipe-handle] + .footer {
+  padding-block-start: 0;
 }
 
 /*

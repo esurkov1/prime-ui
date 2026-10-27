@@ -43,8 +43,8 @@
     scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.target:is(:focus-visible, :has(input:focus-visible)):not(:where([data-focus-ring="false"] *)) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+.target:is(:focus-visible, :has(input:focus-visible)) {
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 

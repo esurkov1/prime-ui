@@ -626,7 +626,7 @@ export const semanticTokens = {
    * Control size tiers shared by Button, Input, Select, Datepicker, Tabs, SegmentedControl, etc.
    * Pairing: a field of tier T uses `labelSize`/`hintSize` of tier T; menus opened from tier T
    * use `itemHeight` of tier T; badges inside tier T use the badge tier one step down.
-   * `track` is the line thickness of Slider and ProgressBar; their thumb and gaps derive from it.
+   * `track` is the line thickness of Slider and ProgressBar (their gaps derive from it); `thumb` is the Slider thumb's height, three tracks.
    */
   control: {
     xs: {
@@ -647,6 +647,7 @@ export const semanticTokens = {
       itemHeight: "{space.6}",
       choice: "{icon.14}",
       track: "0.25rem",
+      thumb: "0.75rem",
     },
     s: {
       height: "{space.8}",
@@ -666,6 +667,7 @@ export const semanticTokens = {
       itemHeight: "{space.7}",
       choice: "{icon.16}",
       track: "0.3125rem",
+      thumb: "0.9375rem",
     },
     m: {
       height: "{space.9}",
@@ -685,6 +687,7 @@ export const semanticTokens = {
       itemHeight: "{space.8}",
       choice: "1.125rem",
       track: "0.375rem",
+      thumb: "1.125rem",
     },
     l: {
       height: "{space.10}",
@@ -704,6 +707,7 @@ export const semanticTokens = {
       itemHeight: "{space.9}",
       choice: "{icon.20}",
       track: "0.4375rem",
+      thumb: "1.3125rem",
     },
     xl: {
       height: "{space.12}",
@@ -723,6 +727,7 @@ export const semanticTokens = {
       itemHeight: "{space.10}",
       choice: "{icon.24}",
       track: "0.5rem",
+      thumb: "1.5rem",
     },
     /**
      * Coarse pointers (`@media (pointer: coarse)`): the hit area of a control below this size grows

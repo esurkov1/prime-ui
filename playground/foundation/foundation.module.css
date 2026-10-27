@@ -828,7 +828,7 @@
   padding-inline: var(--prime-control-m-padding-x);
   border-radius: var(--prime-control-m-radius);
   background: var(--prime-color-fill-muted);
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-ring-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 

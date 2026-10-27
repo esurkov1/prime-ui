@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { COMPACT_QUERY } from "@/hooks/breakpoints";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { type PositionOptions, type PositionSide, usePosition } from "@/hooks/usePosition";
 import { type Presence, usePresence } from "@/hooks/usePresence";
@@ -120,6 +121,8 @@ export function useFloatingLayer({
   const passive = dismiss === "none";
   // A sheet locks the page scroll itself; a passive layer takes no wheel.
   useContainScroll(open && !sheet && !passive ? panel : null);
+  // A sheet stands on the on-screen keyboard, never under it.
+  useKeyboardInset(sheet ? panel : null);
 
   /** Set by a press outside: focus follows the pointer instead of returning to the trigger. */
   const outsideRef = React.useRef(false);
