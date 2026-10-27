@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 
-import { cssRule, cssRules, cssValue } from "@/test/css";
+import { cssRule, cssValue } from "@/test/css";
 
 import { fieldCodeCellClass, fieldTierClass, fieldTriggerClass } from "./fieldClasses";
 import { touchTargetBlockClass } from "./touchTarget";
@@ -39,16 +39,10 @@ describe("field classes", () => {
     }
   });
 
-  it("the text classes read the tier: label, support row and an editable value", () => {
+  it("the text classes read the tier: label, support row and control text", () => {
     expect(cssValue(cssRule(TIER, ".labelText"), "font-size")).toBe("var(--field-label-size)");
     expect(cssValue(cssRule(TIER, ".hintText"), "line-height")).toBe("var(--field-hint-lh)");
-    expect(cssValue(cssRule(TIER, ".inputText"), "font-size")).toBe("var(--field-input-text)");
-    // The 16px touch floor of an editable value lives in the tier, once.
-    expect(
-      cssRules(TIER).some((rule) =>
-        rule.decls.some((d) => d.value.includes("var(--prime-control-touch-text-size)")),
-      ),
-    ).toBe(true);
+    expect(cssValue(cssRule(TIER, ".controlText"), "font-size")).toBe("var(--field-text)");
   });
 
   it("a code cell is two steps above the control height: m 48, then l 56 and xl 64", () => {

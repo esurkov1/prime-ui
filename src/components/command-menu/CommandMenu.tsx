@@ -17,7 +17,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { fieldInputTextClass, fieldTierClass } from "@/internal/fieldClasses";
+import { fieldTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
@@ -390,7 +390,7 @@ function CommandMenuInput({
   return (
     // The palette's search is a field of tier `l` (its text and height), whatever the rows' tier.
     <div
-      className={cx(menu.searchRow, fieldTierClass, fieldInputTextClass, styles.inputRow)}
+      className={cx(menu.searchRow, fieldTierClass, fieldTextClass, styles.inputRow)}
       data-size="l"
     >
       <Search />

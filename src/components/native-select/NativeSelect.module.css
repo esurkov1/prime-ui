@@ -13,7 +13,7 @@
   min-width: 0;
 }
 
-/* With `fieldSurfaceClass` and `fieldInputTextClass` (the editable text, set in TSX). */
+/* With `fieldSurfaceClass` and `fieldTextClass` (the tier text, set in TSX). */
 .select {
   box-sizing: border-box;
   display: block;

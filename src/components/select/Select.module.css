@@ -248,8 +248,8 @@
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
-  font-size: var(--field-input-text);
-  line-height: var(--field-input-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   text-align: start;
   cursor: pointer;
   outline: none;

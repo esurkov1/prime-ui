@@ -134,6 +134,26 @@ describe("List", () => {
     ).toBe("calc(var(--list-bleed-block) * -1)");
   });
 
+  it("drops the side inset of a list whose rows nothing opens, and keeps it for a mixed one", () => {
+    const { rerender } = render(
+      <List.Root aria-label="Сеансы">
+        <List.Item>Chrome</List.Item>
+        <List.Item>Safari</List.Item>
+      </List.Root>,
+    );
+    expect(document.querySelectorAll("li[data-interactive]")).toHaveLength(0);
+    const rule = cssRule(CSS, ".root:not(:has(.item[data-interactive]))");
+    expect(cssValue(rule, "--list-row-px")).toBe("0");
+    expect(cssValue(rule, "--list-row-end")).toBe("0");
+    rerender(
+      <List.Root aria-label="Сеансы">
+        <List.Item>Chrome</List.Item>
+        <List.Item onClick={() => {}}>Safari</List.Item>
+      </List.Root>,
+    );
+    expect(document.querySelectorAll("li[data-interactive]")).toHaveLength(1);
+  });
+
   it("takes the host tier without its own size", () => {
     render(
       <ControlSizeProvider value="s">

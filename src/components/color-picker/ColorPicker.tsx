@@ -35,7 +35,7 @@ import { cx } from "@/internal/cx";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldActionButton, type FieldActionButtonProps } from "@/internal/FieldAction";
 import type { FieldRootDomProps } from "@/internal/FieldFrame";
-import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { fieldSurfaceClass, fieldTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
@@ -258,7 +258,7 @@ function ChannelField({
         {...AUTOFILL_OFF}
         ref={inputRef}
         aria-label={labels[channel]}
-        className={cx(fieldInputTextClass, styles.channelInput)}
+        className={cx(fieldTextClass, styles.channelInput)}
         inputMode="decimal"
         value={text}
         onBlur={commit}
@@ -285,7 +285,7 @@ function StripHexField() {
         aria-label={labels.hex}
         autoCapitalize="off"
         autoCorrect="off"
-        className={cx(fieldInputTextClass, styles.channelInput)}
+        className={cx(fieldTextClass, styles.channelInput)}
         spellCheck={false}
         value={text}
         onBlur={commit}

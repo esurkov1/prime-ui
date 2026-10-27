@@ -73,8 +73,8 @@
   outline: none;
   box-shadow: none;
   font: inherit;
-  font-size: var(--field-input-text);
-  line-height: var(--field-input-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   text-overflow: ellipsis;
 }
 
@@ -158,8 +158,8 @@
   padding-inline: var(--field-px);
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-muted);
-  font-size: var(--field-input-text);
-  line-height: var(--field-input-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   white-space: nowrap;
 }
 
@@ -175,8 +175,8 @@
 .inlineAffix {
   flex-shrink: 0;
   color: var(--prime-color-text-muted);
-  font-size: var(--field-input-text);
-  line-height: var(--field-input-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   white-space: nowrap;
 }
 

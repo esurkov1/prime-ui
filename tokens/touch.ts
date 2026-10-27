@@ -6,14 +6,16 @@
  *
  *   13/20 → 14/20 (body-s, code) · 14/20 → 15/20 (body-m, title-s) · 13/16 → 14/20 (title-xs) ·
  *   12 → 13 and 13 → 14 and 14 → 15 for the text of Badge / Kbd tiers `s` … `xl` ·
+ *   control text m 14 → 16 (24), l and xl 16 → 17 (24) ·
  *   10 → 11 for the BottomNav label, 9 → 10 for the floating capsule's label
  *
  * A size that is already as large as its step (caption, body-l, title-m, title-l, the `xs` tier, the
- * `l` / `xl` tier text) stays; a line height grows only where the new size needs it (title-xs
+ * `s` tier text) stays; a line height grows only where the new size needs it (title-xs
  * 13/16 → 14/20). Every control height stays its tier's (`control.<tier>.height` is not here), so a
  * field, a button and a list row keep their box and only their text grows inside it. Badge / Kbd
  * boxes and the BottomNav keep their height and line height; the `xs` badge stays. Headings, display roles and
- * tooltip text stay. Editable text keeps its own 16px rule (`control.touchTextSize`).
+ * tooltip text stay. Control text is one size per tier on touch for every control family, fields
+ * included: m 16/24 (so iOS does not zoom an `m` field), l and xl 17/24, s 14, xs 12.
  *
  * A phone's controls also draw their marks the platform's size, so they read as native: the Switch
  * takes the iOS proportions (w/h ≈ 1.65, thumb = height − 4: s 36×22, m 44×26, l 48×28, xl 51×31),
@@ -44,13 +46,15 @@ export const touchTextOverrides = {
       thumb: "1.5rem",
     },
     m: {
-      textSize: "{font.size.15}",
+      textSize: "{font.size.16}",
+      lineHeight: "{font.lineHeight.24}",
       labelSize: "{font.size.14}",
       icon: "1.125rem",
       choice: "1.25rem",
       thumb: "1.75rem",
     },
     l: {
+      textSize: "{font.size.17}",
       labelSize: "{font.size.15}",
       hintSize: "{font.size.14}",
       icon: "1.375rem",
@@ -58,6 +62,7 @@ export const touchTextOverrides = {
       thumb: "2rem",
     },
     xl: {
+      textSize: "{font.size.17}",
       labelSize: "{font.size.15}",
       hintSize: "{font.size.14}",
       icon: "1.375rem",

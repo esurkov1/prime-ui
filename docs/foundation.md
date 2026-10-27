@@ -207,8 +207,7 @@ Font: Golos Text (400/500/600), mono: JetBrains Mono. Roles (`--prime-text-<role
 Touch step: under `@media (pointer: coarse)` the type moves one step along the scale
 (12 · 13 · 14 · 15 · 16 · 17 · 18 · 20): 13/20 → 14/20 (body-s, code) · 14/20 → 15/20 (body-m,
 title-s) · title-xs 13/16 → 14/20. Caption, body-l, title-m and title-l stay. It covers the text
-roles and the text, label and hint of the control tiers (`s` text 14 and label 13, `m` text 15 and label 14, `l` /
-`xl` label 15 and hint 14; the `xs` tier and the `l` / `xl` text stay), and the text of Badge / Kbd
+roles and the text, label and hint of the control tiers (`s` text 14 and label 13, `m` text 16/24 and label 14, `l` / `xl` text 17/24, label 15 and hint 14; the `xs` tier stays), and the text of Badge / Kbd
 tiers `s` … `xl` (13 · 13 · 14 · 15) so a badge keeps its ratio to the text beside it, and the BottomNav label (10 → 11, the floating capsule's 9 → 10). Heading and
 display roles, tooltip text, the `xs` badge and every control, badge and BottomNav height stay. The marks
 of the controls take the platform's size too, so they read as native: the Switch the iOS proportions
@@ -230,7 +229,7 @@ Numbers in tables, dates, counters, prices: `font-variant-numeric: tabular-nums`
 | l | 40 | 16/24 | 20 | 12 | 8 | 20 | 10 | 14/20 | 13/20 | 36 | 20 | 7 |
 | xl | 48 | 16/24 | 24 | 16 | 12 | 20 | 12 | 14/20 | 13/20 | 40 | 24 | 8 |
 
-On a coarse pointer the Text / Label / Hint columns take the touch step of §5; Height does not change.
+On a coarse pointer the Text / Label / Hint columns take the touch step of §5; Height does not change. Control text is one size per tier on every family — buttons, fields, menu and list rows, tabs, segments — with no floor of its own for editable text: `m` 16/24, `l` and `xl` 17/24, `s` 14, `xs` 12. `m` (the default) and up are 16px or more, so iOS does not zoom into a focused field; `xs` and `s` are dense tiers whose fields iOS zooms — use `m` for a form on a phone.
 
 Variables: `--prime-control-<tier>-{height,padding-x,field-padding-x,gap,icon,radius,text-size,line-height,label-size,label-line-height,hint-size,hint-line-height,label-gap,hint-gap,item-height,choice,track}`.
 
@@ -559,8 +558,6 @@ Components carry no motion code of their own for these layers.
   - the app shell (AppShell);
   - the overlay form below 640: Modal and its dialog parts, Drawer, Popover actions, Datepicker
     months, the Notification zone, `overlayMotion`;
-  - touch text: editable field text at 16px under `(pointer: coarse), (max-width: 639px)`
-    (`src/internal/fieldTier.module.css`, and the ColorPicker and Datepicker inputs);
   - menu rows at the touch height (`src/internal/menu.module.css`).
   Input queries (`hover`, `pointer`) and preference queries (`prefers-*`) are not width queries and
   go wherever input decides interaction. The one height query is the sticky stop below.
@@ -569,9 +566,7 @@ Components carry no motion code of their own for these layers.
 - Input decides interaction, not width: `:hover` styles only inside `@media (hover: hover)`; whatever
   hover reveals is also shown on focus and under `(hover: none)`. Under `(pointer: coarse)` small
   controls get a 44px hit area (`--prime-control-touch-target`, `src/internal/touchTarget`) and menu
-  rows are at least 44px; editable field text is at least 16px under `(pointer: coarse), (max-width:
-  639px)` (`--prime-control-touch-text-size`) so iOS never zooms, and the type takes its touch step
-  (§5).
+  rows are at least 44px; the type takes its touch step (§5).
 - Switchers — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — all scroll through
   one shared scroller. They never wrap: they scroll inside themselves,
   stretched items tend to equal width and never shrink below their label, the selection indicator

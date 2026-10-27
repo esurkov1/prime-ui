@@ -616,7 +616,7 @@ function ListItem({
     ) : (
       <span className={listRowStyles.check}>{checked ? <Check /> : null}</span>
     );
-  const atStart = selection !== null && selection.multiple && selection.indicator === "start";
+  const atStart = selection?.multiple && selection.indicator === "start";
 
   const content = (
     <>
@@ -645,6 +645,15 @@ function ListItem({
   );
 
   const hitClass = cx(listRowStyles.hit, touchTargetRowClass, className);
+  // A row something opens, toggles, chooses or drags keeps the row's side inset (its wash).
+  const pressable =
+    selection !== null ||
+    reorder !== null ||
+    asChild ||
+    href !== undefined ||
+    onClick !== undefined ||
+    type !== undefined ||
+    switchRow;
   let element: React.ReactElement;
   if (selection !== null) {
     const toggle = () => {
@@ -814,7 +823,12 @@ function ListItem({
   const liClass = cx(styles.item, entered && enterMotion.enter);
   if (reorder === null || value === undefined) {
     return (
-      <li ref={liRef} className={liClass} role={selection ? "presentation" : undefined}>
+      <li
+        ref={liRef}
+        className={liClass}
+        role={selection ? "presentation" : undefined}
+        data-interactive={pressable ? "" : undefined}
+      >
         {row}
       </li>
     );
@@ -826,6 +840,7 @@ function ListItem({
       disabled={disabled}
       locked={locked}
       className={cx(liClass, styles.sortable)}
+      data-interactive={pressable ? "" : undefined}
     >
       {row}
     </Dnd.SortableItem>

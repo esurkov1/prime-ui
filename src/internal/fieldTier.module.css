@@ -6,7 +6,6 @@
  *   --field-px      field padding-x           --field-radius  corner radius
  *   --field-gap     tier gap (value ↔ unit)   --field-text    text size
  *   --field-lh      line height               --field-button-px  button / segment padding-x
- *   --field-input-text / --field-input-lh   text of an editable value (input, textarea, select)
  *   --field-label-size / --field-label-lh   field label text      --field-label-gap  label → field
  *   --field-hint-size / --field-hint-lh     support row text      --field-hint-gap   field → hint
  *   --field-hint-icon                       icon of a support row
@@ -21,7 +20,7 @@
  * No other stylesheet maps `--prime-control-<tier>-*`: hosts read these variables. The text
  * classes below set a text from the tier on the element that joins them:
  *   .labelText  field label (Label)   .hintText  support row (Hint, counter)
- *   .inputText  an editable value outside a field box (a search row, a channel cell)
+ *   .controlText  the control text of the tier on a host outside a field box (a search row, a channel cell)
  * and `.codeCell` sizes a cell of a one-time code from `--field-code` (DigitInput).
  * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` and the text classes
  * in TSX (never a cross-file `composes`, which the bundler cannot order), so it ships with the
@@ -51,9 +50,6 @@
   --field-thumb: var(--prime-control-m-thumb);
   --field-code: var(--prime-control-xl-height);
   --field-code-radius: var(--prime-control-xl-radius);
-  /* Resolved on the same element as the tier rows below, so it follows the tier. */
-  --field-input-text: var(--field-text);
-  --field-input-lh: var(--field-lh);
 }
 
 /*
@@ -64,18 +60,6 @@
  */
 :where(.tier:has(:is(input, textarea):focus-visible)) {
   --prime-focus-ring-width: var(--prime-focus-width);
-}
-
-/*
- * Touch screens and narrow viewports: iOS zooms the page into any focused field whose text is
- * under 16px. The editable value takes at least the touch text size (16px) and the `m` line
- * height; the control height stays the tier height.
- */
-@media (pointer: coarse), (max-width: 639px) {
-  .tier {
-    --field-input-text: max(var(--field-text), var(--prime-control-touch-text-size));
-    --field-input-lh: max(var(--field-lh), var(--prime-control-m-line-height));
-  }
 }
 
 .tier[data-size="xs"] {
@@ -220,10 +204,10 @@
   font-weight: var(--prime-font-weight-regular);
 }
 
-/* An editable value: the tier text, at least 16px on touch screens and narrow viewports. */
-.inputText {
-  font-size: var(--field-input-text);
-  line-height: var(--field-input-lh);
+/* The tier's control text: one size per tier on every family, on touch too. */
+.controlText {
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
 }
 
 /* A cell of a one-time code: a square of the code-cell row, its corner from the same row. On a

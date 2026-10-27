@@ -10,6 +10,7 @@
 - A catalogue tile with photos: `Card.Media` holding a `Carousel`, the status in `Card.Badges`, the price in the footer, the whole tile opening the record through `Card.Link`.
 - A choice among cards — a plan, a module, an extra: `asChild` with a `<button>`, `selected`, and `Card.Indicator` at the end of the header.
 - A setting: one switch is a one-line card (`Card.Icon`, `Card.Title`, a `Switch.Root` in `Card.Actions`); several are a group card with `Switch.Root fullWidth` rows in the body.
+- A one-line card — a title, a description and one or two actions with no body (a password with a reset button, a linked account with «Привязать»): the actions, the primary too, stand in `Card.Actions` of the header and the card has no footer.
 - A pane for a list that pads itself — a `List`, a `ChatList`, a `Chat` — with no zone inside: it stands edge to edge.
 - A block of a form, a chart or a long list in a titled surface — the body takes it, a `ScrollContainer` holds six rows of a long list.
 
@@ -283,6 +284,7 @@ Five steps of metrics, the kit's surface frame (`internal/surfaceFrame`; the hea
 
 ## Mistakes
 - A badge beside a button in the header, or an accent button in the header → the header holds `Card.Badges` after the title and neutral controls; the accent button stands last in the footer.
+- A footer holding the only button of a card that has no body → move it into `Card.Actions` of the header: a footer is for a card with a body (fields, a list) that its action applies, and grows the card by a row.
 - Badges under the title or at the right of the card → `Card.Badges`, on the title's line.
 - Lines between the zones, a divider in the footer, a filled footer → air only; the zones are parted by the zone gap and the footer by the card padding.
 - A hand-made photo (an `<img>`, a gradient box) as the cover → `Card.Media` with a `Carousel`, even for one photo.

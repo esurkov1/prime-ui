@@ -5,10 +5,10 @@ import { cssAtRules, cssRule, cssRules, cssValue, srcCssFiles } from "../test/cs
 
 /**
  * Touch and input guards over the CSS: hover never sticks after a tap, viewport breakpoints come
- * from one scale, editable fields never trigger the iOS focus zoom, small controls get a touch
+ * from one scale, a control's text is its tier's on touch, small controls get a touch
  * hit area. The guard below (`touch`) covers the rest of the touch rules (foundation §9, owner
  * decision on hover): a hover transform also needs `(pointer: fine)`, a hover guard honours
- * `aria-disabled`, the touch text token stays in the field tier, viewport queries stay in the app
+ * `aria-disabled`, viewport queries stay in the app
  * shell and overlay form, media queries in TS go through `useMediaQuery`, and every switcher
  * scrolls through `SwitcherScroller`.
  */
@@ -45,57 +45,42 @@ describe("touch and input", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("keeps editable field text at 16px or more on touch and narrow screens", () => {
-    const query = "@media (pointer: coarse), (max-width: 639px)";
+  it("sets no text floor for touch: a control's text is its tier's, one size per tier", () => {
     const tier = "src/internal/fieldTier.module.css";
-    const raised = cssRules(tier).filter((rule) => rule.parents[0] === query);
-    expect(raised.length, tier).toBeGreaterThan(0);
-    expect(
-      raised.some((rule) =>
-        rule.decls.some(
-          ({ prop, value }) =>
-            prop === "--field-input-text" &&
-            value === "max(var(--field-text), var(--prime-control-touch-text-size))",
-        ),
-      ),
-      tier,
-    ).toBe(true);
-    // Tier-based fields set their editable text from the input variables, never the tier text:
-    // in their own rule, or by joining the tier's `.inputText` (`fieldInputTextClass`).
     for (const [file, selector] of [
       ["src/components/input/Input.module.css", ".field"],
       ["src/components/textarea/Textarea.module.css", ".textarea"],
-      [tier, ".inputText"],
+      [tier, ".controlText"],
     ]) {
-      expect(cssValue(cssRule(file, selector), "font-size"), file).toBe("var(--field-input-text)");
+      expect(cssValue(cssRule(file, selector), "font-size"), file).toBe("var(--field-text)");
     }
     for (const host of [
       "components/native-select/NativeSelect.tsx",
       "components/datepicker/DatepickerPanel.tsx",
       "components/command-menu/CommandMenu.tsx",
       "components/color-picker/ColorPicker.tsx",
+      "components/dropdown/Dropdown.tsx",
     ]) {
-      expect(read(host), host).toMatch(/fieldInputTextClass/);
+      expect(read(host), host).toMatch(/fieldTextClass/);
     }
-    // Inputs outside the field tier raise their own text under the same query. DigitInput needs no
-    // rule: its smallest cell already shows 16px digits (body-l).
-    expect(
-      cssRules("src/components/digit-input/DigitInput.module.css").some((rule) =>
-        rule.decls.some(
-          ({ prop, value }) =>
-            prop === "--digit-cell-text" && value === "var(--prime-text-body-l-size)",
-        ),
-      ),
-    ).toBe(true);
-    for (const file of ["src/internal/menu.module.css"]) {
-      const touch = cssRules(file).filter((rule) => rule.parents[0] === query);
-      expect(
-        touch.some((rule) =>
-          rule.decls.some(({ value }) => value.includes("var(--prime-control-touch-text-size)")),
-        ),
-        file,
-      ).toBe(true);
+    // No stylesheet raises or lowers a control's text under a touch query.
+    const offenders: string[] = [];
+    for (const file of files) {
+      for (const rule of cssRules(file)) {
+        if (!rule.parents.some((parent) => /^@media[^{]*(pointer:\s*coarse)/.test(parent)))
+          continue;
+        for (const { prop, value } of rule.decls) {
+          if (
+            /^(--field-text|--field-lh)$/.test(prop) ||
+            (/^(font-size|line-height|font)$/.test(prop) &&
+              /-text-size|--field-(text|lh)/.test(value))
+          ) {
+            offenders.push(`${file} ${rule.selector} ${prop}`);
+          }
+        }
+      }
     }
+    expect(offenders).toEqual([]);
   });
 
   it("grows small hit areas to the touch target on coarse pointers", () => {
@@ -155,16 +140,7 @@ const VIEWPORT_QUERY_FILES = new Set([
   "src/components/command-menu/CommandMenu.module.css",
   "src/components/media-viewer/MediaViewer.module.css",
   "src/components/notification/Notification.module.css",
-  // The touch text size of editable fields and the menu rows under the same query.
-  "src/internal/fieldTier.module.css",
-  "src/internal/menu.module.css",
   "src/components/datepicker/Datepicker.module.css",
-]);
-
-/** The touch text token: the field tier and the dense pickers that grow under the same query. */
-const TOUCH_TEXT_FILES = new Set([
-  "src/internal/fieldTier.module.css",
-  "src/internal/menu.module.css",
 ]);
 
 /** TS that may read a media query: the hook and the reduced-motion check of presence. */
@@ -197,15 +173,6 @@ describe("touch rules", () => {
         );
         if (hover && moves && !rule.parents.some((parent) => /\(pointer:\s*fine\)/.test(parent))) {
           offenders.push(`${file}: hover transform without (pointer: fine)`);
-        }
-        for (const decl of rule.decls) {
-          if (
-            own &&
-            /--prime-control-touch-text-size/.test(decl.value) &&
-            !TOUCH_TEXT_FILES.has(own)
-          ) {
-            offenders.push(`${file}: touch text token outside the field tier`);
-          }
         }
       }
       if (own && !VIEWPORT_QUERY_FILES.has(own)) {

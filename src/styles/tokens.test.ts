@@ -239,8 +239,12 @@ describe("generated token styles", () => {
       expect(value, name).toBeDefined();
       expect(px(value ?? ""), name).toBeGreaterThan(px(desktop.get(name) ?? ""));
     }
-    // Editable text keeps its own 16px rule: the touch step never reaches it.
-    expect(touch.has("--prime-control-touch-text-size")).toBe(false);
+    // Control text is one size per tier on touch: m 16, l and xl 17, s 14, xs 12 (no separate field floor).
+    expect(touch.get("--prime-control-m-text-size")).toBe("var(--prime-ref-font-size-16)");
+    expect(touch.get("--prime-control-m-line-height")).toBe("var(--prime-ref-font-line-height-24)");
+    for (const t of ["l", "xl"])
+      expect(touch.get(`--prime-control-${t}-text-size`)).toBe("var(--prime-ref-font-size-17)");
+    expect(touch.has("--prime-control-xs-text-size")).toBe(false);
     for (const [name, value] of touch) {
       if (
         /^--prime-(switch-\w+-(width|height|thumb)|control-\w+-(icon|choice|thumb)|badge-\w+-icon)$/.test(

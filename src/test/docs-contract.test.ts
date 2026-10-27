@@ -618,7 +618,11 @@ function componentDocOffenders(rel: string, dir: string, doc: string, api: Compo
     /\b(?:below|above|under|over|narrower than|wider than|less than|more than|from|up to)\s+(\d{3,4})\s?px\b/gi,
   )) {
     const px = Number(m[1]);
-    const media = [px, px - 1].some((value) => css.includes(`${value}px)`));
+    // A viewport threshold lives in a stylesheet or in the media queries `src/hooks/breakpoints` reads.
+    const media = [px, px - 1].some(
+      (value) =>
+        css.includes(`${value}px)`) || read("src/hooks/breakpoints.ts").includes(`${value}px)`),
+    );
     const container = css.includes(`${px / 16}rem`) || css.includes(`${px}px`);
     const scale = [640, 768, 1024, 1280].includes(px);
     if (!((scale && media) || container)) offenders.push(`${at}: threshold ${px}px`);

@@ -556,7 +556,7 @@ looks at: six modules fit one row, not two. The criteria:
 </Drawer.Footer>
 ```
 
-- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Actions` of its `Card.Footer` (up to two, the primary last) or of its `Card.Header` (neutral actions by [the number of actions](#the-number-of-actions), a value picker; never the primary) — nowhere else in a card, and none on a record row; dialog actions in
+- Placement: every button of the page in one `Page.Actions` — of `Page.TopBar` on a screen of data, of the flow `Page.Header` on a document page — the primary last; card actions in `Card.Actions` of its `Card.Footer` (up to two, the primary last) when the card has a body they apply, or of its `Card.Header` (neutral actions by [the number of actions](#the-number-of-actions), a value picker; the primary too on a card of one line with no body) — nowhere else in a card, and none on a record row; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; actions on the selected rows of a
   table in its selection menu ([controls of a table](#controls-of-a-table)).
 - A dialog footer is the dialog's answer, and it has one shape for every kind of dialog:
@@ -608,7 +608,14 @@ card of the app:
   A button that acts on one block («Найти сети» for the networks card) is never the page's.
 - **A card's applying actions** («Сохранить», «Перезагрузить», «Обновить прошивку») →
   `Card.Actions` of its `Card.Footer`, at the end edge, the primary last — never in `Card.Body`,
-  never at the start of a row.
+  never at the start of a row. The footer is for a card that has a body (fields, a list, rows)
+  the action applies: it ends what is read above it.
+- **A card of one line** — a title, a description and one or two actions that fit its header line,
+  with no `Card.Body` (a password with its reset link, a linked account with «Привязать», a done
+  tile with «Выполнено») — keeps its actions in the `Card.Actions` of its `Card.Header`, the
+  primary included, and has no footer: a footer would grow the card by a row for one button. When
+  the title, description and actions no longer fit one line, or the card gets a body, the action
+  moves to the footer.
 - **A helper of one block** (find, refresh, «⋯» with the block's rare actions) → `Card.Actions` of
   its `Card.Header`, at the header's end.
 - **Unrelated groups are two cards.** A card whose actions fall into groups that act on different
@@ -627,6 +634,34 @@ card of the app:
   <Card.Body>
     <Button.Root variant="soft" tone="neutral">Перезагрузить</Button.Root>
   </Card.Body>
+</Card.Root>
+```
+
+```tsx partial
+// bad — a one-line card grown by a row: its only button sent to a footer
+<Card.Root>
+  <Card.Header>
+    <Card.Title as="h2">Пароль</Card.Title>
+    <Card.Description>Ссылка для сброса придёт на почту</Card.Description>
+  </Card.Header>
+  <Card.Footer>
+    <Card.Actions>
+      <Button.Root variant="soft" tone="neutral">Сбросить пароль</Button.Root>
+    </Card.Actions>
+  </Card.Footer>
+</Card.Root>
+```
+
+```tsx good
+// good — title, description and the one action stand on one line, no footer
+<Card.Root>
+  <Card.Header>
+    <Card.Title as="h2">Пароль</Card.Title>
+    <Card.Description>Ссылка для сброса придёт на почту</Card.Description>
+    <Card.Actions>
+      <Button.Root variant="soft" tone="neutral">Сбросить пароль</Button.Root>
+    </Card.Actions>
+  </Card.Header>
 </Card.Root>
 ```
 

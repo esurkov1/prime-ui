@@ -16,11 +16,8 @@ export const fieldLabelTextClass = tier.labelText;
 /** Support row text of the tier (Hint, the character counter); joined next to `fieldTierClass`. */
 export const fieldHintTextClass = tier.hintText;
 
-/**
- * An editable value of the tier: at least 16px on touch screens and narrow viewports (iOS zooms
- * into smaller text). Inside an element with `fieldTierClass`.
- */
-export const fieldInputTextClass = tier.inputText;
+/** The control text of the tier (a search row, a channel cell); inside an element with `fieldTierClass`. */
+export const fieldTextClass = tier.controlText;
 
 /** A cell of a one-time code (DigitInput): the `--field-code` square and its corner. */
 export const fieldCodeCellClass = tier.codeCell;

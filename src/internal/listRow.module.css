@@ -385,7 +385,8 @@
   flex: none;
   align-items: center;
   gap: var(--prime-space-1);
-  padding-inline: var(--field-gap) var(--field-px);
+  /* Public hook: `--list-row-end` — the padding after the controls (a List of static rows: 0). */
+  padding-inline: var(--field-gap) var(--list-row-end, var(--field-px));
 }
 
 .row[data-lines="two"] > .actions {

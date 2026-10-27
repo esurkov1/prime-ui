@@ -8,7 +8,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useDisabledControl, useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
-import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { fieldSurfaceClass, fieldTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
@@ -131,7 +131,7 @@ export function NativeSelect({
           aria-busy={busy || undefined}
           value={changes.shown}
           defaultValue={changes.shown === undefined ? initial : undefined}
-          className={cx(fieldSurfaceClass, fieldInputTextClass, styles.select)}
+          className={cx(fieldSurfaceClass, fieldTextClass, styles.select)}
           onChange={onSelectChange}
           {...toDataAttributes({
             size,

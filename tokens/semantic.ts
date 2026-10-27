@@ -734,8 +734,6 @@ export const semanticTokens = {
      * to it (WCAG 2.5.5); the visual size stays the tier's.
      */
     touchTarget: "2.75rem",
-    /** Touch screens and narrow viewports: the least text size of an editable value (iOS zoom). */
-    touchTextSize: "{font.size.16}",
   },
 
   /** Badge / Kbd tiers. Inside a control of tier T use the badge tier one step down. */

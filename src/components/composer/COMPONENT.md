@@ -234,7 +234,7 @@ Motion: the tray comes and goes as a Crossfade (a fade at its own height, the ro
 - The field grows from one line to eight and then scrolls inside; its padding centres one line exactly like an Input of the tier.
 - The composer takes its container's width and works on the narrowest phone (320 px); it is a size container, the round video preview is `--prime-message-video-note` wide, at most 70% of its width, and needs that room above the composer (a chat history gives it).
 - The recording bar covers the paperclip and the field, so entering and leaving a recording never changes the row height; its waveform takes all the width between the timer and the send button, as tall as the button minus `--prime-space-2`, in VoicePlayer's bar geometry.
-- On touch the editable text is at least 16 px (no iOS zoom) and every button has the 44 px hit area.
+- On touch the text is the tier's (16 px at `m`) and every button has the 44 px hit area.
 - The formatting toolbar floats above the field's start edge on the floating layer, over whatever is above the composer.
 - The reply keyboard (`Composer.Keyboard`) stands under the row, `--prime-space-2` below it inside the fold (a closed keyboard takes no room), rows and keys `--prime-space-1` apart. A row is one line, as in Telegram: its keys share it equally (`fullWidth` soft Buttons at the host tier), a label longer than its share ellipsizes. The keyboard is as tall as its rows — Telegram's `resize_keyboard` is always on: a web page has no system keyboard height to match. A key with `icon` puts it before its label (`Button.Icon`); `tone` maps Telegram's button `style` (`primary` → `accent`, `success`, `danger`). The toggle stands before the send button with `--prime-space-1` between them.
 

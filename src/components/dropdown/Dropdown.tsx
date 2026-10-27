@@ -22,7 +22,7 @@ import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { fieldInputTextClass, fieldTierClass } from "@/internal/fieldClasses";
+import { fieldTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { HeaderLineContent } from "@/internal/headerRow";
 import { InteractiveElement } from "@/internal/interactiveElement";
@@ -426,7 +426,7 @@ function DropdownSearch({
   };
 
   return (
-    <div className={cx(menu.searchRow, menu.panelSearch, fieldInputTextClass)}>
+    <div className={cx(menu.searchRow, menu.panelSearch, fieldTextClass)}>
       <Search size="s" />
       <input
         {...rest}

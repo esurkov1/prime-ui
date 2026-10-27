@@ -121,9 +121,12 @@ screen that moves one elsewhere reads as built by hand.
 
 - **Status and role are `Card.Badges`, after the title on its line** — one container for every
   badge of the record, never under the title and never at the right beside the buttons.
-- **The header holds no accent button.** It holds neutral actions by
-  [the number of actions](composition.md#the-number-of-actions) and at most one value picker; the
-  accent action is the last button of the footer.
+- **A card with a body keeps its accent button in the footer.** The header holds neutral actions
+  by [the number of actions](composition.md#the-number-of-actions) and at most one value picker;
+  the action that applies the body (fields, a list, a set of rows) is the last button of the
+  footer. **A card of one line** — a title, a description and one or two actions with no
+  `Card.Body` — has no footer: its action, accent included, is in the header's `Card.Actions`
+  ([an action stands with what it acts on](composition.md#an-action-stands-with-what-it-acts-on)).
 - **A picker of a person or a status is a `Select` as tall as the buttons**, in `Card.Actions` or
   at the start of `Card.Footer` (both give their controls the buttons' tier) — never a Badge chip
   that opens a menu. A card has no `Fields` row: its header holds one picker at the controls' tier,
@@ -676,15 +679,24 @@ A setting lives with what it governs, as a field of the form that already holds 
 
 ## 11. One fact, one place
 
-Every value the product knows stands in one place on a screen and has one home in the app, and
-every action has one way in sight. A second place for the same fact makes a person compare the two
-and wonder which one is true; a second way of the same action makes them choose between equals.
-Before adding a block, a line or a control, look for its value or its action on the screen: shown
-already → no new place.
+Every block, summary and action stands in one place on a screen, and every value has one home in
+the app. A second block that re-renders the first makes a person compare the two and wonder which
+one is true; a second way of the same action makes them choose between equals. Before adding a
+block, a line or a control, look for it on the screen: a block that shows the same content, or a
+way of the same action, is there already → no new place.
 
-- **A summary holds what the page does not.** A status popover, the page's `Page.Description`, a
-  side block sum up what is off this page; what the page shows in a block of its own (the video
-  stream, the network that is connected) stays out of the summary, and no card repeats a popover.
+What the rule forbids is a repeated **block or summary**: content drawn twice (a card that repeats
+a popover, a side block that restates a list) or a value that answers the same question twice. A
+short figure shown twice is not a repeat when the two places answer different questions and
+neither is a block re-drawing the other: a **switcher's count** (`SegmentedControl.Count`,
+`Tabs.Count`) helps choose a segment, the **page's line of data** (`Page.Description`) says what
+the whole page holds. The figure may stand in both; each is read at a different moment, and a
+person never compares them as two sources.
+
+- **A summary block holds what the page does not.** A status popover or a side block sums up what
+  is off this page; what the page shows in a block of its own (the video stream, the network that
+  is connected) stays out of the summary, and no card repeats a popover. The page's `Page.Description`
+  is a line of data, not such a block: it may carry the figures the page's own switcher counts.
 - **A setting shows its live value in its own `hint`.** The measured value of what a control sets
   (the real frame rate under «Частота кадров», the real resolution under the module's size) is
   that control's `hint` («Сейчас 60 к/с»), never a row of its own beside it. A row of its own only
@@ -693,6 +705,10 @@ already → no new place.
 - **A set edited as a list has no count field.** When people add, remove and reorder the items
   (modules, lines, stages), the list is the count: no «Количество» beside it, no stepper that
   grows the list.
+- **A count on a switcher and the page's line of data may state the same figure.** The count
+  belongs to its segment and stays on every segment that has one; the description of the heading
+  names the whole page. What is repeated is never a block: no «Сводка» card, no row of Kpi cards
+  and no side list that draws the same totals a third time.
 - **One action, one way in sight.** Where the system finds things itself (devices on the network,
   printers), the manual path (an address field with «+») never stands beside the automatic one: it
   waits in the block's «⋯» menu or in the empty state («Добавить по IP»), and only when the
@@ -770,4 +786,45 @@ already → no new place.
     </Button.Root>
   </EmptyPage.Actions>
 </EmptyPage.Root>
+```
+
+```tsx partial
+// bad — the totals drawn a third time as a block of their own beside the heading and the segments
+<Page.Description>12 сотрудников · 3 роли</Page.Description>
+…
+<SegmentedControl.Item value="people">
+  <SegmentedControl.Label>Сотрудники</SegmentedControl.Label>
+  <SegmentedControl.Count>12</SegmentedControl.Count>
+</SegmentedControl.Item>
+…
+<Card.Root>
+  <Card.Body>
+    <DescriptionList.Root align="end">
+      <DescriptionList.Item label="Сотрудников">12</DescriptionList.Item>
+      <DescriptionList.Item label="Ролей">3</DescriptionList.Item>
+    </DescriptionList.Root>
+  </Card.Body>
+</Card.Root>
+```
+
+```tsx good
+// good — the heading's line names the page, each segment counts its own list, no block repeats them
+<Page.TopBar>
+  <Page.Heading>
+    <Page.Title>Команда и роли</Page.Title>
+    <Page.Description>12 сотрудников · 3 роли</Page.Description>
+  </Page.Heading>
+  <Page.Tools aria-label="Разделы">
+    <SegmentedControl.Root defaultValue="people" aria-label="Раздел">
+      <SegmentedControl.Item value="people">
+        <SegmentedControl.Label>Сотрудники</SegmentedControl.Label>
+        <SegmentedControl.Count>12</SegmentedControl.Count>
+      </SegmentedControl.Item>
+      <SegmentedControl.Item value="roles">
+        <SegmentedControl.Label>Роли</SegmentedControl.Label>
+        <SegmentedControl.Count>3</SegmentedControl.Count>
+      </SegmentedControl.Item>
+    </SegmentedControl.Root>
+  </Page.Tools>
+</Page.TopBar>
 ```

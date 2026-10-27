@@ -81,9 +81,9 @@
   background: transparent;
   color: inherit;
   font: inherit;
-  /* The typed text: 16px on touch, or iOS zooms into the field (the chips keep the tier text). */
-  font-size: var(--field-input-text);
-  line-height: var(--field-input-lh);
+  /* The typed text: the tier text, like the chips. */
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   outline: none;
 }
 

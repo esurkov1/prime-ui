@@ -281,7 +281,6 @@
   --prime-control-s-thumb: 0.9375rem;
   --prime-control-s-track: 0.3125rem;
   --prime-control-touch-target: 2.75rem;
-  --prime-control-touch-text-size: var(--prime-ref-font-size-16);
   --prime-control-xl-choice: var(--prime-ref-icon-24);
   --prime-control-xl-field-padding-x: var(--prime-ref-space-4);
   --prime-control-xl-gap: var(--prime-ref-space-3);
@@ -622,11 +621,13 @@
     --prime-control-l-hint-size: var(--prime-ref-font-size-14);
     --prime-control-l-icon: 1.375rem;
     --prime-control-l-label-size: var(--prime-ref-font-size-15);
+    --prime-control-l-text-size: var(--prime-ref-font-size-17);
     --prime-control-l-thumb: 2rem;
     --prime-control-m-choice: 1.25rem;
     --prime-control-m-icon: 1.125rem;
     --prime-control-m-label-size: var(--prime-ref-font-size-14);
-    --prime-control-m-text-size: var(--prime-ref-font-size-15);
+    --prime-control-m-line-height: var(--prime-ref-font-line-height-24);
+    --prime-control-m-text-size: var(--prime-ref-font-size-16);
     --prime-control-m-thumb: 1.75rem;
     --prime-control-s-choice: 1.125rem;
     --prime-control-s-icon: 1.125rem;
@@ -636,6 +637,7 @@
     --prime-control-xl-hint-size: var(--prime-ref-font-size-14);
     --prime-control-xl-icon: 1.375rem;
     --prime-control-xl-label-size: var(--prime-ref-font-size-15);
+    --prime-control-xl-text-size: var(--prime-ref-font-size-17);
     --prime-control-xl-thumb: 2.25rem;
     --prime-control-xs-choice: 1rem;
     --prime-control-xs-icon: 1rem;

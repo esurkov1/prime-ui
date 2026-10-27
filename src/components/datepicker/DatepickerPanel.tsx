@@ -15,7 +15,7 @@ import { AUTOFILL_OFF } from "@/internal/autofill";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { NativeButton } from "@/internal/disabledContext";
-import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { fieldSurfaceClass, fieldTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import listRowStyles from "@/internal/listRow.module.css";
 import { menuRowProps, menuRowTier } from "@/internal/MenuGroup";
@@ -930,7 +930,7 @@ function FooterField({
         <input
           aria-label={timeLabel}
           aria-invalid={invalid || undefined}
-          className={cx(fieldInputTextClass, styles.fieldTime)}
+          className={cx(fieldTextClass, styles.fieldTime)}
           value={time}
           inputMode="numeric"
           {...AUTOFILL_OFF}

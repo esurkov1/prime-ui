@@ -812,6 +812,28 @@
         "No Input, Select or Switch stands directly in Card.Body beside a Fieldset",
         "Short related fields (Дом, Индекс) are paired in a nested Fieldset layout=\"pair\", not in a grid of the screen's own"
       ]
+    },
+    {
+      "id": 66,
+      "prompt": "Страница «Команда и роли» на prime-ui-kit: заголовок с числом сотрудников и ролей, переключатель разделов «Сотрудники» (12) и «Роли» (3), под ним таблица текущего раздела. Собери экран.",
+      "expected_output": "A Page.Root with Page.TopBar: Page.Title «Команда и роли», Page.Description with the totals («12 сотрудников · 3 роли»), Page.Tools with a SegmentedControl whose items carry SegmentedControl.Count 12 and 3; the same figures stand in the description and on the segments, and no summary block repeats them.",
+      "files": [],
+      "expectations": [
+        "The segments keep their SegmentedControl.Count (12 and 3) and Page.Description also states the totals: the repeat of a figure between a switcher's counter and the page's data line is not removed",
+        "No summary Card, Kpi row or DescriptionList draws the staff and role totals a third time",
+        "The count is not replaced by a separate text beside the switcher"
+      ]
+    },
+    {
+      "id": 67,
+      "prompt": "Страница профиля на prime-ui-kit: карточка «Безопасность» (описание «Ссылка для сброса придёт на почту», одна кнопка «Сбросить пароль») и карточка «Telegram» с кнопкой «Привязать». Собери две карточки.",
+      "expected_output": "Two one-line Card.Root: Card.Header with Card.Title, Card.Description and the single button in Card.Actions of the header; no Card.Body and no Card.Footer.",
+      "files": [],
+      "expectations": [
+        "Each card is only a Card.Header: Card.Title, Card.Description and the button in Card.Actions on the same line",
+        "Neither card has a Card.Footer or Card.Body for the single button",
+        "A card that did hold fields (a form with «Сохранить») would keep its button in Card.Footer — the one-line cards are not moved there"
+      ]
     }
   ]
 }

@@ -415,8 +415,7 @@
   color: var(--prime-color-text-placeholder);
 }
 
-/* The time text is the tier's editable text (`fieldInputTextClass`: 16px on touch, so iOS does
-   not zoom); the cell keeps `00:00` whole at any text size. */
+/* The time text is the tier's control text (`fieldTextClass`); the cell keeps `00:00` whole at any text size. */
 .fieldTime {
   box-sizing: border-box;
   flex-shrink: 0;
