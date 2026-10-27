@@ -1,5 +1,5 @@
 /**
- * Text has one home per concern (CLAUDE.md §2): a text role (size, line height, weight, tracking)
+ * Text has one home per concern (AGENTS.md §2): a text role (size, line height, weight, tracking)
  * comes from `src/internal/textRole.module.css` (or Typography), a text tone from
  * `src/internal/textTone.module.css`. A component never reads a role's `-tracking` / `-weight`
  * token itself, and never maps `[data-tone]` to a color of its own.

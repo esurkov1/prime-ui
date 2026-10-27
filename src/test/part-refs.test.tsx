@@ -1,5 +1,5 @@
 /**
- * Every part that renders DOM takes `ref` (CLAUDE.md §1), and its `api.ts` says where it lands.
+ * Every part that renders DOM takes `ref` (AGENTS.md §1), and its `api.ts` says where it lands.
  *
  * Compile time (tsc runs this file): `part-refs.generated.ts` holds the ref line of every
  * `api.ts` part (`bun run docs:build`). Each entry must be an exported part whose props take a

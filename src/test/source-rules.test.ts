@@ -1,6 +1,6 @@
 // @vitest-environment node
 /**
- * Mechanical rules of CLAUDE.md over the TypeScript sources (CLAUDE.md §1, §2, core decisions 5
+ * Mechanical rules of AGENTS.md over the TypeScript sources (AGENTS.md §1, §2, core decisions 5
  * and 11 of the fix plan):
  * - a size mapping (`Record<ControlSize, ControlSize>`) lives only in `src/internal/states.ts`;
  * - a sized root takes its default from the host tier, never a literal `size = "m"`;
@@ -29,7 +29,7 @@ function matches(file: string, text: string, pattern: RegExp, rule: string): str
 }
 
 describe("source rules", () => {
-  it("TypeScript sources follow the mechanical rules of CLAUDE.md", () => {
+  it("TypeScript sources follow the mechanical rules of AGENTS.md", () => {
     const offenders: string[] = [];
     for (const file of sources) {
       const text = read(file);

@@ -1,5 +1,5 @@
 /**
- * State that assistive tech reads is state a person sees (CLAUDE.md, never by color alone and
+ * State that assistive tech reads is state a person sees (AGENTS.md, never by color alone and
  * styled only from `data-*` and ARIA): a component that sets `data-pressed`, `aria-pressed` or
  * `aria-current` has a CSS selector for it (in its own stylesheets or the internal ones it uses),
  * and a list styled `list-style: none` keeps its list semantics with `role="list"` (WebKit drops

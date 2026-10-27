@@ -1,5 +1,5 @@
 /**
- * Shared recipes have one home (CLAUDE.md §2):
+ * Shared recipes have one home (AGENTS.md §2):
  * - the control tier tokens of a size (`--prime-control-xs|s|l|xl-*`) are mapped once, in
  *   `src/internal/fieldTier.module.css`; everything else reads the tier variables it sets;
  * - the visually-hidden clip (`clip-path: inset(50%)`) is `src/components/visually-hidden/VisuallyHidden`;

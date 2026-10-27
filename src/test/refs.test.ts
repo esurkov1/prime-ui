@@ -5,7 +5,7 @@
  * - `bun run <script>` — the script is in package.json (or the file exists);
  * - a backticked repository path (`src/internal/touchTarget`, `scripts/build-docs.ts`) exists;
  * - a comment of an examples stylesheet that names `<file>.tsx` heads a class that file uses;
- * - every module of `src/internal` is in the repository map of CLAUDE.md (§9);
+ * - every module of `src/internal` is in the repository map of AGENTS.md (§9);
  * - the motion token table of foundation §7 has every motion token, with its generated value.
  */
 import fs from "node:fs";
@@ -26,7 +26,7 @@ function foundationSection(n: string): string {
 
 /** Docs and sources whose references must resolve. */
 const DOCS = [
-  "CLAUDE.md",
+  "AGENTS.md",
   "README.md",
   "llms.txt",
   ...walk("SKILL", /\.md$/),
@@ -123,8 +123,8 @@ describe("references resolve", () => {
     expect(offenders, "refs-example-css").toEqual([]);
   });
 
-  it("every internal module is in the CLAUDE.md repository map", () => {
-    const map = read("CLAUDE.md").split(/^## 9\. Repository map/m)[1] ?? "";
+  it("every internal module is in the AGENTS.md repository map", () => {
+    const map = read("AGENTS.md").split(/^## 9\. Repository map/m)[1] ?? "";
     const names = new Set(
       fs
         .readdirSync(path.join(root, "src/internal"))
@@ -133,7 +133,7 @@ describe("references resolve", () => {
     );
     const missing = [...names].filter((name) => !new RegExp(`\\b${name}\\b`).test(map));
     expect(
-      missing.map((name) => `CLAUDE.md §9: src/internal/${name}`),
+      missing.map((name) => `AGENTS.md §9: src/internal/${name}`),
       "refs-internal-map",
     ).toEqual([]);
   });

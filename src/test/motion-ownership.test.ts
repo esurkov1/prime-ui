@@ -1,6 +1,6 @@
 // @vitest-environment node
 /**
- * Motion is owned by the component that knows what changed (foundation §7, CLAUDE.md
+ * Motion is owned by the component that knows what changed (foundation §7, AGENTS.md
  * Conventions «Motion is owned»). Mechanical guards over the TypeScript sources:
  *
  * - Every copy of a rendered node is a still copy: `cloneNode` lives only in

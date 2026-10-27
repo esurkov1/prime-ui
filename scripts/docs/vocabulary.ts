@@ -1,5 +1,5 @@
 /**
- * The API vocabulary of the kit (CLAUDE.md §1, foundation §10) as data, so the docs contract can
+ * The API vocabulary of the kit (AGENTS.md §1, foundation §10) as data, so the docs contract can
  * check every `api.ts` against it: one name per concept. A name listed under `RENAMED` is the old
  * name of a concept with its one canonical name; an event prop must be a triad callback
  * (`onXChange`), a native DOM event, or one of `EVENTS`.
@@ -29,7 +29,7 @@ export const RENAMED = {
 
 /**
  * A literal union holding `multiple` is a selection mode spelled as an enum: one vs many is the
- * `multiple?: boolean` flag (CLAUDE.md §1, selection mode). A `mode` that is
+ * `multiple?: boolean` flag (AGENTS.md §1, selection mode). A `mode` that is
  * structurally different (Datepicker `single | range`) holds no `multiple`.
  */
 export const SELECTION_MODE_VALUE = "multiple";
@@ -37,7 +37,7 @@ export const SELECTION_MODE_VALUE = "multiple";
 /** `Part.prop` names the rules above would rename, kept on purpose — each with its reason. */
 export const KEPT: Record<string, string> = {
   "NotificationCard.icon":
-    "the static rendering of a `notify()` record, whose `icon` is data (CLAUDE.md §1 icons)",
+    "the static rendering of a `notify()` record, whose `icon` is data (AGENTS.md §1 icons)",
 };
 
 /** Event props beyond the triads (`onXChange`) and native DOM events, each with one meaning. */

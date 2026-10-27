@@ -342,7 +342,7 @@ function iconVerbOffenders(file: string, source: string): string[] {
 }
 
 /**
- * Scenarios that break the kit's own rules (CLAUDE.md §2, SKILL/ux.md), as offender ids for the
+ * Scenarios that break the kit's own rules (AGENTS.md §2, SKILL/ux.md), as offender ids for the
  * `example-content` guard.
  */
 function contentOffenders(dir: string, file: string, source: string): string[] {

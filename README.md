@@ -438,7 +438,7 @@ bun run playground:dev   # docs site with every component and scenario
 bun run verify           # biome, typecheck, tests (incl. docs contract), build (with the skill)
 ```
 
-Contributor rules: [`CLAUDE.md`](https://github.com/esurkov1/prime-ui/blob/main/CLAUDE.md). A change to a component updates
+Contributor rules: [`AGENTS.md`](https://github.com/esurkov1/prime-ui/blob/main/AGENTS.md). A change to a component updates
 its code, tests, examples, playground section and `COMPONENT.md` together; the docs-contract test
 keeps them in sync.
 
