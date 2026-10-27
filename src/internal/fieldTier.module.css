@@ -57,6 +57,16 @@
 }
 
 /*
+ * Typing (foundation §7): a field whose input / textarea has focus fills with the surface's own
+ * colour (fieldSurface), so its ring is its edge and shows whatever the app-wide switch says — the
+ * switch hides the rings of controls that take no typing. Zero specificity: a host with its own
+ * indicator (Composer's caret, DigitInput's cells) sets the width on its own root and wins.
+ */
+:where(.tier:has(:is(input, textarea):focus-visible)) {
+  --prime-focus-ring-width: var(--prime-focus-width);
+}
+
+/*
  * Touch screens and narrow viewports: iOS zooms the page into any focused field whose text is
  * under 16px. The editable value takes at least the touch text size (16px) and the `m` line
  * height; the control height stays the tier height.

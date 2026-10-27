@@ -173,8 +173,8 @@ the screen with space and headings instead.
 `fill.strong`), which read on any color. Translucent fills are otherwise only for states: row and
 ghost hover, checkbox and switch tracks.
 
-Fields: `background: var(--prime-color-field-bg)`, hover `--prime-color-field-bg-hover`, focus
-`--prime-color-field-bg-focus` plus the focus ring, error a `--prime-color-danger-border` 1px inset ring
+Fields: `background: var(--prime-color-field-bg)`, hover `--prime-color-field-bg-hover`, focus while typing
+`--prime-color-field-bg-focus` plus the focus ring (a picker trigger keeps its fill), error a `--prime-color-danger-border` 1px inset ring
 (`box-shadow: inset 0 0 0 1px …`) and danger text below.
 
 **Every bounded block must be visible on its host (hard rule).** A block with edges (table, card, panel, code block,
@@ -276,8 +276,9 @@ The focus ring switch — one parameter for the whole kit: every ring is drawn
 ring shows. An app shows the rings by setting `data-focus-ring="visible"` on `<html>` (or on any
 wrapper, for one part of a page). It is a width, not a colour: nested `data-theme` wrappers and a
 host that recolours its ring keep working. Focus itself, `:focus-visible`, the tab order and roving
-focus never change; the focus fill of a field (`--prime-color-field-bg-focus`) and the danger ring of
-an invalid field are no focus ring and always show. `data-focus-quiet` (focus given back to a
+focus never change. The switch covers controls that take no typing: a field a person types into
+(its input or textarea has focus) takes the surface's own colour as its focus fill, so its ring is
+its edge and always shows; the danger ring of an invalid field always shows too. `data-focus-quiet` (focus given back to a
 control a pointer used) sets the width to zero until the next key. No component takes a ring prop of
 its own. The docs site turns the rings on.
 

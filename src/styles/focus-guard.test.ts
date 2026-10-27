@@ -114,6 +114,11 @@ describe("focus ring switch", () => {
     "src/components/media-viewer/MediaViewer.module.css": "the ring of the current thumbnail",
     "src/components/color-picker/ColorPicker.module.css": "the border of the colour thumb",
   };
+  /** The one place the switch is turned on: a field a person types into always shows its ring. */
+  const TYPING_RING = {
+    file: "src/internal/fieldTier.module.css",
+    decl: "--prime-focus-ring-width: var(--prime-focus-width)",
+  };
 
   it('hides every ring by default and shows it under data-focus-ring="visible"', () => {
     const globals = "src/styles/globals.css";
@@ -142,6 +147,7 @@ describe("focus ring switch", () => {
   it("draws every ring with the switch width", () => {
     const offenders: string[] = [];
     const used = new Set<string>();
+    let typingRing = false;
     for (const file of moduleCssFiles()) {
       for (const rule of cssRules(file)) {
         const focus = /:focus/.test([...rule.parents, rule.selector].join(" "));
@@ -149,6 +155,10 @@ describe("focus ring switch", () => {
           const at = `${file}:${line} ${prop}: ${value}`;
           const ringColour = value.includes("--prime-color-focus-ring");
           if (value.includes("--prime-focus-width")) {
+            if (file === TYPING_RING.file && `${prop}: ${value}` === TYPING_RING.decl) {
+              typingRing = true;
+              continue;
+            }
             if (NOT_A_RING[file] && !focus && !ringColour) used.add(file);
             else offenders.push(`${at} — draw it var(--prime-focus-ring-width) wide`);
             continue;
@@ -162,6 +172,7 @@ describe("focus ring switch", () => {
       }
     }
     expect(offenders).toEqual([]);
+    expect(typingRing).toBe(true);
     expect(Object.keys(NOT_A_RING).filter((file) => !used.has(file))).toEqual([]);
   });
 

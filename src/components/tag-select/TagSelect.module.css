@@ -59,12 +59,6 @@
   padding-inline-start: calc(var(--field-px) - var(--prime-space-1));
 }
 
-/* Focus on a chip action keeps the focus fill too (the surface reacts to the input only). */
-.control:focus-within:not([data-disabled="true"]),
-.control[data-state="open"] {
-  background: var(--prime-color-field-bg-focus);
-}
-
 /* The chip row (a ScrollContainer): padded by the focus space so chip rings are never cut (§7 a);
    the negative margin keeps the chips where they were. At rest it clips to one row. */
 .control .chips {

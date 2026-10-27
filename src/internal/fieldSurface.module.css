@@ -43,7 +43,10 @@
   }
 }
 
-.surface:is(:focus-visible, :has(:is(input, textarea):focus-visible)) {
+/* Typing into the box (its own input / textarea, or one inside): the focus fill — the surface's
+   own colour, so the ring is the field's only edge and always shows there (fieldTier.module.css).
+   A box a person only presses (a picker trigger) keeps its fill: its ring follows the switch. */
+.surface:is(:is(input, textarea):focus-visible, :has(:is(input, textarea):focus-visible)) {
   background: var(--prime-color-field-bg-focus);
 }
 
