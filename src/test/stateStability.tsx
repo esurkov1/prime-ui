@@ -19,6 +19,7 @@
  * The props reach the parts without editing an example: the JSX runtime is wrapped, and every
  * element of a part under test takes the flipped prop, a ref that records its node and, under a
  * tooltip, a `Tooltip.Root` around it. A new component is covered by its `api.ts` and examples.
+ * The test files `state-stability.<n>.test.tsx` each run one part (`describeStateStability`).
  */
 import { act, cleanup, render } from "@testing-library/react";
 import * as React from "react";
@@ -481,26 +482,37 @@ beforeEach(() => {
   }
 });
 
-describe("a state change moves in place, it never remounts", () => {
-  it.each(componentDirs())("$rel", async ({ base, dir, rel }) => {
-    const api = apis[`../${base}/${dir}/api.ts`]?.api;
-    expect(api, `${rel}: api.ts`).toBeDefined();
-    const subjects = subjectsOf(api as ComponentApi);
-    const offenders: string[] = [];
-    const prefix = `../${base}/${dir}/examples/`;
-    for (const [key, load] of Object.entries(examples)) {
-      if (!key.startsWith(prefix)) continue;
-      const file = `${rel}/examples/${key.slice(prefix.length)}`;
-      const { default: Example } = await load();
-      const elementParts = new Set<unknown>();
-      for (const context of CONTEXTS) {
-        offenders.push(...(await checkExample(file, Example, subjects, context, elementParts)));
+/**
+ * Runs the guard on one part of the components (every `parts`-th from `part`): the parts are
+ * separate test files, so the guard runs in parallel across workers and CI shards.
+ */
+export function describeStateStability(part: number, parts: number) {
+  const dirs = componentDirs().filter((_, index) => index % parts === part);
+  describe("a state change moves in place, it never remounts", () => {
+    it.each(dirs)("$rel", async ({ base, dir, rel }) => {
+      const api = apis[`../${base}/${dir}/api.ts`]?.api;
+      expect(api, `${rel}: api.ts`).toBeDefined();
+      const subjects = subjectsOf(api as ComponentApi);
+      const offenders: string[] = [];
+      const prefix = `../${base}/${dir}/examples/`;
+      for (const [key, load] of Object.entries(examples)) {
+        if (!key.startsWith(prefix)) continue;
+        const file = `${rel}/examples/${key.slice(prefix.length)}`;
+        const { default: Example } = await load();
+        const elementParts = new Set<unknown>();
+        for (const context of CONTEXTS) {
+          offenders.push(...(await checkExample(file, Example, subjects, context, elementParts)));
+        }
       }
-    }
-    expect(offenders, "state-stability").toEqual([]);
-  }, 120_000);
+      expect(offenders, "state-stability").toEqual([]);
+    }, 120_000);
 
-  it("names only parts that exist in NO_TOOLTIP", () => {
-    expect(Object.keys(NO_TOOLTIP).filter((part) => resolvePart(part) === undefined)).toEqual([]);
+    if (part === 0) {
+      it("names only parts that exist in NO_TOOLTIP", () => {
+        expect(Object.keys(NO_TOOLTIP).filter((name) => resolvePart(name) === undefined)).toEqual(
+          [],
+        );
+      });
+    }
   });
-});
+}

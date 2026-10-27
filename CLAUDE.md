@@ -78,7 +78,7 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
   control renders its native element through `useDisabledControl` / `NativeButton`
   (`src/internal/disabledContext`): native `disabled`, or under a `Tooltip.Trigger` `aria-disabled`
   (no `name` / `required`, press blocked), so the trigger never re-parents it; a disabled `Fieldset`
-  is `aria-disabled` and disables through context only. `src/test/state-stability.test.tsx`.
+  is `aria-disabled` and disables through context only. `src/test/stateStability.tsx`.
 - A11y minimum: every interactive component works from the keyboard, has explicit ARIA, a visible focus
   ring in both themes, never conveys meaning by color alone, and has keyboard tests.
 - Responsive is part of the code (foundation §9, `SKILL/responsive.md`): every component works from
@@ -620,7 +620,7 @@ example, glyph, playground module); `git status` shows only the change being pus
 untracked `kit-gaps.md` / `kit-done.md`). Check with `git ls-files` and `git status --ignored`; keep
 working files in the session scratchpad, never in the tree.
 
-`.github/workflows/ci.yml`: every push to `main` runs `bun run verify`, split into parallel jobs (the checks and the build, the tests in three shards); a release push is preceded by `bun run verify:ci`, the same run on a CI-like machine, so a timing-sensitive test fails locally first; then, if the `package.json`
+`.github/workflows/ci.yml`: every push to `main` runs `bun run verify`, split into parallel jobs (the checks and the build, the tests in four shards); a release push is preceded by `bun run verify:ci`, the same run on a CI-like machine, so a timing-sensitive test fails locally first; then, if the `package.json`
 version is not on npm yet, publishes it. Bump `version` to release (`npm publish` runs `prepublishOnly`: clean + build). `package.json`
 `files` ships `dist` (with the built skill in `dist/skill/`), `bin/` (`prime-ui-kit skill [dir]`,
 Node built-ins only), styles, every `COMPONENT.md` and `examples/**`. Every JS module in `dist/` but a

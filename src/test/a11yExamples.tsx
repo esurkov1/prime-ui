@@ -6,6 +6,7 @@
  *   `aria-activedescendant`, `for`) points at an element in the document.
  * - No `aria-label` sits on a generic element (a `div` / `span` with no role), where it names
  *   nothing.
+ * The test files `a11y-examples.<n>.test.tsx` each run one part (`describeA11yExamples`).
  */
 import { cleanup, render } from "@testing-library/react";
 import { computeAccessibleName, getRole } from "dom-accessibility-api";
@@ -106,24 +107,31 @@ beforeEach(() => {
   }
 });
 
-describe("examples name what assistive tech needs", () => {
-  it.each(componentDirs())("$rel", async ({ base, dir, rel }) => {
-    const offenders: string[] = [];
-    const prefix = `../${base}/${dir}/examples/`;
-    for (const [key, load] of Object.entries(examples)) {
-      if (!key.startsWith(prefix)) continue;
-      const file = `${rel}/examples/${key.slice(prefix.length)}`;
-      const { default: Example } = await load();
-      const { container } = render(
-        React.createElement(
-          MemoryRouter,
-          null,
-          React.createElement(NotificationProvider, null, React.createElement(Example)),
-        ),
-      );
-      offenders.push(...issuesOf(file, container));
-      cleanup();
-    }
-    expect(offenders, "a11y-examples").toEqual([]);
-  }, 60_000);
-});
+/**
+ * Runs the check on one part of the components (every `parts`-th from `part`): the parts are
+ * separate test files, so it runs in parallel across workers and CI shards.
+ */
+export function describeA11yExamples(part: number, parts: number) {
+  const dirs = componentDirs().filter((_, index) => index % parts === part);
+  describe("examples name what assistive tech needs", () => {
+    it.each(dirs)("$rel", async ({ base, dir, rel }) => {
+      const offenders: string[] = [];
+      const prefix = `../${base}/${dir}/examples/`;
+      for (const [key, load] of Object.entries(examples)) {
+        if (!key.startsWith(prefix)) continue;
+        const file = `${rel}/examples/${key.slice(prefix.length)}`;
+        const { default: Example } = await load();
+        const { container } = render(
+          React.createElement(
+            MemoryRouter,
+            null,
+            React.createElement(NotificationProvider, null, React.createElement(Example)),
+          ),
+        );
+        offenders.push(...issuesOf(file, container));
+        cleanup();
+      }
+      expect(offenders, "a11y-examples").toEqual([]);
+    }, 60_000);
+  });
+}

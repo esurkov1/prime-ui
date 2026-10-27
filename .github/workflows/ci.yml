@@ -59,7 +59,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -80,7 +80,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Test
-        run: bunx vitest run --shard=${{ matrix.shard }}/3
+        run: bunx vitest run --shard=${{ matrix.shard }}/4
 
   publish:
     needs: [check, test]
