@@ -1,11 +1,11 @@
 #!/bin/sh
-# `bun run verify` as CI runs it: Linux, the Bun of `packageManager`, two CPUs (a GitHub runner),
+# `bun run verify` as CI runs it: Linux, the Bun of `packageManager`, four CPUs (a GitHub runner of a public repo),
 # a clean install from the lockfile, on a copy of the working tree (uncommitted changes included).
 # A check that passes here passes in CI; timing-sensitive tests fail here the way they fail there.
 set -eu
 cd "$(dirname "$0")/.."
 BUN_VERSION=$(sed -n 's/.*"packageManager": "bun@\([^"]*\)".*/\1/p' package.json)
-exec docker run --rm --cpus=2 -v "$PWD":/src:ro "oven/bun:$BUN_VERSION" sh -c '
+exec docker run --rm --cpus=4 -v "$PWD":/src:ro "oven/bun:$BUN_VERSION" sh -c '
   set -e
   apt-get update -qq >/dev/null && apt-get install -y -qq git >/dev/null
   git config --global --add safe.directory "*"
